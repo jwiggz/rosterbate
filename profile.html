@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RosterBate - Profile Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+  --accent:#f97316;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,rgba(249,115,22,.15) 0%,transparent 60%);pointer-events:none;}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:20px 18px 60px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px;}
+.brand{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
+.brand span{color:var(--accent);}
+.top-actions{display:flex;gap:8px;align-items:center;}
+.btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;}
+.btn.primary{background:var(--accent);color:#fff;}
+.btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btn.danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+.hero{background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(59,130,246,.08));border:1px solid rgba(249,115,22,.22);border-radius:20px;padding:20px;margin-bottom:14px;}
+.hero-title{font-family:var(--fd);font-size:30px;font-weight:900;text-transform:uppercase;line-height:.95;}
+.hero-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-top:8px;max-width:420px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
+.section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:12px;}
+.profile-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.avatar{width:96px;height:96px;border-radius:24px;background:var(--bg3);border:1px solid var(--border);object-fit:cover;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:34px;font-weight:900;color:var(--accent);overflow:hidden;}
+.meta{flex:1;min-width:220px;}
+.display-name{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;}
+.meta-line{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;}
+.field{margin-bottom:12px;}
+.label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:var(--fd);font-weight:700;}
+.input,.textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 13px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;}
+.input:focus,.textarea:focus{border-color:var(--accent);}
+.textarea{min-height:88px;resize:vertical;}
+.help{font-size:11px;color:var(--text3);line-height:1.5;margin-top:6px;}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.preview-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 10px;font-size:11px;color:var(--text2);}
+.status{min-height:18px;font-size:12px;color:var(--text2);margin-top:10px;}
+.status.error{color:#fca5a5;}
+.status.success{color:#86efac;}
+.auth-lock{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
+.auth-lock.open{display:flex;}
+.auth-lock-card{max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;text-align:center;}
+@media (max-width:560px){
+  .split{grid-template-columns:1fr;}
+  .topbar{align-items:flex-start;flex-direction:column;}
+  .top-actions{width:100%;}
+  .top-actions .btn{flex:1;}
+}
+</style>
+</head>
+<body>
+<div id="authLock" class="auth-lock">
+  <div class="auth-lock-card">
+    <div style="font-size:44px;margin-bottom:10px;">Locked</div>
+    <div style="font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;">Sign In Required</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-top:8px;">You need to be signed in to edit your profile.</div>
+    <button class="btn primary" style="margin-top:16px;" onclick="window.location.href='index.html'">Back Home</button>
+  </div>
+</div>
+
+<div id="profileApp" class="wrap" style="display:none;">
+  <div class="topbar">
+    <a href="index.html" class="brand">Roster<span>Bate</span></a>
+    <div class="top-actions">
+      <button class="btn secondary" onclick="window.location.href='index.html'">Home</button>
+      <button class="btn danger" onclick="logoutUser()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-title">Profile Settings</div>
+    <div class="hero-sub">Customize your username and profile picture. GIFs and images both work, and you can upload a file or paste an image URL.</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Account</div>
+    <div class="profile-head">
+      <div id="avatarPreview" class="avatar">RB</div>
+      <div class="meta">
+        <div id="displayName" class="display-name">Manager</div>
+        <div id="memberLine" class="meta-line">Member #—</div>
+        <div id="emailLine" class="meta-line">email@example.com</div>
+        <div id="providerLine" class="meta-line">Signed in with password</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Public Page</div>
+    <div class="help">Every registered user gets a public member page with lifetime league stats.</div>
+    <div class="preview-row" style="margin-top:12px;">
+      <button class="btn secondary" id="viewPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Identity</div>
+    <div class="field">
+      <label class="label" for="usernameInput">Username</label>
+      <input id="usernameInput" class="input" type="text" maxlength="24" placeholder="Your username">
+      <div class="help">This is the public name people will see around the site.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Profile Picture</div>
+    <div class="field">
+      <label class="label" for="avatarUrlInput">Image or GIF URL</label>
+      <input id="avatarUrlInput" class="input" type="url" placeholder="https://example.com/your-gif.gif">
+      <div class="help">Paste a direct image or GIF link if you want an animated profile picture.</div>
+    </div>
+    <div class="field">
+      <label class="label" for="avatarFileInput">Upload Image or GIF</label>
+      <input id="avatarFileInput" class="input" type="file" accept="image/*">
+      <div class="help">Uploads are saved directly to your user profile. Keep files under 350 KB for best results.</div>
+    </div>
+    <div class="preview-row">
+      <button class="btn secondary" onclick="applyAvatarUrl()">Preview URL</button>
+      <button class="btn secondary" onclick="clearAvatar()">Clear Picture</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Save Changes</div>
+    <div class="pill">Email stays tied to your sign-in method</div>
+    <div class="pill">Username can be changed anytime</div>
+    <div class="status" id="saveStatus"></div>
+    <div class="preview-row">
+      <button class="btn primary" onclick="saveProfile()">Save Profile</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
+  authDomain: "rosterbate-51339.firebaseapp.com",
+  databaseURL: "https://rosterbate-51339-default-rtdb.firebaseio.com",
+  projectId: "rosterbate-51339",
+  storageBucket: "rosterbate-51339.firebasestorage.app",
+  messagingSenderId: "951275364572",
+  appId: "1:951275364572:web:758d1b4d970b7b87c05419",
+  measurementId: "G-DNSFKMKYVC"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+let currentUser = null;
+let currentProfile = null;
+let pendingAvatar = '';
+
+function normalizeUsername(value){
+  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+}
+
+function usernameLookupKey(value){
+  return encodeURIComponent(normalizeUsername(value).toLowerCase());
+}
+
+function fallbackUsernameFromUser(user){
+  if(user?.displayName) return normalizeUsername(user.displayName);
+  if(user?.email) return normalizeUsername(user.email.split('@')[0]);
+  return 'Manager';
+}
+
+function defaultLifetimeStats(){
+  return {
+    seasonsPlayed: 0,
+    regularSeasonWins: 0,
+    regularSeasonLosses: 0,
+    pointsFor: 0,
+    pointsAgainst: 0,
+    championships: 0,
+    podiums: 0,
+    bestFinish: 0,
+    lastFinish: 0,
+    updatedAt: 0
+  };
+}
+
+function buildPublicUserUrl(userNumber){
+  return '/user/' + encodeURIComponent(userNumber);
+}
+
+function parseCreatedAt(user, fallbackValue){
+  const created = Date.parse(user?.metadata?.creationTime || '');
+  return Number.isFinite(created) ? created : fallbackValue;
+}
+
+function allocateNextUserNumber(){
+  return new Promise((resolve, reject) => {
+    db.ref('meta/nextUserNumber').transaction(
+      current => (Number(current) || 0) + 1,
+      (error, committed, snapshot) => {
+        if(error) return reject(error);
+        if(!committed) return reject(new Error('Could not reserve a user number.'));
+        resolve(Number(snapshot.val()) || 0);
+      }
+    );
+  });
+}
+
+async function ensureUserNumber(user, profile){
+  const existingNumber = Number(profile?.userNumber || 0);
+  if(existingNumber > 0) return existingNumber;
+  const snap = await db.ref('users/' + user.uid + '/userNumber').once('value').catch(() => null);
+  const storedNumber = Number(snap?.val?.() || 0);
+  if(storedNumber > 0) return storedNumber;
+  return allocateNextUserNumber();
+}
+
+function setStatus(message, type){
+  const el = document.getElementById('saveStatus');
+  el.textContent = message || '';
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+
+function renderAvatar(src, username){
+  const avatar = document.getElementById('avatarPreview');
+  if(src){
+    avatar.innerHTML = `<img src="${src}" alt="Profile avatar" style="width:100%;height:100%;object-fit:cover;">`;
+  } else {
+    avatar.textContent = (username || 'RB').slice(0,2).toUpperCase();
+  }
+}
+
+function applyProfileToUI(user, profile){
+  const username = normalizeUsername(profile?.username) || fallbackUsernameFromUser(user);
+  const photoURL = profile?.photoURL || user.photoURL || '';
+  const userNumber = Number(profile?.userNumber || 0);
+  document.getElementById('displayName').textContent = username;
+  document.getElementById('memberLine').textContent = userNumber > 0 ? 'Member #' + userNumber : 'Member number pending';
+  document.getElementById('emailLine').textContent = user.email || 'No email found';
+  document.getElementById('providerLine').textContent = 'Signed in with ' + (profile?.provider || user.providerData?.[0]?.providerId || 'account');
+  document.getElementById('usernameInput').value = username;
+  document.getElementById('avatarUrlInput').value = photoURL && !photoURL.startsWith('data:') ? photoURL : '';
+  pendingAvatar = photoURL || '';
+  document.getElementById('viewPublicPageBtn').disabled = !(userNumber > 0);
+  renderAvatar(pendingAvatar, username);
+}
+
+function openPublicPage(){
+  const userNumber = Number(currentProfile?.userNumber || 0);
+  if(userNumber > 0) window.location.href = buildPublicUserUrl(userNumber);
+}
+
+function applyAvatarUrl(){
+  const url = document.getElementById('avatarUrlInput').value.trim();
+  if(!url){
+    setStatus('Paste an image or GIF URL first.', 'error');
+    return;
+  }
+  pendingAvatar = url;
+  renderAvatar(pendingAvatar, document.getElementById('usernameInput').value);
+  setStatus('Preview updated from URL.', 'success');
+}
+
+function getSelectedAvatar(){
+  const url = document.getElementById('avatarUrlInput').value.trim();
+  if(url) return url;
+  return pendingAvatar || '';
+}
+
+function clearAvatar(){
+  pendingAvatar = '';
+  document.getElementById('avatarUrlInput').value = '';
+  document.getElementById('avatarFileInput').value = '';
+  renderAvatar('', document.getElementById('usernameInput').value);
+  setStatus('Profile picture cleared. Save to apply.', 'success');
+}
+
+document.addEventListener('change', event => {
+  if(event.target.id !== 'avatarFileInput') return;
+  const file = event.target.files?.[0];
+  if(!file) return;
+  if(file.size > 350 * 1024){
+    setStatus('Please choose a file smaller than 350 KB.', 'error');
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    pendingAvatar = reader.result;
+    document.getElementById('avatarUrlInput').value = '';
+    renderAvatar(pendingAvatar, document.getElementById('usernameInput').value);
+    setStatus('Preview updated from uploaded file.', 'success');
+  };
+  reader.onerror = () => setStatus('Could not read that file.', 'error');
+  reader.readAsDataURL(file);
+});
+
+async function saveProfile(){
+  if(!currentUser) return;
+  const username = normalizeUsername(document.getElementById('usernameInput').value);
+  const selectedAvatar = getSelectedAvatar();
+  if(username.length < 3){
+    setStatus('Username must be at least 3 characters.', 'error');
+    return;
+  }
+  try{
+    setStatus('Saving profile...');
+    const key = usernameLookupKey(username);
+    const existing = await db.ref('usernames/' + key).once('value');
+    const existingValue = existing.val();
+    if(existingValue && existingValue.uid && existingValue.uid !== currentUser.uid){
+      throw new Error('That username is already taken.');
+    }
+    const userNumber = await ensureUserNumber(currentUser, currentProfile);
+    const previousUsername = normalizeUsername(currentProfile?.username);
+    const previousKey = previousUsername ? usernameLookupKey(previousUsername) : '';
+    const updatedAt = Date.now();
+    const memberSince = Number(currentProfile?.memberSince || parseCreatedAt(currentUser, updatedAt));
+    const publicSnap = await db.ref('publicUsers/' + userNumber).once('value').catch(() => null);
+    const hasPublicProfile = !!publicSnap?.exists?.();
+    await currentUser.updateProfile({
+      displayName: username,
+      photoURL: selectedAvatar || null
+    });
+    const updates = {};
+    updates['users/' + currentUser.uid + '/email'] = currentUser.email || '';
+    updates['users/' + currentUser.uid + '/username'] = username;
+    updates['users/' + currentUser.uid + '/userNumber'] = userNumber;
+    updates['users/' + currentUser.uid + '/memberSince'] = memberSince;
+    updates['users/' + currentUser.uid + '/photoURL'] = selectedAvatar || '';
+    updates['users/' + currentUser.uid + '/provider'] = currentUser.providerData?.[0]?.providerId || 'password';
+    updates['users/' + currentUser.uid + '/updatedAt'] = updatedAt;
+    updates['usernames/' + key] = {
+      uid: currentUser.uid,
+      email: currentUser.email || '',
+      username,
+      userNumber,
+      updatedAt
+    };
+    updates['publicUsers/' + userNumber + '/uid'] = currentUser.uid;
+    updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
+    updates['publicUsers/' + userNumber + '/username'] = username;
+    updates['publicUsers/' + userNumber + '/photoURL'] = selectedAvatar || '';
+    updates['publicUsers/' + userNumber + '/memberSince'] = memberSince;
+    updates['publicUsers/' + userNumber + '/profileUrl'] = buildPublicUserUrl(userNumber);
+    updates['publicUsers/' + userNumber + '/updatedAt'] = updatedAt;
+    if(!hasPublicProfile){
+      updates['publicUsers/' + userNumber + '/lifetime'] = defaultLifetimeStats();
+    }
+    if(previousKey && previousKey !== key){
+      updates['usernames/' + previousKey] = null;
+    }
+    await db.ref().update(updates);
+    pendingAvatar = selectedAvatar;
+    localStorage.setItem('rbPlayerName', username);
+    localStorage.setItem('rbPlayerPhoto', selectedAvatar || '');
+    localStorage.setItem('rbUserNumber', String(userNumber));
+    currentProfile = {
+      ...(currentProfile || {}),
+      email: currentUser.email || '',
+      username,
+      userNumber,
+      memberSince,
+      photoURL: selectedAvatar || '',
+      provider: currentUser.providerData?.[0]?.providerId || 'password',
+      updatedAt
+    };
+    document.getElementById('displayName').textContent = username;
+    document.getElementById('memberLine').textContent = 'Member #' + userNumber;
+    document.getElementById('viewPublicPageBtn').disabled = false;
+    renderAvatar(selectedAvatar, username);
+    setStatus('Profile saved.', 'success');
+  } catch (error){
+    setStatus(error.message || 'Could not save profile.', 'error');
+  }
+}
+
+async function logoutUser(){
+  await auth.signOut();
+  window.location.href = 'index.html';
+}
+
+auth.onAuthStateChanged(async user => {
+  const app = document.getElementById('profileApp');
+  const lock = document.getElementById('authLock');
+  if(!user){
+    app.style.display = 'none';
+    lock.classList.add('open');
+    return;
+  }
+  currentUser = user;
+  try{
+    let snap = await db.ref('users/' + user.uid).once('value');
+    currentProfile = snap.val() || {};
+    if(!currentProfile.userNumber){
+      const username = normalizeUsername(currentProfile.username) || fallbackUsernameFromUser(user);
+      const key = usernameLookupKey(username);
+      const userNumber = await ensureUserNumber(user, currentProfile);
+      const updatedAt = Date.now();
+      const memberSince = Number(currentProfile.memberSince || parseCreatedAt(user, updatedAt));
+      const publicSnap = await db.ref('publicUsers/' + userNumber).once('value').catch(() => null);
+      const updates = {};
+      updates['users/' + user.uid + '/email'] = user.email || '';
+      updates['users/' + user.uid + '/username'] = username;
+      updates['users/' + user.uid + '/userNumber'] = userNumber;
+      updates['users/' + user.uid + '/memberSince'] = memberSince;
+      updates['users/' + user.uid + '/photoURL'] = currentProfile.photoURL || user.photoURL || '';
+      updates['users/' + user.uid + '/provider'] = currentProfile.provider || user.providerData?.[0]?.providerId || 'password';
+      updates['users/' + user.uid + '/updatedAt'] = updatedAt;
+      updates['usernames/' + key] = {
+        uid: user.uid,
+        email: user.email || '',
+        username,
+        userNumber,
+        updatedAt
+      };
+      updates['publicUsers/' + userNumber + '/uid'] = user.uid;
+      updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
+      updates['publicUsers/' + userNumber + '/username'] = username;
+      updates['publicUsers/' + userNumber + '/photoURL'] = currentProfile.photoURL || user.photoURL || '';
+      updates['publicUsers/' + userNumber + '/memberSince'] = memberSince;
+      updates['publicUsers/' + userNumber + '/profileUrl'] = buildPublicUserUrl(userNumber);
+      updates['publicUsers/' + userNumber + '/updatedAt'] = updatedAt;
+      if(!publicSnap?.exists?.()) updates['publicUsers/' + userNumber + '/lifetime'] = defaultLifetimeStats();
+      await db.ref().update(updates);
+      snap = await db.ref('users/' + user.uid).once('value');
+      currentProfile = snap.val() || {};
+    }
+  } catch (error){
+    currentProfile = {};
+  }
+  lock.classList.remove('open');
+  app.style.display = 'block';
+  applyProfileToUI(user, currentProfile);
+});
+</script>
+</body>
+</html>

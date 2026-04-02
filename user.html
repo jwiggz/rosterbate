@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RosterBate - Member Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+  --accent:#f97316;--green:#22c55e;--gold:#f59e0b;--blue:#3b82f6;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,rgba(249,115,22,.14) 0%,transparent 60%);pointer-events:none;}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:20px 18px 48px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.brand{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
+.brand span{color:var(--accent);}
+.actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+.btn.primary{background:var(--accent);color:#fff;}
+.btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.hero{display:grid;grid-template-columns:120px 1fr;gap:18px;background:linear-gradient(135deg,rgba(249,115,22,.14),rgba(59,130,246,.08));border:1px solid rgba(249,115,22,.24);border-radius:22px;padding:20px;margin-bottom:14px;align-items:center;}
+.avatar{width:120px;height:120px;border-radius:28px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:42px;font-weight:900;color:var(--accent);}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.eyebrow{font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:#fdba74;}
+.title{font-family:var(--fd);font-size:42px;font-weight:900;text-transform:uppercase;line-height:.95;margin-top:8px;}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;}
+.label{font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
+.value{font-family:var(--fd);font-size:30px;font-weight:900;margin-top:6px;}
+.sub{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;}
+.section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
+.season-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.season-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.season-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;}
+.season-meta{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;}
+.empty{padding:18px;border:1px dashed var(--border);border-radius:14px;color:var(--text3);font-size:13px;text-align:center;}
+@media (max-width:780px){
+  .hero{grid-template-columns:1fr;text-align:center;}
+  .avatar{margin:0 auto;}
+  .meta{justify-content:center;}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .season-list{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="index.html" class="brand">Roster<span>Bate</span></a>
+    <div class="actions">
+      <a href="index.html" class="btn secondary">Home</a>
+      <a href="profile.html" class="btn primary">Settings</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div id="avatar" class="avatar">RB</div>
+    <div>
+      <div class="eyebrow" id="memberId">Member #—</div>
+      <div class="title" id="memberName">Loading</div>
+      <div class="sub" id="memberLine">Public member page and lifetime league history.</div>
+      <div class="meta">
+        <div class="pill" id="memberSince">Joined recently</div>
+        <div class="pill" id="memberLinkPill">Public profile link</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="label">Seasons</div><div class="value" id="statSeasons">0</div><div class="sub">Completed leagues recorded</div></div>
+    <div class="card"><div class="label">Record</div><div class="value" id="statRecord">0-0</div><div class="sub">Regular season lifetime</div></div>
+    <div class="card"><div class="label">Titles</div><div class="value" id="statTitles">0</div><div class="sub">Championship finishes</div></div>
+    <div class="card"><div class="label">Best Finish</div><div class="value" id="statBest">—</div><div class="sub">Highest final rank</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="section-title">Lifetime Totals</div>
+    <div class="season-list">
+      <div class="season-item"><div class="season-title" id="statPF">0.0</div><div class="season-meta">Points For</div></div>
+      <div class="season-item"><div class="season-title" id="statPA">0.0</div><div class="season-meta">Points Against</div></div>
+      <div class="season-item"><div class="season-title" id="statPodiums">0</div><div class="season-meta">Top 3 Finishes</div></div>
+      <div class="season-item"><div class="season-title" id="statLast">—</div><div class="season-meta">Most Recent Finish</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Recent Seasons</div>
+    <div id="seasonHistory" class="season-list"></div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
+  authDomain: "rosterbate-51339.firebaseapp.com",
+  databaseURL: "https://rosterbate-51339-default-rtdb.firebaseio.com",
+  projectId: "rosterbate-51339",
+  storageBucket: "rosterbate-51339.firebasestorage.app",
+  messagingSenderId: "951275364572",
+  appId: "1:951275364572:web:758d1b4d970b7b87c05419",
+  measurementId: "G-DNSFKMKYVC"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+function parseUserNumber(){
+  const pathMatch = window.location.pathname.match(/\/user\/(\d+)(?:\/)?$/i);
+  if(pathMatch) return Number(pathMatch[1] || 0);
+  const params = new URLSearchParams(window.location.search);
+  return Number(params.get('id') || 0);
+}
+
+function formatDate(ts){
+  if(!ts) return 'Joined recently';
+  try{
+    return 'Joined ' + new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+  }catch(e){
+    return 'Joined recently';
+  }
+}
+
+function ord(n){
+  if(!n) return '—';
+  const s=['th','st','nd','rd'],v=n%100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+function renderAvatar(src, username){
+  const el = document.getElementById('avatar');
+  if(src){
+    el.innerHTML = `<img src="${src}" alt="Avatar">`;
+  }else{
+    el.textContent = String(username || 'RB').slice(0,2).toUpperCase();
+  }
+}
+
+function renderProfile(profile){
+  const stats = profile?.lifetime || {};
+  document.getElementById('memberId').textContent = 'Member #' + (profile?.userNumber || '—');
+  document.getElementById('memberName').textContent = profile?.username || 'Unknown Member';
+  document.getElementById('memberLine').textContent = 'Lifetime league stats, finishes, and public identity for this manager.';
+  document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
+  document.getElementById('memberLinkPill').textContent = profile?.profileUrl || 'Public profile';
+  document.getElementById('statSeasons').textContent = stats.seasonsPlayed || 0;
+  document.getElementById('statRecord').textContent = (stats.regularSeasonWins || 0) + '-' + (stats.regularSeasonLosses || 0);
+  document.getElementById('statTitles').textContent = stats.championships || 0;
+  document.getElementById('statBest').textContent = stats.bestFinish ? ord(stats.bestFinish) : '—';
+  document.getElementById('statPF').textContent = Number(stats.pointsFor || 0).toFixed(1);
+  document.getElementById('statPA').textContent = Number(stats.pointsAgainst || 0).toFixed(1);
+  document.getElementById('statPodiums').textContent = stats.podiums || 0;
+  document.getElementById('statLast').textContent = stats.lastFinish ? ord(stats.lastFinish) : '—';
+  renderAvatar(profile?.photoURL || '', profile?.username || 'RB');
+}
+
+function renderSeasons(seasons){
+  const list = document.getElementById('seasonHistory');
+  const rows = Object.values(seasons || {}).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
+  if(!rows.length){
+    list.innerHTML = '<div class="empty">No completed seasons have been recorded for this member yet.</div>';
+    return;
+  }
+  list.innerHTML = rows.slice(0,6).map(season => `
+    <div class="season-item">
+      <div class="season-title">${season.teamName || 'RosterBate Team'}</div>
+      <div class="season-meta">
+        ${season.leagueName || 'RosterBate League'}<br>
+        Finish: ${ord(season.finalRank || 0)}<br>
+        Record: ${(season.regularSeasonWins || 0)}-${(season.regularSeasonLosses || 0)}<br>
+        PF: ${Number(season.pointsFor || 0).toFixed(1)} · PA: ${Number(season.pointsAgainst || 0).toFixed(1)}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadMemberPage(userNumber){
+  if(!(userNumber > 0)){
+    document.getElementById('memberName').textContent = 'Member Not Found';
+    document.getElementById('seasonHistory').innerHTML = '<div class="empty">Open a member page with a valid number, like /user/1.</div>';
+    return;
+  }
+  const [profileSnap, seasonsSnap] = await Promise.all([
+    db.ref('publicUsers/' + userNumber).once('value'),
+    db.ref('publicUserSeasons/' + userNumber).once('value')
+  ]);
+  const profile = profileSnap.val();
+  if(!profile){
+    document.getElementById('memberName').textContent = 'Member Not Found';
+    document.getElementById('seasonHistory').innerHTML = '<div class="empty">This member page does not exist yet.</div>';
+    return;
+  }
+  renderProfile(profile);
+  renderSeasons(seasonsSnap.val() || {});
+}
+
+auth.onAuthStateChanged(async user => {
+  let userNumber = parseUserNumber();
+  if(!(userNumber > 0) && user){
+    const snap = await db.ref('users/' + user.uid + '/userNumber').once('value').catch(() => null);
+    userNumber = Number(snap?.val?.() || localStorage.getItem('rbUserNumber') || 0);
+  }
+  loadMemberPage(userNumber);
+});
+</script>
+</body>
+</html>

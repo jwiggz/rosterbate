@@ -1,0 +1,2751 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RosterBate Draft</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+    --accent:#f97316;--accent2:#fb923c;--green:#22c55e;--red:#ef4444;
+    --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+    --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
+  .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
+  .screen.active{display:flex;}
+
+  /* LOBBY */
+  #lobby{background:linear-gradient(160deg,#0d1220 0%,#0a0e1a 60%);align-items:center;padding:14px 14px 30px;gap:12px;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;}
+  #lobby::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(249,115,22,.15) 0%,transparent 65%);pointer-events:none;z-index:0;}
+  #lobby>*{position:relative;z-index:1;}
+  .logo{text-align:center;}
+  .logo .ball{font-size:48px;line-height:1;filter:drop-shadow(0 0 14px rgba(249,115,22,.5));}
+  .logo h1{font-family:var(--fd);font-size:34px;font-weight:900;letter-spacing:1px;text-transform:uppercase;line-height:1;margin-top:5px;}
+  .logo h1 span{color:var(--accent);}
+  .logo p{color:var(--text2);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+  .pill{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:5px 14px;font-size:11px;color:#4ade80;text-align:center;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;width:100%;max-width:440px;}
+  .card h2{font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;color:var(--text2);}
+  .fr{margin-bottom:10px;}
+  .fr label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);display:block;margin-bottom:4px;}
+  .fr input,.fr select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--fb);font-size:15px;outline:none;appearance:none;}
+  .fr input:focus,.fr select:focus{border-color:var(--accent);}
+  .fr input[type=number]{-moz-appearance:textfield;}
+  .fr input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;}
+  .chip{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .ibox{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text3);line-height:1.5;margin-top:5px;}
+  .btn{width:100%;background:var(--accent);color:#fff;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:none;border-radius:10px;padding:14px;cursor:pointer;margin-top:4px;}
+  .btn:active{background:var(--accent2);}
+  .errmsg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:9px 11px;font-size:12px;color:#f87171;display:none;margin-bottom:8px;}
+  .errmsg.show{display:block;}
+
+  /* PRE-DRAFT COUNTDOWN BAR */
+  .pdc-bar{background:linear-gradient(90deg,rgba(249,115,22,.15),rgba(249,115,22,.08));border-bottom:1px solid rgba(249,115,22,.25);padding:6px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .pdc-bar.hidden{display:none;}
+  .pdc-icon{font-size:14px;flex-shrink:0;}
+  .pdc-text{flex:1;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.3px;}
+  .pdc-text strong{color:var(--accent);}
+  .pdc-time{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-0.5px;flex-shrink:0;min-width:40px;text-align:right;}
+  .pdc-time.urgent{color:var(--red);}
+  .pdc-start{background:var(--accent);border:none;border-radius:7px;padding:5px 12px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;flex-shrink:0;letter-spacing:.5px;}
+  .pdc-start:active{background:var(--accent2);}
+  .pdc-strip{height:2px;background:var(--border);flex-shrink:0;}
+  .pdc-strip-fill{height:100%;background:var(--accent);transition:width .9s linear;}
+  .pdc-strip-fill.urgent{background:var(--red);}
+
+  /* DRAFT */
+  #draft{background:var(--bg);}
+  .dh{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 12px 7px;flex-shrink:0;}
+  .dh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+  .dtitle{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;}
+  .dtitle span{color:var(--accent);}
+  .clk-badge{background:var(--accent);color:#fff;font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:3px 8px;border-radius:20px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .clk-badge.w{background:var(--text3);}
+  .dmeta{display:flex;gap:12px;flex-wrap:wrap;}
+  .mi{display:flex;flex-direction:column;}
+  .ml{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
+  .mv{font-family:var(--fd);font-size:14px;font-weight:700;}
+  .mv.ac{color:var(--accent);}
+  .mbadge{font-size:9px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--text3);font-family:var(--fd);font-weight:700;}
+  .tbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px;}
+  .tfill{height:100%;background:var(--accent);border-radius:2px;transition:width .9s linear;}
+  .tfill.urg{background:var(--red);}
+  .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+  .tb{flex:1;padding:9px 4px;font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;}
+  .tb.on{color:var(--accent);border-bottom-color:var(--accent);}
+  .dc{flex:1;overflow:hidden;position:relative;}
+  .tp{display:none;height:100%;flex-direction:column;overflow:hidden;}
+  .tp.on{display:flex;}
+
+  /* PLAYERS */
+  .pf{padding:7px 10px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;}
+  .sw{flex:1;position:relative;}
+  .sw input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;}
+  .sw::before{content:'🔍';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;}
+  .posf{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;}
+  .posf::-webkit-scrollbar{display:none;}
+  .pb{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+  .pb.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .pl{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .pr{display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;cursor:pointer;transition:background .1s;}
+  .pr:active{background:rgba(249,115,22,.07);}
+  .pr.drafted{opacity:.28;pointer-events:none;}
+  .prank{width:22px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text3);text-align:center;flex-shrink:0;}
+  .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--fd);flex-shrink:0;border:2px solid var(--border);color:#fff;}
+  .pinfo{flex:1;min-width:0;}
+  .pname{font-family:var(--fd);font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+  .pname-wrap{display:flex;align-items:center;gap:4px;min-width:0;overflow:hidden;}
+  .pdet{font-size:11px;color:var(--text2);margin-top:1px;}
+  .psc{text-align:right;flex-shrink:0;}
+  .padp{font-family:var(--fd);font-size:13px;font-weight:700;}
+  .pproj{font-size:10px;color:var(--text3);margin-top:1px;}
+  .pos-badge{display:inline-block;padding:1px 4px;border-radius:3px;font-family:var(--fd);font-size:10px;font-weight:700;margin-left:3px;}
+  .pos-PG{background:rgba(59,130,246,.2);color:#60a5fa;}
+  .pos-SG{background:rgba(168,85,247,.2);color:#c084fc;}
+  .pos-SF{background:rgba(34,197,94,.2);color:#4ade80;}
+  .pos-PF{background:rgba(245,158,11,.2);color:#fbbf24;}
+  .pos-C{background:rgba(239,68,68,.2);color:#f87171;}
+  .pos-G{background:rgba(99,102,241,.2);color:#a5b4fc;}
+  .pos-F{background:rgba(20,184,166,.2);color:#5eead4;}
+  .dbtn{background:var(--accent);border:none;border-radius:7px;padding:6px 11px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;flex-shrink:0;}
+  .dbtn:active{background:var(--accent2);}
+  .dlbl{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);}
+
+  /* MY TEAM */
+  .mtw{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:9px;}
+  .thi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+  .tnb{font-family:var(--fd);font-size:18px;font-weight:800;}
+  .tsr{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;}
+  .ts{font-size:10px;color:var(--text2);}
+  .rs{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+  .spos{width:28px;font-family:var(--fd);font-size:12px;font-weight:800;color:var(--text3);flex-shrink:0;}
+  .semp{font-size:11px;color:var(--text3);font-style:italic;}
+  .spl{flex:1;min-width:0;}
+  .srd{font-family:var(--fd);font-size:10px;color:var(--text3);flex-shrink:0;}
+
+  /* BOARD */
+  .bw{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:7px;}
+  .brd{margin-bottom:8px;}
+  .brl{font-family:var(--fd);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:4px;padding-left:2px;}
+  .bps{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;}
+  .bps::-webkit-scrollbar{display:none;}
+  .bp{flex-shrink:0;width:76px;height:52px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px;display:flex;flex-direction:column;justify-content:space-between;}
+  .bp.mine{border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.07);}
+  .bp.cur{border-color:var(--accent);animation:pp 1.2s ease-in-out infinite;}
+  @keyframes pp{0%,100%{box-shadow:0 0 0 1px var(--accent)}50%{box-shadow:0 0 0 3px rgba(249,115,22,.35)}}
+  .bpt{font-size:8px;color:var(--text3);font-weight:600;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bpp{font-family:var(--fd);font-size:11px;font-weight:700;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .bpp.em{color:var(--text3);font-weight:400;font-family:var(--fb);font-size:9px;font-style:italic;-webkit-line-clamp:1;}
+  .bpn{font-size:8px;color:var(--text3);}
+
+  /* MODAL */
+  .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:flex-end;justify-content:center;}
+  .mo.open{display:flex;}
+  .ms{background:var(--bg2);border-radius:18px 18px 0 0;padding:15px 15px 36px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;}
+  @keyframes su{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .mh{width:36px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 12px;}
+  .mph{display:flex;gap:12px;align-items:center;margin-bottom:13px;}
+  .mav{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;font-family:var(--fd);border:2px solid var(--border);flex-shrink:0;color:#fff;}
+  .mn{font-family:var(--fd);font-size:22px;font-weight:800;line-height:1;}
+  .msub{color:var(--text2);font-size:11px;margin-top:3px;}
+  .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:12px;}
+  .sb{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 5px;text-align:center;}
+  .sv{font-family:var(--fd);font-size:16px;font-weight:800;}
+  .sl{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-top:1px;}
+  .msn{font-size:10px;color:var(--text3);text-align:center;margin-bottom:11px;}
+  .ma{display:flex;gap:7px;}
+  .bdc{flex:1;background:var(--accent);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;}
+  .bcx{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 14px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
+
+  /* AUCTION */
+  .ao{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:110;align-items:flex-end;justify-content:center;}
+  .ao.open{display:flex;}
+  .as{background:var(--bg2);border-radius:18px 18px 0 0;padding:15px 15px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;}
+  .at{font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:2px;}
+  .apn{font-size:12px;color:var(--text2);margin-bottom:12px;}
+  .bbw{margin-bottom:11px;}
+  .bbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;}
+  .bb{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .bf{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
+  .bf.lo{background:var(--red);}
+  .bir{display:flex;gap:8px;align-items:center;margin-bottom:11px;}
+  .bir label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);white-space:nowrap;}
+  .bi{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--text);font-family:var(--fd);font-size:22px;font-weight:800;text-align:center;outline:none;}
+  .bi:focus{border-color:var(--accent);}
+  .qb{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap;}
+  .qbb{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 11px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
+  .qbb:active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  /* TRADE MODAL */
+  .tro{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:120;align-items:flex-end;justify-content:center;}
+  .tro.open{display:flex;}
+  .trs{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 40px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;max-height:85dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .tr-title{font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+  .tr-sub{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.5;}
+  .tr-teams{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+  .tr-team-btn{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:all .15s;text-align:left;}
+  .tr-team-btn:active{background:rgba(249,115,22,.08);}
+  .tr-team-btn.selected{border-color:var(--accent);background:rgba(249,115,22,.08);}
+  .tr-team-btn.disabled{opacity:.35;pointer-events:none;}
+  .tr-team-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+  .tr-team-info{flex:1;min-width:0;}
+  .tr-team-name{font-family:var(--fd);font-size:15px;font-weight:700;}
+  .tr-team-pick{font-size:11px;color:var(--text2);margin-top:2px;}
+  .tr-check{font-size:18px;opacity:0;transition:opacity .15s;}
+  .tr-team-btn.selected .tr-check{opacity:1;}
+  .tr-preview{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:none;}
+  .tr-preview.show{display:block;}
+  .tr-preview-title{font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
+  .tr-swap-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+  .tr-swap-row:last-child{margin-bottom:0;}
+  .tr-swap-pill{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:13px;font-weight:700;flex:1;text-align:center;}
+  .tr-swap-pill.gain{border-color:rgba(34,197,94,.4);color:#4ade80;background:rgba(34,197,94,.07);}
+  .tr-swap-pill.lose{border-color:rgba(239,68,68,.3);color:#f87171;background:rgba(239,68,68,.06);}
+  .tr-arrow{font-size:14px;color:var(--text3);flex-shrink:0;}
+  .tr-swap-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:5px;font-family:var(--fd);font-weight:700;}
+  .tr-btn-row{display:flex;gap:8px;}
+  .tr-confirm{flex:1;background:var(--green);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;transition:opacity .15s;}
+  .tr-confirm:disabled{opacity:.35;cursor:not-allowed;}
+  .tr-cancel{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
+  .trade-btn{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#a5b4fc;cursor:pointer;flex-shrink:0;transition:all .15s;}
+  .trade-btn:active{background:rgba(99,102,241,.3);}
+  .trade-history{margin-top:12px;}
+  .trade-history-title{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:7px;}
+  .trade-log-item{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:5px;font-size:11px;color:var(--text2);line-height:1.5;}
+  .trade-log-item strong{color:var(--text);font-family:var(--fd);}
+
+  .ocb{display:none;position:fixed;top:0;left:0;right:0;z-index:50;background:linear-gradient(90deg,var(--accent),#ea580c);padding:9px 20px;text-align:center;animation:sd .3s ease;}
+  .ocb.show{display:block;}
+  @keyframes sd{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+  .ocb p{font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;font-family:var(--fd);font-size:14px;font-weight:700;padding:9px 20px;border-radius:30px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* PAUSE SYSTEM */
+  .pause-btn{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--red);cursor:pointer;flex-shrink:0;transition:all .15s;display:none;}
+  .pause-btn.admin-mode{display:flex;align-items:center;gap:5px;}
+  .pause-btn:active{background:rgba(239,68,68,.3);}
+  .pause-btn.paused{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:var(--green);}
+
+  /* Full-screen pause overlay */
+  #pauseOverlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(10,14,26,.95);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;}
+  #pauseOverlay.show{display:flex;}
+  .pause-icon{font-size:56px;animation:pausePulse 2s ease-in-out infinite;}
+  @keyframes pausePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.8}}
+  .pause-title{font-family:var(--fd);font-size:36px;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--text);}
+  .pause-reason{font-size:14px;color:var(--text2);text-align:center;line-height:1.6;max-width:300px;}
+  .pause-timer-label{font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);}
+  .pause-elapsed{font-family:var(--fd);font-size:48px;font-weight:900;color:var(--accent);letter-spacing:-1px;line-height:1;}
+  .pause-actions{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px;}
+  .pause-resume-btn{background:var(--green);border:none;border-radius:12px;padding:15px;font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;display:none;}
+  .pause-resume-btn.show{display:block;}
+  .pause-report-btn{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:13px;font-family:var(--fd);font-size:15px;font-weight:700;color:var(--text2);cursor:pointer;}
+
+  /* Vote banner (shown when someone requests a pause but not yet reached threshold) */
+  #voteBar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:var(--bg2);border-top:2px solid rgba(239,68,68,.4);padding:12px 14px;animation:slideUp .3s ease;}
+  #voteBar.show{display:block;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .vote-bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .vote-bar-title{font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--red);}
+  .vote-bar-dismiss{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:2px 4px;}
+  .vote-bar-reason{font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
+  .vote-progress{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .vote-pips{display:flex;gap:5px;}
+  .vote-pip{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;}
+  .vote-pip.voted{background:var(--red);border-color:var(--red);}
+  .vote-pip.needed{background:var(--bg3);border-color:rgba(239,68,68,.4);}
+  .vote-count{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);}
+  .vote-actions{display:flex;gap:8px;}
+  .vote-yes{flex:1;background:var(--red);border:none;border-radius:9px;padding:11px;font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;}
+  .vote-no{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 16px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;}
+
+  /* Disconnect request modal */
+  #disconnectModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:450;align-items:flex-end;justify-content:center;}
+  #disconnectModal.show{display:flex;}
+  .dc-sheet{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;}
+  .dc-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;}
+  .dc-sub{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5;}
+  .dc-teams{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:200px;overflow-y:auto;}
+  .dc-team-row{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--border);border-radius:9px;padding:10px 12px;cursor:pointer;transition:border-color .15s;}
+  .dc-team-row.selected{border-color:var(--red);}
+  .dc-team-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+  .dc-team-name{font-family:var(--fd);font-size:14px;font-weight:700;flex:1;}
+  .dc-check{font-size:16px;opacity:0;transition:opacity .15s;}
+  .dc-team-row.selected .dc-check{opacity:1;color:var(--red);}
+  .dc-reason-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--fb);font-size:14px;outline:none;margin-bottom:14px;resize:none;height:60px;}
+  .dc-reason-input:focus{border-color:var(--red);}
+
+  /* FAVORITES */
+  .fav-btn{background:none;border:none;cursor:pointer;font-size:15px;line-height:1;padding:2px 3px;flex-shrink:0;opacity:.35;transition:opacity .15s,transform .15s;color:#f59e0b;}
+  .fav-btn.on{opacity:1;transform:scale(1.1);}
+  .fav-btn:active{transform:scale(.88);}
+  .fav-tab-wrap{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:9px;}
+  .fav-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+  .fav-header h3{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+  .fav-count{font-size:11px;color:var(--text3);}
+  .fav-hint{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;}
+  .fav-hint-icon{font-size:16px;flex-shrink:0;margin-top:-1px;}
+  .fav-empty{text-align:center;padding:48px 20px;color:var(--text3);}
+  .fav-empty .fe-icon{font-size:40px;margin-bottom:10px;}
+  .fav-empty p{font-size:13px;line-height:1.6;}
+  .fav-row{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 10px;margin-bottom:7px;cursor:grab;transition:background .1s,opacity .2s,transform .15s;position:relative;}
+  .fav-row:active{cursor:grabbing;}
+  .fav-row.dragging{opacity:.4;transform:scale(.97);}
+  .fav-row.drag-over{border-color:var(--accent);background:rgba(249,115,22,.08);}
+  .fav-row.drafted-fav{opacity:.3;}
+  .fav-drag-handle{font-size:14px;color:var(--text3);flex-shrink:0;cursor:grab;padding:2px 4px;user-select:none;}
+  .fav-rank-badge{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--fd);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .fav-info{flex:1;min-width:0;}
+  .fav-name{font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fav-det{font-size:11px;color:var(--text2);margin-top:1px;}
+  .fav-remove{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:4px;transition:color .15s;}
+  .fav-remove:active{color:var(--red);}
+  .fav-auto-badge{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:5px;padding:2px 6px;font-family:var(--fd);font-size:9px;font-weight:800;color:var(--accent);letter-spacing:.5px;flex-shrink:0;}
+  .tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;font-size:9px;font-weight:800;border-radius:10px;padding:1px 5px;margin-left:3px;font-family:var(--fd);min-width:14px;}
+  
+/* RosterBate Home Header */
+.rb-home-bar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:10px 14px;flex-shrink:0;}
+.rb-home-link{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;}
+.rb-home-link span{color:var(--accent);}
+.rb-home-link:hover{opacity:.85;}
+::-webkit-scrollbar{width:0;height:0;}
+</style>
+</head>
+<body>
+
+<!-- LOBBY -->
+<div id="lobby" class="screen active">
+  <div class="logo">
+    <div class="ball">🏀</div>
+    <a href="index.html" style="text-decoration:none;color:inherit;"><h1>Roster<span>Bate</span></h1></a>
+    <p>Draft Room</p>
+  </div>
+  <div class="pill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
+  <div class="card">
+    <h2>League Settings</h2>
+    <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Buckets & Beyond"/></div>
+    <div class="two">
+      <div class="fr"><label>Teams (2–20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
+      <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="5"/></div>
+    </div>
+    <div class="two">
+      <div class="fr"><label>Rounds</label><input type="number" id="iRounds" min="5" max="25" value="13"/></div>
+      <div class="fr" id="iBudgetRow" style="display:none"><label>Budget ($)</label><input type="number" id="iBudget" min="50" max="1000" value="200"/></div>
+    </div>
+    <div class="fr">
+      <label>Draft Format</label>
+      <div class="chips" id="cFormat">
+        <div class="chip on" data-v="snake" onclick="cc('cFormat',this)">🐍 Snake</div>
+        <div class="chip" data-v="auction" onclick="cc('cFormat',this)">💰 Auction</div>
+        <div class="chip" data-v="linear" onclick="cc('cFormat',this)">➡️ Linear</div>
+      </div>
+      <div class="ibox" id="iFormatInfo">Odd rounds 1→N, even rounds N→1. Classic fantasy.</div>
+    </div>
+    <div class="fr">
+      <label>Scoring Format</label>
+      <div class="chips" id="cScoring">
+        <div class="chip on" data-v="h2h_cat" onclick="cc('cScoring',this)">H2H Cat</div>
+        <div class="chip" data-v="h2h_pts" onclick="cc('cScoring',this)">H2H Pts</div>
+        <div class="chip" data-v="roto" onclick="cc('cScoring',this)">Roto</div>
+        <div class="chip" data-v="points" onclick="cc('cScoring',this)">Points</div>
+      </div>
+      <div class="ibox" id="iScoringInfo">Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.</div>
+    </div>
+    <div class="fr">
+      <label>Pick Timer</label>
+      <div class="chips" id="cTimer">
+        <div class="chip" data-v="30" onclick="cc('cTimer',this)">30s</div>
+        <div class="chip" data-v="60" onclick="cc('cTimer',this)">1 min</div>
+        <div class="chip on" data-v="90" onclick="cc('cTimer',this)">1:30</div>
+        <div class="chip" data-v="120" onclick="cc('cTimer',this)">2 min</div>
+        <div class="chip" data-v="0" onclick="cc('cTimer',this)">Off</div>
+      </div>
+    </div>
+    <div class="errmsg" id="err"></div>
+    <button class="btn" onclick="startDraft()">Enter Draft Room 🏀</button>
+</div>
+
+  <!-- Multiplayer -->
+  <div class="card" style="max-width:440px;background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.08));border-color:rgba(99,102,241,.3);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div style="font-size:28px;">👥</div>
+      <div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;color:#a5b4fc;">Multiplayer</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Match with real people who share your settings</div>
+      </div>
+    </div>
+    <button class="btn" onclick="window.location.href='rosterbate-matchmaking.html'" style="background:rgba(99,102,241,.8);border:none;padding:13px;font-size:15px;">🔍 Find a League →</button>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;">Snake/Auction/Linear · H2H/Roto · 6–14 teams</div>
+  </div>
+
+  <div class="card" style="max-width:440px;">
+    <h2>🔧 Commissioner Settings</h2>
+    <div class="fr" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <label style="font-size:13px;color:var(--text);font-weight:600;display:block;">Single Player Commissioner</label>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Single Player always defaults you as commissioner. You can pause the draft and force league decisions.</div>
+      </div>
+      <label style="position:relative;width:44px;height:24px;flex-shrink:0;margin-left:12px;cursor:pointer;">
+        <input type="checkbox" id="isAdminToggle" checked style="opacity:0;width:0;height:0;position:absolute;" onchange="updateAdminMode(this)">
+        <span id="adminToggleTrack" style="position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;transition:background .2s;"></span>
+        <span id="adminToggleThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:var(--text3);border-radius:50%;transition:all .2s;"></span>
+      </label>
+    </div>
+    <div class="fr">
+      <label>Votes needed to pause (excluding admin)</label>
+      <div class="chips" id="cVotes">
+        <div class="chip" data-v="2" onclick="cc('cVotes',this)">2 votes</div>
+        <div class="chip on" data-v="3" onclick="cc('cVotes',this)">3 votes</div>
+        <div class="chip" data-v="4" onclick="cc('cVotes',this)">4 votes</div>
+        <div class="chip" data-v="5" onclick="cc('cVotes',this)">5 votes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAFT -->
+<div id="draft" class="screen">
+
+  <!-- COUNTDOWN BAR (sits above header, hidden once draft starts) -->
+  <div class="pdc-bar" id="pdcBar">
+    <div class="pdc-icon">🏀</div>
+    <div class="pdc-text"><strong>Draft starts in</strong> — browse players &amp; set your queue!</div>
+    <div class="pdc-time" id="pdcTime">2:00</div>
+    <button class="pdc-start" onclick="launchDraft()">Start</button>
+  </div>
+  <div class="pdc-strip" id="pdcStrip"><div class="pdc-strip-fill" id="pdcFill" style="width:100%"></div></div>
+
+  <div class="dh">
+    <div class="dh-top">
+      <a href="index.html" style="text-decoration:none;"><div class="dtitle">🏀 Roster<span>Bate</span></div></a>
+      <div style="display:flex;align-items:center;gap:7px">
+        <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">⏸ Pause</button>
+        <button class="trade-btn" id="tradeHeaderBtn" onclick="openTradeModal()" style="display:none">⇄ Trade Pick</button>
+        <div class="clk-badge" id="clkBadge">On The Clock</div>
+      </div>
+    </div>
+    <div class="dmeta">
+      <div class="mi"><span class="ml">Round</span><span class="mv" id="mRound">1</span></div>
+      <div class="mi"><span class="ml">Pick</span><span class="mv" id="mPick">1</span></div>
+      <div class="mi"><span class="ml">Your Next</span><span class="mv ac" id="mNext">—</span></div>
+      <div class="mi"><span class="ml">Timer</span><span class="mv ac" id="mTimer">1:30</span></div>
+      <div class="mi"><span class="ml">Format</span><span class="mbadge" id="mFmt">SNAKE</span></div>
+    </div>
+    <div class="tbar"><div class="tfill" id="tFill"></div></div>
+  </div>
+  <div class="tabs">
+    <button class="tb on" onclick="sTab('players',this)">Players</button>
+    <button class="tb" onclick="sTab('myteam',this)">My Team</button>
+    <button class="tb" onclick="sTab('board',this)">Board</button>
+    <button class="tb" id="favTab" onclick="sTab('favs',this)">Queue<span class="tab-badge" id="favCount" style="display:none">0</span></button>
+  </div>
+  <div class="dc">
+    <div id="tp-players" class="tp on">
+      <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
+      <div class="pf" style="padding-top:0;padding-bottom:7px">
+        <div class="posf">
+          <button class="pb on" onclick="fPos('ALL',this)">ALL</button>
+          <button class="pb" onclick="fPos('PG',this)">PG</button>
+          <button class="pb" onclick="fPos('SG',this)">SG</button>
+          <button class="pb" onclick="fPos('SF',this)">SF</button>
+          <button class="pb" onclick="fPos('PF',this)">PF</button>
+          <button class="pb" onclick="fPos('C',this)">C</button>
+        </div>
+      </div>
+      <div class="pl" id="pList"></div>
+    </div>
+    <div id="tp-myteam" class="tp"><div class="mtw" id="myTeam"></div></div>
+    <div id="tp-board" class="tp"><div class="bw" id="board"></div></div>
+    <div id="tp-favs" class="tp"><div class="fav-tab-wrap" id="favList"></div></div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="mo" id="pModal" onclick="cModal(event)">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mph">
+      <div class="mav" id="mAv"></div>
+      <div><div class="mn" id="mName">—</div><div class="msub" id="mSub">—</div></div>
+    </div>
+    <div class="sg" id="mStats"></div>
+    <div class="msn" id="mNote"></div>
+    <div class="ma">
+      <button class="bcx" onclick="document.getElementById('pModal').classList.remove('open')">Cancel</button>
+      <button class="bcx" id="bFavModal" onclick="toggleFavFromModal()" style="font-size:18px;padding:13px 14px;">☆</button>
+      <button class="bdc" id="bDraft" onclick="confDraft()">Draft Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUCTION MODAL -->
+<div class="ao" id="aModal">
+  <div class="as">
+    <div class="mh"></div>
+    <div class="at">💰 Nomination</div>
+    <div class="apn" id="aPname">—</div>
+    <div class="bbw">
+      <div class="bbl"><span>Your Budget</span><span id="aBudget">$200</span></div>
+      <div class="bb"><div class="bf" id="bFill" style="width:100%"></div></div>
+    </div>
+    <div class="bir"><label>Bid ($)</label><input type="number" class="bi" id="bInput" min="1" value="1"/></div>
+    <div class="qb">
+      <div class="qbb" onclick="qBid(1)">$1</div>
+      <div class="qbb" onclick="qBid(5)">$5</div>
+      <div class="qbb" onclick="qBid(10)">$10</div>
+      <div class="qbb" onclick="qBid(25)">$25</div>
+      <div class="qbb" onclick="qBid(50)">$50</div>
+      <div class="qbb" onclick="qBid(S.myBudget)">Max</div>
+    </div>
+    <div class="ma">
+      <button class="bcx" onclick="passAuction()">Pass</button>
+      <button class="bdc" onclick="confAuction()">Bid & Draft</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRADE MODAL -->
+<div class="tro" id="tradeModal">
+  <div class="trs">
+    <div class="mh"></div>
+    <div class="tr-title">⇄ Trade Pick</div>
+    <div class="tr-sub" id="trSubText">You're on the clock with pick <strong id="trMyPick">#1</strong>. Select a team to trade with. In snake drafts, teams only swap draft positions. No extra picks are exchanged.</div>
+    <div class="tr-teams" id="trTeamList"></div>
+    <div class="tr-preview" id="trPreview">
+      <div class="tr-preview-title">📋 Trade Preview</div>
+      <div class="tr-swap-label">Snake Draft Rule - Position Swap Only</div>
+      <div class="tr-swap-row">
+        <div class="tr-swap-pill lose" id="trYouGive">You give: —</div>
+        <div class="tr-arrow">⇄</div>
+        <div class="tr-swap-pill gain" id="trYouGet">You get: —</div>
+      </div>
+      <div class="tr-swap-label" style="margin-top:10px">No Compensation Picks</div>
+      <div class="tr-swap-row">
+        <div class="tr-swap-pill gain" id="trCompGet">No extra picks exchanged</div>
+        <div class="tr-arrow">⇄</div>
+        <div class="tr-swap-pill lose" id="trCompGive">Snake draft keeps this clean</div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:10px;line-height:1.5" id="trSummary"></div>
+    </div>
+    <div class="tr-btn-row">
+      <button class="tr-cancel" onclick="closeTradeModal()">Cancel</button>
+      <button class="tr-confirm" id="trConfirmBtn" disabled onclick="confirmTrade()">Select a Team</button>
+    </div>
+    <div class="trade-history" id="tradeHistory" style="display:none">
+      <div class="trade-history-title">Trade Log</div>
+      <div id="tradeLogItems"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE OVERLAY -->
+<div id="pauseOverlay">
+  <div class="pause-icon">⏸</div>
+  <div class="pause-title">Draft Paused</div>
+  <div class="pause-reason" id="pauseReason">The draft has been paused.</div>
+  <div>
+    <div class="pause-timer-label">Paused for</div>
+    <div class="pause-elapsed" id="pauseElapsed">0:00</div>
+  </div>
+  <div class="pause-actions">
+    <button class="pause-resume-btn" id="pauseResumeBtn" onclick="resumeDraft()">▶ Resume Draft</button>
+    <button class="pause-report-btn" onclick="openDisconnectModal()">📡 Report a Disconnection</button>
+  </div>
+</div>
+
+<!-- VOTE BAR (shown to all when pause is requested but not yet passed) -->
+<div id="voteBar">
+  <div class="vote-bar-top">
+    <div class="vote-bar-title">⚠️ Pause Requested</div>
+    <button class="vote-bar-dismiss" onclick="dismissVote()">✕</button>
+  </div>
+  <div class="vote-bar-reason" id="voteBarReason">A player has requested to pause the draft.</div>
+  <div class="vote-progress">
+    <div class="vote-pips" id="votePips"></div>
+    <div class="vote-count" id="voteCount">0 of 3 votes</div>
+  </div>
+  <div class="vote-actions">
+    <button class="vote-no" onclick="castVote(false)">No</button>
+    <button class="vote-yes" onclick="castVote(true)">✋ Vote to Pause</button>
+  </div>
+</div>
+
+<!-- DISCONNECT REPORT MODAL -->
+<div id="disconnectModal">
+  <div class="dc-sheet">
+    <div class="mh"></div>
+    <div class="dc-title">📡 Report Disconnection</div>
+    <div class="dc-sub">Select the team that disconnected. A pause vote will be sent to all managers. If <span id="voteThresholdLabel">3</span> managers vote yes, the draft will pause automatically.</div>
+    <div class="dc-teams" id="dcTeamList"></div>
+    <textarea class="dc-reason-input" id="dcReasonInput" placeholder="Optional: describe the issue (e.g. 'John's internet dropped')"></textarea>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('disconnectModal').classList.remove('show')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">Cancel</button>
+      <button onclick="submitDisconnectReport()" id="dcSubmitBtn" style="flex:1;background:var(--red);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;" disabled>Send Pause Vote</button>
+    </div>
+  </div>
+</div>
+
+<div class="ocb" id="ocBanner"><p id="ocText">⏰ You're On The Clock!</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── TEAM COLORS ──────────────────────────────────────────
+const TC={
+  ATL:'#C1272D',BOS:'#007A33',BKN:'#000000',CHA:'#1D1160',CHI:'#CE1141',
+  CLE:'#860038',DAL:'#00538C',DEN:'#0E2240',DET:'#C8102E',GSW:'#1D428A',
+  HOU:'#CE1141',IND:'#002D62',LAC:'#C8102E',LAL:'#552583',MEM:'#5D76A9',
+  MIA:'#98002E',MIL:'#00471B',MIN:'#0C2340',NOP:'#0C2340',NYK:'#F58426',
+  OKC:'#007AC1',ORL:'#0077C0',PHI:'#006BB6',PHX:'#1D1160',POR:'#E03A3E',
+  SAC:'#5A2D81',SAS:'#C4CED4',TOR:'#CE1141',UTA:'#002B5C',WAS:'#002B5C',
+};
+function tcolor(tm){return TC[tm]||'#334155';}
+function initials(n){
+  if(!n) return '?';
+  const p=n.trim().split(' ');
+  return p.length===1?p[0][0].toUpperCase():(p[0][0]+(p[p.length-1][0]||'')).toUpperCase();
+}
+
+// ─── FAVORITES ────────────────────────────────────────────
+// Array of player IDs in priority order (index 0 = highest priority)
+let FAVS=[];
+const MAX_FAVS=10;
+
+function isFav(id){return FAVS.includes(id);}
+
+function toggleFav(id){
+  if(isFav(id)){
+    FAVS=FAVS.filter(x=>x!==id);
+    showToast('Removed from queue');
+  } else {
+    if(FAVS.length>=MAX_FAVS){showToast('⚠️ Queue full — remove one first');return;}
+    FAVS.push(id);
+    showToast('⭐ Added to queue!');
+  }
+  rPlayers();rFavs();upFavBadge();
+  // update modal button if open
+  if(S.selP&&S.selP.id===id) updateFavModalBtn();
+}
+
+function toggleFavFromModal(){
+  if(!S.selP)return;
+  toggleFav(S.selP.id);
+}
+
+function updateFavModalBtn(){
+  const btn=document.getElementById('bFavModal');
+  if(!btn||!S.selP)return;
+  const faved=isFav(S.selP.id);
+  btn.textContent=faved?'★':'☆';
+  btn.style.color=faved?'#f59e0b':''
+  btn.title=faved?'Remove from queue':'Add to queue';
+}
+
+function upFavBadge(){
+  const badge=document.getElementById('favCount');
+  const active=FAVS.filter(id=>!S.drafted.has(id)).length;
+  if(active>0){badge.textContent=active;badge.style.display='inline-flex';}
+  else badge.style.display='none';
+}
+
+function rFavs(){
+  const wrap=document.getElementById('favList');
+  // Remove drafted players from favs silently
+  const activeFavs=FAVS.filter(id=>!S.drafted.has(id));
+  const draftedFavs=FAVS.filter(id=>S.drafted.has(id));
+
+  let html=`<div class="fav-header">
+    <h3>⭐ Auto-Draft Queue</h3>
+    <span class="fav-count">${activeFavs.length}/${MAX_FAVS} players</span>
+  </div>`;
+
+  if(FAVS.length===0){
+    html+=`<div class="fav-empty">
+      <div class="fe-icon">⭐</div>
+      <p>No players in queue yet.<br/>Tap the ☆ on any player to add them.<br/><br/>If your timer runs out, we'll auto-draft your top queued player who's still available.</p>
+    </div>`;
+  } else {
+    html+=`<div class="fav-hint">
+      <div class="fav-hint-icon">💡</div>
+      <div>Drag to reorder priority. If your pick timer runs out, the <strong>top available</strong> player here is auto-drafted. Up to ${MAX_FAVS} players.</div>
+    </div>`;
+
+    // Active favs (draggable queue)
+    activeFavs.forEach((id,i)=>{
+      const p=PLAYERS.find(x=>x.id===id);
+      if(!p)return;
+      const isNext=i===0;
+      html+=`<div class="fav-row" id="frow-${id}" draggable="true"
+        ondragstart="favDragStart(event,${id})"
+        ondragover="favDragOver(event,${id})"
+        ondrop="favDrop(event,${id})"
+        ondragleave="favDragLeave(event)"
+        ondragend="favDragEnd(event)">
+        <div class="fav-drag-handle">⠿</div>
+        <div class="fav-rank-badge">${i+1}</div>
+        <div class="pav" style="background:${tcolor(p.team)};width:30px;height:30px;font-size:11px;border:none;flex-shrink:0">${initials(p.name)}</div>
+        <div class="fav-info">
+          <div class="fav-name">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
+          <div class="fav-det">${p.team} · ${p.pts}pts · ${p.reb}reb · ${p.ast}ast</div>
+        </div>
+        ${isNext?`<div class="fav-auto-badge">AUTO</div>`:''}
+        <button class="fav-remove" onclick="event.stopPropagation();toggleFav(${id})" title="Remove">✕</button>
+      </div>`;
+    });
+
+    // Already-drafted favs (greyed out, below)
+    if(draftedFavs.length>0){
+      html+=`<div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:8px 2px 4px;font-family:var(--fd);font-weight:700;">Already Drafted</div>`;
+      draftedFavs.forEach(id=>{
+        const p=PLAYERS.find(x=>x.id===id);
+        if(!p)return;
+        html+=`<div class="fav-row drafted-fav" style="cursor:default">
+          <div class="fav-drag-handle" style="opacity:0">⠿</div>
+          <div class="pav" style="background:var(--text3);width:30px;height:30px;font-size:11px;border:none;flex-shrink:0">${initials(p.name)}</div>
+          <div class="fav-info">
+            <div class="fav-name">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
+            <div class="fav-det">${p.team} · Drafted ✓</div>
+          </div>
+        </div>`;
+      });
+    }
+  }
+  wrap.innerHTML=html;
+}
+
+// Drag-to-reorder
+let dragId=null;
+function favDragStart(e,id){
+  dragId=id;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function favDragOver(e,id){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  if(id!==dragId) e.currentTarget.classList.add('drag-over');
+}
+function favDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function favDrop(e,targetId){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragId||dragId===targetId)return;
+  const fromIdx=FAVS.indexOf(dragId);
+  const toIdx=FAVS.indexOf(targetId);
+  if(fromIdx<0||toIdx<0)return;
+  FAVS.splice(fromIdx,1);
+  FAVS.splice(toIdx,0,dragId);
+  rFavs();upFavBadge();
+}
+function favDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  dragId=null;
+}
+
+
+// ─── FULL 2024-25 Pro Sports PLAYER POOL (500 players, all 30 teams) ─────────────
+// [name, team, pos, pts, reb, ast, stl, blk, to, fgp, ftp, tpm]
+const RAW=[
+// ── BOSTON CELTICS ──
+["Jayson Tatum","BOS","SF",28.0,8.5,5.1,1.1,0.6,2.7,46.5,83.7,3.2],
+["Jaylen Brown","BOS","SG",23.0,5.5,3.6,1.1,0.4,2.5,49.5,74.2,2.7],
+["Kristaps Porzingis","BOS","C",20.1,7.2,2.0,0.7,1.9,1.9,52.1,87.0,2.6],
+["Jrue Holiday","BOS","PG",12.5,5.4,5.4,1.6,0.6,2.1,49.6,72.4,1.9],
+["Al Horford","BOS","C",9.5,6.6,2.6,0.8,1.0,1.1,54.0,79.3,1.8],
+["Payton Pritchard","BOS","PG",14.2,3.3,3.7,0.8,0.2,1.4,42.0,88.5,3.5],
+["Derrick White","BOS","SG",15.2,4.2,5.2,1.5,1.2,1.6,44.0,89.1,3.0],
+["Sam Hauser","BOS","SF",12.1,3.3,1.4,0.4,0.2,0.7,48.0,91.2,3.2],
+["Luke Kornet","BOS","C",5.1,3.6,0.8,0.3,1.1,0.8,71.0,66.7,0.0],
+["Neemias Queta","BOS","C",5.8,4.2,0.8,0.4,1.2,0.9,65.0,67.0,0.0],
+["Xavier Tillman","BOS","PF",4.8,3.8,0.9,0.5,0.5,0.8,55.0,66.7,0.3],
+["Jordan Walsh","BOS","SF",4.2,2.8,0.9,0.7,0.5,0.7,46.0,71.0,0.8],
+// ── BROOKLYN NETS ──
+["Cam Thomas","BKN","SG",23.5,3.7,3.0,0.7,0.4,2.3,44.5,83.5,2.9],
+["Ben Simmons","BKN","PG",7.8,6.5,5.0,1.2,0.6,2.0,58.0,55.0,0.0],
+["Nic Claxton","BKN","C",12.5,9.2,2.3,1.0,2.3,1.8,68.0,54.2,0.0],
+["Dennis Schroder","BKN","PG",15.5,3.5,6.2,1.0,0.2,2.5,44.0,84.0,2.3],
+["Trendon Watford","BKN","PF",8.8,5.5,2.8,0.8,0.4,1.7,51.0,75.0,0.9],
+["Ziaire Williams","BKN","SF",10.5,3.5,2.2,0.8,0.4,1.6,44.0,79.0,2.3],
+["Day'Ron Sharpe","BKN","C",10.0,8.2,1.5,0.8,1.0,1.5,62.0,63.0,0.0],
+["Noah Clowney","BKN","PF",8.5,5.5,1.5,0.9,0.8,1.3,44.0,71.0,1.2],
+["Dorian Finney-Smith","BKN","SF",11.0,4.5,2.2,1.0,0.5,1.3,42.0,80.0,2.5],
+["Shake Milton","BKN","SG",10.5,2.5,3.2,0.7,0.2,1.4,44.0,83.0,2.5],
+["Lonnie Walker IV","BKN","SG",12.0,3.0,2.0,0.9,0.3,1.5,43.0,80.0,2.8],
+["Harry Giles III","BKN","C",4.5,3.5,1.0,0.4,0.6,1.0,52.0,68.0,0.0],
+// ── NEW YORK KNICKS ──
+["Jalen Brunson","NYK","PG",27.8,3.6,6.7,0.8,0.2,2.3,47.9,84.6,2.5],
+["Karl-Anthony Towns","NYK","C",24.0,13.5,3.1,0.8,0.8,3.2,51.0,87.0,3.0],
+["OG Anunoby","NYK","SF",14.7,4.7,1.7,1.8,0.9,1.2,50.5,82.4,2.2],
+["Mikal Bridges","NYK","SG",19.6,4.3,3.6,0.8,0.4,1.3,47.7,83.5,2.7],
+["Julius Randle","NYK","PF",24.0,9.2,5.0,0.8,0.4,3.2,45.6,74.4,2.0],
+["Josh Hart","NYK","SG",10.4,8.0,4.5,1.0,0.3,1.6,50.0,74.5,1.2],
+["Donte DiVincenzo","NYK","SG",12.5,4.0,3.4,0.8,0.2,1.4,39.0,82.0,3.5],
+["Mitchell Robinson","NYK","C",7.0,8.8,0.7,0.5,1.8,1.2,68.0,48.0,0.0],
+["Isaiah Hartenstein","NYK","C",8.5,8.5,2.5,0.7,1.5,1.3,60.0,73.0,0.0],
+["Deuce McBride","NYK","PG",10.0,2.5,3.5,0.8,0.2,1.5,43.0,83.0,2.0],
+["Precious Achiuwa","NYK","PF",8.0,6.0,1.5,0.7,0.8,1.2,52.0,67.0,0.5],
+["Miles McBride","NYK","PG",9.5,2.8,3.0,0.9,0.2,1.2,44.0,82.0,2.2],
+// ── PHILADELPHIA 76ERS ──
+["Joel Embiid","PHI","C",34.7,11.0,5.6,1.0,1.7,3.8,52.8,85.7,1.1],
+["Tyrese Maxey","PHI","PG",25.9,3.7,6.2,1.0,0.5,2.5,46.0,90.0,3.0],
+["Paul George","PHI","SF",15.7,5.0,3.5,1.2,0.5,2.2,45.0,87.0,2.8],
+["Kelly Oubre Jr.","PHI","SF",14.5,5.5,1.8,1.1,0.6,1.5,44.5,77.0,1.8],
+["Tobias Harris","PHI","PF",14.7,6.5,3.1,0.7,0.5,1.5,49.7,83.5,1.8],
+["Andre Drummond","PHI","C",9.0,10.5,1.2,0.7,1.0,1.8,58.0,60.0,0.0],
+["Kyle Lowry","PHI","PG",7.0,3.0,5.5,1.0,0.2,1.8,39.0,85.0,1.8],
+["Mo Bamba","PHI","C",7.5,5.5,0.8,0.5,1.5,1.0,48.0,74.0,1.2],
+["Cameron Payne","PHI","PG",8.5,2.5,4.0,0.8,0.2,1.8,41.0,82.0,2.0],
+["Patrick Beverley","PHI","PG",5.5,3.0,3.2,1.0,0.2,1.0,38.0,79.0,1.5],
+// ── TORONTO RAPTORS ──
+["Scottie Barnes","TOR","PF",19.9,8.1,6.1,1.4,0.7,2.8,47.1,72.3,1.6],
+["Immanuel Quickley","TOR","PG",18.6,4.8,6.8,1.1,0.4,2.5,44.1,87.3,3.0],
+["RJ Barrett","TOR","SF",21.8,6.0,3.4,1.0,0.5,2.2,44.5,80.1,2.0],
+["Jakob Poeltl","TOR","C",11.0,9.5,3.5,0.8,1.5,1.8,60.0,71.0,0.0],
+["Gradey Dick","TOR","SG",12.0,4.0,2.0,0.7,0.3,1.2,44.0,82.0,2.8],
+["Bruce Brown","TOR","SG",8.5,4.5,3.5,1.0,0.5,1.4,47.0,76.0,1.0],
+["Ochai Agbaji","TOR","SG",9.5,3.5,1.8,0.8,0.4,1.0,46.0,79.0,2.2],
+["Chris Boucher","TOR","PF",9.0,5.0,1.2,0.7,1.0,1.2,44.0,75.0,2.0],
+["Precious Achiuwa","TOR","PF",8.5,6.5,1.8,0.8,0.8,1.3,52.0,68.0,0.5],
+["Kelly Olynyk","TOR","C",9.0,5.5,3.2,0.7,0.5,1.5,50.0,80.0,1.5],
+// ── CHICAGO BULLS ──
+["DeMar DeRozan","CHI","SG",24.5,4.6,6.8,0.9,0.3,2.4,50.4,84.2,0.7],
+["Zach LaVine","CHI","SG",24.0,4.5,4.5,0.9,0.4,2.8,47.0,82.0,2.5],
+["Nikola Vucevic","CHI","C",18.0,11.3,3.3,0.7,0.8,2.3,50.8,80.3,1.4],
+["Coby White","CHI","PG",19.0,4.0,4.5,0.9,0.3,2.2,44.0,85.0,3.0],
+["Patrick Williams","CHI","PF",11.0,5.5,1.8,0.9,0.8,1.5,47.0,75.0,1.2],
+["Ayo Dosunmu","CHI","PG",12.0,3.5,4.0,1.0,0.3,1.8,48.0,78.0,1.8],
+["Alex Caruso","CHI","PG",9.5,3.8,4.5,1.8,0.5,1.5,47.0,84.0,2.0],
+["Torrey Craig","CHI","SF",7.5,4.5,1.5,1.0,0.5,1.0,46.0,77.0,1.5],
+["Julian Phillips","CHI","SF",8.0,4.0,1.5,0.8,0.5,1.2,47.0,73.0,1.2],
+["Terry Taylor","CHI","PF",5.5,5.0,1.0,0.5,0.5,1.0,58.0,65.0,0.0],
+// ── CLEVELAND CAVALIERS ──
+["Donovan Mitchell","CLE","SG",26.6,5.1,6.1,1.6,0.3,3.2,47.5,85.0,3.2],
+["Darius Garland","CLE","PG",21.6,2.8,7.8,1.2,0.2,2.9,46.2,88.1,2.7],
+["Evan Mobley","CLE","PF",18.0,9.4,2.5,1.2,1.8,1.6,55.9,76.1,0.7],
+["Jarrett Allen","CLE","C",15.5,10.4,2.2,0.8,1.1,1.5,65.0,74.0,0.0],
+["Max Strus","CLE","SG",12.5,3.8,3.2,0.8,0.3,1.5,40.0,80.0,2.8],
+["Sam Merrill","CLE","SG",10.5,2.8,2.0,0.6,0.2,0.8,44.0,89.0,2.5],
+["Georges Niang","CLE","PF",8.5,3.5,1.8,0.6,0.3,0.9,44.0,86.0,2.2],
+["Dean Wade","CLE","SF",7.5,3.8,1.5,0.7,0.4,0.9,46.0,83.0,1.8],
+["Craig Porter Jr.","CLE","PG",6.5,3.0,3.5,1.0,0.3,1.2,42.0,78.0,1.5],
+["Isaac Okoro","CLE","SF",8.0,3.5,2.2,1.2,0.5,1.0,47.0,74.0,1.2],
+// ── DETROIT PISTONS ──
+["Cade Cunningham","DET","PG",22.7,4.3,7.5,1.4,0.5,3.3,43.5,84.9,2.7],
+["Jalen Duren","DET","C",13.5,12.2,2.5,0.8,1.5,1.8,60.0,63.0,0.0],
+["Isaiah Stewart","DET","PF",11.5,7.5,2.0,1.0,1.0,1.5,47.0,69.0,1.2],
+["Ausar Thompson","DET","SF",13.0,6.5,3.5,1.5,0.8,1.8,46.0,64.0,0.8],
+["Alec Burks","DET","SG",14.0,3.5,2.8,0.8,0.3,1.5,43.0,85.0,2.8],
+["Monte Morris","DET","PG",9.5,2.5,4.5,0.8,0.2,1.5,48.0,82.0,1.8],
+["James Wiseman","DET","C",10.0,6.5,1.2,0.5,1.0,1.5,58.0,65.0,0.0],
+["Killian Hayes","DET","PG",8.0,3.5,4.0,1.0,0.4,2.0,41.0,75.0,1.5],
+["Bojan Bogdanovic","DET","SF",14.5,3.5,2.5,0.7,0.2,1.3,46.0,85.0,3.2],
+["Marcus Sasser","DET","SG",8.5,2.5,2.8,0.9,0.3,1.5,41.0,81.0,2.2],
+// ── INDIANA PACERS ──
+["Tyrese Haliburton","IND","PG",20.1,3.9,10.4,1.6,0.5,2.7,47.4,85.5,3.2],
+["Pascal Siakam","IND","PF",21.3,7.8,3.7,0.7,0.4,2.2,52.7,79.3,1.1],
+["Andrew Nembhard","IND","PG",12.5,4.0,5.5,1.0,0.5,2.0,46.0,82.0,2.0],
+["Myles Turner","IND","C",14.5,6.8,1.8,0.7,2.5,1.5,49.0,80.0,2.0],
+["Benedict Mathurin","IND","SG",16.5,4.5,1.8,0.8,0.3,1.5,45.0,79.0,2.5],
+["Aaron Nesmith","IND","SF",13.0,4.5,2.5,1.0,0.5,1.2,47.0,76.0,2.3],
+["Obi Toppin","IND","PF",11.5,4.5,2.0,0.6,0.4,1.2,50.0,80.0,1.5],
+["T.J. McConnell","IND","PG",9.0,2.8,5.5,1.2,0.2,1.5,52.0,79.0,0.5],
+["Isaiah Jackson","IND","C",8.5,5.8,0.8,0.5,1.5,1.2,58.0,61.0,0.0],
+["Ben Sheppard","IND","SG",9.5,3.5,2.0,0.8,0.3,1.0,44.0,82.0,2.5],
+// ── MILWAUKEE BUCKS ──
+["Giannis Antetokounmpo","MIL","PF",32.7,11.5,6.5,1.2,1.1,3.8,61.0,63.8,0.7],
+["Damian Lillard","MIL","PG",24.0,4.4,7.3,0.9,0.3,3.1,44.0,91.1,4.1],
+["Khris Middleton","MIL","SF",15.1,4.0,5.3,0.9,0.2,2.1,47.3,88.2,1.9],
+["Brook Lopez","MIL","C",12.5,5.7,2.0,0.7,2.7,1.3,55.0,75.5,2.3],
+["Bobby Portis","MIL","PF",13.5,7.5,1.8,0.7,0.5,1.5,47.0,80.0,2.0],
+["Pat Connaughton","MIL","SG",8.5,4.2,2.0,0.7,0.3,0.9,41.0,85.0,2.5],
+["MarJon Beauchamp","MIL","SF",8.0,4.0,1.5,0.8,0.5,1.2,44.0,72.0,1.5],
+["Andre Jackson Jr.","MIL","SF",7.5,3.5,2.0,1.0,0.6,1.2,45.0,72.0,1.2],
+["AJ Green","MIL","SG",9.0,2.5,1.5,0.6,0.2,0.8,43.0,87.0,2.8],
+["Taurean Prince","MIL","SF",8.0,3.0,1.5,0.7,0.3,0.9,45.0,80.0,2.0],
+// ── ATLANTA HAWKS ──
+["Trae Young","ATL","PG",25.7,3.3,10.8,1.3,0.3,4.1,43.5,88.2,2.7],
+["Dejounte Murray","ATL","PG",18.0,4.5,6.5,1.5,0.4,2.8,44.0,75.0,1.5],
+["Bogdan Bogdanovic","ATL","SG",15.4,3.6,3.5,0.8,0.2,1.8,44.0,83.3,3.4],
+["Clint Capela","ATL","C",12.0,11.5,1.5,0.8,1.5,1.8,62.0,65.0,0.0],
+["De'Andre Hunter","ATL","SF",14.5,3.5,2.0,1.0,0.5,1.2,46.0,80.0,2.0],
+["Jalen Johnson","ATL","PF",15.5,7.0,4.5,1.2,0.8,2.0,50.0,71.0,1.0],
+["Saddiq Bey","ATL","SF",12.0,5.0,2.5,0.9,0.6,1.5,44.0,78.0,2.5],
+["Onyeka Okongwu","ATL","C",11.5,7.5,1.8,0.8,1.2,1.5,60.0,70.0,0.0],
+["Garrison Mathews","ATL","SG",8.5,2.5,1.5,0.6,0.2,0.8,41.0,86.0,2.8],
+["Kobe Bufkin","ATL","SG",9.0,3.0,2.5,0.9,0.3,1.5,43.0,79.0,1.8],
+// ── CHARLOTTE HORNETS ──
+["LaMelo Ball","CHA","PG",23.0,5.6,8.0,1.6,0.4,4.0,42.0,82.0,3.8],
+["Miles Bridges","CHA","SF",21.0,7.0,3.5,1.0,0.5,2.5,48.0,72.0,2.5],
+["Terry Rozier","CHA","SG",19.0,3.8,4.5,1.2,0.4,2.5,44.0,83.0,3.2],
+["Brandon Miller","CHA","SF",17.0,4.5,3.0,1.0,0.5,2.0,44.0,81.0,2.8],
+["Grant Williams","CHA","PF",11.5,5.5,2.5,1.0,0.5,1.5,46.0,79.0,2.0],
+["Nick Richards","CHA","C",12.0,9.5,1.0,0.7,1.2,1.5,63.0,65.0,0.0],
+["Tre Mann","CHA","SG",12.5,2.5,3.0,0.7,0.3,1.5,42.0,85.0,2.8],
+["Cody Martin","CHA","SF",7.5,4.0,2.5,1.0,0.4,1.2,46.0,76.0,1.0],
+["Mark Williams","CHA","C",9.5,7.5,1.2,0.5,1.2,1.5,65.0,62.0,0.0],
+["Frank Ntilikina","CHA","PG",7.0,2.5,3.0,1.0,0.3,1.2,42.0,79.0,1.5],
+// ── MIAMI HEAT ──
+["Jimmy Butler","MIA","SF",20.8,5.3,5.0,1.8,0.3,2.3,53.1,85.8,1.0],
+["Bam Adebayo","MIA","C",19.5,10.4,3.5,1.1,0.8,2.4,57.3,79.2,0.1],
+["Tyler Herro","MIA","SG",22.0,5.0,4.5,0.8,0.3,2.5,44.0,85.0,3.5],
+["Duncan Robinson","MIA","SG",14.0,3.0,3.2,0.7,0.2,1.3,44.0,87.0,3.8],
+["Nikola Jovic","MIA","PF",11.0,5.5,3.0,0.8,0.7,1.5,47.0,82.0,2.0],
+["Haywood Highsmith","MIA","SF",9.5,4.5,1.5,0.9,0.6,1.0,46.0,77.0,2.5],
+["Josh Richardson","MIA","SG",9.0,3.0,3.0,1.0,0.4,1.5,44.0,80.0,2.0],
+["Caleb Martin","MIA","SF",10.5,5.0,2.5,1.2,0.6,1.3,48.0,77.0,1.8],
+["Jaime Jaquez Jr.","MIA","SF",12.5,4.5,3.5,1.0,0.5,1.8,46.0,78.0,1.5],
+["Thomas Bryant","MIA","C",8.0,6.0,1.0,0.5,0.8,1.2,55.0,72.0,0.2],
+// ── ORLANDO MAGIC ──
+["Paolo Banchero","ORL","PF",22.6,6.9,5.4,0.9,0.7,3.2,45.0,75.0,1.5],
+["Franz Wagner","ORL","SF",19.7,4.5,4.0,0.9,0.5,2.2,48.0,78.0,2.0],
+["Jalen Suggs","ORL","PG",14.5,4.5,5.5,1.8,0.6,2.5,44.0,77.0,2.5],
+["Wendell Carter Jr.","ORL","C",12.5,8.5,3.5,0.7,0.9,2.0,56.0,76.0,0.5],
+["Anthony Black","ORL","PG",12.0,4.5,5.5,1.5,0.5,2.2,44.0,74.0,1.5],
+["Cole Anthony","ORL","PG",13.5,4.0,4.5,0.8,0.3,2.2,42.0,82.0,2.5],
+["Gary Harris","ORL","SG",8.5,3.5,2.0,0.8,0.2,1.0,44.0,84.0,2.2],
+["Moritz Wagner","ORL","C",12.0,6.0,1.5,0.5,0.8,1.5,56.0,77.0,0.5],
+["Jonathan Isaac","ORL","PF",9.5,5.5,1.5,1.2,1.8,1.5,46.0,72.0,1.0],
+["Markelle Fultz","ORL","PG",10.5,3.5,4.5,1.0,0.3,2.0,47.0,75.0,0.5],
+// ── WASHINGTON WIZARDS ──
+["Jordan Poole","WAS","SG",17.3,2.7,4.5,0.9,0.2,2.1,42.8,85.6,3.2],
+["Kyle Kuzma","WAS","PF",16.0,7.5,3.5,0.8,0.5,2.0,44.0,74.0,2.5],
+["Bilal Coulibaly","WAS","SF",13.5,5.5,3.5,1.5,0.8,1.8,46.0,73.0,1.8],
+["Deni Avdija","WAS","SF",15.5,7.0,4.5,1.5,0.7,2.2,47.0,79.0,1.5],
+["Alexandre Sarr","WAS","C",11.0,7.0,2.0,0.8,1.8,1.8,47.0,74.0,1.0],
+["Tyus Jones","WAS","PG",10.5,3.0,7.5,1.2,0.2,2.0,47.0,85.0,1.5],
+["Corey Kispert","WAS","SF",13.0,3.5,2.0,0.6,0.2,1.0,46.0,85.0,3.2],
+["Anthony Gill","WAS","SF",7.5,4.0,1.2,0.7,0.5,0.8,52.0,78.0,1.0],
+["Landry Shamet","WAS","SG",9.0,2.5,2.5,0.6,0.2,1.0,42.0,86.0,2.8],
+["Richaun Holmes","WAS","C",7.0,5.5,1.0,0.5,0.8,1.2,60.0,68.0,0.0],
+// ── DENVER NUGGETS ──
+["Nikola Jokic","DEN","C",26.4,12.4,9.0,1.4,0.7,3.4,58.3,81.7,0.9],
+["Jamal Murray","DEN","PG",21.2,4.1,6.5,1.0,0.4,2.8,46.0,85.0,3.5],
+["Michael Porter Jr.","DEN","SF",17.0,7.5,2.0,0.5,0.5,1.5,48.0,82.0,2.8],
+["Aaron Gordon","DEN","PF",13.8,6.8,3.0,1.0,0.8,1.5,55.0,72.0,0.5],
+["Kentavious Caldwell-Pope","DEN","SG",12.0,3.5,2.5,0.9,0.2,1.2,46.0,85.0,2.8],
+["Reggie Jackson","DEN","PG",9.0,2.5,4.5,0.8,0.2,1.8,40.0,83.0,2.0],
+["Christian Braun","DEN","SG",11.0,4.5,2.5,0.9,0.4,1.2,51.0,76.0,2.0],
+["Peyton Watson","DEN","SF",8.5,4.0,1.8,1.0,0.8,1.0,47.0,73.0,1.5],
+["Justin Holiday","DEN","SG",7.5,2.8,1.5,0.7,0.3,0.8,40.0,84.0,2.2],
+["Zeke Nnaji","DEN","PF",7.0,4.5,1.0,0.4,0.6,1.0,55.0,70.0,0.2],
+// ── MINNESOTA TIMBERWOLVES ──
+["Anthony Edwards","MIN","SG",25.9,5.4,5.1,1.3,0.6,3.2,46.0,83.0,3.8],
+["Rudy Gobert","MIN","C",13.4,11.6,1.3,0.7,2.1,1.5,66.9,62.7,0.0],
+["Mike Conley","MIN","PG",9.5,3.0,6.0,0.8,0.2,1.5,43.0,89.0,2.2],
+["Jaden McDaniels","MIN","SF",12.5,4.5,2.0,1.5,1.0,1.5,47.0,78.0,2.0],
+["Naz Reid","MIN","C",13.5,5.5,2.0,0.7,0.8,1.2,45.0,82.0,2.5],
+["Kyle Anderson","MIN","SF",8.5,5.0,4.0,1.0,0.5,1.5,52.0,78.0,0.8],
+["Monte Morris","MIN","PG",8.5,2.5,4.0,0.8,0.2,1.2,48.0,81.0,1.5],
+["Nickeil Alexander-Walker","MIN","SG",11.0,3.5,3.0,1.0,0.4,1.5,44.0,80.0,2.5],
+["Josh Minott","MIN","SF",6.5,3.5,1.5,0.8,0.5,1.0,45.0,70.0,1.2],
+["Leonard Miller","MIN","SF",7.0,4.0,1.5,0.7,0.6,1.0,47.0,71.0,0.8],
+// ── OKLAHOMA CITY THUNDER ──
+["Shai Gilgeous-Alexander","OKC","PG",30.1,5.5,6.2,2.0,1.1,2.8,53.5,87.4,2.1],
+["Jalen Williams","OKC","SG",23.0,4.5,5.9,1.3,0.6,2.7,50.7,82.1,2.0],
+["Chet Holmgren","OKC","C",16.5,7.9,2.0,1.0,2.6,1.6,49.2,76.5,1.5],
+["Luguentz Dort","OKC","SG",13.5,4.5,2.5,1.5,0.5,1.5,42.0,80.0,3.0],
+["Josh Giddey","OKC","PG",12.5,7.9,6.4,1.0,0.5,2.7,44.7,68.8,1.2],
+["Isaiah Joe","OKC","SG",9.5,2.5,2.0,0.7,0.2,1.0,40.0,84.0,3.0],
+["Aaron Wiggins","OKC","SG",10.5,3.5,2.0,0.8,0.3,1.2,47.0,78.0,2.5],
+["Kenrich Williams","OKC","SF",7.5,4.5,2.5,1.0,0.5,1.2,47.0,76.0,1.2],
+["Jaylin Williams","OKC","PF",8.0,5.5,2.0,0.8,0.8,1.0,53.0,71.0,0.5],
+["Ousmane Dieng","OKC","SF",7.5,3.5,2.0,0.7,0.4,1.2,44.0,74.0,1.5],
+// ── PORTLAND TRAIL BLAZERS ──
+["Anfernee Simons","POR","SG",21.1,3.4,4.9,0.6,0.3,2.1,45.2,87.4,3.5],
+["Jerami Grant","POR","SF",20.5,4.1,2.8,1.1,1.1,1.7,47.4,80.2,2.0],
+["Shaedon Sharpe","POR","SG",18.5,4.5,3.0,1.0,0.5,2.0,44.0,75.0,2.8],
+["Deandre Ayton","POR","C",14.0,10.0,2.0,0.8,1.0,2.0,60.0,72.0,0.0],
+["Scoot Henderson","POR","PG",14.5,4.5,6.5,1.0,0.4,3.0,40.0,75.0,1.5],
+["Matisse Thybulle","POR","SF",8.0,3.5,1.5,1.5,0.8,1.0,44.0,70.0,1.5],
+["Toumani Camara","POR","SF",10.5,5.5,2.5,1.2,0.6,1.3,48.0,75.0,1.5],
+["Jabari Walker","POR","PF",7.5,5.5,2.0,0.8,0.6,1.2,47.0,72.0,1.2],
+["Robert Williams III","POR","C",8.0,7.0,1.0,0.5,1.5,1.2,60.0,63.0,0.0],
+["Kris Murray","POR","SF",8.5,4.0,1.8,0.7,0.5,1.0,46.0,78.0,1.8],
+// ── UTAH JAZZ ──
+["Lauri Markkanen","UTA","PF",25.6,8.6,1.9,0.7,0.8,1.8,49.8,87.4,2.5],
+["John Collins","UTA","PF",14.5,7.5,2.5,0.8,0.5,1.8,52.0,78.0,1.5],
+["Jordan Clarkson","UTA","SG",17.5,3.5,4.0,0.8,0.3,2.2,42.0,84.0,3.0],
+["Keyonte George","UTA","PG",15.5,3.8,5.5,0.9,0.3,2.8,40.0,79.0,3.2],
+["Walker Kessler","UTA","C",9.5,9.0,1.0,0.5,2.5,1.0,65.0,60.0,0.0],
+["Kelly Olynyk","UTA","C",12.5,6.8,3.8,0.8,0.6,1.8,50.2,81.2,1.6],
+["Talen Horton-Tucker","UTA","SG",10.5,4.5,3.5,0.9,0.4,1.8,44.0,74.0,1.8],
+["Taylor Hendricks","UTA","PF",9.0,5.0,1.5,0.8,0.8,1.2,46.0,76.0,1.5],
+["Collin Sexton","UTA","PG",16.0,2.5,4.5,0.8,0.2,2.0,48.0,84.0,2.5],
+["Simone Fontecchio","UTA","SF",10.5,3.5,1.8,0.7,0.4,1.2,45.0,82.0,2.5],
+// ── GOLDEN STATE WARRIORS ──
+["Stephen Curry","GSW","PG",29.4,5.1,6.1,0.7,0.2,3.1,49.2,91.5,5.1],
+["Draymond Green","GSW","PF",8.5,7.2,7.0,1.0,0.8,3.0,49.0,72.0,0.5],
+["Klay Thompson","GSW","SG",17.9,3.3,2.4,0.7,0.5,1.5,43.2,85.4,4.0],
+["Andrew Wiggins","GSW","SF",17.1,5.0,2.4,0.9,0.7,1.5,47.4,69.8,2.3],
+["Jonathan Kuminga","GSW","SF",16.5,4.5,2.5,0.8,0.6,1.8,52.0,71.0,1.0],
+["Brandin Podziemski","GSW","SG",12.5,5.5,4.5,1.2,0.5,1.8,44.0,77.0,2.0],
+["Moses Moody","GSW","SG",10.5,3.5,1.8,0.7,0.3,1.0,46.0,82.0,2.5],
+["Chris Paul","GSW","PG",9.4,3.7,8.9,1.3,0.2,2.1,44.0,84.5,1.5],
+["Trayce Jackson-Davis","GSW","C",10.0,7.0,2.0,0.8,1.5,1.5,60.0,65.0,0.0],
+["Kevon Looney","GSW","C",5.5,6.0,2.0,0.5,0.5,1.0,55.0,68.0,0.0],
+// ── LA CLIPPERS ──
+["Kawhi Leonard","LAC","SF",23.7,6.5,3.6,1.6,0.8,2.1,52.7,87.1,2.1],
+["Paul George","LAC","SF",22.6,5.2,3.5,1.4,0.4,2.4,45.4,88.8,3.0],
+["James Harden","LAC","PG",16.5,5.5,8.5,1.0,0.5,3.5,43.0,87.0,3.0],
+["Ivica Zubac","LAC","C",12.5,11.0,2.5,0.8,1.2,1.5,61.0,75.0,0.0],
+["Norman Powell","LAC","SG",14.5,2.8,2.0,0.8,0.3,1.2,47.0,85.0,2.8],
+["Terance Mann","LAC","SG",10.5,4.5,2.8,0.8,0.4,1.2,50.0,77.0,1.5],
+["Russell Westbrook","LAC","PG",11.0,5.0,5.5,1.2,0.3,3.0,43.0,68.0,1.0],
+["Mason Plumlee","LAC","C",6.5,5.5,2.0,0.5,0.6,1.2,55.0,65.0,0.0],
+["Bones Hyland","LAC","PG",11.5,2.8,3.5,0.8,0.2,1.8,41.0,83.0,2.8],
+["P.J. Tucker","LAC","PF",5.5,3.5,1.5,0.8,0.3,0.8,42.0,76.0,1.5],
+// ── LOS ANGELES LAKERS ──
+["LeBron James","LAL","SF",25.7,7.3,8.3,1.3,0.6,3.5,54.0,73.5,2.4],
+["Anthony Davis","LAL","C",24.7,12.6,3.5,1.1,2.3,2.5,56.3,78.3,0.3],
+["Austin Reaves","LAL","SG",15.9,4.3,5.5,1.0,0.4,2.0,47.0,87.0,2.8],
+["D'Angelo Russell","LAL","PG",18.0,3.0,6.5,0.8,0.3,2.5,43.0,85.0,3.0],
+["Rui Hachimura","LAL","PF",13.0,5.0,1.5,0.6,0.5,1.2,51.0,78.0,1.5],
+["Taurean Prince","LAL","SF",8.5,3.5,1.8,0.7,0.3,0.9,45.0,80.0,2.2],
+["Jarred Vanderbilt","LAL","PF",7.0,7.5,2.0,1.2,0.7,1.2,55.0,62.0,0.2],
+["Christian Wood","LAL","PF",13.5,6.5,2.0,0.6,0.8,1.8,50.0,75.0,2.5],
+["Spencer Dinwiddie","LAL","PG",12.0,3.0,5.5,0.8,0.3,2.2,43.0,82.0,2.5],
+["Cam Reddish","LAL","SF",9.5,3.5,1.8,0.9,0.4,1.2,44.0,76.0,2.2],
+// ── PHOENIX SUNS ──
+["Kevin Durant","PHX","SF",29.1,6.7,5.0,0.7,1.4,3.0,52.3,85.6,2.4],
+["Devin Booker","PHX","SG",27.1,4.5,6.9,0.9,0.3,3.2,49.3,85.2,2.7],
+["Bradley Beal","PHX","SG",18.2,4.0,5.0,0.8,0.3,2.5,49.0,85.0,1.8],
+["Jusuf Nurkic","PHX","C",11.5,10.5,3.0,0.8,0.9,2.5,53.0,72.0,0.0],
+["Grayson Allen","PHX","SG",13.0,3.5,2.5,0.8,0.3,1.2,45.0,88.0,3.5],
+["Eric Gordon","PHX","SG",12.5,2.5,2.5,0.8,0.2,1.5,42.0,85.0,3.0],
+["Yuta Watanabe","PHX","SF",8.0,3.5,1.5,0.8,0.6,0.8,47.0,80.0,2.0],
+["Royce O'Neale","PHX","SF",9.5,4.5,2.5,1.0,0.5,1.2,43.0,80.0,2.5],
+["Drew Eubanks","PHX","C",7.0,5.5,1.0,0.5,0.8,1.0,58.0,68.0,0.0],
+["Bol Bol","PHX","C",8.5,4.5,1.2,0.5,1.2,1.0,52.0,72.0,1.0],
+// ── SACRAMENTO KINGS ──
+["Domantas Sabonis","SAC","C",19.6,13.6,7.3,0.8,0.5,3.0,60.5,69.0,0.2],
+["De'Aaron Fox","SAC","PG",25.2,4.0,6.1,1.6,0.3,3.1,49.1,74.3,1.9],
+["Kevin Huerter","SAC","SG",12.0,4.0,3.5,0.8,0.3,1.5,45.0,85.0,2.8],
+["Harrison Barnes","SAC","PF",14.5,5.5,2.0,0.8,0.4,1.2,49.0,83.0,2.2],
+["Malik Monk","SAC","SG",13.5,3.5,4.5,0.8,0.2,1.8,46.0,83.0,2.5],
+["Trey Lyles","SAC","PF",10.0,6.0,2.0,0.6,0.5,1.2,51.0,77.0,2.0],
+["Alex Len","SAC","C",7.5,7.0,1.5,0.5,0.8,1.5,55.0,70.0,0.0],
+["Keon Ellis","SAC","SG",9.0,3.5,2.0,1.2,0.4,1.0,46.0,78.0,2.2],
+["Jordan McLaughlin","SAC","PG",6.5,2.5,4.5,1.0,0.2,1.5,47.0,82.0,1.0],
+["Chimezie Metu","SAC","PF",7.0,4.0,1.5,0.6,0.7,1.0,48.0,74.0,1.0],
+// ── DALLAS MAVERICKS ──
+["Luka Doncic","DAL","PG",33.9,9.2,9.8,1.4,0.5,4.5,47.5,73.6,3.6],
+["Kyrie Irving","DAL","PG",25.6,5.0,5.2,1.3,0.5,2.5,49.7,90.7,3.0],
+["P.J. Washington","DAL","PF",12.5,6.5,2.5,1.0,0.8,1.5,48.0,78.0,2.5],
+["Daniel Gafford","DAL","C",12.0,7.5,1.5,0.8,2.0,1.2,70.0,65.0,0.0],
+["Josh Green","DAL","SG",11.0,4.5,3.0,1.2,0.5,1.5,48.0,73.0,2.0],
+["Derrick Jones Jr.","DAL","SF",8.5,4.5,1.5,0.9,0.8,1.0,55.0,73.0,0.8],
+["Dwight Powell","DAL","C",7.0,4.5,1.2,0.5,0.5,0.8,60.0,75.0,0.0],
+["Maxi Kleber","DAL","PF",8.5,4.0,1.5,0.7,0.8,1.0,43.0,82.0,2.2],
+["Dante Exum","DAL","PG",10.0,3.0,4.0,1.2,0.3,1.5,46.0,80.0,2.0],
+["Tim Hardaway Jr.","DAL","SG",12.0,3.0,2.5,0.8,0.3,1.5,42.0,84.0,3.0],
+// ── HOUSTON ROCKETS ──
+["Alperen Sengun","HOU","C",21.1,9.3,5.5,0.9,1.2,2.9,54.2,72.3,0.4],
+["Jalen Green","HOU","SG",22.5,4.5,5.5,1.2,0.5,3.0,43.0,80.0,3.5],
+["Fred VanVleet","HOU","PG",18.1,4.0,6.8,1.5,0.2,2.3,40.9,85.5,3.6],
+["Jabari Smith Jr.","HOU","PF",14.5,7.5,2.0,1.0,1.0,1.8,44.0,78.0,2.5],
+["Dillon Brooks","HOU","SF",13.5,4.0,2.5,1.2,0.5,1.8,42.0,79.0,2.8],
+["Tari Eason","HOU","PF",11.0,5.5,2.0,1.5,0.8,1.5,51.0,72.0,0.8],
+["Aaron Holiday","HOU","PG",9.5,2.5,4.0,0.8,0.2,1.5,43.0,83.0,2.2],
+["Cam Whitmore","HOU","SF",12.0,4.0,2.0,1.0,0.5,1.5,46.0,75.0,1.8],
+["Jeff Green","HOU","PF",7.5,4.0,1.5,0.6,0.5,1.0,48.0,78.0,1.5],
+["Jock Landale","HOU","C",6.5,4.0,1.2,0.4,0.5,0.8,56.0,78.0,0.2],
+// ── MEMPHIS GRIZZLIES ──
+["Ja Morant","MEM","PG",26.2,5.9,8.1,1.0,0.5,3.4,46.6,75.4,1.0],
+["Desmond Bane","MEM","SG",21.5,4.8,5.0,1.2,0.4,1.9,47.0,89.3,3.7],
+["Jaren Jackson Jr.","MEM","PF",22.0,5.8,2.0,0.9,3.0,2.4,44.2,83.1,2.5],
+["Marcus Smart","MEM","PG",11.5,4.5,6.5,1.5,0.4,2.8,41.0,79.0,2.0],
+["Santi Aldama","MEM","PF",14.0,6.5,3.0,0.8,0.8,1.5,47.0,79.0,2.5],
+["GG Jackson","MEM","PF",14.0,4.5,2.0,0.7,0.5,1.8,46.0,72.0,2.0],
+["Brandon Clarke","MEM","PF",9.5,5.5,1.5,0.7,0.8,1.0,64.0,74.0,0.0],
+["Ziaire Williams","MEM","SF",10.5,3.5,2.0,0.8,0.4,1.5,44.0,79.0,2.2],
+["Luke Kennard","MEM","SG",9.5,2.5,2.0,0.6,0.2,1.0,45.0,90.0,2.8],
+["John Konchar","MEM","SG",7.5,4.5,2.5,1.0,0.3,1.0,52.0,78.0,1.5],
+// ── NEW ORLEANS PELICANS ──
+["Zion Williamson","NOP","PF",22.9,5.8,4.6,0.9,0.7,2.6,60.8,70.2,0.2],
+["Brandon Ingram","NOP","SF",24.3,5.1,5.1,0.7,0.5,2.7,47.2,85.7,2.2],
+["CJ McCollum","NOP","SG",20.4,3.6,4.4,0.7,0.3,1.8,46.2,84.7,3.1],
+["Trey Murphy III","NOP","SF",16.5,4.5,2.5,0.8,0.5,1.5,46.0,83.0,3.5],
+["Herb Jones","NOP","SF",9.5,4.5,3.0,1.5,0.7,1.5,47.0,73.0,1.0],
+["Jonas Valanciunas","NOP","C",12.0,10.5,2.0,0.7,0.8,2.0,55.0,74.0,0.5],
+["Dyson Daniels","NOP","PG",12.5,4.5,4.5,2.0,0.7,2.0,45.0,72.0,1.5],
+["Naji Marshall","NOP","SF",10.0,4.5,3.0,1.0,0.5,1.5,49.0,78.0,1.8],
+["Jose Alvarado","NOP","PG",9.0,3.0,4.5,2.0,0.4,1.8,42.0,79.0,2.0],
+["Willy Hernangomez","NOP","C",8.0,6.0,1.5,0.5,0.6,1.2,55.0,74.0,0.2],
+// ── SAN ANTONIO SPURS ──
+["Victor Wembanyama","SAS","C",21.4,10.6,3.9,1.2,3.6,3.3,46.5,79.6,2.6],
+["Devin Vassell","SAS","SG",19.5,4.0,3.5,1.0,0.4,2.0,45.0,85.0,3.5],
+["Jeremy Sochan","SAS","PF",13.5,5.5,4.5,1.2,0.7,2.0,48.0,72.0,1.2],
+["Keldon Johnson","SAS","SF",15.5,5.0,2.5,1.0,0.4,1.8,46.0,78.0,2.2],
+["Tre Jones","SAS","PG",11.5,3.5,6.5,1.0,0.3,2.0,47.0,79.0,1.0],
+["Zach Collins","SAS","C",9.5,5.5,2.5,0.7,0.8,1.5,50.0,79.0,1.5],
+["Julian Champagnie","SAS","SF",11.0,4.5,1.8,0.8,0.4,1.2,45.0,80.0,2.5],
+["Blake Wesley","SAS","SG",9.0,3.0,3.5,0.9,0.3,1.8,41.0,76.0,2.0],
+["Charles Bassey","SAS","C",8.0,6.5,1.5,0.7,1.0,1.5,58.0,63.0,0.0],
+["Cedi Osman","SAS","SF",8.5,3.5,2.0,0.7,0.3,1.0,42.0,80.0,2.0],
+];
+
+// Build player objects, rank by fantasy pts
+function fpRaw(p,r,a,s,b,t,tp){return Math.round((p+r*1.2+a*1.5+s*3+b*3-t+tp*0.5)*10)/10;}
+const PLAYERS = RAW.map(([nm,tm,pos,pts,reb,ast,stl,blk,to,fgp,ftp,tpm],i)=>({
+  id:i+1,name:nm,team:tm,pos,
+  pts:+pts,reb:+reb,ast:+ast,stl:+stl,blk:+blk,to:+to,
+  fgp:+fgp,ftp:+ftp,tpm:+tpm,
+  fp:fpRaw(pts,reb,ast,stl,blk,to,tpm),adp:0,
+})).sort((a,b)=>b.fp-a.fp).map((p,i)=>({...p,adp:i+1}));
+
+// ─── SETTINGS ─────────────────────────────────────────────
+const FMT_INFO={
+  snake:'Odd rounds 1→N, even rounds N→1. Classic format.',
+  auction:'Each team gets a budget. Bid on every player. Budget management wins drafts!',
+  linear:'Same order every round. Pick 1 always picks first.',
+};
+const SCR_INFO={
+  h2h_cat:'Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',
+  h2h_pts:'Weekly matchup by total fantasy pts. PTS=1, REB=1.2, AST=1.5, STL=3, BLK=3, TO=-1, 3PM=0.5.',
+  roto:'Season-long ranking in each stat category. Best cumulative rank total wins.',
+  points:'Pure accumulation. Best total fantasy points all season wins.',
+};
+
+function cc(gid,el){
+  document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  if(gid==='cFormat'){
+    document.getElementById('iFormatInfo').textContent=FMT_INFO[el.dataset.v];
+    document.getElementById('iBudgetRow').style.display=el.dataset.v==='auction'?'block':'none';
+  }
+  if(gid==='cScoring') document.getElementById('iScoringInfo').textContent=SCR_INFO[el.dataset.v];
+}
+function gv(gid){return document.querySelector('#'+gid+' .chip.on')?.dataset?.v||null;}
+
+// ─── STATE ────────────────────────────────────────────────
+let S={
+  name:'My Team',ls:10,fmt:'snake',scr:'h2h_cat',
+  rds:13,myPos:4,tmax:90,abud:200,myBudget:200,
+  cur:0,total:0,picks:[],myTeam:[],drafted:new Set(),
+  posF:'ALL',timer:90,timerInt:null,selP:null,
+  teams:[],order:[],cpuBuds:[],
+};
+
+function startDraft(){
+  const e=document.getElementById('err');
+  e.classList.remove('show');
+  const ls=parseInt(document.getElementById('iSize').value);
+  const sp=parseInt(document.getElementById('iSpot').value);
+  const rd=parseInt(document.getElementById('iRounds').value);
+  if(isNaN(ls)||ls<2||ls>20){e.textContent='League size must be 2–20.';e.classList.add('show');return;}
+  if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
+  if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
+  const need=ls*rd;
+  if(need>PLAYERS.length){e.textContent='Need '+need+' slots but only '+PLAYERS.length+' players. Reduce teams or rounds.';e.classList.add('show');return;}
+  S.name=document.getElementById('iName').value.trim()||'My Team';
+  S.ls=ls;S.myPos=sp-1;S.rds=rd;
+  S.fmt=gv('cFormat');S.scr=gv('cScoring');
+  S.tmax=parseInt(gv('cTimer'))||0;
+  S.abud=parseInt(document.getElementById('iBudget').value)||200;
+  S.total=ls*rd;S.cur=0;S.picks=[];S.myTeam=[];S.drafted=new Set();
+  S.myBudget=S.abud;
+  FAVS=[];tradeLog=[];trSelectedTeam=null;
+  initPauseState();
+  const tn=['Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats',
+    'Buckets FC','Glass Eaters','The Paint','Sky Hooks','Ankle Breakers',
+    'Chain Nets','Dunk City','Bench Mob','Run & Gun','Swat Squad',
+    'Pick & Roll','Baseline Boyz','Buzzer Beaters','Alley Oops','Free Ballers'];
+  S.teams=Array.from({length:ls},(_,i)=>i===S.myPos?S.name:(tn[i]||'Team '+(i+1)));
+  S.cpuBuds=Array.from({length:ls},()=>S.abud);
+  S.order=pickOrder(ls,rd,S.fmt);
+  document.getElementById('mFmt').textContent=S.fmt.toUpperCase();
+
+  // Go straight to draft room — everything is live, countdown is just a bar
+  document.getElementById('lobby').classList.remove('active');
+  document.getElementById('draft').classList.add('active');
+  rPlayers();rMyTeam();rBoard();upHdr();updateTradeBtn();
+  startCountdown();
+  // NOTE: advance() is called in launchDraft() — nothing picks until countdown ends
+}
+
+let cdInt=null;
+const CD_DURATION=120;
+
+function startCountdown(){
+  let remaining=CD_DURATION;
+  document.getElementById('pdcBar').classList.remove('hidden');
+  document.getElementById('pdcStrip').style.display='block';
+
+  function tick(){
+    const m=Math.floor(remaining/60);
+    const s=remaining%60;
+    const pct=(remaining/CD_DURATION)*100;
+    const urgent=remaining<=10;
+    document.getElementById('pdcTime').textContent=m+':'+(s+'').padStart(2,'0');
+    document.getElementById('pdcTime').className='pdc-time'+(urgent?' urgent':'');
+    document.getElementById('pdcFill').style.width=pct+'%';
+    document.getElementById('pdcFill').className='pdc-strip-fill'+(urgent?' urgent':'');
+    if(remaining<=0){ clearInterval(cdInt); launchDraft(); return; }
+    remaining--;
+  }
+
+  tick();
+  clearInterval(cdInt);
+  cdInt=setInterval(tick,1000);
+}
+
+function launchDraft(){
+  clearInterval(cdInt);
+  document.getElementById('pdcBar').classList.add('hidden');
+  document.getElementById('pdcStrip').style.display='none';
+  showBanner('🏀 Draft is Live — Make Your Picks!');
+  if(S.fmt==='auction') aucNext(); else advance();
+}
+
+function pickOrder(ls,rds,fmt){
+  const o=[];
+  for(let r=0;r<rds;r++){
+    let t=Array.from({length:ls},(_,i)=>i);
+    if(fmt==='snake'&&r%2===1)t=t.reverse();
+    t.forEach(x=>o.push(x));
+  }
+  return o;
+}
+
+// ─── DRAFT FLOW ───────────────────────────────────────────
+function advance(){
+  if(PS.isPaused) return; // don't advance while paused
+  while(S.cur<S.total&&S.order[S.cur]!==S.myPos) cpuPick();
+  upHdr();rPlayers();rBoard();
+  if(S.cur<S.total&&S.order[S.cur]===S.myPos){
+    showBanner('⏰ You\'re On The Clock!');
+    if(S.tmax>0) resetTimer();
+  } else if(S.cur>=S.total) endDraft();
+}
+function cpuPick(){
+  const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
+  if(!av.length)return;
+  const top=av.slice(0,Math.min(3,av.length));
+  doPick(top[Math.floor(Math.random()*top.length)],S.order[S.cur]);
+}
+function doPick(p,ti){
+  S.drafted.add(p.id);
+  S.picks.push({ov:S.cur+1,round:Math.floor(S.cur/S.ls)+1,ti,pid:p.id});
+  if(ti===S.myPos){S.myTeam.push(p);rMyTeam();}
+  S.cur++;
+  upFavBadge();
+}
+function userPick(p){
+  if(PS.isPaused){ showToast('⏸ Draft is paused'); return; }
+  if(S.drafted.has(p.id)||S.order[S.cur]!==S.myPos)return;
+  clearInterval(S.timerInt);
+  document.getElementById('pModal').classList.remove('open');
+  doPick(p,S.myPos);
+  hideBanner();showToast('✅ '+p.name+' drafted!');
+  rBoard();upHdr();rPlayers();
+  setTimeout(advance,500);
+}
+
+// AUCTION
+function aucNext(){
+  if(S.cur>=S.total){endDraft();return;}
+  const nom=S.order[S.cur];
+  const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
+  if(!av.length){endDraft();return;}
+  if(nom===S.myPos){
+    openAuc(av[0]);
+  } else {
+    const top=av.slice(0,Math.min(4,av.length));
+    const p=top[Math.floor(Math.random()*top.length)];
+    const bid=Math.max(1,Math.floor(S.cpuBuds[nom]*(0.08+Math.random()*0.22)));
+    S.cpuBuds[nom]-=bid;
+    doPick(p,nom);rBoard();rPlayers();upHdr();
+    setTimeout(aucNext,180);
+  }
+}
+function openAuc(p){
+  S.selP=p;
+  document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' — '+p.team+' · '+p.pos+' · Rank #'+p.adp;
+  document.getElementById('aBudget').textContent='$'+S.myBudget;
+  const pct=(S.myBudget/S.abud)*100;
+  document.getElementById('bFill').style.width=pct+'%';
+  document.getElementById('bFill').className='bf'+(pct<25?' lo':'');
+  document.getElementById('bInput').value=1;
+  document.getElementById('aModal').classList.add('open');
+}
+function qBid(a){document.getElementById('bInput').value=Math.min(a,S.myBudget);}
+function passAuction(){
+  document.getElementById('aModal').classList.remove('open');
+  if(S.selP) doPick(S.selP,(S.myPos+1)%S.ls);
+  S.cur++;setTimeout(aucNext,250);
+}
+function confAuction(){
+  const bid=parseInt(document.getElementById('bInput').value)||1;
+  if(bid>S.myBudget){showToast('⚠️ Over budget!');return;}
+  document.getElementById('aModal').classList.remove('open');
+  S.myBudget-=bid;
+  doPick(S.selP,S.myPos);
+  showToast('✅ '+S.selP.name+' — $'+bid+'!');
+  rBoard();rPlayers();rMyTeam();upHdr();
+  setTimeout(aucNext,350);
+}
+
+// PLAYER MODAL
+function calcFP(p){
+  if(S.scr==='h2h_pts'||S.scr==='points')
+    return Math.round((p.pts+p.reb*1.2+p.ast*1.5+p.stl*3+p.blk*3-p.to+p.tpm*0.5)*10)/10;
+  return p.fp;
+}
+function openPModal(idx){
+  const p=PLAYERS[idx];if(!p||S.drafted.has(p.id))return;
+  S.selP=p;
+  const col=tcolor(p.team);
+  document.getElementById('mAv').style.background=col;
+  document.getElementById('mAv').textContent=initials(p.name);
+  document.getElementById('mName').textContent=p.name;
+  document.getElementById('mSub').textContent=p.team+' · '+p.pos+' · Rank #'+p.adp;
+  document.getElementById('mStats').innerHTML=
+    `<div class="sb"><div class="sv">${p.pts}</div><div class="sl">PTS</div></div>
+     <div class="sb"><div class="sv">${p.reb}</div><div class="sl">REB</div></div>
+     <div class="sb"><div class="sv">${p.ast}</div><div class="sl">AST</div></div>
+     <div class="sb"><div class="sv">${p.stl}</div><div class="sl">STL</div></div>
+     <div class="sb"><div class="sv">${p.blk}</div><div class="sl">BLK</div></div>
+     <div class="sb"><div class="sv">${p.to}</div><div class="sl">TO</div></div>
+     <div class="sb"><div class="sv">${p.tpm}</div><div class="sl">3PM</div></div>
+     <div class="sb"><div class="sv">${calcFP(p)}</div><div class="sl">FPTS</div></div>`;
+  const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Rotisserie',points:'Points Lg'};
+  document.getElementById('mNote').textContent='Fantasy pts: '+sl[S.scr];
+  const ok=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
+  document.getElementById('bDraft').textContent=ok?'Draft Player':'View Only';
+  updateFavModalBtn();
+  document.getElementById('pModal').classList.add('open');
+}
+function cModal(e){if(e.target===document.getElementById('pModal'))document.getElementById('pModal').classList.remove('open');}
+function confDraft(){
+  document.getElementById('pModal').classList.remove('open');
+  if(S.selP&&S.fmt!=='auction'&&S.order[S.cur]===S.myPos) userPick(S.selP);
+}
+
+// RENDER PLAYERS
+function rPlayers(){
+  const srch=(document.getElementById('srch')?.value||'').toLowerCase();
+  const list=PLAYERS.filter(p=>{
+    const mp=S.posF==='ALL'||p.pos===S.posF;
+    const ms=!srch||p.name.toLowerCase().includes(srch)||p.team.toLowerCase().includes(srch);
+    return mp&&ms;
+  });
+  const myTurn=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
+  const col=tc=>tcolor(tc);
+  document.getElementById('pList').innerHTML=list.map(p=>{
+    const drafted=S.drafted.has(p.id);
+    const idx=PLAYERS.indexOf(p);
+    const fp=calcFP(p);
+    const faved=isFav(p.id);
+    const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
+    return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
+      <div class="prank">${p.adp}</div>
+      <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
+      <div class="pinfo">
+        <div class="pname" style="display:flex;align-items:center;gap:4px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span>${favBtn}</div>
+        <div class="pdet">${p.team} · ${p.pts}pts · ${p.reb}reb · ${p.ast}ast</div>
+      </div>
+      <div class="psc">
+        ${drafted?`<div class="dlbl">Drafted</div>`
+          :myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`
+          :`<div class="padp">#${p.adp}</div><div class="pproj">${fp} FP</div>`}
+      </div>
+    </div>`;
+  }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
+}
+function fPos(pos,btn){
+  S.posF=pos;
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');rPlayers();
+}
+
+// RENDER MY TEAM
+const RSLOTS=['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN'];
+function rMyTeam(){
+  const slots=RSLOTS.slice(0,S.rds);
+  const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Roto',points:'Points'};
+  const bLine=S.fmt==='auction'?`<span class="ts">· $${S.myBudget} left</span>`:'';
+  let html=`<div class="thi">
+    <div style="font-size:26px">🏀</div>
+    <div><div class="tnb">${S.name}</div>
+    <div class="tsr">
+      <span class="ts">${S.myTeam.length}/${S.rds} picks</span>
+      <span class="ts">· ${sl[S.scr]}</span>
+      <span class="ts">· ${S.ls} teams</span>${bLine}
+    </div></div>
+  </div>`;
+  if(!S.myTeam.length){
+    html+=`<div style="text-align:center;padding:36px 20px;color:var(--text3);font-size:12px">Draft players to fill your roster</div>`;
+  } else {
+    html+=slots.map((slot,i)=>{
+      const p=S.myTeam[i];
+      const col=p?tcolor(p.team):'#334155';
+      return p?`<div class="rs">
+        <div class="spos">${slot}</div>
+        <div class="pav" style="background:${col};width:30px;height:30px;font-size:11px;border:none">${initials(p.name)}</div>
+        <div class="spl">
+          <div class="pname" style="font-size:13px">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
+          <div class="pdet">${p.team}</div>
+        </div>
+        <div class="srd">Rd ${i+1}</div>
+      </div>`:`<div class="rs">
+        <div class="spos">${slot}</div>
+        <div class="semp" style="flex:1">Empty</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('myTeam').innerHTML=html;
+}
+
+// RENDER BOARD
+function rBoard(){
+  let html='';
+  for(let r=1;r<=S.rds;r++){
+    html+=`<div class="brd"><div class="brl">Round ${r}</div><div class="bps">`;
+    for(let p=0;p<S.ls;p++){
+      const ov=(r-1)*S.ls+p;
+      const pick=S.picks.find(x=>x.ov===ov+1);
+      const isCur=ov===S.cur;
+      const isMine=S.order[ov]===S.myPos;
+      const player=pick?PLAYERS.find(pl=>pl.id===pick.pid):null;
+      html+=`<div class="bp${isMine?' mine':''}${isCur?' cur':''}">
+        <div class="bpt">${isMine?'⭐ ':''}${S.teams[S.order[ov]]||'T'+(S.order[ov]+1)}</div>
+        <div class="bpp${pick?'':" em"}">${pick?(player?.name||'—'):(isCur?'On Clock':'—')}</div>
+        <div class="bpn">#${ov+1}</div>
+      </div>`;
+    }
+    html+=`</div></div>`;
+  }
+  document.getElementById('board').innerHTML=html;
+}
+
+function upHdr(){
+  const round=Math.min(Math.floor(S.cur/S.ls)+1,S.rds);
+  const pir=(S.cur%S.ls)+1;
+  document.getElementById('mRound').textContent=round;
+  document.getElementById('mPick').textContent=pir+'/'+S.ls;
+  let nxt='—';
+  for(let i=S.cur;i<S.total;i++){
+    if(S.order[i]===S.myPos){const a=i-S.cur;nxt=a===0?'NOW!':'+'+a;break;}
+  }
+  document.getElementById('mNext').textContent=nxt;
+  const badge=document.getElementById('clkBadge');
+  if(S.cur>=S.total){badge.textContent='Draft Complete 🏆';badge.className='clk-badge w';updateTradeBtn();return;}
+  const mine=S.order[S.cur]===S.myPos;
+  badge.textContent=mine?'On The Clock ⏰':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick';
+  badge.className='clk-badge'+(mine?'':' w');
+  updateTradeBtn();
+}
+
+// TIMER
+function resetTimer(){
+  clearInterval(S.timerInt);
+  if(!S.tmax){document.getElementById('mTimer').textContent='—';document.getElementById('tFill').style.width='100%';return;}
+  S.timer=S.tmax;upTimer();
+  S.timerInt=setInterval(()=>{S.timer--;upTimer();if(S.timer<=0){clearInterval(S.timerInt);autoP();}},1000);
+}
+function upTimer(){
+  const m=Math.floor(S.timer/60),s=S.timer%60;
+  document.getElementById('mTimer').textContent=m+':'+(s+'').padStart(2,'0');
+  const pct=(S.timer/S.tmax)*100;
+  document.getElementById('tFill').style.width=pct+'%';
+  document.getElementById('tFill').className='tfill'+(S.timer<=15?' urg':'');
+}
+function autoP(){
+  // Try favorites queue first (in priority order), skip drafted
+  for(const id of FAVS){
+    if(!S.drafted.has(id)){
+      const p=PLAYERS.find(x=>x.id===id);
+      if(p){
+        showToast('⏰ Auto-drafted '+p.name+' from queue!');
+        userPick(p);
+        return;
+      }
+    }
+  }
+  // Fallback: best available
+  const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
+  if(av.length) userPick(av[0]);
+}
+
+function showBanner(m){
+  const b=document.getElementById('ocBanner');
+  document.getElementById('ocText').textContent=m;
+  b.classList.add('show');setTimeout(()=>b.classList.remove('show'),3500);
+}
+function hideBanner(){document.getElementById('ocBanner').classList.remove('show');}
+function showToast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+function sTab(n,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tp-'+n).classList.add('on');btn.classList.add('on');
+  if(n==='favs') rFavs();
+}
+function showSeasonToastStub(){} // season toast defined in season block below
+
+// ─── PAUSE SYSTEM ─────────────────────────────────────────
+let PS = {
+  isAdmin: false,         // is this user the commissioner?
+  votesNeeded: 3,         // votes required to trigger pause
+  isPaused: false,        // is draft currently paused?
+  pausedAt: null,         // Date when paused
+  pauseElapsedInt: null,  // interval for pause clock
+  totalPausedMs: 0,       // accumulated pause time
+  voteActive: false,      // is a vote currently in progress?
+  votesFor: 0,            // current yes votes
+  votesAgainst: 0,
+  hasVoted: false,        // has this user already voted in current round?
+  pauseReason: '',
+  dcTeamSelected: -1,
+};
+
+function updateAdminMode(checkbox){
+  PS.isAdmin = checkbox.checked;
+  const track = document.getElementById('adminToggleTrack');
+  const thumb = document.getElementById('adminToggleThumb');
+  if(PS.isAdmin){
+    track.style.background = 'var(--accent)';
+    thumb.style.left = '23px';
+    thumb.style.background = '#fff';
+  } else {
+    track.style.background = 'var(--bg3)';
+    thumb.style.left = '3px';
+    thumb.style.background = 'var(--text3)';
+  }
+  // Show/hide pause button based on admin status — it shows for everyone in draft
+  refreshPauseBtn();
+}
+
+function refreshPauseBtn(){
+  const btn = document.getElementById('pauseBtn');
+  if(!btn) return;
+  // Always show during draft; admin shows immediately, others need draft live
+  btn.className = 'pause-btn admin-mode';
+  if(PS.isPaused){
+    btn.textContent = '▶ Resume';
+    btn.classList.add('paused');
+  } else {
+    btn.textContent = PS.isAdmin ? '⏸ Pause' : '⏸ Pause';
+    btn.classList.remove('paused');
+  }
+}
+
+function handlePauseBtn(){
+  if(PS.isPaused){
+    if(PS.isAdmin) resumeDraft();
+    else showToast('Only the commissioner can resume');
+    return;
+  }
+  if(PS.isAdmin){
+    // Admin instant pause
+    triggerPause('Commissioner paused the draft.', true);
+  } else {
+    // Non-admin: open disconnect report
+    openDisconnectModal();
+  }
+}
+
+function triggerPause(reason, isAdmin=false){
+  PS.isPaused = true;
+  PS.pausedAt = Date.now();
+  PS.pauseReason = reason;
+  PS.voteActive = false;
+  // Hide vote bar
+  document.getElementById('voteBar').classList.remove('show');
+  // Stop pick timer
+  clearInterval(S.timerInt);
+  // Show pause overlay
+  document.getElementById('pauseReason').textContent = reason;
+  document.getElementById('pauseOverlay').classList.add('show');
+  // Show resume button only to admin
+  document.getElementById('pauseResumeBtn').className = 'pause-resume-btn' + (PS.isAdmin ? ' show' : '');
+  // Start pause elapsed clock
+  clearInterval(PS.pauseElapsedInt);
+  PS.pauseElapsedInt = setInterval(updatePauseClock, 1000);
+  updatePauseClock();
+  refreshPauseBtn();
+}
+
+function updatePauseClock(){
+  const elapsed = Math.floor((Date.now() - PS.pausedAt) / 1000);
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  const el = document.getElementById('pauseElapsed');
+  if(el) el.textContent = m + ':' + (s+'').padStart(2,'0');
+}
+
+function resumeDraft(){
+  if(!PS.isAdmin){ showToast('Only the commissioner can resume'); return; }
+  PS.isPaused = false;
+  PS.totalPausedMs += (Date.now() - PS.pausedAt);
+  clearInterval(PS.pauseElapsedInt);
+  document.getElementById('pauseOverlay').classList.remove('show');
+  refreshPauseBtn();
+  showBanner('▶ Draft Resumed!');
+  // Restart pick timer if it was running
+  if(S.tmax > 0 && S.cur < S.total && S.order[S.cur] === S.myPos){
+    resetTimer();
+  }
+}
+
+// ── DISCONNECT REPORT ──
+function openDisconnectModal(){
+  PS.dcTeamSelected = -1;
+  document.getElementById('dcSubmitBtn').disabled = true;
+  document.getElementById('voteThresholdLabel').textContent = PS.votesNeeded;
+  // Build team list
+  const colors = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#6366f1','#f97316','#06b6d4','#84cc16','#a855f7'];
+  document.getElementById('dcTeamList').innerHTML = S.teams.map((name, ti) => {
+    const col = colors[ti % colors.length];
+    return `<div class="dc-team-row" id="dcrow-${ti}" onclick="selectDcTeam(${ti})">
+      <div class="dc-team-av" style="background:${col}">${name[0]}</div>
+      <div class="dc-team-name">${name}${ti===S.myPos?' (You)':''}</div>
+      <div class="dc-check">✓</div>
+    </div>`;
+  }).join('');
+  document.getElementById('disconnectModal').classList.add('show');
+}
+
+function selectDcTeam(ti){
+  PS.dcTeamSelected = ti;
+  document.querySelectorAll('.dc-team-row').forEach(r => r.classList.remove('selected'));
+  document.getElementById('dcrow-'+ti)?.classList.add('selected');
+  document.getElementById('dcSubmitBtn').disabled = false;
+}
+
+function submitDisconnectReport(){
+  if(PS.dcTeamSelected < 0) return;
+  const teamName = S.teams[PS.dcTeamSelected];
+  const customReason = document.getElementById('dcReasonInput').value.trim();
+  const reason = customReason || `${teamName} appears to have disconnected.`;
+  document.getElementById('disconnectModal').classList.remove('show');
+  startPauseVote(reason);
+}
+
+// ── VOTING ──
+function startPauseVote(reason){
+  PS.voteActive = true;
+  PS.votesFor = 1; // requester auto-votes yes
+  PS.votesAgainst = 0;
+  PS.hasVoted = true;
+  PS.pauseReason = reason;
+  document.getElementById('voteBarReason').textContent = reason;
+  renderVotePips();
+  document.getElementById('voteBar').classList.add('show');
+  showToast('🗳️ Pause vote started — need '+PS.votesNeeded+' yes votes');
+  // Simulate other players voting over time (since this is single-player)
+  simulateCpuVotes();
+}
+
+function simulateCpuVotes(){
+  // Simulate each CPU team voting within 5-15 seconds
+  const totalVoters = S.ls - 1; // exclude user who already voted
+  let delay = 2000;
+  for(let i = 0; i < Math.min(totalVoters, PS.votesNeeded + 1); i++){
+    const willVoteYes = Math.random() > 0.3; // 70% chance each CPU votes yes
+    setTimeout(()=>{
+      if(!PS.voteActive) return;
+      if(willVoteYes){
+        PS.votesFor++;
+        renderVotePips();
+        if(PS.votesFor >= PS.votesNeeded){
+          triggerPause(PS.pauseReason, false);
+          document.getElementById('voteBar').classList.remove('show');
+          PS.voteActive = false;
+        }
+      } else {
+        PS.votesAgainst++;
+        renderVotePips();
+        // Check if mathematically impossible to reach threshold
+        const remaining = S.ls - PS.votesFor - PS.votesAgainst;
+        if(PS.votesFor + remaining < PS.votesNeeded){
+          dismissVote();
+          showToast('❌ Not enough votes — pause denied');
+        }
+      }
+    }, delay);
+    delay += Math.floor(Math.random() * 4000 + 2000);
+  }
+}
+
+function castVote(yes){
+  if(!PS.voteActive || PS.hasVoted) return;
+  PS.hasVoted = true;
+  if(yes){ PS.votesFor++; } else { PS.votesAgainst++; }
+  renderVotePips();
+  if(PS.votesFor >= PS.votesNeeded){
+    triggerPause(PS.pauseReason, false);
+    document.getElementById('voteBar').classList.remove('show');
+    PS.voteActive = false;
+  }
+}
+
+function renderVotePips(){
+  const needed = PS.votesNeeded;
+  const got = PS.votesFor;
+  let html = '';
+  for(let i = 0; i < needed; i++){
+    html += `<div class="vote-pip ${i < got ? 'voted' : 'needed'}">${i < got ? '✓' : ''}</div>`;
+  }
+  document.getElementById('votePips').innerHTML = html;
+  document.getElementById('voteCount').textContent = got + ' of ' + needed + ' votes';
+}
+
+function dismissVote(){
+  PS.voteActive = false;
+  PS.hasVoted = false;
+  PS.votesFor = 0;
+  PS.votesAgainst = 0;
+  document.getElementById('voteBar').classList.remove('show');
+}
+
+// Init pause state on startDraft
+function initPauseState(){
+  PS.isAdmin = document.getElementById('isAdminToggle')?.checked || false;
+  PS.votesNeeded = parseInt(gv('cVotes')) || 3;
+  PS.isPaused = false;
+  PS.voteActive = false;
+  PS.hasVoted = false;
+  PS.votesFor = 0;
+  PS.totalPausedMs = 0;
+  clearInterval(PS.pauseElapsedInt);
+  const adminToggle = document.getElementById('isAdminToggle');
+  if(adminToggle) updateAdminMode(adminToggle);
+  refreshPauseBtn();
+}
+
+
+// ─── TRADE SYSTEM ─────────────────────────────────────────
+let tradeLog=[];
+let trSelectedTeam=null; // team index of selected trade partner
+
+// Find the next pick index for a given team, starting from position `from`
+function nextPickForTeam(teamIdx, from){
+  for(let i=from;i<S.total;i++){
+    if(S.order[i]===teamIdx) return i;
+  }
+  return -1;
+}
+
+// Find the Nth pick for a team (nth=0 means first upcoming, nth=1 means second, etc.)
+function nthPickForTeam(teamIdx, from, nth){
+  let count=0;
+  for(let i=from;i<S.total;i++){
+    if(S.order[i]===teamIdx){
+      if(count===nth) return i;
+      count++;
+    }
+  }
+  return -1;
+}
+
+function openTradeModal(){
+  // Find MY next upcoming pick (could be during countdown or mid-draft)
+  const myNextPick = nextPickForTeam(S.myPos, S.cur);
+  if(myNextPick < 0){ showToast("No picks left to trade!"); return; }
+
+  trSelectedTeam=null;
+  document.getElementById('trConfirmBtn').disabled=true;
+  document.getElementById('trConfirmBtn').textContent='Select a Team';
+  document.getElementById('trPreview').classList.remove('show');
+  document.getElementById('trMyPick').textContent='#'+(myNextPick+1);
+
+  // Update subtitle to reflect the pick being offered
+  document.getElementById('trSubText').innerHTML=`You're offering pick <strong id="trMyPick">#${myNextPick+1}</strong> (Round ${Math.floor(myNextPick/S.ls)+1}). In snake drafts, this trade only swaps draft positions. No compensation picks are added.`;
+
+  // Build team list — every other team that has a future pick
+  let html='';
+  for(let ti=0;ti<S.ls;ti++){
+    if(ti===S.myPos) continue;
+    const theirPick=nextPickForTeam(ti, S.cur);
+    if(theirPick<0) continue;
+    const pickNum=theirPick+1;
+    const teamName=S.teams[ti];
+    const initLetter=teamName[0].toUpperCase();
+    const teamColor=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#6366f1','#f97316','#06b6d4','#84cc16','#a855f7'][ti%12];
+    html+=`<button class="tr-team-btn" id="trbtn-${ti}" onclick="selectTradeTeam(${ti})">
+      <div class="tr-team-av" style="background:${teamColor}">${initLetter}</div>
+      <div class="tr-team-info">
+        <div class="tr-team-name">${teamName}</div>
+        <div class="tr-team-pick">Next pick: #${pickNum} (Round ${Math.floor(theirPick/S.ls)+1})</div>
+      </div>
+      <div class="tr-check">✓</div>
+    </button>`;
+  }
+  document.getElementById('trTeamList').innerHTML=html||`<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No teams available to trade with.</div>`;
+
+  if(tradeLog.length>0){
+    document.getElementById('tradeHistory').style.display='block';
+    document.getElementById('tradeLogItems').innerHTML=tradeLog.map(t=>`<div class="trade-log-item">${t}</div>`).join('');
+  } else {
+    document.getElementById('tradeHistory').style.display='none';
+  }
+  document.getElementById('tradeModal').classList.add('open');
+}
+
+function closeTradeModal(){
+  document.getElementById('tradeModal').classList.remove('open');
+  trSelectedTeam=null;
+}
+
+function selectTradeTeam(ti){
+  trSelectedTeam=ti;
+  document.querySelectorAll('.tr-team-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('trbtn-'+ti)?.classList.add('selected');
+
+  const myPickIdx=nextPickForTeam(S.myPos, S.cur); // MY next pick
+  const theirPickIdx=nextPickForTeam(ti, S.cur);    // THEIR next pick
+
+  if(myPickIdx<0||theirPickIdx<0){
+    document.getElementById('trPreview').classList.remove('show');
+    document.getElementById('trConfirmBtn').disabled=true;
+    return;
+  }
+
+  const myPickNum=myPickIdx+1;
+  const theirPickNum=theirPickIdx+1;
+  const theirName=S.teams[ti];
+
+
+  document.getElementById('trYouGive').textContent=`You give: Pick #${myPickNum} (Rd ${Math.floor(myPickIdx/S.ls)+1})`;
+  document.getElementById('trYouGet').textContent=`You get: Pick #${theirPickNum} (Rd ${Math.floor(theirPickIdx/S.ls)+1})`;
+  document.getElementById('trCompGet').textContent='No extra picks exchanged';
+  document.getElementById('trCompGive').textContent='Snake draft keeps this clean';
+  const netMove=myPickNum-theirPickNum;
+  const moveLine=netMove>0?`You move UP ${netMove} spots on this pick.`:`You move DOWN ${Math.abs(netMove)} spots on this pick.`;
+  document.getElementById('trSummary').innerHTML=`<strong>${moveLine}</strong><br>No compensation pick is added in snake drafts.`;
+  document.getElementById('trPreview').classList.add('show');
+  document.getElementById('trConfirmBtn').disabled=false;
+  document.getElementById('trConfirmBtn').textContent=`Trade with ${theirName}`;
+}
+
+function confirmTrade(){
+  if(trSelectedTeam===null) return;
+  const ti=trSelectedTeam;
+  const myPickIdx=nextPickForTeam(S.myPos, S.cur);
+  const theirPickIdx=nextPickForTeam(ti, S.cur);
+  if(myPickIdx<0||theirPickIdx<0){closeTradeModal();return;}
+
+  const theirName=S.teams[ti];
+  const myPickNum=myPickIdx+1;
+  const theirPickNum=theirPickIdx+1;
+
+  S.order[myPickIdx]=ti;
+  S.order[theirPickIdx]=S.myPos;
+
+  const logEntry=`<strong>Pick #${myPickNum} <-> Pick #${theirPickNum}</strong> - Traded with ${theirName}. Snake draft position swap only.`;
+  tradeLog.push(logEntry);
+  closeTradeModal();
+  showToast(`Traded! You now pick #${theirPickNum}`);
+  rBoard(); upHdr(); rPlayers();
+}
+
+// Trade button always visible during draft (not just on your turn)
+function updateTradeBtn(){
+  const btn=document.getElementById('tradeHeaderBtn');
+  if(!btn) return;
+  const hasFuturePick=nextPickForTeam(S.myPos, S.cur)>=0;
+  btn.style.display=(S.fmt!=='auction'&&S.cur<S.total&&hasFuturePick)?'block':'none';
+}
+
+// ─── SEASON MANAGEMENT ────────────────────────────────────
+function endDraft(){
+  clearInterval(S.timerInt);
+
+  // Save draft data to localStorage for the season manager to pick up
+  const draftData = {
+    teamName: S.name,
+    leagueSize: S.ls,
+    scoringFormat: S.scr,
+    draftFormat: S.fmt,
+    rounds: S.rds,
+    myPos: S.myPos,
+    teams: S.teams,
+    picks: S.picks,
+    myRoster: S.myTeam.map(p=>({
+      id:p.id, name:p.name, team:p.team, pos:p.pos,
+      pts:p.pts, reb:p.reb, ast:p.ast, stl:p.stl,
+      blk:p.blk, to:p.to, fgp:p.fgp, ftp:p.ftp, tpm:p.tpm, fp:p.fp
+    })),
+    allRosters: S.teams.map((_,ti)=>{
+      return S.picks.filter(pk=>pk.ti===ti).map(pk=>{
+        const p=PLAYERS.find(x=>x.id===pk.pid);
+        return p?{id:p.id,name:p.name,team:p.team,pos:p.pos,pts:p.pts,reb:p.reb,ast:p.ast,stl:p.stl,blk:p.blk,to:p.to,fgp:p.fgp,ftp:p.ftp,tpm:p.tpm,fp:p.fp}:null;
+      }).filter(Boolean);
+    }),
+    isCommissioner: !!PS.isAdmin,
+    savedAt: Date.now()
+  };
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+
+  // Show draft complete screen
+  document.getElementById('draft').classList.remove('active');
+  document.getElementById('draftComplete').classList.add('active');
+
+  // Populate summary
+  const myRoster = S.myTeam;
+  document.getElementById('dcTeamName').textContent = S.name;
+  document.getElementById('dcPicks').textContent = myRoster.length + ' players drafted';
+
+  const topPick = myRoster[0];
+  document.getElementById('dcTopPick').textContent = topPick ? topPick.name + ' (' + topPick.pos + ' · ' + topPick.team + ')' : '—';
+
+  const projTotal = myRoster.reduce((s,p)=>s+p.fp,0).toFixed(1);
+  document.getElementById('dcProjTotal').textContent = projTotal + ' FP';
+
+  // Build roster list
+  const slots=['PG','SG','SF','PF','C','G','F','UTIL','BN','BN','BN','BN','BN'];
+  document.getElementById('dcRoster').innerHTML = myRoster.map((p,i)=>{
+    const col=tcolor(p.team);
+    return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);">'
+      +'<div style="width:22px;font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0;">'+(slots[i]||'BN')+'</div>'
+      +'<div style="width:30px;height:30px;border-radius:50%;background:'+col+';display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+initials(p.name)+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+      +'<div style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'
+      +'<div style="font-size:11px;color:var(--text2);">'+p.team+' · '+p.pos+' · '+p.fp+'fp</div>'
+      +'</div>'
+      +'<div style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;">Rd '+(i+1)+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function openSeasonManager(){
+  // Try to open season manager — works when served from a web server
+  // Falls back to a helpful message if opened as a local file
+  const w = window.open('rosterbate-season.html', '_blank');
+  if(!w || w.closed){
+    showToast('Save both files to the same folder to use Season Manager');
+  }
+}
+</script>
+
+<!-- DRAFT COMPLETE SCREEN -->
+<div id="draftComplete" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;flex-shrink:0;text-align:center;">
+    <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;">🏆 Draft Complete!</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:12px;">
+
+    <!-- Team summary card -->
+    <div style="background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid rgba(249,115,22,.3);border-radius:14px;padding:16px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;">🏀</div>
+        <div>
+          <div id="dcTeamName" style="font-family:var(--fd);font-size:22px;font-weight:900;line-height:1;">My Team</div>
+          <div id="dcPicks" style="font-size:12px;color:var(--text2);margin-top:3px;">0 players drafted</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;margin-bottom:4px;">Top Pick</div>
+          <div id="dcTopPick" style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text);">—</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;margin-bottom:4px;">Proj. Total</div>
+          <div id="dcProjTotal" style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);">0 FP</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roster list -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+      <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;">Your Roster</div>
+      <div id="dcRoster"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:2px;">What's Next</div>
+      <button onclick="openSeasonManager()" style="background:var(--accent);border:none;border-radius:11px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        🏀 Open Season Manager →
+      </button>
+      <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.5;">
+        Manage your roster, pick up players from the waiver wire,<br>propose trades, and track standings all season long.
+      </div>
+      <button onclick="document.getElementById('draftComplete').classList.remove('active');document.getElementById('draft').classList.add('active');" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">
+        ← Back to Draft Board
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SEASON SCREENS -->
+<div id="hub" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;">🏀 Roster<span style="color:var(--accent)">Bate</span></div>
+    <div style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;" id="hubWeekLabel">Week 1</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px;">
+    <div style="background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid var(--border);border-radius:14px;padding:16px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div id="hubTeamAv" style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:20px;font-weight:900;color:#fff;">MY</div>
+        <div><div id="hubTeamName" style="font-family:var(--fd);font-size:20px;font-weight:800;">My Team</div><div id="hubRecord" style="font-size:12px;color:var(--text2);margin-top:2px;">0–0</div></div>
+        <div style="margin-left:auto;text-align:right;"><div style="font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">This Week vs</div><div id="hubOpponent" style="font-family:var(--fd);font-size:14px;font-weight:700;">—</div></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubProjScore" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent);">0.0</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Proj. Score</div></div>
+        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubOppScore" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--text2);">—</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Opp. Proj.</div></div>
+        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubStreak" style="font-family:var(--fd);font-size:22px;font-weight:900;">—</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Streak</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button onclick="goScreen('roster')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">👕</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">My Roster</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Set lineup</div></button>
+      <button onclick="goScreen('waiver')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Waiver Wire</div><div id="hubWaiverCount" style="font-size:11px;color:var(--text3);margin-top:2px;">— available</div></button>
+      <button onclick="goScreen('trades')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">⇄</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Trades</div><div id="hubPendingTrades" style="font-size:11px;color:var(--text3);margin-top:2px;">No offers</div></button>
+      <button onclick="goScreen('standings')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">🏆</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Standings</div><div id="hubStandingPos" style="font-size:11px;color:var(--text3);margin-top:2px;">—</div></button>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;"><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;">This Week's Matchups</div><div id="hubMatchups"></div></div>
+    <button onclick="advanceWeek()" id="hubAdvBtn" style="background:var(--green);border:none;border-radius:12px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;width:100%;">▶ Advance to Next Week</button>
+  </div>
+  <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">🏠 Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+  </div>
+</div>
+
+<div id="roster" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">👕 My Roster</div>
+    <div id="rosterWeekLabel" style="margin-left:auto;font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;">Week 1</div>
+  </div>
+  <div style="background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 14px;flex-shrink:0;font-size:11px;color:var(--text3);">Tap Start/Bench to adjust lineup.</div>
+  <div id="rosterContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;"></div>
+  <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">👕 Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+  </div>
+</div>
+
+<div id="waiver" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">📋 Waiver Wire</div>
+  </div>
+  <div style="padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;">
+    <div style="flex:1;position:relative;"><input type="text" id="waiverSearch" placeholder="Search…" oninput="renderWaiver()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;">🔍</span></div>
+    <select id="waiverPos" onchange="renderWaiver()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:var(--fb);font-size:13px;outline:none;appearance:none;"><option value="ALL">All</option><option value="PG">PG</option><option value="SG">SG</option><option value="SF">SF</option><option value="PF">PF</option><option value="C">C</option></select>
+  </div>
+  <div id="waiverContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+  <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">📋 Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+  </div>
+</div>
+
+<div id="trades" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">⇄ Trades</div>
+  </div>
+  <div id="tradesContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;"></div>
+  <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">⇄ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+  </div>
+</div>
+
+<div id="standings" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">🏆 Standings</div>
+    <div id="standWeekLabel" style="margin-left:auto;font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;">Week 1</div>
+  </div>
+  <div id="standingsContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;"></div>
+  <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+  </div>
+</div>
+
+<!-- WAIVER CLAIM MODAL -->
+<div id="waiverModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);">
+    <div style="width:36px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 14px;"></div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">📋 Claim Player</div>
+    <div id="waiverAddName" style="font-size:12px;color:var(--text2);margin-bottom:14px;">Adding: —</div>
+    <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;">Drop from your roster:</div>
+    <div id="waiverDropList" style="max-height:240px;overflow-y:auto;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('waiverModal').style.display='none'" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">Cancel</button>
+      <button id="waiverConfirmBtn" onclick="confirmWaiverClaim()" disabled style="flex:1;background:var(--accent);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Select Drop</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRADE PROPOSE MODAL -->
+<div id="tradeModal2" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);max-height:88dvh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 14px;"></div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">⇄ Propose Trade</div>
+    <div id="trade2Opponent" style="font-size:12px;color:var(--text2);margin-bottom:14px;">With: —</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:6px;">You Give</div><div id="trade2GiveList" style="max-height:200px;overflow-y:auto;"></div></div>
+      <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:6px;">You Get</div><div id="trade2GetList" style="max-height:200px;overflow-y:auto;"></div></div>
+    </div>
+    <div id="trade2Summary" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--text3);margin-bottom:14px;">Select players to send and receive.</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('tradeModal2').style.display='none'" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">Cancel</button>
+      <button id="trade2ConfirmBtn" onclick="submitTradeOffer()" disabled style="flex:1;background:var(--green);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Send Offer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="seasonToast" style="bottom:90px;background:var(--green);"></div>
+<!-- ROSTERBATE CHAT SYSTEM v1.0 -->
+<!-- Paste this block before </body> in both rosterbate-draft.html and rosterbate-season.html -->
+
+<style>
+/* ── CHAT BUTTON ── */
+.rb-chat-fab{position:fixed;bottom:90px;right:16px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:400;box-shadow:0 4px 20px rgba(249,115,22,.5);transition:transform .15s;}
+.rb-chat-fab:active{transform:scale(.92);}
+.rb-chat-unread{position:absolute;top:-3px;right:-3px;width:20px;height:20px;border-radius:50%;background:var(--red);border:2px solid var(--bg);font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;display:none;align-items:center;justify-content:center;}
+.rb-chat-unread.show{display:flex;}
+
+/* ── CHAT PANEL ── */
+.rb-chat-panel{position:fixed;bottom:0;right:0;width:100%;max-width:420px;height:72dvh;background:var(--bg2);border-top:1px solid var(--border);border-left:1px solid var(--border);border-radius:18px 18px 0 0;z-index:500;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);}
+.rb-chat-panel.open{transform:translateY(0);}
+
+/* Header */
+.rb-chat-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rb-chat-drag{width:36px;height:4px;background:var(--text3);border-radius:2px;position:absolute;top:8px;left:50%;transform:translateX(-50%);}
+.rb-chat-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;flex:1;margin-top:8px;}
+.rb-chat-online{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;}
+.rb-chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+.rb-chat-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px;margin-top:6px;}
+
+/* Tab bar */
+.rb-chat-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rb-chat-tab{flex:1;padding:8px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;}
+.rb-chat-tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* Messages */
+.rb-chat-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:2px;-webkit-overflow-scrolling:touch;}
+.rb-chat-msgs::-webkit-scrollbar{width:0;}
+
+/* Message bubble */
+.rb-msg{display:flex;gap:7px;align-items:flex-end;margin-bottom:4px;animation:msgIn .15s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rb-msg.me{flex-direction:row-reverse;}
+.rb-msg-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-bottom:16px;}
+.rb-msg-body{max-width:72%;display:flex;flex-direction:column;align-items:flex-start;}
+.rb-msg.me .rb-msg-body{align-items:flex-end;}
+.rb-msg-name{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px;padding:0 4px;}
+.rb-msg.me .rb-msg-name{display:none;}
+.rb-bubble{background:var(--card);border:1px solid var(--border);border-radius:14px 14px 14px 3px;padding:8px 11px;font-size:13px;color:var(--text);line-height:1.45;position:relative;word-break:break-word;}
+.rb-msg.me .rb-bubble{background:var(--accent);border-color:var(--accent);color:#fff;border-radius:14px 14px 3px 14px;}
+.rb-bubble.gif-msg{padding:4px;background:transparent;border-color:transparent;}
+.rb-bubble.gif-msg img{border-radius:10px;max-width:180px;max-height:160px;display:block;}
+.rb-msg.me .rb-bubble.gif-msg{background:transparent;border-color:transparent;}
+.rb-msg-time{font-size:10px;color:var(--text3);padding:0 4px;margin-top:2px;}
+
+/* Reactions bar */
+.rb-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;}
+.rb-react-pill{display:flex;align-items:center;gap:3px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:2px 7px;font-size:12px;cursor:pointer;transition:all .1s;user-select:none;}
+.rb-react-pill:active{transform:scale(1.15);}
+.rb-react-pill.mine{background:rgba(249,115,22,.15);border-color:rgba(249,115,22,.3);}
+.rb-react-count{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text2);}
+
+/* React hover button */
+.rb-msg-react-btn{opacity:0;background:var(--bg3);border:1px solid var(--border);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;transition:opacity .15s;flex-shrink:0;align-self:center;margin-bottom:16px;}
+.rb-msg:hover .rb-msg-react-btn{opacity:1;}
+
+/* System message */
+.rb-sys-msg{text-align:center;font-size:11px;color:var(--text3);padding:4px 0;font-family:var(--fd);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+
+/* Input area */
+.rb-chat-input-area{border-top:1px solid var(--border);padding:8px 10px;flex-shrink:0;background:var(--bg2);}
+.rb-chat-toolbar{display:flex;gap:4px;margin-bottom:6px;}
+.rb-tool-btn{background:none;border:none;font-size:18px;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--text2);transition:background .1s;}
+.rb-tool-btn:active{background:var(--bg3);}
+.rb-chat-row{display:flex;gap:6px;align-items:flex-end;}
+.rb-chat-textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:9px 14px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;resize:none;max-height:80px;min-height:38px;line-height:1.4;-webkit-overflow-scrolling:touch;}
+.rb-chat-textarea:focus{border-color:var(--accent);}
+.rb-chat-send{width:38px;height:38px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .1s;}
+.rb-chat-send:active{transform:scale(.9);}
+.rb-chat-send:disabled{background:var(--bg3);opacity:.4;cursor:not-allowed;}
+
+/* Emoji picker */
+.rb-emoji-picker{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px;margin-bottom:6px;max-height:180px;overflow-y:auto;}
+.rb-emoji-picker.open{display:block;}
+.rb-emoji-cats{display:flex;gap:4px;margin-bottom:6px;overflow-x:auto;padding-bottom:4px;}
+.rb-emoji-cat{background:none;border:none;font-size:16px;cursor:pointer;padding:3px 6px;border-radius:6px;}
+.rb-emoji-cat.on{background:var(--bg3);}
+.rb-emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;}
+.rb-emoji-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:6px;line-height:1;}
+.rb-emoji-btn:active{background:var(--bg3);}
+
+/* GIF picker */
+.rb-gif-picker{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px;margin-bottom:6px;}
+.rb-gif-picker.open{display:block;}
+.rb-gif-search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;margin-bottom:8px;}
+.rb-gif-search:focus{border-color:var(--accent);}
+.rb-gif-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;}
+.rb-gif-item{border-radius:8px;overflow:hidden;cursor:pointer;aspect-ratio:16/9;background:var(--bg3);}
+.rb-gif-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.rb-gif-item:active{opacity:.7;}
+
+/* Reaction picker popup */
+.rb-react-picker{position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:30px;padding:6px 10px;display:flex;gap:6px;z-index:600;box-shadow:0 4px 20px rgba(0,0,0,.5);animation:msgIn .1s ease;}
+.rb-react-picker button{background:none;border:none;font-size:22px;cursor:pointer;padding:2px;border-radius:50%;}
+.rb-react-picker button:active{transform:scale(1.3);}
+
+/* GIF loading state */
+.rb-gif-loading{text-align:center;padding:20px;color:var(--text3);font-size:12px;}
+</style>
+
+<!-- Chat FAB button (shown on all screens) -->
+<button class="rb-chat-fab" id="rbChatFab" onclick="rbToggleChat()">
+  💬
+  <div class="rb-chat-unread" id="rbUnread">0</div>
+</button>
+
+<!-- Chat Panel -->
+<div class="rb-chat-panel" id="rbChatPanel">
+  <div class="rb-chat-drag"></div>
+  <div class="rb-chat-hdr">
+    <div style="flex:1">
+      <div class="rb-chat-title">💬 League Chat</div>
+      <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
+    </div>
+    <button class="rb-chat-close" onclick="rbToggleChat()">✕</button>
+  </div>
+
+  <!-- Tabs: All / Draft / Trash Talk -->
+  <div class="rb-chat-tabs">
+    <button class="rb-chat-tab on" onclick="rbSwitchTab('all',this)">All</button>
+    <button class="rb-chat-tab" onclick="rbSwitchTab('draft',this)">Draft Room</button>
+    <button class="rb-chat-tab" onclick="rbSwitchTab('trades',this)">Trades</button>
+    <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk 🔥</button>
+  </div>
+
+  <!-- Messages -->
+  <div class="rb-chat-msgs" id="rbMsgs"></div>
+
+  <!-- Input area -->
+  <div class="rb-chat-input-area">
+    <!-- Emoji picker -->
+    <div class="rb-emoji-picker" id="rbEmojiPicker">
+      <div class="rb-emoji-cats" id="rbEmojiCats"></div>
+      <div class="rb-emoji-grid" id="rbEmojiGrid"></div>
+    </div>
+
+    <!-- GIF picker -->
+    <div class="rb-gif-picker" id="rbGifPicker">
+      <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs… (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
+      <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">🔍 Type to search GIFs</div></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="rb-chat-toolbar">
+      <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">😄</button>
+      <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
+      <button class="rb-tool-btn" onclick="rbInsertAt('📢 ')" title="Announcement">📢</button>
+      <button class="rb-tool-btn" onclick="rbInsertAt('🔥 ')" title="Trash talk">🔥</button>
+      <button class="rb-tool-btn" onclick="rbInsertAt('💀 ')" title="Skull">💀</button>
+    </div>
+
+    <div class="rb-chat-row">
+      <textarea class="rb-chat-textarea" id="rbInput" placeholder="Message the league…" rows="1"
+        oninput="rbAutoResize(this);rbUpdateSendBtn()"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
+      <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reaction picker popup -->
+<div class="rb-react-picker" id="rbReactPicker" style="display:none;"></div>
+
+<script>
+// ── CHAT STATE ─────────────────────────────────────────────
+const RB_CHAT_KEY = 'rosterbateChat';
+const RB_MY_NAME = (typeof S !== 'undefined' && S.name) ? S.name :
+                   (typeof D !== 'undefined' && D.teamName) ? D.teamName : 'Manager';
+const RB_CONTEXT = (typeof S !== 'undefined') ? 'draft' : 'season';
+const RB_COLORS = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#f97316','#06b6d4','#a855f7'];
+
+let rbChat = { msgs:[], lastSeen:0 };
+let rbChatOpen = false;
+let rbActiveTab = 'all';
+let rbReactTarget = null;
+let rbGifTimer = null;
+
+// Load from localStorage
+function rbLoadChat(){
+  try{
+    const raw = localStorage.getItem(RB_CHAT_KEY);
+    if(raw) rbChat = JSON.parse(raw);
+    if(!rbChat.msgs) rbChat.msgs = [];
+    if(!rbChat.lastSeen) rbChat.lastSeen = 0;
+  }catch(e){ rbChat = {msgs:[],lastSeen:0}; }
+}
+
+function rbSaveChat(){
+  try{ localStorage.setItem(RB_CHAT_KEY, JSON.stringify(rbChat)); }catch(e){}
+}
+
+// Color per sender name
+function rbColor(name){
+  let hash=0;
+  for(let i=0;i<name.length;i++) hash=(hash*31+name.charCodeAt(i))&0xffffffff;
+  return RB_COLORS[Math.abs(hash)%RB_COLORS.length];
+}
+
+function rbIni(n){
+  if(!n) return '?';
+  const p=n.trim().split(' ');
+  return (p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();
+}
+
+function rbTime(ts){
+  const d=new Date(ts);
+  const now=new Date();
+  const diff=now-d;
+  if(diff<60000) return 'just now';
+  if(diff<3600000) return Math.floor(diff/60000)+'m ago';
+  if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── OPEN/CLOSE ──────────────────────────────────────────────
+function rbToggleChat(){
+  rbChatOpen = !rbChatOpen;
+  document.getElementById('rbChatPanel').classList.toggle('open', rbChatOpen);
+  if(rbChatOpen){
+    rbLoadChat();
+    rbRender();
+    rbMarkSeen();
+    setTimeout(()=>rbScrollBottom(),100);
+    // Simulate other managers online
+    rbSimulateActivity();
+  }
+}
+
+function rbMarkSeen(){
+  rbChat.lastSeen = Date.now();
+  rbSaveChat();
+  document.getElementById('rbUnread').classList.remove('show');
+}
+
+function rbUpdateUnread(){
+  const unseen = rbChat.msgs.filter(m=>m.ts>rbChat.lastSeen&&m.sender!==RB_MY_NAME).length;
+  const el = document.getElementById('rbUnread');
+  if(unseen>0){el.textContent=unseen>9?'9+':unseen;el.classList.add('show');}
+  else el.classList.remove('show');
+}
+
+// ── TABS ────────────────────────────────────────────────────
+function rbSwitchTab(tab,btn){
+  rbActiveTab=tab;
+  document.querySelectorAll('.rb-chat-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  rbRender();
+  setTimeout(()=>rbScrollBottom(),50);
+}
+
+function rbFilteredMsgs(){
+  if(rbActiveTab==='all') return rbChat.msgs;
+  return rbChat.msgs.filter(m=>m.tag===rbActiveTab||m.tag==='system');
+}
+
+// ── RENDER ──────────────────────────────────────────────────
+function rbRender(){
+  const msgs = rbFilteredMsgs();
+  const el = document.getElementById('rbMsgs');
+  if(!el) return;
+
+  if(!msgs.length){
+    el.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);"><div style="font-size:36px;">💬</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No messages yet</div><div style="font-size:12px;">Be the first to say something!</div></div>';
+    return;
+  }
+
+  el.innerHTML = msgs.map((m,idx)=>rbRenderMsg(m,idx)).join('');
+
+  // Add reaction click handlers after render
+  el.querySelectorAll('.rb-react-pill').forEach(pill=>{
+    pill.addEventListener('click', function(){
+      const msgId=this.dataset.msgid;
+      const emoji=this.dataset.emoji;
+      rbToggleReaction(msgId,emoji);
+    });
+  });
+
+  el.querySelectorAll('.rb-msg-react-btn').forEach(btn=>{
+    btn.addEventListener('click', function(e){
+      rbShowReactPicker(this.dataset.msgid,e);
+    });
+  });
+}
+
+function rbRenderMsg(m,idx){
+  if(m.type==='system'){
+    return`<div class="rb-sys-msg">${m.text}</div>`;
+  }
+  const isMe = m.sender===RB_MY_NAME;
+  const col = rbColor(m.sender);
+
+  // Reactions HTML
+  const reacts = m.reactions||{};
+  const reactHtml = Object.entries(reacts).filter(([e,users])=>users.length>0).map(([e,users])=>{
+    const mine=users.includes(RB_MY_NAME);
+    return`<div class="rb-react-pill${mine?' mine':''}" data-msgid="${m.id}" data-emoji="${e}">
+      <span>${e}</span><span class="rb-react-count">${users.length}</span>
+    </div>`;
+  }).join('');
+
+  const hasReacts = Object.values(reacts).some(u=>u.length>0);
+
+  let bubbleContent='';
+  if(m.type==='gif'){
+    bubbleContent=`<div class="rb-bubble gif-msg"><img src="${m.gifUrl}" alt="GIF" loading="lazy" onerror="this.style.display='none'"></div>`;
+  } else {
+    bubbleContent=`<div class="rb-bubble">${rbEscHtml(m.text)}</div>`;
+  }
+
+  return`<div class="rb-msg${isMe?' me':''}">
+    ${!isMe?`<div class="rb-msg-av" style="background:${col}">${rbIni(m.sender)}</div>`:''}
+    <div class="rb-msg-body">
+      ${!isMe?`<div class="rb-msg-name">${rbEscHtml(m.sender)}</div>`:''}
+      ${bubbleContent}
+      ${hasReacts?`<div class="rb-reactions">${reactHtml}</div>`:''}
+      <div class="rb-msg-time">${rbTime(m.ts)}</div>
+    </div>
+    <button class="rb-msg-react-btn" data-msgid="${m.id}">😊</button>
+  </div>`;
+}
+
+function rbEscHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function rbScrollBottom(){
+  const el=document.getElementById('rbMsgs');
+  if(el) el.scrollTop=el.scrollHeight;
+}
+
+// ── SEND ────────────────────────────────────────────────────
+function rbSend(){
+  const input=document.getElementById('rbInput');
+  const text=(input?.value||'').trim();
+  if(!text) return;
+  rbPostMsg({type:'text',text,tag:rbActiveTab==='all'?'general':rbActiveTab});
+  input.value='';
+  input.style.height='';
+  rbUpdateSendBtn();
+  rbClosePickersAll();
+}
+
+function rbPostMsg(extra){
+  rbLoadChat();
+  const msg={
+    id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    sender:RB_MY_NAME,
+    ts:Date.now(),
+    reactions:{},
+    ...extra
+  };
+  rbChat.msgs.push(msg);
+  // Keep last 500 messages
+  if(rbChat.msgs.length>500) rbChat.msgs=rbChat.msgs.slice(-500);
+  rbSaveChat();
+  rbRender();
+  setTimeout(()=>rbScrollBottom(),50);
+}
+
+function rbUpdateSendBtn(){
+  const v=(document.getElementById('rbInput')?.value||'').trim();
+  const btn=document.getElementById('rbSendBtn');
+  if(btn) btn.disabled=!v;
+}
+
+function rbAutoResize(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.min(ta.scrollHeight,80)+'px';
+}
+
+function rbInsertAt(text){
+  const ta=document.getElementById('rbInput');
+  if(!ta) return;
+  const start=ta.selectionStart, end=ta.selectionEnd;
+  ta.value=ta.value.slice(0,start)+text+ta.value.slice(end);
+  ta.selectionStart=ta.selectionEnd=start+text.length;
+  ta.focus();
+  rbUpdateSendBtn();
+}
+
+// ── REACTIONS ───────────────────────────────────────────────
+const RB_QUICK_REACTS=['👍','😂','🔥','💀','😤','🏆','😭','🤝'];
+
+function rbShowReactPicker(msgId,e){
+  e.stopPropagation();
+  const picker=document.getElementById('rbReactPicker');
+  picker.innerHTML=RB_QUICK_REACTS.map(em=>
+    `<button onclick="rbToggleReaction('${msgId}','${em}');rbHideReactPicker()">${em}</button>`
+  ).join('');
+  const rect=e.target.getBoundingClientRect();
+  picker.style.display='flex';
+  picker.style.left=Math.min(rect.left,window.innerWidth-200)+'px';
+  picker.style.top=(rect.top-50)+'px';
+  rbReactTarget=msgId;
+  setTimeout(()=>document.addEventListener('click',rbHideReactPicker,{once:true}),10);
+}
+
+function rbHideReactPicker(){
+  document.getElementById('rbReactPicker').style.display='none';
+}
+
+function rbToggleReaction(msgId,emoji){
+  rbLoadChat();
+  const msg=rbChat.msgs.find(m=>m.id===msgId);
+  if(!msg) return;
+  if(!msg.reactions) msg.reactions={};
+  if(!msg.reactions[emoji]) msg.reactions[emoji]=[];
+  const idx=msg.reactions[emoji].indexOf(RB_MY_NAME);
+  if(idx>=0) msg.reactions[emoji].splice(idx,1);
+  else msg.reactions[emoji].push(RB_MY_NAME);
+  rbSaveChat();
+  rbRender();
+}
+
+// ── EMOJI PICKER ────────────────────────────────────────────
+const RB_EMOJI_CATS = {
+  '😄':{label:'Smileys',emojis:['😀','😂','🤣','😊','😍','🥰','😎','🤩','😏','😒','😤','😡','🤬','😭','😢','🥹','😱','🤯','🥳','🤔','🫡','😴','🤢','🤮','🥴','😵','🤑','🤫','🤭','🫣','😇','🤠','🤡','👻','💀','☠️','🫶','💪','🫵']},
+  '🏀':{label:'Sports',emojis:['🏀','🏈','⚾','⚽','🏒','🎾','🏆','🥇','🥈','🥉','🎯','🎱','🏋️','🤼','🤺','🏇','🤾','🤸','⛹️','🏌️','🤽','🚴','🏄','🧗','🤿','🎽','🥊','🥋','🎿','🛷','🥌']},
+  '🔥':{label:'Hype',emojis:['🔥','💥','⚡','✨','🌟','💫','🎉','🎊','🎮','🎲','🃏','🎰','🏅','🎖️','🥇','👑','💎','🚀','💣','💸','🤑','💰','📈','🤝','👊','✊','🫡']},
+  '😤':{label:'Trash',emojis:['😤','😤','💩','🤡','👀','🙄','😑','😐','😬','🫠','🥱','🫥','😶','😶‍🌫️','🤥','😈','👿','💀','☠️','🗑️','📉','🤣','😹','🙈','🙉','🙊']},
+  '👋':{label:'Gestures',emojis:['👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','🤲','🤝','🙏','💅']},
+};
+
+let rbEmojiCat = '😄';
+
+function rbToggleEmoji(){
+  const ep=document.getElementById('rbEmojiPicker');
+  const gp=document.getElementById('rbGifPicker');
+  gp.classList.remove('open');
+  ep.classList.toggle('open');
+  if(ep.classList.contains('open')) rbRenderEmoji();
+}
+
+function rbRenderEmoji(){
+  // Category buttons
+  document.getElementById('rbEmojiCats').innerHTML=Object.keys(RB_EMOJI_CATS).map(k=>
+    `<button class="rb-emoji-cat${k===rbEmojiCat?' on':''}" onclick="rbEmojiCat='${k}';rbRenderEmoji()">${k}</button>`
+  ).join('');
+  // Emoji grid
+  const emojis=RB_EMOJI_CATS[rbEmojiCat]?.emojis||[];
+  document.getElementById('rbEmojiGrid').innerHTML=emojis.map(e=>
+    `<button class="rb-emoji-btn" onclick="rbInsertAt('${e}');document.getElementById('rbEmojiPicker').classList.remove('open');rbUpdateSendBtn()">${e}</button>`
+  ).join('');
+}
+
+// ── GIF PICKER ──────────────────────────────────────────────
+// Using Tenor GIF API (free, no key needed for basic usage)
+// Falls back to curated sports GIFs if API unavailable
+const RB_FALLBACK_GIFS = [
+  {url:'https://media.tenor.com/YPAbNGjMXW0AAAAM/lebron-james-nba.gif',preview:'https://media.tenor.com/YPAbNGjMXW0AAAAM/lebron-james-nba.gif'},
+  {url:'https://media.tenor.com/WHo75P0tCCYAAAAM/nba-basketball.gif',preview:'https://media.tenor.com/WHo75P0tCCYAAAAM/nba-basketball.gif'},
+  {url:'https://media.tenor.com/uMCT3UsBhxkAAAAM/stephen-curry-celebration.gif',preview:'https://media.tenor.com/uMCT3UsBhxkAAAAM/stephen-curry-celebration.gif'},
+  {url:'https://media.tenor.com/rSCJTGJLFE4AAAAM/nba-finals-trophy.gif',preview:'https://media.tenor.com/rSCJTGJLFE4AAAAM/nba-finals-trophy.gif'},
+  {url:'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',preview:'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'},
+  {url:'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif',preview:'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif'},
+  {url:'https://media.giphy.com/media/26tknCqiJrBQG6bxC/giphy.gif',preview:'https://media.giphy.com/media/26tknCqiJrBQG6bxC/giphy.gif'},
+  {url:'https://media.giphy.com/media/toB3AnUDkqE3GENKx0/giphy.gif',preview:'https://media.giphy.com/media/toB3AnUDkqE3GENKx0/giphy.gif'},
+];
+
+function rbToggleGif(){
+  const gp=document.getElementById('rbGifPicker');
+  const ep=document.getElementById('rbEmojiPicker');
+  ep.classList.remove('open');
+  gp.classList.toggle('open');
+  if(gp.classList.contains('open')){
+    rbShowFallbackGifs();
+    document.getElementById('rbGifSearch').focus();
+  }
+}
+
+function rbShowFallbackGifs(){
+  document.getElementById('rbGifGrid').innerHTML=RB_FALLBACK_GIFS.map(g=>
+    `<div class="rb-gif-item" onclick="rbSendGif('${g.url}')">
+      <img src="${g.preview}" loading="lazy" alt="GIF">
+    </div>`
+  ).join('');
+}
+
+function rbSearchGifs(query){
+  clearTimeout(rbGifTimer);
+  if(!query.trim()){rbShowFallbackGifs();return;}
+  rbGifTimer=setTimeout(async()=>{
+    document.getElementById('rbGifGrid').innerHTML='<div class="rb-gif-loading">🔍 Searching...</div>';
+    try{
+      // Tenor API v2 - free tier
+      const res=await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query+' sports')}&key=AIzaSyAyimkuYQYF_FXVALexPzpBFLaEFtSPLsA&limit=12&media_filter=gif`);
+      if(!res.ok) throw new Error();
+      const data=await res.json();
+      const results=data.results||[];
+      if(!results.length){rbShowFallbackGifs();return;}
+      document.getElementById('rbGifGrid').innerHTML=results.map(r=>{
+        const url=r.media_formats?.gif?.url||r.media_formats?.tinygif?.url||'';
+        const prev=r.media_formats?.tinygif?.url||url;
+        return`<div class="rb-gif-item" onclick="rbSendGif('${url}')">
+          <img src="${prev}" loading="lazy" alt="GIF">
+        </div>`;
+      }).join('');
+    }catch(e){
+      // Fallback: filter fallback GIFs by keyword
+      rbShowFallbackGifs();
+    }
+  },500);
+}
+
+function rbSendGif(url){
+  rbPostMsg({type:'gif',gifUrl:url,text:'[GIF]',tag:rbActiveTab==='all'?'general':rbActiveTab});
+  document.getElementById('rbGifPicker').classList.remove('open');
+}
+
+function rbClosePickersAll(){
+  document.getElementById('rbEmojiPicker')?.classList.remove('open');
+  document.getElementById('rbGifPicker')?.classList.remove('open');
+}
+
+// ── SYSTEM MESSAGES ─────────────────────────────────────────
+function rbPostSystem(text){
+  rbLoadChat();
+  rbChat.msgs.push({id:'s_'+Date.now(),type:'system',text,ts:Date.now(),tag:'system'});
+  rbSaveChat();
+  if(rbChatOpen) rbRender();
+  rbUpdateUnread();
+}
+
+// ── SIMULATE AI CHAT ACTIVITY ───────────────────────────────
+const RB_AI_NAMES=['Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters'];
+const RB_AI_MSGS=[
+  ['🔥 Just grabbed {player} off waivers. Y\'all sleepin!','trades'],
+  ['Who wants to trade? Looking for a C','trades'],
+  ['This lineup is LOCKED in 💪','general'],
+  ['Good luck this week everyone... you\'re gonna need it 😤','trash'],
+  ['That pick was TERRIBLE 💀','draft'],
+  ['Can\'t believe {player} fell this far in the draft','draft'],
+  ['My team is built different fr','general'],
+  ['Bro really started {player} with no game today 😂','trash'],
+  ['{player} going OFF tonight, thank me later','general'],
+  ['Let\'s get this W 🏆','general'],
+  ['Anyone else\'s team look elite rn?','general'],
+  ['That trade offer is lowball bro come on 😑','trades'],
+];
+const RB_AI_PLAYERS=['Jokic','Luka','SGA','Giannis','LeBron','Curry','Tatum','AD','KD','Wemby'];
+
+function rbSimulateActivity(){
+  // Post 1-3 messages from AI managers on first open if chat is empty
+  rbLoadChat();
+  if(rbChat.msgs.length>0) return;
+
+  // Seed with some initial messages
+  const count=3+Math.floor(Math.random()*3);
+  const now=Date.now();
+  for(let i=0;i<count;i++){
+    const name=RB_AI_NAMES[Math.floor(Math.random()*RB_AI_NAMES.length)];
+    const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
+    const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
+    const text=tmpl.replace('{player}',player);
+    rbChat.msgs.push({
+      id:'ai_'+i+'_'+now,
+      sender:name,
+      type:'text',
+      text,
+      tag,
+      ts:now-(count-i)*180000-(Math.random()*60000|0),
+      reactions:{}
+    });
+  }
+  rbSaveChat();
+  rbRender();
+  setTimeout(()=>rbScrollBottom(),100);
+
+  // Occasionally post new AI messages while chat is open
+  rbScheduleAiMsg();
+}
+
+function rbScheduleAiMsg(){
+  const delay=30000+Math.random()*90000; // 30-120 seconds
+  setTimeout(()=>{
+    if(!rbChatOpen) return;
+    const name=RB_AI_NAMES[Math.floor(Math.random()*RB_AI_NAMES.length)];
+    const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
+    const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
+    const text=tmpl.replace('{player}',player);
+    rbPostMsg({sender:name,type:'text',text,tag,ts:Date.now(),reactions:{},id:'ai_live_'+Date.now()});
+    // Override sender since rbPostMsg uses RB_MY_NAME
+    rbLoadChat();
+    const last=rbChat.msgs[rbChat.msgs.length-1];
+    if(last&&last.id.startsWith('ai_live')) last.sender=name;
+    rbSaveChat();
+    rbRender();
+    setTimeout(()=>rbScrollBottom(),50);
+    rbUpdateUnread();
+    rbScheduleAiMsg();
+  },delay);
+}
+
+// ── INIT ────────────────────────────────────────────────────
+// Post system message on load
+(function(){
+  rbLoadChat();
+  const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
+  // Only post system msg if no recent one
+  const recent=rbChat.msgs.filter(m=>m.type==='system'&&Date.now()-m.ts<5000);
+  if(!recent.length) rbPostSystem(context+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  rbUpdateUnread();
+
+  // Close pickers when clicking outside
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#rbEmojiPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Emoji"]')){
+      document.getElementById('rbEmojiPicker')?.classList.remove('open');
+    }
+    if(!e.target.closest('#rbGifPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Gif"]')){
+      document.getElementById('rbGifPicker')?.classList.remove('open');
+    }
+  });
+
+  // Poll for new messages from other sessions every 5 seconds
+  setInterval(()=>{
+    if(rbChatOpen){
+      const prev=rbChat.msgs.length;
+      rbLoadChat();
+      if(rbChat.msgs.length!==prev){ rbRender(); setTimeout(()=>rbScrollBottom(),50); }
+    } else {
+      rbLoadChat();
+      rbUpdateUnread();
+    }
+  },5000);
+})();
+</script>
+
+</body>
+</html>
+
+
+
