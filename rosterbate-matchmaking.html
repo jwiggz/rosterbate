@@ -526,8 +526,9 @@ async function doCreate(){
   try{
     await createAndJoinLobby({name:league,...createOpts});
   }catch(e){
+    console.error('Create league failed', e);
     btn.disabled=false; btn.textContent='Create League →';
-    toast('Error creating league','var(--red)');
+    toast(e?.code||e?.message||'Error creating league','var(--red)');
   }
 }
 
@@ -584,7 +585,9 @@ async function createAndJoinLobby(opts){
     createdBy:myId, createdAt:Date.now(),
     players:{}, chat:{}
   };
-  const newRef=await db.ref('lobbies').push(lobby);
+  const newRef=db.ref('lobbies').push();
+  await newRef.set(lobby);
+  if(!newRef.key) throw new Error('Could not create lobby key');
   currentLobbyId=newRef.key;
   await joinLobby(newRef.key);
 }
