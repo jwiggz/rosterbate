@@ -20,6 +20,8 @@
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,var(--accentSoft) 0%,transparent 60%);pointer-events:none;}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:20px 18px 48px;}
+.page-shell{opacity:0;transform:translateY(8px);transition:opacity .18s ease,transform .18s ease;}
+.page-shell.ready{opacity:1;transform:none;}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
 .brand{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
 .brand span{color:var(--accent);}
@@ -111,7 +113,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap page-shell" id="pageShell">
   <div class="topbar">
     <a href="index.html" class="brand">Roster<span>Bate</span></a>
     <div class="actions">
@@ -210,6 +212,10 @@ const PROFILE_THEMES = {
 };
 let currentAuthUser=null;
 let currentViewedProfile=null;
+
+function revealPage(){
+  document.getElementById('pageShell')?.classList.add('ready');
+}
 
 function parseUserNumber(){
   const pathMatch = window.location.pathname.match(/\/user\/(\d+)(?:\/)?$/i);
@@ -502,6 +508,7 @@ async function loadMemberPage(userNumber){
   if(!(userNumber > 0)){
     document.getElementById('memberName').textContent = 'Member Not Found';
     document.getElementById('seasonHistory').innerHTML = '<div class="empty">Open a member page with a valid number, like /user/1.</div>';
+    revealPage();
     return;
   }
   const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
@@ -523,6 +530,7 @@ async function loadMemberPage(userNumber){
   if(!profile){
     document.getElementById('memberName').textContent = 'Member Not Found';
     document.getElementById('seasonHistory').innerHTML = '<div class="empty">This member page does not exist yet.</div>';
+    revealPage();
     return;
   }
   currentViewedProfile=profile;
@@ -534,6 +542,7 @@ async function loadMemberPage(userNumber){
   };
   renderProfile(profile, buildSeasonAggregates(seasons), viewsCount, social);
   renderSeasons(seasons);
+  revealPage();
 }
 
 auth.onAuthStateChanged(async user => {
