@@ -113,6 +113,8 @@
   .pname-row{display:flex;align-items:center;gap:6px;min-width:0;}
   .pname-main{display:flex;align-items:center;gap:4px;min-width:0;flex:1;overflow:hidden;}
   .pdet{font-size:11px;color:var(--text2);margin-top:1px;}
+  .pmeta-row{display:flex;align-items:center;gap:8px;margin-top:5px;min-width:0;}
+  .pfp-chip{font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
   .psc{text-align:right;flex-shrink:0;}
   .padp{font-family:var(--fd);font-size:13px;font-weight:700;}
   .pproj{font-size:10px;color:var(--text3);margin-top:1px;}
@@ -1805,6 +1807,9 @@ function rPlayers(){
     const faved=isFav(p.id);
     const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
     const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`:'';
+    const actionRow=drafted
+      ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
+      :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${favBtn}${inlineDraftBtn}</div>`;
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
@@ -1812,16 +1817,13 @@ function rPlayers(){
         <div class="pname-row">
           <div class="pname-main">
             <div class="pname" style="display:flex;align-items:center;gap:4px;min-width:0;flex:1"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span></div>
-            ${inlineDraftBtn}
-            ${favBtn}
           </div>
         </div>
         <div class="pdet">${p.team} · ${getRosterbatePlayerSummary(p, SPORT)}</div>
+        ${actionRow}
       </div>
       <div class="psc">
-        ${drafted?`<div class="dlbl">Drafted</div>`
-          :myTurn?`<div class="pproj">${fp} FP</div>`
-          :`<div class="padp">#${p.adp}</div><div class="pproj">${fp} FP</div>`}
+        ${drafted?'':`<div class="padp">#${p.adp}</div>`}
       </div>
     </div>`;
   }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
