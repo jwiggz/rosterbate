@@ -34,8 +34,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .avatar img{width:100%;height:100%;object-fit:cover;}
 .eyebrow{font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--accent2);}
 .title{font-family:var(--fd);font-size:42px;font-weight:900;text-transform:uppercase;line-height:.95;margin-top:8px;}
-.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.meta{display:flex;flex-direction:column;gap:8px;margin-top:12px;align-items:flex-start;}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
+.sport-pill{gap:7px;}
+.sport-icon{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sport-icon svg{width:14px;height:14px;display:block;}
 .owner-pill{
   background:linear-gradient(135deg,rgba(245,158,11,.28),rgba(234,179,8,.18) 45%,rgba(255,236,179,.34) 100%);
   border-color:rgba(245,158,11,.48);
@@ -141,14 +145,43 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <div class="sub" id="memberLine">Public member page and lifetime league history.</div>
       <div class="meta">
-        <div class="pill" id="memberSince">Joined recently</div>
-        <div class="pill" id="viewCountPill">Views 0</div>
-        <div class="pill" id="rolePill" style="display:none;">Owner</div>
-        <div class="pill" id="titlePill">Championships 0</div>
-        <div class="pill" id="footballTitlePill">NFL 0</div>
-        <div class="pill" id="baseballTitlePill">MLB 0</div>
-        <div class="pill" id="basketballTitlePill">NBA 0</div>
-        <div class="pill" id="friendCountPill">Friends 0</div>
+        <div class="meta-row">
+          <div class="pill" id="memberSince">Joined recently</div>
+          <div class="pill" id="viewCountPill">Views 0</div>
+          <div class="pill" id="friendCountPill">Friends 0</div>
+          <div class="pill" id="rolePill" style="display:none;">Owner</div>
+        </div>
+        <div class="meta-row">
+          <div class="pill" id="titlePill">Championships 0</div>
+          <div class="pill sport-pill" id="footballTitlePill">
+            <span class="sport-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M6.5 16.8c2.6 2.6 8.4 2.6 11 0 2.6-2.6 2.6-8.4 0-11-2.6-2.6-8.4-2.6-11 0-2.6 2.6-2.6 8.4 0 11Z" fill="currentColor" opacity=".22"/>
+                <path d="M8.2 15.1c1.9 1.9 5.7 1.9 7.6 0 1.9-1.9 1.9-5.7 0-7.6-1.9-1.9-5.7-1.9-7.6 0-1.9 1.9-1.9 5.7 0 7.6Z" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M9.5 9.5h5M10.3 12h3.4M11 8l2 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </span>
+            Football 0
+          </div>
+          <div class="pill sport-pill" id="baseballTitlePill">
+            <span class="sport-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M8.7 6.6c1.3 1.4 2 3.4 2 5.4s-.7 4-2 5.4M15.3 6.6c-1.3 1.4-2 3.4-2 5.4s.7 4 2 5.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </span>
+            Baseball 0
+          </div>
+          <div class="pill sport-pill" id="basketballTitlePill">
+            <span class="sport-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M3.8 12h16.4M12 3.8c2.4 2.1 3.7 5 3.7 8.2S14.4 18.1 12 20.2M12 3.8C9.6 5.9 8.3 8.8 8.3 12s1.3 6.1 3.7 8.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </span>
+            Basketball 0
+          </div>
+        </div>
       </div>
       <div class="hero-actions" id="profileActions"></div>
     </div>
@@ -463,9 +496,9 @@ function renderProfile(profile, aggregates, viewsCount, social){
   document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
   document.getElementById('viewCountPill').textContent = 'Views ' + Number(viewsCount || 0);
   document.getElementById('titlePill').textContent = 'Championships ' + Number(meta.championships || stats.championships || 0);
-  document.getElementById('footballTitlePill').textContent = 'NFL ' + Number(meta.nflTitles || 0);
-  document.getElementById('baseballTitlePill').textContent = 'MLB ' + Number(meta.mlbTitles || 0);
-  document.getElementById('basketballTitlePill').textContent = 'NBA ' + Number(meta.nbaTitles || 0);
+  document.getElementById('footballTitlePill').lastChild.textContent = ' Football ' + Number(meta.nflTitles || 0);
+  document.getElementById('baseballTitlePill').lastChild.textContent = ' Baseball ' + Number(meta.mlbTitles || 0);
+  document.getElementById('basketballTitlePill').lastChild.textContent = ' Basketball ' + Number(meta.nbaTitles || 0);
   document.getElementById('rolePill').className = 'pill owner-pill';
   document.getElementById('rolePill').textContent = 'Owner';
   document.getElementById('rolePill').style.display = isOwner ? 'inline-flex' : 'none';
