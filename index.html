@@ -137,20 +137,33 @@
   .auth-status.error{color:#fca5a5;}
   .auth-status.success{color:#86efac;}
 
-  /* VS SECTION */
+  /* LEADERBOARD */
   .vs-section{margin-bottom:24px;}
-  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:980px;margin:0 auto;}
-  .vs-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
-  .vs-card.ai{border-color:rgba(139,92,246,.25);}
-  .vs-card.real{border-color:rgba(34,197,94,.25);}
-  .vs-icon{font-size:28px;margin-bottom:8px;}
-  .vs-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;margin-bottom:6px;}
-  .vs-card.ai .vs-title{color:#c4b5fd;}
-  .vs-card.real .vs-title{color:#86efac;}
-  .vs-desc{font-size:11px;color:var(--text3);line-height:1.5;}
-  .vs-features{margin-top:8px;display:flex;flex-direction:column;gap:3px;}
-  .vs-feat{font-size:11px;color:var(--text2);}
-  .vs-feat::before{content:'✓ ';color:var(--accent);}
+  .leaderboard-card{background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid rgba(249,115,22,.24);border-radius:16px;padding:16px;max-width:980px;margin:0 auto;}
+  .leaderboard-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+  .leaderboard-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;}
+  .leaderboard-sub{font-size:12px;color:var(--text2);line-height:1.55;max-width:560px;margin-top:4px;}
+  .leaderboard-badge{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.28);border-radius:999px;padding:6px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:#fdba74;}
+  .leaderboard-list{display:flex;flex-direction:column;gap:8px;}
+  .leaderboard-row{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:12px;align-items:center;background:rgba(15,23,42,.7);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-decoration:none;color:inherit;}
+  .leaderboard-row:hover{border-color:rgba(249,115,22,.32);transform:translateY(-1px);}
+  .leaderboard-rank{width:36px;height:36px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:17px;font-weight:900;color:var(--text2);}
+  .leaderboard-row.top-1 .leaderboard-rank{background:linear-gradient(180deg,#2b2f3d,#171d2d);border-color:rgba(255,255,255,.28);box-shadow:0 0 18px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.28);color:#f8fafc;}
+  .leaderboard-row.top-2 .leaderboard-rank{background:linear-gradient(180deg,#3f4e66,#202b40);border-color:rgba(191,219,254,.3);color:#dbeafe;}
+  .leaderboard-row.top-3 .leaderboard-rank{background:linear-gradient(180deg,#6a4630,#2d1d15);border-color:rgba(251,191,36,.3);color:#fde68a;}
+  .leaderboard-user{display:flex;align-items:center;gap:10px;min-width:0;}
+  .leaderboard-avatar{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.08);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:15px;font-weight:900;color:#fff;overflow:hidden;flex-shrink:0;}
+  .leaderboard-avatar img{width:100%;height:100%;object-fit:cover;}
+  .leaderboard-name{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;line-height:1;}
+  .leaderboard-meta{font-size:11px;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:.5px;}
+  .leaderboard-score{text-align:right;flex-shrink:0;}
+  .leaderboard-score-value{font-family:var(--fd);font-size:28px;font-weight:900;line-height:1;color:#86efac;}
+  .leaderboard-score-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+  .leaderboard-empty{padding:24px 16px;border:1px dashed var(--border);border-radius:12px;text-align:center;font-size:13px;color:var(--text3);}
+  .leaderboard-rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px;}
+  .leaderboard-rule{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+  .leaderboard-rule strong{display:block;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;color:var(--text);}
+  .leaderboard-rule span{display:block;font-size:11px;color:var(--text2);line-height:1.45;margin-top:4px;}
 
   /* HOW IT WORKS */
   .steps{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:24px;}
@@ -177,7 +190,6 @@
     .promo-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
     .sport-grid{grid-template-columns:repeat(3,minmax(0,180px));justify-content:center;}
     .cta-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
-    .vs-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
     .steps{grid-template-columns:repeat(2,minmax(0,1fr));}
     .feat-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
   }
@@ -189,7 +201,9 @@
     .hero-sub{font-size:14px;}
     .info-panel{padding:16px;}
     .swap-grid{grid-template-columns:1fr;}
-    .vs-grid{grid-template-columns:1fr;}
+    .leaderboard-row{grid-template-columns:44px minmax(0,1fr);align-items:flex-start;}
+    .leaderboard-score{grid-column:2;justify-self:start;text-align:left;}
+    .leaderboard-rules{grid-template-columns:1fr;}
     .feat-grid{grid-template-columns:1fr;}
   }
 </style>
@@ -333,30 +347,32 @@
     </a>
   </div>
 
-  <!-- Play vs AI or Real People -->
+  <!-- Leaderboard -->
   <div class="vs-section">
-    <div class="section-label">Your Way to Play</div>
-    <div class="vs-grid">
-      <div class="vs-card ai">
-        <div class="vs-icon">🤖</div>
-        <div class="vs-title">vs AI</div>
-        <div class="vs-desc">Jump in solo and compete against intelligent AI opponents that draft, trade, and manage rosters dynamically.</div>
-        <div class="vs-features">
-          <div class="vs-feat">Solo play, any time</div>
-          <div class="vs-feat">AI drafts and trades</div>
-          <div class="vs-feat">Adjustable difficulty</div>
-          <div class="vs-feat">No waiting for others</div>
+    <div class="section-label">Platform Leaderboard</div>
+    <div class="leaderboard-card">
+      <div class="leaderboard-head">
+        <div>
+          <div class="leaderboard-title">Top Managers</div>
+          <div class="leaderboard-sub">Every registered member shows up here. Earn score once per day for running leagues, jumping into multiplayer, and opening season mode.</div>
         </div>
+        <div class="leaderboard-badge">Daily Cooldowns Active</div>
       </div>
-      <div class="vs-card real">
-        <div class="vs-icon">👥</div>
-        <div class="vs-title">vs People</div>
-        <div class="vs-desc">Invite friends or join public leagues and compete against real fantasy managers all season long.</div>
-        <div class="vs-features">
-          <div class="vs-feat">Up to 20 teams</div>
-          <div class="vs-feat">Live draft rooms</div>
-          <div class="vs-feat">Real trade offers</div>
-          <div class="vs-feat">Bragging rights</div>
+      <div id="leaderboardList" class="leaderboard-list">
+        <div class="leaderboard-empty">Leaderboard is warming up.</div>
+      </div>
+      <div class="leaderboard-rules">
+        <div class="leaderboard-rule">
+          <strong>Create A League · +10</strong>
+          <span>Starts a fresh draft room and counts once per day.</span>
+        </div>
+        <div class="leaderboard-rule">
+          <strong>Multiplayer · +20</strong>
+          <span>Join or create a live room and cash in once per day.</span>
+        </div>
+        <div class="leaderboard-rule">
+          <strong>Season Manager · +5</strong>
+          <span>Open a season and lock in your daily activity bonus.</span>
         </div>
       </div>
     </div>
@@ -648,6 +664,65 @@ function closeAccountMenu(){ document.getElementById('accountMenu')?.classList.r
 function toggleAccountMenu(){
   document.getElementById('accountMenu')?.classList.toggle('open');
 }
+function leaderboardInitials(name){
+  const parts=String(name||'Player').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return 'RB';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+}
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[char]));
+}
+function renderLeaderboard(users){
+  const host=document.getElementById('leaderboardList');
+  if(!host) return;
+  const rows=(users||[])
+    .map(entry=>({
+      userNumber:Number(entry?.userNumber||0),
+      username:normalizeUsername(entry?.username) || 'Manager',
+      photoURL:String(entry?.photoURL||'').trim(),
+      score:Number(entry?.score||0),
+      profileUrl:entry?.profileUrl || buildPublicUserUrl(entry?.userNumber)
+    }))
+    .sort((a,b)=>(b.score-a.score) || (a.userNumber-b.userNumber));
+  if(!rows.length){
+    host.innerHTML='<div class="leaderboard-empty">No ranked members yet. Create an account and start stacking score.</div>';
+    return;
+  }
+  host.innerHTML=rows.map((entry,index)=>{
+    const rank=index+1;
+    const safeName=escapeHtml(entry.username);
+    const safeUrl=escapeHtml(entry.profileUrl);
+    const avatar=entry.photoURL
+      ? `<img src="${escapeHtml(entry.photoURL)}" alt="${safeName}">`
+      : leaderboardInitials(entry.username);
+    return `<a class="leaderboard-row top-${Math.min(rank,3)}" href="${safeUrl}">
+      <div class="leaderboard-rank">#${rank}</div>
+      <div class="leaderboard-user">
+        <div class="leaderboard-avatar">${avatar}</div>
+        <div>
+          <div class="leaderboard-name">${safeName}</div>
+          <div class="leaderboard-meta">Member #${entry.userNumber || '—'}</div>
+        </div>
+      </div>
+      <div class="leaderboard-score">
+        <div class="leaderboard-score-value">${entry.score}</div>
+        <div class="leaderboard-score-label">Score</div>
+      </div>
+    </a>`;
+  }).join('');
+}
+function subscribeLeaderboard(){
+  db.ref('publicUsers').on('value', snap => {
+    renderLeaderboard(Object.values(snap.val() || {}));
+  }, () => renderLeaderboard([]));
+}
 function openSettings(){
   closeAccountMenu();
   window.location.href='profile.html';
@@ -715,6 +790,12 @@ function defaultLifetimeStats(){
   };
 }
 
+function defaultScoreState(){
+  return {
+    score: 0
+  };
+}
+
 function buildPublicUserUrl(userNumber){
   return '/user/' + encodeURIComponent(userNumber);
 }
@@ -767,7 +848,9 @@ async function saveUserProfile(user, username){
   const isAdmin = isRosterbateAdminNumber(userNumber);
   const memberSince = Number(previousProfile.memberSince || parseCreatedAt(user, updatedAt));
   const publicSnap = await db.ref('publicUsers/' + userNumber).once('value').catch(() => null);
+  const publicProfile = publicSnap?.val?.() || {};
   const hasPublicProfile = !!publicSnap?.exists?.();
+  const score = Math.max(Number(previousProfile.score || 0), Number(publicProfile.score || 0), Number(defaultScoreState().score));
   await user.updateProfile({ displayName: cleanUsername });
   const updates = {};
   updates['users/' + user.uid + '/email'] = user.email || '';
@@ -775,6 +858,7 @@ async function saveUserProfile(user, username){
   updates['users/' + user.uid + '/userNumber'] = userNumber;
   updates['users/' + user.uid + '/isAdmin'] = isAdmin;
   updates['users/' + user.uid + '/memberSince'] = memberSince;
+  updates['users/' + user.uid + '/score'] = score;
   updates['users/' + user.uid + '/provider'] = user.providerData?.[0]?.providerId || 'password';
   updates['users/' + user.uid + '/updatedAt'] = updatedAt;
   updates['usernames/' + key] = {
@@ -790,6 +874,7 @@ async function saveUserProfile(user, username){
   updates['publicUsers/' + userNumber + '/username'] = cleanUsername;
   updates['publicUsers/' + userNumber + '/photoURL'] = user.photoURL || '';
   updates['publicUsers/' + userNumber + '/memberSince'] = memberSince;
+  updates['publicUsers/' + userNumber + '/score'] = score;
   updates['publicUsers/' + userNumber + '/profileUrl'] = buildPublicUserUrl(userNumber);
   updates['publicUsers/' + userNumber + '/updatedAt'] = updatedAt;
   if(!hasPublicProfile){
@@ -906,6 +991,7 @@ document.addEventListener('click', event => {
   if(!event.target.closest('.account-wrap')) closeAccountMenu();
 });
 
+subscribeLeaderboard();
 setAuthMode('signup');
 </script>
 </body>

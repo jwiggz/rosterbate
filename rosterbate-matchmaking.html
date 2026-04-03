@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <script src="sport-config.js"></script>
 
@@ -217,8 +218,43 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+let currentRbUser=null;
+let authReadyResolved=false;
+const authReady=new Promise(resolve=>{
+  auth.onAuthStateChanged(user=>{
+    currentRbUser=user||null;
+    if(!authReadyResolved){
+      authReadyResolved=true;
+      resolve(currentRbUser);
+    }
+  });
+});
 const connectedRef = db.ref('.info/connected');
+
+function rosterbateScoreDayKey(){
+  return new Date().toLocaleDateString('en-CA');
+}
+async function awardRosterbateScore(actionKey, points){
+  await authReady;
+  const user=currentRbUser || auth.currentUser;
+  if(!user) return false;
+  const snap=await db.ref('users/'+user.uid).once('value').catch(() => null);
+  const profile=snap?.val?.() || {};
+  const userNumber=Number(profile.userNumber || localStorage.getItem('rbUserNumber') || 0);
+  if(!userNumber) return false;
+  const today=rosterbateScoreDayKey();
+  if(String(profile?.scoreCooldowns?.[actionKey] || '')===today) return false;
+  const nextScore=Number(profile.score || 0) + Number(points || 0);
+  await db.ref().update({
+    ['users/'+user.uid+'/score']: nextScore,
+    ['users/'+user.uid+'/scoreCooldowns/'+actionKey]: today,
+    ['publicUsers/'+userNumber+'/score']: nextScore
+  });
+  return true;
+}
 
 
 // â”€â”€ PLAYER IDENTITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -986,6 +1022,7 @@ async function joinLobby(lobbyId){
   });
   currentLobbyId=lobbyId;
   myReady=false;
+  awardRosterbateScore('multiplayer', 20).catch(() => {});
   showWaitingRoom(lobbyId);
 }
 

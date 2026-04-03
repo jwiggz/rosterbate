@@ -414,7 +414,37 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
-auth.onAuthStateChanged(user => { currentRbUser = user || null; });
+let authReadyResolved=false;
+const authReady=new Promise(resolve=>{
+  auth.onAuthStateChanged(user => {
+    currentRbUser = user || null;
+    if(!authReadyResolved){
+      authReadyResolved=true;
+      resolve(currentRbUser);
+    }
+  });
+});
+function rosterbateScoreDayKey(){
+  return new Date().toLocaleDateString('en-CA');
+}
+async function awardRosterbateScore(actionKey, points){
+  await authReady;
+  const user=currentRbUser || auth.currentUser;
+  if(!user) return false;
+  const snap=await db.ref('users/'+user.uid).once('value').catch(() => null);
+  const profile=snap?.val?.() || {};
+  const userNumber=Number(profile.userNumber || localStorage.getItem('rbUserNumber') || 0);
+  if(!userNumber) return false;
+  const today=rosterbateScoreDayKey();
+  if(String(profile?.scoreCooldowns?.[actionKey] || '')===today) return false;
+  const nextScore=Number(profile.score || 0) + Number(points || 0);
+  await db.ref().update({
+    ['users/'+user.uid+'/score']: nextScore,
+    ['users/'+user.uid+'/scoreCooldowns/'+actionKey]: today,
+    ['publicUsers/'+userNumber+'/score']: nextScore
+  });
+  return true;
+}
 const DAYS_PER_WEEK=7;
 const TOTAL_DAYS=()=>G.totalWeeks*DAYS_PER_WEEK;
 let SLOT_LABELS=[...SPORT_CFG.starterSlots];
@@ -880,6 +910,7 @@ function initSeason(){
   ensurePowerupState();
   rollWeeklyPowerupDrops(1);
   logActivity('league','Season opened',teamName(D.myPos)+' entered a fresh '+(D.leagueName||'RosterBate League')+'.',D.myPos,'🚪');
+  awardRosterbateScore('season_manager', 5).catch(() => {});
 }
 
 function buildSched(n,weeks){
