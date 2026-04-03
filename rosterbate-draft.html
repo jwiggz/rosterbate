@@ -177,6 +177,7 @@
   .as{background:var(--bg2);border-radius:18px 18px 0 0;padding:15px 15px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;}
   .at{font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:2px;}
   .apn{font-size:12px;color:var(--text2);margin-bottom:12px;}
+  .apsub{font-size:11px;color:var(--accent);margin:-6px 0 12px;letter-spacing:.3px;}
   .bbw{margin-bottom:11px;}
   .bbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;}
   .bb{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
@@ -525,6 +526,7 @@
     <div class="mh"></div>
     <div class="at">💰 Nomination</div>
     <div class="apn" id="aPname">—</div>
+    <div class="apsub" id="aMarket">AI market: —</div>
     <div class="bbw">
       <div class="bbl"><span>Your Budget</span><span id="aBudget">$200</span></div>
       <div class="bb"><div class="bf" id="bFill" style="width:100%"></div></div>
@@ -1333,7 +1335,7 @@ let S={
   rds:13,myPos:4,tmax:0,abud:200,myBudget:200,
   cur:0,total:0,picks:[],myTeam:[],drafted:new Set(),
   posF:'ALL',timer:0,timerInt:null,selP:null,
-  teams:[],order:[],cpuBuds:[],
+  teams:[],order:[],cpuBuds:[],auc:null,auctionTargets:{},
 };
 
 function updatePosFilterBar(){
@@ -1415,6 +1417,8 @@ function startDraft(){
   S.abud=parseInt(document.getElementById('iBudget').value)||200;
   S.total=ls*rd;S.cur=0;S.picks=[];S.myTeam=[];S.drafted=new Set();
   S.myBudget=S.abud;
+  S.auc=null;
+  S.auctionTargets={};
   FAVS=[];tradeLog=[];trSelectedTeam=null;
   initPauseState();
   const tn=['Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats',
@@ -1514,25 +1518,81 @@ function userPick(p){
 }
 
 // AUCTION
+function getAuctionTargetPrice(p){
+  if(!p) return 1;
+  if(S.auctionTargets[p.id]) return S.auctionTargets[p.id];
+  const topPlayer = PLAYERS[0];
+  const topFp = Math.max(1, calcFP(topPlayer));
+  const rank = Math.max(1, p.adp || (PLAYERS.findIndex(x=>x.id===p.id)+1) || 1);
+  let pct;
+  if(rank===1){
+    pct = 0.375 + Math.random()*0.05;
+  } else {
+    const fpRatio = Math.max(0.12, calcFP(p)/topFp);
+    const rankTail = Math.exp(-(rank-2)/14);
+    pct = 0.235*Math.pow(fpRatio,5.2) + 0.03*rankTail;
+    pct *= 0.94 + Math.random()*0.14;
+    const hardCap = rank===2 ? 0.24 : rank<=5 ? 0.18 : rank<=12 ? 0.11 : 0.08;
+    pct = Math.min(hardCap, Math.max(0.01, pct));
+  }
+  const dollars = Math.max(1, Math.min(S.abud, Math.round(S.abud*pct)));
+  S.auctionTargets[p.id]=dollars;
+  return dollars;
+}
+function chooseAuctionCpuWinner(maxBid){
+  const eligible=[];
+  for(let i=0;i<S.ls;i++){
+    if(i===S.myPos) continue;
+    const budget=S.cpuBuds[i]||0;
+    if(budget>=maxBid) eligible.push(i);
+  }
+  if(eligible.length) return eligible[Math.floor(Math.random()*eligible.length)];
+  let fallback=-1,best=0;
+  for(let i=0;i<S.ls;i++){
+    if(i===S.myPos) continue;
+    const budget=S.cpuBuds[i]||0;
+    if(budget>best){best=budget;fallback=i;}
+  }
+  return fallback>=0 ? fallback : Math.max(0, (S.myPos+1)%Math.max(1,S.ls));
+}
+function chooseAuctionCpuPlayer(av){
+  const pool=av.slice(0,Math.min(10,av.length)).map(p=>({p,target:getAuctionTargetPrice(p)}));
+  const affordable = pool.filter(item=>item.target<=Math.max(...S.cpuBuds.filter((_,i)=>i!==S.myPos),1));
+  const source = affordable.length ? affordable : pool;
+  source.sort((a,b)=>b.target-a.target);
+  const top = source.slice(0,Math.min(5,source.length));
+  return top[Math.floor(Math.random()*top.length)].p;
+}
+function nextCpuAuctionPush(currentBid,targetBid){
+  const gap=Math.max(1,targetBid-currentBid);
+  const aggression = gap>40 ? 0.45 : gap>20 ? 0.38 : gap>10 ? 0.3 : 0.22;
+  const jump = Math.max(1, Math.round(gap*(aggression + Math.random()*0.18)));
+  return Math.min(targetBid, currentBid + jump);
+}
 function aucNext(){
   if(S.cur>=S.total){endDraft();return;}
   const nom=S.order[S.cur];
   const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
   if(!av.length){endDraft();return;}
   if(nom===S.myPos){
-    openAuc(av[0]);
+    openAuc(av[0], nom);
   } else {
-    const top=av.slice(0,Math.min(4,av.length));
-    const p=top[Math.floor(Math.random()*top.length)];
-    const bid=Math.max(1,Math.floor(S.cpuBuds[nom]*(0.08+Math.random()*0.22)));
-    S.cpuBuds[nom]-=bid;
-    doPick(p,nom);rBoard();rPlayers();upHdr();
+    const p=chooseAuctionCpuPlayer(av);
+    const targetBid=Math.min(getAuctionTargetPrice(p), S.cpuBuds[nom]||0);
+    const winner = targetBid>0 ? nom : chooseAuctionCpuWinner(1);
+    const bid=Math.max(1, Math.min(targetBid||1, S.cpuBuds[winner]||1));
+    S.cpuBuds[winner]-=bid;
+    doPick(p,winner);rBoard();rPlayers();upHdr();
     setTimeout(aucNext,180);
   }
 }
-function openAuc(p){
+function openAuc(p,nominator){
+  const targetBid=Math.min(getAuctionTargetPrice(p), Math.max(...S.cpuBuds.filter((_,i)=>i!==S.myPos),1));
+  const cpuWinner=chooseAuctionCpuWinner(Math.max(1, Math.min(targetBid, S.abud)));
+  S.auc={playerId:p.id,nominator,currentBid:0,targetBid:Math.max(1,targetBid),cpuWinner};
   S.selP=p;
   document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' — '+p.team+' · '+p.pos+' · Rank #'+p.adp;
+  document.getElementById('aMarket').textContent='AI market usually lands around $'+Math.max(1,targetBid)+' for this profile.';
   document.getElementById('aBudget').textContent='$'+S.myBudget;
   const pct=(S.myBudget/S.abud)*100;
   document.getElementById('bFill').style.width=pct+'%';
@@ -1543,15 +1603,31 @@ function openAuc(p){
 function qBid(a){document.getElementById('bInput').value=Math.min(a,S.myBudget);}
 function passAuction(){
   document.getElementById('aModal').classList.remove('open');
-  if(S.selP) doPick(S.selP,(S.myPos+1)%S.ls);
-  S.cur++;setTimeout(aucNext,250);
+  if(S.selP){
+    const winner = S.auc?.cpuWinner>=0 ? S.auc.cpuWinner : (S.myPos+1)%S.ls;
+    const bid = Math.max(1, Math.min(S.auc?.currentBid || S.auc?.targetBid || 1, S.cpuBuds[winner]||1));
+    if(winner!==S.myPos) S.cpuBuds[winner]-=bid;
+    doPick(S.selP,winner);
+  }
+  S.auc=null;
+  rBoard();rPlayers();upHdr();
+  setTimeout(aucNext,250);
 }
 function confAuction(){
   const bid=parseInt(document.getElementById('bInput').value)||1;
   if(bid>S.myBudget){showToast('⚠️ Over budget!');return;}
+  const targetBid = S.auc?.targetBid || 1;
+  if((S.auc?.cpuWinner>=0) && bid<targetBid){
+    const cpuBid = nextCpuAuctionPush(bid,targetBid);
+    S.auc.currentBid=cpuBid;
+    document.getElementById('bInput').value=Math.min(S.myBudget, cpuBid+1);
+    showToast('💰 '+S.teams[S.auc.cpuWinner]+' pushes it to $'+cpuBid+'.');
+    return;
+  }
   document.getElementById('aModal').classList.remove('open');
   S.myBudget-=bid;
   doPick(S.selP,S.myPos);
+  S.auc=null;
   showToast('✅ '+S.selP.name+' — $'+bid+'!');
   rBoard();rPlayers();rMyTeam();upHdr();
   setTimeout(aucNext,350);
