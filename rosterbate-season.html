@@ -9,7 +9,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-<script src="sport-data-live.js"></script>
 <script src="sport-config-live.js"></script>
 <style>
 :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;--accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;}
@@ -414,6 +413,29 @@ const NAVIDS={hub:'hn',roster:'rn',waiver:'wn',trades:'tn',standings:'stn',commi
 let CURRENT_SPORT = getSelectedRosterbateSport();
 let SPORT_CFG = getRosterbateSportConfig(CURRENT_SPORT);
 let STARTERS = SPORT_CFG.starterSlots.length;
+
+const RB_POOLS_URL='sport-data-live.json';
+let rbPoolsReady=null;
+
+function ensureRosterbatePools(){
+  if(window.RB_IMPORTED_POOLS && Object.keys(window.RB_IMPORTED_POOLS).length) return Promise.resolve(window.RB_IMPORTED_POOLS);
+  if(rbPoolsReady) return rbPoolsReady;
+  rbPoolsReady=fetch(RB_POOLS_URL,{cache:'no-store'})
+    .then(res=>{
+      if(!res.ok) throw new Error('Failed to load '+RB_POOLS_URL+' ('+res.status+')');
+      return res.json();
+    })
+    .then(pools=>{
+      window.RB_IMPORTED_POOLS=pools||{};
+      return window.RB_IMPORTED_POOLS;
+    })
+    .catch(err=>{
+      rbPoolsReady=null;
+      console.error('RosterBate real player pools failed to load:', err);
+      throw err;
+    });
+  return rbPoolsReady;
+}
 
 function tc(t){return getRosterbateTeamColor(CURRENT_SPORT, t);}
 function ini(n){if(!n)return'?';const p=n.trim().split(' ');return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();}
@@ -1016,7 +1038,14 @@ function toggleWaiverSort(key){
   renderWaiver();
 }
 
-window.onload=function(){
+window.onload=async function(){
+  try{
+    await ensureRosterbatePools();
+  }catch(e){
+    console.error(e);
+    toast('Real player data failed to load.');
+    return;
+  }
   applySportContext(CURRENT_SPORT);
   let raw=null;
   try{raw=localStorage.getItem('rosterbateDraft');}catch(e){}
@@ -1041,7 +1070,8 @@ window.onload=function(){
   }
 };
 
-function loadDemo(){
+async function loadDemo(){
+  await ensureRosterbatePools();
   applySportContext(CURRENT_SPORT);
   const teams=getDemoTeamsForSport(CURRENT_SPORT);
   const n=teams.length;

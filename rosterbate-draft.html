@@ -10,7 +10,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-<script src="sport-data-live.js"></script>
 <script src="sport-config-live.js"></script>
 <style>
   :root{
@@ -642,6 +641,29 @@ const firebaseConfig = {
   appId: "1:951275364572:web:758d1b4d970b7b87c05419",
   measurementId: "G-DNSFKMKYVC"
 };
+
+const RB_POOLS_URL='sport-data-live.json';
+let rbPoolsReady=null;
+
+function ensureRosterbatePools(){
+  if(window.RB_IMPORTED_POOLS && Object.keys(window.RB_IMPORTED_POOLS).length) return Promise.resolve(window.RB_IMPORTED_POOLS);
+  if(rbPoolsReady) return rbPoolsReady;
+  rbPoolsReady=fetch(RB_POOLS_URL,{cache:'no-store'})
+    .then(res=>{
+      if(!res.ok) throw new Error('Failed to load '+RB_POOLS_URL+' ('+res.status+')');
+      return res.json();
+    })
+    .then(pools=>{
+      window.RB_IMPORTED_POOLS=pools||{};
+      return window.RB_IMPORTED_POOLS;
+    })
+    .catch(err=>{
+      rbPoolsReady=null;
+      console.error('RosterBate real player pools failed to load:', err);
+      throw err;
+    });
+  return rbPoolsReady;
+}
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
@@ -3068,38 +3090,45 @@ function rbScheduleAiMsg(){
 
 // ── INIT ────────────────────────────────────────────────────
 // Post system message on load
-(function(){
-  applySportToDraftUI();
-  applySavedLobbySettings();
-  hydrateStepperInputs(document);
-  rbLoadChat();
-  const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
-  // Only post system msg if no recent one
-  const recent=rbChat.msgs.filter(m=>m.type==='system'&&Date.now()-m.ts<5000);
-  if(!recent.length) rbPostSystem(context+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
-  rbUpdateUnread();
+(async function(){
+  try{
+    await ensureRosterbatePools();
+    applySportToDraftUI();
+    applySavedLobbySettings();
+    hydrateStepperInputs(document);
+    rbLoadChat();
+    const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
+    // Only post system msg if no recent one
+    const recent=rbChat.msgs.filter(m=>m.type==='system'&&Date.now()-m.ts<5000);
+    if(!recent.length) rbPostSystem(context+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+    rbUpdateUnread();
 
-  // Close pickers when clicking outside
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('#rbEmojiPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Emoji"]')){
-      document.getElementById('rbEmojiPicker')?.classList.remove('open');
-    }
-    if(!e.target.closest('#rbGifPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Gif"]')){
-      document.getElementById('rbGifPicker')?.classList.remove('open');
-    }
-  });
+    // Close pickers when clicking outside
+    document.addEventListener('click',e=>{
+      if(!e.target.closest('#rbEmojiPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Emoji"]')){
+        document.getElementById('rbEmojiPicker')?.classList.remove('open');
+      }
+      if(!e.target.closest('#rbGifPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Gif"]')){
+        document.getElementById('rbGifPicker')?.classList.remove('open');
+      }
+    });
 
-  // Poll for new messages from other sessions every 5 seconds
-  setInterval(()=>{
-    if(rbChatOpen){
-      const prev=rbChat.msgs.length;
-      rbLoadChat();
-      if(rbChat.msgs.length!==prev){ rbRender(); setTimeout(()=>rbScrollBottom(),50); }
-    } else {
-      rbLoadChat();
-      rbUpdateUnread();
-    }
-  },5000);
+    // Poll for new messages from other sessions every 5 seconds
+    setInterval(()=>{
+      if(rbChatOpen){
+        const prev=rbChat.msgs.length;
+        rbLoadChat();
+        if(rbChat.msgs.length!==prev){ rbRender(); setTimeout(()=>rbScrollBottom(),50); }
+      } else {
+        rbLoadChat();
+        rbUpdateUnread();
+      }
+    },5000);
+  }catch(err){
+    console.error(err);
+    const pill=document.getElementById('sportLobbyPill');
+    if(pill) pill.textContent='⚠️ Real player data failed to load';
+  }
 })();
 </script>
 
