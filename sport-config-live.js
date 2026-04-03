@@ -51,22 +51,42 @@
   function fixed(n){ return Math.round(n*10)/10; }
   function buildName(i,a,b){ return a[i%a.length]+' '+b[Math.floor(i/a.length)%b.length]; }
   function assignAdp(players){ return players.sort((a,b)=>b.fp-a.fp).map((p,i)=>Object.assign(p,{adp:i+1})); }
+  function looksMojibakeText(value){
+    return typeof value==='string' && /(?:Ã.|Â|â€|â€™|â€œ|â€\x9d|â€“|â€”|â€¦)/.test(value);
+  }
+  function normalizeImportedText(value){
+    if(typeof value!=='string' || !looksMojibakeText(value)) return value;
+    try{
+      return decodeURIComponent(escape(value));
+    }catch(_err){
+      return value;
+    }
+  }
+  function normalizeImportedDetailStats(detailStats){
+    return (detailStats||[]).map(function(stat){
+      return {
+        label:normalizeImportedText(stat&&stat.label),
+        value:typeof (stat&&stat.value)==='string' ? normalizeImportedText(stat.value) : (stat&&stat.value)
+      };
+    });
+  }
   function cloneImportedPool(list,count){
     return (list||[])
       .slice(0,Math.max(0,count||list.length))
       .map(function(player){
         return {
           id:player.id,
-          name:player.name,
-          team:player.team,
+          name:normalizeImportedText(player.name),
+          team:normalizeImportedText(player.team),
           pos:player.pos,
           fp:player.fp,
           adp:player.adp,
-          statSummary:player.statSummary,
+          source:player.source||'',
+          sourcePlayerId:player.sourcePlayerId||'',
+          statsThroughDate:player.statsThroughDate||'',
+          statSummary:normalizeImportedText(player.statSummary),
           statValues:player.statValues?Object.assign({},player.statValues):null,
-          detailStats:(player.detailStats||[]).map(function(stat){
-            return {label:stat.label,value:stat.value};
-          })
+          detailStats:normalizeImportedDetailStats(player.detailStats)
         };
       });
   }
