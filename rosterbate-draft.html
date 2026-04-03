@@ -366,9 +366,9 @@
       <div class="chips" id="cTimer">
         <div class="chip" data-v="30" onclick="cc('cTimer',this)">30s</div>
         <div class="chip" data-v="60" onclick="cc('cTimer',this)">1 min</div>
-        <div class="chip on" data-v="90" onclick="cc('cTimer',this)">1:30</div>
+        <div class="chip" data-v="90" onclick="cc('cTimer',this)">1:30</div>
         <div class="chip" data-v="120" onclick="cc('cTimer',this)">2 min</div>
-        <div class="chip" data-v="0" onclick="cc('cTimer',this)">Off</div>
+        <div class="chip on" data-v="0" onclick="cc('cTimer',this)">Off</div>
       </div>
     </div>
     <div class="errmsg" id="err"></div>
@@ -1089,9 +1089,9 @@ function gv(gid){return document.querySelector('#'+gid+' .chip.on')?.dataset?.v|
 // ─── STATE ────────────────────────────────────────────────
 let S={
   name:'My Team',ls:10,fmt:'snake',scr:'h2h_cat',
-  rds:13,myPos:4,tmax:90,abud:200,myBudget:200,
+  rds:13,myPos:4,tmax:0,abud:200,myBudget:200,
   cur:0,total:0,picks:[],myTeam:[],drafted:new Set(),
-  posF:'ALL',timer:90,timerInt:null,selP:null,
+  posF:'ALL',timer:0,timerInt:null,selP:null,
   teams:[],order:[],cpuBuds:[],
 };
 
@@ -1294,7 +1294,7 @@ function confAuction(){
 
 // PLAYER MODAL
 function calcFP(p){
-  if(SPORT!=='nba') return p.fp;
+  if(SPORT!=='nba') return getRosterbatePlayerFantasyScore(SPORT,p);
   if(S.scr==='h2h_pts'||S.scr==='points')
     return Math.round((p.pts+p.reb*1.2+p.ast*1.5+p.stl*3+p.blk*3-p.to+p.tpm*0.5)*10)/10;
   return p.fp;
