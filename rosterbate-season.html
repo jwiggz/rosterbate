@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="sport-config.js"></script>
 <style>
 :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;--accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -130,10 +131,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- NO DATA -->
 <div id="noData" class="screen active">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:16px;text-align:center;">
-    <div style="font-size:56px;">🏀</div>
+    <div style="font-size:56px;" id="seasonEmptyIcon">🏀</div>
     <div style="font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;">Roster<span style="color:var(--accent)">Bate</span></div>
-    <div style="font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;">Season Manager</div>
-    <div style="font-size:14px;color:var(--text2);line-height:1.7;max-width:300px;">Complete a draft in the RosterBate Draft app first, then tap "Open Season Manager."</div>
+    <div style="font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;" id="seasonEmptyTitle">Season Manager</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.7;max-width:300px;" id="seasonEmptyCopy">Complete a draft in the RosterBate Draft app first, then tap "Open Season Manager."</div>
     <button onclick="loadDemo()" style="background:var(--accent);border:none;border-radius:10px;padding:13px 28px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">Load Demo Data</button>
   </div>
 </div>
@@ -141,7 +142,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- HUB -->
 <div id="hub" class="screen">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-    <a href="index.html" class="rb-home-link" style="font-size:18px;">🏀 Roster<span style="color:var(--accent)">Bate</span></a>
+    <a href="index.html" class="rb-home-link" style="font-size:18px;" id="seasonHomeLink">🏀 Roster<span style="color:var(--accent)">Bate</span></a>
     <div style="display:flex;align-items:center;gap:8px;">
       <button class="tpb" onclick="openPicker()">👥 Teams</button>
       <div id="hubWeek" style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;"></div>
@@ -224,7 +225,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div id="roster" class="screen">
   <div class="ph" style="position:relative;">
     <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">←</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
+    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="rosterHomeLink">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="pt">👕 My Roster</div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px;"><button class="tpb" onclick="openPicker()">👥 Teams</button><div id="rWk" style="font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;"></div></div>
   </div>
@@ -237,13 +238,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div id="waiver" class="screen">
   <div class="ph" style="position:relative;">
     <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">←</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
+    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="waiverHomeLink">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="pt">📋 Waiver Wire</div>
     <div style="margin-left:auto;"><button class="tpb" onclick="openPicker()">👥 Teams</button></div>
   </div>
   <div style="padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;">
     <div style="flex:1;position:relative;"><input type="text" id="wSrch" placeholder="Search players…" oninput="renderWaiver()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;">🔍</span></div>
-    <select id="wPos" onchange="renderWaiver()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;appearance:none;"><option value="ALL">All</option><option value="PG">PG</option><option value="SG">SG</option><option value="SF">SF</option><option value="PF">PF</option><option value="C">C</option></select>
+    <select id="wPos" onchange="renderWaiver()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;appearance:none;"></select>
   </div>
   <div class="sbb" id="waiverContent"></div>
   <div class="bn" id="wn"></div>
@@ -253,7 +254,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div id="trades" class="screen">
   <div class="ph" style="position:relative;">
     <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">←</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
+    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="tradesHomeLink">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="pt">⇄ Trades</div>
     <div style="margin-left:auto;"><button class="tpb" onclick="openPicker()">👥 Teams</button></div>
   </div>
@@ -366,9 +367,11 @@ const TCOLORS=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4
 const PAGES=['hub','roster','waiver','trades','standings','commissioner'];
 const PLABELS={hub:'🏠 Hub',roster:'👕 Roster',waiver:'📋 Wire',trades:'⇄ Trade',standings:'🏆 Stand.',commissioner:'⚙️ Comm.'};
 const NAVIDS={hub:'hn',roster:'rn',waiver:'wn',trades:'tn',standings:'stn',commissioner:'commNav'};
-const STARTERS=8;
+let CURRENT_SPORT = getSelectedRosterbateSport();
+let SPORT_CFG = getRosterbateSportConfig(CURRENT_SPORT);
+let STARTERS = SPORT_CFG.starterSlots.length;
 
-function tc(t){return TC[t]||'#334155';}
+function tc(t){return getRosterbateTeamColor(CURRENT_SPORT, t);}
 function ini(n){if(!n)return'?';const p=n.trim().split(' ');return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();}
 function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
@@ -409,7 +412,28 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 auth.onAuthStateChanged(user => { currentRbUser = user || null; });
 const DAYS_PER_WEEK=7;
 const TOTAL_DAYS=()=>G.totalWeeks*DAYS_PER_WEEK;
-const SLOT_LABELS=['PG','SG','SF','PF','C','G','F','UTIL'];
+let SLOT_LABELS=[...SPORT_CFG.starterSlots];
+
+function applySportContext(sport){
+  CURRENT_SPORT = normalizeRosterbateSport(sport);
+  SPORT_CFG = getRosterbateSportConfig(CURRENT_SPORT);
+  STARTERS = SPORT_CFG.starterSlots.length;
+  SLOT_LABELS = [...SPORT_CFG.starterSlots];
+  setSelectedRosterbateSport(CURRENT_SPORT);
+  const homeLabel = SPORT_CFG.icon + ' Roster<span style="color:var(--accent)">Bate</span>';
+  ['seasonHomeLink','rosterHomeLink','waiverHomeLink','tradesHomeLink'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = homeLabel;
+  });
+  document.title = 'RosterBate — ' + SPORT_CFG.label + ' Season Manager';
+  document.getElementById('seasonEmptyIcon').textContent = SPORT_CFG.icon;
+  document.getElementById('seasonEmptyTitle').textContent = SPORT_CFG.label + ' Season Manager';
+  document.getElementById('seasonEmptyCopy').textContent = 'Complete a ' + SPORT_CFG.label + ' draft in the RosterBate Draft app first, then tap "Open Season Manager."';
+  const wPos = document.getElementById('wPos');
+  if(wPos){
+    wPos.innerHTML = SPORT_CFG.waiverPositions.map(pos => `<option value="${pos}">${pos}</option>`).join('');
+  }
+}
 // ── Pro Sports GAME SCHEDULE SIMULATION ──────────────────────────
 // Real Pro Sports teams for matchup display
 const PRO_TEAMS=['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW',
@@ -699,12 +723,38 @@ function settleWeek(week){
 let wAdd=null,wDrop=null,trP={ti:-1,give:[],get:[]};
 
 window.onload=function(){
+  applySportContext(CURRENT_SPORT);
   let raw=null;
   try{raw=localStorage.getItem('rosterbateDraft');}catch(e){}
-  if(raw){try{D=JSON.parse(raw);if(typeof D.isCommissioner!=='boolean') D.isCommissioner=true;initSeason();goPage('hub');}catch(e){console.error(e);}}
+  if(raw){try{D=JSON.parse(raw);if(typeof D.isCommissioner!=='boolean') D.isCommissioner=true;applySportContext(D.sport||CURRENT_SPORT);initSeason();goPage('hub');}catch(e){console.error(e);}}
 };
 
 function loadDemo(){
+  applySportContext(CURRENT_SPORT);
+  const teams=['My Demo Team','Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters','The Paint','Sky Hooks'];
+  const n=teams.length;
+  const pool=buildRosterbateSportPlayerPool(CURRENT_SPORT, 180);
+  const allRosters=Array.from({length:n},()=>[]);
+  const rounds=SPORT_CFG.defaultRounds;
+  for(let r=0;r<rounds;r++){
+    for(let i=0;i<n;i++){
+      const pickIndex=r%2===0?i:n-1-i;
+      const player=pool[(r*n)+pickIndex];
+      if(player) allRosters[pickIndex].push({...player});
+    }
+  }
+  D={sport:CURRENT_SPORT,teamName:teams[0],leagueSize:n,scoringFormat:SPORT_CFG.defaultScoring,draftFormat:SPORT_CFG.defaultFormat,rounds,myPos:0,teams,
+     picks:allRosters.flatMap((r,ti)=>r.map((p,i)=>({ov:ti+i*n+1,round:i+1,ti,pid:p.id}))),
+     myRoster:allRosters[0],allRosters,isCommissioner:true,savedAt:Date.now()};
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  try{
+    initSeason();
+    goPage('hub');
+  }catch(e){
+    console.error(e);
+    toast('Demo season failed to load.');
+  }
+  return;
   const teams=['My Demo Team','Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters','The Paint','Sky Hooks'];
   const n=teams.length;
   const pool=[
@@ -833,21 +883,13 @@ function loadDemo(){
 }
 
 function initSeason(){
+  applySportContext(D?.sport || CURRENT_SPORT);
   const n=D.leagueSize;
   if(!D.seasonId) D.seasonId='season_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   G.rosters=D.allRosters.map(r=>r.map(p=>({...p})));
   G.starters=G.rosters.map(r=>[...r].sort((a,b)=>b.fp-a.fp).slice(0,STARTERS).map(p=>p.id));
   const allIds=new Set(G.rosters.flat().map(p=>p.id));
-  G.waiver=[
-    {id:201,name:"Bradley Beal",team:"PHX",pos:"SG",pts:18.2,reb:4.4,ast:5.0,stl:0.9,blk:0.2,fp:27.5,to:2.5,fgp:47.0,ftp:80.0,tpm:1.5},
-    {id:202,name:"Jordan Poole",team:"WAS",pos:"SG",pts:17.3,reb:2.7,ast:4.5,stl:0.9,blk:0.2,fp:26.5,to:2.1,fgp:42.8,ftp:85.6,tpm:3.2},
-    {id:203,name:"Tyus Jones",team:"PHX",pos:"PG",pts:12.5,reb:2.8,ast:7.5,stl:1.1,blk:0.2,fp:22.0,to:1.8,fgp:47.0,ftp:80.0,tpm:1.0},
-    {id:204,name:"Deni Avdija",team:"POR",pos:"SF",pts:15.2,reb:7.5,ast:3.8,stl:1.2,blk:0.6,fp:26.1,to:1.9,fgp:47.0,ftp:78.0,tpm:1.8},
-    {id:205,name:"Gary Trent Jr.",team:"TOR",pos:"SG",pts:16.3,reb:2.8,ast:2.3,stl:1.1,blk:0.2,fp:21.5,to:1.6,fgp:43.0,ftp:87.0,tpm:3.6},
-    {id:206,name:"Anfernee Simons2",team:"POR",pos:"SG",pts:19.0,reb:2.8,ast:4.0,stl:0.8,blk:0.2,fp:25.0,to:2.0,fgp:46.0,ftp:88.0,tpm:3.8},
-    {id:207,name:"Cam Thomas2",team:"BKN",pos:"SG",pts:20.5,reb:3.2,ast:3.5,stl:0.8,blk:0.3,fp:27.0,to:2.0,fgp:47.0,ftp:80.0,tpm:1.5},
-    {id:208,name:"Josh Giddey",team:"OKC",pos:"PG",pts:14.3,reb:7.5,ast:6.4,stl:1.1,blk:0.5,fp:28.2,to:2.8,fgp:47.0,ftp:70.0,tpm:0.8},
-  ].filter(p=>!allIds.has(p.id));
+  G.waiver=buildRosterbateSportPlayerPool(CURRENT_SPORT, 260).filter(p=>!allIds.has(p.id)).slice(0,40).map(p=>({...p}));
   G.schedule=buildSched(n,G.totalWeeks);
   G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
   G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];
@@ -920,7 +962,7 @@ function buildLifetimeSeasonPayload(userNumber){
     seasonId: D.seasonId,
     leagueName: D.leagueName || 'RosterBate League',
     teamName: D.teamName || 'RosterBate Team',
-    sport: 'NBA',
+    sport: SPORT_CFG.label,
     finalRank,
     regularSeasonWins: myStanding.w || 0,
     regularSeasonLosses: myStanding.l || 0,
@@ -1271,7 +1313,7 @@ function pRow(p,slot,isS,day,isPast){
         <span class="pb2">${p.pos}</span>
         ${injuryBadge}
       </div>
-      <div class="pd">${p.team} · ${p.fp}fp · ${p.pts}/${p.reb}/${p.ast}</div>
+      <div class="pd">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
       ${gameInfo}
     </div>
     ${actionBtn}
@@ -1326,7 +1368,7 @@ function renderWaiver(){
     <div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;">
       <div class="pav" style="background:${tc(p.team)};width:36px;height:36px;font-size:13px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;"><div class="pn">${p.name}<span class="pb2">${p.pos}</span></div>
-      <div class="pd">${p.team} · ${p.fp}fp · ${p.pts}pts/${p.reb}reb/${p.ast}ast</div></div>
+      <div class="pd">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div></div>
       <button onclick="openWaiver(${p.id})" style="background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:7px;padding:6px 11px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--accent);cursor:pointer;flex-shrink:0;">Claim</button>
     </div>`).join('');
 }
@@ -1609,7 +1651,7 @@ function openViewer(ti){
   const starters=sIds.map(id=>roster.find(p=>p.id===id)).filter(Boolean);
   const bench=roster.filter(p=>!sIds.includes(p.id));
   const revealedWeekTotal=getTeamWeekRevealedScore(ti,G.week);
-  const slots=['PG','SG','SF','PF','C','G','F','UTIL'];
+  const slots=[...SLOT_LABELS];
 
   const av=document.getElementById('vAv');av.textContent=ini(nm);av.style.background=col;
   document.getElementById('vName').textContent=nm;
@@ -1643,7 +1685,7 @@ function openViewer(ti){
       <div class="pav" style="background:${tc(p.team)};width:32px;height:32px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;flex-wrap:wrap;"><span class="pn">${p.name}</span><span class="pb2">${p.pos}</span>${injBadge}</div>
-        <div class="pd">${p.team} · ${p.fp}fp · ${p.pts}/${p.reb}/${p.ast}</div>
+        <div class="pd">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
         ${gameInfo}
       </div>
       <span class="${isS?'stb':'bnb'}">${isS?'START':'BN'}</span>
@@ -1666,11 +1708,12 @@ function openViewer(ti){
 let CS = null; // commissioner settings object
 
 function defaultCS(){
+  const sportDefaults = getRosterbateCommissionerDefaults(CURRENT_SPORT);
   return {
     // Basic
     leagueName: 'My RosterBate League',
     numTeams: 10,
-    scoringType: 'H2H Points',
+    scoringType: sportDefaults.scoringType,
     format: 'Standard',
     isPublic: false,
     autoReactivate: false,
@@ -1685,28 +1728,14 @@ function defaultCS(){
     timePerPick: 60,
     draftOrder: 'Randomized',
     // Roster
-    rosterSize: 13,
-    totalStarters: 8,
-    totalBench: 3,
+    rosterSize: SPORT_CFG.defaultRounds,
+    totalStarters: STARTERS,
+    totalBench: Math.max(3, SPORT_CFG.defaultRounds - STARTERS),
     irSlots: 1,
-    positions: {
-      PG:{starters:1,max:'No Limit'},
-      SG:{starters:1,max:'No Limit'},
-      SF:{starters:1,max:'No Limit'},
-      PF:{starters:1,max:'No Limit'},
-      C:{starters:1,max:4},
-      G:{starters:1,max:'N/A'},
-      F:{starters:1,max:'N/A'},
-      UTIL:{starters:1,max:'N/A'},
-      BE:{starters:3,max:'N/A'},
-      IR:{starters:1,max:'N/A'},
-    },
+    positions: sportDefaults.positions,
     gamesPlayedLimit: 'No Limit',
     // Scoring
-    scoring: {
-      FGM:2, FGA:-1, FTM:1, FTA:-1, '3PM':1,
-      REB:1, AST:2, STL:4, BLK:4, TO:-2, PTS:1,
-    },
+    scoring: sportDefaults.scoring,
     // Acquisition & Waivers
     lineupChanges: 'Daily',
     acquisitionSystem: 'Waivers',
@@ -1881,7 +1910,11 @@ function commRoster(){
 // ── SCORING ──
 function commScoring(){
   const sc=CS.scoring;
-  const fullNames={FGM:'Field Goals Made',FGA:'Field Goals Attempted',FTM:'Free Throws Made',FTA:'Free Throws Attempted','3PM':'Three Pointers Made',REB:'Rebounds',AST:'Assists',STL:'Steals',BLK:'Blocks',TO:'Turnovers',PTS:'Points'};
+  const fullNames={
+    FGM:'Field Goals Made',FGA:'Field Goals Attempted',FTM:'Free Throws Made',FTA:'Free Throws Attempted','3PM':'Three Pointers Made',REB:'Rebounds',AST:'Assists',STL:'Steals',BLK:'Blocks',TO:'Turnovers',PTS:'Points',
+    PASS_YDS:'Passing Yards',PASS_TD:'Passing Touchdowns',INT:'Interceptions',RUSH_YDS:'Rushing Yards',RUSH_TD:'Rushing Touchdowns',REC:'Receptions',REC_YDS:'Receiving Yards',REC_TD:'Receiving Touchdowns',FUM:'Fumbles Lost',FG:'Field Goals',XP:'Extra Points',SACK:'Defensive Sacks',DEF_TO:'Defensive Takeaways',DEF_TD:'Defensive Touchdowns',
+    SINGLE:'Singles',DOUBLE:'Doubles',TRIPLE:'Triples',HR:'Home Runs',RBI:'Runs Batted In',RUN:'Runs',BB:'Walks',SB:'Stolen Bases',IP:'Innings Pitched',SO:'Strikeouts',W:'Wins',SV:'Saves',ER:'Earned Runs'
+  };
   const rows=Object.entries(sc).map(([k,v])=>`
     <div class="cscore-cell">${fullNames[k]||k} <span style="font-family:var(--fd);font-size:10px;color:var(--text3);margin-left:4px;">(${k})</span></div>
     <div class="cscore-cell"><input type="number" class="cnum" value="${v}" step="0.5" onchange="CS.scoring['${k}']=+this.value;saveCS()"></div>`).join('');

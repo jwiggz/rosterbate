@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="sport-config.js"></script>
 <style>
   :root{
     --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
@@ -29,10 +30,13 @@
   .nav-actions{display:flex;align-items:center;gap:8px;}
   .nav-actions.auth-pending .nav-auth-btn,
   .nav-actions.auth-pending .account-wrap{visibility:hidden;pointer-events:none;}
+  .nav-actions.logged-in #loginTrigger{visibility:hidden;pointer-events:none;}
   .account-wrap{position:relative;}
   .nav-badge{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:20px;padding:4px 10px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);}
-  .nav-auth-btn{background:var(--accent);border:1px solid rgba(249,115,22,.4);border-radius:20px;padding:6px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;}
+  .nav-auth-btn{background:var(--accent);border:1px solid rgba(249,115,22,.4);border-radius:20px;padding:6px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;min-width:86px;}
   .nav-auth-btn.secondary{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:var(--text2);}
+  #loginTrigger{min-width:70px;}
+  #authTrigger{min-width:110px;}
   .account-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:160px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,.45);z-index:200;}
   .account-menu.open{display:block;}
   .account-item{display:block;width:100%;text-align:left;background:none;border:none;border-radius:8px;padding:10px 12px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text2);cursor:pointer;}
@@ -256,19 +260,17 @@
   <div class="sport-section">
     <div class="section-label">Choose Your Sport</div>
     <div class="sport-grid">
-      <div class="sport-card active" onclick="window.location='rosterbate-draft.html'">
+      <div class="sport-card active" data-sport="nba" onclick="selectSportCard('nba')">
         <div class="sport-icon">🏀</div>
         <div class="sport-name">NBA</div>
       </div>
-      <div class="sport-card soon">
+      <div class="sport-card" data-sport="nfl" onclick="selectSportCard('nfl')">
         <div class="sport-icon">🏈</div>
         <div class="sport-name">NFL</div>
-        <div class="soon-badge">Soon</div>
       </div>
-      <div class="sport-card soon">
+      <div class="sport-card" data-sport="mlb" onclick="selectSportCard('mlb')">
         <div class="sport-icon">⚾</div>
         <div class="sport-name">MLB</div>
-        <div class="soon-badge">Soon</div>
       </div>
       
       
@@ -277,9 +279,9 @@
   </div>
 
   <!-- Main CTAs -->
-  <div class="section-label">Get Started — NBA</div>
+  <div class="section-label" id="sportSectionLabel">Get Started — NBA</div>
   <div class="cta-grid">
-    <a href="rosterbate-draft.html" class="cta-card orange" id="single-player-card">
+    <a href="rosterbate-draft.html?sport=nba" class="cta-card orange" id="single-player-card">
       <div class="cta-top">
         <div class="cta-emoji">🎯</div>
         <div class="cta-title">Single Player<span>Start a new league &amp; draft your team</span></div>
@@ -297,7 +299,7 @@
     </a>
 
     <!-- Multiplayer matchmaking card -->
-    <a href="rosterbate-matchmaking.html" id="multiplayer-card" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));border:1px solid rgba(99,102,241,.3);border-radius:16px;padding:18px;transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(99,102,241,.6)'" onmouseleave="this.style.transform='';this.style.borderColor='rgba(99,102,241,.3)'">
+    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));border:1px solid rgba(99,102,241,.3);border-radius:16px;padding:18px;transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(99,102,241,.6)'" onmouseleave="this.style.transform='';this.style.borderColor='rgba(99,102,241,.3)'">
       <div class="cta-top">
         <div class="cta-emoji">👥</div>
         <div class="cta-title" style="color:#a5b4fc;">Multiplayer<span style="color:var(--text2);">Match with real managers</span></div>
@@ -313,7 +315,7 @@
       </div>
     </a>
 
-    <a href="rosterbate-season.html" class="cta-card green">
+    <a href="rosterbate-season.html?sport=nba" class="cta-card green" id="season-card">
       <div class="cta-top">
         <div class="cta-emoji">🏆</div>
         <div class="cta-title">TRY IT NOW<span>Manage your team all season</span></div>
@@ -579,7 +581,28 @@ const auth = firebase.auth();
 const db = firebase.database();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
+const HOME_SPORT_LABELS = { nba:'NBA', nfl:'NFL', mlb:'MLB' };
+let selectedHomeSport = getSelectedRosterbateSport();
+
+function updateHomeSportUI(){
+  const sport = normalizeRosterbateSport(selectedHomeSport);
+  setSelectedRosterbateSport(sport);
+  document.querySelectorAll('.sport-card[data-sport]').forEach(card => {
+    card.classList.toggle('active', card.dataset.sport === sport);
+  });
+  document.getElementById('sportSectionLabel').textContent = 'Get Started — ' + HOME_SPORT_LABELS[sport];
+  document.getElementById('single-player-card').href = 'rosterbate-draft.html?sport=' + sport;
+  document.getElementById('multiplayer-card').href = 'rosterbate-matchmaking.html?sport=' + sport;
+  document.getElementById('season-card').href = 'rosterbate-season.html?sport=' + sport;
+}
+
+function selectSportCard(sport){
+  selectedHomeSport = normalizeRosterbateSport(sport);
+  updateHomeSportUI();
+}
+
 let authMode = 'signup';
+updateHomeSportUI();
 
 function openAuthModal(mode){
   if(mode) setAuthMode(mode);
@@ -814,16 +837,24 @@ auth.onAuthStateChanged(async user => {
     if(profile.userNumber) localStorage.setItem('rbUserNumber', String(profile.userNumber));
     trigger.textContent = username;
     trigger.classList.add('secondary');
-    if(loginTrigger) loginTrigger.style.display = 'none';
+    if(navActions) navActions.classList.add('logged-in');
+    if(loginTrigger){
+      loginTrigger.style.display = 'inline-block';
+      loginTrigger.style.visibility = 'hidden';
+      loginTrigger.style.pointerEvents = 'none';
+    }
     if(accountMenu) accountMenu.classList.remove('open');
     trigger.onclick = toggleAccountMenu;
   } else {
     trigger.textContent = 'Sign Up';
     trigger.classList.remove('secondary');
+    if(navActions) navActions.classList.remove('logged-in');
     if(accountMenu) accountMenu.classList.remove('open');
     trigger.onclick = () => openAuthModal('signup');
     if(loginTrigger){
       loginTrigger.style.display = 'inline-block';
+      loginTrigger.style.visibility = '';
+      loginTrigger.style.pointerEvents = '';
       loginTrigger.onclick = () => openAuthModal('login');
     }
   }

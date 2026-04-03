@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RosterBate Draft</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="sport-config.js"></script>
 <style>
   :root{
     --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
@@ -324,11 +325,11 @@
 <!-- LOBBY -->
 <div id="lobby" class="screen active">
   <div class="logo">
-    <div class="ball">🏀</div>
+    <div class="ball" id="sportLogoBall">🏀</div>
     <a href="index.html" style="text-decoration:none;color:inherit;"><h1>Roster<span>Bate</span></h1></a>
-    <p>Draft Room</p>
+    <p id="sportLogoSub">Draft Room</p>
   </div>
-  <div class="pill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
+  <div class="pill" id="sportLobbyPill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
   <div class="card">
     <h2>League Settings</h2>
     <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Buckets & Beyond"/></div>
@@ -370,7 +371,7 @@
       </div>
     </div>
     <div class="errmsg" id="err"></div>
-    <button class="btn" onclick="startDraft()">Enter Draft Room 🏀</button>
+    <button class="btn" id="enterDraftBtn" onclick="startDraft()">Enter Draft Room</button>
 </div>
 
   <!-- Multiplayer -->
@@ -382,7 +383,7 @@
         <div style="font-size:12px;color:var(--text3);margin-top:2px;">Match with real people who share your settings</div>
       </div>
     </div>
-    <button class="btn" onclick="window.location.href='rosterbate-matchmaking.html'" style="background:rgba(99,102,241,.8);border:none;padding:13px;font-size:15px;">🔍 Find a League →</button>
+    <button class="btn" onclick="window.location.href='rosterbate-matchmaking.html?sport='+SPORT" style="background:rgba(99,102,241,.8);border:none;padding:13px;font-size:15px;">🔍 Find a League →</button>
     <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;">Snake/Auction/Linear · H2H/Roto · 6–14 teams</div>
   </div>
 
@@ -416,7 +417,7 @@
 
   <!-- COUNTDOWN BAR (sits above header, hidden once draft starts) -->
   <div class="pdc-bar" id="pdcBar">
-    <div class="pdc-icon">🏀</div>
+    <div class="pdc-icon" id="sportCountdownIcon">🏀</div>
     <div class="pdc-text"><strong>Draft starts in</strong> — browse players &amp; set your queue!</div>
     <div class="pdc-time" id="pdcTime">2:00</div>
     <button class="pdc-start" onclick="launchDraft()">Start</button>
@@ -425,7 +426,7 @@
 
   <div class="dh">
     <div class="dh-top">
-      <a href="index.html" style="text-decoration:none;"><div class="dtitle">🏀 Roster<span>Bate</span></div></a>
+      <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">🏀 Roster<span>Bate</span></div></a>
       <div style="display:flex;align-items:center;gap:7px">
         <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">⏸ Pause</button>
         <button class="trade-btn" id="tradeHeaderBtn" onclick="openTradeModal()" style="display:none">⇄ Trade Pick</button>
@@ -451,14 +452,7 @@
     <div id="tp-players" class="tp on">
       <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
       <div class="pf" style="padding-top:0;padding-bottom:7px">
-        <div class="posf">
-          <button class="pb on" onclick="fPos('ALL',this)">ALL</button>
-          <button class="pb" onclick="fPos('PG',this)">PG</button>
-          <button class="pb" onclick="fPos('SG',this)">SG</button>
-          <button class="pb" onclick="fPos('SF',this)">SF</button>
-          <button class="pb" onclick="fPos('PF',this)">PF</button>
-          <button class="pb" onclick="fPos('C',this)">C</button>
-        </div>
+        <div class="posf" id="posFilterBar"></div>
       </div>
       <div class="pl" id="pList"></div>
     </div>
@@ -605,7 +599,7 @@ const TC={
   OKC:'#007AC1',ORL:'#0077C0',PHI:'#006BB6',PHX:'#1D1160',POR:'#E03A3E',
   SAC:'#5A2D81',SAS:'#C4CED4',TOR:'#CE1141',UTA:'#002B5C',WAS:'#002B5C',
 };
-function tcolor(tm){return TC[tm]||'#334155';}
+function tcolor(tm){return getRosterbateTeamColor(SPORT, tm);}
 function initials(n){
   if(!n) return '?';
   const p=n.trim().split(' ');
@@ -1092,7 +1086,7 @@ const RAW=[
 
 // Build player objects, rank by fantasy pts
 function fpRaw(p,r,a,s,b,t,tp){return Math.round((p+r*1.2+a*1.5+s*3+b*3-t+tp*0.5)*10)/10;}
-const PLAYERS = RAW.map(([nm,tm,pos,pts,reb,ast,stl,blk,to,fgp,ftp,tpm],i)=>({
+const NBA_PLAYERS = RAW.map(([nm,tm,pos,pts,reb,ast,stl,blk,to,fgp,ftp,tpm],i)=>({
   id:i+1,name:nm,team:tm,pos,
   pts:+pts,reb:+reb,ast:+ast,stl:+stl,blk:+blk,to:+to,
   fgp:+fgp,ftp:+ftp,tpm:+tpm,
@@ -1111,6 +1105,10 @@ const SCR_INFO={
   roto:'Season-long ranking in each stat category. Best cumulative rank total wins.',
   points:'Pure accumulation. Best total fantasy points all season wins.',
 };
+
+const SPORT = getSelectedRosterbateSport();
+const SPORT_CFG = getRosterbateSportConfig(SPORT);
+let PLAYERS = [];
 
 function cc(gid,el){
   document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('on'));
@@ -1132,6 +1130,37 @@ let S={
   teams:[],order:[],cpuBuds:[],
 };
 
+function updatePosFilterBar(){
+  const bar = document.getElementById('posFilterBar');
+  if(!bar) return;
+  bar.innerHTML = SPORT_CFG.filters.map((pos, index) =>
+    `<button class="pb${index===0?' on':''}" onclick="fPos('${pos}',this)">${pos}</button>`
+  ).join('');
+}
+
+function applySportToDraftUI(){
+  PLAYERS = SPORT === 'nba' ? NBA_PLAYERS : buildRosterbateSportPlayerPool(SPORT, 320);
+  document.title = 'RosterBate ' + SPORT_CFG.label + ' Draft';
+  document.getElementById('sportLogoBall').textContent = SPORT_CFG.icon;
+  document.getElementById('sportLogoSub').textContent = SPORT_CFG.label + ' Draft Room';
+  document.getElementById('sportLobbyPill').textContent = '✅ ' + SPORT_CFG.leagueLabel + ' · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players';
+  document.getElementById('sportCountdownIcon').textContent = SPORT_CFG.icon;
+  document.getElementById('sportDraftTitle').innerHTML = SPORT_CFG.icon + ' Roster<span>Bate</span>';
+  document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';
+  document.getElementById('iSize').value = SPORT_CFG.defaultLeagueSize;
+  document.getElementById('iSpot').value = Math.min(5, SPORT_CFG.defaultLeagueSize);
+  document.getElementById('iRounds').value = SPORT_CFG.defaultRounds;
+  document.getElementById('cScoring').querySelectorAll('.chip').forEach(chip => {
+    chip.classList.toggle('on', chip.dataset.v === SPORT_CFG.defaultScoring);
+  });
+  document.getElementById('iScoringInfo').textContent = SPORT_CFG.scoringInfo[SPORT_CFG.defaultScoring];
+  updatePosFilterBar();
+  S.scr = SPORT_CFG.defaultScoring;
+  S.rds = SPORT_CFG.defaultRounds;
+  S.ls = SPORT_CFG.defaultLeagueSize;
+  S.posF = 'ALL';
+}
+
 function startDraft(){
   const e=document.getElementById('err');
   e.classList.remove('show');
@@ -1146,6 +1175,7 @@ function startDraft(){
   S.name=document.getElementById('iName').value.trim()||'My Team';
   S.ls=ls;S.myPos=sp-1;S.rds=rd;
   S.fmt=gv('cFormat');S.scr=gv('cScoring');
+  S.sport=SPORT;
   S.tmax=parseInt(gv('cTimer'))||0;
   S.abud=parseInt(document.getElementById('iBudget').value)||200;
   S.total=ls*rd;S.cur=0;S.picks=[];S.myTeam=[];S.drafted=new Set();
@@ -1293,6 +1323,7 @@ function confAuction(){
 
 // PLAYER MODAL
 function calcFP(p){
+  if(SPORT!=='nba') return p.fp;
   if(S.scr==='h2h_pts'||S.scr==='points')
     return Math.round((p.pts+p.reb*1.2+p.ast*1.5+p.stl*3+p.blk*3-p.to+p.tpm*0.5)*10)/10;
   return p.fp;
@@ -1306,14 +1337,9 @@ function openPModal(idx){
   document.getElementById('mName').textContent=p.name;
   document.getElementById('mSub').textContent=p.team+' · '+p.pos+' · Rank #'+p.adp;
   document.getElementById('mStats').innerHTML=
-    `<div class="sb"><div class="sv">${p.pts}</div><div class="sl">PTS</div></div>
-     <div class="sb"><div class="sv">${p.reb}</div><div class="sl">REB</div></div>
-     <div class="sb"><div class="sv">${p.ast}</div><div class="sl">AST</div></div>
-     <div class="sb"><div class="sv">${p.stl}</div><div class="sl">STL</div></div>
-     <div class="sb"><div class="sv">${p.blk}</div><div class="sl">BLK</div></div>
-     <div class="sb"><div class="sv">${p.to}</div><div class="sl">TO</div></div>
-     <div class="sb"><div class="sv">${p.tpm}</div><div class="sl">3PM</div></div>
-     <div class="sb"><div class="sv">${calcFP(p)}</div><div class="sl">FPTS</div></div>`;
+    getRosterbatePlayerDetailStats(p).map(stat =>
+      `<div class="sb"><div class="sv">${stat.value}</div><div class="sl">${stat.label}</div></div>`
+    ).join('');
   const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Rotisserie',points:'Points Lg'};
   document.getElementById('mNote').textContent='Fantasy pts: '+sl[S.scr];
   const ok=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
@@ -1348,7 +1374,7 @@ function rPlayers(){
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
       <div class="pinfo">
         <div class="pname" style="display:flex;align-items:center;gap:4px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span>${favBtn}</div>
-        <div class="pdet">${p.team} · ${p.pts}pts · ${p.reb}reb · ${p.ast}ast</div>
+        <div class="pdet">${p.team} · ${getRosterbatePlayerSummary(p, SPORT)}</div>
       </div>
       <div class="psc">
         ${drafted?`<div class="dlbl">Drafted</div>`
@@ -1365,13 +1391,12 @@ function fPos(pos,btn){
 }
 
 // RENDER MY TEAM
-const RSLOTS=['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN','BN'];
 function rMyTeam(){
-  const slots=RSLOTS.slice(0,S.rds);
+  const slots=SPORT_CFG.myTeamSlots.slice(0,S.rds);
   const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Roto',points:'Points'};
   const bLine=S.fmt==='auction'?`<span class="ts">· $${S.myBudget} left</span>`:'';
   let html=`<div class="thi">
-    <div style="font-size:26px">🏀</div>
+    <div style="font-size:26px">${SPORT_CFG.icon}</div>
     <div><div class="tnb">${S.name}</div>
     <div class="tsr">
       <span class="ts">${S.myTeam.length}/${S.rds} picks</span>
@@ -1861,6 +1886,7 @@ function endDraft(){
 
   // Save draft data to localStorage for the season manager to pick up
   const draftData = {
+    sport: SPORT,
     teamName: S.name,
     leagueSize: S.ls,
     scoringFormat: S.scr,
@@ -1919,7 +1945,7 @@ function endDraft(){
 function openSeasonManager(){
   // Try to open season manager — works when served from a web server
   // Falls back to a helpful message if opened as a local file
-  const w = window.open('rosterbate-season.html', '_blank');
+  const w = window.open('rosterbate-season.html?sport=' + encodeURIComponent(SPORT), '_blank');
   if(!w || w.closed){
     showToast('Save both files to the same folder to use Season Manager');
   }
@@ -2713,6 +2739,7 @@ function rbScheduleAiMsg(){
 // ── INIT ────────────────────────────────────────────────────
 // Post system message on load
 (function(){
+  applySportToDraftUI();
   rbLoadChat();
   const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
   // Only post system msg if no recent one
