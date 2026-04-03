@@ -440,30 +440,70 @@ function applySportContext(sport){
   }
 }
 // ── Pro Sports GAME SCHEDULE SIMULATION ──────────────────────────
-// Real Pro Sports teams for matchup display
-const PRO_TEAMS=['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW',
-  'HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK',
-  'OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'];
-
-// Generate a deterministic opponent for player on a given day
+const SPORT_SEASON_META={
+  nba:{
+    label:'2025-26 Opening Week',
+    startDate:'2025-10-22',
+    draftDate:'Oct 21, 2025 @ 7:30 PM',
+    tradeDeadline:'Feb 19, 2026'
+  },
+  nfl:{
+    label:'2025 Week 1',
+    startDate:'2025-09-04',
+    draftDate:'Sep 3, 2025 @ 7:30 PM',
+    tradeDeadline:'Nov 18, 2025'
+  },
+  mlb:{
+    label:'2025 Opening Week',
+    startDate:'2025-03-27',
+    draftDate:'Mar 26, 2025 @ 7:30 PM',
+    tradeDeadline:'Jul 31, 2025'
+  }
+};
+const DEMO_TEAM_NAMES={
+  nba:['My Demo Team','Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters','The Paint','Sky Hooks'],
+  nfl:['My Demo Team','Fourth & Gold','Red Zone Renegades','Blitz Brigade','Sunday Bombers','Goal Line Gang','Trench Kings','Pocket Protectors','Hail Mary Co.','Two Minute Drill'],
+  mlb:['My Demo Team','Dugout Dogs','Bullpen Bandits','Line Drive Co.','Southpaw Syndicate','Big Fly Club','The Infield','Closer Culture','Bat Flip Dept.','Warning Track']
+};
+function getSeasonMeta(sport){
+  return SPORT_SEASON_META[normalizeRosterbateSport(sport)]||SPORT_SEASON_META.nba;
+}
+function getDemoTeamsForSport(sport){
+  return (DEMO_TEAM_NAMES[normalizeRosterbateSport(sport)]||DEMO_TEAM_NAMES.nba).slice();
+}
+function getSeasonDayDate(day){
+  const meta=getSeasonMeta(CURRENT_SPORT);
+  const base=new Date(meta.startDate+'T12:00:00');
+  base.setDate(base.getDate() + Math.max(0,day-1));
+  return base;
+}
+function getSportGamePattern(sport, teamCode, day){
+  const dow=dayOfWeek(day);
+  const teamSeed=String(teamCode||'').split('').reduce((sum,ch)=>sum+ch.charCodeAt(0),0)%9;
+  const weekSeed=weekForDay(day)-1;
+  if(sport==='nfl'){
+    const anchors=[4,7,1];
+    const playDay=anchors[(teamSeed+weekSeed)%anchors.length];
+    return dow===playDay;
+  }
+  if(sport==='mlb'){
+    return ![1].includes((teamSeed+weekSeed+dow)%7);
+  }
+  return [2,3,5,6,7].includes((teamSeed+weekSeed+dow)%7);
+}
+function getSportGameTimes(sport){
+  if(sport==='nfl') return ['12:00 PM','3:25 PM','7:20 PM','7:15 PM'];
+  if(sport==='mlb') return ['1:10 PM','4:05 PM','6:40 PM','7:10 PM','9:40 PM'];
+  return ['7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM','10:00 PM'];
+}
 function getGameInfo(p,day){
-  // Determine if player plays — ~54% of days
-  const playSeed=(p.id*31+day*7)%17;
-  if(playSeed>=9) return null; // no game
-
-  // Opponent — pick from Pro Sports teams excluding player's own team
-  const others=PRO_TEAMS.filter(t=>t!==p.team);
-  const oppIdx=(p.id*13+day*11)%others.length;
-  const opp=others[oppIdx];
-
-  // Home or away
+  const teamPool=(SPORT_CFG.teamCodes||[]).filter(t=>t!==p.team);
+  if(!teamPool.length) return null;
+  if(!getSportGamePattern(CURRENT_SPORT,p.team,day)) return null;
+  const opp=teamPool[(p.id*13+day*11)%teamPool.length];
   const isHome=(p.id+day)%3!==0;
-
-  // Game time — Pro Sports games are typically 7pm or later
-  const times=['7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM','10:00 PM','6:00 PM'];
-  const timeIdx=(p.id*5+day*3)%times.length;
-  const time=times[timeIdx];
-
+  const times=getSportGameTimes(CURRENT_SPORT);
+  const time=times[(p.id*5+day*3)%times.length];
   return {opp, isHome, time};
 }
 
@@ -753,7 +793,7 @@ window.onload=function(){
 
 function loadDemo(){
   applySportContext(CURRENT_SPORT);
-  const teams=['My Demo Team','Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters','The Paint','Sky Hooks'];
+  const teams=getDemoTeamsForSport(CURRENT_SPORT);
   const n=teams.length;
   const rounds=SPORT_CFG.defaultRounds;
   const pool=buildRosterbateSportPlayerPool(CURRENT_SPORT, Math.max(180, n*rounds + 40));
@@ -971,7 +1011,10 @@ function activateSundaySurge(){
 }
 
 function weekForDay(day){return Math.ceil(day/DAYS_PER_WEEK);}
-function dayOfWeek(day){return((day-1)%DAYS_PER_WEEK)+1;} // 1-7
+function dayOfWeek(day){
+  const jsDay=getSeasonDayDate(day).getDay();
+  return jsDay===0?7:jsDay;
+}
 const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function renderHub(){
@@ -1081,6 +1124,7 @@ function renderRoster(){
   if(rosterViewDay===null) rosterViewDay=G.day;
   const day=rosterViewDay;
   const week=weekForDay(day);
+  const dateLabel=getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'});
   const weekStart=(week-1)*DAYS_PER_WEEK+1;
   const weekEnd=weekStart+DAYS_PER_WEEK-1;
   const roster=G.rosters[D.myPos]||[];
@@ -1101,7 +1145,7 @@ function renderRoster(){
     <div style="display:flex;gap:4px;overflow-x:auto;flex:1;">`;
 
   for(let d=weekStart;d<=Math.min(weekEnd,TOTAL_DAYS());d++){
-    const dow=DAY_NAMES[((d-1)%7)];
+    const dow=DAY_NAMES[dayOfWeek(d)-1];
     const isToday=d===G.day;
     const isSelected=d===day;
     const isPastDay=d<G.day;
@@ -1119,7 +1163,7 @@ function renderRoster(){
   // ── Week navigator ──
   h+=`<div style="background:var(--bg3);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
     <button onclick="rosterViewDay=Math.max(1,(weekForDay(rosterViewDay)-2)*${DAYS_PER_WEEK}+1);if(rosterViewDay<1)rosterViewDay=1;renderRoster()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:2px 6px;">‹ Prev Wk</button>
-    <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Week ${week} · ${DAY_NAMES[dayOfWeek(day)-1]} Day ${day}</div>
+    <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Week ${week} · ${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel}</div>
     <button onclick="rosterViewDay=Math.min(TOTAL_DAYS(),(weekForDay(rosterViewDay))*${DAYS_PER_WEEK}+1);renderRoster()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:2px 6px;">Next Wk ›</button>
   </div>`;
 
@@ -1605,6 +1649,7 @@ let CS = null; // commissioner settings object
 
 function defaultCS(){
   const sportDefaults = getRosterbateCommissionerDefaults(CURRENT_SPORT);
+  const seasonMeta = getSeasonMeta(CURRENT_SPORT);
   return {
     // Basic
     leagueName: 'My RosterBate League',
@@ -1620,7 +1665,7 @@ function defaultCS(){
     lineupLockPolicy: 'Per-Player Game Time',
     // Draft
     draftType: 'Snake',
-    draftDate: 'Oct 9, 2025 @ 11:13 PM',
+    draftDate: seasonMeta.draftDate,
     timePerPick: 60,
     draftOrder: 'Randomized',
     // Roster
@@ -1643,11 +1688,11 @@ function defaultCS(){
     undroppable: true,
     // Trades
     tradeLimit: 'No Limit',
-    tradeDeadline: 'Feb 27, 2026',
+    tradeDeadline: seasonMeta.tradeDeadline,
     tradeReviewPeriod: 1,
     vetoVotes: 4,
     // Schedule
-    seasonStart: 'Pro Sports Week 1',
+    seasonStart: seasonMeta.label,
     weeksPerMatchup: 1,
     regularSeasonMatchups: 19,
     tieBreakerRegular: 'None',
@@ -1862,10 +1907,12 @@ function commScoring(){
 
 // ── SCHEDULE ──
 function commSchedule(){
+  const seasonMeta=getSeasonMeta(CURRENT_SPORT);
+  const nextWeekLabel=seasonMeta.label+' + 1';
   document.getElementById('commContent').innerHTML=`
     <div class="csection">Regular Season</div>
     <div class="card" style="padding:0 14px;">
-      ${row('Season Start',commSel('seasonStart',['Pro Sports Week 1','Pro Sports Week 2','Custom']))}
+      ${row('Season Start',commSel('seasonStart',[seasonMeta.label,nextWeekLabel,'Custom']))}
       ${row('Weeks Per Matchup',commNum('weeksPerMatchup',1,4))}
       ${row('Regular Season Matchups',commNum('regularSeasonMatchups',10,25))}
       ${row('Tie Breaker',commSel('tieBreakerRegular',['None','Total Points','H2H Record']))}
