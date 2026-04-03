@@ -1514,8 +1514,58 @@ function applySavedLobbySettings(){
       document.querySelectorAll('#cScoring .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===state.scoring));
       document.getElementById('iScoringInfo').textContent=SPORT_CFG.scoringInfo[state.scoring]||SPORT_CFG.scoringInfo[SPORT_CFG.defaultScoring];
     }
+    const savedTimer=state.timePerPick ?? state.pickTimer ?? state.settings?.timePerPick ?? state.settings?.pickTimer;
+    if(savedTimer!==undefined&&savedTimer!==null){
+      const timerValue=String(savedTimer);
+      document.querySelectorAll('#cTimer .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===timerValue));
+    }
     if(state.settings) renderAdvancedLeagueRules(state.settings);
   }catch(e){}
+}
+
+function getSportOpponentNames(sport){
+  const themed = {
+    nba:[
+      'Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats',
+      'Buckets FC','Glass Eaters','The Paint','Sky Hooks','Ankle Breakers',
+      'Chain Nets','Dunk City','Bench Mob','Run & Gun','Swat Squad',
+      'Pick & Roll','Baseline Boyz','Buzzer Beaters','Alley Oops','Free Ballers'
+    ],
+    nfl:[
+      'Fourth And Gold','Red Zone Renegades','Blitz Brigade','Pigskin Patrol','End Zone Empire',
+      'Goal Line Gang','Sunday Slayers','Hail Mary Heroes','Gridiron Giants','First Down Fiends',
+      'Pocket Predators','Two Minute Drill','Lombardi Legends','Snap Count Squad','Trench Terrors',
+      'Play Action Pack','Kickoff Kings','Chain Movers','No Huddle Crew','Friday Night Lights'
+    ],
+    mlb:[
+      'Home Run Hustle','Bullpen Bandits','Diamond Dawgs','Slugger Society','Base Path Bandits',
+      'Closer Crew','Extra Innings','Line Drive Legends','Mound Masters','Pinstripe Power',
+      'Steal City','Bat Flip Bros','Ace Authority','Outfield Orbit','Double Play Dept',
+      'Rally Caps','Catcher Command','Southpaw Syndicate','Cleanup Crew','Walk Off Club'
+    ]
+  };
+  return themed[sport] || themed.nba;
+}
+
+function getDraftAiNames(){
+  const names = (S?.teams || []).filter((name, idx) => idx !== S.myPos);
+  return names.length ? names : getSportOpponentNames(SPORT).slice(0, 7);
+}
+
+function syncDraftTimerDisplay(){
+  const timerEl=document.getElementById('mTimer');
+  const fillEl=document.getElementById('tFill');
+  if(!timerEl||!fillEl) return;
+  if(!S.tmax){
+    timerEl.textContent='—';
+    fillEl.style.width='100%';
+    fillEl.className='tfill';
+    return;
+  }
+  const m=Math.floor(S.tmax/60),s=S.tmax%60;
+  timerEl.textContent=m+':'+(s+'').padStart(2,'0');
+  fillEl.style.width='100%';
+  fillEl.className='tfill';
 }
 
 function startDraft(){
@@ -1543,14 +1593,12 @@ function startDraft(){
   S.auctionTargets={};
   FAVS=[];tradeLog=[];trSelectedTeam=null;
   initPauseState();
-  const tn=['Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats',
-    'Buckets FC','Glass Eaters','The Paint','Sky Hooks','Ankle Breakers',
-    'Chain Nets','Dunk City','Bench Mob','Run & Gun','Swat Squad',
-    'Pick & Roll','Baseline Boyz','Buzzer Beaters','Alley Oops','Free Ballers'];
+  const tn=getSportOpponentNames(SPORT);
   S.teams=Array.from({length:ls},(_,i)=>i===S.myPos?S.name:(tn[i]||'Team '+(i+1)));
   S.cpuBuds=Array.from({length:ls},()=>S.abud);
   S.order=pickOrder(ls,rd,S.fmt);
   document.getElementById('mFmt').textContent=S.fmt.toUpperCase();
+  syncDraftTimerDisplay();
 
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
@@ -3109,7 +3157,6 @@ function rbPostSystem(text){
 }
 
 // ── SIMULATE AI CHAT ACTIVITY ───────────────────────────────
-const RB_AI_NAMES=['Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters'];
 const RB_AI_MSGS=[
   ['🔥 Just grabbed {player} off waivers. Y\'all sleepin!','trades'],
   ['Who wants to trade? Looking for a C','trades'],
@@ -3134,8 +3181,9 @@ function rbSimulateActivity(){
   // Seed with some initial messages
   const count=3+Math.floor(Math.random()*3);
   const now=Date.now();
+  const aiNames=getDraftAiNames();
   for(let i=0;i<count;i++){
-    const name=RB_AI_NAMES[Math.floor(Math.random()*RB_AI_NAMES.length)];
+    const name=aiNames[Math.floor(Math.random()*aiNames.length)];
     const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
     const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
     const text=tmpl.replace('{player}',player);
@@ -3161,7 +3209,8 @@ function rbScheduleAiMsg(){
   const delay=30000+Math.random()*90000; // 30-120 seconds
   setTimeout(()=>{
     if(!rbChatOpen) return;
-    const name=RB_AI_NAMES[Math.floor(Math.random()*RB_AI_NAMES.length)];
+    const aiNames=getDraftAiNames();
+    const name=aiNames[Math.floor(Math.random()*aiNames.length)];
     const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
     const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
     const text=tmpl.replace('{player}',player);
