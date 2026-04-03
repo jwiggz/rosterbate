@@ -330,6 +330,9 @@
 .scoregrid .sval{padding:5px 0;border-bottom:1px solid rgba(30,45,69,.7);}
 .scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
 .scoregrid input:focus{border-color:var(--accent);}
+.rule-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);}
+.rule-summary-copy{font-size:12px;color:var(--text2);line-height:1.45;}
+.rule-link{background:none;border:none;color:var(--accent);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
 .stepper{display:flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
 .stepper:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
 .stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:10px 12px!important;text-align:right;}
@@ -339,6 +342,18 @@
 .stepper-btn:active{background:rgba(249,115,22,.22);}
 .stepper-btn + .stepper-btn{border-top:1px solid var(--border);}
 .stepper.readonly .stepper-btns{display:none;}
+.sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:250;align-items:flex-end;justify-content:center;}
+.sheet.open{display:flex;}
+.sheet-card{width:100%;max-width:560px;max-height:86dvh;overflow:auto;background:var(--bg2);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:16px 16px 28px;}
+.sheet-handle{width:38px;height:4px;border-radius:999px;background:var(--text3);margin:0 auto 14px;}
+.sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.sheet-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;}
+.sheet-sub{font-size:12px;color:var(--text2);line-height:1.55;margin-top:4px;}
+.sheet-close{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--text2);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;}
+.posgrid{display:grid;grid-template-columns:minmax(0,1.6fr) 88px 96px;gap:8px;align-items:center;}
+.posgrid .ph{padding:0 0 6px;background:none;border:none;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);}
+.posname{font-size:12px;color:var(--text2);padding:8px 0;border-bottom:1px solid rgba(30,45,69,.7);}
+.sheet-actions{display:flex;gap:10px;margin-top:16px;}
 ::-webkit-scrollbar{width:0;height:0;}
 </style>
 </head>
@@ -405,12 +420,33 @@
         <div class="fr"><label>IR / IL Slots</label><input type="number" id="iIr" min="0" max="6" value="1" onchange="syncRosterRules()"></div>
         <div class="fr"><label>Total Roster Size</label><input type="number" id="iRosterTotal" readonly></div>
       </div>
+      <div class="rule-summary">
+        <div class="rule-summary-copy" id="positionRuleSummary">Edit position slots, bench limits, and max roster eligibility for each slot.</div>
+        <button type="button" class="rule-link" onclick="openPositionSheet()">Edit Positions</button>
+      </div>
       <div class="scoregrid" id="scoreGrid"></div>
     </div>
     <div class="errmsg" id="err"></div>
     <button class="btn" id="enterDraftBtn" onclick="startDraft()">Enter Draft Room</button>
 </div>
 
+</div>
+
+<div class="sheet" id="positionSheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title">Position Eligibility</div>
+        <div class="sheet-sub">Set starters and maximum roster spots for each position. Basketball uses ESPN-style labels by default.</div>
+      </div>
+      <button type="button" class="sheet-close" onclick="closePositionSheet()">Close</button>
+    </div>
+    <div class="posgrid" id="positionGrid"></div>
+    <div class="sheet-actions">
+      <button type="button" class="btn" onclick="applyPositionSheet()">Save Position Rules</button>
+    </div>
+  </div>
 </div>
 
 <!-- DRAFT -->
@@ -1110,7 +1146,9 @@ const SCR_INFO={
 const SPORT = getSelectedRosterbateSport();
 const SPORT_CFG = getRosterbateSportConfig(SPORT);
 const SPORT_RULES = getRosterbateLeagueRuleDefaults(SPORT);
+const POSITION_LABELS = getRosterbatePositionLabels(SPORT);
 let PLAYERS = [];
+let DRAFT_POSITION_RULES = JSON.parse(JSON.stringify(SPORT_RULES.positions||{}));
 
 function currentLeagueRules(){
   const bench=Math.max(0, parseInt(document.getElementById('iBench')?.value)||0);
@@ -1125,7 +1163,8 @@ function currentLeagueRules(){
     benchSlots:bench,
     irSlots,
     rosterSize:SPORT_RULES.starters+bench+irSlots,
-    scoring
+    scoring,
+    positions:JSON.parse(JSON.stringify(DRAFT_POSITION_RULES))
   };
 }
 
@@ -1143,6 +1182,7 @@ function syncRosterRules(){
 
 function renderAdvancedLeagueRules(prefill){
   const rules={...SPORT_RULES,...(prefill||{})};
+  DRAFT_POSITION_RULES=JSON.parse(JSON.stringify(rules.positions||SPORT_RULES.positions||{}));
   if(document.getElementById('iStarters')) document.getElementById('iStarters').value=rules.starters;
   if(document.getElementById('iBench')) document.getElementById('iBench').value=rules.benchSlots;
   if(document.getElementById('iIr')) document.getElementById('iIr').value=rules.irSlots;
@@ -1154,7 +1194,47 @@ function renderAdvancedLeagueRules(prefill){
       Object.keys(scoring).map(key=>`<div class="slbl">${labels[key]||key}</div><div class="sval"><input type="number" id="score_${key}" step="0.1" value="${scoring[key]}"></div>`).join('');
   }
   syncRosterRules();
+  updatePositionRuleSummary();
   hydrateStepperInputs(document.getElementById('lobby'));
+}
+
+function buildStepperInput(id,value,min,max,step,readonly){
+  return `<input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}" ${readonly?'readonly':''}>`;
+}
+
+function updatePositionRuleSummary(){
+  const text=Object.keys(DRAFT_POSITION_RULES).filter(key=>Number(DRAFT_POSITION_RULES[key]?.starters||0)>0).map(key=>`${key} ${DRAFT_POSITION_RULES[key].starters}`).join(' · ');
+  const el=document.getElementById('positionRuleSummary');
+  if(el) el.textContent=text||'Edit position slots, bench limits, and max roster eligibility for each slot.';
+}
+
+function openPositionSheet(){
+  const grid=document.getElementById('positionGrid');
+  if(!grid) return;
+  grid.innerHTML=`<div class="ph">Position</div><div class="ph">Starters</div><div class="ph">Maximums</div>`+
+    Object.keys(DRAFT_POSITION_RULES).map(key=>{
+      const row=DRAFT_POSITION_RULES[key]||{};
+      const maxValue=row.max==='No Limit'?0:(row.max??0);
+      return `<div class="posname">${POSITION_LABELS[key]||key}</div><div>${buildStepperInput('pos_start_'+key,row.starters??0,0,12,1,false)}</div><div>${buildStepperInput('pos_max_'+key,maxValue,0,20,1,row.max==='No Limit')}</div>`;
+    }).join('');
+  hydrateStepperInputs(grid);
+  document.getElementById('positionSheet').classList.add('open');
+}
+
+function closePositionSheet(){ document.getElementById('positionSheet')?.classList.remove('open'); }
+
+function applyPositionSheet(){
+  Object.keys(DRAFT_POSITION_RULES).forEach(key=>{
+    const starterInput=document.getElementById('pos_start_'+key);
+    const maxInput=document.getElementById('pos_max_'+key);
+    const current=DRAFT_POSITION_RULES[key]||{};
+    DRAFT_POSITION_RULES[key]={
+      starters:Math.max(0, parseInt(starterInput?.value)||0),
+      max:current.max==='No Limit' ? 'No Limit' : Math.max(0, parseInt(maxInput?.value)||0)
+    };
+  });
+  updatePositionRuleSummary();
+  closePositionSheet();
 }
 
 function hydrateStepperInputs(root){

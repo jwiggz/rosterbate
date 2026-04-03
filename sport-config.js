@@ -37,6 +37,11 @@
     nfl:{PASS_YDS:'Passing Yards',PASS_TD:'Passing TD',INT:'Interceptions Thrown',RUSH_YDS:'Rushing Yards',RUSH_TD:'Rushing TD',REC:'Receptions',REC_YDS:'Receiving Yards',REC_TD:'Receiving TD',FUM:'Fumbles Lost',FG:'Field Goals Made',XP:'Extra Points Made',SACK:'Defense Sacks',DEF_TO:'Defense Takeaways',DEF_TD:'Defense TD'},
     mlb:{SINGLE:'Singles',DOUBLE:'Doubles',TRIPLE:'Triples',HR:'Home Runs',RBI:'Runs Batted In',RUN:'Runs Scored',BB:'Walks',SB:'Stolen Bases',IP:'Innings Pitched',SO:'Strikeouts',W:'Wins',SV:'Saves',ER:'Earned Runs'}
   };
+  const POSITION_LABELS = {
+    nba:{PG:'Point Guard (PG)',SG:'Shooting Guard (SG)',SF:'Small Forward (SF)',PF:'Power Forward (PF)',C:'Center (C)',G:'Guard (G)',F:'Forward (F)',UTIL:'Utility (UTIL)',BE:'Bench (BE)',IR:'Injured Reserve (IR)'},
+    nfl:{QB:'Quarterback (QB)',RB:'Running Back (RB)',WR:'Wide Receiver (WR)',TE:'Tight End (TE)',FLEX:'Flex (RB/WR/TE)',K:'Kicker (K)',DST:'Team Defense/Special Teams (DST)',BN:'Bench (BN)',IR:'Injured Reserve (IR)'},
+    mlb:{C:'Catcher (C)','1B':'First Base (1B)','2B':'Second Base (2B)','3B':'Third Base (3B)',SS:'Shortstop (SS)',OF:'Outfield (OF)',UTIL:'Utility (UTIL)',SP:'Starting Pitcher (SP)',RP:'Relief Pitcher (RP)',P:'Pitcher (P)',BN:'Bench (BN)',IL:'Injured List (IL)'}
+  };
 
   function normalizeSportKey(value){ const key=String(value||'').trim().toLowerCase(); return SPORT_CONFIG[key]?key:'nba'; }
   function getSelectedSport(){ const params=new URLSearchParams(window.location.search||''); const query=params.get('sport'); const saved=window.localStorage?localStorage.getItem(STORAGE_KEY):''; return normalizeSportKey(query||saved||'nba'); }
@@ -171,6 +176,9 @@
       positions:Object.assign({},comm.positions)
     };
   }
+  function getPositionLabels(sport){
+    return Object.assign({}, POSITION_LABELS[normalizeSportKey(sport)]||{});
+  }
 
   window.RB_SPORT_CONFIG = SPORT_CONFIG;
   window.normalizeRosterbateSport = normalizeSportKey;
@@ -184,4 +192,5 @@
   window.getRosterbatePlayerDetailStats = getPlayerDetailStats;
   window.getRosterbateCommissionerDefaults = getCommissionerDefaults;
   window.getRosterbateLeagueRuleDefaults = getLeagueRuleDefaults;
+  window.getRosterbatePositionLabels = getPositionLabels;
 })();

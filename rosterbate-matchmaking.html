@@ -96,6 +96,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .scoregrid .sval{padding:5px 0;border-bottom:1px solid rgba(30,45,69,.7);}
 .scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
 .scoregrid input:focus{border-color:var(--accent);}
+.rule-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);}
+.rule-summary-copy{font-size:12px;color:var(--text2);line-height:1.45;}
+.rule-link{background:none;border:none;color:var(--accent);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
 .stepper{display:flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
 .stepper:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
 .stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:10px 12px!important;text-align:right;}
@@ -105,6 +108,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .stepper-btn:active{background:rgba(249,115,22,.22);}
 .stepper-btn + .stepper-btn{border-top:1px solid var(--border);}
 .stepper.readonly .stepper-btns{display:none;}
+.sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:250;align-items:flex-end;justify-content:center;}
+.sheet.open{display:flex;}
+.sheet-card{width:100%;max-width:560px;max-height:86dvh;overflow:auto;background:var(--bg2);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:16px 16px 28px;}
+.sheet-handle{width:38px;height:4px;border-radius:999px;background:var(--text3);margin:0 auto 14px;}
+.sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.sheet-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;}
+.sheet-sub{font-size:12px;color:var(--text2);line-height:1.55;margin-top:4px;}
+.sheet-close{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--text2);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;}
+.posgrid{display:grid;grid-template-columns:minmax(0,1.6fr) 88px 96px;gap:8px;align-items:center;}
+.posgrid .ph2{padding:0 0 6px;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);}
+.posname{font-size:12px;color:var(--text2);padding:8px 0;border-bottom:1px solid rgba(30,45,69,.7);}
+.sheet-actions{display:flex;gap:10px;margin-top:16px;}
 
 /* RosterBate Home Header */
 .rb-home-bar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:10px 14px;flex-shrink:0;}
@@ -170,6 +185,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <div class="toast" id="mmToast"></div>
+<div class="sheet" id="mmPositionSheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title">Position Eligibility</div>
+        <div class="sheet-sub">Set starters and maximum roster spots for each position. Basketball uses ESPN-style labels by default.</div>
+      </div>
+      <button type="button" class="sheet-close" onclick="closeCreatePositionSheet()">Close</button>
+    </div>
+    <div class="posgrid" id="mmPositionGrid"></div>
+    <div class="sheet-actions">
+      <button type="button" class="btn-p" onclick="applyCreatePositionSheet()">Save Position Rules</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // â”€â”€ FIREBASE INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -212,6 +243,7 @@ let globalChatListener = null;
 let globalChatMessages = [];
 const MM_SPORT = getSelectedRosterbateSport();
 const MM_RULES_DEFAULT = getRosterbateLeagueRuleDefaults(MM_SPORT);
+const MM_POSITION_LABELS = getRosterbatePositionLabels(MM_SPORT);
 const presenceRef = db.ref('presence/'+myId);
 const globalChatRef = db.ref('matchmakingGlobalChat');
 
@@ -387,7 +419,7 @@ function getCreateRules(){
     rosterSize:MM_RULES_DEFAULT.starters+bench+irSlots,
     scoring,
     scoringLabels:MM_RULES_DEFAULT.scoringLabels,
-    positions:MM_RULES_DEFAULT.positions
+    positions:JSON.parse(JSON.stringify(createOpts.settings?.positions||MM_RULES_DEFAULT.positions))
   };
 }
 
@@ -396,6 +428,49 @@ function syncCreateRules(){
   const totalEl=document.getElementById('mmRosterTotal');
   if(document.getElementById('mmStarters')) document.getElementById('mmStarters').value=MM_RULES_DEFAULT.starters;
   if(totalEl) totalEl.value=total;
+}
+
+function updateCreatePositionSummary(){
+  const positions=createOpts.settings?.positions||MM_RULES_DEFAULT.positions||{};
+  const text=Object.keys(positions).filter(key=>Number(positions[key]?.starters||0)>0).map(key=>`${key} ${positions[key].starters}`).join(' · ');
+  const el=document.getElementById('mmPositionRuleSummary');
+  if(el) el.textContent=text||'Edit position slots, bench limits, and max roster eligibility for each slot.';
+}
+
+function buildStepperInput(id,value,min,max,step,readonly){
+  return `<input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}" ${readonly?'readonly':''}>`;
+}
+
+function openCreatePositionSheet(){
+  const grid=document.getElementById('mmPositionGrid');
+  const positions=createOpts.settings?.positions||MM_RULES_DEFAULT.positions||{};
+  if(!grid) return;
+  grid.innerHTML=`<div class="ph2">Position</div><div class="ph2">Starters</div><div class="ph2">Maximums</div>`+
+    Object.keys(positions).map(key=>{
+      const row=positions[key]||{};
+      const maxValue=row.max==='No Limit'?0:(row.max??0);
+      return `<div class="posname">${MM_POSITION_LABELS[key]||key}</div><div>${buildStepperInput('mm_pos_start_'+key,row.starters??0,0,12,1,false)}</div><div>${buildStepperInput('mm_pos_max_'+key,maxValue,0,20,1,row.max==='No Limit')}</div>`;
+    }).join('');
+  hydrateStepperInputs(grid);
+  document.getElementById('mmPositionSheet').classList.add('open');
+}
+
+function closeCreatePositionSheet(){ document.getElementById('mmPositionSheet')?.classList.remove('open'); }
+
+function applyCreatePositionSheet(){
+  const positions=JSON.parse(JSON.stringify(createOpts.settings?.positions||MM_RULES_DEFAULT.positions||{}));
+  Object.keys(positions).forEach(key=>{
+    const starterInput=document.getElementById('mm_pos_start_'+key);
+    const maxInput=document.getElementById('mm_pos_max_'+key);
+    const current=positions[key]||{};
+    positions[key]={
+      starters:Math.max(0, parseInt(starterInput?.value)||0),
+      max:current.max==='No Limit' ? 'No Limit' : Math.max(0, parseInt(maxInput?.value)||0)
+    };
+  });
+  createOpts.settings.positions=positions;
+  updateCreatePositionSummary();
+  closeCreatePositionSheet();
 }
 
 function renderCreateRulesSection(){
@@ -410,6 +485,10 @@ function renderCreateRulesSection(){
         <div><div class="ct">Bench Spots</div><input type="number" class="input" id="mmBench" min="2" max="20" value="${createOpts.settings?.benchSlots ?? MM_RULES_DEFAULT.benchSlots}" onchange="syncCreateRules()"></div>
         <div><div class="ct">IR / IL Slots</div><input type="number" class="input" id="mmIr" min="0" max="6" value="${createOpts.settings?.irSlots ?? MM_RULES_DEFAULT.irSlots}" onchange="syncCreateRules()"></div>
         <div><div class="ct">Total Roster Size</div><input type="number" class="input" id="mmRosterTotal" readonly></div>
+      </div>
+      <div class="rule-summary">
+        <div class="rule-summary-copy" id="mmPositionRuleSummary">Edit position slots, bench limits, and max roster eligibility for each slot.</div>
+        <button type="button" class="rule-link" onclick="openCreatePositionSheet()">Edit Positions</button>
       </div>
       <div class="scoregrid">
         <div class="sh">Scoring Stat</div><div class="sh" style="text-align:right;">Points</div>
@@ -724,6 +803,7 @@ function renderCreate(){
     <button class="btn-p" id="createBtn" onclick="doCreate()">Create League</button>
     ${globalChatShell()}`;
   syncCreateRules();
+  updateCreatePositionSummary();
   hydrateStepperInputs(document.getElementById('mmTabContent'));
   attachGlobalChat();
 }
