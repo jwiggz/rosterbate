@@ -55,40 +55,70 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .tpb{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:7px;padding:5px 10px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#a5b4fc;cursor:pointer;}
 .mc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;cursor:pointer;}
 .mc.mine{border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.06);}
-.hub-shell{display:grid;gap:10px;}
-.hub-summary{background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid rgba(249,115,22,.25);border-radius:14px;padding:16px;}
-.hub-summary-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-.hub-summary-meta{margin-left:auto;text-align:right;}
-.hub-summary-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
-.hub-stat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center;}
-.hub-stat-value{font-family:var(--fd);font-size:22px;font-weight:900;line-height:1;}
-.hub-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:4px;letter-spacing:.5px;}
-.hub-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:86px;border:1px solid var(--border);background:var(--card);color:var(--text);width:100%;}
-.hub-action-icon{font-size:22px;line-height:1;margin-top:2px;flex-shrink:0;}
-.hub-action-title{font-family:var(--fd);font-size:16px;font-weight:800;}
-.hub-action-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-.hub-main{display:grid;gap:10px;}
-.hub-lower{display:grid;gap:10px;min-height:440px;}
-.hub-column{display:flex;flex-direction:column;gap:10px;min-width:0;}
-.activity-feed{display:flex;flex-direction:column;gap:8px;}
-.activity-item{display:flex;gap:10px;align-items:flex-start;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 11px;}
-.activity-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.24);}
-.activity-copy{min-width:0;flex:1;}
-.activity-title{font-family:var(--fd);font-size:13px;font-weight:800;line-height:1.1;}
-.activity-meta{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
-.activity-text{font-size:12px;color:var(--text2);line-height:1.45;margin-top:4px;}
-@media (min-width: 980px){
-  .hub-shell{grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);align-items:start;}
-  .hub-lower{grid-template-rows:minmax(0,1fr) minmax(0,1fr);}
-}
+    .hub-shell{display:grid;gap:14px;align-items:start;}
+    .hub-main{display:grid;gap:14px;min-width:0;}
+    .hub-summary{position:relative;overflow:hidden;background:
+      radial-gradient(circle at top right, rgba(76,209,255,.14), transparent 34%),
+      radial-gradient(circle at left center, rgba(249,115,22,.12), transparent 40%),
+      linear-gradient(145deg,#122645 0%,#0f1d34 48%,#101b30 100%);
+      border:1px solid rgba(117,151,201,.18);border-radius:22px;padding:20px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.03);}
+    .hub-summary:before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 35%);pointer-events:none;}
+    .hub-summary-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin-bottom:16px;position:relative;z-index:1;}
+    .hub-summary-ident{display:flex;align-items:center;gap:14px;min-width:0;}
+    .hub-summary-copy{min-width:0;}
+    .hub-summary-kicker{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#7fd9ff;margin-bottom:4px;}
+    .hub-summary-name{font-family:var(--fd);font-size:38px;font-weight:900;line-height:.95;letter-spacing:.3px;}
+    .hub-summary-rec{font-size:13px;color:var(--text2);margin-top:6px;}
+    .hub-summary-meta{padding:10px 14px;border-radius:16px;background:rgba(9,18,34,.55);border:1px solid rgba(126,164,214,.14);text-align:right;min-width:160px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+    .hub-summary-meta .eyebrow{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);}
+    .hub-summary-meta .opp{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--text);margin-top:2px;}
+    .hub-summary-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
+    .hub-stat{background:linear-gradient(180deg,rgba(18,31,56,.88),rgba(13,22,39,.95));border:1px solid rgba(122,149,193,.18);border-radius:18px;padding:14px 14px 12px;text-align:left;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
+    .hub-stat-value{font-family:var(--fd);font-size:32px;font-weight:900;line-height:.95;letter-spacing:.2px;}
+    .hub-stat-label{font-size:10px;color:#7188ae;text-transform:uppercase;margin-top:8px;letter-spacing:.9px;font-weight:700;}
+    .hub-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+    .hub-action{display:flex;align-items:flex-start;gap:12px;text-align:left;cursor:pointer;min-height:96px;border:1px solid rgba(111,133,171,.18);background:linear-gradient(180deg,rgba(21,31,50,.96),rgba(16,24,40,.96));color:var(--text);width:100%;border-radius:18px;padding:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);transition:transform .16s ease,border-color .16s ease,background .16s ease;}
+    .hub-action:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.35);background:linear-gradient(180deg,rgba(24,36,59,.98),rgba(17,25,43,.98));}
+    .hub-action-icon{font-size:24px;line-height:1;margin-top:2px;flex-shrink:0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.28));}
+    .hub-action-title{font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:.2px;}
+    .hub-action-sub{font-size:11px;color:#7e93b6;margin-top:4px;line-height:1.4;}
+    .hub-lower{display:grid;gap:12px;min-height:520px;grid-template-rows:minmax(0,1fr) minmax(0,1fr);}
+    .hub-column{display:flex;flex-direction:column;gap:12px;min-width:0;}
+    .hub-card{background:linear-gradient(180deg,rgba(20,29,47,.96),rgba(14,22,37,.98));border:1px solid rgba(104,129,166,.18);border-radius:22px;padding:16px;box-shadow:0 18px 40px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.02);}
+    .hub-card.compact{padding:14px 16px;}
+    .hub-card-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#7088b0;margin-bottom:12px;}
+    .activity-feed{display:flex;flex-direction:column;gap:8px;}
+    .activity-item{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(180deg,rgba(21,31,50,.88),rgba(15,23,39,.96));border:1px solid rgba(104,129,166,.18);border-radius:16px;padding:12px 13px;}
+    .activity-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.22);}
+    .activity-copy{min-width:0;flex:1;}
+    .activity-title{font-family:var(--fd);font-size:14px;font-weight:800;line-height:1.1;}
+    .activity-meta{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+    .activity-text{font-size:12px;color:var(--text2);line-height:1.45;margin-top:4px;}
+    @media (min-width: 980px){
+      .hub-shell{grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);align-items:start;}
+    }
+    @media (max-width: 860px){
+      .hub-summary-top{grid-template-columns:1fr;}
+      .hub-summary-meta{min-width:0;text-align:left;}
+      .hub-summary-name{font-size:32px;}
+      .hub-summary-stats,.hub-actions{grid-template-columns:1fr;}
+      .hub-lower{min-height:0;}
+    }
 
 /* RosterBate Home Header */
-.rb-home-bar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:10px 14px;flex-shrink:0;}
-.rb-home-link{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;}
-.rb-home-link span{color:var(--accent);}
-.rb-home-link:hover{opacity:.85;}
-::-webkit-scrollbar{width:0;height:0;}
+    .rb-home-bar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:10px 14px;flex-shrink:0;}
+    .rb-home-link{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;}
+    .rb-home-link span{color:var(--accent);}
+    .rb-home-link:hover{opacity:.85;}
+    .season-topbar{background:linear-gradient(180deg,rgba(15,23,37,.98),rgba(12,18,30,.94));border-bottom:1px solid rgba(102,127,166,.18);padding:12px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+    .season-topmeta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+    .season-chip{padding:9px 14px;border-radius:999px;border:1px solid rgba(119,149,191,.18);background:rgba(16,25,40,.78);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#94a8c7;}
+    .season-chip.primary{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.26);color:#ffb06b;}
+    .season-chip.action{background:linear-gradient(180deg,rgba(34,47,73,.98),rgba(21,31,52,.98));color:#eef5ff;}
+    ::-webkit-scrollbar{width:10px;height:10px;}
+    ::-webkit-scrollbar-track{background:rgba(15,22,36,.92);}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#324a70,#243754);border-radius:999px;border:2px solid rgba(15,22,36,.92);}
+    ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#3b5683,#2b4061);}
 .ctab{padding:10px 12px;font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;}
 .ctab.on{color:var(--accent);border-bottom-color:var(--accent);}
 .crow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
@@ -146,11 +176,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
 <!-- HUB -->
 <div id="hub" class="screen">
-  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-    <a href="index.html" class="rb-home-link" style="font-size:18px;" id="seasonHomeLink">🏀 Roster<span style="color:var(--accent)">Bate</span></a>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="tpb" onclick="openPicker()">👥 Teams</button>
-      <div id="hubWeek" style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;"></div>
+  <div class="season-topbar">
+    <a href="index.html" class="rb-home-link" style="font-size:19px;" id="seasonHomeLink">🏀 Roster<span style="color:var(--accent)">Bate</span></a>
+    <div class="season-topmeta">
+      <div id="hubWeek" class="season-chip"></div>
+      <button class="season-chip action" onclick="openPicker()">👥 Teams</button>
     </div>
   </div>
   <div class="sb">
@@ -158,9 +188,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       <div class="hub-main">
         <div class="hub-summary">
           <div class="hub-summary-top">
-            <div id="hubAv" class="pav" style="width:48px;height:48px;font-size:20px;background:var(--accent);"></div>
-            <div><div id="hubName" style="font-family:var(--fd);font-size:20px;font-weight:800;"></div><div id="hubRec" style="font-size:12px;color:var(--text2);margin-top:2px;"></div></div>
-            <div class="hub-summary-meta"><div style="font-family:var(--fd);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">vs this week</div><div id="hubOpp" style="font-family:var(--fd);font-size:14px;font-weight:700;">—</div></div>
+            <div class="hub-summary-ident">
+              <div id="hubAv" class="pav" style="width:64px;height:64px;font-size:24px;background:var(--accent);box-shadow:0 12px 24px rgba(249,115,22,.22);"></div>
+              <div class="hub-summary-copy">
+                <div class="hub-summary-kicker">Season Dashboard</div>
+                <div id="hubName" class="hub-summary-name"></div>
+                <div id="hubRec" class="hub-summary-rec"></div>
+              </div>
+            </div>
+            <div class="hub-summary-meta">
+              <div class="eyebrow">This Week</div>
+              <div id="hubOpp" class="opp">—</div>
+            </div>
           </div>
           <div class="hub-summary-stats">
             <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">—</div><div class="hub-stat-label">Revealed</div></div>
@@ -176,8 +215,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         </div>
         <button id="advBtn" onclick="advanceWeek()" class="bg">▶ Advance to Next Week</button>
         <div class="hub-lower">
-          <div class="card" style="display:flex;flex-direction:column;min-height:0;"><div class="ct">League Activity</div><div id="hubActivity" style="flex:1;"></div></div>
-          <div class="card rb-chat-panel" id="rbChatPanel">
+          <div class="hub-card compact" style="display:flex;flex-direction:column;min-height:0;"><div class="hub-card-title">League Activity</div><div id="hubActivity" style="flex:1;"></div></div>
+          <div class="hub-card compact rb-chat-panel" id="rbChatPanel">
             <div class="rb-chat-hdr">
               <div style="flex:1">
                 <div class="rb-chat-title">League Chat</div>
@@ -218,8 +257,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
         </div>
       </div>
       <div class="hub-column">
-        <div class="card"><div class="ct">Weekly Powerups</div><div id="hubPowerups"></div></div>
-        <div class="card"><div class="ct">This Week's Matchups</div><div id="hubMatchups"></div></div>
+        <div class="hub-card"><div class="hub-card-title">Weekly Powerups</div><div id="hubPowerups"></div></div>
+        <div class="hub-card"><div class="hub-card-title">This Week's Matchups</div><div id="hubMatchups"></div></div>
       </div>
     </div>
   </div>
