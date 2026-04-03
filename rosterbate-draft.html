@@ -84,6 +84,8 @@
   .tbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px;}
   .tfill{height:100%;background:var(--accent);border-radius:2px;transition:width .9s linear;}
   .tfill.urg{background:var(--red);}
+  .draft-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
+  .draft-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
   .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
   .tb{flex:1;padding:9px 4px;font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;}
   .tb.on{color:var(--accent);border-bottom-color:var(--accent);}
@@ -108,7 +110,8 @@
   .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--fd);flex-shrink:0;border:2px solid var(--border);color:#fff;}
   .pinfo{flex:1;min-width:0;}
   .pname{font-family:var(--fd);font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
-  .pname-wrap{display:flex;align-items:center;gap:4px;min-width:0;overflow:hidden;}
+  .pname-row{display:flex;align-items:center;gap:6px;min-width:0;}
+  .pname-main{display:flex;align-items:center;gap:4px;min-width:0;flex:1;overflow:hidden;}
   .pdet{font-size:11px;color:var(--text2);margin-top:1px;}
   .psc{text-align:right;flex-shrink:0;}
   .padp{font-family:var(--fd);font-size:13px;font-weight:700;}
@@ -121,7 +124,7 @@
   .pos-C{background:rgba(239,68,68,.2);color:#f87171;}
   .pos-G{background:rgba(99,102,241,.2);color:#a5b4fc;}
   .pos-F{background:rgba(20,184,166,.2);color:#5eead4;}
-  .dbtn{background:var(--accent);border:none;border-radius:7px;padding:6px 11px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;flex-shrink:0;}
+  .dbtn{background:var(--accent);border:none;border-radius:7px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;flex-shrink:0;}
   .dbtn:active{background:var(--accent2);}
   .dlbl{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);}
 
@@ -131,6 +134,13 @@
   .tnb{font-family:var(--fd);font-size:18px;font-weight:800;}
   .tsr{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;}
   .ts{font-size:10px;color:var(--text2);}
+  .team-menu{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;}
+  .team-menu-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;}
+  .team-menu-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .team-menu-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;font-size:10px;color:var(--text2);}
+  .team-menu-roster{display:grid;gap:6px;}
+  .team-menu-player{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px;}
+  .team-menu-player.empty{justify-content:center;color:var(--text3);font-size:11px;font-style:italic;}
   .rs{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;}
   .spos{width:28px;font-family:var(--fd);font-size:12px;font-weight:800;color:var(--text3);flex-shrink:0;}
   .semp{font-size:11px;color:var(--text3);font-style:italic;}
@@ -483,24 +493,74 @@
     </div>
     <div class="tbar"><div class="tfill" id="tFill"></div></div>
   </div>
-  <div class="tabs">
-    <button class="tb on" onclick="sTab('players',this)">Players</button>
-    <button class="tb" onclick="sTab('myteam',this)">My Team</button>
-    <button class="tb" onclick="sTab('board',this)">Board</button>
-    <button class="tb" id="favTab" onclick="sTab('favs',this)">Queue<span class="tab-badge" id="favCount" style="display:none">0</span></button>
-  </div>
-  <div class="dc">
-    <div id="tp-players" class="tp on">
-      <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
-      <div class="pf" style="padding-top:0;padding-bottom:7px">
-        <div class="posf" id="posFilterBar"></div>
+  <div class="draft-layout">
+    <div class="draft-main">
+      <div class="tabs">
+        <button class="tb on" onclick="sTab('players',this)">Players</button>
+        <button class="tb" onclick="sTab('myteam',this)">My Team</button>
+        <button class="tb" onclick="sTab('teams',this)">Teams</button>
+        <button class="tb" onclick="sTab('board',this)">Board</button>
+        <button class="tb" id="favTab" onclick="sTab('favs',this)">Queue<span class="tab-badge" id="favCount" style="display:none">0</span></button>
       </div>
-      <div class="pl" id="pList"></div>
+      <div class="dc">
+        <div id="tp-players" class="tp on">
+          <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
+          <div class="pf" style="padding-top:0;padding-bottom:7px">
+            <div class="posf" id="posFilterBar"></div>
+          </div>
+          <div class="pl" id="pList"></div>
+        </div>
+        <div id="tp-myteam" class="tp"><div class="mtw" id="myTeam"></div></div>
+        <div id="tp-teams" class="tp"><div class="team-menu" id="otherTeams"></div></div>
+        <div id="tp-board" class="tp"><div class="bw" id="board"></div></div>
+        <div id="tp-favs" class="tp"><div class="fav-tab-wrap" id="favList"></div></div>
+      </div>
     </div>
-    <div id="tp-myteam" class="tp"><div class="mtw" id="myTeam"></div></div>
-    <div id="tp-board" class="tp"><div class="bw" id="board"></div></div>
-    <div id="tp-favs" class="tp"><div class="fav-tab-wrap" id="favList"></div></div>
-</div>
+
+    <div class="rb-chat-panel" id="rbChatPanel">
+      <div class="rb-chat-hdr">
+        <div style="flex:1">
+          <div class="rb-chat-title">💬 League Chat</div>
+          <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
+        </div>
+      </div>
+
+      <div class="rb-chat-tabs">
+        <button class="rb-chat-tab on" onclick="rbSwitchTab('all',this)">All</button>
+        <button class="rb-chat-tab" onclick="rbSwitchTab('draft',this)">Draft Room</button>
+        <button class="rb-chat-tab" onclick="rbSwitchTab('trades',this)">Trades</button>
+        <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk 🔥</button>
+      </div>
+
+      <div class="rb-chat-msgs" id="rbMsgs"></div>
+
+      <div class="rb-chat-input-area">
+        <div class="rb-emoji-picker" id="rbEmojiPicker">
+          <div class="rb-emoji-cats" id="rbEmojiCats"></div>
+          <div class="rb-emoji-grid" id="rbEmojiGrid"></div>
+        </div>
+
+        <div class="rb-gif-picker" id="rbGifPicker">
+          <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs… (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
+          <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">🔍 Type to search GIFs</div></div>
+        </div>
+
+        <div class="rb-chat-toolbar">
+          <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">😄</button>
+          <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
+          <button class="rb-tool-btn" onclick="rbInsertAt('📢 ')" title="Announcement">📢</button>
+          <button class="rb-tool-btn" onclick="rbInsertAt('🔥 ')" title="Trash talk">🔥</button>
+        </div>
+
+        <div class="rb-chat-row">
+          <textarea class="rb-chat-textarea" id="rbInput" placeholder="Message the league…" rows="1"
+            oninput="rbAutoResize(this);rbUpdateSendBtn()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
+          <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <!-- PLAYER MODAL -->
 <div class="mo" id="pModal" onclick="cModal(event)">
@@ -1496,7 +1556,7 @@ function startDraft(){
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
   document.getElementById('draft').classList.add('active');
-  rPlayers();rMyTeam();rBoard();upHdr();updateTradeBtn();
+  rPlayers();rMyTeam();rOtherTeams();rBoard();upHdr();updateTradeBtn();
   startCountdown();
   awardRosterbateScore('create_league', 10).catch(() => {});
   // NOTE: advance() is called in launchDraft() — nothing picks until countdown ends
@@ -1550,7 +1610,7 @@ function pickOrder(ls,rds,fmt){
 function advance(){
   if(PS.isPaused) return; // don't advance while paused
   while(S.cur<S.total&&S.order[S.cur]!==S.myPos) cpuPick();
-  upHdr();rPlayers();rBoard();
+  upHdr();rPlayers();rOtherTeams();rBoard();
   if(S.cur<S.total&&S.order[S.cur]===S.myPos){
     showBanner('⏰ You\'re On The Clock!');
     if(S.tmax>0) resetTimer();
@@ -1576,7 +1636,7 @@ function userPick(p){
   document.getElementById('pModal').classList.remove('open');
   doPick(p,S.myPos);
   hideBanner();showToast('✅ '+p.name+' drafted!');
-  rBoard();upHdr();rPlayers();
+  rBoard();upHdr();rPlayers();rOtherTeams();
   setTimeout(advance,500);
 }
 
@@ -1744,16 +1804,23 @@ function rPlayers(){
     const fp=calcFP(p);
     const faved=isFav(p.id);
     const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
+    const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`:'';
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
       <div class="pinfo">
-        <div class="pname" style="display:flex;align-items:center;gap:4px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span>${favBtn}</div>
+        <div class="pname-row">
+          <div class="pname-main">
+            <div class="pname" style="display:flex;align-items:center;gap:4px;min-width:0;flex:1"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span></div>
+            ${inlineDraftBtn}
+            ${favBtn}
+          </div>
+        </div>
         <div class="pdet">${p.team} · ${getRosterbatePlayerSummary(p, SPORT)}</div>
       </div>
       <div class="psc">
         ${drafted?`<div class="dlbl">Drafted</div>`
-          :myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`
+          :myTurn?`<div class="pproj">${fp} FP</div>`
           :`<div class="padp">#${p.adp}</div><div class="pproj">${fp} FP</div>`}
       </div>
     </div>`;
@@ -1800,6 +1867,45 @@ function rMyTeam(){
     }).join('');
   }
   document.getElementById('myTeam').innerHTML=html;
+}
+
+function rOtherTeams(){
+  const wrap=document.getElementById('otherTeams');
+  if(!wrap) return;
+  const teams=S.teams.map((name,idx)=>({name,idx})).filter(team=>team.idx!==S.myPos);
+  if(!teams.length){
+    wrap.innerHTML=`<div style="text-align:center;padding:36px 20px;color:var(--text3);font-size:12px">No other teams in this draft.</div>`;
+    return;
+  }
+  wrap.innerHTML=teams.map(team=>{
+    const roster=S.picks
+      .filter(pick=>pick.ti===team.idx)
+      .sort((a,b)=>a.ov-b.ov)
+      .map(pick=>({pick,player:PLAYERS.find(pl=>pl.id===pick.pid)}))
+      .filter(entry=>entry.player);
+    const nextPickOffset=S.order.slice(S.cur).findIndex(ti=>ti===team.idx);
+    const nextPickLabel=nextPickOffset===-1?'Draft complete':`Next pick #${S.cur+nextPickOffset+1}`;
+    const rosterHtml=roster.length?roster.map(({pick,player})=>`<div class="team-menu-player">
+        <div class="pav" style="background:${tcolor(player.team)};width:28px;height:28px;font-size:10px;border:none">${initials(player.name)}</div>
+        <div style="min-width:0;flex:1">
+          <div class="pname" style="font-size:12px;display:flex;align-items:center;gap:4px;min-width:0"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${player.name}</span><span class="pos-badge pos-${player.pos}" style="flex-shrink:0">${player.pos}</span></div>
+          <div class="pdet">${player.team} · Pick #${pick.ov}</div>
+        </div>
+      </div>`).join(''):`<div class="team-menu-player empty">No picks yet</div>`;
+    return `<div class="team-menu-card">
+      <div class="team-menu-head">
+        <div class="pav" style="background:var(--accent);width:34px;height:34px;font-size:11px;border:none">${initials(team.name)}</div>
+        <div style="min-width:0;flex:1">
+          <div class="pname" style="font-size:14px">${team.name}</div>
+          <div class="team-menu-meta">
+            <span>${roster.length}/${S.rds} picks</span>
+            <span>${nextPickLabel}</span>
+          </div>
+        </div>
+      </div>
+      <div class="team-menu-roster">${rosterHtml}</div>
+    </div>`;
+  }).join('');
 }
 
 // RENDER BOARD
@@ -1888,6 +1994,7 @@ function sTab(n,btn){
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
   document.getElementById('tp-'+n).classList.add('on');btn.classList.add('on');
   if(n==='favs') rFavs();
+  if(n==='teams') rOtherTeams();
 }
 function showSeasonToastStub(){} // season toast defined in season block below
 
@@ -2532,22 +2639,14 @@ function openSeasonManager(){
 <!-- Paste this block before </body> in both rosterbate-draft.html and rosterbate-season.html -->
 
 <style>
-/* ── CHAT BUTTON ── */
-.rb-chat-fab{position:fixed;bottom:90px;right:16px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:400;box-shadow:0 4px 20px rgba(249,115,22,.5);transition:transform .15s;}
-.rb-chat-fab:active{transform:scale(.92);}
-.rb-chat-unread{position:absolute;top:-3px;right:-3px;width:20px;height:20px;border-radius:50%;background:var(--red);border:2px solid var(--bg);font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;display:none;align-items:center;justify-content:center;}
-.rb-chat-unread.show{display:flex;}
-
 /* ── CHAT PANEL ── */
-.rb-chat-panel{position:fixed;bottom:0;right:0;width:100%;max-width:420px;height:72dvh;background:var(--bg2);border-top:1px solid var(--border);border-left:1px solid var(--border);border-radius:18px 18px 0 0;z-index:500;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);overflow:hidden;box-shadow:0 18px 48px rgba(0,0,0,.38);}
-.rb-chat-panel.open{transform:translateY(0);}
+.rb-chat-panel{width:360px;max-width:360px;height:auto;min-height:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;box-shadow:inset 1px 0 0 rgba(255,255,255,.02);}
 
 /* Header */
 .rb-chat-hdr{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);}
 .rb-chat-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;flex:1;}
 .rb-chat-online{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;}
 .rb-chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-.rb-chat-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px;}
 
 /* Tab bar */
 .rb-chat-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -2603,6 +2702,11 @@ function openSeasonManager(){
 /* Emoji picker */
 .rb-emoji-picker{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px;margin-bottom:6px;max-height:180px;overflow-y:auto;}
 .rb-emoji-picker.open{display:block;}
+
+@media (max-width: 1099px){
+  .draft-layout{flex-direction:column;}
+  .rb-chat-panel{width:100%;max-width:none;min-height:280px;border-left:none;border-top:1px solid var(--border);}
+}
 .rb-emoji-cats{display:flex;gap:4px;margin-bottom:6px;overflow-x:auto;padding-bottom:4px;}
 .rb-emoji-cat{background:none;border:none;font-size:16px;cursor:pointer;padding:3px 6px;border-radius:6px;}
 .rb-emoji-cat.on{background:var(--bg3);}
@@ -2629,65 +2733,6 @@ function openSeasonManager(){
 .rb-gif-loading{text-align:center;padding:20px;color:var(--text3);font-size:12px;}
 </style>
 
-<!-- Chat FAB button (shown on all screens) -->
-<button class="rb-chat-fab" id="rbChatFab" onclick="rbToggleChat()">
-  💬
-  <div class="rb-chat-unread" id="rbUnread">0</div>
-</button>
-
-<!-- Chat Panel -->
-<div class="rb-chat-panel" id="rbChatPanel">
-  <div class="rb-chat-hdr">
-    <div style="flex:1">
-      <div class="rb-chat-title">💬 League Chat</div>
-      <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
-    </div>
-    <button class="rb-chat-close" onclick="rbToggleChat()">✕</button>
-  </div>
-
-  <!-- Tabs: All / Draft / Trash Talk -->
-  <div class="rb-chat-tabs">
-    <button class="rb-chat-tab on" onclick="rbSwitchTab('all',this)">All</button>
-    <button class="rb-chat-tab" onclick="rbSwitchTab('draft',this)">Draft Room</button>
-    <button class="rb-chat-tab" onclick="rbSwitchTab('trades',this)">Trades</button>
-    <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk 🔥</button>
-  </div>
-
-  <!-- Messages -->
-  <div class="rb-chat-msgs" id="rbMsgs"></div>
-
-  <!-- Input area -->
-  <div class="rb-chat-input-area">
-    <!-- Emoji picker -->
-    <div class="rb-emoji-picker" id="rbEmojiPicker">
-      <div class="rb-emoji-cats" id="rbEmojiCats"></div>
-      <div class="rb-emoji-grid" id="rbEmojiGrid"></div>
-    </div>
-
-    <!-- GIF picker -->
-    <div class="rb-gif-picker" id="rbGifPicker">
-      <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs… (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
-      <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">🔍 Type to search GIFs</div></div>
-    </div>
-
-    <!-- Toolbar -->
-    <div class="rb-chat-toolbar">
-      <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">😄</button>
-      <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
-      <button class="rb-tool-btn" onclick="rbInsertAt('📢 ')" title="Announcement">📢</button>
-      <button class="rb-tool-btn" onclick="rbInsertAt('🔥 ')" title="Trash talk">🔥</button>
-      <button class="rb-tool-btn" onclick="rbInsertAt('💀 ')" title="Skull">💀</button>
-    </div>
-
-    <div class="rb-chat-row">
-      <textarea class="rb-chat-textarea" id="rbInput" placeholder="Message the league…" rows="1"
-        oninput="rbAutoResize(this);rbUpdateSendBtn()"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
-      <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
-    </div>
-  </div>
-</div>
-
 <!-- Reaction picker popup -->
 <div class="rb-react-picker" id="rbReactPicker" style="display:none;"></div>
 
@@ -2700,7 +2745,7 @@ const RB_CONTEXT = (typeof S !== 'undefined') ? 'draft' : 'season';
 const RB_COLORS = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#f97316','#06b6d4','#a855f7'];
 
 let rbChat = { msgs:[], lastSeen:0 };
-let rbChatOpen = false;
+let rbChatOpen = true;
 let rbActiveTab = 'all';
 let rbReactTarget = null;
 let rbGifTimer = null;
@@ -2744,27 +2789,24 @@ function rbTime(ts){
 
 // ── OPEN/CLOSE ──────────────────────────────────────────────
 function rbToggleChat(){
-  rbChatOpen = !rbChatOpen;
-  document.getElementById('rbChatPanel').classList.toggle('open', rbChatOpen);
-  if(rbChatOpen){
-    rbLoadChat();
-    rbRender();
-    rbMarkSeen();
-    setTimeout(()=>rbScrollBottom(),100);
-    // Simulate other managers online
-    rbSimulateActivity();
-  }
+  rbChatOpen = true;
+  rbLoadChat();
+  rbRender();
+  rbMarkSeen();
+  setTimeout(()=>rbScrollBottom(),100);
+  rbSimulateActivity();
 }
 
 function rbMarkSeen(){
   rbChat.lastSeen = Date.now();
   rbSaveChat();
-  document.getElementById('rbUnread').classList.remove('show');
+  document.getElementById('rbUnread')?.classList.remove('show');
 }
 
 function rbUpdateUnread(){
   const unseen = rbChat.msgs.filter(m=>m.ts>rbChat.lastSeen&&m.sender!==RB_MY_NAME).length;
   const el = document.getElementById('rbUnread');
+  if(!el) return;
   if(unseen>0){el.textContent=unseen>9?'9+':unseen;el.classList.add('show');}
   else el.classList.remove('show');
 }
@@ -3135,6 +3177,10 @@ function rbScheduleAiMsg(){
     const recent=rbChat.msgs.filter(m=>m.type==='system'&&Date.now()-m.ts<5000);
     if(!recent.length) rbPostSystem(context+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
     rbUpdateUnread();
+    rbRender();
+    rbMarkSeen();
+    setTimeout(()=>rbScrollBottom(),50);
+    rbSimulateActivity();
 
     // Close pickers when clicking outside
     document.addEventListener('click',e=>{
