@@ -1047,6 +1047,10 @@ function loadDemo(){
   const n=teams.length;
   const rounds=SPORT_CFG.defaultRounds;
   const pool=buildRosterbateSportPlayerPool(CURRENT_SPORT, Math.max(180, n*rounds + 40));
+  if(!pool || !pool.length){
+    toast('Real player data failed to load.');
+    throw new Error('RosterBate real player pool missing for '+CURRENT_SPORT);
+  }
   const allRosters=Array.from({length:n},()=>[]);
   for(let r=0;r<rounds;r++){
     for(let i=0;i<n;i++){
@@ -1081,6 +1085,7 @@ function rebuildDemoSeasonData(sport){
   const n=teams.length;
   const rounds=getRosterbateSportConfig(targetSport).defaultRounds;
   const pool=buildRosterbateSportPlayerPool(targetSport, Math.max(180, n*rounds + 40));
+  if(!pool || !pool.length) throw new Error('RosterBate real player pool missing for '+targetSport);
   const allRosters=Array.from({length:n},()=>[]);
   for(let r=0;r<rounds;r++){
     for(let i=0;i<n;i++){

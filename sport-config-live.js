@@ -131,9 +131,8 @@
   function buildSportPlayerPool(sport,count){
     const key=normalizeSportKey(sport), target=Math.max(count||0,SPORT_CONFIG[key].playerCount), imported=(window.RB_IMPORTED_POOLS||{})[key];
     if(imported && imported.length){ return cloneImportedPool(imported,target); }
-    if(key==='nfl') return nflPool(target);
-    if(key==='mlb') return mlbPool(target);
-    return nbaPool(target);
+    console.error('RosterBate real player pool missing for sport:', key);
+    return [];
   }
   function getPlayerFantasyScore(sport,player,scoringMap){
     const key=normalizeSportKey(sport);

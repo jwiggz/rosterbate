@@ -1351,6 +1351,11 @@ function applySportToDraftUI(){
   if(SPORT === 'nba' && (!PLAYERS || !PLAYERS.length)){
     PLAYERS = NBA_PLAYERS;
   }
+  if(!PLAYERS || !PLAYERS.length){
+    const pill=document.getElementById('sportLobbyPill');
+    if(pill) pill.textContent='⚠️ Real player data failed to load';
+    throw new Error('RosterBate real player pool missing for '+SPORT);
+  }
   const teamPlaceholders = {
     nba:'e.g. Buckets & Beyond',
     nfl:'e.g. Fourth & Gold',
