@@ -117,7 +117,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="section-title">Identity</div>
     <div class="field">
       <label class="label" for="usernameInput">Username</label>
-      <input id="usernameInput" class="input" type="text" maxlength="24" placeholder="Your username">
+      <input id="usernameInput" class="input" type="text" maxlength="20" placeholder="Your username">
       <div class="help">This is the public name people will see around the site.</div>
     </div>
     <div class="field">
@@ -192,7 +192,7 @@ const PROFILE_THEMES = {
 };
 
 function normalizeUsername(value){
-  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 20);
 }
 
 function usernameLookupKey(value){
