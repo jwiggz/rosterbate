@@ -535,6 +535,8 @@ const POWERUP_LIBRARY={
     name:'Captain Mode',
     rarity:'Epic',
     color:'#f59e0b',
+    iconId:'captain_mode',
+    iconText:'2x',
     cooldown:2,
     needsTarget:true,
     description:'Double one starter\'s score for every game this week.'
@@ -543,6 +545,8 @@ const POWERUP_LIBRARY={
     name:'White Gloves',
     rarity:'Rare',
     color:'#93c5fd',
+    iconId:'white_gloves',
+    iconText:'OUT',
     cooldown:2,
     description:'Injured starters copy your lowest active starter score that day.'
   },
@@ -550,6 +554,8 @@ const POWERUP_LIBRARY={
     name:'Bench Boost',
     rarity:'Uncommon',
     color:'#34d399',
+    iconId:'bench_boost',
+    iconText:'25%',
     cooldown:1,
     description:'Bench players with games add 25% of their fantasy points this week.'
   },
@@ -557,6 +563,8 @@ const POWERUP_LIBRARY={
     name:'Sunday Surge',
     rarity:'Common',
     color:'#c084fc',
+    iconId:'sunday_surge',
+    iconText:'+25%',
     cooldown:1,
     description:'All starters score 25% more on Sunday.'
   }
@@ -655,6 +663,46 @@ function powerupStatusLabel(id){
   if(G.week<inv.cooldownUntilWeek) return 'Week '+inv.cooldownUntilWeek;
   if(inv.owned>0) return inv.owned+' owned';
   return 'Empty';
+}
+function getPowerupSvg(meta, box){
+  const stroke=meta.color;
+  const glow=meta.color+'22';
+  const iconMap={
+    captain_mode:`<svg viewBox="0 0 64 64" width="${box}" height="${box}" aria-hidden="true">
+      <defs><linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${glow}"/><stop offset="100%" stop-color="rgba(15,23,42,.02)"/></linearGradient></defs>
+      <circle cx="32" cy="32" r="24" fill="url(#capGrad)" stroke="${stroke}" stroke-width="2"/>
+      <circle cx="32" cy="32" r="11" fill="none" stroke="${stroke}" stroke-width="3"/>
+      <circle cx="32" cy="32" r="4" fill="${stroke}"/>
+      <path d="M32 8v9M32 47v9M8 32h9M47 32h9" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+      <path d="M15 15l6 6M43 43l6 6M49 15l-6 6M21 43l-6 6" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`,
+    white_gloves:`<svg viewBox="0 0 64 64" width="${box}" height="${box}" aria-hidden="true">
+      <path d="M20 52c-4 0-7-3-7-7V24c0-2 1-4 3-4s3 2 3 4v10h2V17c0-2 1-4 3-4s3 2 3 4v15h2V15c0-2 1-4 3-4s3 2 3 4v17h2V19c0-2 1-4 3-4s3 2 3 4v21c0 6-2 12-8 12H20Z" fill="${glow}" stroke="${stroke}" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M16 39c3 0 5 1 7 4l4 7" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M42 12l10 10" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+      <path d="M52 12L42 22" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+    </svg>`,
+    bench_boost:`<svg viewBox="0 0 64 64" width="${box}" height="${box}" aria-hidden="true">
+      <rect x="13" y="26" width="38" height="12" rx="5" fill="${glow}" stroke="${stroke}" stroke-width="2.5"/>
+      <path d="M18 39v8M46 39v8" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+      <path d="M22 24c2-7 6-11 10-11s8 4 10 11" fill="none" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M32 12v9M28 16h8" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`,
+    sunday_surge:`<svg viewBox="0 0 64 64" width="${box}" height="${box}" aria-hidden="true">
+      <circle cx="32" cy="32" r="13" fill="${glow}" stroke="${stroke}" stroke-width="2.5"/>
+      <path d="M32 10v8M32 46v8M10 32h8M46 32h8M17 17l6 6M41 41l6 6M47 17l-6 6M23 41l-6 6" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M35 19 25 34h8l-4 11 10-15h-8z" fill="${stroke}"/>
+    </svg>`
+  };
+  return iconMap[meta.iconId]||`<svg viewBox="0 0 64 64" width="${box}" height="${box}" aria-hidden="true"><circle cx="32" cy="32" r="20" fill="${glow}" stroke="${stroke}" stroke-width="2.5"/></svg>`;
+}
+function renderPowerupIcon(meta, size){
+  const box=size||64;
+  const textSize=Math.max(11,Math.round(box*0.2));
+  return `<div style="width:${box}px;height:${box}px;border-radius:${Math.round(box*0.26)}px;background:linear-gradient(180deg,${meta.color}24,rgba(15,23,42,.94));border:1px solid ${meta.color}66;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 20px rgba(0,0,0,.16);flex-shrink:0;">
+    <div style="line-height:1;display:flex;align-items:center;justify-content:center;">${getPowerupSvg(meta,Math.round(box*0.54))}</div>
+    <div style="font-family:var(--fd);font-size:${textSize}px;font-weight:900;color:#fff;line-height:1;">${meta.iconText||''}</div>
+  </div>`;
 }
 
 function getStarterIdsForTeamDay(teamIdx,day){
@@ -1060,7 +1108,7 @@ function renderHub(){
       :`<button onclick="${actionMap[id]}" style="width:100%;background:${available?meta.color+'22':'var(--bg3)'};border:1px solid ${available?meta.color+'55':'var(--border)'};border-radius:8px;padding:9px 10px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:${available?meta.color:'var(--text3)'};cursor:pointer;">${slot.active?'Active This Week':available?'Activate':'On Cooldown'}</button>`;
     return `<div style="background:${meta.color}14;border:1px solid ${meta.color}33;border-radius:10px;padding:12px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-        <div><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:${meta.color};text-transform:uppercase;">${meta.name}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">${meta.rarity} · Cooldown ${meta.cooldown}w</div></div>
+        <div style="display:flex;align-items:center;gap:10px;">${renderPowerupIcon(meta,58)}<div><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:${meta.color};text-transform:uppercase;">${meta.name}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">${meta.rarity} · Cooldown ${meta.cooldown}w</div></div></div>
         <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:${slot.active?'var(--green)':'var(--text2)'};text-transform:uppercase;">${powerupStatusLabel(id)}</div>
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;">${meta.description}</div>
@@ -1082,7 +1130,7 @@ function renderHub(){
           <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;">${thisWeekDrop?.rarity||'Starter Pack'}</div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-          ${(thisWeekDrop?.drops?.length?thisWeekDrop.drops:['captain_mode','white_gloves','bench_boost']).map(id=>`<span style="background:${POWERUP_LIBRARY[id].color}18;border:1px solid ${POWERUP_LIBRARY[id].color}44;border-radius:999px;padding:5px 9px;font-family:var(--fd);font-size:11px;font-weight:800;color:${POWERUP_LIBRARY[id].color};text-transform:uppercase;">${POWERUP_LIBRARY[id].name}</span>`).join('')}
+          ${(thisWeekDrop?.drops?.length?thisWeekDrop.drops:['captain_mode','white_gloves','bench_boost']).map(id=>`<div style="display:flex;align-items:center;gap:8px;background:${POWERUP_LIBRARY[id].color}14;border:1px solid ${POWERUP_LIBRARY[id].color}44;border-radius:999px;padding:5px 10px 5px 6px;">${renderPowerupIcon(POWERUP_LIBRARY[id],34)}<span style="font-family:var(--fd);font-size:11px;font-weight:800;color:${POWERUP_LIBRARY[id].color};text-transform:uppercase;">${POWERUP_LIBRARY[id].name}</span></div>`).join('')}
         </div>
       </div>
       ${powerupCards}
@@ -1173,7 +1221,7 @@ function renderRoster(){
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;">${isPast?'Revealed Score':'Results Status'}</div>
       <div style="font-family:var(--fd);font-size:26px;font-weight:900;color:${isPast?'var(--text2)':'var(--accent)'};">${isPast?revealedScore.toFixed(1):'Hidden'}</div>
       ${!isPast?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">Unlocks when Day ${day} is revealed.</div>`:''}
-      ${Object.entries(weekPowerups).some(([,v])=>v.active)?`<div style="font-size:10px;color:var(--text3);margin-top:3px;">${Object.entries(weekPowerups).filter(([,v])=>v.active).map(([id,v])=>id==='captain_mode'?`Captain: <span style="color:${POWERUP_LIBRARY[id].color}">${roster.find(p=>p.id===v.targetId)?.name||'Active'}</span>`:`<span style="color:${POWERUP_LIBRARY[id].color};">${POWERUP_LIBRARY[id].name}</span>`).join(' · ')}</div>`:''}
+      ${Object.entries(weekPowerups).some(([,v])=>v.active)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;">${Object.entries(weekPowerups).filter(([,v])=>v.active).map(([id,v])=>`<span style="display:inline-flex;align-items:center;gap:6px;background:${POWERUP_LIBRARY[id].color}14;border:1px solid ${POWERUP_LIBRARY[id].color}44;border-radius:999px;padding:4px 8px 4px 5px;color:${POWERUP_LIBRARY[id].color};font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;">${renderPowerupIcon(POWERUP_LIBRARY[id],24)}${id==='captain_mode'?(roster.find(p=>p.id===v.targetId)?.name||'Captain Active'):POWERUP_LIBRARY[id].name}</span>`).join('')}</div>`:''}
     </div>
     <div style="display:flex;gap:6px;">
       ${!isLocked?`<button onclick="autoSetDay(${day})" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);cursor:pointer;">Auto</button>`:''}
