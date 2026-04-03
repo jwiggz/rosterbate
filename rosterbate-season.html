@@ -15,6 +15,9 @@
 :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;--accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
+input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
 .screen.active{display:flex;}
 .ph{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;}

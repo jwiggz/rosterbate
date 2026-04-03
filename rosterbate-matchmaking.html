@@ -20,6 +20,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
+input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(249,115,22,.15) 0%,transparent 65%);pointer-events:none;}
 .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
 .screen.active{display:flex;}
