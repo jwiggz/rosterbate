@@ -27,6 +27,8 @@
   .nav-logo{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;}
   .nav-logo span{color:var(--accent);}
   .nav-actions{display:flex;align-items:center;gap:8px;}
+  .nav-actions.auth-pending .nav-auth-btn,
+  .nav-actions.auth-pending .account-wrap{visibility:hidden;pointer-events:none;}
   .account-wrap{position:relative;}
   .nav-badge{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:20px;padding:4px 10px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);}
   .nav-auth-btn{background:var(--accent);border:1px solid rgba(249,115,22,.4);border-radius:20px;padding:6px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;}
@@ -194,7 +196,7 @@
   <!-- Nav -->
   <nav>
     <div class="nav-logo">Roster<span>Bate</span></div>
-    <div class="nav-actions">
+    <div class="nav-actions auth-pending" id="navActions">
       <div class="nav-badge">Beta</div>
       <button id="loginTrigger" class="nav-auth-btn secondary" onclick="openAuthModal('login')">Sign In</button>
       <div class="account-wrap">
@@ -797,6 +799,7 @@ auth.onAuthStateChanged(async user => {
   const trigger = document.getElementById('authTrigger');
   const loginTrigger = document.getElementById('loginTrigger');
   const accountMenu = document.getElementById('accountMenu');
+  const navActions = document.getElementById('navActions');
   if(!trigger) return;
   if(user){
     let snap = await db.ref('users/' + user.uid).once('value').catch(() => null);
@@ -824,6 +827,7 @@ auth.onAuthStateChanged(async user => {
       loginTrigger.onclick = () => openAuthModal('login');
     }
   }
+  if(navActions) navActions.classList.remove('auth-pending');
 });
 
 document.addEventListener('click', event => {

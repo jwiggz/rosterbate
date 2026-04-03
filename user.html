@@ -11,13 +11,14 @@
 <style>
 :root{
   --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
-  --accent:#f97316;--green:#22c55e;--gold:#f59e0b;--blue:#3b82f6;
+  --accent:#f97316;--accent2:#fb923c;--accentSoft:rgba(249,115,22,.14);--hero2:rgba(59,130,246,.08);--surface:#161d2e;
+  --green:#22c55e;--gold:#f59e0b;--blue:#3b82f6;
   --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
   --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,rgba(249,115,22,.14) 0%,transparent 60%);pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,var(--accentSoft) 0%,transparent 60%);pointer-events:none;}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:20px 18px 48px;}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
 .brand{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
@@ -26,15 +27,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
 .btn.primary{background:var(--accent);color:#fff;}
 .btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
-.hero{display:grid;grid-template-columns:120px 1fr;gap:18px;background:linear-gradient(135deg,rgba(249,115,22,.14),rgba(59,130,246,.08));border:1px solid rgba(249,115,22,.24);border-radius:22px;padding:20px;margin-bottom:14px;align-items:center;}
+.hero{display:grid;grid-template-columns:120px 1fr;gap:18px;background:linear-gradient(135deg,var(--accentSoft),var(--hero2));border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:20px;margin-bottom:14px;align-items:center;}
 .avatar{width:120px;height:120px;border-radius:28px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:42px;font-weight:900;color:var(--accent);}
 .avatar img{width:100%;height:100%;object-fit:cover;}
-.eyebrow{font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:#fdba74;}
+.eyebrow{font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--accent2);}
 .title{font-family:var(--fd);font-size:42px;font-weight:900;text-transform:uppercase;line-height:.95;margin-top:8px;}
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;}
 .label{font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
 .value{font-family:var(--fd);font-size:30px;font-weight:900;margin-top:6px;}
 .sub{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;}
@@ -43,6 +44,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .season-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;}
 .season-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;}
 .season-meta{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;}
+.about-copy{font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
 .empty{padding:18px;border:1px dashed var(--border);border-radius:14px;color:var(--text3);font-size:13px;text-align:center;}
 @media (max-width:780px){
   .hero{grid-template-columns:1fr;text-align:center;}
@@ -66,7 +68,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="hero">
     <div id="avatar" class="avatar">RB</div>
     <div>
-      <div class="eyebrow" id="memberId">Member #—</div>
+      <div class="eyebrow" id="memberId">Member -</div>
       <div class="title" id="memberName">Loading</div>
       <div class="sub" id="memberLine">Public member page and lifetime league history.</div>
       <div class="meta">
@@ -80,7 +82,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="card"><div class="label">Seasons</div><div class="value" id="statSeasons">0</div><div class="sub">Completed leagues recorded</div></div>
     <div class="card"><div class="label">Record</div><div class="value" id="statRecord">0-0</div><div class="sub">Regular season lifetime</div></div>
     <div class="card"><div class="label">Titles</div><div class="value" id="statTitles">0</div><div class="sub">Championship finishes</div></div>
-    <div class="card"><div class="label">Best Finish</div><div class="value" id="statBest">—</div><div class="sub">Highest final rank</div></div>
+    <div class="card"><div class="label">Best Finish</div><div class="value" id="statBest">-</div><div class="sub">Highest final rank</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="section-title">About Me</div>
+    <div id="aboutMeCard" class="about-copy">This manager has not written an about section yet.</div>
   </div>
 
   <div class="card" style="margin-bottom:14px;">
@@ -89,7 +96,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="season-item"><div class="season-title" id="statPF">0.0</div><div class="season-meta">Points For</div></div>
       <div class="season-item"><div class="season-title" id="statPA">0.0</div><div class="season-meta">Points Against</div></div>
       <div class="season-item"><div class="season-title" id="statPodiums">0</div><div class="season-meta">Top 3 Finishes</div></div>
-      <div class="season-item"><div class="season-title" id="statLast">—</div><div class="season-meta">Most Recent Finish</div></div>
+      <div class="season-item"><div class="season-title" id="statLast">-</div><div class="season-meta">Most Recent Finish</div></div>
     </div>
   </div>
 
@@ -116,6 +123,13 @@ const auth = firebase.auth();
 const db = firebase.database();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
+const PROFILE_THEMES = {
+  ember:{accent:'#f97316',accent2:'#fb923c',accentSoft:'rgba(249,115,22,.14)',hero2:'rgba(59,130,246,.08)',surface:'#161d2e'},
+  voltage:{accent:'#38bdf8',accent2:'#22d3ee',accentSoft:'rgba(56,189,248,.16)',hero2:'rgba(59,130,246,.12)',surface:'#132033'},
+  mint:{accent:'#22c55e',accent2:'#2dd4bf',accentSoft:'rgba(34,197,94,.14)',hero2:'rgba(45,212,191,.10)',surface:'#152521'},
+  royal:{accent:'#8b5cf6',accent2:'#f59e0b',accentSoft:'rgba(139,92,246,.16)',hero2:'rgba(245,158,11,.08)',surface:'#201a31'}
+};
+
 function parseUserNumber(){
   const pathMatch = window.location.pathname.match(/\/user\/(\d+)(?:\/)?$/i);
   if(pathMatch) return Number(pathMatch[1] || 0);
@@ -133,7 +147,7 @@ function formatDate(ts){
 }
 
 function ord(n){
-  if(!n) return '—';
+  if(!n) return '-';
   const s=['th','st','nd','rd'],v=n%100;
   return n + (s[(v-20)%10] || s[v] || s[0]);
 }
@@ -147,21 +161,32 @@ function renderAvatar(src, username){
   }
 }
 
+function applyTheme(themeKey){
+  const theme = PROFILE_THEMES[themeKey] || PROFILE_THEMES.ember;
+  document.documentElement.style.setProperty('--accent', theme.accent);
+  document.documentElement.style.setProperty('--accent2', theme.accent2);
+  document.documentElement.style.setProperty('--accentSoft', theme.accentSoft);
+  document.documentElement.style.setProperty('--hero2', theme.hero2);
+  document.documentElement.style.setProperty('--surface', theme.surface);
+}
+
 function renderProfile(profile){
   const stats = profile?.lifetime || {};
-  document.getElementById('memberId').textContent = 'Member #' + (profile?.userNumber || '—');
+  applyTheme(profile?.themeKey);
+  document.getElementById('memberId').textContent = 'Member #' + (profile?.userNumber || '-');
   document.getElementById('memberName').textContent = profile?.username || 'Unknown Member';
-  document.getElementById('memberLine').textContent = 'Lifetime league stats, finishes, and public identity for this manager.';
+  document.getElementById('memberLine').textContent = 'Lifetime league stats, finishes, style, and public identity for this manager.';
   document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
   document.getElementById('memberLinkPill').textContent = profile?.profileUrl || 'Public profile';
+  document.getElementById('aboutMeCard').textContent = String(profile?.aboutMe || '').trim() || 'This manager has not written an about section yet.';
   document.getElementById('statSeasons').textContent = stats.seasonsPlayed || 0;
   document.getElementById('statRecord').textContent = (stats.regularSeasonWins || 0) + '-' + (stats.regularSeasonLosses || 0);
   document.getElementById('statTitles').textContent = stats.championships || 0;
-  document.getElementById('statBest').textContent = stats.bestFinish ? ord(stats.bestFinish) : '—';
+  document.getElementById('statBest').textContent = stats.bestFinish ? ord(stats.bestFinish) : '-';
   document.getElementById('statPF').textContent = Number(stats.pointsFor || 0).toFixed(1);
   document.getElementById('statPA').textContent = Number(stats.pointsAgainst || 0).toFixed(1);
   document.getElementById('statPodiums').textContent = stats.podiums || 0;
-  document.getElementById('statLast').textContent = stats.lastFinish ? ord(stats.lastFinish) : '—';
+  document.getElementById('statLast').textContent = stats.lastFinish ? ord(stats.lastFinish) : '-';
   renderAvatar(profile?.photoURL || '', profile?.username || 'RB');
 }
 

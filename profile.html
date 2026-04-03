@@ -46,6 +46,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .preview-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 10px;font-size:11px;color:var(--text2);}
+.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.theme-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;transition:.18s border-color,.18s transform;color:var(--text);font-family:var(--fb);text-align:left;}
+.theme-card:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.35);}
+.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(249,115,22,.18) inset;}
+.theme-name{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;}
+.theme-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.45;}
+.swatches{display:flex;gap:6px;margin-top:10px;}
+.swatch{width:16px;height:16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);}
 .status{min-height:18px;font-size:12px;color:var(--text2);margin-top:10px;}
 .status.error{color:#fca5a5;}
 .status.success{color:#86efac;}
@@ -81,7 +89,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <div class="hero">
     <div class="hero-title">Profile Settings</div>
-    <div class="hero-sub">Customize your username and profile picture. GIFs and images both work, and you can upload a file or paste an image URL.</div>
+    <div class="hero-sub">Customize your username, add an about section, and give your public page a look that feels like your team.</div>
   </div>
 
   <div class="card">
@@ -99,7 +107,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <div class="card">
     <div class="section-title">Public Page</div>
-    <div class="help">Every registered user gets a public member page with lifetime league stats.</div>
+    <div class="help">Every registered user gets a public member page with lifetime stats, a short bio, and a custom style preset.</div>
     <div class="preview-row" style="margin-top:12px;">
       <button class="btn secondary" id="viewPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
     </div>
@@ -112,6 +120,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <input id="usernameInput" class="input" type="text" maxlength="24" placeholder="Your username">
       <div class="help">This is the public name people will see around the site.</div>
     </div>
+    <div class="field">
+      <label class="label" for="aboutMeInput">About Me</label>
+      <textarea id="aboutMeInput" class="textarea" maxlength="220" placeholder="Tell your league what kind of manager you are. Trade shark, waiver goblin, title hunter, whatever fits."></textarea>
+      <div class="help">This shows up on your public member page under your header.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Public Page Style</div>
+    <div class="help" style="margin-bottom:12px;">A few strong presets keep pages unique without getting messy. Pick the one that feels most like your squad.</div>
+    <div class="option-grid" id="themeOptions"></div>
   </div>
 
   <div class="card">
@@ -163,6 +182,14 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 let currentUser = null;
 let currentProfile = null;
 let pendingAvatar = '';
+let selectedThemeKey = 'ember';
+
+const PROFILE_THEMES = {
+  ember:{name:'Ember',sub:'Warm orange and dark-card energy.',swatches:['#f97316','#fb923c','#111827']},
+  voltage:{name:'Voltage',sub:'Sharper blue with a faster feel.',swatches:['#38bdf8','#22d3ee','#0f172a']},
+  mint:{name:'Mint',sub:'Fresh green with a cleaner board.',swatches:['#22c55e','#14b8a6','#10231f']},
+  royal:{name:'Royal',sub:'Purple and gold with trophy vibes.',swatches:['#8b5cf6','#f59e0b','#19142b']}
+};
 
 function normalizeUsername(value){
   return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 24);
@@ -239,6 +266,22 @@ function renderAvatar(src, username){
   }
 }
 
+function renderThemeOptions(){
+  const wrap = document.getElementById('themeOptions');
+  wrap.innerHTML = Object.entries(PROFILE_THEMES).map(([key, theme]) => `
+    <button type="button" class="theme-card${selectedThemeKey === key ? ' active' : ''}" onclick="selectTheme('${key}')">
+      <div class="theme-name">${theme.name}</div>
+      <div class="theme-sub">${theme.sub}</div>
+      <div class="swatches">${theme.swatches.map(color => `<span class="swatch" style="background:${color};"></span>`).join('')}</div>
+    </button>
+  `).join('');
+}
+
+function selectTheme(key){
+  selectedThemeKey = PROFILE_THEMES[key] ? key : 'ember';
+  renderThemeOptions();
+}
+
 function applyProfileToUI(user, profile){
   const username = normalizeUsername(profile?.username) || fallbackUsernameFromUser(user);
   const photoURL = profile?.photoURL || user.photoURL || '';
@@ -248,10 +291,13 @@ function applyProfileToUI(user, profile){
   document.getElementById('emailLine').textContent = user.email || 'No email found';
   document.getElementById('providerLine').textContent = 'Signed in with ' + (profile?.provider || user.providerData?.[0]?.providerId || 'account');
   document.getElementById('usernameInput').value = username;
+  document.getElementById('aboutMeInput').value = String(profile?.aboutMe || '').slice(0,220);
   document.getElementById('avatarUrlInput').value = photoURL && !photoURL.startsWith('data:') ? photoURL : '';
   pendingAvatar = photoURL || '';
+  selectedThemeKey = PROFILE_THEMES[profile?.themeKey] ? profile.themeKey : 'ember';
   document.getElementById('viewPublicPageBtn').disabled = !(userNumber > 0);
   renderAvatar(pendingAvatar, username);
+  renderThemeOptions();
 }
 
 function openPublicPage(){
@@ -307,6 +353,7 @@ document.addEventListener('change', event => {
 async function saveProfile(){
   if(!currentUser) return;
   const username = normalizeUsername(document.getElementById('usernameInput').value);
+  const aboutMe = String(document.getElementById('aboutMeInput').value || '').trim().slice(0,220);
   const selectedAvatar = getSelectedAvatar();
   if(username.length < 3){
     setStatus('Username must be at least 3 characters.', 'error');
@@ -337,6 +384,8 @@ async function saveProfile(){
     updates['users/' + currentUser.uid + '/userNumber'] = userNumber;
     updates['users/' + currentUser.uid + '/memberSince'] = memberSince;
     updates['users/' + currentUser.uid + '/photoURL'] = selectedAvatar || '';
+    updates['users/' + currentUser.uid + '/aboutMe'] = aboutMe;
+    updates['users/' + currentUser.uid + '/themeKey'] = selectedThemeKey;
     updates['users/' + currentUser.uid + '/provider'] = currentUser.providerData?.[0]?.providerId || 'password';
     updates['users/' + currentUser.uid + '/updatedAt'] = updatedAt;
     updates['usernames/' + key] = {
@@ -350,6 +399,8 @@ async function saveProfile(){
     updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
     updates['publicUsers/' + userNumber + '/username'] = username;
     updates['publicUsers/' + userNumber + '/photoURL'] = selectedAvatar || '';
+    updates['publicUsers/' + userNumber + '/aboutMe'] = aboutMe;
+    updates['publicUsers/' + userNumber + '/themeKey'] = selectedThemeKey;
     updates['publicUsers/' + userNumber + '/memberSince'] = memberSince;
     updates['publicUsers/' + userNumber + '/profileUrl'] = buildPublicUserUrl(userNumber);
     updates['publicUsers/' + userNumber + '/updatedAt'] = updatedAt;
@@ -371,6 +422,8 @@ async function saveProfile(){
       userNumber,
       memberSince,
       photoURL: selectedAvatar || '',
+      aboutMe,
+      themeKey: selectedThemeKey,
       provider: currentUser.providerData?.[0]?.providerId || 'password',
       updatedAt
     };
@@ -414,6 +467,8 @@ auth.onAuthStateChanged(async user => {
       updates['users/' + user.uid + '/userNumber'] = userNumber;
       updates['users/' + user.uid + '/memberSince'] = memberSince;
       updates['users/' + user.uid + '/photoURL'] = currentProfile.photoURL || user.photoURL || '';
+      updates['users/' + user.uid + '/aboutMe'] = currentProfile.aboutMe || '';
+      updates['users/' + user.uid + '/themeKey'] = PROFILE_THEMES[currentProfile.themeKey] ? currentProfile.themeKey : 'ember';
       updates['users/' + user.uid + '/provider'] = currentProfile.provider || user.providerData?.[0]?.providerId || 'password';
       updates['users/' + user.uid + '/updatedAt'] = updatedAt;
       updates['usernames/' + key] = {
@@ -427,6 +482,8 @@ auth.onAuthStateChanged(async user => {
       updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
       updates['publicUsers/' + userNumber + '/username'] = username;
       updates['publicUsers/' + userNumber + '/photoURL'] = currentProfile.photoURL || user.photoURL || '';
+      updates['publicUsers/' + userNumber + '/aboutMe'] = currentProfile.aboutMe || '';
+      updates['publicUsers/' + userNumber + '/themeKey'] = PROFILE_THEMES[currentProfile.themeKey] ? currentProfile.themeKey : 'ember';
       updates['publicUsers/' + userNumber + '/memberSince'] = memberSince;
       updates['publicUsers/' + userNumber + '/profileUrl'] = buildPublicUserUrl(userNumber);
       updates['publicUsers/' + userNumber + '/updatedAt'] = updatedAt;

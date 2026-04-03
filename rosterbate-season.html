@@ -93,6 +93,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .cval{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);text-align:right;flex-shrink:0;}
 .cinput{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;text-align:right;width:130px;}
 .cinput:focus{border-color:var(--accent);}
+.cnum-wrap{display:inline-flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
+.cnum-wrap:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.cnum-input{width:82px;background:transparent;border:none;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;text-align:right;padding:8px 10px;-moz-appearance:textfield;}
+.cnum-input::-webkit-outer-spin-button,
+.cnum-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.cnum-steps{display:flex;flex-direction:column;border-left:1px solid var(--border);background:rgba(255,255,255,.02);}
+.cnum-step{width:28px;height:18px;border:none;background:transparent;color:var(--text2);font-family:var(--fd);font-size:11px;font-weight:900;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;}
+.cnum-step:hover{background:rgba(249,115,22,.14);color:var(--accent);}
+.cnum-step:active{background:rgba(249,115,22,.22);}
+.cnum-step + .cnum-step{border-top:1px solid var(--border);}
 .cselect{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;appearance:none;cursor:pointer;max-width:160px;}
 .cselect:focus{border-color:var(--accent);}
 .ctoggle{display:flex;align-items:center;gap:8px;}
@@ -1782,7 +1792,24 @@ function commSel(key,options,subkey){
   </select>`;
 }
 function commNum(key,min,max,step){
-  return `<input type="number" class="cinput" min="${min||0}" max="${max||999}" step="${step||1}" value="${CS[key]}" onchange="CS['${key}']=+this.value;saveCS()">`;
+  const minVal=min||0;
+  const maxVal=max||999;
+  const stepVal=step||1;
+  return `<div class="cnum-wrap">
+    <input type="number" class="cnum-input" min="${minVal}" max="${maxVal}" step="${stepVal}" value="${CS[key]}" onchange="CS['${key}']=+this.value;saveCS()">
+    <div class="cnum-steps">
+      <button type="button" class="cnum-step" onclick="commStep(this,-1,${minVal},${maxVal},${stepVal})">−</button>
+      <button type="button" class="cnum-step" onclick="commStep(this,1,${minVal},${maxVal},${stepVal})">+</button>
+    </div>
+  </div>`;
+}
+function commStep(btn,dir,min,max,step){
+  const input=btn.closest('.cnum-wrap')?.querySelector('.cnum-input');
+  if(!input) return;
+  const current=Number(input.value||0);
+  const next=Math.min(max,Math.max(min,current+(dir*step)));
+  input.value=String(next);
+  input.dispatchEvent(new Event('change',{bubbles:true}));
 }
 function commToggle(key){
   const on=CS[key];
