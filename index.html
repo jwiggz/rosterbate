@@ -685,7 +685,8 @@ function subscribeNavNotifications(userNumber){
     unreadMessages = threads.filter(thread => {
       const updatedAt = Number(thread?.updatedAt || 0);
       const lastSender = Number(thread?.lastSender || 0);
-      return updatedAt > seenAt && lastSender !== myNumber;
+      const hasRealMessage = !!String(thread?.lastMessage || '').trim();
+      return hasRealMessage && updatedAt > seenAt && lastSender > 0 && lastSender !== myNumber;
     }).length;
     refreshBadge();
   });

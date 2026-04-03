@@ -327,7 +327,13 @@ function subscribeToMessages(threadId){
   }
   messageRef=db.ref('directMessages/' + threadId);
   messageRef.on('value', snap => {
-    const rows=Object.entries(snap.val() || {}).map(([id, msg]) => ({ id, ...msg })).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    const rows=Object.entries(snap.val() || {})
+      .map(([id, msg]) => ({ id, ...msg }))
+      .sort((a,b)=>{
+        const timeDiff=Number(a.createdAt||0)-Number(b.createdAt||0);
+        if(timeDiff!==0) return timeDiff;
+        return String(a.id||'').localeCompare(String(b.id||''));
+      });
     renderMessages(rows);
   });
 }
@@ -342,24 +348,25 @@ async function sendMessage(){
   const otherMetaSnap=await db.ref('userThreads/' + myNumber + '/' + activeThreadId).once('value').catch(() => null);
   const threadMeta=otherMetaSnap?.val?.() || {};
   const now=Date.now();
+  const serverNow=firebase.database.ServerValue.TIMESTAMP;
   const ref=db.ref('directMessages/' + activeThreadId).push();
   const message={
     fromUserNumber: myNumber,
     username: currentProfile.username || 'Manager',
     photoURL: currentProfile.photoURL || '',
     text,
-    createdAt: now
+    createdAt: serverNow
   };
   const updates={};
   updates['directMessages/' + activeThreadId + '/' + ref.key]=message;
-  updates['directThreads/' + activeThreadId + '/updatedAt']=now;
+  updates['directThreads/' + activeThreadId + '/updatedAt']=serverNow;
   updates['directThreads/' + activeThreadId + '/lastMessage']=text.slice(0,120);
   updates['directThreads/' + activeThreadId + '/lastSender']=myNumber;
-  updates['userThreads/' + myNumber + '/' + activeThreadId + '/updatedAt']=now;
+  updates['userThreads/' + myNumber + '/' + activeThreadId + '/updatedAt']=serverNow;
   updates['userThreads/' + myNumber + '/' + activeThreadId + '/lastMessage']=text.slice(0,120);
   updates['userThreads/' + myNumber + '/' + activeThreadId + '/lastSender']=myNumber;
   if(threadMeta.otherUserNumber){
-    updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/updatedAt']=now;
+    updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/updatedAt']=serverNow;
     updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/lastMessage']=text.slice(0,120);
     updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/lastSender']=myNumber;
   }
