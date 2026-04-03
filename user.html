@@ -44,11 +44,21 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   letter-spacing:.7px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px rgba(148,163,184,.12);
 }
+.owner-pill{
+  background:linear-gradient(135deg,rgba(245,158,11,.28),rgba(234,179,8,.18) 45%,rgba(255,236,179,.34) 100%);
+  border-color:rgba(245,158,11,.48);
+  color:#fff1b2;
+  font-family:var(--fd);
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  box-shadow:inset 0 1px 0 rgba(255,245,200,.4),0 8px 18px rgba(245,158,11,.16);
+}
 .admin-rank{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  margin-bottom:10px;
+  margin-top:8px;
   padding:8px 14px;
   border-radius:999px;
   background:linear-gradient(135deg,rgba(255,255,255,.20),rgba(148,163,184,.12) 46%,rgba(255,255,255,.26) 100%);
@@ -116,17 +126,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div id="avatar" class="avatar">RB</div>
     <div>
       <div class="eyebrow" id="memberId">Member -</div>
-      <div id="adminRank" class="admin-rank" style="display:none;">
-        <span class="admin-crown" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M4 17h16l-1.4-8.5-4.3 3.1L12 6 9.7 11.6 5.4 8.5 4 17Z" fill="currentColor"/>
-            <path d="M4 17h16M7 20h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </span>
-        Platinum Administrator
-      </div>
       <div class="admin-name">
         <div class="title" id="memberName">Loading</div>
+        <div id="adminRank" class="admin-rank" style="display:none;">
+          <span class="admin-crown" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 17h16l-1.4-8.5-4.3 3.1L12 6 9.7 11.6 5.4 8.5 4 17Z" fill="currentColor"/>
+              <path d="M4 17h16M7 20h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          Administrator
+        </div>
       </div>
       <div class="sub" id="memberLine">Public member page and lifetime league history.</div>
       <div class="meta">
@@ -230,16 +240,20 @@ function applyTheme(themeKey){
 
 function renderProfile(profile){
   const stats = profile?.lifetime || {};
-  const isAdmin = !!profile?.isAdmin || [1,2,3,4,5].includes(Number(profile?.userNumber || 0));
+  const userNumber = Number(profile?.userNumber || 0);
+  const isAdmin = !!profile?.isAdmin || [1,2,3,4,5].includes(userNumber);
+  const isOwner = userNumber === 1;
   applyTheme(profile?.themeKey);
   document.getElementById('memberId').textContent = 'Member #' + (profile?.userNumber || '-');
   document.getElementById('memberName').textContent = profile?.username || 'Unknown Member';
-  document.getElementById('memberLine').textContent = isAdmin ? 'Platinum administrator with authority to moderate chat and manage bans across RosterBate.' : 'Lifetime league stats, finishes, style, and public identity for this manager.';
+  document.getElementById('memberLine').textContent = isAdmin ? 'Administrator with authority to moderate chat and manage bans across RosterBate.' : 'Lifetime league stats, finishes, style, and public identity for this manager.';
   document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
   document.getElementById('memberLinkPill').textContent = profile?.profileUrl || 'Public profile';
-  document.getElementById('memberLinkPill').className = 'pill' + (isAdmin ? ' admin-pill' : '');
+  document.getElementById('memberLinkPill').className = 'pill' + (isOwner ? ' owner-pill' : '');
   document.getElementById('adminRank').style.display = isAdmin ? 'inline-flex' : 'none';
-  if(isAdmin) document.getElementById('memberLinkPill').textContent = 'Platinum Admin';
+  if(isOwner){
+    document.getElementById('memberLinkPill').textContent = 'Owner';
+  }
   document.getElementById('aboutMeCard').textContent = String(profile?.aboutMe || '').trim() || 'This manager has not written an about section yet.';
   document.getElementById('statSeasons').textContent = stats.seasonsPlayed || 0;
   document.getElementById('statRecord').textContent = (stats.regularSeasonWins || 0) + '-' + (stats.regularSeasonLosses || 0);
