@@ -415,7 +415,30 @@ let SPORT_CFG = getRosterbateSportConfig(CURRENT_SPORT);
 let STARTERS = SPORT_CFG.starterSlots.length;
 
 const RB_POOLS_URL='sport-data-live.json';
+const RB_POOLS_SCRIPT_URL='sport-data-live.js';
 let rbPoolsReady=null;
+
+function loadRosterbatePoolsScript(){
+  return new Promise((resolve,reject)=>{
+    if(window.RB_IMPORTED_POOLS && Object.keys(window.RB_IMPORTED_POOLS).length){
+      resolve(window.RB_IMPORTED_POOLS);
+      return;
+    }
+    const existing=document.querySelector('script[data-rb-pools="1"]');
+    if(existing){
+      existing.addEventListener('load',()=>resolve(window.RB_IMPORTED_POOLS||{}),{once:true});
+      existing.addEventListener('error',()=>reject(new Error('Failed to load '+RB_POOLS_SCRIPT_URL)),{once:true});
+      return;
+    }
+    const script=document.createElement('script');
+    script.src=RB_POOLS_SCRIPT_URL;
+    script.async=true;
+    script.dataset.rbPools='1';
+    script.onload=()=>resolve(window.RB_IMPORTED_POOLS||{});
+    script.onerror=()=>reject(new Error('Failed to load '+RB_POOLS_SCRIPT_URL));
+    document.head.appendChild(script);
+  });
+}
 
 function ensureRosterbatePools(){
   if(window.RB_IMPORTED_POOLS && Object.keys(window.RB_IMPORTED_POOLS).length) return Promise.resolve(window.RB_IMPORTED_POOLS);
@@ -427,6 +450,15 @@ function ensureRosterbatePools(){
     })
     .then(pools=>{
       window.RB_IMPORTED_POOLS=pools||{};
+      return window.RB_IMPORTED_POOLS;
+    })
+    .catch(err=>{
+      console.warn('RosterBate JSON player pool load failed, trying script fallback:', err);
+      return loadRosterbatePoolsScript();
+    })
+    .then(pools=>{
+      if(!pools || !Object.keys(pools).length) throw new Error('RosterBate real player pools were empty after all load attempts');
+      window.RB_IMPORTED_POOLS=pools;
       return window.RB_IMPORTED_POOLS;
     })
     .catch(err=>{
