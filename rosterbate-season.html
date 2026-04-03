@@ -105,6 +105,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .cnum-step:hover{background:rgba(249,115,22,.14);color:var(--accent);}
 .cnum-step:active{background:rgba(249,115,22,.22);}
 .cnum-step + .cnum-step{border-top:1px solid var(--border);}
+.cnum-wrap.readonly .cnum-steps{display:none;}
 .cselect{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;appearance:none;cursor:pointer;max-width:160px;}
 .cselect:focus{border-color:var(--accent);}
 .ctoggle{display:flex;align-items:center;gap:8px;}
@@ -1688,6 +1689,37 @@ function saveCS(){
   if(el){el.style.opacity='1';setTimeout(()=>el.style.opacity='0',1500);}
 }
 
+function hydrateSeasonSteppers(root){
+  (root||document).querySelectorAll('input[type="number"]').forEach(function(input){
+    if(input.closest('.cnum-wrap')) return;
+    const wrapper=document.createElement('div');
+    wrapper.className='cnum-wrap'+(input.readOnly?' readonly':'');
+    input.parentNode.insertBefore(wrapper,input);
+    input.classList.add('cnum-input');
+    wrapper.appendChild(input);
+    if(input.readOnly) return;
+    const steps=document.createElement('div');
+    steps.className='cnum-steps';
+    steps.innerHTML='<button type="button" class="cnum-step">+</button><button type="button" class="cnum-step">−</button>';
+    wrapper.appendChild(steps);
+    const [plus,minus]=steps.querySelectorAll('.cnum-step');
+    function nudge(dir){
+      const step=parseFloat(input.step||'1')||1;
+      const min=input.min!==''?parseFloat(input.min):null;
+      const max=input.max!==''?parseFloat(input.max):null;
+      let value=parseFloat(input.value||'0');
+      value=isNaN(value)?0:value+(dir*step);
+      if(min!==null) value=Math.max(min,value);
+      if(max!==null) value=Math.min(max,value);
+      input.value=String(Math.round(value*1000)/1000);
+      input.dispatchEvent(new Event('change',{bubbles:true}));
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    plus.addEventListener('click',function(){ nudge(1); });
+    minus.addEventListener('click',function(){ nudge(-1); });
+  });
+}
+
 function renderCommissioner(){
   initCS();
   switchCommTab('basic', document.querySelector('.ctab'));
@@ -1705,6 +1737,7 @@ function switchCommTab(tab, btn){
   if(!el) return;
   const renders={basic:commBasic,roster:commRoster,scoring:commScoring,schedule:commSchedule,acq:commAcq,trades:commTrades,playoffs:commPlayoffs};
   renders[tab]?.();
+  hydrateSeasonSteppers(el);
 }
 
 // ── helpers ──

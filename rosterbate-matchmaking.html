@@ -93,6 +93,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .scoregrid .sval{padding:5px 0;border-bottom:1px solid rgba(30,45,69,.7);}
 .scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
 .scoregrid input:focus{border-color:var(--accent);}
+.stepper{display:flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
+.stepper:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:10px 12px!important;text-align:right;}
+.stepper-btns{display:flex;flex-direction:column;border-left:1px solid var(--border);background:rgba(255,255,255,.02);}
+.stepper-btn{width:30px;height:20px;border:none;background:transparent;color:var(--text2);font-family:var(--fd);font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;}
+.stepper-btn:hover{background:rgba(249,115,22,.14);color:var(--accent);}
+.stepper-btn:active{background:rgba(249,115,22,.22);}
+.stepper-btn + .stepper-btn{border-top:1px solid var(--border);}
+.stepper.readonly .stepper-btns{display:none;}
 
 /* RosterBate Home Header */
 .rb-home-bar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:10px 14px;flex-shrink:0;}
@@ -406,6 +415,36 @@ function renderCreateRulesSection(){
     </div>`;
 }
 
+function hydrateStepperInputs(root){
+  (root||document).querySelectorAll('input[type="number"]').forEach(function(input){
+    if(input.closest('.stepper') || input.closest('.cnum-wrap')) return;
+    const wrapper=document.createElement('div');
+    wrapper.className='stepper'+(input.readOnly?' readonly':'');
+    input.parentNode.insertBefore(wrapper,input);
+    wrapper.appendChild(input);
+    if(input.readOnly) return;
+    const btns=document.createElement('div');
+    btns.className='stepper-btns';
+    btns.innerHTML='<button type="button" class="stepper-btn">+</button><button type="button" class="stepper-btn">−</button>';
+    wrapper.appendChild(btns);
+    const [plus,minus]=btns.querySelectorAll('.stepper-btn');
+    function nudge(dir){
+      const step=parseFloat(input.step||'1')||1;
+      const min=input.min!==''?parseFloat(input.min):null;
+      const max=input.max!==''?parseFloat(input.max):null;
+      let value=parseFloat(input.value||'0');
+      value=isNaN(value)?0:value+(dir*step);
+      if(min!==null) value=Math.max(min,value);
+      if(max!==null) value=Math.min(max,value);
+      input.value=String(Math.round(value*1000)/1000);
+      input.dispatchEvent(new Event('change',{bubbles:true}));
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    plus.addEventListener('click',function(){ nudge(1); });
+    minus.addEventListener('click',function(){ nudge(-1); });
+  });
+}
+
 function teamCount(lobby){
   return Object.keys(lobby?.players||{}).length;
 }
@@ -682,6 +721,7 @@ function renderCreate(){
     <button class="btn-p" id="createBtn" onclick="doCreate()">Create League</button>
     ${globalChatShell()}`;
   syncCreateRules();
+  hydrateStepperInputs(document.getElementById('mmTabContent'));
   attachGlobalChat();
 }
 

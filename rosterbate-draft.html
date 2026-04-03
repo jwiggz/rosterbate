@@ -329,6 +329,15 @@
 .scoregrid .sval{padding:5px 0;border-bottom:1px solid rgba(30,45,69,.7);}
 .scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
 .scoregrid input:focus{border-color:var(--accent);}
+.stepper{display:flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
+.stepper:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:10px 12px!important;text-align:right;}
+.stepper-btns{display:flex;flex-direction:column;border-left:1px solid var(--border);background:rgba(255,255,255,.02);}
+.stepper-btn{width:30px;height:20px;border:none;background:transparent;color:var(--text2);font-family:var(--fd);font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;}
+.stepper-btn:hover{background:rgba(249,115,22,.14);color:var(--accent);}
+.stepper-btn:active{background:rgba(249,115,22,.22);}
+.stepper-btn + .stepper-btn{border-top:1px solid var(--border);}
+.stepper.readonly .stepper-btns{display:none;}
 ::-webkit-scrollbar{width:0;height:0;}
 </style>
 </head>
@@ -1144,6 +1153,37 @@ function renderAdvancedLeagueRules(prefill){
       Object.keys(scoring).map(key=>`<div class="slbl">${labels[key]||key}</div><div class="sval"><input type="number" id="score_${key}" step="0.1" value="${scoring[key]}"></div>`).join('');
   }
   syncRosterRules();
+  hydrateStepperInputs(document.getElementById('lobby'));
+}
+
+function hydrateStepperInputs(root){
+  (root||document).querySelectorAll('input[type="number"]').forEach(function(input){
+    if(input.closest('.stepper') || input.closest('.cnum-wrap')) return;
+    const wrapper=document.createElement('div');
+    wrapper.className='stepper'+(input.readOnly?' readonly':'');
+    input.parentNode.insertBefore(wrapper,input);
+    wrapper.appendChild(input);
+    if(input.readOnly) return;
+    const btns=document.createElement('div');
+    btns.className='stepper-btns';
+    btns.innerHTML='<button type="button" class="stepper-btn">+</button><button type="button" class="stepper-btn">−</button>';
+    wrapper.appendChild(btns);
+    const [plus,minus]=btns.querySelectorAll('.stepper-btn');
+    function nudge(dir){
+      const step=parseFloat(input.step||'1')||1;
+      const min=input.min!==''?parseFloat(input.min):null;
+      const max=input.max!==''?parseFloat(input.max):null;
+      let value=parseFloat(input.value||'0');
+      value=isNaN(value)?0:value+(dir*step);
+      if(min!==null) value=Math.max(min,value);
+      if(max!==null) value=Math.min(max,value);
+      input.value=String(Math.round(value*1000)/1000);
+      input.dispatchEvent(new Event('change',{bubbles:true}));
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    plus.addEventListener('click',function(){ nudge(1); });
+    minus.addEventListener('click',function(){ nudge(-1); });
+  });
 }
 
 function cc(gid,el){
@@ -2818,6 +2858,7 @@ function rbScheduleAiMsg(){
 (function(){
   applySportToDraftUI();
   applySavedLobbySettings();
+  hydrateStepperInputs(document);
   rbLoadChat();
   const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
   // Only post system msg if no recent one
