@@ -41,6 +41,24 @@
   function fixed(n){ return Math.round(n*10)/10; }
   function buildName(i,a,b){ return a[i%a.length]+' '+b[Math.floor(i/a.length)%b.length]; }
   function assignAdp(players){ return players.sort((a,b)=>b.fp-a.fp).map((p,i)=>Object.assign(p,{adp:i+1})); }
+  function cloneImportedPool(list,count){
+    return (list||[])
+      .slice(0,Math.max(0,count||list.length))
+      .map(function(player){
+        return {
+          id:player.id,
+          name:player.name,
+          team:player.team,
+          pos:player.pos,
+          fp:player.fp,
+          adp:player.adp,
+          statSummary:player.statSummary,
+          detailStats:(player.detailStats||[]).map(function(stat){
+            return {label:stat.label,value:stat.value};
+          })
+        };
+      });
+  }
 
   function nbaPool(count){
     const first=['Jalen','Tyrese','Anthony','Brandon','Donovan','Zion','Paolo','Devin','Ja','Trae','Cade','Scottie','Franz','Darius','DeAaron','Bam','Mikal','Jaren','Jamal','Desmond','Kawhi','Tyler','Jabari','Evan','Julius','Jaylen','Jayson','Shai','Luka','Nikola'];
@@ -87,7 +105,13 @@
     return assignAdp(players);
   }
 
-  function buildSportPlayerPool(sport,count){ const key=normalizeSportKey(sport), target=Math.max(count||0,SPORT_CONFIG[key].playerCount); if(key==='nfl') return nflPool(target); if(key==='mlb') return mlbPool(target); return nbaPool(target); }
+  function buildSportPlayerPool(sport,count){
+    const key=normalizeSportKey(sport), target=Math.max(count||0,SPORT_CONFIG[key].playerCount), imported=(window.RB_IMPORTED_POOLS||{})[key];
+    if(imported && imported.length){ return cloneImportedPool(imported,target); }
+    if(key==='nfl') return nflPool(target);
+    if(key==='mlb') return mlbPool(target);
+    return nbaPool(target);
+  }
   function getPlayerSummary(player){ return player&&player.statSummary ? player.statSummary : ''; }
   function getPlayerDetailStats(player){ return player&&player.detailStats ? player.detailStats : []; }
   function getCommissionerDefaults(sport){
