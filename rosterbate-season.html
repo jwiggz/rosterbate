@@ -907,6 +907,75 @@ function settleWeek(week){
   return true;
 }
 let wAdd=null,wDrop=null,trP={ti:-1,give:[],get:[]};
+let waiverSortKey='fp',waiverSortDir='desc';
+
+function getWaiverColumns(){
+  if(CURRENT_SPORT==='nfl') return [
+    {key:'name',label:'Player',align:'left'},
+    {key:'pos',label:'Pos'},
+    {key:'team',label:'Team'},
+    {key:'passYds',label:'Pass'},
+    {key:'passTd',label:'Pass TD'},
+    {key:'rushYds',label:'Rush'},
+    {key:'rec',label:'Rec'},
+    {key:'recYds',label:'Rec Yds'},
+    {key:'fp',label:'Fantasy'}
+  ];
+  if(CURRENT_SPORT==='mlb') return [
+    {key:'name',label:'Player',align:'left'},
+    {key:'pos',label:'Pos'},
+    {key:'team',label:'Team'},
+    {key:'hr',label:'HR'},
+    {key:'rbi',label:'RBI'},
+    {key:'r',label:'R'},
+    {key:'sb',label:'SB'},
+    {key:'so',label:'SO'},
+    {key:'fp',label:'Fantasy'}
+  ];
+  return [
+    {key:'name',label:'Player',align:'left'},
+    {key:'pos',label:'Pos'},
+    {key:'team',label:'Team'},
+    {key:'pts',label:'PTS'},
+    {key:'reb',label:'REB'},
+    {key:'ast',label:'AST'},
+    {key:'stl',label:'STL'},
+    {key:'blk',label:'BLK'},
+    {key:'tpm',label:'3PM'},
+    {key:'fp',label:'Fantasy'}
+  ];
+}
+
+function waiverStatValue(player,key){
+  if(key==='name'||key==='pos'||key==='team') return String(player?.[key]||'');
+  return Number(player?.[key]||0);
+}
+
+function waiverCell(player,key){
+  if(key==='name'){
+    return `<div style="display:flex;align-items:center;gap:9px;min-width:190px;">
+      <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
+      <div style="min-width:0;">
+        <div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
+        <div style="font-size:11px;color:var(--text3);">${player.team} · ${player.pos}</div>
+      </div>
+    </div>`;
+  }
+  const value=player?.[key];
+  if(typeof value==='number'){
+    return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
+  }
+  return value!=null && value!=='' ? String(value) : '—';
+}
+
+function toggleWaiverSort(key){
+  if(waiverSortKey===key) waiverSortDir=waiverSortDir==='desc'?'asc':'desc';
+  else{
+    waiverSortKey=key;
+    waiverSortDir=(key==='name'||key==='team'||key==='pos')?'asc':'desc';
+  }
+  renderWaiver();
+}
 
 window.onload=function(){
   applySportContext(CURRENT_SPORT);
@@ -1437,15 +1506,36 @@ function autoSet(){autoSetDay(rosterViewDay||G.day);}
 function renderWaiver(){
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
-  const list=G.waiver.filter(p=>(pf==='ALL'||p.pos===pf)&&(!s||p.name.toLowerCase().includes(s)||p.team.toLowerCase().includes(s))).sort((a,b)=>b.fp-a.fp);
+  const cols=getWaiverColumns();
+  const list=G.waiver.filter(p=>(pf==='ALL'||p.pos===pf)&&(!s||p.name.toLowerCase().includes(s)||p.team.toLowerCase().includes(s))).sort((a,b)=>{
+    const av=waiverStatValue(a,waiverSortKey), bv=waiverStatValue(b,waiverSortKey);
+    let cmp=0;
+    if(typeof av==='string' || typeof bv==='string') cmp=String(av).localeCompare(String(bv));
+    else cmp=Number(av||0)-Number(bv||0);
+    if(cmp===0) cmp=Number(b.fp||0)-Number(a.fp||0);
+    return waiverSortDir==='asc'?cmp:-cmp;
+  });
   if(!list.length){document.getElementById('waiverContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);">No players found</div>';return;}
-  document.getElementById('waiverContent').innerHTML=list.map(p=>`
-    <div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;">
-      <div class="pav" style="background:${tc(p.team)};width:36px;height:36px;font-size:13px;">${ini(p.name)}</div>
-      <div style="flex:1;min-width:0;"><div class="pn">${p.name}<span class="pb2">${p.pos}</span></div>
-      <div class="pd">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div></div>
-      <button onclick="openWaiver(${p.id})" style="background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:7px;padding:6px 11px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--accent);cursor:pointer;flex-shrink:0;">Claim</button>
-    </div>`).join('');
+  const arrow=(key)=>waiverSortKey===key?(waiverSortDir==='desc'?' ▼':' ▲'):'';
+  document.getElementById('waiverContent').innerHTML=`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="overflow:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:${CURRENT_SPORT==='nba'?'980':'900'}px;">
+          <thead>
+            <tr style="background:var(--bg3);border-bottom:1px solid var(--border);">
+              ${cols.map(col=>`<th onclick="toggleWaiverSort('${col.key}')" style="padding:10px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${waiverSortKey===col.key?'var(--accent)':'var(--text3)'};text-align:${col.align||'right'};cursor:pointer;white-space:nowrap;">${col.label}${arrow(col.key)}</th>`).join('')}
+              <th style="padding:10px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map(p=>`<tr style="border-bottom:1px solid rgba(30,45,69,.6);">
+              ${cols.map(col=>`<td style="padding:10px 12px;font-size:12px;color:${col.key==='fp'?'var(--accent)':'var(--text2)'};text-align:${col.align||'right'};vertical-align:middle;${col.key==='fp'?'font-family:var(--fd);font-size:16px;font-weight:800;':''}">${waiverCell(p,col.key)}</td>`).join('')}
+              <td style="padding:10px 12px;text-align:right;"><button onclick="openWaiver(${p.id})" style="background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:7px;padding:6px 11px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--accent);cursor:pointer;flex-shrink:0;">Claim</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 function openWaiver(pid){

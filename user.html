@@ -486,7 +486,7 @@ async function submitGuestbookEntry(){
   const gifEl=document.getElementById('guestbookGif');
   const message=String(messageEl?.value||'').trim();
   const gifURL=String(gifEl?.value||'').trim();
-  if(!message) return alert('Write a message first.');
+  if(!message && !gifURL) return alert('Add a message or a GIF first.');
   const meSnap=await db.ref('users/' + currentAuthUser.uid).once('value').catch(() => null);
   const me=meSnap?.val?.() || {};
   const ref=db.ref('guestbooks/' + viewedNumber).push();
