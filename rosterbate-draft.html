@@ -318,6 +318,17 @@
 .rb-home-link{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;}
 .rb-home-link span{color:var(--accent);}
 .rb-home-link:hover{opacity:.85;}
+.advbox{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,.5);}
+.advhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.advtitle{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
+.advsub{font-size:11px;color:var(--text3);margin-top:2px;}
+.advgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.scoregrid{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin-top:12px;}
+.scoregrid .sh{font-family:var(--fd);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.scoregrid .slbl{font-size:12px;color:var(--text2);padding:7px 0;border-bottom:1px solid rgba(30,45,69,.7);}
+.scoregrid .sval{padding:5px 0;border-bottom:1px solid rgba(30,45,69,.7);}
+.scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
+.scoregrid input:focus{border-color:var(--accent);}
 ::-webkit-scrollbar{width:0;height:0;}
 </style>
 </head>
@@ -339,7 +350,7 @@
       <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="5"/></div>
     </div>
     <div class="two">
-      <div class="fr"><label>Rounds</label><input type="number" id="iRounds" min="5" max="25" value="13"/></div>
+      <div class="fr"><label>Rounds</label><input type="number" id="iRounds" min="5" max="25" value="13" readonly/></div>
       <div class="fr" id="iBudgetRow" style="display:none"><label>Budget ($)</label><input type="number" id="iBudget" min="50" max="1000" value="200"/></div>
     </div>
     <div class="fr">
@@ -370,6 +381,21 @@
         <div class="chip" data-v="120" onclick="cc('cTimer',this)">2 min</div>
         <div class="chip on" data-v="0" onclick="cc('cTimer',this)">Off</div>
       </div>
+    </div>
+    <div class="advbox">
+      <div class="advhead">
+        <div>
+          <div class="advtitle">Custom League Rules</div>
+          <div class="advsub">Deeper roster and scoring controls, like the commissioner tools on the big fantasy sites.</div>
+        </div>
+      </div>
+      <div class="advgrid">
+        <div class="fr"><label>Starters</label><input type="number" id="iStarters" readonly></div>
+        <div class="fr"><label>Bench Spots</label><input type="number" id="iBench" min="2" max="20" value="5" onchange="syncRosterRules()"></div>
+        <div class="fr"><label>IR / IL Slots</label><input type="number" id="iIr" min="0" max="6" value="1" onchange="syncRosterRules()"></div>
+        <div class="fr"><label>Total Roster Size</label><input type="number" id="iRosterTotal" readonly></div>
+      </div>
+      <div class="scoregrid" id="scoreGrid"></div>
     </div>
     <div class="errmsg" id="err"></div>
     <button class="btn" id="enterDraftBtn" onclick="startDraft()">Enter Draft Room</button>
@@ -1073,7 +1099,52 @@ const SCR_INFO={
 
 const SPORT = getSelectedRosterbateSport();
 const SPORT_CFG = getRosterbateSportConfig(SPORT);
+const SPORT_RULES = getRosterbateLeagueRuleDefaults(SPORT);
 let PLAYERS = [];
+
+function currentLeagueRules(){
+  const bench=Math.max(0, parseInt(document.getElementById('iBench')?.value)||0);
+  const irSlots=Math.max(0, parseInt(document.getElementById('iIr')?.value)||0);
+  const scoring={...SPORT_RULES.scoring};
+  Object.keys(scoring).forEach(key=>{
+    const input=document.getElementById('score_'+key);
+    if(input) scoring[key]=parseFloat(input.value)||0;
+  });
+  return {
+    starters:SPORT_RULES.starters,
+    benchSlots:bench,
+    irSlots,
+    rosterSize:SPORT_RULES.starters+bench+irSlots,
+    scoring
+  };
+}
+
+function syncRosterRules(){
+  const starters=SPORT_RULES.starters;
+  const bench=Math.max(0, parseInt(document.getElementById('iBench')?.value)||0);
+  const irSlots=Math.max(0, parseInt(document.getElementById('iIr')?.value)||0);
+  const total=starters+bench+irSlots;
+  const totalEl=document.getElementById('iRosterTotal');
+  const roundsEl=document.getElementById('iRounds');
+  if(document.getElementById('iStarters')) document.getElementById('iStarters').value=starters;
+  if(totalEl) totalEl.value=total;
+  if(roundsEl) roundsEl.value=total;
+}
+
+function renderAdvancedLeagueRules(prefill){
+  const rules={...SPORT_RULES,...(prefill||{})};
+  if(document.getElementById('iStarters')) document.getElementById('iStarters').value=rules.starters;
+  if(document.getElementById('iBench')) document.getElementById('iBench').value=rules.benchSlots;
+  if(document.getElementById('iIr')) document.getElementById('iIr').value=rules.irSlots;
+  const grid=document.getElementById('scoreGrid');
+  if(grid){
+    const labels=rules.scoringLabels||SPORT_RULES.scoringLabels;
+    const scoring={...SPORT_RULES.scoring,...(rules.scoring||{})};
+    grid.innerHTML=`<div class="sh">Scoring Stat</div><div class="sh" style="text-align:right;">Points</div>`+
+      Object.keys(scoring).map(key=>`<div class="slbl">${labels[key]||key}</div><div class="sval"><input type="number" id="score_${key}" step="0.1" value="${scoring[key]}"></div>`).join('');
+  }
+  syncRosterRules();
+}
 
 function cc(gid,el){
   document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('on'));
@@ -1125,6 +1196,7 @@ function applySportToDraftUI(){
     chip.classList.toggle('on', chip.dataset.v === SPORT_CFG.defaultScoring);
   });
   document.getElementById('iScoringInfo').textContent = SPORT_CFG.scoringInfo[SPORT_CFG.defaultScoring];
+  renderAdvancedLeagueRules();
   updatePosFilterBar();
   S.scr = SPORT_CFG.defaultScoring;
   S.rds = SPORT_CFG.defaultRounds;
@@ -1132,12 +1204,33 @@ function applySportToDraftUI(){
   S.posF = 'ALL';
 }
 
+function applySavedLobbySettings(){
+  try{
+    const raw=localStorage.getItem('rbMultiplayerLobby');
+    if(!raw) return;
+    const state=JSON.parse(raw);
+    if(!state || (state.sport && state.sport!==SPORT)) return;
+    if(state.myName) document.getElementById('iName').value=state.myName;
+    if(state.teamSize) document.getElementById('iSize').value=state.teamSize;
+    if(state.format){
+      document.querySelectorAll('#cFormat .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===state.format));
+      document.getElementById('iFormatInfo').textContent=FMT_INFO[state.format]||FMT_INFO.snake;
+    }
+    if(state.scoring){
+      document.querySelectorAll('#cScoring .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===state.scoring));
+      document.getElementById('iScoringInfo').textContent=SPORT_CFG.scoringInfo[state.scoring]||SPORT_CFG.scoringInfo[SPORT_CFG.defaultScoring];
+    }
+    if(state.settings) renderAdvancedLeagueRules(state.settings);
+  }catch(e){}
+}
+
 function startDraft(){
   const e=document.getElementById('err');
   e.classList.remove('show');
+  const rules=currentLeagueRules();
   const ls=parseInt(document.getElementById('iSize').value);
   const sp=parseInt(document.getElementById('iSpot').value);
-  const rd=parseInt(document.getElementById('iRounds').value);
+  const rd=rules.rosterSize;
   if(isNaN(ls)||ls<2||ls>20){e.textContent='League size must be 2–20.';e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
@@ -1146,6 +1239,7 @@ function startDraft(){
   S.name=document.getElementById('iName').value.trim()||'My Team';
   S.ls=ls;S.myPos=sp-1;S.rds=rd;
   S.fmt=gv('cFormat');S.scr=gv('cScoring');
+  S.rules=rules;
   S.sport=SPORT;
   S.tmax=parseInt(gv('cTimer'))||0;
   S.abud=parseInt(document.getElementById('iBudget').value)||200;
@@ -1294,7 +1388,7 @@ function confAuction(){
 
 // PLAYER MODAL
 function calcFP(p){
-  if(SPORT!=='nba') return getRosterbatePlayerFantasyScore(SPORT,p);
+  if(SPORT!=='nba') return getRosterbatePlayerFantasyScore(SPORT,p,S.rules?.scoring);
   if(S.scr==='h2h_pts'||S.scr==='points')
     return Math.round((p.pts+p.reb*1.2+p.ast*1.5+p.stl*3+p.blk*3-p.to+p.tpm*0.5)*10)/10;
   return p.fp;
@@ -1863,18 +1957,30 @@ function endDraft(){
     scoringFormat: S.scr,
     draftFormat: S.fmt,
     rounds: S.rds,
+    customRules: S.rules,
+    commissionerSettings: {
+      numTeams:S.ls,
+      draftType:S.fmt.charAt(0).toUpperCase()+S.fmt.slice(1),
+      timePerPick:S.tmax,
+      scoringType:S.scr==='h2h_cat'?'H2H Categories':S.scr==='roto'?'Rotisserie':'H2H Points',
+      rosterSize:S.rules?.rosterSize||S.rds,
+      totalStarters:S.rules?.starters||SPORT_RULES.starters,
+      totalBench:S.rules?.benchSlots||SPORT_RULES.benchSlots,
+      irSlots:S.rules?.irSlots||SPORT_RULES.irSlots,
+      scoring:S.rules?.scoring||SPORT_RULES.scoring
+    },
     myPos: S.myPos,
     teams: S.teams,
     picks: S.picks,
     myRoster: S.myTeam.map(p=>({
       id:p.id, name:p.name, team:p.team, pos:p.pos,
       pts:p.pts, reb:p.reb, ast:p.ast, stl:p.stl,
-      blk:p.blk, to:p.to, fgp:p.fgp, ftp:p.ftp, tpm:p.tpm, fp:p.fp
+      blk:p.blk, to:p.to, fgp:p.fgp, ftp:p.ftp, tpm:p.tpm, fp:p.fp, statValues:p.statValues||null, statSummary:p.statSummary||''
     })),
     allRosters: S.teams.map((_,ti)=>{
       return S.picks.filter(pk=>pk.ti===ti).map(pk=>{
         const p=PLAYERS.find(x=>x.id===pk.pid);
-        return p?{id:p.id,name:p.name,team:p.team,pos:p.pos,pts:p.pts,reb:p.reb,ast:p.ast,stl:p.stl,blk:p.blk,to:p.to,fgp:p.fgp,ftp:p.ftp,tpm:p.tpm,fp:p.fp}:null;
+        return p?{id:p.id,name:p.name,team:p.team,pos:p.pos,pts:p.pts,reb:p.reb,ast:p.ast,stl:p.stl,blk:p.blk,to:p.to,fgp:p.fgp,ftp:p.ftp,tpm:p.tpm,fp:p.fp,statValues:p.statValues||null,statSummary:p.statSummary||''}:null;
       }).filter(Boolean);
     }),
     isCommissioner: !!PS.isAdmin,
@@ -1894,7 +2000,7 @@ function endDraft(){
   const topPick = myRoster[0];
   document.getElementById('dcTopPick').textContent = topPick ? topPick.name + ' (' + topPick.pos + ' · ' + topPick.team + ')' : '—';
 
-  const projTotal = myRoster.reduce((s,p)=>s+p.fp,0).toFixed(1);
+  const projTotal = myRoster.reduce((s,p)=>s+calcFP(p),0).toFixed(1);
   document.getElementById('dcProjTotal').textContent = projTotal + ' FP';
 
   // Build roster list
@@ -2711,6 +2817,7 @@ function rbScheduleAiMsg(){
 // Post system message on load
 (function(){
   applySportToDraftUI();
+  applySavedLobbySettings();
   rbLoadChat();
   const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
   // Only post system msg if no recent one

@@ -32,6 +32,11 @@
       teamCodes:['ARI','ATL','BAL','BOS','CHC','CWS','CIN','CLE','COL','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WSH']
     }
   };
+  const SCORING_LABELS = {
+    nba:{PTS:'Points',REB:'Rebounds',AST:'Assists',STL:'Steals',BLK:'Blocks',TO:'Turnovers','3PM':'3-Pointers Made',FGM:'Field Goals Made',FGA:'Field Goals Attempted',FTM:'Free Throws Made',FTA:'Free Throws Attempted'},
+    nfl:{PASS_YDS:'Passing Yards',PASS_TD:'Passing TD',INT:'Interceptions Thrown',RUSH_YDS:'Rushing Yards',RUSH_TD:'Rushing TD',REC:'Receptions',REC_YDS:'Receiving Yards',REC_TD:'Receiving TD',FUM:'Fumbles Lost',FG:'Field Goals Made',XP:'Extra Points Made',SACK:'Defense Sacks',DEF_TO:'Defense Takeaways',DEF_TD:'Defense TD'},
+    mlb:{SINGLE:'Singles',DOUBLE:'Doubles',TRIPLE:'Triples',HR:'Home Runs',RBI:'Runs Batted In',RUN:'Runs Scored',BB:'Walks',SB:'Stolen Bases',IP:'Innings Pitched',SO:'Strikeouts',W:'Wins',SV:'Saves',ER:'Earned Runs'}
+  };
 
   function normalizeSportKey(value){ const key=String(value||'').trim().toLowerCase(); return SPORT_CONFIG[key]?key:'nba'; }
   function getSelectedSport(){ const params=new URLSearchParams(window.location.search||''); const query=params.get('sport'); const saved=window.localStorage?localStorage.getItem(STORAGE_KEY):''; return normalizeSportKey(query||saved||'nba'); }
@@ -53,11 +58,24 @@
           fp:player.fp,
           adp:player.adp,
           statSummary:player.statSummary,
+          statValues:player.statValues?Object.assign({},player.statValues):null,
           detailStats:(player.detailStats||[]).map(function(stat){
             return {label:stat.label,value:stat.value};
           })
         };
       });
+  }
+  function calcImportedScore(player, scoringMap){
+    const stats=player&&player.statValues;
+    if(!stats||!scoringMap) return null;
+    let total=0, used=false;
+    Object.keys(scoringMap).forEach(function(key){
+      const weight=Number(scoringMap[key]);
+      const value=Number(stats[key]||0);
+      if(weight!==0&&value!==0) used=true;
+      total+=value*weight;
+    });
+    return used ? Math.round(total*10)/10 : null;
   }
 
   function nbaPool(count){
@@ -112,6 +130,26 @@
     if(key==='mlb') return mlbPool(target);
     return nbaPool(target);
   }
+  function getPlayerFantasyScore(sport,player,scoringMap){
+    const key=normalizeSportKey(sport);
+    if(key==='nba'){
+      if(scoringMap){
+        const total=
+          (Number(player?.pts||0) * Number(scoringMap.PTS||0)) +
+          (Number(player?.reb||0) * Number(scoringMap.REB||0)) +
+          (Number(player?.ast||0) * Number(scoringMap.AST||0)) +
+          (Number(player?.stl||0) * Number(scoringMap.STL||0)) +
+          (Number(player?.blk||0) * Number(scoringMap.BLK||0)) +
+          (Number(player?.to||0) * Number(scoringMap.TO||0)) +
+          (Number(player?.tpm||0) * Number(scoringMap['3PM']||0));
+        return Math.round(total*10)/10;
+      }
+      return typeof player?.fp==='number' ? player.fp : 0;
+    }
+    const importedScore=calcImportedScore(player, scoringMap||getCommissionerDefaults(key).scoring);
+    if(importedScore!==null) return importedScore;
+    return typeof player?.fp==='number' ? player.fp : 0;
+  }
   function getPlayerSummary(player){ return player&&player.statSummary ? player.statSummary : ''; }
   function getPlayerDetailStats(player){ return player&&player.detailStats ? player.detailStats : []; }
   function getCommissionerDefaults(sport){
@@ -120,6 +158,19 @@
     if(key==='mlb') return {scoringType:'Points',positions:{C:{starters:1,max:2},'1B':{starters:1,max:2},'2B':{starters:1,max:2},'3B':{starters:1,max:2},SS:{starters:1,max:2},OF:{starters:3,max:6},UTIL:{starters:1,max:3},SP:{starters:2,max:6},RP:{starters:1,max:4},P:{starters:1,max:4},BN:{starters:7,max:'No Limit'},IL:{starters:1,max:3}},scoring:{SINGLE:1,DOUBLE:2,TRIPLE:3,HR:4,RBI:1,RUN:1,BB:1,SB:2,IP:3,SO:1,W:5,SV:5,ER:-2}};
     return {scoringType:'H2H Points',positions:{PG:{starters:1,max:3},SG:{starters:1,max:3},SF:{starters:1,max:3},PF:{starters:1,max:3},C:{starters:1,max:3},G:{starters:1,max:3},F:{starters:1,max:3},UTIL:{starters:1,max:3},BE:{starters:5,max:'No Limit'},IR:{starters:1,max:3}},scoring:{FGM:2,FGA:-1,FTM:1,FTA:-1,'3PM':1,REB:1,AST:2,STL:4,BLK:4,TO:-2,PTS:1}};
   }
+  function getLeagueRuleDefaults(sport){
+    const key=normalizeSportKey(sport), cfg=getSportConfig(key), comm=getCommissionerDefaults(key), slots=cfg.myTeamSlots||[], irKey=key==='mlb'?'IL':'IR', starterCount=(cfg.starterSlots||[]).length, irCount=slots.filter(function(slot){ return slot===irKey; }).length || 1, benchCount=slots.length - starterCount - irCount;
+    return {
+      rounds:cfg.defaultRounds,
+      rosterSize:cfg.defaultRounds,
+      starters:starterCount,
+      benchSlots:Math.max(3,benchCount),
+      irSlots:irCount,
+      scoring:Object.assign({},comm.scoring),
+      scoringLabels:Object.assign({},SCORING_LABELS[key]||{}),
+      positions:Object.assign({},comm.positions)
+    };
+  }
 
   window.RB_SPORT_CONFIG = SPORT_CONFIG;
   window.normalizeRosterbateSport = normalizeSportKey;
@@ -127,8 +178,10 @@
   window.setSelectedRosterbateSport = setSelectedSport;
   window.getRosterbateSportConfig = getSportConfig;
   window.buildRosterbateSportPlayerPool = buildSportPlayerPool;
+  window.getRosterbatePlayerFantasyScore = getPlayerFantasyScore;
   window.getRosterbateTeamColor = getTeamColor;
   window.getRosterbatePlayerSummary = getPlayerSummary;
   window.getRosterbatePlayerDetailStats = getPlayerDetailStats;
   window.getRosterbateCommissionerDefaults = getCommissionerDefaults;
+  window.getRosterbateLeagueRuleDefaults = getLeagueRuleDefaults;
 })();

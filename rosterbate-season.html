@@ -618,6 +618,10 @@ function getStarterIdsForTeamDay(teamIdx,day){
   return [...(G.starters[teamIdx]||[])];
 }
 
+function getSportAwareFantasyScore(player){
+  return getRosterbatePlayerFantasyScore(CURRENT_SPORT,player,CS?.scoring)||0;
+}
+
 function getTeamDayScoreDetails(teamIdx,day){
   const week=weekForDay(day);
   const roster=G.rosters[teamIdx]||[];
@@ -630,7 +634,7 @@ function getTeamDayScoreDetails(teamIdx,day){
     const game=getGameInfo(p,day);
     const injury=getInjuryStatus(p,week);
     const unavailable=isUnavailableInjury(injury);
-    const baseScore=(game&&!unavailable)?p.fp:0;
+    const baseScore=(game&&!unavailable)?getSportAwareFantasyScore(p):0;
     return {player:p,baseScore,finalScore:baseScore,game,injury,unavailable,source:'starter'};
   }).filter(Boolean);
 
@@ -664,7 +668,7 @@ function getTeamDayScoreDetails(teamIdx,day){
       const game=getGameInfo(p,day);
       const injury=getInjuryStatus(p,week);
       const unavailable=isUnavailableInjury(injury);
-      const baseScore=(game&&!unavailable)?p.fp*0.25:0;
+      const baseScore=(game&&!unavailable)?getSportAwareFantasyScore(p)*0.25:0;
       if(baseScore>0) benchEntries.push({player:p,baseScore,finalScore:baseScore,game,injury,unavailable,source:'bench'});
     });
   }
@@ -1659,17 +1663,19 @@ function initCS(){
   if(!CS){
     try{
       const raw=localStorage.getItem('rosterbateCS');
+      const draftSettings=D?.commissionerSettings||null;
       if(raw){
         const parsed=JSON.parse(raw);
         const base=defaultCS();
         CS={
           ...base,
+          ...(draftSettings||{}),
           ...parsed,
-          positions:{...base.positions,...(parsed.positions||{})},
-          scoring:{...base.scoring,...(parsed.scoring||{})}
+          positions:{...base.positions,...(draftSettings?.positions||{}),...(parsed.positions||{})},
+          scoring:{...base.scoring,...(draftSettings?.scoring||{}),...(parsed.scoring||{})}
         };
       }else{
-        CS=defaultCS();
+        CS={...defaultCS(),...(draftSettings||{}),positions:{...defaultCS().positions,...(draftSettings?.positions||{})},scoring:{...defaultCS().scoring,...(draftSettings?.scoring||{})}};
       }
     }
     catch(e){ CS=defaultCS(); }
