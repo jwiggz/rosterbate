@@ -726,7 +726,20 @@ window.onload=function(){
   applySportContext(CURRENT_SPORT);
   let raw=null;
   try{raw=localStorage.getItem('rosterbateDraft');}catch(e){}
-  if(raw){try{D=JSON.parse(raw);if(typeof D.isCommissioner!=='boolean') D.isCommissioner=true;applySportContext(D.sport||CURRENT_SPORT);initSeason();goPage('hub');}catch(e){console.error(e);}}
+  if(raw){
+    try{
+      const parsed=JSON.parse(raw);
+      if(typeof parsed.isCommissioner!=='boolean') parsed.isCommissioner=true;
+      const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
+      const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
+      if(savedSport===requestedSport){
+        D=parsed;
+        applySportContext(savedSport);
+        initSeason();
+        goPage('hub');
+      }
+    }catch(e){console.error(e);}
+  }
 };
 
 function loadDemo(){
