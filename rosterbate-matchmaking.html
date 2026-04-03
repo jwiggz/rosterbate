@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>RosterBate â€” Find a League</title>
+<title>RosterBate - Find a League</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -135,16 +135,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <!-- MATCHMAKING LOBBY -->
 <div id="mmLobby" class="screen active">
   <div class="ph" style="position:relative;">
-    <button class="bb" onclick="history.back()" style="position:absolute;left:14px;">â†</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;">ðŸ† Roster<span>Bate</span></a>
-    <div id="mmOnline" style="margin-left:auto;font-family:var(--fd);font-size:11px;font-weight:700;color:var(--green);">â— connectingâ€¦</div>
+    <button class="bb" onclick="history.back()" style="position:absolute;left:14px;">&larr;</button>
+    <a href="index.html" class="rb-home-link" style="margin:0 auto;">Roster<span>Bate</span></a>
+    <div id="mmOnline" style="margin-left:auto;font-family:var(--fd);font-size:11px;font-weight:700;color:var(--green);">connecting...</div>
   </div>
   <div class="mm-tabs">
-    <button class="mm-tab on" onclick="mmTab('quick',this)">âš¡ Quick</button>
+    <button class="mm-tab on" onclick="mmTab('quick',this)">Quick</button>
     <button class="mm-tab" onclick="mmTab('live',this)">Live</button>
     <button class="mm-tab" onclick="mmTab('browse',this)">Browse</button>
     <button class="mm-tab" onclick="mmTab('create',this)">+ Create</button>
-    <button class="mm-tab" onclick="mmTab('private',this)">ðŸ”’ Private</button>
+    <button class="mm-tab" onclick="mmTab('private',this)">Private</button>
   </div>
   <div class="sb" id="mmTabContent"></div>
 </div>
@@ -152,7 +152,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <!-- WAITING ROOM -->
 <div id="mmWaiting" class="screen">
   <div class="ph">
-    <button class="bb" onclick="mmLeaveWaiting()">â†</button>
+    <button class="bb" onclick="mmLeaveWaiting()">&larr;</button>
     <div class="pt" id="wrTitle">Waiting Room</div>
     <div id="wrCode" style="margin-left:auto;font-family:var(--fd);font-size:13px;font-weight:800;color:var(--accent);"></div>
   </div>
@@ -163,7 +163,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div id="wrPlayers"></div>
     </div>
     <div id="wrReadySection">
-      <button class="ready-btn" id="wrReadyBtn" onclick="mmToggleReady()">âœ“ Ready Up</button>
+      <button class="ready-btn" id="wrReadyBtn" onclick="mmToggleReady()">Ready Up</button>
       <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3);" id="wrReadyCount"></div>
       <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>
     </div>
@@ -178,8 +178,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="ct">Lobby Chat</div>
       <div id="wrChat" style="min-height:60px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:8px;"></div>
       <div style="display:flex;gap:6px;">
-        <input type="text" class="input" id="wrChatInput" placeholder="Say somethingâ€¦" onkeydown="if(event.key==='Enter')mmSendLobbyChat()" style="flex:1;">
-        <button onclick="mmSendLobbyChat()" style="background:var(--accent);border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:16px;cursor:pointer;">âž¤</button>
+        <input type="text" class="input" id="wrChatInput" placeholder="Say something..." onkeydown="if(event.key==='Enter')mmSendLobbyChat()" style="flex:1;">
+        <button onclick="mmSendLobbyChat()" style="background:var(--accent);border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:16px;cursor:pointer;">Send</button>
       </div>
     </div>
   </div>
@@ -309,7 +309,7 @@ function globalChatShell(){
         </div>
         <div class="global-chat-room">${myIsAdmin ? 'Admin Online · Matchmaking Hub' : 'Matchmaking Hub'}</div>
       </div>
-      <div id="mmGlobalChatFeed" class="global-chat-feed"><div class="empty"><div class="empty-icon">??</div><div class="empty-title">Loading chat…</div></div></div>
+      <div id="mmGlobalChatFeed" class="global-chat-feed"><div class="empty"><div class="empty-icon">...</div><div class="empty-title">Loading chat...</div></div></div>
       <div class="global-chat-compose">
         <textarea id="mmGlobalChatInput" class="input global-chat-input" placeholder="Post your code, format, or whatever the room needs…" onkeydown="mmHandleGlobalChatKey(event)"></textarea>
         <button class="btn-p" style="width:auto;min-width:150px;" onclick="mmSendGlobalChat()">Send</button>
@@ -640,7 +640,7 @@ async function startSearch(){
   if(!name){ toast('Enter your team name first','var(--red)'); return; }
   myName=name; localStorage.setItem('rbPlayerName',name);
   const btn=document.getElementById('quickBtn');
-  btn.disabled=true; btn.textContent='ðŸ” Searchingâ€¦';
+  btn.disabled=true; btn.textContent='Searching...';
 
   try{
     const snap = await db.ref('lobbies').once('value');
@@ -658,16 +658,16 @@ async function startSearch(){
       });
     }
     if(found){
-      toast('Found a league! Joiningâ€¦','var(--blue)');
+      toast('Found a league! Joining...','var(--blue)');
       await joinLobby(found.id);
     } else {
-      toast('No match found â€” creating a new league!');
+      toast('No match found - creating a new league!');
       await createAndJoinLobby({name:`${name}'s League`,sport:MM_SPORT,...quickState,settings:JSON.parse(JSON.stringify(MM_RULES_DEFAULT)),isPrivate:false});
     }
   }catch(e){
     console.error(e);
-    btn.disabled=false; btn.textContent='ðŸ” Find a League';
-    toast('Connection error â€” check Firebase config','var(--red)');
+    btn.disabled=false; btn.textContent='Find a League';
+    toast('Connection error - check Firebase config','var(--red)');
   }
 }
 
@@ -688,7 +688,7 @@ function renderLive(){
 async function loadLiveDrafts(){
   const list=document.getElementById('liveDraftList');
   if(!list) return;
-  list.innerHTML='<div class="empty"><div class="empty-icon">Ã°Å¸Ââ‚¬</div><div class="empty-title">LoadingÃ¢â‚¬Â¦</div></div>';
+  list.innerHTML='<div class="empty"><div class="empty-icon">...</div><div class="empty-title">Loading...</div></div>';
   try{
     const snap=await db.ref('lobbies').once('value');
     if(!snap.exists()){ list.innerHTML=emptyHtml('No live drafts','When one of your leagues starts, it will appear here.'); return; }
@@ -779,7 +779,7 @@ function setBrowseFilter(key, val, el){
 async function loadBrowse(){
   const list=document.getElementById('browseList');
   if(!list) return;
-  list.innerHTML='<div class="empty"><div class="empty-icon">ðŸ“¡</div><div class="empty-title">Loadingâ€¦</div></div>';
+  list.innerHTML='<div class="empty"><div class="empty-icon">...</div><div class="empty-title">Loading...</div></div>';
   try{
     const snap=await db.ref('lobbies').once('value');
     if(!snap.exists()){ list.innerHTML=emptyHtml('No open leagues','Create one or use Quick Match!'); return; }
@@ -809,7 +809,7 @@ async function loadBrowse(){
       const count=players.length;
       const full=count>=l.teamSize;
       const open=l.teamSize-count;
-      const fmtLabel={snake:'ðŸ Snake',auction:'ðŸ’° Auction',linear:'âž¡ï¸ Linear'}[l.format]||l.format;
+      const fmtLabel={snake:'Snake',auction:'Auction',linear:'Linear'}[l.format]||l.format;
       const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points'}[l.scoring]||l.scoring;
       const avs=players.slice(0,5).map(p=>`<div class="lobby-av" style="background:${playerColor(p.id||'x')}">${ini(p.name)}</div>`).join('');
       return `<div class="lobby-card" style="margin-bottom:8px;">
@@ -834,7 +834,7 @@ async function loadBrowse(){
   }catch(e){ console.error(e); list.innerHTML=emptyHtml('Error loading','Check your Firebase config'); }
 }
 
-function emptyHtml(title,desc){ return `<div class="empty"><div class="empty-icon">ðŸ€</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`; }
+function emptyHtml(title,desc){ return `<div class="empty"><div class="empty-icon">-</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`; }
 
 // â”€â”€ CREATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderCreate(){
@@ -902,12 +902,12 @@ async function doCreate(){
   myName=name; localStorage.setItem('rbPlayerName',name);
   createOpts.settings=getCreateRules();
   const btn=document.getElementById('createBtn');
-  btn.disabled=true; btn.textContent='Creatingâ€¦';
+  btn.disabled=true; btn.textContent='Creating...';
   try{
     await createAndJoinLobby({name:league,sport:MM_SPORT,...createOpts});
   }catch(e){
     console.error('Create league failed', e);
-    btn.disabled=false; btn.textContent='Create League â†’';
+    btn.disabled=false; btn.textContent='Create League ->';
     toast(e?.code||e?.message||'Error creating league','var(--red)');
   }
 }
@@ -944,14 +944,14 @@ async function doJoinPrivate(){
     if(!snap.exists()){ toast('Code not found','var(--red)'); return; }
     let found=null;
     snap.forEach(c=>{ if(c.val().code===code) found={id:c.key,...c.val()}; });
-    if(!found){ toast('League not found â€” check the code','var(--red)'); return; }
+    if(!found){ toast('League not found - check the code','var(--red)'); return; }
     if(found.status==='started'){
       if((found.players||{})[myId]){ openLiveDraft(found); return; }
       toast('That league is already in progress','var(--red)');
       return;
     }
     await joinLobby(found.id);
-  }catch(e){ toast('Error joining â€” try again','var(--red)'); }
+  }catch(e){ toast('Error joining - try again','var(--red)'); }
 }
 
 // â”€â”€ CORE FUNCTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1041,7 +1041,7 @@ function renderWaitingRoom(lobby){
   document.getElementById('wrTitle').textContent=lobby.name||'Waiting Room';
   document.getElementById('wrCode').textContent='#'+lobby.code;
 
-  const fmtLabel={snake:'ðŸ Snake',auction:'ðŸ’° Auction',linear:'âž¡ï¸ Linear'}[lobby.format]||lobby.format;
+  const fmtLabel={snake:'Snake',auction:'Auction',linear:'Linear'}[lobby.format]||lobby.format;
   const scrLabel={h2h_pts:'H2H Points',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only'}[lobby.scoring]||lobby.scoring;
   document.getElementById('wrInfo').innerHTML=`
     <div style="display:flex;flex-wrap:wrap;gap:6px;">
@@ -1057,11 +1057,11 @@ function renderWaitingRoom(lobby){
       <div class="wr-av" style="background:${playerColor(p.id)}">${ini(p.name)}</div>
       <div style="flex:1;">
         <div style="font-family:var(--fd);font-size:14px;font-weight:700;">${p.name}${p.id===myId?' (You)':''}</div>
-        <div style="font-size:11px;color:${p.ready?'var(--green)':'var(--text3)'};">${p.ready?'âœ“ Ready':'Waitingâ€¦'}</div>
+        <div style="font-size:11px;color:${p.ready?'var(--green)':'var(--text3)'};">${p.ready?'Ready':'Waiting...'}</div>
       </div>
       ${lobby.createdBy===p.id?'<span style="font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;color:var(--accent);">Host</span>':''}
     </div>`).join('');
-  for(let i=players.length;i<lobby.teamSize;i++) ph+=`<div class="wr-slot"><div class="wr-slot-av"></div><div style="font-size:13px;color:var(--text3);">Waiting for player ${i+1}â€¦</div></div>`;
+  for(let i=players.length;i<lobby.teamSize;i++) ph+=`<div class="wr-slot"><div class="wr-slot-av"></div><div style="font-size:13px;color:var(--text3);">Waiting for player ${i+1}...</div></div>`;
   document.getElementById('wrPlayers').innerHTML=ph;
 
   const readyCount=players.filter(p=>p.ready).length;
@@ -1069,7 +1069,7 @@ function renderWaitingRoom(lobby){
   const myP=lobby.players?.[myId];
   myReady=myP?.ready||false;
   const rb=document.getElementById('wrReadyBtn');
-  if(rb){ rb.textContent=myReady?'âœ“ Ready!':'âœ“ Ready Up'; rb.className=myReady?'ready-btn is-ready':'ready-btn'; }
+  if(rb){ rb.textContent=myReady?'Ready!':'Ready Up'; rb.className=myReady?'ready-btn is-ready':'ready-btn'; }
 
   // Render chat
   const chatMsgs=Object.entries(lobby.chat||{}).map(([id,val])=>({...(val||{}),_id:id})).sort((a,b)=>a.ts-b.ts);

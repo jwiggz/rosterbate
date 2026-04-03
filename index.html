@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="RosterBate — The ultimate multi-sport fantasy experience. Play fantasy sports against AI or real people across NBA, NFL, and MLB.">
+<meta name="description" content="RosterBate — The ultimate multi-sport fantasy experience. Play fantasy sports against AI or real people across Basketball, Football, and Baseball.">
 <title>RosterBate — Multi-Sport Fantasy</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -283,15 +283,15 @@
     <div class="sport-grid">
       <div class="sport-card active" data-sport="nba" onclick="selectSportCard('nba')">
         <div class="sport-icon">🏀</div>
-        <div class="sport-name">NBA</div>
+        <div class="sport-name">Basketball</div>
       </div>
       <div class="sport-card" data-sport="nfl" onclick="selectSportCard('nfl')">
         <div class="sport-icon">🏈</div>
-        <div class="sport-name">NFL</div>
+        <div class="sport-name">Football</div>
       </div>
       <div class="sport-card" data-sport="mlb" onclick="selectSportCard('mlb')">
         <div class="sport-icon">⚾</div>
-        <div class="sport-name">MLB</div>
+        <div class="sport-name">Baseball</div>
       </div>
       
       
@@ -392,7 +392,7 @@
       <div class="step-num">1</div>
       <div>
         <h3>Pick Your Sport & Mode</h3>
-        <p>Choose from NBA, NFL, and MLB. Play solo against AI or invite real people to your league.</p>
+        <p>Choose from Basketball, Football, and Baseball. Play solo against AI or invite real people to your league.</p>
       </div>
     </div>
     <div class="step">
@@ -427,7 +427,7 @@
 
   <footer>
     <p>🏆 <strong>RosterBate</strong> — Multi-Sport Fantasy Platform</p>
-    <p style="margin-top:6px;">NBA · NFL · MLB</p>
+    <p style="margin-top:6px;">Basketball · Football · Baseball</p>
     <p style="margin-top:10px;font-size:11px;">Play against AI or real people · Free to play · Built for fans</p>
     <p style="margin-top:12px;font-size:11px;line-height:1.6;color:var(--text3);max-width:760px;margin-left:auto;margin-right:auto;">RosterBate is an independent fantasy sports platform not affiliated with or endorsed by the NBA, NFL, MLB, or any of their teams.</p>
   </footer>
@@ -635,7 +635,7 @@ const auth = firebase.auth();
 const db = firebase.database();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
-const HOME_SPORT_LABELS = { nba:'NBA', nfl:'NFL', mlb:'MLB' };
+const HOME_SPORT_LABELS = { nba:'Basketball', nfl:'Football', mlb:'Baseball' };
 let selectedHomeSport = getSelectedRosterbateSport();
 
 function updateHomeSportUI(){
