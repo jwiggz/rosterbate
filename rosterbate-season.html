@@ -1027,7 +1027,12 @@ window.onload=function(){
       const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
       const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
       if(savedSport===requestedSport){
-        D=parsed;
+        if(isDemoSeasonData(parsed) && !hasMostlyRealImportedPlayers(parsed)){
+          D=rebuildDemoSeasonData(savedSport);
+          try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+        } else {
+          D=parsed;
+        }
         applySportContext(savedSport);
         initSeason();
         goPage('hub');
@@ -1061,6 +1066,58 @@ function loadDemo(){
     console.error(e);
     toast('Demo season failed to load.');
   }
+}
+
+function isDemoSeasonData(data){
+  if(!data || !Array.isArray(data.teams)) return false;
+  const expected=getDemoTeamsForSport(data.sport||CURRENT_SPORT);
+  if(data.teams.length!==expected.length) return false;
+  return expected.every((name,idx)=>data.teams[idx]===name);
+}
+function hasMostlyRealImportedPlayers(data){
+  if(!data || !Array.isArray(data.allRosters)) return false;
+  const imported=buildRosterbateSportPlayerPool(data.sport||CURRENT_SPORT, 500);
+  const importedNames=new Set(imported.map(p=>String(p.name||'').trim().toLowerCase()));
+  let total=0, matches=0;
+  data.allRosters.forEach(roster=>{
+    (roster||[]).forEach(player=>{
+      total++;
+      if(importedNames.has(String(player?.name||'').trim().toLowerCase())) matches++;
+    });
+  });
+  if(!total) return false;
+  return (matches/total) >= 0.75;
+}
+function rebuildDemoSeasonData(sport){
+  const targetSport=normalizeRosterbateSport(sport||CURRENT_SPORT);
+  applySportContext(targetSport);
+  const teams=getDemoTeamsForSport(targetSport);
+  const n=teams.length;
+  const rounds=getRosterbateSportConfig(targetSport).defaultRounds;
+  const pool=buildRosterbateSportPlayerPool(targetSport, Math.max(180, n*rounds + 40));
+  const allRosters=Array.from({length:n},()=>[]);
+  for(let r=0;r<rounds;r++){
+    for(let i=0;i<n;i++){
+      const pickIndex=r%2===0?i:n-1-i;
+      const player=pool[(r*n)+pickIndex];
+      if(player) allRosters[pickIndex].push({...player});
+    }
+  }
+  return {
+    sport:targetSport,
+    teamName:teams[0],
+    leagueSize:n,
+    scoringFormat:getRosterbateSportConfig(targetSport).defaultScoring,
+    draftFormat:getRosterbateSportConfig(targetSport).defaultFormat,
+    rounds,
+    myPos:0,
+    teams,
+    picks:allRosters.flatMap((roster,ti)=>roster.map((p,i)=>({ov:ti+i*n+1,round:i+1,ti,pid:p.id}))),
+    myRoster:allRosters[0],
+    allRosters,
+    isCommissioner:true,
+    savedAt:Date.now()
+  };
 }
 
 function initSeason(){
