@@ -128,6 +128,23 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .friend-avatar img{width:100%;height:100%;object-fit:cover;}
 .friend-name{font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;line-height:1;}
 .friend-meta{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
+.guestbook-compose{display:grid;gap:10px;margin-top:12px;}
+.guestbook-row{display:grid;grid-template-columns:1fr 220px auto;gap:10px;align-items:start;}
+.guestbook-input,.guestbook-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;}
+.guestbook-textarea{min-height:88px;resize:vertical;line-height:1.55;}
+.guestbook-input:focus,.guestbook-textarea:focus{border-color:var(--accent);}
+.guestbook-note{font-size:12px;color:var(--text3);line-height:1.55;}
+.guestbook-list{display:grid;gap:10px;margin-top:14px;}
+.guestbook-entry{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:12px;}
+.guestbook-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.guestbook-author{display:flex;align-items:center;gap:10px;min-width:0;}
+.guestbook-author .friend-avatar{width:40px;height:40px;border-radius:14px;}
+.guestbook-name{font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;line-height:1;}
+.guestbook-meta{font-size:11px;color:var(--text3);margin-top:4px;}
+.guestbook-body{font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.guestbook-gif{margin-top:10px;border-radius:14px;overflow:hidden;border:1px solid var(--border);max-width:280px;background:var(--card);}
+.guestbook-gif img{display:block;width:100%;height:auto;}
+.guestbook-delete{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:8px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:#fca5a5;cursor:pointer;flex-shrink:0;}
 .empty{padding:18px;border:1px dashed var(--border);border-radius:14px;color:var(--text3);font-size:13px;text-align:center;}
 @media (max-width:780px){
   .hero{grid-template-columns:1fr;text-align:center;}
@@ -137,6 +154,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .season-list{grid-template-columns:1fr;}
   .friend-list{grid-template-columns:1fr;}
+  .guestbook-row{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -229,6 +247,21 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <div class="card" style="margin-bottom:14px;">
+    <div class="section-title">Guestbook</div>
+    <div class="sub">Leave a permanent note, shoutout, or GIF for this manager.</div>
+    <div id="guestbookComposer" class="guestbook-compose" style="display:none;">
+      <textarea id="guestbookMessage" class="guestbook-textarea" maxlength="280" placeholder="Say something for the guestbook..."></textarea>
+      <div class="guestbook-row">
+        <input id="guestbookGif" class="guestbook-input" type="text" maxlength="500" placeholder="Optional GIF or image URL">
+        <div class="guestbook-note">Posts stay here until the author or the profile owner removes them.</div>
+        <button class="btn primary" type="button" onclick="submitGuestbookEntry()">Sign Guestbook</button>
+      </div>
+    </div>
+    <div id="guestbookPrompt" class="empty" style="margin-top:12px;display:none;">Sign in and open someone else's profile to leave a guestbook post.</div>
+    <div id="guestbookList" class="guestbook-list"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
     <div class="section-title">Lifetime Totals</div>
     <div class="season-list">
       <div class="season-item"><div class="season-title" id="statPF">0.0</div><div class="season-meta">Points For</div></div>
@@ -269,6 +302,7 @@ const PROFILE_THEMES = {
 };
 let currentAuthUser=null;
 let currentViewedProfile=null;
+let currentGuestbookEntries={};
 
 function revealPage(){
   document.getElementById('pageShell')?.classList.add('ready');
@@ -368,6 +402,15 @@ function buildSeasonAggregates(seasons){
   return agg;
 }
 
+function guestbookDate(ts){
+  if(!ts) return 'Recently';
+  try{
+    return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+  }catch(e){
+    return 'Recently';
+  }
+}
+
 function renderFriendList(friendMap){
   const host=document.getElementById('friendList');
   const rows=Object.values(friendMap||{}).sort((a,b)=>String(a.username||'').localeCompare(String(b.username||'')));
@@ -388,6 +431,87 @@ function renderFriendList(friendMap){
       </div>
     </a>`;
   }).join('');
+}
+
+function renderGuestbookEntries(entryMap){
+  const host=document.getElementById('guestbookList');
+  const rows=Object.entries(entryMap||{}).map(([id,val])=>({id,...(val||{})})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!rows.length){
+    host.innerHTML='<div class="empty">No guestbook entries yet.</div>';
+    return;
+  }
+  const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const viewedNumber=Number(currentViewedProfile?.userNumber || 0);
+  host.innerHTML=rows.map(entry=>{
+    const canDelete = viewerNumber>0 && (viewerNumber===viewedNumber || viewerNumber===Number(entry.userNumber||0));
+    const avatar=entry.photoURL
+      ? `<img src="${escapeHtml(entry.photoURL)}" alt="${escapeHtml(entry.username||'Manager')}">`
+      : escapeHtml(initials(entry.username));
+    const gifBlock=String(entry.gifURL||'').trim()
+      ? `<div class="guestbook-gif"><img src="${escapeHtml(entry.gifURL)}" alt="Guestbook media"></div>`
+      : '';
+    return `<div class="guestbook-entry">
+      <div class="guestbook-head">
+        <div class="guestbook-author">
+          <div class="friend-avatar">${avatar}</div>
+          <div>
+            <div class="guestbook-name">${escapeHtml(entry.username||'Manager')}</div>
+            <div class="guestbook-meta">Member #${Number(entry.userNumber||0)} · ${escapeHtml(guestbookDate(entry.createdAt))}</div>
+          </div>
+        </div>
+        ${canDelete ? `<button class="guestbook-delete" onclick="deleteGuestbookEntry('${entry.id}')">Remove</button>` : ''}
+      </div>
+      <div class="guestbook-body">${escapeHtml(entry.message||'')}</div>
+      ${gifBlock}
+    </div>`;
+  }).join('');
+}
+
+function renderGuestbookComposer(){
+  const composer=document.getElementById('guestbookComposer');
+  const prompt=document.getElementById('guestbookPrompt');
+  const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const viewedNumber=Number(currentViewedProfile?.userNumber || 0);
+  const canPost=!!currentAuthUser && viewerNumber>0 && viewedNumber>0 && viewerNumber!==viewedNumber;
+  if(composer) composer.style.display=canPost ? 'grid' : 'none';
+  if(prompt) prompt.style.display=canPost ? 'none' : 'block';
+}
+
+async function submitGuestbookEntry(){
+  if(!currentAuthUser || !currentViewedProfile) return;
+  const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const viewedNumber=Number(currentViewedProfile.userNumber || 0);
+  if(!(viewerNumber>0) || !(viewedNumber>0) || viewerNumber===viewedNumber) return;
+  const messageEl=document.getElementById('guestbookMessage');
+  const gifEl=document.getElementById('guestbookGif');
+  const message=String(messageEl?.value||'').trim();
+  const gifURL=String(gifEl?.value||'').trim();
+  if(!message) return alert('Write a message first.');
+  const meSnap=await db.ref('users/' + currentAuthUser.uid).once('value').catch(() => null);
+  const me=meSnap?.val?.() || {};
+  const ref=db.ref('guestbooks/' + viewedNumber).push();
+  await ref.set({
+    uid: currentAuthUser.uid,
+    userNumber: viewerNumber,
+    username: me.username || localStorage.getItem('rbPlayerName') || 'Manager',
+    photoURL: me.photoURL || '',
+    message,
+    gifURL,
+    createdAt: Date.now()
+  });
+  if(messageEl) messageEl.value='';
+  if(gifEl) gifEl.value='';
+}
+
+async function deleteGuestbookEntry(entryId){
+  if(!entryId || !currentViewedProfile) return;
+  const entry=currentGuestbookEntries?.[entryId];
+  const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const viewedNumber=Number(currentViewedProfile.userNumber || 0);
+  const canDelete = viewerNumber>0 && entry && (viewerNumber===viewedNumber || viewerNumber===Number(entry.userNumber||0));
+  if(!canDelete) return;
+  if(!confirm('Remove this guestbook post?')) return;
+  await db.ref('guestbooks/' + viewedNumber + '/' + entryId).remove();
 }
 
 async function sendFriendRequestToProfile(){
@@ -539,6 +663,7 @@ function renderProfile(profile, aggregates, viewsCount, social){
   document.getElementById('statLast').textContent = stats.lastFinish ? ord(stats.lastFinish) : '-';
   renderAvatar(profile?.photoURL || '', profile?.username || 'RB');
   renderFriendList(social?.friends || {});
+  renderGuestbookComposer();
   renderProfileActions(profile, social || {});
 }
 
@@ -576,13 +701,14 @@ async function loadMemberPage(userNumber){
         db.ref('friendRequests/' + viewerNumber + '/' + userNumber).once('value').catch(() => null)
       ]
     : [Promise.resolve(null), Promise.resolve(null)];
-  const [profileSnap, seasonsSnap, viewsCount, friendsSnap, outgoingSnap, incomingSnap] = await Promise.all([
+  const [profileSnap, seasonsSnap, viewsCount, friendsSnap, outgoingSnap, incomingSnap, guestbookSnap] = await Promise.all([
     db.ref('publicUsers/' + userNumber).once('value'),
     db.ref('publicUserSeasons/' + userNumber).once('value'),
     recordUniqueProfileView(userNumber),
     db.ref('friends/' + userNumber).once('value').catch(() => null),
     requestPromises[0],
-    requestPromises[1]
+    requestPromises[1],
+    db.ref('guestbooks/' + userNumber).once('value').catch(() => null)
   ]);
   const profile = profileSnap.val();
   if(!profile){
@@ -592,6 +718,7 @@ async function loadMemberPage(userNumber){
     return;
   }
   currentViewedProfile=profile;
+  currentGuestbookEntries=guestbookSnap?.val?.() || {};
   const seasons=seasonsSnap.val() || {};
   const social={
     friends: friendsSnap?.val?.() || {},
@@ -599,6 +726,7 @@ async function loadMemberPage(userNumber){
     incomingRequest: incomingSnap?.val?.() || null
   };
   renderProfile(profile, buildSeasonAggregates(seasons), viewsCount, social);
+  renderGuestbookEntries(currentGuestbookEntries);
   renderSeasons(seasons);
   revealPage();
 }
