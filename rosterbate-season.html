@@ -740,6 +740,65 @@ function getStarterIdsForTeamDay(teamIdx,day){
   return [...(G.starters[teamIdx]||[])];
 }
 
+function canPlayerFillSlot(player, slot){
+  const pos=String(player?.pos||'').toUpperCase();
+  const target=String(slot||'').toUpperCase();
+  if(!pos||!target) return false;
+  if(pos===target) return true;
+  if(CURRENT_SPORT==='nba'){
+    if(target==='G') return pos==='PG'||pos==='SG';
+    if(target==='F') return pos==='SF'||pos==='PF';
+    if(target==='UTIL') return ['PG','SG','SF','PF','C'].includes(pos);
+    return false;
+  }
+  if(CURRENT_SPORT==='nfl'){
+    if(target==='FLEX') return ['RB','WR','TE'].includes(pos);
+    if(target==='DST') return pos==='DST';
+    return false;
+  }
+  if(CURRENT_SPORT==='mlb'){
+    if(target==='UTIL') return ['C','1B','2B','3B','SS','OF'].includes(pos);
+    if(target==='P') return pos==='SP'||pos==='RP';
+    return false;
+  }
+  return false;
+}
+
+function slotPriority(slot){
+  const target=String(slot||'').toUpperCase();
+  if(CURRENT_SPORT==='nba') return ({PG:1,SG:1,SF:1,PF:1,C:1,G:2,F:2,UTIL:3})[target]||9;
+  if(CURRENT_SPORT==='nfl') return ({QB:1,RB:1,WR:1,TE:1,K:1,DST:1,FLEX:2})[target]||9;
+  if(CURRENT_SPORT==='mlb') return ({C:1,'1B':1,'2B':1,'3B':1,SS:1,OF:1,SP:1,RP:1,UTIL:2,P:2})[target]||9;
+  return 9;
+}
+
+function buildBestLineupIdsForRoster(roster, day){
+  const week=weekForDay(day||G.day||1);
+  const slots=[...SLOT_LABELS];
+  const fillOrder=slots.map((slot,index)=>({slot,index})).sort((a,b)=>{
+    const p=slotPriority(a.slot)-slotPriority(b.slot);
+    return p!==0?p:(a.index-b.index);
+  });
+  const candidates=(roster||[]).map(player=>{
+    const game=day?getGameInfo(player,day):null;
+    const injury=getInjuryStatus(player,week);
+    const unavailable=!!(injury && (injury.label==='OUT'||injury.label==='IR'||injury.label==='SUSP'));
+    const base=Number(player?.fp||0);
+    const score=base + (day && game ? 500 : 0) + (unavailable ? -1000 : injury ? -200 : 0);
+    return {player,score,hasGame:!!game};
+  }).sort((a,b)=>b.score-a.score);
+  const used=new Set();
+  const lineupBySlot=new Array(slots.length).fill(null);
+  fillOrder.forEach(({slot,index})=>{
+    const match=candidates.find(entry=>!used.has(entry.player.id) && canPlayerFillSlot(entry.player,slot));
+    if(match){
+      used.add(match.player.id);
+      lineupBySlot[index]=match.player.id;
+    }
+  });
+  return lineupBySlot.filter(Boolean);
+}
+
 function getSportAwareFantasyScore(player){
   return getRosterbatePlayerFantasyScore(CURRENT_SPORT,player,CS?.scoring)||0;
 }
@@ -901,7 +960,7 @@ function initSeason(){
   const n=D.leagueSize;
   if(!D.seasonId) D.seasonId='season_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   G.rosters=D.allRosters.map(r=>r.map(p=>({...p})));
-  G.starters=G.rosters.map(r=>[...r].sort((a,b)=>b.fp-a.fp).slice(0,STARTERS).map(p=>p.id));
+  G.starters=G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
   const allIds=new Set(G.rosters.flat().map(p=>p.id));
   G.waiver=buildRosterbateSportPlayerPool(CURRENT_SPORT, 260).filter(p=>!allIds.has(p.id)).slice(0,40).map(p=>({...p}));
   G.schedule=buildSched(n,G.totalWeeks);
@@ -1055,9 +1114,11 @@ function getLineupForDay(day){
 
 function setLineupForDay(day,starterIds){
   if(day<G.day||isDayRevealed(day)) return false;
-  G.dailyLineups[day]=[...starterIds];
+  const roster=G.rosters[D.myPos]||[];
+  const selected=roster.filter(p=>starterIds.includes(p.id));
+  G.dailyLineups[day]=buildBestLineupIdsForRoster(selected,day);
   // Also update default starters to match most recent change
-  G.starters[D.myPos]=[...starterIds];
+  G.starters[D.myPos]=[...(G.dailyLineups[day]||[])];
   return true;
 }
 
@@ -1343,12 +1404,16 @@ function toggleStartDay(pid,day){
   if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');return;}
   const current=getLineupForDay(day);
   const roster=G.rosters[D.myPos];
-  if(!roster.find(p=>p.id===pid))return;
+  const player=roster.find(p=>p.id===pid);
+  if(!player)return;
   let updated;
   if(current.includes(pid)){
     updated=current.filter(id=>id!==pid);
   } else {
     if(current.length>=STARTERS){toast('Starter slots full — bench someone first');return;}
+    const selected=roster.filter(p=>current.includes(p.id));
+    const trial=buildBestLineupIdsForRoster([...selected,player],day);
+    if(!trial.includes(pid)){toast('That player does not fit an open starter slot.');return;}
     updated=[...current,pid];
   }
   setLineupForDay(day,updated);
@@ -1360,19 +1425,10 @@ function toggleStart(pid){toggleStartDay(pid,rosterViewDay||G.day);}
 function autoSetDay(day){
   if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');return;}
   const roster=G.rosters[D.myPos]||[];
-  const week=weekForDay(day);
-  // Sort: healthy+game > GTD+game > no game, then by fp
-  const scored=roster.map(p=>{
-    const game=getGameInfo(p,day);
-    const inj=getInjuryStatus(p,week);
-    const injPenalty=inj?(inj.label==='OUT'||inj.label==='IR'||inj.label==='SUSP'?-1000:-200):0;
-    const gameBonus=game?500:0;
-    return{p,score:p.fp+gameBonus+injPenalty};
-  }).sort((a,b)=>b.score-a.score);
-  const newStarters=scored.slice(0,STARTERS).map(x=>x.p.id);
+  const newStarters=buildBestLineupIdsForRoster(roster,day);
   setLineupForDay(day,newStarters);
   renderRoster();
-  const withGames=scored.slice(0,STARTERS).filter(x=>getGameInfo(x.p,day)).length;
+  const withGames=newStarters.map(id=>roster.find(p=>p.id===id)).filter(p=>p&&getGameInfo(p,day)).length;
   toast('Auto-set: '+withGames+'/'+STARTERS+' starters have games');
 }
 
@@ -1420,8 +1476,7 @@ function confirmWaiver(){
   const r=G.rosters[D.myPos],idx=r.findIndex(p=>p.id===wDrop.id);if(idx<0)return;
   const[dropped]=r.splice(idx,1);r.push(wAdd);
   G.waiver=G.waiver.filter(p=>p.id!==wAdd.id);G.waiver.push(dropped);
-  G.starters[D.myPos]=G.starters[D.myPos].filter(id=>id!==wDrop.id);
-  if(G.starters[D.myPos].length<STARTERS)G.starters[D.myPos].push(wAdd.id);
+  G.starters[D.myPos]=buildBestLineupIdsForRoster(G.rosters[D.myPos],G.day);
   document.getElementById('wModal').classList.remove('open');
   logActivity('waiver','Waiver move',teamName(D.myPos)+' added '+wAdd.name+' and dropped '+wDrop.name+'.',D.myPos,'📋');
   toast('Claimed '+wAdd.name+', dropped '+wDrop.name);
@@ -1579,7 +1634,7 @@ function acceptTrade(id,cpu=false){
   const fr=G.rosters[o.fromTeam],tr=G.rosters[o.toTeam];
   o.give.forEach(pid=>{const i=fr.findIndex(p=>p.id===pid);if(i>=0){const[p]=fr.splice(i,1);tr.push(p);}});
   o.get.forEach(pid=>{const i=tr.findIndex(p=>p.id===pid);if(i>=0){const[p]=tr.splice(i,1);fr.push(p);}});
-  [o.fromTeam,o.toTeam].forEach(ti=>{G.starters[ti]=[...G.rosters[ti]].sort((a,b)=>b.fp-a.fp).slice(0,STARTERS).map(p=>p.id);});
+  [o.fromTeam,o.toTeam].forEach(ti=>{G.starters[ti]=buildBestLineupIdsForRoster(G.rosters[ti],G.day);});
   logActivity('trade','Trade completed',teamName(o.fromTeam)+' and '+teamName(o.toTeam)+' completed a trade.',o.toTeam,'🤝');
   if(!cpu){toast('Trade accepted!');renderTrades();renderHub();}
 }

@@ -220,6 +220,7 @@
       <div class="account-wrap">
         <button id="authTrigger" class="nav-auth-btn" onclick="openAuthModal('signup')">Sign Up</button>
         <div id="accountMenu" class="account-menu">
+          <button class="account-item" onclick="openMyProfile()">My Profile</button>
           <button class="account-item" onclick="openSettings()">Settings</button>
           <button class="account-item danger" onclick="logoutUser()">Log Out</button>
         </div>
@@ -725,6 +726,20 @@ function subscribeLeaderboard(){
 }
 function openSettings(){
   closeAccountMenu();
+  window.location.href='profile.html';
+}
+async function openMyProfile(){
+  closeAccountMenu();
+  let userNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  if(!userNumber && auth.currentUser){
+    const snap=await db.ref('users/' + auth.currentUser.uid + '/userNumber').once('value').catch(() => null);
+    userNumber=Number(snap?.val?.() || 0);
+    if(userNumber) localStorage.setItem('rbUserNumber', String(userNumber));
+  }
+  if(userNumber){
+    window.location.href=buildPublicUserUrl(userNumber);
+    return;
+  }
   window.location.href='profile.html';
 }
 async function logoutUser(){
