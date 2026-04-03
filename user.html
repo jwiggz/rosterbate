@@ -34,16 +34,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .title{font-family:var(--fd);font-size:42px;font-weight:900;text-transform:uppercase;line-height:.95;margin-top:8px;}
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
-.admin-pill{
-  background:linear-gradient(135deg,rgba(226,232,240,.28),rgba(148,163,184,.18) 45%,rgba(255,255,255,.34) 100%);
-  border-color:rgba(226,232,240,.45);
-  color:#eef4ff;
-  font-family:var(--fd);
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:.7px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px rgba(148,163,184,.12);
-}
 .owner-pill{
   background:linear-gradient(135deg,rgba(245,158,11,.28),rgba(234,179,8,.18) 45%,rgba(255,236,179,.34) 100%);
   border-color:rgba(245,158,11,.48);
@@ -85,30 +75,38 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   flex-shrink:0;
 }
 .admin-crown svg{width:15px;height:15px;display:block;}
-.admin-name{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+.admin-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;}
 .label{font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
 .value{font-family:var(--fd);font-size:30px;font-weight:900;margin-top:6px;}
 .sub{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;}
+.hero-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.hero-action-btn{border:none;border-radius:12px;padding:10px 14px;font-family:var(--fd);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;cursor:pointer;}
+.hero-action-btn.primary{background:var(--accent);color:#fff;}
+.hero-action-btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.hero-action-btn.accept{background:var(--green);color:#fff;}
 .section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
 .season-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
 .season-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;}
 .season-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;}
 .season-meta{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;}
 .about-copy{font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
+.friend-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.friend-item{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px;text-decoration:none;color:inherit;}
+.friend-avatar{width:44px;height:44px;border-radius:16px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:900;color:var(--accent);overflow:hidden;flex-shrink:0;}
+.friend-avatar img{width:100%;height:100%;object-fit:cover;}
+.friend-name{font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;line-height:1;}
+.friend-meta{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
 .empty{padding:18px;border:1px dashed var(--border);border-radius:14px;color:var(--text3);font-size:13px;text-align:center;}
 @media (max-width:780px){
   .hero{grid-template-columns:1fr;text-align:center;}
   .avatar{margin:0 auto;}
   .meta{justify-content:center;}
+  .hero-actions{justify-content:center;}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .season-list{grid-template-columns:1fr;}
+  .friend-list{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -118,6 +116,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <a href="index.html" class="brand">Roster<span>Bate</span></a>
     <div class="actions">
       <a href="index.html" class="btn secondary">Home</a>
+      <a href="messages.html" class="btn secondary">Messages</a>
       <a href="profile.html" class="btn primary">Settings</a>
     </div>
   </div>
@@ -143,12 +142,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="pill" id="memberSince">Joined recently</div>
         <div class="pill" id="viewCountPill">Views 0</div>
         <div class="pill" id="rolePill" style="display:none;">Owner</div>
-        <div class="pill" id="titlePill">🏆 0</div>
-        <div class="pill" id="footballTitlePill">🏈 0</div>
-        <div class="pill" id="baseballTitlePill">⚾ 0</div>
-        <div class="pill" id="basketballTitlePill">🏀 0</div>
-        <div class="pill" id="multiplayerTitlePill">👥 0</div>
+        <div class="pill" id="titlePill">Championships 0</div>
+        <div class="pill" id="footballTitlePill">NFL 0</div>
+        <div class="pill" id="baseballTitlePill">MLB 0</div>
+        <div class="pill" id="basketballTitlePill">NBA 0</div>
+        <div class="pill" id="friendCountPill">Friends 0</div>
       </div>
+      <div class="hero-actions" id="profileActions"></div>
     </div>
   </div>
 
@@ -162,6 +162,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="card" style="margin-bottom:14px;">
     <div class="section-title">About Me</div>
     <div id="aboutMeCard" class="about-copy">This manager has not written an about section yet.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="section-title">Friends</div>
+    <div id="friendList" class="friend-list"></div>
   </div>
 
   <div class="card" style="margin-bottom:14px;">
@@ -203,6 +208,8 @@ const PROFILE_THEMES = {
   mint:{accent:'#22c55e',accent2:'#2dd4bf',accentSoft:'rgba(34,197,94,.14)',hero2:'rgba(45,212,191,.10)',surface:'#152521'},
   royal:{accent:'#8b5cf6',accent2:'#f59e0b',accentSoft:'rgba(139,92,246,.16)',hero2:'rgba(245,158,11,.08)',surface:'#201a31'}
 };
+let currentAuthUser=null;
+let currentViewedProfile=null;
 
 function parseUserNumber(){
   const pathMatch = window.location.pathname.match(/\/user\/(\d+)(?:\/)?$/i);
@@ -235,6 +242,28 @@ function renderAvatar(src, username){
   }
 }
 
+function initials(name){
+  const parts=String(name||'RB').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return 'RB';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+}
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[char]));
+}
+
+function dmThreadId(a,b){
+  const ids=[Number(a||0),Number(b||0)].sort((x,y)=>x-y);
+  return 'dm_'+ids[0]+'_'+ids[1];
+}
+
 function getProfileViewerId(){
   try{
     let id=localStorage.getItem('rbProfileViewerId');
@@ -263,19 +292,147 @@ async function recordUniqueProfileView(userNumber){
 
 function buildSeasonAggregates(seasons){
   const rows=Object.values(seasons||{});
-  const agg={championships:0,nbaTitles:0,nflTitles:0,mlbTitles:0,multiplayerTitles:0};
+  const agg={championships:0,nbaTitles:0,nflTitles:0,mlbTitles:0};
   rows.forEach(season=>{
     const won=Number(season?.finalRank||0)===1;
     const sport=String(season?.sport||'').toLowerCase();
-    const isMultiplayer=String(season?.mode||season?.leagueMode||'').toLowerCase()==='multiplayer' || season?.isMultiplayer===true;
     if(!won) return;
     agg.championships++;
     if(sport==='nba') agg.nbaTitles++;
     if(sport==='nfl') agg.nflTitles++;
     if(sport==='mlb') agg.mlbTitles++;
-    if(isMultiplayer) agg.multiplayerTitles++;
   });
   return agg;
+}
+
+function renderFriendList(friendMap){
+  const host=document.getElementById('friendList');
+  const rows=Object.values(friendMap||{}).sort((a,b)=>String(a.username||'').localeCompare(String(b.username||'')));
+  document.getElementById('friendCountPill').textContent='Friends ' + rows.length;
+  if(!rows.length){
+    host.innerHTML='<div class="empty">No friends added yet.</div>';
+    return;
+  }
+  host.innerHTML=rows.map(friend=>{
+    const avatar=friend.photoURL
+      ? `<img src="${escapeHtml(friend.photoURL)}" alt="${escapeHtml(friend.username||'Friend')}">`
+      : escapeHtml(initials(friend.username));
+    return `<a class="friend-item" href="/user/${encodeURIComponent(friend.userNumber)}">
+      <div class="friend-avatar">${avatar}</div>
+      <div>
+        <div class="friend-name">${escapeHtml(friend.username||'Manager')}</div>
+        <div class="friend-meta">Member #${Number(friend.userNumber||0)}</div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+async function sendFriendRequestToProfile(){
+  if(!currentAuthUser || !currentViewedProfile) return;
+  const myNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const targetNumber=Number(currentViewedProfile.userNumber || 0);
+  if(!(myNumber>0) || !(targetNumber>0) || myNumber===targetNumber) return;
+  const meSnap=await db.ref('users/' + currentAuthUser.uid).once('value').catch(() => null);
+  const me=meSnap?.val?.() || {};
+  await db.ref('friendRequests/' + targetNumber + '/' + myNumber).set({
+    fromUserNumber: myNumber,
+    fromUid: currentAuthUser.uid,
+    username: me.username || localStorage.getItem('rbPlayerName') || 'Manager',
+    photoURL: me.photoURL || '',
+    createdAt: Date.now()
+  });
+  await loadMemberPage(targetNumber);
+}
+
+async function cancelFriendRequestToProfile(){
+  if(!currentAuthUser || !currentViewedProfile) return;
+  const myNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const targetNumber=Number(currentViewedProfile.userNumber || 0);
+  if(!(myNumber>0) || !(targetNumber>0)) return;
+  await db.ref('friendRequests/' + targetNumber + '/' + myNumber).remove();
+  await loadMemberPage(targetNumber);
+}
+
+async function acceptFriendRequestFromProfile(){
+  if(!currentAuthUser || !currentViewedProfile) return;
+  const myNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const targetNumber=Number(currentViewedProfile.userNumber || 0);
+  if(!(myNumber>0) || !(targetNumber>0) || myNumber===targetNumber) return;
+  const meSnap=await db.ref('users/' + currentAuthUser.uid).once('value').catch(() => null);
+  const me=meSnap?.val?.() || {};
+  const now=Date.now();
+  const updates={};
+  updates['friends/' + myNumber + '/' + targetNumber]={
+    userNumber: targetNumber,
+    username: currentViewedProfile.username || 'Manager',
+    photoURL: currentViewedProfile.photoURL || '',
+    addedAt: now
+  };
+  updates['friends/' + targetNumber + '/' + myNumber]={
+    userNumber: myNumber,
+    username: me.username || localStorage.getItem('rbPlayerName') || 'Manager',
+    photoURL: me.photoURL || '',
+    addedAt: now
+  };
+  updates['friendRequests/' + myNumber + '/' + targetNumber]=null;
+  updates['friendRequests/' + targetNumber + '/' + myNumber]=null;
+  await db.ref().update(updates);
+  await loadMemberPage(targetNumber);
+}
+
+async function ensureDirectThreadWithProfile(){
+  if(!currentAuthUser || !currentViewedProfile) return;
+  const myNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const targetNumber=Number(currentViewedProfile.userNumber || 0);
+  if(!(myNumber>0) || !(targetNumber>0) || myNumber===targetNumber) return;
+  const mySnap=await db.ref('users/' + currentAuthUser.uid).once('value').catch(() => null);
+  const myProfile=mySnap?.val?.() || {};
+  const threadId=dmThreadId(myNumber,targetNumber);
+  const now=Date.now();
+  const updates={};
+  updates['directThreads/'+threadId+'/createdAt']=now;
+  updates['directThreads/'+threadId+'/updatedAt']=now;
+  updates['directThreads/'+threadId+'/members/'+myNumber]=true;
+  updates['directThreads/'+threadId+'/members/'+targetNumber]=true;
+  updates['userThreads/'+myNumber+'/'+threadId]={
+    otherUserNumber: targetNumber,
+    otherUsername: currentViewedProfile.username || 'Manager',
+    otherPhotoURL: currentViewedProfile.photoURL || '',
+    updatedAt: now
+  };
+  updates['userThreads/'+targetNumber+'/'+threadId]={
+    otherUserNumber: myNumber,
+    otherUsername: myProfile.username || localStorage.getItem('rbPlayerName') || 'Manager',
+    otherPhotoURL: myProfile.photoURL || '',
+    updatedAt: now
+  };
+  await db.ref().update(updates);
+  window.location.href='messages.html?thread=' + encodeURIComponent(threadId);
+}
+
+function renderProfileActions(profile, social){
+  const host=document.getElementById('profileActions');
+  const memberNumber=Number(profile?.userNumber || 0);
+  const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  if(!(memberNumber>0) || !(viewerNumber>0) || memberNumber===viewerNumber){
+    host.innerHTML='';
+    return;
+  }
+  const isFriend=!!social?.friends?.[viewerNumber];
+  const outgoing=!!social?.outgoingRequest;
+  const incoming=!!social?.incomingRequest;
+  const parts=[];
+  if(isFriend){
+    parts.push('<button class="hero-action-btn secondary" disabled>Friends</button>');
+  }else if(incoming){
+    parts.push('<button class="hero-action-btn accept" onclick="acceptFriendRequestFromProfile()">Accept Friend</button>');
+  }else if(outgoing){
+    parts.push('<button class="hero-action-btn secondary" onclick="cancelFriendRequestToProfile()">Request Sent</button>');
+  }else{
+    parts.push('<button class="hero-action-btn primary" onclick="sendFriendRequestToProfile()">Add Friend</button>');
+  }
+  parts.push('<button class="hero-action-btn secondary" onclick="ensureDirectThreadWithProfile()">Message</button>');
+  host.innerHTML=parts.join('');
 }
 
 function applyTheme(themeKey){
@@ -287,7 +444,7 @@ function applyTheme(themeKey){
   document.documentElement.style.setProperty('--surface', theme.surface);
 }
 
-function renderProfile(profile, aggregates, viewsCount){
+function renderProfile(profile, aggregates, viewsCount, social){
   const stats = profile?.lifetime || {};
   const userNumber = Number(profile?.userNumber || 0);
   const isAdmin = !!profile?.isAdmin || [1,2,3,4,5].includes(userNumber);
@@ -299,12 +456,12 @@ function renderProfile(profile, aggregates, viewsCount){
   document.getElementById('memberLine').textContent = isAdmin ? 'Administrator with authority to moderate chat and manage bans across RosterBate.' : 'Lifetime league stats, finishes, style, and public identity for this manager.';
   document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
   document.getElementById('viewCountPill').textContent = 'Views ' + Number(viewsCount || 0);
-  document.getElementById('titlePill').textContent = '🏆 ' + Number(meta.championships || stats.championships || 0);
-  document.getElementById('footballTitlePill').textContent = '🏈 ' + Number(meta.nflTitles || 0);
-  document.getElementById('baseballTitlePill').textContent = '⚾ ' + Number(meta.mlbTitles || 0);
-  document.getElementById('basketballTitlePill').textContent = '🏀 ' + Number(meta.nbaTitles || 0);
-  document.getElementById('multiplayerTitlePill').textContent = '👥 ' + Number(meta.multiplayerTitles || 0);
-  document.getElementById('rolePill').className = 'pill' + (isOwner ? ' owner-pill' : '');
+  document.getElementById('titlePill').textContent = 'Championships ' + Number(meta.championships || stats.championships || 0);
+  document.getElementById('footballTitlePill').textContent = 'NFL ' + Number(meta.nflTitles || 0);
+  document.getElementById('baseballTitlePill').textContent = 'MLB ' + Number(meta.mlbTitles || 0);
+  document.getElementById('basketballTitlePill').textContent = 'NBA ' + Number(meta.nbaTitles || 0);
+  document.getElementById('rolePill').className = 'pill owner-pill';
+  document.getElementById('rolePill').textContent = 'Owner';
   document.getElementById('rolePill').style.display = isOwner ? 'inline-flex' : 'none';
   document.getElementById('adminRank').style.display = isAdmin ? 'inline-flex' : 'none';
   document.getElementById('aboutMeCard').textContent = String(profile?.aboutMe || '').trim() || 'This manager has not written an about section yet.';
@@ -317,6 +474,8 @@ function renderProfile(profile, aggregates, viewsCount){
   document.getElementById('statPodiums').textContent = stats.podiums || 0;
   document.getElementById('statLast').textContent = stats.lastFinish ? ord(stats.lastFinish) : '-';
   renderAvatar(profile?.photoURL || '', profile?.username || 'RB');
+  renderFriendList(social?.friends || {});
+  renderProfileActions(profile, social || {});
 }
 
 function renderSeasons(seasons){
@@ -345,10 +504,20 @@ async function loadMemberPage(userNumber){
     document.getElementById('seasonHistory').innerHTML = '<div class="empty">Open a member page with a valid number, like /user/1.</div>';
     return;
   }
-  const [profileSnap, seasonsSnap, viewsCount] = await Promise.all([
+  const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+  const requestPromises = (viewerNumber>0 && viewerNumber!==userNumber)
+    ? [
+        db.ref('friendRequests/' + userNumber + '/' + viewerNumber).once('value').catch(() => null),
+        db.ref('friendRequests/' + viewerNumber + '/' + userNumber).once('value').catch(() => null)
+      ]
+    : [Promise.resolve(null), Promise.resolve(null)];
+  const [profileSnap, seasonsSnap, viewsCount, friendsSnap, outgoingSnap, incomingSnap] = await Promise.all([
     db.ref('publicUsers/' + userNumber).once('value'),
     db.ref('publicUserSeasons/' + userNumber).once('value'),
-    recordUniqueProfileView(userNumber)
+    recordUniqueProfileView(userNumber),
+    db.ref('friends/' + userNumber).once('value').catch(() => null),
+    requestPromises[0],
+    requestPromises[1]
   ]);
   const profile = profileSnap.val();
   if(!profile){
@@ -356,12 +525,19 @@ async function loadMemberPage(userNumber){
     document.getElementById('seasonHistory').innerHTML = '<div class="empty">This member page does not exist yet.</div>';
     return;
   }
+  currentViewedProfile=profile;
   const seasons=seasonsSnap.val() || {};
-  renderProfile(profile, buildSeasonAggregates(seasons), viewsCount);
+  const social={
+    friends: friendsSnap?.val?.() || {},
+    outgoingRequest: outgoingSnap?.val?.() || null,
+    incomingRequest: incomingSnap?.val?.() || null
+  };
+  renderProfile(profile, buildSeasonAggregates(seasons), viewsCount, social);
   renderSeasons(seasons);
 }
 
 auth.onAuthStateChanged(async user => {
+  currentAuthUser=user || null;
   let userNumber = parseUserNumber();
   if(!(userNumber > 0) && user){
     const snap = await db.ref('users/' + user.uid + '/userNumber').once('value').catch(() => null);

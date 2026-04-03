@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RosterBate - Messages</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#24354f;
+  --accent:#f97316;--accent2:#fb923c;--accentSoft:rgba(249,115,22,.14);--green:#22c55e;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{min-height:100vh;background:linear-gradient(180deg,#0c1220,#09101a 60%);color:var(--text);font-family:var(--fb);}
+.wrap{max-width:1260px;margin:0 auto;padding:20px 18px 28px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.brand{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
+.brand span{color:var(--accent);}
+.actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
+.btn.primary{background:var(--accent);color:#fff;}
+.btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btn.accept{background:var(--green);color:#fff;}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:14px;min-height:calc(100vh - 120px);}
+.panel{background:rgba(18,25,39,.96);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
+.sidebar{display:flex;flex-direction:column;min-height:0;}
+.section{padding:16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.section:last-child{border-bottom:none;}
+.section-title{font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
+.request-list,.thread-list{display:flex;flex-direction:column;gap:10px;max-height:220px;overflow:auto;padding-right:4px;}
+.thread-list{max-height:none;flex:1;}
+.request-item,.thread-item,.friend-item{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:10px;}
+.thread-item{cursor:pointer;}
+.thread-item.active{border-color:rgba(249,115,22,.45);box-shadow:0 0 0 1px rgba(249,115,22,.15) inset;}
+.avatar{width:42px;height:42px;border-radius:14px;background:#0f172a;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:900;color:var(--accent);overflow:hidden;flex-shrink:0;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.copy{min-width:0;}
+.name{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;line-height:1;}
+.meta{font-size:12px;color:var(--text2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.actions-row{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}
+.mini-btn{border:none;border-radius:10px;padding:8px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;cursor:pointer;}
+.mini-btn.accept{background:var(--green);color:#fff;}
+.mini-btn.secondary{background:#243248;color:var(--text2);}
+.mini-btn.primary{background:var(--accent);color:#fff;}
+.main{display:flex;flex-direction:column;min-height:0;}
+.thread-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.05);}
+.thread-title{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;line-height:1;}
+.thread-sub{font-size:12px;color:var(--text2);margin-top:4px;}
+.message-list{flex:1;min-height:320px;padding:16px 18px;overflow:auto;display:flex;flex-direction:column;gap:10px;}
+.message{max-width:72%;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.05);background:var(--bg3);}
+.message.mine{align-self:flex-end;background:rgba(249,115,22,.14);border-color:rgba(249,115,22,.24);}
+.message-head{font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin-bottom:4px;}
+.message-body{font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
+.compose{display:flex;gap:10px;padding:14px 18px;border-top:1px solid rgba(255,255,255,.05);}
+.compose input{flex:1;background:#131d2d;border:1px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--text);font-size:14px;outline:none;}
+.compose input:focus{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.empty{padding:20px;border:1px dashed var(--border);border-radius:14px;color:var(--text3);font-size:13px;text-align:center;}
+.friends-grid{display:flex;flex-direction:column;gap:10px;max-height:220px;overflow:auto;padding-right:4px;}
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="index.html" class="brand">Roster<span>Bate</span></a>
+    <div class="actions">
+      <a href="index.html" class="btn secondary">Home</a>
+      <a href="profile.html" class="btn secondary">Settings</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="panel sidebar">
+      <div class="section">
+        <div class="section-title">Friend Requests</div>
+        <div id="requestList" class="request-list"></div>
+      </div>
+      <div class="section">
+        <div class="section-title">Friends</div>
+        <div id="friendsList" class="friends-grid"></div>
+      </div>
+      <div class="section" style="flex:1;min-height:0;">
+        <div class="section-title">Messages</div>
+        <div id="threadList" class="thread-list"></div>
+      </div>
+    </div>
+
+    <div class="panel main">
+      <div class="thread-header">
+        <div>
+          <div id="threadTitle" class="thread-title">Messages</div>
+          <div id="threadSub" class="thread-sub">Open a conversation or start one from a friend profile.</div>
+        </div>
+      </div>
+      <div id="messageList" class="message-list">
+        <div class="empty">No conversation selected yet.</div>
+      </div>
+      <div class="compose">
+        <input id="messageInput" type="text" placeholder="Send a message..." maxlength="400">
+        <button class="btn primary" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
+  authDomain: "rosterbate-51339.firebaseapp.com",
+  databaseURL: "https://rosterbate-51339-default-rtdb.firebaseio.com",
+  projectId: "rosterbate-51339",
+  storageBucket: "rosterbate-51339.firebasestorage.app",
+  messagingSenderId: "951275364572",
+  appId: "1:951275364572:web:758d1b4d970b7b87c05419",
+  measurementId: "G-DNSFKMKYVC"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+let currentUser=null;
+let currentProfile=null;
+let activeThreadId='';
+let messageRef=null;
+let friendDirectory={};
+
+function initials(name){
+  const parts=String(name||'RB').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return 'RB';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[char]));
+}
+
+function avatarMarkup(photoURL, username){
+  return photoURL
+    ? `<img src="${escapeHtml(photoURL)}" alt="${escapeHtml(username||'Manager')}">`
+    : escapeHtml(initials(username));
+}
+
+function dmThreadId(a,b){
+  const ids=[Number(a||0),Number(b||0)].sort((x,y)=>x-y);
+  return 'dm_'+ids[0]+'_'+ids[1];
+}
+
+function formatTime(ts){
+  if(!ts) return '';
+  try{
+    return new Date(ts).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+  }catch(e){
+    return '';
+  }
+}
+
+function getThreadParam(){
+  const params=new URLSearchParams(window.location.search);
+  return params.get('thread') || '';
+}
+
+function renderRequestList(requests){
+  const host=document.getElementById('requestList');
+  if(!requests.length){
+    host.innerHTML='<div class="empty">No pending requests.</div>';
+    return;
+  }
+  host.innerHTML=requests.map(req=>`
+    <div class="request-item">
+      <div class="avatar">${avatarMarkup(req.photoURL, req.username)}</div>
+      <div class="copy">
+        <div class="name">${escapeHtml(req.username || 'Manager')}</div>
+        <div class="meta">Member #${Number(req.fromUserNumber || 0)}</div>
+      </div>
+      <div class="actions-row">
+        <button class="mini-btn accept" onclick="acceptFriendRequest(${Number(req.fromUserNumber || 0)})">Accept</button>
+        <button class="mini-btn secondary" onclick="declineFriendRequest(${Number(req.fromUserNumber || 0)})">Decline</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFriendsList(friends){
+  const host=document.getElementById('friendsList');
+  if(!friends.length){
+    host.innerHTML='<div class="empty">No friends added yet.</div>';
+    return;
+  }
+  host.innerHTML=friends.map(friend=>`
+    <div class="friend-item">
+      <div class="avatar">${avatarMarkup(friend.photoURL, friend.username)}</div>
+      <div class="copy">
+        <div class="name">${escapeHtml(friend.username || 'Manager')}</div>
+        <div class="meta">Member #${Number(friend.userNumber || 0)}</div>
+      </div>
+      <div class="actions-row">
+        <button class="mini-btn primary" onclick="openOrCreateThread(${Number(friend.userNumber || 0)})">Message</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderThreadList(threads){
+  const host=document.getElementById('threadList');
+  if(!threads.length){
+    host.innerHTML='<div class="empty">No messages yet.</div>';
+    return;
+  }
+  host.innerHTML=threads.map(thread=>`
+    <div class="thread-item${thread.threadId===activeThreadId ? ' active' : ''}" onclick="openThread('${thread.threadId}')">
+      <div class="avatar">${avatarMarkup(thread.otherPhotoURL, thread.otherUsername)}</div>
+      <div class="copy">
+        <div class="name">${escapeHtml(thread.otherUsername || 'Manager')}</div>
+        <div class="meta">${escapeHtml(thread.lastMessage || 'Open conversation')} ${thread.updatedAt ? '· ' + escapeHtml(formatTime(thread.updatedAt)) : ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMessages(messages){
+  const host=document.getElementById('messageList');
+  if(!messages.length){
+    host.innerHTML='<div class="empty">No messages in this conversation yet.</div>';
+    return;
+  }
+  host.innerHTML=messages.map(msg=>`
+    <div class="message${Number(msg.fromUserNumber||0)===Number(currentProfile?.userNumber||0) ? ' mine' : ''}">
+      <div class="message-head">${escapeHtml(msg.username || 'Manager')} · ${escapeHtml(formatTime(msg.createdAt))}</div>
+      <div class="message-body">${escapeHtml(msg.text || '')}</div>
+    </div>
+  `).join('');
+  host.scrollTop=host.scrollHeight;
+}
+
+async function acceptFriendRequest(fromUserNumber){
+  if(!currentUser || !currentProfile) return;
+  const myNumber=Number(currentProfile.userNumber || 0);
+  if(!(myNumber>0) || !(fromUserNumber>0)) return;
+  const requesterSnap=await db.ref('publicUsers/' + fromUserNumber).once('value').catch(() => null);
+  const requester=requesterSnap?.val?.() || {};
+  const now=Date.now();
+  const updates={};
+  updates['friends/' + myNumber + '/' + fromUserNumber]={
+    userNumber: fromUserNumber,
+    username: requester.username || 'Manager',
+    photoURL: requester.photoURL || '',
+    addedAt: now
+  };
+  updates['friends/' + fromUserNumber + '/' + myNumber]={
+    userNumber: myNumber,
+    username: currentProfile.username || 'Manager',
+    photoURL: currentProfile.photoURL || '',
+    addedAt: now
+  };
+  updates['friendRequests/' + myNumber + '/' + fromUserNumber]=null;
+  updates['friendRequests/' + fromUserNumber + '/' + myNumber]=null;
+  await db.ref().update(updates);
+  await loadSidebarData();
+}
+
+async function declineFriendRequest(fromUserNumber){
+  if(!currentProfile) return;
+  const myNumber=Number(currentProfile.userNumber || 0);
+  if(!(myNumber>0) || !(fromUserNumber>0)) return;
+  await db.ref('friendRequests/' + myNumber + '/' + fromUserNumber).remove();
+  await loadSidebarData();
+}
+
+async function openOrCreateThread(otherUserNumber){
+  if(!currentProfile) return;
+  const myNumber=Number(currentProfile.userNumber || 0);
+  if(!(myNumber>0) || !(otherUserNumber>0) || myNumber===otherUserNumber) return;
+  const friendMeta=friendDirectory[otherUserNumber] || {};
+  const threadId=dmThreadId(myNumber,otherUserNumber);
+  const now=Date.now();
+  const updates={};
+  updates['directThreads/'+threadId+'/createdAt']=now;
+  updates['directThreads/'+threadId+'/updatedAt']=now;
+  updates['directThreads/'+threadId+'/members/'+myNumber]=true;
+  updates['directThreads/'+threadId+'/members/'+otherUserNumber]=true;
+  updates['userThreads/'+myNumber+'/'+threadId]={
+    otherUserNumber,
+    otherUsername: friendMeta.username || 'Manager',
+    otherPhotoURL: friendMeta.photoURL || '',
+    updatedAt: now
+  };
+  updates['userThreads/'+otherUserNumber+'/'+threadId+'/otherUserNumber']=myNumber;
+  updates['userThreads/'+otherUserNumber+'/'+threadId+'/otherUsername']=currentProfile.username || 'Manager';
+  updates['userThreads/'+otherUserNumber+'/'+threadId+'/otherPhotoURL']=currentProfile.photoURL || '';
+  updates['userThreads/'+otherUserNumber+'/'+threadId+'/updatedAt']=now;
+  await db.ref().update(updates);
+  openThread(threadId);
+}
+
+function openThread(threadId){
+  activeThreadId=threadId;
+  const params=new URLSearchParams(window.location.search);
+  params.set('thread', threadId);
+  history.replaceState(null, '', 'messages.html?' + params.toString());
+  subscribeToMessages(threadId);
+  loadSidebarData();
+}
+
+function subscribeToMessages(threadId){
+  if(messageRef) messageRef.off();
+  if(!threadId){
+    renderMessages([]);
+    return;
+  }
+  messageRef=db.ref('directMessages/' + threadId);
+  messageRef.on('value', snap => {
+    const rows=Object.entries(snap.val() || {}).map(([id, msg]) => ({ id, ...msg })).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    renderMessages(rows);
+  });
+}
+
+async function sendMessage(){
+  if(!currentUser || !currentProfile || !activeThreadId) return;
+  const input=document.getElementById('messageInput');
+  const text=String(input.value || '').trim();
+  if(!text) return;
+  const myNumber=Number(currentProfile.userNumber || 0);
+  if(!(myNumber>0)) return;
+  const otherMetaSnap=await db.ref('userThreads/' + myNumber + '/' + activeThreadId).once('value').catch(() => null);
+  const threadMeta=otherMetaSnap?.val?.() || {};
+  const now=Date.now();
+  const ref=db.ref('directMessages/' + activeThreadId).push();
+  const message={
+    fromUserNumber: myNumber,
+    username: currentProfile.username || 'Manager',
+    photoURL: currentProfile.photoURL || '',
+    text,
+    createdAt: now
+  };
+  const updates={};
+  updates['directMessages/' + activeThreadId + '/' + ref.key]=message;
+  updates['directThreads/' + activeThreadId + '/updatedAt']=now;
+  updates['directThreads/' + activeThreadId + '/lastMessage']=text.slice(0,120);
+  updates['directThreads/' + activeThreadId + '/lastSender']=myNumber;
+  updates['userThreads/' + myNumber + '/' + activeThreadId + '/updatedAt']=now;
+  updates['userThreads/' + myNumber + '/' + activeThreadId + '/lastMessage']=text.slice(0,120);
+  if(threadMeta.otherUserNumber){
+    updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/updatedAt']=now;
+    updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/lastMessage']=text.slice(0,120);
+  }
+  await db.ref().update(updates);
+  input.value='';
+  loadSidebarData();
+}
+
+async function loadSidebarData(){
+  if(!currentProfile) return;
+  const myNumber=Number(currentProfile.userNumber || 0);
+  if(!(myNumber>0)) return;
+  const [requestsSnap, friendsSnap, threadsSnap]=await Promise.all([
+    db.ref('friendRequests/' + myNumber).once('value').catch(() => null),
+    db.ref('friends/' + myNumber).once('value').catch(() => null),
+    db.ref('userThreads/' + myNumber).once('value').catch(() => null)
+  ]);
+  const requests=Object.values(requestsSnap?.val?.() || {}).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const friends=Object.values(friendsSnap?.val?.() || {}).sort((a,b)=>String(a.username||'').localeCompare(String(b.username||'')));
+  const threads=Object.entries(threadsSnap?.val?.() || {}).map(([threadId, thread]) => ({ threadId, ...thread })).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  friendDirectory={};
+  friends.forEach(friend => { friendDirectory[Number(friend.userNumber || 0)] = friend; });
+  renderRequestList(requests);
+  renderFriendsList(friends);
+  renderThreadList(threads);
+  const active=threads.find(thread => thread.threadId===activeThreadId);
+  if(active){
+    document.getElementById('threadTitle').textContent=active.otherUsername || 'Conversation';
+    document.getElementById('threadSub').textContent='Member #' + Number(active.otherUserNumber || 0);
+  }else if(activeThreadId){
+    document.getElementById('threadTitle').textContent='Conversation';
+    document.getElementById('threadSub').textContent='Direct messages';
+  }else{
+    document.getElementById('threadTitle').textContent='Messages';
+    document.getElementById('threadSub').textContent='Open a conversation or start one from a friend profile.';
+  }
+}
+
+auth.onAuthStateChanged(async user => {
+  currentUser=user || null;
+  if(!user){
+    window.location.href='index.html';
+    return;
+  }
+  const snap=await db.ref('users/' + user.uid).once('value').catch(() => null);
+  currentProfile=snap?.val?.() || null;
+  if(!currentProfile?.userNumber){
+    window.location.href='profile.html';
+    return;
+  }
+  localStorage.setItem('rbUserNumber', String(currentProfile.userNumber));
+  activeThreadId=getThreadParam();
+  await loadSidebarData();
+  if(activeThreadId) subscribeToMessages(activeThreadId);
+});
+
+document.getElementById('messageInput').addEventListener('keydown', e => {
+  if(e.key==='Enter'){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+</script>
+</body>
+</html>
