@@ -1027,7 +1027,7 @@ window.onload=function(){
       const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
       const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
       if(savedSport===requestedSport){
-        if(isDemoSeasonData(parsed) && !hasMostlyRealImportedPlayers(parsed)){
+        if(isDemoSeasonData(parsed)){
           D=rebuildDemoSeasonData(savedSport);
           try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
         } else {
@@ -1073,20 +1073,6 @@ function isDemoSeasonData(data){
   const expected=getDemoTeamsForSport(data.sport||CURRENT_SPORT);
   if(data.teams.length!==expected.length) return false;
   return expected.every((name,idx)=>data.teams[idx]===name);
-}
-function hasMostlyRealImportedPlayers(data){
-  if(!data || !Array.isArray(data.allRosters)) return false;
-  const imported=buildRosterbateSportPlayerPool(data.sport||CURRENT_SPORT, 500);
-  const importedNames=new Set(imported.map(p=>String(p.name||'').trim().toLowerCase()));
-  let total=0, matches=0;
-  data.allRosters.forEach(roster=>{
-    (roster||[]).forEach(player=>{
-      total++;
-      if(importedNames.has(String(player?.name||'').trim().toLowerCase())) matches++;
-    });
-  });
-  if(!total) return false;
-  return (matches/total) >= 0.75;
 }
 function rebuildDemoSeasonData(sport){
   const targetSport=normalizeRosterbateSport(sport||CURRENT_SPORT);
