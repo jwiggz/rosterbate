@@ -32,11 +32,14 @@
   .nav-actions.auth-pending .account-wrap{visibility:hidden;pointer-events:none;}
   .nav-actions.logged-in #loginTrigger{visibility:hidden;pointer-events:none;}
   .account-wrap{position:relative;}
+  .nav-user-wrap{position:relative;display:inline-flex;align-items:center;}
   .nav-badge{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:20px;padding:4px 10px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);}
   .nav-auth-btn{background:var(--accent);border:1px solid rgba(249,115,22,.4);border-radius:20px;padding:6px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;min-width:86px;}
   .nav-auth-btn.secondary{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:var(--text2);}
   #loginTrigger{min-width:70px;}
   #authTrigger{min-width:110px;}
+  .nav-notify{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:999px;padding:0 5px;background:linear-gradient(180deg,#fb923c,#f97316);border:2px solid var(--bg);box-shadow:0 6px 16px rgba(249,115,22,.35);display:none;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:900;color:#fff;line-height:1;}
+  .nav-notify.show{display:inline-flex;}
   .account-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:160px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,.45);z-index:200;}
   .account-menu.open{display:block;}
   .account-item{display:block;width:100%;text-align:left;background:none;border:none;border-radius:8px;padding:10px 12px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text2);cursor:pointer;}
@@ -223,7 +226,10 @@
       <div class="nav-badge">Beta</div>
       <button id="loginTrigger" class="nav-auth-btn secondary" onclick="openAuthModal('login')">Sign In</button>
       <div class="account-wrap">
-        <button id="authTrigger" class="nav-auth-btn" onclick="openAuthModal('signup')">Sign Up</button>
+        <div class="nav-user-wrap">
+          <button id="authTrigger" class="nav-auth-btn" onclick="openAuthModal('signup')">Sign Up</button>
+          <span id="navNotify" class="nav-notify" aria-label="Notifications">1</span>
+        </div>
         <div id="accountMenu" class="account-menu">
           <button class="account-item" onclick="openMyProfile()">My Profile</button>
           <button class="account-item" onclick="openMessages()">Messages</button>
@@ -637,6 +643,53 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
 const HOME_SPORT_LABELS = { nba:'Basketball', nfl:'Football', mlb:'Baseball' };
 let selectedHomeSport = getSelectedRosterbateSport();
+let navFriendRequestListener = null;
+let navThreadListener = null;
+
+function updateNavNotificationBadge(count){
+  const badge = document.getElementById('navNotify');
+  if(!badge) return;
+  const total = Number(count || 0);
+  badge.textContent = total > 9 ? '9+' : String(total);
+  badge.classList.toggle('show', total > 0);
+}
+
+function clearNavNotificationSubscriptions(){
+  if(navFriendRequestListener){
+    navFriendRequestListener.off();
+    navFriendRequestListener = null;
+  }
+  if(navThreadListener){
+    navThreadListener.off();
+    navThreadListener = null;
+  }
+  updateNavNotificationBadge(0);
+}
+
+function subscribeNavNotifications(userNumber){
+  clearNavNotificationSubscriptions();
+  const myNumber = Number(userNumber || 0);
+  if(!(myNumber > 0)) return;
+  let pendingRequests = 0;
+  let unreadMessages = 0;
+  const refreshBadge = () => updateNavNotificationBadge(pendingRequests + unreadMessages);
+  navFriendRequestListener = db.ref('friendRequests/' + myNumber);
+  navFriendRequestListener.on('value', snap => {
+    pendingRequests = Object.keys(snap.val() || {}).length;
+    refreshBadge();
+  });
+  navThreadListener = db.ref('userThreads/' + myNumber);
+  navThreadListener.on('value', snap => {
+    const seenAt = Number(localStorage.getItem('rbMessagesLastSeen') || 0);
+    const threads = Object.values(snap.val() || {});
+    unreadMessages = threads.filter(thread => {
+      const updatedAt = Number(thread?.updatedAt || 0);
+      const lastSender = Number(thread?.lastSender || 0);
+      return updatedAt > seenAt && lastSender !== myNumber;
+    }).length;
+    refreshBadge();
+  });
+}
 
 function updateHomeSportUI(){
   const sport = normalizeRosterbateSport(selectedHomeSport);
@@ -736,6 +789,8 @@ function openSettings(){
 }
 function openMessages(){
   closeAccountMenu();
+  localStorage.setItem('rbMessagesLastSeen', String(Date.now()));
+  updateNavNotificationBadge(0);
   window.location.href='messages.html';
 }
 async function openMyProfile(){
@@ -995,7 +1050,9 @@ auth.onAuthStateChanged(async user => {
     }
     if(accountMenu) accountMenu.classList.remove('open');
     trigger.onclick = toggleAccountMenu;
+    subscribeNavNotifications(profile.userNumber || 0);
   } else {
+    clearNavNotificationSubscriptions();
     localStorage.removeItem('rbIsAdmin');
     trigger.textContent = 'Sign Up';
     trigger.classList.remove('secondary');

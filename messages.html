@@ -298,12 +298,14 @@ async function openOrCreateThread(otherUserNumber){
     otherUserNumber,
     otherUsername: friendMeta.username || 'Manager',
     otherPhotoURL: friendMeta.photoURL || '',
-    updatedAt: now
+    updatedAt: now,
+    lastSender: 0
   };
   updates['userThreads/'+otherUserNumber+'/'+threadId+'/otherUserNumber']=myNumber;
   updates['userThreads/'+otherUserNumber+'/'+threadId+'/otherUsername']=currentProfile.username || 'Manager';
   updates['userThreads/'+otherUserNumber+'/'+threadId+'/otherPhotoURL']=currentProfile.photoURL || '';
   updates['userThreads/'+otherUserNumber+'/'+threadId+'/updatedAt']=now;
+  updates['userThreads/'+otherUserNumber+'/'+threadId+'/lastSender']=0;
   await db.ref().update(updates);
   openThread(threadId);
 }
@@ -355,9 +357,11 @@ async function sendMessage(){
   updates['directThreads/' + activeThreadId + '/lastSender']=myNumber;
   updates['userThreads/' + myNumber + '/' + activeThreadId + '/updatedAt']=now;
   updates['userThreads/' + myNumber + '/' + activeThreadId + '/lastMessage']=text.slice(0,120);
+  updates['userThreads/' + myNumber + '/' + activeThreadId + '/lastSender']=myNumber;
   if(threadMeta.otherUserNumber){
     updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/updatedAt']=now;
     updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/lastMessage']=text.slice(0,120);
+    updates['userThreads/' + threadMeta.otherUserNumber + '/' + activeThreadId + '/lastSender']=myNumber;
   }
   await db.ref().update(updates);
   input.value='';
@@ -407,6 +411,7 @@ auth.onAuthStateChanged(async user => {
     return;
   }
   localStorage.setItem('rbUserNumber', String(currentProfile.userNumber));
+  localStorage.setItem('rbMessagesLastSeen', String(Date.now()));
   activeThreadId=getThreadParam();
   await loadSidebarData();
   if(activeThreadId) subscribeToMessages(activeThreadId);

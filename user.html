@@ -50,6 +50,30 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   letter-spacing:.7px;
   box-shadow:inset 0 1px 0 rgba(255,245,200,.4),0 8px 18px rgba(245,158,11,.16);
 }
+.loads-master-pill{
+  background:
+    linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.16) 28%,rgba(244,114,182,.14) 52%,rgba(45,212,191,.18) 76%,rgba(255,255,255,.22) 100%);
+  border-color:rgba(191,219,254,.45);
+  color:#f8fbff;
+  font-family:var(--fd);
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.75px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 24px rgba(96,165,250,.16),0 0 22px rgba(167,139,250,.12);
+  position:relative;
+  overflow:hidden;
+}
+.loads-master-pill::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.32) 26%,transparent 52%);
+  transform:translateX(-110%);
+  animation:loadsMasterShine 3.6s linear infinite;
+}
+@keyframes loadsMasterShine{
+  to{transform:translateX(130%);}
+}
 .admin-rank{
   display:inline-flex;
   align-items:center;
@@ -488,6 +512,7 @@ function renderProfile(profile, aggregates, viewsCount, social){
   const userNumber = Number(profile?.userNumber || 0);
   const isAdmin = !!profile?.isAdmin || [1,2,3,4,5].includes(userNumber);
   const isOwner = userNumber === 1;
+  const isLoadsMaster = userNumber === 2;
   const meta = aggregates || buildSeasonAggregates({});
   applyTheme(profile?.themeKey);
   document.getElementById('memberId').textContent = 'Member #' + (profile?.userNumber || '-');
@@ -499,9 +524,9 @@ function renderProfile(profile, aggregates, viewsCount, social){
   document.getElementById('footballTitlePill').lastChild.textContent = ' Football ' + Number(meta.nflTitles || 0);
   document.getElementById('baseballTitlePill').lastChild.textContent = ' Baseball ' + Number(meta.mlbTitles || 0);
   document.getElementById('basketballTitlePill').lastChild.textContent = ' Basketball ' + Number(meta.nbaTitles || 0);
-  document.getElementById('rolePill').className = 'pill owner-pill';
-  document.getElementById('rolePill').textContent = 'Owner';
-  document.getElementById('rolePill').style.display = isOwner ? 'inline-flex' : 'none';
+  document.getElementById('rolePill').className = 'pill ' + (isOwner ? 'owner-pill' : 'loads-master-pill');
+  document.getElementById('rolePill').textContent = isOwner ? 'Owner' : 'Loads Master';
+  document.getElementById('rolePill').style.display = (isOwner || isLoadsMaster) ? 'inline-flex' : 'none';
   document.getElementById('adminRank').style.display = isAdmin ? 'inline-flex' : 'none';
   document.getElementById('aboutMeCard').textContent = String(profile?.aboutMe || '').trim() || 'This manager has not written an about section yet.';
   document.getElementById('statSeasons').textContent = stats.seasonsPlayed || 0;
