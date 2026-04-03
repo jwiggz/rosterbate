@@ -115,9 +115,6 @@
   .pdet{font-size:11px;color:var(--text2);margin-top:1px;}
   .pmeta-row{display:flex;align-items:center;gap:8px;margin-top:5px;min-width:0;}
   .pfp-chip{font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
-  .psc{text-align:right;flex-shrink:0;}
-  .padp{font-family:var(--fd);font-size:13px;font-weight:700;}
-  .pproj{font-size:10px;color:var(--text3);margin-top:1px;}
   .pos-badge{display:inline-block;padding:1px 4px;border-radius:3px;font-family:var(--fd);font-size:10px;font-weight:700;margin-left:3px;}
   .pos-PG{background:rgba(59,130,246,.2);color:#60a5fa;}
   .pos-SG{background:rgba(168,85,247,.2);color:#c084fc;}
@@ -1809,21 +1806,18 @@ function rPlayers(){
     const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`:'';
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
-      :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${favBtn}${inlineDraftBtn}</div>`;
+      :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${inlineDraftBtn}</div>`;
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
       <div class="pinfo">
         <div class="pname-row">
           <div class="pname-main">
-            <div class="pname" style="display:flex;align-items:center;gap:4px;min-width:0;flex:1"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span></div>
+            <div class="pname" style="display:flex;align-items:center;gap:4px;min-width:0;flex:1"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span>${favBtn}</div>
           </div>
         </div>
         <div class="pdet">${p.team} · ${getRosterbatePlayerSummary(p, SPORT)}</div>
         ${actionRow}
-      </div>
-      <div class="psc">
-        ${drafted?'':`<div class="padp">#${p.adp}</div>`}
       </div>
     </div>`;
   }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
@@ -2351,9 +2345,22 @@ function confirmTrade(){
 
   const logEntry=`<strong>Pick #${myPickNum} <-> Pick #${theirPickNum}</strong> - Traded with ${theirName}. Snake draft position swap only.`;
   tradeLog.push(logEntry);
+  rbLoadChat();
+  rbChat.msgs.push({
+    id:'trade_'+Date.now(),
+    type:'system',
+    text:`Pick trade completed: ${S.name} swapped pick #${myPickNum} with ${theirName}'s pick #${theirPickNum}.`,
+    ts:Date.now(),
+    tag:'trades'
+  });
+  rbSaveChat();
+  if(rbChatOpen){
+    rbRender();
+    setTimeout(()=>rbScrollBottom(),50);
+  }
   closeTradeModal();
   showToast(`Traded! You now pick #${theirPickNum}`);
-  rBoard(); upHdr(); rPlayers();
+  rBoard(); upHdr(); rPlayers(); rOtherTeams();
 }
 
 // Trade button always visible during draft (not just on your turn)
@@ -2759,6 +2766,12 @@ function rbLoadChat(){
     if(raw) rbChat = JSON.parse(raw);
     if(!rbChat.msgs) rbChat.msgs = [];
     if(!rbChat.lastSeen) rbChat.lastSeen = 0;
+    const beforeCount = rbChat.msgs.length;
+    rbChat.msgs = rbChat.msgs.filter(m => {
+      if(m?.type !== 'system' || typeof m?.text !== 'string') return true;
+      return !/Draft Room opened|Season Manager opened/.test(m.text);
+    });
+    if(rbChat.msgs.length !== beforeCount) rbSaveChat();
   }catch(e){ rbChat = {msgs:[],lastSeen:0}; }
 }
 
@@ -3174,10 +3187,6 @@ function rbScheduleAiMsg(){
     applySavedLobbySettings();
     hydrateStepperInputs(document);
     rbLoadChat();
-    const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
-    // Only post system msg if no recent one
-    const recent=rbChat.msgs.filter(m=>m.type==='system'&&Date.now()-m.ts<5000);
-    if(!recent.length) rbPostSystem(context+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
     rbUpdateUnread();
     rbRender();
     rbMarkSeen();
