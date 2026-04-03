@@ -286,8 +286,9 @@ function applyProfileToUI(user, profile){
   const username = normalizeUsername(profile?.username) || fallbackUsernameFromUser(user);
   const photoURL = profile?.photoURL || user.photoURL || '';
   const userNumber = Number(profile?.userNumber || 0);
+  const isAdmin = [1,2,3,4,5].includes(userNumber);
   document.getElementById('displayName').textContent = username;
-  document.getElementById('memberLine').textContent = userNumber > 0 ? 'Member #' + userNumber : 'Member number pending';
+  document.getElementById('memberLine').textContent = userNumber > 0 ? 'Member #' + userNumber + (isAdmin ? ' · Administrator' : '') : 'Member number pending';
   document.getElementById('emailLine').textContent = user.email || 'No email found';
   document.getElementById('providerLine').textContent = 'Signed in with ' + (profile?.provider || user.providerData?.[0]?.providerId || 'account');
   document.getElementById('usernameInput').value = username;
@@ -372,6 +373,7 @@ async function saveProfile(){
     const previousKey = previousUsername ? usernameLookupKey(previousUsername) : '';
     const updatedAt = Date.now();
     const memberSince = Number(currentProfile?.memberSince || parseCreatedAt(currentUser, updatedAt));
+    const isAdmin = [1,2,3,4,5].includes(Number(userNumber || 0));
     const publicSnap = await db.ref('publicUsers/' + userNumber).once('value').catch(() => null);
     const hasPublicProfile = !!publicSnap?.exists?.();
     await currentUser.updateProfile({
@@ -382,6 +384,7 @@ async function saveProfile(){
     updates['users/' + currentUser.uid + '/email'] = currentUser.email || '';
     updates['users/' + currentUser.uid + '/username'] = username;
     updates['users/' + currentUser.uid + '/userNumber'] = userNumber;
+    updates['users/' + currentUser.uid + '/isAdmin'] = isAdmin;
     updates['users/' + currentUser.uid + '/memberSince'] = memberSince;
     updates['users/' + currentUser.uid + '/photoURL'] = selectedAvatar || '';
     updates['users/' + currentUser.uid + '/aboutMe'] = aboutMe;
@@ -397,6 +400,7 @@ async function saveProfile(){
     };
     updates['publicUsers/' + userNumber + '/uid'] = currentUser.uid;
     updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
+    updates['publicUsers/' + userNumber + '/isAdmin'] = isAdmin;
     updates['publicUsers/' + userNumber + '/username'] = username;
     updates['publicUsers/' + userNumber + '/photoURL'] = selectedAvatar || '';
     updates['publicUsers/' + userNumber + '/aboutMe'] = aboutMe;
@@ -415,11 +419,13 @@ async function saveProfile(){
     localStorage.setItem('rbPlayerName', username);
     localStorage.setItem('rbPlayerPhoto', selectedAvatar || '');
     localStorage.setItem('rbUserNumber', String(userNumber));
+    localStorage.setItem('rbIsAdmin', isAdmin ? '1' : '0');
     currentProfile = {
       ...(currentProfile || {}),
       email: currentUser.email || '',
       username,
       userNumber,
+      isAdmin,
       memberSince,
       photoURL: selectedAvatar || '',
       aboutMe,
@@ -428,7 +434,7 @@ async function saveProfile(){
       updatedAt
     };
     document.getElementById('displayName').textContent = username;
-    document.getElementById('memberLine').textContent = 'Member #' + userNumber;
+    document.getElementById('memberLine').textContent = 'Member #' + userNumber + (isAdmin ? ' · Administrator' : '');
     document.getElementById('viewPublicPageBtn').disabled = false;
     renderAvatar(selectedAvatar, username);
     setStatus('Profile saved.', 'success');
@@ -460,11 +466,13 @@ auth.onAuthStateChanged(async user => {
       const userNumber = await ensureUserNumber(user, currentProfile);
       const updatedAt = Date.now();
       const memberSince = Number(currentProfile.memberSince || parseCreatedAt(user, updatedAt));
+      const isAdmin = [1,2,3,4,5].includes(Number(userNumber || 0));
       const publicSnap = await db.ref('publicUsers/' + userNumber).once('value').catch(() => null);
       const updates = {};
       updates['users/' + user.uid + '/email'] = user.email || '';
       updates['users/' + user.uid + '/username'] = username;
       updates['users/' + user.uid + '/userNumber'] = userNumber;
+      updates['users/' + user.uid + '/isAdmin'] = isAdmin;
       updates['users/' + user.uid + '/memberSince'] = memberSince;
       updates['users/' + user.uid + '/photoURL'] = currentProfile.photoURL || user.photoURL || '';
       updates['users/' + user.uid + '/aboutMe'] = currentProfile.aboutMe || '';
@@ -480,6 +488,7 @@ auth.onAuthStateChanged(async user => {
       };
       updates['publicUsers/' + userNumber + '/uid'] = user.uid;
       updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
+      updates['publicUsers/' + userNumber + '/isAdmin'] = isAdmin;
       updates['publicUsers/' + userNumber + '/username'] = username;
       updates['publicUsers/' + userNumber + '/photoURL'] = currentProfile.photoURL || user.photoURL || '';
       updates['publicUsers/' + userNumber + '/aboutMe'] = currentProfile.aboutMe || '';
@@ -491,6 +500,7 @@ auth.onAuthStateChanged(async user => {
       await db.ref().update(updates);
       snap = await db.ref('users/' + user.uid).once('value');
       currentProfile = snap.val() || {};
+      localStorage.setItem('rbIsAdmin', isAdmin ? '1' : '0');
     }
   } catch (error){
     currentProfile = {};

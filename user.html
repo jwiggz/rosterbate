@@ -34,6 +34,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .title{font-family:var(--fd);font-size:42px;font-weight:900;text-transform:uppercase;line-height:.95;margin-top:8px;}
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
+.admin-pill{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.35);color:#fbbf24;font-family:var(--fd);font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;}
 .label{font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
@@ -172,12 +173,15 @@ function applyTheme(themeKey){
 
 function renderProfile(profile){
   const stats = profile?.lifetime || {};
+  const isAdmin = !!profile?.isAdmin || [1,2,3,4,5].includes(Number(profile?.userNumber || 0));
   applyTheme(profile?.themeKey);
   document.getElementById('memberId').textContent = 'Member #' + (profile?.userNumber || '-');
-  document.getElementById('memberName').textContent = profile?.username || 'Unknown Member';
-  document.getElementById('memberLine').textContent = 'Lifetime league stats, finishes, style, and public identity for this manager.';
+  document.getElementById('memberName').textContent = (isAdmin ? 'â™› ' : '') + (profile?.username || 'Unknown Member');
+  document.getElementById('memberLine').textContent = isAdmin ? 'Administrator · Can moderate chat and manage bans across RosterBate.' : 'Lifetime league stats, finishes, style, and public identity for this manager.';
   document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
   document.getElementById('memberLinkPill').textContent = profile?.profileUrl || 'Public profile';
+  document.getElementById('memberLinkPill').className = 'pill' + (isAdmin ? ' admin-pill' : '');
+  if(isAdmin) document.getElementById('memberLinkPill').textContent = 'Admin';
   document.getElementById('aboutMeCard').textContent = String(profile?.aboutMe || '').trim() || 'This manager has not written an about section yet.';
   document.getElementById('statSeasons').textContent = stats.seasonsPlayed || 0;
   document.getElementById('statRecord').textContent = (stats.regularSeasonWins || 0) + '-' + (stats.regularSeasonLosses || 0);
@@ -204,7 +208,7 @@ function renderSeasons(seasons){
         ${season.leagueName || 'RosterBate League'}<br>
         Finish: ${ord(season.finalRank || 0)}<br>
         Record: ${(season.regularSeasonWins || 0)}-${(season.regularSeasonLosses || 0)}<br>
-        PF: ${Number(season.pointsFor || 0).toFixed(1)} Â· PA: ${Number(season.pointsAgainst || 0).toFixed(1)}
+        PF: ${Number(season.pointsFor || 0).toFixed(1)} · PA: ${Number(season.pointsAgainst || 0).toFixed(1)}
       </div>
     </div>
   `).join('');

@@ -241,11 +241,17 @@ let cdRunning = false;
 let cdTimer = null;
 let globalChatListener = null;
 let globalChatMessages = [];
+let globalChatBansListener = null;
+let globalChatBans = {};
 const MM_SPORT = getSelectedRosterbateSport();
 const MM_RULES_DEFAULT = getRosterbateLeagueRuleDefaults(MM_SPORT);
 const MM_POSITION_LABELS = getRosterbatePositionLabels(MM_SPORT);
 const presenceRef = db.ref('presence/'+myId);
-const globalChatRef = db.ref('matchmakingGlobalChat');
+const globalChatRef = db.ref('matchmakingGlobalChat/messages');
+const globalChatBansRef = db.ref('matchmakingGlobalChatBans');
+const ADMIN_USER_NUMBERS = [1,2,3,4,5];
+let myUserNumber = Number(localStorage.getItem('rbUserNumber') || 0);
+let myIsAdmin = localStorage.getItem('rbIsAdmin') === '1' || ADMIN_USER_NUMBERS.includes(myUserNumber);
 
 const quickState = { format:'snake', scoring:'h2h_pts', teamSize:10 };
 const createOpts = { format:'snake', scoring:'h2h_pts', teamSize:10, isPrivate:false, settings:JSON.parse(JSON.stringify(MM_RULES_DEFAULT)) };
@@ -265,7 +271,7 @@ function globalChatShell(){
           <div class="global-chat-title">Global Chat</div>
           <div class="global-chat-sub">Post league codes, call out open rooms, and keep the whole matchmaking floor alive.</div>
         </div>
-        <div class="global-chat-room">Matchmaking Hub</div>
+        <div class="global-chat-room">${myIsAdmin ? 'Admin Online · Matchmaking Hub' : 'Matchmaking Hub'}</div>
       </div>
       <div id="mmGlobalChatFeed" class="global-chat-feed"><div class="empty"><div class="empty-icon">??</div><div class="empty-title">Loading chat…</div></div></div>
       <div class="global-chat-compose">
@@ -277,13 +283,23 @@ function globalChatShell(){
 
 function attachGlobalChat(){
   renderGlobalChat();
+  if(!globalChatBansListener){
+    globalChatBansListener = globalChatBansRef.on('value', snap => {
+      globalChatBans = snap.val() || {};
+      renderGlobalChat();
+    });
+  }
   if(globalChatListener) return;
   globalChatListener = globalChatRef.limitToLast(80).on('value', snap => {
     const rows = [];
-    snap.forEach(c => rows.push(c.val() || {}));
+    snap.forEach(c => rows.push({...c.val() || {}, _id:c.key}));
     globalChatMessages = rows.sort((a,b)=>(a.ts||0)-(b.ts||0));
     renderGlobalChat();
   });
+}
+
+function isChatBanned(playerId){
+  return !!globalChatBans[String(playerId || '')]?.active;
 }
 
 function renderGlobalChat(){
@@ -296,13 +312,39 @@ function renderGlobalChat(){
   feed.innerHTML = globalChatMessages.map(m => `
     <div class="global-chat-row">
       <div class="global-chat-av" style="background:${playerColor(m.playerId||'x')}">${ini(m.name)}</div>
-      <div>
-        <div class="global-chat-meta">${escapeHtml(m.name || 'Manager')} · ${formatChatTime(m.ts)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div class="global-chat-meta">${escapeHtml(m.name || 'Manager')}${ADMIN_USER_NUMBERS.includes(Number(m.userNumber || 0)) ? ' ♛' : ''} · ${formatChatTime(m.ts)}${isChatBanned(m.playerId) ? ' · banned' : ''}</div>
+          ${myIsAdmin && m.playerId !== myId ? `<div style="display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="mmDeleteGlobalChatMessage('${m._id}')" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 8px;color:var(--text2);font-size:10px;cursor:pointer;">Delete</button>
+            <button onclick="mmBanGlobalChatPlayer('${m.playerId}','${escapeHtml(m.name || 'Manager')}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:8px;padding:4px 8px;color:#fca5a5;font-size:10px;cursor:pointer;">Ban</button>
+          </div>` : ''}
+        </div>
         <div class="global-chat-text">${escapeHtml(m.text || '')}</div>
       </div>
     </div>
   `).join('');
   feed.scrollTop = feed.scrollHeight;
+}
+async function mmDeleteGlobalChatMessage(messageId){
+  if(!myIsAdmin || !messageId) return;
+  try{
+    await globalChatRef.child(messageId).remove();
+    toast('Message removed');
+  }catch(e){
+    console.error(e);
+    toast('Could not remove message','var(--red)');
+  }
+}
+async function mmBanGlobalChatPlayer(playerId, name){
+  if(!myIsAdmin || !playerId) return;
+  try{
+    await globalChatBansRef.child(String(playerId)).set({active:true,name:String(name||'Manager'),bannedBy:myName,bannedAt:Date.now()});
+    toast((name || 'Manager') + ' banned from chat');
+  }catch(e){
+    console.error(e);
+    toast('Could not ban player','var(--red)');
+  }
 }
 
 function mmHandleGlobalChatKey(event){
@@ -334,13 +376,17 @@ async function mmSendGlobalChat(){
   const input = document.getElementById('mmGlobalChatInput');
   const text = (input?.value || '').trim();
   if(!text) return;
+  if(isChatBanned(myId)){
+    toast('You are banned from matchmaking chat','var(--red)');
+    return;
+  }
   if(text.length > 280){
     toast('Keep chat messages under 280 characters','var(--red)');
     return;
   }
   input.value = '';
   try{
-    await globalChatRef.push({playerId:myId,name:myName || 'Manager',text,ts:Date.now()});
+    await globalChatRef.push({playerId:myId,userNumber:myUserNumber||0,name:myName || 'Manager',text,ts:Date.now()});
   }catch(e){
     console.error(e);
     toast('Could not send message','var(--red)');
@@ -989,9 +1035,9 @@ function renderWaitingRoom(lobby){
   if(rb){ rb.textContent=myReady?'âœ“ Ready!':'âœ“ Ready Up'; rb.className=myReady?'ready-btn is-ready':'ready-btn'; }
 
   // Render chat
-  const chatMsgs=Object.values(lobby.chat||{}).sort((a,b)=>a.ts-b.ts);
+  const chatMsgs=Object.entries(lobby.chat||{}).map(([id,val])=>({...(val||{}),_id:id})).sort((a,b)=>a.ts-b.ts);
   const wc=document.getElementById('wrChat');
-  if(wc){ wc.innerHTML=chatMsgs.map(m=>`<div style="display:flex;gap:6px;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${m.name}: </span><span style="font-size:12px;color:var(--text);">${m.text}</span></div></div>`).join('');wc.scrollTop=wc.scrollHeight;}
+  if(wc){ wc.innerHTML=chatMsgs.map(m=>`<div style="display:flex;gap:6px;align-items:flex-start;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div style="flex:1;min-width:0;"><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${escapeHtml(m.name)}${ADMIN_USER_NUMBERS.includes(Number(m.userNumber||0))?' ♛':''}: </span><span style="font-size:12px;color:var(--text);">${escapeHtml(m.text)}</span>${myIsAdmin&&m.playerId!==myId?`<div style="display:flex;gap:6px;margin-top:4px;"><button onclick="mmDeleteLobbyChatMessage('${m._id}')" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);font-size:10px;cursor:pointer;">Delete</button><button onclick="mmBanGlobalChatPlayer('${m.playerId}','${escapeHtml(m.name)}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:2px 7px;color:#fca5a5;font-size:10px;cursor:pointer;">Ban</button></div>`:''}</div></div>`).join('');wc.scrollTop=wc.scrollHeight;}
 
   // Check all ready + enough players
   if(players.length>=2&&players.every(p=>p.ready)&&!cdRunning) startCountdown();
@@ -1007,8 +1053,16 @@ function mmSendLobbyChat(){
   const input=document.getElementById('wrChatInput');
   const text=(input?.value||'').trim();
   if(!text||!currentLobbyId) return;
+  if(isChatBanned(myId)){
+    toast('You are banned from matchmaking chat','var(--red)');
+    return;
+  }
   input.value='';
-  db.ref('lobbies/'+currentLobbyId+'/chat').push({playerId:myId,name:myName,text,ts:Date.now()});
+  db.ref('lobbies/'+currentLobbyId+'/chat').push({playerId:myId,userNumber:myUserNumber||0,name:myName,text,ts:Date.now()});
+}
+function mmDeleteLobbyChatMessage(messageId){
+  if(!myIsAdmin || !currentLobbyId || !messageId) return;
+  db.ref('lobbies/'+currentLobbyId+'/chat/'+messageId).remove().then(()=>toast('Lobby message removed')).catch(e=>{console.error(e);toast('Could not remove message','var(--red)');});
 }
 
 function startCountdown(){

@@ -745,6 +745,10 @@ async function ensureUserNumber(user, existingProfile){
   if(storedNumber > 0) return storedNumber;
   return allocateNextUserNumber();
 }
+const ROSTERBATE_ADMIN_NUMBERS = [1,2,3,4,5];
+function isRosterbateAdminNumber(userNumber){
+  return ROSTERBATE_ADMIN_NUMBERS.includes(Number(userNumber || 0));
+}
 
 async function saveUserProfile(user, username){
   const cleanUsername = normalizeUsername(username) || fallbackUsernameFromUser(user);
@@ -760,6 +764,7 @@ async function saveUserProfile(user, username){
   const previousKey = previousUsername ? usernameLookupKey(previousUsername) : '';
   const updatedAt = Date.now();
   const userNumber = await ensureUserNumber(user, previousProfile);
+  const isAdmin = isRosterbateAdminNumber(userNumber);
   const memberSince = Number(previousProfile.memberSince || parseCreatedAt(user, updatedAt));
   const publicSnap = await db.ref('publicUsers/' + userNumber).once('value').catch(() => null);
   const hasPublicProfile = !!publicSnap?.exists?.();
@@ -768,6 +773,7 @@ async function saveUserProfile(user, username){
   updates['users/' + user.uid + '/email'] = user.email || '';
   updates['users/' + user.uid + '/username'] = cleanUsername;
   updates['users/' + user.uid + '/userNumber'] = userNumber;
+  updates['users/' + user.uid + '/isAdmin'] = isAdmin;
   updates['users/' + user.uid + '/memberSince'] = memberSince;
   updates['users/' + user.uid + '/provider'] = user.providerData?.[0]?.providerId || 'password';
   updates['users/' + user.uid + '/updatedAt'] = updatedAt;
@@ -780,6 +786,7 @@ async function saveUserProfile(user, username){
   };
   updates['publicUsers/' + userNumber + '/uid'] = user.uid;
   updates['publicUsers/' + userNumber + '/userNumber'] = userNumber;
+  updates['publicUsers/' + userNumber + '/isAdmin'] = isAdmin;
   updates['publicUsers/' + userNumber + '/username'] = cleanUsername;
   updates['publicUsers/' + userNumber + '/photoURL'] = user.photoURL || '';
   updates['publicUsers/' + userNumber + '/memberSince'] = memberSince;
@@ -794,6 +801,7 @@ async function saveUserProfile(user, username){
   await db.ref().update(updates);
   localStorage.setItem('rbPlayerName', cleanUsername);
   localStorage.setItem('rbUserNumber', String(userNumber));
+  localStorage.setItem('rbIsAdmin', isAdmin ? '1' : '0');
 }
 
 async function resolveLoginEmail(identifier){
@@ -866,6 +874,7 @@ auth.onAuthStateChanged(async user => {
     const username = normalizeUsername(profile.username) || fallbackUsernameFromUser(user);
     localStorage.setItem('rbPlayerName', username);
     if(profile.userNumber) localStorage.setItem('rbUserNumber', String(profile.userNumber));
+    localStorage.setItem('rbIsAdmin', (profile.isAdmin || isRosterbateAdminNumber(profile.userNumber)) ? '1' : '0');
     trigger.textContent = username;
     trigger.classList.add('secondary');
     if(navActions) navActions.classList.add('logged-in');
@@ -877,6 +886,7 @@ auth.onAuthStateChanged(async user => {
     if(accountMenu) accountMenu.classList.remove('open');
     trigger.onclick = toggleAccountMenu;
   } else {
+    localStorage.removeItem('rbIsAdmin');
     trigger.textContent = 'Sign Up';
     trigger.classList.remove('secondary');
     if(navActions) navActions.classList.remove('logged-in');
