@@ -261,6 +261,9 @@
   .pause-btn.admin-mode{display:flex;align-items:center;gap:5px;}
   .pause-btn:active{background:rgba(239,68,68,.3);}
   .pause-btn.paused{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:var(--green);}
+  .sim-btn{display:none;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.32);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;cursor:pointer;flex-shrink:0;transition:all .15s;}
+  .sim-btn.show{display:flex;align-items:center;gap:5px;}
+  .sim-btn:active{background:rgba(59,130,246,.28);}
 
   /* Full-screen pause overlay */
   #pauseOverlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(10,14,26,.95);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;}
@@ -396,7 +399,7 @@
     <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Buckets & Beyond"/></div>
     <div class="two">
       <div class="fr"><label>Teams (2–20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
-      <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="5"/></div>
+      <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="1"/></div>
     </div>
     <div class="two">
       <div class="fr"><label>Rounds</label><input type="number" id="iRounds" min="5" max="25" value="13" readonly/></div>
@@ -490,6 +493,7 @@
       <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">🏀 Roster<span>Bate</span></div></a>
       <div style="display:flex;align-items:center;gap:7px">
         <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">⏸ Pause</button>
+        <button class="sim-btn" id="simDraftBtn" onclick="simulateDraftToFinish()">⚡ Sim Draft</button>
         <button class="trade-btn" id="tradeHeaderBtn" onclick="openTradeModal()" style="display:none">⇄ Trade Pick</button>
         <div class="clk-badge" id="clkBadge">On The Clock</div>
       </div>
@@ -1451,6 +1455,21 @@ function hydrateStepperInputs(root){
   });
 }
 
+function syncDraftSpotBounds(){
+  const sizeEl=document.getElementById('iSize');
+  const spotEl=document.getElementById('iSpot');
+  if(!sizeEl || !spotEl) return;
+  let leagueSize=parseInt(sizeEl.value,10);
+  leagueSize=Number.isFinite(leagueSize)?leagueSize:2;
+  leagueSize=Math.max(1, Math.min(20, leagueSize));
+  sizeEl.value=String(leagueSize);
+  spotEl.max=String(leagueSize);
+  let draftSpot=parseInt(spotEl.value,10);
+  draftSpot=Number.isFinite(draftSpot)?draftSpot:1;
+  draftSpot=Math.max(1, Math.min(leagueSize, draftSpot));
+  spotEl.value=String(draftSpot);
+}
+
 function cc(gid,el){
   document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
@@ -1465,7 +1484,7 @@ function gv(gid){return document.querySelector('#'+gid+' .chip.on')?.dataset?.v|
 // ─── STATE ────────────────────────────────────────────────
 let S={
   name:'My Team',ls:10,fmt:'snake',scr:'h2h_cat',
-  rds:13,myPos:4,tmax:0,abud:200,myBudget:200,
+  rds:13,myPos:0,tmax:0,abud:200,myBudget:200,
   cur:0,total:0,picks:[],myTeam:[],drafted:new Set(),
   posF:'ALL',timer:0,timerInt:null,selP:null,
   teams:[],order:[],cpuBuds:[],auc:null,auctionTargets:{},roomId:'',
@@ -1503,7 +1522,7 @@ function applySportToDraftUI(){
   document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';
   document.getElementById('iName').placeholder = teamPlaceholders[SPORT] || teamPlaceholders.nba;
   document.getElementById('iSize').value = SPORT_CFG.defaultLeagueSize;
-  document.getElementById('iSpot').value = Math.min(5, SPORT_CFG.defaultLeagueSize);
+  document.getElementById('iSpot').value = 1;
   document.getElementById('iRounds').value = SPORT_CFG.defaultRounds;
   document.getElementById('cScoring').querySelectorAll('.chip').forEach(chip => {
     chip.classList.toggle('on', chip.dataset.v === SPORT_CFG.defaultScoring);
@@ -1514,7 +1533,9 @@ function applySportToDraftUI(){
   S.scr = SPORT_CFG.defaultScoring;
   S.rds = SPORT_CFG.defaultRounds;
   S.ls = SPORT_CFG.defaultLeagueSize;
+  S.myPos = 0;
   S.posF = 'ALL';
+  syncDraftSpotBounds();
 }
 
 function applySavedLobbySettings(){
@@ -1523,8 +1544,14 @@ function applySavedLobbySettings(){
     if(!raw) return;
     const state=JSON.parse(raw);
     if(!state || (state.sport && state.sport!==SPORT)) return;
+    const params=new URLSearchParams(window.location.search||'');
+    const hasLobbyParam=!!params.get('lobby');
+    const allowSoloLobby=!!(hasLobbyParam && state.soloTest && state.lobbyId);
     if(state.myName) document.getElementById('iName').value=state.myName;
-    if(state.teamSize) document.getElementById('iSize').value=state.teamSize;
+    if(state.teamSize){
+      const nextSize=Math.max(allowSoloLobby?1:2, Math.min(20, parseInt(state.teamSize,10)||0));
+      if(nextSize>0) document.getElementById('iSize').value=nextSize;
+    }
     if(state.format){
       document.querySelectorAll('#cFormat .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===state.format));
       document.getElementById('iFormatInfo').textContent=FMT_INFO[state.format]||FMT_INFO.snake;
@@ -1539,7 +1566,52 @@ function applySavedLobbySettings(){
       document.querySelectorAll('#cTimer .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===timerValue));
     }
     if(state.settings) renderAdvancedLeagueRules(state.settings);
+    syncDraftSpotBounds();
   }catch(e){}
+}
+
+function getSavedMultiplayerLobbyState(){
+  try{
+    const raw=localStorage.getItem('rbMultiplayerLobby');
+    if(!raw) return null;
+    const state=JSON.parse(raw);
+    return state&&typeof state==='object'?state:null;
+  }catch(e){
+    return null;
+  }
+}
+
+function isSoloTestDraft(){
+  const state=getSavedMultiplayerLobbyState();
+  const params=new URLSearchParams(window.location.search||'');
+  return !!(params.get('lobby') && state?.soloTest && state?.lobbyId);
+}
+
+function isLocalDraftTesting(){
+  const host=String(window.location.hostname||'').toLowerCase();
+  return host==='localhost' || host==='127.0.0.1';
+}
+
+function canUseDraftSimulator(){
+  const params=new URLSearchParams(window.location.search||'');
+  return isSoloTestDraft() || (isLocalDraftTesting() && !!params.get('lobby'));
+}
+
+function updateSoloSimButton(){
+  const btn=document.getElementById('simDraftBtn');
+  if(!btn) return;
+  btn.classList.toggle('show', canUseDraftSimulator() && S.cur < S.total);
+}
+
+function getOrderedLobbyPlayers(state){
+  const players=Array.isArray(state?.players)?state.players.slice():[];
+  return players
+    .filter(Boolean)
+    .sort((a,b)=>{
+      const aj=Number(a?.joinedAt||0), bj=Number(b?.joinedAt||0);
+      if(aj!==bj) return aj-bj;
+      return String(a?.name||'').localeCompare(String(b?.name||''));
+    });
 }
 
 function getSportOpponentNames(sport){
@@ -1594,7 +1666,9 @@ function startDraft(){
   const ls=parseInt(document.getElementById('iSize').value);
   const sp=parseInt(document.getElementById('iSpot').value);
   const rd=rules.rosterSize;
-  if(isNaN(ls)||ls<2||ls>20){e.textContent='League size must be 2–20.';e.classList.add('show');return;}
+  const lobbyState=getSavedMultiplayerLobbyState();
+  const allowSoloTest=!!(lobbyState?.soloTest && lobbyState?.lobbyId);
+  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
   const need=ls*rd;
@@ -1613,12 +1687,24 @@ function startDraft(){
   FAVS=[];tradeLog=[];trSelectedTeam=null;
   initPauseState();
   rbResetDraftRoomChat();
-  const tn=getSportOpponentNames(SPORT);
-  S.teams=Array.from({length:ls},(_,i)=>i===S.myPos?S.name:(tn[i]||'Team '+(i+1)));
+  const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
+  if(lobbyState?.lobbyId && orderedLobbyPlayers.length===ls){
+    const myLobbyIdx=orderedLobbyPlayers.findIndex(player=>player?.id===lobbyState.myId);
+    if(myLobbyIdx>=0){
+      S.myPos=myLobbyIdx;
+      S.name=orderedLobbyPlayers[myLobbyIdx]?.name||S.name;
+      S.teams=orderedLobbyPlayers.map((player,idx)=>player?.name||('Team '+(idx+1)));
+    }
+  }
+  if(!Array.isArray(S.teams)||S.teams.length!==ls){
+    const tn=getSportOpponentNames(SPORT);
+    S.teams=Array.from({length:ls},(_,i)=>i===S.myPos?S.name:(tn[i]||'Team '+(i+1)));
+  }
   S.cpuBuds=Array.from({length:ls},()=>S.abud);
   S.order=pickOrder(ls,rd,S.fmt);
   document.getElementById('mFmt').textContent=S.fmt.toUpperCase();
   syncDraftTimerDisplay();
+  updateSoloSimButton();
 
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
@@ -1765,6 +1851,64 @@ function chooseBestCpuPlayerForTeam(ti,av){
     }
   });
   return best;
+}
+
+function simulateDraftToFinish(){
+  if(!canUseDraftSimulator()){
+    showToast('Local testing only');
+    return;
+  }
+  if(S.cur>=S.total){
+    endDraft();
+    return;
+  }
+  clearInterval(S.timerInt);
+  hideBanner();
+  document.getElementById('pModal')?.classList.remove('open');
+  document.getElementById('aModal')?.classList.remove('open');
+  let guard=0;
+  while(S.cur<S.total && guard<5000){
+    const av=getAvailablePlayersSorted();
+    if(!av.length) break;
+    if(S.fmt==='auction'){
+      const nominator=S.order[S.cur];
+      const nominee=chooseBestCpuPlayerForTeam(nominator,av) || av[0];
+      if(!nominee) break;
+      const targetPrice=Math.max(1, getAuctionTargetPrice(nominee));
+      if(nominator===S.myPos){
+        const myBid=Math.max(1, Math.min(targetPrice, S.myBudget||1));
+        S.myBudget=Math.max(0,(S.myBudget||0)-myBid);
+      }else{
+        const cpuBudget=Math.max(0,S.cpuBuds[nominator]||0);
+        const cpuBid=Math.max(1, Math.min(targetPrice, cpuBudget||1));
+        S.cpuBuds[nominator]=Math.max(0,cpuBudget-cpuBid);
+      }
+      doPick(nominee,nominator);
+    }else{
+      const ti=S.order[S.cur];
+      const pick=chooseBestCpuPlayerForTeam(ti,av) || av[0];
+      if(!pick) break;
+      doPick(pick,ti);
+    }
+    guard++;
+  }
+  S.auc=null;
+  rBoard();
+  rPlayers();
+  rMyTeam();
+  rOtherTeams();
+  upHdr();
+  updateSoloSimButton();
+  if(S.cur>=S.total){
+    endDraft();
+    if(isLocalDraftTesting()){
+      setTimeout(()=>{
+        window.location.href='rosterbate-season.html?sport='+encodeURIComponent(SPORT);
+      },120);
+    }
+  }else{
+    showToast('Simulation stopped early');
+  }
 }
 
 // ─── DRAFT FLOW ───────────────────────────────────────────
@@ -2160,13 +2304,14 @@ function upHdr(){
   }
   document.getElementById('mNext').textContent=nxt;
   const badge=document.getElementById('clkBadge');
-  if(S.cur>=S.total){badge.textContent='Draft Complete 🏆';badge.className='clk-badge w';updateTradeBtn();return;}
+  if(S.cur>=S.total){badge.textContent='Draft Complete 🏆';badge.className='clk-badge w';updateTradeBtn();updateSoloSimButton();return;}
   const mine=S.order[S.cur]===S.myPos;
   badge.textContent=S.fmt==='auction'
     ?(mine?'Your Nomination ⏰':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
     :(mine?'On The Clock ⏰':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
   badge.className='clk-badge'+(mine?'':' w');
   updateTradeBtn();
+  updateSoloSimButton();
 }
 
 // TIMER
@@ -2598,75 +2743,138 @@ function updateTradeBtn(){
 // ─── SEASON MANAGEMENT ────────────────────────────────────
 function endDraft(){
   clearInterval(S.timerInt);
+  updateSoloSimButton();
+  const draftEl=document.getElementById('draft');
+  const completeEl=document.getElementById('draftComplete');
+  if(draftEl) draftEl.classList.remove('active');
+  if(completeEl) completeEl.classList.add('active');
+  try{
+    const lobbyState=getSavedMultiplayerLobbyState();
+    const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
+    const teamCount=Array.isArray(S.teams)?S.teams.length:0;
+    const isMultiplayer=!!(lobbyState?.lobbyId && orderedLobbyPlayers.length===teamCount);
+    const teamUsers=isMultiplayer
+      ? orderedLobbyPlayers.reduce((acc,player,idx)=>{
+          if(player?.id){
+            acc[player.id]={
+              id:player.id,
+              name:player.name||('Team '+(idx+1)),
+              teamIdx:idx,
+              joinedAt:Number(player.joinedAt||0)
+            };
+          }
+          return acc;
+        },{})
+      : null;
 
-  // Save draft data to localStorage for the season manager to pick up
-  const draftData = {
-    sport: SPORT,
-    teamName: S.name,
-    leagueSize: S.ls,
-    scoringFormat: S.scr,
-    draftFormat: S.fmt,
-    rounds: S.rds,
-    customRules: S.rules,
-    commissionerSettings: {
-      numTeams:S.ls,
-      draftType:S.fmt.charAt(0).toUpperCase()+S.fmt.slice(1),
-      timePerPick:S.tmax,
-      scoringType:S.scr==='h2h_cat'?'H2H Categories':S.scr==='roto'?'Rotisserie':'H2H Points',
-      rosterSize:S.rules?.rosterSize||S.rds,
-      totalStarters:S.rules?.starters||SPORT_RULES.starters,
-      totalBench:S.rules?.benchSlots||SPORT_RULES.benchSlots,
-      irSlots:S.rules?.irSlots||SPORT_RULES.irSlots,
-      scoring:S.rules?.scoring||SPORT_RULES.scoring
-    },
-    myPos: S.myPos,
-    teams: S.teams,
-    picks: S.picks,
-    myRoster: S.myTeam.map(p=>({
-      id:p.id, name:p.name, team:p.team, pos:p.pos,
-      pts:p.pts, reb:p.reb, ast:p.ast, stl:p.stl,
-      blk:p.blk, to:p.to, fgp:p.fgp, ftp:p.ftp, tpm:p.tpm, fp:p.fp, statValues:p.statValues||null, statSummary:p.statSummary||''
-    })),
-    allRosters: S.teams.map((_,ti)=>{
-      return S.picks.filter(pk=>pk.ti===ti).map(pk=>{
-        const p=PLAYERS.find(x=>x.id===pk.pid);
-        return p?{id:p.id,name:p.name,team:p.team,pos:p.pos,pts:p.pts,reb:p.reb,ast:p.ast,stl:p.stl,blk:p.blk,to:p.to,fgp:p.fgp,ftp:p.ftp,tpm:p.tpm,fp:p.fp,statValues:p.statValues||null,statSummary:p.statSummary||''}:null;
-      }).filter(Boolean);
-    }),
-    isCommissioner: !!PS.isAdmin,
-    savedAt: Date.now()
-  };
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+    const serializePlayer=p=>({
+      id:p?.id,
+      name:p?.name||'Unknown Player',
+      team:p?.team||'FA',
+      pos:p?.pos||'—',
+      pts:p?.pts,
+      reb:p?.reb,
+      ast:p?.ast,
+      stl:p?.stl,
+      blk:p?.blk,
+      to:p?.to,
+      fgp:p?.fgp,
+      ftp:p?.ftp,
+      tpm:p?.tpm,
+      fp:p?.fp,
+      statValues:p?.statValues||null,
+      statSummary:p?.statSummary||''
+    });
 
-  // Show draft complete screen
-  document.getElementById('draft').classList.remove('active');
-  document.getElementById('draftComplete').classList.add('active');
+    // Save draft data to localStorage for the season manager to pick up
+    const draftData = {
+      sport: SPORT,
+      teamName: S.name,
+      leagueName: lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
+      leagueSize: S.ls,
+      scoringFormat: S.scr,
+      draftFormat: S.fmt,
+      rounds: S.rds,
+      customRules: S.rules,
+      commissionerSettings: {
+        numTeams:S.ls,
+        draftType:S.fmt.charAt(0).toUpperCase()+S.fmt.slice(1),
+        timePerPick:S.tmax,
+        scoringType:S.scr==='h2h_cat'?'H2H Categories':S.scr==='roto'?'Rotisserie':'H2H Points',
+        rosterSize:S.rules?.rosterSize||S.rds,
+        totalStarters:S.rules?.starters||SPORT_RULES.starters,
+        totalBench:S.rules?.benchSlots||SPORT_RULES.benchSlots,
+        irSlots:S.rules?.irSlots||SPORT_RULES.irSlots,
+        scoring:S.rules?.scoring||SPORT_RULES.scoring
+      },
+      myPos: S.myPos,
+      teams: Array.isArray(S.teams)?S.teams:[],
+      picks: Array.isArray(S.picks)?S.picks:[],
+      myRoster: (Array.isArray(S.myTeam)?S.myTeam:[]).map(serializePlayer),
+      allRosters: (Array.isArray(S.teams)?S.teams:[]).map((_,ti)=>{
+        return (Array.isArray(S.picks)?S.picks:[]).filter(pk=>pk.ti===ti).map(pk=>{
+          const p=PLAYERS.find(x=>x.id===pk.pid);
+          return p?serializePlayer(p):null;
+        }).filter(Boolean);
+      }),
+      isCommissioner: !!PS.isAdmin,
+      multiplayer: isMultiplayer,
+      lobbyId: isMultiplayer ? lobbyState.lobbyId : null,
+      sharedSeasonId: isMultiplayer ? lobbyState.lobbyId : null,
+      myPlayerId: isMultiplayer ? (lobbyState.myId||null) : null,
+      teamUsers: teamUsers,
+      savedAt: Date.now()
+    };
+    try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
 
-  // Populate summary
-  const myRoster = S.myTeam;
-  document.getElementById('dcTeamName').textContent = S.name;
-  document.getElementById('dcPicks').textContent = myRoster.length + ' players drafted';
+    const myRoster = Array.isArray(S.myTeam)?S.myTeam.filter(Boolean):[];
+    const teamNameEl=document.getElementById('dcTeamName');
+    const picksEl=document.getElementById('dcPicks');
+    const topPickEl=document.getElementById('dcTopPick');
+    const projEl=document.getElementById('dcProjTotal');
+    const rosterEl=document.getElementById('dcRoster');
+    if(teamNameEl) teamNameEl.textContent = S.name||'My Team';
+    if(picksEl) picksEl.textContent = myRoster.length + ' players drafted';
 
-  const topPick = myRoster[0];
-  document.getElementById('dcTopPick').textContent = topPick ? topPick.name + ' (' + topPick.pos + ' · ' + topPick.team + ')' : '—';
+    const topPick = myRoster[0];
+    if(topPickEl){
+      topPickEl.textContent = topPick ? topPick.name + ' (' + topPick.pos + ' · ' + topPick.team + ')' : '—';
+    }
 
-  const projTotal = myRoster.reduce((s,p)=>s+calcFP(p),0).toFixed(1);
-  document.getElementById('dcProjTotal').textContent = projTotal + ' FP';
+    const projTotal = myRoster.reduce((s,p)=>s+(Number(calcFP(p))||0),0).toFixed(1);
+    if(projEl) projEl.textContent = projTotal + ' FP';
 
-  // Build roster list
-  const slots=['PG','SG','SF','PF','C','G','F','UTIL','BN','BN','BN','BN','BN'];
-  document.getElementById('dcRoster').innerHTML = myRoster.map((p,i)=>{
-    const col=tcolor(p.team);
-    return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);">'
-      +'<div style="width:22px;font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0;">'+(slots[i]||'BN')+'</div>'
-      +'<div style="width:30px;height:30px;border-radius:50%;background:'+col+';display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+initials(p.name)+'</div>'
-      +'<div style="flex:1;min-width:0;">'
-      +'<div style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'
-      +'<div style="font-size:11px;color:var(--text2);">'+p.team+' · '+p.pos+' · '+p.fp+'fp</div>'
-      +'</div>'
-      +'<div style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;">Rd '+(i+1)+'</div>'
-      +'</div>';
-  }).join('');
+    // Build sport-aware roster list with safe fallbacks
+    const slots=(Array.isArray(SPORT_CFG?.myTeamSlots)&&SPORT_CFG.myTeamSlots.length?SPORT_CFG.myTeamSlots.slice():[]);
+    if(rosterEl){
+      rosterEl.innerHTML = myRoster.length ? myRoster.map((p,i)=>{
+        const col=tcolor(p.team);
+        const fpValue=Number.isFinite(Number(p.fp))?Number(p.fp):Number(calcFP(p))||0;
+        return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);">'
+          +'<div style="width:34px;font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0;">'+(slots[i]||'BN')+'</div>'
+          +'<div style="width:30px;height:30px;border-radius:50%;background:'+col+';display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+initials(p.name)+'</div>'
+          +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'
+          +'<div style="font-size:11px;color:var(--text2);">'+p.team+' · '+p.pos+' · '+fpValue+' fp</div>'
+          +'</div>'
+          +'<div style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;">Rd '+(i+1)+'</div>'
+          +'</div>';
+      }).join('') : '<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">No players were drafted to this roster.</div>';
+    }
+  }catch(err){
+    console.error('RosterBate endDraft failed:', err);
+    const teamNameEl=document.getElementById('dcTeamName');
+    const picksEl=document.getElementById('dcPicks');
+    const topPickEl=document.getElementById('dcTopPick');
+    const projEl=document.getElementById('dcProjTotal');
+    const rosterEl=document.getElementById('dcRoster');
+    if(teamNameEl) teamNameEl.textContent=S.name||'My Team';
+    if(picksEl) picksEl.textContent=(Array.isArray(S.myTeam)?S.myTeam.length:0)+' players drafted';
+    if(topPickEl) topPickEl.textContent='Draft finished';
+    if(projEl) projEl.textContent='—';
+    if(rosterEl) rosterEl.innerHTML='<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">Draft complete. Your season data was still saved, but the summary card hit a render issue.</div>';
+    showToast('Draft complete. Summary screen recovered.');
+  }
 }
 
 function openSeasonManager(){
@@ -3445,6 +3653,11 @@ function rbScheduleAiMsg(){
     applySportToDraftUI();
     applySavedLobbySettings();
     hydrateStepperInputs(document);
+    document.getElementById('iSize')?.addEventListener('input', syncDraftSpotBounds);
+    document.getElementById('iSize')?.addEventListener('change', syncDraftSpotBounds);
+    document.getElementById('iSpot')?.addEventListener('input', syncDraftSpotBounds);
+    document.getElementById('iSpot')?.addEventListener('change', syncDraftSpotBounds);
+    syncDraftSpotBounds();
     rbLoadChat();
     rbUpdateUnread();
     rbRender();

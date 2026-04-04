@@ -165,6 +165,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div id="wrReadySection">
       <button class="ready-btn" id="wrReadyBtn" onclick="mmToggleReady()">Ready Up</button>
       <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3);" id="wrReadyCount"></div>
+      <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="margin-top:10px;display:none;">Start Solo Test</button>
       <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>
     </div>
     <div id="wrCountdown" style="display:none;text-align:center;padding:10px 0;">
@@ -616,6 +617,7 @@ function teamCount(lobby){
 function buildMultiplayerLobbyState(lobby){
   return {
     lobbyId:lobby.id,
+    name:lobby.name||'RosterBate League',
     sport:lobby.sport||MM_SPORT,
     format:lobby.format,
     scoring:lobby.scoring,
@@ -1070,6 +1072,11 @@ function renderWaitingRoom(lobby){
   myReady=myP?.ready||false;
   const rb=document.getElementById('wrReadyBtn');
   if(rb){ rb.textContent=myReady?'Ready!':'Ready Up'; rb.className=myReady?'ready-btn is-ready':'ready-btn'; }
+  const soloBtn=document.getElementById('wrSoloBtn');
+  if(soloBtn){
+    const canSolo=lobby.createdBy===myId && players.length===1;
+    soloBtn.style.display=canSolo?'block':'none';
+  }
 
   // Render chat
   const chatMsgs=Object.entries(lobby.chat||{}).map(([id,val])=>({...(val||{}),_id:id})).sort((a,b)=>a.ts-b.ts);
@@ -1084,6 +1091,44 @@ function mmToggleReady(){
   if(!currentLobbyId) return;
   myReady=!myReady;
   db.ref('lobbies/'+currentLobbyId+'/players/'+myId+'/ready').set(myReady);
+}
+
+async function mmStartSoloTest(){
+  if(!currentLobbyId || !currentLobby) return;
+  const players=Object.values(currentLobby.players||{});
+  if(currentLobby.createdBy!==myId || players.length!==1){
+    toast('Solo test is only available to the host when alone in the lobby.','var(--red)');
+    return;
+  }
+  try{
+    const soloLobby={
+      ...currentLobby,
+      id:currentLobbyId,
+      teamSize:1,
+      soloTest:true,
+      players:{
+        [myId]:{
+          ...(currentLobby.players?.[myId]||{}),
+          id:myId,
+          name:myName,
+          ready:true,
+          joinedAt:currentLobby.players?.[myId]?.joinedAt||Date.now()
+        }
+      }
+    };
+    currentLobby=soloLobby;
+    saveMultiplayerLobbyState(soloLobby);
+    await db.ref('lobbies/'+currentLobbyId).update({
+      status:'started',
+      teamSize:1,
+      soloTest:true,
+      ['players/'+myId+'/ready']:true
+    });
+    window.location.href='rosterbate-draft.html?lobby='+currentLobbyId;
+  }catch(e){
+    console.error(e);
+    toast('Could not start solo test','var(--red)');
+  }
 }
 
 function mmSendLobbyChat(){

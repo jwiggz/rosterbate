@@ -73,9 +73,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     .hub-summary-meta .eyebrow{font-family:var(--fb);font-size:12px;font-weight:700;color:#94a3b8;}
     .hub-summary-meta .opp{font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;margin-top:4px;}
     .hub-summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
-    .hub-stat{background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px 12px 10px;text-align:left;}
-    .hub-stat-value{font-family:var(--fb);font-size:28px;font-weight:800;line-height:1;color:#f8fafc;}
-    .hub-stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;margin-top:8px;letter-spacing:.8px;font-weight:700;}
+    .hub-stat{background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px 12px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:82px;}
+    .hub-stat-value{font-family:var(--fb);font-size:28px;font-weight:800;line-height:1.05;color:#f8fafc;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;text-wrap:balance;}
+    .hub-stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;margin-top:8px;letter-spacing:.8px;font-weight:700;text-align:center;}
     .hub-actions{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;}
     .hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:96px;border:1px solid #24324a;background:#121a29;color:#f8fafc;width:100%;border-radius:12px;padding:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;}
     .hub-action:hover{transform:translateY(-1px);border-color:#f59e0b;box-shadow:0 14px 26px rgba(2,6,23,.3);}
@@ -140,6 +140,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .season-mini-tab{padding:14px 0;font-family:var(--fb);font-size:14px;font-weight:700;color:#94a3b8;border-bottom:3px solid transparent;}
 .season-mini-tab.on{color:#f8fafc;border-bottom-color:#f59e0b;}
 .season-stat-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0f1724;border:1px solid #24324a;font-size:12px;color:#cbd5e1;}
+.season-stat-pill.btn{cursor:pointer;font-family:var(--fb);font-weight:700;transition:background .15s ease,border-color .15s ease,color .15s ease;}
+.season-stat-pill.btn:hover{background:#172234;border-color:#3b82f6;color:#f8fafc;}
+.season-stat-pill.btn.on{background:#22180d;border-color:#7c4a18;color:#fdba74;}
 .season-header-band{display:grid;grid-template-columns:120px minmax(220px,1.3fr) 110px 90px 110px 90px;gap:0;border-top:1px solid #24324a;border-bottom:1px solid #24324a;background:#121a29;}
 .season-header-cell{padding:10px 10px 8px;border-right:1px solid #1d283b;}
 .season-header-cell:last-child{border-right:none;}
@@ -628,6 +631,12 @@ function activityAge(ts){
 let D=null;
 let G={week:1,totalWeeks:17,day:1,rosters:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[]};
 let currentRbUser=null;
+let sharedSeasonRef=null;
+let sharedSeasonListener=null;
+let sharedSeasonHydrating=false;
+let sharedSeasonSaveTimer=null;
+let sharedSeasonLastUpdatedAt=0;
+const SHARED_SEASON_ROOT='multiplayerSeasons';
 const firebaseConfig = {
   apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
   authDomain: "rosterbate-51339.firebaseapp.com",
@@ -651,6 +660,138 @@ const authReady=new Promise(resolve=>{
       resolve(currentRbUser);
     }
   });
+});
+function getSavedMultiplayerLobbyState(){
+  try{
+    const raw=localStorage.getItem('rbMultiplayerLobby');
+    if(!raw) return null;
+    const state=JSON.parse(raw);
+    return state&&typeof state==='object'?state:null;
+  }catch(e){
+    return null;
+  }
+}
+function getSharedSeasonActorId(){
+  const lobby=getSavedMultiplayerLobbyState();
+  return String(currentRbUser?.uid || lobby?.myId || D?.myPlayerId || D?.teamName || 'guest');
+}
+function getSharedSeasonKey(){
+  return D?.sharedSeasonId || D?.lobbyId || getSavedMultiplayerLobbyState()?.lobbyId || null;
+}
+function getSharedSeasonPath(){
+  const key=getSharedSeasonKey();
+  return key ? (SHARED_SEASON_ROOT+'/'+key) : '';
+}
+function cloneJsonSafe(value){
+  return JSON.parse(JSON.stringify(value));
+}
+function hydrateDraftUserContextFromLobby(){
+  const lobby=getSavedMultiplayerLobbyState();
+  if(!D) return;
+  if(lobby?.lobbyId){
+    D.multiplayer=true;
+    if(!D.lobbyId) D.lobbyId=lobby.lobbyId;
+    if(!D.sharedSeasonId) D.sharedSeasonId=lobby.lobbyId;
+    if(!D.leagueName && lobby.name) D.leagueName=lobby.name;
+  }
+  const myPlayerId=lobby?.myId || D.myPlayerId;
+  if(myPlayerId) D.myPlayerId=myPlayerId;
+  if(D.teamUsers && myPlayerId && D.teamUsers[myPlayerId]){
+    D.myPos=Number(D.teamUsers[myPlayerId].teamIdx||0);
+    D.teamName=D.teams?.[D.myPos] || D.teamUsers[myPlayerId].name || D.teamName;
+    return;
+  }
+  if(lobby?.myName && Array.isArray(D.teams)){
+    const idx=D.teams.findIndex(name=>String(name||'').trim()===String(lobby.myName||'').trim());
+    if(idx>=0){
+      D.myPos=idx;
+      D.teamName=D.teams[idx];
+    }
+  }
+}
+function serializeSharedGameState(){
+  const plain={...G,processed:Array.from(G.processed||[])};
+  return cloneJsonSafe(plain);
+}
+function serializeSharedDraftState(){
+  return cloneJsonSafe({...D});
+}
+function applySharedSeasonPayload(payload){
+  if(!payload?.draft || !payload?.game) return false;
+  sharedSeasonHydrating=true;
+  D=cloneJsonSafe(payload.draft);
+  G=cloneJsonSafe(payload.game);
+  G.processed=new Set(payload.game?.processed||[]);
+  sharedSeasonLastUpdatedAt=Number(payload.updatedAt||0);
+  hydrateDraftUserContextFromLobby();
+  applySportContext(D?.sport || CURRENT_SPORT);
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  sharedSeasonHydrating=false;
+  return true;
+}
+function renderActiveSeasonPage(){
+  const active=document.querySelector('.screen.active')?.id || 'hub';
+  ({hub:renderHub,roster:renderRoster,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[active]?.();
+}
+async function saveSharedSeason(force, reason){
+  if(sharedSeasonHydrating || !D?.multiplayer) return false;
+  const path=getSharedSeasonPath();
+  if(!path) return false;
+  const payload={
+    version:1,
+    reason:reason||'sync',
+    updatedAt:Date.now(),
+    updatedBy:getSharedSeasonActorId(),
+    draft:serializeSharedDraftState(),
+    game:serializeSharedGameState()
+  };
+  sharedSeasonLastUpdatedAt=payload.updatedAt;
+  await db.ref(path).set(payload);
+  return true;
+}
+function queueSharedSeasonSave(reason, delay){
+  if(sharedSeasonHydrating || !D?.multiplayer) return;
+  clearTimeout(sharedSeasonSaveTimer);
+  sharedSeasonSaveTimer=setTimeout(()=>{
+    saveSharedSeason(false, reason).catch(err=>console.error('Shared season save failed', err));
+  }, delay==null?450:delay);
+}
+function subscribeToSharedSeason(){
+  const path=getSharedSeasonPath();
+  if(!path) return;
+  if(sharedSeasonRef && sharedSeasonListener) sharedSeasonRef.off('value', sharedSeasonListener);
+  sharedSeasonRef=db.ref(path);
+  sharedSeasonListener=snap=>{
+    const payload=snap.val();
+    if(!payload) return;
+    const incomingUpdatedAt=Number(payload.updatedAt||0);
+    if(incomingUpdatedAt && incomingUpdatedAt===sharedSeasonLastUpdatedAt && payload.updatedBy===getSharedSeasonActorId()) return;
+    if(!applySharedSeasonPayload(payload)) return;
+    renderActiveSeasonPage();
+  };
+  sharedSeasonRef.on('value', sharedSeasonListener);
+}
+async function loadOrCreateSharedSeason(){
+  hydrateDraftUserContextFromLobby();
+  if(!D?.multiplayer) return false;
+  const path=getSharedSeasonPath();
+  if(!path) return false;
+  const snap=await db.ref(path).once('value');
+  if(snap.exists() && applySharedSeasonPayload(snap.val())){
+    subscribeToSharedSeason();
+    return true;
+  }
+  if(!Array.isArray(D?.allRosters) || !D.allRosters.length) return false;
+  initSeason();
+  await saveSharedSeason(true,'initial');
+  subscribeToSharedSeason();
+  return true;
+}
+window.addEventListener('beforeunload', ()=>{
+  if(D?.multiplayer){
+    clearTimeout(sharedSeasonSaveTimer);
+    saveSharedSeason(true,'before_unload').catch(()=>{});
+  }
 });
 function rosterbateScoreDayKey(){
   return new Date().toLocaleDateString('en-CA');
@@ -895,6 +1036,7 @@ function activatePowerup(id,config){
     if(config?.targetId!==undefined) slot.targetId=config.targetId;
     renderHub();
     if(document.getElementById('roster').classList.contains('active')) renderRoster();
+    queueSharedSeasonSave('update_powerup');
     toast(POWERUP_LIBRARY[id].name+' updated');
     return;
   }
@@ -908,6 +1050,7 @@ function activatePowerup(id,config){
   Object.assign(slot,{active:true},config||{});
   renderHub();
   if(document.getElementById('roster').classList.contains('active')) renderRoster();
+  queueSharedSeasonSave('activate_powerup');
   toast(POWERUP_LIBRARY[id].name+' activated');
 }
 
@@ -1134,6 +1277,7 @@ function revealDay(day){
   for(let ti=0;ti<G.rosters.length;ti++) G.dayResults[day][ti]=getTeamDayScoreDetails(ti,day);
   G.revealedDays[day]=true;
   logActivity('reveal','Day '+day+' revealed','Official scores for Day '+day+' are now live league-wide.',D.myPos,'🗓️');
+  queueSharedSeasonSave('reveal_day');
 }
 function settleWeek(week){
   if(G.settledWeeks[week]) return false;
@@ -1223,6 +1367,12 @@ function toggleWaiverSort(key){
   renderWaiver();
 }
 
+function setWaiverPosition(pos){
+  const sel=document.getElementById('wPos');
+  if(sel) sel.value=pos;
+  renderWaiver();
+}
+
 window.onload=async function(){
   try{
     await ensureRosterbatePools();
@@ -1248,8 +1398,60 @@ window.onload=async function(){
           D=parsed;
         }
         applySportContext(savedSport);
+        hydrateDraftUserContextFromLobby();
+        let seasonLoaded=false;
+        try{
+          seasonLoaded=await loadOrCreateSharedSeason();
+        }catch(e){
+          console.error('Shared season load failed, falling back to local draft data.', e);
+          seasonLoaded=false;
+        }
+        if(!seasonLoaded){
+          try{
+            initSeason();
+          }catch(initErr){
+            console.error('Local season init failed.', initErr);
+            toast('Could not open the finished draft in Season Manager.');
+            return;
+          }
+        }
+        goPage('hub');
+        return;
+      }
+    }catch(e){console.error(e);}
+  }
+  const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
+  const lobbyState=getSavedMultiplayerLobbyState();
+  if(lobbyState?.lobbyId && normalizeRosterbateSport(lobbyState.sport||requestedSport)===requestedSport){
+    try{
+      D={
+        sport:requestedSport,
+        multiplayer:true,
+        lobbyId:lobbyState.lobbyId,
+        sharedSeasonId:lobbyState.lobbyId,
+        leagueName:lobbyState.name||'RosterBate League',
+        myPlayerId:lobbyState.myId||null,
+        teamName:lobbyState.myName||'My Team',
+        teams:[]
+      };
+      applySportContext(requestedSport);
+      let seasonLoaded=false;
+      try{
+        seasonLoaded=await loadOrCreateSharedSeason();
+      }catch(e){
+        console.error('Shared season resume failed, falling back to local init.', e);
+        seasonLoaded=false;
+      }
+      if(seasonLoaded){
+        goPage('hub');
+        return;
+      }
+      try{
         initSeason();
         goPage('hub');
+        return;
+      }catch(initErr){
+        console.error('Lobby season fallback init failed.', initErr);
       }
     }catch(e){console.error(e);}
   }
@@ -1376,6 +1578,7 @@ function advanceWeek(){
   if(revealDayNo>=TOTAL_DAYS()){
     G.isSeasonComplete=true;
     recordLifetimeSeasonStats().catch(error=>console.error('Could not record lifetime stats', error));
+    queueSharedSeasonSave('season_complete');
     toast('Final day revealed. Season complete!');
     renderHub();
     if(document.getElementById('roster').classList.contains('active')) renderRoster();
@@ -1393,6 +1596,7 @@ function advanceWeek(){
   }else{
     toast('Day '+revealDayNo+' results revealed.');
   }
+  queueSharedSeasonSave('advance_day');
   renderHub();
   if(document.getElementById('roster').classList.contains('active')) renderRoster();
 }
@@ -1490,6 +1694,7 @@ function setLineupForDay(day,starterIds){
   G.dailyLineups[day]=buildBestLineupIdsForRoster(selected,day);
   // Also update default starters to match most recent change
   G.starters[D.myPos]=[...(G.dailyLineups[day]||[])];
+  queueSharedSeasonSave('set_lineup');
   return true;
 }
 
@@ -1501,6 +1706,7 @@ function copyLineupToRange(fromDay,toDay){
     G.dailyLineups[d]=[...lineup];
     copied++;
   }
+  if(copied) queueSharedSeasonSave('copy_lineup');
   return copied;
 }
 
@@ -1715,7 +1921,7 @@ function renderRoster(){
     ...bench.map(p=>({player:p,slot:'BN',isStarter:false}))
   ];
   const matchupCard=(label,matchup,isCurrent)=>{
-    if(!matchup) return `<div class="season-table-card season-card-pad"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div><div style="margin-top:10px;font-size:13px;color:#6b7280;">No matchup available.</div></div>`;
+    if(!matchup) return `<div class="season-table-card season-card-pad"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div><div style="margin-top:10px;font-size:13px;color:#94a3b8;">No matchup available.</div></div>`;
     const a=matchup.home, b=matchup.away;
     const aName=D.teams[a]||('Team '+(a+1)), bName=D.teams[b]||('Team '+(b+1));
     const aScore=isCurrent?getTeamWeekRevealedScore(a,week):matchup.homeScore||0;
@@ -1727,12 +1933,12 @@ function renderRoster(){
       </div>
       <div style="display:grid;gap:10px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <div style="display:flex;align-items:center;gap:10px;min-width:0;"><div class="pav" style="background:${TCOLORS[a%TCOLORS.length]};width:28px;height:28px;font-size:11px;">${ini(aName)}</div><div style="font-weight:700;color:${a===D.myPos?'#111827':'#6b7280'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${aName}</div></div>
-          <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#111827;">${aScore.toFixed(1)}</div>
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;"><div class="pav" style="background:${TCOLORS[a%TCOLORS.length]};width:28px;height:28px;font-size:11px;">${ini(aName)}</div><div style="font-weight:700;color:${a===D.myPos?'#f8fafc':'#94a3b8'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${aName}</div></div>
+          <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${aScore.toFixed(1)}</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <div style="display:flex;align-items:center;gap:10px;min-width:0;"><div class="pav" style="background:${TCOLORS[b%TCOLORS.length]};width:28px;height:28px;font-size:11px;">${ini(bName)}</div><div style="font-weight:700;color:${b===D.myPos?'#111827':'#6b7280'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bName}</div></div>
-          <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#111827;">${bScore.toFixed(1)}</div>
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;"><div class="pav" style="background:${TCOLORS[b%TCOLORS.length]};width:28px;height:28px;font-size:11px;">${ini(bName)}</div><div style="font-weight:700;color:${b===D.myPos?'#f8fafc':'#94a3b8'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bName}</div></div>
+          <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${bScore.toFixed(1)}</div>
         </div>
       </div>
     </div>`;
@@ -1779,7 +1985,7 @@ function renderRoster(){
           <div class="pav" style="background:var(--accent);width:86px;height:86px;font-size:28px;box-shadow:0 12px 24px rgba(249,115,22,.16);">${ini(D.teamName)}</div>
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <div style="font-family:var(--fb);font-size:26px;font-weight:800;color:#111827;">${D.teamName}</div>
+              <div style="font-family:var(--fb);font-size:26px;font-weight:800;color:#f8fafc;">${D.teamName}</div>
               <div class="season-soft-muted" style="font-size:14px;">${myStanding.w}-${myStanding.l} (${rk>0?ord(rk):'—'} of ${D.teams.length})</div>
             </div>
             <div class="season-team-link" style="margin-top:6px;">${D.leagueName||'RosterBate League'}</div>
@@ -1935,6 +2141,10 @@ function renderWaiver(){
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
   const cols=getWaiverColumns();
+  const posChips=(SPORT_CFG.waiverPositions||['ALL']).map(pos=>{
+    const label=pos==='ALL'?'All Players':pos;
+    return `<button class="season-stat-pill btn ${pf===pos?'on':''}" onclick="setWaiverPosition('${pos}')" type="button">${label}</button>`;
+  }).join('');
   const list=G.waiver.filter(p=>(pf==='ALL'||p.pos===pf)&&(!s||p.name.toLowerCase().includes(s)||p.team.toLowerCase().includes(s))).sort((a,b)=>{
     const av=waiverStatValue(a,waiverSortKey), bv=waiverStatValue(b,waiverSortKey);
     let cmp=0;
@@ -1950,10 +2160,10 @@ function renderWaiver(){
       <div class="season-hero-card season-card-pad">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
           <div>
-            <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#111827;">Free Agents</div>
+            <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Free Agents</div>
             <div class="season-subbar-copy">${D.leagueName||'RosterBate League'}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
-              <span class="season-stat-pill">Position: ${pf==='ALL'?'All Players':pf}</span>
+              ${posChips}
               <span class="season-stat-pill">${list.length} available</span>
               <span class="season-stat-pill">Sorted by ${cols.find(c=>c.key===waiverSortKey)?.label||'Fantasy'}</span>
             </div>
@@ -2019,6 +2229,7 @@ function confirmWaiver(){
   G.starters[D.myPos]=buildBestLineupIdsForRoster(G.rosters[D.myPos],G.day);
   document.getElementById('wModal').classList.remove('open');
   logActivity('waiver','Waiver move',teamName(D.myPos)+' added '+wAdd.name+' and dropped '+wDrop.name+'.',D.myPos,'📋');
+  queueSharedSeasonSave('waiver_move');
   toast('Claimed '+wAdd.name+', dropped '+wDrop.name);
   wAdd=null;wDrop=null;renderWaiver();renderHub();
 }
@@ -2176,12 +2387,14 @@ function acceptTrade(id,cpu=false){
   o.get.forEach(pid=>{const i=tr.findIndex(p=>p.id===pid);if(i>=0){const[p]=tr.splice(i,1);fr.push(p);}});
   [o.fromTeam,o.toTeam].forEach(ti=>{G.starters[ti]=buildBestLineupIdsForRoster(G.rosters[ti],G.day);});
   logActivity('trade','Trade completed',teamName(o.fromTeam)+' and '+teamName(o.toTeam)+' completed a trade.',o.toTeam,'🤝');
+  queueSharedSeasonSave('accept_trade');
   if(!cpu){toast('Trade accepted!');renderTrades();renderHub();}
 }
 
 function rejectTrade(id){
   const o=G.tradeOffers.find(t=>t.id===id);if(o)o.status='rejected';
   if(o) logActivity('trade','Trade rejected',teamName(o.toTeam)+' rejected a trade from '+teamName(o.fromTeam)+'.',o.toTeam,'❌');
+  queueSharedSeasonSave('reject_trade');
   toast('Trade rejected.');renderTrades();renderHub();
 }
 
@@ -2198,6 +2411,7 @@ function forceRejectTrade(id){
   const o=G.tradeOffers.find(t=>t.id===id);if(!o)return;
   o.status='rejected';
   logActivity('trade','Commissioner rejected trade','Commissioner vetoed a trade between '+teamName(o.fromTeam)+' and '+teamName(o.toTeam)+'.',D.myPos,'🛑');
+  queueSharedSeasonSave('commissioner_reject_trade');
   toast('Commissioner rejected the trade.');
   renderTrades();renderHub();
 }
