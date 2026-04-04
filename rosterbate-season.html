@@ -25,7 +25,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .bb{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;}
 .sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px;}
 .sbb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.bn{background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;}
+.bn{background:var(--bg2);border-top:1px solid var(--border);display:none;flex-shrink:0;}
 .nb{flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;cursor:pointer;}
 .nb.on{color:var(--accent);}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
@@ -55,55 +55,129 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .tpb{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:7px;padding:5px 10px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#a5b4fc;cursor:pointer;}
 .mc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;cursor:pointer;}
 .mc.mine{border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.06);}
-    .hub-shell{display:grid;gap:14px;align-items:start;}
-    .hub-main{display:grid;gap:14px;min-width:0;}
-    .hub-summary{position:relative;overflow:hidden;background:
-      radial-gradient(circle at top right, rgba(76,209,255,.14), transparent 34%),
-      radial-gradient(circle at left center, rgba(249,115,22,.12), transparent 40%),
-      linear-gradient(145deg,#122645 0%,#0f1d34 48%,#101b30 100%);
-      border:1px solid rgba(117,151,201,.18);border-radius:22px;padding:20px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.03);}
-    .hub-summary:before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 35%);pointer-events:none;}
-    .hub-summary-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin-bottom:16px;position:relative;z-index:1;}
-    .hub-summary-ident{display:flex;align-items:center;gap:14px;min-width:0;}
-    .hub-summary-copy{min-width:0;}
-    .hub-summary-kicker{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#7fd9ff;margin-bottom:4px;}
-    .hub-summary-name{font-family:var(--fd);font-size:38px;font-weight:900;line-height:.95;letter-spacing:.3px;}
-    .hub-summary-rec{font-size:13px;color:var(--text2);margin-top:6px;}
-    .hub-summary-data{font-size:11px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.75px;}
-    .hub-summary-meta{padding:10px 14px;border-radius:16px;background:rgba(9,18,34,.55);border:1px solid rgba(126,164,214,.14);text-align:right;min-width:160px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
-    .hub-summary-meta .eyebrow{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);}
-    .hub-summary-meta .opp{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--text);margin-top:2px;}
-    .hub-summary-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
-    .hub-stat{background:linear-gradient(180deg,rgba(18,31,56,.88),rgba(13,22,39,.95));border:1px solid rgba(122,149,193,.18);border-radius:18px;padding:14px 14px 12px;text-align:left;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
-    .hub-stat-value{font-family:var(--fd);font-size:32px;font-weight:900;line-height:.95;letter-spacing:.2px;}
-    .hub-stat-label{font-size:10px;color:#7188ae;text-transform:uppercase;margin-top:8px;letter-spacing:.9px;font-weight:700;}
-    .hub-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-    .hub-action{display:flex;align-items:flex-start;gap:12px;text-align:left;cursor:pointer;min-height:96px;border:1px solid rgba(111,133,171,.18);background:linear-gradient(180deg,rgba(21,31,50,.96),rgba(16,24,40,.96));color:var(--text);width:100%;border-radius:18px;padding:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);transition:transform .16s ease,border-color .16s ease,background .16s ease;}
-    .hub-action:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.35);background:linear-gradient(180deg,rgba(24,36,59,.98),rgba(17,25,43,.98));}
-    .hub-action-icon{font-size:24px;line-height:1;margin-top:2px;flex-shrink:0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.28));}
-    .hub-action-title{font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:.2px;}
-    .hub-action-sub{font-size:11px;color:#7e93b6;margin-top:4px;line-height:1.4;}
-    .hub-lower{display:grid;gap:12px;min-height:520px;grid-template-rows:minmax(0,1fr) minmax(0,1fr);}
-    .hub-column{display:flex;flex-direction:column;gap:12px;min-width:0;}
-    .hub-card{background:linear-gradient(180deg,rgba(20,29,47,.96),rgba(14,22,37,.98));border:1px solid rgba(104,129,166,.18);border-radius:22px;padding:16px;box-shadow:0 18px 40px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.02);}
+    .hub-shell{display:grid;gap:18px;align-items:start;max-width:1680px;width:100%;margin:0 auto;}
+    .hub-side-aux,.hub-side-left,.hub-main,.hub-column{display:flex;flex-direction:column;gap:16px;min-width:0;}
+    .hub-card{background:#121a29;border:1px solid #24324a;border-radius:14px;padding:16px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
     .hub-card.compact{padding:14px 16px;}
-    .hub-card-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#7088b0;margin-bottom:12px;}
-    .activity-feed{display:flex;flex-direction:column;gap:8px;}
-    .activity-item{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(180deg,rgba(21,31,50,.88),rgba(15,23,39,.96));border:1px solid rgba(104,129,166,.18);border-radius:16px;padding:12px 13px;}
-    .activity-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.22);}
+.hub-card-title{font-family:var(--fb);font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:14px;}
+.hub-summary{position:relative;overflow:hidden;background:linear-gradient(135deg,#121a29 0%,#172234 100%);border:1px solid #24324a;border-radius:14px;padding:18px 18px 16px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
+.hub-summary:before{content:'';position:absolute;inset:auto -40px -10px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(251,146,60,.12),transparent 62%);pointer-events:none;}
+    .hub-summary-top{display:grid;grid-template-columns:minmax(320px,1fr) minmax(180px,220px);align-items:start;gap:18px;margin-bottom:16px;position:relative;z-index:1;}
+    .hub-summary-ident{display:flex;align-items:flex-start;gap:14px;min-width:0;}
+    .hub-summary-copy{min-width:0;}
+    .hub-summary-kicker{font-family:var(--fb);font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:6px;}
+    .hub-summary-name{font-family:var(--fb);font-size:24px;font-weight:800;line-height:1.15;color:#f8fafc;}
+    .hub-summary-rec{font-size:13px;color:#cbd5e1;margin-top:8px;}
+    .hub-summary-data{font-size:11px;color:#94a3b8;margin-top:6px;text-transform:uppercase;letter-spacing:.6px;}
+    .hub-summary-meta{padding:6px 0 0 16px;border-left:1px solid #24324a;text-align:left;min-width:170px;}
+    .hub-summary-meta .eyebrow{font-family:var(--fb);font-size:12px;font-weight:700;color:#94a3b8;}
+    .hub-summary-meta .opp{font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;margin-top:4px;}
+    .hub-summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
+    .hub-stat{background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px 12px 10px;text-align:left;}
+    .hub-stat-value{font-family:var(--fb);font-size:28px;font-weight:800;line-height:1;color:#f8fafc;}
+    .hub-stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;margin-top:8px;letter-spacing:.8px;font-weight:700;}
+    .hub-actions{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;}
+    .hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:96px;border:1px solid #24324a;background:#121a29;color:#f8fafc;width:100%;border-radius:12px;padding:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;}
+    .hub-action:hover{transform:translateY(-1px);border-color:#f59e0b;box-shadow:0 14px 26px rgba(2,6,23,.3);}
+    .hub-action-icon{font-size:22px;line-height:1;margin-top:2px;flex-shrink:0;}
+    .hub-action-title{font-family:var(--fb);font-size:16px;font-weight:700;letter-spacing:.1px;}
+    .hub-action-sub{font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.35;}
+    .hub-lower{display:grid;gap:16px;grid-template-rows:auto auto;}
+    .activity-feed{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
+    .activity-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;padding:12px 6px;border-bottom:1px solid #1d283b;background:#121a29;}
+    .activity-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:4px;}
     .activity-copy{min-width:0;flex:1;}
-    .activity-title{font-family:var(--fd);font-size:14px;font-weight:800;line-height:1.1;}
-    .activity-meta{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
-    .activity-text{font-size:12px;color:var(--text2);line-height:1.45;margin-top:4px;}
-    @media (min-width: 980px){
-      .hub-shell{grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);align-items:start;}
+    .activity-title{font-family:var(--fb);font-size:13px;font-weight:700;line-height:1.15;color:#f8fafc;}
+    .activity-meta{font-size:11px;color:#94a3b8;line-height:1.35;}
+    .activity-text{font-size:13px;color:#dbe4f0;line-height:1.45;margin-top:2px;}
+    .hub-team-card{text-align:center;padding-top:18px;padding-bottom:18px;}
+    .hub-team-name{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;margin-top:12px;}
+    .hub-team-record{font-size:13px;color:#94a3b8;margin-top:4px;}
+    .hub-mini-link{display:inline-block;margin-top:14px;font-size:13px;color:#93c5fd;text-decoration:none;font-weight:600;}
+    .hub-scoreboard{display:flex;flex-direction:column;gap:0;}
+    .hub-score-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #1d283b;}
+    .hub-score-row:last-child{border-bottom:none;}
+    .hub-score-team{display:flex;align-items:center;gap:8px;min-width:0;}
+    .hub-score-name{font-size:13px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .hub-score-val{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;}
+    .hub-standings-table{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
+    .hub-standings-head,.hub-standings-row{display:grid;grid-template-columns:minmax(0,1fr) 28px 28px 42px;gap:8px;align-items:center;padding:8px 0;}
+    .hub-standings-head{font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.7px;}
+    .hub-standings-row{border-top:1px solid #1d283b;}
+.hub-standings-team{display:flex;align-items:center;gap:8px;min-width:0;}
+.hub-standings-name{font-size:13px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hub-standings-cell{font-size:12px;color:#dbe4f0;text-align:right;}
+.hub-panel-note{font-size:12px;color:#94a3b8;line-height:1.5;}
+.hub-powerup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.hub-powerup-tile{border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:172px;}
+.hub-powerup-top{display:flex;align-items:flex-start;gap:10px;}
+.hub-powerup-title{font-family:var(--fb);font-size:12px;font-weight:800;line-height:1.15;}
+.hub-powerup-meta{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.hub-powerup-copy{font-size:12px;color:#dbe4f0;line-height:1.45;flex:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.hub-powerup-foot{font-size:11px;color:#94a3b8;}
+.hub-powerup-status{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;padding:3px 8px;border-radius:999px;background:#0f1724;border:1px solid #24324a;font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;color:#cbd5e1;}
+.season-subbar{background:#121a29;border-bottom:1px solid #24324a;padding:14px 20px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.season-subbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
+.season-back{border:1px solid #24324a;background:#0f1724;border-radius:10px;color:#dbe4f0;padding:8px 12px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
+.season-subbar-title{font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;line-height:1;}
+.season-subbar-copy{font-size:13px;color:#94a3b8;margin-top:4px;}
+.season-page-note{background:#22180d;border-bottom:1px solid #7c4a18;padding:10px 20px;flex-shrink:0;font-size:12px;color:#fdba74;}
+.season-filterbar{padding:16px 20px;background:#121a29;border-bottom:1px solid #24324a;display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
+.season-filter-input,.season-filter-select{background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:10px 12px;color:#f8fafc;font-size:14px;font-family:var(--fb);outline:none;}
+.season-filter-input{width:100%;padding-left:34px;}
+.season-filter-input:focus,.season-filter-select:focus{border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.12);}
+.season-light-body{background:#0b1220;}
+.season-table-card{background:#121a29;border:1px solid #24324a;border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(2,6,23,.28);}
+.season-card-pad{padding:18px;}
+.season-table-wrap{overflow:auto;}
+.season-data-table{width:100%;border-collapse:collapse;min-width:920px;background:#121a29;}
+.season-data-table th{padding:8px 10px;background:#182235;border-bottom:1px solid #24324a;font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;text-align:left;white-space:nowrap;}
+.season-data-table td{padding:9px 10px;border-bottom:1px solid #1d283b;font-size:12px;color:#dbe4f0;vertical-align:middle;background:#121a29;}
+.season-data-table tr:hover td{background:#182235;}
+.season-chip-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #3b82f6;border-radius:999px;background:#0f1724;color:#93c5fd;padding:10px 18px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;}
+.season-chip-link.solid{background:#2563eb;color:#fff;}
+.season-mini-tabs{display:flex;gap:26px;border-bottom:1px solid #24324a;padding:0 18px;}
+.season-mini-tab{padding:14px 0;font-family:var(--fb);font-size:14px;font-weight:700;color:#94a3b8;border-bottom:3px solid transparent;}
+.season-mini-tab.on{color:#f8fafc;border-bottom-color:#f59e0b;}
+.season-stat-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0f1724;border:1px solid #24324a;font-size:12px;color:#cbd5e1;}
+.season-header-band{display:grid;grid-template-columns:120px minmax(220px,1.3fr) 110px 90px 110px 90px;gap:0;border-top:1px solid #24324a;border-bottom:1px solid #24324a;background:#121a29;}
+.season-header-cell{padding:10px 10px 8px;border-right:1px solid #1d283b;}
+.season-header-cell:last-child{border-right:none;}
+.season-header-eyebrow{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;font-weight:700;}
+.season-header-title{font-family:var(--fb);font-size:12px;font-weight:800;color:#f8fafc;margin-top:4px;}
+.season-team-link{color:#93c5fd;text-decoration:none;font-weight:600;}
+.season-soft-muted{color:#94a3b8;}
+.season-hero-card{background:#121a29;border-top:4px solid #f59e0b;border-radius:14px;border-left:1px solid #24324a;border-right:1px solid #24324a;border-bottom:1px solid #24324a;box-shadow:0 10px 28px rgba(2,6,23,.28);}
+.season-split-grid{display:grid;gap:16px;}
+.season-outline-btn{background:#0f1724;border:1px solid #3b82f6;color:#93c5fd;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
+.season-action-btn{background:#f59e0b;border:none;color:#fff;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
+.lineup-move-btn{display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:7px 14px;border-radius:999px;border:1px solid #3b82f6;background:#0f1724;color:#93c5fd;font-family:var(--fb);font-size:13px;font-weight:700;cursor:pointer;}
+.lineup-move-btn:hover,.season-outline-btn:hover,.season-chip-link:hover{background:#172234;}
+#pickerModal .ms,#viewerModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
+#pickerModal .mh,#viewerModal .mh{background:#475569;}
+#pickerModal .bs,#viewerModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
+@media (min-width: 960px){
+  #viewerModal{align-items:center;}
+  #viewerModal .ms{max-width:980px;border-radius:18px;padding:22px 24px 26px;max-height:88dvh;}
+  #pickerModal{align-items:center;}
+  #pickerModal .ms{max-width:720px;border-radius:18px;padding:22px 24px 26px;max-height:88dvh;}
+}
+@media (min-width: 980px){
+  .season-split-grid{grid-template-columns:1.1fr .9fr;}
+}
+    @media (min-width: 1080px){
+      .hub-shell{grid-template-columns:300px 220px minmax(560px,1fr) 360px;}
     }
-    @media (max-width: 860px){
+    @media (max-width: 1079px){
+      .hub-shell{grid-template-columns:1fr;}
+      .hub-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+    @media (max-width: 720px){
       .hub-summary-top{grid-template-columns:1fr;}
-      .hub-summary-meta{min-width:0;text-align:left;}
-      .hub-summary-name{font-size:32px;}
+      .hub-summary-meta{padding:12px 0 0 0;border-left:none;border-top:1px solid #e5e7eb;}
       .hub-summary-stats,.hub-actions{grid-template-columns:1fr;}
-      .hub-lower{min-height:0;}
+      .hub-powerup-grid{grid-template-columns:1fr;}
+      .activity-item{grid-template-columns:28px minmax(0,1fr);}
     }
 
 /* RosterBate Home Header */
@@ -111,15 +185,22 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     .rb-home-link{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;}
     .rb-home-link span{color:var(--accent);}
     .rb-home-link:hover{opacity:.85;}
-    .season-topbar{background:linear-gradient(180deg,rgba(15,23,37,.98),rgba(12,18,30,.94));border-bottom:1px solid rgba(102,127,166,.18);padding:12px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+    .season-topbar{background:#121a29;border-bottom:1px solid #24324a;padding:12px 20px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;}
     .season-topmeta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
-    .season-chip{padding:9px 14px;border-radius:999px;border:1px solid rgba(119,149,191,.18);background:rgba(16,25,40,.78);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#94a8c7;}
-    .season-chip.primary{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.26);color:#ffb06b;}
-    .season-chip.action{background:linear-gradient(180deg,rgba(34,47,73,.98),rgba(21,31,52,.98));color:#eef5ff;}
+    .season-chip{padding:8px 12px;border-radius:999px;border:1px solid #24324a;background:#0f1724;font-family:var(--fb);font-size:12px;font-weight:700;color:#dbe4f0;}
+    .season-chip.primary{background:#22180d;border-color:#7c4a18;color:#fdba74;}
+    .season-chip.action{background:#121a29;color:#f8fafc;}
+    #hub .sb{background:#0b1220;}
+    #hub .bg{background:#2563eb;color:#fff;border:none;}
+    #hub .rb-chat-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
+    #hub .rb-chat-hdr,#hub .rb-chat-tabs,#hub .rb-chat-input-area{background:#121a29;}
+    #hub .rb-chat-msgs{background:#0f1724;}
+    #hub .rb-chat-tab{color:#94a3b8;}
+    #hub .rb-chat-tab.on{color:#2563eb;border-bottom-color:#f59e0b;}
     ::-webkit-scrollbar{width:10px;height:10px;}
-    ::-webkit-scrollbar-track{background:rgba(15,22,36,.92);}
-    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#324a70,#243754);border-radius:999px;border:2px solid rgba(15,22,36,.92);}
-    ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#3b5683,#2b4061);}
+    ::-webkit-scrollbar-track{background:#0f1724;}
+    ::-webkit-scrollbar-thumb{background:#334155;border-radius:999px;border:2px solid #0f1724;}
+    ::-webkit-scrollbar-thumb:hover{background:#475569;}
 .ctab{padding:10px 12px;font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;}
 .ctab.on{color:var(--accent);border-bottom-color:var(--accent);}
 .crow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
@@ -186,34 +267,63 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   </div>
   <div class="sb">
     <div class="hub-shell">
+      <div class="hub-side-aux">
+        <div class="hub-card">
+          <div class="hub-card-title" id="hubStandingsTitle">League Standings</div>
+          <div id="hubStandingsMini" class="hub-standings-table"></div>
+          <a href="javascript:void(0)" onclick="goPage('standings')" class="hub-mini-link" style="display:block;text-align:center;">View Full Standings</a>
+        </div>
+        <div class="hub-card"><div class="hub-card-title">This Week's Matchups</div><div id="hubMatchups"></div></div>
+      </div>
+      <div class="hub-side-left">
+        <div class="hub-card hub-team-card">
+          <div class="hub-card-title" style="text-align:left;">My Team</div>
+          <div id="hubAv" class="pav" style="width:74px;height:74px;font-size:26px;background:var(--accent);box-shadow:0 12px 24px rgba(249,115,22,.18);margin:8px auto 0;"></div>
+          <div id="hubName" class="hub-team-name"></div>
+          <div id="hubRec" class="hub-team-record"></div>
+          <div id="hubDataStamp" class="hub-summary-data" style="display:none;margin-top:10px;"></div>
+          <a href="javascript:void(0)" onclick="goPage('roster')" class="hub-mini-link">View Roster</a>
+        </div>
+        <div class="hub-card compact">
+          <div class="hub-card-title">Scores</div>
+          <div id="hubScores" class="hub-scoreboard"></div>
+          <a href="javascript:void(0)" onclick="goPage('standings')" class="hub-mini-link" style="display:block;text-align:center;">View Full Scoreboard</a>
+        </div>
+      </div>
       <div class="hub-main">
         <div class="hub-summary">
           <div class="hub-summary-top">
             <div class="hub-summary-ident">
-              <div id="hubAv" class="pav" style="width:64px;height:64px;font-size:24px;background:var(--accent);box-shadow:0 12px 24px rgba(249,115,22,.22);"></div>
               <div class="hub-summary-copy">
-                <div class="hub-summary-kicker">Season Dashboard</div>
-                <div id="hubName" class="hub-summary-name"></div>
-                <div id="hubRec" class="hub-summary-rec"></div>
-                <div id="hubDataStamp" class="hub-summary-data" style="display:none;"></div>
+                <div class="hub-summary-kicker">League Home</div>
+                <div id="hubLeagueName" class="hub-summary-name"></div>
+                <div class="hub-summary-rec">
+                  <a href="javascript:void(0)" onclick="goPage('commissioner')" style="color:#2563eb;text-decoration:none;">Settings</a>
+                  &nbsp;|&nbsp;
+                  <a href="javascript:void(0)" onclick="openPicker()" style="color:#2563eb;text-decoration:none;">Members</a>
+                  &nbsp;|&nbsp;
+                  <a href="javascript:void(0)" onclick="goPage('roster')" style="color:#2563eb;text-decoration:none;">Rosters</a>
+                </div>
               </div>
             </div>
             <div class="hub-summary-meta">
-              <div class="eyebrow">This Week</div>
-              <div id="hubOpp" class="opp">—</div>
+              <div class="eyebrow">Format: <span id="hubFormat">Standard</span></div>
+              <div class="eyebrow" style="margin-top:6px;">Scoring: <span id="hubScoringType">Head to Head Points</span></div>
+              <div class="eyebrow" style="margin-top:6px;">Teams: <span id="hubTeamCount">10</span></div>
             </div>
           </div>
           <div class="hub-summary-stats">
-            <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">—</div><div class="hub-stat-label">Revealed</div></div>
+            <div class="hub-stat"><div id="hubOpp" class="hub-stat-value">—</div><div class="hub-stat-label">This Week</div></div>
+            <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">—</div><div class="hub-stat-label">Your Revealed</div></div>
             <div class="hub-stat"><div id="hubOppProj" class="hub-stat-value" style="color:var(--text2);">—</div><div class="hub-stat-label">Opp Revealed</div></div>
             <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">—</div><div class="hub-stat-label">Streak</div></div>
           </div>
-        </div>
-        <div class="hub-actions">
-          <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">👕</div><div><div class="hub-action-title">My Roster</div><div class="hub-action-sub">Set lineup</div></div></button>
-          <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">📋</div><div><div class="hub-action-title">Waiver Wire</div><div id="hubWC" class="hub-action-sub">— available</div></div></button>
-          <button onclick="goPage('trades')" class="card hub-action"><div class="hub-action-icon">⇄</div><div><div class="hub-action-title">Trades</div><div id="hubTC" class="hub-action-sub">No offers</div></div></button>
-          <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">🏆</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">—</div></div></button>
+          <div class="hub-actions" style="margin-top:12px;">
+            <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">👕</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
+            <button onclick="openPicker()" class="card hub-action"><div class="hub-action-icon">👥</div><div><div class="hub-action-title">League</div><div class="hub-action-sub">Open team directory</div></div></button>
+            <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">📋</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">— available</div></div></button>
+            <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">🏆</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">—</div></div></button>
+          </div>
         </div>
         <button id="advBtn" onclick="advanceWeek()" class="bg">▶ Advance to Next Week</button>
         <div class="hub-lower">
@@ -260,7 +370,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       </div>
       <div class="hub-column">
         <div class="hub-card"><div class="hub-card-title">Weekly Powerups</div><div id="hubPowerups"></div></div>
-        <div class="hub-card"><div class="hub-card-title">This Week's Matchups</div><div id="hubMatchups"></div></div>
       </div>
     </div>
   </div>
@@ -269,30 +378,47 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
 <!-- ROSTER -->
 <div id="roster" class="screen">
-  <div class="ph" style="position:relative;">
-    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">←</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="rosterHomeLink">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
-    <div class="pt">👕 My Roster</div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;"><button class="tpb" onclick="openPicker()">👥 Teams</button><div id="rWk" style="font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;"></div></div>
+  <div class="season-subbar">
+    <div class="season-subbar-left">
+      <button class="season-back" onclick="goPage('hub')">←</button>
+      <div>
+        <div class="season-subbar-title">My Team</div>
+        <div class="season-subbar-copy" id="rWk"></div>
+      </div>
+    </div>
+    <div class="season-topmeta">
+      <button class="season-chip action" onclick="openPicker()">League</button>
+      <a href="index.html" class="season-chip action" id="rosterHomeLink" style="text-decoration:none;">Home</a>
+    </div>
   </div>
-  <div style="background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;flex-shrink:0;font-size:11px;color:var(--text3);">Set each day's lineup before the reveal. Once a day unlocks, that lineup is locked.</div>
-  <div class="sbb" style="display:flex;flex-direction:column;" id="rosterContent"></div>
+  <div class="season-page-note">Set each day's lineup before the reveal. Once a day unlocks, that lineup is locked.</div>
+  <div class="sbb season-light-body" style="display:flex;flex-direction:column;" id="rosterContent"></div>
   <div class="bn" id="rn"></div>
 </div>
 
 <!-- WAIVER -->
 <div id="waiver" class="screen">
-  <div class="ph" style="position:relative;">
-    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">←</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="waiverHomeLink">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
-    <div class="pt">📋 Waiver Wire</div>
-    <div style="margin-left:auto;"><button class="tpb" onclick="openPicker()">👥 Teams</button></div>
+  <div class="season-subbar">
+    <div class="season-subbar-left">
+      <button class="season-back" onclick="goPage('hub')">←</button>
+      <div>
+        <div class="season-subbar-title">Players</div>
+        <div class="season-subbar-copy">Free agents and waiver claims</div>
+      </div>
+    </div>
+    <div class="season-topmeta">
+      <button class="season-chip action" onclick="openPicker()">League</button>
+      <a href="index.html" class="season-chip action" id="waiverHomeLink" style="text-decoration:none;">Home</a>
+    </div>
   </div>
-  <div style="padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;">
-    <div style="flex:1;position:relative;"><input type="text" id="wSrch" placeholder="Search players…" oninput="renderWaiver()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;">🔍</span></div>
-    <select id="wPos" onchange="renderWaiver()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;appearance:none;"></select>
+  <div class="season-filterbar">
+    <div style="flex:1;min-width:240px;position:relative;">
+      <input type="text" id="wSrch" placeholder="Player name" oninput="renderWaiver()" class="season-filter-input">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#9ca3af;">🔍</span>
+    </div>
+    <select id="wPos" onchange="renderWaiver()" class="season-filter-select"></select>
   </div>
-  <div class="sbb" id="waiverContent"></div>
+  <div class="sbb season-light-body" id="waiverContent"></div>
   <div class="bn" id="wn"></div>
 </div>
 
@@ -310,13 +436,20 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
 <!-- STANDINGS -->
 <div id="standings" class="screen">
-  <div class="ph" style="position:relative;">
-    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">←</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">🏆 Roster<span style="color:var(--accent)">Bate</span></a>
-    <div class="pt">🏆 Standings</div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;"><button class="tpb" onclick="openPicker()">👥 Teams</button><div id="sWk" style="font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;"></div></div>
+  <div class="season-subbar">
+    <div class="season-subbar-left">
+      <button class="season-back" onclick="goPage('hub')">←</button>
+      <div>
+        <div class="season-subbar-title">Standings</div>
+        <div class="season-subbar-copy" id="sWk"></div>
+      </div>
+    </div>
+    <div class="season-topmeta">
+      <button class="season-chip action" onclick="openPicker()">League</button>
+      <a href="index.html" class="season-chip action" style="text-decoration:none;">Home</a>
+    </div>
   </div>
-  <div class="sbb" style="padding:10px;" id="standingsContent"></div>
+  <div class="sbb season-light-body" style="padding:20px;" id="standingsContent"></div>
   <div class="bn" id="stn"></div>
 </div>
 
@@ -379,8 +512,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 <div class="mo" id="pickerModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="ms">
     <div class="mh"></div>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">👥 All Teams</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Tap any team to view their full roster.</div>
+    <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#111827;margin-bottom:4px;">League Teams</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:14px;">Tap any team to view their full roster.</div>
     <div id="pickerList"></div>
   </div>
 </div>
@@ -391,17 +524,16 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <div class="mh"></div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
       <div id="vAv" class="pav" style="width:52px;height:52px;font-size:20px;"></div>
-      <div style="flex:1;min-width:0;"><div id="vName" style="font-family:var(--fd);font-size:20px;font-weight:800;line-height:1;"></div><div id="vRec" style="font-size:12px;color:var(--text2);margin-top:3px;"></div></div>
-      <div id="vMe" style="display:none;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:6px;padding:4px 8px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--accent);">Your Team</div>
+      <div style="flex:1;min-width:0;"><div id="vName" style="font-family:var(--fb);font-size:24px;font-weight:800;line-height:1;color:#111827;"></div><div id="vRec" style="font-size:13px;color:#6b7280;margin-top:3px;"></div></div>
+      <div id="vMe" style="display:none;background:#22180d;border:1px solid #7c4a18;border-radius:999px;padding:5px 10px;font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#fdba74;">Your Team</div>
     </div>
     <div id="vStats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
     <div id="vMatchup" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text2);"></div>
-    <div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--green);margin-bottom:8px;">Starting Lineup</div>
+    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#15803d;margin-bottom:8px;">Starting Lineup</div>
     <div id="vStarters"></div>
-    <div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin:12px 0 8px;">Bench</div>
+    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:12px 0 8px;">Bench</div>
     <div id="vBench"></div>
     <div id="vActions" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
-    <button onclick="document.getElementById('viewerModal').classList.remove('open')" class="bs" style="margin-top:8px;">Close</button>
   </div>
 </div>
 
@@ -1070,8 +1202,8 @@ function waiverCell(player,key){
     return `<div style="display:flex;align-items:center;gap:9px;min-width:190px;">
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
       <div style="min-width:0;">
-        <div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
-        <div style="font-size:11px;color:var(--text3);">${player.team} · ${player.pos}</div>
+        <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
+        <div style="font-size:11px;color:#6b7280;">${player.team} · ${player.pos}</div>
       </div>
     </div>`;
   }
@@ -1407,6 +1539,10 @@ function renderHub(){
   const dataStampEl=document.getElementById('hubDataStamp');
   document.getElementById('hubAv').textContent=ini(D.teamName);
   document.getElementById('hubName').textContent=D.teamName;
+  document.getElementById('hubLeagueName').textContent=D.leagueName||'RosterBate League';
+  document.getElementById('hubFormat').textContent=CS?.format||'Standard';
+  document.getElementById('hubScoringType').textContent=CS?.scoringType||'Head to Head Points';
+  document.getElementById('hubTeamCount').textContent=(D.teams?.length||0)||10;
   document.getElementById('hubWeek').textContent='Wk '+G.week+'/'+G.totalWeeks+' · Day '+G.day;
   document.getElementById('hubRec').textContent=(myS?.w||0)+'–'+(myS?.l||0)+' · '+(myS?.pf||0).toFixed(1)+' PF';
   if(dataStampEl){
@@ -1431,11 +1567,51 @@ function renderHub(){
   document.getElementById('hubOppProj').textContent=op>0?op.toFixed(1):'—';
   document.getElementById('hubWC').textContent=G.waiver.length+' available';
   const pend=G.tradeOffers.filter(t=>t.toTeam===mp&&t.status==='pending').length;
-  document.getElementById('hubTC').textContent=pend>0?pend+' pending':'No offers';
   const srt=[...G.standings].sort((a,b)=>b.w-a.w||(b.pf-a.pf));
   const rk=srt.findIndex(s=>s.teamIdx===mp)+1;
   document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'—';
   const games=weekGames(G.week);
+  const scoresEl=document.getElementById('hubScores');
+  if(scoresEl){
+    const revealedScores=srt
+      .map(st=>({teamIdx:st.teamIdx,name:D.teams[st.teamIdx]||('Team '+(st.teamIdx+1)),score:getTeamWeekRevealedScore(st.teamIdx,G.week)}))
+      .sort((a,b)=>b.score-a.score)
+      .slice(0,10);
+    scoresEl.innerHTML=revealedScores.map(entry=>`
+      <div class="hub-score-row" onclick="openViewer(${entry.teamIdx})" style="cursor:pointer;">
+        <div class="hub-score-team">
+          <div class="pav" style="background:${TCOLORS[entry.teamIdx%TCOLORS.length]};width:24px;height:24px;font-size:10px;">${ini(entry.name)}</div>
+          <div class="hub-score-name"${entry.teamIdx===mp?' style="color:var(--accent);"':''}>${entry.name}${entry.teamIdx===mp?' ⭐':''}</div>
+        </div>
+        <div class="hub-score-val">${entry.score.toFixed(1)}</div>
+      </div>
+    `).join('');
+  }
+  const standingsEl=document.getElementById('hubStandingsMini');
+  if(standingsEl){
+    const leader=srt[0];
+    standingsEl.innerHTML=`
+      <div class="hub-standings-head">
+        <div>Team</div>
+        <div style="text-align:right;">W</div>
+        <div style="text-align:right;">L</div>
+        <div style="text-align:right;">GB</div>
+      </div>
+      ${srt.slice(0,10).map(st=>{
+        const gb=leader?(((leader.w||0)-(st.w||0))+((st.l||0)-(leader.l||0)))/2:0;
+        const isMine=st.teamIdx===mp;
+        return `<div class="hub-standings-row" onclick="openViewer(${st.teamIdx})" style="cursor:pointer;${isMine?'background:#1b2432;border:1px solid #7c4a18;border-radius:8px;padding-left:6px;padding-right:6px;':''}">
+          <div class="hub-standings-team">
+            <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:24px;height:24px;font-size:10px;">${ini(D.teams[st.teamIdx]||('T'+(st.teamIdx+1)))}</div>
+            <div class="hub-standings-name"${isMine?' style="color:#fdba74;"':''}>${D.teams[st.teamIdx]||('Team '+(st.teamIdx+1))}</div>
+          </div>
+          <div class="hub-standings-cell">${st.w||0}</div>
+          <div class="hub-standings-cell">${st.l||0}</div>
+          <div class="hub-standings-cell">${gb<=0?'--':(Math.round(gb*10)/10).toFixed(gb%1===0?0:1)}</div>
+        </div>`;
+      }).join('')}
+    `;
+  }
   const myRoster=G.rosters[mp]||[];
   const thisWeekDrop=G.powerupDropsByWeek?.[G.week];
   const captainOptions=myRoster.map(p=>`<option value="${p.id}" ${weekPowerups.captain_mode.targetId===p.id?'selected':''}>${p.name} (${p.pos})</option>`).join('');
@@ -1445,37 +1621,41 @@ function renderHub(){
     const available=isPowerupAvailable(id);
     const actionMap={white_gloves:'activateWhiteGloves()',bench_boost:'activateBenchBoost()',sunday_surge:'activateSundaySurge()'};
     const action=id==='captain_mode'
-      ?`<select id="captainSelect" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;appearance:none;margin:8px 0;"><option value="">Choose your captain...</option>${captainOptions}</select>
-        <button onclick="setCaptainMode(+document.getElementById('captainSelect').value)" style="width:100%;background:${available||slot.active?meta.color+'22':'var(--bg3)'};border:1px solid ${available||slot.active?meta.color+'55':'var(--border)'};border-radius:8px;padding:9px 10px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:${available||slot.active?meta.color:'var(--text3)'};cursor:pointer;">${slot.active?'Update Captain':available?'Activate':'On Cooldown'}</button>`
-      :`<button onclick="${actionMap[id]}" style="width:100%;background:${available?meta.color+'22':'var(--bg3)'};border:1px solid ${available?meta.color+'55':'var(--border)'};border-radius:8px;padding:9px 10px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:${available?meta.color:'var(--text3)'};cursor:pointer;">${slot.active?'Active This Week':available?'Activate':'On Cooldown'}</button>`;
-    return `<div style="background:${meta.color}14;border:1px solid ${meta.color}33;border-radius:10px;padding:12px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-        <div style="display:flex;align-items:center;gap:10px;">${renderPowerupIcon(meta,58)}<div><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:${meta.color};text-transform:uppercase;">${meta.name}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">${meta.rarity} · Cooldown ${meta.cooldown}w</div></div></div>
-        <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:${slot.active?'var(--green)':'var(--text2)'};text-transform:uppercase;">${powerupStatusLabel(id)}</div>
+      ?`<select id="captainSelect" style="width:100%;background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:10px 12px;color:#f8fafc;font-size:13px;font-family:var(--fb);outline:none;appearance:none;margin:2px 0 0;"><option value="">Choose your captain...</option>${captainOptions}</select>
+        <button onclick="setCaptainMode(+document.getElementById('captainSelect').value)" style="width:100%;background:${available||slot.active?'#22180d':'#182235'};border:1px solid ${available||slot.active?'#7c4a18':'#24324a'};border-radius:10px;padding:10px 12px;font-family:var(--fb);font-size:12px;font-weight:800;text-transform:uppercase;color:${available||slot.active?'#fdba74':'#94a3b8'};cursor:pointer;">${slot.active?'Update Captain':available?'Activate':'On Cooldown'}</button>`
+      :`<button onclick="${actionMap[id]}" style="width:100%;background:${available?'#0f1724':'#182235'};border:1px solid ${available?meta.color+'55':'#24324a'};border-radius:10px;padding:10px 12px;font-family:var(--fb);font-size:12px;font-weight:800;text-transform:uppercase;color:${available?meta.color:'#94a3b8'};cursor:pointer;">${slot.active?'Active This Week':available?'Activate':'On Cooldown'}</button>`;
+    return `<div class="hub-powerup-tile" style="background:${meta.color}14;border:1px solid ${meta.color}33;">
+      <div class="hub-powerup-top">
+        ${renderPowerupIcon(meta,46)}
+        <div style="min-width:0;flex:1;">
+          <div class="hub-powerup-title" style="color:${meta.color};">${meta.name}</div>
+          <div class="hub-powerup-meta">${meta.rarity} · Cooldown ${meta.cooldown}w</div>
+        </div>
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;">${meta.description}</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Inventory: <span style="color:var(--text);font-family:var(--fd);font-weight:700;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` · Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
+      <div class="hub-powerup-status" style="color:${slot.active?'#86efac':'#cbd5e1'};border-color:${slot.active?'#166534':'#24324a'};background:${slot.active?'#0f2418':'#0f1724'};">${powerupStatusLabel(id)}</div>
+      <div class="hub-powerup-copy">${meta.description}</div>
+      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` · Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
       ${action}
     </div>`;
   }).join('');
   document.getElementById('hubPowerups').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;">
+      <div style="background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div><div style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;">Daily Reveal Mode</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Scores stay hidden until the day is revealed after the final game.</div></div>
-          <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:${revealedToday?'var(--green)':'var(--accent)'};text-transform:uppercase;">${revealedCount}/${weekEnd-weekStart+1} days revealed</div>
+          <div><div style="font-family:var(--fb);font-size:13px;font-weight:800;color:#f8fafc;text-transform:uppercase;">Daily Reveal Mode</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">Scores stay hidden until the day is revealed after the final game.</div></div>
+          <div style="font-family:var(--fb);font-size:11px;font-weight:800;color:${revealedToday?'var(--green)':'var(--accent)'};text-transform:uppercase;">${revealedCount}/${weekEnd-weekStart+1}</div>
         </div>
       </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;">
+      <div style="background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div><div style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;">Week ${G.week} Drops</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">New powerups arrive each week and stack in your inventory.</div></div>
-          <div style="font-family:var(--fd);font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;">${thisWeekDrop?.rarity||'Starter Pack'}</div>
+          <div><div style="font-family:var(--fb);font-size:13px;font-weight:800;color:#f8fafc;text-transform:uppercase;">Week ${G.week} Drops</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">New powerups arrive each week and stack in your inventory.</div></div>
+          <div style="font-family:var(--fb);font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;">${thisWeekDrop?.rarity||'Starter Pack'}</div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-          ${(thisWeekDrop?.drops?.length?thisWeekDrop.drops:['captain_mode','white_gloves','bench_boost']).map(id=>`<div style="display:flex;align-items:center;gap:8px;background:${POWERUP_LIBRARY[id].color}14;border:1px solid ${POWERUP_LIBRARY[id].color}44;border-radius:999px;padding:5px 10px 5px 6px;">${renderPowerupIcon(POWERUP_LIBRARY[id],34)}<span style="font-family:var(--fd);font-size:11px;font-weight:800;color:${POWERUP_LIBRARY[id].color};text-transform:uppercase;">${POWERUP_LIBRARY[id].name}</span></div>`).join('')}
+          ${(thisWeekDrop?.drops?.length?thisWeekDrop.drops:['captain_mode','white_gloves','bench_boost']).map(id=>`<div style="display:flex;align-items:center;gap:8px;background:${POWERUP_LIBRARY[id].color}14;border:1px solid ${POWERUP_LIBRARY[id].color}44;border-radius:999px;padding:5px 10px 5px 6px;">${renderPowerupIcon(POWERUP_LIBRARY[id],34)}<span style="font-family:var(--fb);font-size:11px;font-weight:800;color:${POWERUP_LIBRARY[id].color};text-transform:uppercase;">${POWERUP_LIBRARY[id].name}</span></div>`).join('')}
         </div>
       </div>
-      ${powerupCards}
+      <div class="hub-powerup-grid">${powerupCards}</div>
     </div>`;
   document.getElementById('hubMatchups').innerHTML=games.length?games.map(g=>{
     const im=g.home===mp||g.away===mp;
@@ -1526,69 +1706,136 @@ function renderRoster(){
   const isPast=isDayRevealed(day);
   const isLocked=day<G.day||isDayRevealed(day);
   const weekPowerups=getWeekPowerups(week);
-
-  let h=``;
-
-  // ── Date navigation strip ──
-  h+=`<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;gap:6px;overflow-x:auto;flex-shrink:0;">
-    <button onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);font-size:14px;cursor:pointer;flex-shrink:0;">‹</button>
-    <div style="display:flex;gap:4px;overflow-x:auto;flex:1;">`;
-
-  for(let d=weekStart;d<=Math.min(weekEnd,TOTAL_DAYS());d++){
-    const dow=DAY_NAMES[dayOfWeek(d)-1];
-    const isToday=d===G.day;
-    const isSelected=d===day;
-    const isPastDay=d<G.day;
-    const hasCustom=!!G.dailyLineups[d];
-    h+=`<button onclick="rosterViewDay=${d};renderRoster()" style="flex-shrink:0;min-width:44px;padding:5px 4px;border-radius:7px;font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;cursor:pointer;border:2px solid ${isSelected?'var(--accent)':isToday?'rgba(249,115,22,.4)':'var(--border)'};background:${isSelected?'rgba(249,115,22,.15)':isPastDay?'transparent':'var(--bg3)'};color:${isSelected?'var(--accent)':isPastDay?'var(--text3)':'var(--text)'};opacity:${isPastDay?'.6':'1'};">
-      <div>${dow}</div>
-      <div style="font-size:9px;margin-top:1px;color:${isToday&&!isSelected?'var(--accent)':'inherit'};">${isToday?'TODAY':'Wk'+week}</div>
-      ${hasCustom?`<div style="width:4px;height:4px;border-radius:50%;background:var(--green);margin:2px auto 0;"></div>`:'<div style="height:6px;"></div>'}
-    </button>`;
-  }
-  h+=`</div>
-    <button onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);font-size:14px;cursor:pointer;flex-shrink:0;">›</button>
-  </div>`;
-
-  // ── Week navigator ──
-  h+=`<div style="background:var(--bg3);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-    <button onclick="rosterViewDay=Math.max(1,(weekForDay(rosterViewDay)-2)*${DAYS_PER_WEEK}+1);if(rosterViewDay<1)rosterViewDay=1;renderRoster()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:2px 6px;">‹ Prev Wk</button>
-    <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Week ${week} · ${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel}</div>
-    <button onclick="rosterViewDay=Math.min(TOTAL_DAYS(),(weekForDay(rosterViewDay))*${DAYS_PER_WEEK}+1);renderRoster()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:2px 6px;">Next Wk ›</button>
-  </div>`;
-
-  // ── Score & controls ──
-  h+=`<div style="padding:10px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-    <div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;">${isPast?'Revealed Score':'Results Status'}</div>
-      <div style="font-family:var(--fd);font-size:26px;font-weight:900;color:${isPast?'var(--text2)':'var(--accent)'};">${isPast?revealedScore.toFixed(1):'Hidden'}</div>
-      ${!isPast?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">Unlocks when Day ${day} is revealed.</div>`:''}
-      ${Object.entries(weekPowerups).some(([,v])=>v.active)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;">${Object.entries(weekPowerups).filter(([,v])=>v.active).map(([id,v])=>`<span style="display:inline-flex;align-items:center;gap:6px;background:${POWERUP_LIBRARY[id].color}14;border:1px solid ${POWERUP_LIBRARY[id].color}44;border-radius:999px;padding:4px 8px 4px 5px;color:${POWERUP_LIBRARY[id].color};font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;">${renderPowerupIcon(POWERUP_LIBRARY[id],24)}${id==='captain_mode'?(roster.find(p=>p.id===v.targetId)?.name||'Captain Active'):POWERUP_LIBRARY[id].name}</span>`).join('')}</div>`:''}
-    </div>
-    <div style="display:flex;gap:6px;">
-      ${!isLocked?`<button onclick="autoSetDay(${day})" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);cursor:pointer;">Auto</button>`:''}
-      ${!isLocked?`<div style="position:relative;">
-        <button onclick="toggleCopyMenu(${day})" style="background:var(--accent);border:none;border-radius:7px;padding:6px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;" id="copyBtn${day}">Copy ▾</button>
-        <div id="copyMenu${day}" style="display:none;position:absolute;right:0;top:110%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px;min-width:170px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5);">
-          <button onclick="const copied=copyLineupToRange(${day},${weekEnd});renderRoster();toggleCopyMenu(${day});toast(copied?'Copied to '+copied+' open day'+(copied===1?'':'s')+' this week.':'No open days left this week.')" style="display:block;width:100%;text-align:left;padding:8px 10px;background:none;border:none;color:var(--text);font-size:13px;font-family:var(--fb);cursor:pointer;border-radius:5px;">Copy to rest of week</button>
-          <button onclick="const copied=copyLineupToRange(${day},TOTAL_DAYS());renderRoster();toggleCopyMenu(${day});toast(copied?'Copied to '+copied+' open day'+(copied===1?'':'s')+' this season.':'No open days left this season.')" style="display:block;width:100%;text-align:left;padding:8px 10px;background:none;border:none;color:var(--text);font-size:13px;font-family:var(--fb);cursor:pointer;border-radius:5px;">Copy to entire season</button>
-          <button onclick="const copied=copyLineupToRange(${weekStart},${weekEnd});renderRoster();toggleCopyMenu(${day});toast(copied?'Applied to '+copied+' open day'+(copied===1?'':'s')+' this week.':'This week is already locked.')" style="display:block;width:100%;text-align:left;padding:8px 10px;background:none;border:none;color:var(--text);font-size:13px;font-family:var(--fb);cursor:pointer;border-radius:5px;">Apply to full week</button>
+  const myStanding=G.standings[D.myPos]||{w:0,l:0,pf:0};
+  const rk=[...G.standings].sort((a,b)=>b.w-a.w||(b.pf-a.pf)).findIndex(s=>s.teamIdx===D.myPos)+1;
+  const currentMatch=weekGames(week).find(g=>g.home===D.myPos||g.away===D.myPos);
+  const prevMatch=week>1?weekGames(week-1).find(g=>g.home===D.myPos||g.away===D.myPos):null;
+  const rowData=[
+    ...starters.map((p,i)=>({player:p,slot:SLOT_LABELS[i]||'UTIL',isStarter:true})),
+    ...bench.map(p=>({player:p,slot:'BN',isStarter:false}))
+  ];
+  const matchupCard=(label,matchup,isCurrent)=>{
+    if(!matchup) return `<div class="season-table-card season-card-pad"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div><div style="margin-top:10px;font-size:13px;color:#6b7280;">No matchup available.</div></div>`;
+    const a=matchup.home, b=matchup.away;
+    const aName=D.teams[a]||('Team '+(a+1)), bName=D.teams[b]||('Team '+(b+1));
+    const aScore=isCurrent?getTeamWeekRevealedScore(a,week):matchup.homeScore||0;
+    const bScore=isCurrent?getTeamWeekRevealedScore(b,week):matchup.awayScore||0;
+    return `<div class="season-table-card season-card-pad">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+        <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div>
+        ${isCurrent?'<div class="season-team-link">Full Schedule</div>':''}
+      </div>
+      <div style="display:grid;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;"><div class="pav" style="background:${TCOLORS[a%TCOLORS.length]};width:28px;height:28px;font-size:11px;">${ini(aName)}</div><div style="font-weight:700;color:${a===D.myPos?'#111827':'#6b7280'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${aName}</div></div>
+          <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#111827;">${aScore.toFixed(1)}</div>
         </div>
-      </div>`:''}
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;"><div class="pav" style="background:${TCOLORS[b%TCOLORS.length]};width:28px;height:28px;font-size:11px;">${ini(bName)}</div><div style="font-weight:700;color:${b===D.myPos?'#111827':'#6b7280'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bName}</div></div>
+          <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#111827;">${bScore.toFixed(1)}</div>
+        </div>
+      </div>
+    </div>`;
+  };
+  const dayChips=Array.from({length:Math.min(weekEnd,TOTAL_DAYS())-weekStart+1},(_,idx)=>{
+    const d=weekStart+idx;
+    const dow=DAY_NAMES[dayOfWeek(d)-1];
+    const selected=d===day;
+    const today=d===G.day;
+    return `<button onclick="rosterViewDay=${d};renderRoster()" class="season-outline-btn" style="padding:10px 14px;border-color:${selected?'#7c4a18':'#24324a'};color:${selected?'#fdba74':'#dbe4f0'};background:${selected?'#22180d':'#0f1724'};">
+      <div style="font-size:10px;text-transform:uppercase;line-height:1;">${getSeasonDayDate(d).toLocaleDateString([],{month:'short',day:'numeric'})}</div>
+      <div style="font-size:18px;line-height:1.15;margin-top:4px;">${today?'TODAY':dow}</div>
+    </button>`;
+  }).join('');
+  const activePowerups=Object.entries(weekPowerups).filter(([,v])=>v.active);
+  const rows=rowData.map(entry=>{
+    const p=entry.player;
+    const game=getGameInfo(p,day);
+    const injury=getInjuryStatus(p,week);
+    const opp=game?(game.isHome?'vs ':'@ ')+game.opp:'--';
+    const status=injury?injury.label:(game?game.time:(isPast?'Final':'Idle'));
+    const action=isLocked?`<span class="season-soft-muted" style="font-weight:700;">Locked</span>`:`<button class="lineup-move-btn" onclick="toggleStartDay(${p.id},${day})">Move</button>`;
+    return `<tr>
+      <td>${entry.slot}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
+          <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
+          <div style="min-width:0;">
+            <div style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
+            <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+          </div>
+        </div>
+      </td>
+      <td>${action}</td>
+      <td>${opp}</td>
+      <td>${status}</td>
+      <td style="font-family:var(--fb);font-size:15px;font-weight:800;color:#111827;">${Number(p.fp||0).toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+  let h=`<div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
+    <div class="season-hero-card season-card-pad">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:flex-start;gap:16px;min-width:0;">
+          <div class="pav" style="background:var(--accent);width:86px;height:86px;font-size:28px;box-shadow:0 12px 24px rgba(249,115,22,.16);">${ini(D.teamName)}</div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div style="font-family:var(--fb);font-size:26px;font-weight:800;color:#111827;">${D.teamName}</div>
+              <div class="season-soft-muted" style="font-size:14px;">${myStanding.w}-${myStanding.l} (${rk>0?ord(rk):'—'} of ${D.teams.length})</div>
+            </div>
+            <div class="season-team-link" style="margin-top:6px;">${D.leagueName||'RosterBate League'}</div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;">
+              <a href="javascript:void(0)" onclick="goPage('waiver')" class="season-team-link">Watch List</a>
+              <a href="javascript:void(0)" onclick="goPage('waiver')" class="season-team-link">Waiver Order (${Math.max(1,D.myPos+1)} of ${D.teams.length})</a>
+              <a href="javascript:void(0)" onclick="toast('Daily lineup locks are active.')" class="season-team-link">Lineup Protection Moves</a>
+            </div>
+          </div>
+        </div>
+        <div class="season-team-link" style="white-space:nowrap;">Team Settings</div>
+      </div>
+      <div class="season-split-grid" style="margin-top:18px;">
+        ${matchupCard('Last Matchup',prevMatch,false)}
+        ${matchupCard('Current Matchup',currentMatch,true)}
+      </div>
+    </div>
+    <div class="season-table-card">
+      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #e5e7eb;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:14px;color:#111827;">Set Lineup:</span>
+          <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">‹</button>
+          ${dayChips}
+          <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">›</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          ${!isLocked?`<button class="season-outline-btn" onclick="autoSetDay(${day})">Auto Set</button>`:''}
+          ${!isLocked?`<button class="season-outline-btn" onclick="const copied=copyLineupToRange(${day},${weekEnd});renderRoster();toast(copied?'Copied to '+copied+' open day'+(copied===1?'':'s')+' this week.':'No open days left this week.')">Copy Week</button>`:''}
+          <button class="season-outline-btn" onclick="openPicker()">League</button>
+          <button class="season-outline-btn" onclick="goPage('waiver')">Add Player</button>
+        </div>
+      </div>
+      <div class="season-mini-tabs"><div class="season-mini-tab on">Stats</div><div class="season-mini-tab">Trending</div><div class="season-mini-tab">Schedule</div><div class="season-mini-tab">News</div></div>
+      <div class="season-header-band">
+        <div class="season-header-cell"><div class="season-header-eyebrow">Slot</div><div class="season-header-title">Lineup</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Starters</div><div class="season-header-title">Player</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Action</div><div class="season-header-title">Manage</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">${dateLabel.toUpperCase()}</div><div class="season-header-title">Opp</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Game</div><div class="season-header-title">Status</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Fantasy</div><div class="season-header-title">Pts</div></div>
+      </div>
+      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="season-stat-pill">${isPast?'Revealed Score: '+Number(revealedScore||0).toFixed(1):'Results hidden until reveal'}</span>
+          ${activePowerups.map(([id,v])=>`<span class="season-stat-pill" style="border-color:${POWERUP_LIBRARY[id].color}55;color:${POWERUP_LIBRARY[id].color};background:${POWERUP_LIBRARY[id].color}12;">${id==='captain_mode'?(roster.find(p=>p.id===v.targetId)?.name||'Captain Active'):POWERUP_LIBRARY[id].name}</span>`).join('')}
+        </div>
+        <div class="season-soft-muted">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} · Week ${week}</div>
+      </div>
+      <div class="season-table-wrap">
+        <table class="season-data-table" style="min-width:720px;">
+          <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Status</th><th>FP</th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="6" style="text-align:center;color:#6b7280;">No rostered players found.</td></tr>`}</tbody>
+        </table>
+      </div>
     </div>
   </div>`;
-
-  // ── Starters ──
-  h+=`<div style="padding:0 10px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;">
-    <div class="sl" style="margin-top:10px;">Starters</div>`;
-  starters.forEach((p,i)=>{h+=pRow(p,SLOT_LABELS[i]||'UTIL',true,day,isPast);});
-
-  // ── Bench ──
-  h+=`<div class="sl">Bench</div>`;
-  if(!bench.length) h+=`<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px;">No bench players</div>`;
-  bench.forEach(p=>{h+=pRow(p,'BN',false,day,isPast);});
-  h+=`</div>`;
-
   document.getElementById('rosterContent').innerHTML=h;
 }
 
@@ -1696,25 +1943,47 @@ function renderWaiver(){
     if(cmp===0) cmp=Number(b.fp||0)-Number(a.fp||0);
     return waiverSortDir==='asc'?cmp:-cmp;
   });
-  if(!list.length){document.getElementById('waiverContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);">No players found</div>';return;}
+  if(!list.length){document.getElementById('waiverContent').innerHTML='<div style="padding:24px;"><div class="season-table-card season-card-pad" style="text-align:center;color:#6b7280;">No players found</div></div>';return;}
   const arrow=(key)=>waiverSortKey===key?(waiverSortDir==='desc'?' ▼':' ▲'):'';
   document.getElementById('waiverContent').innerHTML=`
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-      <div style="overflow:auto;">
-        <table style="width:100%;border-collapse:collapse;min-width:${CURRENT_SPORT==='nba'?'980':'900'}px;">
-          <thead>
-            <tr style="background:var(--bg3);border-bottom:1px solid var(--border);">
-              ${cols.map(col=>`<th onclick="toggleWaiverSort('${col.key}')" style="padding:10px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${waiverSortKey===col.key?'var(--accent)':'var(--text3)'};text-align:${col.align||'right'};cursor:pointer;white-space:nowrap;">${col.label}${arrow(col.key)}</th>`).join('')}
-              <th style="padding:10px 12px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);text-align:right;">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${list.map(p=>`<tr style="border-bottom:1px solid rgba(30,45,69,.6);">
-              ${cols.map(col=>`<td style="padding:10px 12px;font-size:12px;color:${col.key==='fp'?'var(--accent)':'var(--text2)'};text-align:${col.align||'right'};vertical-align:middle;${col.key==='fp'?'font-family:var(--fd);font-size:16px;font-weight:800;':''}">${waiverCell(p,col.key)}</td>`).join('')}
-              <td style="padding:10px 12px;text-align:right;"><button onclick="openWaiver(${p.id})" style="background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:7px;padding:6px 11px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--accent);cursor:pointer;flex-shrink:0;">Claim</button></td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
+      <div class="season-hero-card season-card-pad">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#111827;">Free Agents</div>
+            <div class="season-subbar-copy">${D.leagueName||'RosterBate League'}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+              <span class="season-stat-pill">Position: ${pf==='ALL'?'All Players':pf}</span>
+              <span class="season-stat-pill">${list.length} available</span>
+              <span class="season-stat-pill">Sorted by ${cols.find(c=>c.key===waiverSortKey)?.label||'Fantasy'}</span>
+            </div>
+          </div>
+          <button class="season-outline-btn" onclick="document.getElementById('wSrch').value='';document.getElementById('wPos').value='ALL';renderWaiver()">Reset All</button>
+        </div>
+      </div>
+      <div class="season-table-card">
+        <div class="season-mini-tabs"><div class="season-mini-tab on">Stats</div><div class="season-mini-tab">Trending</div><div class="season-mini-tab">Schedule</div><div class="season-mini-tab">News</div></div>
+        <div class="season-header-band" style="grid-template-columns:minmax(230px,1.4fr) repeat(${cols.length-1},82px) 96px;">
+          <div class="season-header-cell"><div class="season-header-eyebrow">Players</div><div class="season-header-title">Available Pool</div></div>
+          ${cols.slice(1).map(col=>`<div class="season-header-cell"><div class="season-header-eyebrow">Stats</div><div class="season-header-title">${col.label}</div></div>`).join('')}
+          <div class="season-header-cell"><div class="season-header-eyebrow">Action</div><div class="season-header-title">Claim</div></div>
+        </div>
+        <div class="season-table-wrap">
+          <table class="season-data-table" style="min-width:${CURRENT_SPORT==='nba'?'980':'900'}px;">
+            <thead>
+              <tr>
+                ${cols.map(col=>`<th onclick="toggleWaiverSort('${col.key}')" style="text-align:${col.align||'right'};cursor:pointer;color:${waiverSortKey===col.key?'#c2410c':'#6b7280'};">${col.label}${arrow(col.key)}</th>`).join('')}
+                <th style="text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(p=>`<tr>
+                ${cols.map(col=>`<td style="text-align:${col.align||'right'};${col.key==='fp'?'font-family:var(--fb);font-size:18px;font-weight:800;color:#111827;':''}">${waiverCell(p,col.key)}</td>`).join('')}
+                <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;">Claim</button></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>`;
 }
@@ -1936,31 +2205,54 @@ function forceRejectTrade(id){
 function renderStandings(){
   const sorted=[...G.standings].sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
   const medals=['🥇','🥈','🥉'];
-  let h=`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;">
-    <div class="sgrid" style="background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 12px;">
-      ${['#','Team','W-L','PF','STK'].map((x,i)=>`<div style="font-family:var(--fd);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);${i>1?'text-align:right':''}">${x}</div>`).join('')}
-    </div>`;
+  let h=`<div style="display:flex;flex-direction:column;gap:18px;">
+    <div class="season-hero-card season-card-pad">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">${D.leagueName||'RosterBate League'}</div>
+          <div class="season-subbar-copy">Standings</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="season-stat-pill">${sorted.length} teams</span>
+          <span class="season-stat-pill">Week ${G.week}</span>
+        </div>
+      </div>
+    </div>
+    <div class="season-table-card">
+      <div class="season-table-wrap">
+        <table class="season-data-table" style="min-width:760px;">
+          <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>PF</th><th>Streak</th><th>Revealed</th></tr></thead>
+          <tbody>`;
   sorted.forEach((st,rk)=>{
-    const im=st.teamIdx===D.myPos,sc=st.streakW?'var(--green)':'var(--red)';
-    h+=`<div class="sgrid" onclick="openViewer(${st.teamIdx})" style="padding:10px 12px;border-bottom:1px solid var(--border);background:${im?'rgba(249,115,22,.06)':'transparent'};cursor:pointer;">
-      <div style="font-family:var(--fd);font-size:14px;font-weight:800;color:${rk<3?'var(--gold)':'var(--text3)'};">${medals[rk]||rk+1}</div>
-      <div style="min-width:0;"><div style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${im?'var(--accent)':'var(--text)'};">${D.teams[st.teamIdx]||'Team '+(st.teamIdx+1)}</div>
-      <div style="font-size:10px;color:var(--text3);">${(st.pf||0).toFixed(1)} PF</div></div>
-      <div style="font-family:var(--fd);font-size:14px;font-weight:800;text-align:right;">${st.w}–${st.l}</div>
-      <div style="font-family:var(--fd);font-size:13px;font-weight:700;text-align:right;color:var(--text2);">${(st.pf||0).toFixed(0)}</div>
-      <div style="font-family:var(--fd);font-size:13px;font-weight:800;text-align:right;color:${sc};">${st.w+st.l>0?(st.streakW?'W':'L')+(st.streak||0):'—'}</div>
-    </div>`;
+    const im=st.teamIdx===D.myPos,sc=st.streakW?'#16a34a':'#dc2626';
+    h+=`<tr onclick="openViewer(${st.teamIdx})" style="cursor:pointer;">
+      <td style="font-family:var(--fb);font-weight:800;color:${rk<3?'#f59e0b':'#6b7280'};">${medals[rk]||rk+1}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;min-width:220px;">
+          <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:30px;height:30px;font-size:11px;">${ini(D.teams[st.teamIdx]||('T'+(st.teamIdx+1)))}</div>
+          <div style="min-width:0;">
+            <div style="font-weight:700;color:${im?'#c2410c':'#111827'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${D.teams[st.teamIdx]||'Team '+(st.teamIdx+1)}${im?' ⭐':''}</div>
+            <div class="season-soft-muted">${(st.pf||0).toFixed(1)} PF</div>
+          </div>
+        </div>
+      </td>
+      <td>${st.w}</td>
+      <td>${st.l}</td>
+      <td style="font-family:var(--fb);font-weight:800;">${(st.pf||0).toFixed(0)}</td>
+      <td style="font-family:var(--fb);font-weight:800;color:${sc};">${st.w+st.l>0?(st.streakW?'W':'L')+(st.streak||0):'—'}</td>
+      <td>${getTeamWeekRevealedScore(st.teamIdx,G.week).toFixed(1)}</td>
+    </tr>`;
   });
-  h+=`</div>`;
+  h+=`</tbody></table></div></div>`;
   const pw=G.week-1;
   if(pw>=1){
-    h+=`<div class="sl" style="margin-top:0;">Week ${pw} Results</div><div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">`;
+    h+=`<div class="season-table-card"><div class="season-card-pad" style="font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;border-bottom:1px solid #24324a;">Week ${pw} Results</div>`;
     weekGames(pw).forEach(g=>{
       const hw=g.winner===g.home;
-      h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border);">
-        <span style="font-family:var(--fd);font-size:13px;font-weight:700;color:${hw?'var(--text)':'var(--text3)'};">${D.teams[g.home]||'T'+g.home}</span>
-        <div style="text-align:center;flex-shrink:0;padding:0 8px;"><div style="font-family:var(--fd);font-size:14px;font-weight:900;">${g.homeScore.toFixed(1)} – ${g.awayScore.toFixed(1)}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;">Final</div></div>
-        <span style="font-family:var(--fd);font-size:13px;font-weight:700;color:${hw?'var(--text3)':'var(--text)'};">${D.teams[g.away]||'T'+g.away}</span>
+      h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid #1d283b;background:#121a29;">
+        <span style="font-family:var(--fb);font-size:14px;font-weight:700;color:${hw?'#f8fafc':'#94a3b8'};">${D.teams[g.home]||'T'+g.home}</span>
+        <div style="text-align:center;flex-shrink:0;padding:0 8px;"><div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${g.homeScore.toFixed(1)} – ${g.awayScore.toFixed(1)}</div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;">Final</div></div>
+        <span style="font-family:var(--fb);font-size:14px;font-weight:700;color:${hw?'#94a3b8':'#f8fafc'};">${D.teams[g.away]||'T'+g.away}</span>
       </div>`;
     });
     h+=`</div>`;
@@ -1976,13 +2268,13 @@ function openPicker(){
     const nm=D.teams[ti]||'Team '+(ti+1),col=TCOLORS[ti%TCOLORS.length];
     const sc=st.streakW?'var(--green)':'var(--red)';
     const strk=(st.w+st.l>0)?(st.streakW?'W':'L')+st.streak:'—';
-    return`<div class="tli${im?' me':''}" onclick="openViewer(${ti})">
-      <div style="width:22px;font-family:var(--fd);font-size:14px;font-weight:800;color:${rk<3?'var(--gold)':'var(--text3)'};text-align:center;">${medals[rk]||rk+1}</div>
-      <div class="pav" style="background:${col};width:38px;height:38px;font-size:15px;">${ini(nm)}</div>
-      <div style="flex:1;min-width:0;"><div style="font-family:var(--fd);font-size:15px;font-weight:700;color:${im?'var(--accent)':'var(--text)'};">${nm}${im?' ⭐':''}</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px;">${st.w}–${st.l} · ${(st.pf||0).toFixed(1)} PF</div></div>
-      <div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--fd);font-size:13px;font-weight:800;color:${sc};">${strk}</div>
-      <div style="font-size:10px;color:var(--text3);">${getTeamWeekRevealedScore(ti,G.week).toFixed(1)} revealed</div></div>
+    return`<div onclick="openViewer(${ti})" style="display:flex;align-items:center;gap:12px;background:#121a29;border:1px solid ${im?'#7c4a18':'#24324a'};border-radius:14px;padding:12px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(2,6,23,.2);margin-bottom:8px;">
+      <div style="width:24px;font-family:var(--fb);font-size:15px;font-weight:800;color:${rk<3?'#f59e0b':'#94a3b8'};text-align:center;">${medals[rk]||rk+1}</div>
+      <div class="pav" style="background:${col};width:40px;height:40px;font-size:14px;">${ini(nm)}</div>
+      <div style="flex:1;min-width:0;"><div style="font-family:var(--fb);font-size:16px;font-weight:700;color:${im?'#fdba74':'#f8fafc'};">${nm}${im?' ⭐':''}</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px;">${st.w}–${st.l} · ${(st.pf||0).toFixed(1)} PF</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--fb);font-size:13px;font-weight:800;color:${sc};">${strk}</div>
+      <div style="font-size:11px;color:#94a3b8;">${getTeamWeekRevealedScore(ti,G.week).toFixed(1)} revealed</div></div>
     </div>`;
   }).join('');
   document.getElementById('pickerModal').classList.add('open');
@@ -2003,49 +2295,65 @@ function openViewer(ti){
   document.getElementById('vRec').textContent=(st?.w||0)+'–'+(st?.l||0)+' · '+(st?.pf||0).toFixed(1)+' PF';
   document.getElementById('vMe').style.display=im?'block':'none';
 
-  const strkC=(st?.streakW)?'var(--green)':'var(--red)';
+  const strkC=(st?.streakW)?'#16a34a':'#dc2626';
   const strkT=(st&&(st.w+st.l>0))?(st.streakW?'W':'L')+st.streak:'—';
   document.getElementById('vStats').innerHTML=[
-    [revealedWeekTotal.toFixed(1),'Revealed FP','var(--accent)'],
-    [(st?.w||0)+'–'+(st?.l||0),'Record','var(--text)'],
+    [revealedWeekTotal.toFixed(1),'Revealed FP','#c2410c'],
+    [(st?.w||0)+'–'+(st?.l||0),'Record','#111827'],
     [strkT,'Streak',strkC],
-    [roster.length,'Players','var(--text)']
-  ].map(([v,l,c])=>`<div class="tvs"><div class="tvsv" style="color:${c}">${v}</div><div class="tvsl">${l}</div></div>`).join('');
+    [roster.length,'Players','#111827']
+  ].map(([v,l,c])=>`<div style="background:#121a29;border:1px solid #24324a;border-radius:12px;padding:10px 14px;text-align:center;min-width:92px;"><div style="font-family:var(--fb);font-size:24px;font-weight:800;color:${c};line-height:1;">${v}</div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-top:8px;">${l}</div></div>`).join('');
 
   const mm=weekGames(G.week).find(g=>g.home===ti||g.away===ti);
   if(mm){
     const oi=mm.home===ti?mm.away:mm.home;
-    document.getElementById('vMatchup').innerHTML=`<b style="color:var(--text)">Week ${G.week}:</b> vs ${D.teams[oi]||'Team '+(oi+1)} &nbsp;·&nbsp; ${revealedWeekTotal.toFixed(1)} vs ${getTeamWeekRevealedScore(oi,G.week).toFixed(1)} revealed`;
+    document.getElementById('vMatchup').innerHTML=`<b style="color:#f8fafc">Week ${G.week}:</b> vs ${D.teams[oi]||'Team '+(oi+1)} &nbsp;·&nbsp; ${revealedWeekTotal.toFixed(1)} vs ${getTeamWeekRevealedScore(oi,G.week).toFixed(1)} revealed`;
   } else {
-    document.getElementById('vMatchup').innerHTML=`<b style="color:var(--text)">Week ${G.week}:</b> <span style="color:var(--text3)">Bye week</span>`;
+    document.getElementById('vMatchup').innerHTML=`<b style="color:#f8fafc">Week ${G.week}:</b> <span style="color:#94a3b8">Bye week</span>`;
   }
+  document.getElementById('vMatchup').style.background='#121a29';
+  document.getElementById('vMatchup').style.border='1px solid #24324a';
+  document.getElementById('vMatchup').style.color='#dbe4f0';
 
   function vPRow(p,slot,isS){
     const inj=getInjuryStatus(p,G.week);
-    const injBadge=inj?`<span style="background:${inj.color}22;border:1px solid ${inj.color}55;border-radius:3px;padding:1px 5px;font-family:var(--fd);font-size:9px;font-weight:800;color:${inj.color};margin-left:4px;">${inj.label}</span>`:'';
+    const injBadge=inj?`<span style="background:${inj.color}22;border:1px solid ${inj.color}55;border-radius:999px;padding:2px 7px;font-family:var(--fb);font-size:10px;font-weight:700;color:${inj.color};margin-left:4px;">${inj.label}</span>`:'';
     const game=getGameInfo(p,G.day);
-    const gameInfo=game?`<span style="font-size:10px;color:var(--text3);margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} · ${game.time}</span>`:`<span style="font-size:10px;color:var(--text3);margin-top:1px;display:block;">No game today</span>`;
-    return`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);">
-      <div style="width:28px;font-family:var(--fd);font-size:11px;font-weight:800;color:var(--text3);flex-shrink:0;">${slot}</div>
+    const gameInfo=game?`<span style="font-size:11px;color:#6b7280;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} · ${game.time}</span>`:`<span style="font-size:11px;color:#9ca3af;margin-top:1px;display:block;">No game today</span>`;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e5e7eb;">
+      <div style="width:34px;font-family:var(--fb);font-size:12px;font-weight:800;color:#6b7280;flex-shrink:0;">${slot}</div>
       <div class="pav" style="background:${tc(p.team)};width:32px;height:32px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;flex-wrap:wrap;"><span class="pn">${p.name}</span><span class="pb2">${p.pos}</span>${injBadge}</div>
-        <div class="pd">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;"><span style="font-family:var(--fb);font-size:15px;font-weight:700;color:#111827;">${p.name}</span><span style="display:inline-block;padding:2px 6px;border-radius:999px;font-family:var(--fb);font-size:10px;font-weight:700;margin-left:6px;background:#eff6ff;color:#2563eb;">${p.pos}</span>${injBadge}</div>
+        <div style="font-size:12px;color:#6b7280;">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
         ${gameInfo}
       </div>
-      <span class="${isS?'stb':'bnb'}">${isS?'START':'BN'}</span>
+      <span style="background:${isS?'#dcfce7':'#f3f4f6'};border:1px solid ${isS?'#86efac':'#d1d5db'};border-radius:999px;padding:3px 9px;font-family:var(--fb);font-size:10px;font-weight:700;color:${isS?'#15803d':'#6b7280'};">${isS?'START':'BN'}</span>
     </div>`;
   }
 
-  document.getElementById('vStarters').innerHTML=starters.length?starters.map((p,i)=>vPRow(p,slots[i]||'UTIL',true)).join(''):'<div style="padding:12px;color:var(--text3);font-size:12px;text-align:center;">No starters set</div>';
-  document.getElementById('vBench').innerHTML=bench.length?bench.map(p=>vPRow(p,'BN',false)).join(''):'<div style="padding:8px;color:var(--text3);font-size:12px;text-align:center;">Empty bench</div>';
+  document.getElementById('vStarters').innerHTML=`<div class="season-table-card" style="overflow:hidden;">
+    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #e5e7eb;">
+      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#111827;">Starting Lineup</div>
+      <div class="season-soft-muted" style="margin-top:4px;">Current starters and active matchup context.</div>
+    </div>
+    <div style="padding:0 18px 6px;">${starters.length?starters.map((p,i)=>vPRow(p,slots[i]||'UTIL',true)).join(''):'<div style="padding:16px;color:#6b7280;font-size:12px;text-align:center;">No starters set</div>'}</div>
+  </div>`;
+  document.getElementById('vBench').innerHTML=`<div class="season-table-card" style="overflow:hidden;">
+    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #e5e7eb;">
+      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#111827;">Bench</div>
+      <div class="season-soft-muted" style="margin-top:4px;">Depth pieces and reserves.</div>
+    </div>
+    <div style="padding:0 18px 6px;">${bench.length?bench.map(p=>vPRow(p,'BN',false)).join(''):'<div style="padding:16px;color:#6b7280;font-size:12px;text-align:center;">Empty bench</div>'}</div>
+  </div>`;
 
   const act=document.getElementById('vActions');
   if(im){
-    act.innerHTML=`<button onclick="document.getElementById('viewerModal').classList.remove('open');goPage('roster');" class="bp">✏️ Edit My Lineup</button>`;
+    act.innerHTML=`<button onclick="document.getElementById('viewerModal').classList.remove('open');goPage('roster');" class="season-chip-link solid">Edit My Lineup</button>`;
   } else {
-    act.innerHTML=`<button onclick="document.getElementById('viewerModal').classList.remove('open');openTrade(${ti});" class="bg">⇄ Propose Trade with ${nm}</button>`;
+    act.innerHTML=`<button onclick="document.getElementById('viewerModal').classList.remove('open');openTrade(${ti});" class="season-chip-link solid">Propose Trade with ${nm}</button>`;
   }
+  act.innerHTML+=`<button onclick="document.getElementById('viewerModal').classList.remove('open')" class="season-chip-link">Close</button>`;
   document.getElementById('viewerModal').classList.add('open');
 }
 
