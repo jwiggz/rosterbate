@@ -181,9 +181,13 @@
   .bcx{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 14px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
 
   /* AUCTION */
-  .ao{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:110;align-items:flex-end;justify-content:center;}
+  .ao{display:none;position:fixed;right:calc(50% - 280px);bottom:22px;z-index:110;align-items:flex-end;justify-content:flex-end;pointer-events:none;}
   .ao.open{display:flex;}
-  .as{background:var(--bg2);border-radius:18px 18px 0 0;padding:15px 15px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;}
+  .as{background:rgba(17,24,39,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:18px;padding:15px 15px 20px;width:min(420px,calc(100vw - 24px));max-width:420px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(0,0,0,.45);animation:su .2s ease;pointer-events:auto;}
+  .ah{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:2px;}
+  .ah-copy{min-width:0;flex:1;}
+  .ax{background:var(--bg3);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;color:var(--text2);font-family:var(--fd);font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ax:active{background:rgba(249,115,22,.12);color:var(--accent);}
   .at{font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:2px;}
   .apn{font-size:12px;color:var(--text2);margin-bottom:12px;}
   .apsub{font-size:11px;color:var(--accent);margin:-6px 0 12px;letter-spacing:.3px;}
@@ -192,6 +196,9 @@
   .bb{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
   .bf{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
   .bf.lo{background:var(--red);}
+  .alive{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin-bottom:11px;}
+  .alive-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
+  .alive-value{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--accent);}
   .bir{display:flex;gap:8px;align-items:center;margin-bottom:11px;}
   .bir label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);white-space:nowrap;}
   .bi{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--text);font-family:var(--fd);font-size:22px;font-weight:800;text-align:center;outline:none;}
@@ -199,6 +206,10 @@
   .qb{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap;}
   .qbb{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 11px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
   .qbb:active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .qbb.off{opacity:.35;cursor:not-allowed;filter:grayscale(.2);}
+  @media (max-width: 900px){
+    .ao{right:12px;bottom:12px;}
+  }
 
   /* TRADE MODAL */
   .tro{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:120;align-items:flex-end;justify-content:center;}
@@ -582,21 +593,30 @@
 <div class="ao" id="aModal">
   <div class="as">
     <div class="mh"></div>
-    <div class="at">💰 Nomination</div>
-    <div class="apn" id="aPname">—</div>
+    <div class="ah">
+      <div class="ah-copy">
+        <div class="at">💰 Nomination</div>
+        <div class="apn" id="aPname">—</div>
+      </div>
+      <button class="ax" onclick="closeAuctionPanel()" title="Close nomination">×</button>
+    </div>
     <div class="apsub" id="aMarket">AI market: —</div>
     <div class="bbw">
       <div class="bbl"><span>Your Budget</span><span id="aBudget">$200</span></div>
       <div class="bb"><div class="bf" id="bFill" style="width:100%"></div></div>
     </div>
+    <div class="alive">
+      <div class="alive-label">Live Bid</div>
+      <div class="alive-value" id="aLiveBid">$1</div>
+    </div>
     <div class="bir"><label>Bid ($)</label><input type="number" class="bi" id="bInput" min="1" value="1"/></div>
     <div class="qb">
-      <div class="qbb" onclick="qBid(1)">$1</div>
-      <div class="qbb" onclick="qBid(5)">$5</div>
-      <div class="qbb" onclick="qBid(10)">$10</div>
-      <div class="qbb" onclick="qBid(25)">$25</div>
-      <div class="qbb" onclick="qBid(50)">$50</div>
-      <div class="qbb" onclick="qBid(S.myBudget)">Max</div>
+      <div class="qbb" data-bid="1" onclick="qBid(1)">$1</div>
+      <div class="qbb" data-bid="5" onclick="qBid(5)">$5</div>
+      <div class="qbb" data-bid="10" onclick="qBid(10)">$10</div>
+      <div class="qbb" data-bid="25" onclick="qBid(25)">$25</div>
+      <div class="qbb" data-bid="50" onclick="qBid(50)">$50</div>
+      <div class="qbb" data-bid="max" onclick="qBid(S.myBudget)">Max</div>
     </div>
     <div class="ma">
       <button class="bcx" onclick="passAuction()">Pass</button>
@@ -1858,6 +1878,15 @@ function openAuc(p,nominator){
   const cpuWinner=chooseAuctionCpuWinner(p,1);
   const cpuCap=cpuWinner>=0 ? (S.cpuBuds[cpuWinner]||0) : 0;
   const targetBid=cpuWinner>=0 ? Math.max(1, Math.min(getAuctionTargetPrice(p), cpuCap||1)) : 0;
+  if(nominator!==S.myPos && cpuWinner>=0 && S.myBudget<Math.max(1,targetBid)){
+    S.selP=p;
+    S.auc={playerId:p.id,nominator,currentBid:targetBid,targetBid:Math.max(1,targetBid),cpuWinner};
+    S.cpuBuds[cpuWinner]=Math.max(0,cpuCap-Math.max(1,targetBid));
+    doPick(p,cpuWinner);
+    rBoard();rPlayers();upHdr();
+    setTimeout(aucNext,180);
+    return;
+  }
   S.auc={playerId:p.id,nominator,currentBid:0,targetBid:Math.max(1,targetBid),cpuWinner};
   S.selP=p;
   document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' — '+p.team+' · '+p.pos+' · Rank #'+p.adp;
@@ -1869,10 +1898,37 @@ function openAuc(p,nominator){
   const pct=(S.myBudget/S.abud)*100;
   document.getElementById('bFill').style.width=pct+'%';
   document.getElementById('bFill').className='bf'+(pct<25?' lo':'');
-  document.getElementById('bInput').value=1;
+  updateAuctionBidControls();
   document.getElementById('aModal').classList.add('open');
 }
-function qBid(a){document.getElementById('bInput').value=Math.min(a,S.myBudget);}
+function getAuctionMinBid(){
+  return Math.max(1, Number(S.auc?.currentBid||0)+1);
+}
+function updateAuctionBidControls(){
+  const input=document.getElementById('bInput');
+  const live=document.getElementById('aLiveBid');
+  const minBid=getAuctionMinBid();
+  if(live) live.textContent='$'+Math.max(0, Number(S.auc?.currentBid||0));
+  if(input){
+    input.min=minBid;
+    const nextValue=Math.min(S.myBudget, Math.max(minBid, parseInt(input.value)||minBid));
+    input.value=nextValue;
+    input.disabled=minBid>S.myBudget;
+  }
+  document.querySelectorAll('.qbb[data-bid]').forEach(btn=>{
+    const raw=btn.dataset.bid;
+    const target=raw==='max'?S.myBudget:parseInt(raw,10);
+    const allowed=target>=minBid && target<=S.myBudget;
+    btn.classList.toggle('off', !allowed);
+  });
+}
+function qBid(a){
+  const minBid=getAuctionMinBid();
+  const next=Math.min(a,S.myBudget);
+  if(next<minBid) return;
+  document.getElementById('bInput').value=next;
+}
+function closeAuctionPanel(){ passAuction(); }
 function passAuction(){
   document.getElementById('aModal').classList.remove('open');
   if(S.selP){
@@ -1890,12 +1946,14 @@ function passAuction(){
 }
 function confAuction(){
   const bid=parseInt(document.getElementById('bInput').value)||1;
+  const minBid=getAuctionMinBid();
   if(bid>S.myBudget){showToast('⚠️ Over budget!');return;}
+  if(bid<minBid){showToast('⚠️ Bid must be at least $'+minBid+'.'); updateAuctionBidControls(); return;}
   const targetBid = S.auc?.targetBid || 1;
   if((S.auc?.cpuWinner>=0) && bid<targetBid){
     const cpuBid = nextCpuAuctionPush(bid,targetBid);
     S.auc.currentBid=cpuBid;
-    document.getElementById('bInput').value=Math.min(S.myBudget, cpuBid+1);
+    updateAuctionBidControls();
     showToast('💰 '+S.teams[S.auc.cpuWinner]+' pushes it to $'+cpuBid+'.');
     return;
   }
