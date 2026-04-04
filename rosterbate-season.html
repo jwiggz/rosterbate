@@ -137,17 +137,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .season-roster-table{table-layout:fixed;width:auto;min-width:0;}
 .season-roster-table th:nth-child(1),.season-roster-table td:nth-child(1){width:70px;}
 .season-roster-table th:nth-child(2),.season-roster-table td:nth-child(2){width:240px;}
-.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:150px;text-align:left;}
+.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:150px;text-align:center;}
 .season-roster-table th:nth-child(4),.season-roster-table td:nth-child(4){width:76px;}
 .season-roster-table th:nth-child(5),.season-roster-table td:nth-child(5){width:86px;}
-.season-roster-table th:nth-child(6),.season-roster-table td:nth-child(6){width:74px;text-align:right;}
+.season-roster-table th:nth-child(6),.season-roster-table td:nth-child(6){width:86px;}
+.season-roster-table th:nth-child(7),.season-roster-table td:nth-child(7){width:74px;text-align:right;}
 .season-roster-table .stat-col{width:60px;text-align:right;}
 .season-roster-table .stat-head{color:#cbd5e1;text-align:right;}
 .season-fp-val{font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);}
 .season-roster-table td:nth-child(2) .season-player-wrap{min-width:0;max-width:100%;}
 .season-roster-table td:nth-child(2) .season-player-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.season-roster-table td:nth-child(3),.season-roster-table th:nth-child(3){padding-left:8px;padding-right:8px;text-align:left;}
-.season-roster-table td:nth-child(3) .lineup-move-btn{margin-left:0;}
+.season-roster-table td:nth-child(3),.season-roster-table th:nth-child(3){padding-left:8px;padding-right:8px;text-align:center;}
+.season-roster-table td:nth-child(3) .lineup-move-btn{margin-left:auto;margin-right:auto;}
 .season-chip-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #3b82f6;border-radius:999px;background:#0f1724;color:#93c5fd;padding:10px 18px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;}
 .season-chip-link.solid{background:#2563eb;color:#fff;}
 .season-mini-tabs{display:flex;gap:26px;border-bottom:1px solid #24324a;padding:0 18px;}
@@ -1351,15 +1352,25 @@ function canPlayerFillSlot(player, slot){
   return false;
 }
 
-function getRosterTableColumns(){
+function getRosterTableColumns(group='all'){
   if(CURRENT_SPORT==='mlb'){
+    if(group==='pitching'){
+      return [
+        {key:'IP',label:'IP'},
+        {key:'ER',label:'ER'},
+        {key:'BB',label:'BB'},
+        {key:'SO',label:'K'},
+        {key:'W',label:'W'},
+        {key:'SV',label:'SV'}
+      ];
+    }
     return [
+      {key:'RUN',label:'R'},
       {key:'HR',label:'HR'},
       {key:'RBI',label:'RBI'},
-      {key:'RUN',label:'R'},
       {key:'BB',label:'BB'},
-      {key:'SB',label:'SB'},
-      {key:'SO',label:'SO'}
+      {key:'SO',label:'K'},
+      {key:'SB',label:'SB'}
     ];
   }
   if(CURRENT_SPORT==='nba'){
@@ -1393,6 +1404,12 @@ function getPlayerStatValue(player,key){
     SB:'sb',
     BB:'bb',
     SO:'so',
+    IP:'ip',
+    ER:'er',
+    W:'w',
+    SV:'sv',
+    H:'h',
+    L:'l',
     PTS:'pts',
     REB:'reb',
     AST:'ast',
@@ -2186,6 +2203,8 @@ function renderRoster(){
   const ilSlotKey=getIlSlotKey();
   const ilOpenSlots=Math.max(0,getIlSlotCount()-ilPlayers.length);
   const statCols=getRosterTableColumns();
+  const battingCols=getRosterTableColumns('batting');
+  const pitchingCols=getRosterTableColumns('pitching');
   const scheduleDays=Array.from({length:14},(_,idx)=>day+idx).filter(d=>d<=TOTAL_DAYS());
   const revealedScore=getDayResult(D.myPos,day)?.total ?? null;
   const isCurrentDay=day===G.day;
@@ -2246,12 +2265,31 @@ function renderRoster(){
       <span class="dow">${DAY_NAMES[dayOfWeek(d)-1]}</span>
     </th>`;
   }).join('');
-  const rows=rowData.map(entry=>{
+  const statusBadge=(status)=>{
+    const label=String(status||'--');
+    const key=label.toUpperCase();
+    let fg='#94a3b8', bg='rgba(148,163,184,.10)', bd='rgba(148,163,184,.28)';
+    if(key==='AVAILABLE'){
+      fg='#22c55e'; bg='rgba(34,197,94,.12)'; bd='rgba(34,197,94,.30)';
+    } else if(key==='OUT' || key==='O'){
+      fg='#ef4444'; bg='rgba(239,68,68,.12)'; bd='rgba(239,68,68,.30)';
+    } else if(key==='DTD' || key==='GTD'){
+      fg='#f59e0b'; bg='rgba(245,158,11,.12)'; bd='rgba(245,158,11,.30)';
+    } else if(key==='IL' || key==='IR'){
+      fg='#a78bfa'; bg='rgba(167,139,250,.12)'; bd='rgba(167,139,250,.30)';
+    } else if(key==='FINAL'){
+      fg='#cbd5e1'; bg='rgba(148,163,184,.08)'; bd='rgba(148,163,184,.22)';
+    }
+    return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:62px;padding:4px 8px;border-radius:999px;border:1px solid ${bd};background:${bg};color:${fg};font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;">${label}</span>`;
+  };
+  const isPitcherPlayer=p=>['P','SP','RP'].includes(String(p?.pos||'').toUpperCase());
+  function buildRows(entries, cols){
+    return entries.map(entry=>{
     const isMoveSource=!!(movePlayer && entry.player && entry.player.id===movePlayer.id);
     const canMoveHere=!!(movePlayer && !isMoveSource && canMoveToRosterEntry(movePlayer,day,entry,starterIds,roster));
     const rowBg=isMoveSource?'#22180d':(canMoveHere?'rgba(245,158,11,.08)':'');
     const rowBorder=isMoveSource?'#f59e0b':(canMoveHere?'rgba(245,158,11,.5)':'');
-    const rowCellStyle=rowBorder?`background:${rowBg};border-top:1px solid ${rowBorder};border-bottom:1px solid ${rowBorder};`:'';
+    const rowCellStyle=rowBorder?`background:${rowBg};border-top:1px solid ${rowBorder};border-bottom:1px solid ${rowBorder};`:''; 
     const rowCellAttr=rowCellStyle?` style="${rowCellStyle}"`:'';
     if(entry.isEmpty || entry.isEmptyStarter){
       return `<tr>
@@ -2267,16 +2305,18 @@ function renderRoster(){
         </td>
         <td${rowCellAttr}>${canMoveHere?`<button class="lineup-move-btn" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',null,${entry.isStarter?entry.index:'null'})">Move Here</button>`:`<span class="season-soft-muted" style="font-weight:700;">Empty</span>`}</td>
         <td${rowCellAttr}>--</td>
-        <td${rowCellAttr}>${entry.isIL?entry.slot:'Open'}</td>
+        <td${rowCellAttr}>${statusBadge(entry.isIL?entry.slot:'Open')}</td>
+        <td${rowCellAttr}>--</td>
         <td${rowCellAttr}><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
-        ${statCols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
+        ${cols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
       </tr>`;
     }
     const p=entry.player;
     const game=getGameInfo(p,day);
     const injury=getInjuryStatus(p,week);
     const opp=game?(game.isHome?'vs ':'@ ')+game.opp:'--';
-    const status=entry.isIL ? ilSlotKey : (injury?injury.label:(game?game.time:(isPast?'Final':'Idle')));
+    const time=game?game.time:'--';
+    const status=entry.isIL ? ilSlotKey : (injury?injury.label:(isPast?'Final':'Available'));
     const action=isMoveSource
       ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="clearMoveMode()">Cancel</button>`
       : canMoveHere
@@ -2303,11 +2343,19 @@ function renderRoster(){
       </td>
       <td${rowCellAttr}>${action}</td>
       <td${rowCellAttr}>${opp}</td>
-      <td${rowCellAttr}>${status}</td>
+      <td${rowCellAttr}>${time}</td>
+      <td${rowCellAttr}>${statusBadge(status)}</td>
       <td${rowCellAttr}><span class="season-fp-val">${Number(p.fp||0).toFixed(1)}</span></td>
-      ${statCols.map(col=>`<td${rowCellAttr} class="stat-col">${formatRosterStatValue(p,col.key)}</td>`).join('')}
+      ${cols.map(col=>`<td${rowCellAttr} class="stat-col">${formatRosterStatValue(p,col.key)}</td>`).join('')}
     </tr>`;
   }).join('');
+  }
+  const batterEntries=rowData.filter(entry=>entry.isStarter && entry.slot!=='P');
+  const reserveEntries=rowData.filter(entry=>!entry.isStarter);
+  const pitcherEntries=rowData.filter(entry=>entry.isStarter && entry.slot==='P');
+  const batterRows=buildRows(batterEntries, battingCols);
+  const reserveRows=buildRows(reserveEntries, isPitcherPlayer(movePlayer)?pitchingCols:battingCols);
+  const pitcherRows=buildRows(pitcherEntries, pitchingCols);
   const scheduleRows=rowData.filter(entry=>entry.player).map(entry=>{
     const p=entry.player;
     const injury=getInjuryStatus(p,weekForDay(day));
@@ -2351,14 +2399,6 @@ function renderRoster(){
         </table>
       </div>`
     : `${tabButtons}
-      <div class="season-header-band">
-        <div class="season-header-cell"><div class="season-header-eyebrow">Slot</div><div class="season-header-title">Lineup</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Starters</div><div class="season-header-title">Player</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Action</div><div class="season-header-title">Manage</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">${dateLabel.toUpperCase()}</div><div class="season-header-title">Opp</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Game</div><div class="season-header-title">Status</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Fantasy</div><div class="season-header-title">Pts</div></div>
-      </div>
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <span class="season-stat-pill">${isPast?'Revealed Score: '+Number(revealedScore||0).toFixed(1):'Results hidden until reveal'}</span>
@@ -2366,10 +2406,29 @@ function renderRoster(){
         </div>
       </div>
       <div class="season-table-wrap">
-        <table class="season-data-table season-roster-table" style="width:${726 + statCols.length*60}px;min-width:${726 + statCols.length*60}px;">
-          <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Status</th><th>FP</th>${statCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
-          <tbody>${rows || `<tr><td colspan="${6+statCols.length}" style="text-align:center;color:#6b7280;">No rostered players found.</td></tr>`}</tbody>
-        </table>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Batters</div></div>
+            <table class="season-data-table season-roster-table" style="width:${812 + battingCols.length*60}px;min-width:${812 + battingCols.length*60}px;">
+              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${battingCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+              <tbody>${batterRows || `<tr><td colspan="${7+battingCols.length}" style="text-align:center;color:#6b7280;">No batters found.</td></tr>`}</tbody>
+            </table>
+          </div>
+          <div>
+            <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Reserves / IL</div></div>
+            <table class="season-data-table season-roster-table" style="width:${812 + Math.max(battingCols.length,pitchingCols.length)*60}px;min-width:${812 + Math.max(battingCols.length,pitchingCols.length)*60}px;">
+              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${(isPitcherPlayer(movePlayer)?pitchingCols:battingCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+              <tbody>${reserveRows || `<tr><td colspan="${7+Math.max(battingCols.length,pitchingCols.length)}" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}</tbody>
+            </table>
+          </div>
+          <div>
+            <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Pitchers</div></div>
+            <table class="season-data-table season-roster-table" style="width:${812 + pitchingCols.length*60}px;min-width:${812 + pitchingCols.length*60}px;">
+              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${pitchingCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+              <tbody>${pitcherRows || `<tr><td colspan="${7+pitchingCols.length}" style="text-align:center;color:#6b7280;">No pitchers found.</td></tr>`}</tbody>
+            </table>
+          </div>
+        </div>
       </div>`;
   let h=`<div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
     <div class="season-hero-card season-card-pad">
