@@ -1653,6 +1653,100 @@ function pickOrder(ls,rds,fmt){
   return o;
 }
 
+function getAvailablePlayersSorted(){
+  return PLAYERS
+    .filter(p=>!S.drafted.has(p.id))
+    .slice()
+    .sort((a,b)=>(a.adp||9999)-(b.adp||9999) || calcFP(b)-calcFP(a) || a.name.localeCompare(b.name));
+}
+function getTeamDraftedPlayers(ti){
+  if(ti===S.myPos) return S.myTeam.slice();
+  return S.picks
+    .filter(pk=>pk.ti===ti)
+    .sort((a,b)=>a.ov-b.ov)
+    .map(pk=>PLAYERS.find(pl=>pl.id===pk.pid))
+    .filter(Boolean);
+}
+function isLateSpecialTeamsPos(pos){
+  return SPORT==='nfl' && (pos==='K' || pos==='DST' || pos==='DEF');
+}
+function getStarterNeedSnapshot(players){
+  const rules=S.rules?.positions || DRAFT_POSITION_RULES || {};
+  const counts={};
+  (players||[]).forEach(p=>{ counts[p.pos]=(counts[p.pos]||0)+1; });
+  if(SPORT==='nfl'){
+    let qb=Math.min(counts.QB||0, Number(rules.QB?.starters||0));
+    let rb=Math.min(counts.RB||0, Number(rules.RB?.starters||0));
+    let wr=Math.min(counts.WR||0, Number(rules.WR?.starters||0));
+    let te=Math.min(counts.TE||0, Number(rules.TE?.starters||0));
+    let k=Math.min(counts.K||0, Number(rules.K?.starters||0));
+    let dst=Math.min((counts.DST||0)+(counts.DEF||0), Number(rules.DST?.starters||0));
+    const flexPool=Math.max(0,(counts.RB||0)-rb)+Math.max(0,(counts.WR||0)-wr)+Math.max(0,(counts.TE||0)-te);
+    const flex=Math.min(flexPool, Number(rules.FLEX?.starters||0));
+    const coreFilled=qb+rb+wr+te+flex;
+    const allFilled=coreFilled+k+dst;
+    const coreNeeded=(Number(rules.QB?.starters||0)+Number(rules.RB?.starters||0)+Number(rules.WR?.starters||0)+Number(rules.TE?.starters||0)+Number(rules.FLEX?.starters||0))-coreFilled;
+    const lateNeeded=(Number(rules.K?.starters||0)+Number(rules.DST?.starters||0))-k-dst;
+    return {filled:allFilled,coreNeeded,lateNeeded};
+  }
+  if(SPORT==='nba'){
+    let pg=Math.min(counts.PG||0, Number(rules.PG?.starters||0));
+    let sg=Math.min(counts.SG||0, Number(rules.SG?.starters||0));
+    let sf=Math.min(counts.SF||0, Number(rules.SF?.starters||0));
+    let pf=Math.min(counts.PF||0, Number(rules.PF?.starters||0));
+    let c=Math.min(counts.C||0, Number(rules.C?.starters||0));
+    const gPool=Math.max(0,(counts.PG||0)-pg)+Math.max(0,(counts.SG||0)-sg);
+    const fPool=Math.max(0,(counts.SF||0)-sf)+Math.max(0,(counts.PF||0)-pf);
+    const g=Math.min(gPool, Number(rules.G?.starters||0));
+    const f=Math.min(fPool, Number(rules.F?.starters||0));
+    const utilPool=Math.max(0,(counts.PG||0)-pg-Math.min(Math.max(0,(counts.PG||0)-pg),g))
+      +Math.max(0,(counts.SG||0)-sg-Math.max(0,g-Math.max(0,(counts.PG||0)-pg)))
+      +Math.max(0,(counts.SF||0)-sf-Math.min(Math.max(0,(counts.SF||0)-sf),f))
+      +Math.max(0,(counts.PF||0)-pf-Math.max(0,f-Math.max(0,(counts.SF||0)-sf)))
+      +Math.max(0,(counts.C||0)-c);
+    const util=Math.min(utilPool, Number(rules.UTIL?.starters||0));
+    return {filled:pg+sg+sf+pf+c+g+f+util,coreNeeded:0,lateNeeded:0};
+  }
+  let c=Math.min(counts.C||0, Number(rules.C?.starters||0));
+  let b1=Math.min(counts['1B']||0, Number(rules['1B']?.starters||0));
+  let b2=Math.min(counts['2B']||0, Number(rules['2B']?.starters||0));
+  let b3=Math.min(counts['3B']||0, Number(rules['3B']?.starters||0));
+  let ss=Math.min(counts.SS||0, Number(rules.SS?.starters||0));
+  let of=Math.min(counts.OF||0, Number(rules.OF?.starters||0));
+  let sp=Math.min(counts.SP||0, Number(rules.SP?.starters||0));
+  let rp=Math.min(counts.RP||0, Number(rules.RP?.starters||0));
+  const pPool=Math.max(0,(counts.SP||0)-sp)+Math.max(0,(counts.RP||0)-rp);
+  const p=Math.min(pPool, Number(rules.P?.starters||0));
+  const utilPool=Math.max(0,(counts.C||0)-c)+Math.max(0,(counts['1B']||0)-b1)+Math.max(0,(counts['2B']||0)-b2)+Math.max(0,(counts['3B']||0)-b3)+Math.max(0,(counts.SS||0)-ss)+Math.max(0,(counts.OF||0)-of);
+  const util=Math.min(utilPool, Number(rules.UTIL?.starters||0));
+  return {filled:c+b1+b2+b3+ss+of+sp+rp+p+util,coreNeeded:0,lateNeeded:0};
+}
+function getStarterNeedDelta(ti,p){
+  const roster=getTeamDraftedPlayers(ti);
+  const before=getStarterNeedSnapshot(roster).filled;
+  const after=getStarterNeedSnapshot(roster.concat([p])).filled;
+  return after-before;
+}
+function chooseBestCpuPlayerForTeam(ti,av){
+  const roster=getTeamDraftedPlayers(ti);
+  const needSnapshot=getStarterNeedSnapshot(roster);
+  const sorted=(av||[]).slice().sort((a,b)=>(a.adp||9999)-(b.adp||9999) || calcFP(b)-calcFP(a) || a.name.localeCompare(b.name));
+  let best=sorted[0]||null;
+  let bestScore=-Infinity;
+  sorted.forEach(p=>{
+    const delta=getStarterNeedDelta(ti,p);
+    let score=((delta>0)?100000:0) + (5000-Math.min(5000,p.adp||5000));
+    if(isLateSpecialTeamsPos(p.pos) && needSnapshot.coreNeeded>0) score-=75000;
+    if(delta===0 && !isLateSpecialTeamsPos(p.pos)) score+=1500;
+    if(delta>0 && isLateSpecialTeamsPos(p.pos) && needSnapshot.coreNeeded<=0) score+=2500;
+    if(score>bestScore){
+      bestScore=score;
+      best=p;
+    }
+  });
+  return best;
+}
+
 // ─── DRAFT FLOW ───────────────────────────────────────────
 function advance(){
   if(PS.isPaused) return; // don't advance while paused
@@ -1664,10 +1758,10 @@ function advance(){
   } else if(S.cur>=S.total) endDraft();
 }
 function cpuPick(){
-  const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
+  const av=getAvailablePlayersSorted();
   if(!av.length)return;
-  const top=av.slice(0,Math.min(3,av.length));
-  doPick(top[Math.floor(Math.random()*top.length)],S.order[S.cur]);
+  const pick=chooseBestCpuPlayerForTeam(S.order[S.cur],av);
+  if(pick) doPick(pick,S.order[S.cur]);
 }
 function doPick(p,ti){
   const pickNumber=S.cur+1;
@@ -1713,29 +1807,31 @@ function getAuctionTargetPrice(p){
   S.auctionTargets[p.id]=dollars;
   return dollars;
 }
-function chooseAuctionCpuWinner(maxBid){
+function chooseAuctionCpuWinner(player,maxBid){
   const eligible=[];
   for(let i=0;i<S.ls;i++){
     if(i===S.myPos) continue;
     const budget=S.cpuBuds[i]||0;
     if(budget>=maxBid) eligible.push(i);
   }
-  if(eligible.length) return eligible[Math.floor(Math.random()*eligible.length)];
+  if(eligible.length){
+    eligible.sort((a,b)=>{
+      const aScore=(getStarterNeedDelta(a,player)*1000)+(S.cpuBuds[a]||0);
+      const bScore=(getStarterNeedDelta(b,player)*1000)+(S.cpuBuds[b]||0);
+      return bScore-aScore;
+    });
+    return eligible[0];
+  }
   let fallback=-1,best=0;
   for(let i=0;i<S.ls;i++){
     if(i===S.myPos) continue;
     const budget=S.cpuBuds[i]||0;
     if(budget>best){best=budget;fallback=i;}
   }
-  return fallback>=0 ? fallback : Math.max(0, (S.myPos+1)%Math.max(1,S.ls));
+  return best>0 ? fallback : -1;
 }
 function chooseAuctionCpuPlayer(av){
-  const pool=av.slice(0,Math.min(10,av.length)).map(p=>({p,target:getAuctionTargetPrice(p)}));
-  const affordable = pool.filter(item=>item.target<=Math.max(...S.cpuBuds.filter((_,i)=>i!==S.myPos),1));
-  const source = affordable.length ? affordable : pool;
-  source.sort((a,b)=>b.target-a.target);
-  const top = source.slice(0,Math.min(5,source.length));
-  return top[Math.floor(Math.random()*top.length)].p;
+  return chooseBestCpuPlayerForTeam(S.order[S.cur], av);
 }
 function nextCpuAuctionPush(currentBid,targetBid){
   const gap=Math.max(1,targetBid-currentBid);
@@ -1746,27 +1842,29 @@ function nextCpuAuctionPush(currentBid,targetBid){
 function aucNext(){
   if(S.cur>=S.total){endDraft();return;}
   const nom=S.order[S.cur];
-  const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
+  const av=getAvailablePlayersSorted();
   if(!av.length){endDraft();return;}
   if(nom===S.myPos){
-    openAuc(av[0], nom);
+    S.auc={nominator:nom,playerId:null,currentBid:0,targetBid:0,cpuWinner:-1};
+    upHdr();rPlayers();
+    showBanner('💰 Your nomination — choose any available player.');
+    if(S.tmax>0) resetTimer();
   } else {
     const p=chooseAuctionCpuPlayer(av);
-    const targetBid=Math.min(getAuctionTargetPrice(p), S.cpuBuds[nom]||0);
-    const winner = targetBid>0 ? nom : chooseAuctionCpuWinner(1);
-    const bid=Math.max(1, Math.min(targetBid||1, S.cpuBuds[winner]||1));
-    S.cpuBuds[winner]-=bid;
-    doPick(p,winner);rBoard();rPlayers();upHdr();
-    setTimeout(aucNext,180);
+    openAuc(p,nom);
   }
 }
 function openAuc(p,nominator){
-  const targetBid=Math.min(getAuctionTargetPrice(p), Math.max(...S.cpuBuds.filter((_,i)=>i!==S.myPos),1));
-  const cpuWinner=chooseAuctionCpuWinner(Math.max(1, Math.min(targetBid, S.abud)));
+  const cpuWinner=chooseAuctionCpuWinner(p,1);
+  const cpuCap=cpuWinner>=0 ? (S.cpuBuds[cpuWinner]||0) : 0;
+  const targetBid=cpuWinner>=0 ? Math.max(1, Math.min(getAuctionTargetPrice(p), cpuCap||1)) : 0;
   S.auc={playerId:p.id,nominator,currentBid:0,targetBid:Math.max(1,targetBid),cpuWinner};
   S.selP=p;
   document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' — '+p.team+' · '+p.pos+' · Rank #'+p.adp;
-  document.getElementById('aMarket').textContent='AI market usually lands around $'+Math.max(1,targetBid)+' for this profile.';
+  const nomName=nominator===S.myPos?'You':(S.teams[nominator]||'CPU');
+  document.getElementById('aMarket').textContent=cpuWinner>=0
+    ?(nomName+' nominated this player. AI market usually lands around $'+Math.max(1,targetBid)+'.')
+    :(nomName+' nominated this player. No CPU teams can top a $1 bid right now.');
   document.getElementById('aBudget').textContent='$'+S.myBudget;
   const pct=(S.myBudget/S.abud)*100;
   document.getElementById('bFill').style.width=pct+'%';
@@ -1778,10 +1876,13 @@ function qBid(a){document.getElementById('bInput').value=Math.min(a,S.myBudget);
 function passAuction(){
   document.getElementById('aModal').classList.remove('open');
   if(S.selP){
-    const winner = S.auc?.cpuWinner>=0 ? S.auc.cpuWinner : (S.myPos+1)%S.ls;
-    const bid = Math.max(1, Math.min(S.auc?.currentBid || S.auc?.targetBid || 1, S.cpuBuds[winner]||1));
-    if(winner!==S.myPos) S.cpuBuds[winner]-=bid;
-    doPick(S.selP,winner);
+    const winner = S.auc?.cpuWinner>=0 ? S.auc.cpuWinner : chooseAuctionCpuWinner(S.selP,1);
+    if(winner>=0){
+      const cpuBudget=Math.max(0,S.cpuBuds[winner]||0);
+      const bid = Math.max(1, Math.min(S.auc?.currentBid || S.auc?.targetBid || 1, cpuBudget||1));
+      if(winner!==S.myPos) S.cpuBuds[winner]=Math.max(0,cpuBudget-bid);
+      doPick(S.selP,winner);
+    }
   }
   S.auc=null;
   rBoard();rPlayers();upHdr();
@@ -1807,6 +1908,14 @@ function confAuction(){
   setTimeout(aucNext,350);
 }
 
+function startAuctionNomination(p){
+  if(S.fmt!=='auction'||S.cur>=S.total||S.order[S.cur]!==S.myPos||S.drafted.has(p.id)) return;
+  clearInterval(S.timerInt);
+  document.getElementById('pModal').classList.remove('open');
+  hideBanner();
+  openAuc(p,S.myPos);
+}
+
 // PLAYER MODAL
 function calcFP(p){
   if(SPORT!=='nba') return getRosterbatePlayerFantasyScore(SPORT,p,S.rules?.scoring);
@@ -1828,15 +1937,18 @@ function openPModal(idx){
     ).join('');
   const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Rotisserie',points:'Points Lg'};
   document.getElementById('mNote').textContent='Fantasy pts: '+sl[S.scr];
-  const ok=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
-  document.getElementById('bDraft').textContent=ok?'Draft Player':'View Only';
+  const canDraft=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
+  const canNominate=S.fmt==='auction'&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId);
+  document.getElementById('bDraft').textContent=canNominate?'Nominate Player':(canDraft?'Draft Player':'View Only');
   updateFavModalBtn();
   document.getElementById('pModal').classList.add('open');
 }
 function cModal(e){if(e.target===document.getElementById('pModal'))document.getElementById('pModal').classList.remove('open');}
 function confDraft(){
   document.getElementById('pModal').classList.remove('open');
-  if(S.selP&&S.fmt!=='auction'&&S.order[S.cur]===S.myPos) userPick(S.selP);
+  if(!S.selP) return;
+  if(S.fmt==='auction'&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId)){ startAuctionNomination(S.selP); return; }
+  if(S.fmt!=='auction'&&S.order[S.cur]===S.myPos) userPick(S.selP);
 }
 
 // RENDER PLAYERS
@@ -1848,6 +1960,7 @@ function rPlayers(){
     return mp&&ms;
   });
   const myTurn=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
+  const myNomTurn=S.fmt==='auction'&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId);
   const col=tc=>tcolor(tc);
   document.getElementById('pList').innerHTML=list.map(p=>{
     const drafted=S.drafted.has(p.id);
@@ -1855,7 +1968,7 @@ function rPlayers(){
     const fp=calcFP(p);
     const faved=isFav(p.id);
     const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
-    const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`:'';
+    const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`:(!drafted&&myNomTurn?`<button class="dbtn" onclick="event.stopPropagation();startAuctionNomination(PLAYERS[${idx}])">Nominate</button>`:'');
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
       :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${inlineDraftBtn}</div>`;
@@ -1991,7 +2104,9 @@ function upHdr(){
   const badge=document.getElementById('clkBadge');
   if(S.cur>=S.total){badge.textContent='Draft Complete 🏆';badge.className='clk-badge w';updateTradeBtn();return;}
   const mine=S.order[S.cur]===S.myPos;
-  badge.textContent=mine?'On The Clock ⏰':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick';
+  badge.textContent=S.fmt==='auction'
+    ?(mine?'Your Nomination ⏰':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
+    :(mine?'On The Clock ⏰':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
   badge.className='clk-badge'+(mine?'':' w');
   updateTradeBtn();
 }
@@ -2011,6 +2126,17 @@ function upTimer(){
   document.getElementById('tFill').className='tfill'+(S.timer<=15?' urg':'');
 }
 function autoP(){
+  if(S.fmt==='auction'&&S.cur<S.total&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId)){
+    const av=getAvailablePlayersSorted();
+    if(av.length){
+      const target=chooseBestCpuPlayerForTeam(S.myPos,av);
+      if(target){
+        showToast('⏰ Auto-nominated '+target.name+'!');
+        startAuctionNomination(target);
+      }
+    }
+    return;
+  }
   // Try favorites queue first (in priority order), skip drafted
   for(const id of FAVS){
     if(!S.drafted.has(id)){
