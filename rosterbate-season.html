@@ -129,21 +129,44 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .season-light-body{background:#0b1220;}
 .season-table-card{background:#121a29;border:1px solid #24324a;border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(2,6,23,.28);}
 .season-card-pad{padding:18px;}
-.season-table-wrap{overflow:auto;}
+.season-table-wrap{overflow-x:auto;overflow-y:hidden;}
 .season-data-table{width:100%;border-collapse:collapse;min-width:920px;background:#121a29;}
 .season-data-table th{padding:8px 10px;background:#182235;border-bottom:1px solid #24324a;font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;text-align:left;white-space:nowrap;}
 .season-data-table td{padding:9px 10px;border-bottom:1px solid #1d283b;font-size:12px;color:#dbe4f0;vertical-align:middle;background:#121a29;}
 .season-data-table tr:hover td{background:#182235;}
+.season-roster-table{table-layout:fixed;width:auto;min-width:0;}
+.season-roster-table th:nth-child(1),.season-roster-table td:nth-child(1){width:70px;}
+.season-roster-table th:nth-child(2),.season-roster-table td:nth-child(2){width:240px;}
+.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:150px;text-align:left;}
+.season-roster-table th:nth-child(4),.season-roster-table td:nth-child(4){width:76px;}
+.season-roster-table th:nth-child(5),.season-roster-table td:nth-child(5){width:86px;}
+.season-roster-table th:nth-child(6),.season-roster-table td:nth-child(6){width:74px;text-align:right;}
+.season-roster-table .stat-col{width:60px;text-align:right;}
+.season-roster-table .stat-head{color:#cbd5e1;text-align:right;}
+.season-fp-val{font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);}
+.season-roster-table td:nth-child(2) .season-player-wrap{min-width:0;max-width:100%;}
+.season-roster-table td:nth-child(2) .season-player-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.season-roster-table td:nth-child(3),.season-roster-table th:nth-child(3){padding-left:8px;padding-right:8px;text-align:left;}
+.season-roster-table td:nth-child(3) .lineup-move-btn{margin-left:0;}
 .season-chip-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #3b82f6;border-radius:999px;background:#0f1724;color:#93c5fd;padding:10px 18px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;}
 .season-chip-link.solid{background:#2563eb;color:#fff;}
 .season-mini-tabs{display:flex;gap:26px;border-bottom:1px solid #24324a;padding:0 18px;}
-.season-mini-tab{padding:14px 0;font-family:var(--fb);font-size:14px;font-weight:700;color:#94a3b8;border-bottom:3px solid transparent;}
+.season-mini-tab{padding:14px 0;font-family:var(--fb);font-size:14px;font-weight:700;color:#94a3b8;border:0;border-bottom:3px solid transparent;background:transparent;cursor:pointer;}
 .season-mini-tab.on{color:#f8fafc;border-bottom-color:#f59e0b;}
+.season-schedule-table td,.season-schedule-table th{white-space:nowrap;}
+.season-schedule-head{min-width:92px;text-align:center;}
+.season-schedule-head .date{display:block;font-size:11px;font-weight:800;color:#cbd5e1;letter-spacing:.04em;}
+.season-schedule-head .dow{display:block;font-size:10px;color:#94a3b8;text-transform:uppercase;margin-top:2px;}
+.season-schedule-cell{min-width:92px;text-align:center;}
+.season-schedule-cell.on{background:rgba(59,130,246,.06);}
+.season-schedule-cell.off{background:rgba(239,68,68,.08);box-shadow:inset 0 0 0 1px rgba(239,68,68,.38);}
+.season-schedule-cell .main{display:block;font-weight:800;color:#dbe4f0;}
+.season-schedule-cell .sub{display:block;font-size:11px;color:#94a3b8;margin-top:2px;}
 .season-stat-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0f1724;border:1px solid #24324a;font-size:12px;color:#cbd5e1;}
 .season-stat-pill.btn{cursor:pointer;font-family:var(--fb);font-weight:700;transition:background .15s ease,border-color .15s ease,color .15s ease;}
 .season-stat-pill.btn:hover{background:#172234;border-color:#3b82f6;color:#f8fafc;}
 .season-stat-pill.btn.on{background:#22180d;border-color:#7c4a18;color:#fdba74;}
-.season-header-band{display:grid;grid-template-columns:120px minmax(220px,1.3fr) 110px 90px 110px 90px;gap:0;border-top:1px solid #24324a;border-bottom:1px solid #24324a;background:#121a29;}
+.season-header-band{display:grid;grid-template-columns:90px 300px 150px 86px 92px 82px;gap:0;border-top:1px solid #24324a;border-bottom:1px solid #24324a;background:#121a29;}
 .season-header-cell{padding:10px 10px 8px;border-right:1px solid #1d283b;}
 .season-header-cell:last-child{border-right:none;}
 .season-header-eyebrow{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;font-weight:700;}
@@ -156,14 +179,16 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .season-action-btn{background:#f59e0b;border:none;color:#fff;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .lineup-move-btn{display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:7px 14px;border-radius:999px;border:1px solid #3b82f6;background:#0f1724;color:#93c5fd;font-family:var(--fb);font-size:13px;font-weight:700;cursor:pointer;}
 .lineup-move-btn:hover,.season-outline-btn:hover,.season-chip-link:hover{background:#172234;}
-#pickerModal .ms,#viewerModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
-#pickerModal .mh,#viewerModal .mh{background:#475569;}
-#pickerModal .bs,#viewerModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
+#pickerModal .ms,#viewerModal .ms,#moveModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
+#pickerModal .mh,#viewerModal .mh,#moveModal .mh{background:#475569;}
+#pickerModal .bs,#viewerModal .bs,#moveModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
 @media (min-width: 960px){
   #viewerModal{align-items:center;}
   #viewerModal .ms{max-width:980px;border-radius:18px;padding:22px 24px 26px;max-height:88dvh;}
   #pickerModal{align-items:center;}
   #pickerModal .ms{max-width:720px;border-radius:18px;padding:22px 24px 26px;max-height:88dvh;}
+  #moveModal{align-items:center;}
+  #moveModal .ms{max-width:720px;border-radius:18px;padding:22px 24px 26px;max-height:88dvh;}
 }
 @media (min-width: 980px){
   .season-split-grid{grid-template-columns:1.1fr .9fr;}
@@ -540,6 +565,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   </div>
 </div>
 
+<!-- MOVE PLAYER MODAL -->
+<div class="mo" id="moveModal" onclick="if(event.target===this)closeMoveModal()">
+  <div class="ms">
+    <div class="mh"></div>
+    <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;margin-bottom:4px;">Move Player</div>
+    <div id="movePlayerName" style="font-size:13px;color:#94a3b8;margin-bottom:14px;"></div>
+    <div id="moveCurrentSlot" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0f1724;border:1px solid #24324a;font-size:12px;color:#cbd5e1;margin-bottom:14px;"></div>
+    <div class="sl" style="margin-top:0;">Choose destination:</div>
+    <div id="moveOptions" style="display:grid;gap:10px;"></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button onclick="closeMoveModal()" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -629,7 +669,9 @@ function activityAge(ts){
 }
 
 let D=null;
-let G={week:1,totalWeeks:17,day:1,rosters:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[]};
+let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[]};
+let moveCtx=null;
+let rosterTab='stats';
 let currentRbUser=null;
 let sharedSeasonRef=null;
 let sharedSeasonListener=null;
@@ -721,6 +763,7 @@ function applySharedSeasonPayload(payload){
   sharedSeasonHydrating=true;
   D=cloneJsonSafe(payload.draft);
   G=cloneJsonSafe(payload.game);
+  if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:(D?.leagueSize||D?.teams?.length||0)},()=>[]);
   G.processed=new Set(payload.game?.processed||[]);
   sharedSeasonLastUpdatedAt=Number(payload.updatedAt||0);
   hydrateDraftUserContextFromLobby();
@@ -933,7 +976,52 @@ const INJURY_STATUSES=[
   {label:'SUSP',color:'#6366f1',desc:'Suspended',priority:4},
 ];
 
+function getExplicitPlayerDesignation(p){
+  const raw=[
+    p?.designation,
+    p?.injuryStatus,
+    p?.injuryLabel,
+    p?.status,
+    p?.gameStatus,
+    p?.health,
+    p?.availability
+  ].find(v=>typeof v==='string' && v.trim());
+  return raw ? raw.trim().toUpperCase() : '';
+}
+
+function mapDesignationToInjuryStatus(p, designation){
+  const d=String(designation||'').trim().toUpperCase();
+  if(!d) return null;
+  if(CURRENT_SPORT==='mlb'){
+    if(['IL','IR','O','OUT','10-DAY IL','15-DAY IL','60-DAY IL'].includes(d)){
+      return {label:'IL',color:'#7c3aed',desc:'Injured List',priority:3,raw:d};
+    }
+    if(['DTD','DAY TO DAY','DAY-TO-DAY','GTD'].includes(d)){
+      return {label:'DTD',color:'#f59e0b',desc:'Day To Day',priority:1,raw:d};
+    }
+    if(['SUSP','SUSPENDED'].includes(d)){
+      return {label:'SUSP',color:'#6366f1',desc:'Suspended',priority:4,raw:d};
+    }
+  } else {
+    if(['IR','IL'].includes(d)){
+      return {label:'IR',color:'#7c3aed',desc:'Injured Reserve',priority:3,raw:d};
+    }
+    if(['O','OUT'].includes(d)){
+      return {label:'OUT',color:'#ef4444',desc:'Out',priority:2,raw:d};
+    }
+    if(['DTD','DAY TO DAY','DAY-TO-DAY','GTD'].includes(d)){
+      return {label:'GTD',color:'#f59e0b',desc:'Game Time Decision',priority:1,raw:d};
+    }
+    if(['SUSP','SUSPENDED'].includes(d)){
+      return {label:'SUSP',color:'#6366f1',desc:'Suspended',priority:4,raw:d};
+    }
+  }
+  return null;
+}
+
 function getInjuryStatus(p,week){
+  const explicit=mapDesignationToInjuryStatus(p,getExplicitPlayerDesignation(p));
+  if(explicit) return explicit;
   // ~15% of players have some status each week
   const seed=(p.id*17+week*13)%100;
   if(seed<5) return INJURY_STATUSES[0];  // 5% GTD
@@ -944,7 +1032,117 @@ function getInjuryStatus(p,week){
 }
 
 function isUnavailableInjury(injury){
-  return !!(injury&&(injury.label==='OUT'||injury.label==='IR'||injury.label==='SUSP'));
+  return !!(injury&&(injury.label==='OUT'||injury.label==='IR'||injury.label==='IL'||injury.label==='SUSP'));
+}
+
+function getIlSlotKey(){
+  return CURRENT_SPORT==='mlb' ? 'IL' : 'IR';
+}
+
+function getIlSlotCount(){
+  const key=getIlSlotKey();
+  return (SPORT_CFG?.myTeamSlots||[]).filter(slot=>String(slot).toUpperCase()===key).length || 0;
+}
+
+function getActiveRosterCapacity(){
+  const key=getIlSlotKey();
+  return (SPORT_CFG?.myTeamSlots||[]).filter(slot=>String(slot).toUpperCase()!==key).length || ((G.rosters?.[D.myPos]||[]).length);
+}
+
+function getIlRoster(teamIdx){
+  if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:(D?.leagueSize||D?.teams?.length||0)},()=>[]);
+  if(!Array.isArray(G.ilByTeam[teamIdx])) G.ilByTeam[teamIdx]=[];
+  return G.ilByTeam[teamIdx];
+}
+
+function isIlEligiblePlayer(player, injury){
+  const label=String(injury?.label||'').toUpperCase();
+  if(CURRENT_SPORT==='mlb') return ['IL','IR','O','OUT'].includes(label);
+  return label==='IR'||label==='OUT';
+}
+
+function rebuildLineupsAfterRosterChange(teamIdx){
+  const roster=G.rosters[teamIdx]||[];
+  Object.keys(G.dailyLineups||{}).forEach(dayKey=>{
+    const day=Number(dayKey);
+    const current=(G.dailyLineups[day]||[]).map(id=>roster.find(p=>p.id===id)).filter(Boolean);
+    G.dailyLineups[day]=buildBestLineupIdsForRoster(current,day);
+  });
+  G.starters[teamIdx]=buildBestLineupIdsForRoster(roster,G.day||1);
+}
+
+function getCurrentRosterSlot(pid,day){
+  const teamIdx=D?.myPos??0;
+  const ilRoster=getIlRoster(teamIdx);
+  if(ilRoster.some(p=>p.id===pid)) return getIlSlotKey();
+  const starterIds=getLineupForDay(day);
+  const starterIndex=starterIds.indexOf(pid);
+  if(starterIndex>=0) return SLOT_LABELS[starterIndex]||'UTIL';
+  const roster=G.rosters[teamIdx]||[];
+  if(roster.some(p=>p.id===pid)) return 'BN';
+  return '';
+}
+
+function getEligibleMoveSlots(player,day){
+  const teamIdx=D?.myPos??0;
+  const currentStarterIds=[...getLineupForDay(day)];
+  const currentSlot=getCurrentRosterSlot(player.id,day);
+  const eligible=[];
+  SLOT_LABELS.forEach((slot,index)=>{
+    if(!canPlayerFillSlot(player,slot)) return;
+    const occupantId=currentStarterIds[index]||null;
+    if(occupantId===player.id){
+      eligible.push({slot,label:slot,type:'starter',occupant:null,current:true});
+      return;
+    }
+    const occupant=occupantId?(G.rosters[teamIdx]||[]).find(p=>p.id===occupantId)||null:null;
+    eligible.push({slot,label:slot,type:'starter',occupant,current:false});
+  });
+  eligible.push({slot:'BN',label:'Bench',type:'bench',occupant:null,current:currentSlot==='BN'});
+  const injury=getInjuryStatus(player,weekForDay(day));
+  const ilRoster=getIlRoster(teamIdx);
+  const ilSlotKey=getIlSlotKey();
+  const ilHasRoom=currentSlot===ilSlotKey || ilRoster.length<getIlSlotCount();
+  if(isIlEligiblePlayer(player,injury) && ilHasRoom){
+    eligible.push({slot:ilSlotKey,label:ilSlotKey,type:'il',occupant:null,current:currentSlot===ilSlotKey});
+  }
+  return eligible;
+}
+
+function closeMoveModal(){
+  moveCtx=null;
+  document.getElementById('moveModal')?.classList.remove('open');
+}
+
+function startMoveMode(pid,day){
+  if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');return;}
+  moveCtx={pid,day};
+  renderRoster();
+}
+
+function clearMoveMode(){
+  moveCtx=null;
+  renderRoster();
+}
+
+function canMoveToRosterEntry(sourcePlayer,day,entry,starterIds,roster){
+  const ilSlotKey=getIlSlotKey();
+  const sourceIndex=starterIds.indexOf(sourcePlayer.id);
+  const sourceSlot=sourceIndex>=0?(SLOT_LABELS[sourceIndex]||'UTIL'):getCurrentRosterSlot(sourcePlayer.id,day);
+  const injury=getInjuryStatus(sourcePlayer,weekForDay(day));
+  const activeRosterFull=(G.rosters[D.myPos]||[]).length>=getActiveRosterCapacity();
+  if(entry.player && entry.player.id===sourcePlayer.id) return false;
+  if(entry.isIL && !entry.isEmpty) return false;
+  if(entry.isIL){
+    return isIlEligiblePlayer(sourcePlayer,injury) && (sourceSlot===ilSlotKey || getIlRoster(D.myPos).length<getIlSlotCount());
+  }
+  if(sourceSlot===ilSlotKey && activeRosterFull) return false;
+  if(entry.slot==='BN'){
+    if(entry.isEmpty) return sourceSlot!=='BN';
+    if(sourceSlot==='BN' || sourceSlot===ilSlotKey) return false;
+    return !!entry.player && canPlayerFillSlot(entry.player, sourceSlot);
+  }
+  return canPlayerFillSlot(sourcePlayer, entry.slot);
 }
 
 const POWERUP_LIBRARY={
@@ -1151,6 +1349,73 @@ function canPlayerFillSlot(player, slot){
     return false;
   }
   return false;
+}
+
+function getRosterTableColumns(){
+  if(CURRENT_SPORT==='mlb'){
+    return [
+      {key:'HR',label:'HR'},
+      {key:'RBI',label:'RBI'},
+      {key:'RUN',label:'R'},
+      {key:'BB',label:'BB'},
+      {key:'SB',label:'SB'},
+      {key:'SO',label:'SO'}
+    ];
+  }
+  if(CURRENT_SPORT==='nba'){
+    return [
+      {key:'PTS',label:'PTS'},
+      {key:'REB',label:'REB'},
+      {key:'AST',label:'AST'},
+      {key:'STL',label:'STL'},
+      {key:'BLK',label:'BLK'}
+    ];
+  }
+  if(CURRENT_SPORT==='nfl'){
+    return [
+      {key:'PASS_YDS',label:'PYD'},
+      {key:'RUSH_YDS',label:'RYD'},
+      {key:'REC_YDS',label:'RECY'},
+      {key:'REC_TD',label:'TD'},
+      {key:'FG',label:'FG'}
+    ];
+  }
+  return [];
+}
+
+function getPlayerStatValue(player,key){
+  const statValues=player?.statValues||{};
+  if(statValues[key]!==undefined && statValues[key]!==null) return statValues[key];
+  const aliases={
+    RUN:'r',
+    RBI:'rbi',
+    HR:'hr',
+    SB:'sb',
+    BB:'bb',
+    SO:'so',
+    PTS:'pts',
+    REB:'reb',
+    AST:'ast',
+    STL:'stl',
+    BLK:'blk',
+    PASS_YDS:'passYds',
+    RUSH_YDS:'rushYds',
+    REC_YDS:'recYds',
+    REC_TD:'recTd',
+    FG:'fg'
+  };
+  const prop=aliases[key];
+  return prop ? player?.[prop] : null;
+}
+
+function formatRosterStatValue(player,key){
+  const value=getPlayerStatValue(player,key);
+  if(value===undefined || value===null || value==='') return '--';
+  if(typeof value==='number'){
+    if(!Number.isFinite(value)) return '--';
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
+  }
+  return String(value);
 }
 
 function slotPriority(slot){
@@ -1533,6 +1798,7 @@ function initSeason(){
   const n=D.leagueSize;
   if(!D.seasonId) D.seasonId='season_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   G.rosters=D.allRosters.map(r=>r.map(p=>({...p})));
+  G.ilByTeam=Array.isArray(D.ilRosters) ? D.ilRosters.map(r=>(r||[]).map(p=>({...p}))) : Array.from({length:n},()=>[]);
   G.starters=G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
   const allIds=new Set(G.rosters.flat().map(p=>p.id));
   G.waiver=buildRosterbateSportPlayerPool(CURRENT_SPORT, 260).filter(p=>!allIds.has(p.id)).slice(0,40).map(p=>({...p}));
@@ -1683,17 +1949,23 @@ async function recordLifetimeSeasonStats(){
 
 // Get lineup for a specific day (falls back to default starters)
 function getLineupForDay(day){
-  if(G.dailyLineups[day]) return G.dailyLineups[day];
-  return [...(G.starters[D.myPos]||[])];
+  const source=G.dailyLineups[day]||G.starters[D.myPos]||[];
+  return Array.from({length:STARTERS},(_,index)=>source[index]||null);
 }
 
 function setLineupForDay(day,starterIds){
   if(day<G.day||isDayRevealed(day)) return false;
   const roster=G.rosters[D.myPos]||[];
-  const selected=roster.filter(p=>starterIds.includes(p.id));
-  G.dailyLineups[day]=buildBestLineupIdsForRoster(selected,day);
-  // Also update default starters to match most recent change
-  G.starters[D.myPos]=[...(G.dailyLineups[day]||[])];
+  const validIds=new Set(roster.map(p=>p.id));
+  const seen=new Set();
+  const normalized=Array.from({length:STARTERS},(_,index)=>{
+    const id=starterIds[index]??null;
+    if(!id || !validIds.has(id) || seen.has(id)) return null;
+    seen.add(id);
+    return id;
+  });
+  G.dailyLineups[day]=normalized;
+  G.starters[D.myPos]=[...normalized];
   queueSharedSeasonSave('set_lineup');
   return true;
 }
@@ -1904,9 +2176,17 @@ function renderRoster(){
   const weekStart=(week-1)*DAYS_PER_WEEK+1;
   const weekEnd=weekStart+DAYS_PER_WEEK-1;
   const roster=G.rosters[D.myPos]||[];
+  const ilRoster=getIlRoster(D.myPos);
   const starterIds=getLineupForDay(day);
-  const starters=starterIds.map(id=>roster.find(p=>p.id===id)).filter(Boolean);
-  const bench=roster.filter(p=>!starterIds.includes(p.id));
+  const starterRows=SLOT_LABELS.map((slot,index)=>({player:starterIds[index]?roster.find(p=>p.id===starterIds[index])||null:null,slot,index,isStarter:true,isEmptyStarter:!starterIds[index]}));
+  const activeStarterIds=starterIds.filter(Boolean);
+  const bench=roster.filter(p=>!activeStarterIds.includes(p.id));
+  const benchOpenSlots=Math.max(0,getActiveRosterCapacity()-roster.length);
+  const ilPlayers=[...ilRoster];
+  const ilSlotKey=getIlSlotKey();
+  const ilOpenSlots=Math.max(0,getIlSlotCount()-ilPlayers.length);
+  const statCols=getRosterTableColumns();
+  const scheduleDays=Array.from({length:14},(_,idx)=>day+idx).filter(d=>d<=TOTAL_DAYS());
   const revealedScore=getDayResult(D.myPos,day)?.total ?? null;
   const isCurrentDay=day===G.day;
   const isPast=isDayRevealed(day);
@@ -1917,10 +2197,15 @@ function renderRoster(){
   const currentMatch=weekGames(week).find(g=>g.home===D.myPos||g.away===D.myPos);
   const prevMatch=week>1?weekGames(week-1).find(g=>g.home===D.myPos||g.away===D.myPos):null;
   const rowData=[
-    ...starters.map((p,i)=>({player:p,slot:SLOT_LABELS[i]||'UTIL',isStarter:true})),
-    ...bench.map(p=>({player:p,slot:'BN',isStarter:false}))
+    ...starterRows,
+    ...bench.map(p=>({player:p,slot:'BN',isStarter:false})),
+    ...Array.from({length:benchOpenSlots},()=>({player:null,slot:'BN',isStarter:false,isBenchEmpty:true,isEmpty:true})),
+    ...ilPlayers.map(p=>({player:p,slot:ilSlotKey,isStarter:false,isIL:true})),
+    ...Array.from({length:ilOpenSlots},()=>({player:null,slot:ilSlotKey,isStarter:false,isIL:true,isEmpty:true}))
   ];
-  const matchupCard=(label,matchup,isCurrent)=>{
+  const movePlayer=(moveCtx && moveCtx.day===day)?((roster.find(p=>p.id===moveCtx.pid)||ilRoster.find(p=>p.id===moveCtx.pid))||null):null;
+  const moveSourceSlot=movePlayer?getCurrentRosterSlot(movePlayer.id,day):'';
+  const matchupCard=(label,matchup,isCurrent)=>{ 
     if(!matchup) return `<div class="season-table-card season-card-pad"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div><div style="margin-top:10px;font-size:13px;color:#94a3b8;">No matchup available.</div></div>`;
     const a=matchup.home, b=matchup.away;
     const aName=D.teams[a]||('Team '+(a+1)), bName=D.teams[b]||('Team '+(b+1));
@@ -1954,30 +2239,138 @@ function renderRoster(){
     </button>`;
   }).join('');
   const activePowerups=Object.entries(weekPowerups).filter(([,v])=>v.active);
+  const scheduleHeader=scheduleDays.map(d=>{
+    const dt=getSeasonDayDate(d);
+    return `<th class="season-schedule-head">
+      <span class="date">${dt.toLocaleDateString([],{month:'short',day:'numeric'}).toUpperCase()}</span>
+      <span class="dow">${DAY_NAMES[dayOfWeek(d)-1]}</span>
+    </th>`;
+  }).join('');
   const rows=rowData.map(entry=>{
+    const isMoveSource=!!(movePlayer && entry.player && entry.player.id===movePlayer.id);
+    const canMoveHere=!!(movePlayer && !isMoveSource && canMoveToRosterEntry(movePlayer,day,entry,starterIds,roster));
+    const rowBg=isMoveSource?'#22180d':(canMoveHere?'rgba(245,158,11,.08)':'');
+    const rowBorder=isMoveSource?'#f59e0b':(canMoveHere?'rgba(245,158,11,.5)':'');
+    const rowCellStyle=rowBorder?`background:${rowBg};border-top:1px solid ${rowBorder};border-bottom:1px solid ${rowBorder};`:'';
+    const rowCellAttr=rowCellStyle?` style="${rowCellStyle}"`:'';
+    if(entry.isEmpty || entry.isEmptyStarter){
+      return `<tr>
+        <td${rowCellAttr}>${entry.slot}</td>
+        <td${rowCellAttr}>
+          <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
+            <div class="pav" style="background:#1f2937;width:34px;height:34px;font-size:12px;color:#94a3b8;">—</div>
+            <div class="season-player-wrap" style="min-width:0;">
+              <div style="font-weight:700;color:#94a3b8;">Empty ${entry.slot} slot</div>
+              <div class="season-soft-muted">${entry.isIL?'Stash an injured player here to open an active roster spot.':'Choose an eligible player from your bench or IL to fill this spot.'}</div>
+            </div>
+          </div>
+        </td>
+        <td${rowCellAttr}>${canMoveHere?`<button class="lineup-move-btn" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',null,${entry.isStarter?entry.index:'null'})">Move Here</button>`:`<span class="season-soft-muted" style="font-weight:700;">Empty</span>`}</td>
+        <td${rowCellAttr}>--</td>
+        <td${rowCellAttr}>${entry.isIL?entry.slot:'Open'}</td>
+        <td${rowCellAttr}><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
+        ${statCols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
+      </tr>`;
+    }
     const p=entry.player;
     const game=getGameInfo(p,day);
     const injury=getInjuryStatus(p,week);
     const opp=game?(game.isHome?'vs ':'@ ')+game.opp:'--';
-    const status=injury?injury.label:(game?game.time:(isPast?'Final':'Idle'));
-    const action=isLocked?`<span class="season-soft-muted" style="font-weight:700;">Locked</span>`:`<button class="lineup-move-btn" onclick="toggleStartDay(${p.id},${day})">Move</button>`;
+    const status=entry.isIL ? ilSlotKey : (injury?injury.label:(game?game.time:(isPast?'Final':'Idle')));
+    const action=isMoveSource
+      ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="clearMoveMode()">Cancel</button>`
+      : canMoveHere
+        ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',${entry.slot==='BN'&&entry.player?entry.player.id:'null'},${entry.isStarter?starterIds.indexOf(entry.player?.id):'null'})">Move Here</button>`
+      : entry.isIL
+      ? (isLocked
+          ? `<span class="season-soft-muted" style="font-weight:700;">Locked</span>`
+          : `<button class="lineup-move-btn" onclick="startMoveMode(${p.id},${day})">Activate</button>`)
+      : (isLocked
+          ? `<span class="season-soft-muted" style="font-weight:700;">Locked</span>`
+          : `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+              <button class="lineup-move-btn" onclick="startMoveMode(${p.id},${day})">Move</button>
+            </div>`);
+    return `<tr>
+      <td${rowCellAttr}>${entry.slot}</td>
+      <td${rowCellAttr}>
+        <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
+          <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
+          <div class="season-player-wrap" style="min-width:0;">
+            <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
+            <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+          </div>
+        </div>
+      </td>
+      <td${rowCellAttr}>${action}</td>
+      <td${rowCellAttr}>${opp}</td>
+      <td${rowCellAttr}>${status}</td>
+      <td${rowCellAttr}><span class="season-fp-val">${Number(p.fp||0).toFixed(1)}</span></td>
+      ${statCols.map(col=>`<td${rowCellAttr} class="stat-col">${formatRosterStatValue(p,col.key)}</td>`).join('')}
+    </tr>`;
+  }).join('');
+  const scheduleRows=rowData.filter(entry=>entry.player).map(entry=>{
+    const p=entry.player;
+    const injury=getInjuryStatus(p,weekForDay(day));
     return `<tr>
       <td>${entry.slot}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
           <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
-          <div style="min-width:0;">
-            <div style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-            <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+          <div class="season-player-wrap" style="min-width:0;">
+            <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
+            <div class="season-soft-muted">${entry.slot==='BN'?'Bench':entry.slot} · ${p.team} ${p.pos}</div>
           </div>
         </div>
       </td>
-      <td>${action}</td>
-      <td>${opp}</td>
-      <td>${status}</td>
-      <td style="font-family:var(--fb);font-size:15px;font-weight:800;color:#111827;">${Number(p.fp||0).toFixed(1)}</td>
+      ${scheduleDays.map(d=>{
+        const game=getGameInfo(p,d);
+        if(!game){
+          return `<td class="season-schedule-cell off"><span class="main">OFF</span><span class="sub">No game</span></td>`;
+        }
+        return `<td class="season-schedule-cell on"><span class="main">${game.isHome?'vs':'@'} ${game.opp}</span><span class="sub">${game.time}</span></td>`;
+      }).join('')}
     </tr>`;
   }).join('');
+  const tabButtons=`<div class="season-mini-tabs">
+        <button type="button" class="season-mini-tab ${rosterTab==='stats'?'on':''}" onclick="rosterTab='stats';renderRoster()">Stats</button>
+        <button type="button" class="season-mini-tab ${rosterTab==='schedule'?'on':''}" onclick="rosterTab='schedule';renderRoster()">Schedule</button>
+      </div>`;
+  const dateSummary=`<div class="season-soft-muted" style="font-size:14px;white-space:nowrap;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} · Week ${week}</div>`;
+  const rosterMain=rosterTab==='schedule'
+    ? `${tabButtons}
+      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="season-stat-pill">Upcoming Schedule</span>
+          <span class="season-stat-pill">${scheduleDays.length} days</span>
+        </div>
+      </div>
+      <div class="season-table-wrap">
+        <table class="season-data-table season-schedule-table" style="width:${310 + scheduleDays.length*92}px;min-width:${310 + scheduleDays.length*92}px;">
+          <thead><tr><th style="width:70px;">Slot</th><th style="width:240px;">Player</th>${scheduleHeader}</tr></thead>
+          <tbody>${scheduleRows || `<tr><td colspan="${2+scheduleDays.length}" style="text-align:center;color:#6b7280;">No rostered players found.</td></tr>`}</tbody>
+        </table>
+      </div>`
+    : `${tabButtons}
+      <div class="season-header-band">
+        <div class="season-header-cell"><div class="season-header-eyebrow">Slot</div><div class="season-header-title">Lineup</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Starters</div><div class="season-header-title">Player</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Action</div><div class="season-header-title">Manage</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">${dateLabel.toUpperCase()}</div><div class="season-header-title">Opp</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Game</div><div class="season-header-title">Status</div></div>
+        <div class="season-header-cell"><div class="season-header-eyebrow">Fantasy</div><div class="season-header-title">Pts</div></div>
+      </div>
+      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="season-stat-pill">${isPast?'Revealed Score: '+Number(revealedScore||0).toFixed(1):'Results hidden until reveal'}</span>
+          ${activePowerups.map(([id,v])=>`<span class="season-stat-pill" style="border-color:${POWERUP_LIBRARY[id].color}55;color:${POWERUP_LIBRARY[id].color};background:${POWERUP_LIBRARY[id].color}12;">${id==='captain_mode'?(roster.find(p=>p.id===v.targetId)?.name||'Captain Active'):POWERUP_LIBRARY[id].name}</span>`).join('')}
+        </div>
+      </div>
+      <div class="season-table-wrap">
+        <table class="season-data-table season-roster-table" style="width:${726 + statCols.length*60}px;min-width:${726 + statCols.length*60}px;">
+          <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Status</th><th>FP</th>${statCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+          <tbody>${rows || `<tr><td colspan="${6+statCols.length}" style="text-align:center;color:#6b7280;">No rostered players found.</td></tr>`}</tbody>
+        </table>
+      </div>`;
   let h=`<div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
     <div class="season-hero-card season-card-pad">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
@@ -2004,42 +2397,21 @@ function renderRoster(){
       </div>
     </div>
     <div class="season-table-card">
-      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #e5e7eb;">
+      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span style="font-size:14px;color:#111827;">Set Lineup:</span>
+          <span style="font-size:14px;color:#dbe4f0;">Set Lineup:</span>
           <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">‹</button>
           ${dayChips}
           <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">›</button>
+          ${dateSummary}
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           ${!isLocked?`<button class="season-outline-btn" onclick="autoSetDay(${day})">Auto Set</button>`:''}
-          ${!isLocked?`<button class="season-outline-btn" onclick="const copied=copyLineupToRange(${day},${weekEnd});renderRoster();toast(copied?'Copied to '+copied+' open day'+(copied===1?'':'s')+' this week.':'No open days left this week.')">Copy Week</button>`:''}
           <button class="season-outline-btn" onclick="openPicker()">League</button>
           <button class="season-outline-btn" onclick="goPage('waiver')">Add Player</button>
         </div>
       </div>
-      <div class="season-mini-tabs"><div class="season-mini-tab on">Stats</div><div class="season-mini-tab">Trending</div><div class="season-mini-tab">Schedule</div><div class="season-mini-tab">News</div></div>
-      <div class="season-header-band">
-        <div class="season-header-cell"><div class="season-header-eyebrow">Slot</div><div class="season-header-title">Lineup</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Starters</div><div class="season-header-title">Player</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Action</div><div class="season-header-title">Manage</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">${dateLabel.toUpperCase()}</div><div class="season-header-title">Opp</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Game</div><div class="season-header-title">Status</div></div>
-        <div class="season-header-cell"><div class="season-header-eyebrow">Fantasy</div><div class="season-header-title">Pts</div></div>
-      </div>
-      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="season-stat-pill">${isPast?'Revealed Score: '+Number(revealedScore||0).toFixed(1):'Results hidden until reveal'}</span>
-          ${activePowerups.map(([id,v])=>`<span class="season-stat-pill" style="border-color:${POWERUP_LIBRARY[id].color}55;color:${POWERUP_LIBRARY[id].color};background:${POWERUP_LIBRARY[id].color}12;">${id==='captain_mode'?(roster.find(p=>p.id===v.targetId)?.name||'Captain Active'):POWERUP_LIBRARY[id].name}</span>`).join('')}
-        </div>
-        <div class="season-soft-muted">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} · Week ${week}</div>
-      </div>
-      <div class="season-table-wrap">
-        <table class="season-data-table" style="min-width:720px;">
-          <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Status</th><th>FP</th></tr></thead>
-          <tbody>${rows || `<tr><td colspan="6" style="text-align:center;color:#6b7280;">No rostered players found.</td></tr>`}</tbody>
-        </table>
-      </div>
+      ${rosterMain}
     </div>
   </div>`;
   document.getElementById('rosterContent').innerHTML=h;
@@ -2103,6 +2475,85 @@ function pRow(p,slot,isS,day,isPast){
   </div>`;
 }
 
+function openMoveModal(pid,day){
+  startMoveMode(pid,day);
+}
+
+function applyMoveChoice(pid,day,targetSlot,targetBenchPlayerId=null,targetStarterIndex=null){
+  if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');closeMoveModal();return;}
+  const teamIdx=D?.myPos??0;
+  const roster=G.rosters[teamIdx]||[];
+  const ilRoster=getIlRoster(teamIdx);
+  let player=roster.find(p=>p.id===pid)||ilRoster.find(p=>p.id===pid);
+  if(!player) return;
+  const currentSlot=getCurrentRosterSlot(pid,day);
+  const ilSlotKey=getIlSlotKey();
+  if(targetSlot===currentSlot){closeMoveModal();return;}
+
+  if(currentSlot===ilSlotKey){
+    if(targetSlot!==ilSlotKey && roster.length>=getActiveRosterCapacity()){
+      toast('Your active roster is full. Drop or bench someone first.');
+      return;
+    }
+    const idx=ilRoster.findIndex(p=>p.id===pid);
+    if(idx>=0){
+      [player]=ilRoster.splice(idx,1);
+      G.rosters[teamIdx].push(player);
+    }
+  }
+
+  if(targetSlot===ilSlotKey){
+    closeMoveModal();
+    movePlayerToIL(pid);
+    return;
+  }
+
+  let starterIds=[...getLineupForDay(day)];
+  const currentIndex=starterIds.indexOf(pid);
+  if(currentIndex>=0) starterIds[currentIndex]=null;
+
+  if(targetSlot==='BN'){
+    if(targetBenchPlayerId){
+      const benchPlayer=(G.rosters[teamIdx]||[]).find(p=>p.id===targetBenchPlayerId);
+      if(currentIndex>=0 && benchPlayer && canPlayerFillSlot(benchPlayer,SLOT_LABELS[currentIndex]||targetSlot)){
+        starterIds[currentIndex]=benchPlayer.id;
+      }
+    }
+    setLineupForDay(day,starterIds);
+    queueSharedSeasonSave('move_player');
+    renderRoster();
+    moveCtx=null;
+    toast(player.name+' moved to bench.');
+    return;
+  }
+
+  const targetIndex=Number.isInteger(targetStarterIndex)?targetStarterIndex:SLOT_LABELS.findIndex(slot=>slot===targetSlot);
+  if(targetIndex<0){moveCtx=null;renderRoster();return;}
+  if(!canPlayerFillSlot(player,targetSlot)){
+    toast(player.name+' is not eligible for '+targetSlot+'.');
+    return;
+  }
+  const displacedId=starterIds[targetIndex]||null;
+  if(displacedId===pid){
+    moveCtx=null;
+    renderRoster();
+    return;
+  }
+  starterIds[targetIndex]=pid;
+  if(displacedId){
+    const displacedPlayer=(G.rosters[teamIdx]||[]).find(p=>p.id===displacedId);
+    if(currentIndex>=0 && displacedPlayer && canPlayerFillSlot(displacedPlayer,SLOT_LABELS[currentIndex]||'')){
+      starterIds[currentIndex]=displacedId;
+    }
+  }
+  setLineupForDay(day,starterIds);
+  queueSharedSeasonSave('move_player');
+  renderRoster();
+  moveCtx=null;
+  const displacedPlayer=displacedId?(G.rosters[teamIdx]||[]).find(p=>p.id===displacedId):null;
+  toast(displacedPlayer?`${player.name} moved to ${targetSlot}; ${displacedPlayer.name} moved to bench.`:`${player.name} moved to ${targetSlot}.`);
+}
+
 function toggleStartDay(pid,day){
   if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');return;}
   const current=getLineupForDay(day);
@@ -2124,6 +2575,36 @@ function toggleStartDay(pid,day){
 }
 
 function toggleStart(pid){toggleStartDay(pid,rosterViewDay||G.day);}
+
+function movePlayerToIL(pid){
+  const roster=G.rosters[D.myPos]||[];
+  const ilRoster=getIlRoster(D.myPos);
+  const player=roster.find(p=>p.id===pid);
+  if(!player) return;
+  const injury=getInjuryStatus(player,weekForDay(rosterViewDay||G.day));
+  if(!isIlEligiblePlayer(player,injury)){toast('That player is not IL eligible.');return;}
+  if(ilRoster.length>=getIlSlotCount()){toast('Your IL spots are full.');return;}
+  G.rosters[D.myPos]=roster.filter(p=>p.id!==pid);
+  ilRoster.push(player);
+  rebuildLineupsAfterRosterChange(D.myPos);
+  queueSharedSeasonSave('move_to_il');
+  renderRoster();
+  toast(player.name+' moved to '+getIlSlotKey()+'.');
+}
+
+function activatePlayerFromIL(pid){
+  const roster=G.rosters[D.myPos]||[];
+  const ilRoster=getIlRoster(D.myPos);
+  if(roster.length>=getActiveRosterCapacity()){toast('Your active roster is full. Drop a player first.');return;}
+  const idx=ilRoster.findIndex(p=>p.id===pid);
+  if(idx<0) return;
+  const [player]=ilRoster.splice(idx,1);
+  G.rosters[D.myPos].push(player);
+  rebuildLineupsAfterRosterChange(D.myPos);
+  queueSharedSeasonSave('activate_from_il');
+  renderRoster();
+  toast(player.name+' activated from '+getIlSlotKey()+'.');
+}
 
 function autoSetDay(day){
   if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');return;}
@@ -2202,8 +2683,16 @@ function openWaiver(pid){
   wAdd=G.waiver.find(x=>x.id===pid);if(!wAdd)return;
   wDrop=null;
   document.getElementById('wAddName').textContent='Adding: '+wAdd.name+' ('+wAdd.pos+' · '+wAdd.team+' · '+wAdd.fp+' FP)';
-  const cb=document.getElementById('wConfirm');cb.disabled=true;cb.textContent='Select player to drop';
   const roster=G.rosters[D.myPos]||[];
+  const cb=document.getElementById('wConfirm');
+  const openSpot=roster.length<getActiveRosterCapacity();
+  if(openSpot){
+    cb.disabled=false;
+    cb.textContent='Claim '+wAdd.name;
+  }else{
+    cb.disabled=true;
+    cb.textContent='Select player to drop';
+  }
   document.getElementById('wDropList').innerHTML=roster.map(rp=>`
     <div onclick="pickDrop(${rp.id},this)" style="display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;margin-bottom:5px;">
       <div class="pav" style="background:${tc(rp.team)};width:30px;height:30px;font-size:11px;">${ini(rp.name)}</div>
@@ -2211,6 +2700,9 @@ function openWaiver(pid){
       <div class="pd">${rp.team} · ${rp.fp} FP</div></div>
       <div style="font-family:var(--fd);font-size:11px;color:var(--red);font-weight:700;">Drop</div>
     </div>`).join('');
+  if(openSpot){
+    document.getElementById('wDropList').innerHTML=`<div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 14px;margin-bottom:8px;font-size:12px;color:#bbf7d0;">Open roster spot available. No drop needed because you have room after using your ${getIlSlotKey()} stash.</div>`+document.getElementById('wDropList').innerHTML;
+  }
   document.getElementById('wModal').classList.add('open');
 }
 
@@ -2222,15 +2714,23 @@ function pickDrop(pid,el){
 }
 
 function confirmWaiver(){
-  if(!wAdd||!wDrop)return;
-  const r=G.rosters[D.myPos],idx=r.findIndex(p=>p.id===wDrop.id);if(idx<0)return;
-  const[dropped]=r.splice(idx,1);r.push(wAdd);
-  G.waiver=G.waiver.filter(p=>p.id!==wAdd.id);G.waiver.push(dropped);
+  if(!wAdd)return;
+  const r=G.rosters[D.myPos];
+  const openSpot=r.length<getActiveRosterCapacity();
+  let dropped=null;
+  if(!openSpot){
+    if(!wDrop) return;
+    const idx=r.findIndex(p=>p.id===wDrop.id);if(idx<0)return;
+    [dropped]=r.splice(idx,1);
+  }
+  r.push(wAdd);
+  G.waiver=G.waiver.filter(p=>p.id!==wAdd.id);
+  if(dropped) G.waiver.push(dropped);
   G.starters[D.myPos]=buildBestLineupIdsForRoster(G.rosters[D.myPos],G.day);
   document.getElementById('wModal').classList.remove('open');
-  logActivity('waiver','Waiver move',teamName(D.myPos)+' added '+wAdd.name+' and dropped '+wDrop.name+'.',D.myPos,'📋');
+  logActivity('waiver','Waiver move',dropped?(teamName(D.myPos)+' added '+wAdd.name+' and dropped '+dropped.name+'.'):(teamName(D.myPos)+' added '+wAdd.name+' into an open roster spot.'),D.myPos,'📋');
   queueSharedSeasonSave('waiver_move');
-  toast('Claimed '+wAdd.name+', dropped '+wDrop.name);
+  toast(dropped?('Claimed '+wAdd.name+', dropped '+dropped.name):('Claimed '+wAdd.name));
   wAdd=null;wDrop=null;renderWaiver();renderHub();
 }
 

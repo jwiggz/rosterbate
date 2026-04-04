@@ -25,8 +25,8 @@
     },
     mlb:{
       key:'mlb',label:'MLB',icon:'\u{26BE}',leagueLabel:'Pro Baseball Season',defaultLeagueSize:10,defaultRounds:20,defaultScoring:'points',defaultFormat:'snake',timer:90,playerCount:320,
-      filters:['ALL','C','1B','2B','3B','SS','OF','SP','RP'],waiverPositions:['ALL','C','1B','2B','3B','SS','OF','SP','RP'],
-      starterSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP','SP','RP','P'],myTeamSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP','SP','RP','P','BN','BN','BN','BN','BN','BN','BN'],
+      filters:['ALL','C','1B','2B','3B','SS','OF','P'],waiverPositions:['ALL','C','1B','2B','3B','SS','OF','P'],
+      starterSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P'],myTeamSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P','BN','BN','BN','IL','IL','IL'],
       commissionerScoringType:'Points',
       scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in later.',h2h_pts:'Head-to-head points using hitter and pitcher events across the week.',roto:'Season-long ranking by cumulative points for now.',points:'Primary MLB default: Single 1, Double 2, Triple 3, HR 4, RBI 1, Run 1, BB 1, SB 2, IP 3, SO 1, Win 5, Save 5, ER -2.'},
       teamCodes:['ARI','ATL','BAL','BOS','CHC','CWS','CIN','CLE','COL','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WSH']
@@ -160,7 +160,7 @@
   function getCommissionerDefaults(sport){
     const key=normalizeSportKey(sport);
     if(key==='nfl') return {scoringType:'H2H Points',positions:{QB:{starters:1,max:4},RB:{starters:2,max:6},WR:{starters:2,max:6},TE:{starters:1,max:3},FLEX:{starters:1,max:3},K:{starters:1,max:2},DST:{starters:1,max:2},BN:{starters:6,max:'No Limit'},IR:{starters:1,max:2}},scoring:{PASS_YDS:0.04,PASS_TD:4,INT:-2,RUSH_YDS:0.1,RUSH_TD:6,REC:1,REC_YDS:0.1,REC_TD:6,FUM:-2,FG:3,XP:1,SACK:1,DEF_TO:2,DEF_TD:6}};
-    if(key==='mlb') return {scoringType:'Points',positions:{C:{starters:1,max:2},'1B':{starters:1,max:2},'2B':{starters:1,max:2},'3B':{starters:1,max:2},SS:{starters:1,max:2},OF:{starters:3,max:6},UTIL:{starters:1,max:3},SP:{starters:2,max:6},RP:{starters:1,max:4},P:{starters:1,max:4},BN:{starters:7,max:'No Limit'},IL:{starters:1,max:3}},scoring:{SINGLE:1,DOUBLE:2,TRIPLE:3,HR:4,RBI:1,RUN:1,BB:1,SB:2,IP:3,SO:1,W:5,SV:5,ER:-2}};
+    if(key==='mlb') return {scoringType:'Points',positions:{C:{starters:1,max:2},'1B':{starters:1,max:2},'2B':{starters:1,max:2},'3B':{starters:1,max:2},SS:{starters:1,max:2},OF:{starters:3,max:6},UTIL:{starters:1,max:2},P:{starters:6,max:10},BN:{starters:3,max:'No Limit'},IL:{starters:3,max:3}},scoring:{SINGLE:1,DOUBLE:2,TRIPLE:3,HR:4,RBI:1,RUN:1,BB:1,SB:2,IP:3,SO:1,W:5,SV:5,ER:-2}};
     return {scoringType:'H2H Points',positions:{PG:{starters:1,max:3},SG:{starters:1,max:3},SF:{starters:1,max:3},PF:{starters:1,max:3},C:{starters:1,max:3},G:{starters:1,max:3},F:{starters:1,max:3},UTIL:{starters:1,max:3},BE:{starters:5,max:'No Limit'},IR:{starters:1,max:3}},scoring:{FGM:2,FGA:-1,FTM:1,FTA:-1,'3PM':1,REB:1,AST:2,STL:4,BLK:4,TO:-2,PTS:1}};
   }
   function getLeagueRuleDefaults(sport){
