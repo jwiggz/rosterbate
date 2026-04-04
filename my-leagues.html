@@ -25,6 +25,7 @@
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:11px 16px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;border:none}
   .btn.primary{background:var(--accent);color:#fff}
   .btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+  .btn.danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.32);color:#fca5a5}
   .btn.small{padding:9px 12px;font-size:13px}
   .shell{max-width:1320px;margin:0 auto;padding:28px 20px 40px}
   .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:24px}
@@ -192,6 +193,31 @@ function getSeasonMember(payload){
   return users.find(memberMatches) || null;
 }
 
+function memberIdentityKeys(member){
+  const keys=[];
+  if(member?.uid) keys.push('uid:'+String(member.uid));
+  if(member?.id) keys.push('id:'+String(member.id));
+  if(member?.userNumber) keys.push('userNumber:'+String(member.userNumber));
+  if(member?.name) keys.push('name:'+String(member.name).trim().toLowerCase());
+  if(currentUser?.uid) keys.push('uid:'+String(currentUser.uid));
+  if(localPlayerId) keys.push('id:'+String(localPlayerId));
+  if(currentUserNumber) keys.push('userNumber:'+String(currentUserNumber));
+  if(currentUsername) keys.push('name:'+String(currentUsername).trim().toLowerCase());
+  return [...new Set(keys.filter(Boolean))];
+}
+
+function memberIsMarkedLeft(container, member){
+  const left = container?.leftMembers || {};
+  const keys = memberIdentityKeys(member);
+  return keys.some(key=>left && left[key]);
+}
+
+function buildLeftMemberPatch(member){
+  const patch={};
+  memberIdentityKeys(member).forEach(key=>{ patch[key] = Date.now(); });
+  return patch;
+}
+
 function buildLobbyStateFromLobby(id,lobby,member){
   return {
     lobbyId:id,
@@ -262,6 +288,7 @@ function renderDrafts(rows){
       <div class="league-copy">Created ${escapeHtml(formatDate(row.createdAt))}. ${row.status==='started'?'Jump back into the live board.':'Open the waiting room and keep the league moving.'}</div>
       <div class="actions">
         <button class="btn primary small" onclick="openDraftLeague('${row.id}')">${row.status==='started'?'Open Draft':'Open Lobby'}</button>
+        <button class="btn danger small" onclick="leaveDraftLeague('${row.id}')">Leave League</button>
       </div>
     </div>
   `).join('');
@@ -295,6 +322,7 @@ function renderSeasons(rows){
       <div class="league-copy">${row.complete?'This season is already finished, but you can reopen it to review standings and league history.':'Open the shared season manager and continue playing through the real season.'}</div>
       <div class="actions">
         <button class="btn primary small" onclick="openSeasonLeague('${row.id}')">Open Season</button>
+        <button class="btn danger small" onclick="leaveSeasonLeague('${row.id}')">Leave League</button>
       </div>
     </div>
   `).join('');
@@ -313,6 +341,7 @@ async function loadMyLeagues(){
       const lobby=child.val()||{};
       const member=getLobbyMember(lobby);
       if(!member) return;
+      if(memberIsMarkedLeft(lobby, member)) return;
       drafts.push({
         id:child.key,
         name:lobby.name||'RosterBate League',
@@ -337,6 +366,7 @@ async function loadMyLeagues(){
       const payload=child.val()||{};
       const member=getSeasonMember(payload);
       if(!member) return;
+      if(memberIsMarkedLeft(payload, member)) return;
       const draft=payload.draft||{};
       seasons.push({
         id:child.key,
@@ -379,6 +409,81 @@ function openSeasonLeague(id){
   try{ localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state)); }catch(e){}
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(row.payload.draft||{})); }catch(e){}
   window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba');
+}
+
+async function leaveDraftLeague(id){
+  const row=(window.__rbDraftRows||[]).find(x=>x.id===id);
+  if(!row) return;
+  const isWaiting = String(row.status||'waiting') !== 'started';
+  const prompt = isWaiting
+    ? `Leave ${row.name}? You will be removed from this draft room.`
+    : `Leave ${row.name}? This draft is already live, so it will be hidden from your account instead of changing the room for everyone else.`;
+  if(!confirm(prompt)) return;
+  try{
+    const lobbyRef = db.ref('lobbies/' + id);
+    const snap = await lobbyRef.once('value');
+    const lobby = snap.val() || {};
+    const member = getLobbyMember(lobby) || row.member;
+    if(!member){
+      toast('You are no longer in that draft room.','var(--red)');
+      await loadMyLeagues();
+      return;
+    }
+
+    if(String(lobby.status||'waiting') !== 'started'){
+      const players = Object.entries(lobby.players || {});
+      const targetEntry = players.find(([,p])=>memberMatches(p));
+      if(targetEntry){
+        await lobbyRef.child('players/' + targetEntry[0]).remove();
+      }
+      const remainingSnap = await lobbyRef.child('players').once('value');
+      const remainingCount = Object.keys(remainingSnap.val() || {}).length;
+      if(remainingCount === 0){
+        await lobbyRef.remove();
+      }
+      toast('You left the draft room.');
+    }else{
+      const patch = buildLeftMemberPatch(member);
+      await lobbyRef.child('leftMembers').update(patch);
+      toast('Draft removed from your leagues.');
+    }
+    try{
+      const saved = JSON.parse(localStorage.getItem('rbMultiplayerLobby') || 'null');
+      if(saved?.lobbyId === id) localStorage.removeItem('rbMultiplayerLobby');
+    }catch(e){}
+    await loadMyLeagues();
+  }catch(e){
+    console.error(e);
+    toast('Could not leave that draft room.','var(--red)');
+  }
+}
+
+async function leaveSeasonLeague(id){
+  const row=(window.__rbSeasonRows||[]).find(x=>x.id===id);
+  if(!row) return;
+  if(!confirm(`Leave ${row.name}? This will remove it from your My Leagues list, but won’t delete the season for the other managers.`)) return;
+  try{
+    const seasonRef = db.ref(SHARED_SEASON_ROOT + '/' + id);
+    const snap = await seasonRef.once('value');
+    const payload = snap.val() || {};
+    const member = getSeasonMember(payload) || row.member;
+    if(!member){
+      toast('You are no longer in that season.','var(--red)');
+      await loadMyLeagues();
+      return;
+    }
+    const patch = buildLeftMemberPatch(member);
+    await seasonRef.child('leftMembers').update(patch);
+    try{
+      const saved = JSON.parse(localStorage.getItem('rbMultiplayerLobby') || 'null');
+      if(saved?.lobbyId === id) localStorage.removeItem('rbMultiplayerLobby');
+    }catch(e){}
+    toast('Season removed from your leagues.');
+    await loadMyLeagues();
+  }catch(e){
+    console.error(e);
+    toast('Could not leave that season.','var(--red)');
+  }
 }
 
 auth.onAuthStateChanged(async user=>{

@@ -327,8 +327,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div id="hubName" class="hub-team-name"></div>
           <div id="hubRec" class="hub-team-record"></div>
         <div id="hubDataStamp" class="hub-summary-data" style="display:none;margin-top:10px;"></div>
-        <a href="javascript:void(0)" onclick="goPage('roster')" class="hub-mini-link">View Roster</a>
-        <button type="button" onclick="openTeamSettings()" class="season-team-link-btn" style="margin-top:10px;">Team Settings</button>
+          <button type="button" onclick="openTeamSettings()" class="season-team-link-btn" style="margin-top:14px;">Team Settings</button>
       </div>
         <div class="hub-card compact">
           <div class="hub-card-title">Scores</div>
@@ -377,15 +376,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           <div class="hub-card compact rb-chat-panel" id="rbChatPanel">
             <div class="rb-chat-hdr">
               <div style="flex:1">
-                <div class="rb-chat-title">League Chat</div>
-                <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
+                <div class="rb-chat-title">Trash Talk</div>
+                <div class="rb-chat-online" id="rbOnlineCount">Season-long multiplayer thread</div>
               </div>
-            </div>
-            <div class="rb-chat-tabs">
-              <button class="rb-chat-tab on" onclick="rbSwitchTab('all',this)">All</button>
-              <button class="rb-chat-tab" onclick="rbSwitchTab('draft',this)">Draft Room</button>
-              <button class="rb-chat-tab" onclick="rbSwitchTab('trades',this)">Trades</button>
-              <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk 🔥</button>
             </div>
             <div class="rb-chat-msgs" id="rbMsgs"></div>
             <div class="rb-chat-input-area">
@@ -397,15 +390,15 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
                 <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs… (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
                 <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">🔍 Type to search GIFs</div></div>
               </div>
+              <div class="rb-chat-replybar" id="rbReplyBar" style="display:none;"></div>
               <div class="rb-chat-toolbar">
                 <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">😄</button>
                 <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
-                <button class="rb-tool-btn" onclick="rbInsertAt('📢 ')" title="Announcement">📢</button>
                 <button class="rb-tool-btn" onclick="rbInsertAt('🔥 ')" title="Trash talk">🔥</button>
                 <button class="rb-tool-btn" onclick="rbInsertAt('💀 ')" title="Skull">💀</button>
               </div>
               <div class="rb-chat-row">
-                <textarea class="rb-chat-textarea" id="rbInput" placeholder="Message the league…" rows="1"
+                <textarea class="rb-chat-textarea" id="rbInput" placeholder="Talk your trash…" rows="1"
                   oninput="rbAutoResize(this);rbUpdateSendBtn()"
                   onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
                 <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
@@ -3813,33 +3806,36 @@ function commPlayoffs(){
 /* Header */
 .rb-chat-hdr{display:flex;align-items:center;gap:10px;padding:0 0 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .rb-chat-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;flex:1;}
-.rb-chat-online{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;}
+.rb-chat-online{display:flex;align-items:center;gap:4px;font-size:11px;color:#38bdf8;font-family:var(--fd);font-weight:700;}
 .rb-chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-
-/* Tab bar */
-.rb-chat-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-.rb-chat-tab{flex:1;padding:8px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;}
-.rb-chat-tab.on{color:var(--accent);border-bottom-color:var(--accent);}
 
 /* Messages */
 .rb-chat-msgs{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:2px;-webkit-overflow-scrolling:touch;}
-.rb-chat-msgs::-webkit-scrollbar{width:0;}
+.rb-chat-msgs::-webkit-scrollbar{width:8px;}
 
 /* Message bubble */
-.rb-msg{display:flex;gap:7px;align-items:flex-end;margin-bottom:4px;animation:msgIn .15s ease;}
+.rb-msg{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;animation:msgIn .15s ease;}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .rb-msg.me{flex-direction:row-reverse;}
-.rb-msg-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-bottom:16px;}
-.rb-msg-body{max-width:72%;display:flex;flex-direction:column;align-items:flex-start;}
+.rb-msg-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;}
+.rb-msg-body{max-width:82%;display:flex;flex-direction:column;align-items:flex-start;gap:4px;}
 .rb-msg.me .rb-msg-body{align-items:flex-end;}
 .rb-msg-name{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px;padding:0 4px;}
+.rb-bubble-wrap{display:flex;flex-direction:column;gap:6px;}
 .rb-msg.me .rb-msg-name{display:none;}
-.rb-bubble{background:var(--card);border:1px solid var(--border);border-radius:14px 14px 14px 3px;padding:8px 11px;font-size:13px;color:var(--text);line-height:1.45;position:relative;word-break:break-word;}
+.rb-quoted{padding:8px 10px;border-radius:12px;background:rgba(15,23,36,.94);border:1px solid rgba(56,189,248,.18);max-width:100%;}
+.rb-msg.me .rb-quoted{background:rgba(11,18,32,.28);border-color:rgba(255,255,255,.24);}
+.rb-quoted-meta{font-size:10px;font-family:var(--fd);font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#38bdf8;margin-bottom:3px;}
+.rb-quoted-text{font-size:12px;color:var(--text2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.rb-bubble{background:var(--card);border:1px solid rgba(59,130,246,.14);border-radius:14px 14px 14px 3px;padding:9px 12px;font-size:13px;color:var(--text);line-height:1.45;position:relative;word-break:break-word;}
 .rb-msg.me .rb-bubble{background:var(--accent);border-color:var(--accent);color:#fff;border-radius:14px 14px 3px 14px;}
 .rb-bubble.gif-msg{padding:4px;background:transparent;border-color:transparent;}
 .rb-bubble.gif-msg img{border-radius:10px;max-width:180px;max-height:160px;display:block;}
 .rb-msg.me .rb-bubble.gif-msg{background:transparent;border-color:transparent;}
 .rb-msg-time{font-size:10px;color:var(--text3);padding:0 4px;margin-top:2px;}
+.rb-msg-actions{display:flex;gap:8px;padding:0 4px;}
+.rb-msg-action{border:none;background:none;color:#94a3b8;font-size:11px;font-family:var(--fd);font-weight:700;cursor:pointer;padding:0;}
+.rb-msg-action:hover{color:#f8fafc;}
 
 /* Reactions bar */
 .rb-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;}
@@ -3860,6 +3856,11 @@ function commPlayoffs(){
 .rb-chat-toolbar{display:flex;gap:4px;margin-bottom:6px;}
 .rb-tool-btn{background:none;border:none;font-size:18px;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--text2);transition:background .1s;}
 .rb-tool-btn:active{background:var(--bg3);}
+.rb-chat-replybar{margin-bottom:8px;padding:10px 12px;border:1px solid rgba(56,189,248,.18);background:rgba(15,23,36,.8);border-radius:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.rb-chat-replymeta{font-size:10px;font-family:var(--fd);font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#38bdf8;margin-bottom:3px;}
+.rb-chat-replytext{font-size:12px;color:var(--text2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.rb-chat-replyclose{border:none;background:none;color:#94a3b8;font-size:18px;cursor:pointer;line-height:1;padding:0 2px;}
+.rb-chat-replyclose:hover{color:#f8fafc;}
 .rb-chat-row{display:flex;gap:6px;align-items:flex-end;}
 .rb-chat-textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:9px 14px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;resize:none;max-height:80px;min-height:38px;line-height:1.4;-webkit-overflow-scrolling:touch;}
 .rb-chat-textarea:focus{border-color:var(--accent);}
@@ -3901,33 +3902,80 @@ function commPlayoffs(){
 
 <script>
 // ── CHAT STATE ─────────────────────────────────────────────
-const RB_CHAT_KEY = 'rosterbateChat';
-const RB_MY_NAME = (typeof S !== 'undefined' && S.name) ? S.name :
-                   (typeof D !== 'undefined' && D.teamName) ? D.teamName : 'Manager';
-const RB_CONTEXT = (typeof S !== 'undefined') ? 'draft' : 'season';
+const RB_CHAT_KEY = 'rosterbateSeasonTrashTalk';
 const RB_COLORS = ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#f97316','#06b6d4','#a855f7'];
+const RB_QUICK_REACTS=['👍','😂','🔥','💀','😤','🏆','😭','🤝'];
 
 let rbChat = { msgs:[], lastSeen:0 };
 let rbChatOpen = true;
-let rbActiveTab = 'all';
 let rbReactTarget = null;
 let rbGifTimer = null;
+let rbReplyToId = null;
+let rbLastRenderedCount = 0;
 
-// Load from localStorage
+function rbLeagueKey(){
+  return (D?.sharedSeasonId || D?.lobbyId || D?.leagueId || `${CURRENT_SPORT||'sport'}-solo`).toString();
+}
+
+function rbStorageKey(){
+  return `${RB_CHAT_KEY}:${rbLeagueKey()}`;
+}
+
+function rbGetMyName(){
+  return D?.teams?.[D?.myPos] || D?.teamName || 'Manager';
+}
+
+function rbGetTeamAvatar(name){
+  const teamIndex = Array.isArray(D?.teams) ? D.teams.indexOf(name) : -1;
+  if(teamIndex >= 0){
+    const url = D?.teamAvatarUrls?.[teamIndex];
+    if(url) return `<img src="${rbEscAttr(url)}" alt="${rbEscAttr(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">`;
+  }
+  return rbIni(name);
+}
+
+function rbEnsureChatState(){
+  if(!D) return;
+  if(!D.trashTalkThread || typeof D.trashTalkThread !== 'object') D.trashTalkThread = {};
+  if(!Array.isArray(D.trashTalkThread.msgs)) D.trashTalkThread.msgs = [];
+  if(!D.trashTalkThread.lastSeen) D.trashTalkThread.lastSeen = 0;
+}
+
 function rbLoadChat(){
+  rbEnsureChatState();
+  let local = { msgs:[], lastSeen:0 };
   try{
-    const raw = localStorage.getItem(RB_CHAT_KEY);
-    if(raw) rbChat = JSON.parse(raw);
-    if(!rbChat.msgs) rbChat.msgs = [];
-    if(!rbChat.lastSeen) rbChat.lastSeen = 0;
-  }catch(e){ rbChat = {msgs:[],lastSeen:0}; }
+    const raw = localStorage.getItem(rbStorageKey());
+    if(raw) local = JSON.parse(raw);
+  }catch(e){}
+  if(!Array.isArray(local.msgs)) local.msgs = [];
+  if(!local.lastSeen) local.lastSeen = 0;
+  const seasonMsgs = Array.isArray(D?.trashTalkThread?.msgs) ? D.trashTalkThread.msgs : [];
+  const seasonLastSeen = D?.trashTalkThread?.lastSeen || 0;
+  const mergedMsgs = [...seasonMsgs, ...local.msgs].reduce((acc, msg)=>{
+    if(!msg?.id) return acc;
+    const existing = acc.findIndex(x=>x.id===msg.id);
+    if(existing>=0) acc[existing] = {...acc[existing], ...msg};
+    else acc.push(msg);
+    return acc;
+  }, []).sort((a,b)=>(a.ts||0)-(b.ts||0));
+  rbChat = {
+    msgs: mergedMsgs,
+    lastSeen: Math.max(local.lastSeen || 0, seasonLastSeen || 0)
+  };
+  rbSyncChatIntoSeason(false);
 }
 
-function rbSaveChat(){
-  try{ localStorage.setItem(RB_CHAT_KEY, JSON.stringify(rbChat)); }catch(e){}
+function rbSyncChatIntoSeason(shouldSave){
+  rbEnsureChatState();
+  D.trashTalkThread.msgs = Array.isArray(rbChat.msgs) ? rbChat.msgs : [];
+  D.trashTalkThread.lastSeen = rbChat.lastSeen || 0;
+  try{ localStorage.setItem(rbStorageKey(), JSON.stringify(rbChat)); }catch(e){}
+  if(shouldSave && typeof queueSharedSeasonSave === 'function'){
+    queueSharedSeasonSave('trash_talk');
+  }
 }
 
-// Color per sender name
 function rbColor(name){
   let hash=0;
   for(let i=0;i<name.length;i++) hash=(hash*31+name.charCodeAt(i))&0xffffffff;
@@ -3936,8 +3984,8 @@ function rbColor(name){
 
 function rbIni(n){
   if(!n) return '?';
-  const p=n.trim().split(' ');
-  return (p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();
+  const p=n.trim().split(' ').filter(Boolean);
+  return (p[0]?.[0] || '?').toUpperCase() + ((p.length>1?p[p.length-1][0]:'') || '').toUpperCase();
 }
 
 function rbTime(ts){
@@ -3946,116 +3994,86 @@ function rbTime(ts){
   const diff=now-d;
   if(diff<60000) return 'just now';
   if(diff<3600000) return Math.floor(diff/60000)+'m ago';
-  if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 }
 
-// ── OPEN/CLOSE ──────────────────────────────────────────────
+function rbEscHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function rbEscAttr(s){
+  return rbEscHtml(s).replace(/'/g,'&#39;');
+}
+
+function rbFindMsg(id){
+  return rbChat.msgs.find(m=>m.id===id);
+}
+
+function rbMarkSeen(){
+  rbChat.lastSeen = Date.now();
+  rbSyncChatIntoSeason(false);
+}
+
 function rbToggleChat(){
   rbLoadChat();
   rbRender();
   rbMarkSeen();
   setTimeout(()=>rbScrollBottom(),100);
-  rbSimulateActivity();
 }
 
-function rbMarkSeen(){
-  rbChat.lastSeen = Date.now();
-  rbSaveChat();
-  const unread=document.getElementById('rbUnread');
-  if(unread) unread.classList.remove('show');
-}
-
-function rbUpdateUnread(){
-  const unseen = rbChat.msgs.filter(m=>m.ts>rbChat.lastSeen&&m.sender!==RB_MY_NAME).length;
-  const el = document.getElementById('rbUnread');
-  if(!el) return;
-  if(unseen>0){el.textContent=unseen>9?'9+':unseen;el.classList.add('show');}
-  else el.classList.remove('show');
-}
-
-// ── TABS ────────────────────────────────────────────────────
-function rbSwitchTab(tab,btn){
-  rbActiveTab=tab;
-  document.querySelectorAll('.rb-chat-tab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  rbRender();
-  setTimeout(()=>rbScrollBottom(),50);
-}
-
-function rbFilteredMsgs(){
-  if(rbActiveTab==='all') return rbChat.msgs;
-  return rbChat.msgs.filter(m=>m.tag===rbActiveTab||m.tag==='system');
-}
-
-// ── RENDER ──────────────────────────────────────────────────
-function rbRender(){
-  const msgs = rbFilteredMsgs();
-  const el = document.getElementById('rbMsgs');
-  if(!el) return;
-
-  if(!msgs.length){
-    el.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);"><div style="font-size:36px;">💬</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No messages yet</div><div style="font-size:12px;">Be the first to say something!</div></div>';
+function rbRenderReplyBar(){
+  const bar = document.getElementById('rbReplyBar');
+  if(!bar) return;
+  if(!rbReplyToId){
+    bar.style.display='none';
+    bar.innerHTML='';
     return;
   }
-
-  el.innerHTML = msgs.map((m,idx)=>rbRenderMsg(m,idx)).join('');
-
-  // Add reaction click handlers after render
-  el.querySelectorAll('.rb-react-pill').forEach(pill=>{
-    pill.addEventListener('click', function(){
-      const msgId=this.dataset.msgid;
-      const emoji=this.dataset.emoji;
-      rbToggleReaction(msgId,emoji);
-    });
-  });
-
-  el.querySelectorAll('.rb-msg-react-btn').forEach(btn=>{
-    btn.addEventListener('click', function(e){
-      rbShowReactPicker(this.dataset.msgid,e);
-    });
-  });
-}
-
-function rbRenderMsg(m,idx){
-  if(m.type==='system'){
-    return`<div class="rb-sys-msg">${m.text}</div>`;
+  const msg = rbFindMsg(rbReplyToId);
+  if(!msg){
+    rbReplyToId = null;
+    bar.style.display='none';
+    bar.innerHTML='';
+    return;
   }
-  const isMe = m.sender===RB_MY_NAME;
-  const col = rbColor(m.sender);
-
-  // Reactions HTML
-  const reacts = m.reactions||{};
-  const reactHtml = Object.entries(reacts).filter(([e,users])=>users.length>0).map(([e,users])=>{
-    const mine=users.includes(RB_MY_NAME);
-    return`<div class="rb-react-pill${mine?' mine':''}" data-msgid="${m.id}" data-emoji="${e}">
-      <span>${e}</span><span class="rb-react-count">${users.length}</span>
-    </div>`;
-  }).join('');
-
-  const hasReacts = Object.values(reacts).some(u=>u.length>0);
-
-  let bubbleContent='';
-  if(m.type==='gif'){
-    bubbleContent=`<div class="rb-bubble gif-msg"><img src="${m.gifUrl}" alt="GIF" loading="lazy" onerror="this.style.display='none'"></div>`;
-  } else {
-    bubbleContent=`<div class="rb-bubble">${rbEscHtml(m.text)}</div>`;
-  }
-
-  return`<div class="rb-msg${isMe?' me':''}">
-    ${!isMe?`<div class="rb-msg-av" style="background:${col}">${rbIni(m.sender)}</div>`:''}
-    <div class="rb-msg-body">
-      ${!isMe?`<div class="rb-msg-name">${rbEscHtml(m.sender)}</div>`:''}
-      ${bubbleContent}
-      ${hasReacts?`<div class="rb-reactions">${reactHtml}</div>`:''}
-      <div class="rb-msg-time">${rbTime(m.ts)}</div>
+  const preview = msg.type === 'gif' ? '[GIF]' : (msg.text || '');
+  bar.innerHTML = `
+    <div>
+      <div class="rb-chat-replymeta">Replying to ${rbEscHtml(msg.sender)}</div>
+      <div class="rb-chat-replytext">${rbEscHtml(preview)}</div>
     </div>
-    <button class="rb-msg-react-btn" data-msgid="${m.id}">😊</button>
-  </div>`;
+    <button class="rb-chat-replyclose" onclick="rbClearReply()" aria-label="Cancel reply">×</button>
+  `;
+  bar.style.display='flex';
 }
 
-function rbEscHtml(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function rbClearReply(){
+  rbReplyToId = null;
+  rbRenderReplyBar();
+}
+
+function rbReplyTo(msgId){
+  rbReplyToId = msgId;
+  rbRenderReplyBar();
+  const input = document.getElementById('rbInput');
+  if(input) input.focus();
+}
+
+function rbQuoteMsg(msgId){
+  const msg = rbFindMsg(msgId);
+  if(!msg) return;
+  rbReplyTo(msgId);
+  if(msg.type === 'gif') return;
+  const input = document.getElementById('rbInput');
+  if(!input) return;
+  const quote = `> ${msg.text || ''}\n`;
+  if(!input.value.includes(quote)){
+    input.value = quote + input.value;
+    rbAutoResize(input);
+    rbUpdateSendBtn();
+  }
+  input.focus();
 }
 
 function rbScrollBottom(){
@@ -4063,33 +4081,72 @@ function rbScrollBottom(){
   if(el) el.scrollTop=el.scrollHeight;
 }
 
-// ── SEND ────────────────────────────────────────────────────
-function rbSend(){
-  const input=document.getElementById('rbInput');
-  const text=(input?.value||'').trim();
-  if(!text) return;
-  rbPostMsg({type:'text',text,tag:rbActiveTab==='all'?'general':rbActiveTab});
-  input.value='';
-  input.style.height='';
-  rbUpdateSendBtn();
-  rbClosePickersAll();
+function rbRenderMsg(m){
+  const isMe = m.sender===rbGetMyName();
+  const col = rbColor(m.sender);
+  const reply = m.replyTo ? rbFindMsg(m.replyTo) : null;
+  const reacts = m.reactions||{};
+  const reactHtml = Object.entries(reacts).filter(([,users])=>users.length>0).map(([e,users])=>{
+    const mine=users.includes(rbGetMyName());
+    return `<div class="rb-react-pill${mine?' mine':''}" data-msgid="${m.id}" data-emoji="${e}">
+      <span>${e}</span><span class="rb-react-count">${users.length}</span>
+    </div>`;
+  }).join('');
+  const hasReacts = Object.values(reacts).some(u=>u.length>0);
+  const replyHtml = reply ? `
+    <div class="rb-quoted">
+      <div class="rb-quoted-meta">${rbEscHtml(reply.sender)}</div>
+      <div class="rb-quoted-text">${rbEscHtml(reply.type==='gif'?'[GIF]':(reply.text||''))}</div>
+    </div>` : '';
+  const bubbleInner = m.type === 'gif'
+    ? `<div class="rb-bubble gif-msg"><img src="${rbEscAttr(m.gifUrl)}" alt="GIF" loading="lazy" onerror="this.style.display='none'"></div>`
+    : `<div class="rb-bubble">${rbEscHtml(m.text || '')}</div>`;
+
+  return `<div class="rb-msg${isMe?' me':''}">
+    ${!isMe?`<div class="rb-msg-av" style="background:${col}">${rbGetTeamAvatar(m.sender)}</div>`:''}
+    <div class="rb-msg-body">
+      ${!isMe?`<div class="rb-msg-name">${rbEscHtml(m.sender)}</div>`:''}
+      <div class="rb-bubble-wrap">
+        ${replyHtml}
+        ${bubbleInner}
+      </div>
+      <div class="rb-msg-actions">
+        <button class="rb-msg-action" onclick="rbReplyTo('${m.id}')">Reply</button>
+        <button class="rb-msg-action" onclick="rbQuoteMsg('${m.id}')">Quote</button>
+      </div>
+      ${hasReacts?`<div class="rb-reactions">${reactHtml}</div>`:''}
+      <div class="rb-msg-time">${rbTime(m.ts)}</div>
+    </div>
+    <button class="rb-msg-react-btn" data-msgid="${m.id}">😊</button>
+  </div>`;
 }
 
-function rbPostMsg(extra){
+function rbRender(){
   rbLoadChat();
-  const msg={
-    id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
-    sender:RB_MY_NAME,
-    ts:Date.now(),
-    reactions:{},
-    ...extra
-  };
-  rbChat.msgs.push(msg);
-  // Keep last 500 messages
-  if(rbChat.msgs.length>500) rbChat.msgs=rbChat.msgs.slice(-500);
-  rbSaveChat();
-  rbRender();
-  setTimeout(()=>rbScrollBottom(),50);
+  rbRenderReplyBar();
+  const el = document.getElementById('rbMsgs');
+  if(!el) return;
+  const msgs = Array.isArray(rbChat.msgs) ? rbChat.msgs : [];
+  const seasonLabel = Array.isArray(D?.teams) && D.teams.length ? `${D.teams.length} teams talking` : 'Season-long multiplayer thread';
+  const onlineEl = document.getElementById('rbOnlineCount');
+  if(onlineEl) onlineEl.textContent = seasonLabel;
+  if(!msgs.length){
+    el.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);padding:22px 0;"><div style="font-size:34px;">🔥</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No trash talk yet</div><div style="font-size:12px;">Start the season-long thread.</div></div>';
+    rbLastRenderedCount = 0;
+    return;
+  }
+  el.innerHTML = msgs.map(rbRenderMsg).join('');
+  rbLastRenderedCount = msgs.length;
+  el.querySelectorAll('.rb-react-pill').forEach(pill=>{
+    pill.addEventListener('click', function(){
+      rbToggleReaction(this.dataset.msgid,this.dataset.emoji);
+    });
+  });
+  el.querySelectorAll('.rb-msg-react-btn').forEach(btn=>{
+    btn.addEventListener('click', function(e){
+      rbShowReactPicker(this.dataset.msgid,e);
+    });
+  });
 }
 
 function rbUpdateSendBtn(){
@@ -4100,7 +4157,7 @@ function rbUpdateSendBtn(){
 
 function rbAutoResize(ta){
   ta.style.height='auto';
-  ta.style.height=Math.min(ta.scrollHeight,80)+'px';
+  ta.style.height=Math.min(ta.scrollHeight,110)+'px';
 }
 
 function rbInsertAt(text){
@@ -4113,8 +4170,32 @@ function rbInsertAt(text){
   rbUpdateSendBtn();
 }
 
-// ── REACTIONS ───────────────────────────────────────────────
-const RB_QUICK_REACTS=['👍','😂','🔥','💀','😤','🏆','😭','🤝'];
+function rbSend(){
+  const input=document.getElementById('rbInput');
+  const text=(input?.value||'').trim();
+  if(!text) return;
+  const msg={
+    id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    sender:rbGetMyName(),
+    ts:Date.now(),
+    type:'text',
+    text,
+    reactions:{},
+    replyTo:rbReplyToId || null
+  };
+  rbChat.msgs.push(msg);
+  rbSyncChatIntoSeason(true);
+  rbRender();
+  rbClearReply();
+  if(input){
+    input.value='';
+    input.style.height='';
+    input.focus();
+  }
+  rbUpdateSendBtn();
+  rbClosePickersAll();
+  setTimeout(()=>rbScrollBottom(),50);
+}
 
 function rbShowReactPicker(msgId,e){
   e.stopPropagation();
@@ -4136,14 +4217,15 @@ function rbHideReactPicker(){
 
 function rbToggleReaction(msgId,emoji){
   rbLoadChat();
-  const msg=rbChat.msgs.find(m=>m.id===msgId);
+  const msg=rbFindMsg(msgId);
   if(!msg) return;
   if(!msg.reactions) msg.reactions={};
   if(!msg.reactions[emoji]) msg.reactions[emoji]=[];
-  const idx=msg.reactions[emoji].indexOf(RB_MY_NAME);
+  const me = rbGetMyName();
+  const idx=msg.reactions[emoji].indexOf(me);
   if(idx>=0) msg.reactions[emoji].splice(idx,1);
-  else msg.reactions[emoji].push(RB_MY_NAME);
-  rbSaveChat();
+  else msg.reactions[emoji].push(me);
+  rbSyncChatIntoSeason(true);
   rbRender();
 }
 
@@ -4238,7 +4320,21 @@ function rbSearchGifs(query){
 }
 
 function rbSendGif(url){
-  rbPostMsg({type:'gif',gifUrl:url,text:'[GIF]',tag:rbActiveTab==='all'?'general':rbActiveTab});
+  rbLoadChat();
+  rbChat.msgs.push({
+    id:'g_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    sender:rbGetMyName(),
+    ts:Date.now(),
+    type:'gif',
+    gifUrl:url,
+    text:'[GIF]',
+    reactions:{},
+    replyTo:rbReplyToId || null
+  });
+  rbSyncChatIntoSeason(true);
+  rbRender();
+  rbClearReply();
+  setTimeout(()=>rbScrollBottom(),50);
   document.getElementById('rbGifPicker').classList.remove('open');
 }
 
@@ -4247,98 +4343,12 @@ function rbClosePickersAll(){
   document.getElementById('rbGifPicker')?.classList.remove('open');
 }
 
-// ── SYSTEM MESSAGES ─────────────────────────────────────────
-function rbPostSystem(text){
-  rbLoadChat();
-  rbChat.msgs.push({id:'s_'+Date.now(),type:'system',text,ts:Date.now(),tag:'system'});
-  rbSaveChat();
-  if(rbChatOpen) rbRender();
-  rbUpdateUnread();
-}
-
-// ── SIMULATE AI CHAT ACTIVITY ───────────────────────────────
-const RB_AI_NAMES=['Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters'];
-const RB_AI_MSGS=[
-  ['🔥 Just grabbed {player} off waivers. Y\'all sleepin!','trades'],
-  ['Who wants to trade? Looking for a C','trades'],
-  ['This lineup is LOCKED in 💪','general'],
-  ['Good luck this week everyone... you\'re gonna need it 😤','trash'],
-  ['That pick was TERRIBLE 💀','draft'],
-  ['Can\'t believe {player} fell this far in the draft','draft'],
-  ['My team is built different fr','general'],
-  ['Bro really started {player} with no game today 😂','trash'],
-  ['{player} going OFF tonight, thank me later','general'],
-  ['Let\'s get this W 🏆','general'],
-  ['Anyone else\'s team look elite rn?','general'],
-  ['That trade offer is lowball bro come on 😑','trades'],
-];
-const RB_AI_PLAYERS=['Jokic','Luka','SGA','Giannis','LeBron','Curry','Tatum','AD','KD','Wemby'];
-
-function rbSimulateActivity(){
-  // Post 1-3 messages from AI managers on first open if chat is empty
-  rbLoadChat();
-  if(rbChat.msgs.length>0) return;
-
-  // Seed with some initial messages
-  const count=3+Math.floor(Math.random()*3);
-  const now=Date.now();
-  for(let i=0;i<count;i++){
-    const name=RB_AI_NAMES[Math.floor(Math.random()*RB_AI_NAMES.length)];
-    const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
-    const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
-    const text=tmpl.replace('{player}',player);
-    rbChat.msgs.push({
-      id:'ai_'+i+'_'+now,
-      sender:name,
-      type:'text',
-      text,
-      tag,
-      ts:now-(count-i)*180000-(Math.random()*60000|0),
-      reactions:{}
-    });
-  }
-  rbSaveChat();
-  rbRender();
-  setTimeout(()=>rbScrollBottom(),100);
-
-  // Occasionally post new AI messages while chat is open
-  rbScheduleAiMsg();
-}
-
-function rbScheduleAiMsg(){
-  const delay=30000+Math.random()*90000; // 30-120 seconds
-  setTimeout(()=>{
-    if(!rbChatOpen) return;
-    const name=RB_AI_NAMES[Math.floor(Math.random()*RB_AI_NAMES.length)];
-    const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
-    const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
-    const text=tmpl.replace('{player}',player);
-    rbPostMsg({sender:name,type:'text',text,tag,ts:Date.now(),reactions:{},id:'ai_live_'+Date.now()});
-    // Override sender since rbPostMsg uses RB_MY_NAME
-    rbLoadChat();
-    const last=rbChat.msgs[rbChat.msgs.length-1];
-    if(last&&last.id.startsWith('ai_live')) last.sender=name;
-    rbSaveChat();
-    rbRender();
-    setTimeout(()=>rbScrollBottom(),50);
-    rbUpdateUnread();
-    rbScheduleAiMsg();
-  },delay);
-}
-
 // ── INIT ────────────────────────────────────────────────────
-// Post system message on load
 (function(){
   rbLoadChat();
-  const context=RB_CONTEXT==='draft'?'📋 Draft Room opened':'🏀 Season Manager opened';
-  // Only post system msg if no recent one
-  const recent=rbChat.msgs.filter(m=>m.type==='system'&&Date.now()-m.ts<5000);
-  if(!recent.length) rbPostSystem(context+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
   rbRender();
   rbMarkSeen();
   setTimeout(()=>rbScrollBottom(),100);
-  rbSimulateActivity();
-  rbUpdateUnread();
 
   // Close pickers when clicking outside
   document.addEventListener('click',e=>{
@@ -4353,12 +4363,12 @@ function rbScheduleAiMsg(){
   // Poll for new messages from other sessions every 5 seconds
   setInterval(()=>{
     if(rbChatOpen){
-      const prev=rbChat.msgs.length;
       rbLoadChat();
-      if(rbChat.msgs.length!==prev){ rbRender(); setTimeout(()=>rbScrollBottom(),50); }
-    } else {
-      rbLoadChat();
-      rbUpdateUnread();
+      if(rbChat.msgs.length!==rbLastRenderedCount){
+        const stickToBottom = Math.abs((document.getElementById('rbMsgs')?.scrollHeight || 0) - ((document.getElementById('rbMsgs')?.scrollTop || 0) + (document.getElementById('rbMsgs')?.clientHeight || 0))) < 80;
+        rbRender();
+        if(stickToBottom) setTimeout(()=>rbScrollBottom(),50);
+      }
     }
   },5000);
 })();
