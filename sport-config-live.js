@@ -10,7 +10,7 @@
     nba:{
       key:'nba',label:'NBA',icon:'\u{1F3C0}',leagueLabel:'Pro Hoops Season',defaultLeagueSize:10,defaultRounds:13,defaultScoring:'h2h_cat',defaultFormat:'snake',timer:90,playerCount:240,
       filters:['ALL','PG','SG','SF','PF','C'],waiverPositions:['ALL','PG','SG','SF','PF','C'],
-      starterSlots:['PG','SG','SF','PF','C','G','F','UTIL'],myTeamSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','BN'],
+      starterSlots:['PG','SG','SF','PF','C','G','F','UTIL'],myTeamSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','IR'],
       commissionerScoringType:'H2H Points',
       scoringInfo:{h2h_cat:'Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',h2h_pts:'Weekly matchup by total fantasy pts. PTS=1, REB=1.2, AST=1.5, STL=3, BLK=3, TO=-1, 3PM=0.5.',roto:'Season-long ranking in each stat category. Best cumulative rank total wins.',points:'Pure accumulation. Best total fantasy points all season wins.'},
       teamCodes:['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS']

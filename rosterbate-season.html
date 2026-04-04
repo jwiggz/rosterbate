@@ -235,13 +235,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     .season-chip.action{background:#121a29;color:#f8fafc;}
     #hub .sb{background:#0b1220;}
     #hub .bg{background:#2563eb;color:#fff;border:none;}
-    #hub .rb-chat-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
-    #hub .rb-chat-hdr,#hub .rb-chat-tabs,#hub .rb-chat-input-area{background:#121a29;}
+    #hub .rb-chat-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;box-shadow:0 10px 28px rgba(2,6,23,.28);height:420px;max-height:420px;overflow:hidden;}
+    #hub .rb-chat-hdr,#hub .rb-chat-input-area{background:#121a29;}
     #hub .rb-chat-hdr{justify-content:center;text-align:center;}
     #hub .rb-chat-hdr > div{flex:none !important;}
     #hub .rb-chat-msgs{background:#0f1724;}
-    #hub .rb-chat-tab{color:#94a3b8;}
-    #hub .rb-chat-tab.on{color:#2563eb;border-bottom-color:#f59e0b;}
     ::-webkit-scrollbar{width:10px;height:10px;}
     ::-webkit-scrollbar-track{background:#0f1724;}
     ::-webkit-scrollbar-thumb{background:#334155;border-radius:999px;border:2px solid #0f1724;}
@@ -1294,7 +1292,7 @@ function getIlRoster(teamIdx){
 function isIlEligiblePlayer(player, injury){
   const label=String(injury?.label||'').toUpperCase();
   if(CURRENT_SPORT==='mlb') return ['IL','IR','O','OUT'].includes(label);
-  return label==='IR'||label==='OUT';
+  return ['IR','O','OUT','IL'].includes(label);
 }
 
 function rebuildLineupsAfterRosterChange(teamIdx){
@@ -2544,6 +2542,7 @@ function renderRoster(){
     return entries.map(entry=>{
     const isMoveSource=!!(movePlayer && entry.player && entry.player.id===movePlayer.id);
     const canMoveHere=!!(movePlayer && !isMoveSource && canMoveToRosterEntry(movePlayer,day,entry,starterIds,roster));
+    const moveModeBlocked=!!(movePlayer && !isMoveSource && !canMoveHere);
     const rowBg=isMoveSource?'#22180d':(canMoveHere?'rgba(245,158,11,.08)':'');
     const rowBorder=isMoveSource?'#f59e0b':(canMoveHere?'rgba(245,158,11,.5)':'');
     const rowCellStyle=rowBorder?`background:${rowBg};border-top:1px solid ${rowBorder};border-bottom:1px solid ${rowBorder};`:''; 
@@ -2560,7 +2559,11 @@ function renderRoster(){
             </div>
           </div>
         </td>
-        <td${rowCellAttr}>${canMoveHere?`<button class="lineup-move-btn" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',null,${entry.isStarter?entry.index:'null'})">Move Here</button>`:`<span class="season-soft-muted" style="font-weight:700;">Empty</span>`}</td>
+        <td${rowCellAttr}>${canMoveHere
+          ? `<button class="lineup-move-btn" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',null,${entry.isStarter?entry.index:'null'})">Move Here</button>`
+          : moveModeBlocked
+            ? `<span class="lineup-move-btn" style="opacity:.32;border-color:rgba(100,116,139,.35);color:#64748b;cursor:not-allowed;pointer-events:none;">Move</span>`
+            : `<span class="season-soft-muted" style="font-weight:700;">Empty</span>`}</td>
         <td${rowCellAttr}>--</td>
         <td${rowCellAttr}>${statusBadge(entry.isIL?entry.slot:'Open')}</td>
         <td${rowCellAttr}>--</td>
@@ -2578,6 +2581,8 @@ function renderRoster(){
       ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="clearMoveMode()">Cancel</button>`
       : canMoveHere
         ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',${entry.slot==='BN'&&entry.player?entry.player.id:'null'},${entry.isStarter?starterIds.indexOf(entry.player?.id):'null'})">Move Here</button>`
+      : moveModeBlocked
+        ? `<span class="lineup-move-btn" style="opacity:.32;border-color:rgba(100,116,139,.35);color:#64748b;cursor:not-allowed;pointer-events:none;">Move</span>`
       : entry.isIL
       ? (isLocked
           ? `<span class="season-soft-muted" style="font-weight:700;">Locked</span>`
@@ -2846,8 +2851,8 @@ function applyMoveChoice(pid,day,targetSlot,targetBenchPlayerId=null,targetStart
     }
     setLineupForDay(day,starterIds);
     queueSharedSeasonSave('move_player');
-    renderRoster();
     moveCtx=null;
+    renderRoster();
     toast(player.name+' moved to bench.');
     return;
   }
@@ -2877,8 +2882,8 @@ function applyMoveChoice(pid,day,targetSlot,targetBenchPlayerId=null,targetStart
   }
   setLineupForDay(day,starterIds);
   queueSharedSeasonSave('move_player');
-  renderRoster();
   moveCtx=null;
+  renderRoster();
   const displacedMovedToIl=currentSlot===ilSlotKey && displacedPlayer && isIlEligiblePlayer(displacedPlayer,displacedInjury) && currentIndex<0;
   toast(displacedPlayer?`${player.name} moved to ${targetSlot}; ${displacedPlayer.name} moved to ${displacedMovedToIl?ilSlotKey:'bench'}.`:`${player.name} moved to ${targetSlot}.`);
 }
@@ -3810,25 +3815,21 @@ function commPlayoffs(){
 .rb-chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
 
 /* Messages */
-.rb-chat-msgs{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:2px;-webkit-overflow-scrolling:touch;}
+.rb-chat-msgs{flex:1;min-height:0;height:280px;max-height:280px;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:2px;-webkit-overflow-scrolling:touch;}
 .rb-chat-msgs::-webkit-scrollbar{width:8px;}
 
 /* Message bubble */
 .rb-msg{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;animation:msgIn .15s ease;}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.rb-msg.me{flex-direction:row-reverse;}
 .rb-msg-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;}
 .rb-msg-body{max-width:82%;display:flex;flex-direction:column;align-items:flex-start;gap:4px;}
-.rb-msg.me .rb-msg-body{align-items:flex-end;}
 .rb-msg-name{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px;padding:0 4px;}
 .rb-bubble-wrap{display:flex;flex-direction:column;gap:6px;}
-.rb-msg.me .rb-msg-name{display:none;}
 .rb-quoted{padding:8px 10px;border-radius:12px;background:rgba(15,23,36,.94);border:1px solid rgba(56,189,248,.18);max-width:100%;}
-.rb-msg.me .rb-quoted{background:rgba(11,18,32,.28);border-color:rgba(255,255,255,.24);}
 .rb-quoted-meta{font-size:10px;font-family:var(--fd);font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#38bdf8;margin-bottom:3px;}
 .rb-quoted-text{font-size:12px;color:var(--text2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .rb-bubble{background:var(--card);border:1px solid rgba(59,130,246,.14);border-radius:14px 14px 14px 3px;padding:9px 12px;font-size:13px;color:var(--text);line-height:1.45;position:relative;word-break:break-word;}
-.rb-msg.me .rb-bubble{background:var(--accent);border-color:var(--accent);color:#fff;border-radius:14px 14px 3px 14px;}
+.rb-msg.me .rb-bubble{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.35);color:#f8fafc;}
 .rb-bubble.gif-msg{padding:4px;background:transparent;border-color:transparent;}
 .rb-bubble.gif-msg img{border-radius:10px;max-width:180px;max-height:160px;display:block;}
 .rb-msg.me .rb-bubble.gif-msg{background:transparent;border-color:transparent;}
@@ -4103,9 +4104,9 @@ function rbRenderMsg(m){
     : `<div class="rb-bubble">${rbEscHtml(m.text || '')}</div>`;
 
   return `<div class="rb-msg${isMe?' me':''}">
-    ${!isMe?`<div class="rb-msg-av" style="background:${col}">${rbGetTeamAvatar(m.sender)}</div>`:''}
+    <div class="rb-msg-av" style="background:${col}">${rbGetTeamAvatar(m.sender)}</div>
     <div class="rb-msg-body">
-      ${!isMe?`<div class="rb-msg-name">${rbEscHtml(m.sender)}</div>`:''}
+      <div class="rb-msg-name">${rbEscHtml(isMe ? `${m.sender} · You` : m.sender)}</div>
       <div class="rb-bubble-wrap">
         ${replyHtml}
         ${bubbleInner}
