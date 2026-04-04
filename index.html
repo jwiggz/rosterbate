@@ -232,6 +232,7 @@
         </div>
         <div id="accountMenu" class="account-menu">
           <button class="account-item" onclick="openMyProfile()">My Profile</button>
+          <button class="account-item" onclick="openMyLeagues()">My Leagues</button>
           <button class="account-item" onclick="openMessages()">Messages</button>
           <button class="account-item" onclick="openSettings()">Settings</button>
           <button class="account-item danger" onclick="logoutUser()">Log Out</button>
@@ -800,6 +801,10 @@ function openMessages(){
   localStorage.setItem('rbMessagesLastSeen', String(Date.now()));
   updateNavNotificationBadge(0);
   window.location.href='messages.html';
+}
+function openMyLeagues(){
+  closeAccountMenu();
+  window.location.href='my-leagues.html';
 }
 async function openMyProfile(){
   closeAccountMenu();

@@ -2755,12 +2755,14 @@ function endDraft(){
     const isMultiplayer=!!(lobbyState?.lobbyId && orderedLobbyPlayers.length===teamCount);
     const teamUsers=isMultiplayer
       ? orderedLobbyPlayers.reduce((acc,player,idx)=>{
-          if(player?.id){
-            acc[player.id]={
-              id:player.id,
-              name:player.name||('Team '+(idx+1)),
-              teamIdx:idx,
-              joinedAt:Number(player.joinedAt||0)
+        if(player?.id){
+          acc[player.id]={
+            id:player.id,
+            uid:player.uid||null,
+            userNumber:Number(player.userNumber||0),
+            name:player.name||('Team '+(idx+1)),
+            teamIdx:idx,
+            joinedAt:Number(player.joinedAt||0)
             };
           }
           return acc;

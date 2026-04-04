@@ -624,6 +624,8 @@ function buildMultiplayerLobbyState(lobby){
     teamSize:lobby.teamSize,
     settings:lobby.settings||null,
     myId, myName,
+    myUid: currentRbUser?.uid || null,
+    myUserNumber: myUserNumber || 0,
     players:Object.values(lobby.players||{})
   };
 }
@@ -1020,7 +1022,12 @@ async function leaveLeague(lobbyId, refreshLive){
 
 async function joinLobby(lobbyId){
   await db.ref('lobbies/'+lobbyId+'/players/'+myId).set({
-    id:myId, name:myName, joinedAt:Date.now(), ready:false
+    id:myId,
+    uid:currentRbUser?.uid || null,
+    userNumber:myUserNumber || 0,
+    name:myName,
+    joinedAt:Date.now(),
+    ready:false
   });
   currentLobbyId=lobbyId;
   myReady=false;

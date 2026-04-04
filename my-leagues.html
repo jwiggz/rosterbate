@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RosterBate - My Leagues</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+  :root{
+    --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+    --accent:#f97316;--accent2:#fb923c;--green:#22c55e;--blue:#60a5fa;--red:#ef4444;
+    --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+    --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(circle at top,rgba(249,115,22,.08),transparent 30%),var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh}
+  a{text-decoration:none;color:inherit}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);background:rgba(10,14,26,.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+  .brand{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
+  .brand span{color:var(--accent)}
+  .top-actions{display:flex;gap:10px;align-items:center}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:11px 16px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;border:none}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+  .btn.small{padding:9px 12px;font-size:13px}
+  .shell{max-width:1320px;margin:0 auto;padding:28px 20px 40px}
+  .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:24px}
+  .hero h1{font-family:var(--fd);font-size:42px;font-weight:900;letter-spacing:.4px}
+  .hero p{color:var(--text2);font-size:15px;line-height:1.6;max-width:760px}
+  .section{margin-top:22px}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .section-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.6px}
+  .section-sub{color:var(--text3);font-size:12px;text-transform:uppercase;letter-spacing:.9px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+  .league-card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:210px}
+  .league-card.complete{border-color:rgba(34,197,94,.24)}
+  .league-card.waiting{border-color:rgba(96,165,250,.22)}
+  .league-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .league-title{font-family:var(--fd);font-size:28px;font-weight:900;line-height:1}
+  .league-meta{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+  .pill.live{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
+  .pill.waiting{color:#93c5fd;border-color:rgba(96,165,250,.26);background:rgba(96,165,250,.08)}
+  .pill.complete{color:#fde68a;border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.08)}
+  .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  .stat-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1}
+  .stat-label{margin-top:6px;color:var(--text3);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
+  .league-copy{color:var(--text2);font-size:13px;line-height:1.6;min-height:42px}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:28px;text-align:center;color:var(--text2)}
+  .empty h3{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;margin-bottom:8px}
+  .empty p{font-size:14px;line-height:1.6;max-width:460px;margin:0 auto}
+  .banner{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);border-radius:16px;padding:14px 16px;color:#dbeafe;font-size:13px;line-height:1.6;margin-bottom:18px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--green);color:#fff;padding:12px 18px;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  @media (max-width:720px){
+    .topbar{padding:16px}
+    .hero{flex-direction:column;align-items:flex-start}
+    .hero h1{font-size:34px}
+    .stats{grid-template-columns:1fr}
+    .actions{flex-direction:column}
+    .btn{width:100%}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html" class="brand">Roster<span>Bate</span></a>
+    <div class="top-actions">
+      <a href="messages.html" class="btn secondary small">Messages</a>
+      <a href="profile.html" class="btn secondary small">Settings</a>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="hero">
+      <div>
+        <h1>My Leagues</h1>
+        <p>Jump back into any league tied to your account. Draft rooms stay grouped separately from shared season leagues so it’s easy to reopen the right experience.</p>
+      </div>
+      <a href="rosterbate-matchmaking.html" class="btn primary">Create or Join League</a>
+    </div>
+
+    <div class="banner" id="leagueBanner">Loading your leagues…</div>
+
+    <div class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Draft Rooms</div>
+          <div class="section-sub">Waiting and in-progress multiplayer drafts</div>
+        </div>
+      </div>
+      <div class="grid" id="draftList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Season Leagues</div>
+          <div class="section-sub">Shared multiplayer seasons and completed leagues</div>
+        </div>
+      </div>
+      <div class="grid" id="seasonList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
+  authDomain: "rosterbate-51339.firebaseapp.com",
+  databaseURL: "https://rosterbate-51339-default-rtdb.firebaseio.com",
+  projectId: "rosterbate-51339",
+  storageBucket: "rosterbate-51339.firebasestorage.app",
+  messagingSenderId: "951275364572",
+  appId: "1:951275364572:web:758d1b4d970b7b87c05419",
+  measurementId: "G-DNSFKMKYVC"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+const SHARED_SEASON_ROOT='multiplayerSeasons';
+const localPlayerId=localStorage.getItem('rbPlayerId') || '';
+const localPlayerName=localStorage.getItem('rbPlayerName') || 'Manager';
+const localUserNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+let currentUser=null;
+let currentUserNumber=localUserNumber;
+let currentUsername=localPlayerName;
+
+function toast(msg,color){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=color||'var(--green)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatLabel(v){
+  return ({snake:'Snake',auction:'Auction',linear:'Linear'}[String(v||'').toLowerCase()] || String(v||'—'));
+}
+
+function scoringLabel(v){
+  return ({h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points'}[String(v||'').toLowerCase()] || String(v||'—'));
+}
+
+function sportLabel(v){
+  return ({nba:'NBA',nfl:'NFL',mlb:'MLB'}[String(v||'').toLowerCase()] || String(v||'').toUpperCase() || 'League');
+}
+
+function formatDate(ts){
+  const n=Number(ts||0);
+  if(!n) return '—';
+  return new Date(n).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function setBanner(text){
+  const el=document.getElementById('leagueBanner');
+  if(el) el.textContent=text;
+}
+
+function memberMatches(member){
+  if(!member || typeof member!=='object') return false;
+  const memberId=String(member.id||'');
+  const memberUid=String(member.uid||'');
+  const memberName=String(member.name||'').trim().toLowerCase();
+  const memberUserNumber=Number(member.userNumber||0);
+  if(currentUser?.uid && memberUid && memberUid===currentUser.uid) return true;
+  if(currentUserNumber>0 && memberUserNumber>0 && memberUserNumber===currentUserNumber) return true;
+  if(localPlayerId && memberId && memberId===localPlayerId) return true;
+  if(currentUsername && memberName && memberName===String(currentUsername).trim().toLowerCase()) return true;
+  return false;
+}
+
+function getLobbyMember(lobby){
+  const players=Object.values(lobby?.players||{});
+  return players.find(memberMatches) || null;
+}
+
+function getSeasonMember(payload){
+  const users=Object.values(payload?.draft?.teamUsers||{});
+  return users.find(memberMatches) || null;
+}
+
+function buildLobbyStateFromLobby(id,lobby,member){
+  return {
+    lobbyId:id,
+    name:lobby.name||'RosterBate League',
+    sport:lobby.sport||'nba',
+    format:lobby.format||'snake',
+    scoring:lobby.scoring||'h2h_pts',
+    teamSize:Number(lobby.teamSize||Object.keys(lobby.players||{}).length||10),
+    settings:lobby.settings||null,
+    myId:(member?.id || localPlayerId || ''),
+    myName:(member?.name || currentUsername || localPlayerName || 'Manager'),
+    myUid:(member?.uid || currentUser?.uid || null),
+    myUserNumber:Number(member?.userNumber || currentUserNumber || 0),
+    players:Object.values(lobby.players||{})
+  };
+}
+
+function buildLobbyStateFromSeason(id,payload,member){
+  const draft=payload?.draft||{};
+  const teamUsers=Object.values(draft.teamUsers||{});
+  return {
+    lobbyId:id,
+    name:draft.leagueName||'RosterBate League',
+    sport:draft.sport||'nba',
+    format:draft.draftFormat||'snake',
+    scoring:draft.scoringFormat||'h2h_pts',
+    teamSize:Number(draft.leagueSize||teamUsers.length||0),
+    settings:draft.customRules||null,
+    myId:(member?.id || localPlayerId || ''),
+    myName:(member?.name || currentUsername || localPlayerName || 'Manager'),
+    myUid:(member?.uid || currentUser?.uid || null),
+    myUserNumber:Number(member?.userNumber || currentUserNumber || 0),
+    players:teamUsers
+  };
+}
+
+function renderEmpty(hostId,title,copy){
+  const host=document.getElementById(hostId);
+  if(!host) return;
+  host.innerHTML=`<div class="empty"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(copy)}</p></div>`;
+}
+
+function renderDrafts(rows){
+  const host=document.getElementById('draftList');
+  if(!host) return;
+  if(!rows.length){
+    renderEmpty('draftList','No Draft Rooms Yet','When you join or create a multiplayer draft, it will show up here.');
+    return;
+  }
+  host.innerHTML=rows.map(row=>`
+    <div class="league-card ${row.status==='waiting'?'waiting':''}">
+      <div class="league-card-top">
+        <div>
+          <div class="league-title">${escapeHtml(row.name)}</div>
+          <div class="league-meta" style="margin-top:8px;">
+            <span class="pill ${row.status==='started'?'live':'waiting'}">${row.status==='started'?'Live Draft':'Waiting Room'}</span>
+            <span class="pill">${escapeHtml(sportLabel(row.sport))}</span>
+            <span class="pill">${escapeHtml(formatLabel(row.format))}</span>
+            <span class="pill">${escapeHtml(scoringLabel(row.scoring))}</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
+        <div class="stat"><div class="stat-value">${Number(row.joinedCount||0)}</div><div class="stat-label">Joined</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'—'))}</div><div class="stat-label">My Seat</div></div>
+      </div>
+      <div class="league-copy">Created ${escapeHtml(formatDate(row.createdAt))}. ${row.status==='started'?'Jump back into the live board.':'Open the waiting room and keep the league moving.'}</div>
+      <div class="actions">
+        <button class="btn primary small" onclick="openDraftLeague('${row.id}')">${row.status==='started'?'Open Draft':'Open Lobby'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderSeasons(rows){
+  const host=document.getElementById('seasonList');
+  if(!host) return;
+  if(!rows.length){
+    renderEmpty('seasonList','No Shared Seasons Yet','Finish a multiplayer draft and its season league will appear here.');
+    return;
+  }
+  host.innerHTML=rows.map(row=>`
+    <div class="league-card ${row.complete?'complete':''}">
+      <div class="league-card-top">
+        <div>
+          <div class="league-title">${escapeHtml(row.name)}</div>
+          <div class="league-meta" style="margin-top:8px;">
+            <span class="pill ${row.complete?'complete':'live'}">${row.complete?'Completed':'Season Active'}</span>
+            <span class="pill">${escapeHtml(sportLabel(row.sport))}</span>
+            <span class="pill">${escapeHtml(formatLabel(row.format))}</span>
+            <span class="pill">${escapeHtml(scoringLabel(row.scoring))}</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'—'))}</div><div class="stat-label">My Seat</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.updatedLabel||'—'))}</div><div class="stat-label">Updated</div></div>
+      </div>
+      <div class="league-copy">${row.complete?'This season is already finished, but you can reopen it to review standings and league history.':'Open the shared season manager and continue playing through the real season.'}</div>
+      <div class="actions">
+        <button class="btn primary small" onclick="openSeasonLeague('${row.id}')">Open Season</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadMyLeagues(){
+  setBanner('Loading your leagues…');
+  const [lobbiesSnap,seasonsSnap]=await Promise.all([
+    db.ref('lobbies').once('value').catch(()=>null),
+    db.ref(SHARED_SEASON_ROOT).once('value').catch(()=>null)
+  ]);
+
+  const drafts=[];
+  if(lobbiesSnap?.exists?.()){
+    lobbiesSnap.forEach(child=>{
+      const lobby=child.val()||{};
+      const member=getLobbyMember(lobby);
+      if(!member) return;
+      drafts.push({
+        id:child.key,
+        name:lobby.name||'RosterBate League',
+        sport:lobby.sport||'nba',
+        format:lobby.format||'snake',
+        scoring:lobby.scoring||'h2h_pts',
+        teamSize:Number(lobby.teamSize||0),
+        joinedCount:Object.keys(lobby.players||{}).length,
+        status:lobby.status||'waiting',
+        createdAt:Number(lobby.createdAt||0),
+        mySeat:Number(Object.values(lobby.players||{}).findIndex(p=>String(p?.id||'')===String(member.id||'')))+1,
+        lobby,
+        member
+      });
+    });
+  }
+  drafts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+
+  const seasons=[];
+  if(seasonsSnap?.exists?.()){
+    seasonsSnap.forEach(child=>{
+      const payload=child.val()||{};
+      const member=getSeasonMember(payload);
+      if(!member) return;
+      const draft=payload.draft||{};
+      seasons.push({
+        id:child.key,
+        name:draft.leagueName||'RosterBate League',
+        sport:draft.sport||'nba',
+        format:draft.draftFormat||'snake',
+        scoring:draft.scoringFormat||'h2h_pts',
+        teamSize:Number(draft.leagueSize||Object.keys(draft.teamUsers||{}).length||0),
+        mySeat:Number(member.teamIdx||0)+1,
+        complete:!!payload.game?.isSeasonComplete,
+        updatedAt:Number(payload.updatedAt||0),
+        updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
+        payload,
+        member
+      });
+    });
+  }
+  seasons.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+
+  renderDrafts(drafts);
+  renderSeasons(seasons);
+  const total=drafts.length+seasons.length;
+  setBanner(total ? `Found ${total} league${total===1?'':'s'} tied to your account.` : 'No leagues tied to your account yet.');
+  window.__rbDraftRows=drafts;
+  window.__rbSeasonRows=seasons;
+}
+
+function openDraftLeague(id){
+  const row=(window.__rbDraftRows||[]).find(x=>x.id===id);
+  if(!row) return;
+  const state=buildLobbyStateFromLobby(id,row.lobby,row.member);
+  try{ localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state)); }catch(e){}
+  window.location.href='rosterbate-draft.html?lobby='+encodeURIComponent(id);
+}
+
+function openSeasonLeague(id){
+  const row=(window.__rbSeasonRows||[]).find(x=>x.id===id);
+  if(!row) return;
+  const state=buildLobbyStateFromSeason(id,row.payload,row.member);
+  try{ localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state)); }catch(e){}
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(row.payload.draft||{})); }catch(e){}
+  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba');
+}
+
+auth.onAuthStateChanged(async user=>{
+  currentUser=user||null;
+  if(currentUser){
+    const snap=await db.ref('users/' + currentUser.uid).once('value').catch(()=>null);
+    const profile=snap?.val?.() || {};
+    currentUserNumber=Number(profile.userNumber || localStorage.getItem('rbUserNumber') || 0);
+    currentUsername=String(profile.username || localStorage.getItem('rbPlayerName') || localPlayerName || 'Manager');
+    if(currentUserNumber) localStorage.setItem('rbUserNumber', String(currentUserNumber));
+    if(currentUsername) localStorage.setItem('rbPlayerName', currentUsername);
+  }else{
+    currentUserNumber=Number(localStorage.getItem('rbUserNumber') || 0);
+    currentUsername=String(localStorage.getItem('rbPlayerName') || localPlayerName || 'Manager');
+  }
+  try{
+    await loadMyLeagues();
+  }catch(e){
+    console.error(e);
+    setBanner('Could not load your leagues right now.');
+    renderEmpty('draftList','Unable to Load Draft Rooms','Try refreshing in a moment.');
+    renderEmpty('seasonList','Unable to Load Season Leagues','Try refreshing in a moment.');
+    toast('Could not load leagues','var(--red)');
+  }
+});
+</script>
+</body>
+</html>
