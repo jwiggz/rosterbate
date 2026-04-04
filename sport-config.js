@@ -25,7 +25,7 @@
     },
     mlb:{
       key:'mlb',label:'MLB',icon:'\u{26BE}',leagueLabel:'Pro Baseball Season',defaultLeagueSize:10,defaultRounds:20,defaultScoring:'points',defaultFormat:'snake',timer:90,playerCount:320,
-      filters:['ALL','C','1B','2B','3B','SS','OF','P'],waiverPositions:['ALL','C','1B','2B','3B','SS','OF','P'],
+      filters:['ALL','C','1B','2B','3B','SS','OF','P','SP','RP'],waiverPositions:['ALL','C','1B','2B','3B','SS','OF','P','SP','RP'],
       starterSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P'],myTeamSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P','BN','BN','BN','IL','IL','IL'],
       commissionerScoringType:'Points',
       scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in later.',h2h_pts:'Head-to-head points using hitter and pitcher events across the week.',roto:'Season-long ranking by cumulative points for now.',points:'Primary MLB default: Single 1, Double 2, Triple 3, HR 4, RBI 1, Run 1, BB 1, SB 2, IP 3, SO 1, Win 5, Save 5, ER -2.'},
