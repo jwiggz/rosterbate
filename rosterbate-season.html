@@ -178,6 +178,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .season-soft-muted{color:#94a3b8;}
 .season-hero-card{background:#121a29;border-top:4px solid #f59e0b;border-radius:14px;border-left:1px solid #24324a;border-right:1px solid #24324a;border-bottom:1px solid #24324a;box-shadow:0 10px 28px rgba(2,6,23,.28);}
 .season-split-grid{display:grid;gap:16px;}
+.season-matchup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start;}
 .season-outline-btn{background:#0f1724;border:1px solid #3b82f6;color:#93c5fd;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .season-action-btn{background:#f59e0b;border:none;color:#fff;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .lineup-move-btn{display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:7px 14px;border-radius:999px;border:1px solid #3b82f6;background:#0f1724;color:#93c5fd;font-family:var(--fb);font-size:13px;font-weight:700;cursor:pointer;}
@@ -207,6 +208,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 }
 @media (min-width: 980px){
   .season-split-grid{grid-template-columns:1.1fr .9fr;}
+}
+@media (max-width: 1180px){
+  .season-matchup-grid{grid-template-columns:1fr;}
 }
     @media (min-width: 1080px){
       .hub-shell{grid-template-columns:300px 220px minmax(560px,1fr) 360px;}
@@ -363,7 +367,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
           </div>
           <div class="hub-actions" style="margin-top:12px;">
             <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">👕</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
-            <button onclick="openPicker()" class="card hub-action"><div class="hub-action-icon">👥</div><div><div class="hub-action-title">League</div><div class="hub-action-sub">Open team directory</div></div></button>
+            <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">⚔️</div><div><div class="hub-action-title">Matchup</div><div class="hub-action-sub">Open the head-to-head box score</div></div></button>
             <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">📋</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">— available</div></div></button>
             <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">🏆</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">—</div></div></button>
           </div>
@@ -424,13 +428,33 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
       </div>
     </div>
     <div class="season-topmeta">
-      <button class="season-chip action" onclick="openPicker()">League</button>
+      <button class="season-chip action" onclick="goPage('matchup')">Matchup</button>
       <a href="index.html" class="season-chip action" id="rosterHomeLink" style="text-decoration:none;">Home</a>
     </div>
   </div>
   <div class="season-page-note">Set each day's lineup before the reveal. Once a day unlocks, that lineup is locked.</div>
   <div class="sbb season-light-body" style="display:flex;flex-direction:column;" id="rosterContent"></div>
   <div class="bn" id="rn"></div>
+</div>
+
+<!-- MATCHUP -->
+<div id="matchup" class="screen">
+  <div class="season-subbar">
+    <div class="season-subbar-left">
+      <button class="season-back" onclick="goPage('roster')">←</button>
+      <div>
+        <div class="season-subbar-title">Matchup</div>
+        <div class="season-subbar-copy" id="mWk"></div>
+      </div>
+    </div>
+    <div class="season-topmeta">
+      <button class="season-chip action" onclick="goPage('roster')">My Team</button>
+      <a href="index.html" class="season-chip action" id="matchupHomeLink" style="text-decoration:none;">Home</a>
+    </div>
+  </div>
+  <div class="season-page-note">Daily head-to-head view. Both lineups are shown side by side for the selected day.</div>
+  <div class="sbb season-light-body" style="display:flex;flex-direction:column;" id="matchupContent"></div>
+  <div class="bn" id="mn"></div>
 </div>
 
 <!-- WAIVER -->
@@ -563,8 +587,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 <div class="mo" id="pickerModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="ms">
     <div class="mh"></div>
-    <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#111827;margin-bottom:4px;">League Teams</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:14px;">Tap any team to view their full roster.</div>
+    <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;margin-bottom:4px;">League Teams</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:14px;">Tap any team to view their full roster.</div>
     <div id="pickerList"></div>
   </div>
 </div>
@@ -575,14 +599,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <div class="mh"></div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
       <div id="vAv" class="pav" style="width:52px;height:52px;font-size:20px;"></div>
-      <div style="flex:1;min-width:0;"><div id="vName" style="font-family:var(--fb);font-size:24px;font-weight:800;line-height:1;color:#111827;"></div><div id="vRec" style="font-size:13px;color:#6b7280;margin-top:3px;"></div></div>
+        <div style="flex:1;min-width:0;"><div id="vName" style="font-family:var(--fb);font-size:24px;font-weight:800;line-height:1;color:#f8fafc;"></div><div id="vRec" style="font-size:13px;color:#94a3b8;margin-top:3px;"></div></div>
       <div id="vMe" style="display:none;background:#22180d;border:1px solid #7c4a18;border-radius:999px;padding:5px 10px;font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#fdba74;">Your Team</div>
     </div>
     <div id="vStats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
     <div id="vMatchup" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text2);"></div>
-    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#15803d;margin-bottom:8px;">Starting Lineup</div>
+    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#22c55e;margin-bottom:8px;">Starting Lineup</div>
     <div id="vStarters"></div>
-    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:12px 0 8px;">Bench</div>
+    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:12px 0 8px;">Bench</div>
     <div id="vBench"></div>
     <div id="vActions" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
   </div>
@@ -635,9 +659,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 <script>
 const TC={ATL:'#C1272D',BOS:'#007A33',BKN:'#000000',CHA:'#00788C',CHI:'#CE1141',CLE:'#860038',DAL:'#00538C',DEN:'#0E2240',DET:'#C8102E',GSW:'#1D428A',HOU:'#CE1141',IND:'#002D62',LAC:'#C8102E',LAL:'#552583',MEM:'#5D76A9',MIA:'#98002E',MIL:'#00471B',MIN:'#0C2340',NOP:'#0C2340',NYK:'#F58426',OKC:'#007AC1',ORL:'#0077C0',PHI:'#006BB6',PHX:'#1D1160',POR:'#E03A3E',SAC:'#5A2D81',SAS:'#C4CED4',TOR:'#CE1141',UTA:'#002B5C',WAS:'#002B5C'};
 const TCOLORS=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#6366f1','#f97316','#06b6d4','#84cc16','#a855f7'];
-const PAGES=['hub','roster','waiver','trades','standings','commissioner'];
-const PLABELS={hub:'🏠 Hub',roster:'👕 Roster',waiver:'📋 Wire',trades:'⇄ Trade',standings:'🏆 Stand.',commissioner:'⚙️ Comm.'};
-const NAVIDS={hub:'hn',roster:'rn',waiver:'wn',trades:'tn',standings:'stn',commissioner:'commNav'};
+const PAGES=['hub','roster','matchup','waiver','trades','standings','commissioner'];
+const PLABELS={hub:'🏠 Hub',roster:'👕 Roster',matchup:'⚔️ Matchup',waiver:'📋 Wire',trades:'⇄ Trade',standings:'🏆 Stand.',commissioner:'⚙️ Comm.'};
+const NAVIDS={hub:'hn',roster:'rn',matchup:'mn',waiver:'wn',trades:'tn',standings:'stn',commissioner:'commNav'};
 let CURRENT_SPORT = getSelectedRosterbateSport();
 let SPORT_CFG = getRosterbateSportConfig(CURRENT_SPORT);
 let STARTERS = SPORT_CFG.starterSlots.length;
@@ -708,6 +732,25 @@ function getTeamAvatarUrl(teamIdx){
   return '';
 }
 function getCurrentTeamAvatarUrl(){return getTeamAvatarUrl(D?.myPos??0);}
+function renderStatusBadge(status){
+  const label=String(status||'--');
+  const key=label.toUpperCase();
+  let fg='#94a3b8', bg='rgba(148,163,184,.10)', bd='rgba(148,163,184,.28)';
+  if(key==='AVAILABLE'){
+    fg='#22c55e'; bg='rgba(34,197,94,.12)'; bd='rgba(34,197,94,.30)';
+  } else if(key==='OUT' || key==='O'){
+    fg='#ef4444'; bg='rgba(239,68,68,.12)'; bd='rgba(239,68,68,.30)';
+  } else if(key==='DTD' || key==='GTD'){
+    fg='#f59e0b'; bg='rgba(245,158,11,.12)'; bd='rgba(245,158,11,.30)';
+  } else if(key==='IL' || key==='IR'){
+    fg='#a78bfa'; bg='rgba(167,139,250,.12)'; bd='rgba(167,139,250,.30)';
+  } else if(key==='FINAL'){
+    fg='#cbd5e1'; bg='rgba(148,163,184,.08)'; bd='rgba(148,163,184,.22)';
+  } else if(key==='OFF' || key==='OPEN'){
+    fg='#94a3b8'; bg='rgba(148,163,184,.08)'; bd='rgba(148,163,184,.22)';
+  }
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:62px;padding:4px 8px;border-radius:999px;border:1px solid ${bd};background:${bg};color:${fg};font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;">${label}</span>`;
+}
 function setAvatarNode(el,name,size,bg,url,extraStyle=''){
   if(!el) return;
   const safeName=String(name||'Team');
@@ -2098,13 +2141,14 @@ function goPage(id){
     if(el) el.innerHTML=PAGES.map(pg=>`<button class="nb${pg===id?' on':''}" onclick="goPage('${pg}')">${PLABELS[pg]}</button>`).join('');
   });
   if(id==='roster') rosterViewDay=G.day;
+  if(id==='matchup') matchupViewDay=rosterViewDay||G.day;
   if(id==='waiver'){
     const srch=document.getElementById('wSrch');
     const pos=document.getElementById('wPos');
     if(srch) srch.value='';
     if(pos) pos.value='ALL';
   }
-  ({hub:renderHub,roster:renderRoster,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[id]?.();
+  ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[id]?.();
 }
 
 function advanceWeek(){
@@ -2439,6 +2483,151 @@ function renderHub(){
 
 // ── ROSTER STATE ──────────────────────────────────────────
 let rosterViewDay = null; // which day we're editing (null = current)
+let matchupViewDay = null; // which day we're viewing in matchup
+
+function getMatchupForTeamDay(teamIdx,day){
+  return weekGames(weekForDay(day)).find(g=>g.home===teamIdx||g.away===teamIdx)||null;
+}
+
+function renderMatchup(){
+  if(matchupViewDay===null) matchupViewDay=G.day;
+  const day=matchupViewDay;
+  const week=weekForDay(day);
+  const matchup=getMatchupForTeamDay(D.myPos,day);
+  document.getElementById('mWk').textContent=`Week ${week} · ${DAY_NAMES[dayOfWeek(day)-1]} ${getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'})}`;
+  if(!matchup){
+    document.getElementById('matchupContent').innerHTML=`<div style="padding:20px;">
+      <div class="season-table-card season-card-pad" style="text-align:center;">
+        <div style="font-family:var(--fb);font-size:22px;font-weight:800;color:#f8fafc;">No Matchup This Week</div>
+        <div class="season-soft-muted" style="margin-top:8px;">Your team does not have an opponent assigned for Week ${week}.</div>
+      </div>
+    </div>`;
+    return;
+  }
+  const leftIdx=matchup.home===D.myPos?matchup.home:matchup.away;
+  const rightIdx=matchup.home===D.myPos?matchup.away:matchup.home;
+  const dateLabel=getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'});
+  const isRevealed=isDayRevealed(day);
+  const statusText=isRevealed?'Revealed':'Projected';
+  const weekStart=(week-1)*DAYS_PER_WEEK+1;
+  const weekEnd=Math.min(TOTAL_DAYS(),weekStart+DAYS_PER_WEEK-1);
+  const dayChips=Array.from({length:weekEnd-weekStart+1},(_,idx)=>{
+    const d=weekStart+idx;
+    const selected=d===day;
+    const today=d===G.day;
+    return `<button onclick="matchupViewDay=${d};renderMatchup()" class="season-outline-btn" style="padding:10px 14px;border-color:${selected?'#7c4a18':'#24324a'};color:${selected?'#fdba74':'#dbe4f0'};background:${selected?'#22180d':'#0f1724'};">
+      <div style="font-size:10px;text-transform:uppercase;line-height:1;">${getSeasonDayDate(d).toLocaleDateString([],{month:'short',day:'numeric'})}</div>
+      <div style="font-size:18px;line-height:1.15;margin-top:4px;">${today?'TODAY':DAY_NAMES[dayOfWeek(d)-1]}</div>
+    </button>`;
+  }).join('');
+  const buildTeamPanel=(teamIdx,sideLabel)=>{
+    const roster=G.rosters[teamIdx]||[];
+    const ilRoster=getIlRoster(teamIdx);
+    const starterIds=getStarterIdsForTeamDay(teamIdx,day);
+    const starterEntries=starterIds.map((id,index)=>({slot:SLOT_LABELS[index]||'UTIL',player:roster.find(p=>p.id===id)||null,isStarter:true}));
+    const benchEntries=roster.filter(p=>!starterIds.includes(p.id)).map(p=>({slot:'BN',player:p,isStarter:false}));
+    const ilSlotKey=getIlSlotKey();
+    const ilEntries=ilRoster.map(p=>({slot:ilSlotKey,player:p,isStarter:false,isIL:true}));
+    const scoreDetails=getTeamDayScoreDetails(teamIdx,day);
+    const scoreMap=new Map(scoreDetails.entries.map(entry=>[entry.player.id,entry]));
+    const dailyTotal=(isRevealed?(getDayResult(teamIdx,day)?.total ?? 0):scoreDetails.total) || 0;
+    const weekTotal=getTeamWeekRevealedScore(teamIdx,week);
+    const standing=G.standings[teamIdx]||{w:0,l:0,pf:0};
+    const teamName=D.teams[teamIdx]||`Team ${teamIdx+1}`;
+    const renderRow=(entry)=>{
+      if(!entry.player){
+        return `<tr>
+          <td>${entry.slot}</td>
+          <td><div class="season-soft-muted">Empty</div></td>
+          <td>--</td>
+          <td>--</td>
+          <td>${renderStatusBadge('Open')}</td>
+          <td><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
+        </tr>`;
+      }
+      const p=entry.player;
+      const game=getGameInfo(p,day);
+      const injury=getInjuryStatus(p,week);
+      const opp=game?(game.isHome?'vs ':'@ ')+game.opp:'--';
+      const time=game?game.time:'--';
+      const status=entry.isIL ? ilSlotKey : (injury?injury.label:(game?'Available':'Off'));
+      const box=scoreMap.get(p.id);
+      const fp=Number(box?.finalScore||0).toFixed(1);
+      return `<tr>
+        <td>${entry.slot}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;min-width:220px;">
+            <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
+            <div class="season-player-wrap" style="min-width:0;">
+              <div class="season-player-name" style="font-weight:700;color:#f8fafc;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
+              <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+            </div>
+          </div>
+        </td>
+        <td>${opp}</td>
+        <td>${time}</td>
+        <td>${renderStatusBadge(status)}</td>
+        <td><span class="season-fp-val">${fp}</span></td>
+      </tr>`;
+    };
+    return `<div class="season-table-card" style="overflow:hidden;">
+      <div class="season-card-pad" style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
+        <div style="display:flex;align-items:flex-start;gap:12px;min-width:0;">
+          ${renderAvatarMarkup(teamName,62,TCOLORS[teamIdx%TCOLORS.length],getTeamAvatarUrl(teamIdx),'box-shadow:none;')}
+          <div style="min-width:0;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;font-weight:700;">${sideLabel}</div>
+            <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${teamName}</div>
+            <div class="season-soft-muted" style="margin-top:6px;">${standing.w}-${standing.l} · ${weekTotal.toFixed(1)} week revealed</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <span class="season-stat-pill">${statusText}</span>
+          <div style="text-align:right;">
+            <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;line-height:1;">${dailyTotal.toFixed(1)}</div>
+            <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;margin-top:4px;">Day ${day} total</div>
+          </div>
+        </div>
+      </div>
+      <div class="season-card-pad" style="padding-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div style="font-family:var(--fb);font-size:16px;font-weight:700;color:#f8fafc;">Lineup</div>
+          <div class="season-soft-muted" style="font-size:12px;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel}</div>
+        </div>
+      </div>
+      <div class="season-table-wrap">
+        <table class="season-data-table season-roster-table" style="width:100%;min-width:760px;">
+          <thead><tr><th>Slot</th><th>Player</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th></tr></thead>
+          <tbody>
+            <tr><td colspan="6" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Starters</td></tr>
+            ${starterEntries.map(renderRow).join('')}
+            <tr><td colspan="6" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Bench / IL</td></tr>
+            ${(benchEntries.concat(ilEntries)).length ? benchEntries.concat(ilEntries).map(renderRow).join('') : `<tr><td colspan="6" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  };
+  document.getElementById('matchupContent').innerHTML=`<div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
+    <div class="season-table-card">
+      <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:14px;color:#dbe4f0;">Matchup Day:</span>
+          <button class="season-back" onclick="matchupViewDay=Math.max(1,matchupViewDay-1);renderMatchup()">‹</button>
+          ${dayChips}
+          <button class="season-back" onclick="matchupViewDay=Math.min(TOTAL_DAYS(),matchupViewDay+1);renderMatchup()">›</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span class="season-stat-pill">Week ${week}</span>
+          <span class="season-stat-pill">${isRevealed?'Scores revealed':'Pre-reveal day view'}</span>
+        </div>
+      </div>
+    </div>
+    <div class="season-matchup-grid">
+      ${buildTeamPanel(leftIdx,leftIdx===D.myPos?'Your Team':'Opponent')}
+      ${buildTeamPanel(rightIdx,rightIdx===D.myPos?'Your Team':'Opponent')}
+    </div>
+  </div>`;
+}
 
 function renderRoster(){
   if(rosterViewDay===null) rosterViewDay=G.day;
@@ -2730,7 +2919,7 @@ function renderRoster(){
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           ${!isLocked?`<button class="season-outline-btn" onclick="autoSetDay(${day})">Auto Set</button>`:''}
-          <button class="season-outline-btn" onclick="openPicker()">League</button>
+          <button class="season-outline-btn" onclick="goPage('matchup')">Matchup</button>
           <button class="season-outline-btn" onclick="goPage('waiver')" style="background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button>
           <button class="season-outline-btn" onclick="openDropPlayerModal()" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#fca5a5;">Drop Player</button>
         </div>
@@ -3416,32 +3605,32 @@ function openViewer(ti){
     const inj=getInjuryStatus(p,G.week);
     const injBadge=inj?`<span style="background:${inj.color}22;border:1px solid ${inj.color}55;border-radius:999px;padding:2px 7px;font-family:var(--fb);font-size:10px;font-weight:700;color:${inj.color};margin-left:4px;">${inj.label}</span>`:'';
     const game=getGameInfo(p,G.day);
-    const gameInfo=game?`<span style="font-size:11px;color:#6b7280;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} · ${game.time}</span>`:`<span style="font-size:11px;color:#9ca3af;margin-top:1px;display:block;">No game today</span>`;
-    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e5e7eb;">
-      <div style="width:34px;font-family:var(--fb);font-size:12px;font-weight:800;color:#6b7280;flex-shrink:0;">${slot}</div>
+    const gameInfo=game?`<span style="font-size:11px;color:#94a3b8;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} · ${game.time}</span>`:`<span style="font-size:11px;color:#64748b;margin-top:1px;display:block;">No game today</span>`;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #24324a;">
+      <div style="width:34px;font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;flex-shrink:0;">${slot}</div>
       <div class="pav" style="background:${tc(p.team)};width:32px;height:32px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;flex-wrap:wrap;"><span style="font-family:var(--fb);font-size:15px;font-weight:700;color:#111827;">${p.name}</span><span style="display:inline-block;padding:2px 6px;border-radius:999px;font-family:var(--fb);font-size:10px;font-weight:700;margin-left:6px;background:#eff6ff;color:#2563eb;">${p.pos}</span>${injBadge}</div>
-        <div style="font-size:12px;color:#6b7280;">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;"><span style="font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;">${p.name}</span><span style="display:inline-block;padding:2px 6px;border-radius:999px;font-family:var(--fb);font-size:10px;font-weight:700;margin-left:6px;background:#eff6ff;color:#2563eb;">${p.pos}</span>${injBadge}</div>
+        <div style="font-size:12px;color:#94a3b8;">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
         ${gameInfo}
       </div>
-      <span style="background:${isS?'#dcfce7':'#f3f4f6'};border:1px solid ${isS?'#86efac':'#d1d5db'};border-radius:999px;padding:3px 9px;font-family:var(--fb);font-size:10px;font-weight:700;color:${isS?'#15803d':'#6b7280'};">${isS?'START':'BN'}</span>
+      <span style="background:${isS?'rgba(34,197,94,.14)':'#0f1724'};border:1px solid ${isS?'rgba(34,197,94,.35)':'#24324a'};border-radius:999px;padding:3px 9px;font-family:var(--fb);font-size:10px;font-weight:700;color:${isS?'#86efac':'#94a3b8'};">${isS?'START':'BN'}</span>
     </div>`;
   }
 
   document.getElementById('vStarters').innerHTML=`<div class="season-table-card" style="overflow:hidden;">
-    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #e5e7eb;">
-      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#111827;">Starting Lineup</div>
+    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #24324a;">
+      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;">Starting Lineup</div>
       <div class="season-soft-muted" style="margin-top:4px;">Current starters and active matchup context.</div>
     </div>
-    <div style="padding:0 18px 6px;">${starters.length?starters.map((p,i)=>vPRow(p,slots[i]||'UTIL',true)).join(''):'<div style="padding:16px;color:#6b7280;font-size:12px;text-align:center;">No starters set</div>'}</div>
+    <div style="padding:0 18px 6px;">${starters.length?starters.map((p,i)=>vPRow(p,slots[i]||'UTIL',true)).join(''):'<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center;">No starters set</div>'}</div>
   </div>`;
   document.getElementById('vBench').innerHTML=`<div class="season-table-card" style="overflow:hidden;">
-    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #e5e7eb;">
-      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#111827;">Bench</div>
+    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #24324a;">
+      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;">Bench</div>
       <div class="season-soft-muted" style="margin-top:4px;">Depth pieces and reserves.</div>
     </div>
-    <div style="padding:0 18px 6px;">${bench.length?bench.map(p=>vPRow(p,'BN',false)).join(''):'<div style="padding:16px;color:#6b7280;font-size:12px;text-align:center;">Empty bench</div>'}</div>
+    <div style="padding:0 18px 6px;">${bench.length?bench.map(p=>vPRow(p,'BN',false)).join(''):'<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center;">Empty bench</div>'}</div>
   </div>`;
 
   const act=document.getElementById('vActions');
@@ -3538,6 +3727,8 @@ function initCS(){
       }
     }
     catch(e){ CS=defaultCS(); }
+    syncCommissionerRosterTotals();
+    syncSportSlotsFromCommissioner();
   }
 }
 
@@ -3545,6 +3736,118 @@ function saveCS(){
   try{ localStorage.setItem('rosterbateCS',JSON.stringify(CS)); }catch(e){}
   const el=document.getElementById('commSaved');
   if(el){el.style.opacity='1';setTimeout(()=>el.style.opacity='0',1500);}
+}
+
+function syncCommissionerRosterTotals(){
+  if(!CS || !CS.positions) return;
+  const pos = CS.positions || {};
+  const benchKeys = ['BN','BE'];
+  const ilKeys = ['IR','IL'];
+  let totalStarters = 0;
+  let totalBench = 0;
+  let irSlots = 0;
+  Object.entries(pos).forEach(function(entry){
+    const slot = String(entry[0] || '').toUpperCase();
+    const starters = Math.max(0, Number(entry[1]?.starters || 0));
+    if(benchKeys.includes(slot)){
+      totalBench += starters;
+      return;
+    }
+    if(ilKeys.includes(slot)){
+      irSlots += starters;
+      return;
+    }
+    totalStarters += starters;
+  });
+  CS.totalStarters = totalStarters;
+  CS.totalBench = totalBench;
+  CS.irSlots = irSlots;
+  CS.rosterSize = totalStarters + totalBench + irSlots;
+}
+
+function remapStarterIdsToSlots(starterIds, oldSlots, newSlots, roster){
+  const rosterMap = new Map((roster || []).map(function(player){ return [player.id, player]; }));
+  const entries = Array.from({length:(oldSlots||[]).length}, function(_, index){
+    const id = starterIds && starterIds[index] ? starterIds[index] : null;
+    if(!id || !rosterMap.has(id)) return null;
+    return { id:id, player:rosterMap.get(id), oldSlot:String(oldSlots[index] || '').toUpperCase() };
+  }).filter(Boolean);
+  const normalized = Array.from({length:(newSlots||[]).length}, function(){ return null; });
+  const used = new Set();
+
+  entries.forEach(function(entry){
+    const exactIndex = newSlots.findIndex(function(slot, index){
+      return !used.has(index) && String(slot || '').toUpperCase() === entry.oldSlot;
+    });
+    if(exactIndex >= 0 && canPlayerFillSlot(entry.player, newSlots[exactIndex])){
+      normalized[exactIndex] = entry.id;
+      used.add(exactIndex);
+    }
+  });
+
+  entries.forEach(function(entry){
+    if(normalized.includes(entry.id)) return;
+    const flexibleIndex = newSlots.findIndex(function(slot, index){
+      return !used.has(index) && canPlayerFillSlot(entry.player, slot);
+    });
+    if(flexibleIndex >= 0){
+      normalized[flexibleIndex] = entry.id;
+      used.add(flexibleIndex);
+    }
+  });
+
+  return normalized;
+}
+
+function syncExistingLineupsToCurrentSlots(oldSlots){
+  if(!G || !Array.isArray(G.rosters)) return;
+  const previousSlots = [...(oldSlots || [])];
+  const nextSlots = [...SLOT_LABELS];
+  if(Array.isArray(G.starters)){
+    G.starters = G.starters.map(function(starterIds, teamIdx){
+      return remapStarterIdsToSlots(starterIds || [], previousSlots, nextSlots, G.rosters[teamIdx] || []);
+    });
+  }
+  if(G.dailyLineups && typeof G.dailyLineups === 'object'){
+    Object.keys(G.dailyLineups).forEach(function(dayKey){
+      const day = Number(dayKey);
+      const current = Array.isArray(G.dailyLineups[day]) ? G.dailyLineups[day] : [];
+      G.dailyLineups[day] = remapStarterIdsToSlots(current, previousSlots, nextSlots, G.rosters[D.myPos] || []);
+    });
+  }
+}
+
+function syncSportSlotsFromCommissioner(){
+  if(!CS || !CS.positions || !SPORT_CFG) return;
+  const previousSlots = [...SLOT_LABELS];
+  const pos = CS.positions || {};
+  const starterSlots = [];
+  let benchCount = 0;
+  let ilCount = 0;
+  Object.entries(pos).forEach(function(entry){
+    const rawSlot = String(entry[0] || '').toUpperCase();
+    const slot = rawSlot === 'BE' ? 'BN' : rawSlot;
+    const starters = Math.max(0, Number(entry[1]?.starters || 0));
+    if(slot === 'BN'){
+      benchCount += starters;
+      return;
+    }
+    if(slot === 'IR' || slot === 'IL'){
+      ilCount += starters;
+      return;
+    }
+    for(let i=0;i<starters;i++) starterSlots.push(slot);
+  });
+  const ilSlot = CURRENT_SPORT === 'mlb' ? 'IL' : 'IR';
+  SPORT_CFG.starterSlots = starterSlots;
+  SPORT_CFG.myTeamSlots = [
+    ...starterSlots,
+    ...Array.from({length:benchCount}, function(){ return 'BN'; }),
+    ...Array.from({length:ilCount}, function(){ return ilSlot; })
+  ];
+  STARTERS = starterSlots.length;
+  SLOT_LABELS = [...starterSlots];
+  syncExistingLineupsToCurrentSlots(previousSlots);
 }
 
 function hydrateSeasonSteppers(root){
@@ -3610,12 +3913,12 @@ function commNum(key,min,max,step){
   const maxVal=max||999;
   const stepVal=step||1;
   return `<div class="cnum-wrap">
-    <input type="number" class="cnum-input" min="${minVal}" max="${maxVal}" step="${stepVal}" value="${CS[key]}" onchange="CS['${key}']=+this.value;saveCS()">
-    <div class="cnum-steps">
-      <button type="button" class="cnum-step" onclick="commStep(this,-1,${minVal},${maxVal},${stepVal})">−</button>
-      <button type="button" class="cnum-step" onclick="commStep(this,1,${minVal},${maxVal},${stepVal})">+</button>
-    </div>
-  </div>`;
+      <input type="number" class="cnum-input" min="${minVal}" max="${maxVal}" step="${stepVal}" value="${CS[key]}" onchange="CS['${key}']=+this.value;saveCS()">
+      <div class="cnum-steps">
+       <button type="button" class="cnum-step" onclick="commStep(this,1,${minVal},${maxVal},${stepVal})">+</button>
+       <button type="button" class="cnum-step" onclick="commStep(this,-1,${minVal},${maxVal},${stepVal})">−</button>
+      </div>
+    </div>`;
 }
 function commStep(btn,dir,min,max,step){
   const input=btn.closest('.cnum-wrap')?.querySelector('.cnum-input');
@@ -3669,8 +3972,8 @@ function commBasic(){
 function commRoster(){
   const pos=CS.positions;
   const posRows=Object.entries(pos).map(([p,v])=>`
-    <div class="cpos-cell">${p}</div>
-    <div class="cpos-cell"><input type="number" class="cnum" min="0" max="10" value="${v.starters}" onchange="CS.positions['${p}'].starters=+this.value;saveCS()"></div>
+      <div class="cpos-cell">${p}</div>
+    <div class="cpos-cell"><input type="number" class="cnum" min="0" max="10" value="${v.starters}" onchange="CS.positions['${p}'].starters=+this.value;syncCommissionerRosterTotals();syncSportSlotsFromCommissioner();saveCS();if(document.getElementById('roster')?.classList.contains('active')) renderRoster();if(document.getElementById('hub')?.classList.contains('active')) renderHub();commRoster()"></div>
     <div class="cpos-cell"><input type="text" class="cnum" value="${v.max}" onchange="CS.positions['${p}'].max=this.value;saveCS()"></div>`).join('');
   document.getElementById('commContent').innerHTML=`
     <div class="csection">Roster Settings</div>
@@ -3690,6 +3993,7 @@ function commRoster(){
         ${posRows}
       </div>
     </div>`;
+  hydrateSeasonSteppers(document.getElementById('commContent'));
 }
 
 // ── SCORING ──
