@@ -453,6 +453,7 @@ function renderQuick(){
       <div class="chips">
         <div class="chip on" onclick="setQuick('scoring','h2h_pts',this)">H2H Points</div>
         <div class="chip" onclick="setQuick('scoring','h2h_cat',this)">H2H Categories</div>
+        <div class="chip" onclick="setQuick('scoring','money_ball',this)">Money Ball</div>
         <div class="chip" onclick="setQuick('scoring','roto',this)">Rotisserie</div>
         <div class="chip" onclick="setQuick('scoring','points',this)">Points Only</div>
       </div>
@@ -484,7 +485,7 @@ function formatLabel(format){
 }
 
 function scoringLabel(scoring){
-  return {h2h_pts:'H2H Points',h2h_cat:'H2H Categories',roto:'Rotisserie',points:'Points Only'}[scoring]||scoring||'Scoring';
+  return {h2h_pts:'H2H Points',h2h_cat:'H2H Categories',money_ball:'Money Ball',roto:'Rotisserie',points:'Points Only'}[scoring]||scoring||'Scoring';
 }
 
 function getCreateRules(){
@@ -864,6 +865,7 @@ function renderCreate(){
       <div class="chips">
         <div class="chip on" onclick="setCreate('scoring','h2h_pts',this)">H2H Points</div>
         <div class="chip" onclick="setCreate('scoring','h2h_cat',this)">H2H Categories</div>
+        <div class="chip" onclick="setCreate('scoring','money_ball',this)">Money Ball</div>
         <div class="chip" onclick="setCreate('scoring','roto',this)">Rotisserie</div>
         <div class="chip" onclick="setCreate('scoring','points',this)">Points Only</div>
       </div>
@@ -1051,7 +1053,7 @@ function renderWaitingRoom(lobby){
   document.getElementById('wrCode').textContent='#'+lobby.code;
 
   const fmtLabel={snake:'Snake',auction:'Auction',linear:'Linear'}[lobby.format]||lobby.format;
-  const scrLabel={h2h_pts:'H2H Points',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only'}[lobby.scoring]||lobby.scoring;
+const scrLabel={h2h_pts:'H2H Points',h2h_cat:'H2H Cat',money_ball:'Money Ball',roto:'Roto',points:'Points Only'}[lobby.scoring]||lobby.scoring;
   document.getElementById('wrInfo').innerHTML=`
     <div style="display:flex;flex-wrap:wrap;gap:6px;">
       <span style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--accent);">${fmtLabel}</span>

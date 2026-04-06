@@ -837,7 +837,7 @@ function activityAge(ts){
 }
 
 let D=null;
-let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[]};
+let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{}};
 let moveCtx=null;
 let rosterTab='stats';
 let dropCandidate=null;
@@ -933,6 +933,7 @@ function applySharedSeasonPayload(payload){
   D=cloneJsonSafe(payload.draft);
   G=cloneJsonSafe(payload.game);
   if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:(D?.leagueSize||D?.teams?.length||0)},()=>[]);
+  if(!G.moneyBallLocks || typeof G.moneyBallLocks!=='object') G.moneyBallLocks={};
   G.processed=new Set(payload.game?.processed||[]);
   sharedSeasonLastUpdatedAt=Number(payload.updatedAt||0);
   hydrateDraftUserContextFromLobby();
@@ -1631,6 +1632,155 @@ function canPlayerFillSlot(player, slot){
   return false;
 }
 
+function isMoneyBallScoring(){
+  return String(CS?.scoringType||'').trim().toLowerCase()==='money ball';
+}
+
+function getStarterSlotEntriesForTeamDay(teamIdx, day){
+  const roster=G.rosters[teamIdx]||[];
+  const starterIds=teamIdx===D.myPos ? getLineupForDay(day) : Array.from({length:STARTERS},(_,index)=>(G.starters[teamIdx]||[])[index]||null);
+  return Array.from({length:STARTERS},(_,index)=>{
+    const slot=SLOT_LABELS[index]||'UTIL';
+    const playerId=starterIds[index]||null;
+    const player=playerId ? roster.find(p=>p.id===playerId) || null : null;
+    return {slotIndex:index,slot,playerId,player,day,teamIdx};
+  });
+}
+
+function getMoneyBallWeekLocks(teamIdx, week){
+  if(!G.moneyBallLocks || typeof G.moneyBallLocks!=='object') G.moneyBallLocks={};
+  const weekKey=String(week);
+  if(!G.moneyBallLocks[weekKey] || typeof G.moneyBallLocks[weekKey]!=='object') G.moneyBallLocks[weekKey]={};
+  const teamKey=String(teamIdx);
+  if(!Array.isArray(G.moneyBallLocks[weekKey][teamKey])) G.moneyBallLocks[weekKey][teamKey]=Array.from({length:STARTERS},()=>null);
+  const locks=G.moneyBallLocks[weekKey][teamKey];
+  while(locks.length<STARTERS) locks.push(null);
+  return locks;
+}
+
+function getMoneyBallSlotLock(teamIdx, week, slotIndex){
+  return getMoneyBallWeekLocks(teamIdx, week)[slotIndex]||null;
+}
+
+function getMoneyBallSlotLabel(slotIndex){
+  const slot=SLOT_LABELS[slotIndex]||'UTIL';
+  const dupes=SLOT_LABELS.slice(0,slotIndex+1).filter(label=>label===slot).length;
+  return dupes>1 ? `${slot} ${dupes}` : slot;
+}
+
+function buildMoneyBallSelectionEntry(slotEntry, week, game, injury, source){
+  if(!slotEntry?.player) return null;
+  const unavailable=isUnavailableInjury(injury);
+  const baseScore=(game && !unavailable) ? getSportAwareFantasyScore(slotEntry.player) : 0;
+  return {
+    teamIdx:slotEntry.teamIdx,
+    slotIndex:slotEntry.slotIndex,
+    slot:slotEntry.slot,
+    playerId:slotEntry.player.id,
+    player:cloneJsonSafe(slotEntry.player),
+    day:slotEntry.day,
+    game:game?{...game}:null,
+    injury:injury?{...injury}:null,
+    unavailable,
+    baseScore,
+    finalScore:baseScore,
+    source,
+    label:getMoneyBallSlotLabel(slotEntry.slotIndex)
+  };
+}
+
+function getMoneyBallAutoSelection(teamIdx, week, slotIndex){
+  const start=(week-1)*DAYS_PER_WEEK+1;
+  const end=Math.min(TOTAL_DAYS(),start+DAYS_PER_WEEK-1);
+  let chosen=null;
+  for(let day=start;day<=end;day++){
+    const slotEntry=getStarterSlotEntriesForTeamDay(teamIdx, day)[slotIndex];
+    if(!slotEntry?.player || !canPlayerFillSlot(slotEntry.player, slotEntry.slot)) continue;
+    const game=getGameInfo(slotEntry.player, day);
+    if(!game) continue;
+    const injury=getInjuryStatus(slotEntry.player, week);
+    chosen=buildMoneyBallSelectionEntry(slotEntry, week, game, injury, 'moneyball_auto');
+  }
+  return chosen;
+}
+
+function getMoneyBallSelectionForSlot(teamIdx, week, slotIndex){
+  const lock=getMoneyBallSlotLock(teamIdx, week, slotIndex);
+  if(lock){
+    const teamRoster=[
+      ...(G.rosters[teamIdx]||[]),
+      ...(getIlRoster(teamIdx)||[])
+    ];
+    const livePlayer=teamRoster.find(p=>p.id===lock.playerId)||null;
+    const player=livePlayer || cloneJsonSafe(lock.player||null);
+    if(player){
+      const game=lock.game || getGameInfo(player, lock.day);
+      const injury=lock.injury || getInjuryStatus(player, week);
+      const slotEntry={teamIdx,slotIndex,slot:lock.slot||SLOT_LABELS[slotIndex]||'UTIL',playerId:player.id,player,day:lock.day};
+      return {
+        ...buildMoneyBallSelectionEntry(slotEntry, week, game, injury, 'moneyball_lock'),
+        lockedAt:lock.lockedAt||null
+      };
+    }
+  }
+  return getMoneyBallAutoSelection(teamIdx, week, slotIndex);
+}
+
+function getMoneyBallSelectionsForTeamWeek(teamIdx, week){
+  return Array.from({length:STARTERS},(_,slotIndex)=>getMoneyBallSelectionForSlot(teamIdx, week, slotIndex)).filter(Boolean);
+}
+
+function canLockMoneyBallSlot(slotEntry){
+  if(!isMoneyBallScoring()) return false;
+  if(!slotEntry?.player || slotEntry.teamIdx!==D.myPos) return false;
+  if(slotEntry.day<G.day || isDayRevealed(slotEntry.day)) return false;
+  if(!!getMoneyBallSlotLock(slotEntry.teamIdx, weekForDay(slotEntry.day), slotEntry.slotIndex)) return false;
+  const game=getGameInfo(slotEntry.player, slotEntry.day);
+  return !!game && canPlayerFillSlot(slotEntry.player, slotEntry.slot);
+}
+
+function lockMoneyBallSlot(slotIndex, day){
+  const teamIdx=D.myPos;
+  const week=weekForDay(day);
+  if(getMoneyBallSlotLock(teamIdx, week, slotIndex)){
+    toast(getMoneyBallSlotLabel(slotIndex)+' is already locked for Week '+week+'.');
+    return;
+  }
+  const slotEntry=getStarterSlotEntriesForTeamDay(teamIdx, day)[slotIndex];
+  if(!slotEntry?.player){
+    toast('No starter is in that slot on this day.');
+    return;
+  }
+  if(!canPlayerFillSlot(slotEntry.player, slotEntry.slot)){
+    toast(slotEntry.player.name+' is not eligible for '+slotEntry.slot+'.');
+    return;
+  }
+  const game=getGameInfo(slotEntry.player, day);
+  if(!game){
+    toast(slotEntry.player.name+' has no game on that day.');
+    return;
+  }
+  const injury=getInjuryStatus(slotEntry.player, week);
+  const locks=getMoneyBallWeekLocks(teamIdx, week);
+  locks[slotIndex]={
+    slot:slotEntry.slot,
+    slotLabel:getMoneyBallSlotLabel(slotIndex),
+    slotIndex,
+    day,
+    playerId:slotEntry.player.id,
+    player:cloneJsonSafe(slotEntry.player),
+    game:{...game},
+    injury:injury?{...injury}:null,
+    score:(!isUnavailableInjury(injury) ? getSportAwareFantasyScore(slotEntry.player) : 0),
+    lockedAt:Date.now()
+  };
+  queueSharedSeasonSave('money_ball_lock');
+  renderRoster();
+  if(document.getElementById('hub')?.classList.contains('active')) renderHub();
+  if(document.getElementById('matchup')?.classList.contains('active')) renderMatchup();
+  toast(`${slotEntry.player.name} locked into ${getMoneyBallSlotLabel(slotIndex)} for Week ${week}.`);
+}
+
 function getRosterTableColumns(group='all'){
   if(CURRENT_SPORT==='mlb'){
     if(group==='pitching'){
@@ -1759,15 +1909,18 @@ function getTeamDayScoreDetails(teamIdx,day){
   const starterIds=getStarterIdsForTeamDay(teamIdx,day);
   const benchIds=roster.map(p=>p.id).filter(id=>!starterIds.includes(id));
   const powerups=teamIdx===D.myPos?getWeekPowerups(week):null;
-  const entries=starterIds.map(id=>{
-    const p=roster.find(x=>x.id===id);
-    if(!p) return null;
-    const game=getGameInfo(p,day);
-    const injury=getInjuryStatus(p,week);
-    const unavailable=isUnavailableInjury(injury);
-    const baseScore=(game&&!unavailable)?getSportAwareFantasyScore(p):0;
-    return {player:p,baseScore,finalScore:baseScore,game,injury,unavailable,source:'starter'};
-  }).filter(Boolean);
+  const entries=(isMoneyBallScoring()
+    ? getMoneyBallSelectionsForTeamWeek(teamIdx, week).filter(selection=>selection.day===day)
+    : starterIds.map(id=>{
+        const p=roster.find(x=>x.id===id);
+        if(!p) return null;
+        const game=getGameInfo(p,day);
+        const injury=getInjuryStatus(p,week);
+        const unavailable=isUnavailableInjury(injury);
+        const baseScore=(game&&!unavailable)?getSportAwareFantasyScore(p):0;
+        return {player:p,baseScore,finalScore:baseScore,game,injury,unavailable,source:'starter'};
+      }).filter(Boolean)
+  );
 
   if(powerups?.white_gloves?.active){
     const fallbackPool=entries.filter(e=>e.baseScore>0);
@@ -2113,7 +2266,7 @@ function initSeason(){
   G.waiver=buildRosterbateSportPlayerPool(CURRENT_SPORT, 260).filter(p=>!allIds.has(p.id)).slice(0,40).map(p=>({...p}));
   G.schedule=buildSched(n,G.totalWeeks);
   G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
-  G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];
+  G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];G.moneyBallLocks={};
   ensurePowerupState();
   rollWeeklyPowerupDrops(1);
   logActivity('league','Season opened',teamName(D.myPos)+' entered a fresh '+(D.leagueName||'RosterBate League')+'.',D.myPos,'🚪');
@@ -2630,6 +2783,12 @@ function renderMatchup(){
 }
 
 function renderRoster(){
+  const rosterNote=document.querySelector('#roster .season-page-note');
+  if(rosterNote){
+    rosterNote.textContent=isMoneyBallScoring()
+      ? 'Money Ball: lock one game per week for each starting position. If you do not lock a slot, that position uses its final game of the week.'
+      : 'Set each day\'s lineup before the reveal. Once a day unlocks, that lineup is locked.';
+  }
   if(rosterViewDay===null) rosterViewDay=G.day;
   const day=rosterViewDay;
   const week=weekForDay(day);
@@ -2732,6 +2891,8 @@ function renderRoster(){
     const isMoveSource=!!(movePlayer && entry.player && entry.player.id===movePlayer.id);
     const canMoveHere=!!(movePlayer && !isMoveSource && canMoveToRosterEntry(movePlayer,day,entry,starterIds,roster));
     const moveModeBlocked=!!(movePlayer && !isMoveSource && !canMoveHere);
+    const moneyBallLock=entry.isStarter && Number.isInteger(entry.index) ? getMoneyBallSlotLock(D.myPos, week, entry.index) : null;
+    const canMoneyBallLock=entry.isStarter && Number.isInteger(entry.index) && canLockMoneyBallSlot({teamIdx:D.myPos,slotIndex:entry.index,slot:entry.slot,player:entry.player,day});
     const rowBg=isMoveSource?'#22180d':(canMoveHere?'rgba(245,158,11,.08)':'');
     const rowBorder=isMoveSource?'#f59e0b':(canMoveHere?'rgba(245,158,11,.5)':'');
     const rowCellStyle=rowBorder?`background:${rowBg};border-top:1px solid ${rowBorder};border-bottom:1px solid ${rowBorder};`:''; 
@@ -2766,7 +2927,7 @@ function renderRoster(){
     const opp=game?(game.isHome?'vs ':'@ ')+game.opp:'--';
     const time=game?game.time:'--';
     const status=entry.isIL ? ilSlotKey : (injury?injury.label:(isPast?'Final':'Available'));
-    const action=isMoveSource
+    const baseAction=isMoveSource
       ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="clearMoveMode()">Cancel</button>`
       : canMoveHere
         ? `<button class="lineup-move-btn" style="border-color:#f59e0b;color:#fdba74;" onclick="applyMoveChoice(${movePlayer.id},${day},'${entry.slot.replace(/'/g,"\\'")}',${entry.slot==='BN'&&entry.player?entry.player.id:'null'},${entry.isStarter?starterIds.indexOf(entry.player?.id):'null'})">Move Here</button>`
@@ -2781,6 +2942,16 @@ function renderRoster(){
           : `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
               <button class="lineup-move-btn" onclick="startMoveMode(${p.id},${day})">Move</button>
             </div>`);
+    const moneyBallAction=entry.isStarter && !entry.isIL && isMoneyBallScoring()
+      ? (moneyBallLock
+          ? `<span style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fdba74;">Locked ${DAY_NAMES[dayOfWeek(moneyBallLock.day)-1]} ${getSeasonDayDate(moneyBallLock.day).toLocaleDateString([],{month:'short',day:'numeric'})}</span>`
+          : canMoneyBallLock
+            ? `<button class="lineup-move-btn" style="border-color:rgba(34,197,94,.45);color:#86efac;" onclick="lockMoneyBallSlot(${entry.index},${day})">Lock Game</button>`
+            : '')
+      : '';
+    const action=(moneyBallAction && !canMoveHere && !moveModeBlocked)
+      ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;">${baseAction}${moneyBallAction}</div>`
+      : baseAction;
     return `<tr>
       <td${rowCellAttr}>${entry.slot}</td>
       <td${rowCellAttr}>
@@ -3945,7 +4116,7 @@ function commBasic(){
     <div class="card" style="padding:0 14px;">
       ${row('League Name',commText('leagueName','My League'))}
       ${row('Number of Teams',commNum('numTeams',2,30))}
-      ${row('Scoring Type',commSel('scoringType',['H2H Points','H2H Categories','Rotisserie','Points Only']))}
+      ${row('Scoring Type',commSel('scoringType',['H2H Points','Money Ball','H2H Categories','Rotisserie','Points Only']))}
       ${row('Format',commSel('format',['Standard','Keeper','Dynasty']))}
       ${row('Make League Public',commToggle('isPublic'))}
       ${row('Auto Reactivate',commToggle('autoReactivate'))}

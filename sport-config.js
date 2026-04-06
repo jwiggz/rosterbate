@@ -12,7 +12,7 @@
       filters:['ALL','PG','SG','SF','PF','C'],waiverPositions:['ALL','PG','SG','SF','PF','C'],
       starterSlots:['PG','SG','SF','PF','C','G','F','UTIL'],myTeamSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','IR'],
       commissionerScoringType:'H2H Points',
-      scoringInfo:{h2h_cat:'Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',h2h_pts:'Weekly matchup by total fantasy pts. PTS=1, REB=1.2, AST=1.5, STL=3, BLK=3, TO=-1, 3PM=0.5.',roto:'Season-long ranking in each stat category. Best cumulative rank total wins.',points:'Pure accumulation. Best total fantasy points all season wins.'},
+scoringInfo:{h2h_cat:'Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',h2h_pts:'Weekly matchup by total fantasy pts. PTS=1, REB=1.2, AST=1.5, STL=3, BLK=3, TO=-1, 3PM=0.5.',money_ball:'Points scoring with one lockable game per starting position each week. If you do not lock a slot, its final game of the week counts.',roto:'Season-long ranking in each stat category. Best cumulative rank total wins.',points:'Pure accumulation. Best total fantasy points all season wins.'},
       teamCodes:['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS']
     },
     nfl:{
@@ -20,7 +20,7 @@
       filters:['ALL','QB','RB','WR','TE','K','DST'],waiverPositions:['ALL','QB','RB','WR','TE','K','DST'],
       starterSlots:['QB','RB','RB','WR','WR','TE','FLEX','K','DST'],myTeamSlots:['QB','RB','RB','WR','WR','TE','FLEX','K','DST','BN','BN','BN','BN','BN','BN','BN','BN','BN'],
       commissionerScoringType:'H2H Points',
-      scoringInfo:{h2h_cat:'Standard NFL leagues use points scoring. Category play is disabled for football.',h2h_pts:'Standard NFL scoring: Pass Yds /25, Pass TD 4, INT -2, Rush/Rec Yds /10, Rec 1, Rush/Rec TD 6, FG 3, XP 1, DST plays by stops.',roto:'Season-long ranking by cumulative fantasy points.',points:'Straight cumulative fantasy points using standard NFL scoring.'},
+scoringInfo:{h2h_cat:'Standard NFL leagues use points scoring. Category play is disabled for football.',h2h_pts:'Standard NFL scoring: Pass Yds /25, Pass TD 4, INT -2, Rush/Rec Yds /10, Rec 1, Rush/Rec TD 6, FG 3, XP 1, DST plays by stops.',money_ball:'Points scoring with one lockable game per starting position each week. If you do not lock a slot, its final game of the week counts.',roto:'Season-long ranking by cumulative fantasy points.',points:'Straight cumulative fantasy points using standard NFL scoring.'},
       teamCodes:['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LV','LAC','LAR','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS']
     },
     mlb:{
@@ -28,7 +28,7 @@
       filters:['ALL','C','1B','2B','3B','SS','OF','P','SP','RP'],waiverPositions:['ALL','C','1B','2B','3B','SS','OF','P','SP','RP'],
       starterSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P'],myTeamSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P','BN','BN','BN','IL','IL','IL'],
       commissionerScoringType:'Points',
-      scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in later.',h2h_pts:'Head-to-head points using hitter and pitcher events across the week.',roto:'Season-long ranking by cumulative points for now.',points:'Primary MLB default: Single 1, Double 2, Triple 3, HR 4, RBI 1, Run 1, BB 1, SB 2, IP 3, SO 1, Win 5, Save 5, ER -2.'},
+scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in later.',h2h_pts:'Head-to-head points using hitter and pitcher events across the week.',money_ball:'Points scoring with one lockable game per starting position each week. If you do not lock a slot, its final game of the week counts.',roto:'Season-long ranking by cumulative points for now.',points:'Primary MLB default: Single 1, Double 2, Triple 3, HR 4, RBI 1, Run 1, BB 1, SB 2, IP 3, SO 1, Win 5, Save 5, ER -2.'},
       teamCodes:['ARI','ATL','BAL','BOS','CHC','CWS','CIN','CLE','COL','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WSH']
     }
   };
