@@ -47,6 +47,8 @@
   .chips{display:flex;gap:5px;flex-wrap:wrap;}
   .chip{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;flex:1 1 auto;min-width:fit-content;text-align:center;}
   .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .chip.moneyball{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:var(--green);}
+  .chip.moneyball.on{background:var(--accent);border-color:var(--accent);color:#fff;}
   #cScoring .chip:nth-child(n+5){flex-basis:calc(50% - 2.5px);}
   .ibox{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text3);line-height:1.5;margin-top:5px;}
   .btn{width:100%;background:var(--accent);color:#fff;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:1px;border:none;border-radius:10px;padding:14px;cursor:pointer;margin-top:4px;}
@@ -421,8 +423,8 @@
         <div class="chip" data-v="h2h_cat" onclick="cc('cScoring',this)">H2H Cat</div>
         <div class="chip" data-v="roto" onclick="cc('cScoring',this)">Roto</div>
         <div class="chip" data-v="points" onclick="cc('cScoring',this)">Season Pts</div>
-        <div class="chip" data-v="moneyball_cat" onclick="cc('cScoring',this)">💰 Moneyball Cat</div>
-        <div class="chip" data-v="moneyball_pts" onclick="cc('cScoring',this)">💰 Moneyball H2H Pts</div>
+        <div class="chip moneyball" data-v="moneyball_cat" onclick="cc('cScoring',this)">Moneyball Cat</div>
+        <div class="chip moneyball" data-v="moneyball_pts" onclick="cc('cScoring',this)">Moneyball H2H Pts</div>
       </div>
       <div class="ibox" id="iScoringInfo">Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.</div>
     </div>
@@ -781,13 +783,24 @@ function ensureRosterbatePools(){
     });
   return rbPoolsReady;
 }
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+// Declare Firebase variables
+let auth, db;
+
+// Wait for Firebase to load before initializing
+if (typeof firebase !== 'undefined') {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.database();
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+}
 let currentRbUser=null;
 let authReadyResolved=false;
 const authReady=new Promise(resolve=>{
+  if(!auth){
+    resolve(null);
+    return;
+  }
   auth.onAuthStateChanged(user=>{
     currentRbUser=user||null;
     if(!authReadyResolved){
