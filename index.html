@@ -54,15 +54,17 @@
   .hero-sub{font-size:15px;color:var(--text2);line-height:1.6;max-width:520px;margin:0 auto 18px;}
   .hero-sub strong{color:var(--text);}
   .promo-grid{display:grid;grid-template-columns:1fr;gap:10px;max-width:1200px;margin:8px auto 0;}
-  .promo-card{background:linear-gradient(135deg,rgba(239,68,68,.14),rgba(249,115,22,.08));border:1px solid rgba(239,68,68,.28);border-radius:14px;padding:14px 16px;}
+  .promo-card{background:linear-gradient(135deg,rgba(239,68,68,.14),rgba(249,115,22,.08));border:1px solid rgba(239,68,68,.28);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;}
   .promo-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;line-height:.95;text-align:center;color:var(--text);margin-bottom:10px;}
-  .promo-copy{font-size:13px;color:var(--text2);line-height:1.55;}
+  .promo-copy{font-size:13px;color:var(--text2);line-height:1.55;flex:1;}
   .promo-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;}
   .promo-tag{border-color:rgba(239,68,68,.24);color:#fca5a5;}
-  .promo-card.powerups{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(59,130,246,.08));border-color:rgba(34,197,94,.24);}
-  .promo-card.powerups .promo-tag{border-color:rgba(34,197,94,.24);color:#86efac;}
-  .promo-card.trade{background:linear-gradient(135deg,rgba(249,115,22,.14),rgba(245,158,11,.08));border-color:rgba(249,115,22,.26);}
-  .promo-card.trade .promo-tag{border-color:rgba(249,115,22,.24);color:#fdba74;}
+  .promo-card.moneyball{background:linear-gradient(135deg,rgba(34,197,94,.14),rgba(34,197,94,.08));border-color:rgba(34,197,94,.28);}
+  .promo-card.moneyball .promo-tag{border-color:rgba(34,197,94,.24);color:#86efac;}
+  .promo-card.powerups{background:linear-gradient(135deg,rgba(234,179,8,.14),rgba(250,204,21,.08));border-color:rgba(234,179,8,.28);}
+  .promo-card.powerups .promo-tag{border-color:rgba(234,179,8,.24);color:#fde047;}
+  .promo-card.trade{background:linear-gradient(135deg,rgba(239,68,68,.14),rgba(248,113,113,.08));border-color:rgba(239,68,68,.28);}
+  .promo-card.trade .promo-tag{border-color:rgba(239,68,68,.24);color:#fca5a5;}
   .promo-action{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:rgba(249,115,22,.16);border:1px solid rgba(249,115,22,.34);border-radius:999px;padding:8px 12px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fdba74;cursor:pointer;}
   .promo-action:hover{background:rgba(249,115,22,.22);}
   .info-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:320;align-items:center;justify-content:center;padding:20px;}
@@ -98,10 +100,11 @@
   /* SPORT GRID */
   .sport-section{margin-bottom:24px;}
   .section-label{font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:10px;}
+  .section-label.features{margin-top:24px;}
   .sport-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
   .sport-card{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
   .sport-card:hover{transform:translateY(-2px);border-color:var(--accent);}
-  .sport-card.active{border-color:var(--accent);background:rgba(249,115,22,.08);}
+  .sport-card.active{border:2px solid var(--accent);background:rgba(249,115,22,.08);}
   .sport-card.soon{opacity:.45;cursor:default;}
   .sport-card:hover.soon{transform:none;border-color:var(--border);}
   .sport-icon{font-size:28px;margin-bottom:6px;line-height:1;}
@@ -110,13 +113,14 @@
 
   /* MAIN CTAs */
   .cta-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;align-items:stretch;}
-  .cta-card{display:flex;flex-direction:column;text-decoration:none;background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:18px;transition:all .2s;position:relative;overflow:hidden;}
-  .cta-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
-  .cta-card.orange:hover{border-color:rgba(249,115,22,.4);}
-  .cta-card.green:hover{border-color:rgba(34,197,94,.4);}
-  .cta-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .cta-card{display:flex;flex-direction:column;text-decoration:none;background:linear-gradient(135deg,var(--card),var(--bg3));border:2px solid var(--border);border-radius:16px;padding:18px;transition:all .2s;position:relative;overflow:hidden;color:var(--text);}
+  .cta-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);border-color:var(--green);}
+  .cta-top{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:8px;text-align:center;}
   .cta-emoji{font-size:32px;line-height:1;flex-shrink:0;}
-  .cta-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;}
+  .cta-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--text) !important;}
+  .cta-card .cta-title{color:var(--text) !important;}
+  .cta-card.orange .cta-title{color:var(--text) !important;}
+  .cta-card.green .cta-title{color:var(--text) !important;}
   .cta-title span{display:block;font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--text2);margin-top:1px;}
   .cta-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px;flex:1;}
   .cta-btn{display:block;width:100%;padding:12px 18px;border-radius:8px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-top:auto;}
@@ -248,18 +252,20 @@
     <p class="hero-sub">The ultimate fantasy sports experience. Play against <strong>real people</strong> or challenge <strong>AI opponents</strong> across multiple sports — all season long.</p>
 
     <div class="mode-row">
-      <a href="#single-player-card" class="mode-pill ai">🤖 Play vs AI</a>
-      <a href="#multiplayer-card" class="mode-pill real">👥 Play vs Real People</a>
+      <a href="rosterbate-draft.html?sport=nba" class="mode-pill ai">🤖 Play vs AI</a>
+      <a href="rosterbate-matchmaking.html?sport=nba" class="mode-pill real">👥 Play vs Real People</a>
     </div>
+    <div class="section-label features">Unique Features</div>
     <div class="promo-grid">
-      <div class="promo-card">
-        <div class="promo-title">Trash Talk</div>
-        <div class="promo-copy">Bring back the lobby energy with <strong style="color:var(--text);">s*%t talking</strong>, callouts, rivalry chatter, and all the noise that makes playing real people feel alive.</div>
+      <div class="promo-card moneyball">
+        <div class="promo-title">Moneyball Modes</div>
+        <div class="promo-copy">Lock in your best performances. Pick <strong style="color:var(--text);">one game per week</strong> for each position instead of all games. Strategic timing, injury management, and matchup selection become critical when every lock-in counts.</div>
         <div class="promo-tags">
-          <span class="tag promo-tag">Live chat vibes</span>
-          <span class="tag promo-tag">League banter</span>
-          <span class="tag promo-tag">Rivalry fuel</span>
+          <span class="tag promo-tag">Lock-in strategy</span>
+          <span class="tag promo-tag">Game selection</span>
+          <span class="tag promo-tag">Matchup mastery</span>
         </div>
+        <button class="promo-action" onclick="openMoneyballExplainer()">How This Works</button>
       </div>
       <div class="promo-card powerups">
         <div class="promo-title">Boost Your Team</div>
@@ -307,17 +313,17 @@
   </div>
 
   <!-- Main CTAs -->
-  <div class="section-label" id="sportSectionLabel">Get Started — NBA</div>
+  <div class="section-label" id="sportSectionLabel">Get Started — Basketball</div>
   <div class="cta-grid">
     <a href="rosterbate-draft.html?sport=nba" class="cta-card orange" id="single-player-card">
       <div class="cta-top">
         <div class="cta-emoji">🎯</div>
-        <div class="cta-title">Single Player<span>Start a new league &amp; draft your team</span></div>
+        <div class="cta-title">Draft Your Team<span>Start a new league &amp; draft your team</span></div>
       </div>
       <div class="cta-desc">Set up your league, customize scoring and roster settings, then draft live with a pick timer, auto-draft queue, and full pick trading before the draft even starts.</div>
 <div class="cta-btn">Create Your League →</div>
       <div class="cta-tags">
-        <span class="tag">Snake / Auction / Linear</span>
+        <span class="tag">Snake / Auction</span>
         <span class="tag">Pick timer</span>
         <span class="tag">Auto-draft queue</span>
         <span class="tag">Trade picks</span>
@@ -327,10 +333,10 @@
     </a>
 
     <!-- Multiplayer matchmaking card -->
-    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));border:1px solid rgba(99,102,241,.3);border-radius:16px;padding:18px;transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(99,102,241,.6)'" onmouseleave="this.style.transform='';this.style.borderColor='rgba(99,102,241,.3)'">
+    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));border:2px solid var(--border);border-radius:16px;padding:18px;transition:all .2s;color:var(--text);" onmouseenter="this.style.transform='translateY(-2px)';this.style.borderColor='var(--green)'" onmouseleave="this.style.transform='';this.style.borderColor='var(--border)'">
       <div class="cta-top">
         <div class="cta-emoji">👥</div>
-        <div class="cta-title" style="color:#a5b4fc;">Multiplayer<span style="color:var(--text2);">Match with real managers</span></div>
+        <div class="cta-title">Multiplayer<span style="color:var(--text2);">Match with real managers</span></div>
       </div>
       <div class="cta-desc">Quick Match finds leagues by draft format, scoring type, and team size. Browse open leagues, create a private one, or join with a share code.</div>
       <div class="cta-btn" style="background:rgba(99,102,241,.85);color:#fff;display:block;width:100%;text-align:center;box-sizing:border-box;">🔍 Find a League →</div>
@@ -413,7 +419,7 @@
       <div class="step-num">3</div>
       <div>
         <h3>Draft Your Roster</h3>
-        <p>Snake, auction, or linear draft with live pick timers, an auto-draft queue, and mid-draft pick trades.</p>
+        <p>Snake or auction draft with live pick timers, an auto-draft queue, and mid-draft pick trades.</p>
       </div>
     </div>
     <div class="step">
@@ -609,6 +615,82 @@
     </div>
   </div>
 </div>
+<div id="moneyballExplainer" class="info-modal" onclick="if(event.target===this)closeMoneyballExplainer()">
+  <div class="info-panel">
+    <div class="info-head">
+      <div>
+        <div class="info-title">Moneyball Modes</div>
+        <div class="info-sub">Lock in your best performances each week. Instead of scoring points from every game, you choose ONE game per position. Strategic timing and matchup selection become critical.</div>
+      </div>
+      <button class="nav-auth-btn secondary" onclick="closeMoneyballExplainer()">Close</button>
+    </div>
+    <div class="swap-grid">
+      <div class="swap-card">
+        <div class="swap-step">Step 1 · Choose Your Game</div>
+        <div class="swap-board">
+          <div class="pick-column">
+            <div class="pick-slot active" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+              <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
+                  <rect x="12" y="12" width="40" height="40" rx="6" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="2.5"/>
+                  <path d="M22 12v-4M42 12v-4M12 22h40" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="24" cy="32" r="3" fill="#22c55e"/>
+                  <circle cx="32" cy="32" r="3" fill="#22c55e"/>
+                  <circle cx="40" cy="32" r="3" fill="#22c55e"/>
+                  <circle cx="24" cy="42" r="3" fill="rgba(34,197,94,.3)"/>
+                  <circle cx="32" cy="42" r="3" fill="rgba(34,197,94,.3)"/>
+                  <path d="M28 30 32 36l8-12" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </div>
+              <div class="pick-no">1</div>
+              <div class="pick-label">Pick one game per position each week to lock in</div>
+            </div>
+          </div>
+        </div>
+        <div class="swap-note">Your point guard has 4 games this week? You only lock in ONE. Choose wisely based on matchup, injury status, and schedule.</div>
+      </div>
+      <div class="swap-card">
+        <div class="swap-step">Step 2 · Lock Before Tipoff</div>
+        <div class="swap-board">
+          <div class="pick-column">
+            <div class="pick-slot alt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+              <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
+                  <rect x="16" y="22" width="32" height="28" rx="4" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="2.5"/>
+                  <path d="M24 22V16a8 8 0 0 1 16 0v6" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="32" cy="36" r="4" fill="#22c55e"/>
+                  <path d="M32 40v6" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="pick-no">🔒</div>
+              <div class="pick-label">Must lock before that game starts — no changes after</div>
+            </div>
+          </div>
+        </div>
+        <div class="swap-note">Once a game tips off, that lock is <strong style="color:var(--text);">permanent</strong>. No swaps, no regrets. Make your call and live with it.</div>
+      </div>
+      <div class="swap-card">
+        <div class="swap-step">Step 3 · Only Locked Games Score</div>
+        <div class="swap-board">
+          <div class="pick-column">
+            <div class="pick-slot active" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+              <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
+                  <circle cx="32" cy="32" r="18" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="2.5"/>
+                  <path d="M22 32l6 6 14-14" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                  <path d="M12 32h8M44 32h8M32 12v8M32 44v8" stroke="#22c55e" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+                </svg>
+              </div>
+              <div class="pick-no">✓</div>
+              <div class="pick-label">Your locked game = your points for that position</div>
+            </div>
+          </div>
+        </div>
+        <div class="swap-note">All other games are ignored. If your locked player drops <strong style="color:var(--text);">40 fantasy points</strong>, you bank 40. If they go 2-12, you eat it.</div>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="authModal" class="auth-modal" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-panel">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
@@ -719,6 +801,7 @@ function updateHomeSportUI(){
 
 function selectSportCard(sport){
   selectedHomeSport = normalizeRosterbateSport(sport);
+  setSelectedRosterbateSport(selectedHomeSport);
   updateHomeSportUI();
 }
 
@@ -734,6 +817,8 @@ function openSwapExplainer(){ document.getElementById('swapExplainer').classList
 function closeSwapExplainer(){ document.getElementById('swapExplainer').classList.remove('open'); }
 function openPowerupExplainer(){ document.getElementById('powerupExplainer').classList.add('open'); }
 function closePowerupExplainer(){ document.getElementById('powerupExplainer').classList.remove('open'); }
+function openMoneyballExplainer(){ document.getElementById('moneyballExplainer').classList.add('open'); }
+function closeMoneyballExplainer(){ document.getElementById('moneyballExplainer').classList.remove('open'); }
 function closeAccountMenu(){ document.getElementById('accountMenu')?.classList.remove('open'); }
 function toggleAccountMenu(){
   document.getElementById('accountMenu')?.classList.toggle('open');
