@@ -632,6 +632,8 @@
   </div>
 </div>
 
+<audio id="shemmyAudio" preload="none" src="https://users.content.ytmnd.com/d/6/2/d62143415d6810f35ca1dd9a91916100.mp3"></audio>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
@@ -653,6 +655,9 @@ const HOME_SPORT_LABELS = { nba:'Basketball', nfl:'Football', mlb:'Baseball' };
 let selectedHomeSport = getSelectedRosterbateSport();
 let navFriendRequestListener = null;
 let navThreadListener = null;
+const SHEMMY_SEQUENCE = 'shemmy';
+let shemmyBuffer = '';
+let shemmyLastPlayedAt = 0;
 
 function updateNavNotificationBadge(count){
   const badge = document.getElementById('navNotify');
@@ -795,6 +800,28 @@ function subscribeLeaderboard(){
 function openSettings(){
   closeAccountMenu();
   window.location.href='profile.html';
+}
+function tryPlayShemmyClip(){
+  const audio = document.getElementById('shemmyAudio');
+  const now = Date.now();
+  if(!audio || now - shemmyLastPlayedAt < 2000) return;
+  shemmyLastPlayedAt = now;
+  try{
+    audio.pause();
+    audio.currentTime = 0;
+    const playAttempt = audio.play();
+    if(playAttempt && typeof playAttempt.catch === 'function') playAttempt.catch(() => {});
+  } catch(_error){}
+}
+function handleShemmySequence(event){
+  if(event.ctrlKey || event.metaKey || event.altKey) return;
+  const key = String(event.key || '').toLowerCase();
+  if(key.length !== 1 || key < 'a' || key > 'z') return;
+  shemmyBuffer = (shemmyBuffer + key).slice(-SHEMMY_SEQUENCE.length);
+  if(shemmyBuffer === SHEMMY_SEQUENCE){
+    shemmyBuffer = '';
+    tryPlayShemmyClip();
+  }
 }
 function openMessages(){
   closeAccountMenu();
@@ -1085,6 +1112,7 @@ auth.onAuthStateChanged(async user => {
 document.addEventListener('click', event => {
   if(!event.target.closest('.account-wrap')) closeAccountMenu();
 });
+document.addEventListener('keydown', handleShemmySequence);
 
 subscribeLeaderboard();
 setAuthMode('signup');

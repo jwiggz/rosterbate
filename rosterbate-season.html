@@ -1073,7 +1073,7 @@ const SPORT_SEASON_META={
 };
 const DEMO_TEAM_NAMES={
   nba:['My Demo Team','Rim Rockers','Net Ninjas','Hoop Dreams','Fast Breakers','Triple Threats','Buckets FC','Glass Eaters','The Paint','Sky Hooks'],
-  nfl:['My Demo Team','Fourth & Gold','Red Zone Renegades','Blitz Brigade','Sunday Bombers','Goal Line Gang','Trench Kings','Pocket Protectors','Hail Mary Co.','Two Minute Drill'],
+  nfl:['My Demo Team','Run CMC','Baby Got Dak','Country Road Take Mahomes','Diggs in a Blanket','Fourth & Drunk','Jefferson Airplane','Show Me Your TDs','Multiple Scoregasms','Zeke and Destroy'],
   mlb:['My Demo Team','Dugout Dogs','Bullpen Bandits','Line Drive Co.','Southpaw Syndicate','Big Fly Club','The Infield','Closer Culture','Bat Flip Dept.','Warning Track']
 };
 function getSeasonMeta(sport){
@@ -2918,7 +2918,6 @@ function renderRoster(){
           ${dateSummary}
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          ${!isLocked?`<button class="season-outline-btn" onclick="autoSetDay(${day})">Auto Set</button>`:''}
           <button class="season-outline-btn" onclick="goPage('matchup')">Matchup</button>
           <button class="season-outline-btn" onclick="goPage('waiver')" style="background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button>
           <button class="season-outline-btn" onclick="openDropPlayerModal()" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#fca5a5;">Drop Player</button>
