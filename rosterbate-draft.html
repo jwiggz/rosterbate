@@ -109,6 +109,10 @@
   .pr{display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;cursor:pointer;transition:background .1s;}
   .pr:active{background:rgba(249,115,22,.07);}
   .pr.drafted{opacity:.28;pointer-events:none;}
+  .pstat{min-width:40px;font-size:11px;font-weight:600;color:var(--text2);text-align:right;flex-shrink:0;}
+  .pstat-header{display:flex;align-items:center;padding:8px 11px;gap:9px;border-bottom:2px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:10;}
+  .pstat-label{min-width:40px;font-size:10px;font-weight:800;color:var(--text3);text-align:right;flex-shrink:0;text-transform:uppercase;cursor:pointer;user-select:none;}
+  .pstat-label:hover{color:var(--accent);}
   .prank{width:22px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text3);text-align:center;flex-shrink:0;}
   .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--fd);flex-shrink:0;border:2px solid var(--border);color:#fff;}
   .pinfo{flex:1;min-width:0;}
@@ -128,6 +132,7 @@
   .pos-F{background:rgba(20,184,166,.2);color:#5eead4;}
   .dbtn{background:var(--accent);border:none;border-radius:7px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;flex-shrink:0;}
   .dbtn:active{background:var(--accent2);}
+  .dbtn.disabled{background:#444;color:#888;cursor:not-allowed;}
   .dlbl{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);}
 
   /* MY TEAM */
@@ -525,6 +530,23 @@
           <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
           <div class="pf" style="padding-top:0;padding-bottom:7px">
             <div class="posf" id="posFilterBar"></div>
+          </div>
+          <div id="statHeader" class="pstat-header" style="display:none;">
+            <div class="prank"></div>
+            <div style="width:34px;flex-shrink:0;"></div>
+            <div style="flex:1;min-width:0;"></div>
+            <div class="pstat-label" onclick="sortPlayers('min')">MIN</div>
+            <div class="pstat-label" onclick="sortPlayers('fgm')">FGM</div>
+            <div class="pstat-label" onclick="sortPlayers('fga')">FGA</div>
+            <div class="pstat-label" onclick="sortPlayers('ftm')">FTM</div>
+            <div class="pstat-label" onclick="sortPlayers('fta')">FTA</div>
+            <div class="pstat-label" onclick="sortPlayers('tpm')">3PM</div>
+            <div class="pstat-label" onclick="sortPlayers('reb')">REB</div>
+            <div class="pstat-label" onclick="sortPlayers('ast')">AST</div>
+            <div class="pstat-label" onclick="sortPlayers('stl')">STL</div>
+            <div class="pstat-label" onclick="sortPlayers('blk')">BLK</div>
+            <div class="pstat-label" onclick="sortPlayers('to')">TO</div>
+            <div class="pstat-label" onclick="sortPlayers('pts')">PTS</div>
           </div>
           <div class="pl" id="pList"></div>
         </div>
@@ -1725,6 +1747,7 @@ function startDraft(){
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
   document.getElementById('draft').classList.add('active');
+  document.getElementById('statHeader').style.display='flex';
   rPlayers();rMyTeam();rOtherTeams();rBoard();upHdr();updateTradeBtn();
   startCountdown();
   awardRosterbateScore('create_league', 10).catch(() => {});
@@ -2188,10 +2211,17 @@ function rPlayers(){
     const fp=calcFP(p);
     const faved=isFav(p.id);
     const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
-    const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn" onclick="event.stopPropagation();userPick(PLAYERS[${idx}])">Draft</button>`:(!drafted&&myNomTurn?`<button class="dbtn" onclick="event.stopPropagation();startAuctionNomination(PLAYERS[${idx}])">Nominate</button>`:'');
+    const btnClass=!S.started?' disabled':'';
+    const btnClick=!S.started?'':`onclick="event.stopPropagation();userPick(PLAYERS[${idx}])"`;
+    const inlineDraftBtn=!drafted&&myTurn?`<button class="dbtn${btnClass}" ${btnClick}>Draft</button>`:(!drafted&&myNomTurn?`<button class="dbtn${btnClass}" ${btnClick}>Nominate</button>`:'');
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
       :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${inlineDraftBtn}</div>`;
+    const min=p.min||28;
+    const fgm=p.fgm||Math.round(min*0.3);
+    const fga=p.fga||Math.round(fgm/(p.fgp||0.45));
+    const ftm=p.ftm||Math.round(min*0.15);
+    const fta=p.fta||Math.round(ftm/(p.ftp||0.75));
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
@@ -2204,8 +2234,66 @@ function rPlayers(){
         <div class="pdet">${p.team} · ${getRosterbatePlayerSummary(p, SPORT)}</div>
         ${actionRow}
       </div>
+      <div class="pstat">${min.toFixed(1)}</div>
+      <div class="pstat">${fgm.toFixed(1)}</div>
+      <div class="pstat">${fga.toFixed(1)}</div>
+      <div class="pstat">${ftm.toFixed(1)}</div>
+      <div class="pstat">${fta.toFixed(1)}</div>
+      <div class="pstat">${(p.tpm||0).toFixed(1)}</div>
+      <div class="pstat">${(p.reb||0).toFixed(1)}</div>
+      <div class="pstat">${(p.ast||0).toFixed(1)}</div>
+      <div class="pstat">${(p.stl||0).toFixed(1)}</div>
+      <div class="pstat">${(p.blk||0).toFixed(1)}</div>
+      <div class="pstat">${(p.to||0).toFixed(1)}</div>
+      <div class="pstat">${(p.pts||0).toFixed(1)}</div>
     </div>`;
   }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
+}
+let sortStat='adp';
+let sortDir=1;
+function sortPlayers(stat){
+  if(sortStat===stat){
+    sortDir*=-1;
+  }else{
+    sortStat=stat;
+    sortDir=-1;
+  }
+  PLAYERS.sort((a,b)=>{
+    let aVal,bVal;
+    if(stat==='min'){
+      aVal=a.min||28;
+      bVal=b.min||28;
+    }else if(stat==='fgm'){
+      const aMin=a.min||28;
+      aVal=a.fgm||Math.round(aMin*0.3);
+      const bMin=b.min||28;
+      bVal=b.fgm||Math.round(bMin*0.3);
+    }else if(stat==='fga'){
+      const aMin=a.min||28;
+      const aFgm=a.fgm||Math.round(aMin*0.3);
+      aVal=a.fga||Math.round(aFgm/(a.fgp||0.45));
+      const bMin=b.min||28;
+      const bFgm=b.fgm||Math.round(bMin*0.3);
+      bVal=b.fga||Math.round(bFgm/(b.fgp||0.45));
+    }else if(stat==='ftm'){
+      const aMin=a.min||28;
+      aVal=a.ftm||Math.round(aMin*0.15);
+      const bMin=b.min||28;
+      bVal=b.ftm||Math.round(bMin*0.15);
+    }else if(stat==='fta'){
+      const aMin=a.min||28;
+      const aFtm=a.ftm||Math.round(aMin*0.15);
+      aVal=a.fta||Math.round(aFtm/(a.ftp||0.75));
+      const bMin=b.min||28;
+      const bFtm=b.ftm||Math.round(bMin*0.15);
+      bVal=b.fta||Math.round(bFtm/(b.ftp||0.75));
+    }else{
+      aVal=a[stat]||0;
+      bVal=b[stat]||0;
+    }
+    return (bVal-aVal)*sortDir;
+  });
+  rPlayers();
 }
 function fPos(pos,btn){
   S.posF=pos;
