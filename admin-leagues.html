@@ -220,16 +220,30 @@ async function checkAdminAccess(){
     return false;
   }
   
+  // Check if user is a hardcoded admin
+  const hardcodedAdmins = [
+    'ZqytkFsUCYZylOgWF6OZf2714w12',
+    'sAu0wDTK33ensoTQ3reEXvzpkbv2'
+  ];
+  
+  if (hardcodedAdmins.includes(currentUser.uid)) {
+    console.log('✅ Admin access granted (hardcoded UID)');
+    return true;
+  }
+  
+  // Check if user has isAdmin flag in database
   const snap = await db.ref(`users/${currentUser.uid}`).once('value');
   const user = snap.val() || {};
   
-  if(user.isAdmin !== true){
-    alert('Access denied. Admin privileges required.');
-    window.location.href = 'index.html';
-    return false;
+  if(user.isAdmin === true){
+    console.log('✅ Admin access granted (isAdmin flag)');
+    return true;
   }
   
-  return true;
+  console.log('❌ Admin access denied');
+  alert('Access denied. Admin privileges required.');
+  window.location.href = 'index.html';
+  return false;
 }
 
 async function loadAllLeagues(){

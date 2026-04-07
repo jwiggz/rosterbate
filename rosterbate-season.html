@@ -2227,7 +2227,105 @@ window.onload=async function(){
     if (currentRbUser) {
       try {
         const userId = currentRbUser.uid;
-        const snapshot = await db.ref(`userSeasons/${userId}/${leagueId}`).once('value');
+        let snapshot = await db.ref(`userSeasons/${userId}/${leagueId}`).once('value');
+        
+        // If not found in current user's seasons, check if it's in localStorage from a fresh draft
+        if (!snapshot.exists()) {
+          console.log('⚠️ League not in Firebase, checking localStorage...');
+          const localRaw = localStorage.getItem('rosterbateDraft');
+          if (localRaw) {
+            try {
+              const localData = JSON.parse(localRaw);
+              // Check if localStorage has this league
+              if (localData.seasonId === leagueId) {
+                console.log('✅ Found league in localStorage, will use that and save to Firebase');
+                
+                // This is a fresh draft that hasn't been saved to Firebase yet
+                // The draft completion should have saved it, but let's ensure it's there
+                const leagueData = localData;
+                
+                // Save to Firebase now
+                try {
+                  const saveData = {
+                    ...leagueData,
+                    seasonId: leagueId,
+                    userId: userId,
+                    userEmail: currentRbUser.email || 'unknown',
+                    createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                    updatedAt: Date.now()
+                  };
+                  
+                  const cleanedData = removeUndefined(saveData);
+                  await db.ref(`userSeasons/${userId}/${leagueId}`).set(cleanedData);
+                  
+                  // Also save to admin index
+                  await db.ref(`allSeasons/${leagueId}`).set({
+                    seasonId: leagueId,
+                    userId: userId,
+                    userEmail: currentRbUser.email || 'unknown',
+                    sport: leagueData.sport || 'nba',
+                    leagueName: leagueData.leagueName || 'RosterBate League',
+                    teamName: leagueData.teamName || 'My Team',
+                    isMultiplayer: !!leagueData.multiplayer,
+                    leagueSize: leagueData.leagueSize || 0,
+                    scoringFormat: leagueData.scoringFormat || 'h2h_pts',
+                    draftFormat: leagueData.draftFormat || 'snake',
+                    createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                    updatedAt: Date.now()
+                  });
+                  
+                  console.log('✅ Saved league to Firebase');
+                } catch(saveErr) {
+                  console.warn('Failed to save to Firebase, continuing with localStorage data:', saveErr);
+                }
+                
+                // Continue with the league data
+                D = leagueData;
+                
+                if (typeof D.isCommissioner !== 'boolean') D.isCommissioner = true;
+                if (!D.myPos && D.myPos !== 0) D.myPos = 0;
+                
+                applySportContext(leagueData.sport || requestedSport);
+                hydrateDraftUserContextFromLobby();
+                
+                let seasonLoaded = false;
+                if (D.multiplayer) {
+                  try {
+                    seasonLoaded = await loadOrCreateSharedSeason();
+                  } catch(e) {
+                    console.error('Shared season load failed:', e);
+                    seasonLoaded = false;
+                  }
+                }
+                
+                if (!seasonLoaded) {
+                  try {
+                    console.log('🚀 Initializing season from localStorage data...');
+                    initSeason();
+                    console.log('✅ Season initialized successfully');
+                  } catch(initErr) {
+                    console.error('❌ Season init failed:', initErr);
+                    toast('Could not open the league: ' + initErr.message);
+                    return;
+                  }
+                }
+                
+                goPage('hub');
+                return;
+              }
+            } catch(e) {
+              console.error('Failed to parse localStorage:', e);
+            }
+          }
+          
+          console.warn('⚠️ League not found in Firebase or localStorage:', leagueId);
+          toast('League not found. Please select your league from My Leagues page.');
+          // Redirect to my-leagues after 2 seconds
+          setTimeout(() => {
+            window.location.href = 'my-leagues.html';
+          }, 2000);
+          return;
+        }
         
         if (snapshot.exists()) {
           const leagueData = snapshot.val();
