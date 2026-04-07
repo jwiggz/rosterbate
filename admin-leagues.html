@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RosterBate - Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+  :root{
+    --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+    --accent:#f97316;--accent2:#fb923c;--green:#22c55e;--blue:#60a5fa;--red:#ef4444;
+    --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+    --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(circle at top,rgba(249,115,22,.08),transparent 30%),var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh}
+  a{text-decoration:none;color:inherit}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);background:rgba(10,14,26,.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+  .brand{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
+  .brand span{color:var(--accent)}
+  .admin-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.26);color:#fca5a5;padding:6px 12px;border-radius:8px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-left:12px}
+  .top-actions{display:flex;gap:10px;align-items:center}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:11px 16px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;border:none;transition:all .15s}
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+  .btn.danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.32);color:#fca5a5}
+  .btn.small{padding:9px 12px;font-size:13px}
+  .btn.tiny{padding:7px 10px;font-size:11px}
+  .shell{max-width:1520px;margin:0 auto;padding:28px 20px 40px}
+  .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:24px}
+  .hero h1{font-family:var(--fd);font-size:42px;font-weight:900;letter-spacing:.4px}
+  .hero p{color:var(--text2);font-size:15px;line-height:1.6;max-width:760px}
+  .filters{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .filter-group{display:flex;flex-direction:column;gap:6px}
+  .filter-label{font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)}
+  select,input[type="text"]{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:var(--fb);font-size:14px;min-width:180px}
+  select:focus,input[type="text"]:focus{outline:none;border-color:var(--accent)}
+  .stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .stat-value{font-family:var(--fd);font-size:32px;font-weight:900;line-height:1;color:var(--accent)}
+  .stat-label{margin-top:6px;color:var(--text3);font-size:11px;letter-spacing:.7px;text-transform:uppercase}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+  .league-card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:all .2s}
+  .league-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .league-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .league-title{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1.2}
+  .league-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+  .pill.solo{color:#a78bfa;border-color:rgba(167,139,250,.26);background:rgba(167,139,250,.08)}
+  .pill.multi{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
+  .league-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .info-item{display:flex;flex-direction:column;gap:2px}
+  .info-label{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--text3)}
+  .info-value{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--text)}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:36px;text-align:center;color:var(--text2)}
+  .empty h3{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;margin-bottom:8px}
+  .empty p{font-size:14px;line-height:1.6;max-width:460px;margin:0 auto}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--green);color:#fff;padding:12px 18px;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  .toast.error{background:var(--red)}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal.active{display:flex}
+  .modal-content{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto}
+  .modal-title{font-family:var(--fd);font-size:28px;font-weight:900;margin-bottom:16px}
+  .modal-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
+  pre{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;font-size:12px;line-height:1.5;color:var(--text2)}
+  @media (max-width:720px){
+    .topbar{padding:16px}
+    .hero{flex-direction:column;align-items:flex-start}
+    .hero h1{font-size:34px}
+    .filters{flex-direction:column;align-items:stretch}
+    .filter-group{width:100%}
+    select,input[type="text"]{width:100%}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;">
+      <a href="index.html" class="brand">Roster<span>Bate</span></a>
+      <div class="admin-badge">🛡️ Admin</div>
+    </div>
+    <div class="top-actions">
+      <a href="my-leagues.html" class="btn secondary small">My Leagues</a>
+      <a href="profile.html" class="btn secondary small">Settings</a>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="hero">
+      <div>
+        <h1>Admin Panel</h1>
+        <p>Manage all leagues across all users. View, edit, delete, or export league data.</p>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-label">Total Leagues</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statSolo">—</div>
+        <div class="stat-label">Solo Leagues</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statMulti">—</div>
+        <div class="stat-label">Multiplayer Leagues</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statUsers">—</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label class="filter-label">Search</label>
+        <input type="text" id="filterSearch" placeholder="League name or user email..." oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Sport</label>
+        <select id="filterSport" onchange="applyFilters()">
+          <option value="">All Sports</option>
+          <option value="nba">NBA</option>
+          <option value="nfl">NFL</option>
+          <option value="mlb">MLB</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Type</label>
+        <select id="filterType" onchange="applyFilters()">
+          <option value="">All Types</option>
+          <option value="solo">Solo Only</option>
+          <option value="multi">Multiplayer Only</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Sort By</label>
+        <select id="filterSort" onchange="applyFilters()">
+          <option value="updated">Recently Updated</option>
+          <option value="created">Recently Created</option>
+          <option value="name">League Name</option>
+        </select>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:flex-end;">
+        <button class="btn secondary small" onclick="loadAllLeagues()">🔄 Refresh</button>
+        <button class="btn primary small" onclick="exportAllData()">💾 Export All</button>
+      </div>
+    </div>
+
+    <div class="grid" id="leagueList"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- View Details Modal -->
+  <div class="modal" id="viewModal">
+    <div class="modal-content" style="position:relative;">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-title">League Details</div>
+      <pre id="viewDetails"></pre>
+    </div>
+  </div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
+  authDomain: "rosterbate-51339.firebaseapp.com",
+  databaseURL: "https://rosterbate-51339-default-rtdb.firebaseio.com",
+  projectId: "rosterbate-51339",
+  storageBucket: "rosterbate-51339.firebasestorage.app",
+  messagingSenderId: "951275364572",
+  appId: "1:951275364572:web:758d1b4d970b7b87c05419",
+  measurementId: "G-DNSFKMKYVC"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+let currentUser = null;
+let allLeagues = [];
+let filteredLeagues = [];
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function sportLabel(sport){
+  return {nba:'NBA',nfl:'NFL',mlb:'MLB'}[sport?.toLowerCase()] || sport?.toUpperCase() || 'Unknown';
+}
+
+function formatDate(timestamp){
+  if(!timestamp) return '—';
+  const date = new Date(timestamp);
+  return date.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function toast(msg,bg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  if(bg) el.style.background = bg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+async function checkAdminAccess(){
+  if(!currentUser){
+    alert('You must be logged in to access the admin panel.');
+    window.location.href = 'index.html';
+    return false;
+  }
+  
+  const snap = await db.ref(`users/${currentUser.uid}`).once('value');
+  const user = snap.val() || {};
+  
+  if(user.isAdmin !== true){
+    alert('Access denied. Admin privileges required.');
+    window.location.href = 'index.html';
+    return false;
+  }
+  
+  return true;
+}
+
+async function loadAllLeagues(){
+  toast('Loading all leagues...');
+  
+  try{
+    const snap = await db.ref('allSeasons').once('value');
+    allLeagues = [];
+    
+    if(snap.exists()){
+      snap.forEach(child => {
+        const data = child.val() || {};
+        allLeagues.push({
+          id: child.key,
+          ...data
+        });
+      });
+    }
+    
+    updateStats();
+    applyFilters();
+    toast('Loaded ' + allLeagues.length + ' leagues');
+  }catch(e){
+    console.error(e);
+    toast('Failed to load leagues','var(--red)');
+  }
+}
+
+function updateStats(){
+  const total = allLeagues.length;
+  const solo = allLeagues.filter(l => !l.isMultiplayer).length;
+  const multi = allLeagues.filter(l => l.isMultiplayer).length;
+  const uniqueUsers = new Set(allLeagues.map(l => l.userId)).size;
+  
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statSolo').textContent = solo;
+  document.getElementById('statMulti').textContent = multi;
+  document.getElementById('statUsers').textContent = uniqueUsers;
+}
+
+function applyFilters(){
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+  const sport = document.getElementById('filterSport').value;
+  const type = document.getElementById('filterType').value;
+  const sort = document.getElementById('filterSort').value;
+  
+  filteredLeagues = allLeagues.filter(league => {
+    if(search && !league.leagueName?.toLowerCase().includes(search) && !league.userEmail?.toLowerCase().includes(search)){
+      return false;
+    }
+    if(sport && league.sport !== sport){
+      return false;
+    }
+    if(type === 'solo' && league.isMultiplayer){
+      return false;
+    }
+    if(type === 'multi' && !league.isMultiplayer){
+      return false;
+    }
+    return true;
+  });
+  
+  // Sort
+  if(sort === 'updated'){
+    filteredLeagues.sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  }else if(sort === 'created'){
+    filteredLeagues.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }else if(sort === 'name'){
+    filteredLeagues.sort((a,b) => (a.leagueName || '').localeCompare(b.leagueName || ''));
+  }
+  
+  renderLeagues();
+}
+
+function renderLeagues(){
+  const host = document.getElementById('leagueList');
+  if(!filteredLeagues.length){
+    host.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <h3>No Leagues Found</h3>
+        <p>No leagues match your current filters. Try adjusting the filters or create a new league.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  host.innerHTML = filteredLeagues.map(league => `
+    <div class="league-card">
+      <div class="league-card-top">
+        <div>
+          <div class="league-title">${escapeHtml(league.leagueName || 'Unnamed League')}</div>
+          <div class="league-meta">
+            <span class="pill ${league.isMultiplayer ? 'multi' : 'solo'}">${league.isMultiplayer ? 'Multiplayer' : 'Solo'}</span>
+            <span class="pill">${escapeHtml(sportLabel(league.sport))}</span>
+            <span class="pill">${escapeHtml(league.scoringFormat || 'h2h_pts')}</span>
+            <span class="pill">${league.leagueSize || 0} Teams</span>
+          </div>
+        </div>
+      </div>
+      <div class="league-info">
+        <div class="info-item">
+          <div class="info-label">User</div>
+          <div class="info-value" style="font-size:13px;font-weight:600;">${escapeHtml(league.userEmail || 'Unknown')}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Team Name</div>
+          <div class="info-value">${escapeHtml(league.teamName || '—')}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Created</div>
+          <div class="info-value" style="font-size:12px;">${formatDate(league.createdAt)}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Updated</div>
+          <div class="info-value" style="font-size:12px;">${formatDate(league.updatedAt)}</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary tiny" onclick="viewLeague('${league.id}')">👁️ View</button>
+        <button class="btn secondary tiny" onclick="exportLeague('${league.id}')">💾 Export</button>
+        <button class="btn danger tiny" onclick="deleteLeague('${league.id}','${escapeHtml(league.leagueName || 'this league')}')">🗑️ Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function viewLeague(seasonId){
+  try{
+    const league = allLeagues.find(l => l.id === seasonId);
+    if(!league) return;
+    
+    // Load full data from userSeasons
+    const snap = await db.ref(`userSeasons/${league.userId}/${seasonId}`).once('value');
+    const fullData = snap.val();
+    
+    document.getElementById('viewDetails').textContent = JSON.stringify(fullData, null, 2);
+    document.getElementById('viewModal').classList.add('active');
+  }catch(e){
+    console.error(e);
+    toast('Failed to load league details','var(--red)');
+  }
+}
+
+function closeModal(){
+  document.getElementById('viewModal').classList.remove('active');
+}
+
+async function exportLeague(seasonId){
+  try{
+    const league = allLeagues.find(l => l.id === seasonId);
+    if(!league) return;
+    
+    const snap = await db.ref(`userSeasons/${league.userId}/${seasonId}`).once('value');
+    const fullData = snap.val();
+    
+    const blob = new Blob([JSON.stringify(fullData, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `league_${seasonId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast('League exported');
+  }catch(e){
+    console.error(e);
+    toast('Export failed','var(--red)');
+  }
+}
+
+async function exportAllData(){
+  try{
+    const blob = new Blob([JSON.stringify(allLeagues, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `all_leagues_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast('All leagues exported');
+  }catch(e){
+    console.error(e);
+    toast('Export failed','var(--red)');
+  }
+}
+
+async function deleteLeague(seasonId, leagueName){
+  if(!confirm(`Delete "${leagueName}"? This will permanently remove the league from both userSeasons and allSeasons. This cannot be undone.`)){
+    return;
+  }
+  
+  try{
+    const league = allLeagues.find(l => l.id === seasonId);
+    if(!league) return;
+    
+    await db.ref(`userSeasons/${league.userId}/${seasonId}`).remove();
+    await db.ref(`allSeasons/${seasonId}`).remove();
+    
+    toast('League deleted');
+    loadAllLeagues();
+  }catch(e){
+    console.error(e);
+    toast('Delete failed','var(--red)');
+  }
+}
+
+auth.onAuthStateChanged(async user => {
+  currentUser = user || null;
+  
+  if(await checkAdminAccess()){
+    loadAllLeagues();
+  }
+});
+</script>
+</body>
+</html>

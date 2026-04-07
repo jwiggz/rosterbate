@@ -831,6 +831,59 @@ const authReady=new Promise(resolve=>{
     }
   });
 });
+
+// Save league to Firebase for permanent cloud storage
+async function saveLeagueToFirebase(draftData) {
+  if (!auth || !db) {
+    console.log('📴 Firebase not available');
+    return false;
+  }
+  
+  if (!currentRbUser) {
+    console.log('👤 Not logged in - league only saved locally');
+    showToast('Sign in to save your league permanently!');
+    return false;
+  }
+  
+  try {
+    const seasonId = draftData.seasonId || ('season_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7));
+    const userId = currentRbUser.uid;
+    const userEmail = currentRbUser.email || 'unknown';
+    
+    // Save full league data to user's seasons
+    await db.ref(`userSeasons/${userId}/${seasonId}`).set({
+      ...draftData,
+      seasonId: seasonId,
+      userId: userId,
+      userEmail: userEmail,
+      createdAt: draftData.savedAt || Date.now(),
+      updatedAt: Date.now()
+    });
+    
+    // Create lightweight admin index entry
+    await db.ref(`allSeasons/${seasonId}`).set({
+      seasonId: seasonId,
+      userId: userId,
+      userEmail: userEmail,
+      sport: draftData.sport || 'nba',
+      leagueName: draftData.leagueName || 'RosterBate League',
+      teamName: draftData.teamName || 'My Team',
+      isMultiplayer: !!draftData.multiplayer,
+      leagueSize: draftData.leagueSize || 0,
+      scoringFormat: draftData.scoringFormat || 'h2h_pts',
+      draftFormat: draftData.draftFormat || 'snake',
+      createdAt: draftData.savedAt || Date.now(),
+      updatedAt: Date.now()
+    });
+    
+    console.log('✅ League saved to Firebase:', seasonId);
+    return true;
+  } catch (error) {
+    console.error('❌ Firebase save failed:', error);
+    throw error;
+  }
+}
+
 function rosterbateScoreDayKey(){
   return new Date().toLocaleDateString('en-CA');
 }
@@ -3018,7 +3071,14 @@ function endDraft(){
       teamUsers: teamUsers,
       savedAt: Date.now()
     };
+    
+    // Save to localStorage (backup for offline access)
     try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+    
+    // Save to Firebase (permanent cloud storage)
+    saveLeagueToFirebase(draftData).catch(err => {
+      console.warn('⚠️ Firebase save failed (league still saved locally):', err);
+    });
 
     const myRoster = Array.isArray(S.myTeam)?S.myTeam.filter(Boolean):[];
     const teamNameEl=document.getElementById('dcTeamName');

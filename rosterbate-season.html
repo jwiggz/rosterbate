@@ -815,6 +815,12 @@ function saveTeamSettings(){
     D.teamUsers[D.myPlayerId].avatarUrl=nextAvatar;
   }
   try{localStorage.setItem('rosterbateDraft', JSON.stringify(D));}catch(e){}
+  
+  // Save to Firebase for solo leagues
+  if(!D?.multiplayer) {
+    saveSeasonToFirebase().catch(err => console.log('Firebase save skipped:', err.message || err));
+  }
+  
   queueSharedSeasonSave('team_settings');
   closeTeamSettings();
   renderActiveSeasonPage();
@@ -873,6 +879,108 @@ const authReady=new Promise(resolve=>{
     }
   });
 });
+
+// Save season state to Firebase for permanent cloud storage
+async function saveSeasonToFirebase() {
+  if (!auth || !db) {
+    console.log('📴 Firebase not available');
+    return false;
+  }
+  
+  if (!currentRbUser) {
+    console.log('👤 Not logged in - season only saved locally');
+    return false;
+  }
+  
+  // Don't save if it's a demo
+  if (D.isDemo) {
+    console.log('🎮 Demo mode - not saving to Firebase');
+    return false;
+  }
+  
+  try {
+    // Generate seasonId if not exists
+    if (!D.seasonId) {
+      D.seasonId = 'season_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    }
+    
+    const seasonId = D.seasonId;
+    const userId = currentRbUser.uid;
+    const userEmail = currentRbUser.email || 'unknown';
+    
+    // Prepare data to save
+    const saveData = {
+      sport: D.sport || 'nba',
+      leagueName: D.leagueName || 'RosterBate League',
+      teamName: D.teamName || 'My Team',
+      seasonId: seasonId,
+      userId: userId,
+      userEmail: userEmail,
+      isMultiplayer: !!D.multiplayer,
+      leagueSize: D.leagueSize || 0,
+      scoringFormat: D.scoringFormat || 'h2h_pts',
+      draftFormat: D.draftFormat || 'snake',
+      myTeamIndex: D.myTeamIndex || 0,
+      currentWeek: D.currentWeek || 1,
+      updatedAt: Date.now()
+    };
+    
+    // Include draft data if exists
+    if (D.teams || D.schedule || D.matchups) {
+      saveData.draft = {
+        teams: D.teams,
+        schedule: D.schedule,
+        matchups: D.matchups,
+        teamUsers: D.teamUsers,
+        myTeamIndex: D.myTeamIndex
+      };
+    }
+    
+    // Include game state if exists
+    if (D.waiverPriority || D.freeAgents || D.weekResults) {
+      saveData.game = {
+        waiverPriority: D.waiverPriority,
+        freeAgents: D.freeAgents,
+        weekResults: D.weekResults,
+        currentWeek: D.currentWeek,
+        standings: D.standings,
+        isSeasonComplete: D.isSeasonComplete
+      };
+    }
+    
+    // If createdAt doesn't exist, set it
+    if (!D.createdAt) {
+      saveData.createdAt = D.savedAt || Date.now();
+    } else {
+      saveData.createdAt = D.createdAt;
+    }
+    
+    // Save full data to userSeasons
+    await db.ref(`userSeasons/${userId}/${seasonId}`).update(saveData);
+    
+    // Update admin index
+    await db.ref(`allSeasons/${seasonId}`).update({
+      userId: userId,
+      userEmail: userEmail,
+      sport: D.sport || 'nba',
+      leagueName: D.leagueName || 'RosterBate League',
+      teamName: D.teamName || 'My Team',
+      isMultiplayer: !!D.multiplayer,
+      leagueSize: D.leagueSize || 0,
+      scoringFormat: D.scoringFormat || 'h2h_pts',
+      draftFormat: D.draftFormat || 'snake',
+      currentWeek: D.currentWeek || 1,
+      updatedAt: Date.now()
+    });
+    
+    console.log('✅ Season saved to Firebase:', seasonId);
+    return true;
+  } catch (error) {
+    console.error('❌ Firebase save failed:', error);
+    return false;
+  }
+}
+
 function getSavedMultiplayerLobbyState(){
   try{
     const raw=localStorage.getItem('rbMultiplayerLobby');
@@ -964,6 +1072,15 @@ async function saveSharedSeason(force, reason){
   return true;
 }
 function queueSharedSeasonSave(reason, delay){
+  // Save to localStorage for all leagues
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  
+  // Save to Firebase for solo leagues (async, non-blocking)
+  if(!D?.multiplayer) {
+    saveSeasonToFirebase().catch(err => console.log('Firebase save skipped:', err.message || err));
+  }
+  
+  // Save to shared season for multiplayer leagues
   if(sharedSeasonHydrating || !D?.multiplayer) return;
   clearTimeout(sharedSeasonSaveTimer);
   sharedSeasonSaveTimer=setTimeout(()=>{

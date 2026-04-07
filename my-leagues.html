@@ -107,6 +107,16 @@
       </div>
       <div class="grid" id="seasonList"></div>
     </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Solo Leagues</div>
+          <div class="section-sub">Your personal single-player seasons (saved locally)</div>
+        </div>
+      </div>
+      <div class="grid" id="soloList"></div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -328,6 +338,40 @@ function renderSeasons(rows){
   `).join('');
 }
 
+function renderSolo(rows){
+  const host=document.getElementById('soloList');
+  if(!host) return;
+  if(!rows.length){
+    renderEmpty('soloList','No Solo Leagues Yet','Complete a solo draft and it will appear here.');
+    return;
+  }
+  host.innerHTML=rows.map(row=>`
+    <div class="league-card">
+      <div class="league-card-top">
+        <div>
+          <div class="league-title">${escapeHtml(row.name)}</div>
+          <div class="league-meta" style="margin-top:8px;">
+            <span class="pill live">Solo</span>
+            <span class="pill">${escapeHtml(sportLabel(row.sport))}</span>
+            <span class="pill">${escapeHtml(formatLabel(row.format))}</span>
+            <span class="pill">${escapeHtml(scoringLabel(row.scoring))}</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(row.teamName||'My Team')}</div><div class="stat-label">My Team</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.savedLabel||'—'))}</div><div class="stat-label">Last Saved</div></div>
+      </div>
+      <div class="league-copy">Your personal single-player league. ${row.id==='local'?'Saved locally in browser.':'Saved to cloud - accessible anywhere!'}</div>
+      <div class="actions">
+        <button class="btn primary small" onclick="openSoloLeague('${row.id}')">Open Season</button>
+        <button class="btn danger small" onclick="deleteSoloLeague('${row.id}')">Delete League</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 async function loadMyLeagues(){
   setBanner('Loading your leagues…');
   const [lobbiesSnap,seasonsSnap]=await Promise.all([
@@ -386,12 +430,97 @@ async function loadMyLeagues(){
   }
   seasons.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
 
+  // Load solo leagues from Firebase (if logged in)
+  const solo=[];
+  if(currentUser){
+    const userId=currentUser.uid;
+    try{
+      const userSeasonsSnap=await db.ref(`userSeasons/${userId}`).once('value');
+      if(userSeasonsSnap?.exists?.()){
+        userSeasonsSnap.forEach(child=>{
+          const data=child.val()||{};
+          // Only show solo leagues (not multiplayer)
+          if(!data.isMultiplayer && !data.isDemo){
+            solo.push({
+              id:child.key,
+              seasonId:child.key,
+              name:data.leagueName||'RosterBate League',
+              sport:data.sport||'nba',
+              format:data.draftFormat||'snake',
+              scoring:data.scoringFormat||'h2h_pts',
+              teamSize:Number(data.leagueSize||0),
+              teamName:data.teamName||'My Team',
+              currentWeek:Number(data.currentWeek||1),
+              createdAt:Number(data.createdAt||0),
+              updatedAt:Number(data.updatedAt||0),
+              savedLabel:data.updatedAt ? new Date(data.updatedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : '—',
+              data
+            });
+          }
+        });
+      }
+      solo.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+    }catch(e){
+      console.error('Failed to load solo leagues from Firebase:', e);
+      
+      // Fallback to localStorage if Firebase fails
+      try{
+        const saved=localStorage.getItem('rosterbateDraft');
+        if(saved){
+          const data=JSON.parse(saved);
+          if(!data.multiplayer && !data.isDemo){
+            solo.push({
+              id:'local',
+              name:data.leagueName||'RosterBate League',
+              sport:data.sport||'nba',
+              format:data.draftFormat||'snake',
+              scoring:data.scoringFormat||'h2h_pts',
+              teamSize:Number(data.leagueSize||0),
+              teamName:data.teamName||'My Team',
+              savedAt:Number(data.savedAt||0),
+              savedLabel:data.savedAt ? new Date(data.savedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : '—',
+              data
+            });
+          }
+        }
+      }catch(localErr){
+        console.error('Failed to load from localStorage:', localErr);
+      }
+    }
+  } else {
+    // Not logged in - try localStorage
+    try{
+      const saved=localStorage.getItem('rosterbateDraft');
+      if(saved){
+        const data=JSON.parse(saved);
+        if(!data.multiplayer && !data.isDemo){
+          solo.push({
+            id:'local',
+            name:data.leagueName||'RosterBate League',
+            sport:data.sport||'nba',
+            format:data.draftFormat||'snake',
+            scoring:data.scoringFormat||'h2h_pts',
+            teamSize:Number(data.leagueSize||0),
+            teamName:data.teamName||'My Team',
+            savedAt:Number(data.savedAt||0),
+            savedLabel:data.savedAt ? new Date(data.savedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : '—',
+            data
+          });
+        }
+      }
+    }catch(e){
+      console.error('Failed to load solo league from localStorage:', e);
+    }
+  }
+
   renderDrafts(drafts);
   renderSeasons(seasons);
-  const total=drafts.length+seasons.length;
+  renderSolo(solo);
+  const total=drafts.length+seasons.length+solo.length;
   setBanner(total ? `Found ${total} league${total===1?'':'s'} tied to your account.` : 'No leagues tied to your account yet.');
   window.__rbDraftRows=drafts;
   window.__rbSeasonRows=seasons;
+  window.__rbSoloRows=solo;
 }
 
 function openDraftLeague(id){
@@ -483,6 +612,45 @@ async function leaveSeasonLeague(id){
   }catch(e){
     console.error(e);
     toast('Could not leave that season.','var(--red)');
+  }
+}
+
+function openSoloLeague(seasonId){
+  const row=(window.__rbSoloRows||[]).find(x=>x.id===seasonId);
+  if(!row) return;
+  
+  // Load the league data into localStorage so season manager can use it
+  try{
+    localStorage.setItem('rosterbateDraft', JSON.stringify(row.data));
+  }catch(e){
+    console.error('Failed to load league into localStorage:', e);
+  }
+  
+  // Navigate to season manager
+  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba');
+}
+
+async function deleteSoloLeague(seasonId){
+  const row=(window.__rbSoloRows||[]).find(x=>x.id===seasonId);
+  if(!row) return;
+  if(!confirm(`Delete ${row.name}? This will permanently remove your solo league. This action cannot be undone.`)) return;
+  
+  try{
+    if(currentUser && seasonId !== 'local'){
+      // Delete from Firebase
+      const userId = currentUser.uid;
+      await db.ref(`userSeasons/${userId}/${seasonId}`).remove();
+      await db.ref(`allSeasons/${seasonId}`).remove();
+      toast('Solo league deleted from cloud.');
+    } else {
+      // Delete from localStorage only
+      localStorage.removeItem('rosterbateDraft');
+      toast('Solo league deleted from browser.');
+    }
+    loadMyLeagues();
+  }catch(e){
+    console.error(e);
+    toast('Failed to delete solo league.','var(--red)');
   }
 }
 
