@@ -2266,13 +2266,29 @@ function rebuildDemoSeasonData(sport){
 }
 
 function initSeason(){
+  console.log('🔧 initSeason() started');
+  console.log('📊 D object:', D);
+  
   applySportContext(D?.sport || CURRENT_SPORT);
+  console.log('✅ Sport context applied:', CURRENT_SPORT);
+  
   const n=D.leagueSize;
+  console.log('👥 League size:', n);
+  
   if(!D.seasonId) D.seasonId='season_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  console.log('🆔 Season ID:', D.seasonId);
+  
   G.rosters=D.allRosters.map(r=>r.map(p=>({...p})));
+  console.log('🏀 G.rosters populated:', G.rosters.length, 'teams');
+  console.log('🏀 My roster (team 0):', G.rosters[0]);
+  
   G.ilByTeam=Array.isArray(D.ilRosters) ? D.ilRosters.map(r=>(r||[]).map(p=>({...p}))) : Array.from({length:n},()=>[]);
+  
   G.starters=G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
+  console.log('⭐ G.starters populated:', G.starters);
+  
   const allIds=new Set(G.rosters.flat().map(p=>p.id));
+  console.log('🔢 Total drafted player IDs:', allIds.size);
   
   // Use demo players for waiver wire if in demo mode, otherwise use live pool
   const waiverPool = D.isDemo 
@@ -2281,14 +2297,27 @@ function initSeason(){
         ? buildRosterbateSportPlayerPool(CURRENT_SPORT, 260) 
         : []);
   
+  console.log('📋 Waiver pool size:', waiverPool.length);
+  
   G.waiver=waiverPool.filter(p=>!allIds.has(p.id)).slice(0,40).map(p=>({...p}));
+  console.log('📋 G.waiver populated:', G.waiver.length, 'players');
+  console.log('📋 Sample waiver players:', G.waiver.slice(0, 3));
+  
   G.schedule=buildSched(n,G.totalWeeks);
+  console.log('📅 G.schedule populated:', G.schedule.length, 'matchups');
+  
   G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
   G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];G.moneyBallLocks={};
+  
+  console.log('✅ All G properties initialized');
+  console.log('📊 Final G state:', G);
+  
   ensurePowerupState();
   rollWeeklyPowerupDrops(1);
   logActivity('league','Season opened',teamName(D.myPos)+' entered a fresh '+(D.leagueName||'RosterBate League')+'.',D.myPos,'🚪');
   awardRosterbateScore('season_manager', 5).catch(() => {});
+  
+  console.log('✅ initSeason() completed successfully');
 }
 
 function buildSched(n,weeks){
