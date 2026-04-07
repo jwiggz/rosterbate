@@ -300,6 +300,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <div style="font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;" id="seasonEmptyTitle">Season Manager</div>
     <div style="font-size:14px;color:var(--text2);line-height:1.7;max-width:300px;" id="seasonEmptyCopy">Complete a draft in the RosterBate Draft app first, then tap "Open Season Manager."</div>
     <button onclick="loadDemo()" style="background:var(--accent);border:none;border-radius:10px;padding:13px 28px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">Load Demo Data</button>
+    <button onclick="clearAllData()" style="background:#ef4444;border:none;border-radius:10px;padding:10px 20px;font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:4px;">Clear All Data & Reset</button>
   </div>
 </div>
 
@@ -2101,17 +2102,16 @@ function setWaiverTab(tab){
 }
 
 window.onload=async function(){
-  try{
-    await ensureRosterbatePools();
-  }catch(e){
-    console.error(e);
-    toast('Real player data failed to load.');
-    return;
-  }
+  // Don't try to load live pools on initial page load
+  // They're only needed for real drafts, not demo mode
+  
   applySportContext(CURRENT_SPORT);
   let raw=null;
   try{raw=localStorage.getItem('rosterbateDraft');}catch(e){}
+  
+  // Only auto-load if we have valid saved data
   if(raw){
+    console.log('📦 Found saved data in localStorage, auto-loading...');
     try{
       const parsed=JSON.parse(raw);
       if(typeof parsed.isCommissioner!=='boolean') parsed.isCommissioner=true;
@@ -2119,9 +2119,11 @@ window.onload=async function(){
       const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
       if(savedSport===requestedSport){
         if(isDemoSeasonData(parsed)){
+          console.log('🎮 Loading demo season data...');
           D=rebuildDemoSeasonData(savedSport);
           try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
         } else {
+          console.log('🏀 Loading saved season data...');
           D=parsed;
         }
         applySportContext(savedSport);
@@ -2146,7 +2148,11 @@ window.onload=async function(){
         return;
       }
     }catch(e){console.error(e);}
+  } else {
+    console.log('✅ Ready for demo mode - no saved data found');
   }
+  
+  // Check for multiplayer lobby
   const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
   const lobbyState=getSavedMultiplayerLobbyState();
   if(lobbyState?.lobbyId && normalizeRosterbateSport(lobbyState.sport||requestedSport)===requestedSport){
@@ -2182,7 +2188,23 @@ window.onload=async function(){
       }
     }catch(e){console.error(e);}
   }
+  
+  // If we get here, show the Load Demo Data screen (no auto-navigation)
+  console.log('✅ Ready for demo mode - no saved data found');
 };
+
+function clearAllData(){
+  if(!confirm('This will delete all saved season data and reload the page. Continue?')) return;
+  try {
+    localStorage.removeItem('rosterbateDraft');
+    console.log('🗑️ Cleared localStorage');
+    toast('Data cleared! Reloading...');
+    setTimeout(() => window.location.reload(), 1000);
+  } catch(e) {
+    console.error('Failed to clear data:', e);
+    toast('Failed to clear data');
+  }
+}
 
 async function loadDemo(){
   console.log('🎯 Loading demo data...');
