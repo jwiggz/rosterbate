@@ -12,6 +12,29 @@
     return normalizeRosterbateSport(sport);
   };
 
+  // Set the sport (updates URL and reloads config)
+  window.setSelectedRosterbateSport = function(sport) {
+    const normalized = normalizeRosterbateSport(sport);
+    window.CURRENT_SPORT = normalized;
+    window.SPORT_CFG = getRosterbateSportConfig(normalized);
+    window.SPORT_RULES = getRosterbateLeagueRuleDefaults(normalized);
+    window.POSITION_LABELS = getRosterbatePositionLabels(normalized);
+    return normalized;
+  };
+
+  // Check if we're in demo/preview mode
+  window.isRosterbateDemoMode = function() {
+    // Check if localStorage has demo data
+    try {
+      const saved = localStorage.getItem('rosterbateDraft');
+      if (!saved) return false;
+      const data = JSON.parse(saved);
+      return data.teamName === 'Demo Dunkers' || data.isDemo === true;
+    } catch(e) {
+      return false;
+    }
+  };
+
   window.CURRENT_SPORT = getSelectedRosterbateSport();
 
   window.getRosterbateSportConfig = function(sport) {
