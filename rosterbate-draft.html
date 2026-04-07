@@ -109,9 +109,9 @@
   .pr{display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;cursor:pointer;transition:background .1s;}
   .pr:active{background:rgba(249,115,22,.07);}
   .pr.drafted{opacity:.28;pointer-events:none;}
-  .pstat{min-width:38px;font-size:11px;font-weight:600;color:var(--text2);text-align:left;flex-shrink:0;padding-left:4px;}
+  .pstat{min-width:32px;font-size:11px;font-weight:600;color:var(--text2);text-align:left;flex-shrink:0;}
   .pstat-header{display:flex;align-items:center;padding:8px 11px;gap:9px;border-bottom:2px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:10;}
-  .pstat-label{min-width:38px;font-size:10px;font-weight:800;color:var(--text3);text-align:left;flex-shrink:0;text-transform:uppercase;cursor:pointer;user-select:none;padding-left:4px;}
+  .pstat-label{min-width:32px;font-size:10px;font-weight:800;color:var(--text3);text-align:left;flex-shrink:0;text-transform:uppercase;cursor:pointer;user-select:none;}
   .pstat-label:hover{color:var(--accent);}
   .prank{width:22px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text3);text-align:center;flex-shrink:0;}
   .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--fd);flex-shrink:0;border:2px solid var(--border);color:#fff;}
@@ -404,7 +404,7 @@
   <div class="pill" id="sportLobbyPill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
   <div class="card">
     <h2>League Settings</h2>
-    <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="Tommy's Minions"/></div>
+    <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Tommy's Minions"/></div>
     <div class="two">
       <div class="fr"><label>Teams (2–20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
       <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="1"/></div>
@@ -1547,7 +1547,7 @@ function applySportToDraftUI(){
     throw new Error('RosterBate real player pool missing for '+SPORT);
   }
   const teamPlaceholders = {
-    nba:'Tommy\'s Minions',
+    nba:'e.g. Tommy\'s Minions',
     nfl:'e.g. Fourth & Gold',
     mlb:'e.g. Dugout Dogs'
   };
@@ -2219,18 +2219,12 @@ function rPlayers(){
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
       :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${inlineDraftBtn}</div>`;
-    // Estimate minutes based on points (rough correlation)
-    const min=p.min||(p.pts ? Math.min(38, Math.max(15, p.pts * 1.2)) : 28);
-    // Estimate FGM from points and 3PM (assuming ~1.7 pts per FGM for 2s, adjust for 3s)
-    const estimated3ptPts = (p.tpm || 0) * 3;
-    const estimated2ptPts = (p.pts || 0) - estimated3ptPts;
-    const fgm = p.fgm || Math.max(0, ((estimated2ptPts / 2) + (p.tpm || 0)));
-    // Estimate FGA from FGM and FG%
-    const fga = p.fga || (fgm > 0 && p.fgp > 0 ? fgm / (p.fgp / 100) : fgm * 2.2);
-    // Estimate FTM from points (rough estimate: about 15-20% of points from FTs)
-    const ftm = p.ftm || ((p.pts || 0) * 0.17);
-    // Estimate FTA from FTM and FT%
-    const fta = p.fta || (ftm > 0 && p.ftp > 0 ? ftm / (p.ftp / 100) : ftm * 1.25);
+    // Estimate stats
+    const min = p.min || (p.pts > 20 ? 35 : p.pts > 15 ? 30 : p.pts > 10 ? 25 : p.pts > 5 ? 20 : 15);
+    const fgm = p.fgm || ((p.pts - (p.tpm * 3)) / 2 + p.tpm);
+    const fga = p.fga || (p.fgp ? fgm / (p.fgp / 100) : fgm * 2.2);
+    const ftm = p.ftm || (p.pts * 0.15);
+    const fta = p.fta || (p.ftp ? ftm / (p.ftp / 100) : ftm * 1.3);
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
@@ -2271,32 +2265,24 @@ function sortPlayers(stat){
   PLAYERS.sort((a,b)=>{
     let aVal,bVal;
     if(stat==='min'){
-      aVal=a.min||(a.pts ? Math.min(38, Math.max(15, a.pts * 1.2)) : 28);
-      bVal=b.min||(b.pts ? Math.min(38, Math.max(15, b.pts * 1.2)) : 28);
+      aVal = a.min || (a.pts > 20 ? 35 : a.pts > 15 ? 30 : a.pts > 10 ? 25 : a.pts > 5 ? 20 : 15);
+      bVal = b.min || (b.pts > 20 ? 35 : b.pts > 15 ? 30 : b.pts > 10 ? 25 : b.pts > 5 ? 20 : 15);
     }else if(stat==='fgm'){
-      const aEst3 = (a.tpm || 0) * 3;
-      const aEst2 = (a.pts || 0) - aEst3;
-      aVal = a.fgm || Math.max(0, ((aEst2 / 2) + (a.tpm || 0)));
-      const bEst3 = (b.tpm || 0) * 3;
-      const bEst2 = (b.pts || 0) - bEst3;
-      bVal = b.fgm || Math.max(0, ((bEst2 / 2) + (b.tpm || 0)));
+      aVal = a.fgm || ((a.pts - (a.tpm * 3)) / 2 + a.tpm);
+      bVal = b.fgm || ((b.pts - (b.tpm * 3)) / 2 + b.tpm);
     }else if(stat==='fga'){
-      const aEst3 = (a.tpm || 0) * 3;
-      const aEst2 = (a.pts || 0) - aEst3;
-      const aFgm = a.fgm || Math.max(0, ((aEst2 / 2) + (a.tpm || 0)));
-      aVal = a.fga || (aFgm > 0 && a.fgp > 0 ? aFgm / (a.fgp / 100) : aFgm * 2.2);
-      const bEst3 = (b.tpm || 0) * 3;
-      const bEst2 = (b.pts || 0) - bEst3;
-      const bFgm = b.fgm || Math.max(0, ((bEst2 / 2) + (b.tpm || 0)));
-      bVal = b.fga || (bFgm > 0 && b.fgp > 0 ? bFgm / (b.fgp / 100) : bFgm * 2.2);
+      const aFgm = a.fgm || ((a.pts - (a.tpm * 3)) / 2 + a.tpm);
+      aVal = a.fga || (a.fgp ? aFgm / (a.fgp / 100) : aFgm * 2.2);
+      const bFgm = b.fgm || ((b.pts - (b.tpm * 3)) / 2 + b.tpm);
+      bVal = b.fga || (b.fgp ? bFgm / (b.fgp / 100) : bFgm * 2.2);
     }else if(stat==='ftm'){
-      aVal = a.ftm || ((a.pts || 0) * 0.17);
-      bVal = b.ftm || ((b.pts || 0) * 0.17);
+      aVal = a.ftm || (a.pts * 0.15);
+      bVal = b.ftm || (b.pts * 0.15);
     }else if(stat==='fta'){
-      const aFtm = a.ftm || ((a.pts || 0) * 0.17);
-      aVal = a.fta || (aFtm > 0 && a.ftp > 0 ? aFtm / (a.ftp / 100) : aFtm * 1.25);
-      const bFtm = b.ftm || ((b.pts || 0) * 0.17);
-      bVal = b.fta || (bFtm > 0 && b.ftp > 0 ? bFtm / (b.ftp / 100) : bFtm * 1.25);
+      const aFtm = a.ftm || (a.pts * 0.15);
+      aVal = a.fta || (a.ftp ? aFtm / (a.ftp / 100) : aFtm * 1.3);
+      const bFtm = b.ftm || (b.pts * 0.15);
+      bVal = b.fta || (b.ftp ? bFtm / (b.ftp / 100) : bFtm * 1.3);
     }else{
       aVal=a[stat]||0;
       bVal=b[stat]||0;
