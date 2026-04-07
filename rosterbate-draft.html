@@ -121,7 +121,7 @@
   .pname-main{display:flex;align-items:center;gap:4px;min-width:0;flex:1;overflow:hidden;}
   .pdet{font-size:11px;color:var(--text2);margin-top:1px;}
   .pmeta-row{display:flex;align-items:center;gap:8px;margin-top:5px;min-width:0;}
-  .pfp-chip{font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+  .pfp-chip{font-family:var(--fd);font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
   .pos-badge{display:inline-block;padding:1px 4px;border-radius:3px;font-family:var(--fd);font-size:10px;font-weight:700;margin-left:3px;}
   .pos-PG{background:rgba(59,130,246,.2);color:#60a5fa;}
   .pos-SG{background:rgba(168,85,247,.2);color:#c084fc;}
@@ -2210,7 +2210,7 @@ function openPModal(idx){
     getRosterbatePlayerDetailStats(p).map(stat =>
       `<div class="sb"><div class="sv">${stat.value}</div><div class="sl">${stat.label}</div></div>`
     ).join('');
-  const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Rotisserie',points:'Points Lg',moneyball_cat:'Moneyball Cat',moneyball_pts:'Moneyball H2H Pts',money_ball:'Money Ball'};
+  const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Rotisserie',points:'Points Lg',moneyball_cat:'Moneyball Cat',moneyball_pts:'Moneyball H2H Pts'};
   document.getElementById('mNote').textContent='Fantasy pts: '+sl[S.scr];
   const canDraft=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
   const canNominate=S.fmt==='auction'&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId);
@@ -2993,7 +2993,7 @@ function endDraft(){
         numTeams:S.ls,
         draftType:S.fmt.charAt(0).toUpperCase()+S.fmt.slice(1),
         timePerPick:S.tmax,
-        scoringType:S.scr==='h2h_cat'?'H2H Categories':S.scr==='moneyball_cat'?'Moneyball Categories':S.scr==='moneyball_pts'?'Moneyball H2H Points':S.scr==='money_ball'?'Money Ball':S.scr==='roto'?'Rotisserie':S.scr==='points'?'Points Only':'H2H Points',
+        scoringType:S.scr==='h2h_cat'?'H2H Categories':S.scr==='moneyball_cat'?'Moneyball Categories':S.scr==='moneyball_pts'?'Moneyball H2H Points':S.scr==='roto'?'Rotisserie':S.scr==='points'?'Points Only':'H2H Points',
         rosterSize:S.rules?.rosterSize||S.rds,
         totalStarters:S.rules?.starters||(typeof SPORT_RULES!=='undefined'?SPORT_RULES.starters:9),
         totalBench:S.rules?.benchSlots||(typeof SPORT_RULES!=='undefined'?SPORT_RULES.benchSlots:5),
