@@ -115,7 +115,7 @@
   .pstat-label:hover{color:var(--accent);}
   .prank{width:22px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text3);text-align:center;flex-shrink:0;}
   .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--fd);flex-shrink:0;border:2px solid var(--border);color:#fff;}
-  .pinfo{flex:1;min-width:0;}
+  .pinfo{flex:0 1 200px;min-width:140px;max-width:240px;}
   .pname{font-family:var(--fd);font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .pname-row{display:flex;align-items:center;gap:6px;min-width:0;}
   .pname-main{display:flex;align-items:center;gap:4px;min-width:0;flex:1;overflow:hidden;}
@@ -532,9 +532,9 @@
             <div class="posf" id="posFilterBar"></div>
           </div>
           <div id="statHeader" class="pstat-header" style="display:none;">
-            <div class="prank"></div>
+            <div class="pstat-label" onclick="sortPlayers('adp')" style="width:22px;text-align:center;cursor:pointer;" title="Sort by rank">#</div>
             <div style="width:34px;flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;"></div>
+            <div style="flex:0 1 200px;min-width:140px;max-width:240px;"></div>
             <div class="pstat-label" onclick="sortPlayers('min')">MIN</div>
             <div class="pstat-label" onclick="sortPlayers('fgm')">FGM</div>
             <div class="pstat-label" onclick="sortPlayers('fga')">FGA</div>
@@ -2163,10 +2163,40 @@ function startAuctionNomination(p){
 
 // PLAYER MODAL
 function calcFP(p){
+  if(!p) return 0;
+  
+  // Get stats from statValues
+  const sv = p.statValues || {};
+  const pts = sv.PTS || 0;
+  const reb = sv.REB || 0;
+  const ast = sv.AST || 0;
+  const stl = sv.STL || 0;
+  const blk = sv.BLK || 0;
+  const to = sv.TO || 0;
+  const tpm = sv['3PM'] || 0;
+  
+  // For non-NBA sports, use the getRosterbatePlayerFantasyScore function
   if(SPORT!=='nba') return getRosterbatePlayerFantasyScore(SPORT,p,S.rules?.scoring);
-  if(S.scr==='h2h_pts'||S.scr==='points'||S.scr==='moneyball_pts')
-    return Math.round((p.pts+p.reb*1.2+p.ast*1.5+p.stl*3+p.blk*3-p.to+p.tpm*0.5)*10)/10;
-  return p.fp;
+  
+  // For points-based scoring systems, calculate based on league settings
+  if(S.scr==='h2h_pts'||S.scr==='points'||S.scr==='moneyball_pts') {
+    // Use league scoring rules if available, otherwise use defaults
+    const scoring = S.rules?.scoring || {};
+    const ptsVal = scoring.pts !== undefined ? scoring.pts : 1;
+    const rebVal = scoring.reb !== undefined ? scoring.reb : 1.2;
+    const astVal = scoring.ast !== undefined ? scoring.ast : 1.5;
+    const stlVal = scoring.stl !== undefined ? scoring.stl : 3;
+    const blkVal = scoring.blk !== undefined ? scoring.blk : 3;
+    const toVal = scoring.to !== undefined ? scoring.to : -1;
+    const tpmVal = scoring.tpm !== undefined ? scoring.tpm : 0.5;
+    
+    const total = (pts * ptsVal) + (reb * rebVal) + (ast * astVal) + 
+                  (stl * stlVal) + (blk * blkVal) + (to * toVal) + (tpm * tpmVal);
+    return Math.round(total * 10) / 10;
+  }
+  
+  // For category leagues, return the base fp from the data
+  return p.fp || 0;
 }
 function openPModal(idx){
   const p=PLAYERS[idx];if(!p||S.drafted.has(p.id))return;
@@ -2278,7 +2308,10 @@ function sortPlayers(stat){
   }
   PLAYERS.sort((a,b)=>{
     let aVal,bVal;
-    if(stat==='min'){
+    if(stat==='adp'){
+      aVal = a.adp || 9999;
+      bVal = b.adp || 9999;
+    }else if(stat==='min'){
       const aPts = a.statValues?.PTS || 0;
       const bPts = b.statValues?.PTS || 0;
       aVal = a.min || (aPts > 20 ? 35 : aPts > 15 ? 30 : aPts > 10 ? 25 : aPts > 5 ? 20 : 15);
