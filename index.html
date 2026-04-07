@@ -237,6 +237,7 @@
         <div id="accountMenu" class="account-menu">
           <button class="account-item" onclick="openMyProfile()">My Profile</button>
           <button class="account-item" onclick="openMyLeagues()">My Leagues</button>
+          <button id="adminMenuItem" class="account-item" onclick="openAdministrator()" style="display:none;">Administrator</button>
           <button class="account-item" onclick="openMessages()">Messages</button>
           <button class="account-item" onclick="openSettings()">Settings</button>
           <button class="account-item danger" onclick="logoutUser()">Log Out</button>
@@ -918,6 +919,10 @@ function openMyLeagues(){
   closeAccountMenu();
   window.location.href='my-leagues.html';
 }
+function openAdministrator(){
+  closeAccountMenu();
+  window.location.href='admin-leagues.html';
+}
 async function openMyProfile(){
   closeAccountMenu();
   let userNumber=Number(localStorage.getItem('rbUserNumber') || 0);
@@ -1165,6 +1170,17 @@ auth.onAuthStateChanged(async user => {
     localStorage.setItem('rbPlayerName', username);
     if(profile.userNumber) localStorage.setItem('rbUserNumber', String(profile.userNumber));
     localStorage.setItem('rbIsAdmin', (profile.isAdmin || isRosterbateAdminNumber(profile.userNumber)) ? '1' : '0');
+    
+    // Show/hide admin menu item
+    const adminMenuItem = document.getElementById('adminMenuItem');
+    if(adminMenuItem){
+      if(profile.isAdmin === true || user.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12'){
+        adminMenuItem.style.display = 'block';
+      } else {
+        adminMenuItem.style.display = 'none';
+      }
+    }
+    
     trigger.textContent = username;
     trigger.classList.add('secondary');
     if(navActions) navActions.classList.add('logged-in');
