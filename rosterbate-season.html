@@ -958,11 +958,12 @@ async function saveSeasonToFirebase() {
     // Clean ALL undefined values (JSON.stringify removes them automatically)
     const cleanedSaveData = removeUndefined(saveData);
     
-    // Save full data to userSeasons
-    await db.ref(`userSeasons/${userId}/${seasonId}`).update(cleanedSaveData);
+    // Save full data to userSeasons (use set to ensure it exists)
+    await db.ref(`userSeasons/${userId}/${seasonId}`).set(cleanedSaveData);
     
-    // Update admin index (only with defined values)
+    // Update admin index (use set to ensure it exists, must include all required fields)
     const adminIndexData = {
+      seasonId: seasonId,  // Required by validation
       userId: userId,
       userEmail: userEmail,
       sport: D.sport || 'nba',
@@ -973,10 +974,11 @@ async function saveSeasonToFirebase() {
       scoringFormat: D.scoringFormat || 'h2h_pts',
       draftFormat: D.draftFormat || 'snake',
       currentWeek: D.currentWeek || 1,
+      createdAt: D.createdAt || D.savedAt || Date.now(),  // Required by validation
       updatedAt: Date.now()
     };
     
-    await db.ref(`allSeasons/${seasonId}`).update(removeUndefined(adminIndexData));
+    await db.ref(`allSeasons/${seasonId}`).set(removeUndefined(adminIndexData));
     
     console.log('✅ Season saved to Firebase:', seasonId);
     return true;
