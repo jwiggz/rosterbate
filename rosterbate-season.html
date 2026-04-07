@@ -880,6 +880,26 @@ const authReady=new Promise(resolve=>{
   });
 });
 
+// Helper function to remove undefined values from objects (Firebase doesn't allow undefined)
+function removeUndefined(obj) {
+  if (obj === null || obj === undefined) return null;
+  if (typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(removeUndefined).filter(v => v !== undefined);
+  
+  const cleaned = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key) && obj[key] !== undefined) {
+      const value = obj[key];
+      if (typeof value === 'object' && value !== null) {
+        cleaned[key] = removeUndefined(value);
+      } else if (value !== undefined) {
+        cleaned[key] = value;
+      }
+    }
+  }
+  return cleaned;
+}
+
 // Save season state to Firebase for permanent cloud storage
 async function saveSeasonToFirebase() {
   if (!auth || !db) {
@@ -925,27 +945,31 @@ async function saveSeasonToFirebase() {
       updatedAt: Date.now()
     };
     
-    // Include draft data if exists
+    // Include draft data if exists (only include defined values)
     if (D.teams || D.schedule || D.matchups) {
-      saveData.draft = {
-        teams: D.teams,
-        schedule: D.schedule,
-        matchups: D.matchups,
-        teamUsers: D.teamUsers,
-        myTeamIndex: D.myTeamIndex
-      };
+      const draftData = {};
+      if (D.teams !== undefined) draftData.teams = D.teams;
+      if (D.schedule !== undefined) draftData.schedule = D.schedule;
+      if (D.matchups !== undefined) draftData.matchups = D.matchups;
+      if (D.teamUsers !== undefined) draftData.teamUsers = D.teamUsers;
+      if (D.myTeamIndex !== undefined) draftData.myTeamIndex = D.myTeamIndex;
+      
+      // Remove any undefined values from nested objects
+      saveData.draft = removeUndefined(draftData);
     }
     
-    // Include game state if exists
+    // Include game state if exists (only include defined values)
     if (D.waiverPriority || D.freeAgents || D.weekResults) {
-      saveData.game = {
-        waiverPriority: D.waiverPriority,
-        freeAgents: D.freeAgents,
-        weekResults: D.weekResults,
-        currentWeek: D.currentWeek,
-        standings: D.standings,
-        isSeasonComplete: D.isSeasonComplete
-      };
+      const gameData = {};
+      if (D.waiverPriority !== undefined) gameData.waiverPriority = D.waiverPriority;
+      if (D.freeAgents !== undefined) gameData.freeAgents = D.freeAgents;
+      if (D.weekResults !== undefined) gameData.weekResults = D.weekResults;
+      if (D.currentWeek !== undefined) gameData.currentWeek = D.currentWeek;
+      if (D.standings !== undefined) gameData.standings = D.standings;
+      if (D.isSeasonComplete !== undefined) gameData.isSeasonComplete = D.isSeasonComplete;
+      
+      // Remove any undefined values from nested objects
+      saveData.game = removeUndefined(gameData);
     }
     
     // If createdAt doesn't exist, set it
@@ -955,11 +979,14 @@ async function saveSeasonToFirebase() {
       saveData.createdAt = D.createdAt;
     }
     
-    // Save full data to userSeasons
-    await db.ref(`userSeasons/${userId}/${seasonId}`).update(saveData);
+    // Remove any undefined values from the entire saveData object
+    const cleanedSaveData = removeUndefined(saveData);
     
-    // Update admin index
-    await db.ref(`allSeasons/${seasonId}`).update({
+    // Save full data to userSeasons
+    await db.ref(`userSeasons/${userId}/${seasonId}`).update(cleanedSaveData);
+    
+    // Update admin index (only with defined values)
+    const adminIndexData = {
       userId: userId,
       userEmail: userEmail,
       sport: D.sport || 'nba',
@@ -971,7 +998,9 @@ async function saveSeasonToFirebase() {
       draftFormat: D.draftFormat || 'snake',
       currentWeek: D.currentWeek || 1,
       updatedAt: Date.now()
-    });
+    };
+    
+    await db.ref(`allSeasons/${seasonId}`).update(removeUndefined(adminIndexData));
     
     console.log('✅ Season saved to Firebase:', seasonId);
     return true;
