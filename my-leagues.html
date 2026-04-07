@@ -626,8 +626,8 @@ function openSoloLeague(seasonId){
     console.error('Failed to load league into localStorage:', e);
   }
   
-  // Navigate to season manager
-  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba');
+  // Navigate to season manager with unique league ID
+  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba')+'&league='+encodeURIComponent(seasonId);
 }
 
 async function deleteSoloLeague(seasonId){

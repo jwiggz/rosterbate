@@ -2230,6 +2230,76 @@ window.onload=async function(){
   // They're only needed for real drafts, not demo mode
   
   applySportContext(CURRENT_SPORT);
+  
+  // Check if loading a specific league via URL parameter
+  const urlParams = new URLSearchParams(window.location.search || '');
+  const leagueId = urlParams.get('league');
+  const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
+  
+  // If league ID is provided, try to load from Firebase first
+  if (leagueId && leagueId !== 'demo') {
+    console.log('🔗 Loading specific league from URL:', leagueId);
+    
+    // Wait for auth to be ready
+    await authReady;
+    
+    if (currentRbUser) {
+      try {
+        const userId = currentRbUser.uid;
+        const snapshot = await db.ref(`userSeasons/${userId}/${leagueId}`).once('value');
+        
+        if (snapshot.exists()) {
+          const leagueData = snapshot.val();
+          console.log('✅ Loaded league from Firebase:', leagueId);
+          
+          // Save to localStorage for offline access
+          try {
+            localStorage.setItem('rosterbateDraft', JSON.stringify(leagueData));
+          } catch(e) {
+            console.warn('Failed to save to localStorage:', e);
+          }
+          
+          // Set as current data
+          D = leagueData;
+          applySportContext(leagueData.sport || requestedSport);
+          hydrateDraftUserContextFromLobby();
+          
+          // Check if multiplayer
+          let seasonLoaded = false;
+          try {
+            seasonLoaded = await loadOrCreateSharedSeason();
+          } catch(e) {
+            console.error('Shared season load failed, falling back to local draft data.', e);
+            seasonLoaded = false;
+          }
+          
+          if (!seasonLoaded) {
+            try {
+              initSeason();
+            } catch(initErr) {
+              console.error('Local season init failed.', initErr);
+              toast('Could not open the league.');
+              return;
+            }
+          }
+          
+          goPage('hub');
+          return;
+        } else {
+          console.warn('⚠️ League not found in Firebase:', leagueId);
+          toast('League not found. Loading from localStorage instead.');
+        }
+      } catch(e) {
+        console.error('❌ Failed to load league from Firebase:', e);
+        toast('Failed to load league from cloud. Loading from localStorage instead.');
+      }
+    } else {
+      console.warn('⚠️ Not logged in, cannot load league from Firebase');
+      toast('Sign in to load your league from the cloud.');
+    }
+  }
+  
+  // Fall back to localStorage loading
   let raw=null;
   try{raw=localStorage.getItem('rosterbateDraft');}catch(e){}
   
@@ -2239,7 +2309,6 @@ window.onload=async function(){
     try{
       const parsed=JSON.parse(raw);
       if(typeof parsed.isCommissioner!=='boolean') parsed.isCommissioner=true;
-      const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
       const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
       if(savedSport===requestedSport){
         if(isDemoSeasonData(parsed)){
@@ -2277,7 +2346,6 @@ window.onload=async function(){
   }
   
   // Check for multiplayer lobby
-  const requestedSport=normalizeRosterbateSport(new URLSearchParams(window.location.search||'').get('sport') || CURRENT_SPORT);
   const lobbyState=getSavedMultiplayerLobbyState();
   if(lobbyState?.lobbyId && normalizeRosterbateSport(lobbyState.sport||requestedSport)===requestedSport){
     try{

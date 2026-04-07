@@ -3032,8 +3032,12 @@ function endDraft(){
       statSummary:p?.statSummary||''
     });
 
+    // Generate unique seasonId for this league (NOT for demo)
+    const seasonId = 'season_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    
     // Save draft data to localStorage for the season manager to pick up
     const draftData = {
+      seasonId: seasonId,  // Add unique ID
       sport: SPORT,
       teamName: S.name,
       leagueName: lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
@@ -3131,9 +3135,25 @@ function endDraft(){
 }
 
 function openSeasonManager(){
-  // Try to open season manager — works when served from a web server
-  // Falls back to a helpful message if opened as a local file
-  const w = window.open('rosterbate-season.html?sport=' + encodeURIComponent(SPORT), '_blank');
+  // Get the seasonId from the saved draft data
+  let seasonId = null;
+  try {
+    const saved = localStorage.getItem('rosterbateDraft');
+    if (saved) {
+      const data = JSON.parse(saved);
+      seasonId = data.seasonId;
+    }
+  } catch(e) {
+    console.error('Failed to get seasonId:', e);
+  }
+  
+  // Build URL with seasonId if available
+  let url = 'rosterbate-season.html?sport=' + encodeURIComponent(SPORT);
+  if (seasonId) {
+    url += '&league=' + encodeURIComponent(seasonId);
+  }
+  
+  const w = window.open(url, '_blank');
   if(!w || w.closed){
     showToast('Save both files to the same folder to use Season Manager');
   }
