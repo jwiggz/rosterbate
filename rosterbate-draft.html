@@ -2931,6 +2931,13 @@ function updateTradeBtn(){
 
 // ─── SEASON MANAGEMENT ────────────────────────────────────
 function endDraft(){
+  // Guard against double-calling
+  if(S.draftEnded) {
+    console.log('⚠️ endDraft already called, skipping duplicate');
+    return;
+  }
+  S.draftEnded = true;
+  
   console.log('🏆 Draft ending, switching to completion screen...');
   clearInterval(S.timerInt);
   updateSoloSimButton();
@@ -3056,7 +3063,9 @@ function endDraft(){
       }).join('') : '<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">No players were drafted to this roster.</div>';
     }
   }catch(err){
-    console.error('RosterBate endDraft failed:', err);
+    console.error('❌ RosterBate endDraft failed:', err);
+    console.error('Error stack:', err.stack);
+    console.error('Error at line:', err.lineNumber || 'unknown');
     const teamNameEl=document.getElementById('dcTeamName');
     const picksEl=document.getElementById('dcPicks');
     const topPickEl=document.getElementById('dcTopPick');
@@ -3069,6 +3078,8 @@ function endDraft(){
     if(rosterEl) rosterEl.innerHTML='<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">Draft complete. Your season data was still saved, but the summary card hit a render issue.</div>';
     showToast('Draft complete. Summary screen recovered.');
   }
+  
+  console.log('✅ endDraft completed successfully');
 }
 
 function openSeasonManager(){
