@@ -915,45 +915,26 @@ async function saveSeasonToFirebase() {
     const userId = currentRbUser.uid;
     const userEmail = currentRbUser.email || 'unknown';
     
-    // Prepare data to save
+    // Prepare data to save - include ALL properties from D to preserve everything
     const saveData = {
-      sport: D.sport || 'nba',
-      leagueName: D.leagueName || 'RosterBate League',
-      teamName: D.teamName || 'My Team',
+      ...D,  // Start with all existing data
+      // Override/ensure critical fields
       seasonId: seasonId,
       userId: userId,
       userEmail: userEmail,
+      sport: D.sport || 'nba',
+      leagueName: D.leagueName || 'RosterBate League',
+      teamName: D.teamName || 'My Team',
       isMultiplayer: !!D.multiplayer,
       leagueSize: D.leagueSize || 0,
       scoringFormat: D.scoringFormat || 'h2h_pts',
       draftFormat: D.draftFormat || 'snake',
       myTeamIndex: D.myTeamIndex || 0,
+      myPos: D.myPos || 0,
       currentWeek: D.currentWeek || 1,
       createdAt: D.createdAt || D.savedAt || Date.now(),
       updatedAt: Date.now()
     };
-    
-    // Include draft data if any of these exist
-    if (D.teams || D.matchups || D.teamUsers) {
-      saveData.draft = {
-        teams: D.teams,
-        matchups: D.matchups,
-        teamUsers: D.teamUsers,
-        myTeamIndex: D.myTeamIndex
-      };
-    }
-    
-    // Include game state if any of these exist
-    if (D.waiverPriority || D.freeAgents || D.weekResults || D.standings) {
-      saveData.game = {
-        waiverPriority: D.waiverPriority,
-        freeAgents: D.freeAgents,
-        weekResults: D.weekResults,
-        currentWeek: D.currentWeek,
-        standings: D.standings,
-        isSeasonComplete: D.isSeasonComplete
-      };
-    }
     
     // Clean ALL undefined values (JSON.stringify removes them automatically)
     const cleanedSaveData = removeUndefined(saveData);
@@ -2251,6 +2232,14 @@ window.onload=async function(){
         if (snapshot.exists()) {
           const leagueData = snapshot.val();
           console.log('✅ Loaded league from Firebase:', leagueId);
+          console.log('📦 League data structure:', Object.keys(leagueData));
+          
+          // Check if this is valid league data
+          if (!leagueData.allRosters || !Array.isArray(leagueData.allRosters)) {
+            console.error('❌ Invalid league data - missing allRosters');
+            toast('League data is corrupted. Please try loading from My Leagues page.');
+            return;
+          }
           
           // Save to localStorage for offline access
           try {
@@ -2261,24 +2250,33 @@ window.onload=async function(){
           
           // Set as current data
           D = leagueData;
+          
+          // Ensure D has required properties
+          if (typeof D.isCommissioner !== 'boolean') D.isCommissioner = true;
+          if (!D.myPos && D.myPos !== 0) D.myPos = 0;
+          
           applySportContext(leagueData.sport || requestedSport);
           hydrateDraftUserContextFromLobby();
           
           // Check if multiplayer
           let seasonLoaded = false;
-          try {
-            seasonLoaded = await loadOrCreateSharedSeason();
-          } catch(e) {
-            console.error('Shared season load failed, falling back to local draft data.', e);
-            seasonLoaded = false;
+          if (D.multiplayer) {
+            try {
+              seasonLoaded = await loadOrCreateSharedSeason();
+            } catch(e) {
+              console.error('Shared season load failed, falling back to local draft data.', e);
+              seasonLoaded = false;
+            }
           }
           
           if (!seasonLoaded) {
             try {
+              console.log('🚀 Initializing season from Firebase data...');
               initSeason();
+              console.log('✅ Season initialized successfully');
             } catch(initErr) {
-              console.error('Local season init failed.', initErr);
-              toast('Could not open the league.');
+              console.error('❌ Local season init failed:', initErr);
+              toast('Could not open the league: ' + initErr.message);
               return;
             }
           }
