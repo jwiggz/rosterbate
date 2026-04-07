@@ -2221,16 +2221,24 @@ function rPlayers(){
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
       :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div></div>`;
-    // Estimate stats - ensure all values are numbers
-    const pts = p.pts || 0;
-    const tpm = p.tpm || 0;
+    // Get stats from statValues object - this is where the real data lives
+    const sv = p.statValues || {};
+    const pts = sv.PTS || 0;
+    const tpm = sv['3PM'] || 0;
+    const reb = sv.REB || 0;
+    const ast = sv.AST || 0;
+    const stl = sv.STL || 0;
+    const blk = sv.BLK || 0;
+    const to = sv.TO || 0;
+    
+    // Estimate missing values for display
     const fgp = p.fgp || 45;
     const ftp = p.ftp || 75;
     const min = p.min || (pts > 20 ? 35 : pts > 15 ? 30 : pts > 10 ? 25 : pts > 5 ? 20 : 15);
-    const fgm = p.fgm || ((pts - (tpm * 3)) / 2 + tpm);
-    const fga = p.fga || (fgm / (fgp / 100));
-    const ftm = p.ftm || (pts * 0.15);
-    const fta = p.fta || (ftm / (ftp / 100));
+    const fgm = sv.FGM || ((pts - (tpm * 3)) / 2 + tpm);
+    const fga = sv.FGA || (fgm / (fgp / 100));
+    const ftm = sv.FTM || (pts * 0.15);
+    const fta = sv.FTA || (ftm / (ftp / 100));
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       ${avatarOrButton}
@@ -2248,13 +2256,13 @@ function rPlayers(){
       <div class="pstat">${fga.toFixed(1)}</div>
       <div class="pstat">${ftm.toFixed(1)}</div>
       <div class="pstat">${fta.toFixed(1)}</div>
-      <div class="pstat">${(p.tpm||0).toFixed(1)}</div>
-      <div class="pstat">${(p.reb||0).toFixed(1)}</div>
-      <div class="pstat">${(p.ast||0).toFixed(1)}</div>
-      <div class="pstat">${(p.stl||0).toFixed(1)}</div>
-      <div class="pstat">${(p.blk||0).toFixed(1)}</div>
-      <div class="pstat">${(p.to||0).toFixed(1)}</div>
-      <div class="pstat">${(p.pts||0).toFixed(1)}</div>
+      <div class="pstat">${tpm.toFixed(1)}</div>
+      <div class="pstat">${reb.toFixed(1)}</div>
+      <div class="pstat">${ast.toFixed(1)}</div>
+      <div class="pstat">${stl.toFixed(1)}</div>
+      <div class="pstat">${blk.toFixed(1)}</div>
+      <div class="pstat">${to.toFixed(1)}</div>
+      <div class="pstat">${pts.toFixed(1)}</div>
     </div>`;
   }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
 }
@@ -2271,42 +2279,63 @@ function sortPlayers(stat){
   PLAYERS.sort((a,b)=>{
     let aVal,bVal;
     if(stat==='min'){
-      const aPts = a.pts || 0;
-      const bPts = b.pts || 0;
+      const aPts = a.statValues?.PTS || 0;
+      const bPts = b.statValues?.PTS || 0;
       aVal = a.min || (aPts > 20 ? 35 : aPts > 15 ? 30 : aPts > 10 ? 25 : aPts > 5 ? 20 : 15);
       bVal = b.min || (bPts > 20 ? 35 : bPts > 15 ? 30 : bPts > 10 ? 25 : bPts > 5 ? 20 : 15);
     }else if(stat==='fgm'){
-      const aPts = a.pts || 0;
-      const aTpm = a.tpm || 0;
-      const bPts = b.pts || 0;
-      const bTpm = b.tpm || 0;
-      aVal = a.fgm || ((aPts - (aTpm * 3)) / 2 + aTpm);
-      bVal = b.fgm || ((bPts - (bTpm * 3)) / 2 + bTpm);
+      const aPts = a.statValues?.PTS || 0;
+      const aTpm = a.statValues?.['3PM'] || 0;
+      const bPts = b.statValues?.PTS || 0;
+      const bTpm = b.statValues?.['3PM'] || 0;
+      aVal = a.statValues?.FGM || ((aPts - (aTpm * 3)) / 2 + aTpm);
+      bVal = b.statValues?.FGM || ((bPts - (bTpm * 3)) / 2 + bTpm);
     }else if(stat==='fga'){
-      const aPts = a.pts || 0;
-      const aTpm = a.tpm || 0;
+      const aPts = a.statValues?.PTS || 0;
+      const aTpm = a.statValues?.['3PM'] || 0;
       const aFgp = a.fgp || 45;
-      const bPts = b.pts || 0;
-      const bTpm = b.tpm || 0;
+      const bPts = b.statValues?.PTS || 0;
+      const bTpm = b.statValues?.['3PM'] || 0;
       const bFgp = b.fgp || 45;
-      const aFgm = a.fgm || ((aPts - (aTpm * 3)) / 2 + aTpm);
-      const bFgm = b.fgm || ((bPts - (bTpm * 3)) / 2 + bTpm);
-      aVal = a.fga || (aFgm / (aFgp / 100));
-      bVal = b.fga || (bFgm / (bFgp / 100));
+      const aFgm = a.statValues?.FGM || ((aPts - (aTpm * 3)) / 2 + aTpm);
+      const bFgm = b.statValues?.FGM || ((bPts - (bTpm * 3)) / 2 + bTpm);
+      aVal = a.statValues?.FGA || (aFgm / (aFgp / 100));
+      bVal = b.statValues?.FGA || (bFgm / (bFgp / 100));
     }else if(stat==='ftm'){
-      const aPts = a.pts || 0;
-      const bPts = b.pts || 0;
-      aVal = a.ftm || (aPts * 0.15);
-      bVal = b.ftm || (bPts * 0.15);
+      const aPts = a.statValues?.PTS || 0;
+      const bPts = b.statValues?.PTS || 0;
+      aVal = a.statValues?.FTM || (aPts * 0.15);
+      bVal = b.statValues?.FTM || (bPts * 0.15);
     }else if(stat==='fta'){
-      const aPts = a.pts || 0;
+      const aPts = a.statValues?.PTS || 0;
       const aFtp = a.ftp || 75;
-      const bPts = b.pts || 0;
+      const bPts = b.statValues?.PTS || 0;
       const bFtp = b.ftp || 75;
-      const aFtm = a.ftm || (aPts * 0.15);
-      const bFtm = b.ftm || (bPts * 0.15);
-      aVal = a.fta || (aFtm / (aFtp / 100));
-      bVal = b.fta || (bFtm / (bFtp / 100));
+      const aFtm = a.statValues?.FTM || (aPts * 0.15);
+      const bFtm = b.statValues?.FTM || (bPts * 0.15);
+      aVal = a.statValues?.FTA || (aFtm / (aFtp / 100));
+      bVal = b.statValues?.FTA || (bFtm / (bFtp / 100));
+    }else if(stat==='tpm'){
+      aVal = a.statValues?.['3PM'] || 0;
+      bVal = b.statValues?.['3PM'] || 0;
+    }else if(stat==='reb'){
+      aVal = a.statValues?.REB || 0;
+      bVal = b.statValues?.REB || 0;
+    }else if(stat==='ast'){
+      aVal = a.statValues?.AST || 0;
+      bVal = b.statValues?.AST || 0;
+    }else if(stat==='stl'){
+      aVal = a.statValues?.STL || 0;
+      bVal = b.statValues?.STL || 0;
+    }else if(stat==='blk'){
+      aVal = a.statValues?.BLK || 0;
+      bVal = b.statValues?.BLK || 0;
+    }else if(stat==='to'){
+      aVal = a.statValues?.TO || 0;
+      bVal = b.statValues?.TO || 0;
+    }else if(stat==='pts'){
+      aVal = a.statValues?.PTS || 0;
+      bVal = b.statValues?.PTS || 0;
     }else{
       aVal=a[stat]||0;
       bVal=b[stat]||0;
@@ -2869,12 +2898,14 @@ function updateTradeBtn(){
 
 // ─── SEASON MANAGEMENT ────────────────────────────────────
 function endDraft(){
+  console.log('🏆 Draft ending, switching to completion screen...');
   clearInterval(S.timerInt);
   updateSoloSimButton();
   const draftEl=document.getElementById('draft');
   const completeEl=document.getElementById('draftComplete');
   if(draftEl) draftEl.classList.remove('active');
   if(completeEl) completeEl.classList.add('active');
+  console.log('✓ Draft screen hidden, complete screen shown');
   try{
     const lobbyState=getSavedMultiplayerLobbyState();
     const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
