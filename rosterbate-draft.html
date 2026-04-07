@@ -2954,10 +2954,10 @@ function endDraft(){
             name:player.name||('Team '+(idx+1)),
             teamIdx:idx,
             joinedAt:Number(player.joinedAt||0)
-            };
-          }
-          return acc;
-        },{})
+          };
+        }
+        return acc;
+      },{})
       : null;
 
     const serializePlayer=p=>({
@@ -3016,6 +3016,7 @@ function endDraft(){
       sharedSeasonId: isMultiplayer ? lobbyState.lobbyId : null,
       myPlayerId: isMultiplayer ? (lobbyState.myId||null) : null,
       teamUsers: teamUsers,
+      isDemo: false,
       savedAt: Date.now()
     };
     try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}

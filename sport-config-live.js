@@ -29,7 +29,8 @@
       const saved = localStorage.getItem('rosterbateDraft');
       if (!saved) return false;
       const data = JSON.parse(saved);
-      return data.teamName === 'Demo Dunkers' || data.isDemo === true;
+      // Explicitly check isDemo flag (false = live data, true = demo data)
+      return data.isDemo === true;
     } catch(e) {
       return false;
     }
@@ -270,8 +271,12 @@
     return player?.fp || 0;
   };
 
+  // Build player pool for drafts and seasons
+  // This ALWAYS uses LIVE data from RB_IMPORTED_POOLS (sport-data-live.json/js)
+  // Live data is loaded at 4AM daily with current season stats
+  // Demo data (sport-demo-data.js) is separate and only used for "Try It Now" preview mode
   window.buildRosterbateSportPlayerPool = function(sport, limit) {
-    // Get players from the imported pool
+    // Get players from the imported pool (LIVE DATA ONLY)
     const pool = window.RB_IMPORTED_POOLS?.[sport];
     if (!pool || !Array.isArray(pool)) return [];
     return pool.slice(0, limit || 300);
