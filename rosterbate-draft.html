@@ -2953,18 +2953,21 @@ function endDraft(){
   const completeEl = document.getElementById('draftComplete');
   if(completeEl) {
     completeEl.classList.add('active');
-    completeEl.style.display = 'flex';
-    completeEl.style.position = 'fixed';
-    completeEl.style.inset = '0';
-    completeEl.style.top = '0';
-    completeEl.style.left = '0';
-    completeEl.style.right = '0';
-    completeEl.style.bottom = '0';
-    completeEl.style.width = '100%';
-    completeEl.style.height = '100vh';
-    completeEl.style.zIndex = '100';
-    completeEl.style.flexDirection = 'column';
-    completeEl.style.overflow = 'hidden';
+    // Force all styles with setAttribute to override everything
+    completeEl.setAttribute('style', 
+      'display: flex !important; ' +
+      'position: fixed !important; ' +
+      'top: 0 !important; ' +
+      'left: 0 !important; ' +
+      'right: 0 !important; ' +
+      'bottom: 0 !important; ' +
+      'width: 100vw !important; ' +
+      'height: 100vh !important; ' +
+      'z-index: 100 !important; ' +
+      'flex-direction: column !important; ' +
+      'overflow: hidden !important; ' +
+      'background: #0a0e1a !important;'
+    );
   }
   
   console.log('✓ Draft screen hidden, complete screen shown');
