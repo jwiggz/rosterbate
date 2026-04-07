@@ -1547,7 +1547,7 @@ function applySportToDraftUI(){
     throw new Error('RosterBate real player pool missing for '+SPORT);
   }
   const teamPlaceholders = {
-    nba:'e.g. Buckets & Beyond',
+    nba:'Tommy\'s Minions',
     nfl:'e.g. Fourth & Gold',
     mlb:'e.g. Dugout Dogs'
   };
@@ -1563,12 +1563,12 @@ function applySportToDraftUI(){
   document.getElementById('iSpot').value = 1;
   document.getElementById('iRounds').value = SPORT_CFG.defaultRounds;
   document.getElementById('cScoring').querySelectorAll('.chip').forEach(chip => {
-    chip.classList.toggle('on', chip.dataset.v === SPORT_CFG.defaultScoring);
+    chip.classList.toggle('on', chip.dataset.v === (SPORT === 'nba' ? 'h2h_pts' : SPORT_CFG.defaultScoring));
   });
-  document.getElementById('iScoringInfo').textContent = SPORT_CFG.scoringInfo[SPORT_CFG.defaultScoring];
+  document.getElementById('iScoringInfo').textContent = SPORT_CFG.scoringInfo[SPORT === 'nba' ? 'h2h_pts' : SPORT_CFG.defaultScoring];
   renderAdvancedLeagueRules();
   updatePosFilterBar();
-  S.scr = SPORT_CFG.defaultScoring;
+  S.scr = SPORT === 'nba' ? 'h2h_pts' : SPORT_CFG.defaultScoring;
   S.rds = SPORT_CFG.defaultRounds;
   S.ls = SPORT_CFG.defaultLeagueSize;
   S.myPos = 0;
@@ -2219,11 +2219,18 @@ function rPlayers(){
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
       :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${inlineDraftBtn}</div>`;
-    const min=p.min||28;
-    const fgm=p.fgm||Math.round(min*0.3);
-    const fga=p.fga||Math.round(fgm/((p.fgp||45)/100));
-    const ftm=p.ftm||Math.round(min*0.15);
-    const fta=p.fta||Math.round(ftm/((p.ftp||75)/100));
+    // Estimate minutes based on points (rough correlation)
+    const min=p.min||(p.pts ? Math.min(38, Math.max(15, p.pts * 1.2)) : 28);
+    // Estimate FGM from points and 3PM (assuming ~1.7 pts per FGM for 2s, adjust for 3s)
+    const estimated3ptPts = (p.tpm || 0) * 3;
+    const estimated2ptPts = (p.pts || 0) - estimated3ptPts;
+    const fgm = p.fgm || Math.max(0, ((estimated2ptPts / 2) + (p.tpm || 0)));
+    // Estimate FGA from FGM and FG%
+    const fga = p.fga || (fgm > 0 && p.fgp > 0 ? fgm / (p.fgp / 100) : fgm * 2.2);
+    // Estimate FTM from points (rough estimate: about 15-20% of points from FTs)
+    const ftm = p.ftm || ((p.pts || 0) * 0.17);
+    // Estimate FTA from FTM and FT%
+    const fta = p.fta || (ftm > 0 && p.ftp > 0 ? ftm / (p.ftp / 100) : ftm * 1.25);
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
@@ -2264,32 +2271,32 @@ function sortPlayers(stat){
   PLAYERS.sort((a,b)=>{
     let aVal,bVal;
     if(stat==='min'){
-      aVal=a.min||28;
-      bVal=b.min||28;
+      aVal=a.min||(a.pts ? Math.min(38, Math.max(15, a.pts * 1.2)) : 28);
+      bVal=b.min||(b.pts ? Math.min(38, Math.max(15, b.pts * 1.2)) : 28);
     }else if(stat==='fgm'){
-      const aMin=a.min||28;
-      aVal=a.fgm||Math.round(aMin*0.3);
-      const bMin=b.min||28;
-      bVal=b.fgm||Math.round(bMin*0.3);
+      const aEst3 = (a.tpm || 0) * 3;
+      const aEst2 = (a.pts || 0) - aEst3;
+      aVal = a.fgm || Math.max(0, ((aEst2 / 2) + (a.tpm || 0)));
+      const bEst3 = (b.tpm || 0) * 3;
+      const bEst2 = (b.pts || 0) - bEst3;
+      bVal = b.fgm || Math.max(0, ((bEst2 / 2) + (b.tpm || 0)));
     }else if(stat==='fga'){
-      const aMin=a.min||28;
-      const aFgm=a.fgm||Math.round(aMin*0.3);
-      aVal=a.fga||Math.round(aFgm/((a.fgp||45)/100));
-      const bMin=b.min||28;
-      const bFgm=b.fgm||Math.round(bMin*0.3);
-      bVal=b.fga||Math.round(bFgm/((b.fgp||45)/100));
+      const aEst3 = (a.tpm || 0) * 3;
+      const aEst2 = (a.pts || 0) - aEst3;
+      const aFgm = a.fgm || Math.max(0, ((aEst2 / 2) + (a.tpm || 0)));
+      aVal = a.fga || (aFgm > 0 && a.fgp > 0 ? aFgm / (a.fgp / 100) : aFgm * 2.2);
+      const bEst3 = (b.tpm || 0) * 3;
+      const bEst2 = (b.pts || 0) - bEst3;
+      const bFgm = b.fgm || Math.max(0, ((bEst2 / 2) + (b.tpm || 0)));
+      bVal = b.fga || (bFgm > 0 && b.fgp > 0 ? bFgm / (b.fgp / 100) : bFgm * 2.2);
     }else if(stat==='ftm'){
-      const aMin=a.min||28;
-      aVal=a.ftm||Math.round(aMin*0.15);
-      const bMin=b.min||28;
-      bVal=b.ftm||Math.round(bMin*0.15);
+      aVal = a.ftm || ((a.pts || 0) * 0.17);
+      bVal = b.ftm || ((b.pts || 0) * 0.17);
     }else if(stat==='fta'){
-      const aMin=a.min||28;
-      const aFtm=a.ftm||Math.round(aMin*0.15);
-      aVal=a.fta||Math.round(aFtm/((a.ftp||75)/100));
-      const bMin=b.min||28;
-      const bFtm=b.ftm||Math.round(bMin*0.15);
-      bVal=b.fta||Math.round(bFtm/((b.ftp||75)/100));
+      const aFtm = a.ftm || ((a.pts || 0) * 0.17);
+      aVal = a.fta || (aFtm > 0 && a.ftp > 0 ? aFtm / (a.ftp / 100) : aFtm * 1.25);
+      const bFtm = b.ftm || ((b.pts || 0) * 0.17);
+      bVal = b.fta || (bFtm > 0 && b.ftp > 0 ? bFtm / (b.ftp / 100) : bFtm * 1.25);
     }else{
       aVal=a[stat]||0;
       bVal=b[stat]||0;
