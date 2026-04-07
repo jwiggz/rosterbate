@@ -1174,7 +1174,9 @@ auth.onAuthStateChanged(async user => {
     // Show/hide admin menu item
     const adminMenuItem = document.getElementById('adminMenuItem');
     if(adminMenuItem){
-      if(profile.isAdmin === true || user.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12'){
+      if(profile.isAdmin === true || 
+         user.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12' || 
+         user.uid === 'sAu0wDTK33ensoTQ3reEXvzpkbv2'){
         adminMenuItem.style.display = 'block';
       } else {
         adminMenuItem.style.display = 'none';
