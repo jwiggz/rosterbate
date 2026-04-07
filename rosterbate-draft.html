@@ -404,7 +404,7 @@
   <div class="pill" id="sportLobbyPill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
   <div class="card">
     <h2>League Settings</h2>
-    <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Buckets & Beyond"/></div>
+    <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="Tommy's Minions"/></div>
     <div class="two">
       <div class="fr"><label>Teams (2–20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
       <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="1"/></div>
@@ -443,6 +443,8 @@
         <div class="chip on" data-v="0" onclick="cc('cTimer',this)">Off</div>
       </div>
     </div>
+    <div class="errmsg" id="err"></div>
+    <button class="btn" id="enterDraftBtn" onclick="startDraft()">Enter Draft Room</button>
     <div class="advbox">
       <div class="advhead">
         <div>
@@ -462,8 +464,6 @@
       </div>
       <div class="scoregrid" id="scoreGrid"></div>
     </div>
-    <div class="errmsg" id="err"></div>
-    <button class="btn" id="enterDraftBtn" onclick="startDraft()">Enter Draft Room</button>
 </div>
 
 </div>
@@ -1706,12 +1706,14 @@ function startDraft(){
   const rd=rules.rosterSize;
   const lobbyState=getSavedMultiplayerLobbyState();
   const allowSoloTest=!!(lobbyState?.soloTest && lobbyState?.lobbyId);
+  const teamName=document.getElementById('iName').value.trim();
+  if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
   if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
   const need=ls*rd;
   if(need>PLAYERS.length){e.textContent='Need '+need+' slots but only '+PLAYERS.length+' players. Reduce teams or rounds.';e.classList.add('show');return;}
-  S.name=document.getElementById('iName').value.trim()||(SPORT==='nba'?'Tommy\'s Minions':'My Team');
+  S.name=teamName;
   S.ls=ls;S.myPos=sp-1;S.rds=rd;
   S.fmt=gv('cFormat');S.scr=gv('cScoring');
   S.rules=rules;
@@ -2252,6 +2254,7 @@ function rPlayers(){
 let sortStat='adp';
 let sortDir=1;
 function sortPlayers(stat){
+  console.log('Sorting by:', stat);
   if(sortStat===stat){
     sortDir*=-1;
   }else{
@@ -2293,6 +2296,7 @@ function sortPlayers(stat){
     }
     return (bVal-aVal)*sortDir;
   });
+  console.log('Sorted, now calling rPlayers');
   rPlayers();
 }
 function fPos(pos,btn){
