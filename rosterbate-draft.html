@@ -109,9 +109,9 @@
   .pr{display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;cursor:pointer;transition:background .1s;}
   .pr:active{background:rgba(249,115,22,.07);}
   .pr.drafted{opacity:.28;pointer-events:none;}
-  .pstat{min-width:40px;font-size:11px;font-weight:600;color:var(--text2);text-align:right;flex-shrink:0;}
+  .pstat{min-width:38px;font-size:11px;font-weight:600;color:var(--text2);text-align:left;flex-shrink:0;padding-left:4px;}
   .pstat-header{display:flex;align-items:center;padding:8px 11px;gap:9px;border-bottom:2px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:10;}
-  .pstat-label{min-width:40px;font-size:10px;font-weight:800;color:var(--text3);text-align:right;flex-shrink:0;text-transform:uppercase;cursor:pointer;user-select:none;}
+  .pstat-label{min-width:38px;font-size:10px;font-weight:800;color:var(--text3);text-align:left;flex-shrink:0;text-transform:uppercase;cursor:pointer;user-select:none;padding-left:4px;}
   .pstat-label:hover{color:var(--accent);}
   .prank{width:22px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text3);text-align:center;flex-shrink:0;}
   .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--fd);flex-shrink:0;border:2px solid var(--border);color:#fff;}
@@ -1711,7 +1711,7 @@ function startDraft(){
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
   const need=ls*rd;
   if(need>PLAYERS.length){e.textContent='Need '+need+' slots but only '+PLAYERS.length+' players. Reduce teams or rounds.';e.classList.add('show');return;}
-  S.name=document.getElementById('iName').value.trim()||'My Team';
+  S.name=document.getElementById('iName').value.trim()||(SPORT==='nba'?'Tommy\'s Minions':'My Team');
   S.ls=ls;S.myPos=sp-1;S.rds=rd;
   S.fmt=gv('cFormat');S.scr=gv('cScoring');
   S.rules=rules;
@@ -2219,9 +2219,9 @@ function rPlayers(){
       :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${inlineDraftBtn}</div>`;
     const min=p.min||28;
     const fgm=p.fgm||Math.round(min*0.3);
-    const fga=p.fga||Math.round(fgm/(p.fgp||0.45));
+    const fga=p.fga||Math.round(fgm/((p.fgp||45)/100));
     const ftm=p.ftm||Math.round(min*0.15);
-    const fta=p.fta||Math.round(ftm/(p.ftp||0.75));
+    const fta=p.fta||Math.round(ftm/((p.ftp||75)/100));
     return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>
@@ -2271,10 +2271,10 @@ function sortPlayers(stat){
     }else if(stat==='fga'){
       const aMin=a.min||28;
       const aFgm=a.fgm||Math.round(aMin*0.3);
-      aVal=a.fga||Math.round(aFgm/(a.fgp||0.45));
+      aVal=a.fga||Math.round(aFgm/((a.fgp||45)/100));
       const bMin=b.min||28;
       const bFgm=b.fgm||Math.round(bMin*0.3);
-      bVal=b.fga||Math.round(bFgm/(b.fgp||0.45));
+      bVal=b.fga||Math.round(bFgm/((b.fgp||45)/100));
     }else if(stat==='ftm'){
       const aMin=a.min||28;
       aVal=a.ftm||Math.round(aMin*0.15);
@@ -2283,10 +2283,10 @@ function sortPlayers(stat){
     }else if(stat==='fta'){
       const aMin=a.min||28;
       const aFtm=a.ftm||Math.round(aMin*0.15);
-      aVal=a.fta||Math.round(aFtm/(a.ftp||0.75));
+      aVal=a.fta||Math.round(aFtm/((a.ftp||75)/100));
       const bMin=b.min||28;
       const bFtm=b.ftm||Math.round(bMin*0.15);
-      bVal=b.fta||Math.round(bFtm/(b.ftp||0.75));
+      bVal=b.fta||Math.round(bFtm/((b.ftp||75)/100));
     }else{
       aVal=a[stat]||0;
       bVal=b[stat]||0;
