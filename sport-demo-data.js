@@ -4,6 +4,7 @@
 (function() {
   
   // Static NBA demo players (pre-saved, not from live pools)
+  // Need 104 players for draft (8 teams × 13 rounds) + extras for waiver wire
   const NBA_DEMO_PLAYERS = [
     {id:1,name:"Jayson Tatum",team:"BOS",pos:"SF",fp:49.8,adp:9,statValues:{PTS:28,REB:8.5,AST:5.1,STL:1.1,BLK:0.6,TO:2.7,"3PM":3.2},statSummary:"28 pts - 8.5 reb - 5.1 ast"},
     {id:37,name:"Joel Embiid",team:"PHI",pos:"C",fp:61.2,adp:2,statValues:{PTS:34.7,REB:11,AST:5.6,STL:1,BLK:1.7,TO:3.8,"3PM":1.1},statSummary:"34.7 pts - 11 reb - 5.6 ast"},
@@ -28,8 +29,53 @@
     {id:107,name:"Trae Young",team:"ATL",pos:"PG",fp:47.9,adp:13,statValues:{PTS:25.7,REB:3.3,AST:10.8,STL:1.3,BLK:0.3,TO:4.1,"3PM":2.7},statSummary:"25.7 pts - 3.3 reb - 10.8 ast"},
     {id:257,name:"Luka Doncic",team:"DAL",pos:"PG",fp:62.6,adp:1,statValues:{PTS:33.9,REB:9.2,AST:9.8,STL:1.4,BLK:0.5,TO:4.5,"3PM":3.6},statSummary:"33.9 pts - 9.2 reb - 9.8 ast"},
     {id:167,name:"Anthony Edwards",team:"MIN",pos:"SG",fp:43.1,adp:23,statValues:{PTS:25.9,REB:5.4,AST:5.1,STL:1.3,BLK:0.5,TO:3.1,"3PM":2.6},statSummary:"25.9 pts - 5.4 reb - 5.1 ast"},
-    {id:197,name:"Scottie Barnes",team:"TOR",pos:"PF",fp:35.2,adp:48,statValues:{PTS:19.9,REB:8.2,AST:6,STL:1.3,BLK:1.5,TO:2.3,"3PM":1.3},statSummary:"19.9 pts - 8.2 reb - 6 ast"}
+    {id:197,name:"Scottie Barnes",team:"TOR",pos:"PF",fp:35.2,adp:48,statValues:{PTS:19.9,REB:8.2,AST:6,STL:1.3,BLK:1.5,TO:2.3,"3PM":1.3},statSummary:"19.9 pts - 8.2 reb - 6 ast"},
+    // Adding more players to reach 120+
+    {id:2,name:"Devin Vassell",team:"SAS",pos:"SG",fp:35,adp:50,statValues:{PTS:19.5,REB:4.1,AST:3.8,STL:1.1,BLK:0.6,TO:1.8,"3PM":2.4},statSummary:"19.5 pts - 4.1 reb - 3.8 ast"},
+    {id:3,name:"Jaren Jackson Jr",team:"MEM",pos:"PF",fp:34.8,adp:52,statValues:{PTS:22.5,REB:5.5,AST:2.3,STL:1.6,BLK:1.6,TO:1.7,"3PM":1.6},statSummary:"22.5 pts - 5.5 reb - 2.3 ast"},
+    {id:4,name:"Franz Wagner",team:"ORL",pos:"SF",fp:34.5,adp:54,statValues:{PTS:20.1,REB:5.3,AST:5.7,STL:1.1,BLK:0.6,TO:2.1,"3PM":1.5},statSummary:"20.1 pts - 5.3 reb - 5.7 ast"},
+    {id:5,name:"Cade Cunningham",team:"DET",pos:"PG",fp:34.2,adp:56,statValues:{PTS:22.7,REB:7.5,AST:7.5,STL:0.9,BLK:0.8,TO:3.1,"3PM":1.6},statSummary:"22.7 pts - 7.5 reb - 7.5 ast"},
+    {id:6,name:"Paolo Banchero",team:"ORL",pos:"PF",fp:33.9,adp:58,statValues:{PTS:23,REB:6.9,AST:5.4,STL:0.9,BLK:0.7,TO:2.8,"3PM":1.2},statSummary:"23 pts - 6.9 reb - 5.4 ast"},
+    {id:7,name:"Jalen Williams",team:"OKC",pos:"SF",fp:33.6,adp:60,statValues:{PTS:19.1,REB:4,AST:4.5,STL:2.1,BLK:1.1,TO:1.3,"3PM":1.4},statSummary:"19.1 pts - 4 reb - 4.5 ast"},
+    {id:8,name:"Alperen Sengun",team:"HOU",pos:"C",fp:33.3,adp:62,statValues:{PTS:18.7,REB:10.3,AST:5,STL:1.2,BLK:1.4,TO:2.7,"3PM":0.3},statSummary:"18.7 pts - 10.3 reb - 5 ast"},
+    {id:9,name:"Scottie Pippen Jr",team:"MEM",pos:"PG",fp:33,adp:64,statValues:{PTS:12.9,REB:4.7,AST:5.6,STL:1.8,BLK:0.3,TO:1.9,"3PM":1.1},statSummary:"12.9 pts - 4.7 reb - 5.6 ast"},
+    {id:10,name:"Jamal Murray",team:"DEN",pos:"PG",fp:32.7,adp:66,statValues:{PTS:21.2,REB:4,AST:5.8,STL:1,BLK:0.4,TO:2,"3PM":2.3},statSummary:"21.2 pts - 4 reb - 5.8 ast"},
+    {id:11,name:"Evan Mobley",team:"CLE",pos:"PF",fp:32.4,adp:68,statValues:{PTS:17.4,REB:9.4,AST:3.2,STL:0.9,BLK:1.4,TO:2.2,"3PM":0.6},statSummary:"17.4 pts - 9.4 reb - 3.2 ast"},
+    {id:12,name:"De'Aaron Fox",team:"SAC",pos:"PG",fp:32.1,adp:70,statValues:{PTS:25.9,REB:5,AST:6.1,STL:1.7,BLK:0.4,TO:2.8,"3PM":2},statSummary:"25.9 pts - 5 reb - 6.1 ast"},
+    {id:13,name:"Desmond Bane",team:"MEM",pos:"SG",fp:31.8,adp:72,statValues:{PTS:24.7,REB:5,AST:5.5,STL:1.1,BLK:0.8,TO:2.4,"3PM":3.6},statSummary:"24.7 pts - 5 reb - 5.5 ast"},
+    {id:14,name:"Brandon Ingram",team:"NO",pos:"SF",fp:31.5,adp:74,statValues:{PTS:20.8,REB:5.7,AST:5.7,STL:0.8,BLK:0.6,TO:2.2,"3PM":1.2},statSummary:"20.8 pts - 5.7 reb - 5.7 ast"},
+    {id:15,name:"Chet Holmgren",team:"OKC",pos:"C",fp:31.2,adp:76,statValues:{PTS:16.4,REB:7.9,AST:2.3,STL:0.6,BLK:2.3,TO:1.9,"3PM":1.6},statSummary:"16.4 pts - 7.9 reb - 2.3 ast"},
+    {id:16,name:"Darius Garland",team:"CLE",pos:"PG",fp:30.9,adp:78,statValues:{PTS:18,REB:2.7,AST:6.5,STL:1.3,BLK:0.1,TO:1.8,"3PM":2.6},statSummary:"18 pts - 2.7 reb - 6.5 ast"}
   ];
+  
+  // Generate more players to fill out the draft
+  const additionalPositions = ['PG','SG','SF','PF','C'];
+  const additionalTeams = ['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'];
+  
+  for(let i = NBA_DEMO_PLAYERS.length; i < 120; i++) {
+    const fp = 30 - (i - 40) * 0.3;
+    const pts = 15 + Math.random() * 10;
+    const reb = 3 + Math.random() * 5;
+    const ast = 2 + Math.random() * 4;
+    NBA_DEMO_PLAYERS.push({
+      id: 1000 + i,
+      name: `Player ${i}`,
+      team: additionalTeams[i % additionalTeams.length],
+      pos: additionalPositions[i % additionalPositions.length],
+      fp: parseFloat(fp.toFixed(1)),
+      adp: i + 1,
+      statValues: {
+        PTS: parseFloat(pts.toFixed(1)),
+        REB: parseFloat(reb.toFixed(1)),
+        AST: parseFloat(ast.toFixed(1)),
+        STL: parseFloat((Math.random() * 1.5).toFixed(1)),
+        BLK: parseFloat((Math.random() * 1.2).toFixed(1)),
+        TO: parseFloat((1 + Math.random() * 2).toFixed(1)),
+        "3PM": parseFloat((Math.random() * 3).toFixed(1))
+      },
+      statSummary: `${pts.toFixed(1)} pts - ${reb.toFixed(1)} reb - ${ast.toFixed(1)} ast`
+    });
+  }
 
   // Pre-draft the rosters using snake draft pattern
   function buildDemoRosters() {
