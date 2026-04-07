@@ -4413,6 +4413,7 @@ function rbEnsureChatState(){
 }
 
 function rbLoadChat(){
+  if(!D || typeof D !== 'object') return; // Don't load chat if D doesn't exist yet
   rbEnsureChatState();
   let local = { msgs:[], lastSeen:0 };
   try{
@@ -4438,7 +4439,9 @@ function rbLoadChat(){
 }
 
 function rbSyncChatIntoSeason(shouldSave){
+  if(!D || typeof D !== 'object') return; // Don't sync if D doesn't exist yet
   rbEnsureChatState();
+  if(!D.trashTalkThread) return; // Extra safety check
   D.trashTalkThread.msgs = Array.isArray(rbChat.msgs) ? rbChat.msgs : [];
   D.trashTalkThread.lastSeen = rbChat.lastSeen || 0;
   try{ localStorage.setItem(rbStorageKey(), JSON.stringify(rbChat)); }catch(e){}

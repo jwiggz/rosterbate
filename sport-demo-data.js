@@ -81,6 +81,7 @@
           pid: p.id
         }))
       ),
+      trashTalkThread: { msgs: [], lastSeen: 0 },
       isCommissioner: true,
       isDemo: true,
       savedAt: Date.now()
