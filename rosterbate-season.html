@@ -2185,31 +2185,44 @@ window.onload=async function(){
 };
 
 async function loadDemo(){
+  console.log('🎯 Loading demo data...');
+  
   // Use static demo data - NO live player pools!
   const demoData = getRosterbateDemoData(CURRENT_SPORT);
   
   if (!demoData) {
+    console.error('❌ Demo data not available for', CURRENT_SPORT);
     toast('Demo data not available');
     return;
   }
   
+  console.log('✅ Demo data loaded:', demoData);
+  
   // Set global D to demo data
   D = {...demoData};
+  
+  console.log('📦 D is now set:', D);
   
   // Save to localStorage
   try { 
     localStorage.setItem('rosterbateDraft', JSON.stringify(D)); 
+    console.log('💾 Saved to localStorage');
   } catch(e) {
-    console.error('Failed to save demo data:', e);
+    console.error('❌ Failed to save demo data:', e);
   }
   
   // Initialize season with demo data
   try {
+    console.log('🚀 Calling initSeason()...');
     initSeason();
+    console.log('✅ initSeason() completed');
+    console.log('🏀 G.rosters:', G.rosters);
+    console.log('📋 G.waiver:', G.waiver);
     goPage('hub');
+    console.log('✅ Navigated to hub');
   } catch(e) {
-    console.error('Demo season init failed:', e);
-    toast('Demo season failed to load.');
+    console.error('❌ Demo season init failed:', e);
+    toast('Demo season failed to load: ' + e.message);
   }
 }
 
