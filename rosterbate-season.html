@@ -882,22 +882,9 @@ const authReady=new Promise(resolve=>{
 
 // Helper function to remove undefined values from objects (Firebase doesn't allow undefined)
 function removeUndefined(obj) {
-  if (obj === null || obj === undefined) return null;
-  if (typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(removeUndefined).filter(v => v !== undefined);
-  
-  const cleaned = {};
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key) && obj[key] !== undefined) {
-      const value = obj[key];
-      if (typeof value === 'object' && value !== null) {
-        cleaned[key] = removeUndefined(value);
-      } else if (value !== undefined) {
-        cleaned[key] = value;
-      }
-    }
-  }
-  return cleaned;
+  // JSON.stringify automatically removes undefined values
+  // Then we parse it back to get a clean object
+  return JSON.parse(JSON.stringify(obj));
 }
 
 // Save season state to Firebase for permanent cloud storage
@@ -942,44 +929,33 @@ async function saveSeasonToFirebase() {
       draftFormat: D.draftFormat || 'snake',
       myTeamIndex: D.myTeamIndex || 0,
       currentWeek: D.currentWeek || 1,
+      createdAt: D.createdAt || D.savedAt || Date.now(),
       updatedAt: Date.now()
     };
     
-    // Include draft data if exists (only include defined values)
-    if (D.teams || D.schedule || D.matchups) {
-      const draftData = {};
-      if (D.teams !== undefined) draftData.teams = D.teams;
-      if (D.schedule !== undefined) draftData.schedule = D.schedule;
-      if (D.matchups !== undefined) draftData.matchups = D.matchups;
-      if (D.teamUsers !== undefined) draftData.teamUsers = D.teamUsers;
-      if (D.myTeamIndex !== undefined) draftData.myTeamIndex = D.myTeamIndex;
-      
-      // Remove any undefined values from nested objects
-      saveData.draft = removeUndefined(draftData);
+    // Include draft data if any of these exist
+    if (D.teams || D.matchups || D.teamUsers) {
+      saveData.draft = {
+        teams: D.teams,
+        matchups: D.matchups,
+        teamUsers: D.teamUsers,
+        myTeamIndex: D.myTeamIndex
+      };
     }
     
-    // Include game state if exists (only include defined values)
-    if (D.waiverPriority || D.freeAgents || D.weekResults) {
-      const gameData = {};
-      if (D.waiverPriority !== undefined) gameData.waiverPriority = D.waiverPriority;
-      if (D.freeAgents !== undefined) gameData.freeAgents = D.freeAgents;
-      if (D.weekResults !== undefined) gameData.weekResults = D.weekResults;
-      if (D.currentWeek !== undefined) gameData.currentWeek = D.currentWeek;
-      if (D.standings !== undefined) gameData.standings = D.standings;
-      if (D.isSeasonComplete !== undefined) gameData.isSeasonComplete = D.isSeasonComplete;
-      
-      // Remove any undefined values from nested objects
-      saveData.game = removeUndefined(gameData);
+    // Include game state if any of these exist
+    if (D.waiverPriority || D.freeAgents || D.weekResults || D.standings) {
+      saveData.game = {
+        waiverPriority: D.waiverPriority,
+        freeAgents: D.freeAgents,
+        weekResults: D.weekResults,
+        currentWeek: D.currentWeek,
+        standings: D.standings,
+        isSeasonComplete: D.isSeasonComplete
+      };
     }
     
-    // If createdAt doesn't exist, set it
-    if (!D.createdAt) {
-      saveData.createdAt = D.savedAt || Date.now();
-    } else {
-      saveData.createdAt = D.createdAt;
-    }
-    
-    // Remove any undefined values from the entire saveData object
+    // Clean ALL undefined values (JSON.stringify removes them automatically)
     const cleanedSaveData = removeUndefined(saveData);
     
     // Save full data to userSeasons
