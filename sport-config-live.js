@@ -1,10 +1,15 @@
 // RosterBate Sport Configuration
 (function() {
+  window.normalizeRosterbateSport = function(sport) {
+    const normalized = String(sport || '').toLowerCase().trim();
+    return ['nba', 'nfl', 'mlb'].includes(normalized) ? normalized : 'nba';
+  };
+
   // Detect which sport to use from URL parameter or default to NBA
   window.getSelectedRosterbateSport = function() {
     const params = new URLSearchParams(window.location.search || '');
     const sport = params.get('sport');
-    return sport && ['nba', 'nfl', 'mlb'].includes(sport) ? sport : 'nba';
+    return normalizeRosterbateSport(sport);
   };
 
   window.CURRENT_SPORT = getSelectedRosterbateSport();
@@ -18,6 +23,7 @@
         defaultLeagueSize: 10,
         defaultRounds: 13,
         defaultScoring: 'h2h_pts',
+        starterSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL'],
         teamCodes: ['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'],
         filters: ['ALL','PG','SG','SF','PF','C'],
         myTeamSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL','UTIL','BN','BN','BN'],
@@ -37,6 +43,7 @@
         defaultLeagueSize: 10,
         defaultRounds: 15,
         defaultScoring: 'h2h_pts',
+        starterSlots: ['QB','RB','RB','WR','WR','TE','FLEX','K','DST'],
         teamCodes: ['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LAC','LAR','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS'],
         filters: ['ALL','QB','RB','WR','TE','K','DST'],
         myTeamSlots: ['QB','RB','RB','WR','WR','TE','FLEX','K','DST','BN','BN','BN','BN','BN','BN'],
@@ -54,6 +61,7 @@
         defaultLeagueSize: 10,
         defaultRounds: 14,
         defaultScoring: 'h2h_cat',
+        starterSlots: ['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP'],
         teamCodes: ['ARI','ATL','BAL','BOS','CHC','CHW','CIN','CLE','COL','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WAS'],
         filters: ['ALL','C','1B','2B','3B','SS','OF','SP','RP'],
         myTeamSlots: ['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP','SP','RP','RP','BN'],
