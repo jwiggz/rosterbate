@@ -25,7 +25,7 @@
 
   /* NAV */
   nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0 0;}
-  .nav-logo{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;}
+  .nav-logo{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;background:none;border:none;color:var(--text);cursor:pointer;}
   .nav-logo span{color:var(--accent);}
   .nav-actions{display:flex;align-items:center;gap:8px;}
   .nav-actions.auth-pending .nav-auth-btn,
@@ -257,7 +257,7 @@
 
   <!-- Nav -->
   <nav>
-    <div class="nav-logo">Roster<span>Bate</span></div>
+    <button class="nav-logo" type="button" onclick="window.location.reload()">Roster<span>Bate</span></button>
     <div class="nav-actions auth-pending" id="navActions">
       <div class="nav-badge">Beta</div>
       <button id="loginTrigger" class="nav-auth-btn secondary" onclick="openAuthModal('login')">Sign In</button>
