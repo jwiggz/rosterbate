@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="sport-demo-data.js"></script>
 <script src="sport-data-live.js"></script>
 <script src="sport-config-live.js"></script>
 <style>
@@ -1638,15 +1639,61 @@ function updatePosFilterBar(){
   ).join('');
 }
 
+function isMultiplayerDraftContext(){
+  const params=new URLSearchParams(window.location.search||'');
+  const lobbyId=(params.get('lobby')||'').trim();
+  if(!lobbyId) return false;
+  try{
+    const state=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
+    if(state?.lobbyId && String(state.lobbyId)===lobbyId) return true;
+  }catch(e){}
+  return true;
+}
+
+function getStaticSoloDraftPlayers(){
+  if(SPORT!=='nba' || typeof getRosterbateDemoPlayers!=='function') return [];
+  return (getRosterbateDemoPlayers('nba')||[]).map((player, index)=>({
+    id:player.id,
+    name:player.name||'Unknown Player',
+    team:player.team||'FA',
+    pos:player.pos||'UTIL',
+    pts:Number(player?.statValues?.PTS ?? player?.pts ?? 0),
+    reb:Number(player?.statValues?.REB ?? player?.reb ?? 0),
+    ast:Number(player?.statValues?.AST ?? player?.ast ?? 0),
+    stl:Number(player?.statValues?.STL ?? player?.stl ?? 0),
+    blk:Number(player?.statValues?.BLK ?? player?.blk ?? 0),
+    to:Number(player?.statValues?.TO ?? player?.to ?? 0),
+    fgp:Number(player?.statValues?.FGP ?? player?.fgp ?? 0),
+    ftp:Number(player?.statValues?.FTP ?? player?.ftp ?? 0),
+    tpm:Number(player?.statValues?.['3PM'] ?? player?.tpm ?? 0),
+    fp:Number(player?.fp ?? fpRaw(
+      player?.statValues?.PTS ?? 0,
+      player?.statValues?.REB ?? 0,
+      player?.statValues?.AST ?? 0,
+      player?.statValues?.STL ?? 0,
+      player?.statValues?.BLK ?? 0,
+      player?.statValues?.TO ?? 0,
+      player?.statValues?.['3PM'] ?? 0
+    )),
+    adp:Number(player?.adp || (index+1)),
+    statValues:player?.statValues||null,
+    statSummary:player?.statSummary||''
+  })).sort((a,b)=>(a.adp||9999)-(b.adp||9999) || (b.fp||0)-(a.fp||0) || a.name.localeCompare(b.name));
+}
+
 function applySportToDraftUI(){
-  PLAYERS = buildRosterbateSportPlayerPool(SPORT, SPORT === 'nba' ? 300 : 320);
-  if(SPORT === 'nba' && (!PLAYERS || !PLAYERS.length)){
+  const isMultiplayerDraft=isMultiplayerDraftContext();
+  const useStaticSoloData=!isMultiplayerDraft && SPORT==='nba';
+  PLAYERS = useStaticSoloData
+    ? getStaticSoloDraftPlayers()
+    : buildRosterbateSportPlayerPool(SPORT, SPORT === 'nba' ? 500 : 320);
+  if(!useStaticSoloData && SPORT === 'nba' && (!PLAYERS || !PLAYERS.length)){
     PLAYERS = NBA_PLAYERS;
   }
   if(!PLAYERS || !PLAYERS.length){
     const pill=document.getElementById('sportLobbyPill');
-    if(pill) pill.textContent='⚠️ Real player data failed to load';
-    throw new Error('RosterBate real player pool missing for '+SPORT);
+    if(pill) pill.textContent=useStaticSoloData?'⚠️ 2024-25 player data failed to load':'⚠️ Live player data failed to load';
+    throw new Error('RosterBate player pool missing for '+SPORT);
   }
   const teamPlaceholders = {
     nba:'e.g. Tommy\'s Minions',
@@ -1656,7 +1703,9 @@ function applySportToDraftUI(){
   document.title = 'RosterBate ' + SPORT_CFG.label + ' Draft';
   document.getElementById('sportLogoBall').textContent = SPORT_CFG.icon;
   document.getElementById('sportLogoSub').textContent = SPORT_CFG.label + ' Draft Room';
-  document.getElementById('sportLobbyPill').textContent = '✅ ' + SPORT_CFG.leagueLabel + ' · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players';
+  document.getElementById('sportLobbyPill').textContent = useStaticSoloData
+    ? ('✅ 2024-25 ' + SPORT_CFG.leagueLabel + ' Season · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
+    : ('✅ Live ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players');
   document.getElementById('sportCountdownIcon').textContent = SPORT_CFG.icon;
   document.getElementById('sportDraftTitle').innerHTML = SPORT_CFG.icon + ' Roster<span>Bate</span>';
   document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';

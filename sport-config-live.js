@@ -279,7 +279,8 @@
     // Get players from the imported pool (LIVE DATA ONLY)
     const pool = window.RB_IMPORTED_POOLS?.[sport];
     if (!pool || !Array.isArray(pool)) return [];
-    return pool.slice(0, limit || 300);
+    const fallbackLimit = sport === 'nba' ? 500 : 300;
+    return pool.slice(0, limit || fallbackLimit);
   };
 
   // Get team colors for display
