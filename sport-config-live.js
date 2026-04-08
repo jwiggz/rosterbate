@@ -45,14 +45,14 @@
         label: 'NBA',
         leagueLabel: 'NBA',
         defaultLeagueSize: 10,
-        defaultRounds: 13,
+        defaultRounds: 15,
         defaultScoring: 'h2h_pts',
         defaultFormat: 'snake',
         starterSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL'],
         waiverPositions: ['ALL','PG','SG','SF','PF','C'],
         teamCodes: ['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'],
         filters: ['ALL','PG','SG','SF','PF','C'],
-        myTeamSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL','UTIL','BN','BN','BN'],
+        myTeamSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL','UTIL','BN','BN','BN','IR','IR'],
         scoringInfo: {
           h2h_pts: 'Weekly head-to-head matchups. Win by scoring more total fantasy points than your opponent.',
           h2h_cat: 'Win/lose 9 stat categories weekly. PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',
@@ -67,14 +67,14 @@
         label: 'NFL',
         leagueLabel: 'NFL',
         defaultLeagueSize: 10,
-        defaultRounds: 15,
+        defaultRounds: 17,
         defaultScoring: 'h2h_pts',
         defaultFormat: 'snake',
         starterSlots: ['QB','RB','RB','WR','WR','TE','FLEX','K','DST'],
         waiverPositions: ['ALL','QB','RB','WR','TE','K','DST'],
         teamCodes: ['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LAC','LAR','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS'],
         filters: ['ALL','QB','RB','WR','TE','K','DST'],
-        myTeamSlots: ['QB','RB','RB','WR','WR','TE','FLEX','K','DST','BN','BN','BN','BN','BN','BN'],
+        myTeamSlots: ['QB','RB','RB','WR','WR','TE','FLEX','K','DST','BN','BN','BN','BN','BN','BN','IR','IR'],
         scoringInfo: {
           h2h_pts: 'Weekly matchups. Win by scoring more fantasy points.',
           h2h_cat: 'Win/lose stat categories weekly.',
@@ -87,14 +87,14 @@
         label: 'MLB',
         leagueLabel: 'MLB',
         defaultLeagueSize: 10,
-        defaultRounds: 14,
+        defaultRounds: 16,
         defaultScoring: 'h2h_cat',
         defaultFormat: 'snake',
         starterSlots: ['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP'],
         waiverPositions: ['ALL','C','1B','2B','3B','SS','OF','SP','RP'],
         teamCodes: ['ARI','ATL','BAL','BOS','CHC','CHW','CIN','CLE','COL','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WAS'],
         filters: ['ALL','C','1B','2B','3B','SS','OF','SP','RP'],
-        myTeamSlots: ['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP','SP','RP','RP','BN'],
+        myTeamSlots: ['C','1B','2B','3B','SS','OF','OF','OF','UTIL','SP','SP','RP','RP','BN','IL','IL'],
         scoringInfo: {
           h2h_pts: 'Weekly matchups by total points.',
           h2h_cat: 'Win/lose hitting and pitching categories weekly.',
@@ -111,7 +111,7 @@
       nba: {
         starters: 9,
         benchSlots: 4,
-        irSlots: 0,
+        irSlots: 2,
         positions: {
           PG: { starters: 1, max: 4 },
           SG: { starters: 1, max: 4 },
@@ -144,7 +144,7 @@
       nfl: {
         starters: 9,
         benchSlots: 6,
-        irSlots: 0,
+        irSlots: 2,
         positions: {
           QB: { starters: 1, max: 3 },
           RB: { starters: 2, max: 6 },
@@ -178,7 +178,7 @@
       mlb: {
         starters: 10,
         benchSlots: 4,
-        irSlots: 0,
+        irSlots: 2,
         positions: {
           C: { starters: 1, max: 3 },
           '1B': { starters: 1, max: 3 },
