@@ -20,6 +20,7 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
 .screen.active{display:flex;}
+body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .ph{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;}
 .pt{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;}
 .bb{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;}
@@ -299,8 +300,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     <div style="font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;">Roster<span style="color:var(--accent)">Bate</span></div>
     <div style="font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;" id="seasonEmptyTitle">Season Manager</div>
     <div style="font-size:14px;color:var(--text2);line-height:1.7;max-width:300px;" id="seasonEmptyCopy">Complete a draft in the RosterBate Draft app first, then tap "Open Season Manager."</div>
-    <button onclick="loadDemo()" style="background:var(--accent);border:none;border-radius:10px;padding:13px 28px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">Load Demo Data</button>
-    <button onclick="clearAllData()" style="background:#ef4444;border:none;border-radius:10px;padding:10px 20px;font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:4px;">Clear All Data & Reset</button>
+    <div id="seasonEmptyActions" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;">
+      <button onclick="loadDemo()" style="background:var(--accent);border:none;border-radius:10px;padding:13px 28px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:8px;">Load Demo Data</button>
+      <button onclick="clearAllData()" style="background:#ef4444;border:none;border-radius:10px;padding:10px 20px;font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:4px;">Clear All Data & Reset</button>
+    </div>
   </div>
 </div>
 
@@ -888,6 +891,26 @@ function getRequestedLeagueId(){
   }catch(e){
     return null;
   }
+}
+
+function setSeasonEmptyState(mode){
+  const title=document.getElementById('seasonEmptyTitle');
+  const copy=document.getElementById('seasonEmptyCopy');
+  const icon=document.getElementById('seasonEmptyIcon');
+  const actions=document.getElementById('seasonEmptyActions');
+  if(mode==='loading'){
+    document.body.dataset.seasonBoot='loading';
+    if(icon) icon.textContent='🏀';
+    if(title) title.textContent='Loading League';
+    if(copy) copy.textContent='Loading your saved season...';
+    if(actions) actions.style.display='none';
+    return;
+  }
+  document.body.dataset.seasonBoot='idle';
+  if(icon) icon.textContent='🏀';
+  if(title) title.textContent='Season Manager';
+  if(copy) copy.textContent='Complete a draft in the RosterBate Draft app first, then tap "Open Season Manager."';
+  if(actions) actions.style.display='flex';
 }
 
 // Helper function to remove undefined values from objects (Firebase doesn't allow undefined)
@@ -2266,6 +2289,8 @@ window.onload=async function(){
   const urlParams = new URLSearchParams(window.location.search || '');
   const leagueId = urlParams.get('league');
   const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
+  if (leagueId && leagueId !== 'demo') setSeasonEmptyState('loading');
+  else setSeasonEmptyState('idle');
   
   // If league ID is provided, try to load from Firebase first
   if (leagueId && leagueId !== 'demo') {
@@ -2369,6 +2394,7 @@ window.onload=async function(){
           }
           
           console.warn('⚠️ League not found in Firebase or localStorage:', leagueId);
+          setSeasonEmptyState('idle');
           toast('League not found. Please select your league from My Leagues page.');
           // Redirect to my-leagues after 2 seconds
           setTimeout(() => {
@@ -2528,6 +2554,7 @@ window.onload=async function(){
   }
   
   // If we get here, show the Load Demo Data screen (no auto-navigation)
+  setSeasonEmptyState('idle');
   console.log('✅ Ready for demo mode - no saved data found');
 };
 
@@ -5270,7 +5297,6 @@ function rbClosePickersAll(){
 
 </body>
 </html>
-
 
 
 
