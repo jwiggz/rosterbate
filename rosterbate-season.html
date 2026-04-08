@@ -1059,9 +1059,45 @@ async function saveSharedSeason(force, reason){
   await db.ref(path).set(payload);
   return true;
 }
+
+// Sync game state (G) back to D object before saving
+function syncGameStateToD() {
+  if (!G || !D) return;
+  
+  // Sync current game state
+  D.currentWeek = G.week;
+  D.currentDay = G.day;
+  D.standings = G.standings;
+  D.isSeasonComplete = G.isSeasonComplete;
+  
+  // Sync rosters (current state)
+  D.allRosters = G.rosters;
+  
+  // Sync game-specific data
+  if (G.dayResults) D.dayResults = G.dayResults;
+  if (G.revealedDays) D.revealedDays = G.revealedDays;
+  if (G.settledWeeks) D.settledWeeks = G.settledWeeks;
+  if (G.processed) D.processed = Array.from(G.processed);
+  if (G.waiverPriority) D.waiverPriority = G.waiverPriority;
+  if (G.freeAgents) D.freeAgents = G.freeAgents;
+  if (G.tradeOffers) D.tradeOffers = G.tradeOffers;
+  if (G.activityLog) D.activityLog = G.activityLog;
+  if (G.recentDrops) D.recentDrops = G.recentDrops;
+  if (G.powerupInventory) D.powerupInventory = G.powerupInventory;
+  if (G.powerupsByWeek) D.powerupsByWeek = G.powerupsByWeek;
+  if (G.powerupDropsByWeek) D.powerupDropsByWeek = G.powerupDropsByWeek;
+  if (G.moneyBallLocks) D.moneyBallLocks = G.moneyBallLocks;
+  if (G.dailyLineups) D.dailyLineups = G.dailyLineups;
+  if (G.starters) D.starters = G.starters;
+  if (G.ilByTeam) D.ilRosters = G.ilByTeam;
+}
+
 function queueSharedSeasonSave(reason, delay){
   // Save to localStorage for all leagues
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  
+  // Sync G to D before saving to Firebase
+  syncGameStateToD();
   
   // Save to Firebase for solo leagues (async, non-blocking)
   if(!D?.multiplayer) {
@@ -2594,16 +2630,47 @@ function initSeason(){
   G.schedule=buildSched(n,G.totalWeeks);
   console.log('📅 G.schedule populated:', G.schedule.length, 'matchups');
   
-  G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
-  G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];G.moneyBallLocks={};
+  // Check if we have saved game state in D - if so, restore it
+  if (D.currentWeek && D.currentDay && D.standings) {
+    console.log('📦 Restoring saved game state from D...');
+    G.week = D.currentWeek || 1;
+    G.day = D.currentDay || 1;
+    G.standings = D.standings || Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
+    G.isSeasonComplete = D.isSeasonComplete || false;
+    
+    // Restore other game state
+    G.processed = D.processed ? new Set(D.processed) : new Set();
+    G.tradeOffers = D.tradeOffers || [];
+    G.dailyLineups = D.dailyLineups || {};
+    G.powerupsByWeek = D.powerupsByWeek || {};
+    G.powerupInventory = D.powerupInventory || null;
+    G.powerupDropsByWeek = D.powerupDropsByWeek || {};
+    G.dayResults = D.dayResults || {};
+    G.revealedDays = D.revealedDays || {};
+    G.settledWeeks = D.settledWeeks || {};
+    G.activityLog = D.activityLog || [];
+    G.recentDrops = D.recentDrops || [];
+    G.moneyBallLocks = D.moneyBallLocks || {};
+    G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
+    
+    console.log('✅ Restored game state - Week', G.week, 'Day', G.day);
+  } else {
+    console.log('🆕 Fresh season - initializing from scratch');
+    G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
+    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];G.moneyBallLocks={};
+  }
   
   console.log('✅ All G properties initialized');
   console.log('📊 Final G state:', G);
   
   ensurePowerupState();
-  rollWeeklyPowerupDrops(1);
-  logActivity('league','Season opened',teamName(D.myPos)+' entered a fresh '+(D.leagueName||'RosterBate League')+'.',D.myPos,'🚪');
-  awardRosterbateScore('season_manager', 5).catch(() => {});
+  
+  // Only roll powerups and log activity for fresh seasons
+  if (!D.currentWeek) {
+    rollWeeklyPowerupDrops(1);
+    logActivity('league','Season opened',teamName(D.myPos)+' entered a fresh '+(D.leagueName||'RosterBate League')+'.',D.myPos,'🚪');
+    awardRosterbateScore('season_manager', 5).catch(() => {});
+  }
   
   console.log('✅ initSeason() completed successfully');
 }
