@@ -1652,7 +1652,7 @@ function isMultiplayerDraftContext(){
 
 function getStaticSoloDraftPlayers(){
   if(SPORT!=='nba' || typeof getRosterbateDemoPlayers!=='function') return [];
-  return (getRosterbateDemoPlayers('nba')||[]).map((player, index)=>({
+  const players=(getRosterbateDemoPlayers('nba')||[]).map((player)=>({
     id:player.id,
     name:player.name||'Unknown Player',
     team:player.team||'FA',
@@ -1675,10 +1675,19 @@ function getStaticSoloDraftPlayers(){
       player?.statValues?.TO ?? 0,
       player?.statValues?.['3PM'] ?? 0
     )),
-    adp:Number(player?.adp || (index+1)),
+    adp:Number(player?.adp || 0),
     statValues:player?.statValues||null,
     statSummary:player?.statSummary||''
-  })).sort((a,b)=>(a.adp||9999)-(b.adp||9999) || (b.fp||0)-(a.fp||0) || a.name.localeCompare(b.name));
+  })).sort((a,b)=>(b.fp||0)-(a.fp||0) || a.name.localeCompare(b.name))
+    .map((player, index)=>({...player, adp:index+1}));
+  return players;
+}
+
+function normalizeDraftPlayerRanks(players){
+  return (Array.isArray(players)?players:[])
+    .slice()
+    .sort((a,b)=>(Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name))
+    .map((player,index)=>({...player, adp:index+1}));
 }
 
 function applySportToDraftUI(){
@@ -1690,6 +1699,7 @@ function applySportToDraftUI(){
   if(!useStaticSoloData && SPORT === 'nba' && (!PLAYERS || !PLAYERS.length)){
     PLAYERS = NBA_PLAYERS;
   }
+  PLAYERS = normalizeDraftPlayerRanks(PLAYERS);
   if(!PLAYERS || !PLAYERS.length){
     const pill=document.getElementById('sportLobbyPill');
     if(pill) pill.textContent=useStaticSoloData?'⚠️ 2024-25 player data failed to load':'⚠️ Live player data failed to load';
@@ -3134,6 +3144,7 @@ async function endDraft(){
     // Note: seasonId will be generated when saving to Firebase
     const draftData = {
       sport: SPORT,
+      playerPoolSource: (SPORT==='nba' && !isMultiplayer) ? 'static_2024_25' : 'live',
       teamName: S.name,
       leagueName: lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
       leagueSize: S.ls,

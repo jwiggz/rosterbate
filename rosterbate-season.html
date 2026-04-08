@@ -2630,6 +2630,20 @@ function rebuildDemoSeasonData(sport){
   return {...demoData};
 }
 
+function getSeasonPlayerPool(){
+  const source=String(D?.playerPoolSource || '').trim().toLowerCase();
+  if(CURRENT_SPORT==='nba' && source==='static_2024_25' && typeof getRosterbateDemoPlayers==='function'){
+    return (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}));
+  }
+  if(D?.isDemo && typeof getRosterbateDemoPlayers==='function'){
+    return (getRosterbateDemoPlayers(CURRENT_SPORT) || []).map(p=>({...p}));
+  }
+  if(typeof buildRosterbateSportPlayerPool === 'function'){
+    return buildRosterbateSportPlayerPool(CURRENT_SPORT, CURRENT_SPORT==='nba' ? 500 : 260);
+  }
+  return [];
+}
+
 function initSeason(){
   console.log('🔧 initSeason() started');
   console.log('📊 D object:', D);
@@ -2655,12 +2669,7 @@ function initSeason(){
   const allIds=new Set(G.rosters.flat().map(p=>p.id));
   console.log('🔢 Total drafted player IDs:', allIds.size);
   
-  // Use demo players for waiver wire if in demo mode, otherwise use live pool
-  const waiverPool = D.isDemo 
-    ? (getRosterbateDemoPlayers(CURRENT_SPORT) || [])
-    : (typeof buildRosterbateSportPlayerPool === 'function' 
-        ? buildRosterbateSportPlayerPool(CURRENT_SPORT, 260) 
-        : []);
+  const waiverPool = getSeasonPlayerPool();
   
   console.log('📋 Waiver pool size:', waiverPool.length);
   
@@ -5337,4 +5346,3 @@ function rbClosePickersAll(){
 
 </body>
 </html>
-
