@@ -43,6 +43,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .chips{display:flex;flex-wrap:wrap;gap:6px;}
 .chip{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 13px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;}
 .chip.on{background:rgba(249,115,22,.15);border-color:var(--accent);color:var(--accent);}
+.chip.moneyball{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:var(--green);}
+.chip.moneyball.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 .sl{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px;margin-top:4px;}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;font-family:var(--fd);font-size:14px;font-weight:700;padding:9px 20px;border-radius:30px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:300;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -85,8 +87,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .global-chat-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
 .global-chat-meta{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);}
 .global-chat-text{font-size:13px;color:var(--text);line-height:1.55;word-break:break-word;}
-.global-chat-compose{display:flex;gap:8px;align-items:flex-end;margin-top:12px;}
-.global-chat-input{min-height:72px;resize:none;}
+.global-chat-compose{display:flex;gap:8px;align-items:stretch;margin-top:12px;}
+.global-chat-input{min-height:48px;height:48px;max-height:48px;resize:none;overflow-y:auto;padding-top:12px;padding-bottom:12px;}
 .advbox{margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,.5);}
 .advtitle{font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
 .advsub{font-size:11px;color:var(--text3);margin-top:3px;}
@@ -140,11 +142,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div id="mmOnline" style="margin-left:auto;font-family:var(--fd);font-size:11px;font-weight:700;color:var(--green);">connecting...</div>
   </div>
   <div class="mm-tabs">
-    <button class="mm-tab on" onclick="mmTab('quick',this)">Quick</button>
-    <button class="mm-tab" onclick="mmTab('live',this)">Live</button>
+    <button class="mm-tab on" onclick="mmTab('create',this)">+ Create</button>
     <button class="mm-tab" onclick="mmTab('browse',this)">Browse</button>
-    <button class="mm-tab" onclick="mmTab('create',this)">+ Create</button>
-    <button class="mm-tab" onclick="mmTab('private',this)">Private</button>
+    <button class="mm-tab" onclick="mmTab('live',this)">Live Drafts</button>
+    <button class="mm-tab" onclick="mmTab('private',this)">League Code</button>
   </div>
   <div class="sb" id="mmTabContent"></div>
 </div>
@@ -333,7 +334,7 @@ const browseFilters = { format:null, teamSize:null };
 function mmTab(tab, btn){
   document.querySelectorAll('.mm-tab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  ({quick:renderQuick, live:renderLive, browse:renderBrowse, create:renderCreate, private:renderPrivate})[tab]?.();
+  ({live:renderLive, browse:renderBrowse, create:renderCreate, private:renderPrivate})[tab]?.();
 }
 function globalChatShell(){
   return `
@@ -348,7 +349,7 @@ function globalChatShell(){
       <div id="mmGlobalChatFeed" class="global-chat-feed"><div class="empty"><div class="empty-icon">...</div><div class="empty-title">Loading chat...</div></div></div>
       <div class="global-chat-compose">
         <textarea id="mmGlobalChatInput" class="input global-chat-input" placeholder="Post your code, format, or whatever the room needs…" onkeydown="mmHandleGlobalChatKey(event)"></textarea>
-        <button class="btn-p" style="width:auto;min-width:150px;" onclick="mmSendGlobalChat()">Send</button>
+        <button class="btn-p" style="width:auto;min-width:150px;height:48px;padding:0 20px;align-self:stretch;" onclick="mmSendGlobalChat()">Send</button>
       </div>
     </div>`;
 }
@@ -488,17 +489,17 @@ function renderQuick(){
       <div class="chips">
         <div class="chip on" onclick="setQuick('format','snake',this)">Snake</div>
         <div class="chip" onclick="setQuick('format','auction',this)">Auction</div>
-        <div class="chip" onclick="setQuick('format','linear',this)">Linear</div>
       </div>
     </div>
     <div class="card">
       <div class="ct">Scoring Format</div>
-      <div class="chips">
-        <div class="chip on" onclick="setQuick('scoring','h2h_pts',this)">H2H Points</div>
-        <div class="chip" onclick="setQuick('scoring','h2h_cat',this)">H2H Categories</div>
-        <div class="chip" onclick="setQuick('scoring','money_ball',this)">Money Ball</div>
-        <div class="chip" onclick="setQuick('scoring','roto',this)">Rotisserie</div>
+      <div class="chips" id="mmQuickScoring">
+        <div class="chip on" onclick="setQuick('scoring','h2h_pts',this)">H2H Pts</div>
+        <div class="chip" onclick="setQuick('scoring','h2h_cat',this)">H2H Cat</div>
+        <div class="chip" onclick="setQuick('scoring','roto',this)">Roto</div>
         <div class="chip" onclick="setQuick('scoring','points',this)">Points Only</div>
+        <div class="chip moneyball" onclick="setQuick('scoring','moneyball_pts',this)">Moneyball H2H Pts</div>
+        <div class="chip moneyball" onclick="setQuick('scoring','moneyball_cat',this)">Moneyball Cat</div>
       </div>
     </div>
     <div class="card">
@@ -524,11 +525,18 @@ function setQuick(key, val, el){
 }
 
 function formatLabel(format){
-  return {snake:'Snake',auction:'Auction',linear:'Linear'}[format]||format||'Draft';
+  return {snake:'Snake',auction:'Auction'}[format]||format||'Draft';
 }
 
 function scoringLabel(scoring){
-  return {h2h_pts:'H2H Points',h2h_cat:'H2H Categories',money_ball:'Money Ball',roto:'Rotisserie',points:'Points Only'}[scoring]||scoring||'Scoring';
+  return {
+    h2h_pts:'H2H Pts',
+    h2h_cat:'H2H Cat',
+    roto:'Roto',
+    points:'Points Only',
+    moneyball_pts:'Moneyball H2H Pts',
+    moneyball_cat:'Moneyball Cat'
+  }[scoring]||scoring||'Scoring';
 }
 
 function getCreateRules(){
@@ -798,7 +806,6 @@ function renderBrowse(){
         <div class="chip filter-active" onclick="setBrowseFilter('format',null,this)">Any</div>
         <div class="chip" onclick="setBrowseFilter('format','snake',this)">Snake</div>
         <div class="chip" onclick="setBrowseFilter('format','auction',this)">Auction</div>
-        <div class="chip" onclick="setBrowseFilter('format','linear',this)">Linear</div>
       </div>
       <div class="ct" style="margin-top:10px;">Filter by Size</div>
       <div class="chips">
@@ -830,7 +837,7 @@ async function loadBrowse(){
   list.innerHTML='<div class="empty"><div class="empty-icon">...</div><div class="empty-title">Loading...</div></div>';
   try{
     const snap=await db.ref('lobbies').once('value');
-    if(!snap.exists()){ list.innerHTML=emptyHtml('No open leagues','Create one or use Quick Match!'); return; }
+    if(!snap.exists()){ list.innerHTML=emptyHtml('No open leagues','Create one or browse back later when rooms open up.'); return; }
 
     const now=Date.now();
     const TWO_HOURS=2*60*60*1000;
@@ -857,8 +864,8 @@ async function loadBrowse(){
       const count=players.length;
       const full=count>=l.teamSize;
       const open=l.teamSize-count;
-      const fmtLabel={snake:'Snake',auction:'Auction',linear:'Linear'}[l.format]||l.format;
-      const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points'}[l.scoring]||l.scoring;
+      const fmtLabel={snake:'Snake',auction:'Auction'}[l.format]||l.format;
+      const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[l.scoring]||l.scoring;
       const avs=players.slice(0,5).map(p=>`<div class="lobby-av" style="background:${playerColor(p.id||'x')}">${ini(p.name)}</div>`).join('');
       return `<div class="lobby-card" style="margin-bottom:8px;">
         <div class="lobby-card-top">
@@ -900,17 +907,17 @@ function renderCreate(){
       <div class="chips">
         <div class="chip on" onclick="setCreate('format','snake',this)">Snake</div>
         <div class="chip" onclick="setCreate('format','auction',this)">Auction</div>
-        <div class="chip" onclick="setCreate('format','linear',this)">Linear</div>
       </div>
     </div>
     <div class="card">
       <div class="ct">Scoring Format</div>
-      <div class="chips">
-        <div class="chip on" onclick="setCreate('scoring','h2h_pts',this)">H2H Points</div>
-        <div class="chip" onclick="setCreate('scoring','h2h_cat',this)">H2H Categories</div>
-        <div class="chip" onclick="setCreate('scoring','money_ball',this)">Money Ball</div>
-        <div class="chip" onclick="setCreate('scoring','roto',this)">Rotisserie</div>
+      <div class="chips" id="mmCreateScoring">
+        <div class="chip on" onclick="setCreate('scoring','h2h_pts',this)">H2H Pts</div>
+        <div class="chip" onclick="setCreate('scoring','h2h_cat',this)">H2H Cat</div>
+        <div class="chip" onclick="setCreate('scoring','roto',this)">Roto</div>
         <div class="chip" onclick="setCreate('scoring','points',this)">Points Only</div>
+        <div class="chip moneyball" onclick="setCreate('scoring','moneyball_pts',this)">Moneyball H2H Pts</div>
+        <div class="chip moneyball" onclick="setCreate('scoring','moneyball_cat',this)">Moneyball Cat</div>
       </div>
     </div>
     <div class="card">
@@ -965,8 +972,8 @@ async function doCreate(){
 function renderPrivate(){
   document.getElementById('mmTabContent').innerHTML=`
     <div style="text-align:center;padding:8px 0;">
-      <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">Private League</div>
-      <div style="font-size:12px;color:var(--text3);">Join with a code from your friend</div>
+      <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">League Code</div>
+      <div style="font-size:12px;color:var(--text3);">Join an existing league with a code from your friend</div>
     </div>
     <div class="card">
       <div class="ct">Your Team Name</div>
@@ -976,9 +983,7 @@ function renderPrivate(){
       <div class="ct">League Code</div>
       <input type="text" class="input" id="pvCode" placeholder="Enter code..." maxlength="8" style="text-transform:uppercase;letter-spacing:4px;font-family:var(--fd);font-size:20px;font-weight:800;text-align:center;">
     </div>
-    <button class="btn-p" onclick="doJoinPrivate()">Join Private League</button>
-    <div style="text-align:center;font-size:12px;color:var(--text3);margin-top:4px;">or</div>
-    <button class="btn-s" onclick="mmTab('create',document.querySelectorAll('.mm-tab')[3])">Create a Private League</button>
+    <button class="btn-p" onclick="doJoinPrivate()">Join League</button>
     ${globalChatShell()}`;
   attachGlobalChat();
 }
@@ -1095,8 +1100,8 @@ function renderWaitingRoom(lobby){
   document.getElementById('wrTitle').textContent=lobby.name||'Waiting Room';
   document.getElementById('wrCode').textContent='#'+lobby.code;
 
-  const fmtLabel={snake:'Snake',auction:'Auction',linear:'Linear'}[lobby.format]||lobby.format;
-const scrLabel={h2h_pts:'H2H Points',h2h_cat:'H2H Cat',money_ball:'Money Ball',roto:'Roto',points:'Points Only'}[lobby.scoring]||lobby.scoring;
+  const fmtLabel={snake:'Snake',auction:'Auction'}[lobby.format]||lobby.format;
+const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[lobby.scoring]||lobby.scoring;
   document.getElementById('wrInfo').innerHTML=`
     <div style="display:flex;flex-wrap:wrap;gap:6px;">
       <span style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--accent);">${fmtLabel}</span>
@@ -1266,7 +1271,7 @@ connectedRef.on('value', async snap=>{
 });
 
 syncMatchmakingIdentity().finally(()=>{
-  renderQuick();
+  renderCreate();
 });
 updatePresence();
 setInterval(updatePresence,15000);
