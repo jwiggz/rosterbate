@@ -4259,6 +4259,12 @@ function openViewer(ti){
 // ── COMMISSIONER SETTINGS ─────────────────────────────────
 let CS = null; // commissioner settings object
 
+function commissionerStorageKey(){
+  const sportKey=normalizeRosterbateSport(D?.sport || CURRENT_SPORT || 'nba');
+  const seasonKey=D?.seasonId || getRequestedLeagueId() || 'local';
+  return 'rosterbateCS:' + sportKey + ':' + seasonKey;
+}
+
 function defaultCS(){
   const sportDefaults = getRosterbateCommissionerDefaults(CURRENT_SPORT);
   const seasonMeta = getSeasonMeta(CURRENT_SPORT);
@@ -4323,7 +4329,7 @@ function defaultCS(){
 function initCS(){
   if(!CS){
     try{
-      const raw=localStorage.getItem('rosterbateCS');
+      const raw=localStorage.getItem(commissionerStorageKey());
       const draftSettings=D?.commissionerSettings||null;
       if(raw){
         const parsed=JSON.parse(raw);
@@ -4339,14 +4345,23 @@ function initCS(){
         CS={...defaultCS(),...(draftSettings||{}),positions:{...defaultCS().positions,...(draftSettings?.positions||{})},scoring:{...defaultCS().scoring,...(draftSettings?.scoring||{})}};
       }
     }
-    catch(e){ CS=defaultCS(); }
+    catch(e){
+      console.warn('Commissioner settings init failed, resetting to defaults.', e);
+      CS=defaultCS();
+    }
     syncCommissionerRosterTotals();
     syncSportSlotsFromCommissioner();
   }
 }
 
+function rebuildCommissionerSettings(){
+  CS=null;
+  initCS();
+  return CS;
+}
+
 function saveCS(){
-  try{ localStorage.setItem('rosterbateCS',JSON.stringify(CS)); }catch(e){}
+  try{ localStorage.setItem(commissionerStorageKey(),JSON.stringify(CS)); }catch(e){}
   const el=document.getElementById('commSaved');
   if(el){el.style.opacity='1';setTimeout(()=>el.style.opacity='0',1500);}
 }
@@ -4495,9 +4510,24 @@ function hydrateSeasonSteppers(root){
 }
 
 function renderCommissioner(){
-  initCS();
-  switchCommTab('basic', document.querySelector('.ctab'));
-  // Render bottom nav
+  try{
+    initCS();
+    switchCommTab(activeCommTab || 'basic', document.querySelector(`.ctab[onclick*="${activeCommTab || 'basic'}"]`) || document.querySelector('.ctab'));
+  }catch(err){
+    console.error('Commissioner render failed. Resetting settings.', err);
+    rebuildCommissionerSettings();
+    const content=document.getElementById('commContent');
+    if(content){
+      try{
+        activeCommTab='basic';
+        commBasic();
+        hydrateSeasonSteppers(content);
+      }catch(innerErr){
+        console.error('Commissioner fallback render failed.', innerErr);
+        content.innerHTML='<div class="card" style="padding:16px;"><div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--accent);margin-bottom:8px;">Commissioner settings were reset</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Old commissioner settings for this browser were incompatible with the current season format, so RosterBate rebuilt them from this league\'s saved draft settings.</div></div>';
+      }
+    }
+  }
   const el=document.getElementById('commNav');
   if(el) el.innerHTML=PAGES.map(pg=>`<button class="nb${pg==='commissioner'?' on':''}" onclick="goPage('${pg}')">${PLABELS[pg]}</button>`).join('');
 }
@@ -4510,7 +4540,17 @@ function switchCommTab(tab, btn){
   const el=document.getElementById('commContent');
   if(!el) return;
   const renders={basic:commBasic,roster:commRoster,scoring:commScoring,schedule:commSchedule,acq:commAcq,trades:commTrades,playoffs:commPlayoffs};
-  renders[tab]?.();
+  try{
+    renders[tab]?.();
+  }catch(err){
+    console.error('Commissioner tab render failed for tab:', tab, err);
+    rebuildCommissionerSettings();
+    activeCommTab='basic';
+    document.querySelectorAll('.ctab').forEach(function(node){
+      node.classList.toggle('on', String(node.textContent || '').trim().toLowerCase()==='basic');
+    });
+    commBasic();
+  }
   hydrateSeasonSteppers(el);
 }
 
@@ -5297,6 +5337,4 @@ function rbClosePickersAll(){
 
 </body>
 </html>
-
-
 

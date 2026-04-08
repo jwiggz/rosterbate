@@ -115,6 +115,42 @@
   .cta-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;align-items:stretch;}
   .cta-card{display:flex;flex-direction:column;text-decoration:none;background:linear-gradient(135deg,var(--card),var(--bg3));border:2px solid var(--border);border-radius:16px;padding:18px;transition:all .2s;position:relative;overflow:hidden;color:var(--text);}
   .cta-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);border-color:var(--green);}
+  .cta-card.multiplayer-glow{
+    background:
+      linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08)) padding-box,
+      linear-gradient(180deg,rgba(255,214,102,.96) 0%,rgba(249,115,22,.98) 28%,rgba(255,142,43,.92) 62%,rgba(120,38,8,.92) 100%) border-box;
+    border:2px solid transparent;
+    box-shadow:
+      0 0 0 1px rgba(255,190,92,.18),
+      0 0 22px rgba(249,115,22,.22),
+      0 0 44px rgba(249,115,22,.18),
+      0 12px 34px rgba(0,0,0,.42);
+    isolation:isolate;
+  }
+  .cta-card.multiplayer-glow::before{
+    content:'';
+    position:absolute;
+    inset:-2px;
+    border-radius:18px;
+    background:
+      radial-gradient(circle at 50% -10%,rgba(255,220,140,.95),transparent 34%),
+      radial-gradient(circle at 0% 50%,rgba(249,115,22,.32),transparent 26%),
+      radial-gradient(circle at 100% 50%,rgba(249,115,22,.28),transparent 24%),
+      radial-gradient(circle at 50% 100%,rgba(255,132,0,.24),transparent 28%);
+    filter:blur(10px);
+    opacity:.95;
+    z-index:-1;
+    pointer-events:none;
+  }
+  .cta-card.multiplayer-glow:hover{
+    transform:translateY(-3px);
+    border-color:transparent;
+    box-shadow:
+      0 0 0 1px rgba(255,211,122,.24),
+      0 0 26px rgba(249,115,22,.34),
+      0 0 56px rgba(249,115,22,.26),
+      0 18px 42px rgba(0,0,0,.46);
+  }
   .cta-top{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:8px;text-align:center;}
   .cta-emoji{font-size:32px;line-height:1;flex-shrink:0;}
   .cta-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--text) !important;}
@@ -334,7 +370,7 @@
     </a>
 
     <!-- Multiplayer matchmaking card -->
-    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(139,92,246,.08));border:2px solid var(--border);border-radius:16px;padding:18px;transition:all .2s;color:var(--text);" onmouseenter="this.style.transform='translateY(-2px)';this.style.borderColor='var(--green)'" onmouseleave="this.style.transform='';this.style.borderColor='var(--border)'">
+    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" class="cta-card multiplayer-glow" style="display:block;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
       <div class="cta-top">
         <div class="cta-emoji">👥</div>
         <div class="cta-title">Multiplayer<span style="color:var(--text2);">Match with real managers</span></div>
@@ -1222,6 +1258,5 @@ setAuthMode('signup');
 </script>
 </body>
 </html>
-
 
 
