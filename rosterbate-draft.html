@@ -1804,6 +1804,11 @@ function updateSoloSimButton(){
 
 function getOrderedLobbyPlayers(state){
   const players=Array.isArray(state?.players)?state.players.slice():[];
+  const byId=new Map(players.filter(Boolean).map(player=>[player.id,player]));
+  if(Array.isArray(state?.finalDraftOrder) && state.finalDraftOrder.length){
+    const ordered=state.finalDraftOrder.map(id=>byId.get(id)).filter(Boolean);
+    if(ordered.length===players.filter(Boolean).length) return ordered;
+  }
   return players
     .filter(Boolean)
     .sort((a,b)=>{
@@ -1840,6 +1845,15 @@ function getSportOpponentNames(sport){
 function getDraftAiNames(){
   const names = (S?.teams || []).filter((name, idx) => idx !== S.myPos);
   return names.length ? names : getSportOpponentNames(SPORT).slice(0, 7);
+}
+
+function getScheduledDraftStartAt(){
+  const state=getSavedMultiplayerLobbyState();
+  return Number(state?.scheduledStartAt||0);
+}
+
+function isScheduledMultiplayerDraft(){
+  return !!(getSavedMultiplayerLobbyState()?.lobbyId && getScheduledDraftStartAt());
 }
 
 function syncDraftTimerDisplay(){
@@ -1921,9 +1935,58 @@ let cdInt=null;
 const CD_DURATION=120;
 
 function startCountdown(){
+  const scheduledStartAt=getScheduledDraftStartAt();
+  if(scheduledStartAt && Date.now() < scheduledStartAt){
+    const scheduledDuration=Math.max(1, Math.ceil((scheduledStartAt-Date.now())/1000));
+    let remaining=scheduledDuration;
+    document.getElementById('pdcBar').classList.remove('hidden');
+    document.getElementById('pdcStrip').style.display='block';
+    document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Scheduled draft starts in</strong> — draft order is locked and the room is now open.';
+    const startBtn=document.querySelector('#pdcBar .pdc-start');
+    if(startBtn){
+      startBtn.textContent='Scheduled';
+      startBtn.disabled=true;
+      startBtn.style.opacity='.55';
+      startBtn.style.cursor='not-allowed';
+    }
+    function scheduledTick(){
+      const m=Math.floor(remaining/60);
+      const s=remaining%60;
+      const pct=(remaining/scheduledDuration)*100;
+      const urgent=remaining<=300;
+      document.getElementById('pdcTime').textContent=m+':'+(s+'').padStart(2,'0');
+      document.getElementById('pdcTime').className='pdc-time'+(urgent?' urgent':'');
+      document.getElementById('pdcFill').style.width=pct+'%';
+      document.getElementById('pdcFill').className='pdc-strip-fill'+(urgent?' urgent':'');
+      if(remaining<=0){
+        clearInterval(cdInt);
+        if(startBtn){
+          startBtn.textContent='Start';
+          startBtn.disabled=false;
+          startBtn.style.opacity='';
+          startBtn.style.cursor='';
+        }
+        launchDraft();
+        return;
+      }
+      remaining--;
+    }
+    scheduledTick();
+    clearInterval(cdInt);
+    cdInt=setInterval(scheduledTick,1000);
+    return;
+  }
   let remaining=CD_DURATION;
   document.getElementById('pdcBar').classList.remove('hidden');
   document.getElementById('pdcStrip').style.display='block';
+  const startBtn=document.querySelector('#pdcBar .pdc-start');
+  document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Draft starts in</strong> — browse players &amp; set your queue!';
+  if(startBtn){
+    startBtn.textContent='Start';
+    startBtn.disabled=false;
+    startBtn.style.opacity='';
+    startBtn.style.cursor='';
+  }
 
   function tick(){
     const m=Math.floor(remaining/60);
@@ -1944,6 +2007,11 @@ function startCountdown(){
 }
 
 function launchDraft(){
+  const scheduledStartAt=getScheduledDraftStartAt();
+  if(scheduledStartAt && Date.now() < scheduledStartAt){
+    showToast('⏰ This scheduled draft has not started yet');
+    return;
+  }
   S.started=true;
   clearInterval(cdInt);
   document.getElementById('pdcBar').classList.add('hidden');

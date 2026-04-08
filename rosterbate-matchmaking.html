@@ -58,6 +58,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .lobby-status{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:20px;}
 .lobby-status.waiting{background:rgba(34,197,94,.15);color:var(--green);}
 .lobby-status.full{background:rgba(239,68,68,.15);color:var(--red);}
+.lobby-status.scheduled{background:rgba(59,130,246,.15);color:#93c5fd;}
+.lobby-status.locked{background:rgba(245,158,11,.15);color:#fbbf24;}
 .lobby-tags{display:flex;flex-wrap:wrap;gap:5px;}
 .lobby-tag{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--text2);font-family:var(--fd);font-weight:700;text-transform:uppercase;}
 .lobby-av{width:24px;height:24px;border-radius:50%;border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:9px;font-weight:800;color:#fff;margin-left:-4px;}
@@ -290,6 +292,7 @@ const globalChatBansRef = db.ref('matchmakingGlobalChatBans');
 const ADMIN_USER_NUMBERS = [1,2,3,4,5];
 let myUserNumber = Number(localStorage.getItem('rbUserNumber') || 0);
 let myIsAdmin = localStorage.getItem('rbIsAdmin') === '1' || ADMIN_USER_NUMBERS.includes(myUserNumber);
+const DRAFT_ROOM_UNLOCK_MS = 30 * 60 * 1000;
 
 async function syncMatchmakingIdentity(){
   await authReady;
@@ -327,7 +330,16 @@ async function clearProtectedBanIfNeeded(){
 }
 
 const quickState = { format:'snake', scoring:'h2h_pts', teamSize:10 };
-const createOpts = { format:'snake', scoring:'h2h_pts', teamSize:10, isPrivate:false, settings:JSON.parse(JSON.stringify(MM_RULES_DEFAULT)) };
+const createOpts = {
+  format:'snake',
+  scoring:'h2h_pts',
+  teamSize:10,
+  isPrivate:false,
+  draftTiming:'now',
+  scheduledStartAt:'',
+  draftOrderMode:'random_30m',
+  settings:JSON.parse(JSON.stringify(MM_RULES_DEFAULT))
+};
 const browseFilters = { format:null, teamSize:null };
 
 // â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -539,6 +551,158 @@ function scoringLabel(scoring){
   }[scoring]||scoring||'Scoring';
 }
 
+function formatDraftDateTime(ts){
+  const value=Number(ts||0);
+  if(!value) return 'Not scheduled';
+  return new Date(value).toLocaleString([], {
+    month:'short',
+    day:'numeric',
+    hour:'numeric',
+    minute:'2-digit'
+  });
+}
+
+function formatCountdown(ms){
+  const total=Math.max(0, Math.floor(Number(ms||0)/1000));
+  const hrs=Math.floor(total/3600);
+  const mins=Math.floor((total%3600)/60);
+  if(hrs>0) return hrs+'h '+String(mins).padStart(2,'0')+'m';
+  const secs=total%60;
+  return mins+'m '+String(secs).padStart(2,'0')+'s';
+}
+
+function toDatetimeLocalValue(ts){
+  const value=Number(ts||0);
+  if(!value) return '';
+  const dt=new Date(value - (new Date().getTimezoneOffset()*60000));
+  return dt.toISOString().slice(0,16);
+}
+
+function computeDraftAccessAt(startAt){
+  const start=Number(startAt||0);
+  return start ? Math.max(Date.now(), start - DRAFT_ROOM_UNLOCK_MS) : 0;
+}
+
+function getLobbyPlayerList(lobby){
+  return Object.values(lobby?.players||{});
+}
+
+function getLobbyOrderBaseline(lobby){
+  return getLobbyPlayerList(lobby)
+    .filter(Boolean)
+    .sort((a,b)=>{
+      const aj=Number(a?.joinedAt||0), bj=Number(b?.joinedAt||0);
+      if(aj!==bj) return aj-bj;
+      return String(a?.name||'').localeCompare(String(b?.name||''));
+    });
+}
+
+function buildDeterministicDraftOrder(lobby){
+  const players=getLobbyOrderBaseline(lobby);
+  const seedBase=String(lobby?.id||'')+'|'+String(lobby?.scheduledStartAt||'');
+  function scoreFor(id){
+    const key=seedBase+'|'+String(id||'');
+    let hash=2166136261;
+    for(let i=0;i<key.length;i++){
+      hash^=key.charCodeAt(i);
+      hash=Math.imul(hash,16777619);
+    }
+    return hash>>>0;
+  }
+  return players
+    .map(player=>({player,score:scoreFor(player?.id)}))
+    .sort((a,b)=>a.score-b.score || String(a.player?.name||'').localeCompare(String(b.player?.name||'')))
+    .map(entry=>entry.player?.id)
+    .filter(Boolean);
+}
+
+function isScheduledLobby(lobby){
+  return !!Number(lobby?.scheduledStartAt||0);
+}
+
+function isLobbyJoinLocked(lobby){
+  if(!isScheduledLobby(lobby)) return false;
+  const accessAt=Number(lobby?.draftAccessAt||0);
+  return !!(accessAt && Date.now() >= accessAt);
+}
+
+function canOpenDraftRoom(lobby){
+  if(!lobby) return false;
+  if(!isScheduledLobby(lobby)) return lobby.status==='started' || lobby.status==='draft_room_open';
+  const accessAt=Number(lobby?.draftAccessAt||0);
+  if(!accessAt || Date.now() < accessAt) return false;
+  if(String(lobby?.draftOrderMode||'random_30m')==='manual'){
+    return Array.isArray(lobby?.finalDraftOrder) && lobby.finalDraftOrder.length===Number(lobby?.teamSize||0);
+  }
+  return true;
+}
+
+async function ensureScheduledLobbyState(lobbyId, lobby){
+  const target=lobby||((await db.ref('lobbies/'+lobbyId).once('value')).val());
+  if(!target || !isScheduledLobby(target)) return target;
+  const now=Date.now();
+  const accessAt=Number(target.draftAccessAt||0);
+  if(!accessAt || now < accessAt) return target;
+  const players=getLobbyPlayerList(target);
+  const expectedTeamSize=Number(target.teamSize||0);
+  const updates={};
+  if(!target.draftRoomId) updates.draftRoomId=lobbyId;
+  if(String(target.draftOrderMode||'random_30m')==='random_30m'){
+    if(!(Array.isArray(target.finalDraftOrder) && target.finalDraftOrder.length===expectedTeamSize) && players.length===expectedTeamSize){
+      updates.finalDraftOrder=buildDeterministicDraftOrder({...target,id:lobbyId});
+      updates.orderFinalizedAt=now;
+    }
+  }
+  if((updates.finalDraftOrder || (Array.isArray(target.finalDraftOrder) && target.finalDraftOrder.length===expectedTeamSize)) && target.status!=='started'){
+    updates.status='draft_room_open';
+  }
+  if(Object.keys(updates).length){
+    await db.ref('lobbies/'+lobbyId).update(updates);
+    return {...target,...updates};
+  }
+  return target;
+}
+
+function getCurrentDraftOrder(lobby){
+  const byId=new Map(getLobbyOrderBaseline(lobby).map(player=>[player.id,player]));
+  if(Array.isArray(lobby?.finalDraftOrder) && lobby.finalDraftOrder.length){
+    return lobby.finalDraftOrder.map(id=>byId.get(id)).filter(Boolean);
+  }
+  return getLobbyOrderBaseline(lobby);
+}
+
+async function saveManualDraftOrder(lobbyId, orderedIds){
+  const clean=(Array.isArray(orderedIds)?orderedIds:[]).filter(Boolean);
+  if(!clean.length) return;
+  await db.ref('lobbies/'+lobbyId).update({
+    finalDraftOrder:clean,
+    orderFinalizedAt:Date.now()
+  });
+}
+
+async function moveDraftOrder(lobbyId, fromIndex, dir){
+  const snap=await db.ref('lobbies/'+lobbyId).once('value');
+  if(!snap.exists()) return;
+  const lobby={id:lobbyId,...(snap.val()||{})};
+  if(lobby.createdBy!==myId) return;
+  const ordered=getCurrentDraftOrder(lobby).map(player=>player.id);
+  const toIndex=fromIndex+dir;
+  if(toIndex<0 || toIndex>=ordered.length) return;
+  const next=ordered.slice();
+  const [moved]=next.splice(fromIndex,1);
+  next.splice(toIndex,0,moved);
+  await saveManualDraftOrder(lobbyId,next);
+}
+
+async function finalizeJoinOrder(lobbyId){
+  const snap=await db.ref('lobbies/'+lobbyId).once('value');
+  if(!snap.exists()) return;
+  const lobby={id:lobbyId,...(snap.val()||{})};
+  if(lobby.createdBy!==myId) return;
+  await saveManualDraftOrder(lobbyId,getCurrentDraftOrder(lobby).map(player=>player.id));
+  toast('Draft order saved');
+}
+
 function getCreateRules(){
   const bench=Math.max(0, parseInt(document.getElementById('mmBench')?.value)||0);
   const irSlots=Math.max(0, parseInt(document.getElementById('mmIr')?.value)||0);
@@ -669,11 +833,18 @@ function teamCount(lobby){
 function buildMultiplayerLobbyState(lobby){
   return {
     lobbyId:lobby.id,
+    draftRoomId:lobby.draftRoomId||lobby.id,
     name:lobby.name||'RosterBate League',
     sport:lobby.sport||MM_SPORT,
     format:lobby.format,
     scoring:lobby.scoring,
     teamSize:lobby.teamSize,
+    status:lobby.status,
+    scheduledStartAt:lobby.scheduledStartAt||null,
+    draftAccessAt:lobby.draftAccessAt||null,
+    draftOrderMode:lobby.draftOrderMode||'random_30m',
+    finalDraftOrder:Array.isArray(lobby.finalDraftOrder)?lobby.finalDraftOrder.slice():null,
+    orderFinalizedAt:lobby.orderFinalizedAt||null,
     settings:lobby.settings||null,
     myId, myName,
     myUid: currentRbUser?.uid || null,
@@ -687,8 +858,22 @@ function saveMultiplayerLobbyState(lobby){
 }
 
 function openLiveDraft(lobby){
+  if(!canOpenDraftRoom(lobby)){
+    toast(isScheduledLobby(lobby)
+      ? (String(lobby?.draftOrderMode||'random_30m')==='manual' && !Array.isArray(lobby?.finalDraftOrder)
+          ? 'The host still needs to set the draft order before the room opens'
+          : 'This draft room opens 30 minutes before the scheduled start')
+      : 'This draft room is not open yet','var(--red)');
+    return;
+  }
   saveMultiplayerLobbyState(lobby);
   window.location.href='rosterbate-draft.html?lobby='+lobby.id;
+}
+
+function canJoinLobbyNow(lobby){
+  if(!lobby || lobby.status==='started') return false;
+  if(teamCount(lobby) >= Number(lobby.teamSize||0)) return false;
+  return !isLobbyJoinLocked(lobby);
 }
 
 async function startSearch(){
@@ -749,31 +934,42 @@ async function loadLiveDrafts(){
     const snap=await db.ref('lobbies').once('value');
     if(!snap.exists()){ list.innerHTML=emptyHtml('No live drafts','When one of your leagues starts, it will appear here.'); return; }
     const live=[];
+    const tasks=[];
     snap.forEach(c=>{
-      const lobby=c.val()||{};
-      if(lobby.status!=='started') return;
+      const lobby={id:c.key,...(c.val()||{})};
       if(!(lobby.players||{})[myId]) return;
-      live.push({id:c.key,...lobby});
+      tasks.push(ensureScheduledLobbyState(c.key,lobby).then(next=>{
+        const target={id:c.key,...(next||lobby)};
+        if(['draft_room_open','started','scheduled','waiting'].includes(target.status)) live.push(target);
+      }).catch(()=>{}));
     });
+    if(tasks.length) await Promise.all(tasks);
     live.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     if(!live.length){ list.innerHTML=emptyHtml('No live drafts','When one of your leagues starts, it will appear here.'); return; }
     list.innerHTML=live.map(lobby=>{
       const players=Object.values(lobby.players||{});
       const me=lobby.players?.[myId];
       const joined = me?.joinedAt ? new Date(me.joinedAt).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Joined';
+      const statusLabel=lobby.status==='started'?'Live':lobby.status==='draft_room_open'?'Draft Room Open':'Scheduled';
+      const statusClass=lobby.status==='started'?'waiting':(lobby.status==='draft_room_open'?'locked':'scheduled');
+      const subline=lobby.status==='scheduled'
+        ? `Starts ${formatDraftDateTime(lobby.scheduledStartAt)} · Draft room opens ${formatDraftDateTime(lobby.draftAccessAt)}`
+        : (lobby.status==='draft_room_open' && Number(lobby.scheduledStartAt||0)>Date.now()
+            ? `Draft starts ${formatDraftDateTime(lobby.scheduledStartAt)}`
+            : `You joined ${joined}`);
       return `<div class="lobby-card" style="margin-bottom:8px;">
         <div class="lobby-card-top">
           <div class="lobby-name">${lobby.name||'League'}</div>
-          <div class="lobby-status waiting">Live</div>
+          <div class="lobby-status ${statusClass}">${statusLabel}</div>
         </div>
         <div class="lobby-tags">
           <span class="lobby-tag">${formatLabel(lobby.format)}</span>
           <span class="lobby-tag">${scoringLabel(lobby.scoring)}</span>
           <span class="lobby-tag">${teamCount(lobby)}/${lobby.teamSize} teams</span>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">You joined ${joined}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${subline}</div>
         <div style="display:flex;gap:8px;margin-top:10px;">
-          <button onclick="resumeLiveDraft('${lobby.id}')" style="flex:1;background:var(--accent);border:none;border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Open Draft</button>
+          <button onclick="resumeLiveDraft('${lobby.id}')" style="flex:1;background:var(--accent);border:none;border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">${canOpenDraftRoom(lobby)?'Open Draft':'View Lobby'}</button>
           <button onclick="leaveLeague('${lobby.id}', true)" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:var(--red);cursor:pointer;">Leave</button>
         </div>
       </div>`;
@@ -788,9 +984,10 @@ async function resumeLiveDraft(lobbyId){
   try{
     const snap=await db.ref('lobbies/'+lobbyId).once('value');
     if(!snap.exists()){ toast('This draft is no longer available','var(--red)'); return; }
-    const lobby={id:lobbyId,...snap.val()};
+    const lobby=await ensureScheduledLobbyState(lobbyId,{id:lobbyId,...snap.val()}) || {id:lobbyId,...snap.val()};
     if(!(lobby.players||{})[myId]){ toast('You are no longer in this league','var(--red)'); renderLive(); return; }
-    openLiveDraft(lobby);
+    if(canOpenDraftRoom(lobby)) openLiveDraft(lobby);
+    else showWaitingRoom(lobbyId);
   }catch(e){
     console.error(e);
     toast('Unable to open draft','var(--red)');
@@ -843,19 +1040,24 @@ async function loadBrowse(){
     const TWO_HOURS=2*60*60*1000;
     const results=[];
 
+    const tasks=[];
     snap.forEach(c=>{
-      const l=c.val();
-      const count=Object.keys(l.players||{}).length;
+      const l={id:c.key,...(c.val()||{})};
+      tasks.push(ensureScheduledLobbyState(c.key,l).then(next=>{
+      const lobby={id:c.key,...(next||l)};
+      const count=Object.keys(lobby.players||{}).length;
       // Remove stale: no players or older than 2 hours
-      if(count===0||(l.createdAt&&now-l.createdAt>TWO_HOURS)){
+      if(count===0||(!isScheduledLobby(lobby) && lobby.createdAt&&now-lobby.createdAt>TWO_HOURS)){
         db.ref('lobbies/'+c.key).remove().catch(()=>{});
         return;
       }
-      if(l.isPrivate||l.status==='started') return;
-      if(browseFilters.format&&l.format!==browseFilters.format) return;
-      if(browseFilters.teamSize&&l.teamSize!==browseFilters.teamSize) return;
-      results.push({id:c.key,...l});
+      if(lobby.isPrivate||lobby.status==='started') return;
+      if(browseFilters.format&&lobby.format!==browseFilters.format) return;
+      if(browseFilters.teamSize&&lobby.teamSize!==browseFilters.teamSize) return;
+      results.push(lobby);
+      }).catch(()=>{}));
     });
+    if(tasks.length) await Promise.all(tasks);
 
     if(!results.length){ list.innerHTML=emptyHtml('No open leagues','Try different filters or create a league!'); return; }
 
@@ -864,13 +1066,20 @@ async function loadBrowse(){
       const count=players.length;
       const full=count>=l.teamSize;
       const open=l.teamSize-count;
+      const scheduled=isScheduledLobby(l);
+      const locked=isLobbyJoinLocked(l);
       const fmtLabel={snake:'Snake',auction:'Auction'}[l.format]||l.format;
       const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[l.scoring]||l.scoring;
       const avs=players.slice(0,5).map(p=>`<div class="lobby-av" style="background:${playerColor(p.id||'x')}">${ini(p.name)}</div>`).join('');
+      const statusClass=scheduled ? (locked ? 'locked' : 'scheduled') : (full ? 'full' : 'waiting');
+      const statusLabel=scheduled ? (locked ? 'Locked' : 'Scheduled') : (full ? 'Full' : open+' spot'+(open!==1?'s':'')+' open');
+      const metaLine=scheduled
+        ? `Starts ${formatDraftDateTime(l.scheduledStartAt)} · Draft room opens ${formatDraftDateTime(l.draftAccessAt)}`
+        : `${count}/${l.teamSize} joined`;
       return `<div class="lobby-card" style="margin-bottom:8px;">
         <div class="lobby-card-top">
           <div class="lobby-name">${l.name||'League'}</div>
-          <div class="lobby-status ${full?'full':'waiting'}">${full?'Full':open+' spot'+(open!==1?'s':'')+' open'}</div>
+          <div class="lobby-status ${statusClass}">${statusLabel}</div>
         </div>
         <div class="lobby-tags">
           <span class="lobby-tag">${fmtLabel}</span>
@@ -880,9 +1089,9 @@ async function loadBrowse(){
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
           <div style="display:flex;align-items:center;">
             <div style="display:flex;">${avs}</div>
-            <span class="lobby-slots" style="margin-left:${players.length?8:0}px;">${count}/${l.teamSize} joined</span>
+            <span class="lobby-slots" style="margin-left:${players.length?8:0}px;">${metaLine}</span>
           </div>
-          ${!full?`<button onclick="joinLobby('${l.id}')" style="background:var(--accent);border:none;border-radius:7px;padding:7px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Join</button>`:'<span style="font-size:11px;color:var(--text3);">Full</span>'}
+          ${canJoinLobbyNow(l)?`<button onclick="joinLobby('${l.id}')" style="background:var(--accent);border:none;border-radius:7px;padding:7px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Join</button>`:`<span style="font-size:11px;color:var(--text3);">${full?'Full':(locked?'Locked':'Unavailable')}</span>`}
         </div>
       </div>`;
     }).join('');
@@ -937,6 +1146,26 @@ function renderCreate(){
         <div class="chip" onclick="setCreate('isPrivate',true,this)">Private</div>
       </div>
     </div>
+    <div class="card">
+      <div class="ct">Draft Timing</div>
+      <div class="chips">
+        <div class="chip ${createOpts.draftTiming==='now'?'on':''}" onclick="setCreate('draftTiming','now',this)">Start Now</div>
+        <div class="chip ${createOpts.draftTiming==='scheduled'?'on':''}" onclick="setCreate('draftTiming','scheduled',this)">Schedule Draft</div>
+      </div>
+      <div style="margin-top:10px;${createOpts.draftTiming==='scheduled'?'':'display:none;'}" id="mmScheduleWrap">
+        <div class="ct">Scheduled Start</div>
+        <input type="datetime-local" class="input" id="cStartAt" value="${createOpts.scheduledStartAt||''}" min="${toDatetimeLocalValue(Date.now()+DRAFT_ROOM_UNLOCK_MS)}">
+        <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.55;">Managers can enter the draft room 30 minutes before the scheduled start. Draft order randomization also happens at that unlock time.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Draft Order</div>
+      <div class="chips">
+        <div class="chip ${createOpts.draftOrderMode==='random_30m'?'on':''}" onclick="setCreate('draftOrderMode','random_30m',this)">Randomize 30 Min Before</div>
+        <div class="chip ${createOpts.draftOrderMode==='manual'?'on':''}" onclick="setCreate('draftOrderMode','manual',this)">Set In Waiting Room</div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.55;">Manual order is set by the host from the waiting room once teams join. Random order locks in 30 minutes before scheduled start.</div>
+    </div>
     ${renderCreateRulesSection()}
     <button class="btn-p" id="createBtn" onclick="doCreate()">Create League</button>
     ${globalChatShell()}`;
@@ -950,6 +1179,10 @@ function setCreate(key,val,el){
   createOpts[key]=val;
   el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
+  if(key==='draftTiming'){
+    const wrap=document.getElementById('mmScheduleWrap');
+    if(wrap) wrap.style.display=val==='scheduled'?'block':'none';
+  }
 }
 
 async function doCreate(){
@@ -957,10 +1190,28 @@ async function doCreate(){
   const league=document.getElementById('cLeague')?.value?.trim()||name+"'s League";
   myName=name; localStorage.setItem('rbPlayerName',name);
   createOpts.settings=getCreateRules();
+  let scheduledStartAt=0;
+  if(createOpts.draftTiming==='scheduled'){
+    const raw=document.getElementById('cStartAt')?.value||'';
+    scheduledStartAt=raw ? new Date(raw).getTime() : 0;
+    if(!scheduledStartAt || Number.isNaN(scheduledStartAt)){
+      toast('Pick a valid draft start time','var(--red)');
+      return;
+    }
+    if(scheduledStartAt < Date.now() + DRAFT_ROOM_UNLOCK_MS){
+      toast('Scheduled drafts must start at least 30 minutes from now','var(--red)');
+      return;
+    }
+  }
   const btn=document.getElementById('createBtn');
   btn.disabled=true; btn.textContent='Creating...';
   try{
-    await createAndJoinLobby({name:league,sport:MM_SPORT,...createOpts});
+    await createAndJoinLobby({
+      name:league,
+      sport:MM_SPORT,
+      ...createOpts,
+      scheduledStartAt
+    });
   }catch(e){
     console.error('Create league failed', e);
     btn.disabled=false; btn.textContent='Create League ->';
@@ -999,9 +1250,18 @@ async function doJoinPrivate(){
     let found=null;
     snap.forEach(c=>{ if(c.val().code===code) found={id:c.key,...c.val()}; });
     if(!found){ toast('League not found - check the code','var(--red)'); return; }
+    found=await ensureScheduledLobbyState(found.id,found) || found;
+    if((found.players||{})[myId]){
+      if(canOpenDraftRoom(found)){ openLiveDraft(found); return; }
+      showWaitingRoom(found.id);
+      return;
+    }
     if(found.status==='started'){
-      if((found.players||{})[myId]){ openLiveDraft(found); return; }
       toast('That league is already in progress','var(--red)');
+      return;
+    }
+    if(isLobbyJoinLocked(found) && !(found.players||{})[myId]){
+      toast('That league is locked because the draft room is about to open','var(--red)');
       return;
     }
     await joinLobby(found.id);
@@ -1011,6 +1271,8 @@ async function doJoinPrivate(){
 // â”€â”€ CORE FUNCTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function createAndJoinLobby(opts){
   const code=Math.random().toString(36).slice(2,8).toUpperCase();
+  const scheduledStartAt=Number(opts.scheduledStartAt||0);
+  const draftAccessAt=scheduledStartAt ? Math.max(0, scheduledStartAt - DRAFT_ROOM_UNLOCK_MS) : 0;
   const lobby={
     name:opts.name||'New League',
     sport:opts.sport||MM_SPORT,
@@ -1019,7 +1281,14 @@ async function createAndJoinLobby(opts){
     teamSize:opts.teamSize||10,
     settings:opts.settings||JSON.parse(JSON.stringify(MM_RULES_DEFAULT)),
     isPrivate:opts.isPrivate||false,
-    code, status:'waiting',
+    draftTiming:scheduledStartAt ? 'scheduled' : 'now',
+    scheduledStartAt:scheduledStartAt||null,
+    draftAccessAt:draftAccessAt||null,
+    draftOrderMode:opts.draftOrderMode||'random_30m',
+    finalDraftOrder:null,
+    orderFinalizedAt:null,
+    draftRoomId:null,
+    code, status:scheduledStartAt?'scheduled':'waiting',
     createdBy:myId, createdAt:Date.now(),
     players:{}, chat:{}
   };
@@ -1071,6 +1340,16 @@ async function leaveLeague(lobbyId, refreshLive){
 }
 
 async function joinLobby(lobbyId){
+  const lobbySnap=await db.ref('lobbies/'+lobbyId).once('value');
+  if(!lobbySnap.exists()){
+    toast('This league is no longer available','var(--red)');
+    return;
+  }
+  const lobby=await ensureScheduledLobbyState(lobbyId,{id:lobbyId,...(lobbySnap.val()||{})}) || {id:lobbyId,...(lobbySnap.val()||{})};
+  if(!canJoinLobbyNow(lobby) && !(lobby.players||{})[myId]){
+    toast(isLobbyJoinLocked(lobby)?'This league is locked for order finalization and draft-room access':'That league is not accepting joins right now','var(--red)');
+    return;
+  }
   await db.ref('lobbies/'+lobbyId+'/players/'+myId).set({
     id:myId,
     uid:currentRbUser?.uid || null,
@@ -1089,9 +1368,9 @@ function showWaitingRoom(lobbyId){
   document.getElementById('mmLobby').classList.remove('active');
   document.getElementById('mmWaiting').classList.add('active');
   if(lobbyListener) db.ref('lobbies/'+lobbyId).off('value',lobbyListener);
-  lobbyListener=db.ref('lobbies/'+lobbyId).on('value',snap=>{
+  lobbyListener=db.ref('lobbies/'+lobbyId).on('value',async snap=>{
     if(!snap.exists()){ mmLeaveWaiting(); return; }
-    currentLobby={id:lobbyId,...snap.val()};
+    currentLobby=await ensureScheduledLobbyState(lobbyId,{id:lobbyId,...snap.val()}) || {id:lobbyId,...snap.val()};
     renderWaitingRoom(currentLobby);
   });
 }
@@ -1101,13 +1380,23 @@ function renderWaitingRoom(lobby){
   document.getElementById('wrCode').textContent='#'+lobby.code;
 
   const fmtLabel={snake:'Snake',auction:'Auction'}[lobby.format]||lobby.format;
-const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[lobby.scoring]||lobby.scoring;
+  const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[lobby.scoring]||lobby.scoring;
+  const scheduled=isScheduledLobby(lobby);
+  const accessAt=Number(lobby.draftAccessAt||0);
+  const canOpenRoom=canOpenDraftRoom(lobby);
+  const orderIsManual=String(lobby.draftOrderMode||'random_30m')==='manual';
+  const orderLocked=Array.isArray(lobby.finalDraftOrder) && lobby.finalDraftOrder.length===Number(lobby.teamSize||0);
   document.getElementById('wrInfo').innerHTML=`
     <div style="display:flex;flex-wrap:wrap;gap:6px;">
       <span style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--accent);">${fmtLabel}</span>
       <span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);">${scrLabel}</span>
       <span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);">${lobby.teamSize} Teams</span>
     </div>
+    ${scheduled?`<div style="margin-top:10px;font-size:11px;color:var(--text2);line-height:1.6;">
+      <div>Scheduled start: <strong style="color:var(--text);">${formatDraftDateTime(lobby.scheduledStartAt)}</strong></div>
+      <div>Draft room opens: <strong style="color:var(--text);">${formatDraftDateTime(lobby.draftAccessAt)}</strong></div>
+      <div>Draft order: <strong style="color:var(--text);">${orderIsManual?'Manual (host sets it here)':'Randomize 30 minutes before start'}</strong></div>
+    </div>`:''}
     ${lobby.isPrivate?`<div style="margin-top:10px;font-size:11px;color:var(--text3);">Share code: <strong style="color:var(--accent);letter-spacing:2px;font-family:var(--fd);font-size:14px;">${lobby.code}</strong> <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${lobby.code}').then(()=>toast('Copied!'))" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text3);font-size:11px;cursor:pointer;">Copy</button></div>`:''}`;
 
   const players=Object.values(lobby.players||{});
@@ -1134,6 +1423,60 @@ const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points O
     const canSolo=lobby.createdBy===myId && players.length===1;
     soloBtn.style.display=canSolo?'block':'none';
   }
+  const countdownWrap=document.getElementById('wrCountdown');
+  if(countdownWrap && scheduled){
+    countdownWrap.style.display='none';
+    cdRunning=false;
+    clearTimeout(cdTimer);
+  }
+
+  const readySection=document.getElementById('wrReadySection');
+  if(readySection){
+    if(!scheduled){
+      readySection.innerHTML=`
+        <button class="${myReady?'ready-btn is-ready':'ready-btn'}" id="wrReadyBtn" onclick="mmToggleReady()">${myReady?'Ready!':'Ready Up'}</button>
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3);" id="wrReadyCount">${readyCount}/${players.length} ready</div>
+        <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="margin-top:10px;display:${lobby.createdBy===myId && players.length===1?'block':'none'};">Start Solo Test</button>
+        <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
+    } else {
+      const waitingCopy=Date.now() < accessAt
+        ? `Draft room unlocks in ${formatCountdown(accessAt-Date.now())}.`
+        : (!orderLocked && orderIsManual
+            ? 'Host must set and save the manual draft order before the room opens.'
+            : 'Draft room is open. Enter any time before the scheduled start.');
+      readySection.innerHTML=`
+        <div class="card" style="padding:12px;margin-bottom:10px;background:rgba(15,23,42,.5);">
+          <div style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:${canOpenRoom?'var(--green)':'var(--accent)'};">${canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby'}</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text2);line-height:1.55;">${waitingCopy}</div>
+        </div>
+        <button class="ready-btn" onclick="${canOpenRoom?`resumeLiveDraft('${lobby.id}')`:''}" ${canOpenRoom?'':'disabled'} style="${canOpenRoom?'':'opacity:.5;cursor:not-allowed;background:var(--text3);'}">${canOpenRoom?'Open Draft Room':'Draft Room Locked'}</button>
+        <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
+    }
+  }
+
+  const existingOrderCard=document.getElementById('wrOrderCard');
+  if(existingOrderCard) existingOrderCard.remove();
+  if(scheduled){
+    const orderRows=getCurrentDraftOrder(lobby);
+    const card=document.createElement('div');
+    card.id='wrOrderCard';
+    card.className='card';
+    card.innerHTML=`
+      <div class="ct">Draft Order</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">${orderIsManual?'Host can set the exact order here before the room opens.':'Order will randomize automatically 30 minutes before start.'}</div>
+      <div>${orderRows.map((player,idx)=>`
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">${idx+1}</div>
+          <div class="wr-av" style="width:28px;height:28px;font-size:11px;background:${playerColor(player?.id||'x')}">${ini(player?.name||'?')}</div>
+          <div style="flex:1;font-family:var(--fd);font-size:13px;font-weight:700;">${player?.name||('Team '+(idx+1))}${player?.id===myId?' (You)':''}</div>
+          ${orderIsManual && lobby.createdBy===myId && !canOpenRoom?`
+            <button onclick="moveDraftOrder('${lobby.id}',${idx},-1)" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text2);font-size:11px;cursor:pointer;${idx===0?'opacity:.35;cursor:not-allowed;':''}" ${idx===0?'disabled':''}>↑</button>
+            <button onclick="moveDraftOrder('${lobby.id}',${idx},1)" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text2);font-size:11px;cursor:pointer;${idx===orderRows.length-1?'opacity:.35;cursor:not-allowed;':''}" ${idx===orderRows.length-1?'disabled':''}>↓</button>
+          `:''}
+        </div>`).join('')}</div>
+      ${orderIsManual && lobby.createdBy===myId && !canOpenRoom?`<button class="btn-p" onclick="finalizeJoinOrder('${lobby.id}')">${orderLocked?'Save Draft Order':'Use Current Order'}</button>`:''}`;
+    document.querySelector('#mmWaiting .sb')?.insertBefore(card, document.getElementById('wrCountdown'));
+  }
 
   // Render chat
   const chatMsgs=Object.entries(lobby.chat||{}).map(([id,val])=>({...(val||{}),_id:id})).sort((a,b)=>a.ts-b.ts);
@@ -1141,7 +1484,7 @@ const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points O
   if(wc){ wc.innerHTML=chatMsgs.map(m=>`<div style="display:flex;gap:6px;align-items:flex-start;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div style="flex:1;min-width:0;"><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${escapeHtml(m.name)}${ADMIN_USER_NUMBERS.includes(Number(m.userNumber||0))?' ♛':''}: </span><span style="font-size:12px;color:var(--text);">${escapeHtml(m.text)}</span>${myIsAdmin&&m.playerId!==myId&&!isProtectedChatUser(m.playerId,m.userNumber)?`<div style="display:flex;gap:6px;margin-top:4px;"><button onclick="mmDeleteLobbyChatMessage('${m._id}')" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);font-size:10px;cursor:pointer;">Delete</button><button onclick="mmBanGlobalChatPlayer('${m.playerId}','${escapeHtml(m.name)}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:2px 7px;color:#fca5a5;font-size:10px;cursor:pointer;">Ban</button></div>`:''}</div></div>`).join('');wc.scrollTop=wc.scrollHeight;}
 
   // Check all ready + enough players
-  if(players.length>=2&&players.every(p=>p.ready)&&!cdRunning) startCountdown();
+  if(!scheduled && players.length>=2&&players.every(p=>p.ready)&&!cdRunning) startCountdown();
 }
 
 function mmToggleReady(){
