@@ -873,7 +873,10 @@ async function saveLeagueToFirebase(draftData) {
     return false;
   }
   
-  if (!currentRbUser) {
+  await authReady;
+  const user = currentRbUser || auth.currentUser;
+  
+  if (!user) {
     console.log('👤 Not logged in - league only saved locally');
     showToast('Sign in to save your league permanently!');
     return false;
@@ -890,8 +893,8 @@ async function saveLeagueToFirebase(draftData) {
       console.log('🆔 Generated season ID:', seasonId);
     }
     
-    const userId = currentRbUser.uid;
-    const userEmail = currentRbUser.email || 'unknown';
+    const userId = user.uid;
+    const userEmail = user.email || 'unknown';
     
     // Save full league data to user's seasons
     await db.ref(`userSeasons/${userId}/${seasonId}`).set({
@@ -3185,17 +3188,31 @@ async function endDraft(){
   }
 }
 
-function openSeasonManager(){
+async function openSeasonManager(){
   // Get the seasonId from the saved draft data
   let seasonId = null;
+  let draftData = null;
   try {
     const saved = localStorage.getItem('rosterbateDraft');
     if (saved) {
-      const data = JSON.parse(saved);
-      seasonId = data.seasonId;
+      draftData = JSON.parse(saved);
+      seasonId = draftData.seasonId;
     }
   } catch(e) {
     console.error('Failed to get seasonId:', e);
+  }
+  
+  if (!seasonId && draftData) {
+    try {
+      const savedSeasonId = await saveLeagueToFirebase(draftData);
+      if (savedSeasonId) {
+        seasonId = savedSeasonId;
+        draftData.seasonId = savedSeasonId;
+        try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+      }
+    } catch (err) {
+      console.warn('Could not create sequential season ID before opening season manager:', err);
+    }
   }
   
   // Build URL with seasonId if available
@@ -4023,4 +4040,3 @@ function rbScheduleAiMsg(){
 
 </body>
 </html>
-
