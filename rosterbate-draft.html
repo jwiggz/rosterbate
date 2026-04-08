@@ -885,14 +885,9 @@ async function saveLeagueToFirebase(draftData) {
     
     if (!seasonId) {
       const seasonNumber = await getNextSeasonNumber();
-      if (seasonNumber) {
-        seasonId = 'season_' + seasonNumber;
-        console.log('🆔 Generated season ID:', seasonId);
-      } else {
-        // Fallback to timestamp-based ID if counter fails
-        seasonId = 'season_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-        console.warn('⚠️ Using fallback season ID:', seasonId);
-      }
+      if (!seasonNumber) throw new Error('Failed to get next sequential season number');
+      seasonId = 'season_' + seasonNumber;
+      console.log('🆔 Generated season ID:', seasonId);
     }
     
     const userId = currentRbUser.uid;
@@ -3134,8 +3129,7 @@ async function endDraft(){
       }
     } catch(err) {
       console.warn('⚠️ Firebase save failed (league will save locally):', err);
-      // Generate fallback seasonId for localStorage
-      draftData.seasonId = 'season_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+      delete draftData.seasonId;
     }
     
     // Save to localStorage (backup for offline access) - now includes seasonId
@@ -4029,5 +4023,4 @@ function rbScheduleAiMsg(){
 
 </body>
 </html>
-
 

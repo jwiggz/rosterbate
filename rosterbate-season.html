@@ -880,6 +880,16 @@ const authReady=new Promise(resolve=>{
   });
 });
 
+function getRequestedLeagueId(){
+  try{
+    const params=new URLSearchParams(window.location.search || '');
+    const leagueId=(params.get('league')||'').trim();
+    return leagueId && leagueId!=='demo' ? leagueId : null;
+  }catch(e){
+    return null;
+  }
+}
+
 // Helper function to remove undefined values from objects (Firebase doesn't allow undefined)
 function removeUndefined(obj) {
   // JSON.stringify automatically removes undefined values
@@ -906,9 +916,13 @@ async function saveSeasonToFirebase() {
   }
   
   try {
-    // Generate seasonId if not exists
+    // Preserve the sequential season ID from the draft flow/URL.
     if (!D.seasonId) {
-      D.seasonId = 'season_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+      D.seasonId = getRequestedLeagueId() || D.leagueId || null;
+    }
+    if (!D.seasonId) {
+      console.warn('⚠️ Missing seasonId, skipping Firebase save to avoid creating a random league ID');
+      return false;
     }
     
     const seasonId = D.seasonId;
@@ -2599,7 +2613,7 @@ function initSeason(){
   const n=D.leagueSize;
   console.log('👥 League size:', n);
   
-  if(!D.seasonId) D.seasonId='season_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  if(!D.seasonId) D.seasonId=getRequestedLeagueId() || D.leagueId || null;
   console.log('🆔 Season ID:', D.seasonId);
   
   G.rosters=D.allRosters.map(r=>r.map(p=>({...p})));
@@ -5256,7 +5270,6 @@ function rbClosePickersAll(){
 
 </body>
 </html>
-
 
 
 
