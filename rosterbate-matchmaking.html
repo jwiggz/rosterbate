@@ -40,6 +40,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:800;color:var(--red);cursor:pointer;width:100%;}
 .input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;width:100%;}
 .input:focus{border-color:var(--accent);}
+.schedule-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(120px,.8fr);gap:10px;}
+.schedule-grid .ct{margin-bottom:6px;}
 .chips{display:flex;flex-wrap:wrap;gap:6px;}
 .chip{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 13px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;}
 .chip.on{background:rgba(249,115,22,.15);border-color:var(--accent);color:var(--accent);}
@@ -578,6 +580,63 @@ function toDatetimeLocalValue(ts){
   return dt.toISOString().slice(0,16);
 }
 
+function toDateInputValue(ts){
+  const value=Number(ts||0);
+  if(!value) return '';
+  const dt=new Date(value - (new Date().getTimezoneOffset()*60000));
+  return dt.toISOString().slice(0,10);
+}
+
+function toTimeInputValue(ts){
+  const value=Number(ts||0);
+  if(!value) return '';
+  const dt=new Date(value);
+  const hh=String(dt.getHours()).padStart(2,'0');
+  const mm=String(dt.getMinutes()).padStart(2,'0');
+  return hh+':'+mm;
+}
+
+function getMinimumScheduledStart(){
+  return Date.now()+DRAFT_ROOM_UNLOCK_MS;
+}
+
+function getMinimumScheduleDateValue(){
+  return toDateInputValue(getMinimumScheduledStart());
+}
+
+function getMinimumScheduleTimeValue(){
+  return toTimeInputValue(getMinimumScheduledStart());
+}
+
+function buildTeamSizeChips(currentValue, handlerName, withLabel){
+  return Array.from({length:13}, (_,idx)=>{
+    const size=idx+2;
+    const active=Number(currentValue)===size ? ' on' : '';
+    const label=withLabel ? `${size} Teams` : String(size);
+    return `<div class="chip${active}" onclick="${handlerName}(${size},this)">${label}</div>`;
+  }).join('');
+}
+
+function parseScheduledStartInputs(){
+  const dateValue=document.getElementById('cStartDate')?.value||'';
+  const timeValue=document.getElementById('cStartTime')?.value||'';
+  if(!dateValue || !timeValue) return 0;
+  return new Date(`${dateValue}T${timeValue}`).getTime();
+}
+
+function syncScheduledTimeInputs(){
+  const dateInput=document.getElementById('cStartDate');
+  const timeInput=document.getElementById('cStartTime');
+  if(!dateInput || !timeInput) return;
+  const minDate=getMinimumScheduleDateValue();
+  const minTime=getMinimumScheduleTimeValue();
+  const selectedDate=dateInput.value||'';
+  timeInput.min=selectedDate===minDate ? minTime : '';
+  if(timeInput.min && timeInput.value && timeInput.value<timeInput.min){
+    timeInput.value=timeInput.min;
+  }
+}
+
 function computeDraftAccessAt(startAt){
   const start=Number(startAt||0);
   return start ? Math.max(Date.now(), start - DRAFT_ROOM_UNLOCK_MS) : 0;
@@ -1007,10 +1066,19 @@ function renderBrowse(){
       <div class="ct" style="margin-top:10px;">Filter by Size</div>
       <div class="chips">
         <div class="chip filter-active" onclick="setBrowseFilter('teamSize',null,this)">Any</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',2,this)">2</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',3,this)">3</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',4,this)">4</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',5,this)">5</div>
         <div class="chip" onclick="setBrowseFilter('teamSize',6,this)">6</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',7,this)">7</div>
         <div class="chip" onclick="setBrowseFilter('teamSize',8,this)">8</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',9,this)">9</div>
         <div class="chip" onclick="setBrowseFilter('teamSize',10,this)">10</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',11,this)">11</div>
         <div class="chip" onclick="setBrowseFilter('teamSize',12,this)">12</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',13,this)">13</div>
+        <div class="chip" onclick="setBrowseFilter('teamSize',14,this)">14</div>
       </div>
     </div>
     <div class="sl" style="margin-top:4px;">Open Leagues</div>
@@ -1132,11 +1200,7 @@ function renderCreate(){
     <div class="card">
       <div class="ct">League Size</div>
       <div class="chips">
-        <div class="chip" onclick="setCreate('teamSize',6,this)">6 Teams</div>
-        <div class="chip" onclick="setCreate('teamSize',8,this)">8 Teams</div>
-        <div class="chip on" onclick="setCreate('teamSize',10,this)">10 Teams</div>
-        <div class="chip" onclick="setCreate('teamSize',12,this)">12 Teams</div>
-        <div class="chip" onclick="setCreate('teamSize',14,this)">14 Teams</div>
+        ${buildTeamSizeChips(createOpts.teamSize,'setCreateTeamSize',true)}
       </div>
     </div>
     <div class="card">
@@ -1153,8 +1217,16 @@ function renderCreate(){
         <div class="chip ${createOpts.draftTiming==='scheduled'?'on':''}" onclick="setCreate('draftTiming','scheduled',this)">Schedule Draft</div>
       </div>
       <div style="margin-top:10px;${createOpts.draftTiming==='scheduled'?'':'display:none;'}" id="mmScheduleWrap">
-        <div class="ct">Scheduled Start</div>
-        <input type="datetime-local" class="input" id="cStartAt" value="${createOpts.scheduledStartAt||''}" min="${toDatetimeLocalValue(Date.now()+DRAFT_ROOM_UNLOCK_MS)}">
+        <div class="schedule-grid">
+          <div>
+            <div class="ct">Draft Date</div>
+            <input type="date" class="input" id="cStartDate" value="${toDateInputValue(createOpts.scheduledStartAt)}" min="${getMinimumScheduleDateValue()}" onchange="syncScheduledTimeInputs()">
+          </div>
+          <div>
+            <div class="ct">Draft Time</div>
+            <input type="time" class="input" id="cStartTime" value="${toTimeInputValue(createOpts.scheduledStartAt)}" step="300" min="${toDateInputValue(createOpts.scheduledStartAt||getMinimumScheduledStart())===getMinimumScheduleDateValue()?getMinimumScheduleTimeValue():''}">
+          </div>
+        </div>
         <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.55;">Managers can enter the draft room 30 minutes before the scheduled start. Draft order randomization also happens at that unlock time.</div>
       </div>
     </div>
@@ -1172,6 +1244,7 @@ function renderCreate(){
   syncCreateRules();
   updateCreatePositionSummary();
   hydrateStepperInputs(document.getElementById('mmTabContent'));
+  syncScheduledTimeInputs();
   attachGlobalChat();
 }
 
@@ -1185,6 +1258,10 @@ function setCreate(key,val,el){
   }
 }
 
+function setCreateTeamSize(val, el){
+  setCreate('teamSize', val, el);
+}
+
 async function doCreate(){
   const name=document.getElementById('cName')?.value?.trim()||'Manager';
   const league=document.getElementById('cLeague')?.value?.trim()||name+"'s League";
@@ -1192,10 +1269,9 @@ async function doCreate(){
   createOpts.settings=getCreateRules();
   let scheduledStartAt=0;
   if(createOpts.draftTiming==='scheduled'){
-    const raw=document.getElementById('cStartAt')?.value||'';
-    scheduledStartAt=raw ? new Date(raw).getTime() : 0;
+    scheduledStartAt=parseScheduledStartInputs();
     if(!scheduledStartAt || Number.isNaN(scheduledStartAt)){
-      toast('Pick a valid draft start time','var(--red)');
+      toast('Pick a valid draft date and time','var(--red)');
       return;
     }
     if(scheduledStartAt < Date.now() + DRAFT_ROOM_UNLOCK_MS){
