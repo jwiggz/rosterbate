@@ -7,6 +7,7 @@
     html,body{background:#040507 !important;}
     body{position:relative;}
     body::before,body::after{display:none !important;}
+    .screen,.sb,.sbb,.season-light-body{background:transparent !important;}
     .rb-site-bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
     .rb-site-bg-layer::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,3,5,.985) 0%,rgba(4,5,8,.975) 42%,rgba(5,6,9,.99) 100%);}
     .rb-site-bg-layer::after{content:'';position:absolute;inset:0;background:radial-gradient(68% 48% at 50% 24%,rgba(255,255,255,.012),transparent 60%);}
