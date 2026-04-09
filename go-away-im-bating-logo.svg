@@ -1,0 +1,64 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="textFill" x1="330" y1="180" x2="1270" y2="740" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4C0"/>
+      <stop offset="0.3" stop-color="#FFC857"/>
+      <stop offset="0.68" stop-color="#FF8C2A"/>
+      <stop offset="1" stop-color="#F04B19"/>
+    </linearGradient>
+    <linearGradient id="rimFill" x1="489" y1="207" x2="1111" y2="693" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE79E"/>
+      <stop offset="0.42" stop-color="#FFB238"/>
+      <stop offset="1" stop-color="#E65A16"/>
+    </linearGradient>
+    <radialGradient id="outerAura" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(800 450) rotate(90) scale(292 430)">
+      <stop stop-color="#FFD86D" stop-opacity="0.95"/>
+      <stop offset="0.36" stop-color="#FFAB2C" stop-opacity="0.72"/>
+      <stop offset="0.7" stop-color="#FF6A20" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#FF6A20" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="180" y="40" width="1240" height="820" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="26" result="blur"/>
+      <feBlend in="SourceGraphic" in2="blur" mode="screen"/>
+    </filter>
+    <filter id="shadow" x="130" y="50" width="1340" height="800" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feOffset dy="14"/>
+      <feGaussianBlur stdDeviation="12" result="shadow"/>
+      <feColorMatrix in="shadow" type="matrix" values="0 0 0 0 0.14  0 0 0 0 0.04  0 0 0 0 0.02  0 0 0 0.88 0"/>
+      <feBlend in="SourceGraphic" in2="shadow" mode="normal"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="800" cy="450" rx="410" ry="260" fill="url(#outerAura)"/>
+
+  <g filter="url(#glow)">
+    <path d="M800 185L1038 282L1120 500L800 715L480 500L562 282L800 185Z" fill="#170C0A" fill-opacity="0.82"/>
+    <path d="M800 213L1008 298L1084 495L800 687L516 495L592 298L800 213Z" fill="#140E0D" stroke="url(#rimFill)" stroke-width="18"/>
+    <path d="M800 237L977 311L1045 490L800 660L555 490L623 311L800 237Z" fill="#1B1413"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <text x="800" y="232" text-anchor="middle" font-size="108" font-weight="900" letter-spacing="8" fill="url(#textFill)" stroke="#25120B" stroke-width="14" paint-order="stroke" font-family="'Impact','Anton','Barlow Condensed','Arial Black',sans-serif">GO AWAY</text>
+    <text x="800" y="704" text-anchor="middle" font-size="118" font-weight="900" letter-spacing="5" fill="url(#textFill)" stroke="#25120B" stroke-width="14" paint-order="stroke" font-family="'Impact','Anton','Barlow Condensed','Arial Black',sans-serif">I'M BATING</text>
+  </g>
+
+  <g filter="url(#glow)">
+    <circle cx="800" cy="448" r="138" fill="#1A120F" fill-opacity="0.94" stroke="url(#rimFill)" stroke-width="12"/>
+    <circle cx="800" cy="448" r="116" fill="#2B1913" fill-opacity="0.88"/>
+    <g transform="translate(800 448)">
+      <rect x="-66" y="-12" width="28" height="96" rx="14" fill="#FFD257"/>
+      <rect x="-30" y="-46" width="28" height="130" rx="14" fill="#FFD257"/>
+      <rect x="6" y="-58" width="28" height="142" rx="14" fill="#FFD257"/>
+      <rect x="42" y="-34" width="28" height="118" rx="14" fill="#FFD257"/>
+      <path d="M-70 18C-70 -16 -44 -42 -12 -42H38C67 -42 91 -18 91 12V29C91 74 56 109 11 109H-6C-42 109 -72 79 -72 43V20C-72 19 -71 18 -70 18Z" fill="#FFD257"/>
+      <path d="M-74 16C-92 2 -101 -25 -89 -46C-78 -64 -56 -69 -39 -58L-7 -37L-24 -1L-60 14C-65 16 -70 18 -74 16Z" fill="#FFD257"/>
+      <path d="M-27 -14L-8 -37L17 -29L42 -38L65 -22L63 36L-28 36L-27 -14Z" fill="#FFC43D" opacity="0.72"/>
+      <path d="M-64 13C-64 -20 -39 -44 -7 -44H36C65 -44 88 -21 88 8V27C88 68 55 101 14 101H-3C-36 101 -64 73 -64 40V13Z" stroke="#2A1A12" stroke-width="8" fill="none" stroke-linejoin="round"/>
+      <path d="M-72 16C-88 4 -94 -18 -84 -36C-74 -53 -55 -57 -40 -48L-12 -31" stroke="#2A1A12" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M-38 -12V36" stroke="#2A1A12" stroke-width="7" stroke-linecap="round"/>
+      <path d="M-2 -32V36" stroke="#2A1A12" stroke-width="7" stroke-linecap="round"/>
+      <path d="M34 -40V36" stroke="#2A1A12" stroke-width="7" stroke-linecap="round"/>
+      <path d="M68 -20V36" stroke="#2A1A12" stroke-width="7" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
