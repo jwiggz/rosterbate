@@ -172,6 +172,20 @@
   .pick-slot.small{padding:8px;}
   .pick-slot.small .pick-no{font-size:22px;}
   .pick-slot.small .pick-label{font-size:10px;}
+  #swapExplainer .swap-board{min-height:128px;}
+  #swapExplainer .pick-slot{min-height:112px;padding:16px 14px;}
+  #powerupExplainer .swap-board{display:block;min-height:0;}
+  #powerupExplainer .pick-column{display:block;}
+  .powerup-slot{display:grid !important;grid-template-columns:56px minmax(0,1fr);align-items:center;gap:14px;padding:18px 20px;text-align:left;min-height:124px;}
+  .powerup-slot-copy{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .powerup-slot .pick-no{font-size:30px;line-height:.95;}
+  .powerup-slot .pick-label{font-size:13px;line-height:1.45;max-width:none;}
+  #moneyballExplainer .swap-board{display:block;min-height:0;}
+  #moneyballExplainer .pick-column{display:block;}
+  .moneyball-slot{display:grid !important;grid-template-columns:92px minmax(0,1fr);align-items:center;gap:16px;padding:18px 20px;text-align:left;min-height:138px;}
+  .moneyball-slot-copy{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .moneyball-slot .pick-no{font-size:30px;line-height:.95;}
+  .moneyball-slot .pick-label{font-size:13px;line-height:1.45;max-width:none;}
 
   /* MODE PILLS */
   .mode-row{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
@@ -661,10 +675,10 @@
     </div>
     <div class="swap-grid">
       <div class="swap-card">
-        <div class="swap-step">Epic · Captain Mode</div>
+        <div class="swap-step">Captain Mode</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot active" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+            <div class="pick-slot active powerup-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
                   <circle cx="32" cy="32" r="24" fill="rgba(249,115,22,.12)" stroke="#f59e0b" stroke-width="2"/>
@@ -674,18 +688,20 @@
                   <path d="M15 15l6 6M43 43l6 6M49 15l-6 6M21 43l-6 6" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
               </div>
-              <div class="pick-no">2x</div>
-              <div class="pick-label">Double one starter’s fantasy score for every game that week</div>
+              <div class="powerup-slot-copy">
+                <div class="pick-no">2x</div>
+                <div class="pick-label">Double one starter’s fantasy score for every game that week</div>
+              </div>
             </div>
           </div>
         </div>
         <div class="swap-note">Turn your best scorer into a weekly hammer. If your captain drops 38 fantasy points, you bank <strong style="color:var(--text);">76</strong>.</div>
       </div>
       <div class="swap-card">
-        <div class="swap-step">Rare · White Gloves</div>
+        <div class="swap-step">White Gloves</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot alt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+            <div class="pick-slot alt powerup-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
                   <path d="M20 52c-4 0-7-3-7-7V24c0-2 1-4 3-4s3 2 3 4v10h2V17c0-2 1-4 3-4s3 2 3 4v15h2V15c0-2 1-4 3-4s3 2 3 4v17h2V19c0-2 1-4 3-4s3 2 3 4v21c0 6-2 12-8 12H20Z" fill="rgba(147,197,253,.12)" stroke="#93c5fd" stroke-width="2.5" stroke-linejoin="round"/>
@@ -693,18 +709,20 @@
                   <path d="M42 12l10 10M52 12 42 22" stroke="#93c5fd" stroke-width="3" stroke-linecap="round"/>
                 </svg>
               </div>
-              <div class="pick-no">OUT</div>
-              <div class="pick-label">Injured starters copy your lowest active starter score that day</div>
+              <div class="powerup-slot-copy">
+                <div class="pick-no">OUT</div>
+                <div class="pick-label">Injured starters copy your lowest active starter score that day</div>
+              </div>
             </div>
           </div>
         </div>
         <div class="swap-note">This is your injury shield. A dead starting slot can still scrape together points instead of giving you a zero.</div>
       </div>
       <div class="swap-card">
-        <div class="swap-step">Uncommon · Bench Boost</div>
+        <div class="swap-step">Bench Boost</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot active" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+            <div class="pick-slot active powerup-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
                   <rect x="13" y="26" width="38" height="12" rx="5" fill="rgba(52,211,153,.12)" stroke="#34d399" stroke-width="2.5"/>
@@ -713,18 +731,20 @@
                   <path d="M32 12v9M28 16h8" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
               </div>
-              <div class="pick-no">25%</div>
-              <div class="pick-label">Bench players with games add a quarter of their fantasy score</div>
+              <div class="powerup-slot-copy">
+                <div class="pick-no">25%</div>
+                <div class="pick-label">Bench players with games add a quarter of their fantasy score</div>
+              </div>
             </div>
           </div>
         </div>
         <div class="swap-note">Stack your depth and squeeze extra production out of your bench instead of leaving those game days on the table.</div>
       </div>
       <div class="swap-card">
-        <div class="swap-step">Common · Sunday Surge</div>
+        <div class="swap-step">Sunday Surge</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot alt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+            <div class="pick-slot alt powerup-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true">
                   <circle cx="32" cy="32" r="13" fill="rgba(192,132,252,.12)" stroke="#c084fc" stroke-width="2.5"/>
@@ -732,8 +752,10 @@
                   <path d="M35 19 25 34h8l-4 11 10-15h-8z" fill="#c084fc"/>
                 </svg>
               </div>
-              <div class="pick-no">+25%</div>
-              <div class="pick-label">All starters score 25% more on Sunday</div>
+              <div class="powerup-slot-copy">
+                <div class="pick-no">+25%</div>
+                <div class="pick-label">All starters score 25% more on Sunday</div>
+              </div>
             </div>
           </div>
         </div>
@@ -756,7 +778,7 @@
         <div class="swap-step">Step 1 · Choose Your Game</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot active">
+            <div class="pick-slot active moneyball-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="100" height="100" aria-hidden="true">
                   <rect x="12" y="12" width="40" height="40" rx="6" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="2.5"/>
@@ -769,8 +791,10 @@
                   <path d="M28 30 32 36l8-12" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
               </div>
-              <div class="pick-no">1</div>
-              <div class="pick-label">Pick one game per position each week to lock in</div>
+              <div class="moneyball-slot-copy">
+                <div class="pick-no">1</div>
+                <div class="pick-label">Pick one game per position each week to lock in</div>
+              </div>
             </div>
           </div>
         </div>
@@ -780,7 +804,7 @@
         <div class="swap-step">Step 2 · Lock Before Tipoff</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot alt">
+            <div class="pick-slot alt moneyball-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="100" height="100" aria-hidden="true">
                   <rect x="16" y="22" width="32" height="28" rx="4" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="2.5"/>
@@ -789,8 +813,10 @@
                   <path d="M32 40v6" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
               </div>
-              <div class="pick-no">🔒</div>
-              <div class="pick-label">Must lock before that game starts — no changes after</div>
+              <div class="moneyball-slot-copy">
+                <div class="pick-no">🔒</div>
+                <div class="pick-label">Must lock before that game starts — no changes after</div>
+              </div>
             </div>
           </div>
         </div>
@@ -800,7 +826,7 @@
         <div class="swap-step">Step 3 · Only Locked Games Score</div>
         <div class="swap-board">
           <div class="pick-column">
-            <div class="pick-slot active">
+            <div class="pick-slot active moneyball-slot">
               <div style="line-height:1;display:flex;align-items:center;justify-content:center;">
                 <svg viewBox="0 0 64 64" width="100" height="100" aria-hidden="true">
                   <circle cx="32" cy="32" r="18" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="2.5"/>
@@ -808,8 +834,10 @@
                   <path d="M12 32h8M44 32h8M32 12v8M32 44v8" stroke="#22c55e" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
                 </svg>
               </div>
-              <div class="pick-no">✓</div>
-              <div class="pick-label">Your locked game = your points for that position</div>
+              <div class="moneyball-slot-copy">
+                <div class="pick-no">✓</div>
+                <div class="pick-label">Your locked game = your points for that position</div>
+              </div>
             </div>
           </div>
         </div>
