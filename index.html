@@ -18,13 +18,39 @@
     --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden;}
-  body::before{content:'';position:fixed;inset:0;background:
-    radial-gradient(ellipse 90% 50% at 50% -5%,rgba(249,115,22,.12) 0%,transparent 60%),
-    linear-gradient(180deg,rgba(6,10,18,.2),rgba(6,10,18,.5));
-    pointer-events:none;z-index:0;}
-  .shader-bg{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#050812;}
-  .shader-bg canvas{display:block;width:100%;height:100%;}
+  html,body{min-height:100%;background:#070b14;color:var(--text);font-family:var(--fb);overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgba(4,8,16,.92) 0%,rgba(7,11,20,.88) 38%,rgba(8,12,24,.94) 100%);pointer-events:none;z-index:0;}
+  body::after{content:'';position:fixed;inset:0;background:radial-gradient(72% 54% at 50% 24%,rgba(255,255,255,.03),transparent 62%);pointer-events:none;z-index:0;}
+
+  .site-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .bg-accent-lines{position:absolute;inset:0;opacity:.32;}
+  .bg-hline,.bg-vline{position:absolute;background:rgba(148,163,184,.08);will-change:transform,opacity;}
+  .bg-hline{left:0;right:0;height:1px;transform:scaleX(0);transform-origin:50% 50%;animation:drawX .85s cubic-bezier(.22,.61,.36,1) forwards;}
+  .bg-vline{top:0;bottom:0;width:1px;transform:scaleY(0);transform-origin:50% 0%;animation:drawY .95s cubic-bezier(.22,.61,.36,1) forwards;}
+  .bg-hline:nth-child(1){top:18%;animation-delay:.12s;}
+  .bg-hline:nth-child(2){top:50%;animation-delay:.22s;}
+  .bg-hline:nth-child(3){top:82%;animation-delay:.32s;}
+  .bg-vline:nth-child(4){left:22%;animation-delay:.42s;}
+  .bg-vline:nth-child(5){left:50%;animation-delay:.54s;}
+  .bg-vline:nth-child(6){left:78%;animation-delay:.66s;}
+  .bg-hline::after,.bg-vline::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);opacity:0;animation:shimmer .95s ease-out forwards;}
+  .bg-hline:nth-child(1)::after{animation-delay:.12s;}
+  .bg-hline:nth-child(2)::after{animation-delay:.22s;}
+  .bg-hline:nth-child(3)::after{animation-delay:.32s;}
+  .bg-vline:nth-child(4)::after{animation-delay:.42s;}
+  .bg-vline:nth-child(5)::after{animation-delay:.54s;}
+  .bg-vline:nth-child(6)::after{animation-delay:.66s;}
+  .bg-vline::after{background:linear-gradient(180deg,transparent,rgba(255,255,255,.18),transparent);}
+  .bg-particles{position:absolute;inset:0;width:100%;height:100%;opacity:.18;mix-blend-mode:screen;}
+  .bg-glow{position:absolute;inset:-10%;background:
+    radial-gradient(24% 18% at 18% 30%, rgba(59,130,246,.05), transparent 75%),
+    radial-gradient(26% 20% at 84% 34%, rgba(139,92,246,.045), transparent 75%);
+    filter:blur(14px);
+    opacity:.42;
+  }
+  @keyframes drawX{0%{transform:scaleX(0);opacity:0}60%{opacity:.6}100%{transform:scaleX(1);opacity:.32}}
+  @keyframes drawY{0%{transform:scaleY(0);opacity:0}60%{opacity:.6}100%{transform:scaleY(1);opacity:.32}}
+  @keyframes shimmer{0%{opacity:0}35%{opacity:.14}100%{opacity:0}}
 
   .wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:0 24px 42px;}
 
@@ -60,6 +86,57 @@
   .hero-sub strong{color:var(--text);}
   .promo-grid{display:grid;grid-template-columns:1fr;gap:10px;max-width:1200px;margin:0;}
   .promo-card{background:linear-gradient(135deg,rgba(239,68,68,.14),rgba(249,115,22,.08));border:1px solid rgba(239,68,68,.28);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;}
+  .spotlight-pane{
+    --gx:50%;
+    --gy:50%;
+    --base:30;
+    --spread:200;
+    --border-alpha:.95;
+    --glow-alpha:.18;
+    position:relative;
+    isolation:isolate;
+    overflow:visible;
+  }
+  .spotlight-pane::before,
+  .spotlight-pane::after{
+    content:'';
+    position:absolute;
+    inset:-2px;
+    border-radius:inherit;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .18s ease;
+  }
+  .spotlight-pane::before{
+    border:1px solid transparent;
+    background:
+      radial-gradient(180px 180px at var(--gx) var(--gy),
+        hsla(var(--base), 100%, 72%, var(--border-alpha)),
+        transparent 70%) border-box;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) padding-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask:
+      linear-gradient(#fff 0 0) padding-box,
+      linear-gradient(#fff 0 0);
+    mask-composite:exclude;
+  }
+  .spotlight-pane::after{
+    inset:-12px;
+    background:
+      radial-gradient(220px 220px at var(--gx) var(--gy),
+        hsla(var(--base), 100%, 70%, var(--glow-alpha)),
+        transparent 72%);
+    filter:blur(12px);
+    z-index:-1;
+  }
+  .spotlight-pane.is-glowing::before,
+  .spotlight-pane.is-glowing::after{opacity:1;}
+  .spotlight-orange{--base:30;--spread:200;}
+  .spotlight-blue{--base:220;--spread:200;}
+  .spotlight-green{--base:120;--spread:200;}
+  .spotlight-purple{--base:280;--spread:280;}
   .promo-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;line-height:.95;text-align:center;color:var(--text);margin-bottom:10px;}
   .promo-copy{font-size:13px;color:var(--text2);line-height:1.55;flex:1;}
   .promo-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;}
@@ -258,8 +335,17 @@
 </style>
 </head>
 <body>
-<div class="shader-bg" aria-hidden="true">
-  <canvas id="heroShaderCanvas"></canvas>
+<div class="site-bg" aria-hidden="true">
+  <div class="bg-glow"></div>
+  <div class="bg-accent-lines">
+    <div class="bg-hline"></div>
+    <div class="bg-hline"></div>
+    <div class="bg-hline"></div>
+    <div class="bg-vline"></div>
+    <div class="bg-vline"></div>
+    <div class="bg-vline"></div>
+  </div>
+  <canvas id="homeBgParticles" class="bg-particles"></canvas>
 </div>
 <div class="wrap">
 
@@ -356,7 +442,7 @@
   <!-- Main CTAs -->
   <div class="section-label" id="sportSectionLabel">Get Started — Basketball</div>
   <div class="cta-grid">
-    <a href="rosterbate-draft.html?sport=nba" class="cta-card orange" id="single-player-card">
+    <a href="rosterbate-draft.html?sport=nba" class="cta-card orange spotlight-pane spotlight-orange" id="single-player-card">
       <div class="cta-top">
         <div class="cta-emoji">🎯</div>
         <div class="cta-title">Draft Your Team<span>Start a new league &amp; draft your team</span></div>
@@ -374,7 +460,7 @@
     </a>
 
     <!-- Multiplayer matchmaking card -->
-    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" class="cta-card multiplayer-glow" style="display:block;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+    <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" class="cta-card multiplayer-glow spotlight-pane spotlight-orange" style="display:block;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
       <div class="cta-top">
         <div class="cta-emoji">👥</div>
         <div class="cta-title">Multiplayer<span style="color:var(--text2);">Match with real managers</span></div>
@@ -390,7 +476,7 @@
       </div>
     </a>
 
-    <a href="rosterbate-season.html?sport=nba" class="cta-card green" id="season-card">
+    <a href="rosterbate-season.html?sport=nba" class="cta-card green spotlight-pane spotlight-green" id="season-card">
       <div class="cta-top">
         <div class="cta-emoji">🏆</div>
         <div class="cta-title">TRY IT NOW<span>Manage your team all season</span></div>
@@ -442,42 +528,42 @@
   <!-- How it works -->
   <div class="section-label">How It Works</div>
   <div class="steps">
-    <div class="step">
+      <div class="step">
       <div class="step-num">1</div>
       <div>
         <h3>Pick Your Sport & Mode</h3>
         <p>Choose from Basketball, Football, and Baseball. Play solo against AI or invite real people to your league.</p>
       </div>
     </div>
-    <div class="step">
+      <div class="step">
       <div class="step-num">2</div>
       <div>
         <h3>Set Up Your League</h3>
         <p>Customize teams, scoring format, roster settings, draft style, and all commissioner rules.</p>
       </div>
     </div>
-    <div class="step">
+      <div class="step">
       <div class="step-num">3</div>
       <div>
         <h3>Draft Your Roster</h3>
         <p>Snake or auction draft with live pick timers, an auto-draft queue, and mid-draft pick trades.</p>
       </div>
     </div>
-    <div class="step">
+      <div class="step">
       <div class="step-num">4</div>
       <div>
         <h3>Manage All Season</h3>
         <p>Set lineups every single day, stream free agents off waivers, propose trades, and track your standings.</p>
       </div>
     </div>
-    <div class="step">
+      <div class="step">
       <div class="step-num">5</div>
       <div>
         <h3>Win the Championship</h3>
         <p>Top teams advance to the playoffs. Full bracket, seeding, and championship round with reseeding options.</p>
       </div>
     </div>
-    <div class="step">
+      <div class="step">
       <div class="step-num">6</div>
       <div>
         <h3>Earn Profile Awards</h3>
@@ -758,291 +844,6 @@
 <audio id="shemmyAudio" preload="none" src="https://users.content.ytmnd.com/d/6/2/d62143415d6810f35ca1dd9a91916100.mp3"></audio>
 
 <script>
-const HERO_SHADER_VERTEX = `#version 300 es
-precision mediump float;
-layout(location = 0) in vec4 a_position;
-void main() {
-  gl_Position = a_position;
-}`;
-
-const HERO_SHADER_FRAGMENT = `#version 300 es
-precision mediump float;
-
-uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec4 u_colorBack;
-uniform vec4 u_colorFront;
-uniform float u_shape;
-uniform float u_type;
-uniform float u_pxSize;
-
-out vec4 fragColor;
-
-#define TWO_PI 6.28318530718
-#define PI 3.14159265358979323846
-
-float hash11(float p) {
-  p = fract(p * 0.3183099) + 0.1;
-  p *= p + 19.19;
-  return fract(p * p);
-}
-
-float hash21(vec2 p) {
-  p = fract(p * vec2(0.3183099, 0.3678794)) + 0.1;
-  p += dot(p, p + 19.19);
-  return fract(p.x * p.y);
-}
-
-vec3 permute(vec3 x) { return mod(((x * 34.0) + 1.0) * x, 289.0); }
-float snoise(vec2 v) {
-  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
-    -0.577350269189626, 0.024390243902439);
-  vec2 i = floor(v + dot(v, C.yy));
-  vec2 x0 = v - i + dot(i, C.xx);
-  vec2 i1;
-  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-  i = mod(i, 289.0);
-  vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
-    + i.x + vec3(0.0, i1.x, 1.0));
-  vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy),
-      dot(x12.zw, x12.zw)), 0.0);
-  m = m * m;
-  m = m * m;
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-  m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
-  vec3 g;
-  g.x = a0.x * x0.x + h.x * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
-}
-
-float getSimplexNoise(vec2 uv, float t) {
-  float noise = .5 * snoise(uv - vec2(0., .3 * t));
-  noise += .5 * snoise(2. * uv + vec2(0., .32 * t));
-  return noise;
-}
-
-const int bayer2x2[4] = int[4](0, 2, 3, 1);
-const int bayer4x4[16] = int[16](
-  0,  8,  2, 10,
- 12,  4, 14,  6,
-  3, 11,  1,  9,
- 15,  7, 13,  5
-);
-const int bayer8x8[64] = int[64](
-   0, 32,  8, 40,  2, 34, 10, 42,
-  48, 16, 56, 24, 50, 18, 58, 26,
-  12, 44,  4, 36, 14, 46,  6, 38,
-  60, 28, 52, 20, 62, 30, 54, 22,
-   3, 35, 11, 43,  1, 33,  9, 41,
-  51, 19, 59, 27, 49, 17, 57, 25,
-  15, 47,  7, 39, 13, 45,  5, 37,
-  63, 31, 55, 23, 61, 29, 53, 21
-);
-
-float getBayerValue(vec2 uv, int size) {
-  ivec2 pos = ivec2(mod(uv, float(size)));
-  int index = pos.y * size + pos.x;
-  if (size == 2) return float(bayer2x2[index]) / 4.0;
-  if (size == 4) return float(bayer4x4[index]) / 16.0;
-  return float(bayer8x8[index]) / 64.0;
-}
-
-void main() {
-  float t = .5 * u_time;
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  uv -= .5;
-
-  float pxSize = u_pxSize;
-  vec2 pxSizeUv = gl_FragCoord.xy;
-  pxSizeUv -= .5 * u_resolution;
-  pxSizeUv /= pxSize;
-  vec2 pixelizedUv = floor(pxSizeUv) * pxSize / u_resolution.xy;
-  pixelizedUv += .5;
-  pixelizedUv -= .5;
-
-  vec2 shape_uv = pixelizedUv;
-  vec2 dithering_uv = pxSizeUv;
-  vec2 ditheringNoise_uv = uv * u_resolution;
-
-  float shape = 0.;
-  if (u_shape < 1.5) {
-    shape_uv *= .001;
-    shape = 0.5 + 0.5 * getSimplexNoise(shape_uv, t);
-    shape = smoothstep(0.3, 0.9, shape);
-  } else if (u_shape < 2.5) {
-    shape_uv *= .003;
-    for (float i = 1.0; i < 6.0; i++) {
-      shape_uv.x += 0.6 / i * cos(i * 2.5 * shape_uv.y + t);
-      shape_uv.y += 0.6 / i * cos(i * 1.5 * shape_uv.x + t);
-    }
-    shape = .15 / abs(sin(t - shape_uv.y - shape_uv.x));
-    shape = smoothstep(0.02, 1., shape);
-  } else if (u_shape < 3.5) {
-    shape_uv *= .05;
-    float stripeIdx = floor(2. * shape_uv.x / TWO_PI);
-    float rand = hash11(stripeIdx * 10.);
-    rand = sign(rand - .5) * pow(.1 + abs(rand), .4);
-    shape = sin(shape_uv.x) * cos(shape_uv.y - 5. * rand * t);
-    shape = pow(abs(shape), 6.);
-  } else if (u_shape < 4.5) {
-    shape_uv *= 4.;
-    float wave = cos(.5 * shape_uv.x - 2. * t) * sin(1.5 * shape_uv.x + t) * (.75 + .25 * cos(3. * t));
-    shape = 1. - smoothstep(-1., 1., shape_uv.y + wave);
-  } else if (u_shape < 5.5) {
-    float dist = length(shape_uv);
-    float waves = sin(pow(dist, 1.7) * 7. - 3. * t) * .5 + .5;
-    shape = waves;
-  } else if (u_shape < 6.5) {
-    float l = length(shape_uv);
-    float angle = 6. * atan(shape_uv.y, shape_uv.x) + 4. * t;
-    float twist = 1.2;
-    float offset = pow(l, -twist) + angle / TWO_PI;
-    float mid = smoothstep(0., 1., pow(l, twist));
-    shape = mix(0., fract(offset), mid);
-  } else {
-    shape_uv *= 2.;
-    float d = 1. - pow(length(shape_uv), 2.);
-    vec3 pos = vec3(shape_uv, sqrt(d));
-    vec3 lightPos = normalize(vec3(cos(1.5 * t), .8, sin(1.25 * t)));
-    shape = .5 + .5 * dot(lightPos, pos);
-    shape *= step(0., d);
-  }
-
-  int type = int(floor(u_type));
-  float dithering = 0.0;
-  switch (type) {
-    case 1: dithering = step(hash21(ditheringNoise_uv), shape); break;
-    case 2: dithering = getBayerValue(dithering_uv, 2); break;
-    case 3: dithering = getBayerValue(dithering_uv, 4); break;
-    default: dithering = getBayerValue(dithering_uv, 8); break;
-  }
-
-  dithering -= .5;
-  float res = step(.5, shape + dithering);
-
-  vec3 fgColor = u_colorFront.rgb * u_colorFront.a;
-  float fgOpacity = u_colorFront.a;
-  vec3 bgColor = u_colorBack.rgb * u_colorBack.a;
-  float bgOpacity = u_colorBack.a;
-
-  vec3 color = fgColor * res;
-  float opacity = fgOpacity * res;
-  color += bgColor * (1. - opacity);
-  opacity += bgOpacity * (1. - opacity);
-  fragColor = vec4(color, opacity);
-}`;
-
-function hexToRgbaFloat(hex){
-  const match=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(String(hex||''));
-  if(!match) return [0,0,0,1];
-  return [
-    parseInt(match[1],16)/255,
-    parseInt(match[2],16)/255,
-    parseInt(match[3],16)/255,
-    1
-  ];
-}
-
-function createHeroShader(gl, type, source){
-  const shader=gl.createShader(type);
-  if(!shader) return null;
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
-    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
-  }
-  return shader;
-}
-
-function initHomeShader(){
-  const canvas=document.getElementById('heroShaderCanvas');
-  if(!canvas) return;
-  const gl=canvas.getContext('webgl2', { alpha:true, antialias:false });
-  if(!gl){
-    console.warn('WebGL2 not supported, skipping homepage shader background.');
-    return;
-  }
-  const vertexShader=createHeroShader(gl, gl.VERTEX_SHADER, HERO_SHADER_VERTEX);
-  const fragmentShader=createHeroShader(gl, gl.FRAGMENT_SHADER, HERO_SHADER_FRAGMENT);
-  if(!vertexShader || !fragmentShader) return;
-  const program=gl.createProgram();
-  if(!program) return;
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  if(!gl.getProgramParameter(program, gl.LINK_STATUS)){
-    console.error('Shader link error:', gl.getProgramInfoLog(program));
-    return;
-  }
-  gl.useProgram(program);
-
-  const positionBuffer=gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1,-1, 1,-1, -1,1,
-    -1,1, 1,-1, 1,1
-  ]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(0);
-  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-
-  const uniforms={
-    time: gl.getUniformLocation(program, 'u_time'),
-    resolution: gl.getUniformLocation(program, 'u_resolution'),
-    colorBack: gl.getUniformLocation(program, 'u_colorBack'),
-    colorFront: gl.getUniformLocation(program, 'u_colorFront'),
-    shape: gl.getUniformLocation(program, 'u_shape'),
-    type: gl.getUniformLocation(program, 'u_type'),
-    pxSize: gl.getUniformLocation(program, 'u_pxSize')
-  };
-
-  const backColor=hexToRgbaFloat('#001122');
-  const frontColor=hexToRgbaFloat('#ff0088');
-  const shapeValue=4;
-  const typeValue=4;
-  const pxSize=3;
-  const speed=0.6;
-  const start=performance.now();
-
-  function resize(){
-    const dpr=Math.min(window.devicePixelRatio||1, 2);
-    const width=Math.max(1, Math.floor(window.innerWidth*dpr));
-    const height=Math.max(1, Math.floor(window.innerHeight*dpr));
-    if(canvas.width!==width || canvas.height!==height){
-      canvas.width=width;
-      canvas.height=height;
-      gl.viewport(0,0,width,height);
-    }
-  }
-
-  function frame(now){
-    resize();
-    gl.clearColor(0,0,0,0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.useProgram(program);
-    if(uniforms.time) gl.uniform1f(uniforms.time, ((now-start)*0.001)*speed);
-    if(uniforms.resolution) gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
-    if(uniforms.colorBack) gl.uniform4fv(uniforms.colorBack, backColor);
-    if(uniforms.colorFront) gl.uniform4fv(uniforms.colorFront, frontColor);
-    if(uniforms.shape) gl.uniform1f(uniforms.shape, shapeValue);
-    if(uniforms.type) gl.uniform1f(uniforms.type, typeValue);
-    if(uniforms.pxSize) gl.uniform1f(uniforms.pxSize, pxSize);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    requestAnimationFrame(frame);
-  }
-
-  window.addEventListener('resize', resize);
-  resize();
-  requestAnimationFrame(frame);
-}
-
 const firebaseConfig = {
   apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
   authDomain: "rosterbate-51339.firebaseapp.com",
@@ -1340,6 +1141,139 @@ function parseCreatedAt(user, fallbackValue){
   return Number.isFinite(created) ? created : fallbackValue;
 }
 
+function initSpotlightPanes(){
+  const panes = Array.from(document.querySelectorAll('.spotlight-pane'));
+  if(!panes.length) return;
+  if(window.matchMedia && window.matchMedia('(hover: none)').matches){
+    panes.forEach(pane => pane.classList.remove('is-glowing'));
+    return;
+  }
+
+  const activationPadding = 96;
+  let rafId = 0;
+  let pointerX = window.innerWidth * 0.5;
+  let pointerY = window.innerHeight * 0.5;
+
+  const render = () => {
+    panes.forEach(pane => {
+      const rect = pane.getBoundingClientRect();
+      const active =
+        pointerX >= rect.left - activationPadding &&
+        pointerX <= rect.right + activationPadding &&
+        pointerY >= rect.top - activationPadding &&
+        pointerY <= rect.bottom + activationPadding;
+
+      if(!active){
+        pane.classList.remove('is-glowing');
+        return;
+      }
+
+      const relativeX = Math.max(0, Math.min(100, ((pointerX - rect.left) / Math.max(rect.width, 1)) * 100));
+      const relativeY = Math.max(0, Math.min(100, ((pointerY - rect.top) / Math.max(rect.height, 1)) * 100));
+      pane.style.setProperty('--gx', relativeX.toFixed(2) + '%');
+      pane.style.setProperty('--gy', relativeY.toFixed(2) + '%');
+      pane.classList.add('is-glowing');
+    });
+    rafId = 0;
+  };
+
+  const queueRender = () => {
+    if(rafId) return;
+    rafId = requestAnimationFrame(render);
+  };
+
+  window.addEventListener('pointermove', event => {
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    queueRender();
+  }, { passive:true });
+
+  window.addEventListener('scroll', queueRender, { passive:true });
+  window.addEventListener('resize', queueRender);
+  document.addEventListener('pointerleave', () => {
+    panes.forEach(pane => pane.classList.remove('is-glowing'));
+  });
+
+  queueRender();
+}
+
+function initHomeBackground(){
+  const canvas = document.getElementById('homeBgParticles');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if(!ctx) return;
+
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let particles = [];
+  let rafId = 0;
+
+  function setSize(){
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.8);
+    canvas.width = Math.floor(window.innerWidth * ratio);
+    canvas.height = Math.floor(window.innerHeight * ratio);
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  }
+
+  function makeParticle(){
+    return {
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      v: Math.random() * 0.26 + 0.06,
+      o: Math.random() * 0.26 + 0.08,
+      l: Math.random() * 3 + 1.2
+    };
+  }
+
+  function seedParticles(){
+    particles = [];
+    const count = Math.max(36, Math.floor((window.innerWidth * window.innerHeight) / 14000));
+    for(let i = 0; i < count; i += 1){
+      particles.push(makeParticle());
+    }
+  }
+
+  function drawStatic(){
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    particles.forEach(particle => {
+      ctx.fillStyle = 'rgba(250,250,250,' + particle.o.toFixed(3) + ')';
+      ctx.fillRect(particle.x, particle.y, 0.8, particle.l);
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    particles.forEach(particle => {
+      particle.y -= particle.v;
+      if(particle.y < -particle.l){
+        particle.x = Math.random() * window.innerWidth;
+        particle.y = window.innerHeight + Math.random() * 40;
+        particle.v = Math.random() * 0.26 + 0.06;
+        particle.o = Math.random() * 0.26 + 0.08;
+        particle.l = Math.random() * 3 + 1.2;
+      }
+      ctx.fillStyle = 'rgba(250,250,250,' + particle.o.toFixed(3) + ')';
+      ctx.fillRect(particle.x, particle.y, 0.8, particle.l);
+    });
+    rafId = requestAnimationFrame(draw);
+  }
+
+  function refresh(){
+    setSize();
+    seedParticles();
+    if(reducedMotion){
+      drawStatic();
+      return;
+    }
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', refresh);
+  refresh();
+}
+
 function allocateNextUserNumber(){
   return new Promise((resolve, reject) => {
     db.ref('meta/nextUserNumber').transaction(
@@ -1542,9 +1476,10 @@ document.addEventListener('click', event => {
 });
 document.addEventListener('keydown', handleShemmySequence);
 
+initHomeBackground();
+initSpotlightPanes();
 subscribeLeaderboard();
 setAuthMode('signup');
-initHomeShader();
 </script>
 </body>
 </html>
