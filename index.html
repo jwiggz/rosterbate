@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="RosterBate — The ultimate multi-sport fantasy experience. Play fantasy sports against AI or real people across Basketball, Football, and Baseball.">
 <title>RosterBate — Multi-Sport Fantasy</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
@@ -15,7 +15,7 @@
     --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
     --accent:#f97316;--green:#22c55e;--blue:#3b82f6;--purple:#8b5cf6;
     --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
-    --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+    --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'Manrope',sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{min-height:100%;background:#040507;color:var(--text);font-family:var(--fb);overflow-x:hidden;}
@@ -96,7 +96,7 @@
   .hero-logo-wrap{width:min(440px,74vw);height:116px;margin:0 auto;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;animation:heroLogoIntro .52s cubic-bezier(.22,.61,.36,1) both;}
   .hero-logo-wrap::after{content:'';position:absolute;top:8%;bottom:8%;width:22%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);filter:blur(8px);mix-blend-mode:screen;pointer-events:none;animation:heroLogoSheen 1.05s ease-out .16s both;}
   .hero-logo{display:block;width:100%;height:100%;object-fit:cover;object-position:center 50%;filter:drop-shadow(0 10px 24px rgba(0,0,0,.32));transform:scale(1.02);}
-  .hero-sub{font-size:15px;color:var(--text2);line-height:1.6;max-width:520px;margin:0 auto 6px;}
+  .hero-sub{font-family:var(--fm);font-size:15px;font-weight:600;color:var(--text2);line-height:1.65;max-width:520px;margin:0 auto 6px;}
   .hero-sub strong{color:var(--text);}
   .promo-grid{display:grid;grid-template-columns:1fr;gap:10px;max-width:1200px;margin:0;}
   @keyframes feature-border-rotate{
@@ -198,7 +198,7 @@
   .spotlight-green{--base:120;--spread:200;}
   .spotlight-purple{--base:280;--spread:280;}
   .promo-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;line-height:.95;text-align:center;color:var(--text);margin-bottom:10px;}
-  .promo-copy{font-size:13px;color:var(--text2);line-height:1.55;flex:1;}
+  .promo-copy{font-family:var(--fm);font-size:13px;font-weight:600;color:#a9b8cb;line-height:1.72;letter-spacing:-.01em;flex:1;}
   .promo-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;}
   .promo-tag{border-color:rgba(239,68,68,.24);color:#fca5a5;}
   .promo-card.moneyball{
@@ -281,7 +281,7 @@
 
   /* MAIN CTAs */
   .cta-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;align-items:stretch;}
-  .cta-card{display:flex;flex-direction:column;text-decoration:none;background:linear-gradient(135deg,var(--card),var(--bg3));border:2px solid var(--border);border-radius:16px;padding:18px;transition:all .2s;position:relative;overflow:hidden;color:var(--text);}
+  .cta-card{display:flex;flex-direction:column;text-decoration:none;background:linear-gradient(135deg,var(--card),var(--bg3));border:2px solid var(--border);border-radius:16px;padding:14px 14px 12px;transition:all .2s;position:relative;overflow:hidden;color:var(--text);}
   .cta-corner-badge{position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;line-height:1;pointer-events:none;}
   .cta-corner-badge.ai{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;}
   .cta-corner-badge.real{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#86efac;}
@@ -318,18 +318,18 @@
       0 0 28px rgba(249,115,22,.12),
       0 18px 42px rgba(0,0,0,.46);
   }
-  .cta-top{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:8px;text-align:center;}
+  .cta-top{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:4px;text-align:center;}
   .cta-emoji{font-size:32px;line-height:1;flex-shrink:0;}
   .cta-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--text) !important;}
   .cta-card .cta-title{color:var(--text) !important;}
   .cta-card.orange .cta-title{color:var(--text) !important;}
   .cta-card.green .cta-title{color:var(--text) !important;}
   .cta-title span{display:block;font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--text2);margin-top:1px;}
-  .cta-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px;flex:1;}
-  .cta-btn{display:block;width:100%;padding:12px 18px;border-radius:8px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-top:auto;}
+  .cta-desc{font-family:var(--fm);font-size:12px;font-weight:600;color:#a9b8cb;line-height:1.5;letter-spacing:-.01em;margin-bottom:6px;min-height:72px;}
+  .cta-btn{display:block;width:100%;padding:10px 16px;border-radius:8px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-top:2px;}
   .cta-card.orange .cta-btn{background:var(--accent);color:#fff;}
   .cta-card.green .cta-btn{background:var(--green);color:#fff;}
-  .cta-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;}
+  .cta-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
   .tag{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 7px;font-size:10px;color:var(--text3);}
   .auth-note{font-size:11px;color:var(--text3);line-height:1.5;}
   .auth-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:300;align-items:center;justify-content:center;padding:20px;}
@@ -556,7 +556,7 @@
       </div>
       <div class="cta-desc">Quick Match finds leagues by draft format, scoring type, and team size. Browse open leagues, create a private one, or join with a share code.</div>
       <div class="cta-btn" style="background:rgba(99,102,241,.85);color:#fff;display:block;width:100%;text-align:center;box-sizing:border-box;">🔍 Find a League →</div>
-      <div class="cta-tags" style="margin-top:12px;">
+      <div class="cta-tags">
         <span class="tag">Quick Match</span>
         <span class="tag">Browse leagues</span>
         <span class="tag">Private leagues</span>
