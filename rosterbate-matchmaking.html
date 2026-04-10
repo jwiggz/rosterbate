@@ -119,24 +119,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .rules-layout{display:flex;gap:8px;margin-top:10px;align-items:start;}
 .rules-left{flex:1 1 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
 .rules-right{flex:0 0 320px;min-width:320px;display:flex;}
-.scoregrid{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin-top:12px;}
-.scoregrid .sh{font-family:var(--fd);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;padding-bottom:4px;border-bottom:1px solid var(--border);}
-.scoregrid .slbl{font-size:12px;color:var(--text2);padding:7px 0;border-bottom:1px solid rgba(30,45,69,.7);}
-.scoregrid .sval{padding:5px 0;border-bottom:1px solid rgba(30,45,69,.7);}
-.scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
-.scoregrid input:focus{border-color:var(--accent);}
+.scoregrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;align-items:start;margin-top:12px;}
+.scorecol{display:grid;gap:8px;min-width:0;}
+.scorehead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.scorehead .sh{font-family:var(--fd);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;}
+.score-row{display:grid;grid-template-columns:minmax(0,1fr) 98px;gap:8px;align-items:center;}
+.score-label{font-size:12px;color:var(--text);line-height:1.25;min-width:0;}
+.score-stepper{min-width:0;}
+.score-stepper .stepper{width:100%;}
+.score-stepper .stepper input[type=number]{font-size:12px!important;color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;}
+.score-stepper .stepper-btn{height:19px;}
 .rule-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:0;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);width:100%;height:100%;}
-.rule-summary-copy{font-size:12px;color:var(--text2);line-height:1.45;}
+.rule-summary-copy{font-size:12px;color:var(--text);line-height:1.45;}
 .rule-link{background:none;border:none;color:var(--accent);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
 .inline-pos-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
 .inline-pos-row{display:grid;grid-template-columns:minmax(0,1fr) 98px;gap:8px;align-items:center;}
-.inline-pos-name{font-size:12px;color:var(--text2);line-height:1.25;min-width:0;}
+.inline-pos-name{font-size:12px;color:var(--text);line-height:1.25;min-width:0;}
 .inline-pos-stepper{min-width:0;}
 .rule-field{display:grid;gap:4px;}
 .rule-field .ct{margin:0;}
 .stepper{display:flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:9px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
 .stepper:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
-.stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:8px 10px!important;text-align:right;font-size:13px!important;min-height:38px;}
+.stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:8px 10px!important;text-align:right;font-size:13px!important;min-height:38px;color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;}
 .stepper-btns{display:flex;flex-direction:column;border-left:1px solid var(--border);background:rgba(255,255,255,.02);}
 .stepper-btn{width:28px;height:18px;border:none;background:transparent;color:var(--text2);font-family:var(--fd);font-size:11px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;}
 .stepper-btn:hover{background:rgba(249,115,22,.14);color:var(--accent);}
@@ -160,6 +164,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   .rules-right{flex:1 1 auto;min-width:0;}
   .rules-left{grid-template-columns:repeat(2,minmax(0,1fr));}
   .inline-pos-grid{grid-template-columns:1fr;}
+  .scoregrid{grid-template-columns:1fr;}
   .schedule-top-row{grid-template-columns:1fr;}
 }
 @media (max-width: 640px){
@@ -869,7 +874,7 @@ function getCreateStarterPositionKeys(){
   const positions=createOpts.settings?.positions||MM_RULES_DEFAULT.positions||{};
   return Object.keys(positions).filter(key=>{
     const upper=String(key).toUpperCase();
-    return upper!=='BN' && upper!=='IR' && upper!=='IL';
+    return upper!=='BN' && upper!=='BE' && upper!=='IR' && upper!=='IL';
   });
 }
 
@@ -888,6 +893,9 @@ function syncCreatePositionCounts(){
   const irSlots=Math.max(0, parseInt(document.getElementById('mmIr')?.value)||0);
   if(positions.BN){
     positions.BN=Object.assign({}, positions.BN, { starters:bench });
+  }
+  if(positions.BE){
+    positions.BE=Object.assign({}, positions.BE, { starters:bench });
   }
   const irKey=Object.keys(positions).find(key=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL');
   if(irKey){
@@ -909,6 +917,8 @@ function syncCreateRules(){
   const total=starters+(parseInt(document.getElementById('mmBench')?.value)||0)+(parseInt(document.getElementById('mmIr')?.value)||0);
   const totalEl=document.getElementById('mmRosterTotal');
   if(totalEl) totalEl.value=total;
+  const irMirror=document.getElementById('mmInlineIrMirror');
+  if(irMirror) irMirror.value=String(Math.max(0, parseInt(document.getElementById('mmIr')?.value)||0));
   updateCreatePositionSummary();
 }
 
@@ -924,7 +934,7 @@ function updateCreatePositionSummary(){
   const text=Object.keys(positions)
     .filter(key=>{
       const upper=String(key).toUpperCase();
-      if(upper==='BN' || upper==='IR' || upper==='IL') return false;
+      if(upper==='BN' || upper==='BE' || upper==='IR' || upper==='IL') return false;
       return Number(positions[key]?.starters||0)>0;
     })
     .map(key=>`${key} ${positions[key].starters}`)
@@ -940,7 +950,7 @@ function buildStepperInput(id,value,min,max,step,readonly){
 
 function renderInlinePositionControls(){
   const positions=createOpts.settings?.positions||MM_RULES_DEFAULT.positions||{};
-  return getCreateStarterPositionKeys().map(key=>{
+  const starterRows=getCreateStarterPositionKeys().map(key=>{
     const row=positions[key]||{};
     return `
       <div class="inline-pos-row">
@@ -949,7 +959,16 @@ function renderInlinePositionControls(){
           <input type="number" id="mmInlineStart_${key}" min="0" max="12" step="1" value="${Math.max(0, Number(row.starters||0))}" onchange="syncInlinePositionStarters()">
         </div>
       </div>`;
-  }).join('');
+  });
+  const irKey=Object.keys(positions).find(key=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL') || 'IR';
+  starterRows.push(`
+      <div class="inline-pos-row">
+        <div class="inline-pos-name">${MM_POSITION_LABELS[irKey]||'IR / IL'}</div>
+        <div class="inline-pos-stepper">
+          <input type="number" id="mmInlineIrMirror" min="0" max="6" step="1" value="${Math.max(0, Number(createOpts.settings?.irSlots ?? MM_RULES_DEFAULT.irSlots ?? 0))}" readonly>
+        </div>
+      </div>`);
+  return starterRows.join('');
 }
 
 function openCreatePositionSheet(){
@@ -1002,6 +1021,9 @@ function applyCreatePositionSheet(){
 function renderCreateRulesSection(){
   const labels=MM_RULES_DEFAULT.scoringLabels||{};
   const scoring=createOpts.settings?.scoring||MM_RULES_DEFAULT.scoring;
+  const scoringKeys=Object.keys(scoring);
+  const midpoint=Math.ceil(scoringKeys.length/2);
+  const scoringColumns=[scoringKeys.slice(0,midpoint), scoringKeys.slice(midpoint)];
   return `
     <div class="advbox">
       <div class="advtitle">Custom League Rules</div>
@@ -1009,9 +1031,9 @@ function renderCreateRulesSection(){
       <div class="rules-layout" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(420px,.8fr);gap:8px;align-items:start;">
         <div class="rules-left" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;">
           <div class="rule-field"><div class="ct">Starters</div><input type="number" class="input" id="mmStarters" min="1" max="30" value="${createOpts.settings?.starters ?? MM_RULES_DEFAULT.starters}" readonly></div>
+          <div class="rule-field"><div class="ct">Total Roster Size</div><input type="number" class="input" id="mmRosterTotal" readonly></div>
           <div class="rule-field"><div class="ct">Bench Spots</div><input type="number" class="input" id="mmBench" min="2" max="20" value="${createOpts.settings?.benchSlots ?? MM_RULES_DEFAULT.benchSlots}" onchange="syncCreateRules()"></div>
           <div class="rule-field"><div class="ct">IR / IL Slots</div><input type="number" class="input" id="mmIr" min="0" max="6" value="${createOpts.settings?.irSlots ?? MM_RULES_DEFAULT.irSlots}" onchange="syncCreateRules()"></div>
-          <div class="rule-field"><div class="ct">Total Roster Size</div><input type="number" class="input" id="mmRosterTotal" readonly></div>
         </div>
         <div class="rules-right" style="display:flex;min-width:0;">
           <div class="rule-summary" style="min-height:100%;width:100%;height:100%;cursor:default;display:flex;flex-direction:column;justify-content:flex-start;">
@@ -1027,8 +1049,15 @@ function renderCreateRulesSection(){
         </div>
       </div>
       <div class="scoregrid">
-        <div class="sh">Scoring Stat</div><div class="sh" style="text-align:right;">Points</div>
-        ${Object.keys(scoring).map(key=>`<div class="slbl">${labels[key]||key}</div><div class="sval"><input type="number" id="mmScore_${key}" step="0.1" value="${scoring[key]}"></div>`).join('')}
+        ${scoringColumns.map(column=>`
+          <div class="scorecol">
+            <div class="scorehead">
+              <div class="sh">Scoring Stat</div>
+              <div class="sh">Points</div>
+            </div>
+            ${column.map(key=>`<div class="score-row"><div class="score-label">${labels[key]||key}</div><div class="score-stepper"><input type="number" id="mmScore_${key}" min="-99" max="99" step="0.1" value="${Number.isFinite(Number(scoring[key])) ? Number(scoring[key]) : 0}"></div></div>`).join('')}
+          </div>
+        `).join('')}
       </div>
     </div>`;
 }
