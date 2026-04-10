@@ -74,6 +74,41 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @keyframes loadsMasterShine{
   to{transform:translateX(130%);}
 }
+.founders-pill{
+  position:relative;
+  background:#0b0b0f;
+  color:#f8fafc;
+  font-family:var(--fd);
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  border:1px solid rgba(255,255,255,.12);
+  isolation:isolate;
+  box-shadow:0 10px 22px rgba(0,0,0,.22);
+}
+.founders-pill::before,
+.founders-pill::after{
+  content:'';
+  position:absolute;
+  left:-2px;
+  top:-2px;
+  width:calc(100% + 4px);
+  height:calc(100% + 4px);
+  border-radius:999px;
+  background:linear-gradient(45deg,#fb0094,#0000ff,#00ff00,#ffff00,#ff0000,#fb0094,#0000ff,#00ff00,#ffff00,#ff0000);
+  background-size:400%;
+  z-index:-2;
+  animation:foundersRainbow 20s linear infinite;
+}
+.founders-pill::after{
+  filter:blur(18px);
+  opacity:.45;
+}
+@keyframes foundersRainbow{
+  0%{background-position:0 0;}
+  50%{background-position:400% 0;}
+  100%{background-position:0 0;}
+}
 .admin-rank{
   display:inline-flex;
   align-items:center;
@@ -192,6 +227,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="pill" id="viewCountPill">Views 0</div>
           <div class="pill" id="friendCountPill">Friends 0</div>
           <div class="pill" id="rolePill" style="display:none;">Owner</div>
+          <div class="pill founders-pill" id="foundersPill" style="display:none;">Elite Founders Club</div>
         </div>
         <div class="meta-row">
           <div class="pill" id="titlePill">Championships 0</div>
@@ -634,6 +670,7 @@ function applyTheme(themeKey){
 function renderProfile(profile, aggregates, viewsCount, social){
   const stats = profile?.lifetime || {};
   const userNumber = Number(profile?.userNumber || 0);
+  const isEliteFounder = [1,2,6].includes(userNumber);
   const isAdmin = !!profile?.isAdmin || [1,2,3,4,5].includes(userNumber);
   const isOwner = userNumber === 1;
   const isLoadsMaster = userNumber === 2;
@@ -651,6 +688,7 @@ function renderProfile(profile, aggregates, viewsCount, social){
   document.getElementById('rolePill').className = 'pill ' + (isOwner ? 'owner-pill' : 'loads-master-pill');
   document.getElementById('rolePill').textContent = isOwner ? 'Owner' : 'Loads Master';
   document.getElementById('rolePill').style.display = (isOwner || isLoadsMaster) ? 'inline-flex' : 'none';
+  document.getElementById('foundersPill').style.display = isEliteFounder ? 'inline-flex' : 'none';
   document.getElementById('adminRank').style.display = isAdmin ? 'inline-flex' : 'none';
   document.getElementById('aboutMeCard').textContent = String(profile?.aboutMe || '').trim() || 'This manager has not written an about section yet.';
   document.getElementById('statSeasons').textContent = stats.seasonsPlayed || 0;
