@@ -859,6 +859,7 @@ let sharedSeasonListener=null;
 let sharedSeasonHydrating=false;
 let sharedSeasonSaveTimer=null;
 let sharedSeasonLastUpdatedAt=0;
+let sharedSeasonClientId=null;
 const SHARED_SEASON_ROOT='multiplayerSeasons';
 const firebaseConfig = {
   apiKey: "AIzaSyAs8NPmI_BF9ggyWHZz-lUojGQPJ6gdazQ",
@@ -1022,6 +1023,19 @@ function getSharedSeasonActorId(){
   const lobby=getSavedMultiplayerLobbyState();
   return String(currentRbUser?.uid || lobby?.myId || D?.myPlayerId || D?.teamName || 'guest');
 }
+function getSharedSeasonClientId(){
+  if(sharedSeasonClientId) return sharedSeasonClientId;
+  try{
+    const existing=sessionStorage.getItem('rbSharedSeasonClientId');
+    if(existing){
+      sharedSeasonClientId=existing;
+      return sharedSeasonClientId;
+    }
+  }catch(e){}
+  sharedSeasonClientId='client_'+Math.random().toString(36).slice(2,10)+'_'+Date.now().toString(36);
+  try{ sessionStorage.setItem('rbSharedSeasonClientId', sharedSeasonClientId); }catch(e){}
+  return sharedSeasonClientId;
+}
 function getSharedSeasonKey(){
   return D?.sharedSeasonId || D?.lobbyId || getSavedMultiplayerLobbyState()?.lobbyId || null;
 }
@@ -1066,11 +1080,23 @@ function serializeSharedDraftState(){
 function applySharedSeasonPayload(payload){
   if(!payload?.draft || !payload?.game) return false;
   sharedSeasonHydrating=true;
+  const previousDraft=D?cloneJsonSafe(D):null;
   D=cloneJsonSafe(payload.draft);
   G=cloneJsonSafe(payload.game);
   if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:(D?.leagueSize||D?.teams?.length||0)},()=>[]);
   if(!G.moneyBallLocks || typeof G.moneyBallLocks!=='object') G.moneyBallLocks={};
   G.processed=new Set(payload.game?.processed||[]);
+  if(previousDraft){
+    if(previousDraft.isCommissioner!=null && D.isCommissioner==null) D.isCommissioner=previousDraft.isCommissioner;
+    if(previousDraft.teamUsers && !D.teamUsers) D.teamUsers=previousDraft.teamUsers;
+    if(previousDraft.teamAvatars && !D.teamAvatars) D.teamAvatars=previousDraft.teamAvatars;
+    if(previousDraft.myPos!=null) D.myPos=previousDraft.myPos;
+    if(previousDraft.teamName && !D.teamName) D.teamName=previousDraft.teamName;
+    if(previousDraft.myPlayerId && !D.myPlayerId) D.myPlayerId=previousDraft.myPlayerId;
+    if(previousDraft.multiplayer) D.multiplayer=true;
+    if(previousDraft.lobbyId && !D.lobbyId) D.lobbyId=previousDraft.lobbyId;
+    if(previousDraft.sharedSeasonId && !D.sharedSeasonId) D.sharedSeasonId=previousDraft.sharedSeasonId;
+  }
   sharedSeasonLastUpdatedAt=Number(payload.updatedAt||0);
   hydrateDraftUserContextFromLobby();
   applySportContext(D?.sport || CURRENT_SPORT);
@@ -1080,17 +1106,19 @@ function applySharedSeasonPayload(payload){
 }
 function renderActiveSeasonPage(){
   const active=document.querySelector('.screen.active')?.id || 'hub';
-  ({hub:renderHub,roster:renderRoster,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[active]?.();
+  ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[active]?.();
 }
 async function saveSharedSeason(force, reason){
   if(sharedSeasonHydrating || !D?.multiplayer) return false;
   const path=getSharedSeasonPath();
   if(!path) return false;
+  syncGameStateToD();
   const payload={
     version:1,
     reason:reason||'sync',
     updatedAt:Date.now(),
     updatedBy:getSharedSeasonActorId(),
+    updatedClientId:getSharedSeasonClientId(),
     draft:serializeSharedDraftState(),
     game:serializeSharedGameState()
   };
@@ -1132,12 +1160,12 @@ function syncGameStateToD() {
 }
 
 function queueSharedSeasonSave(reason, delay){
+  // Sync G to D before saving anywhere
+  syncGameStateToD();
+
   // Save to localStorage for all leagues
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
-  
-  // Sync G to D before saving to Firebase
-  syncGameStateToD();
-  
+
   // Save to Firebase for solo leagues (async, non-blocking)
   if(!D?.multiplayer) {
     saveSeasonToFirebase().catch(err => console.log('Firebase save skipped:', err.message || err));
@@ -1159,7 +1187,7 @@ function subscribeToSharedSeason(){
     const payload=snap.val();
     if(!payload) return;
     const incomingUpdatedAt=Number(payload.updatedAt||0);
-    if(incomingUpdatedAt && incomingUpdatedAt===sharedSeasonLastUpdatedAt && payload.updatedBy===getSharedSeasonActorId()) return;
+    if(incomingUpdatedAt && incomingUpdatedAt===sharedSeasonLastUpdatedAt && payload.updatedClientId===getSharedSeasonClientId()) return;
     if(!applySharedSeasonPayload(payload)) return;
     renderActiveSeasonPage();
   };
