@@ -319,6 +319,7 @@ let currentLobby = null;
 let myReady = false;
 let cdRunning = false;
 let cdTimer = null;
+let scheduledCountdownTimer = null;
 let globalChatListener = null;
 let globalChatMessages = [];
 let globalChatBansListener = null;
@@ -1730,6 +1731,7 @@ function renderWaitingRoom(lobby){
     cdRunning=false;
     clearTimeout(cdTimer);
   }
+  if(!scheduled) stopScheduledCountdown();
 
   const readySection=document.getElementById('wrReadySection');
   if(readySection){
@@ -1740,18 +1742,14 @@ function renderWaitingRoom(lobby){
         <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="margin-top:10px;display:${lobby.createdBy===myId && players.length===1?'block':'none'};">Start Solo Test</button>
         <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
     } else {
-      const waitingCopy=Date.now() < accessAt
-        ? `Draft room unlocks in ${formatCountdown(accessAt-Date.now())}.`
-        : (!orderLocked && orderIsManual
-            ? 'Host must set and save the manual draft order before the room opens.'
-            : 'Draft room is open. Enter any time before the scheduled start.');
       readySection.innerHTML=`
         <div class="card" style="padding:12px;margin-bottom:10px;background:rgba(15,23,42,.5);">
-          <div style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:${canOpenRoom?'var(--green)':'var(--accent)'};">${canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby'}</div>
-          <div style="margin-top:6px;font-size:12px;color:var(--text2);line-height:1.55;">${waitingCopy}</div>
+          <div id="wrScheduledStatus" style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:${canOpenRoom?'var(--green)':'var(--accent)'};">${canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby'}</div>
+          <div id="wrScheduledCopy" style="margin-top:6px;font-size:12px;color:var(--text2);line-height:1.55;"></div>
         </div>
         <button class="ready-btn" onclick="${canOpenRoom?`resumeLiveDraft('${lobby.id}')`:''}" ${canOpenRoom?'':'disabled'} style="${canOpenRoom?'':'opacity:.5;cursor:not-allowed;background:var(--text3);'}">${canOpenRoom?'Open Draft Room':'Draft Room Locked'}</button>
         <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
+      startScheduledCountdown(lobby);
     }
   }
 
@@ -1865,6 +1863,47 @@ function startCountdown(){
   tick();
 }
 
+function stopScheduledCountdown(){
+  if(scheduledCountdownTimer){
+    clearTimeout(scheduledCountdownTimer);
+    scheduledCountdownTimer=null;
+  }
+}
+
+function startScheduledCountdown(lobby){
+  stopScheduledCountdown();
+  const lobbyId=lobby?.id;
+  const accessAt=Number(lobby?.draftAccessAt||0);
+  const statusEl=document.getElementById('wrScheduledStatus');
+  const copyEl=document.getElementById('wrScheduledCopy');
+  if(!lobbyId || !statusEl || !copyEl || !accessAt) return;
+  function tick(){
+    if(!currentLobby || currentLobby.id!==lobbyId){
+      stopScheduledCountdown();
+      return;
+    }
+    const now=Date.now();
+    const latestLobby=currentLobby;
+    const canOpenRoom=canOpenDraftRoom(latestLobby);
+    const orderIsManual=String(latestLobby?.draftOrderMode||'random_30m')==='manual';
+    const orderLocked=Array.isArray(latestLobby?.finalDraftOrder) && latestLobby.finalDraftOrder.length===Number(latestLobby?.teamSize||0);
+    statusEl.textContent=canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby';
+    statusEl.style.color=canOpenRoom?'var(--green)':'var(--accent)';
+    if(now < accessAt){
+      copyEl.textContent=`Draft room unlocks in ${formatCountdown(accessAt-now)}.`;
+      scheduledCountdownTimer=setTimeout(tick,1000);
+      return;
+    }
+    if(!orderLocked && orderIsManual){
+      copyEl.textContent='Host must set and save the manual draft order before the room opens.';
+    } else {
+      copyEl.textContent='Draft room is open. Enter any time before the scheduled start.';
+    }
+    stopScheduledCountdown();
+  }
+  tick();
+}
+
 function launchDraft(){
   if(!currentLobby) return;
   saveMultiplayerLobbyState(currentLobby);
@@ -1873,7 +1912,7 @@ function launchDraft(){
 }
 
 async function mmLeaveWaiting(){
-  cdRunning=false; clearTimeout(cdTimer);
+  cdRunning=false; clearTimeout(cdTimer); stopScheduledCountdown();
   if(currentLobbyId){
     const leavingLobbyId=currentLobbyId;
     if(lobbyListener){ db.ref('lobbies/'+currentLobbyId).off('value',lobbyListener); lobbyListener=null; }

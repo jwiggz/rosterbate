@@ -1780,6 +1780,16 @@ function getSavedMultiplayerLobbyState(){
   }
 }
 
+function shouldAutoLaunchMultiplayerDraft(){
+  const params=new URLSearchParams(window.location.search||'');
+  const lobbyId=(params.get('lobby')||'').trim();
+  if(!lobbyId) return false;
+  const state=getSavedMultiplayerLobbyState();
+  if(!state?.lobbyId || String(state.lobbyId)!==lobbyId) return false;
+  const players=Array.isArray(state.players)?state.players.filter(Boolean):[];
+  return players.length===Number(state.teamSize||0) && players.length>0;
+}
+
 function isSoloTestDraft(){
   const state=getSavedMultiplayerLobbyState();
   const params=new URLSearchParams(window.location.search||'');
@@ -4136,6 +4146,9 @@ function rbScheduleAiMsg(){
     rbMarkSeen();
     setTimeout(()=>rbScrollBottom(),50);
     rbSimulateActivity();
+    if(shouldAutoLaunchMultiplayerDraft()){
+      setTimeout(()=>startDraft(),0);
+    }
 
     // Close pickers when clicking outside
     document.addEventListener('click',e=>{
