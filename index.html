@@ -984,6 +984,8 @@ function leaderboardInitials(name){
   if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
   return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
 }
+let leaderboardPublicCache=[];
+let leaderboardUsernameMap={};
 function escapeHtml(value){
   return String(value ?? '').replace(/[&<>"']/g, char => ({
     '&':'&amp;',
@@ -992,6 +994,44 @@ function escapeHtml(value){
     '"':'&quot;',
     "'":'&#39;'
   }[char]));
+}
+function mergeLeaderboardUsers(users, usernameMap){
+  return (users||[]).map(entry => {
+    const userNumber=Number(entry?.userNumber || 0);
+    const canonical=usernameMap?.[userNumber];
+    if(!canonical) return entry;
+    return {
+      ...entry,
+      username: canonical.username || entry?.username || 'Manager',
+      updatedAt: Math.max(Number(entry?.updatedAt || 0), Number(canonical.updatedAt || 0))
+    };
+  });
+}
+function dedupeLeaderboardUsers(users){
+  const byKey=new Map();
+  (users||[]).forEach(entry => {
+    const uid=String(entry?.uid || '').trim();
+    const userNumber=Number(entry?.userNumber || 0);
+    const key=uid || ('userNumber:'+userNumber);
+    const existing=byKey.get(key);
+    if(!existing){
+      byKey.set(key, entry);
+      return;
+    }
+    const existingUpdated=Number(existing?.updatedAt || 0);
+    const nextUpdated=Number(entry?.updatedAt || 0);
+    const existingScore=Number(existing?.score || 0);
+    const nextScore=Number(entry?.score || 0);
+    const shouldReplace=
+      nextUpdated > existingUpdated ||
+      (nextUpdated === existingUpdated && nextScore > existingScore) ||
+      (nextUpdated === existingUpdated && nextScore === existingScore && userNumber < Number(existing?.userNumber || 0));
+    if(shouldReplace) byKey.set(key, entry);
+  });
+  return Array.from(byKey.values());
+}
+function refreshLeaderboard(){
+  renderLeaderboard(dedupeLeaderboardUsers(mergeLeaderboardUsers(leaderboardPublicCache, leaderboardUsernameMap)));
 }
 function renderLeaderboard(users){
   const host=document.getElementById('leaderboardList');
@@ -1034,8 +1074,32 @@ function renderLeaderboard(users){
 }
 function subscribeLeaderboard(){
   db.ref('publicUsers').on('value', snap => {
-    renderLeaderboard(Object.values(snap.val() || {}));
-  }, () => renderLeaderboard([]));
+    leaderboardPublicCache=Object.values(snap.val() || {});
+    refreshLeaderboard();
+  }, () => {
+    leaderboardPublicCache=[];
+    refreshLeaderboard();
+  });
+  db.ref('usernames').on('value', snap => {
+    const map={};
+    Object.values(snap.val() || {}).forEach(record => {
+      const userNumber=Number(record?.userNumber || 0);
+      const username=normalizeUsername(record?.username);
+      if(!userNumber || !username) return;
+      const existing=map[userNumber];
+      if(!existing || Number(record?.updatedAt || 0) >= Number(existing.updatedAt || 0)){
+        map[userNumber]={
+          username,
+          updatedAt:Number(record?.updatedAt || 0)
+        };
+      }
+    });
+    leaderboardUsernameMap=map;
+    refreshLeaderboard();
+  }, () => {
+    leaderboardUsernameMap={};
+    refreshLeaderboard();
+  });
 }
 function openSettings(){
   closeAccountMenu();
