@@ -2687,7 +2687,10 @@ function getSeasonPlayerPool(){
     return (getRosterbateDemoPlayers(CURRENT_SPORT) || []).map(p=>({...p}));
   }
   if(typeof buildRosterbateSportPlayerPool === 'function'){
-    return buildRosterbateSportPlayerPool(CURRENT_SPORT, CURRENT_SPORT==='nba' ? 500 : 260);
+    const importedPoolLimit=typeof getRosterbatePlayerPoolLimit === 'function'
+      ? getRosterbatePlayerPoolLimit(CURRENT_SPORT)
+      : (CURRENT_SPORT==='nba' ? 500 : 320);
+    return buildRosterbateSportPlayerPool(CURRENT_SPORT, importedPoolLimit);
   }
   return [];
 }

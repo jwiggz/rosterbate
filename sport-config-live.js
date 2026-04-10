@@ -38,6 +38,30 @@
 
   window.CURRENT_SPORT = getSelectedRosterbateSport();
 
+  window.getRosterbatePlayerPoolServiceMode = function(sport) {
+    const normalized = normalizeRosterbateSport(sport);
+    const modes = {
+      nba: 'imported_snapshot',
+      nfl: 'imported_snapshot',
+      mlb: 'live'
+    };
+    return modes[normalized] || 'imported_snapshot';
+  };
+
+  window.isRosterbateLiveServiceSport = function(sport) {
+    return getRosterbatePlayerPoolServiceMode(sport) === 'live';
+  };
+
+  window.getRosterbatePlayerPoolLimit = function(sport) {
+    const normalized = normalizeRosterbateSport(sport);
+    const limits = {
+      nba: 500,
+      nfl: 320,
+      mlb: 500
+    };
+    return limits[normalized] || 320;
+  };
+
   window.getRosterbateSportConfig = function(sport) {
     const configs = {
       nba: {
@@ -272,14 +296,16 @@
   };
 
   // Build player pool for drafts and seasons
-  // This ALWAYS uses LIVE data from RB_IMPORTED_POOLS (sport-data-live.json/js)
-  // Live data is loaded at 4AM daily with current season stats
-  // Demo data (sport-demo-data.js) is separate and only used for "Try It Now" preview mode
+  // These pools come from RB_IMPORTED_POOLS (sport-data-live.json/js)
+  // Only sports with an active live service should be labeled "live" in the UI.
+  // Other sports may still use imported snapshot data until their live feed is ready.
   window.buildRosterbateSportPlayerPool = function(sport, limit) {
-    // Get players from the imported pool (LIVE DATA ONLY)
+    // Get players from the imported pool
     const pool = window.RB_IMPORTED_POOLS?.[sport];
     if (!pool || !Array.isArray(pool)) return [];
-    const fallbackLimit = sport === 'nba' ? 500 : 300;
+    const fallbackLimit = typeof getRosterbatePlayerPoolLimit === 'function'
+      ? getRosterbatePlayerPoolLimit(sport)
+      : (sport === 'nba' ? 500 : 320);
     return pool.slice(0, limit || fallbackLimit);
   };
 

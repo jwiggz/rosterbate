@@ -754,7 +754,9 @@ const firebaseConfig = {
 
 const RB_POOLS_URL='sport-data-live.json';
 const RB_POOLS_SCRIPT_URL='sport-data-live.js';
+const RB_POOLS_META_URL='sport-data-live-meta.json';
 let rbPoolsReady=null;
+window.RB_IMPORTED_POOLS_META=window.RB_IMPORTED_POOLS_META||{};
 
 function loadRosterbatePoolsScript(){
   return new Promise((resolve,reject)=>{
@@ -784,9 +786,25 @@ function ensureRosterbatePools(){
   rbPoolsReady=fetch(RB_POOLS_URL,{cache:'no-store'})
     .then(res=>{
       if(!res.ok) throw new Error('Failed to load '+RB_POOLS_URL+' ('+res.status+')');
-      return res.json();
+      window.RB_IMPORTED_POOLS_META={
+        ...(window.RB_IMPORTED_POOLS_META||{}),
+        lastModified: String(res.headers.get('Last-Modified')||'').trim(),
+        fetchedAt: Date.now()
+      };
+      return Promise.all([
+        res.json(),
+        fetch(RB_POOLS_META_URL,{cache:'no-store'})
+          .then(metaRes=>metaRes.ok ? metaRes.json() : null)
+          .catch(()=>null)
+      ]);
     })
-    .then(pools=>{
+    .then(([pools, meta])=>{
+      if(meta && typeof meta === 'object'){
+        window.RB_IMPORTED_POOLS_META={
+          ...(window.RB_IMPORTED_POOLS_META||{}),
+          ...meta
+        };
+      }
       window.RB_IMPORTED_POOLS=pools||{};
       return window.RB_IMPORTED_POOLS;
     })
@@ -1694,20 +1712,71 @@ function normalizeDraftPlayerRanks(players){
     .sort((a,b)=>(Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name))
     .map((player,index)=>({...player, adp:index+1}));
 }
+function formatRosterbatePoolUpdatedDate(rawDate){
+  const value=String(rawDate||'').trim();
+  if(!value) return '';
+  const parts=value.split('-').map(Number);
+  if(parts.length!==3 || parts.some(Number.isNaN)) return value;
+  return new Date(parts[0], parts[1]-1, parts[2], 12, 0, 0).toLocaleDateString([], {
+    month:'short',
+    day:'numeric',
+    year:'numeric'
+  });
+}
+function formatRosterbatePoolUpdatedMinute(rawValue){
+  const value=String(rawValue||'').trim();
+  if(!value) return '';
+  const parsed=new Date(value);
+  if(Number.isNaN(parsed.getTime())) return '';
+  return parsed.toLocaleString([], {
+    month:'short',
+    day:'numeric',
+    year:'numeric',
+    hour:'numeric',
+    minute:'2-digit'
+  });
+}
+function getLivePoolUpdatedDate(sport){
+  if(typeof isRosterbateLiveServiceSport === 'function' && !isRosterbateLiveServiceSport(sport)) return '';
+  const pool=window.RB_IMPORTED_POOLS?.[sport];
+  if(!Array.isArray(pool) || !pool.length) return '';
+  let latest='';
+  pool.forEach(player=>{
+    const candidate=String(player?.statsThroughDate||'').trim();
+    if(candidate && (!latest || candidate > latest)) latest=candidate;
+  });
+  return latest;
+}
+function getLivePoolUpdatedTimestampLabel(sport){
+  if(typeof isRosterbateLiveServiceSport === 'function' && !isRosterbateLiveServiceSport(sport)) return '';
+  const explicitMetaLabel=formatRosterbatePoolUpdatedMinute(window.RB_IMPORTED_POOLS_META?.updatedAt);
+  if(explicitMetaLabel) return explicitMetaLabel;
+  const lastModifiedLabel=formatRosterbatePoolUpdatedMinute(window.RB_IMPORTED_POOLS_META?.lastModified);
+  if(lastModifiedLabel) return lastModifiedLabel;
+  return formatRosterbatePoolUpdatedDate(getLivePoolUpdatedDate(sport));
+}
 
 function applySportToDraftUI(){
   const isMultiplayerDraft=isMultiplayerDraftContext();
   const useStaticSoloData=!isMultiplayerDraft && SPORT==='nba';
+  const isLiveServiceSportForDraft=typeof isRosterbateLiveServiceSport === 'function'
+    ? isRosterbateLiveServiceSport(SPORT)
+    : SPORT==='mlb';
+  const importedPoolLimit=typeof getRosterbatePlayerPoolLimit === 'function'
+    ? getRosterbatePlayerPoolLimit(SPORT)
+    : (SPORT === 'nba' ? 500 : 320);
   PLAYERS = useStaticSoloData
     ? getStaticSoloDraftPlayers()
-    : buildRosterbateSportPlayerPool(SPORT, SPORT === 'nba' ? 500 : 320);
+    : buildRosterbateSportPlayerPool(SPORT, importedPoolLimit);
   if(!useStaticSoloData && SPORT === 'nba' && (!PLAYERS || !PLAYERS.length)){
     PLAYERS = NBA_PLAYERS;
   }
   PLAYERS = normalizeDraftPlayerRanks(PLAYERS);
   if(!PLAYERS || !PLAYERS.length){
     const pill=document.getElementById('sportLobbyPill');
-    if(pill) pill.textContent=useStaticSoloData?'⚠️ 2024-25 player data failed to load':'⚠️ Live player data failed to load';
+    if(pill) pill.textContent=useStaticSoloData
+      ? '⚠️ 2024-25 player data failed to load'
+      : (isLiveServiceSportForDraft ? '⚠️ Live player data failed to load' : '⚠️ Imported player data failed to load');
     throw new Error('RosterBate player pool missing for '+SPORT);
   }
   const teamPlaceholders = {
@@ -1718,9 +1787,14 @@ function applySportToDraftUI(){
   document.title = 'RosterBate ' + SPORT_CFG.label + ' Draft';
   document.getElementById('sportLogoBall').textContent = SPORT_CFG.icon;
   document.getElementById('sportLogoSub').textContent = SPORT_CFG.label + ' Draft Room';
+  const liveUpdatedLabel=getLivePoolUpdatedTimestampLabel(SPORT);
   document.getElementById('sportLobbyPill').textContent = useStaticSoloData
     ? ('✅ 2024-25 ' + SPORT_CFG.leagueLabel + ' Season · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
-    : ('✅ Live ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players');
+    : (
+      isLiveServiceSportForDraft
+        ? ('✅ Live ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' · Updated ' + liveUpdatedLabel : ''))
+        : ('✅ Imported ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
+    );
   document.getElementById('sportCountdownIcon').textContent = SPORT_CFG.icon;
   document.getElementById('sportDraftTitle').innerHTML = SPORT_CFG.icon + ' Roster<span>Bate</span>';
   document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';
@@ -3359,7 +3433,9 @@ async function endDraft(){
     // Note: seasonId will be generated when saving to Firebase
     const draftData = {
       sport: SPORT,
-      playerPoolSource: (SPORT==='nba' && !isMultiplayer) ? 'static_2024_25' : 'live',
+      playerPoolSource: (SPORT==='nba' && !isMultiplayer)
+        ? 'static_2024_25'
+        : ((typeof isRosterbateLiveServiceSport === 'function' && isRosterbateLiveServiceSport(SPORT)) ? 'live' : 'imported_snapshot'),
       teamName: S.name,
       leagueName: lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
       leagueSize: S.ls,
