@@ -809,6 +809,11 @@ function ensureRosterbatePools(){
 
 // Declare Firebase variables
 let auth, db;
+let multiplayerDraftRef = null;
+let multiplayerDraftListener = null;
+let multiplayerDraftApplying = false;
+let multiplayerDraftReady = false;
+let multiplayerDraftStateVersion = 0;
 
 // Wait for Firebase to load before initializing
 if (typeof firebase !== 'undefined') {
@@ -1790,6 +1795,124 @@ function shouldAutoLaunchMultiplayerDraft(){
   return players.length===Number(state.teamSize||0) && players.length>0;
 }
 
+function getRealtimeMultiplayerLobbyId(){
+  const state=getSavedMultiplayerLobbyState();
+  if(!state?.lobbyId || state?.soloTest || !db) return '';
+  return String(state.lobbyId);
+}
+
+function isRealtimeMultiplayerDraft(){
+  return !!getRealtimeMultiplayerLobbyId();
+}
+
+function buildRealtimeDraftState(){
+  return {
+    version: Date.now(),
+    sport: SPORT,
+    started: !!S.started,
+    cur: Number(S.cur||0),
+    ls: Number(S.ls||0),
+    rds: Number(S.rds||0),
+    fmt: S.fmt||'snake',
+    scr: S.scr||'h2h_pts',
+    tmax: Number(S.tmax||0),
+    abud: Number(S.abud||200),
+    myBudget: Number(S.myBudget||0),
+    picks: Array.isArray(S.picks)?S.picks.map(pick=>({
+      ov:Number(pick.ov||0),
+      round:Number(pick.round||0),
+      ti:Number(pick.ti||0),
+      pid:Number(pick.pid||0)
+    })) : [],
+    teams: Array.isArray(S.teams)?S.teams.slice():[],
+    order: Array.isArray(S.order)?S.order.slice():[],
+    draftedIds: Array.from(S.drafted||[]),
+    updatedAt: Date.now()
+  };
+}
+
+function rebuildMyRosterFromPicks(){
+  S.myTeam=(Array.isArray(S.picks)?S.picks:[])
+    .filter(pick=>pick.ti===S.myPos)
+    .sort((a,b)=>a.ov-b.ov)
+    .map(pick=>PLAYERS.find(player=>player.id===pick.pid))
+    .filter(Boolean);
+}
+
+function renderDraftFromSharedState(){
+  rebuildMyRosterFromPicks();
+  syncDraftTimerDisplay();
+  rPlayers();
+  rMyTeam();
+  rOtherTeams();
+  rBoard();
+  upHdr();
+  updateTradeBtn();
+  updateSoloSimButton();
+}
+
+function applyRealtimeDraftState(state){
+  if(!state || typeof state!=='object') return;
+  multiplayerDraftApplying=true;
+  try{
+    multiplayerDraftStateVersion=Math.max(multiplayerDraftStateVersion, Number(state.version||0));
+    S.started=!!state.started;
+    S.cur=Math.max(0, Number(state.cur||0));
+    if(Number(state.ls||0)>0) S.ls=Number(state.ls||0);
+    if(Number(state.rds||0)>0) S.rds=Number(state.rds||0);
+    if(state.fmt) S.fmt=state.fmt;
+    if(state.scr) S.scr=state.scr;
+    if(state.tmax!=null) S.tmax=Number(state.tmax||0);
+    if(state.abud!=null) S.abud=Number(state.abud||200);
+    if(state.myBudget!=null) S.myBudget=Number(state.myBudget||0);
+    if(Array.isArray(state.teams) && state.teams.length) S.teams=state.teams.slice();
+    if(Array.isArray(state.order) && state.order.length) S.order=state.order.slice();
+    S.picks=Array.isArray(state.picks)?state.picks.map(pick=>({
+      ov:Number(pick.ov||0),
+      round:Number(pick.round||0),
+      ti:Number(pick.ti||0),
+      pid:Number(pick.pid||0)
+    })):[];
+    S.drafted=new Set(Array.isArray(state.draftedIds)?state.draftedIds.map(Number):S.picks.map(pick=>Number(pick.pid||0)));
+    S.total=(Number(S.ls||0)*Number(S.rds||0))||S.total||0;
+    if(S.started){
+      document.getElementById('lobby').classList.remove('active');
+      document.getElementById('draft').classList.add('active');
+      document.getElementById('statHeader').style.display='flex';
+      document.getElementById('pdcBar').classList.add('hidden');
+      document.getElementById('pdcStrip').style.display='none';
+    }
+    renderDraftFromSharedState();
+  }finally{
+    multiplayerDraftApplying=false;
+  }
+}
+
+async function publishRealtimeDraftState(){
+  const lobbyId=getRealtimeMultiplayerLobbyId();
+  if(!lobbyId || !db || multiplayerDraftApplying) return;
+  const state=buildRealtimeDraftState();
+  multiplayerDraftStateVersion=Math.max(multiplayerDraftStateVersion, Number(state.version||0));
+  try{
+    await db.ref('lobbies/'+lobbyId+'/draftState').set(state);
+  }catch(err){
+    console.error('Failed to publish multiplayer draft state', err);
+  }
+}
+
+function subscribeRealtimeDraftState(){
+  const lobbyId=getRealtimeMultiplayerLobbyId();
+  if(!lobbyId || !db || multiplayerDraftReady) return;
+  multiplayerDraftReady=true;
+  multiplayerDraftRef=db.ref('lobbies/'+lobbyId+'/draftState');
+  multiplayerDraftListener=multiplayerDraftRef.on('value', snap=>{
+    const state=snap.val();
+    if(!state) return;
+    if(Number(state.version||0) && Number(state.version||0)<multiplayerDraftStateVersion) return;
+    applyRealtimeDraftState(state);
+  });
+}
+
 function isSoloTestDraft(){
   const state=getSavedMultiplayerLobbyState();
   const params=new URLSearchParams(window.location.search||'');
@@ -1930,6 +2053,7 @@ function startDraft(){
   document.getElementById('mFmt').textContent=S.fmt.toUpperCase();
   syncDraftTimerDisplay();
   updateSoloSimButton();
+  subscribeRealtimeDraftState();
 
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
@@ -2027,6 +2151,7 @@ function launchDraft(){
   document.getElementById('pdcBar').classList.add('hidden');
   document.getElementById('pdcStrip').style.display='none';
   showBanner('🏀 Draft is Live — Make Your Picks!');
+  if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
   if(S.fmt==='auction') aucNext(); else advance();
 }
 
@@ -2195,7 +2320,9 @@ function simulateDraftToFinish(){
 // ─── DRAFT FLOW ───────────────────────────────────────────
 function advance(){
   if(PS.isPaused) return; // don't advance while paused
-  while(S.cur<S.total&&S.order[S.cur]!==S.myPos) cpuPick();
+  if(!isRealtimeMultiplayerDraft()){
+    while(S.cur<S.total&&S.order[S.cur]!==S.myPos) cpuPick();
+  }
   upHdr();rPlayers();rOtherTeams();rBoard();
   if(S.cur<S.total&&S.order[S.cur]===S.myPos){
     showBanner('⏰ You\'re On The Clock!');
@@ -2203,6 +2330,7 @@ function advance(){
   } else if(S.cur>=S.total) endDraft();
 }
 function cpuPick(){
+  if(isRealtimeMultiplayerDraft()) return;
   const av=getAvailablePlayersSorted();
   if(!av.length)return;
   const pick=chooseBestCpuPlayerForTeam(S.order[S.cur],av);
@@ -2218,6 +2346,7 @@ function doPick(p,ti){
   rbPostSystem(`#${pickNumber} · ${teamName} drafted ${p.name} (${p.pos}, ${p.team})`,'draft');
   S.cur++;
   upFavBadge();
+  if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
 }
 function userPick(p){
   if(!S.started){ showToast('⏰ Draft hasn\'t started yet'); return; }
@@ -3158,6 +3287,7 @@ function confirmTrade(){
   closeTradeModal();
   showToast(`Traded! You now pick #${theirPickNum}`);
   rBoard(); upHdr(); rPlayers(); rOtherTeams();
+  if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
 }
 
 // Trade button always visible during draft (not just on your turn)
