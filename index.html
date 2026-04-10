@@ -95,6 +95,7 @@
   }
   .hero-logo-wrap{width:min(440px,74vw);height:116px;margin:0 auto;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;animation:heroLogoIntro .52s cubic-bezier(.22,.61,.36,1) both;}
   .hero-logo-wrap::after{content:'';position:absolute;top:8%;bottom:8%;width:22%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);filter:blur(8px);mix-blend-mode:screen;pointer-events:none;animation:heroLogoSheen 1.05s ease-out .16s both;}
+  body.cta-logo-sync .hero-logo-wrap::after{animation:ctaButtonShimmer 10s ease-in-out infinite;}
   .hero-logo{display:block;width:100%;height:100%;object-fit:cover;object-position:center 50%;filter:drop-shadow(0 10px 24px rgba(0,0,0,.32));transform:scale(1.02);}
   .hero-sub{font-family:var(--fm);font-size:15px;font-weight:600;color:var(--text2);line-height:1.65;max-width:520px;margin:0 auto 6px;}
   .hero-sub strong{color:var(--text);}
@@ -117,6 +118,7 @@
     flex-direction:column;
     overflow:hidden;
     isolation:isolate;
+    min-height:220px;
   }
   .promo-card::before{
     content:'';
@@ -200,7 +202,18 @@
   .promo-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;line-height:.95;text-align:center;color:var(--text);margin-bottom:10px;}
   .promo-copy{font-family:var(--fm);font-size:13px;font-weight:600;color:#a9b8cb;line-height:1.72;letter-spacing:-.01em;flex:1;}
   .promo-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;}
-  .promo-tag{border-color:rgba(239,68,68,.24);color:#fca5a5;}
+  .promo-tag{
+    border-width:1px;
+    border-style:solid;
+    border-color:rgba(239,68,68,.28);
+    color:#fca5a5;
+    background:rgba(255,255,255,.045);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 4px 12px rgba(0,0,0,.16);
+    padding:4px 10px;
+    border-radius:6px;
+    font-weight:700;
+    letter-spacing:.02em;
+  }
   .promo-card.moneyball{
     --feature-bg:linear-gradient(135deg,rgba(10,28,22,.96),rgba(13,43,32,.9));
     --feature-primary:#0f2b1d;
@@ -208,7 +221,7 @@
     --feature-accent:#86efac;
     border-color:rgba(34,197,94,.28);
   }
-  .promo-card.moneyball .promo-tag{border-color:rgba(34,197,94,.24);color:#86efac;}
+  .promo-card.moneyball .promo-tag{border-color:rgba(34,197,94,.34);color:#86efac;background:rgba(34,197,94,.11);box-shadow:inset 0 1px 0 rgba(134,239,172,.14), 0 4px 12px rgba(0,0,0,.16), 0 0 18px rgba(34,197,94,.08);}
   .promo-card.powerups{
     --feature-bg:linear-gradient(135deg,rgba(42,33,11,.96),rgba(63,46,12,.9));
     --feature-primary:#584827;
@@ -216,7 +229,7 @@
     --feature-accent:#f9de90;
     border-color:rgba(234,179,8,.28);
   }
-  .promo-card.powerups .promo-tag{border-color:rgba(234,179,8,.24);color:#fde047;}
+  .promo-card.powerups .promo-tag{border-color:rgba(234,179,8,.34);color:#fde047;background:rgba(234,179,8,.1);box-shadow:inset 0 1px 0 rgba(253,224,71,.14), 0 4px 12px rgba(0,0,0,.16), 0 0 18px rgba(234,179,8,.08);}
   .promo-card.trade{
     --feature-bg:linear-gradient(135deg,rgba(42,17,15,.96),rgba(60,20,18,.9));
     --feature-primary:#5a1f18;
@@ -224,7 +237,7 @@
     --feature-accent:#fca685;
     border-color:rgba(239,68,68,.28);
   }
-  .promo-card.trade .promo-tag{border-color:rgba(239,68,68,.24);color:#fca5a5;}
+  .promo-card.trade .promo-tag{border-color:rgba(239,68,68,.34);color:#fca5a5;background:rgba(239,68,68,.1);box-shadow:inset 0 1px 0 rgba(252,165,165,.14), 0 4px 12px rgba(0,0,0,.16), 0 0 18px rgba(239,68,68,.08);}
   .promo-action{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:rgba(249,115,22,.16);border:1px solid rgba(249,115,22,.34);border-radius:999px;padding:8px 12px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fdba74;cursor:pointer;}
   .promo-action:hover{background:rgba(249,115,22,.22);}
   .info-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:320;align-items:center;justify-content:center;padding:20px;}
@@ -232,7 +245,7 @@
   .info-panel{width:100%;max-width:860px;background:linear-gradient(180deg,var(--bg2),#0f172a);border:1px solid rgba(249,115,22,.24);border-radius:22px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.5);}
   .info-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;}
   .info-title{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;line-height:.95;}
-  .info-sub{font-size:13px;color:var(--text2);line-height:1.6;max-width:520px;margin-top:8px;}
+  .info-sub{font-family:var(--fm);font-size:13px;font-weight:600;color:#a9b8cb;line-height:1.68;letter-spacing:-.01em;max-width:520px;margin-top:8px;}
   .swap-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
   .swap-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;}
   .swap-step{font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fdba74;margin-bottom:10px;}
@@ -242,9 +255,9 @@
   .pick-slot.active{border-color:rgba(249,115,22,.38);background:rgba(249,115,22,.1);}
   .pick-slot.alt{border-color:rgba(99,102,241,.34);background:rgba(99,102,241,.1);}
   .pick-no{font-family:var(--fd);font-size:32px;font-weight:900;line-height:1;}
-  .pick-label{font-size:12px;color:var(--text2);line-height:1.5;}
+  .pick-label{font-family:var(--fm);font-size:12px;font-weight:600;color:#a9b8cb;line-height:1.55;letter-spacing:-.01em;}
   .swap-arrow{font-family:var(--fd);font-size:28px;font-weight:900;color:#fdba74;text-transform:uppercase;text-align:center;}
-  .swap-note{font-size:12px;color:var(--text2);line-height:1.55;margin-top:12px;}
+  .swap-note{font-family:var(--fm);font-size:12px;font-weight:600;color:#a9b8cb;line-height:1.62;letter-spacing:-.01em;margin-top:12px;}
   .swap-divider{height:1px;background:var(--border);margin:12px 0;}
   .swap-mini-label{font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;text-align:center;}
   .pick-slot.small{padding:8px;}
@@ -326,7 +339,46 @@
   .cta-card.green .cta-title{color:var(--text) !important;}
   .cta-title span{display:block;font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--text2);margin-top:1px;}
   .cta-desc{font-family:var(--fm);font-size:12px;font-weight:600;color:#a9b8cb;line-height:1.5;letter-spacing:-.01em;margin-bottom:6px;min-height:72px;}
-  .cta-btn{display:block;width:100%;padding:10px 16px;border-radius:8px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-top:2px;}
+  @keyframes ctaButtonShimmer{
+    0%{transform:translateX(-165%) skewX(-18deg);opacity:0;}
+    4%{opacity:.2;}
+    9%{opacity:.42;}
+    15%{transform:translateX(165%) skewX(-18deg);opacity:0;}
+    100%{transform:translateX(165%) skewX(-18deg);opacity:0;}
+  }
+  .cta-btn{
+    position:relative;
+    display:block;
+    width:100%;
+    padding:10px 16px;
+    border-radius:8px;
+    font-family:var(--fd);
+    font-size:14px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    text-align:center;
+    margin-top:2px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .cta-btn::after{
+    content:'';
+    position:absolute;
+    top:-18%;
+    bottom:-18%;
+    left:0;
+    width:26%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+    filter:blur(5px);
+    mix-blend-mode:screen;
+    pointer-events:none;
+    opacity:0;
+    transform:translateX(-165%) skewX(-18deg);
+  }
+  body.cta-shimmer-ready .cta-btn::after{
+    animation:ctaButtonShimmer 10s ease-in-out infinite;
+  }
   .cta-card.orange .cta-btn{background:var(--accent);color:#fff;}
   .cta-card.green .cta-btn{background:var(--green);color:#fff;}
   .cta-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
@@ -1037,6 +1089,8 @@ function selectSportCard(sport){
 
 let authMode = 'signup';
 updateHomeSportUI();
+setTimeout(()=>document.body.classList.add('cta-shimmer-ready'), 2000);
+setTimeout(()=>document.body.classList.add('cta-logo-sync'), 12000);
 
 function openAuthModal(mode){
   if(mode) setAuthMode(mode);

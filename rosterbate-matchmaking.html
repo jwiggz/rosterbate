@@ -42,9 +42,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .input:focus{border-color:var(--accent);}
 .schedule-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.35fr);gap:10px;align-items:start;}
 .schedule-grid .ct{margin-bottom:6px;}
-.schedule-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.schedule-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:start;}
 .schedule-picker{display:grid;gap:4px;align-content:start;}
-.schedule-picker .sl{margin:0;font-size:10px;}
+.schedule-picker .sl{margin:0;font-size:10px;text-align:center;}
 .schedule-locked{display:inline-flex;align-items:center;justify-content:center;background:rgba(249,115,22,.15);border:1px solid var(--accent);border-radius:7px;padding:7px 13px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--accent);}
 .schedule-date-wrap,.schedule-time-wrap{display:grid;align-content:start;}
 .schedule-action{margin-top:12px;}
@@ -52,9 +52,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .schedule-top-row .ct{margin-bottom:6px;}
 .schedule-timing-wrap{display:grid;gap:6px;align-content:start;}
 .schedule-helper{margin-top:8px;font-size:11px;color:var(--text3);line-height:1.55;}
-.schedule-time-wrap{justify-items:end;}
+.schedule-time-wrap{justify-items:stretch;}
 .schedule-time-wrap > .ct{justify-self:start;width:100%;}
-.schedule-time-grid{width:100%;justify-content:end;}
+.schedule-time-grid{width:100%;justify-content:stretch;}
 .schedule-picker select.input{text-align:left;}
 .format-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;}
 .format-row .chips{flex:0 1 auto;}
@@ -1346,6 +1346,15 @@ async function loadBrowse(){
 
 function emptyHtml(title,desc){ return `<div class="empty"><div class="empty-icon">-</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`; }
 
+function getLeagueNamePlaceholder(){
+  const placeholders = {
+    nba: 'e.g. Friday Night Hoops...',
+    nfl: 'e.g. Sunday Night Showdown...',
+    mlb: 'e.g. Friday Night Fastballs...'
+  };
+  return placeholders[MM_SPORT] || placeholders.nba;
+}
+
 // â”€â”€ CREATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderCreate(){
   document.getElementById('mmTabContent').innerHTML=`
@@ -1355,7 +1364,7 @@ function renderCreate(){
     </div>
     <div class="card">
       <div class="ct">League Name</div>
-      <input type="text" class="input" id="cLeague" placeholder="e.g. Friday Night Hoops...">
+      <input type="text" class="input" id="cLeague" placeholder="${getLeagueNamePlaceholder()}">
     </div>
     <div class="card">
       <div class="ct">Draft Format</div>
@@ -1409,22 +1418,22 @@ function renderCreate(){
             <div class="ct">Draft Time</div>
             <div class="schedule-time-grid">
               <div class="schedule-picker">
-                <div class="sl">Hour</div>
                 <select class="input" id="cStartHour" onchange="syncScheduledTimeInputs()">
                   ${buildScheduleSelectOptions([1,2,3,4,5,6,7,8,9,10,11,12], toScheduleHourValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
                 </select>
+                <div class="sl">Hour</div>
               </div>
               <div class="schedule-picker">
-                <div class="sl">Minute</div>
                 <select class="input" id="cStartMinute" onchange="syncScheduledTimeInputs()">
                   ${buildScheduleSelectOptions(['00','15','30','45'], toScheduleMinuteValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
                 </select>
+                <div class="sl">Minute</div>
               </div>
               <div class="schedule-picker">
-                <div class="sl">AM / PM</div>
                 <select class="input" id="cStartMeridiem" onchange="syncScheduledTimeInputs()">
                   ${buildScheduleSelectOptions(['AM','PM'], toScheduleMeridiemValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
                 </select>
+                <div class="sl">AM / PM</div>
               </div>
             </div>
           </div>
