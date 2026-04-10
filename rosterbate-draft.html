@@ -218,6 +218,9 @@
   .qbb.off{opacity:.35;cursor:not-allowed;filter:grayscale(.2);}
   @media (max-width: 900px){
     .ao{right:12px;bottom:12px;}
+    .rules-layout{grid-template-columns:1fr;}
+    .rules-left{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .inline-pos-grid{grid-template-columns:1fr;}
   }
 
   /* TRADE MODAL */
@@ -359,7 +362,13 @@
 .advhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .advtitle{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
 .advsub{font-size:11px;color:var(--text3);margin-top:2px;}
+.reset-rules-btn{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:8px;padding:7px 10px;color:#f87171;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;cursor:pointer;white-space:nowrap;line-height:1;}
+.reset-rules-btn:hover{background:rgba(239,68,68,.18);}
 .advgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.rules-layout{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;}
+.rules-left{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.rules-right{display:flex;min-width:0;}
+.rule-panel{display:flex;flex-direction:column;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);}
 .scoregrid{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin-top:12px;}
 .scoregrid .sh{font-family:var(--fd);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;padding-bottom:4px;border-bottom:1px solid var(--border);}
 .scoregrid .slbl{font-size:12px;color:var(--text2);padding:7px 0;border-bottom:1px solid rgba(30,45,69,.7);}
@@ -367,17 +376,27 @@
 .scoregrid input{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font:600 13px var(--fb);outline:none;text-align:right;}
 .scoregrid input:focus{border-color:var(--accent);}
 .rule-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);}
-.rule-summary-copy{font-size:12px;color:var(--text2);line-height:1.45;}
+.rule-summary-copy{font-size:12px;color:var(--text);line-height:1.45;}
 .rule-link{background:none;border:none;color:var(--accent);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
+.inline-pos-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.inline-pos-row{display:grid;grid-template-columns:minmax(0,1fr) 98px;gap:8px;align-items:center;}
+.inline-pos-name{font-size:12px;color:var(--text);line-height:1.25;min-width:0;}
+.inline-pos-stepper{min-width:0;}
 .stepper{display:flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
 .stepper:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
-.stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:10px 12px!important;text-align:right;}
+.stepper input[type=number]{border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:10px 12px!important;text-align:right;color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;}
 .stepper-btns{display:flex;flex-direction:column;border-left:1px solid var(--border);background:rgba(255,255,255,.02);}
 .stepper-btn{width:30px;height:20px;border:none;background:transparent;color:var(--text2);font-family:var(--fd);font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;}
 .stepper-btn:hover{background:rgba(249,115,22,.14);color:var(--accent);}
 .stepper-btn:active{background:rgba(249,115,22,.22);}
 .stepper-btn + .stepper-btn{border-top:1px solid var(--border);}
 .stepper.readonly .stepper-btns{display:none;}
+@media (max-width: 520px){
+  .rules-left{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .inline-pos-grid{grid-template-columns:1fr;}
+  .inline-pos-row{grid-template-columns:minmax(0,1fr) 96px;}
+  .rule-panel{padding:10px;}
+}
 .sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:250;align-items:flex-end;justify-content:center;}
 .sheet.open{display:flex;}
 .sheet-card{width:100%;max-width:560px;max-height:86dvh;overflow:auto;background:var(--bg2);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:16px 16px 28px;}
@@ -406,6 +425,7 @@
   <div class="card">
     <h2>League Settings</h2>
     <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Tommy's Minions"/></div>
+    <div class="fr"><label>Your League Name</label><input type="text" id="iLeagueName" placeholder="e.g. Friday Night Hoops"/></div>
     <div class="two">
       <div class="fr"><label>Teams (2–20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
       <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="1"/></div>
@@ -452,16 +472,25 @@
           <div class="advtitle">Custom League Rules</div>
           <div class="advsub">Deeper roster and scoring controls, like the commissioner tools on the big fantasy sites.</div>
         </div>
+        <button type="button" class="reset-rules-btn" onclick="resetDraftRulesToDefaults()">Reset To Defaults</button>
       </div>
-      <div class="advgrid">
-        <div class="fr"><label>Starters</label><input type="number" id="iStarters" readonly></div>
-        <div class="fr"><label>Bench Spots</label><input type="number" id="iBench" min="2" max="20" value="5" onchange="syncRosterRules()"></div>
-        <div class="fr"><label>IR / IL Slots</label><input type="number" id="iIr" min="0" max="6" value="1" onchange="syncRosterRules()"></div>
-        <div class="fr"><label>Total Roster Size</label><input type="number" id="iRosterTotal" readonly></div>
-      </div>
-      <div class="rule-summary">
-        <div class="rule-summary-copy" id="positionRuleSummary">Edit position slots, bench limits, and max roster eligibility for each slot.</div>
-        <button type="button" class="rule-link" onclick="openPositionSheet()">Edit Positions</button>
+      <div class="rules-layout">
+        <div class="rules-left">
+          <div class="fr"><label>Starters</label><input type="number" id="iStarters" readonly></div>
+          <div class="fr"><label>Total Roster Size</label><input type="number" id="iRosterTotal" readonly></div>
+          <div class="fr"><label>Bench Spots</label><input type="number" id="iBench" min="2" max="20" value="5" onchange="syncRosterRules()"></div>
+          <div class="fr"><label>IR / IL Slots</label><input type="number" id="iIr" min="0" max="6" value="1" onchange="syncRosterRules()"></div>
+        </div>
+        <div class="rules-right">
+          <div class="rule-panel">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+              <div class="ct" style="margin:0;">Starting Positions</div>
+              <div class="rule-link" style="pointer-events:none;opacity:.85;">Adjust with +/-</div>
+            </div>
+            <div class="rule-summary-copy" id="positionRuleSummary">Choose how many starters you want at each position. Bench and IR / IL update automatically.</div>
+            <div class="inline-pos-grid" id="inlinePositionGrid"></div>
+          </div>
+        </div>
       </div>
       <div class="scoregrid" id="scoreGrid"></div>
     </div>
@@ -1502,6 +1531,17 @@ const POSITION_LABELS = getRosterbatePositionLabels(SPORT);
 let PLAYERS = [];
 let DRAFT_POSITION_RULES = JSON.parse(JSON.stringify(SPORT_RULES.positions||{}));
 
+function getDraftStarterPositionKeys(){
+  return Object.keys(DRAFT_POSITION_RULES||{}).filter(key=>{
+    const upper=String(key).toUpperCase();
+    return upper!=='BN' && upper!=='BE' && upper!=='IR' && upper!=='IL';
+  });
+}
+
+function getDraftStarterTotal(){
+  return getDraftStarterPositionKeys().reduce((sum,key)=>sum+Math.max(0, Number(DRAFT_POSITION_RULES[key]?.starters||0)),0);
+}
+
 function currentLeagueRules(){
   const bench=Math.max(0, parseInt(document.getElementById('iBench')?.value)||0);
   const irSlots=Math.max(0, parseInt(document.getElementById('iIr')?.value)||0);
@@ -1511,25 +1551,69 @@ function currentLeagueRules(){
     if(input) scoring[key]=parseFloat(input.value)||0;
   });
   return {
-    starters:SPORT_RULES.starters,
+    starters:getDraftStarterTotal(),
     benchSlots:bench,
     irSlots,
-    rosterSize:SPORT_RULES.starters+bench+irSlots,
+    rosterSize:getDraftStarterTotal()+bench+irSlots,
     scoring,
     positions:JSON.parse(JSON.stringify(DRAFT_POSITION_RULES))
   };
 }
 
 function syncRosterRules(){
-  const starters=SPORT_RULES.starters;
+  getDraftStarterPositionKeys().forEach(key=>{
+    const input=document.getElementById('inline_start_'+key);
+    if(input){
+      DRAFT_POSITION_RULES[key]=Object.assign({}, DRAFT_POSITION_RULES[key]||{}, {
+        starters:Math.max(0, parseInt(input.value)||0)
+      });
+    }
+  });
   const bench=Math.max(0, parseInt(document.getElementById('iBench')?.value)||0);
   const irSlots=Math.max(0, parseInt(document.getElementById('iIr')?.value)||0);
+  if(DRAFT_POSITION_RULES.BN){
+    DRAFT_POSITION_RULES.BN=Object.assign({}, DRAFT_POSITION_RULES.BN, { starters:bench });
+  }
+  if(DRAFT_POSITION_RULES.BE){
+    DRAFT_POSITION_RULES.BE=Object.assign({}, DRAFT_POSITION_RULES.BE, { starters:bench });
+  }
+  const irKey=Object.keys(DRAFT_POSITION_RULES).find(key=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL');
+  if(irKey){
+    DRAFT_POSITION_RULES[irKey]=Object.assign({}, DRAFT_POSITION_RULES[irKey], { starters:irSlots });
+  }
+  const starters=getDraftStarterTotal();
   const total=starters+bench+irSlots;
   const totalEl=document.getElementById('iRosterTotal');
   const roundsEl=document.getElementById('iRounds');
   if(document.getElementById('iStarters')) document.getElementById('iStarters').value=starters;
   if(totalEl) totalEl.value=total;
   if(roundsEl) roundsEl.value=total;
+  const irMirror=document.getElementById('inline_ir_mirror');
+  if(irMirror) irMirror.value=String(irSlots);
+  updatePositionRuleSummary();
+}
+
+function renderInlinePositionControls(){
+  const rows=getDraftStarterPositionKeys().map(key=>{
+    const row=DRAFT_POSITION_RULES[key]||{};
+    return `
+      <div class="inline-pos-row">
+        <div class="inline-pos-name">${POSITION_LABELS[key]||key}</div>
+        <div class="inline-pos-stepper">
+          <input type="number" id="inline_start_${key}" min="0" max="12" step="1" value="${Math.max(0, Number(row.starters||0))}" onchange="syncRosterRules()">
+        </div>
+      </div>`;
+  });
+  const irKey=Object.keys(DRAFT_POSITION_RULES).find(key=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL') || 'IR';
+  rows.push(`
+      <div class="inline-pos-row">
+        <div class="inline-pos-name">${POSITION_LABELS[irKey]||'IR / IL'}</div>
+        <div class="inline-pos-stepper">
+          <input type="number" id="inline_ir_mirror" min="0" max="6" step="1" value="${Math.max(0, Number(document.getElementById('iIr')?.value||0))}" readonly>
+        </div>
+      </div>`);
+  const grid=document.getElementById('inlinePositionGrid');
+  if(grid) grid.innerHTML=rows.join('');
 }
 
 function renderAdvancedLeagueRules(prefill){
@@ -1545,9 +1629,15 @@ function renderAdvancedLeagueRules(prefill){
     grid.innerHTML=`<div class="sh">Scoring Stat</div><div class="sh" style="text-align:right;">Points</div>`+
       Object.keys(scoring).map(key=>`<div class="slbl">${labels[key]||key}</div><div class="sval"><input type="number" id="score_${key}" step="0.1" value="${scoring[key]}"></div>`).join('');
   }
+  renderInlinePositionControls();
   syncRosterRules();
   updatePositionRuleSummary();
   hydrateStepperInputs(document.getElementById('lobby'));
+}
+
+function resetDraftRulesToDefaults(){
+  renderAdvancedLeagueRules();
+  showToast('Rules reset to default');
 }
 
 function buildStepperInput(id,value,min,max,step,readonly){
@@ -1555,9 +1645,20 @@ function buildStepperInput(id,value,min,max,step,readonly){
 }
 
 function updatePositionRuleSummary(){
-  const text=Object.keys(DRAFT_POSITION_RULES).filter(key=>Number(DRAFT_POSITION_RULES[key]?.starters||0)>0).map(key=>`${key} ${DRAFT_POSITION_RULES[key].starters}`).join(' · ');
+  const bench=Math.max(0, parseInt(document.getElementById('iBench')?.value)||0);
+  const irSlots=Math.max(0, parseInt(document.getElementById('iIr')?.value)||0);
+  const irKey=Object.keys(DRAFT_POSITION_RULES).find(key=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL') || 'IR';
+  const text=Object.keys(DRAFT_POSITION_RULES)
+    .filter(key=>{
+      const upper=String(key).toUpperCase();
+      if(upper==='BN' || upper==='BE' || upper==='IR' || upper==='IL') return false;
+      return Number(DRAFT_POSITION_RULES[key]?.starters||0)>0;
+    })
+    .map(key=>`${key} ${DRAFT_POSITION_RULES[key].starters}`)
+    .concat([`BN ${bench}`, `${irKey} ${irSlots}`])
+    .join(' · ');
   const el=document.getElementById('positionRuleSummary');
-  if(el) el.textContent=text||'Edit position slots, bench limits, and max roster eligibility for each slot.';
+  if(el) el.textContent=text||'Choose how many starters you want at each position. Bench and IR / IL update automatically.';
 }
 
 function openPositionSheet(){
@@ -1585,6 +1686,9 @@ function applyPositionSheet(){
       max:current.max==='No Limit' ? 'No Limit' : Math.max(0, parseInt(maxInput?.value)||0)
     };
   });
+  renderInlinePositionControls();
+  hydrateStepperInputs(document.getElementById('inlinePositionGrid'));
+  syncRosterRules();
   updatePositionRuleSummary();
   closePositionSheet();
 }
@@ -1799,6 +1903,8 @@ function applySportToDraftUI(){
   document.getElementById('sportDraftTitle').innerHTML = SPORT_CFG.icon + ' Roster<span>Bate</span>';
   document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';
   document.getElementById('iName').placeholder = teamPlaceholders[SPORT] || teamPlaceholders.nba;
+  const leaguePlaceholders=getLeagueNamePlaceholders();
+  document.getElementById('iLeagueName').placeholder = leaguePlaceholders[SPORT] || leaguePlaceholders.nba;
   document.getElementById('iSize').value = SPORT_CFG.defaultLeagueSize;
   document.getElementById('iSpot').value = 1;
   document.getElementById('iRounds').value = SPORT_CFG.defaultRounds;
@@ -1826,6 +1932,7 @@ function applySavedLobbySettings(){
     const hasLobbyParam=!!params.get('lobby');
     const allowSoloLobby=!!(hasLobbyParam && state.soloTest && state.lobbyId);
     if(state.myName) document.getElementById('iName').value=state.myName;
+    if(state.leagueName || state.name) document.getElementById('iLeagueName').value=state.leagueName||state.name;
     if(state.teamSize){
       const nextSize=Math.max(allowSoloLobby?1:2, Math.min(20, parseInt(state.teamSize,10)||0));
       if(nextSize>0) document.getElementById('iSize').value=nextSize;
@@ -1857,6 +1964,14 @@ function getSavedMultiplayerLobbyState(){
   }catch(e){
     return null;
   }
+}
+
+function getLeagueNamePlaceholders(){
+  return {
+    nba:'e.g. Friday Night Hoops',
+    nfl:'e.g. Sunday Night Showdown',
+    mlb:'e.g. Friday Night Fastballs'
+  };
 }
 
 function shouldAutoLaunchMultiplayerDraft(){
@@ -2095,6 +2210,7 @@ function startDraft(){
   const lobbyState=getSavedMultiplayerLobbyState();
   const allowSoloTest=!!(lobbyState?.soloTest && lobbyState?.lobbyId);
   const teamName=document.getElementById('iName').value.trim();
+  const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
   if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
@@ -3437,7 +3553,7 @@ async function endDraft(){
         ? 'static_2024_25'
         : ((typeof isRosterbateLiveServiceSport === 'function' && isRosterbateLiveServiceSport(SPORT)) ? 'live' : 'imported_snapshot'),
       teamName: S.name,
-      leagueName: lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
+      leagueName: leagueName || lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
       leagueSize: S.ls,
       scoringFormat: S.scr,
       draftFormat: S.fmt,
