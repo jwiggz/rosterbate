@@ -1875,6 +1875,9 @@ function applyRealtimeDraftState(state){
     })):[];
     S.drafted=new Set(Array.isArray(state.draftedIds)?state.draftedIds.map(Number):S.picks.map(pick=>Number(pick.pid||0)));
     S.total=(Number(S.ls||0)*Number(S.rds||0))||S.total||0;
+    if(S.total>0){
+      S.cur=Math.min(S.cur, S.total);
+    }
     if(S.started){
       document.getElementById('lobby').classList.remove('active');
       document.getElementById('draft').classList.add('active');
@@ -1883,6 +1886,9 @@ function applyRealtimeDraftState(state){
       document.getElementById('pdcStrip').style.display='none';
     }
     renderDraftFromSharedState();
+    if(S.total>0 && S.cur>=S.total && !document.getElementById('draftComplete')?.classList.contains('active')){
+      setTimeout(()=>endDraft(),0);
+    }
   }finally{
     multiplayerDraftApplying=false;
   }
@@ -2611,8 +2617,9 @@ function rPlayers(){
     const fp=calcFP(p);
     const faved=isFav(p.id);
     const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
-    const btnClass=!S.started?' disabled':'';
-    const btnClick=!S.started?'':`onclick="event.stopPropagation();userPick(PLAYERS[${idx}])"`;
+    const canActOnPlayer=(S.fmt==='auction'?myNomTurn:myTurn) && S.started;
+    const btnClass=!canActOnPlayer?' disabled':'';
+    const btnClick=!canActOnPlayer?'':`onclick="event.stopPropagation();userPick(PLAYERS[${idx}])"`;
     const draftLabel=S.fmt==='auction'?'Nominate':'Draft';
     const inlineDraftBtn=!drafted?`<button class="dbtn${btnClass}" ${btnClick}>${draftLabel}</button>`:'';
     const avatarOrButton=inlineDraftBtn||`<div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>`;
