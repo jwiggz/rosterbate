@@ -355,6 +355,9 @@ function toast(msg,color){const t=document.getElementById('mmToast');t.textConte
 let currentLobbyId = null;
 let lobbyListener = null;
 let currentLobby = null;
+let waitingLobbyChatListener = null;
+let waitingLobbyChatLobbyId = null;
+let waitingLobbyChatMessages = [];
 let myReady = false;
 let cdRunning = false;
 let cdTimer = null;
@@ -1168,6 +1171,47 @@ function saveMultiplayerLobbyState(lobby){
   localStorage.setItem('rbMultiplayerLobby', JSON.stringify(buildMultiplayerLobbyState(lobby)));
 }
 
+function renderWaitingLobbyChat(messages){
+  const wc=document.getElementById('wrChat');
+  if(!wc) return;
+  const rows=Array.isArray(messages) ? messages.slice() : [];
+  if(!rows.length){
+    wc.innerHTML='<div style="font-size:12px;color:var(--text3);line-height:1.5;">No messages yet. Break the ice before the draft starts.</div>';
+    return;
+  }
+  wc.innerHTML=rows.map(m=>`<div style="display:flex;gap:6px;align-items:flex-start;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div style="flex:1;min-width:0;"><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${escapeHtml(m.name||'Manager')}${ADMIN_USER_NUMBERS.includes(Number(m.userNumber||0))?' ♛':''}: </span><span style="font-size:12px;color:var(--text);">${escapeHtml(m.text||'')}</span>${myIsAdmin&&m.playerId!==myId&&!isProtectedChatUser(m.playerId,m.userNumber)?`<div style="display:flex;gap:6px;margin-top:4px;"><button onclick="mmDeleteLobbyChatMessage('${m._id}')" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);font-size:10px;cursor:pointer;">Delete</button><button onclick="mmBanGlobalChatPlayer('${m.playerId}','${escapeHtml(m.name||'Manager')}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:2px 7px;color:#fca5a5;font-size:10px;cursor:pointer;">Ban</button></div>`:''}</div></div>`).join('');
+  wc.scrollTop=wc.scrollHeight;
+}
+
+function detachWaitingLobbyChatListener(){
+  if(waitingLobbyChatListener && waitingLobbyChatLobbyId){
+    db.ref('lobbies/'+waitingLobbyChatLobbyId+'/chat').off('value', waitingLobbyChatListener);
+  }
+  waitingLobbyChatListener=null;
+  waitingLobbyChatLobbyId=null;
+  waitingLobbyChatMessages=[];
+}
+
+function attachWaitingLobbyChatListener(lobbyId){
+  const nextLobbyId=String(lobbyId||'').trim();
+  if(!nextLobbyId) return;
+  if(waitingLobbyChatLobbyId===nextLobbyId && waitingLobbyChatListener){
+    renderWaitingLobbyChat(waitingLobbyChatMessages);
+    return;
+  }
+  detachWaitingLobbyChatListener();
+  waitingLobbyChatLobbyId=nextLobbyId;
+  waitingLobbyChatListener=db.ref('lobbies/'+nextLobbyId+'/chat').on('value', snap=>{
+    const rows=[];
+    snap.forEach(child=>rows.push({...(child.val()||{}),_id:child.key}));
+    waitingLobbyChatMessages=rows.sort((a,b)=>(a.ts||0)-(b.ts||0));
+    renderWaitingLobbyChat(waitingLobbyChatMessages);
+  }, error=>{
+    console.error('Waiting room chat listener failed', error);
+    renderWaitingLobbyChat(waitingLobbyChatMessages);
+  });
+}
+
 async function restoreSavedMultiplayerLobby(){
   try{
     const savedRaw=localStorage.getItem('rbMultiplayerLobby');
@@ -1789,10 +1833,12 @@ async function joinLobby(lobbyId){
 }
 
 function showWaitingRoom(lobbyId){
+  const previousLobbyId=currentLobbyId;
   currentLobbyId=lobbyId;
   document.getElementById('mmLobby').classList.remove('active');
   document.getElementById('mmWaiting').classList.add('active');
-  if(lobbyListener) db.ref('lobbies/'+lobbyId).off('value',lobbyListener);
+  if(lobbyListener && previousLobbyId) db.ref('lobbies/'+previousLobbyId).off('value',lobbyListener);
+  attachWaitingLobbyChatListener(lobbyId);
   lobbyListener=db.ref('lobbies/'+lobbyId).on('value',async snap=>{
     if(!snap.exists()){ mmLeaveWaiting(); return; }
     currentLobby=await ensureScheduledLobbyState(lobbyId,{id:lobbyId,...snap.val()}) || {id:lobbyId,...snap.val()};
@@ -1901,9 +1947,9 @@ function renderWaitingRoom(lobby){
   }
 
   // Render chat
-  const chatMsgs=Object.entries(lobby.chat||{}).map(([id,val])=>({...(val||{}),_id:id})).sort((a,b)=>a.ts-b.ts);
-  const wc=document.getElementById('wrChat');
-  if(wc){ wc.innerHTML=chatMsgs.map(m=>`<div style="display:flex;gap:6px;align-items:flex-start;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div style="flex:1;min-width:0;"><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${escapeHtml(m.name)}${ADMIN_USER_NUMBERS.includes(Number(m.userNumber||0))?' ♛':''}: </span><span style="font-size:12px;color:var(--text);">${escapeHtml(m.text)}</span>${myIsAdmin&&m.playerId!==myId&&!isProtectedChatUser(m.playerId,m.userNumber)?`<div style="display:flex;gap:6px;margin-top:4px;"><button onclick="mmDeleteLobbyChatMessage('${m._id}')" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);font-size:10px;cursor:pointer;">Delete</button><button onclick="mmBanGlobalChatPlayer('${m.playerId}','${escapeHtml(m.name)}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:2px 7px;color:#fca5a5;font-size:10px;cursor:pointer;">Ban</button></div>`:''}</div></div>`).join('');wc.scrollTop=wc.scrollHeight;}
+  renderWaitingLobbyChat(waitingLobbyChatMessages.length
+    ? waitingLobbyChatMessages
+    : Object.entries(lobby.chat||{}).map(([id,val])=>({...(val||{}),_id:id})).sort((a,b)=>(a.ts||0)-(b.ts||0)));
 
   // Check all ready + enough players
   if(!scheduled && players.length>=2&&players.every(p=>p.ready)&&!cdRunning) startCountdown();
@@ -2086,6 +2132,7 @@ async function mmLeaveWaiting(){
   if(currentLobbyId){
     const leavingLobbyId=currentLobbyId;
     if(lobbyListener){ db.ref('lobbies/'+currentLobbyId).off('value',lobbyListener); lobbyListener=null; }
+    detachWaitingLobbyChatListener();
     currentLobbyId=null;
     currentLobby=null;
     myReady=false;
