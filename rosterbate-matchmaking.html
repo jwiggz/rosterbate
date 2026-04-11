@@ -859,7 +859,10 @@ async function ensureScheduledLobbyState(lobbyId, lobby){
 function getCurrentDraftOrder(lobby){
   const byId=new Map(getLobbyOrderBaseline(lobby).map(player=>[player.id,player]));
   if(Array.isArray(lobby?.finalDraftOrder) && lobby.finalDraftOrder.length){
-    return lobby.finalDraftOrder.map(id=>byId.get(id)).filter(Boolean);
+    const ordered=lobby.finalDraftOrder.map(id=>byId.get(id)).filter(Boolean);
+    const seen=new Set(ordered.map(player=>player.id));
+    const missing=getLobbyOrderBaseline(lobby).filter(player=>player?.id && !seen.has(player.id));
+    return ordered.concat(missing);
   }
   return getLobbyOrderBaseline(lobby);
 }
@@ -1169,6 +1172,26 @@ function buildMultiplayerLobbyState(lobby){
 
 function saveMultiplayerLobbyState(lobby){
   localStorage.setItem('rbMultiplayerLobby', JSON.stringify(buildMultiplayerLobbyState(lobby)));
+}
+
+function getMatchmakingBaseUrl(){
+  const params=new URLSearchParams(window.location.search||'');
+  const sport=normalizeRosterbateSport(params.get('sport') || MM_SPORT);
+  return 'rosterbate-matchmaking.html?sport='+encodeURIComponent(sport);
+}
+
+function updateWaitingRoomUrl(lobbyId){
+  const cleanLobbyId=String(lobbyId||'').trim();
+  if(!cleanLobbyId || !window.history?.replaceState) return;
+  const params=new URLSearchParams(window.location.search||'');
+  params.set('sport', normalizeRosterbateSport(params.get('sport') || MM_SPORT));
+  params.set('lobby', cleanLobbyId);
+  window.history.replaceState({lobbyId:cleanLobbyId}, '', 'rosterbate-matchmaking.html?'+params.toString());
+}
+
+function restoreMatchmakingBaseUrl(){
+  if(!window.history?.replaceState) return;
+  window.history.replaceState({}, '', getMatchmakingBaseUrl());
 }
 
 function renderWaitingLobbyChat(messages){
@@ -1835,6 +1858,7 @@ async function joinLobby(lobbyId){
 function showWaitingRoom(lobbyId){
   const previousLobbyId=currentLobbyId;
   currentLobbyId=lobbyId;
+  updateWaitingRoomUrl(lobbyId);
   document.getElementById('mmLobby').classList.remove('active');
   document.getElementById('mmWaiting').classList.add('active');
   if(lobbyListener && previousLobbyId) db.ref('lobbies/'+previousLobbyId).off('value',lobbyListener);
@@ -1931,15 +1955,23 @@ function renderWaitingRoom(lobby){
     card.className='card';
     card.innerHTML=`
       <div class="ct">Draft Order</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">${orderIsManual?'Host can set the exact order here before the room opens.':'Order will randomize automatically 5 minutes before start.'}</div>
-      <div>${orderRows.map((player,idx)=>`
-        <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;">
-          <div style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">${idx+1}</div>
-          <div class="wr-av" style="width:28px;height:28px;font-size:11px;background:${playerColor(player?.id||'x')}">${ini(player?.name||'?')}</div>
-          <div style="flex:1;font-family:var(--fd);font-size:13px;font-weight:700;">${player?.name||('Team '+(idx+1))}${player?.id===myId?' (You)':''}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">${orderIsManual?'Host can stack managers top to bottom here before the room opens.':'Order will randomize automatically 5 minutes before start.'}</div>
+      ${orderIsManual && orderRows.length<2 ? `<div style="margin-bottom:10px;padding:10px 12px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.18);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5;">A second manager needs to join before there is anything to reorder.</div>`:''}
+      <div style="display:flex;flex-direction:column;gap:8px;">${orderRows.map((player,idx)=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">${idx+1}</div>
+            <div class="wr-av" style="width:30px;height:30px;font-size:11px;background:${playerColor(player?.id||'x')}">${ini(player?.name||'?')}</div>
+            <div style="min-width:0;flex:1;">
+              <div style="font-family:var(--fd);font-size:14px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player?.name||('Team '+(idx+1))}${player?.id===myId?' (You)':''}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px;">Draft slot ${idx+1}</div>
+            </div>
+          </div>
           ${orderIsManual && lobby.createdBy===myId && !canOpenRoom?`
-            <button onclick="moveDraftOrder('${lobby.id}',${idx},-1)" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text2);font-size:11px;cursor:pointer;${idx===0?'opacity:.35;cursor:not-allowed;':''}" ${idx===0?'disabled':''}>↑</button>
-            <button onclick="moveDraftOrder('${lobby.id}',${idx},1)" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text2);font-size:11px;cursor:pointer;${idx===orderRows.length-1?'opacity:.35;cursor:not-allowed;':''}" ${idx===orderRows.length-1?'disabled':''}>↓</button>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+              <button onclick="moveDraftOrder('${lobby.id}',${idx},-1)" style="min-width:92px;background:${idx===0?'rgba(30,45,69,.55)':'rgba(59,130,246,.12)'};border:1px solid ${idx===0?'var(--border)':'rgba(59,130,246,.35)'};border-radius:7px;padding:7px 10px;color:${idx===0?'var(--text3)':'#93c5fd'};font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;cursor:${idx===0?'not-allowed':'pointer'};opacity:${idx===0?'.45':'1'};" ${idx===0?'disabled':''}>Move Up</button>
+              <button onclick="moveDraftOrder('${lobby.id}',${idx},1)" style="min-width:92px;background:${idx===orderRows.length-1?'rgba(30,45,69,.55)':'rgba(34,197,94,.12)'};border:1px solid ${idx===orderRows.length-1?'var(--border)':'rgba(34,197,94,.35)'};border-radius:7px;padding:7px 10px;color:${idx===orderRows.length-1?'var(--text3)':'#86efac'};font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;cursor:${idx===orderRows.length-1?'not-allowed':'pointer'};opacity:${idx===orderRows.length-1?'.45':'1'};" ${idx===orderRows.length-1?'disabled':''}>Move Down</button>
+            </div>
           `:''}
         </div>`).join('')}</div>
       ${orderIsManual && lobby.createdBy===myId && !canOpenRoom?`<button class="btn-p" onclick="finalizeJoinOrder('${lobby.id}')">${orderLocked?'Save Draft Order':'Use Current Order'}</button>`:''}`;
@@ -2022,6 +2054,23 @@ async function mmSendLobbyChat(){
   }
   input.value='';
   try{
+    const lobbySnap=await db.ref('lobbies/'+lobbyId).once('value');
+    if(!lobbySnap.exists()){
+      throw new Error('Lobby not found');
+    }
+    const lobby=lobbySnap.val()||{};
+    if(!(lobby.players||{})[myId]){
+      const existingByUid=Object.values(lobby.players||{}).find(player=>{
+        if(currentRbUser?.uid && player?.uid && String(player.uid)===String(currentRbUser.uid)) return true;
+        const sameUserNumber=myUserNumber && Number(player?.userNumber||0)===Number(myUserNumber);
+        const sameName=(myName||'').trim() && String(player?.name||'').trim()===String(myName||'').trim();
+        return !!(sameUserNumber && sameName);
+      });
+      if(existingByUid?.id){
+        throw new Error('This browser is using a stale player session. Rejoin the lobby from this client and try again.');
+      }
+      throw new Error('You are not registered in this lobby yet.');
+    }
     const payload={
       playerId:myId,
       userNumber:myUserNumber||0,
@@ -2037,7 +2086,7 @@ async function mmSendLobbyChat(){
     waitingLobbyChatMessages=waitingLobbyChatMessages.filter(m=>!(String(m._id||'').startsWith('pending_') && m.text===text && String(m.playerId||'')===String(myId)));
     renderWaitingLobbyChat(waitingLobbyChatMessages);
     input.value=text;
-    toast('Could not send lobby chat message','var(--red)');
+    toast(e?.message||'Could not send lobby chat message','var(--red)');
   }
 }
 function mmDeleteLobbyChatMessage(messageId){
@@ -2149,6 +2198,7 @@ async function mmLeaveWaiting(){
   }
   document.getElementById('mmWaiting').classList.remove('active');
   document.getElementById('mmLobby').classList.add('active');
+  restoreMatchmakingBaseUrl();
   toast('You left the league');
 }
 
@@ -2180,8 +2230,29 @@ connectedRef.on('value', async snap=>{
 });
 
 syncMatchmakingIdentity().finally(async ()=>{
-  const restored=await restoreSavedMultiplayerLobby();
-  if(!restored) renderCreate();
+  let restored=false;
+  try{
+    const params=new URLSearchParams(window.location.search||'');
+    const lobbyId=String(params.get('lobby')||'').trim();
+    if(lobbyId){
+      try{
+        await resumeLiveDraft(lobbyId);
+        restored=!!currentLobbyId;
+      }catch(e){
+        console.error('Failed to restore matchmaking lobby from URL', e);
+        restoreMatchmakingBaseUrl();
+      }
+    }
+    if(!restored){
+      restored=await restoreSavedMultiplayerLobby();
+    }
+  }catch(e){
+    console.error('Failed to restore matchmaking state', e);
+  }
+  if(!restored){
+    restoreMatchmakingBaseUrl();
+    renderCreate();
+  }
 });
 setTimeout(()=>document.body.classList.add('mm-create-shimmer-ready'), 2000);
 updatePresence();
