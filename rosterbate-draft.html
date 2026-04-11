@@ -465,6 +465,14 @@
         <div class="chip on" data-v="0" onclick="cc('cTimer',this)">Off</div>
       </div>
     </div>
+    <div class="fr">
+      <label>Auto Draft</label>
+      <div class="chips" id="cAutoDraft">
+        <div class="chip on" data-v="off" onclick="cc('cAutoDraft',this)">Off</div>
+        <div class="chip" data-v="on" onclick="cc('cAutoDraft',this)">On</div>
+      </div>
+      <div class="ibox">When enabled, your team auto-picks the best available roster fit, prioritizing starters and utility before bench depth.</div>
+    </div>
     <div class="errmsg" id="err"></div>
     <button class="btn" id="enterDraftBtn" onclick="startDraft()">Enter Draft Room</button>
     <div class="advbox">
@@ -1757,7 +1765,9 @@ let S={
   cur:0,total:0,picks:[],myTeam:[],drafted:new Set(),
   posF:'ALL',timer:0,timerInt:null,selP:null,
   teams:[],order:[],cpuBuds:[],auc:null,auctionTargets:{},roomId:'',started:false,
+  autoDraft:false,
 };
+let autoDraftKickoffTimer=null;
 
 function updatePosFilterBar(){
   const bar = document.getElementById('posFilterBar');
@@ -1951,6 +1961,11 @@ function applySavedLobbySettings(){
       const timerValue=String(savedTimer);
       document.querySelectorAll('#cTimer .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===timerValue));
     }
+    const savedAutoDraft=state.autoDraft ?? state.settings?.autoDraft;
+    if(savedAutoDraft!==undefined&&savedAutoDraft!==null){
+      const autoDraftValue=savedAutoDraft ? 'on' : 'off';
+      document.querySelectorAll('#cAutoDraft .chip').forEach(chip=>chip.classList.toggle('on', chip.dataset.v===autoDraftValue));
+    }
     if(state.settings) renderAdvancedLeagueRules(state.settings);
     syncDraftSpotBounds();
   }catch(e){}
@@ -2021,6 +2036,42 @@ function buildRealtimeDraftState(){
   };
 }
 
+function mergeRealtimeDraftStates(remoteState, localState){
+  const remote=remoteState&&typeof remoteState==='object'?remoteState:{};
+  const local=localState&&typeof localState==='object'?localState:{};
+  const mergedPicksByOv=new Map();
+  const addPick=pick=>{
+    const ov=Number(pick?.ov||0);
+    if(!ov) return;
+    mergedPicksByOv.set(ov,{
+      ov,
+      round:Number(pick?.round||0),
+      ti:Number(pick?.ti||0),
+      pid:Number(pick?.pid||0)
+    });
+  };
+  (Array.isArray(remote.picks)?remote.picks:[]).forEach(addPick);
+  (Array.isArray(local.picks)?local.picks:[]).forEach(addPick);
+  const mergedPicks=Array.from(mergedPicksByOv.values()).sort((a,b)=>a.ov-b.ov);
+  const mergedDraftedIds=Array.from(new Set([
+    ...(Array.isArray(remote.draftedIds)?remote.draftedIds:[]),
+    ...(Array.isArray(local.draftedIds)?local.draftedIds:[]),
+    ...mergedPicks.map(pick=>Number(pick.pid||0))
+  ].map(Number).filter(Boolean)));
+  const merged={
+    ...remote,
+    ...local,
+    version:Date.now(),
+    picks:mergedPicks,
+    draftedIds:mergedDraftedIds,
+    cur:Math.max(Number(remote.cur||0), Number(local.cur||0), mergedPicks.length),
+    updatedAt:Date.now()
+  };
+  if(Array.isArray(remote.teams) && remote.teams.length && (!Array.isArray(local.teams) || !local.teams.length)) merged.teams=remote.teams.slice();
+  if(Array.isArray(remote.order) && remote.order.length && (!Array.isArray(local.order) || !local.order.length)) merged.order=remote.order.slice();
+  return merged;
+}
+
 function rebuildMyRosterFromPicks(){
   S.myTeam=(Array.isArray(S.picks)?S.picks:[])
     .filter(pick=>pick.ti===S.myPos)
@@ -2039,6 +2090,7 @@ function renderDraftFromSharedState(){
   upHdr();
   updateTradeBtn();
   updateSoloSimButton();
+  syncAutoDraftTurn();
 }
 
 function applyRealtimeDraftState(state){
@@ -2087,10 +2139,12 @@ function applyRealtimeDraftState(state){
 async function publishRealtimeDraftState(){
   const lobbyId=getRealtimeMultiplayerLobbyId();
   if(!lobbyId || !db || multiplayerDraftApplying) return;
-  const state=buildRealtimeDraftState();
-  multiplayerDraftStateVersion=Math.max(multiplayerDraftStateVersion, Number(state.version||0));
+  const localState=buildRealtimeDraftState();
   try{
-    await db.ref('lobbies/'+lobbyId+'/draftState').set(state);
+    const remoteSnap=await db.ref('lobbies/'+lobbyId+'/draftState').once('value');
+    const mergedState=mergeRealtimeDraftStates(remoteSnap.val(), localState);
+    multiplayerDraftStateVersion=Math.max(multiplayerDraftStateVersion, Number(mergedState.version||0));
+    await db.ref('lobbies/'+lobbyId+'/draftState').set(mergedState);
   }catch(err){
     console.error('Failed to publish multiplayer draft state', err);
   }
@@ -2224,6 +2278,7 @@ function startDraft(){
   S.rules=rules;
   S.sport=SPORT;
   S.tmax=parseInt(gv('cTimer'))||0;
+  S.autoDraft=gv('cAutoDraft')==='on';
   S.abud=parseInt(document.getElementById('iBudget').value)||200;
   S.total=ls*rd;S.cur=0;S.picks=[];S.myTeam=[];S.drafted=new Set();
   S.myBudget=S.abud;
@@ -2436,6 +2491,28 @@ function getStarterNeedDelta(ti,p){
   const after=getStarterNeedSnapshot(roster.concat([p])).filled;
   return after-before;
 }
+function clearAutoDraftTurn(){
+  if(autoDraftKickoffTimer){
+    clearTimeout(autoDraftKickoffTimer);
+    autoDraftKickoffTimer=null;
+  }
+}
+function getBestAutodraftPlayerForTeam(ti){
+  const av=getAvailablePlayersSorted();
+  if(!av.length) return null;
+  return chooseBestCpuPlayerForTeam(ti,av) || av[0] || null;
+}
+function syncAutoDraftTurn(){
+  clearAutoDraftTurn();
+  if(!S.autoDraft || !S.started || PS.isPaused || S.cur>=S.total) return;
+  if(S.order[S.cur]!==S.myPos) return;
+  autoDraftKickoffTimer=setTimeout(()=>{
+    autoDraftKickoffTimer=null;
+    if(!S.autoDraft || !S.started || PS.isPaused || S.cur>=S.total) return;
+    if(S.order[S.cur]!==S.myPos) return;
+    autoP(true);
+  }, 900);
+}
 function chooseBestCpuPlayerForTeam(ti,av){
   const roster=getTeamDraftedPlayers(ti);
   const needSnapshot=getStarterNeedSnapshot(roster);
@@ -2524,6 +2601,7 @@ function advance(){
   if(S.cur<S.total&&S.order[S.cur]===S.myPos){
     showBanner('⏰ You\'re On The Clock!');
     if(S.tmax>0) resetTimer();
+    syncAutoDraftTurn();
   } else if(S.cur>=S.total) endDraft();
 }
 function cpuPick(){
@@ -2534,6 +2612,7 @@ function cpuPick(){
   if(pick) doPick(pick,S.order[S.cur]);
 }
 function doPick(p,ti){
+  clearAutoDraftTurn();
   const pickNumber=S.cur+1;
   const roundNumber=Math.floor(S.cur/S.ls)+1;
   const teamName=S.teams[ti]||('Team '+(ti+1));
@@ -2549,6 +2628,7 @@ function userPick(p){
   if(!S.started){ showToast('⏰ Draft hasn\'t started yet'); return; }
   if(PS.isPaused){ showToast('⏸ Draft is paused'); return; }
   if(S.drafted.has(p.id)||S.order[S.cur]!==S.myPos)return;
+  clearAutoDraftTurn();
   clearInterval(S.timerInt);
   document.getElementById('pModal').classList.remove('open');
   doPick(p,S.myPos);
@@ -3001,8 +3081,8 @@ function rOtherTeams(){
       .sort((a,b)=>a.ov-b.ov)
       .map(pick=>({pick,player:PLAYERS.find(pl=>pl.id===pick.pid)}))
       .filter(entry=>entry.player);
-    const nextPickOffset=S.order.slice(S.cur).findIndex(ti=>ti===team.idx);
-    const nextPickLabel=nextPickOffset===-1?'Draft complete':`Next pick #${S.cur+nextPickOffset+1}`;
+    const nextPickIndex=nextPickForTeam(team.idx, S.cur);
+    const nextPickLabel=nextPickIndex===-1?'Draft complete':`Next pick ${nextPickIndex+1}/${S.total}`;
     const rosterHtml=roster.length?roster.map(({pick,player})=>`<div class="team-menu-player">
         <div class="pav" style="background:${tcolor(player.team)};width:28px;height:28px;font-size:10px;border:none">${initials(player.name)}</div>
         <div style="min-width:0;flex:1">
@@ -3083,17 +3163,22 @@ function upTimer(){
   document.getElementById('tFill').style.width=pct+'%';
   document.getElementById('tFill').className='tfill'+(S.timer<=15?' urg':'');
 }
-function autoP(){
+function autoP(forceBestFit=false){
   if(S.fmt==='auction'&&S.cur<S.total&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId)){
-    const av=getAvailablePlayersSorted();
-    if(av.length){
-      const target=chooseBestCpuPlayerForTeam(S.myPos,av);
-      if(target){
-        showToast('⏰ Auto-nominated '+target.name+'!');
-        startAuctionNomination(target);
-      }
+    const target=getBestAutodraftPlayerForTeam(S.myPos);
+    if(target){
+      showToast((forceBestFit?'🤖 ':'⏰ ')+'Auto-nominated '+target.name+'!');
+      startAuctionNomination(target);
     }
     return;
+  }
+  if(forceBestFit){
+    const bestFit=getBestAutodraftPlayerForTeam(S.myPos);
+    if(bestFit){
+      showToast('🤖 Auto-drafted '+bestFit.name+'!');
+      userPick(bestFit);
+      return;
+    }
   }
   // Try favorites queue first (in priority order), skip drafted
   for(const id of FAVS){
@@ -3106,9 +3191,9 @@ function autoP(){
       }
     }
   }
-  // Fallback: best available
-  const av=PLAYERS.filter(p=>!S.drafted.has(p.id));
-  if(av.length) userPick(av[0]);
+  // Fallback: best available roster fit
+  const bestFit=getBestAutodraftPlayerForTeam(S.myPos);
+  if(bestFit) userPick(bestFit);
 }
 
 function showBanner(m){
