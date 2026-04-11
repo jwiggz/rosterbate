@@ -761,7 +761,7 @@ function syncScheduledTimeInputs(){
 
 function computeDraftAccessAt(startAt){
   const start=Number(startAt||0);
-  return start ? Math.max(Date.now(), start - DRAFT_ROOM_UNLOCK_MS) : 0;
+  return start ? Math.max(0, start - DRAFT_ROOM_UNLOCK_MS) : 0;
 }
 
 function getLobbyPlayerList(lobby){
@@ -803,14 +803,14 @@ function isScheduledLobby(lobby){
 
 function isLobbyJoinLocked(lobby){
   if(!isScheduledLobby(lobby)) return false;
-  const accessAt=Number(lobby?.draftAccessAt||0);
+  const accessAt=computeDraftAccessAt(lobby?.scheduledStartAt||lobby?.draftAccessAt||0);
   return !!(accessAt && Date.now() >= accessAt);
 }
 
 function canOpenDraftRoom(lobby){
   if(!lobby) return false;
   if(!isScheduledLobby(lobby)) return lobby.status==='started' || lobby.status==='draft_room_open';
-  const accessAt=Number(lobby?.draftAccessAt||0);
+  const accessAt=computeDraftAccessAt(lobby?.scheduledStartAt||lobby?.draftAccessAt||0);
   if(!accessAt || Date.now() < accessAt) return false;
   if(String(lobby?.draftOrderMode||'random_30m')==='manual'){
     return Array.isArray(lobby?.finalDraftOrder) && lobby.finalDraftOrder.length===Number(lobby?.teamSize||0);
@@ -822,11 +822,20 @@ async function ensureScheduledLobbyState(lobbyId, lobby){
   const target=lobby||((await db.ref('lobbies/'+lobbyId).once('value')).val());
   if(!target || !isScheduledLobby(target)) return target;
   const now=Date.now();
-  const accessAt=Number(target.draftAccessAt||0);
-  if(!accessAt || now < accessAt) return target;
+  const accessAt=computeDraftAccessAt(target.scheduledStartAt||target.draftAccessAt||0);
+  const updates={};
+  if(Number(target.draftAccessAt||0)!==accessAt){
+    updates.draftAccessAt=accessAt;
+  }
+  if(!accessAt || now < accessAt){
+    if(Object.keys(updates).length){
+      await db.ref('lobbies/'+lobbyId).update(updates);
+      return {...target,...updates};
+    }
+    return target;
+  }
   const players=getLobbyPlayerList(target);
   const expectedTeamSize=Number(target.teamSize||0);
-  const updates={};
   if(!target.draftRoomId) updates.draftRoomId=lobbyId;
   if(String(target.draftOrderMode||'random_30m')==='random_30m'){
     if(!(Array.isArray(target.finalDraftOrder) && target.finalDraftOrder.length===expectedTeamSize) && players.length===expectedTeamSize){
@@ -1938,16 +1947,37 @@ async function mmStartSoloTest(){
   }
 }
 
-function mmSendLobbyChat(){
+async function mmSendLobbyChat(){
   const input=document.getElementById('wrChatInput');
   const text=(input?.value||'').trim();
-  if(!text||!currentLobbyId) return;
+  const lobbyId=String(currentLobbyId || currentLobby?.id || '').trim();
+  if(!text) return;
+  if(!lobbyId){
+    toast('Could not find this lobby chat room','var(--red)');
+    return;
+  }
   if(isChatBanned(myId)){
     toast('You are banned from matchmaking chat','var(--red)');
     return;
   }
+  if(text.length > 280){
+    toast('Keep chat messages under 280 characters','var(--red)');
+    return;
+  }
   input.value='';
-  db.ref('lobbies/'+currentLobbyId+'/chat').push({playerId:myId,userNumber:myUserNumber||0,name:myName,text,ts:Date.now()});
+  try{
+    await db.ref('lobbies/'+lobbyId+'/chat').push({
+      playerId:myId,
+      userNumber:myUserNumber||0,
+      name:myName || 'Manager',
+      text,
+      ts:Date.now()
+    });
+  }catch(e){
+    console.error('Failed to send lobby chat message', e);
+    input.value=text;
+    toast('Could not send lobby chat message','var(--red)');
+  }
 }
 function mmDeleteLobbyChatMessage(messageId){
   if(!myIsAdmin || !currentLobbyId || !messageId) return;
