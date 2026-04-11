@@ -120,6 +120,12 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .wr-slot-av{width:34px;height:34px;border-radius:50%;background:var(--bg2);border:1px dashed var(--border);flex-shrink:0;}
 .ready-btn{background:var(--green);border:none;border-radius:11px;padding:15px;font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;width:100%;}
 .ready-btn.is-ready{background:var(--text3);}
+.ready-btn.draft-room-open-flash{animation:mmDraftRoomOpenFlash .9s ease-out 1;}
+@keyframes mmDraftRoomOpenFlash{
+  0%{transform:scale(1);box-shadow:0 0 0 rgba(34,197,94,0);}
+  35%{transform:scale(1.03);box-shadow:0 0 0 8px rgba(34,197,94,.14);}
+  100%{transform:scale(1);box-shadow:0 0 0 rgba(34,197,94,0);}
+}
 .countdown-ring{position:relative;width:100px;height:100px;margin:0 auto;}
 .countdown-ring svg{transform:rotate(-90deg);}
 .countdown-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent);}
@@ -1151,6 +1157,34 @@ function saveMultiplayerLobbyState(lobby){
   localStorage.setItem('rbMultiplayerLobby', JSON.stringify(buildMultiplayerLobbyState(lobby)));
 }
 
+async function restoreSavedMultiplayerLobby(){
+  try{
+    const savedRaw=localStorage.getItem('rbMultiplayerLobby');
+    if(!savedRaw) return false;
+    const saved=JSON.parse(savedRaw);
+    const lobbyId=String(saved?.lobbyId||'').trim();
+    if(!lobbyId) return false;
+    const snap=await db.ref('lobbies/'+lobbyId).once('value');
+    if(!snap.exists()){
+      localStorage.removeItem('rbMultiplayerLobby');
+      return false;
+    }
+    const restored=await ensureScheduledLobbyState(lobbyId,{id:lobbyId,...(snap.val()||{})}) || {id:lobbyId,...(snap.val()||{})};
+    if(!(restored.players||{})[myId]){
+      localStorage.removeItem('rbMultiplayerLobby');
+      return false;
+    }
+    currentLobbyId=lobbyId;
+    currentLobby=restored;
+    saveMultiplayerLobbyState(restored);
+    showWaitingRoom(lobbyId);
+    return true;
+  }catch(e){
+    console.error('Failed to restore saved multiplayer lobby', e);
+    return false;
+  }
+}
+
 function openLiveDraft(lobby){
   if(!canOpenDraftRoom(lobby)){
     toast(isScheduledLobby(lobby)
@@ -1211,7 +1245,7 @@ function renderLive(){
   document.getElementById('mmTabContent').innerHTML=`
     <div style="text-align:center;padding:4px 0 8px;">
       <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;">Live Drafts</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:4px;">Jump back into drafts you already joined</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;">See active ${String(MM_SPORT||'').toUpperCase()} draft rooms and jump back into the ones you joined</div>
     </div>
     <div id="liveDraftList"><div class="empty"><div class="empty-icon">??</div><div class="empty-title">Loading...</div></div></div>
     <button class="btn-s" onclick="loadLiveDrafts()">Refresh</button>
@@ -1228,13 +1262,20 @@ async function loadLiveDrafts(){
     const snap=await db.ref('lobbies').once('value');
     if(!snap.exists()){ list.innerHTML=emptyHtml('No live drafts','When one of your leagues starts, it will appear here.'); return; }
     const live=[];
+    const seenIds=new Set();
     const tasks=[];
     snap.forEach(c=>{
       const lobby={id:c.key,...(c.val()||{})};
-      if(!(lobby.players||{})[myId]) return;
+      if((lobby.sport||MM_SPORT)!==MM_SPORT) return;
       tasks.push(ensureScheduledLobbyState(c.key,lobby).then(next=>{
         const target={id:c.key,...(next||lobby)};
-        if(['draft_room_open','started','scheduled','waiting'].includes(target.status)) live.push(target);
+        const isJoined=!!(target.players||{})[myId];
+        const isVisibleStatus=['draft_room_open','started'].includes(target.status)
+          || (isJoined && ['scheduled','waiting'].includes(target.status));
+        if(isVisibleStatus && !seenIds.has(target.id)){
+          seenIds.add(target.id);
+          live.push(target);
+        }
       }).catch(()=>{}));
     });
     if(tasks.length) await Promise.all(tasks);
@@ -1243,6 +1284,7 @@ async function loadLiveDrafts(){
     list.innerHTML=live.map(lobby=>{
       const players=Object.values(lobby.players||{});
       const me=lobby.players?.[myId];
+      const isJoined=!!me;
       const joined = me?.joinedAt ? new Date(me.joinedAt).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Joined';
       const statusLabel=lobby.status==='started'?'Live':lobby.status==='draft_room_open'?'Draft Room Open':'Scheduled';
       const statusClass=lobby.status==='started'?'waiting':(lobby.status==='draft_room_open'?'locked':'scheduled');
@@ -1250,7 +1292,7 @@ async function loadLiveDrafts(){
         ? `Starts ${formatDraftDateTime(lobby.scheduledStartAt)} · Draft room opens ${formatDraftDateTime(lobby.draftAccessAt)}`
         : (lobby.status==='draft_room_open' && Number(lobby.scheduledStartAt||0)>Date.now()
             ? `Draft starts ${formatDraftDateTime(lobby.scheduledStartAt)}`
-            : `You joined ${joined}`);
+            : (isJoined ? `You joined ${joined}` : `${teamCount(lobby)}/${lobby.teamSize} teams in room`));
       return `<div class="lobby-card" style="margin-bottom:8px;">
         <div class="lobby-card-top">
           <div class="lobby-name">${lobby.name||'League'}</div>
@@ -1263,8 +1305,8 @@ async function loadLiveDrafts(){
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:2px;">${subline}</div>
         <div style="display:flex;gap:8px;margin-top:10px;">
-          <button onclick="resumeLiveDraft('${lobby.id}')" style="flex:1;background:var(--accent);border:none;border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">${canOpenDraftRoom(lobby)?'Open Draft':'View Lobby'}</button>
-          <button onclick="leaveLeague('${lobby.id}', true)" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:var(--red);cursor:pointer;">Leave</button>
+          <button onclick="${isJoined?`resumeLiveDraft('${lobby.id}')`:(canJoinLobbyNow(lobby)?`joinLobby('${lobby.id}')`:`resumeLiveDraft('${lobby.id}')`)}" style="flex:1;background:var(--accent);border:none;border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">${isJoined?(canOpenDraftRoom(lobby)?'Open Draft':'View Lobby'):(canJoinLobbyNow(lobby)?'Join Lobby':'View Lobby')}</button>
+          ${isJoined?`<button onclick="leaveLeague('${lobby.id}', true)" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:var(--red);cursor:pointer;">Leave</button>`:''}
         </div>
       </div>`;
     }).join('');
@@ -1813,7 +1855,7 @@ function renderWaitingRoom(lobby){
           <div id="wrScheduledStatus" style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:${canOpenRoom?'var(--green)':'var(--accent)'};">${canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby'}</div>
           <div id="wrScheduledCopy" style="margin-top:6px;font-size:12px;color:var(--text2);line-height:1.55;"></div>
         </div>
-        <button class="ready-btn" onclick="${canOpenRoom?`resumeLiveDraft('${lobby.id}')`:''}" ${canOpenRoom?'':'disabled'} style="${canOpenRoom?'':'opacity:.5;cursor:not-allowed;background:var(--text3);'}">${canOpenRoom?'Open Draft Room':'Draft Room Locked'}</button>
+        <button id="wrOpenDraftBtn" class="ready-btn ${canOpenRoom?'draft-room-open-flash':''}" onclick="${canOpenRoom?`resumeLiveDraft('${lobby.id}')`:''}" ${canOpenRoom?'':'disabled'} style="${canOpenRoom?'background:var(--green);':'opacity:.5;cursor:not-allowed;background:var(--text3);'}">${canOpenRoom?'Draft Room Open':'Draft Room Locked'}</button>
         <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
       startScheduledCountdown(lobby);
     }
@@ -1942,6 +1984,7 @@ function startScheduledCountdown(lobby){
   const accessAt=Number(lobby?.draftAccessAt||0);
   const statusEl=document.getElementById('wrScheduledStatus');
   const copyEl=document.getElementById('wrScheduledCopy');
+  const openBtn=()=>document.getElementById('wrOpenDraftBtn');
   if(!lobbyId || !statusEl || !copyEl || !accessAt) return;
   function tick(){
     if(!currentLobby || currentLobby.id!==lobbyId){
@@ -1955,6 +1998,15 @@ function startScheduledCountdown(lobby){
     const orderLocked=Array.isArray(latestLobby?.finalDraftOrder) && latestLobby.finalDraftOrder.length===Number(latestLobby?.teamSize||0);
     statusEl.textContent=canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby';
     statusEl.style.color=canOpenRoom?'var(--green)':'var(--accent)';
+    const btn=openBtn();
+    if(btn){
+      btn.textContent=canOpenRoom?'Draft Room Open':'Draft Room Locked';
+      btn.disabled=!canOpenRoom;
+      btn.style.opacity=canOpenRoom?'1':'.5';
+      btn.style.cursor=canOpenRoom?'pointer':'not-allowed';
+      btn.style.background=canOpenRoom?'var(--green)':'var(--text3)';
+      btn.onclick=canOpenRoom ? ()=>resumeLiveDraft(lobbyId) : null;
+    }
     if(now < accessAt){
       copyEl.textContent=`Draft room unlocks in ${formatCountdown(accessAt-now)}.`;
       scheduledCountdownTimer=setTimeout(tick,1000);
@@ -1965,6 +2017,18 @@ function startScheduledCountdown(lobby){
     } else {
       copyEl.textContent='Draft room is open. Enter any time before the scheduled start.';
     }
+    ensureScheduledLobbyState(lobbyId, latestLobby).then(updatedLobby=>{
+      if(updatedLobby){
+        currentLobby={...latestLobby,...updatedLobby};
+        saveMultiplayerLobbyState(currentLobby);
+        const liveBtn=openBtn();
+        if(liveBtn){
+          liveBtn.classList.remove('draft-room-open-flash');
+          void liveBtn.offsetWidth;
+          liveBtn.classList.add('draft-room-open-flash');
+        }
+      }
+    }).catch(err=>console.error('Failed to refresh scheduled lobby state', err));
     stopScheduledCountdown();
   }
   tick();
@@ -2019,8 +2083,9 @@ connectedRef.on('value', async snap=>{
   }
 });
 
-syncMatchmakingIdentity().finally(()=>{
-  renderCreate();
+syncMatchmakingIdentity().finally(async ()=>{
+  const restored=await restoreSavedMultiplayerLobby();
+  if(!restored) renderCreate();
 });
 setTimeout(()=>document.body.classList.add('mm-create-shimmer-ready'), 2000);
 updatePresence();
