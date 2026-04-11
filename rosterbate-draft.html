@@ -3824,8 +3824,7 @@ async function endDraft(){
   }
 }
 
-async function openSeasonManager(){
-  // Get the seasonId from the saved draft data
+async function resolveSeasonManagerUrl(){
   let seasonId = null;
   let draftData = null;
   const lobbyState=getSavedMultiplayerLobbyState();
@@ -3883,10 +3882,16 @@ async function openSeasonManager(){
   if (seasonId) {
     url += '&league=' + encodeURIComponent(seasonId);
   }
-  
-  const w = window.open(url, '_blank');
-  if(!w || w.closed){
-    showToast('Save both files to the same folder to use Season Manager');
+  return url;
+}
+
+async function openSeasonManager(){
+  try{
+    const url=await resolveSeasonManagerUrl();
+    window.location.href=url;
+  }catch(e){
+    console.error('Failed to open season manager', e);
+    showToast('Could not open season manager');
   }
 }
 </script>

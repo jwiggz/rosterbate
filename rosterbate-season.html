@@ -1114,6 +1114,9 @@ function getSharedSeasonKey(){
   return D?.sharedSeasonId || D?.seasonId || D?.lobbyId || lobbyState?.sharedSeasonId || lobbyState?.seasonId || lobbyState?.lobbyId || null;
 }
 function getSharedSeasonPath(){
+  const lobbyState=getSavedMultiplayerLobbyState();
+  const lobbyId=String(D?.lobbyId || lobbyState?.lobbyId || '').trim();
+  if(lobbyId) return 'lobbies/'+lobbyId+'/seasonState';
   const key=getSharedSeasonKey();
   return key ? (SHARED_SEASON_ROOT+'/'+key) : '';
 }
@@ -1273,14 +1276,27 @@ async function loadOrCreateSharedSeason(){
   if(!D?.multiplayer) return false;
   const path=getSharedSeasonPath();
   if(!path) return false;
-  const snap=await db.ref(path).once('value');
+  let snap=null;
+  try{
+    snap=await db.ref(path).once('value');
+  }catch(err){
+    if(String(err?.code||'').toLowerCase()==='permission_denied'){
+      console.warn('Shared season path is not readable for this client, skipping shared sync.', err);
+      return false;
+    }
+    throw err;
+  }
   if(snap.exists() && applySharedSeasonPayload(snap.val())){
     subscribeToSharedSeason();
     return true;
   }
   if(!Array.isArray(D?.allRosters) || !D.allRosters.length) return false;
   initSeason();
-  await saveSharedSeason(true,'initial');
+  try{
+    await saveSharedSeason(true,'initial');
+  }catch(err){
+    console.warn('Initial shared season save failed', err);
+  }
   subscribeToSharedSeason();
   return true;
 }
