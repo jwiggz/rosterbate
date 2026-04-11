@@ -3829,6 +3829,9 @@ async function openSeasonManager(){
   let seasonId = null;
   let draftData = null;
   const lobbyState=getSavedMultiplayerLobbyState();
+  const params=new URLSearchParams(window.location.search||'');
+  const urlLobbyId=String(params.get('lobby')||'').trim();
+  const lobbyId=String(lobbyState?.lobbyId || urlLobbyId || '').trim();
   try {
     const saved = localStorage.getItem('rosterbateDraft');
     if (saved) {
@@ -3841,6 +3844,25 @@ async function openSeasonManager(){
 
   if(!seasonId){
     seasonId = lobbyState?.seasonId || lobbyState?.sharedSeasonId || null;
+  }
+
+  if(!seasonId && lobbyId && typeof db!=='undefined'){
+    try{
+      const lobbySnap=await db.ref('lobbies/'+lobbyId).once('value');
+      const lobby=lobbySnap?.val?.() || null;
+      const lobbySeasonId=String(lobby?.seasonId || lobby?.sharedSeasonId || '').trim();
+      if(lobbySeasonId){
+        seasonId=lobbySeasonId;
+        persistMultiplayerLobbySeasonInfo(lobbySeasonId);
+        if(draftData && !draftData.seasonId){
+          draftData.seasonId=lobbySeasonId;
+          draftData.sharedSeasonId=lobbySeasonId;
+          try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); }catch(e){}
+        }
+      }
+    }catch(err){
+      console.warn('Could not load shared season from lobby before opening season manager:', err);
+    }
   }
   
   if (!seasonId && draftData) {
