@@ -915,6 +915,8 @@ let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineup
 let moveCtx=null;
 let rosterTab='stats';
 let dropCandidate=null;
+let rosterActionPane='';
+let pendingWaiverAdd=null;
 let currentRbUser=null;
 let sharedSeasonRef=null;
 let sharedSeasonListener=null;
@@ -1513,10 +1515,18 @@ function hasOpenTotalRosterSlot(teamIdx){
 }
 function closeDropModal(){
   dropCandidate=null;
-  document.getElementById('dModal')?.classList.remove('open');
+  const modal=document.getElementById('dModal');
+  if(modal){
+    modal.classList.remove('open');
+    modal.style.display='none';
+  }
 }
 function closeFreeAgencyModal(){
-  document.getElementById('faModal')?.classList.remove('open');
+  const modal=document.getElementById('faModal');
+  if(modal){
+    modal.classList.remove('open');
+    modal.style.display='none';
+  }
 }
 function renderFreeAgencyModal(){
   const search=(document.getElementById('faSearch')?.value||'').trim().toLowerCase();
@@ -1542,14 +1552,32 @@ function openFreeAgencyModal(){
   const input=document.getElementById('faSearch');
   if(input) input.value='';
   renderFreeAgencyModal();
-  document.getElementById('faModal')?.classList.add('open');
+  const modal=document.getElementById('faModal');
+  if(modal){
+    modal.style.display='flex';
+    modal.classList.add('open');
+  }
 }
 function claimFreeAgentFromModal(pid){
   closeFreeAgencyModal();
   openWaiver(pid);
 }
+function handleRosterAction(action){
+  if(action==='matchup') return goPage('matchup');
+  if(action==='add') return goPage('waiver');
+  if(action==='drop' && rosterActionPane==='drop' && pendingWaiverAdd){
+    pendingWaiverAdd=null;
+  }
+  rosterActionPane = rosterActionPane===action ? '' : action;
+  moveCtx=null;
+  renderRoster();
+}
 function closeIlModal(){
-  document.getElementById('ilModal')?.classList.remove('open');
+  const modal=document.getElementById('ilModal');
+  if(modal){
+    modal.classList.remove('open');
+    modal.style.display='none';
+  }
 }
 function renderManageIlModal(){
   const wrap=document.getElementById('ilManageWrap');
@@ -1583,7 +1611,11 @@ function renderManageIlModal(){
 }
 function openManageIlModal(){
   renderManageIlModal();
-  document.getElementById('ilModal')?.classList.add('open');
+  const modal=document.getElementById('ilModal');
+  if(modal){
+    modal.style.display='flex';
+    modal.classList.add('open');
+  }
 }
 function openDropPlayerModal(){
   const roster=G.rosters[D.myPos]||[];
@@ -1594,6 +1626,11 @@ function openDropPlayerModal(){
   ];
   const wrap=document.getElementById('dDropList');
   const confirm=document.getElementById('dConfirm');
+  const modal=document.getElementById('dModal');
+  if(!wrap || !modal){
+    toast('Drop player tools are unavailable right now.');
+    return;
+  }
   if(confirm){
     confirm.disabled=true;
     confirm.textContent='Confirm Drop';
@@ -1608,7 +1645,8 @@ function openDropPlayerModal(){
       </div>
       <div style="font-family:var(--fd);font-size:11px;color:var(--red);font-weight:700;">Drop</div>
     </div>`).join('') : `<div style="padding:12px;color:var(--text2);text-align:center;">No players available to drop.</div>`;
-  document.getElementById('dModal')?.classList.add('open');
+  modal.style.display='flex';
+  modal.classList.add('open');
 }
 function pickDropPlayer(pid,fromIL,el){
   dropCandidate={pid,fromIL:!!fromIL};
@@ -1627,7 +1665,11 @@ function confirmDropPlayer(){
   const idx=source.findIndex(p=>p.id===dropCandidate.pid);
   if(idx<0){closeDropModal();return;}
   const player=source[idx];
-  if(!confirm('Drop '+player.name+'?')) return;
+  const pendingAddPlayer=pendingWaiverAdd?{...pendingWaiverAdd}:null;
+  const confirmText=pendingAddPlayer
+    ? ('Drop '+player.name+' and add '+pendingAddPlayer.name+'?')
+    : ('Drop '+player.name+'?');
+  if(!confirm(confirmText)) return;
   source.splice(idx,1);
   if(!Array.isArray(G.recentDrops)) G.recentDrops=[];
   G.recentDrops.unshift({
@@ -1641,16 +1683,26 @@ function confirmDropPlayer(){
     undone:false
   });
   if(G.recentDrops.length>30) G.recentDrops.length=30;
-  G.waiver.unshift({...player});
+  if(pendingAddPlayer){
+    claimWaiverPlayerToTeam(pendingAddPlayer,player);
+    pendingWaiverAdd=null;
+  }else{
+    G.waiver.unshift({...player});
+    logActivity('waiver','Player dropped',teamName(D.myPos)+' dropped '+player.name+'.',D.myPos,'🗑️');
+    queueSharedSeasonSave('drop_player');
+    toast('Dropped '+player.name+'.');
+  }
   if(!dropCandidate.fromIL) rebuildLineupsAfterRosterChange(D.myPos);
-  logActivity('waiver','Player dropped',teamName(D.myPos)+' dropped '+player.name+'.',D.myPos,'🗑️');
-  queueSharedSeasonSave('drop_player');
   closeDropModal();
+  rosterActionPane='';
   renderRoster();
   renderWaiver();
   renderHub();
   if(document.getElementById('commissioner')?.classList.contains('active')) renderCommissioner();
-  toast('Dropped '+player.name+'.');
+}
+function confirmInlineDropPlayer(pid,fromIL){
+  dropCandidate={pid,fromIL:!!fromIL};
+  confirmDropPlayer();
 }
 function undoRecentDrop(dropId){
   if(D?.isCommissioner===false){toast('Commissioner access required.');return;}
@@ -1957,6 +2009,16 @@ function setCaptainModeFromPane(btn){
   const select = btn?.previousElementSibling;
   const value = Number(select?.value || 0);
   setCaptainMode(value);
+}
+
+function setSeasonSidePanelVisible(targetId, visible){
+  const aside=document.getElementById(targetId);
+  if(!aside) return;
+  const shell=aside.closest('.season-screen-shell');
+  aside.style.display=visible?'':'none';
+  if(shell){
+    shell.style.gridTemplateColumns=visible ? 'minmax(0,1fr) 360px' : 'minmax(0,1fr)';
+  }
 }
 
 function buildPowerupCardsHtml(){
@@ -2433,7 +2495,66 @@ function settleWeek(week){
   return true;
 }
 let wAdd=null,wDrop=null,trP={ti:-1,give:[],get:[]};
-let waiverSortKey='fp',waiverSortDir='desc',waiverTab='stats';
+let waiverSortKey='fp',waiverSortDir='desc',waiverTab='stats',waiverListMode='all';
+
+function getWatchListIds(){
+  if(!D || !Array.isArray(D.watchList)) D.watchList=[];
+  return D.watchList;
+}
+
+function isWatchListed(pid){
+  return getWatchListIds().includes(Number(pid));
+}
+
+function setWaiverListMode(mode){
+  waiverListMode=mode==='watch' ? 'watch' : 'all';
+  renderWaiver();
+}
+
+function openWatchList(){
+  waiverListMode='watch';
+  goPage('waiver');
+}
+
+function toggleWatchList(pid){
+  const targetId=Number(pid);
+  const current=getWatchListIds();
+  const next=current.includes(targetId)
+    ? current.filter(id=>id!==targetId)
+    : [...current, targetId];
+  D.watchList=next;
+  queueSharedSeasonSave('watch_list', 150);
+  renderWaiver();
+}
+
+function claimWaiverPlayerToTeam(playerToAdd,droppedPlayer=null){
+  if(!playerToAdd) return false;
+  const targetId=Number(playerToAdd.id);
+  const alreadyRostered=(G.rosters||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId))
+    || (G.ilByTeam||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId));
+  if(alreadyRostered){
+    G.waiver=G.waiver.filter(p=>Number(p.id)!==targetId);
+    toast(playerToAdd.name+' is already on a roster.');
+    return false;
+  }
+  const roster=G.rosters[D.myPos]||[];
+  roster.push(playerToAdd);
+  G.waiver=G.waiver.filter(p=>Number(p.id)!==targetId);
+  if(droppedPlayer) G.waiver.unshift({...droppedPlayer});
+  G.starters[D.myPos]=buildBestLineupIdsForRoster(G.rosters[D.myPos],G.day);
+  logActivity(
+    'waiver',
+    'Waiver move',
+    droppedPlayer
+      ? (teamName(D.myPos)+' added '+playerToAdd.name+' and dropped '+droppedPlayer.name+'.')
+      : (teamName(D.myPos)+' added '+playerToAdd.name+' into an open roster spot.'),
+    D.myPos,
+    '📋'
+  );
+  queueSharedSeasonSave('waiver_move');
+  toast(droppedPlayer?('Claimed '+playerToAdd.name+', dropped '+droppedPlayer.name):('Claimed '+playerToAdd.name));
+  return true;
+}
 
 function getWaiverColumns(){
   if(CURRENT_SPORT==='nfl') return [
@@ -2474,20 +2595,72 @@ function getWaiverColumns(){
 
 function waiverStatValue(player,key){
   if(key==='name'||key==='pos'||key==='team') return String(player?.[key]||'');
+  const aliasMap={
+    pts:'PTS',
+    reb:'REB',
+    ast:'AST',
+    stl:'STL',
+    blk:'BLK',
+    tpm:'3PM',
+    hr:'HR',
+    rbi:'RBI',
+    r:'RUN',
+    sb:'SB',
+    so:'SO',
+    passYds:'PASS_YDS',
+    passTd:'PASS_TD',
+    rushYds:'RUSH_YDS',
+    rec:'REC',
+    recYds:'REC_YDS'
+  };
+  const statKey=aliasMap[key];
+  if(statKey){
+    const value=getPlayerStatValue(player,statKey);
+    return Number(value||0);
+  }
   return Number(player?.[key]||0);
 }
 
 function waiverCell(player,key){
   if(key==='name'){
-    return `<div style="display:flex;align-items:center;gap:9px;min-width:190px;">
+    const watched=isWatchListed(player.id);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:220px;">
+      <div style="display:flex;align-items:center;gap:9px;min-width:0;flex:1;">
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
       <div style="min-width:0;">
         <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
         <div style="font-size:11px;color:#6b7280;">${player.team} · ${player.pos}</div>
       </div>
+      </div>
+      <button
+        type="button"
+        onclick="toggleWatchList(${player.id})"
+        title="${watched?'Remove from':'Add to'} watch list"
+        aria-label="${watched?'Remove from':'Add to'} watch list"
+        style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${watched?'rgba(250,204,21,.45)':'#24324a'};background:${watched?'rgba(250,204,21,.14)':'#0f1724'};color:${watched?'#facc15':'#94a3b8'};font-size:16px;font-weight:900;cursor:pointer;flex-shrink:0;transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;"
+      >${watched?'★':'☆'}</button>
     </div>`;
   }
-  const value=player?.[key];
+  const aliasMap={
+    pts:'PTS',
+    reb:'REB',
+    ast:'AST',
+    stl:'STL',
+    blk:'BLK',
+    tpm:'3PM',
+    hr:'HR',
+    rbi:'RBI',
+    r:'RUN',
+    sb:'SB',
+    so:'SO',
+    passYds:'PASS_YDS',
+    passTd:'PASS_TD',
+    rushYds:'RUSH_YDS',
+    rec:'REC',
+    recYds:'REC_YDS'
+  };
+  const statKey=aliasMap[key];
+  const value=statKey ? getPlayerStatValue(player,statKey) : player?.[key];
   if(typeof value==='number'){
     return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
   }
@@ -2514,6 +2687,7 @@ function resetWaiverFilters(){
   const pos=document.getElementById('wPos');
   if(srch) srch.value='';
   if(pos) pos.value='ALL';
+  waiverListMode='all';
   renderWaiver();
 }
 
@@ -3321,6 +3495,7 @@ function getMatchupForTeamDay(teamIdx,day){
 }
 
 function renderMatchup(){
+  setSeasonSidePanelVisible('matchupPowerups', true);
   renderSidePowerups('matchupPowerups');
   if(matchupViewDay===null) matchupViewDay=G.day;
   const day=matchupViewDay;
@@ -3462,6 +3637,7 @@ function renderMatchup(){
 }
 
 function renderRoster(){
+  setSeasonSidePanelVisible('rosterPowerups', true);
   renderSidePowerups('rosterPowerups');
   const rosterNote=document.querySelector('#roster .season-page-note');
   if(rosterNote){
@@ -3493,6 +3669,7 @@ function renderRoster(){
   const isCurrentDay=day===G.day;
   const isPast=isDayRevealed(day);
   const isLocked=day<G.day||isDayRevealed(day);
+  const rosterInlineSearch=(document.getElementById('rosterInlineSearch')?.value||'').trim().toLowerCase();
   const weekPowerups=getWeekPowerups(week);
   const myStanding=G.standings[D.myPos]||{w:0,l:0,pf:0};
   const rk=[...G.standings].sort((a,b)=>b.w-a.w||(b.pf-a.pf)).findIndex(s=>s.teamIdx===D.myPos)+1;
@@ -3622,6 +3799,15 @@ function renderRoster(){
           : `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
               <button class="lineup-move-btn" onclick="startMoveMode(${p.id},${day})">Move</button>
             </div>`);
+    const manageModeAction = rosterActionPane==='drop'
+      ? `<button class="lineup-move-btn" style="border-color:rgba(239,68,68,.4);color:#fca5a5;background:rgba(239,68,68,.12);" onclick="confirmInlineDropPlayer(${p.id},${entry.isIL?'true':'false'})">Drop</button>`
+      : rosterActionPane==='il'
+        ? (entry.isIL
+            ? `<button class="lineup-move-btn" style="border-color:rgba(96,165,250,.35);color:#bfdbfe;" onclick="activatePlayerFromIL(${p.id});renderRoster()">Activate</button>`
+            : (isIlEligiblePlayer(p,injury)
+                ? `<button class="lineup-move-btn" style="border-color:rgba(245,158,11,.45);color:#fcd34d;background:rgba(245,158,11,.12);" onclick="movePlayerToIL(${p.id});renderRoster()">Move to ${ilSlotKey}</button>`
+                : `<span class="lineup-move-btn" style="opacity:.32;border-color:rgba(100,116,139,.35);color:#64748b;cursor:not-allowed;pointer-events:none;">Not Eligible</span>`))
+        : '';
     const moneyBallAction=entry.isStarter && !entry.isIL && isMoneyBallScoring()
       ? (moneyBallLock
           ? `<span style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fdba74;">Locked ${DAY_NAMES[dayOfWeek(moneyBallLock.day)-1]} ${getSeasonDayDate(moneyBallLock.day).toLocaleDateString([],{month:'short',day:'numeric'})}</span>`
@@ -3629,9 +3815,10 @@ function renderRoster(){
             ? `<button class="lineup-move-btn" style="border-color:rgba(34,197,94,.45);color:#86efac;" onclick="lockMoneyBallSlot(${entry.index},${day})">Lock Game</button>`
             : '')
       : '';
-    const action=(moneyBallAction && !canMoveHere && !moveModeBlocked)
-      ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;">${baseAction}${moneyBallAction}</div>`
-      : baseAction;
+    const primaryAction = manageModeAction || baseAction;
+    const action=(moneyBallAction && !canMoveHere && !moveModeBlocked && !manageModeAction)
+      ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;">${primaryAction}${moneyBallAction}</div>`
+      : primaryAction;
     return `<tr>
       <td${rowCellAttr}>${entry.slot}</td>
       <td${rowCellAttr}>
@@ -3746,7 +3933,7 @@ function renderRoster(){
             </div>
             <div class="season-team-link" style="margin-top:6px;">${D.leagueName||'RosterBate League'}</div>
             <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;">
-              <a href="javascript:void(0)" onclick="goPage('waiver')" class="season-team-link">Watch List</a>
+              <a href="javascript:void(0)" onclick="openWatchList()" class="season-team-link">Watch List</a>
               <a href="javascript:void(0)" onclick="goPage('waiver')" class="season-team-link">Waiver Order (${Math.max(1,D.myPos+1)} of ${D.teams.length})</a>
               <button type="button" onclick="openTeamSettings()" class="season-team-link-btn">Team Settings</button>
             </div>
@@ -3768,17 +3955,19 @@ function renderRoster(){
           <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">›</button>
           ${dateSummary}
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="season-outline-btn" onclick="goPage('matchup')">Matchup</button>
-          <button class="season-outline-btn" onclick="openFreeAgencyModal()" style="background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button>
-          <button class="season-outline-btn" onclick="openManageIlModal()" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.45);color:#fcd34d;">Manage ${'IL'}</button>
-          <button class="season-outline-btn" onclick="openDropPlayerModal()" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#fca5a5;">Drop Player</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:5;pointer-events:auto;">
+          <button id="rosterMatchupBtn" data-roster-action="matchup" type="button" onclick="handleRosterAction('matchup')" class="season-outline-btn" style="pointer-events:auto;">Matchup</button>
+          <button id="rosterAddPlayerBtn" data-roster-action="add" type="button" onclick="handleRosterAction('add')" class="season-outline-btn" style="pointer-events:auto;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button>
+          <button id="rosterManageIlBtn" data-roster-action="il" type="button" onclick="handleRosterAction('il')" class="season-outline-btn" style="pointer-events:auto;background:${rosterActionPane==='il'?'rgba(245,158,11,.2)':'rgba(245,158,11,.12)'};border-color:rgba(245,158,11,.45);color:#fcd34d;">${rosterActionPane==='il'?'Close IL':'Manage IL'}</button>
+          <button id="rosterDropPlayerBtn" data-roster-action="drop" type="button" onclick="handleRosterAction('drop')" class="season-outline-btn" style="pointer-events:auto;background:${rosterActionPane==='drop'?'rgba(239,68,68,.2)':'rgba(239,68,68,.12)'};border-color:rgba(239,68,68,.4);color:#fca5a5;">${pendingWaiverAdd?(rosterActionPane==='drop'?'Cancel Swap':'Drop for Add'):(rosterActionPane==='drop'?'Close Drop':'Drop Player')}</button>
         </div>
       </div>
       ${rosterMain}
     </div>
   </div>`;
-  document.getElementById('rosterContent').innerHTML=h;
+  const rosterContent=document.getElementById('rosterContent');
+  if(!rosterContent) return;
+  rosterContent.innerHTML=h;
 }
 
 function toggleCopyMenu(day){
@@ -3993,9 +4182,16 @@ function autoSetDay(day){
 function autoSet(){autoSetDay(rosterViewDay||G.day);}
 
 function renderWaiver(){
-  renderSidePowerups('waiverPowerups');
+  setSeasonSidePanelVisible('waiverPowerups', false);
+  const waiverPowerups=document.getElementById('waiverPowerups');
+  if(waiverPowerups) waiverPowerups.innerHTML='';
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
+  const watchIds=getWatchListIds();
+  const unavailableIds=new Set([
+    ...(G.rosters||[]).flat().map(p=>Number(p.id)),
+    ...(G.ilByTeam||[]).flat().map(p=>Number(p.id))
+  ]);
   const cols=getWaiverColumns();
   const waiverTableWidth=412 + ((cols.length-1) * 96) + 110;
   const scheduleDays=Array.from({length:14},(_,idx)=>(G.day||1)+idx).filter(d=>d<=TOTAL_DAYS());
@@ -4004,11 +4200,13 @@ function renderWaiver(){
     return `<button class="season-stat-pill btn ${pf===pos?'on':''}" onclick="setWaiverPosition('${pos}')" type="button">${label}</button>`;
   }).join('');
   const list=G.waiver.filter(p=>{
+    if(unavailableIds.has(Number(p.id))) return false;
     const pos=String(p.pos||'').toUpperCase();
     const posMatch = pf==='ALL'
       || pos===pf
       || (CURRENT_SPORT==='mlb' && pf==='P' && (pos==='SP' || pos==='RP'));
-    return posMatch && (!s||p.name.toLowerCase().includes(s)||p.team.toLowerCase().includes(s));
+    const watchMatch=waiverListMode!=='watch' || watchIds.includes(Number(p.id));
+    return watchMatch && posMatch && (!s||p.name.toLowerCase().includes(s)||p.team.toLowerCase().includes(s));
   }).sort((a,b)=>{
     const av=waiverStatValue(a,waiverSortKey), bv=waiverStatValue(b,waiverSortKey);
     let cmp=0;
@@ -4020,11 +4218,14 @@ function renderWaiver(){
   if(!list.length){
     document.getElementById('waiverContent').innerHTML=`<div style="padding:24px;">
       <div class="season-table-card season-card-pad" style="text-align:center;color:#94a3b8;display:flex;flex-direction:column;gap:14px;align-items:center;">
-        <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">No players found</div>
-        <div style="font-size:13px;max-width:420px;">Try clearing your search or resetting the position filter to show the full free-agent pool again.</div>
+        <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${waiverListMode==='watch'?'No watch list players yet':'No players found'}</div>
+        <div style="font-size:13px;max-width:420px;">${waiverListMode==='watch'
+          ? 'Tap the empty star next to any free agent to save them to your watch list.'
+          : 'Try clearing your search or resetting the position filter to show the full free-agent pool again.'}</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
           ${s?`<button class="season-outline-btn" onclick="document.getElementById('wSrch').value='';renderWaiver()">Clear Search</button>`:''}
           ${pf!=='ALL'?`<button class="season-outline-btn" onclick="setWaiverPosition('ALL')">Show All Players</button>`:''}
+          ${waiverListMode==='watch'?`<button class="season-outline-btn" onclick="setWaiverListMode('all')">Show All Players</button>`:''}
           <button class="season-outline-btn" onclick="resetWaiverFilters()">Reset All</button>
         </div>
       </div>
@@ -4047,7 +4248,7 @@ function renderWaiver(){
         if(!game) return `<td class="season-schedule-cell off"><span class="main">OFF</span><span class="sub">No game</span></td>`;
         return `<td class="season-schedule-cell on"><span class="main">${game.isHome?'vs':'@'} ${game.opp}</span><span class="sub">${game.time}</span></td>`;
       }).join('')}
-      <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;">Claim</button></td>
+      <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button></td>
     </tr>`).join('');
   document.getElementById('waiverContent').innerHTML=`
     <div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
@@ -4057,6 +4258,8 @@ function renderWaiver(){
             <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Free Agents</div>
             <div class="season-subbar-copy">${D.leagueName||'RosterBate League'}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+              <button class="season-stat-pill btn ${waiverListMode==='all'?'on':''}" onclick="setWaiverListMode('all')" type="button">All Players</button>
+              <button class="season-stat-pill btn ${waiverListMode==='watch'?'on':''}" onclick="setWaiverListMode('watch')" type="button">Watch List ${watchIds.length?`(${watchIds.length})`:''}</button>
               ${posChips}
               <span class="season-stat-pill">${list.length} available</span>
               <span class="season-stat-pill">Sorted by ${cols.find(c=>c.key===waiverSortKey)?.label||'Fantasy'}</span>
@@ -4094,7 +4297,7 @@ function renderWaiver(){
             <tbody>
               ${list.map(p=>`<tr>
                 ${cols.map(col=>`<td style="text-align:${col.align||'right'};${col.key==='fp'?'font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);':''}">${waiverCell(p,col.key)}</td>`).join('')}
-                <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;">Claim</button></td>
+                <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button></td>
               </tr>`).join('')}
             </tbody>
           </table>`}
@@ -4105,29 +4308,33 @@ function renderWaiver(){
 
 function openWaiver(pid){
   wAdd=G.waiver.find(x=>x.id===pid);if(!wAdd)return;
+  const targetId=Number(wAdd.id);
+  const alreadyRostered=(G.rosters||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId))
+    || (G.ilByTeam||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId));
+  if(alreadyRostered){
+    G.waiver=G.waiver.filter(p=>Number(p.id)!==targetId);
+    wAdd=null;
+    renderWaiver();
+    toast('That player is already on a roster.');
+    return;
+  }
   wDrop=null;
-  document.getElementById('wAddName').textContent='Adding: '+wAdd.name+' ('+wAdd.pos+' · '+wAdd.team+' · '+wAdd.fp+' FP)';
-  const roster=G.rosters[D.myPos]||[];
-  const cb=document.getElementById('wConfirm');
   const openSpot=hasOpenTotalRosterSlot(D.myPos);
   if(openSpot){
-    cb.disabled=false;
-    cb.textContent='Claim '+wAdd.name;
-  }else{
-    cb.disabled=true;
-    cb.textContent='Select player to drop';
+    const playerToAdd={...wAdd};
+    claimWaiverPlayerToTeam(playerToAdd,null);
+    wAdd=null;
+    renderWaiver();
+    renderRoster();
+    renderHub();
+    if(document.getElementById('commissioner')?.classList.contains('active')) renderCommissioner();
+    return;
   }
-  document.getElementById('wDropList').innerHTML=roster.map(rp=>`
-    <div onclick="pickDrop(${rp.id},this)" style="display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;margin-bottom:5px;">
-      <div class="pav" style="background:${tc(rp.team)};width:30px;height:30px;font-size:11px;">${ini(rp.name)}</div>
-      <div style="flex:1;min-width:0;"><div style="font-family:var(--fd);font-size:13px;font-weight:700;">${rp.name}<span class="pb2">${rp.pos}</span></div>
-      <div class="pd">${rp.team} · ${rp.fp} FP</div></div>
-      <div style="font-family:var(--fd);font-size:11px;color:var(--red);font-weight:700;">Drop</div>
-    </div>`).join('');
-  if(openSpot){
-    document.getElementById('wDropList').innerHTML=`<div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 14px;margin-bottom:8px;font-size:12px;color:#bbf7d0;">Open roster spot available. No drop needed because your ${getIlSlotKey()} stash created room for another player.</div>`+document.getElementById('wDropList').innerHTML;
-  }
-  document.getElementById('wModal').classList.add('open');
+  pendingWaiverAdd={...wAdd};
+  rosterActionPane='drop';
+  moveCtx=null;
+  goPage('roster');
+  toast('Drop one player to add '+wAdd.name+'.');
 }
 
 function pickDrop(pid,el){
@@ -4147,18 +4354,13 @@ function confirmWaiver(){
     const idx=r.findIndex(p=>p.id===wDrop.id);if(idx<0)return;
     [dropped]=r.splice(idx,1);
   }
-  r.push(wAdd);
-  G.waiver=G.waiver.filter(p=>p.id!==wAdd.id);
-  if(dropped) G.waiver.push(dropped);
-  G.starters[D.myPos]=buildBestLineupIdsForRoster(G.rosters[D.myPos],G.day);
+  claimWaiverPlayerToTeam({...wAdd},dropped);
   document.getElementById('wModal').classList.remove('open');
-  logActivity('waiver','Waiver move',dropped?(teamName(D.myPos)+' added '+wAdd.name+' and dropped '+dropped.name+'.'):(teamName(D.myPos)+' added '+wAdd.name+' into an open roster spot.'),D.myPos,'📋');
-  queueSharedSeasonSave('waiver_move');
-  toast(dropped?('Claimed '+wAdd.name+', dropped '+dropped.name):('Claimed '+wAdd.name));
   wAdd=null;wDrop=null;renderWaiver();renderHub();
 }
 
 function renderTrades(){
+  setSeasonSidePanelVisible('tradesPowerups', true);
   renderSidePowerups('tradesPowerups');
   const mp=D.myPos;
   const isComm = D?.isCommissioner !== false;
@@ -4342,6 +4544,7 @@ function forceRejectTrade(id){
 }
 
 function renderStandings(){
+  setSeasonSidePanelVisible('standingsPowerups', true);
   renderSidePowerups('standingsPowerups');
   const sorted=getLiveStandingsSnapshot().sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
   const medals=['🥇','🥈','🥉'];
@@ -4752,6 +4955,7 @@ function hydrateSeasonSteppers(root){
 }
 
 function renderCommissioner(){
+  setSeasonSidePanelVisible('commPowerups', true);
   renderSidePowerups('commPowerups');
   try{
     initCS();
