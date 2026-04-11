@@ -1143,6 +1143,8 @@ function buildMultiplayerLobbyState(lobby){
   return {
     lobbyId:lobby.id,
     draftRoomId:lobby.draftRoomId||lobby.id,
+    seasonId:lobby.seasonId||null,
+    sharedSeasonId:lobby.sharedSeasonId||lobby.seasonId||null,
     name:lobby.name||'RosterBate League',
     sport:lobby.sport||MM_SPORT,
     format:lobby.format,
@@ -1331,6 +1333,9 @@ async function resumeLiveDraft(lobbyId){
     if(!snap.exists()){ toast('This draft is no longer available','var(--red)'); return; }
     const lobby=await ensureScheduledLobbyState(lobbyId,{id:lobbyId,...snap.val()}) || {id:lobbyId,...snap.val()};
     if(!(lobby.players||{})[myId]){ toast('You are no longer in this league','var(--red)'); renderLive(); return; }
+    currentLobbyId=lobbyId;
+    currentLobby=lobby;
+    saveMultiplayerLobbyState(lobby);
     if(canOpenDraftRoom(lobby)) openLiveDraft(lobby);
     else showWaitingRoom(lobbyId);
   }catch(e){
@@ -1784,6 +1789,7 @@ async function joinLobby(lobbyId){
 }
 
 function showWaitingRoom(lobbyId){
+  currentLobbyId=lobbyId;
   document.getElementById('mmLobby').classList.remove('active');
   document.getElementById('mmWaiting').classList.add('active');
   if(lobbyListener) db.ref('lobbies/'+lobbyId).off('value',lobbyListener);
@@ -1795,13 +1801,13 @@ function showWaitingRoom(lobbyId){
 }
 
 function renderWaitingRoom(lobby){
+  const draftAccessAt=computeDraftAccessAt(lobby?.scheduledStartAt||lobby?.draftAccessAt||0);
   document.getElementById('wrTitle').textContent=lobby.name||'Waiting Room';
   document.getElementById('wrCode').textContent='#'+lobby.code;
 
   const fmtLabel={snake:'Snake',auction:'Auction'}[lobby.format]||lobby.format;
   const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[lobby.scoring]||lobby.scoring;
   const scheduled=isScheduledLobby(lobby);
-  const accessAt=Number(lobby.draftAccessAt||0);
   const canOpenRoom=canOpenDraftRoom(lobby);
   const orderIsManual=String(lobby.draftOrderMode||'random_30m')==='manual';
   const orderLocked=Array.isArray(lobby.finalDraftOrder) && lobby.finalDraftOrder.length===Number(lobby.teamSize||0);
@@ -1813,7 +1819,7 @@ function renderWaitingRoom(lobby){
     </div>
     ${scheduled?`<div style="margin-top:10px;font-size:11px;color:var(--text2);line-height:1.6;">
       <div>Scheduled start: <strong style="color:var(--text);">${formatDraftDateTime(lobby.scheduledStartAt)}</strong></div>
-      <div>Draft room opens: <strong style="color:var(--text);">${formatDraftDateTime(lobby.draftAccessAt)}</strong></div>
+      <div>Draft room opens: <strong style="color:var(--text);">${formatDraftDateTime(draftAccessAt)}</strong></div>
       <div>Draft order: <strong style="color:var(--text);">${orderIsManual?'Manual (host sets it here)':'Randomize 5 minutes before start'}</strong></div>
     </div>`:''}
     ${lobby.isPrivate?`<div style="margin-top:10px;font-size:11px;color:var(--text3);">Share code: <strong style="color:var(--accent);letter-spacing:2px;font-family:var(--fd);font-size:14px;">${lobby.code}</strong> <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${lobby.code}').then(()=>toast('Copied!'))" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text3);font-size:11px;cursor:pointer;">Copy</button></div>`:''}`;
@@ -2011,11 +2017,10 @@ function stopScheduledCountdown(){
 function startScheduledCountdown(lobby){
   stopScheduledCountdown();
   const lobbyId=lobby?.id;
-  const accessAt=Number(lobby?.draftAccessAt||0);
   const statusEl=document.getElementById('wrScheduledStatus');
   const copyEl=document.getElementById('wrScheduledCopy');
   const openBtn=()=>document.getElementById('wrOpenDraftBtn');
-  if(!lobbyId || !statusEl || !copyEl || !accessAt) return;
+  if(!lobbyId || !statusEl || !copyEl) return;
   function tick(){
     if(!currentLobby || currentLobby.id!==lobbyId){
       stopScheduledCountdown();
@@ -2023,6 +2028,11 @@ function startScheduledCountdown(lobby){
     }
     const now=Date.now();
     const latestLobby=currentLobby;
+    const accessAt=computeDraftAccessAt(latestLobby?.scheduledStartAt||latestLobby?.draftAccessAt||0);
+    if(!accessAt){
+      stopScheduledCountdown();
+      return;
+    }
     const canOpenRoom=canOpenDraftRoom(latestLobby);
     const orderIsManual=String(latestLobby?.draftOrderMode||'random_30m')==='manual';
     const orderLocked=Array.isArray(latestLobby?.finalDraftOrder) && latestLobby.finalDraftOrder.length===Number(latestLobby?.teamSize||0);

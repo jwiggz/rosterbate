@@ -257,6 +257,10 @@
   .tr-cancel{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
   .trade-btn{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#a5b4fc;cursor:pointer;flex-shrink:0;transition:all .15s;}
   .trade-btn:active{background:rgba(99,102,241,.3);}
+  .auto-btn{background:rgba(71,85,105,.16);border:1px solid rgba(71,85,105,.28);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#cbd5e1;cursor:pointer;flex-shrink:0;transition:all .15s;}
+  .auto-btn:active{background:rgba(71,85,105,.28);}
+  .auto-btn.on{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.42);color:#dcfce7;box-shadow:0 0 0 1px rgba(34,197,94,.16) inset;}
+  .auto-btn.off{background:rgba(71,85,105,.16);border-color:rgba(71,85,105,.28);color:#cbd5e1;}
   .trade-history{margin-top:12px;}
   .trade-history-title{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:7px;}
   .trade-log-item{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:5px;font-size:11px;color:var(--text2);line-height:1.5;}
@@ -540,6 +544,7 @@
     <div class="dh-top">
       <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">🏀 Roster<span>Bate</span></div></a>
       <div style="display:flex;align-items:center;gap:7px">
+        <button class="auto-btn off" id="autoDraftBtn" onclick="toggleAutoDraft()">Auto Draft Off</button>
         <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">⏸ Pause</button>
         <button class="sim-btn" id="simDraftBtn" onclick="simulateDraftToFinish()">⚡ Sim Draft</button>
         <button class="trade-btn" id="tradeHeaderBtn" onclick="openTradeModal()" style="display:none">⇄ Trade Pick</button>
@@ -993,6 +998,52 @@ async function saveLeagueToFirebase(draftData) {
     console.error('❌ Firebase save failed:', error);
     throw error;
   }
+}
+
+async function ensureMultiplayerLobbySeasonId(lobbyId){
+  const id=String(lobbyId||'').trim();
+  if(!id || !db) return null;
+  try{
+    const lobbyRef=db.ref('lobbies/'+id);
+    const seasonRef=lobbyRef.child('seasonId');
+    const existingSnap=await seasonRef.once('value');
+    const existingId=String(existingSnap.val()||'').trim();
+    if(existingId){
+      try{
+        await lobbyRef.update({ sharedSeasonId: existingId });
+      }catch(e){}
+      return existingId;
+    }
+    const seasonNumber=await getNextSeasonNumber();
+    if(!seasonNumber) return null;
+    const proposedId='season_'+seasonNumber;
+    await seasonRef.transaction(current=>current || proposedId);
+    const finalSnap=await seasonRef.once('value');
+    const finalId=String(finalSnap.val()||proposedId).trim();
+    if(finalId){
+      try{
+        await lobbyRef.update({ sharedSeasonId: finalId });
+      }catch(e){}
+      return finalId;
+    }
+  }catch(err){
+    console.warn('Could not ensure shared lobby season ID', err);
+  }
+  return null;
+}
+
+function persistMultiplayerLobbySeasonInfo(seasonId){
+  const finalId=String(seasonId||'').trim();
+  if(!finalId) return;
+  try{
+    const raw=localStorage.getItem('rbMultiplayerLobby');
+    if(!raw) return;
+    const state=JSON.parse(raw);
+    if(!state || typeof state!=='object') return;
+    state.seasonId=finalId;
+    state.sharedSeasonId=finalId;
+    localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
+  }catch(e){}
 }
 
 function rosterbateScoreDayKey(){
@@ -2090,6 +2141,7 @@ function renderDraftFromSharedState(){
   upHdr();
   updateTradeBtn();
   updateSoloSimButton();
+  updateAutoDraftButton();
   syncAutoDraftTurn();
 }
 
@@ -2495,6 +2547,24 @@ function clearAutoDraftTurn(){
   if(autoDraftKickoffTimer){
     clearTimeout(autoDraftKickoffTimer);
     autoDraftKickoffTimer=null;
+  }
+}
+function updateAutoDraftButton(){
+  const btn=document.getElementById('autoDraftBtn');
+  if(!btn) return;
+  const isOn=!!S.autoDraft;
+  btn.textContent=isOn?'Auto Draft On':'Auto Draft Off';
+  btn.className='auto-btn '+(isOn?'on':'off');
+}
+function toggleAutoDraft(){
+  S.autoDraft=!S.autoDraft;
+  updateAutoDraftButton();
+  if(S.autoDraft){
+    showToast('Auto Draft enabled');
+    syncAutoDraftTurn();
+  }else{
+    clearAutoDraftTurn();
+    showToast('Auto Draft disabled');
   }
 }
 function getBestAutodraftPlayerForTeam(ti){
@@ -3674,6 +3744,15 @@ async function endDraft(){
       teamUsers: teamUsers,
       savedAt: Date.now()
     };
+
+    if(isMultiplayer && lobbyState?.lobbyId){
+      const sharedSeasonId=await ensureMultiplayerLobbySeasonId(lobbyState.lobbyId);
+      if(sharedSeasonId){
+        draftData.seasonId=sharedSeasonId;
+        draftData.sharedSeasonId=sharedSeasonId;
+        persistMultiplayerLobbySeasonInfo(sharedSeasonId);
+      }
+    }
     
     // Save to Firebase first to get the sequential seasonId
     try {
@@ -3681,6 +3760,10 @@ async function endDraft(){
       if (seasonId) {
         // Update draftData with the seasonId
         draftData.seasonId = seasonId;
+        if (isMultiplayer) {
+          draftData.sharedSeasonId = seasonId;
+          persistMultiplayerLobbySeasonInfo(seasonId);
+        }
         console.log('✅ Draft data updated with seasonId:', seasonId);
       }
     } catch(err) {
@@ -3745,14 +3828,19 @@ async function openSeasonManager(){
   // Get the seasonId from the saved draft data
   let seasonId = null;
   let draftData = null;
+  const lobbyState=getSavedMultiplayerLobbyState();
   try {
     const saved = localStorage.getItem('rosterbateDraft');
     if (saved) {
       draftData = JSON.parse(saved);
-      seasonId = draftData.seasonId;
+      seasonId = draftData.seasonId || draftData.sharedSeasonId || draftData.lobbyId || null;
     }
   } catch(e) {
     console.error('Failed to get seasonId:', e);
+  }
+
+  if(!seasonId){
+    seasonId = lobbyState?.seasonId || lobbyState?.sharedSeasonId || null;
   }
   
   if (!seasonId && draftData) {

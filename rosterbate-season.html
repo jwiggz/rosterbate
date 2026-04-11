@@ -1110,7 +1110,8 @@ function getSharedSeasonClientId(){
   return sharedSeasonClientId;
 }
 function getSharedSeasonKey(){
-  return D?.sharedSeasonId || D?.lobbyId || getSavedMultiplayerLobbyState()?.lobbyId || null;
+  const lobbyState=getSavedMultiplayerLobbyState();
+  return D?.sharedSeasonId || D?.seasonId || D?.lobbyId || lobbyState?.sharedSeasonId || lobbyState?.seasonId || lobbyState?.lobbyId || null;
 }
 function getSharedSeasonPath(){
   const key=getSharedSeasonKey();
@@ -1125,7 +1126,8 @@ function hydrateDraftUserContextFromLobby(){
   if(lobby?.lobbyId){
     D.multiplayer=true;
     if(!D.lobbyId) D.lobbyId=lobby.lobbyId;
-    if(!D.sharedSeasonId) D.sharedSeasonId=lobby.lobbyId;
+    if(!D.seasonId && lobby.seasonId) D.seasonId=lobby.seasonId;
+    if(!D.sharedSeasonId) D.sharedSeasonId=lobby.sharedSeasonId || lobby.seasonId || lobby.lobbyId;
     if(!D.leagueName && lobby.name) D.leagueName=lobby.name;
   }
   const myPlayerId=lobby?.myId || D.myPlayerId;
@@ -2942,7 +2944,8 @@ window.onload=async function(){
         sport:requestedSport,
         multiplayer:true,
         lobbyId:lobbyState.lobbyId,
-        sharedSeasonId:lobbyState.lobbyId,
+        seasonId:lobbyState.seasonId||null,
+        sharedSeasonId:lobbyState.sharedSeasonId||lobbyState.seasonId||lobbyState.lobbyId,
         leagueName:lobbyState.name||'RosterBate League',
         myPlayerId:lobbyState.myId||null,
         teamName:lobbyState.myName||'My Team',
