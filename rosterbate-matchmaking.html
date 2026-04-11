@@ -1235,6 +1235,33 @@ function attachWaitingLobbyChatListener(lobbyId){
   });
 }
 
+function resolveLobbyChatSender(lobby){
+  const players=lobby?.players||{};
+  if(players[myId]){
+    return {
+      playerId:myId,
+      name:players[myId]?.name || myName || 'Manager',
+      userNumber:Number(players[myId]?.userNumber || myUserNumber || 0)
+    };
+  }
+  const matchedEntry=Object.entries(players).find(([,player])=>{
+    if(!player) return false;
+    if(currentRbUser?.uid && player?.uid && String(player.uid)===String(currentRbUser.uid)) return true;
+    if(myUserNumber && Number(player?.userNumber||0)===Number(myUserNumber)) return true;
+    if((myName||'').trim() && String(player?.name||'').trim()===String(myName||'').trim()) return true;
+    return false;
+  });
+  if(matchedEntry){
+    const [playerId, player]=matchedEntry;
+    return {
+      playerId:String(playerId),
+      name:player?.name || myName || 'Manager',
+      userNumber:Number(player?.userNumber || myUserNumber || 0)
+    };
+  }
+  return null;
+}
+
 async function restoreSavedMultiplayerLobby(){
   try{
     const savedRaw=localStorage.getItem('rbMultiplayerLobby');
@@ -2059,22 +2086,14 @@ async function mmSendLobbyChat(){
       throw new Error('Lobby not found');
     }
     const lobby=lobbySnap.val()||{};
-    if(!(lobby.players||{})[myId]){
-      const existingByUid=Object.values(lobby.players||{}).find(player=>{
-        if(currentRbUser?.uid && player?.uid && String(player.uid)===String(currentRbUser.uid)) return true;
-        const sameUserNumber=myUserNumber && Number(player?.userNumber||0)===Number(myUserNumber);
-        const sameName=(myName||'').trim() && String(player?.name||'').trim()===String(myName||'').trim();
-        return !!(sameUserNumber && sameName);
-      });
-      if(existingByUid?.id){
-        throw new Error('This browser is using a stale player session. Rejoin the lobby from this client and try again.');
-      }
+    const sender=resolveLobbyChatSender(lobby);
+    if(!sender){
       throw new Error('You are not registered in this lobby yet.');
     }
     const payload={
-      playerId:myId,
-      userNumber:myUserNumber||0,
-      name:myName || 'Manager',
+      playerId:sender.playerId,
+      userNumber:sender.userNumber,
+      name:sender.name,
       text,
       ts:Date.now()
     };
@@ -2083,7 +2102,7 @@ async function mmSendLobbyChat(){
     await db.ref('lobbies/'+lobbyId+'/chat').push(payload);
   }catch(e){
     console.error('Failed to send lobby chat message', e);
-    waitingLobbyChatMessages=waitingLobbyChatMessages.filter(m=>!(String(m._id||'').startsWith('pending_') && m.text===text && String(m.playerId||'')===String(myId)));
+    waitingLobbyChatMessages=waitingLobbyChatMessages.filter(m=>!(String(m._id||'').startsWith('pending_') && m.text===text));
     renderWaitingLobbyChat(waitingLobbyChatMessages);
     input.value=text;
     toast(e?.message||'Could not send lobby chat message','var(--red)');

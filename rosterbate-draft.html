@@ -3870,28 +3870,63 @@ async function resolveSeasonManagerUrl(){
       if (savedSeasonId) {
         seasonId = savedSeasonId;
         draftData.seasonId = savedSeasonId;
+        if(lobbyId){
+          persistMultiplayerLobbySeasonInfo(savedSeasonId);
+        }
         try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
       }
     } catch (err) {
       console.warn('Could not create sequential season ID before opening season manager:', err);
     }
   }
-  
-  // Build URL with seasonId if available
-  let url = 'rosterbate-season.html?sport=' + encodeURIComponent(SPORT);
-  if (seasonId) {
-    url += '&league=' + encodeURIComponent(seasonId);
-  }
-  return url;
+
+  return seasonId
+    ? ('rosterbate-season.html?sport=' + encodeURIComponent(SPORT) + '&league=' + encodeURIComponent(seasonId))
+    : '';
 }
 
 async function openSeasonManager(){
   try{
     const url=await resolveSeasonManagerUrl();
+    if(!url){
+      showToast('League link is still syncing. Try again in a moment.');
+      return;
+    }
     window.location.href=url;
   }catch(e){
     console.error('Failed to open season manager', e);
     showToast('Could not open season manager');
+  }
+}
+
+async function startYourSeason(){
+  try{
+    const btn=document.getElementById('startSeasonBtn');
+    if(btn){
+      btn.disabled=true;
+      btn.textContent='Starting Season...';
+      btn.style.opacity='.75';
+    }
+    const url=await resolveSeasonManagerUrl();
+    if(!url){
+      if(btn){
+        btn.disabled=false;
+        btn.textContent='Start Your Season →';
+        btn.style.opacity='1';
+      }
+      showToast('League link is still syncing. Try again in a moment.');
+      return;
+    }
+    window.location.href=url;
+  }catch(e){
+    console.error('Failed to start season', e);
+    const btn=document.getElementById('startSeasonBtn');
+    if(btn){
+      btn.disabled=false;
+      btn.textContent='Start Your Season →';
+      btn.style.opacity='1';
+    }
+    showToast('Could not start your season');
   }
 }
 </script>
@@ -3936,11 +3971,11 @@ async function openSeasonManager(){
     <!-- Action buttons -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
       <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:2px;">What's Next</div>
-      <button onclick="openSeasonManager()" style="background:var(--accent);border:none;border-radius:11px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-        🏀 Open Season Manager →
+      <button id="startSeasonBtn" onclick="startYourSeason()" style="background:var(--accent);border:none;border-radius:11px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        🏀 Start Your Season →
       </button>
       <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.5;">
-        Manage your roster, pick up players from the waiver wire,<br>propose trades, and track standings all season long.
+        Jump straight into this league's season page with the exact link for your completed draft.
       </div>
       <button onclick="document.getElementById('draftComplete').classList.remove('active');document.getElementById('draft').classList.add('active');" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">
         ← Back to Draft Board
@@ -4203,10 +4238,40 @@ let RB_CHAT_KEY = '';
 let rbActiveTab = 'draft';
 let rbReactTarget = null;
 let rbGifTimer = null;
+let rbRealtimeChatReady = false;
+let rbRealtimeChatRef = null;
+let rbRealtimeChatListener = null;
+let rbRealtimePresenceRef = null;
+let rbRealtimePresenceListener = null;
+let rbRealtimePresenceSelfRef = null;
 
 function rbGetRoomId(){
   if(RB_CONTEXT!=='draft') return 'season';
   return S?.roomId || '';
+}
+
+function rbGetRealtimeLobbyId(){
+  return RB_CONTEXT==='draft' ? getRealtimeMultiplayerLobbyId() : '';
+}
+
+function rbUseRealtimeDraftChat(){
+  return !!(RB_CONTEXT==='draft' && rbGetRealtimeLobbyId() && typeof db!=='undefined');
+}
+
+function rbGetChatMessagesPath(){
+  const lobbyId=rbGetRealtimeLobbyId();
+  return lobbyId ? ('lobbies/'+lobbyId+'/draftChat/messages') : '';
+}
+
+function rbGetPresencePath(){
+  const lobbyId=rbGetRealtimeLobbyId();
+  return lobbyId ? ('lobbies/'+lobbyId+'/draftChat/presence') : '';
+}
+
+function rbUpdateOnlineCount(count){
+  const el=document.getElementById('rbOnlineCount');
+  if(!el) return;
+  el.textContent=Math.max(0, Number(count||0))+' online';
 }
 
 function rbRefreshChatKey(){
@@ -4228,6 +4293,7 @@ function rbResetDraftRoomChat(){
 
 // Load from localStorage
 function rbLoadChat(){
+  if(rbUseRealtimeDraftChat()) return;
   try{
     const key=rbRefreshChatKey();
     if(!key){ rbChat = {msgs:[],lastSeen:0}; return; }
@@ -4245,6 +4311,7 @@ function rbLoadChat(){
 }
 
 function rbSaveChat(){
+  if(rbUseRealtimeDraftChat()) return;
   const key=rbRefreshChatKey();
   if(!key) return;
   try{ localStorage.setItem(key, JSON.stringify(rbChat)); }catch(e){}
@@ -4389,19 +4456,30 @@ function rbScrollBottom(){
 }
 
 // ── SEND ────────────────────────────────────────────────────
-function rbSend(){
+async function rbSend(){
   const input=document.getElementById('rbInput');
   const text=(input?.value||'').trim();
   if(!text) return;
   const chatTag=rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft';
-  rbPostMsg({type:'text',text,tag:chatTag});
+  await rbPostMsg({type:'text',text,tag:chatTag});
   input.value='';
   input.style.height='';
   rbUpdateSendBtn();
   rbClosePickersAll();
 }
 
-function rbPostMsg(extra){
+async function rbPostMsg(extra){
+  if(rbUseRealtimeDraftChat()){
+    const path=rbGetChatMessagesPath();
+    if(!path) return;
+    await db.ref(path).push({
+      sender:RB_MY_NAME,
+      ts:Date.now(),
+      reactions:{},
+      ...extra
+    });
+    return;
+  }
   rbLoadChat();
   const msg={
     id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
@@ -4576,6 +4654,7 @@ function rbClosePickersAll(){
 
 // ── SYSTEM MESSAGES ─────────────────────────────────────────
 function rbPostSystem(text, tag='draft'){
+  if(rbUseRealtimeDraftChat()) return;
   rbLoadChat();
   rbChat.msgs.push({id:'s_'+Date.now(),type:'system',text,ts:Date.now(),tag});
   rbSaveChat();
@@ -4601,6 +4680,7 @@ const RB_AI_MSGS=[
 const RB_AI_PLAYERS=['Jokic','Luka','SGA','Giannis','LeBron','Curry','Tatum','AD','KD','Wemby'];
 
 function rbSimulateActivity(){
+  if(rbUseRealtimeDraftChat()) return;
   if(!rbRefreshChatKey()) return;
   // Post 1-3 messages from AI managers on first open if chat is empty
   rbLoadChat();
@@ -4634,6 +4714,7 @@ function rbSimulateActivity(){
 }
 
 function rbScheduleAiMsg(){
+  if(rbUseRealtimeDraftChat()) return;
   if(!rbRefreshChatKey()) return;
   const delay=30000+Math.random()*90000; // 30-120 seconds
   setTimeout(()=>{
@@ -4657,6 +4738,46 @@ function rbScheduleAiMsg(){
   },delay);
 }
 
+async function rbInitRealtimeDraftChat(){
+  if(!rbUseRealtimeDraftChat() || rbRealtimeChatReady) return;
+  const chatPath=rbGetChatMessagesPath();
+  const presencePath=rbGetPresencePath();
+  if(!chatPath || !presencePath) return;
+  rbRealtimeChatReady=true;
+
+  rbRealtimeChatRef=db.ref(chatPath);
+  rbRealtimeChatListener=snap=>{
+    const rows=[];
+    snap.forEach(child=>rows.push({...(child.val()||{}),id:child.key}));
+    rbChat.msgs=rows.sort((a,b)=>(a.ts||0)-(b.ts||0));
+    rbRender();
+    rbUpdateUnread();
+    if(rbChatOpen) setTimeout(()=>rbScrollBottom(),50);
+  };
+  rbRealtimeChatRef.limitToLast(300).on('value', rbRealtimeChatListener);
+
+  rbRealtimePresenceRef=db.ref(presencePath);
+  rbRealtimePresenceListener=snap=>{
+    let count=0;
+    snap.forEach(()=>count++);
+    rbUpdateOnlineCount(count);
+  };
+  rbRealtimePresenceRef.on('value', rbRealtimePresenceListener);
+
+  rbRealtimePresenceSelfRef=db.ref(presencePath+'/'+myId);
+  try{
+    await rbRealtimePresenceSelfRef.onDisconnect().remove();
+    await rbRealtimePresenceSelfRef.set({
+      id:myId,
+      name:RB_MY_NAME,
+      uid:currentRbUser?.uid||null,
+      ts:Date.now()
+    });
+  }catch(e){
+    console.warn('Draft chat presence setup failed', e);
+  }
+}
+
 // ── INIT ────────────────────────────────────────────────────
 // Post system message on load
 (async function(){
@@ -4670,7 +4791,13 @@ function rbScheduleAiMsg(){
     document.getElementById('iSpot')?.addEventListener('input', syncDraftSpotBounds);
     document.getElementById('iSpot')?.addEventListener('change', syncDraftSpotBounds);
     syncDraftSpotBounds();
-    rbLoadChat();
+    if(rbUseRealtimeDraftChat()){
+      rbChat={msgs:[],lastSeen:0};
+      rbUpdateOnlineCount(0);
+      await rbInitRealtimeDraftChat();
+    } else {
+      rbLoadChat();
+    }
     rbUpdateUnread();
     rbRender();
     rbMarkSeen();
@@ -4690,23 +4817,30 @@ function rbScheduleAiMsg(){
       }
     });
 
-    // Poll for new messages from other sessions every 5 seconds
-    setInterval(()=>{
-      if(rbChatOpen){
-        const prev=rbChat.msgs.length;
-        rbLoadChat();
-        if(rbChat.msgs.length!==prev){ rbRender(); setTimeout(()=>rbScrollBottom(),50); }
-      } else {
-        rbLoadChat();
-        rbUpdateUnread();
-      }
-    },5000);
+    // Poll for new messages from other sessions every 5 seconds in local-only chat mode
+    if(!rbUseRealtimeDraftChat()){
+      setInterval(()=>{
+        if(rbChatOpen){
+          const prev=rbChat.msgs.length;
+          rbLoadChat();
+          if(rbChat.msgs.length!==prev){ rbRender(); setTimeout(()=>rbScrollBottom(),50); }
+        } else {
+          rbLoadChat();
+          rbUpdateUnread();
+        }
+      },5000);
+    }
   }catch(err){
     console.error(err);
     const pill=document.getElementById('sportLobbyPill');
     if(pill) pill.textContent='⚠️ Real player data failed to load';
   }
 })();
+window.addEventListener('beforeunload', ()=>{
+  if(rbRealtimePresenceSelfRef){
+    rbRealtimePresenceSelfRef.remove().catch(()=>{});
+  }
+});
 </script>
 
 <script src="/site-background.js"></script>
