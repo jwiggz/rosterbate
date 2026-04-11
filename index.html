@@ -996,7 +996,7 @@
   </div>
 </div>
 
-<audio id="shemmyAudio" preload="none" src="https://users.content.ytmnd.com/d/6/2/d62143415d6810f35ca1dd9a91916100.mp3"></audio>
+<audio id="shemmyAudio" preload="auto" crossorigin="anonymous" src="https://users.content.ytmnd.com/d/6/2/d62143415d6810f35ca1dd9a91916100.mp3"></audio>
 
 <script>
 const firebaseConfig = {
@@ -1022,6 +1022,7 @@ let navThreadListener = null;
 const SHEMMY_SEQUENCE = 'shemmy';
 let shemmyBuffer = '';
 let shemmyLastPlayedAt = 0;
+let shemmyAudioPrimed = false;
 
 function updateNavNotificationBadge(count){
   const badge = document.getElementById('navNotify');
@@ -1234,22 +1235,45 @@ function openSettings(){
   closeAccountMenu();
   window.location.href='profile.html';
 }
+function primeShemmyAudio(){
+  const audio = document.getElementById('shemmyAudio');
+  if(!audio || shemmyAudioPrimed) return;
+  shemmyAudioPrimed = true;
+  try{
+    audio.load();
+  } catch(_error){}
+}
 function tryPlayShemmyClip(){
   const audio = document.getElementById('shemmyAudio');
   const now = Date.now();
   if(!audio || now - shemmyLastPlayedAt < 2000) return;
   shemmyLastPlayedAt = now;
+  const playNow = () => {
+    try{
+      audio.pause();
+      audio.currentTime = 0;
+      const playAttempt = audio.play();
+      if(playAttempt && typeof playAttempt.catch === 'function') playAttempt.catch(() => {});
+    } catch(_error){}
+  };
   try{
-    audio.pause();
-    audio.currentTime = 0;
-    const playAttempt = audio.play();
-    if(playAttempt && typeof playAttempt.catch === 'function') playAttempt.catch(() => {});
+    if(audio.readyState >= 2){
+      playNow();
+      return;
+    }
+    const handleReady = () => {
+      audio.removeEventListener('canplay', handleReady);
+      playNow();
+    };
+    audio.addEventListener('canplay', handleReady, { once:true });
+    audio.load();
   } catch(_error){}
 }
 function handleShemmySequence(event){
   if(event.ctrlKey || event.metaKey || event.altKey) return;
   const key = String(event.key || '').toLowerCase();
   if(key.length !== 1 || key < 'a' || key > 'z') return;
+  primeShemmyAudio();
   shemmyBuffer = (shemmyBuffer + key).slice(-SHEMMY_SEQUENCE.length);
   if(shemmyBuffer === SHEMMY_SEQUENCE){
     shemmyBuffer = '';
