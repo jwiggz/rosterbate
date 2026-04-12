@@ -23,6 +23,7 @@
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
   .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
   .screen.active{display:flex;}
+  body[data-draft-boot="loading"] .screen.active{display:none !important;}
 
   /* LOBBY */
   #lobby{background:linear-gradient(160deg,#0d1220 0%,#0a0e1a 60%);align-items:center;padding:14px 14px 30px;gap:12px;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;}
@@ -416,10 +417,10 @@
 ::-webkit-scrollbar{width:0;height:0;}
 </style>
 </head>
-<body>
+<body data-draft-boot="loading">
 
 <!-- LOBBY -->
-<div id="lobby" class="screen active">
+<div id="lobby" class="screen">
   <div class="logo">
     <div class="ball" id="sportLogoBall">🏀</div>
     <a href="index.html" class="draft-logo-link" aria-label="RosterBate home"><div class="draft-logo-wordmark">Roster<span>Bate</span></div></a>
@@ -2080,6 +2081,14 @@ function shouldAutoLaunchMultiplayerDraft(){
   return players.length===Number(state.teamSize||0) && players.length>0;
 }
 
+function finishDraftBoot(targetScreen){
+  const screens=['lobby','draft','draftComplete'];
+  screens.forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  const nextId=(targetScreen && screens.includes(targetScreen)) ? targetScreen : 'lobby';
+  document.getElementById(nextId)?.classList.add('active');
+  document.body.dataset.draftBoot='ready';
+}
+
 function getRealtimeMultiplayerLobbyId(){
   const state=getSavedMultiplayerLobbyState();
   if(!state?.lobbyId || state?.soloTest || !db) return '';
@@ -3139,9 +3148,99 @@ function fPos(pos,btn){
 }
 
 // RENDER MY TEAM
+function getDraftRosterDisplaySlots(){
+  const rules = S.rules?.positions || currentLeagueRules().positions || DRAFT_POSITION_RULES || {};
+  const slots = [];
+  Object.keys(rules).forEach(key=>{
+    const upper = String(key).toUpperCase();
+    if(upper==='BN' || upper==='BE' || upper==='IR' || upper==='IL') return;
+    const count = Math.max(0, Number(rules[key]?.starters || 0));
+    for(let i=0;i<count;i++) slots.push(key);
+  });
+  const benchKey = rules.BN ? 'BN' : (rules.BE ? 'BE' : 'BN');
+  const benchCount = Math.max(0, Number(S.rules?.benchSlots ?? currentLeagueRules().benchSlots ?? rules[benchKey]?.starters ?? 0));
+  for(let i=0;i<benchCount;i++) slots.push(benchKey);
+  const irKey = Object.keys(rules).find(key=>{
+    const upper = String(key).toUpperCase();
+    return upper==='IR' || upper==='IL';
+  }) || 'IR';
+  const irCount = Math.max(0, Number(S.rules?.irSlots ?? currentLeagueRules().irSlots ?? rules[irKey]?.starters ?? 0));
+  for(let i=0;i<irCount;i++) slots.push(irKey);
+  return slots;
+}
+
+function getPlayerEligibleDraftPositions(player){
+  const raw = String(player?.pos || '')
+    .toUpperCase()
+    .replace(/\s+/g,'')
+    .replace(/-/g,'/')
+    .replace(/,/g,'/')
+    .replace(/\|/g,'/');
+  const base = raw.split('/').map(part=>part.trim()).filter(Boolean);
+  const positions = new Set(base);
+  if(SPORT==='nba'){
+    if(positions.has('PG') || positions.has('SG')) positions.add('G');
+    if(positions.has('SF') || positions.has('PF')) positions.add('F');
+    if(base.length) positions.add('UTIL');
+  }else if(SPORT==='nfl'){
+    if(positions.has('RB') || positions.has('WR') || positions.has('TE')) positions.add('FLEX');
+  }else if(SPORT==='mlb'){
+    if(positions.has('SP') || positions.has('RP')) positions.add('P');
+    if(['C','1B','2B','3B','SS','OF'].some(pos=>positions.has(pos))) positions.add('UTIL');
+  }
+  if(base.length){
+    positions.add('BN');
+    positions.add('BE');
+    positions.add('IR');
+    positions.add('IL');
+  }
+  return Array.from(positions);
+}
+
+function playerCanFillDraftSlot(player, slot){
+  return getPlayerEligibleDraftPositions(player).includes(String(slot || '').toUpperCase());
+}
+
+function buildDraftRosterDisplayAssignments(players){
+  const roster = Array.isArray(players) ? players.slice() : [];
+  const slotEntries = getDraftRosterDisplaySlots().map((slot,index)=>({ slot, index, player:null }));
+  const used = new Set();
+  const starterEntries = slotEntries.filter(entry=>!['BN','BE','IR','IL'].includes(String(entry.slot).toUpperCase()));
+  const benchEntries = slotEntries.filter(entry=>['BN','BE'].includes(String(entry.slot).toUpperCase()));
+  const irEntries = slotEntries.filter(entry=>['IR','IL'].includes(String(entry.slot).toUpperCase()));
+
+  function assign(entries){
+    entries.forEach(entry=>{
+      const idx = roster.findIndex((player, rosterIndex)=>!used.has(rosterIndex) && playerCanFillDraftSlot(player, entry.slot));
+      if(idx !== -1){
+        entry.player = roster[idx];
+        used.add(idx);
+      }
+    });
+  }
+
+  assign(starterEntries);
+  assign(benchEntries);
+  assign(irEntries);
+
+  roster.forEach((player, rosterIndex)=>{
+    if(used.has(rosterIndex)) return;
+    const fallback = benchEntries.find(entry=>!entry.player) || irEntries.find(entry=>!entry.player) || slotEntries.find(entry=>!entry.player);
+    if(fallback){
+      fallback.player = player;
+      used.add(rosterIndex);
+    }
+  });
+
+  return slotEntries;
+}
 function rMyTeam(){
-  const slots=SPORT_CFG.myTeamSlots.slice(0,S.rds);
+  const slots=buildDraftRosterDisplayAssignments(S.myTeam);
   const sl={h2h_cat:'H2H Cat',h2h_pts:'H2H Pts',roto:'Roto',points:'Points',moneyball_cat:'Moneyball Cat',moneyball_pts:'Moneyball H2H Pts'};
+  const roundByPlayerId=new Map();
+  (S.myTeam||[]).forEach((player,index)=>{
+    if(player && player.id!=null) roundByPlayerId.set(String(player.id), index+1);
+  });
   const bLine=S.fmt==='auction'?`<span class="ts">· $${S.myBudget} left</span>`:'';
   let html=`<div class="thi">
     <div style="font-size:26px">${SPORT_CFG.icon}</div>
@@ -3155,8 +3254,7 @@ function rMyTeam(){
   if(!S.myTeam.length){
     html+=`<div style="text-align:center;padding:36px 20px;color:var(--text3);font-size:12px">Draft players to fill your roster</div>`;
   } else {
-    html+=slots.map((slot,i)=>{
-      const p=S.myTeam[i];
+    html+=slots.map(({slot,player:p},i)=>{
       const col=p?tcolor(p.team):'#334155';
       return p?`<div class="rs">
         <div class="spos">${slot}</div>
@@ -3165,7 +3263,7 @@ function rMyTeam(){
           <div class="pname" style="font-size:13px">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
           <div class="pdet">${p.team}</div>
         </div>
-        <div class="srd">Rd ${i+1}</div>
+        <div class="srd">Rd ${roundByPlayerId.get(String(p.id)) || (i+1)}</div>
       </div>`:`<div class="rs">
         <div class="spos">${slot}</div>
         <div class="semp" style="flex:1">Empty</div>
@@ -5140,7 +5238,10 @@ function rbEnsureChatListenerActive() {
     setTimeout(()=>rbScrollBottom(),50);
     rbSimulateActivity();
     if(shouldAutoLaunchMultiplayerDraft()){
-      setTimeout(()=>startDraft(),0);
+      startDraft();
+      finishDraftBoot('draft');
+    } else {
+      finishDraftBoot('lobby');
     }
 
     // Close pickers when clicking outside
@@ -5174,6 +5275,7 @@ function rbEnsureChatListenerActive() {
     const pill=document.getElementById('sportLobbyPill');
     if(pill) pill.textContent='⚠️ Real player data failed to load';
   }
+  if(document.body.dataset.draftBoot!=='ready') finishDraftBoot('lobby');
 })();
 window.addEventListener('beforeunload', ()=>{
   if(rbRealtimePresenceSelfRef){

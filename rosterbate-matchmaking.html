@@ -889,6 +889,21 @@ function canOpenDraftRoom(lobby){
   return true;
 }
 
+function isCompletedOrStaleLobby(lobby){
+  const target=lobby||{};
+  const now=Date.now();
+  const scheduledStartAt=Number(target.scheduledStartAt||0);
+  const completed=target.status==='completed'
+    || Number(target.completedAt||0) > 0
+    || !!String(target.completedSeasonId||'').trim();
+  if(completed) return true;
+  if(isScheduledLobby(target)){
+    if(['started','draft_room_open'].includes(String(target.status||''))) return false;
+    if(scheduledStartAt && scheduledStartAt <= now) return true;
+  }
+  return false;
+}
+
 async function ensureScheduledLobbyState(lobbyId, lobby){
   const target=lobby||((await db.ref('lobbies/'+lobbyId).once('value')).val());
   if(!target || !isScheduledLobby(target)) return target;
@@ -1520,7 +1535,7 @@ async function loadLiveDrafts(){
       if((lobby.sport||MM_SPORT)!==MM_SPORT) return;
       tasks.push(ensureScheduledLobbyState(c.key,lobby).then(next=>{
         const target={id:c.key,...(next||lobby)};
-        if(target.status==='completed' || Number(target.completedAt||0)>0 || String(target.completedSeasonId||target.seasonId||'').trim()) return;
+        if(isCompletedOrStaleLobby(target)) return;
         const isJoined=!!(target.players||{})[myId];
         const isVisibleStatus=['draft_room_open','started'].includes(target.status)
           || (isJoined && ['scheduled','waiting'].includes(target.status));
@@ -1646,12 +1661,18 @@ async function loadBrowse(){
       tasks.push(ensureScheduledLobbyState(c.key,l).then(next=>{
       const lobby={id:c.key,...(next||l)};
       const count=Object.keys(lobby.players||{}).length;
+      if(isCompletedOrStaleLobby(lobby)){
+        if(lobby.status==='completed' || Number(lobby.completedAt||0)>0 || String(lobby.completedSeasonId||'').trim()){
+          db.ref('lobbies/'+c.key).remove().catch(()=>{});
+        }
+        return;
+      }
       // Remove stale: no players or older than 2 hours
       if(count===0||(!isScheduledLobby(lobby) && lobby.createdAt&&now-lobby.createdAt>TWO_HOURS)){
         db.ref('lobbies/'+c.key).remove().catch(()=>{});
         return;
       }
-      if(lobby.isPrivate||lobby.status==='started') return;
+      if(lobby.isPrivate||['started','draft_room_open','completed'].includes(String(lobby.status||''))) return;
       if(browseFilters.format&&lobby.format!==browseFilters.format) return;
       if(browseFilters.teamSize&&lobby.teamSize!==browseFilters.teamSize) return;
       results.push(lobby);

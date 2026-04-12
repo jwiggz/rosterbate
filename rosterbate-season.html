@@ -4425,8 +4425,8 @@ function renderWaiver(){
   const pf=document.getElementById('wPos')?.value||'ALL';
   const watchIds=getWatchListIds();
   const unavailableIds=new Set([
-    ...(G.rosters||[]).flat().map(p=>Number(p.id)),
-    ...(G.ilByTeam||[]).flat().map(p=>Number(p.id))
+    ...(G.rosters||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite),
+    ...(G.ilByTeam||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite)
   ]);
   const cols=getWaiverColumns();
   const waiverTableWidth=412 + ((cols.length-1) * 96) + 110;
@@ -4435,14 +4435,15 @@ function renderWaiver(){
     const label=pos==='ALL'?'All Players':pos;
     return `<button class="season-stat-pill btn ${pf===pos?'on':''}" onclick="setWaiverPosition('${pos}')" type="button">${label}</button>`;
   }).join('');
-  const list=G.waiver.filter(p=>{
+  const list=(G.waiver||[]).filter(Boolean).filter(p=>{
+    if(p.id==null) return false;
     if(unavailableIds.has(Number(p.id))) return false;
     const pos=String(p.pos||'').toUpperCase();
     const posMatch = pf==='ALL'
       || pos===pf
       || (CURRENT_SPORT==='mlb' && pf==='P' && (pos==='SP' || pos==='RP'));
     const watchMatch=waiverListMode!=='watch' || watchIds.includes(Number(p.id));
-    return watchMatch && posMatch && (!s||p.name.toLowerCase().includes(s)||p.team.toLowerCase().includes(s));
+    return watchMatch && posMatch && (!s||String(p.name||'').toLowerCase().includes(s)||String(p.team||'').toLowerCase().includes(s));
   }).sort((a,b)=>{
     const av=waiverStatValue(a,waiverSortKey), bv=waiverStatValue(b,waiverSortKey);
     let cmp=0;
@@ -4543,7 +4544,7 @@ function renderWaiver(){
 }
 
 function openWaiver(pid){
-  wAdd=G.waiver.find(x=>x.id===pid);if(!wAdd)return;
+  wAdd=(G.waiver||[]).filter(Boolean).find(x=>x && x.id===pid);if(!wAdd)return;
   const targetId=Number(wAdd.id);
   const alreadyRostered=(G.rosters||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId))
     || (G.ilByTeam||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId));
