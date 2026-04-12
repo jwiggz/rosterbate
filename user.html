@@ -111,6 +111,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 }
 .blue-wolf-pill{
   position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
   background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(59,130,246,.18) 45%,rgba(125,211,252,.22) 100%);
   border-color:rgba(96,165,250,.5);
   color:#dbeafe;
@@ -128,6 +131,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   border-radius:999px;
   border:1px solid rgba(191,219,254,.28);
   pointer-events:none;
+}
+.blue-wolf-icon{
+  width:18px;
+  height:18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  filter:drop-shadow(0 0 6px rgba(147,197,253,.32));
+}
+.blue-wolf-icon svg{
+  width:100%;
+  height:100%;
+  display:block;
 }
 @keyframes blueWolfPulse{
   0%,100%{
@@ -260,7 +277,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="pill" id="friendCountPill">Friends 0</div>
           <div class="pill" id="rolePill" style="display:none;">Owner</div>
           <div class="pill founders-pill" id="foundersPill" style="display:none;">Elite Founders Club</div>
-          <div class="pill blue-wolf-pill" id="blueWolfPill" style="display:none;">Blue Wolf Gaiters</div>
+          <div class="pill blue-wolf-pill" id="blueWolfPill" style="display:none;">
+            <span>Blue Wolf Gaiters</span>
+            <span class="blue-wolf-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M8.1 4.2 12 2.8l3.9 1.4 2.3 4.2-1.5 5.8L12 21.2 7.3 14.2 5.8 8.4l2.3-4.2Z" fill="rgba(226,232,240,.96)"/>
+                <path d="M12 2.8v18.4" stroke="rgba(15,23,42,.55)" stroke-width="1"/>
+                <path d="M8.2 6.2 6.7 8.8l1.1 4.7L12 19.7l4.2-6.2 1.1-4.7-1.5-2.6" stroke="#e2e8f0" stroke-width="1.2" stroke-linejoin="round"/>
+                <path d="M9.4 7.4 12 6.4l2.6 1" stroke="#0f172a" stroke-width="1.1" stroke-linecap="round"/>
+                <path d="M8.7 10.2 10 13.7M15.3 10.2 14 13.7" stroke="#1d4ed8" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M9.2 15.6 12 17.4l2.8-1.8" stroke="#93c5fd" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M6.4 6.5 4.8 9.8M17.6 6.5l1.6 3.3" stroke="#7dd3fc" stroke-width="1.15" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
         </div>
         <div class="meta-row">
           <div class="pill" id="titlePill">Championships 0</div>
