@@ -358,6 +358,8 @@ let currentLobby = null;
 let waitingLobbyChatListener = null;
 let waitingLobbyChatLobbyId = null;
 let waitingLobbyChatMessages = [];
+let waitingLobbyChatQuery = null;
+let waitingLobbyChatMap = new Map();
 let myReady = false;
 let cdRunning = false;
 let cdTimer = null;
@@ -1294,12 +1296,25 @@ function renderWaitingLobbyChat(messages){
   wc.scrollTop=wc.scrollHeight;
 }
 
+function syncWaitingLobbyChatMessages(){
+  waitingLobbyChatMessages = Array.from(waitingLobbyChatMap.values()).sort((a,b)=>{
+    const tsDiff = Number(a?.ts||0) - Number(b?.ts||0);
+    if(tsDiff!==0) return tsDiff;
+    return String(a?._id||'').localeCompare(String(b?._id||''));
+  });
+  renderWaitingLobbyChat(waitingLobbyChatMessages);
+}
+
 function detachWaitingLobbyChatListener(){
-  if(waitingLobbyChatListener && waitingLobbyChatLobbyId){
-    db.ref('lobbies/'+waitingLobbyChatLobbyId+'/chat').off('value', waitingLobbyChatListener);
+  if(waitingLobbyChatQuery && waitingLobbyChatListener){
+    if(waitingLobbyChatListener.added) waitingLobbyChatQuery.off('child_added', waitingLobbyChatListener.added);
+    if(waitingLobbyChatListener.changed) waitingLobbyChatQuery.off('child_changed', waitingLobbyChatListener.changed);
+    if(waitingLobbyChatListener.removed) waitingLobbyChatQuery.off('child_removed', waitingLobbyChatListener.removed);
   }
+  waitingLobbyChatQuery=null;
   waitingLobbyChatListener=null;
   waitingLobbyChatLobbyId=null;
+  waitingLobbyChatMap = new Map();
   waitingLobbyChatMessages=[];
 }
 
@@ -1312,15 +1327,28 @@ function attachWaitingLobbyChatListener(lobbyId){
   }
   detachWaitingLobbyChatListener();
   waitingLobbyChatLobbyId=nextLobbyId;
-  waitingLobbyChatListener=db.ref('lobbies/'+nextLobbyId+'/chat').on('value', snap=>{
-    const rows=[];
-    snap.forEach(child=>rows.push({...(child.val()||{}),_id:child.key}));
-    waitingLobbyChatMessages=rows.sort((a,b)=>(a.ts||0)-(b.ts||0));
-    renderWaitingLobbyChat(waitingLobbyChatMessages);
-  }, error=>{
+  waitingLobbyChatQuery=db.ref('lobbies/'+nextLobbyId+'/chat').limitToLast(200);
+  waitingLobbyChatMap = new Map();
+  waitingLobbyChatListener={
+    added:snap=>{
+      waitingLobbyChatMap.set(String(snap.key), {...(snap.val()||{}), _id:snap.key});
+      syncWaitingLobbyChatMessages();
+    },
+    changed:snap=>{
+      waitingLobbyChatMap.set(String(snap.key), {...(snap.val()||{}), _id:snap.key});
+      syncWaitingLobbyChatMessages();
+    },
+    removed:snap=>{
+      waitingLobbyChatMap.delete(String(snap.key));
+      syncWaitingLobbyChatMessages();
+    }
+  };
+  waitingLobbyChatQuery.on('child_added', waitingLobbyChatListener.added, error=>{
     console.error('Waiting room chat listener failed', error);
     renderWaitingLobbyChat(waitingLobbyChatMessages);
   });
+  waitingLobbyChatQuery.on('child_changed', waitingLobbyChatListener.changed);
+  waitingLobbyChatQuery.on('child_removed', waitingLobbyChatListener.removed);
 }
 
 function resolveLobbyChatSender(lobby){
@@ -2223,13 +2251,9 @@ async function mmSendLobbyChat(){
       text,
       ts:Date.now()
     };
-    waitingLobbyChatMessages=[...waitingLobbyChatMessages,{...payload,_id:'pending_'+payload.ts}].sort((a,b)=>(a.ts||0)-(b.ts||0));
-    renderWaitingLobbyChat(waitingLobbyChatMessages);
     await db.ref('lobbies/'+lobbyId+'/chat').push(payload);
   }catch(e){
     console.error('Failed to send lobby chat message', e);
-    waitingLobbyChatMessages=waitingLobbyChatMessages.filter(m=>!(String(m._id||'').startsWith('pending_') && m.text===text));
-    renderWaitingLobbyChat(waitingLobbyChatMessages);
     input.value=text;
     toast(e?.message||'Could not send lobby chat message','var(--red)');
   }
@@ -2414,5 +2438,4 @@ window.addEventListener('beforeunload', ()=>{ presenceRef.remove().catch(()=>{})
 <script src="/site-background.js"></script>
 </body>
 </html>
-
 

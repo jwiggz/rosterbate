@@ -1292,9 +1292,25 @@ function rebuildSeasonWaiverPool(){
 
 function ensureSeasonWaiverPool(force){
   const rebuilt = rebuildSeasonWaiverPool();
+  const savedFallback = []
+    .concat(Array.isArray(D?.freeAgents) ? D.freeAgents : [])
+    .concat(Array.isArray(D?.waiver) ? D.waiver : []);
+  const savedSeen = new Set();
+  const savedRebuilt = savedFallback.filter(player=>{
+    const pid = Number(player?.id);
+    if(!player || !Number.isFinite(pid) || savedSeen.has(pid)) return false;
+    savedSeen.add(pid);
+    return true;
+  }).map(player=>({...player}));
+  const preferred = rebuilt.length ? rebuilt : savedRebuilt;
   if(force || !Array.isArray(G?.waiver) || !G.waiver.length){
-    G.waiver = rebuilt;
-    return rebuilt;
+    G.waiver = preferred;
+    return G.waiver;
+  }
+  if(!rebuilt.length){
+    if(Array.isArray(G.waiver) && G.waiver.length) return G.waiver;
+    G.waiver = savedRebuilt;
+    return G.waiver;
   }
   const rebuiltIds = new Set(rebuilt.map(player=>Number(player.id)));
   G.waiver = (G.waiver||[])
@@ -3222,19 +3238,30 @@ function rebuildDemoSeasonData(sport){
 
 function getSeasonPlayerPool(){
   const source=String(D?.playerPoolSource || '').trim().toLowerCase();
+  const savedFreeAgents = Array.isArray(D?.freeAgents) ? D.freeAgents.filter(Boolean).map(p=>({...p})) : [];
+  const savedWaiver = Array.isArray(D?.waiver) ? D.waiver.filter(Boolean).map(p=>({...p})) : [];
+  const savedPool = savedFreeAgents.length ? savedFreeAgents : savedWaiver;
+  const nbaStaticFallback = (CURRENT_SPORT==='nba' && typeof getRosterbateDemoPlayers==='function')
+    ? (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}))
+    : [];
   if(CURRENT_SPORT==='nba' && typeof getRosterbateDemoPlayers==='function' && (source==='static_2024_25' || !source)){
-    return (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}));
+    const demoPool = (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}));
+    return demoPool.length ? demoPool : savedPool;
   }
   if(D?.isDemo && typeof getRosterbateDemoPlayers==='function'){
-    return (getRosterbateDemoPlayers(CURRENT_SPORT) || []).map(p=>({...p}));
+    const demoPool = (getRosterbateDemoPlayers(CURRENT_SPORT) || []).map(p=>({...p}));
+    return demoPool.length ? demoPool : savedPool;
   }
   if(typeof buildRosterbateSportPlayerPool === 'function'){
     const importedPoolLimit=typeof getRosterbatePlayerPoolLimit === 'function'
       ? getRosterbatePlayerPoolLimit(CURRENT_SPORT)
       : (CURRENT_SPORT==='nba' ? 500 : 320);
-    return buildRosterbateSportPlayerPool(CURRENT_SPORT, importedPoolLimit);
+    const importedPool = buildRosterbateSportPlayerPool(CURRENT_SPORT, importedPoolLimit);
+    if(Array.isArray(importedPool) && importedPool.length) return importedPool;
+    if(nbaStaticFallback.length) return nbaStaticFallback;
+    return savedPool;
   }
-  return [];
+  return savedPool.length ? savedPool : nbaStaticFallback;
 }
 
 function initSeason(){
