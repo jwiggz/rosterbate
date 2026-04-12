@@ -1920,9 +1920,16 @@ function showWaitingRoom(lobbyId){
 }
 
 function renderWaitingRoom(lobby){
+  const titleEl=document.getElementById('wrTitle');
+  const codeEl=document.getElementById('wrCode');
+  const infoEl=document.getElementById('wrInfo');
+  const playersEl=document.getElementById('wrPlayers');
+  const readySectionRoot=document.getElementById('wrReadySection');
+  const countdownRoot=document.getElementById('wrCountdown');
+  if(!titleEl || !codeEl || !infoEl || !playersEl || !readySectionRoot || !countdownRoot) return;
   const draftAccessAt=computeDraftAccessAt(lobby?.scheduledStartAt||lobby?.draftAccessAt||0);
-  document.getElementById('wrTitle').textContent=lobby.name||'Waiting Room';
-  document.getElementById('wrCode').textContent='#'+lobby.code;
+  titleEl.textContent=lobby.name||'Waiting Room';
+  codeEl.textContent='#'+lobby.code;
 
   const fmtLabel={snake:'Snake',auction:'Auction'}[lobby.format]||lobby.format;
   const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[lobby.scoring]||lobby.scoring;
@@ -1930,7 +1937,7 @@ function renderWaitingRoom(lobby){
   const canOpenRoom=canOpenDraftRoom(lobby);
   const orderIsManual=String(lobby.draftOrderMode||'random_30m')==='manual';
   const orderLocked=Array.isArray(lobby.finalDraftOrder) && lobby.finalDraftOrder.length===Number(lobby.teamSize||0);
-  document.getElementById('wrInfo').innerHTML=`
+  infoEl.innerHTML=`
     <div style="display:flex;flex-wrap:wrap;gap:6px;">
       <span style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--accent);">${fmtLabel}</span>
       <span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);">${scrLabel}</span>
@@ -1954,10 +1961,11 @@ function renderWaitingRoom(lobby){
       ${lobby.createdBy===p.id?'<span style="font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;color:var(--accent);">Host</span>':''}
     </div>`).join('');
   for(let i=players.length;i<lobby.teamSize;i++) ph+=`<div class="wr-slot"><div class="wr-slot-av"></div><div style="font-size:13px;color:var(--text3);">Waiting for player ${i+1}...</div></div>`;
-  document.getElementById('wrPlayers').innerHTML=ph;
+  playersEl.innerHTML=ph;
 
   const readyCount=players.filter(p=>p.ready).length;
-  document.getElementById('wrReadyCount').textContent=readyCount+'/'+players.length+' ready';
+  const readyCountEl=document.getElementById('wrReadyCount');
+  if(readyCountEl) readyCountEl.textContent=readyCount+'/'+players.length+' ready';
   const myP=lobby.players?.[myId];
   myReady=myP?.ready||false;
   const rb=document.getElementById('wrReadyBtn');
@@ -1967,7 +1975,7 @@ function renderWaitingRoom(lobby){
     const canSolo=lobby.createdBy===myId && players.length===1;
     soloBtn.style.display=canSolo?'block':'none';
   }
-  const countdownWrap=document.getElementById('wrCountdown');
+  const countdownWrap=countdownRoot;
   if(countdownWrap && scheduled){
     countdownWrap.style.display='none';
     cdRunning=false;
@@ -1975,7 +1983,7 @@ function renderWaitingRoom(lobby){
   }
   if(!scheduled) stopScheduledCountdown();
 
-  const readySection=document.getElementById('wrReadySection');
+  const readySection=readySectionRoot;
   if(readySection){
     if(!scheduled){
       readySection.innerHTML=`
@@ -2137,8 +2145,14 @@ function mmDeleteLobbyChatMessage(messageId){
 
 function startCountdown(){
   cdRunning=true;
-  document.getElementById('wrReadySection').style.display='none';
-  document.getElementById('wrCountdown').style.display='block';
+  const readySection=document.getElementById('wrReadySection');
+  const countdown=document.getElementById('wrCountdown');
+  if(!readySection || !countdown){
+    cdRunning=false;
+    return;
+  }
+  readySection.style.display='none';
+  countdown.style.display='block';
   let secs=5;
   const circ=document.getElementById('cdCircle');
   const numEl=document.getElementById('cdNum');
