@@ -493,7 +493,8 @@ async function loadMyLeagues(){
               member:{
                 id:data.myPlayerId||'local',
                 teamIdx:data.myPos||0
-              }
+              },
+              source:'userSeasons' // Flag to identify this came from userSeasons
             });
           }
         });
@@ -647,25 +648,88 @@ async function leaveSeasonLeague(id){
   const row=seasons.find(x=>x.id===id);
   if(!row) return;
   if(!confirm(`Leave ${row.name}? You can rejoin if someone invites you back.`)) return;
+  
+  // Show loading state
+  setBanner('Removing league...');
+  
   try{
-    const seasonRef=db.ref(SHARED_SEASON_ROOT+'/'+id);
-    const member=row.member;
-    if(!member){
-      toast('Could not identify your player ID in this season.','var(--red)');
-      await loadMyLeagues();
-      return;
+    console.log('🚪 Leaving season:', {id, name: row.name, source: row.source, currentUser: !!currentUser});
+    
+    // Check if this league is from userSeasons or sharedSeasons
+    if(row.source === 'userSeasons'){
+      // For leagues in userSeasons, just delete the league data
+      if(!currentUser){
+        console.error('❌ Not logged in');
+        toast('Must be logged in to leave this league','var(--red)');
+        setBanner('');
+        return;
+      }
+      
+      const userId = currentUser.uid;
+      console.log('🗑️ Deleting from userSeasons:', `userSeasons/${userId}/${id}`);
+      await db.ref(`userSeasons/${userId}/${id}`).remove();
+      console.log('✅ Removed league from userSeasons');
+      
+      // Also try to remove from allSeasons if it exists there
+      try{
+        console.log('🗑️ Trying to delete from allSeasons:', `allSeasons/${id}`);
+        await db.ref(`allSeasons/${id}`).remove();
+        console.log('✅ Removed league from allSeasons');
+      }catch(e){
+        console.warn('Could not remove from allSeasons (might not exist there):', e);
+      }
+      
+    } else {
+      // For leagues in sharedSeasons, mark as left
+      console.log('📝 Marking as left in sharedSeasons');
+      const seasonRef=db.ref(SHARED_SEASON_ROOT+'/'+id);
+      const member=row.member;
+      if(!member){
+        console.error('❌ No member found');
+        toast('Could not identify your player ID in this season.','var(--red)');
+        setBanner('');
+        await loadMyLeagues();
+        return;
+      }
+      const patch=buildLeftMemberPatch(member);
+      console.log('📝 Updating leftMembers:', patch);
+      await seasonRef.child('leftMembers').update(patch);
+      console.log('✅ Marked as left in sharedSeasons');
     }
-    const patch=buildLeftMemberPatch(member);
-    await seasonRef.child('leftMembers').update(patch);
+    
+    // Clear from localStorage if it's the active lobby
     try{
       const saved=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
-      if(saved?.lobbyId===id) localStorage.removeItem('rbMultiplayerLobby');
+      if(saved?.lobbyId===id || saved?.seasonId===id) {
+        localStorage.removeItem('rbMultiplayerLobby');
+        console.log('✅ Cleared from localStorage');
+      }
     }catch(e){}
+    
+    // Remove from the local array immediately for instant UI update
+    const idx = seasons.findIndex(s => s.id === id);
+    if(idx !== -1){
+      seasons.splice(idx, 1);
+      console.log('✅ Removed from local array');
+    }
+    
+    // Re-render immediately
+    renderSeasons(seasons);
+    
     toast('Season removed from your leagues.');
-    await loadMyLeagues();
+    
+    // Reload from Firebase after a short delay to confirm
+    setTimeout(async () => {
+      console.log('🔄 Reloading leagues from Firebase...');
+      await loadMyLeagues();
+    }, 500);
+    
   }catch(e){
-    console.error(e);
-    toast('Could not leave that season.','var(--red)');
+    console.error('❌ Failed to leave season:', e);
+    toast('Could not leave that season: ' + (e.message || 'Unknown error'),'var(--red)');
+    setBanner('');
+    // Reload to show current state
+    await loadMyLeagues();
   }
 }
 
