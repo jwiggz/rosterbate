@@ -4801,8 +4801,106 @@ function commissionerStorageKey(){
   return 'rosterbateCS:' + sportKey + ':' + seasonKey;
 }
 
+function getLocalCommissionerDefaults(sport){
+  const sportKey=normalizeRosterbateSport(sport || CURRENT_SPORT || 'nba');
+  if(sportKey==='nfl'){
+    return {
+      scoringType:'H2H Points',
+      positions:{
+        QB:{starters:1,max:3},
+        RB:{starters:2,max:6},
+        WR:{starters:2,max:7},
+        TE:{starters:1,max:3},
+        FLEX:{starters:1,max:4},
+        K:{starters:1,max:2},
+        DST:{starters:1,max:2},
+        BN:{starters:6,max:'No Limit'},
+        IR:{starters:2,max:4}
+      },
+      scoring:{
+        PASS_YDS:0.04,
+        PASS_TD:4,
+        INT:-2,
+        RUSH_YDS:0.1,
+        RUSH_TD:6,
+        REC:1,
+        REC_YDS:0.1,
+        REC_TD:6,
+        FUM:-2,
+        FG:3,
+        XP:1,
+        SACK:1,
+        DEF_TO:2,
+        DEF_TD:6
+      }
+    };
+  }
+  if(sportKey==='mlb'){
+    return {
+      scoringType:'H2H Points',
+      positions:{
+        C:{starters:1,max:2},
+        '1B':{starters:1,max:2},
+        '2B':{starters:1,max:2},
+        '3B':{starters:1,max:2},
+        SS:{starters:1,max:2},
+        OF:{starters:3,max:6},
+        UTIL:{starters:1,max:3},
+        P:{starters:6,max:10},
+        BN:{starters:5,max:'No Limit'},
+        IL:{starters:3,max:5}
+      },
+      scoring:{
+        SINGLE:1,
+        DOUBLE:2,
+        TRIPLE:3,
+        HR:4,
+        RBI:1,
+        RUN:1,
+        BB:1,
+        SB:2,
+        IP:3,
+        SO:1,
+        W:5,
+        SV:5,
+        ER:-1
+      }
+    };
+  }
+  return {
+    scoringType:'H2H Points',
+    positions:{
+      PG:{starters:1,max:3},
+      SG:{starters:1,max:3},
+      SF:{starters:1,max:3},
+      PF:{starters:1,max:3},
+      C:{starters:1,max:3},
+      G:{starters:1,max:3},
+      F:{starters:1,max:3},
+      UTIL:{starters:1,max:4},
+      BN:{starters:5,max:'No Limit'},
+      IR:{starters:2,max:4}
+    },
+    scoring:{
+      FGM:1,
+      FGA:0,
+      FTM:1,
+      FTA:0,
+      '3PM':1,
+      REB:1.2,
+      AST:1.5,
+      STL:3,
+      BLK:3,
+      TO:-1,
+      PTS:1
+    }
+  };
+}
+
 function defaultCS(){
-  const sportDefaults = getRosterbateCommissionerDefaults(CURRENT_SPORT);
+  const sportDefaults = (typeof getRosterbateCommissionerDefaults === 'function')
+    ? getRosterbateCommissionerDefaults(CURRENT_SPORT)
+    : getLocalCommissionerDefaults(CURRENT_SPORT);
   const seasonMeta = getSeasonMeta(CURRENT_SPORT);
   return {
     // Basic
