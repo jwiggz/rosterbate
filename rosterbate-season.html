@@ -197,6 +197,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-matchup-table th:nth-child(4),.season-matchup-table td:nth-child(4){width:78px;}
 .season-matchup-table th:nth-child(5),.season-matchup-table td:nth-child(5){width:94px;}
 .season-matchup-table th:nth-child(6),.season-matchup-table td:nth-child(6){width:58px;text-align:right;}
+.season-matchup-table td:nth-child(2) .season-player-name{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15;}
+.season-matchup-table td:nth-child(2) .season-soft-muted{white-space:normal;line-height:1.15;}
 .season-outline-btn{background:#0f1724;border:1px solid #3b82f6;color:#93c5fd;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .season-action-btn{background:#f59e0b;border:none;color:#fff;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .lineup-move-btn{display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:7px 14px;border-radius:999px;border:1px solid #3b82f6;background:#0f1724;color:#93c5fd;font-family:var(--fb);font-size:13px;font-weight:700;cursor:pointer;}
@@ -229,7 +231,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 @media (min-width: 980px){
   .season-split-grid{grid-template-columns:1.1fr .9fr;}
 }
-@media (max-width: 1180px){
+@media (max-width: 1480px){
   .season-matchup-grid{grid-template-columns:1fr;}
 }
     @media (min-width: 1080px){
@@ -1609,13 +1611,16 @@ function getSportGameTimes(sport){
   return ['7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM','10:00 PM'];
 }
 function getGameInfo(p,day){
+  if(!p || p.id==null || !p.team) return null;
+  const numericId=Number(p.id);
+  if(!Number.isFinite(numericId)) return null;
   const teamPool=(SPORT_CFG.teamCodes||[]).filter(t=>t!==p.team);
   if(!teamPool.length) return null;
   if(!getSportGamePattern(CURRENT_SPORT,p.team,day)) return null;
-  const opp=teamPool[(p.id*13+day*11)%teamPool.length];
-  const isHome=(p.id+day)%3!==0;
+  const opp=teamPool[(numericId*13+day*11)%teamPool.length];
+  const isHome=(numericId+day)%3!==0;
   const times=getSportGameTimes(CURRENT_SPORT);
-  const time=times[(p.id*5+day*3)%times.length];
+  const time=times[(numericId*5+day*3)%times.length];
   return {opp, isHome, time};
 }
 
@@ -3996,7 +4001,8 @@ function renderRoster(){
   const isPitcherPlayer=p=>['P','SP','RP'].includes(String(p?.pos||'').toUpperCase());
   function buildRows(entries, cols){
     return entries.map(entry=>{
-    const isMoveSource=!!(movePlayer && entry.player && entry.player.id===movePlayer.id);
+    const safePlayer=entry.player||null;
+    const isMoveSource=!!(movePlayer && safePlayer && safePlayer.id===movePlayer.id);
     const canMoveHere=!!(movePlayer && !isMoveSource && canMoveToRosterEntry(movePlayer,day,entry,starterIds,roster));
     const moveModeBlocked=!!(movePlayer && !isMoveSource && !canMoveHere);
     const moneyBallLock=entry.isStarter && Number.isInteger(entry.index) ? getMoneyBallSlotLock(D.myPos, week, entry.index) : null;
@@ -4029,7 +4035,19 @@ function renderRoster(){
         ${cols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
       </tr>`;
     }
-    const p=entry.player;
+    const p=safePlayer;
+    if(!p || p.id==null){
+      return `<tr>
+        <td${rowCellAttr}>${entry.slot}</td>
+        <td${rowCellAttr}><div class="season-soft-muted">Player unavailable</div></td>
+        <td${rowCellAttr}><span class="season-soft-muted" style="font-weight:700;">Syncing</span></td>
+        <td${rowCellAttr}>--</td>
+        <td${rowCellAttr}>--</td>
+        <td${rowCellAttr}>${statusBadge('Syncing')}</td>
+        <td${rowCellAttr}><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
+        ${cols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
+      </tr>`;
+    }
     const game=getGameInfo(p,day);
     const injury=getInjuryStatus(p,week);
     const opp=game?(game.isHome?'vs ':'@ ')+game.opp:'--';
