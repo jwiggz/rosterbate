@@ -46,25 +46,26 @@
   .pill.live{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
   .pill.waiting{color:#93c5fd;border-color:rgba(96,165,250,.26);background:rgba(96,165,250,.08)}
   .pill.complete{color:#fde68a;border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.08)}
+  .pill.solo{color:#c4b5fd;border-color:rgba(139,92,246,.26);background:rgba(139,92,246,.08)}
+  .pill.multi{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
   .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
   .stat-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1}
   .stat-label{margin-top:6px;color:var(--text3);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
   .league-copy{color:var(--text2);font-size:13px;line-height:1.6;min-height:42px}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
-  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:28px;text-align:center;color:var(--text2)}
-  .empty h3{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;margin-bottom:8px}
-  .empty p{font-size:14px;line-height:1.6;max-width:460px;margin:0 auto}
-  .banner{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);border-radius:16px;padding:14px 16px;color:#dbeafe;font-size:13px;line-height:1.6;margin-bottom:18px}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--green);color:#fff;padding:12px 18px;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:50}
+  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:32px 20px;text-align:center}
+  .empty h3{font-family:var(--fd);font-size:24px;font-weight:900;margin-bottom:8px}
+  .empty p{color:var(--text2);font-size:14px;line-height:1.6}
+  .banner{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-align:center;color:var(--text2);font-size:13px;margin-bottom:16px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:14px 20px;border-radius:12px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:50}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  .toast.error{background:var(--red)}
   @media (max-width:720px){
     .topbar{padding:16px}
     .hero{flex-direction:column;align-items:flex-start}
     .hero h1{font-size:34px}
-    .stats{grid-template-columns:1fr}
-    .actions{flex-direction:column}
-    .btn{width:100%}
+    .grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -72,7 +73,7 @@
   <div class="topbar">
     <a href="index.html" class="brand">Roster<span>Bate</span></a>
     <div class="top-actions">
-      <a href="messages.html" class="btn secondary small">Messages</a>
+      <a href="rosterbate-matchmaking.html" class="btn primary small">Find League</a>
       <a href="profile.html" class="btn secondary small">Settings</a>
     </div>
   </div>
@@ -81,7 +82,7 @@
     <div class="hero">
       <div>
         <h1>My Leagues</h1>
-        <p>Jump back into any league tied to your account. Draft rooms stay grouped separately from shared season leagues so it’s easy to reopen the right experience.</p>
+        <p>All your draft rooms, shared seasons, and solo leagues. Draft rooms stay grouped separately from shared season leagues so it's easy to reopen the right experience.</p>
       </div>
       <a href="rosterbate-matchmaking.html" class="btn primary">Create or Join League</a>
     </div>
@@ -135,100 +136,118 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+const SHARED_SEASON_ROOT = 'sharedSeasons';
+let currentUser = null;
+let currentUserNumber = 0;
+let currentUsername = '';
+const localPlayerId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+const localPlayerName = String(localStorage.getItem('rbPlayerName') || '').trim() || 'Manager';
 
-const SHARED_SEASON_ROOT='multiplayerSeasons';
-const localPlayerId=localStorage.getItem('rbPlayerId') || '';
-const localPlayerName=localStorage.getItem('rbPlayerName') || 'Manager';
-const localUserNumber=Number(localStorage.getItem('rbUserNumber') || 0);
-let currentUser=null;
-let currentUserNumber=localUserNumber;
-let currentUsername=localPlayerName;
-
-function toast(msg,color){
+function toast(msg,bg){
   const el=document.getElementById('toast');
+  if(!el) return;
   el.textContent=msg;
-  el.style.background=color||'var(--green)';
+  if(bg) el.style.background=bg;
   el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2600);
+  setTimeout(()=>el.classList.remove('show'),2800);
 }
 
-function escapeHtml(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function setBanner(msg){
+  const el=document.getElementById('leagueBanner');
+  if(!el) return;
+  if(!msg){
+    el.style.display='none';
+    return;
+  }
+  el.style.display='block';
+  el.textContent=msg;
 }
 
-function formatLabel(v){
-  return ({snake:'Snake',auction:'Auction',linear:'Linear'}[String(v||'').toLowerCase()] || String(v||'—'));
-}
-
-function scoringLabel(v){
-  return ({h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points'}[String(v||'').toLowerCase()] || String(v||'—'));
-}
-
-function sportLabel(v){
-  return ({nba:'NBA',nfl:'NFL',mlb:'MLB'}[String(v||'').toLowerCase()] || String(v||'').toUpperCase() || 'League');
+function escapeHtml(str){
+  const div=document.createElement('div');
+  div.textContent=String(str||'');
+  return div.innerHTML;
 }
 
 function formatDate(ts){
-  const n=Number(ts||0);
-  if(!n) return '—';
-  return new Date(n).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  if(!ts) return '—';
+  return new Date(ts).toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
 }
 
-function setBanner(text){
-  const el=document.getElementById('leagueBanner');
-  if(el) el.textContent=text;
+function sportLabel(sport){
+  const map={nba:'NBA',nfl:'NFL',mlb:'MLB'};
+  return map[String(sport||'').toLowerCase()]||'Unknown';
 }
 
-function memberMatches(member){
-  if(!member || typeof member!=='object') return false;
-  const memberId=String(member.id||'');
-  const memberUid=String(member.uid||'');
-  const memberName=String(member.name||'').trim().toLowerCase();
-  const memberUserNumber=Number(member.userNumber||0);
-  if(currentUser?.uid && memberUid && memberUid===currentUser.uid) return true;
-  if(currentUserNumber>0 && memberUserNumber>0 && memberUserNumber===currentUserNumber) return true;
-  if(localPlayerId && memberId && memberId===localPlayerId) return true;
-  if(currentUsername && memberName && memberName===String(currentUsername).trim().toLowerCase()) return true;
-  return false;
+function formatLabel(format){
+  const map={snake:'Snake',auction:'Auction',linear:'Linear'};
+  return map[String(format||'').toLowerCase()]||'Snake';
+}
+
+function scoringLabel(scoring){
+  const map={
+    h2h_pts:'H2H Points',
+    h2h_cat:'H2H Cats',
+    points:'Points',
+    roto:'Roto',
+    moneyball_pts:'Moneyball Points',
+    moneyball_cat:'Moneyball Cats',
+    money_ball:'Moneyball'
+  };
+  return map[String(scoring||'').toLowerCase()]||'H2H Points';
 }
 
 function getLobbyMember(lobby){
-  const players=Object.values(lobby?.players||{});
-  return players.find(memberMatches) || null;
+  if(!lobby||!lobby.players) return null;
+  const uid=String(currentUser?.uid||'');
+  const userNumber=currentUserNumber;
+  const playerId=localPlayerId;
+  for(const key of Object.keys(lobby.players)){
+    const p=lobby.players[key];
+    if(uid && String(p?.uid||'')===uid) return p;
+    if(userNumber>0 && Number(p?.userNumber||0)===userNumber) return p;
+    if(String(p?.id||'')===playerId) return p;
+  }
+  return null;
 }
 
 function getSeasonMember(payload){
-  const users=Object.values(payload?.draft?.teamUsers||{});
-  return users.find(memberMatches) || null;
+  if(!payload||!payload.draft) return null;
+  const draft=payload.draft;
+  const uid=String(currentUser?.uid||'');
+  const userNumber=currentUserNumber;
+  const playerId=localPlayerId;
+  if(!draft.teamUsers) return null;
+  for(const key of Object.keys(draft.teamUsers)){
+    const user=draft.teamUsers[key];
+    if(uid && String(user?.uid||'')===uid) return user;
+    if(userNumber>0 && Number(user?.userNumber||0)===userNumber) return user;
+    if(String(user?.id||'')===playerId) return user;
+  }
+  return null;
 }
 
-function memberIdentityKeys(member){
-  const keys=[];
-  if(member?.uid) keys.push('uid:'+String(member.uid));
-  if(member?.id) keys.push('id:'+String(member.id));
-  if(member?.userNumber) keys.push('userNumber:'+String(member.userNumber));
-  if(member?.name) keys.push('name:'+String(member.name).trim().toLowerCase());
-  if(currentUser?.uid) keys.push('uid:'+String(currentUser.uid));
-  if(localPlayerId) keys.push('id:'+String(localPlayerId));
-  if(currentUserNumber) keys.push('userNumber:'+String(currentUserNumber));
-  if(currentUsername) keys.push('name:'+String(currentUsername).trim().toLowerCase());
-  return [...new Set(keys.filter(Boolean))];
-}
-
-function memberIsMarkedLeft(container, member){
-  const left = container?.leftMembers || {};
-  const keys = memberIdentityKeys(member);
-  return keys.some(key=>left && left[key]);
+function memberIsMarkedLeft(data,member){
+  if(!data||!member) return false;
+  const leftMembers=data.leftMembers||{};
+  const memberId=String(member.id||member.uid||'');
+  if(!memberId) return false;
+  return !!leftMembers[memberId];
 }
 
 function buildLeftMemberPatch(member){
+  const memberId=String(member.id||member.uid||'');
+  if(!memberId) return {};
   const patch={};
-  memberIdentityKeys(member).forEach(key=>{ patch[key] = Date.now(); });
+  patch[memberId]={
+    id:memberId,
+    name:String(member.name||currentUsername||'Manager'),
+    leftAt:Date.now()
+  };
   return patch;
 }
 
-function buildLobbyStateFromLobby(id,lobby,member){
+function buildLobbyState(id,lobby,member){
   return {
     lobbyId:id,
     name:lobby.name||'RosterBate League',
@@ -333,7 +352,7 @@ function renderSeasons(rows){
       </div>
       <div class="league-copy">${row.complete?'This season is already finished, but you can reopen it to review standings and league history.':'Open the shared season manager and continue playing through the real season.'}</div>
       <div class="actions">
-        <button class="btn primary small" onclick="openSeasonLeague('${row.id}')">Open Season</button>
+        <button class="btn primary small" onclick="openSeasonLeague('${row.id}','${row.sport}')">${row.complete?'Review Season':'Open Season'}</button>
         <button class="btn danger small" onclick="leaveSeasonLeague('${row.id}')">Leave League</button>
       </div>
     </div>
@@ -353,7 +372,7 @@ function renderSolo(rows){
         <div>
           <div class="league-title">${escapeHtml(row.name)}</div>
           <div class="league-meta" style="margin-top:8px;">
-            <span class="pill live">Solo</span>
+            <span class="pill solo">Solo</span>
             <span class="pill">${escapeHtml(sportLabel(row.sport))}</span>
             <span class="pill">${escapeHtml(formatLabel(row.format))}</span>
             <span class="pill">${escapeHtml(scoringLabel(row.scoring))}</span>
@@ -375,12 +394,15 @@ function renderSolo(rows){
 }
 
 async function loadMyLeagues(){
+  console.log('🔄 Loading leagues...');
   setBanner('Loading your leagues…');
+  
   const [lobbiesSnap,seasonsSnap]=await Promise.all([
     db.ref('lobbies').once('value').catch(()=>null),
     db.ref(SHARED_SEASON_ROOT).once('value').catch(()=>null)
   ]);
 
+  // DRAFT ROOMS
   const drafts=[];
   if(lobbiesSnap?.exists?.()){
     lobbiesSnap.forEach(child=>{
@@ -410,7 +432,9 @@ async function loadMyLeagues(){
     });
   }
   drafts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  console.log('✅ Found', drafts.length, 'draft rooms');
 
+  // SEASON LEAGUES - Load from sharedSeasons
   const seasons=[];
   if(seasonsSnap?.exists?.()){
     seasonsSnap.forEach(child=>{
@@ -435,9 +459,49 @@ async function loadMyLeagues(){
       });
     });
   }
+  console.log('✅ Found', seasons.length, 'shared seasons from sharedSeasons/');
+  
+  // ALSO load multiplayer leagues from userSeasons (for leagues saved there instead of sharedSeasons)
+  if(currentUser){
+    const userId=currentUser.uid;
+    try{
+      const userSeasonsSnap=await db.ref(`userSeasons/${userId}`).once('value');
+      if(userSeasonsSnap?.exists?.()){
+        userSeasonsSnap.forEach(child=>{
+          const data=child.val()||{};
+          
+          // Only add multiplayer leagues that aren't already in seasons array
+          if((data.multiplayer || data.isMultiplayer) && !seasons.find(s=>s.id===child.key)){
+            console.log('📦 Found multiplayer league in userSeasons:', child.key, data.leagueName);
+            seasons.push({
+              id:child.key,
+              name:data.leagueName||'RosterBate League',
+              sport:data.sport||'nba',
+              format:data.draftFormat||'snake',
+              scoring:data.scoringFormat||'h2h_pts',
+              teamSize:Number(data.leagueSize||0),
+              mySeat:Number(data.myPos||0)+1,
+              complete:!!data.isSeasonComplete,
+              updatedAt:Number(data.updatedAt||data.savedAt||0),
+              updatedLabel:data.updatedAt ? new Date(data.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
+              payload:data,
+              member:{
+                id:data.myPlayerId||'local',
+                teamIdx:data.myPos||0
+              }
+            });
+          }
+        });
+      }
+      console.log('✅ Total seasons after userSeasons check:', seasons.length);
+    }catch(e){
+      console.error('Failed to load multiplayer leagues from userSeasons:', e);
+    }
+  }
+  
   seasons.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
 
-  // Load solo leagues from Firebase (if logged in)
+  // SOLO LEAGUES - Load from userSeasons (only truly solo leagues)
   const solo=[];
   if(currentUser){
     const userId=currentUser.uid;
@@ -446,7 +510,7 @@ async function loadMyLeagues(){
       if(userSeasonsSnap?.exists?.()){
         userSeasonsSnap.forEach(child=>{
           const data=child.val()||{};
-          // Only show solo leagues (not multiplayer)
+          // Only show SOLO leagues (not multiplayer, not demo)
           if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
             solo.push({
               id:child.key,
@@ -467,6 +531,7 @@ async function loadMyLeagues(){
         });
       }
       solo.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+      console.log('✅ Found', solo.length, 'solo leagues');
     }catch(e){
       console.error('Failed to load solo leagues from Firebase:', e);
       
@@ -490,12 +555,10 @@ async function loadMyLeagues(){
             });
           }
         }
-      }catch(localErr){
-        console.error('Failed to load from localStorage:', localErr);
-      }
+      }catch(e){}
     }
-  } else {
-    // Not logged in - try localStorage
+  }else{
+    // Not logged in - check localStorage only
     try{
       const saved=localStorage.getItem('rosterbateDraft');
       if(saved){
@@ -515,78 +578,49 @@ async function loadMyLeagues(){
           });
         }
       }
-    }catch(e){
-      console.error('Failed to load solo league from localStorage:', e);
-    }
+    }catch(e){}
   }
 
+  window.__rbSoloRows=solo;
+  setBanner('');
   renderDrafts(drafts);
   renderSeasons(seasons);
   renderSolo(solo);
-  const total=drafts.length+seasons.length+solo.length;
-  setBanner(total ? `Found ${total} league${total===1?'':'s'} tied to your account.` : 'No leagues tied to your account yet.');
-  window.__rbDraftRows=drafts;
-  window.__rbSeasonRows=seasons;
-  window.__rbSoloRows=solo;
 }
 
 function openDraftLeague(id){
-  const row=(window.__rbDraftRows||[]).find(x=>x.id===id);
+  const row=drafts.find(x=>x.id===id);
   if(!row) return;
-  const state=buildLobbyStateFromLobby(id,row.lobby,row.member);
-  try{ localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state)); }catch(e){}
-  window.location.href='rosterbate-draft.html?lobby='+encodeURIComponent(id);
-}
-
-function openSeasonLeague(id){
-  const row=(window.__rbSeasonRows||[]).find(x=>x.id===id);
-  if(!row) return;
-  const state=buildLobbyStateFromSeason(id,row.payload,row.member);
-  try{ localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state)); }catch(e){}
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(row.payload.draft||{})); }catch(e){}
-  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba')+'&league='+encodeURIComponent(id);
+  const state=buildLobbyState(id,row.lobby,row.member);
+  try{
+    localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
+  }catch(e){}
+  if(row.status==='started'){
+    window.location.href='rosterbate-draft.html?lobby='+encodeURIComponent(id);
+  }else{
+    window.location.href='rosterbate-matchmaking.html?lobby='+encodeURIComponent(id);
+  }
 }
 
 async function leaveDraftLeague(id){
-  const row=(window.__rbDraftRows||[]).find(x=>x.id===id);
+  const row=drafts.find(x=>x.id===id);
   if(!row) return;
-  const isWaiting = String(row.status||'waiting') !== 'started';
-  const prompt = isWaiting
-    ? `Leave ${row.name}? You will be removed from this draft room.`
-    : `Leave ${row.name}? This draft is already live, so it will be hidden from your account instead of changing the room for everyone else.`;
-  if(!confirm(prompt)) return;
+  if(!confirm(`Leave ${row.name}? You can rejoin later with the lobby code.`)) return;
   try{
-    const lobbyRef = db.ref('lobbies/' + id);
-    const snap = await lobbyRef.once('value');
-    const lobby = snap.val() || {};
-    const member = getLobbyMember(lobby) || row.member;
+    const lobbyRef=db.ref('lobbies/'+id);
+    const member=row.member;
     if(!member){
-      toast('You are no longer in that draft room.','var(--red)');
+      toast('Could not identify your player ID in this lobby.','var(--red)');
       await loadMyLeagues();
       return;
     }
-
-    if(String(lobby.status||'waiting') !== 'started'){
-      const players = Object.entries(lobby.players || {});
-      const targetEntry = players.find(([,p])=>memberMatches(p));
-      if(targetEntry){
-        await lobbyRef.child('players/' + targetEntry[0]).remove();
-      }
-      const remainingSnap = await lobbyRef.child('players').once('value');
-      const remainingCount = Object.keys(remainingSnap.val() || {}).length;
-      if(remainingCount === 0){
-        await lobbyRef.remove();
-      }
-      toast('You left the draft room.');
-    }else{
-      const patch = buildLeftMemberPatch(member);
-      await lobbyRef.child('leftMembers').update(patch);
-      toast('Draft removed from your leagues.');
-    }
+    const patch=buildLeftMemberPatch(member);
+    await lobbyRef.child('leftMembers').update(patch);
     try{
-      const saved = JSON.parse(localStorage.getItem('rbMultiplayerLobby') || 'null');
-      if(saved?.lobbyId === id) localStorage.removeItem('rbMultiplayerLobby');
+      const saved=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
+      if(saved?.lobbyId===id) localStorage.removeItem('rbMultiplayerLobby');
     }catch(e){}
+    toast('Draft room removed from your leagues.');
     await loadMyLeagues();
   }catch(e){
     console.error(e);
@@ -594,25 +628,33 @@ async function leaveDraftLeague(id){
   }
 }
 
-async function leaveSeasonLeague(id){
-  const row=(window.__rbSeasonRows||[]).find(x=>x.id===id);
+function openSeasonLeague(id,sport){
+  const row=seasons.find(x=>x.id===id);
   if(!row) return;
-  if(!confirm(`Leave ${row.name}? This will remove it from your My Leagues list, but won’t delete the season for the other managers.`)) return;
+  const state=buildLobbyStateFromSeason(id,row.payload,row.member);
   try{
-    const seasonRef = db.ref(SHARED_SEASON_ROOT + '/' + id);
-    const snap = await seasonRef.once('value');
-    const payload = snap.val() || {};
-    const member = getSeasonMember(payload) || row.member;
+    localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
+  }catch(e){}
+  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(sport||row.sport||'nba')+'&league='+encodeURIComponent(id);
+}
+
+async function leaveSeasonLeague(id){
+  const row=seasons.find(x=>x.id===id);
+  if(!row) return;
+  if(!confirm(`Leave ${row.name}? You can rejoin if someone invites you back.`)) return;
+  try{
+    const seasonRef=db.ref(SHARED_SEASON_ROOT+'/'+id);
+    const member=row.member;
     if(!member){
-      toast('You are no longer in that season.','var(--red)');
+      toast('Could not identify your player ID in this season.','var(--red)');
       await loadMyLeagues();
       return;
     }
-    const patch = buildLeftMemberPatch(member);
+    const patch=buildLeftMemberPatch(member);
     await seasonRef.child('leftMembers').update(patch);
     try{
-      const saved = JSON.parse(localStorage.getItem('rbMultiplayerLobby') || 'null');
-      if(saved?.lobbyId === id) localStorage.removeItem('rbMultiplayerLobby');
+      const saved=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
+      if(saved?.lobbyId===id) localStorage.removeItem('rbMultiplayerLobby');
     }catch(e){}
     toast('Season removed from your leagues.');
     await loadMyLeagues();
@@ -681,6 +723,7 @@ auth.onAuthStateChanged(async user=>{
     setBanner('Could not load your leagues right now.');
     renderEmpty('draftList','Unable to Load Draft Rooms','Try refreshing in a moment.');
     renderEmpty('seasonList','Unable to Load Season Leagues','Try refreshing in a moment.');
+    renderEmpty('soloList','Unable to Load Solo Leagues','Try refreshing in a moment.');
     toast('Could not load leagues','var(--red)');
   }
 });
