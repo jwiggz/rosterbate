@@ -857,15 +857,26 @@ function updateTeamSettingsPreview(){
 }
 function openTeamSettings(){
   if(!D) return;
+  const modal=document.getElementById('teamSettingsModal');
+  if(!modal){
+    toast('Team settings are unavailable right now.');
+    return;
+  }
   const nameInput=document.getElementById('teamSettingsName');
   const avatarInput=document.getElementById('teamSettingsAvatar');
   if(nameInput) nameInput.value=D.teamName||teamName(D.myPos||0)||'';
   if(avatarInput) avatarInput.value=getCurrentTeamAvatarUrl();
   updateTeamSettingsPreview();
-  document.getElementById('teamSettingsModal')?.classList.add('open');
+  modal.style.display='flex';
+  requestAnimationFrame(()=>modal.classList.add('open'));
 }
 function closeTeamSettings(){
-  document.getElementById('teamSettingsModal')?.classList.remove('open');
+  const modal=document.getElementById('teamSettingsModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  setTimeout(()=>{
+    if(!modal.classList.contains('open')) modal.style.display='';
+  },180);
 }
 function saveTeamSettings(){
   if(!D) return;
@@ -1233,6 +1244,7 @@ function syncGameStateToD() {
   // Sync current game state
   D.currentWeek = G.week;
   D.currentDay = G.day;
+  D.lastRevealedDay = Math.max(0, ...Object.keys(G.revealedDays||{}).filter(day=>G.revealedDays?.[day]).map(day=>Number(day)||0));
   D.standings = G.standings;
   D.isSeasonComplete = G.isSeasonComplete;
   
@@ -2510,10 +2522,12 @@ function getLiveStandingsSnapshot(){
 }
 function syncCalendarFromDay(){G.week=Math.min(G.totalWeeks,Math.max(1,weekForDay(G.day)));}
 function revealDay(day){
+  if(day!==G.day) return;
   if(isDayRevealed(day)) return;
   G.dayResults[day]={};
   for(let ti=0;ti<G.rosters.length;ti++) G.dayResults[day][ti]=getTeamDayScoreDetails(ti,day);
   G.revealedDays[day]=true;
+  D.lastRevealedDay=Math.max(Number(D.lastRevealedDay||0), Number(day||0));
   logActivity('reveal','Day '+day+' revealed','Official scores for Day '+day+' are now live league-wide.',D.myPos,'🗓️');
   queueSharedSeasonSave('reveal_day');
 }
@@ -3090,7 +3104,7 @@ function rebuildDemoSeasonData(sport){
 
 function getSeasonPlayerPool(){
   const source=String(D?.playerPoolSource || '').trim().toLowerCase();
-  if(CURRENT_SPORT==='nba' && source==='static_2024_25' && typeof getRosterbateDemoPlayers==='function'){
+  if(CURRENT_SPORT==='nba' && typeof getRosterbateDemoPlayers==='function' && (source==='static_2024_25' || !source)){
     return (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}));
   }
   if(D?.isDemo && typeof getRosterbateDemoPlayers==='function'){
@@ -3134,7 +3148,7 @@ function initSeason(){
   
   console.log('📋 Waiver pool size:', waiverPool.length);
   
-  G.waiver=waiverPool.filter(p=>!allIds.has(p.id)).slice(0,40).map(p=>({...p}));
+  G.waiver=waiverPool.filter(p=>!allIds.has(p.id)).map(p=>({...p}));
   console.log('📋 G.waiver populated:', G.waiver.length, 'players');
   console.log('📋 Sample waiver players:', G.waiver.slice(0, 3));
   
@@ -3163,7 +3177,22 @@ function initSeason(){
     G.recentDrops = D.recentDrops || [];
     G.moneyBallLocks = D.moneyBallLocks || {};
     G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
-    G.waiver = Array.isArray(D.freeAgents) ? D.freeAgents.map(p=>({...p})) : (Array.isArray(D.waiver) ? D.waiver.map(p=>({...p})) : G.waiver);
+    const savedFreeAgents=Array.isArray(D.freeAgents) ? D.freeAgents : null;
+    const savedWaiver=Array.isArray(D.waiver) ? D.waiver : null;
+    if(savedFreeAgents && savedFreeAgents.length){
+      G.waiver=savedFreeAgents.map(p=>({...p}));
+    } else if(savedWaiver && savedWaiver.length){
+      G.waiver=savedWaiver.map(p=>({...p}));
+    }
+    const highestRevealed=Math.max(
+      Number(D.lastRevealedDay||0),
+      ...Object.keys(G.revealedDays||{}).filter(day=>G.revealedDays?.[day]).map(day=>Number(day)||0)
+    );
+    if(highestRevealed>0){
+      D.lastRevealedDay=highestRevealed;
+      if(G.day<=highestRevealed) G.day=Math.min(TOTAL_DAYS(), highestRevealed+1);
+      syncCalendarFromDay();
+    }
     
     console.log('✅ Restored game state - Week', G.week, 'Day', G.day);
   } else {
