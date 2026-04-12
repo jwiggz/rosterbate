@@ -980,10 +980,12 @@ function getRequestedLeagueId(){
 }
 
 function setSeasonEmptyState(mode){
+  const emptyScreen=document.getElementById('noData');
   const title=document.getElementById('seasonEmptyTitle');
   const copy=document.getElementById('seasonEmptyCopy');
   const icon=document.getElementById('seasonEmptyIcon');
   const actions=document.getElementById('seasonEmptyActions');
+  if(emptyScreen) emptyScreen.classList.add('active');
   if(mode==='loading'){
     document.body.dataset.seasonBoot='loading';
     if(icon) icon.textContent='🏀';
@@ -997,6 +999,12 @@ function setSeasonEmptyState(mode){
   if(title) title.textContent='Season Manager';
   if(copy) copy.textContent=getSeasonEmptyStateCopy(CURRENT_SPORT||'nba');
   if(actions) actions.style.display='flex';
+}
+
+function hideSeasonEmptyState(){
+  document.body.dataset.seasonBoot='idle';
+  const emptyScreen=document.getElementById('noData');
+  if(emptyScreen) emptyScreen.classList.remove('active');
 }
 
 function getSeasonEmptyStateCopy(sport){
@@ -2894,7 +2902,7 @@ window.onload=async function(){
   const urlParams = new URLSearchParams(window.location.search || '');
   const leagueId = urlParams.get('league');
   const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
-  if (leagueId && leagueId !== 'demo') setSeasonEmptyState('loading');
+  if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
   else setSeasonEmptyState('idle');
   
   // If league ID is provided, try to load from Firebase first

@@ -1520,6 +1520,7 @@ async function loadLiveDrafts(){
       if((lobby.sport||MM_SPORT)!==MM_SPORT) return;
       tasks.push(ensureScheduledLobbyState(c.key,lobby).then(next=>{
         const target={id:c.key,...(next||lobby)};
+        if(target.status==='completed' || Number(target.completedAt||0)>0 || String(target.completedSeasonId||target.seasonId||'').trim()) return;
         const isJoined=!!(target.players||{})[myId];
         const isVisibleStatus=['draft_room_open','started'].includes(target.status)
           || (isJoined && ['scheduled','waiting'].includes(target.status));
@@ -2438,4 +2439,3 @@ window.addEventListener('beforeunload', ()=>{ presenceRef.remove().catch(()=>{})
 <script src="/site-background.js"></script>
 </body>
 </html>
-

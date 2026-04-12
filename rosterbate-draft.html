@@ -3955,6 +3955,19 @@ async function endDraft(){
       delete draftData.seasonId;
     }
     
+    if(isMultiplayer && lobbyState?.lobbyId && typeof db!=='undefined'){
+      try{
+        const completedAt=Date.now();
+        await db.ref('lobbies/'+lobbyState.lobbyId).update({
+          status:'completed',
+          completedAt,
+          completedSeasonId:String(draftData.seasonId || draftData.sharedSeasonId || '').trim() || null
+        });
+      }catch(lobbyCompleteErr){
+        console.warn('Could not mark multiplayer lobby completed', lobbyCompleteErr);
+      }
+    }
+
     // Save to localStorage (backup for offline access) - now includes seasonId
     try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
 
