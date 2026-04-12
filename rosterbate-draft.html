@@ -732,6 +732,26 @@
   </div>
 </div>
 
+<div id="pickTradeRequestModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:260;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:520px;border-top:1px solid var(--border);box-shadow:0 -18px 48px rgba(0,0,0,.45);">
+    <div style="width:38px;height:4px;background:var(--text3);border-radius:999px;margin:0 auto 14px;"></div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;margin-bottom:6px;">⇄ Pick Trade Request</div>
+    <div id="pickTradeRequestCopy" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px;">Another manager wants to swap draft positions with you.</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 12px 10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+        <div id="pickTradeRequestGive" style="font-family:var(--fd);font-size:15px;font-weight:800;color:#fca5a5;">You give: —</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);">⇄</div>
+        <div id="pickTradeRequestGet" style="font-family:var(--fd);font-size:15px;font-weight:800;color:#86efac;text-align:right;">You get: —</div>
+      </div>
+      <div id="pickTradeRequestSummary" style="font-size:11px;color:var(--text3);line-height:1.6;">Accept to swap the two draft slots. Decline to keep the current order.</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button onclick="declinePendingPickTrade()" style="flex:1;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:11px;padding:14px;font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;color:#fca5a5;cursor:pointer;">Decline</button>
+      <button onclick="acceptPendingPickTrade()" style="flex:1;background:var(--green);border:none;border-radius:11px;padding:14px;font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Accept Trade</button>
+    </div>
+  </div>
+</div>
+
 <!-- PAUSE OVERLAY -->
 <div id="pauseOverlay">
   <div class="pause-icon">⏸</div>
@@ -1814,7 +1834,7 @@ let S={
   rds:13,myPos:0,tmax:0,abud:200,myBudget:200,
   cur:0,total:0,picks:[],myTeam:[],drafted:new Set(),
   posF:'ALL',timer:0,timerInt:null,selP:null,
-  teams:[],order:[],cpuBuds:[],auc:null,auctionTargets:{},roomId:'',started:false,
+  teams:[],order:[],cpuBuds:[],auc:null,auctionTargets:{},roomId:'',started:false,pendingPickTrade:null,
   autoDraft:false,
 };
 let autoDraftKickoffTimer=null;
@@ -2082,6 +2102,9 @@ function buildRealtimeDraftState(){
     teams: Array.isArray(S.teams)?S.teams.slice():[],
     order: Array.isArray(S.order)?S.order.slice():[],
     draftedIds: Array.from(S.drafted||[]),
+    pendingPickTrade: S.pendingPickTrade && typeof S.pendingPickTrade==='object'
+      ? {...S.pendingPickTrade}
+      : null,
     updatedAt: Date.now()
   };
 }
@@ -2117,9 +2140,11 @@ function mergeRealtimeDraftStates(remoteState, localState){
     cur:Math.max(Number(remote.cur||0), Number(local.cur||0), mergedPicks.length),
     updatedAt:Date.now()
   };
-  if(Array.isArray(remote.teams) && remote.teams.length && (!Array.isArray(local.teams) || !local.teams.length)) merged.teams=remote.teams.slice();
-  if(Array.isArray(remote.order) && remote.order.length && (!Array.isArray(local.order) || !local.order.length)) merged.order=remote.order.slice();
-  return merged;
+    if(Array.isArray(remote.teams) && remote.teams.length && (!Array.isArray(local.teams) || !local.teams.length)) merged.teams=remote.teams.slice();
+    if(Array.isArray(remote.order) && remote.order.length && (!Array.isArray(local.order) || !local.order.length)) merged.order=remote.order.slice();
+    if(local.pendingPickTrade!==undefined) merged.pendingPickTrade=local.pendingPickTrade;
+    else if(remote.pendingPickTrade!==undefined) merged.pendingPickTrade=remote.pendingPickTrade;
+    return merged;
 }
 
 function rebuildMyRosterFromPicks(){
@@ -2142,6 +2167,7 @@ function renderDraftFromSharedState(){
   updateSoloSimButton();
   updateAutoDraftButton();
   syncAutoDraftTurn();
+  renderPendingPickTradePrompt();
 }
 
 function applyRealtimeDraftState(state){
@@ -2160,6 +2186,9 @@ function applyRealtimeDraftState(state){
     if(state.myBudget!=null) S.myBudget=Number(state.myBudget||0);
     if(Array.isArray(state.teams) && state.teams.length) S.teams=state.teams.slice();
     if(Array.isArray(state.order) && state.order.length) S.order=state.order.slice();
+    S.pendingPickTrade=state.pendingPickTrade&&typeof state.pendingPickTrade==='object'
+      ? {...state.pendingPickTrade}
+      : null;
     S.picks=Array.isArray(state.picks)?state.picks.map(pick=>({
       ov:Number(pick.ov||0),
       round:Number(pick.round||0),
@@ -3197,6 +3226,119 @@ function rBoard(){
   document.getElementById('board').innerHTML=html;
 }
 
+function getPendingPickTradeRole(){
+  const trade=S.pendingPickTrade;
+  if(!trade || trade.status!=='pending') return '';
+  if(Number(trade.toTeamIdx)===Number(S.myPos)) return 'recipient';
+  if(Number(trade.fromTeamIdx)===Number(S.myPos)) return 'sender';
+  return '';
+}
+
+function renderPendingPickTradePrompt(){
+  const modal=document.getElementById('pickTradeRequestModal');
+  if(!modal) return;
+  const trade=S.pendingPickTrade;
+  const role=getPendingPickTradeRole();
+  if(!trade || trade.status!=='pending' || role!=='recipient'){
+    modal.style.display='none';
+    return;
+  }
+  const copy=document.getElementById('pickTradeRequestCopy');
+  const give=document.getElementById('pickTradeRequestGive');
+  const get=document.getElementById('pickTradeRequestGet');
+  const summary=document.getElementById('pickTradeRequestSummary');
+  if(copy) copy.innerHTML=`<strong style="color:var(--text)">${trade.fromTeamName||'Another manager'}</strong> wants to swap draft positions with you.`;
+  if(give) give.textContent=`You give: Pick #${Number(trade.toPickIdx||0)+1}`;
+  if(get) get.textContent=`You get: Pick #${Number(trade.fromPickIdx||0)+1}`;
+  if(summary){
+    const swing=(Number(trade.toPickIdx||0)+1)-(Number(trade.fromPickIdx||0)+1);
+    const moveLine=swing>0
+      ? `Accepting moves you up ${swing} spots in the draft order.`
+      : (swing<0 ? `Accepting moves you down ${Math.abs(swing)} spots in the draft order.` : 'This keeps you in the same draft slot.');
+    summary.textContent=moveLine+' No extra picks are exchanged in snake drafts.';
+  }
+  modal.style.display='flex';
+}
+
+function clearPendingPickTradePrompt(){
+  const modal=document.getElementById('pickTradeRequestModal');
+  if(modal) modal.style.display='none';
+}
+
+function canApplyPendingPickTrade(trade){
+  if(!trade) return false;
+  const fromIdx=Number(trade.fromPickIdx);
+  const toIdx=Number(trade.toPickIdx);
+  if(fromIdx<0 || toIdx<0) return false;
+  if(S.cur>Math.min(fromIdx,toIdx)) return false;
+  if(S.picks.some(pick=>Number(pick.ov||0)===(fromIdx+1) || Number(pick.ov||0)===(toIdx+1))) return false;
+  if(Number(S.order?.[fromIdx])!==Number(trade.fromTeamIdx)) return false;
+  if(Number(S.order?.[toIdx])!==Number(trade.toTeamIdx)) return false;
+  return true;
+}
+
+function buildPendingPickTrade(targetTeamIdx){
+  const myPickIdx=nextPickForTeam(S.myPos, S.cur);
+  const theirPickIdx=nextPickForTeam(targetTeamIdx, S.cur);
+  if(myPickIdx<0 || theirPickIdx<0) return null;
+  return {
+    id:'pick_trade_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    type:'pick_swap',
+    status:'pending',
+    fromTeamIdx:Number(S.myPos),
+    toTeamIdx:Number(targetTeamIdx),
+    fromTeamName:S.teams[S.myPos]||S.name||'Your Team',
+    toTeamName:S.teams[targetTeamIdx]||('Team '+(Number(targetTeamIdx)+1)),
+    fromPickIdx:Number(myPickIdx),
+    toPickIdx:Number(theirPickIdx),
+    createdAt:Date.now()
+  };
+}
+
+function applyAcceptedPendingPickTrade(trade){
+  S.order[Number(trade.fromPickIdx)]=Number(trade.toTeamIdx);
+  S.order[Number(trade.toPickIdx)]=Number(trade.fromTeamIdx);
+  const fromPickNum=Number(trade.fromPickIdx)+1;
+  const toPickNum=Number(trade.toPickIdx)+1;
+  const requesterName=trade.fromTeamName||'Manager';
+  const responderName=trade.toTeamName||'Manager';
+  const logEntry=`<strong>Pick #${fromPickNum} <-> Pick #${toPickNum}</strong> - ${requesterName} and ${responderName} agreed to swap draft positions.`;
+  tradeLog.push(logEntry);
+  rbPostSystem(`Pick trade accepted: ${requesterName} swapped pick #${fromPickNum} with ${responderName}'s pick #${toPickNum}.`,'trades');
+  renderDraftFromSharedState();
+}
+
+async function acceptPendingPickTrade(){
+  const trade=S.pendingPickTrade;
+  if(!trade || getPendingPickTradeRole()!=='recipient') return;
+  if(!canApplyPendingPickTrade(trade)){
+    S.pendingPickTrade=null;
+    clearPendingPickTradePrompt();
+    if(isRealtimeMultiplayerDraft()) await publishRealtimeDraftState();
+    showToast('That trade offer expired.');
+    return;
+  }
+  applyAcceptedPendingPickTrade(trade);
+  S.pendingPickTrade=null;
+  clearPendingPickTradePrompt();
+  if(isRealtimeMultiplayerDraft()) await publishRealtimeDraftState();
+  showToast('Trade accepted!');
+}
+
+async function declinePendingPickTrade(){
+  const trade=S.pendingPickTrade;
+  if(!trade) return;
+  const role=getPendingPickTradeRole();
+  if(role!=='recipient' && role!=='sender') return;
+  const requesterName=trade.fromTeamName||'Manager';
+  const responderName=trade.toTeamName||'Manager';
+  rbPostSystem(`Pick trade declined: ${responderName} declined ${requesterName}'s swap request.`,'trades');
+  S.pendingPickTrade=null;
+  clearPendingPickTradePrompt();
+  if(isRealtimeMultiplayerDraft()) await publishRealtimeDraftState();
+  showToast('Trade declined.');
+}
+
 function upHdr(){
   const round=Math.min(Math.floor(S.cur/S.ls)+1,S.rds);
   const pir=(S.cur%S.ls)+1;
@@ -3630,6 +3772,26 @@ function confirmTrade(){
   const myPickNum=myPickIdx+1;
   const theirPickNum=theirPickIdx+1;
 
+  if(isRealtimeMultiplayerDraft()){
+    if(S.pendingPickTrade && S.pendingPickTrade.status==='pending'){
+      showToast('There is already a pending trade request.');
+      return;
+    }
+    const offer=buildPendingPickTrade(ti);
+    if(!offer){
+      closeTradeModal();
+      showToast('That trade offer is no longer available.');
+      return;
+    }
+    S.pendingPickTrade=offer;
+    rbPostSystem(`Pick trade requested: ${S.teams[S.myPos]||S.name} offered pick #${myPickNum} to ${theirName} for pick #${theirPickNum}.`,'trades');
+    closeTradeModal();
+    renderDraftFromSharedState();
+    publishRealtimeDraftState();
+    showToast(`Trade offer sent to ${theirName}`);
+    return;
+  }
+
   S.order[myPickIdx]=ti;
   S.order[theirPickIdx]=S.myPos;
 
@@ -3647,7 +3809,11 @@ function updateTradeBtn(){
   const btn=document.getElementById('tradeHeaderBtn');
   if(!btn) return;
   const hasFuturePick=nextPickForTeam(S.myPos, S.cur)>=0;
+  const hasPendingTrade=!!(S.pendingPickTrade && S.pendingPickTrade.status==='pending');
   btn.style.display=(S.fmt!=='auction'&&S.cur<S.total&&hasFuturePick)?'block':'none';
+  btn.disabled=hasPendingTrade;
+  btn.style.opacity=hasPendingTrade?'.45':'1';
+  btn.style.cursor=hasPendingTrade?'not-allowed':'pointer';
 }
 
 // ─── SEASON MANAGEMENT ────────────────────────────────────
@@ -3666,6 +3832,7 @@ async function endDraft(){
     const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
     const teamCount=Array.isArray(S.teams)?S.teams.length:0;
     const isMultiplayer=!!(lobbyState?.lobbyId && orderedLobbyPlayers.length===teamCount);
+    const currentLeagueName=(document.getElementById('iLeagueName')?.value||'').trim() || lobbyState?.name || lobbyState?.leagueName || S.league || 'RosterBate League';
     const teamUsers=isMultiplayer
       ? orderedLobbyPlayers.reduce((acc,player,idx)=>{
         if(player?.id){
@@ -3709,7 +3876,7 @@ async function endDraft(){
         ? 'static_2024_25'
         : ((typeof isRosterbateLiveServiceSport === 'function' && isRosterbateLiveServiceSport(SPORT)) ? 'live' : 'imported_snapshot'),
       teamName: S.name,
-      leagueName: leagueName || lobbyState?.name || lobbyState?.leagueName || 'RosterBate League',
+      leagueName: currentLeagueName,
       leagueSize: S.ls,
       scoringFormat: S.scr,
       draftFormat: S.fmt,
