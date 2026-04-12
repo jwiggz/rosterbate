@@ -693,7 +693,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 </div>
 
 <!-- TEAM VIEWER MODAL -->
-<div class="mo" id="viewerModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="mo" id="viewerModal" onclick="if(event.target===this)closeViewerModal()">
   <div class="ms">
     <div class="mh"></div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
@@ -2326,9 +2326,32 @@ function renderSidePowerups(targetId){
   setAvatarNode(target.querySelector('.season-side-team-avatar'),D.teamName,74,'var(--accent)',getCurrentTeamAvatarUrl(),'box-shadow:0 12px 24px rgba(249,115,22,.18);margin:8px auto 0;');
 }
 
+function normalizeStarterIdList(source){
+  if(Array.isArray(source)){
+    const ids=source.slice(0, STARTERS).map(id=>{
+      const numericId=Number(id);
+      return Number.isFinite(numericId) ? numericId : null;
+    });
+    while(ids.length<STARTERS) ids.push(null);
+    return ids;
+  }
+  if(source && typeof source==='object'){
+    const ids=Array.from({length:STARTERS},()=>null);
+    Object.entries(source).forEach(([slotIndex, playerId])=>{
+      const idx=Number(slotIndex);
+      const numericId=Number(playerId);
+      if(Number.isInteger(idx) && idx>=0 && idx<STARTERS){
+        ids[idx]=Number.isFinite(numericId) ? numericId : null;
+      }
+    });
+    return ids;
+  }
+  return Array.from({length:STARTERS},()=>null);
+}
+
 function getStarterIdsForTeamDay(teamIdx,day){
-  if(teamIdx===D.myPos) return getLineupForDay(day);
-  return [...(G.starters[teamIdx]||[])];
+  if(teamIdx===D.myPos) return normalizeStarterIdList(getLineupForDay(day));
+  return normalizeStarterIdList(G.starters[teamIdx]);
 }
 
 function canPlayerFillSlot(player, slot){
@@ -2361,7 +2384,7 @@ function isMoneyBallScoring(){
 
 function getStarterSlotEntriesForTeamDay(teamIdx, day){
   const roster=G.rosters[teamIdx]||[];
-  const starterIds=teamIdx===D.myPos ? getLineupForDay(day) : Array.from({length:STARTERS},(_,index)=>(G.starters[teamIdx]||[])[index]||null);
+  const starterIds=getStarterIdsForTeamDay(teamIdx,day);
   return Array.from({length:STARTERS},(_,index)=>{
     const slot=SLOT_LABELS[index]||'UTIL';
     const playerId=starterIds[index]||null;
@@ -4867,8 +4890,7 @@ function forceRejectTrade(id){
 }
 
 function renderStandings(){
-  setSeasonSidePanelVisible('standingsPowerups', true);
-  renderSidePowerups('standingsPowerups');
+  setSeasonSidePanelVisible('standingsPowerups', false);
   const sorted=getLiveStandingsSnapshot().sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
   const medals=['🥇','🥈','🥉'];
   let h=`<div style="display:flex;flex-direction:column;gap:18px;">
@@ -4897,7 +4919,9 @@ function renderStandings(){
         <div style="display:flex;align-items:center;gap:10px;min-width:220px;">
           <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:30px;height:30px;font-size:11px;">${ini(D.teams[st.teamIdx]||('T'+(st.teamIdx+1)))}</div>
           <div style="min-width:0;">
-            <div style="font-weight:700;color:${im?'#c2410c':'#111827'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${D.teams[st.teamIdx]||'Team '+(st.teamIdx+1)}${im?' ⭐':''}</div>
+            <button type="button" onclick="event.stopPropagation();openViewer(${st.teamIdx})" class="season-team-link-btn" style="font-weight:700;color:${im?'#fdba74':'#f8fafc'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-align:left;">
+              ${D.teams[st.teamIdx]||'Team '+(st.teamIdx+1)}${im?' ⭐':''}
+            </button>
             <div class="season-soft-muted">${(st.pf||0).toFixed(1)} PF · ${(st.pa||0).toFixed(1)} PA</div>
           </div>
         </div>
@@ -4949,6 +4973,15 @@ function openPicker(){
 
 function closeFullSchedule(){
   document.getElementById('scheduleModal')?.classList.remove('open');
+}
+
+function closeViewerModal(){
+  const modal=document.getElementById('viewerModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  setTimeout(()=>{
+    if(!modal.classList.contains('open')) modal.style.display='none';
+  },180);
 }
 
 function openFullSchedule(){
@@ -5011,7 +5044,7 @@ function openViewer(ti){
   document.getElementById('pickerModal').classList.remove('open');
   const nm=D.teams[ti]||'Team '+(ti+1),im=ti===D.myPos;
   const col=TCOLORS[ti%TCOLORS.length],st=getLiveStandingsSnapshot().find(entry=>entry.teamIdx===ti)||G.standings[ti];
-  const roster=G.rosters[ti]||[],sIds=G.starters[ti]||[];
+  const roster=G.rosters[ti]||[],sIds=getStarterIdsForTeamDay(ti,G.day);
   const starters=sIds.map(id=>roster.find(p=>p.id===id)).filter(Boolean);
   const bench=roster.filter(p=>!sIds.includes(p.id));
   const revealedWeekTotal=getTeamWeekRevealedScore(ti,G.week);
@@ -5076,12 +5109,18 @@ function openViewer(ti){
 
   const act=document.getElementById('vActions');
   if(im){
-    act.innerHTML=`<button onclick="document.getElementById('viewerModal').classList.remove('open');goPage('roster');" class="season-chip-link solid">Edit My Lineup</button>`;
+    act.innerHTML=`<button onclick="closeViewerModal();goPage('roster');" class="season-chip-link solid">Edit My Lineup</button>`;
   } else {
-    act.innerHTML=`<button onclick="document.getElementById('viewerModal').classList.remove('open');openTrade(${ti});" class="season-chip-link solid">Propose Trade with ${nm}</button>`;
+    act.innerHTML=`<button onclick="closeViewerModal();openTrade(${ti});" class="season-chip-link solid">Propose Trade with ${nm}</button>`;
   }
-  act.innerHTML+=`<button onclick="document.getElementById('viewerModal').classList.remove('open')" class="season-chip-link">Close</button>`;
-  document.getElementById('viewerModal').classList.add('open');
+  act.innerHTML+=`<button onclick="closeViewerModal()" class="season-chip-link">Close</button>`;
+  const modal=document.getElementById('viewerModal');
+  if(modal){
+    modal.style.display='flex';
+    modal.style.alignItems='center';
+    modal.style.justifyContent='center';
+    requestAnimationFrame(()=>modal.classList.add('open'));
+  }
 }
 
 // ── COMMISSIONER SETTINGS ─────────────────────────────────
