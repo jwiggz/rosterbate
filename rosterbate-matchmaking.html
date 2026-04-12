@@ -1224,7 +1224,7 @@ function renderWaitingLobbyChat(messages){
     wc.innerHTML='<div style="font-size:12px;color:var(--text3);line-height:1.5;">No messages yet. Break the ice before the draft starts.</div>';
     return;
   }
-  wc.innerHTML=rows.map(m=>`<div style="display:flex;gap:6px;align-items:flex-start;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${escapeHtml(m.name||'Manager')}${ADMIN_USER_NUMBERS.includes(Number(m.userNumber||0))?' ♛':''}</span><span style="font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);opacity:.9;">${formatChatTime(m.ts)}</span></div><div style="font-size:12px;color:var(--text);line-height:1.5;margin-top:1px;">${escapeHtml(m.text||'')}</div>${myIsAdmin&&m.playerId!==myId&&!isProtectedChatUser(m.playerId,m.userNumber)?`<div style="display:flex;gap:6px;margin-top:4px;"><button onclick="mmDeleteLobbyChatMessage('${m._id}')" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);font-size:10px;cursor:pointer;">Delete</button><button onclick="mmBanGlobalChatPlayer('${m.playerId}','${escapeHtml(m.name||'Manager')}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:2px 7px;color:#fca5a5;font-size:10px;cursor:pointer;">Ban</button></div>`:''}</div></div>`).join('');
+  wc.innerHTML=rows.map(m=>`<div style="display:flex;gap:6px;align-items:flex-start;"><div style="width:20px;height:20px;border-radius:50%;background:${playerColor(m.playerId||'x')};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px;">${ini(m.name)}</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);">${escapeHtml(m.name||'Manager')}</span><span style="font-family:var(--fd);font-size:10px;font-weight:700;color:var(--text3);opacity:.9;">${formatChatTime(m.ts)}</span></div><div style="font-size:12px;color:var(--text);line-height:1.5;margin-top:1px;">${escapeHtml(m.text||'')}</div></div></div>`).join('');
   wc.scrollTop=wc.scrollHeight;
 }
 
@@ -2131,9 +2131,6 @@ async function mmSendLobbyChat(){
       throw new Error('You are not registered in this lobby yet.');
     }
     syncLocalPlayerIdToLobby(lobby);
-    if(isChatBanned(sender.playerId)){
-      throw new Error('You are banned from matchmaking chat');
-    }
     const payload={
       playerId:sender.playerId,
       userNumber:sender.userNumber,
