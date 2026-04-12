@@ -208,6 +208,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 #teamSettingsModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
 #teamSettingsModal .mh{background:#475569;}
 #teamSettingsModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
+#teamSettingsModal{align-items:center;justify-content:center;padding:18px;}
+#teamSettingsModal .ms{max-width:640px;width:min(640px,100%);border-radius:18px;padding:22px 24px 26px;max-height:min(88dvh,760px);box-shadow:0 20px 60px rgba(2,6,23,.5);}
 @media (min-width: 960px){
   #viewerModal{align-items:center;}
   #viewerModal .ms{max-width:980px;border-radius:18px;padding:22px 24px 26px;max-height:88dvh;}
@@ -868,7 +870,13 @@ function openTeamSettings(){
   if(avatarInput) avatarInput.value=getCurrentTeamAvatarUrl();
   updateTeamSettingsPreview();
   modal.style.display='flex';
+  modal.style.alignItems='center';
+  modal.style.justifyContent='center';
   requestAnimationFrame(()=>modal.classList.add('open'));
+  setTimeout(()=>{
+    nameInput?.focus();
+    nameInput?.select?.();
+  },30);
 }
 function closeTeamSettings(){
   const modal=document.getElementById('teamSettingsModal');
@@ -3146,14 +3154,18 @@ function initSeason(){
   G.starters=G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
   console.log('⭐ G.starters populated:', G.starters);
   
-  const allIds=new Set(G.rosters.flat().map(p=>p.id));
-  console.log('🔢 Total drafted player IDs:', allIds.size);
-  
   const waiverPool = getSeasonPlayerPool();
-  
+  const rebuildWaiverPool = ()=>{
+    const rosterIds=new Set(G.rosters.flat().map(p=>p.id));
+    const seenIds=new Set();
+    return waiverPool
+      .filter(p=>p && p.id!=null && !rosterIds.has(p.id) && !seenIds.has(p.id) && seenIds.add(p.id))
+      .map(p=>({...p}));
+  };
+  const initialRosterIds=new Set(G.rosters.flat().map(p=>p.id));
+  console.log('🔢 Total drafted player IDs:', initialRosterIds.size);
   console.log('📋 Waiver pool size:', waiverPool.length);
-  
-  G.waiver=waiverPool.filter(p=>!allIds.has(p.id)).map(p=>({...p}));
+  G.waiver=rebuildWaiverPool();
   console.log('📋 G.waiver populated:', G.waiver.length, 'players');
   console.log('📋 Sample waiver players:', G.waiver.slice(0, 3));
   
@@ -3184,7 +3196,10 @@ function initSeason(){
     G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
     const savedFreeAgents=Array.isArray(D.freeAgents) ? D.freeAgents : null;
     const savedWaiver=Array.isArray(D.waiver) ? D.waiver : null;
-    if(savedFreeAgents && savedFreeAgents.length){
+    const rebuiltWaiver=rebuildWaiverPool();
+    if(rebuiltWaiver.length){
+      G.waiver=rebuiltWaiver;
+    } else if(savedFreeAgents && savedFreeAgents.length){
       G.waiver=savedFreeAgents.map(p=>({...p}));
     } else if(savedWaiver && savedWaiver.length){
       G.waiver=savedWaiver.map(p=>({...p}));

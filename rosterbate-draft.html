@@ -4686,11 +4686,17 @@ async function rbSend(){
   const text=(input?.value||'').trim();
   if(!text) return;
   const chatTag=rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft';
-  await rbPostMsg({type:'text',text,tag:chatTag});
-  input.value='';
-  input.style.height='';
+  if(input){
+    input.value='';
+    input.style.height='';
+  }
   rbUpdateSendBtn();
   rbClosePickersAll();
+  rbPostMsg({type:'text',text,tag:chatTag}).catch(e=>{
+    console.error('Draft chat text send failed', e);
+    if(input && !input.value) input.value=text;
+    rbUpdateSendBtn();
+  });
 }
 
 async function rbPostMsg(extra){
@@ -4873,7 +4879,9 @@ function rbSearchGifs(query){
 
 function rbSendGif(url){
   const chatTag=rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft';
-  rbPostMsg({type:'gif',gifUrl:url,text:'[GIF]',tag:chatTag});
+  rbPostMsg({type:'gif',gifUrl:url,text:'[GIF]',tag:chatTag}).catch(e=>{
+    console.error('Draft chat GIF send failed', e);
+  });
   document.getElementById('rbGifPicker').classList.remove('open');
 }
 
