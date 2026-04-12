@@ -452,6 +452,10 @@ function globalChatShell(){
 
 function attachGlobalChat(){
   renderGlobalChat();
+  
+  // Clean up old messages when chat is first attached
+  cleanupOldGlobalChatMessages();
+  
   if(!globalChatBansListener){
     globalChatBansListener = globalChatBansRef.on('value', snap => {
       globalChatBans = snap.val() || {};
@@ -552,21 +556,83 @@ function escapeHtml(value){
 async function mmSendGlobalChat(){
   const input = document.getElementById('mmGlobalChatInput');
   const text = (input?.value || '').trim();
-  if(!text) return;
+  
+  console.log('🔍 Global chat send attempt:', {
+    text: text,
+    myId: myId,
+    myName: myName,
+    myUserNumber: myUserNumber,
+    textLength: text.length
+  });
+  
+  if(!text) {
+    console.warn('⚠️ No text to send');
+    return;
+  }
+  
+  if(!myId) {
+    console.error('❌ myId is not set!');
+    toast('Error: Player ID not initialized', 'var(--red)');
+    return;
+  }
+  
   if(isChatBanned(myId)){
     toast('You are banned from matchmaking chat','var(--red)');
     return;
   }
+  
   if(text.length > 280){
     toast('Keep chat messages under 280 characters','var(--red)');
     return;
   }
+  
   input.value = '';
+  
   try{
-    await globalChatRef.push({playerId:myId,userNumber:myUserNumber||0,name:myName || 'Manager',text,ts:Date.now()});
+    const messageData = {
+      playerId: myId,
+      userNumber: myUserNumber || 0,
+      name: myName || 'Manager',
+      text: text,
+      ts: Date.now()
+    };
+    
+    console.log('📤 Sending message:', messageData);
+    await globalChatRef.push(messageData);
+    console.log('✅ Message sent successfully');
   }catch(e){
-    console.error(e);
-    toast('Could not send message','var(--red)');
+    console.error('❌ Failed to send message:', e);
+    toast('Could not send message: ' + (e.message || 'Unknown error'),'var(--red)');
+    input.value = text;
+  }
+}
+
+async function cleanupOldGlobalChatMessages() {
+  try {
+    const now = Date.now();
+    const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+    
+    const snapshot = await globalChatRef.once('value');
+    const messagesToDelete = [];
+    
+    snapshot.forEach(child => {
+      const message = child.val();
+      if (message && message.ts && message.ts < twentyFourHoursAgo) {
+        messagesToDelete.push(child.key);
+      }
+    });
+    
+    if (messagesToDelete.length > 0) {
+      console.log(`🧹 Cleaning up ${messagesToDelete.length} old messages`);
+      const updates = {};
+      messagesToDelete.forEach(key => {
+        updates[key] = null;
+      });
+      await globalChatRef.update(updates);
+      console.log('✅ Old messages cleaned up');
+    }
+  } catch(e) {
+    console.error('Failed to cleanup old messages:', e);
   }
 }
 // â”€â”€ QUICK MATCH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -2342,6 +2408,7 @@ syncMatchmakingIdentity().finally(async ()=>{
 setTimeout(()=>document.body.classList.add('mm-create-shimmer-ready'), 2000);
 updatePresence();
 setInterval(updatePresence,15000);
+setInterval(cleanupOldGlobalChatMessages, 60 * 60 * 1000); // Clean up old messages every hour
 window.addEventListener('beforeunload', ()=>{ presenceRef.remove().catch(()=>{}); });
 </script>
 <script src="/site-background.js"></script>
