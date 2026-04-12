@@ -4683,36 +4683,80 @@ function rbScrollBottom(){
 // ── SEND ────────────────────────────────────────────────────
 async function rbSend(){
   const input=document.getElementById('rbInput');
+  const btn=document.getElementById('rbSendBtn');
   const text=(input?.value||'').trim();
-  if(!text) return;
+  
+  console.log('🔍 Draft chat send attempt:', {
+    text: text,
+    rbUseRealtime: rbUseRealtimeDraftChat(),
+    chatPath: rbGetChatMessagesPath(),
+    RB_MY_ID: RB_MY_ID,
+    chatTag: rbActiveTab
+  });
+  
+  if(!text) {
+    console.warn('⚠️ No text to send');
+    return;
+  }
+  
   const chatTag=rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft';
+  
+  // Clear input and disable button to prevent double-send
+  const originalText = text;
   if(input){
     input.value='';
     input.style.height='';
   }
-  rbUpdateSendBtn();
+  if(btn) btn.disabled = true;
+  
   rbClosePickersAll();
-  rbPostMsg({type:'text',text,tag:chatTag}).catch(e=>{
-    console.error('Draft chat text send failed', e);
-    if(input && !input.value) input.value=text;
+  
+  try {
+    console.log('📤 Sending draft chat message...');
+    await rbPostMsg({type:'text',text,tag:chatTag});
+    console.log('✅ Draft chat message sent successfully');
+    rbUpdateSendBtn(); // Re-enable if there's text
+  } catch(e) {
+    console.error('❌ Draft chat send failed:', e);
+    // Restore the message
+    if(input && !input.value) {
+      input.value = originalText;
+    }
+    toast('Could not send message: ' + (e.message || 'Unknown error'), 'var(--red)');
     rbUpdateSendBtn();
-  });
+  }
 }
 
 async function rbPostMsg(extra){
   if(rbUseRealtimeDraftChat()){
     const path=rbGetChatMessagesPath();
-    if(!path) return;
-    await db.ref(path).push({
+    if(!path) {
+      console.error('❌ No chat path available');
+      throw new Error('Chat path not available');
+    }
+    
+    const messageData = {
       sender:rbGetMyChatName(),
       playerId:RB_MY_ID,
       userNumber:rbGetMyChatUserNumber(),
       ts:Date.now(),
       reactions:{},
       ...extra
-    });
+    };
+    
+    console.log('📤 Pushing to Firebase:', path, messageData);
+    
+    try {
+      await db.ref(path).push(messageData);
+      console.log('✅ Message pushed to Firebase successfully');
+    } catch(e) {
+      console.error('❌ Firebase push failed:', e);
+      throw e;
+    }
     return;
   }
+  
+  // localStorage fallback
   rbLoadChat();
   const msg={
     id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
@@ -5016,6 +5060,16 @@ async function rbInitRealtimeDraftChat(){
   }
 }
 
+// Ensure realtime chat listener stays active
+function rbEnsureChatListenerActive() {
+  if (!rbUseRealtimeDraftChat()) return;
+  if (!rbRealtimeChatRef || !rbRealtimeChatListener) {
+    console.warn('⚠️ Chat listener not active, reinitializing...');
+    rbRealtimeChatReady = false;
+    rbInitRealtimeDraftChat();
+  }
+}
+
 // ── INIT ────────────────────────────────────────────────────
 // Post system message on load
 (async function(){
@@ -5067,6 +5121,9 @@ async function rbInitRealtimeDraftChat(){
           rbUpdateUnread();
         }
       },5000);
+    } else {
+      // Check realtime chat listener health every 10 seconds
+      setInterval(rbEnsureChatListenerActive, 10000);
     }
   }catch(err){
     console.error(err);
