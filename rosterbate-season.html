@@ -1155,15 +1155,36 @@ function serializeSharedGameState(){
 function serializeSharedDraftState(){
   return cloneJsonSafe({...D});
 }
+function normalizeSharedGameState(){
+  if(!G || typeof G!=='object') G={};
+  const teamCount=Number(D?.leagueSize || D?.teams?.length || G?.rosters?.length || 0);
+  if(!Number.isFinite(Number(G.week))) G.week=1;
+  if(!Number.isFinite(Number(G.totalWeeks))) G.totalWeeks=17;
+  if(!Number.isFinite(Number(G.day))) G.day=1;
+  if(!Array.isArray(G.rosters)) G.rosters=Array.from({length:teamCount},()=>[]);
+  if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:teamCount},()=>[]);
+  if(!Array.isArray(G.starters)) G.starters=Array.from({length:teamCount},()=>[]);
+  if(!G.dailyLineups || typeof G.dailyLineups!=='object') G.dailyLineups={};
+  if(!Array.isArray(G.waiver)) G.waiver=[];
+  if(!Array.isArray(G.schedule)) G.schedule=[];
+  if(!Array.isArray(G.standings)) G.standings=[];
+  if(!Array.isArray(G.tradeOffers)) G.tradeOffers=[];
+  if(!Array.isArray(G.recentDrops)) G.recentDrops=[];
+  if(!Array.isArray(G.activityLog)) G.activityLog=[];
+  if(!G.moneyBallLocks || typeof G.moneyBallLocks!=='object') G.moneyBallLocks={};
+  if(!G.powerupInventory || typeof G.powerupInventory!=='object') G.powerupInventory={};
+  if(!G.powerupsByWeek || typeof G.powerupsByWeek!=='object') G.powerupsByWeek={};
+  if(!G.powerupDropsByWeek || typeof G.powerupDropsByWeek!=='object') G.powerupDropsByWeek={};
+  if(!G.waiverPriority || typeof G.waiverPriority!=='object') G.waiverPriority={};
+  G.processed=new Set(Array.isArray(G.processed) ? G.processed : Array.from(G.processed||[]));
+}
 function applySharedSeasonPayload(payload){
   if(!payload?.draft || !payload?.game) return false;
   sharedSeasonHydrating=true;
   const previousDraft=D?cloneJsonSafe(D):null;
   D=cloneJsonSafe(payload.draft);
   G=cloneJsonSafe(payload.game);
-  if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:(D?.leagueSize||D?.teams?.length||0)},()=>[]);
-  if(!G.moneyBallLocks || typeof G.moneyBallLocks!=='object') G.moneyBallLocks={};
-  G.processed=new Set(payload.game?.processed||[]);
+  normalizeSharedGameState();
   if(previousDraft){
     if(previousDraft.isCommissioner!=null && D.isCommissioner==null) D.isCommissioner=previousDraft.isCommissioner;
     if(previousDraft.teamUsers && !D.teamUsers) D.teamUsers=previousDraft.teamUsers;
@@ -1224,7 +1245,8 @@ function syncGameStateToD() {
   if (G.settledWeeks) D.settledWeeks = G.settledWeeks;
   if (G.processed) D.processed = Array.from(G.processed);
   if (G.waiverPriority) D.waiverPriority = G.waiverPriority;
-  if (G.freeAgents) D.freeAgents = G.freeAgents;
+  if (G.waiver) D.freeAgents = G.waiver;
+  if (G.waiver) D.waiver = G.waiver;
   if (G.tradeOffers) D.tradeOffers = G.tradeOffers;
   if (G.activityLog) D.activityLog = G.activityLog;
   if (G.recentDrops) D.recentDrops = G.recentDrops;
@@ -3141,6 +3163,7 @@ function initSeason(){
     G.recentDrops = D.recentDrops || [];
     G.moneyBallLocks = D.moneyBallLocks || {};
     G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
+    G.waiver = Array.isArray(D.freeAgents) ? D.freeAgents.map(p=>({...p})) : (Array.isArray(D.waiver) ? D.waiver.map(p=>({...p})) : G.waiver);
     
     console.log('✅ Restored game state - Week', G.week, 'Day', G.day);
   } else {
@@ -3368,7 +3391,7 @@ const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function renderHub(){
   const liveStandings=getLiveStandingsSnapshot();
-  const mp=D.myPos,myS=liveStandings.find(st=>st.teamIdx===mp)||G.standings[mp];
+  const mp=D.myPos,myS=liveStandings.find(st=>st.teamIdx===mp)||(G.standings||[])[mp];
   const weekPowerups=getWeekPowerups(G.week);
   const revealedToday=isDayRevealed(G.day);
   const weekStart=(G.week-1)*DAYS_PER_WEEK+1;
@@ -3406,8 +3429,8 @@ function renderHub(){
   const mp2=getTeamWeekRevealedScore(mp,G.week),op=oi>=0?getTeamWeekRevealedScore(oi,G.week):0;
   const hpEl=document.getElementById('hubProj');hpEl.textContent=mp2.toFixed(1);hpEl.style.color=mp2>=op?'var(--green)':'var(--red)';
   document.getElementById('hubOppProj').textContent=op>0?op.toFixed(1):'—';
-  document.getElementById('hubWC').textContent=G.waiver.length+' available';
-  const pend=G.tradeOffers.filter(t=>t.toTeam===mp&&t.status==='pending').length;
+  document.getElementById('hubWC').textContent=(G.waiver||[]).length+' available';
+  const pend=(G.tradeOffers||[]).filter(t=>t.toTeam===mp&&t.status==='pending').length;
   const srt=[...liveStandings].sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
   const rk=srt.findIndex(s=>s.teamIdx===mp)+1;
   document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'—';

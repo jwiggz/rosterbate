@@ -1259,6 +1259,21 @@ function attachWaitingLobbyChatListener(lobbyId){
 
 function resolveLobbyChatSender(lobby){
   const players=lobby?.players||{};
+  let savedState=null;
+  try{
+    savedState=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
+  }catch(e){}
+  const savedPlayerId=String(savedState?.myId || '').trim();
+  const savedUid=String(savedState?.myUid || '').trim();
+  const savedUserNumber=Number(savedState?.myUserNumber || 0);
+  const savedName=String(savedState?.myName || '').trim();
+  if(savedPlayerId && players[savedPlayerId]){
+    return {
+      playerId:savedPlayerId,
+      name:players[savedPlayerId]?.name || savedName || myName || 'Manager',
+      userNumber:Number(players[savedPlayerId]?.userNumber || savedUserNumber || myUserNumber || 0)
+    };
+  }
   if(players[myId]){
     return {
       playerId:myId,
@@ -1268,6 +1283,9 @@ function resolveLobbyChatSender(lobby){
   }
   const matchedEntry=Object.entries(players).find(([,player])=>{
     if(!player) return false;
+    if(savedUid && player?.uid && String(player.uid)===savedUid) return true;
+    if(savedUserNumber && Number(player?.userNumber||0)===savedUserNumber) return true;
+    if(savedName && String(player?.name||'').trim()===savedName) return true;
     if(currentRbUser?.uid && player?.uid && String(player.uid)===String(currentRbUser.uid)) return true;
     if(myUserNumber && Number(player?.userNumber||0)===Number(myUserNumber)) return true;
     if((myName||'').trim() && String(player?.name||'').trim()===String(myName||'').trim()) return true;
@@ -2133,6 +2151,7 @@ async function mmSendLobbyChat(){
     syncLocalPlayerIdToLobby(lobby);
     const payload={
       playerId:sender.playerId,
+      uid:String(currentRbUser?.uid || ''),
       userNumber:sender.userNumber,
       name:sender.name,
       text,

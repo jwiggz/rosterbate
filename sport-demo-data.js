@@ -184,7 +184,7 @@
     "id": 9,
     "name": "Cade Cunningham",
     "team": "DET",
-    "pos": "C",
+    "pos": "PG",
     "fp": 50.2,
     "adp": 9,
     "statValues": {
