@@ -1272,6 +1272,38 @@ function normalizeSharedGameState(){
   if(!G.waiverPriority || typeof G.waiverPriority!=='object') G.waiverPriority={};
   G.processed=new Set(Array.isArray(G.processed) ? G.processed : Array.from(G.processed||[]));
 }
+
+function rebuildSeasonWaiverPool(){
+  const allRosters = Array.isArray(G?.rosters) ? G.rosters : [];
+  const allIlRosters = Array.isArray(G?.ilByTeam) ? G.ilByTeam : [];
+  const rosterIds = new Set([
+    ...allRosters.flat().map(p=>Number(p?.id)).filter(Number.isFinite),
+    ...allIlRosters.flat().map(p=>Number(p?.id)).filter(Number.isFinite)
+  ]);
+  const sourcePool = getSeasonPlayerPool();
+  const seenIds = new Set();
+  return sourcePool.filter(player=>{
+    const pid = Number(player?.id);
+    if(!player || !Number.isFinite(pid) || rosterIds.has(pid) || seenIds.has(pid)) return false;
+    seenIds.add(pid);
+    return true;
+  }).map(player=>({...player}));
+}
+
+function ensureSeasonWaiverPool(force){
+  const rebuilt = rebuildSeasonWaiverPool();
+  if(force || !Array.isArray(G?.waiver) || !G.waiver.length){
+    G.waiver = rebuilt;
+    return rebuilt;
+  }
+  const rebuiltIds = new Set(rebuilt.map(player=>Number(player.id)));
+  G.waiver = (G.waiver||[])
+    .filter(player=>player && Number.isFinite(Number(player.id)) && rebuiltIds.has(Number(player.id)))
+    .map(player=>({...player}));
+  if(!G.waiver.length && rebuilt.length) G.waiver = rebuilt;
+  return G.waiver;
+}
+
 function applySharedSeasonPayload(payload){
   if(!payload?.draft || !payload?.game) return false;
   sharedSeasonHydrating=true;
@@ -1293,6 +1325,7 @@ function applySharedSeasonPayload(payload){
   hydrateDraftUserContextFromLobby();
   refreshCommissionerAccess();
   applySportContext(D?.sport || CURRENT_SPORT);
+  ensureSeasonWaiverPool(true);
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
   sharedSeasonHydrating=false;
   return true;
@@ -4352,6 +4385,7 @@ function renderWaiver(){
   setSeasonSidePanelVisible('waiverPowerups', false);
   const waiverPowerups=document.getElementById('waiverPowerups');
   if(waiverPowerups) waiverPowerups.innerHTML='';
+  ensureSeasonWaiverPool(false);
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
   const watchIds=getWatchListIds();
