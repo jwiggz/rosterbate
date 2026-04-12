@@ -143,6 +143,11 @@ let currentUsername = '';
 const localPlayerId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
 const localPlayerName = String(localStorage.getItem('rbPlayerName') || '').trim() || 'Manager';
 
+// Global arrays to store loaded leagues
+let drafts = [];
+let seasons = [];
+let solo = [];
+
 function toast(msg,bg){
   const el=document.getElementById('toast');
   if(!el) return;
@@ -402,8 +407,8 @@ async function loadMyLeagues(){
     db.ref(SHARED_SEASON_ROOT).once('value').catch(()=>null)
   ]);
 
-  // DRAFT ROOMS
-  const drafts=[];
+  // DRAFT ROOMS - use global variable
+  drafts=[];
   if(lobbiesSnap?.exists?.()){
     lobbiesSnap.forEach(child=>{
       const lobby=child.val()||{};
@@ -434,8 +439,8 @@ async function loadMyLeagues(){
   drafts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   console.log('✅ Found', drafts.length, 'draft rooms');
 
-  // SEASON LEAGUES - Load from sharedSeasons
-  const seasons=[];
+  // SEASON LEAGUES - use global variable
+  seasons=[];
   if(seasonsSnap?.exists?.()){
     seasonsSnap.forEach(child=>{
       const payload=child.val()||{};
@@ -501,8 +506,8 @@ async function loadMyLeagues(){
   
   seasons.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
 
-  // SOLO LEAGUES - Load from userSeasons (only truly solo leagues)
-  const solo=[];
+  // SOLO LEAGUES - use global variable
+  solo=[];
   if(currentUser){
     const userId=currentUser.uid;
     try{

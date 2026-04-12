@@ -432,22 +432,33 @@ async function exportAllData(){
 }
 
 async function deleteLeague(seasonId, leagueName){
-  if(!confirm(`Delete "${leagueName}"? This will permanently remove the league from both userSeasons and allSeasons. This cannot be undone.`)){
+  if(!confirm(`Delete "${leagueName}"?\n\nThis will remove the league from the admin index.\nThe user's personal copy will remain in their account.\n\nThis cannot be undone.`)){
     return;
   }
   
   try{
     const league = allLeagues.find(l => l.id === seasonId);
-    if(!league) return;
+    if(!league) {
+      toast('League not found','var(--red)');
+      return;
+    }
     
-    await db.ref(`userSeasons/${league.userId}/${seasonId}`).remove();
+    // ONLY delete from allSeasons (admin index)
+    // Don't try to delete from userSeasons - Firebase rules prevent this
     await db.ref(`allSeasons/${seasonId}`).remove();
     
-    toast('League deleted');
+    console.log('✅ Removed league from admin index:', seasonId);
+    toast('League removed from admin index');
+    
+    // Reload the leagues list
     loadAllLeagues();
   }catch(e){
-    console.error(e);
-    toast('Delete failed','var(--red)');
+    console.error('Delete failed:', e);
+    if(String(e.code||'').toLowerCase().includes('permission')){
+      toast('Permission denied - check Firebase rules','var(--red)');
+    }else{
+      toast('Delete failed: ' + (e.message||'Unknown error'),'var(--red)');
+    }
   }
 }
 
