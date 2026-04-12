@@ -876,25 +876,47 @@ async function saveManualDraftOrder(lobbyId, orderedIds){
   });
 }
 
+function isLobbyHost(lobby){
+  if(!lobby) return false;
+  const createdBy=String(lobby.createdBy || '').trim();
+  const myPlayerId=String(myId || '').trim();
+  const myUid=String(currentRbUser?.uid || '').trim();
+  return !!createdBy && (createdBy===myPlayerId || (myUid && createdBy===myUid));
+}
+
 async function moveDraftOrder(lobbyId, fromIndex, dir){
-  const snap=await db.ref('lobbies/'+lobbyId).once('value');
-  if(!snap.exists()) return;
-  const lobby={id:lobbyId,...(snap.val()||{})};
-  if(lobby.createdBy!==myId) return;
-  const ordered=getCurrentDraftOrder(lobby).map(player=>player.id);
-  const toIndex=fromIndex+dir;
-  if(toIndex<0 || toIndex>=ordered.length) return;
-  const next=ordered.slice();
-  const [moved]=next.splice(fromIndex,1);
-  next.splice(toIndex,0,moved);
-  await saveManualDraftOrder(lobbyId,next);
+  try{
+    const liveLobby=(currentLobby && currentLobby.id===lobbyId) ? currentLobby : null;
+    const snap=!liveLobby ? await db.ref('lobbies/'+lobbyId).once('value') : null;
+    if(!liveLobby && !snap?.exists()) return;
+    const lobby=liveLobby || {id:lobbyId,...(snap.val()||{})};
+    if(!isLobbyHost(lobby)){
+      toast('Only the host can change the draft order','var(--red)');
+      return;
+    }
+    const ordered=getCurrentDraftOrder(lobby).map(player=>player.id).filter(Boolean);
+    const toIndex=Number(fromIndex) + Number(dir);
+    if(toIndex<0 || toIndex>=ordered.length) return;
+    const next=ordered.slice();
+    const [moved]=next.splice(Number(fromIndex),1);
+    if(!moved) return;
+    next.splice(toIndex,0,moved);
+    await saveManualDraftOrder(lobbyId,next);
+    if(currentLobby && currentLobby.id===lobbyId){
+      currentLobby={...currentLobby, finalDraftOrder:next.slice(), orderFinalizedAt:Date.now()};
+      renderWaitingRoom(currentLobby);
+    }
+  }catch(e){
+    console.error('moveDraftOrder failed', e);
+    toast('Could not update draft order','var(--red)');
+  }
 }
 
 async function finalizeJoinOrder(lobbyId){
   const snap=await db.ref('lobbies/'+lobbyId).once('value');
   if(!snap.exists()) return;
   const lobby={id:lobbyId,...(snap.val()||{})};
-  if(lobby.createdBy!==myId) return;
+  if(!isLobbyHost(lobby)) return;
   await saveManualDraftOrder(lobbyId,getCurrentDraftOrder(lobby).map(player=>player.id));
   toast('Draft order saved');
 }

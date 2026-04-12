@@ -987,9 +987,9 @@
       <button id="loginTab" class="auth-tab" onclick="setAuthMode('login')">Log In</button>
     </div>
     <div class="auth-form">
-      <input id="authEmail" class="auth-input" type="text" placeholder="Email">
-      <input id="authUsername" class="auth-input" type="text" placeholder="Username">
-      <input id="authPassword" class="auth-input" type="password" placeholder="Password">
+      <input id="authEmail" class="auth-input" type="text" placeholder="Email" onkeydown="handleAuthKeydown(event)">
+      <input id="authUsername" class="auth-input" type="text" placeholder="Username" onkeydown="handleAuthKeydown(event)">
+      <input id="authPassword" class="auth-input" type="password" placeholder="Password" onkeydown="handleAuthKeydown(event)">
       <button id="authSubmit" class="auth-btn primary" onclick="submitAuth()">Create Account</button>
       <div id="authStatus" class="auth-status"></div>
     </div>
@@ -1317,6 +1317,12 @@ function setAuthStatus(message, type){
   const el = document.getElementById('authStatus');
   el.textContent = message || '';
   el.className = 'auth-status' + (type ? ' ' + type : '');
+}
+
+function handleAuthKeydown(event){
+  if(event.key !== 'Enter') return;
+  event.preventDefault();
+  submitAuth();
 }
 
 function setAuthMode(mode){
