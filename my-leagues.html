@@ -250,6 +250,8 @@ function buildLobbyStateFromSeason(id,payload,member){
   const teamUsers=Object.values(draft.teamUsers||{});
   return {
     lobbyId:id,
+    seasonId:id,
+    sharedSeasonId:id,
     name:draft.leagueName||'RosterBate League',
     sport:draft.sport||'nba',
     format:draft.draftFormat||'snake',
@@ -386,6 +388,11 @@ async function loadMyLeagues(){
       const member=getLobbyMember(lobby);
       if(!member) return;
       if(memberIsMarkedLeft(lobby, member)) return;
+      const hasSharedSeason=String(lobby.sharedSeasonId||lobby.seasonId||'').trim();
+      const lobbyStatus=String(lobby.status||'waiting').toLowerCase();
+      if(hasSharedSeason || lobbyStatus==='completed' || lobbyStatus==='season'){
+        return;
+      }
       drafts.push({
         id:child.key,
         name:lobby.name||'RosterBate League',
@@ -440,7 +447,7 @@ async function loadMyLeagues(){
         userSeasonsSnap.forEach(child=>{
           const data=child.val()||{};
           // Only show solo leagues (not multiplayer)
-          if(!data.isMultiplayer && !data.isDemo){
+          if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
             solo.push({
               id:child.key,
               seasonId:child.key,
@@ -468,7 +475,7 @@ async function loadMyLeagues(){
         const saved=localStorage.getItem('rosterbateDraft');
         if(saved){
           const data=JSON.parse(saved);
-          if(!data.multiplayer && !data.isDemo){
+          if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
             solo.push({
               id:'local',
               name:data.leagueName||'RosterBate League',
@@ -493,7 +500,7 @@ async function loadMyLeagues(){
       const saved=localStorage.getItem('rosterbateDraft');
       if(saved){
         const data=JSON.parse(saved);
-        if(!data.multiplayer && !data.isDemo){
+        if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
           solo.push({
             id:'local',
             name:data.leagueName||'RosterBate League',
@@ -537,7 +544,7 @@ function openSeasonLeague(id){
   const state=buildLobbyStateFromSeason(id,row.payload,row.member);
   try{ localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state)); }catch(e){}
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(row.payload.draft||{})); }catch(e){}
-  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba');
+  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport||'nba')+'&league='+encodeURIComponent(id);
 }
 
 async function leaveDraftLeague(id){

@@ -1182,6 +1182,9 @@ function normalizeSharedGameState(){
   if(!Array.isArray(G.tradeOffers)) G.tradeOffers=[];
   if(!Array.isArray(G.recentDrops)) G.recentDrops=[];
   if(!Array.isArray(G.activityLog)) G.activityLog=[];
+  if(!G.dayResults || typeof G.dayResults!=='object') G.dayResults={};
+  if(!G.revealedDays || typeof G.revealedDays!=='object') G.revealedDays={};
+  if(!G.settledWeeks || typeof G.settledWeeks!=='object') G.settledWeeks={};
   if(!G.moneyBallLocks || typeof G.moneyBallLocks!=='object') G.moneyBallLocks={};
   if(!G.powerupInventory || typeof G.powerupInventory!=='object') G.powerupInventory={};
   if(!G.powerupsByWeek || typeof G.powerupsByWeek!=='object') G.powerupsByWeek={};
@@ -2524,6 +2527,8 @@ function syncCalendarFromDay(){G.week=Math.min(G.totalWeeks,Math.max(1,weekForDa
 function revealDay(day){
   if(day!==G.day) return;
   if(isDayRevealed(day)) return;
+  if(!G.dayResults || typeof G.dayResults!=='object') G.dayResults={};
+  if(!G.revealedDays || typeof G.revealedDays!=='object') G.revealedDays={};
   G.dayResults[day]={};
   for(let ti=0;ti<G.rosters.length;ti++) G.dayResults[day][ti]=getTeamDayScoreDetails(ti,day);
   G.revealedDays[day]=true;
@@ -5741,18 +5746,54 @@ function rbRenderEmoji(){
 }
 
 // ── GIF PICKER ──────────────────────────────────────────────
-// Using Tenor GIF API (free, no key needed for basic usage)
-// Falls back to curated sports GIFs if API unavailable
+// Built-in animated sports stickers so GIF posting works without third-party URL failures.
+function rbGifDataUri(svg){
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+}
+function rbBuildAnimatedSticker(label, emoji, colors){
+  const bg=colors?.bg || '#111827';
+  const glow=colors?.glow || '#f97316';
+  const accent=colors?.accent || '#22c55e';
+  return rbGifDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${bg}"/>
+          <stop offset="100%" stop-color="#0b1220"/>
+        </linearGradient>
+        <filter id="blur">
+          <feGaussianBlur stdDeviation="10"/>
+        </filter>
+      </defs>
+      <rect width="320" height="180" rx="20" fill="url(#g)"/>
+      <circle cx="70" cy="90" r="34" fill="${glow}" opacity=".18" filter="url(#blur)">
+        <animate attributeName="r" values="24;40;24" dur="1.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".10;.28;.10" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="18" y="18" width="284" height="144" rx="18" fill="none" stroke="${glow}" stroke-opacity=".45"/>
+      <text x="70" y="105" text-anchor="middle" font-size="44">${emoji}</text>
+      <text x="116" y="76" fill="#f8fafc" font-size="26" font-weight="800" font-family="Arial, sans-serif">${label}</text>
+      <text x="116" y="108" fill="${accent}" font-size="15" font-weight="700" font-family="Arial, sans-serif">ROSTERBATE TRASH TALK</text>
+      <rect x="116" y="122" width="118" height="10" rx="5" fill="${accent}" opacity=".35">
+        <animate attributeName="width" values="72;142;72" dur="1.2s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="256" cy="52" r="6" fill="${glow}">
+        <animate attributeName="cy" values="52;44;52" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="276" cy="128" r="5" fill="${accent}">
+        <animate attributeName="opacity" values=".25;1;.25" dur=".9s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  `);
+}
 const RB_FALLBACK_GIFS = [
-  {url:'https://media.tenor.com/YPAbNGjMXW0AAAAM/lebron-james-nba.gif',preview:'https://media.tenor.com/YPAbNGjMXW0AAAAM/lebron-james-nba.gif'},
-  {url:'https://media.tenor.com/WHo75P0tCCYAAAAM/nba-basketball.gif',preview:'https://media.tenor.com/WHo75P0tCCYAAAAM/nba-basketball.gif'},
-  {url:'https://media.tenor.com/uMCT3UsBhxkAAAAM/stephen-curry-celebration.gif',preview:'https://media.tenor.com/uMCT3UsBhxkAAAAM/stephen-curry-celebration.gif'},
-  {url:'https://media.tenor.com/rSCJTGJLFE4AAAAM/nba-finals-trophy.gif',preview:'https://media.tenor.com/rSCJTGJLFE4AAAAM/nba-finals-trophy.gif'},
-  {url:'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',preview:'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'},
-  {url:'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif',preview:'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif'},
-  {url:'https://media.giphy.com/media/26tknCqiJrBQG6bxC/giphy.gif',preview:'https://media.giphy.com/media/26tknCqiJrBQG6bxC/giphy.gif'},
-  {url:'https://media.giphy.com/media/toB3AnUDkqE3GENKx0/giphy.gif',preview:'https://media.giphy.com/media/toB3AnUDkqE3GENKx0/giphy.gif'},
-];
+  {label:'Heat Check', tags:['heat','fire','hot','cook'], url:rbBuildAnimatedSticker('HEAT CHECK','🔥',{bg:'#1f1720',glow:'#fb923c',accent:'#f97316'})},
+  {label:'Buckets', tags:['bucket','buckets','score','basketball'], url:rbBuildAnimatedSticker('BUCKETS','🏀',{bg:'#18181b',glow:'#f59e0b',accent:'#fb923c'})},
+  {label:'Cooked', tags:['cooked','bbq','done','smoke'], url:rbBuildAnimatedSticker('COOKED','💀',{bg:'#140f1b',glow:'#a855f7',accent:'#c084fc'})},
+  {label:'Clamp God', tags:['clamp','defense','lock'], url:rbBuildAnimatedSticker('CLAMP GOD','🔒',{bg:'#0f1724',glow:'#22c55e',accent:'#34d399'})},
+  {label:'Too Small', tags:['small','baby','tiny'], url:rbBuildAnimatedSticker('TOO SMALL','😤',{bg:'#172033',glow:'#60a5fa',accent:'#38bdf8'})},
+  {label:'Champ', tags:['champ','trophy','winner','win'], url:rbBuildAnimatedSticker('CHAMP','🏆',{bg:'#23170f',glow:'#facc15',accent:'#f59e0b'})}
+].map(item=>({...item, preview:item.url}));
 
 function rbToggleGif(){
   const gp=document.getElementById('rbGifPicker');
@@ -5777,25 +5818,19 @@ function rbSearchGifs(query){
   clearTimeout(rbGifTimer);
   if(!query.trim()){rbShowFallbackGifs();return;}
   rbGifTimer=setTimeout(async()=>{
-    document.getElementById('rbGifGrid').innerHTML='<div class="rb-gif-loading">🔍 Searching...</div>';
-    try{
-      // Tenor API v2 - free tier
-      const res=await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query+' sports')}&key=AIzaSyAyimkuYQYF_FXVALexPzpBFLaEFtSPLsA&limit=12&media_filter=gif`);
-      if(!res.ok) throw new Error();
-      const data=await res.json();
-      const results=data.results||[];
-      if(!results.length){rbShowFallbackGifs();return;}
-      document.getElementById('rbGifGrid').innerHTML=results.map(r=>{
-        const url=r.media_formats?.gif?.url||r.media_formats?.tinygif?.url||'';
-        const prev=r.media_formats?.tinygif?.url||url;
-        return`<div class="rb-gif-item" onclick="rbSendGif('${url}')">
-          <img src="${prev}" loading="lazy" alt="GIF">
-        </div>`;
-      }).join('');
-    }catch(e){
-      // Fallback: filter fallback GIFs by keyword
-      rbShowFallbackGifs();
+    const q=query.trim().toLowerCase();
+    const results=RB_FALLBACK_GIFS.filter(g=>
+      g.label.toLowerCase().includes(q) || (g.tags||[]).some(tag=>tag.includes(q))
+    );
+    if(!results.length){
+      document.getElementById('rbGifGrid').innerHTML='<div class="rb-gif-loading">No GIFs matched that search yet.</div>';
+      return;
     }
+    document.getElementById('rbGifGrid').innerHTML=results.map(g=>
+      `<div class="rb-gif-item" onclick="rbSendGif('${g.url}')">
+        <img src="${g.preview}" loading="lazy" alt="${rbEscAttr(g.label)}">
+      </div>`
+    ).join('');
   },500);
 }
 
