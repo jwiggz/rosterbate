@@ -189,6 +189,14 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-hero-card{background:#121a29;border-top:4px solid #f59e0b;border-radius:14px;border-left:1px solid #24324a;border-right:1px solid #24324a;border-bottom:1px solid #24324a;box-shadow:0 10px 28px rgba(2,6,23,.28);}
 .season-split-grid{display:grid;gap:16px;}
 .season-matchup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start;}
+.season-matchup-table-wrap{overflow-x:hidden;}
+.season-matchup-table{width:100%!important;min-width:0!important;table-layout:fixed;}
+.season-matchup-table th:nth-child(1),.season-matchup-table td:nth-child(1){width:52px;}
+.season-matchup-table th:nth-child(2),.season-matchup-table td:nth-child(2){width:40%;}
+.season-matchup-table th:nth-child(3),.season-matchup-table td:nth-child(3){width:76px;}
+.season-matchup-table th:nth-child(4),.season-matchup-table td:nth-child(4){width:78px;}
+.season-matchup-table th:nth-child(5),.season-matchup-table td:nth-child(5){width:94px;}
+.season-matchup-table th:nth-child(6),.season-matchup-table td:nth-child(6){width:58px;text-align:right;}
 .season-outline-btn{background:#0f1724;border:1px solid #3b82f6;color:#93c5fd;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .season-action-btn{background:#f59e0b;border:none;color:#fff;border-radius:999px;padding:9px 16px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
 .lineup-move-btn{display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:7px 14px;border-radius:999px;border:1px solid #3b82f6;background:#0f1724;color:#93c5fd;font-family:var(--fb);font-size:13px;font-weight:700;cursor:pointer;}
@@ -2828,13 +2836,21 @@ function waiverCell(player,key){
         <div style="font-size:11px;color:#6b7280;">${player.team} · ${player.pos}</div>
       </div>
       </div>
-      <button
-        type="button"
-        onclick="toggleWatchList(${player.id})"
-        title="${watched?'Remove from':'Add to'} watch list"
-        aria-label="${watched?'Remove from':'Add to'} watch list"
-        style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${watched?'rgba(250,204,21,.45)':'#24324a'};background:${watched?'rgba(250,204,21,.14)':'#0f1724'};color:${watched?'#facc15':'#94a3b8'};font-size:16px;font-weight:900;cursor:pointer;flex-shrink:0;transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;"
-      >${watched?'★':'☆'}</button>
+      <div style="display:flex;align-items:flex-end;gap:8px;flex-shrink:0;">
+        <button
+          type="button"
+          onclick="toggleWatchList(${player.id})"
+          title="${watched?'Remove from':'Add to'} watch list"
+          aria-label="${watched?'Remove from':'Add to'} watch list"
+          style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${watched?'rgba(250,204,21,.45)':'#24324a'};background:${watched?'rgba(250,204,21,.14)':'#0f1724'};color:${watched?'#facc15':'#94a3b8'};font-size:16px;font-weight:900;cursor:pointer;flex-shrink:0;transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;"
+        >${watched?'★':'☆'}</button>
+        <button
+          type="button"
+          onclick="openWaiver(${player.id})"
+          class="season-outline-btn"
+          style="padding:7px 12px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;white-space:nowrap;"
+        >Add Player</button>
+      </div>
     </div>`;
   }
   const aliasMap={
@@ -3836,8 +3852,8 @@ function renderMatchup(){
           <div class="season-soft-muted" style="font-size:12px;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel}</div>
         </div>
       </div>
-      <div class="season-table-wrap">
-        <table class="season-data-table season-roster-table" style="width:100%;min-width:760px;">
+      <div class="season-table-wrap season-matchup-table-wrap">
+        <table class="season-data-table season-roster-table season-matchup-table">
           <thead><tr><th>Slot</th><th>Player</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th></tr></thead>
           <tbody>
             <tr><td colspan="6" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Starters</td></tr>
@@ -4485,7 +4501,6 @@ function renderWaiver(){
         if(!game) return `<td class="season-schedule-cell off"><span class="main">OFF</span><span class="sub">No game</span></td>`;
         return `<td class="season-schedule-cell on"><span class="main">${game.isHome?'vs':'@'} ${game.opp}</span><span class="sub">${game.time}</span></td>`;
       }).join('')}
-      <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button></td>
     </tr>`).join('');
   document.getElementById('waiverContent').innerHTML=`
     <div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
@@ -4512,12 +4527,11 @@ function renderWaiver(){
         </div>
         <div class="season-table-wrap">
           ${waiverTab==='schedule'
-            ? `<table class="season-data-table season-schedule-table" style="width:${320 + scheduleDays.length*92 + 110}px;min-width:${320 + scheduleDays.length*92 + 110}px;">
+            ? `<table class="season-data-table season-schedule-table" style="width:${320 + scheduleDays.length*92}px;min-width:${320 + scheduleDays.length*92}px;">
                 <thead>
                   <tr>
                     <th style="width:210px;text-align:left;">Player</th>
                     ${scheduleHeader}
-                    <th style="width:110px;text-align:right;">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -4528,13 +4542,11 @@ function renderWaiver(){
             <thead>
               <tr>
                 ${cols.map(col=>`<th onclick="toggleWaiverSort('${col.key}')" style="text-align:${col.align||'right'};cursor:pointer;color:${waiverSortKey===col.key?'#c2410c':'#6b7280'};">${col.label}${arrow(col.key)}</th>`).join('')}
-                <th style="text-align:right;">Action</th>
               </tr>
             </thead>
             <tbody>
               ${list.map(p=>`<tr>
                 ${cols.map(col=>`<td style="text-align:${col.align||'right'};${col.key==='fp'?'font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);':''}">${waiverCell(p,col.key)}</td>`).join('')}
-                <td style="text-align:right;"><button onclick="openWaiver(${p.id})" class="season-outline-btn" style="padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Add Player</button></td>
               </tr>`).join('')}
             </tbody>
           </table>`}
