@@ -215,6 +215,25 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 #pickerModal .ms,#viewerModal .ms,#moveModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
 #pickerModal .mh,#viewerModal .mh,#moveModal .mh{background:#475569;}
 #pickerModal .bs,#viewerModal .bs,#moveModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
+#scheduleModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
+#scheduleModal .mh{background:#475569;}
+#scheduleModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
+#scheduleModal{align-items:center;justify-content:center;padding:18px;}
+#scheduleModal .ms{max-width:980px;width:min(980px,100%);border-radius:18px;padding:22px 24px 26px;max-height:88dvh;box-shadow:0 20px 60px rgba(2,6,23,.5);}
+.season-schedule-modal-grid{display:grid;gap:16px;}
+.season-schedule-week-card{background:#0f1724;border:1px solid #24324a;border-radius:14px;overflow:hidden;}
+.season-schedule-week-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #24324a;background:#121a29;}
+.season-schedule-week-title{font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;}
+.season-schedule-week-sub{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;}
+.season-schedule-game-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center;padding:12px 14px;border-top:1px solid #1d283b;}
+.season-schedule-game-row:first-child{border-top:none;}
+.season-schedule-game-team{display:flex;align-items:center;gap:10px;min-width:0;}
+.season-schedule-game-team.away{justify-content:flex-end;}
+.season-schedule-game-name{font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.season-schedule-game-name.me{color:#fdba74;}
+.season-schedule-game-meta{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:118px;text-align:center;}
+.season-schedule-game-score{font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;line-height:1;}
+.season-schedule-game-status{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;}
 #teamSettingsModal .ms{background:#121a29;border-top:1px solid #24324a;color:#f8fafc;}
 #teamSettingsModal .mh{background:#475569;}
 #teamSettingsModal .bs{background:#0f1724;border:1px solid #24324a;color:#dbe4f0;}
@@ -689,6 +708,21 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:12px 0 8px;">Bench</div>
     <div id="vBench"></div>
     <div id="vActions" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+
+<!-- FULL SCHEDULE MODAL -->
+<div class="mo" id="scheduleModal" onclick="if(event.target===this)closeFullSchedule()">
+  <div class="ms">
+    <div class="mh"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;">Full Schedule</div>
+        <div style="font-size:13px;color:#94a3b8;margin-top:4px;">Every weekly matchup for this league, with your team highlighted.</div>
+      </div>
+      <button onclick="closeFullSchedule()" class="bs" style="width:auto;padding:13px 16px;">Close</button>
+    </div>
+    <div id="scheduleModalContent" class="season-schedule-modal-grid"></div>
   </div>
 </div>
 
@@ -1274,6 +1308,13 @@ function normalizeSharedGameState(){
   if(!Array.isArray(G.ilByTeam)) G.ilByTeam=Array.from({length:teamCount},()=>[]);
   if(!Array.isArray(G.starters)) G.starters=Array.from({length:teamCount},()=>[]);
   if(!G.dailyLineups || typeof G.dailyLineups!=='object') G.dailyLineups={};
+  if(!G.dailyLineupsByTeam || typeof G.dailyLineupsByTeam!=='object') G.dailyLineupsByTeam={};
+  if(Object.values(G.dailyLineups).some(value=>Array.isArray(value))){
+    // Legacy shared format stored one lineup bucket for the whole league.
+    // That's ambiguous across teams, so we discard it and fall back to
+    // team-specific starters until fresh per-team day lineups are saved.
+    G.dailyLineups={};
+  }
   if(!Array.isArray(G.waiver)) G.waiver=[];
   if(!Array.isArray(G.schedule)) G.schedule=[];
   if(!Array.isArray(G.standings)) G.standings=[];
@@ -1289,6 +1330,15 @@ function normalizeSharedGameState(){
   if(!G.powerupDropsByWeek || typeof G.powerupDropsByWeek!=='object') G.powerupDropsByWeek={};
   if(!G.waiverPriority || typeof G.waiverPriority!=='object') G.waiverPriority={};
   G.processed=new Set(Array.isArray(G.processed) ? G.processed : Array.from(G.processed||[]));
+}
+
+function getDailyLineupStore(teamIdx){
+  if(!G.dailyLineupsByTeam || typeof G.dailyLineupsByTeam!=='object') G.dailyLineupsByTeam={};
+  const key=String(teamIdx ?? 0);
+  if(!G.dailyLineupsByTeam[key] || typeof G.dailyLineupsByTeam[key]!=='object'){
+    G.dailyLineupsByTeam[key]={};
+  }
+  return G.dailyLineupsByTeam[key];
 }
 
 function rebuildSeasonWaiverPool(){
@@ -1417,6 +1467,7 @@ function syncGameStateToD() {
   if (G.powerupDropsByWeek) D.powerupDropsByWeek = G.powerupDropsByWeek;
   if (G.moneyBallLocks) D.moneyBallLocks = G.moneyBallLocks;
   if (G.dailyLineups) D.dailyLineups = G.dailyLineups;
+  if (G.dailyLineupsByTeam) D.dailyLineupsByTeam = G.dailyLineupsByTeam;
   if (G.starters) D.starters = G.starters;
   if (G.ilByTeam) D.ilRosters = G.ilByTeam;
 }
@@ -1948,10 +1999,11 @@ function isIlEligiblePlayer(player, injury){
 
 function rebuildLineupsAfterRosterChange(teamIdx){
   const roster=G.rosters[teamIdx]||[];
-  Object.keys(G.dailyLineups||{}).forEach(dayKey=>{
+  const teamDailyLineups=getDailyLineupStore(teamIdx);
+  Object.keys(teamDailyLineups||{}).forEach(dayKey=>{
     const day=Number(dayKey);
-    const current=(G.dailyLineups[day]||[]).map(id=>roster.find(p=>p.id===id)).filter(Boolean);
-    G.dailyLineups[day]=buildBestLineupIdsForRoster(current,day);
+    const current=(teamDailyLineups[day]||[]).map(id=>roster.find(p=>p.id===id)).filter(Boolean);
+    teamDailyLineups[day]=buildBestLineupIdsForRoster(current,day);
   });
   G.starters[teamIdx]=buildBestLineupIdsForRoster(roster,G.day||1);
 }
@@ -3345,6 +3397,7 @@ function initSeason(){
     G.processed = D.processed ? new Set(D.processed) : new Set();
     G.tradeOffers = D.tradeOffers || [];
     G.dailyLineups = D.dailyLineups || {};
+    G.dailyLineupsByTeam = D.dailyLineupsByTeam || {};
     G.powerupsByWeek = D.powerupsByWeek || {};
     G.powerupInventory = D.powerupInventory || null;
     G.powerupDropsByWeek = D.powerupDropsByWeek || {};
@@ -3546,13 +3599,15 @@ async function recordLifetimeSeasonStats(){
 
 // Get lineup for a specific day (falls back to default starters)
 function getLineupForDay(day){
-  const source=G.dailyLineups[day]||G.starters[D.myPos]||[];
+  const teamLineups=getDailyLineupStore(D.myPos);
+  const source=teamLineups[day]||G.starters[D.myPos]||[];
   return Array.from({length:STARTERS},(_,index)=>source[index]||null);
 }
 
 function setLineupForDay(day,starterIds){
   if(day<G.day||isDayRevealed(day)) return false;
   const roster=G.rosters[D.myPos]||[];
+  const teamLineups=getDailyLineupStore(D.myPos);
   const validIds=new Set(roster.map(p=>p.id));
   const seen=new Set();
   const normalized=Array.from({length:STARTERS},(_,index)=>{
@@ -3561,7 +3616,7 @@ function setLineupForDay(day,starterIds){
     seen.add(id);
     return id;
   });
-  G.dailyLineups[day]=normalized;
+  teamLineups[day]=normalized;
   G.starters[D.myPos]=[...normalized];
   queueSharedSeasonSave('set_lineup');
   return true;
@@ -3569,10 +3624,11 @@ function setLineupForDay(day,starterIds){
 
 function copyLineupToRange(fromDay,toDay){
   const lineup=getLineupForDay(fromDay);
+  const teamLineups=getDailyLineupStore(D.myPos);
   let copied=0;
   for(let d=fromDay;d<=toDay;d++){
     if(d<G.day||isDayRevealed(d)) continue;
-    G.dailyLineups[d]=[...lineup];
+    teamLineups[d]=[...lineup];
     copied++;
   }
   if(copied) queueSharedSeasonSave('copy_lineup');
@@ -3949,7 +4005,7 @@ function renderRoster(){
     return `<div class="season-table-card season-card-pad">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
         <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div>
-        ${isCurrent?'<div class="season-team-link">Full Schedule</div>':''}
+        ${isCurrent?'<button type="button" class="season-team-link-btn" onclick="openFullSchedule()">Full Schedule</button>':''}
       </div>
       <div style="display:grid;gap:10px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -4891,6 +4947,66 @@ function openPicker(){
   document.getElementById('pickerModal').classList.add('open');
 }
 
+function closeFullSchedule(){
+  document.getElementById('scheduleModal')?.classList.remove('open');
+}
+
+function openFullSchedule(){
+  const wrap=document.getElementById('scheduleModalContent');
+  const modal=document.getElementById('scheduleModal');
+  if(!wrap || !modal) return;
+  const scheduledGames=Array.isArray(G?.schedule)?G.schedule:[];
+  const totalWeeks=Math.max(1, Number(G?.totalWeeks)||0, ...scheduledGames.map(game=>Number(game?.week)||0));
+  const weeks=Array.from({length:totalWeeks},(_,idx)=>idx+1);
+  wrap.innerHTML=weeks.map(week=>{
+    const games=weekGames(week);
+    const isCurrentWeek=week===Number(G?.week||1);
+    if(!games.length){
+      return `<div class="season-schedule-week-card">
+        <div class="season-schedule-week-head">
+          <div class="season-schedule-week-title">Week ${week}</div>
+          <div class="season-schedule-week-sub">${isCurrentWeek?'Current Week':'Scheduled'}</div>
+        </div>
+        <div style="padding:14px;color:#94a3b8;font-size:13px;">No games scheduled for this week yet.</div>
+      </div>`;
+    }
+    const rows=games.map(game=>{
+      const homeIdx=Number(game.home);
+      const awayIdx=Number(game.away);
+      const homeName=D.teams?.[homeIdx] || ('Team '+(homeIdx+1));
+      const awayName=D.teams?.[awayIdx] || ('Team '+(awayIdx+1));
+      const homeMine=homeIdx===Number(D?.myPos);
+      const awayMine=awayIdx===Number(D?.myPos);
+      const settled=game.winner!=null || Number.isFinite(Number(game.homeScore)) || Number.isFinite(Number(game.awayScore));
+      const homeScore=Number.isFinite(Number(game.homeScore)) ? Number(game.homeScore).toFixed(1) : '0.0';
+      const awayScore=Number.isFinite(Number(game.awayScore)) ? Number(game.awayScore).toFixed(1) : '0.0';
+      const status=isCurrentWeek ? 'This week' : (settled ? 'Final' : 'Upcoming');
+      return `<div class="season-schedule-game-row">
+        <div class="season-schedule-game-team">
+          <div class="pav" style="background:${TCOLORS[homeIdx%TCOLORS.length]};width:34px;height:34px;font-size:12px;">${ini(homeName)}</div>
+          <div class="season-schedule-game-name${homeMine?' me':''}">${homeName}</div>
+        </div>
+        <div class="season-schedule-game-meta">
+          <div class="season-schedule-game-score">${homeScore} <span style="color:#64748b;">vs</span> ${awayScore}</div>
+          <div class="season-schedule-game-status">${status}</div>
+        </div>
+        <div class="season-schedule-game-team away">
+          <div class="season-schedule-game-name${awayMine?' me':''}">${awayName}</div>
+          <div class="pav" style="background:${TCOLORS[awayIdx%TCOLORS.length]};width:34px;height:34px;font-size:12px;">${ini(awayName)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="season-schedule-week-card">
+      <div class="season-schedule-week-head">
+        <div class="season-schedule-week-title">Week ${week}</div>
+        <div class="season-schedule-week-sub">${isCurrentWeek?'Current Week':'League Matchups'}</div>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+  modal.classList.add('open');
+}
+
 function openViewer(ti){
   document.getElementById('pickerModal').classList.remove('open');
   const nm=D.teams[ti]||'Team '+(ti+1),im=ti===D.myPos;
@@ -5246,7 +5362,18 @@ function syncExistingLineupsToCurrentSlots(oldSlots){
       return remapStarterIdsToSlots(starterIds || [], previousSlots, nextSlots, G.rosters[teamIdx] || []);
     });
   }
-  if(G.dailyLineups && typeof G.dailyLineups === 'object'){
+  if(G.dailyLineupsByTeam && typeof G.dailyLineupsByTeam === 'object'){
+    Object.keys(G.dailyLineupsByTeam).forEach(function(teamKey){
+      const teamIdx = Number(teamKey);
+      const teamLineups = G.dailyLineupsByTeam[teamKey];
+      if(!teamLineups || typeof teamLineups !== 'object') return;
+      Object.keys(teamLineups).forEach(function(dayKey){
+        const day = Number(dayKey);
+        const current = Array.isArray(teamLineups[day]) ? teamLineups[day] : [];
+        teamLineups[day] = remapStarterIdsToSlots(current, previousSlots, nextSlots, G.rosters[teamIdx] || []);
+      });
+    });
+  } else if(G.dailyLineups && typeof G.dailyLineups === 'object'){
     Object.keys(G.dailyLineups).forEach(function(dayKey){
       const day = Number(dayKey);
       const current = Array.isArray(G.dailyLineups[day]) ? G.dailyLineups[day] : [];
