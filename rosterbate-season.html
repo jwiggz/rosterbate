@@ -975,6 +975,7 @@ function activityAge(ts){
 
 let D=null;
 let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{}};
+let selectedStandingsTeamIdx=null;
 let moveCtx=null;
 let rosterTab='stats';
 let dropCandidate=null;
@@ -4889,6 +4890,48 @@ function forceRejectTrade(id){
   renderTrades();renderHub();
 }
 
+function renderStandingsTeamDetails(teamIdx){
+  if(!Number.isFinite(Number(teamIdx))) return '';
+  const ti=Number(teamIdx);
+  const nm=D.teams[ti]||('Team '+(ti+1));
+  const roster=G.rosters[ti]||[];
+  const starterIds=getStarterIdsForTeamDay(ti,G.day);
+  const starterSet=new Set(starterIds.filter(Boolean));
+  const starters=starterIds.map((id,index)=>({slot:SLOT_LABELS[index]||'UTIL',player:roster.find(p=>p.id===id)||null})).filter(entry=>entry.player);
+  const bench=roster.filter(p=>!starterSet.has(p.id));
+  const st=getLiveStandingsSnapshot().find(entry=>entry.teamIdx===ti)||G.standings[ti]||{w:0,l:0,pf:0,pa:0};
+  const renderRow=(entry,slot)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #1d283b;">
+    <div style="width:38px;font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;flex-shrink:0;">${slot}</div>
+    <div class="pav" style="background:${tc(entry.team)};width:32px;height:32px;font-size:12px;">${ini(entry.name)}</div>
+    <div style="min-width:0;flex:1;">
+      <div style="font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.name}</div>
+      <div style="font-size:12px;color:#94a3b8;">${entry.team} ${entry.pos} · ${getRosterbatePlayerSummary(entry,CURRENT_SPORT)}</div>
+    </div>
+  </div>`;
+  return `<div class="season-table-card">
+    <div class="season-card-pad" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+        <div class="pav" style="background:${TCOLORS[ti%TCOLORS.length]};width:54px;height:54px;font-size:20px;">${ini(nm)}</div>
+        <div style="min-width:0;">
+          <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;">${nm}</div>
+          <div style="font-size:13px;color:#94a3b8;margin-top:6px;">${(st.w||0)}-${(st.l||0)} · ${(st.pf||0).toFixed(1)} PF · ${(st.pa||0).toFixed(1)} PA</div>
+        </div>
+      </div>
+      <button type="button" onclick="selectedStandingsTeamIdx=null;renderStandings()" class="season-outline-btn">Close</button>
+    </div>
+    <div class="season-card-pad" style="display:grid;gap:16px;">
+      <div>
+        <div style="font-family:var(--fb);font-size:12px;font-weight:800;color:#22c55e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Starting Lineup</div>
+        <div>${starters.length?starters.map(entry=>renderRow(entry.player,entry.slot)).join(''):'<div style="color:#94a3b8;font-size:13px;">No starters set.</div>'}</div>
+      </div>
+      <div>
+        <div style="font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Bench</div>
+        <div>${bench.length?bench.map(player=>renderRow(player,'BN')).join(''):'<div style="color:#94a3b8;font-size:13px;">Empty bench.</div>'}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderStandings(){
   setSeasonSidePanelVisible('standingsPowerups', false);
   const sorted=getLiveStandingsSnapshot().sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
@@ -4913,13 +4956,13 @@ function renderStandings(){
           <tbody>`;
   sorted.forEach((st,rk)=>{
     const im=st.teamIdx===D.myPos,sc=st.streakW?'#16a34a':'#dc2626';
-    h+=`<tr onclick="openViewer(${st.teamIdx})" style="cursor:pointer;">
+    h+=`<tr onclick="selectedStandingsTeamIdx=${st.teamIdx};renderStandings()" style="cursor:pointer;">
       <td style="font-family:var(--fb);font-weight:800;color:${rk<3?'#f59e0b':'#6b7280'};">${medals[rk]||rk+1}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px;min-width:220px;">
           <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:30px;height:30px;font-size:11px;">${ini(D.teams[st.teamIdx]||('T'+(st.teamIdx+1)))}</div>
           <div style="min-width:0;">
-            <button type="button" onclick="event.stopPropagation();openViewer(${st.teamIdx})" class="season-team-link-btn" style="font-weight:700;color:${im?'#fdba74':'#f8fafc'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-align:left;">
+            <button type="button" onclick="event.stopPropagation();selectedStandingsTeamIdx=${st.teamIdx};renderStandings()" class="season-team-link-btn" style="font-weight:700;color:${im?'#fdba74':'#f8fafc'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-align:left;">
               ${D.teams[st.teamIdx]||'Team '+(st.teamIdx+1)}${im?' ⭐':''}
             </button>
             <div class="season-soft-muted">${(st.pf||0).toFixed(1)} PF · ${(st.pa||0).toFixed(1)} PA</div>
@@ -4935,6 +4978,9 @@ function renderStandings(){
     </tr>`;
   });
   h+=`</tbody></table></div></div>`;
+  if(Number.isFinite(Number(selectedStandingsTeamIdx))){
+    h+=renderStandingsTeamDetails(Number(selectedStandingsTeamIdx));
+  }
   const pw=G.week-1;
   if(pw>=1){
     h+=`<div class="season-table-card"><div class="season-card-pad" style="font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;border-bottom:1px solid #24324a;">Week ${pw} Results</div>`;
