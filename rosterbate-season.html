@@ -1157,6 +1157,7 @@ function hydrateDraftUserContextFromLobby(){
   if(D.teamUsers && myPlayerId && D.teamUsers[myPlayerId]){
     D.myPos=Number(D.teamUsers[myPlayerId].teamIdx||0);
     D.teamName=D.teams?.[D.myPos] || D.teamUsers[myPlayerId].name || D.teamName;
+    refreshCommissionerAccess();
     return;
   }
   if(lobby?.myName && Array.isArray(D.teams)){
@@ -1166,7 +1167,78 @@ function hydrateDraftUserContextFromLobby(){
       D.teamName=D.teams[idx];
     }
   }
+  refreshCommissionerAccess();
 }
+
+function findCommissionerTeamUser(teamIdx){
+  if(!D?.teamUsers) return null;
+  return Object.values(D.teamUsers).find(user=>Number(user?.teamIdx)===Number(teamIdx)) || null;
+}
+
+function resolveCommissionerTeamIdx(){
+  if(Number.isFinite(Number(D?.commissionerTeamIdx))) return Number(D.commissionerTeamIdx);
+  if(D?.multiplayer){
+    if(D?.commissionerUserId && D?.teamUsers){
+      const assigned = Object.values(D.teamUsers).find(user=>String(user?.uid||'')===String(D.commissionerUserId));
+      if(assigned && Number.isFinite(Number(assigned.teamIdx))) return Number(assigned.teamIdx);
+    }
+    if(D?.userId && D?.teamUsers){
+      const creator = Object.values(D.teamUsers).find(user=>String(user?.uid||'')===String(D.userId));
+      if(creator && Number.isFinite(Number(creator.teamIdx))) return Number(creator.teamIdx);
+    }
+    if(currentRbUser?.uid && D?.userId && String(currentRbUser.uid)===String(D.userId) && Number.isFinite(Number(D?.myPos))){
+      return Number(D.myPos);
+    }
+    return null;
+  }
+  if(Number.isFinite(Number(D?.myPos))) return Number(D.myPos);
+  return 0;
+}
+
+function refreshCommissionerAccess(){
+  if(!D || typeof D!=='object') return false;
+  const commissionerTeamIdx = resolveCommissionerTeamIdx();
+  if(Number.isFinite(Number(commissionerTeamIdx))){
+    D.commissionerTeamIdx = Number(commissionerTeamIdx);
+    const commissionerUser = findCommissionerTeamUser(commissionerTeamIdx);
+    if(commissionerUser?.uid) D.commissionerUserId = commissionerUser.uid;
+  } else if(!D?.multiplayer && currentRbUser?.uid){
+    D.commissionerUserId = currentRbUser.uid;
+  }
+  if(D?.multiplayer){
+    D.isCommissioner = Number.isFinite(Number(D?.commissionerTeamIdx)) && Number(D.myPos)===Number(D.commissionerTeamIdx);
+  } else {
+    const ownerUid = String(D?.commissionerUserId || D?.userId || currentRbUser?.uid || '').trim();
+    D.isCommissioner = ownerUid ? String(currentRbUser?.uid || '')===ownerUid : true;
+    if(!Number.isFinite(Number(D?.commissionerTeamIdx)) && Number.isFinite(Number(D?.myPos))){
+      D.commissionerTeamIdx = Number(D.myPos);
+    }
+  }
+  return !!D.isCommissioner;
+}
+
+function commissionerTeamOptions(){
+  if(!Array.isArray(D?.teams)) return '<option value="0">Team 1</option>';
+  return D.teams.map((name,idx)=>`<option value="${idx}"${Number(D?.commissionerTeamIdx)===idx?' selected':''}>${String(name||('Team '+(idx+1)))}</option>`).join('');
+}
+
+function setCommissionerTeam(teamIdx){
+  if(D?.isCommissioner===false){
+    toast('Only the current commissioner can transfer league control.');
+    return;
+  }
+  const nextIdx = Number(teamIdx);
+  if(!Number.isFinite(nextIdx) || !Array.isArray(D?.teams) || !D.teams[nextIdx]) return;
+  D.commissionerTeamIdx = nextIdx;
+  const commissionerUser = findCommissionerTeamUser(nextIdx);
+  D.commissionerUserId = commissionerUser?.uid || null;
+  refreshCommissionerAccess();
+  queueSharedSeasonSave('commissioner_transfer');
+  toast('Commissioner switched to ' + teamName(nextIdx) + '.');
+  if(document.getElementById('hub')?.classList.contains('active')) renderHub();
+  if(document.getElementById('commissioner')?.classList.contains('active')) renderCommissioner();
+}
+
 function serializeSharedGameState(){
   const plain={...G,processed:Array.from(G.processed||[])};
   return cloneJsonSafe(plain);
@@ -1208,7 +1280,6 @@ function applySharedSeasonPayload(payload){
   G=cloneJsonSafe(payload.game);
   normalizeSharedGameState();
   if(previousDraft){
-    if(previousDraft.isCommissioner!=null && D.isCommissioner==null) D.isCommissioner=previousDraft.isCommissioner;
     if(previousDraft.teamUsers && !D.teamUsers) D.teamUsers=previousDraft.teamUsers;
     if(previousDraft.teamAvatars && !D.teamAvatars) D.teamAvatars=previousDraft.teamAvatars;
     if(previousDraft.myPos!=null) D.myPos=previousDraft.myPos;
@@ -1220,6 +1291,7 @@ function applySharedSeasonPayload(payload){
   }
   sharedSeasonLastUpdatedAt=Number(payload.updatedAt||0);
   hydrateDraftUserContextFromLobby();
+  refreshCommissionerAccess();
   applySportContext(D?.sport || CURRENT_SPORT);
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
   sharedSeasonHydrating=false;
@@ -2841,11 +2913,11 @@ window.onload=async function(){
                 // Continue with the league data
                 D = leagueData;
                 
-                if (typeof D.isCommissioner !== 'boolean') D.isCommissioner = true;
                 if (!D.myPos && D.myPos !== 0) D.myPos = 0;
                 
                 applySportContext(leagueData.sport || requestedSport);
                 hydrateDraftUserContextFromLobby();
+                refreshCommissionerAccess();
                 
                 let seasonLoaded = false;
                 if (D.multiplayer) {
@@ -2910,11 +2982,11 @@ window.onload=async function(){
           D = leagueData;
           
           // Ensure D has required properties
-          if (typeof D.isCommissioner !== 'boolean') D.isCommissioner = true;
           if (!D.myPos && D.myPos !== 0) D.myPos = 0;
           
           applySportContext(leagueData.sport || requestedSport);
           hydrateDraftUserContextFromLobby();
+          refreshCommissionerAccess();
           
           // Check if multiplayer
           let seasonLoaded = false;
@@ -2964,7 +3036,6 @@ window.onload=async function(){
     console.log('📦 Found saved data in localStorage, auto-loading...');
     try{
       const parsed=JSON.parse(raw);
-      if(typeof parsed.isCommissioner!=='boolean') parsed.isCommissioner=true;
       const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
       if(savedSport===requestedSport){
         if(isDemoSeasonData(parsed)){
@@ -2977,6 +3048,7 @@ window.onload=async function(){
         }
         applySportContext(savedSport);
         hydrateDraftUserContextFromLobby();
+        refreshCommissionerAccess();
         let seasonLoaded=false;
         try{
           seasonLoaded=await loadOrCreateSharedSeason();
@@ -3250,6 +3322,10 @@ function weekGames(w){return G.schedule.filter(g=>g.week===w);}
 function projScore(ti,week=G.week){return getTeamWeekRevealedScore(ti,week);}
 
 function goPage(id){
+  if(id==='commissioner' && D?.isCommissioner===false){
+    toast('Only the commissioner can open league settings.');
+    return;
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   PAGES.forEach(p=>{
@@ -5235,6 +5311,7 @@ function commBasic(){
     <div class="csection">Basic Settings</div>
     <div class="card" style="padding:0 14px;">
       ${row('League Name',commText('leagueName','My League'))}
+      ${row('Commissioner',`<select class="cselect" onchange="setCommissionerTeam(this.value)">${commissionerTeamOptions()}</select>`,'Only the current commissioner can transfer league control to another team manager.')}
       ${row('Number of Teams',commNum('numTeams',2,30))}
       ${row('Scoring Type',commSel('scoringType',['H2H Points','Money Ball','H2H Categories','Rotisserie','Points Only']))}
       ${row('Format',commSel('format',['Standard','Keeper','Dynasty']))}
