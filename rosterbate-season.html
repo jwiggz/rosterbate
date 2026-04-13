@@ -1032,16 +1032,30 @@ function setSeasonEmptyState(mode){
   const copy=document.getElementById('seasonEmptyCopy');
   const icon=document.getElementById('seasonEmptyIcon');
   const actions=document.getElementById('seasonEmptyActions');
-  if(emptyScreen) emptyScreen.classList.add('active');
+  const existingSpinner = document.getElementById('seasonSpinner');
+  
   if(mode==='loading'){
     document.body.dataset.seasonBoot='loading';
-    if(icon) icon.textContent='??';
+    if(icon) icon.style.display='none';
+    if(!existingSpinner){
+      const spinner = document.createElement('div');
+      spinner.id = 'seasonSpinner';
+      spinner.className = 'spinner';
+      icon?.parentNode.insertBefore(spinner, icon);
+    } else {
+      existingSpinner.style.display = 'block';
+    }
     if(title) title.textContent='Loading League';
     if(copy) copy.textContent='Loading your saved season...';
     if(actions) actions.style.display='none';
+    emptyScreen?.classList.add('active');
     return;
   }
+  
   document.body.dataset.seasonBoot='idle';
+  if(icon) icon.style.display='';
+  const spinner = document.getElementById('seasonSpinner');
+  if(spinner) spinner.style.display='none';
   if(icon) icon.textContent='??';
   if(title) title.textContent='Season Manager';
   if(copy) copy.textContent=getSeasonEmptyStateCopy(CURRENT_SPORT||'nba');
@@ -6422,6 +6436,7 @@ function rbClosePickersAll(){
 <script src="/site-background.js"></script>
 </body>
 </html>
+
 
 
 
