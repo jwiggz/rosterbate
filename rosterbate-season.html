@@ -3030,8 +3030,32 @@ window.onload=async function(){
         const userId = currentRbUser.uid;
         let snapshot = await db.ref(`userSeasons/${userId}/${leagueId}`).once('value');
         
-        // If not found in current user's seasons, check if it's in localStorage from a fresh draft
+        // If not found in current user's seasons, check if this is a shared multiplayer season
         if (!snapshot.exists()) {
+          console.log('?? League not in userSeasons, checking shared season paths...');
+          try {
+            D = {
+              sport: requestedSport,
+              multiplayer: true,
+              seasonId: leagueId,
+              sharedSeasonId: leagueId,
+              leagueName: leagueId,
+              teams: []
+            };
+            hydrateDraftUserContextFromLobby();
+            refreshCommissionerAccess();
+            const sharedSeasonLoaded = await loadOrCreateSharedSeason();
+            if (sharedSeasonLoaded) {
+              console.log('? Loaded league from shared multiplayer season:', leagueId);
+              hideSeasonEmptyState();
+              goPage('hub');
+              return;
+            }
+          } catch (sharedErr) {
+            console.warn('Shared season lookup by league ID failed, falling back to local/user data.', sharedErr);
+          }
+
+          // If still not found, check if it's in localStorage from a fresh draft
           console.log('?? League not in Firebase, checking localStorage...');
           const localRaw = localStorage.getItem('rosterbateDraft');
           if (localRaw) {
@@ -3134,8 +3158,31 @@ window.onload=async function(){
           console.log('? Loaded league from Firebase:', leagueId);
           console.log('?? League data structure:', Object.keys(leagueData));
           
-          // Check if this is valid league data
+          // Check if this is valid league data. For multiplayer leagues, we can recover from shared season state.
           if (!leagueData.allRosters || !Array.isArray(leagueData.allRosters)) {
+            console.warn('?? League data missing allRosters, trying shared season recovery...');
+            try {
+              D = {
+                ...leagueData,
+                sport: leagueData.sport || requestedSport,
+                multiplayer: true,
+                seasonId: leagueId,
+                sharedSeasonId: leagueData.sharedSeasonId || leagueId,
+                leagueName: leagueData.leagueName || leagueId,
+                teams: Array.isArray(leagueData.teams) ? leagueData.teams : []
+              };
+              hydrateDraftUserContextFromLobby();
+              refreshCommissionerAccess();
+              const recoveredFromShared = await loadOrCreateSharedSeason();
+              if (recoveredFromShared) {
+                console.log('? Recovered league from shared season payload:', leagueId);
+                hideSeasonEmptyState();
+                goPage('hub');
+                return;
+              }
+            } catch (recoveryErr) {
+              console.error('Shared season recovery failed:', recoveryErr);
+            }
             console.error('? Invalid league data - missing allRosters');
             toast('League data is corrupted. Please try loading from My Leagues page.');
             return;
@@ -3150,6 +3197,7 @@ window.onload=async function(){
           
           // Set as current data
           D = leagueData;
+          hideSeasonEmptyState();
           
           // Ensure D has required properties
           if (!D.myPos && D.myPos !== 0) D.myPos = 0;
@@ -3192,7 +3240,28 @@ window.onload=async function(){
         toast('Failed to load league from cloud. Loading from localStorage instead.');
       }
     } else {
-      console.warn('?? Not logged in, cannot load league from Firebase');
+      console.warn('?? Not logged in, cannot load league from userSeasons. Trying shared season path only...');
+      try {
+        D = {
+          sport: requestedSport,
+          multiplayer: true,
+          seasonId: leagueId,
+          sharedSeasonId: leagueId,
+          leagueName: leagueId,
+          teams: []
+        };
+        hydrateDraftUserContextFromLobby();
+        refreshCommissionerAccess();
+        const sharedSeasonLoaded = await loadOrCreateSharedSeason();
+        if (sharedSeasonLoaded) {
+          console.log('? Loaded shared season without userSeasons access:', leagueId);
+          hideSeasonEmptyState();
+          goPage('hub');
+          return;
+        }
+      } catch(sharedErr) {
+        console.warn('Shared season lookup without auth failed:', sharedErr);
+      }
       toast('Sign in to load your league from the cloud.');
     }
   }
@@ -3339,6 +3408,7 @@ async function loadDemo(){
     toast('Demo season failed to load: ' + e.message);
   }
 }
+window.loadDemo = loadDemo;
 
 function isDemoSeasonData(data){
   if(!data || !Array.isArray(data.teams)) return false;
@@ -6447,9 +6517,6 @@ function rbClosePickersAll(){
 <script src="/site-background.js"></script>
 </body>
 </html>
-
-
-
 
 
 
