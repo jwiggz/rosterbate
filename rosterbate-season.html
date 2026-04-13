@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1199,6 +1199,18 @@ function getSharedSeasonKey(){
   const lobbyState=getSavedMultiplayerLobbyState();
   return D?.sharedSeasonId || D?.seasonId || D?.lobbyId || lobbyState?.sharedSeasonId || lobbyState?.seasonId || lobbyState?.lobbyId || null;
 }
+
+async function ensureLobbyPlayerIndex(lobbyId, userId) {
+  if (!lobbyId || !userId) return;
+  const indexRef = db.ref(`lobbyPlayersByUid/${lobbyId}/${userId}`);
+  const snapshot = await indexRef.once('value');
+  if (!snapshot.exists()) {
+    await indexRef.set(true);
+    console.log('✅ Created lobby player index for', userId);
+  }
+}
+
+
 function getSharedSeasonPath(){
   const lobbyState=getSavedMultiplayerLobbyState();
   const lobbyId=String(D?.lobbyId || lobbyState?.lobbyId || '').trim();
@@ -1422,107 +1434,9 @@ function applySharedSeasonPayload(payload){
   }
   sharedSeasonLastUpdatedAt=Number(payload.updatedAt||0);
   hydrateDraftUserContextFromLobby();
-  refreshCommissionerAccess();
-  applySportContext(D?.sport || CURRENT_SPORT);
-  ensureSeasonWaiverPool(true);
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
-  sharedSeasonHydrating=false;
-  return true;
-}
-function renderActiveSeasonPage(){
-  const active=document.querySelector('.screen.active')?.id || 'hub';
-  ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[active]?.();
-}
-async function saveSharedSeason(force, reason){
-  if(sharedSeasonHydrating || !D?.multiplayer) return false;
-  const path=getSharedSeasonPath();
-  if(!path) return false;
-  syncGameStateToD();
-  const payload={
-    version:1,
-    reason:reason||'sync',
-    updatedAt:Date.now(),
-    updatedBy:getSharedSeasonActorId(),
-    updatedClientId:getSharedSeasonClientId(),
-    draft:serializeSharedDraftState(),
-    game:serializeSharedGameState()
-  };
-  sharedSeasonLastUpdatedAt=payload.updatedAt;
-  await db.ref(path).set(payload);
-  return true;
-}
-
-// Sync game state (G) back to D object before saving
-function syncGameStateToD() {
-  if (!G || !D) return;
-  
-  // Sync current game state
-  D.currentWeek = G.week;
-  D.currentDay = G.day;
-  D.lastRevealedDay = Math.max(0, ...Object.keys(G.revealedDays||{}).filter(day=>G.revealedDays?.[day]).map(day=>Number(day)||0));
-  D.standings = G.standings;
-  D.isSeasonComplete = G.isSeasonComplete;
-  
-  // Sync rosters (current state)
-  D.allRosters = G.rosters;
-  
-  // Sync game-specific data
-  if (G.dayResults) D.dayResults = G.dayResults;
-  if (G.revealedDays) D.revealedDays = G.revealedDays;
-  if (G.settledWeeks) D.settledWeeks = G.settledWeeks;
-  if (G.processed) D.processed = Array.from(G.processed);
-  if (G.waiverPriority) D.waiverPriority = G.waiverPriority;
-  if (G.waiver) D.freeAgents = G.waiver;
-  if (G.waiver) D.waiver = G.waiver;
-  if (G.tradeOffers) D.tradeOffers = G.tradeOffers;
-  if (G.activityLog) D.activityLog = G.activityLog;
-  if (G.recentDrops) D.recentDrops = G.recentDrops;
-  if (G.powerupInventory) D.powerupInventory = G.powerupInventory;
-  if (G.powerupsByWeek) D.powerupsByWeek = G.powerupsByWeek;
-  if (G.powerupDropsByWeek) D.powerupDropsByWeek = G.powerupDropsByWeek;
-  if (G.moneyBallLocks) D.moneyBallLocks = G.moneyBallLocks;
-  if (G.dailyLineups) D.dailyLineups = G.dailyLineups;
-  if (G.dailyLineupsByTeam) D.dailyLineupsByTeam = G.dailyLineupsByTeam;
-  if (G.starters) D.starters = G.starters;
-  if (G.ilByTeam) D.ilRosters = G.ilByTeam;
-}
-
-function queueSharedSeasonSave(reason, delay){
-  // Sync G to D before saving anywhere
-  syncGameStateToD();
-
-  // Save to localStorage for all leagues
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
-
-  // Save to Firebase for solo leagues (async, non-blocking)
-  if(!D?.multiplayer) {
-    saveSeasonToFirebase().catch(err => console.log('Firebase save skipped:', err.message || err));
+  if(currentRbUser && D.lobbyId){
+    await ensureLobbyPlayerIndex(D.lobbyId, currentRbUser.uid);
   }
-  
-  // Save to shared season for multiplayer leagues
-  if(sharedSeasonHydrating || !D?.multiplayer) return;
-  clearTimeout(sharedSeasonSaveTimer);
-  sharedSeasonSaveTimer=setTimeout(()=>{
-    saveSharedSeason(false, reason).catch(err=>console.error('Shared season save failed', err));
-  }, delay==null?450:delay);
-}
-function subscribeToSharedSeason(){
-  const path=getSharedSeasonPath();
-  if(!path) return;
-  if(sharedSeasonRef && sharedSeasonListener) sharedSeasonRef.off('value', sharedSeasonListener);
-  sharedSeasonRef=db.ref(path);
-  sharedSeasonListener=snap=>{
-    const payload=snap.val();
-    if(!payload) return;
-    const incomingUpdatedAt=Number(payload.updatedAt||0);
-    if(incomingUpdatedAt && incomingUpdatedAt===sharedSeasonLastUpdatedAt && payload.updatedClientId===getSharedSeasonClientId()) return;
-    if(!applySharedSeasonPayload(payload)) return;
-    renderActiveSeasonPage();
-  };
-  sharedSeasonRef.on('value', sharedSeasonListener);
-}
-async function loadOrCreateSharedSeason(){
-  hydrateDraftUserContextFromLobby();
   if(!D?.multiplayer) return false;
   const path=getSharedSeasonPath();
   if(!path) return false;
@@ -3263,6 +3177,9 @@ window.onload=async function(){
       }catch(e){
         console.error('Shared season resume failed, falling back to local init.', e);
         seasonLoaded=false;
+      }
+      if (currentRbUser && lobbyState?.lobbyId) {
+        await ensureLobbyPlayerIndex(lobbyState.lobbyId, currentRbUser.uid);
       }
       if(seasonLoaded){
         goPage('hub');
@@ -6408,3 +6325,4 @@ function rbClosePickersAll(){
 <script src="/site-background.js"></script>
 </body>
 </html>
+
