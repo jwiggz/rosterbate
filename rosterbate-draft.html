@@ -102,7 +102,7 @@
   .pf{padding:7px 10px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;}
   .sw{flex:1;position:relative;}
   .sw input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;}
-  .sw::before{content:'🔍';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;}
+  .sw::before{content:'ðŸ”';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;}
   .posf{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;}
   .posf::-webkit-scrollbar{display:none;}
   .pb{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
@@ -422,17 +422,17 @@
 <!-- LOBBY -->
 <div id="lobby" class="screen">
   <div class="logo">
-    <div class="ball" id="sportLogoBall">🏀</div>
+    <div class="ball" id="sportLogoBall">ðŸ€</div>
     <a href="index.html" class="draft-logo-link" aria-label="RosterBate home"><div class="draft-logo-wordmark">Roster<span>Bate</span></div></a>
     <p id="sportLogoSub">Draft Room</p>
   </div>
-  <div class="pill" id="sportLobbyPill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
+  <div class="pill" id="sportLobbyPill">âœ… 2024-25 Pro Sports Season Â· 30 Teams Â· 500 Players</div>
   <div class="card">
     <h2>League Settings</h2>
     <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Tommy's Minions"/></div>
     <div class="fr"><label>Your League Name</label><input type="text" id="iLeagueName" placeholder="e.g. Friday Night Hoops"/></div>
     <div class="two">
-      <div class="fr"><label>Teams (2–20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
+      <div class="fr"><label>Teams (2â€“20)</label><input type="number" id="iSize" min="2" max="20" value="10"/></div>
       <div class="fr"><label>Your Draft Spot</label><input type="number" id="iSpot" min="1" max="20" value="1"/></div>
     </div>
     <div class="two">
@@ -442,10 +442,10 @@
     <div class="fr">
       <label>Draft Format</label>
       <div class="chips" id="cFormat">
-        <div class="chip on" data-v="snake" onclick="cc('cFormat',this)">🐍 Snake</div>
-        <div class="chip" data-v="auction" onclick="cc('cFormat',this)">💰 Auction</div>
+        <div class="chip on" data-v="snake" onclick="cc('cFormat',this)">ðŸ Snake</div>
+        <div class="chip" data-v="auction" onclick="cc('cFormat',this)">ðŸ’° Auction</div>
       </div>
-      <div class="ibox" id="iFormatInfo">Odd rounds 1→N, even rounds N→1. Classic fantasy.</div>
+      <div class="ibox" id="iFormatInfo">Odd rounds 1â†’N, even rounds Nâ†’1. Classic fantasy.</div>
     </div>
     <div class="fr">
       <label>Scoring Format</label>
@@ -533,8 +533,8 @@
 
   <!-- COUNTDOWN BAR (sits above header, hidden once draft starts) -->
   <div class="pdc-bar" id="pdcBar">
-    <div class="pdc-icon" id="sportCountdownIcon">🏀</div>
-    <div class="pdc-text"><strong>Draft starts in</strong> — browse players &amp; set your queue!</div>
+    <div class="pdc-icon" id="sportCountdownIcon">ðŸ€</div>
+    <div class="pdc-text"><strong>Draft starts in</strong> â€” browse players &amp; set your queue!</div>
     <div class="pdc-time" id="pdcTime">2:00</div>
     <button class="pdc-start" onclick="launchDraft()">Start</button>
   </div>
@@ -542,19 +542,19 @@
 
   <div class="dh">
     <div class="dh-top">
-      <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">🏀 Roster<span>Bate</span></div></a>
+      <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">ðŸ€ Roster<span>Bate</span></div></a>
       <div style="display:flex;align-items:center;gap:7px">
         <button class="auto-btn off" id="autoDraftBtn" onclick="toggleAutoDraft()">Auto Draft Off</button>
-        <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">⏸ Pause</button>
-        <button class="sim-btn" id="simDraftBtn" onclick="simulateDraftToFinish()">⚡ Sim Draft</button>
-        <button class="trade-btn" id="tradeHeaderBtn" onclick="openTradeModal()" style="display:none">⇄ Trade Pick</button>
+        <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">â¸ Pause</button>
+        <button class="sim-btn" id="simDraftBtn" onclick="simulateDraftToFinish()">âš¡ Sim Draft</button>
+        <button class="trade-btn" id="tradeHeaderBtn" onclick="openTradeModal()" style="display:none">â‡„ Trade Pick</button>
         <div class="clk-badge" id="clkBadge">On The Clock</div>
       </div>
     </div>
     <div class="dmeta">
       <div class="mi"><span class="ml">Round</span><span class="mv" id="mRound">1</span></div>
       <div class="mi"><span class="ml">Pick</span><span class="mv" id="mPick">1</span></div>
-      <div class="mi"><span class="ml">Your Next</span><span class="mv ac" id="mNext">—</span></div>
+      <div class="mi"><span class="ml">Your Next</span><span class="mv ac" id="mNext">â€”</span></div>
       <div class="mi"><span class="ml">Timer</span><span class="mv ac" id="mTimer">1:30</span></div>
       <div class="mi"><span class="ml">Format</span><span class="mbadge" id="mFmt">SNAKE</span></div>
     </div>
@@ -571,7 +571,7 @@
       </div>
       <div class="dc">
         <div id="tp-players" class="tp on">
-          <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
+          <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search playersâ€¦" oninput="rPlayers()"/></div></div>
           <div class="pf" style="padding-top:0;padding-bottom:7px">
             <div class="posf" id="posFilterBar"></div>
           </div>
@@ -604,7 +604,7 @@
     <div class="rb-chat-panel" id="rbChatPanel">
       <div class="rb-chat-hdr">
         <div style="flex:1">
-          <div class="rb-chat-title">💬 League Chat</div>
+          <div class="rb-chat-title">ðŸ’¬ League Chat</div>
           <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
         </div>
       </div>
@@ -612,7 +612,7 @@
       <div class="rb-chat-tabs">
         <button class="rb-chat-tab on" onclick="rbSwitchTab('draft',this)">Draft Room</button>
         <button class="rb-chat-tab" onclick="rbSwitchTab('trades',this)">Trades</button>
-        <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk 🔥</button>
+        <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk ðŸ”¥</button>
       </div>
 
       <div class="rb-chat-msgs" id="rbMsgs"></div>
@@ -624,22 +624,22 @@
         </div>
 
         <div class="rb-gif-picker" id="rbGifPicker">
-          <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs… (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
-          <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">🔍 Type to search GIFs</div></div>
+          <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFsâ€¦ (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
+          <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">ðŸ” Type to search GIFs</div></div>
         </div>
 
         <div class="rb-chat-toolbar">
-          <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">😄</button>
+          <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">ðŸ˜„</button>
           <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
-          <button class="rb-tool-btn" onclick="rbInsertAt('📢 ')" title="Announcement">📢</button>
-          <button class="rb-tool-btn" onclick="rbInsertAt('🔥 ')" title="Trash talk">🔥</button>
+          <button class="rb-tool-btn" onclick="rbInsertAt('ðŸ“¢ ')" title="Announcement">ðŸ“¢</button>
+          <button class="rb-tool-btn" onclick="rbInsertAt('ðŸ”¥ ')" title="Trash talk">ðŸ”¥</button>
         </div>
 
         <div class="rb-chat-row">
-          <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Message the league…" rows="1"
+          <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Message the leagueâ€¦" rows="1"
             oninput="rbAutoResize(this);rbUpdateSendBtn()"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
-          <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
+          <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>âž¤</button>
         </div>
       </div>
     </div>
@@ -651,13 +651,13 @@
     <div class="mh"></div>
     <div class="mph">
       <div class="mav" id="mAv"></div>
-      <div><div class="mn" id="mName">—</div><div class="msub" id="mSub">—</div></div>
+      <div><div class="mn" id="mName">â€”</div><div class="msub" id="mSub">â€”</div></div>
     </div>
     <div class="sg" id="mStats"></div>
     <div class="msn" id="mNote"></div>
     <div class="ma">
       <button class="bcx" onclick="document.getElementById('pModal').classList.remove('open')">Cancel</button>
-      <button class="bcx" id="bFavModal" onclick="toggleFavFromModal()" style="font-size:18px;padding:13px 14px;">☆</button>
+      <button class="bcx" id="bFavModal" onclick="toggleFavFromModal()" style="font-size:18px;padding:13px 14px;">â˜†</button>
       <button class="bdc" id="bDraft" onclick="confDraft()">Draft Player</button>
     </div>
   </div>
@@ -669,12 +669,12 @@
     <div class="mh"></div>
     <div class="ah">
       <div class="ah-copy">
-        <div class="at">💰 Nomination</div>
-        <div class="apn" id="aPname">—</div>
+        <div class="at">ðŸ’° Nomination</div>
+        <div class="apn" id="aPname">â€”</div>
       </div>
-      <button class="ax" onclick="closeAuctionPanel()" title="Close nomination">×</button>
+      <button class="ax" onclick="closeAuctionPanel()" title="Close nomination">Ã—</button>
     </div>
-    <div class="apsub" id="aMarket">AI market: —</div>
+    <div class="apsub" id="aMarket">AI market: â€”</div>
     <div class="bbw">
       <div class="bbl"><span>Your Budget</span><span id="aBudget">$200</span></div>
       <div class="bb"><div class="bf" id="bFill" style="width:100%"></div></div>
@@ -703,21 +703,21 @@
 <div class="tro" id="tradeModal">
   <div class="trs">
     <div class="mh"></div>
-    <div class="tr-title">⇄ Trade Pick</div>
+    <div class="tr-title">â‡„ Trade Pick</div>
     <div class="tr-sub" id="trSubText">You're on the clock with pick <strong id="trMyPick">#1</strong>. Select a team to trade with. In snake drafts, teams only swap draft positions. No extra picks are exchanged.</div>
     <div class="tr-teams" id="trTeamList"></div>
     <div class="tr-preview" id="trPreview">
-      <div class="tr-preview-title">📋 Trade Preview</div>
+      <div class="tr-preview-title">ðŸ“‹ Trade Preview</div>
       <div class="tr-swap-label">Snake Draft Rule - Position Swap Only</div>
       <div class="tr-swap-row">
-        <div class="tr-swap-pill lose" id="trYouGive">You give: —</div>
-        <div class="tr-arrow">⇄</div>
-        <div class="tr-swap-pill gain" id="trYouGet">You get: —</div>
+        <div class="tr-swap-pill lose" id="trYouGive">You give: â€”</div>
+        <div class="tr-arrow">â‡„</div>
+        <div class="tr-swap-pill gain" id="trYouGet">You get: â€”</div>
       </div>
       <div class="tr-swap-label" style="margin-top:10px">No Compensation Picks</div>
       <div class="tr-swap-row">
         <div class="tr-swap-pill gain" id="trCompGet">No extra picks exchanged</div>
-        <div class="tr-arrow">⇄</div>
+        <div class="tr-arrow">â‡„</div>
         <div class="tr-swap-pill lose" id="trCompGive">Snake draft keeps this clean</div>
       </div>
       <div style="font-size:10px;color:var(--text3);margin-top:10px;line-height:1.5" id="trSummary"></div>
@@ -736,13 +736,13 @@
 <div id="pickTradeRequestModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:260;align-items:flex-end;justify-content:center;">
   <div style="background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:520px;border-top:1px solid var(--border);box-shadow:0 -18px 48px rgba(0,0,0,.45);">
     <div style="width:38px;height:4px;background:var(--text3);border-radius:999px;margin:0 auto 14px;"></div>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;margin-bottom:6px;">⇄ Pick Trade Request</div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;margin-bottom:6px;">â‡„ Pick Trade Request</div>
     <div id="pickTradeRequestCopy" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px;">Another manager wants to swap draft positions with you.</div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 12px 10px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
-        <div id="pickTradeRequestGive" style="font-family:var(--fd);font-size:15px;font-weight:800;color:#fca5a5;">You give: —</div>
-        <div style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);">⇄</div>
-        <div id="pickTradeRequestGet" style="font-family:var(--fd);font-size:15px;font-weight:800;color:#86efac;text-align:right;">You get: —</div>
+        <div id="pickTradeRequestGive" style="font-family:var(--fd);font-size:15px;font-weight:800;color:#fca5a5;">You give: â€”</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);">â‡„</div>
+        <div id="pickTradeRequestGet" style="font-family:var(--fd);font-size:15px;font-weight:800;color:#86efac;text-align:right;">You get: â€”</div>
       </div>
       <div id="pickTradeRequestSummary" style="font-size:11px;color:var(--text3);line-height:1.6;">Accept to swap the two draft slots. Decline to keep the current order.</div>
     </div>
@@ -755,7 +755,7 @@
 
 <!-- PAUSE OVERLAY -->
 <div id="pauseOverlay">
-  <div class="pause-icon">⏸</div>
+  <div class="pause-icon">â¸</div>
   <div class="pause-title">Draft Paused</div>
   <div class="pause-reason" id="pauseReason">The draft has been paused.</div>
   <div>
@@ -763,16 +763,16 @@
     <div class="pause-elapsed" id="pauseElapsed">0:00</div>
   </div>
   <div class="pause-actions">
-    <button class="pause-resume-btn" id="pauseResumeBtn" onclick="resumeDraft()">▶ Resume Draft</button>
-    <button class="pause-report-btn" onclick="openDisconnectModal()">📡 Report a Disconnection</button>
+    <button class="pause-resume-btn" id="pauseResumeBtn" onclick="resumeDraft()">â–¶ Resume Draft</button>
+    <button class="pause-report-btn" onclick="openDisconnectModal()">ðŸ“¡ Report a Disconnection</button>
   </div>
 </div>
 
 <!-- VOTE BAR (shown to all when pause is requested but not yet passed) -->
 <div id="voteBar">
   <div class="vote-bar-top">
-    <div class="vote-bar-title">⚠️ Pause Requested</div>
-    <button class="vote-bar-dismiss" onclick="dismissVote()">✕</button>
+    <div class="vote-bar-title">âš ï¸ Pause Requested</div>
+    <button class="vote-bar-dismiss" onclick="dismissVote()">âœ•</button>
   </div>
   <div class="vote-bar-reason" id="voteBarReason">A player has requested to pause the draft.</div>
   <div class="vote-progress">
@@ -781,7 +781,7 @@
   </div>
   <div class="vote-actions">
     <button class="vote-no" onclick="castVote(false)">No</button>
-    <button class="vote-yes" onclick="castVote(true)">✋ Vote to Pause</button>
+    <button class="vote-yes" onclick="castVote(true)">âœ‹ Vote to Pause</button>
   </div>
 </div>
 
@@ -789,7 +789,7 @@
 <div id="disconnectModal">
   <div class="dc-sheet">
     <div class="mh"></div>
-    <div class="dc-title">📡 Report Disconnection</div>
+    <div class="dc-title">ðŸ“¡ Report Disconnection</div>
     <div class="dc-sub">Select the team that disconnected. A pause vote will be sent to all managers. If <span id="voteThresholdLabel">3</span> managers vote yes, the draft will pause automatically.</div>
     <div class="dc-teams" id="dcTeamList"></div>
     <textarea class="dc-reason-input" id="dcReasonInput" placeholder="Optional: describe the issue (e.g. 'John's internet dropped')"></textarea>
@@ -800,7 +800,7 @@
   </div>
 </div>
 
-<div class="ocb" id="ocBanner"><p id="ocText">⏰ You're On The Clock!</p></div>
+<div class="ocb" id="ocBanner"><p id="ocText">â° You're On The Clock!</p></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -941,7 +941,7 @@ async function getNextSeasonNumber() {
             reject(new Error('Transaction not committed'));
           } else {
             const seasonNumber = snapshot.val();
-            console.log('✅ Got season number:', seasonNumber);
+            console.log('âœ… Got season number:', seasonNumber);
             resolve(seasonNumber);
           }
         }
@@ -956,7 +956,7 @@ async function getNextSeasonNumber() {
 // Save league to Firebase for permanent cloud storage
 async function saveLeagueToFirebase(draftData) {
   if (!auth || !db) {
-    console.log('📴 Firebase not available');
+    console.log('ðŸ“´ Firebase not available');
     return false;
   }
   
@@ -964,7 +964,7 @@ async function saveLeagueToFirebase(draftData) {
   const user = currentRbUser || auth.currentUser;
   
   if (!user) {
-    console.log('👤 Not logged in - league only saved locally');
+    console.log('ðŸ‘¤ Not logged in - league only saved locally');
     showToast('Sign in to save your league permanently!');
     return false;
   }
@@ -977,7 +977,7 @@ async function saveLeagueToFirebase(draftData) {
       const seasonNumber = await getNextSeasonNumber();
       if (!seasonNumber) throw new Error('Failed to get next sequential season number');
       seasonId = 'season_' + seasonNumber;
-      console.log('🆔 Generated season ID:', seasonId);
+      console.log('ðŸ†” Generated season ID:', seasonId);
     }
     
     const userId = user.uid;
@@ -1012,10 +1012,10 @@ async function saveLeagueToFirebase(draftData) {
     // Update draftData with the seasonId for localStorage
     draftData.seasonId = seasonId;
     
-    console.log('✅ League saved to Firebase:', seasonId);
+    console.log('âœ… League saved to Firebase:', seasonId);
     return seasonId;  // Return the seasonId
   } catch (error) {
-    console.error('❌ Firebase save failed:', error);
+    console.error('âŒ Firebase save failed:', error);
     throw error;
   }
 }
@@ -1087,7 +1087,7 @@ async function awardRosterbateScore(actionKey, points){
   });
   return true;
 }
-// ─── TEAM COLORS ──────────────────────────────────────────
+// â”€â”€â”€ TEAM COLORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const TC={
   ATL:'#C1272D',BOS:'#007A33',BKN:'#000000',CHA:'#1D1160',CHI:'#CE1141',
   CLE:'#860038',DAL:'#00538C',DEN:'#0E2240',DET:'#C8102E',GSW:'#1D428A',
@@ -1103,7 +1103,7 @@ function initials(n){
   return p.length===1?p[0][0].toUpperCase():(p[0][0]+(p[p.length-1][0]||'')).toUpperCase();
 }
 
-// ─── FAVORITES ────────────────────────────────────────────
+// â”€â”€â”€ FAVORITES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Array of player IDs in priority order (index 0 = highest priority)
 let FAVS=[];
 const MAX_FAVS=10;
@@ -1115,9 +1115,9 @@ function toggleFav(id){
     FAVS=FAVS.filter(x=>x!==id);
     showToast('Removed from queue');
   } else {
-    if(FAVS.length>=MAX_FAVS){showToast('⚠️ Queue full — remove one first');return;}
+    if(FAVS.length>=MAX_FAVS){showToast('âš ï¸ Queue full â€” remove one first');return;}
     FAVS.push(id);
-    showToast('⭐ Added to queue!');
+    showToast('â­ Added to queue!');
   }
   rPlayers();rFavs();upFavBadge();
   // update modal button if open
@@ -1133,7 +1133,7 @@ function updateFavModalBtn(){
   const btn=document.getElementById('bFavModal');
   if(!btn||!S.selP)return;
   const faved=isFav(S.selP.id);
-  btn.textContent=faved?'★':'☆';
+  btn.textContent=faved?'â˜…':'â˜†';
   btn.style.color=faved?'#f59e0b':''
   btn.title=faved?'Remove from queue':'Add to queue';
 }
@@ -1152,18 +1152,18 @@ function rFavs(){
   const draftedFavs=FAVS.filter(id=>S.drafted.has(id));
 
   let html=`<div class="fav-header">
-    <h3>⭐ Auto-Draft Queue</h3>
+    <h3>â­ Auto-Draft Queue</h3>
     <span class="fav-count">${activeFavs.length}/${MAX_FAVS} players</span>
   </div>`;
 
   if(FAVS.length===0){
     html+=`<div class="fav-empty">
-      <div class="fe-icon">⭐</div>
-      <p>No players in queue yet.<br/>Tap the ☆ on any player to add them.<br/><br/>If your timer runs out, we'll auto-draft your top queued player who's still available.</p>
+      <div class="fe-icon">â­</div>
+      <p>No players in queue yet.<br/>Tap the â˜† on any player to add them.<br/><br/>If your timer runs out, we'll auto-draft your top queued player who's still available.</p>
     </div>`;
   } else {
     html+=`<div class="fav-hint">
-      <div class="fav-hint-icon">💡</div>
+      <div class="fav-hint-icon">ðŸ’¡</div>
       <div>Drag to reorder priority. If your pick timer runs out, the <strong>top available</strong> player here is auto-drafted. Up to ${MAX_FAVS} players.</div>
     </div>`;
 
@@ -1178,15 +1178,15 @@ function rFavs(){
         ondrop="favDrop(event,${id})"
         ondragleave="favDragLeave(event)"
         ondragend="favDragEnd(event)">
-        <div class="fav-drag-handle">⠿</div>
+        <div class="fav-drag-handle">â ¿</div>
         <div class="fav-rank-badge">${i+1}</div>
         <div class="pav" style="background:${tcolor(p.team)};width:30px;height:30px;font-size:11px;border:none;flex-shrink:0">${initials(p.name)}</div>
         <div class="fav-info">
           <div class="fav-name">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
-          <div class="fav-det">${p.team} · ${p.pts}pts · ${p.reb}reb · ${p.ast}ast</div>
+          <div class="fav-det">${p.team} Â· ${p.pts}pts Â· ${p.reb}reb Â· ${p.ast}ast</div>
         </div>
         ${isNext?`<div class="fav-auto-badge">AUTO</div>`:''}
-        <button class="fav-remove" onclick="event.stopPropagation();toggleFav(${id})" title="Remove">✕</button>
+        <button class="fav-remove" onclick="event.stopPropagation();toggleFav(${id})" title="Remove">âœ•</button>
       </div>`;
     });
 
@@ -1197,11 +1197,11 @@ function rFavs(){
         const p=PLAYERS.find(x=>x.id===id);
         if(!p)return;
         html+=`<div class="fav-row drafted-fav" style="cursor:default">
-          <div class="fav-drag-handle" style="opacity:0">⠿</div>
+          <div class="fav-drag-handle" style="opacity:0">â ¿</div>
           <div class="pav" style="background:var(--text3);width:30px;height:30px;font-size:11px;border:none;flex-shrink:0">${initials(p.name)}</div>
           <div class="fav-info">
             <div class="fav-name">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
-            <div class="fav-det">${p.team} · Drafted ✓</div>
+            <div class="fav-det">${p.team} Â· Drafted âœ“</div>
           </div>
         </div>`;
       });
@@ -1240,10 +1240,10 @@ function favDragEnd(e){
 }
 
 
-// ─── FULL 2024-25 Pro Sports PLAYER POOL (500 players, all 30 teams) ─────────────
+// â”€â”€â”€ FULL 2024-25 Pro Sports PLAYER POOL (500 players, all 30 teams) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // [name, team, pos, pts, reb, ast, stl, blk, to, fgp, ftp, tpm]
 const RAW=[
-// ── BOSTON CELTICS ──
+// â”€â”€ BOSTON CELTICS â”€â”€
 ["Jayson Tatum","BOS","SF",28.0,8.5,5.1,1.1,0.6,2.7,46.5,83.7,3.2],
 ["Jaylen Brown","BOS","SG",23.0,5.5,3.6,1.1,0.4,2.5,49.5,74.2,2.7],
 ["Kristaps Porzingis","BOS","C",20.1,7.2,2.0,0.7,1.9,1.9,52.1,87.0,2.6],
@@ -1256,7 +1256,7 @@ const RAW=[
 ["Neemias Queta","BOS","C",5.8,4.2,0.8,0.4,1.2,0.9,65.0,67.0,0.0],
 ["Xavier Tillman","BOS","PF",4.8,3.8,0.9,0.5,0.5,0.8,55.0,66.7,0.3],
 ["Jordan Walsh","BOS","SF",4.2,2.8,0.9,0.7,0.5,0.7,46.0,71.0,0.8],
-// ── BROOKLYN NETS ──
+// â”€â”€ BROOKLYN NETS â”€â”€
 ["Cam Thomas","BKN","SG",23.5,3.7,3.0,0.7,0.4,2.3,44.5,83.5,2.9],
 ["Ben Simmons","BKN","PG",7.8,6.5,5.0,1.2,0.6,2.0,58.0,55.0,0.0],
 ["Nic Claxton","BKN","C",12.5,9.2,2.3,1.0,2.3,1.8,68.0,54.2,0.0],
@@ -1269,7 +1269,7 @@ const RAW=[
 ["Shake Milton","BKN","SG",10.5,2.5,3.2,0.7,0.2,1.4,44.0,83.0,2.5],
 ["Lonnie Walker IV","BKN","SG",12.0,3.0,2.0,0.9,0.3,1.5,43.0,80.0,2.8],
 ["Harry Giles III","BKN","C",4.5,3.5,1.0,0.4,0.6,1.0,52.0,68.0,0.0],
-// ── NEW YORK KNICKS ──
+// â”€â”€ NEW YORK KNICKS â”€â”€
 ["Jalen Brunson","NYK","PG",27.8,3.6,6.7,0.8,0.2,2.3,47.9,84.6,2.5],
 ["Karl-Anthony Towns","NYK","C",24.0,13.5,3.1,0.8,0.8,3.2,51.0,87.0,3.0],
 ["OG Anunoby","NYK","SF",14.7,4.7,1.7,1.8,0.9,1.2,50.5,82.4,2.2],
@@ -1282,7 +1282,7 @@ const RAW=[
 ["Deuce McBride","NYK","PG",10.0,2.5,3.5,0.8,0.2,1.5,43.0,83.0,2.0],
 ["Precious Achiuwa","NYK","PF",8.0,6.0,1.5,0.7,0.8,1.2,52.0,67.0,0.5],
 ["Miles McBride","NYK","PG",9.5,2.8,3.0,0.9,0.2,1.2,44.0,82.0,2.2],
-// ── PHILADELPHIA 76ERS ──
+// â”€â”€ PHILADELPHIA 76ERS â”€â”€
 ["Joel Embiid","PHI","C",34.7,11.0,5.6,1.0,1.7,3.8,52.8,85.7,1.1],
 ["Tyrese Maxey","PHI","PG",25.9,3.7,6.2,1.0,0.5,2.5,46.0,90.0,3.0],
 ["Paul George","PHI","SF",15.7,5.0,3.5,1.2,0.5,2.2,45.0,87.0,2.8],
@@ -1293,7 +1293,7 @@ const RAW=[
 ["Mo Bamba","PHI","C",7.5,5.5,0.8,0.5,1.5,1.0,48.0,74.0,1.2],
 ["Cameron Payne","PHI","PG",8.5,2.5,4.0,0.8,0.2,1.8,41.0,82.0,2.0],
 ["Patrick Beverley","PHI","PG",5.5,3.0,3.2,1.0,0.2,1.0,38.0,79.0,1.5],
-// ── TORONTO RAPTORS ──
+// â”€â”€ TORONTO RAPTORS â”€â”€
 ["Scottie Barnes","TOR","PF",19.9,8.1,6.1,1.4,0.7,2.8,47.1,72.3,1.6],
 ["Immanuel Quickley","TOR","PG",18.6,4.8,6.8,1.1,0.4,2.5,44.1,87.3,3.0],
 ["RJ Barrett","TOR","SF",21.8,6.0,3.4,1.0,0.5,2.2,44.5,80.1,2.0],
@@ -1304,7 +1304,7 @@ const RAW=[
 ["Chris Boucher","TOR","PF",9.0,5.0,1.2,0.7,1.0,1.2,44.0,75.0,2.0],
 ["Precious Achiuwa","TOR","PF",8.5,6.5,1.8,0.8,0.8,1.3,52.0,68.0,0.5],
 ["Kelly Olynyk","TOR","C",9.0,5.5,3.2,0.7,0.5,1.5,50.0,80.0,1.5],
-// ── CHICAGO BULLS ──
+// â”€â”€ CHICAGO BULLS â”€â”€
 ["DeMar DeRozan","CHI","SG",24.5,4.6,6.8,0.9,0.3,2.4,50.4,84.2,0.7],
 ["Zach LaVine","CHI","SG",24.0,4.5,4.5,0.9,0.4,2.8,47.0,82.0,2.5],
 ["Nikola Vucevic","CHI","C",18.0,11.3,3.3,0.7,0.8,2.3,50.8,80.3,1.4],
@@ -1315,7 +1315,7 @@ const RAW=[
 ["Torrey Craig","CHI","SF",7.5,4.5,1.5,1.0,0.5,1.0,46.0,77.0,1.5],
 ["Julian Phillips","CHI","SF",8.0,4.0,1.5,0.8,0.5,1.2,47.0,73.0,1.2],
 ["Terry Taylor","CHI","PF",5.5,5.0,1.0,0.5,0.5,1.0,58.0,65.0,0.0],
-// ── CLEVELAND CAVALIERS ──
+// â”€â”€ CLEVELAND CAVALIERS â”€â”€
 ["Donovan Mitchell","CLE","SG",26.6,5.1,6.1,1.6,0.3,3.2,47.5,85.0,3.2],
 ["Darius Garland","CLE","PG",21.6,2.8,7.8,1.2,0.2,2.9,46.2,88.1,2.7],
 ["Evan Mobley","CLE","PF",18.0,9.4,2.5,1.2,1.8,1.6,55.9,76.1,0.7],
@@ -1326,7 +1326,7 @@ const RAW=[
 ["Dean Wade","CLE","SF",7.5,3.8,1.5,0.7,0.4,0.9,46.0,83.0,1.8],
 ["Craig Porter Jr.","CLE","PG",6.5,3.0,3.5,1.0,0.3,1.2,42.0,78.0,1.5],
 ["Isaac Okoro","CLE","SF",8.0,3.5,2.2,1.2,0.5,1.0,47.0,74.0,1.2],
-// ── DETROIT PISTONS ──
+// â”€â”€ DETROIT PISTONS â”€â”€
 ["Cade Cunningham","DET","PG",22.7,4.3,7.5,1.4,0.5,3.3,43.5,84.9,2.7],
 ["Jalen Duren","DET","C",13.5,12.2,2.5,0.8,1.5,1.8,60.0,63.0,0.0],
 ["Isaiah Stewart","DET","PF",11.5,7.5,2.0,1.0,1.0,1.5,47.0,69.0,1.2],
@@ -1337,7 +1337,7 @@ const RAW=[
 ["Killian Hayes","DET","PG",8.0,3.5,4.0,1.0,0.4,2.0,41.0,75.0,1.5],
 ["Bojan Bogdanovic","DET","SF",14.5,3.5,2.5,0.7,0.2,1.3,46.0,85.0,3.2],
 ["Marcus Sasser","DET","SG",8.5,2.5,2.8,0.9,0.3,1.5,41.0,81.0,2.2],
-// ── INDIANA PACERS ──
+// â”€â”€ INDIANA PACERS â”€â”€
 ["Tyrese Haliburton","IND","PG",20.1,3.9,10.4,1.6,0.5,2.7,47.4,85.5,3.2],
 ["Pascal Siakam","IND","PF",21.3,7.8,3.7,0.7,0.4,2.2,52.7,79.3,1.1],
 ["Andrew Nembhard","IND","PG",12.5,4.0,5.5,1.0,0.5,2.0,46.0,82.0,2.0],
@@ -1348,7 +1348,7 @@ const RAW=[
 ["T.J. McConnell","IND","PG",9.0,2.8,5.5,1.2,0.2,1.5,52.0,79.0,0.5],
 ["Isaiah Jackson","IND","C",8.5,5.8,0.8,0.5,1.5,1.2,58.0,61.0,0.0],
 ["Ben Sheppard","IND","SG",9.5,3.5,2.0,0.8,0.3,1.0,44.0,82.0,2.5],
-// ── MILWAUKEE BUCKS ──
+// â”€â”€ MILWAUKEE BUCKS â”€â”€
 ["Giannis Antetokounmpo","MIL","PF",32.7,11.5,6.5,1.2,1.1,3.8,61.0,63.8,0.7],
 ["Damian Lillard","MIL","PG",24.0,4.4,7.3,0.9,0.3,3.1,44.0,91.1,4.1],
 ["Khris Middleton","MIL","SF",15.1,4.0,5.3,0.9,0.2,2.1,47.3,88.2,1.9],
@@ -1359,7 +1359,7 @@ const RAW=[
 ["Andre Jackson Jr.","MIL","SF",7.5,3.5,2.0,1.0,0.6,1.2,45.0,72.0,1.2],
 ["AJ Green","MIL","SG",9.0,2.5,1.5,0.6,0.2,0.8,43.0,87.0,2.8],
 ["Taurean Prince","MIL","SF",8.0,3.0,1.5,0.7,0.3,0.9,45.0,80.0,2.0],
-// ── ATLANTA HAWKS ──
+// â”€â”€ ATLANTA HAWKS â”€â”€
 ["Trae Young","ATL","PG",25.7,3.3,10.8,1.3,0.3,4.1,43.5,88.2,2.7],
 ["Dejounte Murray","ATL","PG",18.0,4.5,6.5,1.5,0.4,2.8,44.0,75.0,1.5],
 ["Bogdan Bogdanovic","ATL","SG",15.4,3.6,3.5,0.8,0.2,1.8,44.0,83.3,3.4],
@@ -1370,7 +1370,7 @@ const RAW=[
 ["Onyeka Okongwu","ATL","C",11.5,7.5,1.8,0.8,1.2,1.5,60.0,70.0,0.0],
 ["Garrison Mathews","ATL","SG",8.5,2.5,1.5,0.6,0.2,0.8,41.0,86.0,2.8],
 ["Kobe Bufkin","ATL","SG",9.0,3.0,2.5,0.9,0.3,1.5,43.0,79.0,1.8],
-// ── CHARLOTTE HORNETS ──
+// â”€â”€ CHARLOTTE HORNETS â”€â”€
 ["LaMelo Ball","CHA","PG",23.0,5.6,8.0,1.6,0.4,4.0,42.0,82.0,3.8],
 ["Miles Bridges","CHA","SF",21.0,7.0,3.5,1.0,0.5,2.5,48.0,72.0,2.5],
 ["Terry Rozier","CHA","SG",19.0,3.8,4.5,1.2,0.4,2.5,44.0,83.0,3.2],
@@ -1381,7 +1381,7 @@ const RAW=[
 ["Cody Martin","CHA","SF",7.5,4.0,2.5,1.0,0.4,1.2,46.0,76.0,1.0],
 ["Mark Williams","CHA","C",9.5,7.5,1.2,0.5,1.2,1.5,65.0,62.0,0.0],
 ["Frank Ntilikina","CHA","PG",7.0,2.5,3.0,1.0,0.3,1.2,42.0,79.0,1.5],
-// ── MIAMI HEAT ──
+// â”€â”€ MIAMI HEAT â”€â”€
 ["Jimmy Butler","MIA","SF",20.8,5.3,5.0,1.8,0.3,2.3,53.1,85.8,1.0],
 ["Bam Adebayo","MIA","C",19.5,10.4,3.5,1.1,0.8,2.4,57.3,79.2,0.1],
 ["Tyler Herro","MIA","SG",22.0,5.0,4.5,0.8,0.3,2.5,44.0,85.0,3.5],
@@ -1392,7 +1392,7 @@ const RAW=[
 ["Caleb Martin","MIA","SF",10.5,5.0,2.5,1.2,0.6,1.3,48.0,77.0,1.8],
 ["Jaime Jaquez Jr.","MIA","SF",12.5,4.5,3.5,1.0,0.5,1.8,46.0,78.0,1.5],
 ["Thomas Bryant","MIA","C",8.0,6.0,1.0,0.5,0.8,1.2,55.0,72.0,0.2],
-// ── ORLANDO MAGIC ──
+// â”€â”€ ORLANDO MAGIC â”€â”€
 ["Paolo Banchero","ORL","PF",22.6,6.9,5.4,0.9,0.7,3.2,45.0,75.0,1.5],
 ["Franz Wagner","ORL","SF",19.7,4.5,4.0,0.9,0.5,2.2,48.0,78.0,2.0],
 ["Jalen Suggs","ORL","PG",14.5,4.5,5.5,1.8,0.6,2.5,44.0,77.0,2.5],
@@ -1403,7 +1403,7 @@ const RAW=[
 ["Moritz Wagner","ORL","C",12.0,6.0,1.5,0.5,0.8,1.5,56.0,77.0,0.5],
 ["Jonathan Isaac","ORL","PF",9.5,5.5,1.5,1.2,1.8,1.5,46.0,72.0,1.0],
 ["Markelle Fultz","ORL","PG",10.5,3.5,4.5,1.0,0.3,2.0,47.0,75.0,0.5],
-// ── WASHINGTON WIZARDS ──
+// â”€â”€ WASHINGTON WIZARDS â”€â”€
 ["Jordan Poole","WAS","SG",17.3,2.7,4.5,0.9,0.2,2.1,42.8,85.6,3.2],
 ["Kyle Kuzma","WAS","PF",16.0,7.5,3.5,0.8,0.5,2.0,44.0,74.0,2.5],
 ["Bilal Coulibaly","WAS","SF",13.5,5.5,3.5,1.5,0.8,1.8,46.0,73.0,1.8],
@@ -1414,7 +1414,7 @@ const RAW=[
 ["Anthony Gill","WAS","SF",7.5,4.0,1.2,0.7,0.5,0.8,52.0,78.0,1.0],
 ["Landry Shamet","WAS","SG",9.0,2.5,2.5,0.6,0.2,1.0,42.0,86.0,2.8],
 ["Richaun Holmes","WAS","C",7.0,5.5,1.0,0.5,0.8,1.2,60.0,68.0,0.0],
-// ── DENVER NUGGETS ──
+// â”€â”€ DENVER NUGGETS â”€â”€
 ["Nikola Jokic","DEN","C",26.4,12.4,9.0,1.4,0.7,3.4,58.3,81.7,0.9],
 ["Jamal Murray","DEN","PG",21.2,4.1,6.5,1.0,0.4,2.8,46.0,85.0,3.5],
 ["Michael Porter Jr.","DEN","SF",17.0,7.5,2.0,0.5,0.5,1.5,48.0,82.0,2.8],
@@ -1425,7 +1425,7 @@ const RAW=[
 ["Peyton Watson","DEN","SF",8.5,4.0,1.8,1.0,0.8,1.0,47.0,73.0,1.5],
 ["Justin Holiday","DEN","SG",7.5,2.8,1.5,0.7,0.3,0.8,40.0,84.0,2.2],
 ["Zeke Nnaji","DEN","PF",7.0,4.5,1.0,0.4,0.6,1.0,55.0,70.0,0.2],
-// ── MINNESOTA TIMBERWOLVES ──
+// â”€â”€ MINNESOTA TIMBERWOLVES â”€â”€
 ["Anthony Edwards","MIN","SG",25.9,5.4,5.1,1.3,0.6,3.2,46.0,83.0,3.8],
 ["Rudy Gobert","MIN","C",13.4,11.6,1.3,0.7,2.1,1.5,66.9,62.7,0.0],
 ["Mike Conley","MIN","PG",9.5,3.0,6.0,0.8,0.2,1.5,43.0,89.0,2.2],
@@ -1436,7 +1436,7 @@ const RAW=[
 ["Nickeil Alexander-Walker","MIN","SG",11.0,3.5,3.0,1.0,0.4,1.5,44.0,80.0,2.5],
 ["Josh Minott","MIN","SF",6.5,3.5,1.5,0.8,0.5,1.0,45.0,70.0,1.2],
 ["Leonard Miller","MIN","SF",7.0,4.0,1.5,0.7,0.6,1.0,47.0,71.0,0.8],
-// ── OKLAHOMA CITY THUNDER ──
+// â”€â”€ OKLAHOMA CITY THUNDER â”€â”€
 ["Shai Gilgeous-Alexander","OKC","PG",30.1,5.5,6.2,2.0,1.1,2.8,53.5,87.4,2.1],
 ["Jalen Williams","OKC","SG",23.0,4.5,5.9,1.3,0.6,2.7,50.7,82.1,2.0],
 ["Chet Holmgren","OKC","C",16.5,7.9,2.0,1.0,2.6,1.6,49.2,76.5,1.5],
@@ -1447,7 +1447,7 @@ const RAW=[
 ["Kenrich Williams","OKC","SF",7.5,4.5,2.5,1.0,0.5,1.2,47.0,76.0,1.2],
 ["Jaylin Williams","OKC","PF",8.0,5.5,2.0,0.8,0.8,1.0,53.0,71.0,0.5],
 ["Ousmane Dieng","OKC","SF",7.5,3.5,2.0,0.7,0.4,1.2,44.0,74.0,1.5],
-// ── PORTLAND TRAIL BLAZERS ──
+// â”€â”€ PORTLAND TRAIL BLAZERS â”€â”€
 ["Anfernee Simons","POR","SG",21.1,3.4,4.9,0.6,0.3,2.1,45.2,87.4,3.5],
 ["Jerami Grant","POR","SF",20.5,4.1,2.8,1.1,1.1,1.7,47.4,80.2,2.0],
 ["Shaedon Sharpe","POR","SG",18.5,4.5,3.0,1.0,0.5,2.0,44.0,75.0,2.8],
@@ -1458,7 +1458,7 @@ const RAW=[
 ["Jabari Walker","POR","PF",7.5,5.5,2.0,0.8,0.6,1.2,47.0,72.0,1.2],
 ["Robert Williams III","POR","C",8.0,7.0,1.0,0.5,1.5,1.2,60.0,63.0,0.0],
 ["Kris Murray","POR","SF",8.5,4.0,1.8,0.7,0.5,1.0,46.0,78.0,1.8],
-// ── UTAH JAZZ ──
+// â”€â”€ UTAH JAZZ â”€â”€
 ["Lauri Markkanen","UTA","PF",25.6,8.6,1.9,0.7,0.8,1.8,49.8,87.4,2.5],
 ["John Collins","UTA","PF",14.5,7.5,2.5,0.8,0.5,1.8,52.0,78.0,1.5],
 ["Jordan Clarkson","UTA","SG",17.5,3.5,4.0,0.8,0.3,2.2,42.0,84.0,3.0],
@@ -1469,7 +1469,7 @@ const RAW=[
 ["Taylor Hendricks","UTA","PF",9.0,5.0,1.5,0.8,0.8,1.2,46.0,76.0,1.5],
 ["Collin Sexton","UTA","PG",16.0,2.5,4.5,0.8,0.2,2.0,48.0,84.0,2.5],
 ["Simone Fontecchio","UTA","SF",10.5,3.5,1.8,0.7,0.4,1.2,45.0,82.0,2.5],
-// ── GOLDEN STATE WARRIORS ──
+// â”€â”€ GOLDEN STATE WARRIORS â”€â”€
 ["Stephen Curry","GSW","PG",29.4,5.1,6.1,0.7,0.2,3.1,49.2,91.5,5.1],
 ["Draymond Green","GSW","PF",8.5,7.2,7.0,1.0,0.8,3.0,49.0,72.0,0.5],
 ["Klay Thompson","GSW","SG",17.9,3.3,2.4,0.7,0.5,1.5,43.2,85.4,4.0],
@@ -1480,7 +1480,7 @@ const RAW=[
 ["Chris Paul","GSW","PG",9.4,3.7,8.9,1.3,0.2,2.1,44.0,84.5,1.5],
 ["Trayce Jackson-Davis","GSW","C",10.0,7.0,2.0,0.8,1.5,1.5,60.0,65.0,0.0],
 ["Kevon Looney","GSW","C",5.5,6.0,2.0,0.5,0.5,1.0,55.0,68.0,0.0],
-// ── LA CLIPPERS ──
+// â”€â”€ LA CLIPPERS â”€â”€
 ["Kawhi Leonard","LAC","SF",23.7,6.5,3.6,1.6,0.8,2.1,52.7,87.1,2.1],
 ["Paul George","LAC","SF",22.6,5.2,3.5,1.4,0.4,2.4,45.4,88.8,3.0],
 ["James Harden","LAC","PG",16.5,5.5,8.5,1.0,0.5,3.5,43.0,87.0,3.0],
@@ -1491,7 +1491,7 @@ const RAW=[
 ["Mason Plumlee","LAC","C",6.5,5.5,2.0,0.5,0.6,1.2,55.0,65.0,0.0],
 ["Bones Hyland","LAC","PG",11.5,2.8,3.5,0.8,0.2,1.8,41.0,83.0,2.8],
 ["P.J. Tucker","LAC","PF",5.5,3.5,1.5,0.8,0.3,0.8,42.0,76.0,1.5],
-// ── LOS ANGELES LAKERS ──
+// â”€â”€ LOS ANGELES LAKERS â”€â”€
 ["LeBron James","LAL","SF",25.7,7.3,8.3,1.3,0.6,3.5,54.0,73.5,2.4],
 ["Anthony Davis","LAL","C",24.7,12.6,3.5,1.1,2.3,2.5,56.3,78.3,0.3],
 ["Austin Reaves","LAL","SG",15.9,4.3,5.5,1.0,0.4,2.0,47.0,87.0,2.8],
@@ -1502,7 +1502,7 @@ const RAW=[
 ["Christian Wood","LAL","PF",13.5,6.5,2.0,0.6,0.8,1.8,50.0,75.0,2.5],
 ["Spencer Dinwiddie","LAL","PG",12.0,3.0,5.5,0.8,0.3,2.2,43.0,82.0,2.5],
 ["Cam Reddish","LAL","SF",9.5,3.5,1.8,0.9,0.4,1.2,44.0,76.0,2.2],
-// ── PHOENIX SUNS ──
+// â”€â”€ PHOENIX SUNS â”€â”€
 ["Kevin Durant","PHX","SF",29.1,6.7,5.0,0.7,1.4,3.0,52.3,85.6,2.4],
 ["Devin Booker","PHX","SG",27.1,4.5,6.9,0.9,0.3,3.2,49.3,85.2,2.7],
 ["Bradley Beal","PHX","SG",18.2,4.0,5.0,0.8,0.3,2.5,49.0,85.0,1.8],
@@ -1513,7 +1513,7 @@ const RAW=[
 ["Royce O'Neale","PHX","SF",9.5,4.5,2.5,1.0,0.5,1.2,43.0,80.0,2.5],
 ["Drew Eubanks","PHX","C",7.0,5.5,1.0,0.5,0.8,1.0,58.0,68.0,0.0],
 ["Bol Bol","PHX","C",8.5,4.5,1.2,0.5,1.2,1.0,52.0,72.0,1.0],
-// ── SACRAMENTO KINGS ──
+// â”€â”€ SACRAMENTO KINGS â”€â”€
 ["Domantas Sabonis","SAC","C",19.6,13.6,7.3,0.8,0.5,3.0,60.5,69.0,0.2],
 ["De'Aaron Fox","SAC","PG",25.2,4.0,6.1,1.6,0.3,3.1,49.1,74.3,1.9],
 ["Kevin Huerter","SAC","SG",12.0,4.0,3.5,0.8,0.3,1.5,45.0,85.0,2.8],
@@ -1524,7 +1524,7 @@ const RAW=[
 ["Keon Ellis","SAC","SG",9.0,3.5,2.0,1.2,0.4,1.0,46.0,78.0,2.2],
 ["Jordan McLaughlin","SAC","PG",6.5,2.5,4.5,1.0,0.2,1.5,47.0,82.0,1.0],
 ["Chimezie Metu","SAC","PF",7.0,4.0,1.5,0.6,0.7,1.0,48.0,74.0,1.0],
-// ── DALLAS MAVERICKS ──
+// â”€â”€ DALLAS MAVERICKS â”€â”€
 ["Luka Doncic","DAL","PG",33.9,9.2,9.8,1.4,0.5,4.5,47.5,73.6,3.6],
 ["Kyrie Irving","DAL","PG",25.6,5.0,5.2,1.3,0.5,2.5,49.7,90.7,3.0],
 ["P.J. Washington","DAL","PF",12.5,6.5,2.5,1.0,0.8,1.5,48.0,78.0,2.5],
@@ -1535,7 +1535,7 @@ const RAW=[
 ["Maxi Kleber","DAL","PF",8.5,4.0,1.5,0.7,0.8,1.0,43.0,82.0,2.2],
 ["Dante Exum","DAL","PG",10.0,3.0,4.0,1.2,0.3,1.5,46.0,80.0,2.0],
 ["Tim Hardaway Jr.","DAL","SG",12.0,3.0,2.5,0.8,0.3,1.5,42.0,84.0,3.0],
-// ── HOUSTON ROCKETS ──
+// â”€â”€ HOUSTON ROCKETS â”€â”€
 ["Alperen Sengun","HOU","C",21.1,9.3,5.5,0.9,1.2,2.9,54.2,72.3,0.4],
 ["Jalen Green","HOU","SG",22.5,4.5,5.5,1.2,0.5,3.0,43.0,80.0,3.5],
 ["Fred VanVleet","HOU","PG",18.1,4.0,6.8,1.5,0.2,2.3,40.9,85.5,3.6],
@@ -1546,7 +1546,7 @@ const RAW=[
 ["Cam Whitmore","HOU","SF",12.0,4.0,2.0,1.0,0.5,1.5,46.0,75.0,1.8],
 ["Jeff Green","HOU","PF",7.5,4.0,1.5,0.6,0.5,1.0,48.0,78.0,1.5],
 ["Jock Landale","HOU","C",6.5,4.0,1.2,0.4,0.5,0.8,56.0,78.0,0.2],
-// ── MEMPHIS GRIZZLIES ──
+// â”€â”€ MEMPHIS GRIZZLIES â”€â”€
 ["Ja Morant","MEM","PG",26.2,5.9,8.1,1.0,0.5,3.4,46.6,75.4,1.0],
 ["Desmond Bane","MEM","SG",21.5,4.8,5.0,1.2,0.4,1.9,47.0,89.3,3.7],
 ["Jaren Jackson Jr.","MEM","PF",22.0,5.8,2.0,0.9,3.0,2.4,44.2,83.1,2.5],
@@ -1557,7 +1557,7 @@ const RAW=[
 ["Ziaire Williams","MEM","SF",10.5,3.5,2.0,0.8,0.4,1.5,44.0,79.0,2.2],
 ["Luke Kennard","MEM","SG",9.5,2.5,2.0,0.6,0.2,1.0,45.0,90.0,2.8],
 ["John Konchar","MEM","SG",7.5,4.5,2.5,1.0,0.3,1.0,52.0,78.0,1.5],
-// ── NEW ORLEANS PELICANS ──
+// â”€â”€ NEW ORLEANS PELICANS â”€â”€
 ["Zion Williamson","NOP","PF",22.9,5.8,4.6,0.9,0.7,2.6,60.8,70.2,0.2],
 ["Brandon Ingram","NOP","SF",24.3,5.1,5.1,0.7,0.5,2.7,47.2,85.7,2.2],
 ["CJ McCollum","NOP","SG",20.4,3.6,4.4,0.7,0.3,1.8,46.2,84.7,3.1],
@@ -1568,7 +1568,7 @@ const RAW=[
 ["Naji Marshall","NOP","SF",10.0,4.5,3.0,1.0,0.5,1.5,49.0,78.0,1.8],
 ["Jose Alvarado","NOP","PG",9.0,3.0,4.5,2.0,0.4,1.8,42.0,79.0,2.0],
 ["Willy Hernangomez","NOP","C",8.0,6.0,1.5,0.5,0.6,1.2,55.0,74.0,0.2],
-// ── SAN ANTONIO SPURS ──
+// â”€â”€ SAN ANTONIO SPURS â”€â”€
 ["Victor Wembanyama","SAS","C",21.4,10.6,3.9,1.2,3.6,3.3,46.5,79.6,2.6],
 ["Devin Vassell","SAS","SG",19.5,4.0,3.5,1.0,0.4,2.0,45.0,85.0,3.5],
 ["Jeremy Sochan","SAS","PF",13.5,5.5,4.5,1.2,0.7,2.0,48.0,72.0,1.2],
@@ -1590,9 +1590,9 @@ const NBA_PLAYERS = RAW.map(([nm,tm,pos,pts,reb,ast,stl,blk,to,fgp,ftp,tpm],i)=>
   fp:fpRaw(pts,reb,ast,stl,blk,to,tpm),adp:0,
 })).sort((a,b)=>b.fp-a.fp).map((p,i)=>({...p,adp:i+1}));
 
-// ─── SETTINGS ─────────────────────────────────────────────
+// â”€â”€â”€ SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const FMT_INFO={
-  snake:'Odd rounds 1→N, even rounds N→1. Classic format.',
+  snake:'Odd rounds 1â†’N, even rounds Nâ†’1. Classic format.',
   auction:'Each team gets a budget. Bid on every player. Budget management wins drafts!',
 };
 const SCR_INFO={
@@ -1736,7 +1736,7 @@ function updatePositionRuleSummary(){
     })
     .map(key=>`${key} ${DRAFT_POSITION_RULES[key].starters}`)
     .concat([`BN ${bench}`, `${irKey} ${irSlots}`])
-    .join(' · ');
+    .join(' Â· ');
   const el=document.getElementById('positionRuleSummary');
   if(el) el.textContent=text||'Choose how many starters you want at each position. Bench and IR / IL update automatically.';
 }
@@ -1783,7 +1783,7 @@ function hydrateStepperInputs(root){
     if(input.readOnly) return;
     const btns=document.createElement('div');
     btns.className='stepper-btns';
-    btns.innerHTML='<button type="button" class="stepper-btn">+</button><button type="button" class="stepper-btn">−</button>';
+    btns.innerHTML='<button type="button" class="stepper-btn">+</button><button type="button" class="stepper-btn">âˆ’</button>';
     wrapper.appendChild(btns);
     const [plus,minus]=btns.querySelectorAll('.stepper-btn');
     function nudge(dir){
@@ -1829,7 +1829,7 @@ function cc(gid,el){
 }
 function gv(gid){return document.querySelector('#'+gid+' .chip.on')?.dataset?.v||null;}
 
-// ─── STATE ────────────────────────────────────────────────
+// â”€â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let S={
   name:'My Team',ls:10,fmt:'snake',scr:'h2h_cat',
   rds:13,myPos:0,tmax:0,abud:200,myBudget:200,
@@ -1971,8 +1971,8 @@ function applySportToDraftUI(){
   if(!PLAYERS || !PLAYERS.length){
     const pill=document.getElementById('sportLobbyPill');
     if(pill) pill.textContent=useStaticSoloData
-      ? '⚠️ 2024-25 player data failed to load'
-      : (isLiveServiceSportForDraft ? '⚠️ Live player data failed to load' : '⚠️ Imported player data failed to load');
+      ? 'âš ï¸ 2024-25 player data failed to load'
+      : (isLiveServiceSportForDraft ? 'âš ï¸ Live player data failed to load' : 'âš ï¸ Imported player data failed to load');
     throw new Error('RosterBate player pool missing for '+SPORT);
   }
   const teamPlaceholders = {
@@ -1985,11 +1985,11 @@ function applySportToDraftUI(){
   document.getElementById('sportLogoSub').textContent = SPORT_CFG.label + ' Draft Room';
   const liveUpdatedLabel=getLivePoolUpdatedTimestampLabel(SPORT);
   document.getElementById('sportLobbyPill').textContent = useStaticSoloData
-    ? ('✅ 2024-25 ' + SPORT_CFG.leagueLabel + ' Season · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
+    ? ('âœ… 2024-25 ' + SPORT_CFG.leagueLabel + ' Season Â· ' + SPORT_CFG.teamCodes.length + ' Teams Â· ' + PLAYERS.length + ' Players')
     : (
       isLiveServiceSportForDraft
-        ? ('✅ Live ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' · Updated ' + liveUpdatedLabel : ''))
-        : ('✅ Imported ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
+        ? ('âœ… Live ' + SPORT_CFG.leagueLabel + ' Pool Â· ' + SPORT_CFG.teamCodes.length + ' Teams Â· ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' Â· Updated ' + liveUpdatedLabel : ''))
+        : ('âœ… Imported ' + SPORT_CFG.leagueLabel + ' Pool Â· ' + SPORT_CFG.teamCodes.length + ' Teams Â· ' + PLAYERS.length + ' Players')
     );
   document.getElementById('sportCountdownIcon').textContent = SPORT_CFG.icon;
   document.getElementById('sportDraftTitle').innerHTML = SPORT_CFG.icon + ' Roster<span>Bate</span>';
@@ -2051,6 +2051,18 @@ function applySavedLobbySettings(){
     syncDraftSpotBounds();
   }catch(e){}
 }
+
+
+async function ensureLobbyPlayerIndex(lobbyId, userId) {
+  if (!lobbyId || !userId) return;
+  const indexRef = db.ref(lobbyPlayersByUid/ + lobbyId + / + userId);
+  const snapshot = await indexRef.once('value');
+  if (!snapshot.exists()) {
+    await indexRef.set(true);
+    console.log('✅ Created lobby player index for', userId);
+  }
+}
+
 
 function getSavedMultiplayerLobbyState(){
   try{
@@ -2343,7 +2355,7 @@ function syncDraftTimerDisplay(){
   const fillEl=document.getElementById('tFill');
   if(!timerEl||!fillEl) return;
   if(!S.tmax){
-    timerEl.textContent='—';
+    timerEl.textContent='â€”';
     fillEl.style.width='100%';
     fillEl.className='tfill';
     return;
@@ -2366,9 +2378,9 @@ function startDraft(){
   const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
-  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
-  if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
-  if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
+  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1â€“20 for solo multiplayer test.':'League size must be 2â€“20.';e.classList.add('show');return;}
+  if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1â€“'+ls+'.';e.classList.add('show');return;}
+  if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5â€“25.';e.classList.add('show');return;}
   const need=ls*rd;
   if(need>PLAYERS.length){e.textContent='Need '+need+' slots but only '+PLAYERS.length+' players. Reduce teams or rounds.';e.classList.add('show');return;}
   S.name=teamName;
@@ -2406,14 +2418,14 @@ function startDraft(){
   updateSoloSimButton();
   subscribeRealtimeDraftState();
 
-  // Go straight to draft room — everything is live, countdown is just a bar
+  // Go straight to draft room â€” everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
   document.getElementById('draft').classList.add('active');
   document.getElementById('statHeader').style.display='flex';
   rPlayers();rMyTeam();rOtherTeams();rBoard();upHdr();updateTradeBtn();
   startCountdown();
   awardRosterbateScore('create_league', 10).catch(() => {});
-  // NOTE: advance() is called in launchDraft() — nothing picks until countdown ends
+  // NOTE: advance() is called in launchDraft() â€” nothing picks until countdown ends
 }
 
 let cdInt=null;
@@ -2426,7 +2438,7 @@ function startCountdown(){
     let remaining=scheduledDuration;
     document.getElementById('pdcBar').classList.remove('hidden');
     document.getElementById('pdcStrip').style.display='block';
-    document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Scheduled draft starts in</strong> — draft order is locked and the room is now open.';
+    document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Scheduled draft starts in</strong> â€” draft order is locked and the room is now open.';
     const startBtn=document.querySelector('#pdcBar .pdc-start');
     if(startBtn){
       startBtn.textContent='Scheduled';
@@ -2465,7 +2477,7 @@ function startCountdown(){
   document.getElementById('pdcBar').classList.remove('hidden');
   document.getElementById('pdcStrip').style.display='block';
   const startBtn=document.querySelector('#pdcBar .pdc-start');
-  document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Draft starts in</strong> — browse players &amp; set your queue!';
+  document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Draft starts in</strong> â€” browse players &amp; set your queue!';
   if(startBtn){
     startBtn.textContent='Start';
     startBtn.disabled=false;
@@ -2494,14 +2506,14 @@ function startCountdown(){
 function launchDraft(){
   const scheduledStartAt=getScheduledDraftStartAt();
   if(scheduledStartAt && Date.now() < scheduledStartAt){
-    showToast('⏰ This scheduled draft has not started yet');
+    showToast('â° This scheduled draft has not started yet');
     return;
   }
   S.started=true;
   clearInterval(cdInt);
   document.getElementById('pdcBar').classList.add('hidden');
   document.getElementById('pdcStrip').style.display='none';
-  showBanner('🏀 Draft is Live — Make Your Picks!');
+  showBanner('ðŸ€ Draft is Live â€” Make Your Picks!');
   if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
   if(S.fmt==='auction') aucNext(); else advance();
 }
@@ -2708,7 +2720,7 @@ function simulateDraftToFinish(){
   }
 }
 
-// ─── DRAFT FLOW ───────────────────────────────────────────
+// â”€â”€â”€ DRAFT FLOW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function advance(){
   if(PS.isPaused) return; // don't advance while paused
   if(!isRealtimeMultiplayerDraft()){
@@ -2716,7 +2728,7 @@ function advance(){
   }
   upHdr();rPlayers();rOtherTeams();rBoard();
   if(S.cur<S.total&&S.order[S.cur]===S.myPos){
-    showBanner('⏰ You\'re On The Clock!');
+    showBanner('â° You\'re On The Clock!');
     if(S.tmax>0) resetTimer();
     syncAutoDraftTurn();
   } else if(S.cur>=S.total) endDraft();
@@ -2736,20 +2748,20 @@ function doPick(p,ti){
   S.drafted.add(p.id);
   S.picks.push({ov:pickNumber,round:roundNumber,ti,pid:p.id});
   if(ti===S.myPos){S.myTeam.push(p);rMyTeam();}
-  rbPostSystem(`#${pickNumber} · ${teamName} drafted ${p.name} (${p.pos}, ${p.team})`,'draft');
+  rbPostSystem(`#${pickNumber} Â· ${teamName} drafted ${p.name} (${p.pos}, ${p.team})`,'draft');
   S.cur++;
   upFavBadge();
   if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
 }
 function userPick(p){
-  if(!S.started){ showToast('⏰ Draft hasn\'t started yet'); return; }
-  if(PS.isPaused){ showToast('⏸ Draft is paused'); return; }
+  if(!S.started){ showToast('â° Draft hasn\'t started yet'); return; }
+  if(PS.isPaused){ showToast('â¸ Draft is paused'); return; }
   if(S.drafted.has(p.id)||S.order[S.cur]!==S.myPos)return;
   clearAutoDraftTurn();
   clearInterval(S.timerInt);
   document.getElementById('pModal').classList.remove('open');
   doPick(p,S.myPos);
-  hideBanner();showToast('✅ '+p.name+' drafted!');
+  hideBanner();showToast('âœ… '+p.name+' drafted!');
   rBoard();upHdr();rPlayers();rOtherTeams();
   setTimeout(advance,500);
 }
@@ -2816,7 +2828,7 @@ function aucNext(){
   if(nom===S.myPos){
     S.auc={nominator:nom,playerId:null,currentBid:0,targetBid:0,cpuWinner:-1};
     upHdr();rPlayers();
-    showBanner('💰 Your nomination — choose any available player.');
+    showBanner('ðŸ’° Your nomination â€” choose any available player.');
     if(S.tmax>0) resetTimer();
   } else {
     const p=chooseAuctionCpuPlayer(av);
@@ -2838,7 +2850,7 @@ function openAuc(p,nominator){
   }
   S.auc={playerId:p.id,nominator,currentBid:0,targetBid:Math.max(1,targetBid),cpuWinner};
   S.selP=p;
-  document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' — '+p.team+' · '+p.pos+' · Rank #'+p.adp;
+  document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' â€” '+p.team+' Â· '+p.pos+' Â· Rank #'+p.adp;
   const nomName=nominator===S.myPos?'You':(S.teams[nominator]||'CPU');
   document.getElementById('aMarket').textContent=cpuWinner>=0
     ?(nomName+' nominated this player. AI market usually lands around $'+Math.max(1,targetBid)+'.')
@@ -2896,21 +2908,21 @@ function passAuction(){
 function confAuction(){
   const bid=parseInt(document.getElementById('bInput').value)||1;
   const minBid=getAuctionMinBid();
-  if(bid>S.myBudget){showToast('⚠️ Over budget!');return;}
-  if(bid<minBid){showToast('⚠️ Bid must be at least $'+minBid+'.'); updateAuctionBidControls(); return;}
+  if(bid>S.myBudget){showToast('âš ï¸ Over budget!');return;}
+  if(bid<minBid){showToast('âš ï¸ Bid must be at least $'+minBid+'.'); updateAuctionBidControls(); return;}
   const targetBid = S.auc?.targetBid || 1;
   if((S.auc?.cpuWinner>=0) && bid<targetBid){
     const cpuBid = nextCpuAuctionPush(bid,targetBid);
     S.auc.currentBid=cpuBid;
     updateAuctionBidControls();
-    showToast('💰 '+S.teams[S.auc.cpuWinner]+' pushes it to $'+cpuBid+'.');
+    showToast('ðŸ’° '+S.teams[S.auc.cpuWinner]+' pushes it to $'+cpuBid+'.');
     return;
   }
   document.getElementById('aModal').classList.remove('open');
   S.myBudget-=bid;
   doPick(S.selP,S.myPos);
   S.auc=null;
-  showToast('✅ '+S.selP.name+' — $'+bid+'!');
+  showToast('âœ… '+S.selP.name+' â€” $'+bid+'!');
   rBoard();rPlayers();rMyTeam();upHdr();
   setTimeout(aucNext,350);
 }
@@ -2967,7 +2979,7 @@ function openPModal(idx){
   document.getElementById('mAv').style.background=col;
   document.getElementById('mAv').textContent=initials(p.name);
   document.getElementById('mName').textContent=p.name;
-  document.getElementById('mSub').textContent=p.team+' · '+p.pos+' · Rank #'+p.adp;
+  document.getElementById('mSub').textContent=p.team+' Â· '+p.pos+' Â· Rank #'+p.adp;
   document.getElementById('mStats').innerHTML=
     getRosterbatePlayerDetailStats(p).map(stat =>
       `<div class="sb"><div class="sv">${stat.value}</div><div class="sl">${stat.label}</div></div>`
@@ -3004,7 +3016,7 @@ function rPlayers(){
     const idx=PLAYERS.indexOf(p);
     const fp=calcFP(p);
     const faved=isFav(p.id);
-    const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
+    const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'â˜…':'â˜†'}</button>`;
     const canActOnPlayer=(S.fmt==='auction'?myNomTurn:myTurn) && S.started;
     const btnClass=!canActOnPlayer?' disabled':'';
     const btnClick=!canActOnPlayer?'':`onclick="event.stopPropagation();userPick(PLAYERS[${idx}])"`;
@@ -3041,7 +3053,7 @@ function rPlayers(){
             <div class="pname" style="display:flex;align-items:center;gap:4px;min-width:0;flex:1"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${p.name}</span><span class="pos-badge pos-${p.pos}" style="flex-shrink:0">${p.pos}</span>${favBtn}</div>
           </div>
         </div>
-        <div class="pdet">${p.team} · ${getRosterbatePlayerSummary(p, SPORT)}</div>
+        <div class="pdet">${p.team} Â· ${getRosterbatePlayerSummary(p, SPORT)}</div>
         ${actionRow}
       </div>
       <div class="pstat">${min.toFixed(1)}</div>
@@ -3241,14 +3253,14 @@ function rMyTeam(){
   (S.myTeam||[]).forEach((player,index)=>{
     if(player && player.id!=null) roundByPlayerId.set(String(player.id), index+1);
   });
-  const bLine=S.fmt==='auction'?`<span class="ts">· $${S.myBudget} left</span>`:'';
+  const bLine=S.fmt==='auction'?`<span class="ts">Â· $${S.myBudget} left</span>`:'';
   let html=`<div class="thi">
     <div style="font-size:26px">${SPORT_CFG.icon}</div>
     <div><div class="tnb">${S.name}</div>
     <div class="tsr">
       <span class="ts">${S.myTeam.length}/${S.rds} picks</span>
-      <span class="ts">· ${sl[S.scr]}</span>
-      <span class="ts">· ${S.ls} teams</span>${bLine}
+      <span class="ts">Â· ${sl[S.scr]}</span>
+      <span class="ts">Â· ${S.ls} teams</span>${bLine}
     </div></div>
   </div>`;
   if(!S.myTeam.length){
@@ -3293,7 +3305,7 @@ function rOtherTeams(){
         <div class="pav" style="background:${tcolor(player.team)};width:28px;height:28px;font-size:10px;border:none">${initials(player.name)}</div>
         <div style="min-width:0;flex:1">
           <div class="pname" style="font-size:12px;display:flex;align-items:center;gap:4px;min-width:0"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${player.name}</span><span class="pos-badge pos-${player.pos}" style="flex-shrink:0">${player.pos}</span></div>
-          <div class="pdet">${player.team} · Pick #${pick.ov}</div>
+          <div class="pdet">${player.team} Â· Pick #${pick.ov}</div>
         </div>
       </div>`).join(''):`<div class="team-menu-player empty">No picks yet</div>`;
     return `<div class="team-menu-card">
@@ -3324,8 +3336,8 @@ function rBoard(){
       const isMine=S.order[ov]===S.myPos;
       const player=pick?PLAYERS.find(pl=>pl.id===pick.pid):null;
       html+=`<div class="bp${isMine?' mine':''}${isCur?' cur':''}">
-        <div class="bpt">${isMine?'⭐ ':''}${S.teams[S.order[ov]]||'T'+(S.order[ov]+1)}</div>
-        <div class="bpp${pick?'':" em"}">${pick?(player?.name||'—'):(isCur?'On Clock':'—')}</div>
+        <div class="bpt">${isMine?'â­ ':''}${S.teams[S.order[ov]]||'T'+(S.order[ov]+1)}</div>
+        <div class="bpp${pick?'':" em"}">${pick?(player?.name||'â€”'):(isCur?'On Clock':'â€”')}</div>
         <div class="bpn">#${ov+1}</div>
       </div>`;
     }
@@ -3452,17 +3464,17 @@ function upHdr(){
   const pir=(S.cur%S.ls)+1;
   document.getElementById('mRound').textContent=round+'/'+S.rds;
   document.getElementById('mPick').textContent=(S.cur+1)+'/'+S.total;
-  let nxt='—';
+  let nxt='â€”';
   for(let i=S.cur;i<S.total;i++){
     if(S.order[i]===S.myPos){const a=i-S.cur;nxt=a===0?'NOW!':'+'+a;break;}
   }
   document.getElementById('mNext').textContent=nxt;
   const badge=document.getElementById('clkBadge');
-  if(S.cur>=S.total){badge.textContent='Draft Complete 🏆';badge.className='clk-badge w';updateTradeBtn();updateSoloSimButton();return;}
+  if(S.cur>=S.total){badge.textContent='Draft Complete ðŸ†';badge.className='clk-badge w';updateTradeBtn();updateSoloSimButton();return;}
   const mine=S.order[S.cur]===S.myPos;
   badge.textContent=S.fmt==='auction'
-    ?(mine?'Your Nomination ⏰':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
-    :(mine?'On The Clock ⏰':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
+    ?(mine?'Your Nomination â°':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
+    :(mine?'On The Clock â°':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
   badge.className='clk-badge'+(mine?'':' w');
   updateTradeBtn();
   updateSoloSimButton();
@@ -3471,7 +3483,7 @@ function upHdr(){
 // TIMER
 function resetTimer(){
   clearInterval(S.timerInt);
-  if(!S.tmax){document.getElementById('mTimer').textContent='—';document.getElementById('tFill').style.width='100%';return;}
+  if(!S.tmax){document.getElementById('mTimer').textContent='â€”';document.getElementById('tFill').style.width='100%';return;}
   S.timer=S.tmax;upTimer();
   S.timerInt=setInterval(()=>{S.timer--;upTimer();if(S.timer<=0){clearInterval(S.timerInt);autoP();}},1000);
 }
@@ -3486,7 +3498,7 @@ function autoP(forceBestFit=false){
   if(S.fmt==='auction'&&S.cur<S.total&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId)){
     const target=getBestAutodraftPlayerForTeam(S.myPos);
     if(target){
-      showToast((forceBestFit?'🤖 ':'⏰ ')+'Auto-nominated '+target.name+'!');
+      showToast((forceBestFit?'ðŸ¤– ':'â° ')+'Auto-nominated '+target.name+'!');
       startAuctionNomination(target);
     }
     return;
@@ -3494,7 +3506,7 @@ function autoP(forceBestFit=false){
   if(forceBestFit){
     const bestFit=getBestAutodraftPlayerForTeam(S.myPos);
     if(bestFit){
-      showToast('🤖 Auto-drafted '+bestFit.name+'!');
+      showToast('ðŸ¤– Auto-drafted '+bestFit.name+'!');
       userPick(bestFit);
       return;
     }
@@ -3504,7 +3516,7 @@ function autoP(forceBestFit=false){
     if(!S.drafted.has(id)){
       const p=PLAYERS.find(x=>x.id===id);
       if(p){
-        showToast('⏰ Auto-drafted '+p.name+' from queue!');
+        showToast('â° Auto-drafted '+p.name+' from queue!');
         userPick(p);
         return;
       }
@@ -3534,7 +3546,7 @@ function sTab(n,btn){
 }
 function showSeasonToastStub(){} // season toast defined in season block below
 
-// ─── PAUSE SYSTEM ─────────────────────────────────────────
+// â”€â”€â”€ PAUSE SYSTEM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let PS = {
   isAdmin: false,         // is this user the commissioner?
   votesNeeded: 3,         // votes required to trigger pause
@@ -3563,7 +3575,7 @@ function updateAdminMode(checkbox){
     thumb.style.left = '3px';
     thumb.style.background = 'var(--text3)';
   }
-  // Show/hide pause button based on admin status — it shows for everyone in draft
+  // Show/hide pause button based on admin status â€” it shows for everyone in draft
   refreshPauseBtn();
 }
 
@@ -3573,10 +3585,10 @@ function refreshPauseBtn(){
   // Always show during draft; admin shows immediately, others need draft live
   btn.className = 'pause-btn admin-mode';
   if(PS.isPaused){
-    btn.textContent = '▶ Resume';
+    btn.textContent = 'â–¶ Resume';
     btn.classList.add('paused');
   } else {
-    btn.textContent = PS.isAdmin ? '⏸ Pause' : '⏸ Pause';
+    btn.textContent = PS.isAdmin ? 'â¸ Pause' : 'â¸ Pause';
     btn.classList.remove('paused');
   }
 }
@@ -3631,14 +3643,14 @@ function resumeDraft(){
   clearInterval(PS.pauseElapsedInt);
   document.getElementById('pauseOverlay').classList.remove('show');
   refreshPauseBtn();
-  showBanner('▶ Draft Resumed!');
+  showBanner('â–¶ Draft Resumed!');
   // Restart pick timer if it was running
   if(S.tmax > 0 && S.cur < S.total && S.order[S.cur] === S.myPos){
     resetTimer();
   }
 }
 
-// ── DISCONNECT REPORT ──
+// â”€â”€ DISCONNECT REPORT â”€â”€
 function openDisconnectModal(){
   PS.dcTeamSelected = -1;
   document.getElementById('dcSubmitBtn').disabled = true;
@@ -3650,7 +3662,7 @@ function openDisconnectModal(){
     return `<div class="dc-team-row" id="dcrow-${ti}" onclick="selectDcTeam(${ti})">
       <div class="dc-team-av" style="background:${col}">${name[0]}</div>
       <div class="dc-team-name">${name}${ti===S.myPos?' (You)':''}</div>
-      <div class="dc-check">✓</div>
+      <div class="dc-check">âœ“</div>
     </div>`;
   }).join('');
   document.getElementById('disconnectModal').classList.add('show');
@@ -3672,7 +3684,7 @@ function submitDisconnectReport(){
   startPauseVote(reason);
 }
 
-// ── VOTING ──
+// â”€â”€ VOTING â”€â”€
 function startPauseVote(reason){
   PS.voteActive = true;
   PS.votesFor = 1; // requester auto-votes yes
@@ -3682,7 +3694,7 @@ function startPauseVote(reason){
   document.getElementById('voteBarReason').textContent = reason;
   renderVotePips();
   document.getElementById('voteBar').classList.add('show');
-  showToast('🗳️ Pause vote started — need '+PS.votesNeeded+' yes votes');
+  showToast('ðŸ—³ï¸ Pause vote started â€” need '+PS.votesNeeded+' yes votes');
   // Simulate other players voting over time (since this is single-player)
   simulateCpuVotes();
 }
@@ -3710,7 +3722,7 @@ function simulateCpuVotes(){
         const remaining = S.ls - PS.votesFor - PS.votesAgainst;
         if(PS.votesFor + remaining < PS.votesNeeded){
           dismissVote();
-          showToast('❌ Not enough votes — pause denied');
+          showToast('âŒ Not enough votes â€” pause denied');
         }
       }
     }, delay);
@@ -3735,7 +3747,7 @@ function renderVotePips(){
   const got = PS.votesFor;
   let html = '';
   for(let i = 0; i < needed; i++){
-    html += `<div class="vote-pip ${i < got ? 'voted' : 'needed'}">${i < got ? '✓' : ''}</div>`;
+    html += `<div class="vote-pip ${i < got ? 'voted' : 'needed'}">${i < got ? 'âœ“' : ''}</div>`;
   }
   document.getElementById('votePips').innerHTML = html;
   document.getElementById('voteCount').textContent = got + ' of ' + needed + ' votes';
@@ -3765,7 +3777,7 @@ function initPauseState(){
 }
 
 
-// ─── TRADE SYSTEM ─────────────────────────────────────────
+// â”€â”€â”€ TRADE SYSTEM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let tradeLog=[];
 let trSelectedTeam=null; // team index of selected trade partner
 
@@ -3803,7 +3815,7 @@ function openTradeModal(){
   // Update subtitle to reflect the pick being offered
   document.getElementById('trSubText').innerHTML=`You're offering pick <strong id="trMyPick">#${myNextPick+1}</strong> (Round ${Math.floor(myNextPick/S.ls)+1}). In snake drafts, this trade only swaps draft positions. No compensation picks are added.`;
 
-  // Build team list — every other team that has a future pick
+  // Build team list â€” every other team that has a future pick
   let html='';
   for(let ti=0;ti<S.ls;ti++){
     if(ti===S.myPos) continue;
@@ -3819,7 +3831,7 @@ function openTradeModal(){
         <div class="tr-team-name">${teamName}</div>
         <div class="tr-team-pick">Next pick: #${pickNum} (Round ${Math.floor(theirPick/S.ls)+1})</div>
       </div>
-      <div class="tr-check">✓</div>
+      <div class="tr-check">âœ“</div>
     </button>`;
   }
   document.getElementById('trTeamList').innerHTML=html||`<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No teams available to trade with.</div>`;
@@ -3924,17 +3936,17 @@ function updateTradeBtn(){
   btn.style.cursor=hasPendingTrade?'not-allowed':'pointer';
 }
 
-// ─── SEASON MANAGEMENT ────────────────────────────────────
+// â”€â”€â”€ SEASON MANAGEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let autoSeasonRedirectTimer = null;
 async function endDraft(){
-  console.log('🏆 Draft ending, switching to completion screen...');
+  console.log('ðŸ† Draft ending, switching to completion screen...');
   clearInterval(S.timerInt);
   updateSoloSimButton();
   const draftEl=document.getElementById('draft');
   const completeEl=document.getElementById('draftComplete');
   if(draftEl) draftEl.classList.remove('active');
   if(completeEl) completeEl.classList.add('active');
-  console.log('✓ Draft screen hidden, complete screen shown');
+  console.log('âœ“ Draft screen hidden, complete screen shown');
   try{
     const lobbyState=getSavedMultiplayerLobbyState();
     const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
@@ -3961,7 +3973,7 @@ async function endDraft(){
       id:p?.id,
       name:p?.name||'Unknown Player',
       team:p?.team||'FA',
-      pos:p?.pos||'—',
+      pos:p?.pos||'â€”',
       pts:p?.pts,
       reb:p?.reb,
       ast:p?.ast,
@@ -4046,10 +4058,10 @@ async function endDraft(){
           draftData.sharedSeasonId = seasonId;
           persistMultiplayerLobbySeasonInfo(seasonId);
         }
-        console.log('✅ Draft data updated with seasonId:', seasonId);
+        console.log('âœ… Draft data updated with seasonId:', seasonId);
       }
     } catch(err) {
-      console.warn('⚠️ Firebase save failed (league will save locally):', err);
+      console.warn('âš ï¸ Firebase save failed (league will save locally):', err);
       delete draftData.seasonId;
     }
     
@@ -4080,7 +4092,7 @@ async function endDraft(){
 
     const topPick = myRoster[0];
     if(topPickEl){
-      topPickEl.textContent = topPick ? topPick.name + ' (' + topPick.pos + ' · ' + topPick.team + ')' : '—';
+      topPickEl.textContent = topPick ? topPick.name + ' (' + topPick.pos + ' Â· ' + topPick.team + ')' : 'â€”';
     }
 
     const projTotal = myRoster.reduce((s,p)=>s+(Number(calcFP(p))||0),0).toFixed(1);
@@ -4097,7 +4109,7 @@ async function endDraft(){
           +'<div style="width:30px;height:30px;border-radius:50%;background:'+col+';display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+initials(p.name)+'</div>'
           +'<div style="flex:1;min-width:0;">'
           +'<div style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'
-          +'<div style="font-size:11px;color:var(--text2);">'+p.team+' · '+p.pos+' · '+fpValue+' fp</div>'
+          +'<div style="font-size:11px;color:var(--text2);">'+p.team+' Â· '+p.pos+' Â· '+fpValue+' fp</div>'
           +'</div>'
           +'<div style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;">Rd '+(i+1)+'</div>'
           +'</div>';
@@ -4120,7 +4132,7 @@ async function endDraft(){
           }
           if(startBtn){
             startBtn.disabled=false;
-            startBtn.textContent='Start Your Season →';
+            startBtn.textContent='Start Your Season â†’';
             startBtn.style.opacity='1';
           }
           showToast('League link is still syncing. Try Start Your Season in a moment.');
@@ -4128,7 +4140,7 @@ async function endDraft(){
           console.error('Auto season redirect failed:', redirectErr);
           if(startBtn){
             startBtn.disabled=false;
-            startBtn.textContent='Start Your Season →';
+            startBtn.textContent='Start Your Season â†’';
             startBtn.style.opacity='1';
           }
         }
@@ -4144,7 +4156,7 @@ async function endDraft(){
     if(teamNameEl) teamNameEl.textContent=S.name||'My Team';
     if(picksEl) picksEl.textContent=(Array.isArray(S.myTeam)?S.myTeam.length:0)+' players drafted';
     if(topPickEl) topPickEl.textContent='Draft finished';
-    if(projEl) projEl.textContent='—';
+    if(projEl) projEl.textContent='â€”';
     if(rosterEl) rosterEl.innerHTML='<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">Draft complete. Your season data was still saved, but the summary card hit a render issue.</div>';
     showToast('Draft complete. Summary screen recovered.');
   }
@@ -4237,7 +4249,7 @@ async function startYourSeason(){
     if(!url){
       if(btn){
         btn.disabled=false;
-        btn.textContent='Start Your Season →';
+        btn.textContent='Start Your Season â†’';
         btn.style.opacity='1';
       }
       showToast('League link is still syncing. Try again in a moment.');
@@ -4249,7 +4261,7 @@ async function startYourSeason(){
     const btn=document.getElementById('startSeasonBtn');
     if(btn){
       btn.disabled=false;
-      btn.textContent='Start Your Season →';
+      btn.textContent='Start Your Season â†’';
       btn.style.opacity='1';
     }
     showToast('Could not start your season');
@@ -4263,14 +4275,14 @@ async function startYourSeason(){
 <!-- DRAFT COMPLETE SCREEN -->
 <div id="draftComplete" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;flex-shrink:0;text-align:center;">
-    <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;">🏆 Draft Complete!</div>
+    <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;">ðŸ† Draft Complete!</div>
   </div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:12px;">
 
     <!-- Team summary card -->
     <div style="background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid rgba(249,115,22,.3);border-radius:14px;padding:16px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div style="width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;">🏀</div>
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;">ðŸ€</div>
         <div>
           <div id="dcTeamName" style="font-family:var(--fd);font-size:22px;font-weight:900;line-height:1;">My Team</div>
           <div id="dcPicks" style="font-size:12px;color:var(--text2);margin-top:3px;">0 players drafted</div>
@@ -4279,7 +4291,7 @@ async function startYourSeason(){
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px;">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;margin-bottom:4px;">Top Pick</div>
-          <div id="dcTopPick" style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text);">—</div>
+          <div id="dcTopPick" style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text);">â€”</div>
         </div>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px;">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;margin-bottom:4px;">Proj. Total</div>
@@ -4298,13 +4310,13 @@ async function startYourSeason(){
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
       <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:2px;">What's Next</div>
       <button id="startSeasonBtn" onclick="startYourSeason()" style="background:var(--accent);border:none;border-radius:11px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-        🏀 Start Your Season →
+        ðŸ€ Start Your Season â†’
       </button>
       <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.5;">
         Jump straight into this league's season page with the exact link for your completed draft.
       </div>
       <button onclick="document.getElementById('draftComplete').classList.remove('active');document.getElementById('draft').classList.add('active');" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">
-        ← Back to Draft Board
+        â† Back to Draft Board
       </button>
     </div>
 
@@ -4314,104 +4326,104 @@ async function startYourSeason(){
 <!-- SEASON SCREENS -->
 <div id="hub" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-    <div style="font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;">🏀 Roster<span style="color:var(--accent)">Bate</span></div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;">ðŸ€ Roster<span style="color:var(--accent)">Bate</span></div>
     <div style="font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;" id="hubWeekLabel">Week 1</div>
   </div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px;">
     <div style="background:linear-gradient(135deg,var(--card),var(--bg3));border:1px solid var(--border);border-radius:14px;padding:16px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
         <div id="hubTeamAv" style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:20px;font-weight:900;color:#fff;">MY</div>
-        <div><div id="hubTeamName" style="font-family:var(--fd);font-size:20px;font-weight:800;">My Team</div><div id="hubRecord" style="font-size:12px;color:var(--text2);margin-top:2px;">0–0</div></div>
-        <div style="margin-left:auto;text-align:right;"><div style="font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">This Week vs</div><div id="hubOpponent" style="font-family:var(--fd);font-size:14px;font-weight:700;">—</div></div>
+        <div><div id="hubTeamName" style="font-family:var(--fd);font-size:20px;font-weight:800;">My Team</div><div id="hubRecord" style="font-size:12px;color:var(--text2);margin-top:2px;">0â€“0</div></div>
+        <div style="margin-left:auto;text-align:right;"><div style="font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">This Week vs</div><div id="hubOpponent" style="font-family:var(--fd);font-size:14px;font-weight:700;">â€”</div></div>
       </div>
       <div style="display:flex;gap:8px;">
         <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubProjScore" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent);">0.0</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Proj. Score</div></div>
-        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubOppScore" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--text2);">—</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Opp. Proj.</div></div>
-        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubStreak" style="font-family:var(--fd);font-size:22px;font-weight:900;">—</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Streak</div></div>
+        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubOppScore" style="font-family:var(--fd);font-size:22px;font-weight:900;color:var(--text2);">â€”</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Opp. Proj.</div></div>
+        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div id="hubStreak" style="font-family:var(--fd);font-size:22px;font-weight:900;">â€”</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Streak</div></div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <button onclick="goScreen('roster')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">👕</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">My Roster</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Set lineup</div></button>
-      <button onclick="goScreen('waiver')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Waiver Wire</div><div id="hubWaiverCount" style="font-size:11px;color:var(--text3);margin-top:2px;">— available</div></button>
-      <button onclick="goScreen('trades')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">⇄</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Trades</div><div id="hubPendingTrades" style="font-size:11px;color:var(--text3);margin-top:2px;">No offers</div></button>
-      <button onclick="goScreen('standings')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">🏆</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Standings</div><div id="hubStandingPos" style="font-size:11px;color:var(--text3);margin-top:2px;">—</div></button>
+      <button onclick="goScreen('roster')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">ðŸ‘•</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">My Roster</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Set lineup</div></button>
+      <button onclick="goScreen('waiver')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">ðŸ“‹</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Waiver Wire</div><div id="hubWaiverCount" style="font-size:11px;color:var(--text3);margin-top:2px;">â€” available</div></button>
+      <button onclick="goScreen('trades')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">â‡„</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Trades</div><div id="hubPendingTrades" style="font-size:11px;color:var(--text3);margin-top:2px;">No offers</div></button>
+      <button onclick="goScreen('standings')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:left;cursor:pointer;"><div style="font-size:24px;margin-bottom:6px;">ðŸ†</div><div style="font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text);">Standings</div><div id="hubStandingPos" style="font-size:11px;color:var(--text3);margin-top:2px;">â€”</div></button>
     </div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;"><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;">This Week's Matchups</div><div id="hubMatchups"></div></div>
-    <button onclick="advanceWeek()" id="hubAdvBtn" style="background:var(--green);border:none;border-radius:12px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;width:100%;">▶ Advance to Next Week</button>
+    <button onclick="advanceWeek()" id="hubAdvBtn" style="background:var(--green);border:none;border-radius:12px;padding:15px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#fff;cursor:pointer;width:100%;">â–¶ Advance to Next Week</button>
   </div>
   <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
-    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">🏠 Hub</button>
-    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
-    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
-    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
-    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">ðŸ  Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ‘• Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ“‹ Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">â‡„ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ† Stand.</button>
   </div>
 </div>
 
 <div id="roster" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
-    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">👕 My Roster</div>
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">â†</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">ðŸ‘• My Roster</div>
     <div id="rosterWeekLabel" style="margin-left:auto;font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;">Week 1</div>
   </div>
   <div style="background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 14px;flex-shrink:0;font-size:11px;color:var(--text3);">Tap Start/Bench to adjust lineup.</div>
   <div id="rosterContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;"></div>
   <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
-    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
-    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">👕 Roster</button>
-    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
-    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
-    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ  Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">ðŸ‘• Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ“‹ Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">â‡„ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ† Stand.</button>
   </div>
 </div>
 
 <div id="waiver" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
-    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">📋 Waiver Wire</div>
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">â†</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">ðŸ“‹ Waiver Wire</div>
   </div>
   <div style="padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;">
-    <div style="flex:1;position:relative;"><input type="text" id="waiverSearch" placeholder="Search…" oninput="renderWaiver()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;">🔍</span></div>
+    <div style="flex:1;position:relative;"><input type="text" id="waiverSearch" placeholder="Searchâ€¦" oninput="renderWaiver()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;">ðŸ”</span></div>
     <select id="waiverPos" onchange="renderWaiver()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:var(--fb);font-size:13px;outline:none;appearance:none;"><option value="ALL">All</option><option value="PG">PG</option><option value="SG">SG</option><option value="SF">SF</option><option value="PF">PF</option><option value="C">C</option></select>
   </div>
   <div id="waiverContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
   <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
-    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
-    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
-    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">📋 Wire</button>
-    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
-    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ  Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ‘• Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">ðŸ“‹ Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">â‡„ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ† Stand.</button>
   </div>
 </div>
 
 <div id="trades" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
-    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">⇄ Trades</div>
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">â†</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">â‡„ Trades</div>
   </div>
   <div id="tradesContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;"></div>
   <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
-    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
-    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
-    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
-    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">⇄ Trade</button>
-    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ  Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ‘• Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ“‹ Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">â‡„ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ† Stand.</button>
   </div>
 </div>
 
 <div id="standings" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
-    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">←</button>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">🏆 Standings</div>
+    <button onclick="goScreen('hub')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;">â†</button>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">ðŸ† Standings</div>
     <div id="standWeekLabel" style="margin-left:auto;font-family:var(--fd);font-size:11px;color:var(--text3);text-transform:uppercase;">Week 1</div>
   </div>
   <div id="standingsContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;"></div>
   <div style="background:var(--bg2);border-top:1px solid var(--border);display:flex;flex-shrink:0;">
-    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">🏠 Hub</button>
-    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">👕 Roster</button>
-    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">📋 Wire</button>
-    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">⇄ Trade</button>
-    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">🏆 Stand.</button>
+    <button onclick="goScreen('hub')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ  Hub</button>
+    <button onclick="goScreen('roster')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ‘• Roster</button>
+    <button onclick="goScreen('waiver')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">ðŸ“‹ Wire</button>
+    <button onclick="goScreen('trades')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;">â‡„ Trade</button>
+    <button onclick="goScreen('standings')" style="flex:1;padding:12px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);border:none;background:none;cursor:pointer;">ðŸ† Stand.</button>
   </div>
 </div>
 
@@ -4419,8 +4431,8 @@ async function startYourSeason(){
 <div id="waiverModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;">
   <div style="background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);">
     <div style="width:36px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 14px;"></div>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">📋 Claim Player</div>
-    <div id="waiverAddName" style="font-size:12px;color:var(--text2);margin-bottom:14px;">Adding: —</div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">ðŸ“‹ Claim Player</div>
+    <div id="waiverAddName" style="font-size:12px;color:var(--text2);margin-bottom:14px;">Adding: â€”</div>
     <div style="font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;">Drop from your roster:</div>
     <div id="waiverDropList" style="max-height:240px;overflow-y:auto;margin-bottom:14px;"></div>
     <div style="display:flex;gap:8px;">
@@ -4434,8 +4446,8 @@ async function startYourSeason(){
 <div id="tradeModal2" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;">
   <div style="background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 38px;width:100%;max-width:500px;border-top:1px solid var(--border);max-height:88dvh;overflow-y:auto;">
     <div style="width:36px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 14px;"></div>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">⇄ Propose Trade</div>
-    <div id="trade2Opponent" style="font-size:12px;color:var(--text2);margin-bottom:14px;">With: —</div>
+    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">â‡„ Propose Trade</div>
+    <div id="trade2Opponent" style="font-size:12px;color:var(--text2);margin-bottom:14px;">With: â€”</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
       <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:6px;">You Give</div><div id="trade2GiveList" style="max-height:200px;overflow-y:auto;"></div></div>
       <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:6px;">You Get</div><div id="trade2GetList" style="max-height:200px;overflow-y:auto;"></div></div>
@@ -4453,7 +4465,7 @@ async function startYourSeason(){
 <!-- Paste this block before </body> in both rosterbate-draft.html and rosterbate-season.html -->
 
 <style>
-/* ── CHAT PANEL ── */
+/* â”€â”€ CHAT PANEL â”€â”€ */
 .rb-chat-panel{width:360px;max-width:360px;height:auto;min-height:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;box-shadow:inset 1px 0 0 rgba(255,255,255,.02);}
 
 /* Header */
@@ -4551,7 +4563,7 @@ async function startYourSeason(){
 <div class="rb-react-picker" id="rbReactPicker" style="display:none;"></div>
 
 <script>
-// ── CHAT STATE ─────────────────────────────────────────────
+// â”€â”€ CHAT STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const RB_CHAT_KEY_PREFIX = 'rosterbateChat:';
 const RB_MY_ID = (getSavedMultiplayerLobbyState()?.myId)
                || (typeof D !== 'undefined' && D.myPlayerId ? D.myPlayerId : '')
@@ -4637,6 +4649,7 @@ function rbResetDraftRoomChat(){
 
 // Load from localStorage
 function rbLoadChat(){
+  if(typeof S === 'undefined' || !S) return;
   if(rbUseRealtimeDraftChat()) return;
   try{
     const key=rbRefreshChatKey();
@@ -4684,7 +4697,7 @@ function rbTime(ts){
   return d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── OPEN/CLOSE ──────────────────────────────────────────────
+// â”€â”€ OPEN/CLOSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function rbToggleChat(){
   rbChatOpen = true;
   rbLoadChat();
@@ -4709,7 +4722,7 @@ function rbUpdateUnread(){
   else el.classList.remove('show');
 }
 
-// ── TABS ────────────────────────────────────────────────────
+// â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function rbSwitchTab(tab,btn){
   rbActiveTab=tab;
   document.querySelectorAll('.rb-chat-tab').forEach(b=>b.classList.remove('on'));
@@ -4725,14 +4738,14 @@ function rbFilteredMsgs(){
   return rbChat.msgs;
 }
 
-// ── RENDER ──────────────────────────────────────────────────
+// â”€â”€ RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function rbRender(){
   const msgs = rbFilteredMsgs();
   const el = document.getElementById('rbMsgs');
   if(!el) return;
 
   if(!msgs.length){
-    el.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);"><div style="font-size:36px;">💬</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No messages yet</div><div style="font-size:12px;">Be the first to say something!</div></div>';
+    el.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);"><div style="font-size:36px;">ðŸ’¬</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No messages yet</div><div style="font-size:12px;">Be the first to say something!</div></div>';
     return;
   }
 
@@ -4787,7 +4800,7 @@ function rbRenderMsg(m,idx){
       ${hasReacts?`<div class="rb-reactions">${reactHtml}</div>`:''}
       <div class="rb-msg-time">${rbTime(m.ts)}</div>
     </div>
-    <button class="rb-msg-react-btn" data-msgid="${m.id}">😊</button>
+    <button class="rb-msg-react-btn" data-msgid="${m.id}">ðŸ˜Š</button>
   </div>`;
 }
 
@@ -4800,13 +4813,13 @@ function rbScrollBottom(){
   if(el) el.scrollTop=el.scrollHeight;
 }
 
-// ── SEND ────────────────────────────────────────────────────
+// â”€â”€ SEND â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function rbSend(){
   const input=document.getElementById('rbInput');
   const btn=document.getElementById('rbSendBtn');
   const text=(input?.value||'').trim();
   
-  console.log('🔍 Draft chat send attempt:', {
+  console.log('ðŸ” Draft chat send attempt:', {
     text: text,
     rbUseRealtime: rbUseRealtimeDraftChat(),
     chatPath: rbGetChatMessagesPath(),
@@ -4815,7 +4828,7 @@ async function rbSend(){
   });
   
   if(!text) {
-    console.warn('⚠️ No text to send');
+    console.warn('âš ï¸ No text to send');
     return;
   }
   
@@ -4832,12 +4845,12 @@ async function rbSend(){
   rbClosePickersAll();
   
   try {
-    console.log('📤 Sending draft chat message...');
+    console.log('ðŸ“¤ Sending draft chat message...');
     await rbPostMsg({type:'text',text,tag:chatTag});
-    console.log('✅ Draft chat message sent successfully');
+    console.log('âœ… Draft chat message sent successfully');
     rbUpdateSendBtn(); // Re-enable if there's text
   } catch(e) {
-    console.error('❌ Draft chat send failed:', e);
+    console.error('âŒ Draft chat send failed:', e);
     // Restore the message
     if(input && !input.value) {
       input.value = originalText;
@@ -4851,7 +4864,7 @@ async function rbPostMsg(extra){
   if(rbUseRealtimeDraftChat()){
     const path=rbGetChatMessagesPath();
     if(!path) {
-      console.error('❌ No chat path available');
+      console.error('âŒ No chat path available');
       throw new Error('Chat path not available');
     }
     
@@ -4864,13 +4877,13 @@ async function rbPostMsg(extra){
       ...extra
     };
     
-    console.log('📤 Pushing to Firebase:', path, messageData);
+    console.log('ðŸ“¤ Pushing to Firebase:', path, messageData);
     
     try {
       await db.ref(path).push(messageData);
-      console.log('✅ Message pushed to Firebase successfully');
+      console.log('âœ… Message pushed to Firebase successfully');
     } catch(e) {
-      console.error('❌ Firebase push failed:', e);
+      console.error('âŒ Firebase push failed:', e);
       throw e;
     }
     return;
@@ -4927,8 +4940,8 @@ function rbInsertAt(text){
   rbUpdateSendBtn();
 }
 
-// ── REACTIONS ───────────────────────────────────────────────
-const RB_QUICK_REACTS=['👍','😂','🔥','💀','😤','🏆','😭','🤝'];
+// â”€â”€ REACTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const RB_QUICK_REACTS=['ðŸ‘','ðŸ˜‚','ðŸ”¥','ðŸ’€','ðŸ˜¤','ðŸ†','ðŸ˜­','ðŸ¤'];
 
 function rbShowReactPicker(msgId,e){
   e.stopPropagation();
@@ -4962,16 +4975,16 @@ function rbToggleReaction(msgId,emoji){
   rbRender();
 }
 
-// ── EMOJI PICKER ────────────────────────────────────────────
+// â”€â”€ EMOJI PICKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const RB_EMOJI_CATS = {
-  '😄':{label:'Smileys',emojis:['😀','😂','🤣','😊','😍','🥰','😎','🤩','😏','😒','😤','😡','🤬','😭','😢','🥹','😱','🤯','🥳','🤔','🫡','😴','🤢','🤮','🥴','😵','🤑','🤫','🤭','🫣','😇','🤠','🤡','👻','💀','☠️','🫶','💪','🫵']},
-  '🏀':{label:'Sports',emojis:['🏀','🏈','⚾','⚽','🏒','🎾','🏆','🥇','🥈','🥉','🎯','🎱','🏋️','🤼','🤺','🏇','🤾','🤸','⛹️','🏌️','🤽','🚴','🏄','🧗','🤿','🎽','🥊','🥋','🎿','🛷','🥌']},
-  '🔥':{label:'Hype',emojis:['🔥','💥','⚡','✨','🌟','💫','🎉','🎊','🎮','🎲','🃏','🎰','🏅','🎖️','🥇','👑','💎','🚀','💣','💸','🤑','💰','📈','🤝','👊','✊','🫡']},
-  '😤':{label:'Trash',emojis:['😤','😤','💩','🤡','👀','🙄','😑','😐','😬','🫠','🥱','🫥','😶','😶‍🌫️','🤥','😈','👿','💀','☠️','🗑️','📉','🤣','😹','🙈','🙉','🙊']},
-  '👋':{label:'Gestures',emojis:['👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','🤲','🤝','🙏','💅']},
+  'ðŸ˜„':{label:'Smileys',emojis:['ðŸ˜€','ðŸ˜‚','ðŸ¤£','ðŸ˜Š','ðŸ˜','ðŸ¥°','ðŸ˜Ž','ðŸ¤©','ðŸ˜','ðŸ˜’','ðŸ˜¤','ðŸ˜¡','ðŸ¤¬','ðŸ˜­','ðŸ˜¢','ðŸ¥¹','ðŸ˜±','ðŸ¤¯','ðŸ¥³','ðŸ¤”','ðŸ«¡','ðŸ˜´','ðŸ¤¢','ðŸ¤®','ðŸ¥´','ðŸ˜µ','ðŸ¤‘','ðŸ¤«','ðŸ¤­','ðŸ«£','ðŸ˜‡','ðŸ¤ ','ðŸ¤¡','ðŸ‘»','ðŸ’€','â˜ ï¸','ðŸ«¶','ðŸ’ª','ðŸ«µ']},
+  'ðŸ€':{label:'Sports',emojis:['ðŸ€','ðŸˆ','âš¾','âš½','ðŸ’','ðŸŽ¾','ðŸ†','ðŸ¥‡','ðŸ¥ˆ','ðŸ¥‰','ðŸŽ¯','ðŸŽ±','ðŸ‹ï¸','ðŸ¤¼','ðŸ¤º','ðŸ‡','ðŸ¤¾','ðŸ¤¸','â›¹ï¸','ðŸŒï¸','ðŸ¤½','ðŸš´','ðŸ„','ðŸ§—','ðŸ¤¿','ðŸŽ½','ðŸ¥Š','ðŸ¥‹','ðŸŽ¿','ðŸ›·','ðŸ¥Œ']},
+  'ðŸ”¥':{label:'Hype',emojis:['ðŸ”¥','ðŸ’¥','âš¡','âœ¨','ðŸŒŸ','ðŸ’«','ðŸŽ‰','ðŸŽŠ','ðŸŽ®','ðŸŽ²','ðŸƒ','ðŸŽ°','ðŸ…','ðŸŽ–ï¸','ðŸ¥‡','ðŸ‘‘','ðŸ’Ž','ðŸš€','ðŸ’£','ðŸ’¸','ðŸ¤‘','ðŸ’°','ðŸ“ˆ','ðŸ¤','ðŸ‘Š','âœŠ','ðŸ«¡']},
+  'ðŸ˜¤':{label:'Trash',emojis:['ðŸ˜¤','ðŸ˜¤','ðŸ’©','ðŸ¤¡','ðŸ‘€','ðŸ™„','ðŸ˜‘','ðŸ˜','ðŸ˜¬','ðŸ« ','ðŸ¥±','ðŸ«¥','ðŸ˜¶','ðŸ˜¶â€ðŸŒ«ï¸','ðŸ¤¥','ðŸ˜ˆ','ðŸ‘¿','ðŸ’€','â˜ ï¸','ðŸ—‘ï¸','ðŸ“‰','ðŸ¤£','ðŸ˜¹','ðŸ™ˆ','ðŸ™‰','ðŸ™Š']},
+  'ðŸ‘‹':{label:'Gestures',emojis:['ðŸ‘‹','ðŸ¤š','ðŸ–ï¸','âœ‹','ðŸ––','ðŸ«±','ðŸ«²','ðŸ«³','ðŸ«´','ðŸ‘Œ','ðŸ¤Œ','ðŸ¤','âœŒï¸','ðŸ¤ž','ðŸ«°','ðŸ¤Ÿ','ðŸ¤˜','ðŸ¤™','ðŸ‘ˆ','ðŸ‘‰','ðŸ‘†','ðŸ–•','ðŸ‘‡','â˜ï¸','ðŸ‘','ðŸ‘Ž','âœŠ','ðŸ‘Š','ðŸ¤›','ðŸ¤œ','ðŸ‘','ðŸ™Œ','ðŸ«¶','ðŸ¤²','ðŸ¤','ðŸ™','ðŸ’…']},
 };
 
-let rbEmojiCat = '😄';
+let rbEmojiCat = 'ðŸ˜„';
 
 function rbToggleEmoji(){
   const ep=document.getElementById('rbEmojiPicker');
@@ -4993,7 +5006,7 @@ function rbRenderEmoji(){
   ).join('');
 }
 
-// ── GIF PICKER ──────────────────────────────────────────────
+// â”€â”€ GIF PICKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Using Tenor GIF API (free, no key needed for basic usage)
 // Falls back to curated sports GIFs if API unavailable
 const RB_FALLBACK_GIFS = [
@@ -5030,7 +5043,7 @@ function rbSearchGifs(query){
   clearTimeout(rbGifTimer);
   if(!query.trim()){rbShowFallbackGifs();return;}
   rbGifTimer=setTimeout(async()=>{
-    document.getElementById('rbGifGrid').innerHTML='<div class="rb-gif-loading">🔍 Searching...</div>';
+    document.getElementById('rbGifGrid').innerHTML='<div class="rb-gif-loading">ðŸ” Searching...</div>';
     try{
       // Tenor API v2 - free tier
       const res=await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query+' sports')}&key=AIzaSyAyimkuYQYF_FXVALexPzpBFLaEFtSPLsA&limit=12&media_filter=gif`);
@@ -5065,7 +5078,7 @@ function rbClosePickersAll(){
   document.getElementById('rbGifPicker')?.classList.remove('open');
 }
 
-// ── SYSTEM MESSAGES ─────────────────────────────────────────
+// â”€â”€ SYSTEM MESSAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function rbPostSystem(text, tag='draft'){
   if(rbUseRealtimeDraftChat()) return;
   rbLoadChat();
@@ -5075,20 +5088,20 @@ function rbPostSystem(text, tag='draft'){
   rbUpdateUnread();
 }
 
-// ── SIMULATE AI CHAT ACTIVITY ───────────────────────────────
+// â”€â”€ SIMULATE AI CHAT ACTIVITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const RB_AI_MSGS=[
-  ['🔥 Just grabbed {player} off waivers. Y\'all sleepin!','trades'],
+  ['ðŸ”¥ Just grabbed {player} off waivers. Y\'all sleepin!','trades'],
   ['Who wants to trade? Looking for a C','trades'],
-  ['This lineup is LOCKED in 💪','draft'],
-  ['Good luck this week everyone... you\'re gonna need it 😤','trash'],
-  ['That pick was TERRIBLE 💀','draft'],
+  ['This lineup is LOCKED in ðŸ’ª','draft'],
+  ['Good luck this week everyone... you\'re gonna need it ðŸ˜¤','trash'],
+  ['That pick was TERRIBLE ðŸ’€','draft'],
   ['Can\'t believe {player} fell this far in the draft','draft'],
   ['My team is built different fr','draft'],
-  ['Bro really started {player} with no game today 😂','trash'],
+  ['Bro really started {player} with no game today ðŸ˜‚','trash'],
   ['{player} going OFF tonight, thank me later','draft'],
-  ['Let\'s get this W 🏆','draft'],
+  ['Let\'s get this W ðŸ†','draft'],
   ['Anyone else\'s team look elite rn?','draft'],
-  ['That trade offer is lowball bro come on 😑','trades'],
+  ['That trade offer is lowball bro come on ðŸ˜‘','trades'],
 ];
 const RB_AI_PLAYERS=['Jokic','Luka','SGA','Giannis','LeBron','Curry','Tatum','AD','KD','Wemby'];
 
@@ -5206,13 +5219,13 @@ async function rbInitRealtimeDraftChat(){
 function rbEnsureChatListenerActive() {
   if (!rbUseRealtimeDraftChat()) return;
   if (!rbRealtimeChatRef || !rbRealtimeChatListener) {
-    console.warn('⚠️ Chat listener not active, reinitializing...');
+    console.warn('âš ï¸ Chat listener not active, reinitializing...');
     rbRealtimeChatReady = false;
     rbInitRealtimeDraftChat();
   }
 }
 
-// ── INIT ────────────────────────────────────────────────────
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Post system message on load
 (async function(){
   try{
@@ -5237,10 +5250,14 @@ function rbEnsureChatListenerActive() {
     rbMarkSeen();
     setTimeout(()=>rbScrollBottom(),50);
     rbSimulateActivity();
-    if(shouldAutoLaunchMultiplayerDraft()){
+    if (shouldAutoLaunchMultiplayerDraft()) {
       startDraft();
       finishDraftBoot('draft');
     } else {
+      const lobbyState = getSavedMultiplayerLobbyState();
+      if (currentRbUser && lobbyState?.lobbyId) {
+        ensureLobbyPlayerIndex(lobbyState.lobbyId, currentRbUser.uid).catch(()=>{});
+      }
       finishDraftBoot('lobby');
     }
 
@@ -5273,7 +5290,7 @@ function rbEnsureChatListenerActive() {
   }catch(err){
     console.error(err);
     const pill=document.getElementById('sportLobbyPill');
-    if(pill) pill.textContent='⚠️ Real player data failed to load';
+    if(pill) pill.textContent='âš ï¸ Real player data failed to load';
   }
   if(document.body.dataset.draftBoot!=='ready') finishDraftBoot('lobby');
 })();
@@ -5287,5 +5304,6 @@ window.addEventListener('beforeunload', ()=>{
 <script src="/site-background.js"></script>
 </body>
 </html>
+
 
 

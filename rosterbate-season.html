@@ -5857,6 +5857,7 @@ function rbEnsureChatState(){
 }
 
 function rbLoadChat(){
+  if(!D || typeof D !== 'object') return;
   if(!D || typeof D !== 'object') return; // Don't load chat if D doesn't exist yet
   rbEnsureChatState();
   let local = { msgs:[], lastSeen:0 };
