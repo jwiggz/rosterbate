@@ -1562,7 +1562,7 @@ function buildPowerupCardsHtml(){
       </div>
       <div class="hub-powerup-status" style="color:${slot.active?'#86efac':'#cbd5e1'};border-color:${slot.active?'#166534':'#24324a'};background:${slot.active?'#0f2418':'#0f1724'};">${powerupStatusLabel(id)}</div>
       <div class="hub-powerup-copy">${meta.description}</div>
-      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` ? Ready in Week ${inv.cooldownUntilWeek}`:'}</div>
+      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` - Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
       ${action}
     </div>`;
   }).join('');
@@ -3104,7 +3104,7 @@ function renderHub(){
       </div>
       <div class="hub-powerup-status" style="color:${slot.active?'#86efac':'#cbd5e1'};border-color:${slot.active?'#166534':'#24324a'};background:${slot.active?'#0f2418':'#0f1724'};">${powerupStatusLabel(id)}</div>
       <div class="hub-powerup-copy">${meta.description}</div>
-      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` ? Ready in Week ${inv.cooldownUntilWeek}`:'}</div>
+      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` - Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
       ${action}
     </div>`;
   }).join('');
@@ -3301,7 +3301,7 @@ function renderMatchup(){
 }
 
 let rosterRenderTimer = null;
-window.scheduleRosterRender = function scheduleRosterRender(){
+function scheduleRosterRender(){
   if(rosterRenderTimer) clearTimeout(rosterRenderTimer);
   rosterRenderTimer = setTimeout(()=>{
     rosterRenderTimer = null;
@@ -3309,7 +3309,8 @@ window.scheduleRosterRender = function scheduleRosterRender(){
       renderRoster();
     }
   }, 0);
-};
+}
+window.scheduleRosterRender = scheduleRosterRender;
 
 function refreshRosterRow(pid, day){
   const row = document.querySelector(`tr[data-pid="${pid}"]`);
