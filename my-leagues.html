@@ -136,7 +136,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
-const SHARED_SEASON_ROOT = 'sharedSeasons';
+const SHARED_SEASON_ROOT = 'multiplayerSeasons';
 let currentUser = null;
 let currentUserNumber = 0;
 let currentUsername = '';
@@ -270,12 +270,12 @@ function buildLobbyState(id,lobby,member){
 }
 
 function buildLobbyStateFromSeason(id,payload,member){
-  const draft=payload?.draft||{};
+  const draft=(payload?.draft && typeof payload.draft === 'object') ? payload.draft : (payload||{});
   const teamUsers=Object.values(draft.teamUsers||{});
   return {
     lobbyId:id,
     seasonId:id,
-    sharedSeasonId:id,
+    sharedSeasonId:String(draft.sharedSeasonId || draft.seasonId || draft.lobbyId || id),
     name:draft.leagueName||'RosterBate League',
     sport:draft.sport||'nba',
     format:draft.draftFormat||'snake',
@@ -402,9 +402,10 @@ async function loadMyLeagues(){
   console.log('🔄 Loading leagues...');
   setBanner('Loading your leagues…');
   
-  const [lobbiesSnap,seasonsSnap]=await Promise.all([
+  const [lobbiesSnap,seasonsSnap,legacySeasonsSnap]=await Promise.all([
     db.ref('lobbies').once('value').catch(()=>null),
-    db.ref(SHARED_SEASON_ROOT).once('value').catch(()=>null)
+    db.ref(SHARED_SEASON_ROOT).once('value').catch(()=>null),
+    db.ref('sharedSeasons').once('value').catch(()=>null)
   ]);
 
   // DRAFT ROOMS - use global variable
@@ -461,6 +462,31 @@ async function loadMyLeagues(){
         updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
         payload,
         member
+      });
+    });
+  }
+  if(legacySeasonsSnap?.exists?.()){
+    legacySeasonsSnap.forEach(child=>{
+      if(seasons.find(x=>x.id===child.key)) return;
+      const payload=child.val()||{};
+      const member=getSeasonMember(payload);
+      if(!member) return;
+      if(memberIsMarkedLeft(payload, member)) return;
+      const draft=payload.draft||{};
+      seasons.push({
+        id:child.key,
+        name:draft.leagueName||'RosterBate League',
+        sport:draft.sport||'nba',
+        format:draft.draftFormat||'snake',
+        scoring:draft.scoringFormat||'h2h_pts',
+        teamSize:Number(draft.leagueSize||Object.keys(draft.teamUsers||{}).length||0),
+        mySeat:Number(member.teamIdx||0)+1,
+        complete:!!payload.game?.isSeasonComplete,
+        updatedAt:Number(payload.updatedAt||0),
+        updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
+        payload,
+        member,
+        source:'sharedSeasons'
       });
     });
   }
@@ -640,6 +666,10 @@ function openSeasonLeague(id,sport){
   const state=buildLobbyStateFromSeason(id,row.payload,row.member);
   try{
     localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
+    const draftPayload=(row.payload?.draft && typeof row.payload.draft === 'object') ? row.payload.draft : row.payload;
+    if(draftPayload && typeof draftPayload === 'object'){
+      localStorage.setItem('rosterbateDraft', JSON.stringify(draftPayload));
+    }
   }catch(e){}
   window.location.href='rosterbate-season.html?sport='+encodeURIComponent(sport||row.sport||'nba')+'&league='+encodeURIComponent(id);
 }
