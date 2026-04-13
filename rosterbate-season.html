@@ -4065,7 +4065,7 @@ function renderMatchup(){
 }
 
 let rosterRenderTimer = null;
-function scheduleRosterRender(){
+window.scheduleRosterRender = function scheduleRosterRender(){
   if(rosterRenderTimer) clearTimeout(rosterRenderTimer);
   rosterRenderTimer = setTimeout(()=>{
     rosterRenderTimer = null;
@@ -4073,7 +4073,7 @@ function scheduleRosterRender(){
       renderRoster();
     }
   }, 0);
-}
+};
 
 function refreshRosterRow(pid, day){
   const row = document.querySelector(`tr[data-pid="${pid}"]`);
