@@ -636,7 +636,7 @@
         </div>
 
         <div class="rb-chat-row">
-          <textarea class="rb-chat-textarea" id="rbInput" placeholder="Message the league…" rows="1"
+          <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Message the league…" rows="1"
             oninput="rbAutoResize(this);rbUpdateSendBtn()"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
           <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
@@ -2363,7 +2363,7 @@ function startDraft(){
   const rd=rules.rosterSize;
   const lobbyState=getSavedMultiplayerLobbyState();
   const allowSoloTest=!!(lobbyState?.soloTest && lobbyState?.lobbyId);
-  const teamName=document.getElementById('iName').value.trim();
+  const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
   if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
@@ -5287,3 +5287,5 @@ window.addEventListener('beforeunload', ()=>{
 <script src="/site-background.js"></script>
 </body>
 </html>
+
+

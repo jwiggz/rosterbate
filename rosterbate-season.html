@@ -331,6 +331,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .cscore-head{font-family:var(--fd);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border);}
 .cscore-cell{padding:9px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;color:var(--text2);font-size:13px;}
 .cscore-cell:nth-child(2n){justify-content:flex-end;}
+.spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,.1);border-left-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -1827,7 +1829,7 @@ function handleRosterAction(action){
   }
   rosterActionPane = rosterActionPane===action ? '' : action;
   moveCtx=null;
-  renderRoster();
+  scheduleRosterRender();
 }
 function closeIlModal(){
   const modal=document.getElementById('ilModal');
@@ -1952,7 +1954,7 @@ function confirmDropPlayer(){
   if(!dropCandidate.fromIL) rebuildLineupsAfterRosterChange(D.myPos);
   closeDropModal();
   rosterActionPane='';
-  renderRoster();
+  scheduleRosterRender();
   renderWaiver();
   renderHub();
   if(document.getElementById('commissioner')?.classList.contains('active')) renderCommissioner();
@@ -1982,7 +1984,7 @@ function undoRecentDrop(dropId){
   renderCommissioner();
   renderWaiver();
   renderHub();
-  if(document.getElementById('roster')?.classList.contains('active')) renderRoster();
+  if(document.getElementById('roster')?.classList.contains('active')) scheduleRosterRender();
   toast('Restored '+drop.player.name+'.');
 }
 
@@ -2055,12 +2057,12 @@ function closeMoveModal(){
 function startMoveMode(pid,day){
   if(day<G.day||isDayRevealed(day)){toast('That day is locked after reveal.');return;}
   moveCtx={pid,day};
-  renderRoster();
+  scheduleRosterRender();
 }
 
 function clearMoveMode(){
   moveCtx=null;
-  renderRoster();
+  scheduleRosterRender();
 }
 
 function canMoveToRosterEntry(sourcePlayer,day,entry,starterIds,roster){
@@ -2174,7 +2176,7 @@ function activatePowerup(id,config){
   if(slot.active){
     if(config?.targetId!==undefined) slot.targetId=config.targetId;
     renderHub();
-    if(document.getElementById('roster').classList.contains('active')) renderRoster();
+    if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
     queueSharedSeasonSave('update_powerup');
     toast(POWERUP_LIBRARY[id].name+' updated');
     return;
@@ -2188,7 +2190,7 @@ function activatePowerup(id,config){
   inv.cooldownUntilWeek=G.week+POWERUP_LIBRARY[id].cooldown+1;
   Object.assign(slot,{active:true},config||{});
   renderHub();
-  if(document.getElementById('roster').classList.contains('active')) renderRoster();
+  if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
   queueSharedSeasonSave('activate_powerup');
   toast(POWERUP_LIBRARY[id].name+' activated');
 }
@@ -2522,7 +2524,7 @@ function lockMoneyBallSlot(slotIndex, day){
     lockedAt:Date.now()
   };
   queueSharedSeasonSave('money_ball_lock');
-  renderRoster();
+  scheduleRosterRender();
   if(document.getElementById('hub')?.classList.contains('active')) renderHub();
   if(document.getElementById('matchup')?.classList.contains('active')) renderMatchup();
   toast(`${slotEntry.player.name} locked into ${getMoneyBallSlotLabel(slotIndex)} for Week ${week}.`);
@@ -3520,7 +3522,7 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     queueSharedSeasonSave('season_complete');
     toast('Final day revealed. Season complete!');
     renderHub();
-    if(document.getElementById('roster').classList.contains('active')) renderRoster();
+    if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
     return;
   }
   G.day++;
@@ -3536,7 +3538,7 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     toast('Day '+revealDayNo+' results revealed.');
   }
   queueSharedSeasonSave('advance_day'); advanceWeek.disabled=false; renderHub();
-  if(document.getElementById('roster').classList.contains('active')) renderRoster();
+  if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
 }
 
 function buildLifetimeSeasonPayload(userNumber){
@@ -3970,7 +3972,33 @@ function renderMatchup(){
   </div>`;
 }
 
-function renderRoster(){
+function refreshRosterRow(pid, day){
+  const row = document.querySelector(`tr[data-pid="${pid}"]`);
+  if(!row) { scheduleRosterRender(); return; }
+  const teamIdx = D?.myPos??0;
+  const roster = G.rosters[teamIdx]||[];
+  const player = roster.find(p=>p.id===pid);
+  if(!player){ scheduleRosterRender(); return; }
+  const starterIds = getLineupForDay(day);
+  const entry = {
+    player: player,
+    slot: getCurrentRosterSlot(pid, day),
+    isStarter: starterIds.includes(pid),
+    isIL: getIlRoster(teamIdx).some(p=>p.id===pid),
+    index: starterIds.indexOf(pid)
+  };
+  // Build new row HTML (simplified for performance)
+  const newRowHtml = buildSingleRowHtml(entry, day);
+  row.outerHTML = newRowHtml;
+}
+
+function buildSingleRowHtml(entry, day){
+  // Reuse the existing row-building logic but for one player
+  // This is a placeholder; we'll implement a lightweight version
+  return ''; // We'll fill this manually after insertion
+}
+
+function renderRoster\(\)\{
   setSeasonSidePanelVisible('rosterPowerups', true);
   renderSidePowerups('rosterPowerups');
   const rosterNote=document.querySelector('#roster .season-page-note');
@@ -4428,13 +4456,13 @@ function applyMoveChoice(pid,day,targetSlot,targetBenchPlayerId=null,targetStart
     setLineupForDay(day,starterIds);
     queueSharedSeasonSave('move_player');
     moveCtx=null;
-    renderRoster();
+    scheduleRosterRender();
     toast(player.name+' moved to bench.');
     return;
   }
 
   const targetIndex=Number.isInteger(targetStarterIndex)?targetStarterIndex:SLOT_LABELS.findIndex(slot=>slot===targetSlot);
-  if(targetIndex<0){moveCtx=null;renderRoster();return;}
+  if(targetIndex<0){moveCtx=null;scheduleRosterRender();return;}
   if(!canPlayerFillSlot(player,targetSlot)){
     toast(player.name+' is not eligible for '+targetSlot+'.');
     return;
@@ -4444,7 +4472,7 @@ function applyMoveChoice(pid,day,targetSlot,targetBenchPlayerId=null,targetStart
   const displacedInjury=displacedPlayer?getInjuryStatus(displacedPlayer,weekForDay(day)):null;
   if(displacedId===pid){
     moveCtx=null;
-    renderRoster();
+    scheduleRosterRender();
     return;
   }
   starterIds[targetIndex]=pid;
@@ -4459,7 +4487,7 @@ function applyMoveChoice(pid,day,targetSlot,targetBenchPlayerId=null,targetStart
   setLineupForDay(day,starterIds);
   queueSharedSeasonSave('move_player');
   moveCtx=null;
-  renderRoster();
+  scheduleRosterRender();
   const displacedMovedToIl=currentSlot===ilSlotKey && displacedPlayer && isIlEligiblePlayer(displacedPlayer,displacedInjury) && currentIndex<0;
   toast(displacedPlayer?`${player.name} moved to ${targetSlot}; ${displacedPlayer.name} moved to ${displacedMovedToIl?ilSlotKey:'bench'}.`:`${player.name} moved to ${targetSlot}.`);
 }
@@ -4481,7 +4509,7 @@ function toggleStartDay(pid,day){
     updated=[...current,pid];
   }
   setLineupForDay(day,updated);
-  renderRoster();
+  scheduleRosterRender();
 }
 
 function toggleStart(pid){toggleStartDay(pid,rosterViewDay||G.day);}
@@ -4498,7 +4526,7 @@ function movePlayerToIL(pid){
   ilRoster.push(player);
   rebuildLineupsAfterRosterChange(D.myPos);
   queueSharedSeasonSave('move_to_il');
-  renderRoster();
+  scheduleRosterRender();
   toast(player.name+' moved to '+getIlSlotKey()+'.');
 }
 
@@ -4512,7 +4540,7 @@ function activatePlayerFromIL(pid){
   G.rosters[D.myPos].push(player);
   rebuildLineupsAfterRosterChange(D.myPos);
   queueSharedSeasonSave('activate_from_il');
-  renderRoster();
+  scheduleRosterRender();
   toast(player.name+' activated from '+getIlSlotKey()+'.');
 }
 
@@ -4521,7 +4549,7 @@ function autoSetDay(day){
   const roster=G.rosters[D.myPos]||[];
   const newStarters=buildBestLineupIdsForRoster(roster,day);
   setLineupForDay(day,newStarters);
-  renderRoster();
+  scheduleRosterRender();
   const withGames=newStarters.map(id=>roster.find(p=>p.id===id)).filter(p=>p&&getGameInfo(p,day)).length;
   toast('Auto-set: '+withGames+'/'+STARTERS+' starters have games');
 }
@@ -4670,7 +4698,7 @@ function openWaiver(pid){
     claimWaiverPlayerToTeam(playerToAdd,null);
     wAdd=null;
     renderWaiver();
-    renderRoster();
+    scheduleRosterRender();
     renderHub();
     if(document.getElementById('commissioner')?.classList.contains('active')) renderCommissioner();
     return;
@@ -5650,7 +5678,7 @@ function commRoster(){
   const pos=CS.positions;
   const posRows=Object.entries(pos).map(([p,v])=>`
       <div class="cpos-cell">${p}</div>
-    <div class="cpos-cell"><input type="number" class="cnum" min="0" max="10" value="${v.starters}" onchange="CS.positions['${p}'].starters=+this.value;syncCommissionerRosterTotals();syncSportSlotsFromCommissioner();saveCS();if(document.getElementById('roster')?.classList.contains('active')) renderRoster();if(document.getElementById('hub')?.classList.contains('active')) renderHub();commRoster()"></div>
+    <div class="cpos-cell"><input type="number" class="cnum" min="0" max="10" value="${v.starters}" onchange="CS.positions['${p}'].starters=+this.value;syncCommissionerRosterTotals();syncSportSlotsFromCommissioner();saveCS();if(document.getElementById('roster')?.classList.contains('active')) scheduleRosterRender();if(document.getElementById('hub')?.classList.contains('active')) renderHub();commRoster()"></div>
     <div class="cpos-cell"><input type="text" class="cnum" value="${v.max}" onchange="CS.positions['${p}'].max=this.value;saveCS()"></div>`).join('');
   document.getElementById('commContent').innerHTML=`
     <div class="csection">Roster Settings</div>
@@ -5877,6 +5905,8 @@ function commPlayoffs(){
 
 /* GIF loading state */
 .rb-gif-loading{text-align:center;padding:20px;color:var(--text3);font-size:12px;}
+.spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,.1);border-left-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 
 <!-- Reaction picker popup -->
@@ -6392,6 +6422,15 @@ function rbClosePickersAll(){
 <script src="/site-background.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 
