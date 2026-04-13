@@ -2368,13 +2368,19 @@ window.onload=async function(){
                 }
                 
                 if (!seasonLoaded) {
-                  try {
-                    console.log('?? Initializing season from localStorage data...');
-                    initSeason();
-                    console.log('? Season initialized successfully');
-                  } catch(initErr) {
-                    console.error('? Season init failed:', initErr);
-                    toast('Could not open the league: ' + initErr.message);
+                  if (Array.isArray(D?.allRosters) && D.allRosters.length) {
+                    try {
+                      console.log('?? Initializing season from localStorage data...');
+                      initSeason();
+                      console.log('? Season initialized successfully');
+                    } catch(initErr) {
+                      console.error('? Season init failed:', initErr);
+                      toast('Could not open the league: ' + initErr.message);
+                      return;
+                    }
+                  } else {
+                    console.warn('Local season payload is incomplete and could not be hydrated from shared state.');
+                    toast('That league is still syncing. Please reopen it in a moment.');
                     return;
                   }
                 }
@@ -2462,13 +2468,19 @@ window.onload=async function(){
           }
           
           if (!seasonLoaded) {
-            try {
-              console.log('?? Initializing season from Firebase data...');
-              initSeason();
-              console.log('? Season initialized successfully');
-            } catch(initErr) {
-              console.error('? Local season init failed:', initErr);
-              toast('Could not open the league: ' + initErr.message);
+            if (Array.isArray(D?.allRosters) && D.allRosters.length) {
+              try {
+                console.log('?? Initializing season from Firebase data...');
+                initSeason();
+                console.log('? Season initialized successfully');
+              } catch(initErr) {
+                console.error('? Local season init failed:', initErr);
+                toast('Could not open the league: ' + initErr.message);
+                return;
+              }
+            } else {
+              console.warn('Firebase season payload is missing allRosters and could not be hydrated from shared state.');
+              toast('That league is still syncing. Please try opening it again in a moment.');
               return;
             }
           }
@@ -2540,11 +2552,17 @@ window.onload=async function(){
           seasonLoaded=false;
         }
         if(!seasonLoaded){
-          try{
-            initSeason();
-          }catch(initErr){
-            console.error('Local season init failed.', initErr);
-            toast('Could not open the finished draft in Season Manager.');
+          if(Array.isArray(D?.allRosters) && D.allRosters.length){
+            try{
+              initSeason();
+            }catch(initErr){
+              console.error('Local season init failed.', initErr);
+              toast('Could not open the finished draft in Season Manager.');
+              return;
+            }
+          } else {
+            console.warn('Saved season data is incomplete and could not be hydrated from shared state.');
+            toast('Could not load that league yet. Please reopen it from My Leagues in a moment.');
             return;
           }
         }
@@ -2583,12 +2601,16 @@ window.onload=async function(){
         goPage('hub');
         return;
       }
-      try{
-        initSeason();
-        goPage('hub');
-        return;
-      }catch(initErr){
-        console.error('Lobby season fallback init failed.', initErr);
+      if(Array.isArray(D?.allRosters) && D.allRosters.length){
+        try{
+          initSeason();
+          goPage('hub');
+          return;
+        }catch(initErr){
+          console.error('Lobby season fallback init failed.', initErr);
+        }
+      } else {
+        console.warn('Lobby season fallback skipped because no hydrated roster data is available yet.');
       }
     }catch(e){console.error(e);}
   }
@@ -2710,6 +2732,9 @@ function initSeason(){
   
   if(!D.seasonId) D.seasonId=getRequestedLeagueId() || D.leagueId || null;
   console.log('?? Season ID:', D.seasonId);
+  if(!Array.isArray(D?.allRosters) || !D.allRosters.length){
+    throw new Error('Season data is incomplete: allRosters is missing');
+  }
   
   G.rosters=D.allRosters.map(r=>r.map(p=>({...p})));
   console.log('?? G.rosters populated:', G.rosters.length, 'teams');
@@ -3051,11 +3076,10 @@ function renderHub(){
   const mp2=getTeamWeekRevealedScore(mp,G.week),op=oi>=0?getTeamWeekRevealedScore(oi,G.week):0;
   const hpEl=document.getElementById('hubProj');hpEl.textContent=mp2.toFixed(1);hpEl.style.color=mp2>=op?'var(--green)':'var(--red)';
   document.getElementById('hubOppProj').textContent=op>0?op.toFixed(1):'-';
-  document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'-';
   const pend=(G.tradeOffers||[]).filter(t=>t.toTeam===mp&&t.status==='pending').length;
   const srt=[...liveStandings].sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
-  const rk=srt.findIndex(s=>s.teamIdx===mp)+1;
-  document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'-';
+  const rankPos=srt.findIndex(s=>s.teamIdx===mp)+1;
+  document.getElementById('hubRank').textContent=rankPos>0?ord(rankPos)+' place':'-';
   const games=weekGames(G.week);
   const standingsEl=document.getElementById('hubStandingsMini');
   if(standingsEl){
