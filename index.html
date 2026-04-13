@@ -617,22 +617,6 @@
       </div>
     </a>
 
-  <a href="rosterbate-season.html?sport=nba" class="cta-card green" id="season-card">
-      <div class="cta-top">
-        <div class="cta-emoji">🏆</div>
-        <div class="cta-title">TRY IT NOW<span>Manage your team all season</span></div>
-      </div>
-      <div class="cta-desc">Set daily lineups, work the waiver wire, propose trades, track standings, and compete in weekly head-to-head matchups against real people or AI.</div>
-      <div class="cta-btn">Open Season Manager →</div>
-      <div class="cta-tags">
-        <span class="tag">Daily lineups</span>
-        <span class="tag">Waiver wire</span>
-        <span class="tag">Trades</span>
-        <span class="tag">Standings</span>
-        <span class="tag">Injury status</span>
-        <span class="tag">Commissioner tools</span>
-      </div>
-    </a>
   </div>
 
   <!-- Leaderboard -->
@@ -1079,7 +1063,6 @@ function updateHomeSportUI(){
   document.getElementById('sportSectionLabel').textContent = 'Get Started — ' + HOME_SPORT_LABELS[sport];
   document.getElementById('single-player-card').href = 'rosterbate-draft.html?sport=' + sport;
   document.getElementById('multiplayer-card').href = 'rosterbate-matchmaking.html?sport=' + sport;
-  document.getElementById('season-card').href = 'rosterbate-season.html?sport=' + sport;
 }
 
 function selectSportCard(sport){
