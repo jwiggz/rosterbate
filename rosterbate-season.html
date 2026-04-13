@@ -422,21 +422,21 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
                 <div class="rb-emoji-grid" id="rbEmojiGrid"></div>
               </div>
               <div class="rb-gif-picker" id="rbGifPicker">
-                <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFsï¿½ (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
-                <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">?? Type to search GIFs</div></div>
+                <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
+                <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">Type to search GIFs</div></div>
               </div>
               <div class="rb-chat-replybar" id="rbReplyBar" style="display:none;"></div>
               <div class="rb-chat-toolbar">
                 <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">??</button>
                 <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
-                <button class="rb-tool-btn" onclick="rbInsertAt('?? ')" title="Trash talk">??</button>
-                <button class="rb-tool-btn" onclick="rbInsertAt('?? ')" title="Skull">??</button>
+                <button class="rb-tool-btn" onclick="rbInsertAt('&#128293; ')" title="Trash talk">&#128293;</button>
+                <button class="rb-tool-btn" onclick="rbInsertAt('&#128128; ')" title="Skull">&#128128;</button>
               </div>
               <div class="rb-chat-row">
-                <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Talk your trashï¿½" rows="1"
+                <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Talk your trash..." rows="1"
                   oninput="rbAutoResize(this);rbUpdateSendBtn()"
                   onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
-                <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>?</button>
+                <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>&#10148;</button>
               </div>
             </div>
           </div>
@@ -465,7 +465,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="roster" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('hub')">?</button>
+      <button class="season-back" onclick="goPage('hub')">&larr;</button>
       <div>
         <div class="season-subbar-title">My Team</div>
         <div class="season-subbar-copy" id="rWk"></div>
@@ -490,7 +490,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="matchup" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('roster')">?</button>
+      <button class="season-back" onclick="goPage('roster')">&larr;</button>
       <div>
         <div class="season-subbar-title">Matchup</div>
         <div class="season-subbar-copy" id="mWk"></div>
@@ -515,7 +515,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="waiver" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('hub')">?</button>
+      <button class="season-back" onclick="goPage('hub')">&larr;</button>
       <div>
         <div class="season-subbar-title">Players</div>
         <div class="season-subbar-copy">Free agents and waiver claims</div>
@@ -545,7 +545,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <!-- TRADES -->
 <div id="trades" class="screen">
   <div class="ph" style="position:relative;">
-    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">?</button>
+    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">&larr;</button>
     <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="tradesHomeLink">&#127936; Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="pt">? Trades</div>
 <div style="margin-left:auto;"><button class="tpb" onclick="openPicker()">&#128101; Teams</button></div>
@@ -563,7 +563,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="standings" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('hub')">?</button>
+      <button class="season-back" onclick="goPage('hub')">&larr;</button>
       <div>
         <div class="season-subbar-title">Standings</div>
         <div class="season-subbar-copy" id="sWk"></div>
@@ -586,7 +586,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <!-- COMMISSIONER -->
 <div id="commissioner" class="screen">
   <div class="ph" style="position:relative;">
-    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">?</button>
+    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">&larr;</button>
     <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">&#127936; Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="pt">&#9881;&#65039; Commissioner</div>
     <div id="commSaved" style="margin-left:auto;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;opacity:0;transition:opacity .3s;">Saved ?</div>
@@ -1823,7 +1823,7 @@ function renderFreeAgencyModal(){
       <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#f8fafc;">${p.name}<span class="pb2">${p.pos}</span>${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-        <div class="pd">${p.team} ï¿½ ${Number(p.fp||0).toFixed(1)} FP ï¿½ ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+        <div class="pd">${p.team} - ${Number(p.fp||0).toFixed(1)} FP - ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
       </div>
       <button onclick="claimFreeAgentFromModal(${p.id})" class="season-outline-btn" style="padding:8px 14px;white-space:nowrap;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Select</button>
     </div>`;
@@ -1876,7 +1876,7 @@ function renderManageIlModal(){
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;">${ini(player.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#f8fafc;">${player.name}<span class="pb2">${player.pos}</span></div>
-        <div class="pd">${slotLabel} ï¿½ ${player.team} ï¿½ ${Number(player.fp||0).toFixed(1)} FP</div>
+        <div class="pd">${slotLabel} - ${player.team} - ${Number(player.fp||0).toFixed(1)} FP</div>
       </div>
       ${actionHtml}
     </div>`;
@@ -1922,7 +1922,7 @@ function openDropPlayerModal(){
       <div class="pav" style="background:${tc(item.player.team)};width:30px;height:30px;font-size:11px;">${ini(item.player.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#f8fafc;">${item.player.name}<span class="pb2">${item.player.pos}</span></div>
-        <div class="pd">${item.slot} ï¿½ ${item.player.team} ï¿½ ${Number(item.player.fp||0).toFixed(1)} FP</div>
+        <div class="pd">${item.slot} - ${item.player.team} - ${Number(item.player.fp||0).toFixed(1)} FP</div>
       </div>
       <div style="font-family:var(--fd);font-size:11px;color:var(--red);font-weight:700;">Drop</div>
     </div>`).join('') : `<div style="padding:12px;color:var(--text2);text-align:center;">No players available to drop.</div>`;
@@ -2938,7 +2938,7 @@ function waiverCell(player,key){
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
       <div style="min-width:0;">
         <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
-        <div style="font-size:11px;color:#6b7280;">${player.team} ï¿½ ${player.pos}</div>
+        <div style="font-size:11px;color:#6b7280;">${player.team} - ${player.pos}</div>
       </div>
       </div>
       <div style="display:flex;align-items:flex-end;gap:8px;flex-shrink:0;">
@@ -2948,7 +2948,7 @@ function waiverCell(player,key){
           title="${watched?'Remove from':'Add to'} watch list"
           aria-label="${watched?'Remove from':'Add to'} watch list"
           style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${watched?'rgba(250,204,21,.45)':'#24324a'};background:${watched?'rgba(250,204,21,.14)':'#0f1724'};color:${watched?'#facc15':'#94a3b8'};font-size:16px;font-weight:900;cursor:pointer;flex-shrink:0;transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;"
-        >${watched?'?':'?'}</button>
+        >${watched?'&#9733;':'&#9734;'}</button>
         <button
           type="button"
           onclick="openWaiver(${player.id})"
@@ -2981,7 +2981,7 @@ function waiverCell(player,key){
   if(typeof value==='number'){
     return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
   }
-  return value!=null && value!=='' ? String(value) : 'ï¿½';
+  return value!=null && value!=='' ? String(value) : '-';
 }
 
 function toggleWaiverSort(key){
@@ -3953,7 +3953,7 @@ function renderMatchup(){
   const day=matchupViewDay;
   const week=weekForDay(day);
   const matchup=getMatchupForTeamDay(D.myPos,day);
-  document.getElementById('mWk').textContent=`Week ${week} ï¿½ ${DAY_NAMES[dayOfWeek(day)-1]} ${getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'})}`;
+  document.getElementById('mWk').textContent=`Week ${week} - ${DAY_NAMES[dayOfWeek(day)-1]} ${getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'})}`;
   if(!matchup){
     document.getElementById('matchupContent').innerHTML=`<div style="padding:20px;">
       <div class="season-table-card season-card-pad" style="text-align:center;">
@@ -4019,7 +4019,7 @@ function renderMatchup(){
             <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
             <div class="season-player-wrap" style="min-width:0;">
               <div class="season-player-name" style="font-weight:700;color:#f8fafc;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-              <div class="season-soft-muted">${p.team} ${p.pos} ï¿½ ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+              <div class="season-soft-muted">${p.team} ${p.pos} - ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
             </div>
           </div>
         </td>
@@ -4036,7 +4036,7 @@ function renderMatchup(){
           <div style="min-width:0;">
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;font-weight:700;">${sideLabel}</div>
             <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${teamName}</div>
-            <div class="season-soft-muted" style="margin-top:6px;">${standing.w}-${standing.l} ï¿½ ${weekTotal.toFixed(1)} week revealed</div>
+            <div class="season-soft-muted" style="margin-top:6px;">${standing.w}-${standing.l} - ${weekTotal.toFixed(1)} week revealed</div>
           </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -4071,9 +4071,9 @@ function renderMatchup(){
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="font-size:14px;color:#dbe4f0;">Matchup Day:</span>
-          <button class="season-back" onclick="matchupViewDay=Math.max(1,matchupViewDay-1);renderMatchup()">ï¿½</button>
+          <button class="season-back" onclick="matchupViewDay=Math.max(1,matchupViewDay-1);renderMatchup()">&larr;</button>
           ${dayChips}
-          <button class="season-back" onclick="matchupViewDay=Math.min(TOTAL_DAYS(),matchupViewDay+1);renderMatchup()">ï¿½</button>
+          <button class="season-back" onclick="matchupViewDay=Math.min(TOTAL_DAYS(),matchupViewDay+1);renderMatchup()">&rarr;</button>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="season-stat-pill">Week ${week}</span>
@@ -4250,7 +4250,7 @@ function renderRoster(){
         <td${rowCellAttr}>${entry.slot}</td>
         <td${rowCellAttr}>
           <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
-            <div class="pav" style="background:#1f2937;width:34px;height:34px;font-size:12px;color:#94a3b8;">ï¿½</div>
+            <div class="pav" style="background:#1f2937;width:34px;height:34px;font-size:12px;color:#94a3b8;">-</div>
             <div class="season-player-wrap" style="min-width:0;">
               <div style="font-weight:700;color:#94a3b8;">Empty ${entry.slot} slot</div>
               <div class="season-soft-muted">${entry.isIL?'Stash an injured player here to open an active roster spot.':'Choose an eligible player from your bench or IL to fill this spot.'}</div>
@@ -4329,7 +4329,7 @@ function renderRoster(){
           <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
           <div class="season-player-wrap" style="min-width:0;">
             <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-            <div class="season-soft-muted">${p.team} ${p.pos} ï¿½ ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+            <div class="season-soft-muted">${p.team} ${p.pos} - ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
           </div>
         </div>
       </td>
@@ -4358,7 +4358,7 @@ function renderRoster(){
           <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
           <div class="season-player-wrap" style="min-width:0;">
             <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-            <div class="season-soft-muted">${entry.slot==='BN'?'Bench':entry.slot} ï¿½ ${p.team} ${p.pos}</div>
+            <div class="season-soft-muted">${entry.slot==='BN'?'Bench':entry.slot} - ${p.team} ${p.pos}</div>
           </div>
         </div>
       </td>
@@ -4376,7 +4376,7 @@ function renderRoster(){
         <button type="button" class="season-mini-tab ${rosterTab==='schedule'?'on':''}" onclick="rosterTab='schedule';renderRoster()">Schedule</button>
       </div>`;
   const dateSummary=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <div class="season-soft-muted" style="font-size:14px;white-space:nowrap;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} ï¿½ Week ${week}</div>
+    <div class="season-soft-muted" style="font-size:14px;white-space:nowrap;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} - Week ${week}</div>
     ${rosterTab==='stats' ? `<span class="season-stat-pill">${isPast?'Revealed Score: '+Number(revealedScore||0).toFixed(1):'Results hidden until reveal'}</span>` : ''}
   </div>`;
   const rosterMain=rosterTab==='schedule'
@@ -4432,7 +4432,7 @@ function renderRoster(){
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
               <div style="font-family:var(--fb);font-size:26px;font-weight:800;color:#f8fafc;">${D.teamName}</div>
-              <div class="season-soft-muted" style="font-size:14px;">${myStanding.w}-${myStanding.l} (${rk>0?ord(rk):'ï¿½'} of ${D.teams.length})</div>
+              <div class="season-soft-muted" style="font-size:14px;">${myStanding.w}-${myStanding.l} (${rk>0?ord(rk):'-'} of ${D.teams.length})</div>
             </div>
             <div class="season-team-link" style="margin-top:6px;">${D.leagueName||'RosterBate League'}</div>
             <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;">
@@ -4453,9 +4453,9 @@ function renderRoster(){
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="font-size:14px;color:#dbe4f0;">Set Lineup:</span>
-          <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">ï¿½</button>
+          <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">&larr;</button>
           ${dayChips}
-          <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">ï¿½</button>
+          <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">&rarr;</button>
           ${dateSummary}
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:5;pointer-events:auto;">
@@ -4500,7 +4500,7 @@ function pRow(p,slot,isS,day,isPast){
     const hlColor=game.isHome?'var(--text2)':'#93c5fd';
     gameInfo=`<div style="display:flex;align-items:center;gap:5px;margin-top:2px;flex-wrap:wrap;">
       <span style="font-family:var(--fd);font-size:11px;font-weight:800;color:${hlColor};">${matchup}</span>
-      <span style="font-size:10px;color:var(--text3);">ï¿½</span>
+      <span style="font-size:10px;color:var(--text3);">-</span>
       <span style="font-size:10px;color:var(--text3);">${game.time}</span>
       <span style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:3px;padding:0px 4px;font-family:var(--fd);font-size:9px;font-weight:800;color:var(--green);">${game.isHome?'HOME':'AWAY'}</span>
     </div>`;
@@ -4524,7 +4524,7 @@ function pRow(p,slot,isS,day,isPast){
         <span class="pb2">${p.pos}</span>
         ${injuryBadge}
       </div>
-      <div class="pd">${p.team} ï¿½ ${p.fp}fp ï¿½ ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
+      <div class="pd">${p.team} - ${p.fp}fp - ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
       ${gameInfo}
     </div>
     ${actionBtn}
@@ -4630,7 +4630,7 @@ function toggleStartDay(pid,day){
   if(current.includes(pid)){
     updated=current.filter(id=>id!==pid);
   } else {
-    if(current.length>=STARTERS){toast('Starter slots full ï¿½ bench someone first');return;}
+    if(current.length>=STARTERS){toast('Starter slots full - bench someone first');return;}
     const selected=roster.filter(p=>current.includes(p.id));
     const trial=buildBestLineupIdsForRoster([...selected,player],day);
     if(!trial.includes(pid)){toast('That player does not fit an open starter slot.');return;}
@@ -4737,7 +4737,7 @@ function renderWaiver(){
     </div>`;
     return;
   }
-  const arrow=(key)=>waiverSortKey===key?(waiverSortDir==='desc'?' ?':' ?'):'';
+  const arrow=(key)=>waiverSortKey===key?(waiverSortDir==='desc'?' &#9660;':' &#9650;'):'';
   const scheduleHeader=scheduleDays.map(d=>{
     const dt=getSeasonDayDate(d);
     return `<th class="season-schedule-head">
@@ -4905,7 +4905,7 @@ function renderTrades(){
       <div class="pav" style="background:${col};width:36px;height:36px;font-size:14px;">${nm[0]}</div>
       <div style="flex:1;"><div style="font-family:var(--fd);font-size:15px;font-weight:700;">${nm}</div>
       <div style="font-size:11px;color:var(--text2);">${G.rosters[ti]?.length||0} players</div></div>
-      <div style="color:var(--text3);font-size:18px;">ï¿½</div></button>`;
+      <div style="color:var(--text3);font-size:18px;">+</div></button>`;
   });
   if(sent.length){
     h+=`<div class="sl">Sent Offers</div>`;
@@ -4966,8 +4966,8 @@ function renderTradeForm(){
     return`<div onclick="toggleTr('${side}',${p.id})" style="display:flex;align-items:center;gap:6px;background:${bg};border:1px solid ${bd};border-radius:7px;padding:7px 9px;cursor:pointer;margin-bottom:4px;">
       <div class="pav" style="background:${tc(p.team)};width:26px;height:26px;font-size:10px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;"><div style="font-family:var(--fd);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-      <div style="font-size:10px;color:var(--text3);">${p.pos} ï¿½ ${p.fp}fp</div></div>
-      ${sel?`<span style="color:${side==='give'?'var(--green)':'var(--accent)'};font-size:14px;">?</span>`:''}
+      <div style="font-size:10px;color:var(--text3);">${p.pos} - ${p.fp}fp</div></div>
+      ${sel?`<span style="color:${side==='give'?'var(--green)':'var(--accent)'};font-size:14px;">&#10003;</span>`:''}
     </div>`;
   }
   document.getElementById('trGive').innerHTML=myR.map(p=>pr(p,'give')).join('');
@@ -4975,7 +4975,7 @@ function renderTradeForm(){
   const gv=trP.give.reduce((s,id)=>{const p=myR.find(x=>x.id===id);return s+(p?p.fp:0);},0);
   const gt=trP.get.reduce((s,id)=>{const p=thR.find(x=>x.id===id);return s+(p?p.fp:0);},0);
   const d=(gt-gv).toFixed(1);
-  document.getElementById('trFair').textContent=trP.give.length&&trP.get.length?(Math.abs(gt-gv)<10?'? Fair trade':gt>gv?'?? Favors you (+'+d+' FP)':'?? Favors them ('+d+' FP)'):'Select players to send and receive.';
+  document.getElementById('trFair').textContent=trP.give.length&&trP.get.length?(Math.abs(gt-gv)<10?'Fair trade':gt>gv?'Favors you (+'+d+' FP)':'Favors them ('+d+' FP)'):'Select players to send and receive.';
   document.getElementById('trConfirm').disabled=!(trP.give.length&&trP.get.length);
 }
 
@@ -5059,7 +5059,7 @@ function renderStandingsTeamDetails(teamIdx){
     <div class="pav" style="background:${tc(entry.team)};width:32px;height:32px;font-size:12px;">${ini(entry.name)}</div>
     <div style="min-width:0;flex:1;">
       <div style="font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.name}</div>
-      <div style="font-size:12px;color:#94a3b8;">${entry.team} ${entry.pos} ï¿½ ${getRosterbatePlayerSummary(entry,CURRENT_SPORT)}</div>
+      <div style="font-size:12px;color:#94a3b8;">${entry.team} ${entry.pos} - ${getRosterbatePlayerSummary(entry,CURRENT_SPORT)}</div>
     </div>
   </div>`;
   return `<div class="season-table-card">
@@ -5068,7 +5068,7 @@ function renderStandingsTeamDetails(teamIdx){
         <div class="pav" style="background:${TCOLORS[ti%TCOLORS.length]};width:54px;height:54px;font-size:20px;">${ini(nm)}</div>
         <div style="min-width:0;">
           <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;">${nm}</div>
-          <div style="font-size:13px;color:#94a3b8;margin-top:6px;">${(st.w||0)}-${(st.l||0)} ï¿½ ${(st.pf||0).toFixed(1)} PF ï¿½ ${(st.pa||0).toFixed(1)} PA</div>
+          <div style="font-size:13px;color:#94a3b8;margin-top:6px;">${(st.w||0)}-${(st.l||0)} - ${(st.pf||0).toFixed(1)} PF - ${(st.pa||0).toFixed(1)} PA</div>
         </div>
       </div>
       <button type="button" onclick="selectedStandingsTeamIdx=null;renderStandings()" class="season-outline-btn">Close</button>
@@ -5279,13 +5279,13 @@ function openViewer(ti){
     const inj=getInjuryStatus(p,G.week);
     const injBadge=inj?`<span style="background:${inj.color}22;border:1px solid ${inj.color}55;border-radius:999px;padding:2px 7px;font-family:var(--fb);font-size:10px;font-weight:700;color:${inj.color};margin-left:4px;">${inj.label}</span>`:'';
     const game=getGameInfo(p,G.day);
-    const gameInfo=game?`<span style="font-size:11px;color:#94a3b8;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} ï¿½ ${game.time}</span>`:`<span style="font-size:11px;color:#64748b;margin-top:1px;display:block;">No game today</span>`;
+    const gameInfo=game?`<span style="font-size:11px;color:#94a3b8;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} - ${game.time}</span>`:`<span style="font-size:11px;color:#64748b;margin-top:1px;display:block;">No game today</span>`;
     return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #24324a;">
       <div style="width:34px;font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;flex-shrink:0;">${slot}</div>
       <div class="pav" style="background:${tc(p.team)};width:32px;height:32px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;flex-wrap:wrap;"><span style="font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;">${p.name}</span><span style="display:inline-block;padding:2px 6px;border-radius:999px;font-family:var(--fb);font-size:10px;font-weight:700;margin-left:6px;background:#eff6ff;color:#2563eb;">${p.pos}</span>${injBadge}</div>
-        <div style="font-size:12px;color:#94a3b8;">${p.team} ï¿½ ${p.fp}fp ï¿½ ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
+        <div style="font-size:12px;color:#94a3b8;">${p.team} - ${p.fp}fp - ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
         ${gameInfo}
       </div>
       <span style="background:${isS?'rgba(34,197,94,.14)':'#0f1724'};border:1px solid ${isS?'rgba(34,197,94,.35)':'#24324a'};border-radius:999px;padding:3px 9px;font-family:var(--fb);font-size:10px;font-weight:700;color:${isS?'#86efac':'#94a3b8'};">${isS?'START':'BN'}</span>
@@ -5877,7 +5877,7 @@ function commAcq(){
       <div class="crow">
         <div>
           <div class="clabel">${drop.player.name}</div>
-          <div class="csub">${drop.teamName} ï¿½ ${drop.fromIL?getIlSlotKey():'Roster'} ï¿½ ${activityAge(drop.droppedAt)}</div>
+          <div class="csub">${drop.teamName} - ${drop.fromIL?getIlSlotKey():'Roster'} - ${activityAge(drop.droppedAt)}</div>
         </div>
         <button class="season-outline-btn" style="padding:8px 14px;" onclick="undoRecentDrop('${drop.id}')">Undo Drop</button>
       </div>`).join('');
@@ -6138,7 +6138,7 @@ function rbTime(ts){
   if(diff<60000) return 'just now';
   if(diff<3600000) return Math.floor(diff/60000)+'m ago';
   if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' ï¿½ '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' - '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 }
 
 function rbEscHtml(s){
@@ -6186,7 +6186,7 @@ function rbRenderReplyBar(){
       <div class="rb-chat-replymeta">Replying to ${rbEscHtml(msg.sender)}</div>
       <div class="rb-chat-replytext">${rbEscHtml(preview)}</div>
     </div>
-    <button class="rb-chat-replyclose" onclick="rbClearReply()" aria-label="Cancel reply">ï¿½</button>
+    <button class="rb-chat-replyclose" onclick="rbClearReply()" aria-label="Cancel reply">&times;</button>
   `;
   bar.style.display='flex';
 }
@@ -6248,7 +6248,7 @@ function rbRenderMsg(m){
   return `<div class="rb-msg${isMe?' me':''}">
     <div class="rb-msg-av" style="background:${col}">${rbGetTeamAvatar(m.sender)}</div>
     <div class="rb-msg-body">
-      <div class="rb-msg-name">${rbEscHtml(isMe ? `${m.sender} ï¿½ You` : m.sender)}</div>
+      <div class="rb-msg-name">${rbEscHtml(isMe ? `${m.sender} - You` : m.sender)}</div>
       <div class="rb-bubble-wrap">
         ${replyHtml}
         ${bubbleInner}
