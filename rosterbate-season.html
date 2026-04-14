@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>RosterBate â€” Season Manager</title>
+<title>RosterBate - Season Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -67,6 +67,10 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-card{background:#121a29;border:1px solid #24324a;border-radius:14px;padding:16px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
     .hub-card.compact{padding:14px 16px;}
 .hub-card-title{font-family:var(--fb);font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:14px;text-align:center;}
+.hub-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.hub-card-head-copy{min-width:0;flex:1;}
+.hub-card-sub{font-size:11px;color:#94a3b8;line-height:1.45;margin-top:4px;}
+.hub-card-meta{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;white-space:nowrap;}
 .hub-summary{position:relative;overflow:hidden;background:linear-gradient(135deg,#121a29 0%,#172234 100%);border:1px solid #24324a;border-radius:14px;padding:18px 18px 16px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
 .hub-summary:before{content:'';position:absolute;inset:auto -40px -10px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(251,146,60,.12),transparent 62%);pointer-events:none;}
     .hub-summary-top{display:grid;grid-template-columns:minmax(320px,1fr) minmax(180px,220px);align-items:start;gap:18px;margin-bottom:16px;position:relative;z-index:1;}
@@ -100,6 +104,102 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-now-value{font-family:var(--fb);font-size:18px;font-weight:800;line-height:1.1;color:#f8fafc;}
 .season-now-copy{font-size:12px;color:#cbd5e1;line-height:1.45;flex:1;}
 .season-now-link{font-size:12px;font-weight:700;color:#93c5fd;text-decoration:none;cursor:pointer;background:none;border:none;padding:0;text-align:left;font-family:var(--fb);}
+.trade-builder-shell{margin-bottom:14px;border-color:rgba(249,115,22,.28);background:linear-gradient(180deg,rgba(18,26,41,.98),rgba(12,18,29,.98));}
+.trade-builder-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.trade-builder-badges,.trade-builder-impact,.trade-builder-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.trade-builder-summary,.trade-builder-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.trade-builder-summary-card{border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0;}
+.trade-builder-summary-card.send{background:linear-gradient(180deg,rgba(16,44,29,.92),rgba(15,23,36,.98));border:1px solid rgba(34,197,94,.25);}
+.trade-builder-summary-card.get{background:linear-gradient(180deg,rgba(46,23,12,.92),rgba(15,23,36,.98));border:1px solid rgba(249,115,22,.28);}
+.trade-builder-ready{margin-bottom:12px;border-radius:12px;padding:12px 14px;border:1px solid rgba(56,189,248,.28);background:linear-gradient(180deg,rgba(15,33,56,.92),rgba(15,23,36,.98));}
+.trade-builder-ready-title{font-family:var(--fb);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;}
+.trade-builder-ready-copy{font-size:12px;color:#dbe4f0;line-height:1.45;margin-top:6px;}
+.trade-builder-roster{max-height:260px;overflow-y:auto;padding-right:2px;}
+.trade-builder-player{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;margin-bottom:8px;width:100%;text-align:left;color:#f8fafc;transition:border-color .15s ease,background .15s ease,transform .15s ease,box-shadow .15s ease;}
+.trade-builder-player:hover{transform:translateY(-1px);border-color:#334155;background:#202a3b;}
+.trade-builder-player.selected-give{background:linear-gradient(180deg,rgba(16,44,29,.98),rgba(18,35,27,.98));border-color:rgba(34,197,94,.5);box-shadow:inset 0 0 0 1px rgba(34,197,94,.24),0 10px 24px rgba(16,44,29,.22);}
+.trade-builder-player.selected-get{background:linear-gradient(180deg,rgba(46,23,12,.98),rgba(39,25,18,.98));border-color:rgba(249,115,22,.55);box-shadow:inset 0 0 0 1px rgba(249,115,22,.24),0 10px 24px rgba(46,23,12,.24);}
+.trade-builder-player-copy{flex:1;min-width:0;}
+.trade-builder-player-meta{font-size:10px;color:#94a3b8;margin-top:2px;}
+.trade-builder-player-flag{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 8px;border:1px solid currentColor;}
+.trade-builder-player-flag.send{color:#86efac;background:rgba(34,197,94,.14);}
+.trade-builder-player-flag.get{color:#fdba74;background:rgba(249,115,22,.14);}
+.picker-shell{display:grid;gap:10px;}
+.picker-card{display:flex;align-items:center;gap:12px;background:#121a29;border:1px solid #24324a;border-radius:16px;padding:14px;cursor:pointer;box-shadow:0 10px 24px rgba(2,6,23,.2);transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.picker-card:hover{transform:translateY(-1px);border-color:#3b82f6;box-shadow:0 16px 28px rgba(2,6,23,.26);}
+.picker-card.mine{border-color:#7c4a18;background:linear-gradient(180deg,rgba(46,23,12,.9),rgba(18,26,41,.98));}
+.picker-rank{width:28px;font-family:var(--fb);font-size:15px;font-weight:800;text-align:center;color:#94a3b8;flex-shrink:0;}
+.picker-copy{flex:1;min-width:0;}
+.picker-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.picker-name{font-family:var(--fb);font-size:16px;font-weight:700;color:#f8fafc;}
+.picker-meta{font-size:12px;color:#94a3b8;margin-top:4px;}
+.picker-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.picker-side{text-align:right;flex-shrink:0;min-width:94px;}
+.picker-side-value{font-family:var(--fb);font-size:13px;font-weight:800;color:#f8fafc;}
+.picker-side-copy{font-size:11px;color:#94a3b8;margin-top:4px;}
+.viewer-shell{display:grid;gap:14px;}
+.viewer-hero{background:linear-gradient(135deg,#121a29 0%,#172234 100%);border:1px solid #24324a;border-radius:16px;padding:18px;box-shadow:0 10px 28px rgba(2,6,23,.28);position:relative;overflow:hidden;}
+.viewer-hero:before{content:'';position:absolute;inset:auto -50px -40px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.14),transparent 60%);pointer-events:none;}
+.viewer-hero-top{display:flex;align-items:flex-start;gap:12px;position:relative;z-index:1;}
+.viewer-hero-copy{flex:1;min-width:0;}
+.viewer-now-band{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;position:relative;z-index:1;}
+.viewer-now-card{background:#0f1724;border:1px solid #24324a;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:98px;}
+.viewer-now-card.alert{border-color:rgba(249,115,22,.32);background:linear-gradient(180deg,rgba(46,23,12,.92),rgba(15,23,36,.98));}
+.viewer-now-card.live{border-color:rgba(34,197,94,.28);background:linear-gradient(180deg,rgba(16,44,29,.92),rgba(15,23,36,.98));}
+.viewer-now-card.info{border-color:rgba(59,130,246,.28);background:linear-gradient(180deg,rgba(15,33,56,.9),rgba(15,23,36,.98));}
+.viewer-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;}
+.standings-team-detail-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;}
+.viewer-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(2,6,23,.2);}
+.viewer-panel-head{padding:14px 18px 12px;border-bottom:1px solid #24324a;}
+.viewer-panel-title{font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;}
+.viewer-panel-copy{font-size:12px;color:#94a3b8;margin-top:4px;}
+.viewer-list{padding:0 18px 6px;}
+.viewer-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+@media (max-width: 900px){
+  .viewer-now-band,.viewer-grid,.viewer-actions,.standings-team-detail-grid{grid-template-columns:1fr;}
+  .picker-card{align-items:flex-start;}
+  .picker-side{min-width:0;text-align:left;}
+}
+.comm-hero{background:linear-gradient(135deg,#121a29 0%,#172234 100%);border:1px solid #24324a;border-radius:14px;padding:18px;box-shadow:0 10px 28px rgba(2,6,23,.28);margin-bottom:14px;position:relative;overflow:hidden;}
+.comm-hero:before{content:'';position:absolute;inset:auto -50px -30px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(249,115,22,.12),transparent 62%);pointer-events:none;}
+.comm-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;position:relative;z-index:1;}
+.comm-hero-title{font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;}
+.comm-hero-copy{font-size:13px;color:#cbd5e1;line-height:1.55;margin-top:6px;max-width:760px;}
+.comm-hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;position:relative;z-index:1;}
+.comm-hero-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px;position:relative;z-index:1;}
+.comm-hero-stat{background:#0f1724;border:1px solid #24324a;border-radius:12px;padding:12px;min-height:92px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+.comm-hero-stat-value{font-family:var(--fb);font-size:26px;font-weight:800;color:#f8fafc;line-height:1.05;}
+.comm-hero-stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-top:8px;}
+.comm-overview-grid{display:grid;grid-template-columns:1.3fr .9fr;gap:14px;margin-bottom:14px;}
+.comm-overview-card{background:#121a29;border:1px solid #24324a;border-radius:14px;padding:16px;box-shadow:0 10px 28px rgba(2,6,23,.22);}
+.comm-overview-label{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#94a3b8;}
+.comm-overview-value{font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;line-height:1.1;margin-top:8px;}
+.comm-overview-copy{font-size:12px;color:#cbd5e1;line-height:1.5;margin-top:6px;}
+.comm-action-list{display:grid;gap:10px;}
+.comm-action-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;border:1px solid #24324a;background:#0f1724;}
+.comm-action-item.alert{border-color:rgba(249,115,22,.32);background:linear-gradient(180deg,rgba(46,23,12,.9),rgba(15,23,36,.98));}
+.comm-action-item.live{border-color:rgba(34,197,94,.26);background:linear-gradient(180deg,rgba(16,44,29,.9),rgba(15,23,36,.98));}
+.comm-action-text{min-width:0;flex:1;}
+.comm-action-title{font-family:var(--fb);font-size:15px;font-weight:800;color:#f8fafc;line-height:1.15;}
+.comm-action-copy{font-size:12px;color:#cbd5e1;line-height:1.45;margin-top:4px;}
+.comm-action-btn{border:1px solid #3b82f6;background:#0f1724;color:#93c5fd;border-radius:999px;padding:9px 14px;font-family:var(--fb);font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.comm-tab-rail{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 12px;flex-shrink:0;display:flex;gap:0;overflow-x:auto;}
+.ctab{padding:12px 14px;font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;}
+.ctab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.ctab.alert{color:#fdba74;}
+.ctab.live{color:#86efac;}
+@media (max-width: 900px){
+  .comm-overview-grid,.comm-hero-stats{grid-template-columns:1fr;}
+  .comm-action-item{flex-direction:column;align-items:flex-start;}
+  .comm-action-btn{width:100%;}
+}
+@media (max-width: 900px){
+  .trade-builder-summary,.trade-builder-grid{grid-template-columns:1fr;}
+  .trade-builder-shell{padding:14px;}
+  .trade-builder-actions{flex-direction:column;}
+  .trade-builder-actions .bs,.trade-builder-actions .bg,.trade-builder-head .season-outline-btn{width:100% !important;}
+  .trade-builder-roster{max-height:none;}
+}
 .hub-actions{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;}
     .hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:96px;border:1px solid #24324a;background:#121a29;color:#f8fafc;width:100%;border-radius:12px;padding:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;}
     .hub-action:hover{transform:translateY(-1px);border-color:#f59e0b;box-shadow:0 14px 26px rgba(2,6,23,.3);}
@@ -125,9 +225,9 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-score-name{font-size:13px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .hub-score-val{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;}
     .hub-standings-table{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
-    .hub-standings-head,.hub-standings-row{display:grid;grid-template-columns:minmax(0,1fr) 28px 28px 54px 54px;gap:8px;align-items:center;padding:8px 0;}
-    .hub-standings-head{font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.7px;}
-    .hub-standings-row{border-top:1px solid #1d283b;}
+.hub-standings-head,.hub-standings-row{display:grid;grid-template-columns:minmax(0,1fr) 28px 28px 54px 54px;gap:8px;align-items:center;padding:8px 0;}
+.hub-standings-head{font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.7px;}
+.hub-standings-row{border-top:1px solid #1d283b;background:transparent;color:inherit;font:inherit;appearance:none;-webkit-appearance:none;position:relative;z-index:6;pointer-events:auto;}
 .hub-standings-team{display:flex;align-items:center;gap:8px;min-width:0;}
 .hub-standings-name{font-size:13px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hub-standings-cell{font-size:12px;color:#dbe4f0;text-align:right;}
@@ -141,8 +241,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .hub-powerup-foot{font-size:11px;color:#94a3b8;}
 .hub-powerup-status{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;padding:3px 8px;border-radius:999px;background:#0f1724;border:1px solid #24324a;font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;color:#cbd5e1;}
 .season-screen-shell{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start;max-width:1680px;width:100%;margin:0 auto;padding:20px;}
-.season-screen-main{min-width:0;}
-.season-side-powerups{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.season-screen-main{min-width:0;position:relative;z-index:2;}
+.season-side-powerups{display:flex;flex-direction:column;gap:16px;min-width:0;position:relative;z-index:1;}
 .season-subbar{background:#121a29;border-bottom:1px solid #24324a;padding:14px 20px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:14px;}
 .season-subbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
 .season-back{border:1px solid #24324a;background:#0f1724;border-radius:10px;color:#dbe4f0;padding:8px 12px;font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;}
@@ -296,7 +396,9 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .season-topmeta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
     .season-chip{padding:8px 12px;border-radius:999px;border:1px solid #24324a;background:#0f1724;font-family:var(--fb);font-size:12px;font-weight:700;color:#dbe4f0;}
     .season-chip.primary{background:#22180d;border-color:#7c4a18;color:#fdba74;}
-    .season-chip.action{background:#121a29;color:#f8fafc;}
+    .season-chip.action{background:#121a29;color:#f8fafc;position:relative;z-index:12;pointer-events:auto;cursor:pointer;}
+.tpb{position:relative;z-index:12;pointer-events:auto;}
+.season-team-link-btn[data-open-picker]{position:relative;z-index:12;pointer-events:auto;cursor:pointer;}
     #hub .sb{background:#0b1220;}
     #hub .bg{background:#2563eb;color:#fff;border:none;}
     #hub .rb-chat-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;box-shadow:0 10px 28px rgba(2,6,23,.28);height:420px;max-height:420px;overflow:hidden;}
@@ -374,7 +476,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     <a href="index.html" class="rb-home-link" style="font-size:19px;" id="seasonHomeLink">&#127968; Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="season-topmeta">
       <div id="hubWeek" class="season-chip"></div>
-      <button class="season-chip action" onclick="openPicker()">&#128101; Teams</button>
+      <button type="button" class="season-chip action" onclick="openLeagueTeams()"><span aria-hidden="true">&#128101;</span> League Teams</button>
     </div>
   </div>
   <div class="sb">
@@ -397,7 +499,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
                 <div class="hub-summary-rec">
                   <a href="javascript:void(0)" onclick="goPage('commissioner')" style="color:#2563eb;text-decoration:none;">Settings</a>
                   &nbsp;|&nbsp;
-                  <a href="javascript:void(0)" onclick="openPicker()" style="color:#2563eb;text-decoration:none;">Members</a>
+                  <button type="button" onclick="openLeagueTeams()" class="season-team-link-btn" style="padding:0;background:none;border:none;color:#2563eb;text-decoration:none;">League Teams</button>
                   &nbsp;|&nbsp;
                   <a href="javascript:void(0)" onclick="goPage('roster')" style="color:#2563eb;text-decoration:none;">Rosters</a>
                 </div>
@@ -410,10 +512,10 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             </div>
           </div>
           <div class="hub-summary-stats">
-            <div class="hub-stat"><div id="hubOpp" class="hub-stat-value">â€”</div><div class="hub-stat-label">This Week</div></div>
-            <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">â€”</div><div class="hub-stat-label">Your Revealed</div></div>
-            <div class="hub-stat"><div id="hubOppProj" class="hub-stat-value" style="color:var(--text2);">â€”</div><div class="hub-stat-label">Opp Revealed</div></div>
-            <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">â€”</div><div class="hub-stat-label">Streak</div></div>
+            <div class="hub-stat"><div id="hubOpp" class="hub-stat-value">—</div><div class="hub-stat-label">This Week</div></div>
+            <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">—</div><div class="hub-stat-label">Your Revealed</div></div>
+            <div class="hub-stat"><div id="hubOppProj" class="hub-stat-value" style="color:var(--text2);">—</div><div class="hub-stat-label">Opp Revealed</div></div>
+            <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">—</div><div class="hub-stat-label">Streak</div></div>
           </div>
           <div class="hub-now-band" id="hubNowBand"></div>
           <div class="hub-actions" style="margin-top:12px;">
@@ -425,12 +527,22 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
         </div>
         <button id="advBtn" onclick="advanceWeek()" class="bg">? Advance to Next Week</button>
         <div class="hub-lower">
-          <div class="hub-card compact" style="display:flex;flex-direction:column;min-height:0;"><div class="hub-card-title">League Activity</div><div id="hubActivity" style="flex:1;"></div></div>
+          <div class="hub-card compact" style="display:flex;flex-direction:column;min-height:0;">
+            <div class="hub-card-head">
+              <div class="hub-card-head-copy">
+                <div class="hub-card-title" style="text-align:left;margin-bottom:0;">League Activity</div>
+                <div class="hub-card-sub">Trades, waivers, reveals, and commissioner moves in one running feed.</div>
+              </div>
+              <div class="hub-card-meta" id="hubActivityMeta">Quiet now</div>
+            </div>
+            <div id="hubActivity" style="flex:1;"></div>
+          </div>
           <div class="hub-card compact rb-chat-panel" id="rbChatPanel">
             <div class="rb-chat-hdr">
               <div style="flex:1">
                 <div class="rb-chat-title">Trash Talk</div>
                 <div class="rb-chat-online" id="rbOnlineCount">Season-long multiplayer thread</div>
+                <div class="hub-card-sub" id="rbChatPrompt" style="margin-top:6px;">Call your shot, answer trades, or stir the room before the next reveal.</div>
               </div>
             </div>
             <div class="rb-chat-msgs" id="rbMsgs"></div>
@@ -440,21 +552,21 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
                 <div class="rb-emoji-grid" id="rbEmojiGrid"></div>
               </div>
               <div class="rb-gif-picker" id="rbGifPicker">
-                <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFsâ€¦ (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
-                <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">?? Type to search GIFs</div></div>
+                <input type="text" class="rb-gif-search" id="rbGifSearch" placeholder="Search GIFs... (e.g. basketball, dunk)" oninput="rbSearchGifs(this.value)">
+                <div class="rb-gif-grid" id="rbGifGrid"><div class="rb-gif-loading">&#8987; Type to search GIFs</div></div>
               </div>
               <div class="rb-chat-replybar" id="rbReplyBar" style="display:none;"></div>
               <div class="rb-chat-toolbar">
-                <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">??</button>
+                <button class="rb-tool-btn" onclick="rbToggleEmoji()" title="Emoji">&#128578;</button>
                 <button class="rb-tool-btn" onclick="rbToggleGif()" title="GIF">GIF</button>
-                <button class="rb-tool-btn" onclick="rbInsertAt('?? ')" title="Trash talk">??</button>
-                <button class="rb-tool-btn" onclick="rbInsertAt('?? ')" title="Skull">??</button>
+                <button class="rb-tool-btn" onclick="rbInsertAt('&#128293; ')" title="Heat">&#128293;</button>
+                <button class="rb-tool-btn" onclick="rbInsertAt('&#128128; ')" title="Skull">&#128128;</button>
               </div>
               <div class="rb-chat-row">
-                <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Talk your trashâ€¦" rows="1"
+                <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Talk your trash..." rows="1"
                   oninput="rbAutoResize(this);rbUpdateSendBtn()"
                   onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
-                <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>?</button>
+                <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>&#10148;</button>
               </div>
             </div>
           </div>
@@ -508,7 +620,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="matchup" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('roster')">?</button>
+      <button class="season-back" onclick="goPage('roster')">‹</button>
       <div>
         <div class="season-subbar-title">Matchup</div>
         <div class="season-subbar-copy" id="mWk"></div>
@@ -533,14 +645,14 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="waiver" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('hub')">?</button>
+      <button class="season-back" onclick="goPage('hub')">‹</button>
       <div>
         <div class="season-subbar-title">Players</div>
         <div class="season-subbar-copy">Free agents and waiver claims</div>
       </div>
     </div>
     <div class="season-topmeta">
-      <button class="season-chip action" onclick="openPicker()">League</button>
+      <button type="button" class="season-chip action" onclick="openLeagueTeams()">League Teams</button>
       <a href="index.html" class="season-chip action" id="waiverHomeLink" style="text-decoration:none;">Home</a>
     </div>
   </div>
@@ -566,7 +678,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">Back</button>
     <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;" id="tradesHomeLink">&#127968; Roster<span style="color:var(--accent)">Bate</span></a>
     <div class="pt">Trade Desk</div>
-    <div style="margin-left:auto;"><button class="tpb" onclick="openPicker()">Teams</button></div>
+    <div style="margin-left:auto;"><button type="button" class="tpb" onclick="openLeagueTeams()">League Teams</button></div>
   </div>
   <div class="sbb season-light-body">
     <div class="season-screen-shell">
@@ -581,14 +693,14 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="standings" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('hub')">?</button>
+      <button class="season-back" onclick="goPage('hub')">‹</button>
       <div>
         <div class="season-subbar-title">Standings</div>
         <div class="season-subbar-copy" id="sWk"></div>
       </div>
     </div>
     <div class="season-topmeta">
-      <button class="season-chip action" onclick="openPicker()">League</button>
+      <button type="button" class="season-chip action" onclick="openLeagueTeams()">League Teams</button>
       <a href="index.html" class="season-chip action" style="text-decoration:none;">Home</a>
     </div>
   </div>
@@ -604,24 +716,27 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <!-- COMMISSIONER -->
 <div id="commissioner" class="screen">
   <div class="ph" style="position:relative;">
-    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">?</button>
-    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">?? Roster<span style="color:var(--accent)">Bate</span></a>
-    <div class="pt">?? Commissioner</div>
-    <div id="commSaved" style="margin-left:auto;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;opacity:0;transition:opacity .3s;">Saved ?</div>
+    <button class="bb" onclick="goPage('hub')" style="position:absolute;left:14px;">&#8249;</button>
+    <a href="index.html" class="rb-home-link" style="margin:0 auto;font-size:16px;">&#127968; Roster<span style="color:var(--accent)">Bate</span></a>
+    <div class="pt">Commissioner</div>
+    <div id="commSaved" style="margin-left:auto;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;opacity:0;transition:opacity .3s;">Saved</div>
   </div>
   <!-- Section tabs -->
-  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:0 12px;flex-shrink:0;display:flex;gap:0;overflow-x:auto;">
+  <div class="comm-tab-rail">
     <button class="ctab on" onclick="switchCommTab('basic',this)">Basic</button>
     <button class="ctab" onclick="switchCommTab('roster',this)">Roster</button>
     <button class="ctab" onclick="switchCommTab('scoring',this)">Scoring</button>
     <button class="ctab" onclick="switchCommTab('schedule',this)">Schedule</button>
-    <button class="ctab" onclick="switchCommTab('acq',this)">Acq/Waivers</button>
+    <button class="ctab" onclick="switchCommTab('acq',this)">Waivers</button>
     <button class="ctab" onclick="switchCommTab('trades',this)">Trades</button>
     <button class="ctab" onclick="switchCommTab('playoffs',this)">Playoffs</button>
   </div>
   <div class="sbb season-light-body">
     <div class="season-screen-shell">
-      <div class="season-screen-main" id="commContent"></div>
+      <div class="season-screen-main">
+        <div id="commOverview"></div>
+        <div id="commContent"></div>
+      </div>
       <aside class="season-side-powerups" id="commPowerups"></aside>
     </div>
   </div>
@@ -684,31 +799,13 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   </div>
 </div>
 
-<!-- TRADE MODAL -->
-<div class="mo" id="trModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">? Propose Trade</div>
-    <div id="trWith" style="font-size:12px;color:var(--text2);margin-bottom:14px;"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--green);margin-bottom:6px;">You Give</div><div id="trGive" style="max-height:180px;overflow-y:auto;"></div></div>
-      <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">You Get</div><div id="trGet" style="max-height:180px;overflow-y:auto;"></div></div>
-    </div>
-    <div id="trFair" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--text3);margin-bottom:14px;">Select players to send and receive.</div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="document.getElementById('trModal').classList.remove('open')" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
-      <button id="trConfirm" onclick="submitTrade()" class="bg" disabled>Send Offer</button>
-    </div>
-  </div>
-</div>
-
 <!-- TEAM PICKER MODAL -->
-<div class="mo" id="pickerModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="mo" id="pickerModal" onclick="if(event.target===this)closePickerModal()">
   <div class="ms">
     <div class="mh"></div>
     <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;margin-bottom:4px;">League Teams</div>
-    <div style="font-size:13px;color:#94a3b8;margin-bottom:14px;">Tap any team to view their full roster.</div>
-    <div id="pickerList"></div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:14px;">Open any team to inspect starters, bench depth, current matchup context, and quick trade pressure.</div>
+    <div id="pickerList" class="picker-shell"></div>
   </div>
 </div>
 
@@ -716,18 +813,38 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div class="mo" id="viewerModal" onclick="if(event.target===this)closeViewerModal()">
   <div class="ms">
     <div class="mh"></div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-      <div id="vAv" class="pav" style="width:52px;height:52px;font-size:20px;"></div>
-        <div style="flex:1;min-width:0;"><div id="vName" style="font-family:var(--fb);font-size:24px;font-weight:800;line-height:1;color:#f8fafc;"></div><div id="vRec" style="font-size:13px;color:#94a3b8;margin-top:3px;"></div></div>
-      <div id="vMe" style="display:none;background:#22180d;border:1px solid #7c4a18;border-radius:999px;padding:5px 10px;font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#fdba74;">Your Team</div>
+    <div class="viewer-shell">
+      <div class="viewer-hero">
+        <div class="viewer-hero-top">
+          <div id="vAv" class="pav" style="width:56px;height:56px;font-size:20px;"></div>
+          <div class="viewer-hero-copy">
+            <div id="vName" style="font-family:var(--fb);font-size:24px;font-weight:800;line-height:1;color:#f8fafc;"></div>
+            <div id="vRec" style="font-size:13px;color:#94a3b8;margin-top:5px;"></div>
+          </div>
+          <div id="vMe" style="display:none;background:#22180d;border:1px solid #7c4a18;border-radius:999px;padding:5px 10px;font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#fdba74;">Your Team</div>
+        </div>
+        <div id="vStats" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;"></div>
+        <div id="vNowBand" class="viewer-now-band"></div>
+      </div>
+      <div id="vMatchup" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text2);"></div>
+      <div class="viewer-grid">
+        <div class="viewer-panel">
+          <div class="viewer-panel-head">
+            <div class="viewer-panel-title">Starting Lineup</div>
+            <div class="viewer-panel-copy">Current starters and active matchup context.</div>
+          </div>
+          <div id="vStarters" class="viewer-list"></div>
+        </div>
+        <div class="viewer-panel">
+          <div class="viewer-panel-head">
+            <div class="viewer-panel-title">Bench + Depth</div>
+            <div class="viewer-panel-copy">Reserve pieces, lineup flexibility, and stash value.</div>
+          </div>
+          <div id="vBench" class="viewer-list"></div>
+        </div>
+      </div>
+      <div id="vActions" class="viewer-actions"></div>
     </div>
-    <div id="vStats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
-    <div id="vMatchup" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text2);"></div>
-    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#22c55e;margin-bottom:8px;">Starting Lineup</div>
-    <div id="vStarters"></div>
-    <div style="font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:12px 0 8px;">Bench</div>
-    <div id="vBench"></div>
-    <div id="vActions" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 </div>
 
@@ -1539,6 +1656,8 @@ function applySharedSeasonPayload(payload){
 }
 function renderActiveSeasonPage(){
   repairSeasonUiIcons();
+  bindPickerTriggers();
+  bindSeasonInteractiveDelegates();
   const active=document.querySelector('.screen.active')?.id || 'hub';
   ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[active]?.();
 }
@@ -1547,9 +1666,17 @@ function repairSeasonUiIcons(){
   homeLinks.forEach(link=>{
     if(link) link.innerHTML='&#127968; Roster<span style="color:var(--accent)">Bate</span>';
   });
-  const teamButtons=document.querySelectorAll('.season-chip.action, .tpb');
+  const seasonBacks=document.querySelectorAll('.season-back');
+  seasonBacks.forEach(btn=>{
+    if(btn && /\?/.test(btn.textContent||'')) btn.textContent='‹';
+  });
+  const teamButtons=document.querySelectorAll('.season-chip.action, .tpb, .season-team-link-btn');
   teamButtons.forEach(btn=>{
-    if(btn && /\?\? Teams/.test(btn.textContent||'')) btn.innerHTML='&#128101; Teams';
+    if(!btn) return;
+    const text=(btn.textContent||'').trim().toLowerCase();
+    if(!/teams/.test(text)) return;
+    const isChip=btn.classList.contains('season-chip');
+    btn.innerHTML=isChip?'&#128101; League Teams':'League Teams';
   });
   const actionIcons=document.querySelectorAll('#hub .hub-action-icon');
   const replacements=['&#128101;','&#9876;','&#128269;','&#127942;'];
@@ -1557,8 +1684,67 @@ function repairSeasonUiIcons(){
     if(icon && replacements[idx] && /\?/.test(icon.textContent||'')) icon.innerHTML=replacements[idx];
   });
 }
+function bindPickerTriggers(){
+  document.querySelectorAll('[data-open-picker]').forEach(el=>{
+    el.onclick = ev=>{
+      ev.preventDefault();
+      ev.stopPropagation();
+      openPicker();
+      return false;
+    };
+    el.dataset.pickerBound='1';
+  });
+}
+function openLeagueTeams(){
+  selectedStandingsTeamIdx = Number.isFinite(Number(D?.myPos)) ? Number(D.myPos) : 0;
+  goPage('standings');
+}
+function openStandingsTeam(teamIdx){
+  const nextIdx=Number(teamIdx);
+  if(!Number.isFinite(nextIdx)) return;
+  selectedStandingsTeamIdx=nextIdx;
+  goPage('standings');
+}
+function bindHubStandingsInteractions(root=document){
+  root.querySelectorAll('[data-open-viewer]').forEach(el=>{
+    el.onclick = ev=>{
+      const teamIdx=Number(el.dataset.openViewer);
+      if(!Number.isFinite(teamIdx)) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      openStandingsTeam(teamIdx);
+      return false;
+    };
+    el.dataset.viewerBound='1';
+  });
+}
+function bindSeasonInteractiveDelegates(){
+  if(document.body?.dataset?.seasonDelegatesBound==='1') return;
+  document.body.dataset.seasonDelegatesBound='1';
+  document.addEventListener('click', ev=>{
+    const pickerTrigger=ev.target.closest?.('[data-open-picker]');
+    if(pickerTrigger){
+      ev.preventDefault();
+      ev.stopPropagation();
+      openPicker();
+      return;
+    }
+    const viewerTrigger=ev.target.closest?.('[data-open-viewer]');
+    if(viewerTrigger){
+      const teamIdx=Number(viewerTrigger.dataset.openViewer);
+      if(Number.isFinite(teamIdx)){
+        ev.preventDefault();
+        ev.stopPropagation();
+        openViewer(teamIdx);
+      }
+    }
+  });
+}
 function applySeasonShellEnhancements(){
   repairSeasonUiIcons();
+  bindPickerTriggers();
+  bindHubStandingsInteractions(document);
+  bindSeasonInteractiveDelegates();
   const homeLabel='&#127968; Roster<span style="color:var(--accent)">Bate</span>';
   ['seasonHomeLink','rosterHomeLink','waiverHomeLink','tradesHomeLink'].forEach(id=>{
     const el=document.getElementById(id);
@@ -1968,7 +2154,7 @@ function renderFreeAgencyModal(){
       <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#f8fafc;">${p.name}<span class="pb2">${p.pos}</span>${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-        <div class="pd">${p.team} Â· ${Number(p.fp||0).toFixed(1)} FP Â· ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+        <div class="pd">${p.team} · ${Number(p.fp||0).toFixed(1)} FP · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
       </div>
       <button onclick="claimFreeAgentFromModal(${p.id})" class="season-outline-btn" style="padding:8px 14px;white-space:nowrap;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;">Select</button>
     </div>`;
@@ -2021,7 +2207,7 @@ function renderManageIlModal(){
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;">${ini(player.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#f8fafc;">${player.name}<span class="pb2">${player.pos}</span></div>
-        <div class="pd">${slotLabel} Â· ${player.team} Â· ${Number(player.fp||0).toFixed(1)} FP</div>
+        <div class="pd">${slotLabel} · ${player.team} · ${Number(player.fp||0).toFixed(1)} FP</div>
       </div>
       ${actionHtml}
     </div>`;
@@ -2067,7 +2253,7 @@ function openDropPlayerModal(){
       <div class="pav" style="background:${tc(item.player.team)};width:30px;height:30px;font-size:11px;">${ini(item.player.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#f8fafc;">${item.player.name}<span class="pb2">${item.player.pos}</span></div>
-        <div class="pd">${item.slot} Â· ${item.player.team} Â· ${Number(item.player.fp||0).toFixed(1)} FP</div>
+        <div class="pd">${item.slot} · ${item.player.team} · ${Number(item.player.fp||0).toFixed(1)} FP</div>
       </div>
       <div style="font-family:var(--fd);font-size:11px;color:var(--red);font-weight:700;">Drop</div>
     </div>`).join('') : `<div style="padding:12px;color:var(--text2);text-align:center;">No players available to drop.</div>`;
@@ -2471,7 +2657,7 @@ function buildPowerupCardsHtml(){
       </div>
       <div class="hub-powerup-status" style="color:${slot.active?'#86efac':'#cbd5e1'};border-color:${slot.active?'#166534':'#24324a'};background:${slot.active?'#0f2418':'#0f1724'};">${powerupStatusLabel(id)}</div>
       <div class="hub-powerup-copy">${meta.description}</div>
-      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` Â· Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
+      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` · Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
       ${action}
     </div>`;
   }).join('');
@@ -2487,8 +2673,8 @@ function renderSidePowerups(targetId){
       <div class="hub-card-title" style="margin-bottom:10px;">My Team</div>
       <div class="season-side-team-avatar pav" style="width:74px;height:74px;font-size:26px;background:var(--accent);box-shadow:0 12px 24px rgba(249,115,22,.18);margin:8px auto 0;"></div>
       <div class="hub-team-name">${D.teamName||'My Team'}</div>
-      <div class="hub-team-record">${(myStanding.w||0)}â€“${(myStanding.l||0)} Â· ${(myStanding.pf||0).toFixed(1)} PF Â· ${(myStanding.pa||0).toFixed(1)} PA</div>
-      <div class="hub-summary-data" style="margin-top:10px;">Wk ${G.week}/${G.totalWeeks} Â· Day ${G.day}</div>
+      <div class="hub-team-record">${(myStanding.w||0)}–${(myStanding.l||0)} · ${(myStanding.pf||0).toFixed(1)} PF · ${(myStanding.pa||0).toFixed(1)} PA</div>
+      <div class="hub-summary-data" style="margin-top:10px;">Wk ${G.week}/${G.totalWeeks} · Day ${G.day}</div>
       <button type="button" onclick="openTeamSettings()" class="season-team-link-btn" style="margin-top:14px;">Team Settings</button>
     </div>
     <div class="hub-powerup-grid">${buildPowerupCardsHtml()}</div>
@@ -3354,7 +3540,7 @@ function waiverCell(player,key){
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
       <div style="min-width:0;">
         <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
-        <div style="font-size:11px;color:#6b7280;">${player.team} Â· ${player.pos}</div>
+        <div style="font-size:11px;color:#6b7280;">${player.team} · ${player.pos}</div>
         ${tags.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${tags.join('')}</div>`:''}
       </div>
       </div>
@@ -3398,7 +3584,7 @@ function waiverCell(player,key){
   if(typeof value==='number'){
     return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
   }
-  return value!=null && value!=='' ? String(value) : 'â€”';
+  return value!=null && value!=='' ? String(value) : '—';
 }
 
 function toggleWaiverSort(key){
@@ -4284,7 +4470,7 @@ function renderHub(){
       </div>
       ${srt.slice(0,10).map(st=>{
         const isMine=st.teamIdx===mp;
-        return `<div class="hub-standings-row" onclick="openViewer(${st.teamIdx})" style="cursor:pointer;${isMine?'background:#1b2432;border:1px solid #7c4a18;border-radius:8px;padding-left:6px;padding-right:6px;':''}">
+        return `<button type="button" class="hub-standings-row" onclick="openStandingsTeam(${st.teamIdx})" aria-label="Open ${D.teams[st.teamIdx]||('Team '+(st.teamIdx+1))}" style="width:100%;border:none;text-align:left;cursor:pointer;${isMine?'background:#1b2432;border:1px solid #7c4a18;border-radius:8px;padding-left:6px;padding-right:6px;':''}">
           <div class="hub-standings-team">
             <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:24px;height:24px;font-size:10px;">${ini(D?.teams?.[st.teamIdx] || ('Team '+(st.teamIdx+1)))}</div>
             <div class="hub-standings-name"${isMine?' style="color:#fdba74;"':''}>${D.teams[st.teamIdx]||('Team '+(st.teamIdx+1))}</div>
@@ -4293,9 +4479,10 @@ function renderHub(){
           <div class="hub-standings-cell">${st.l||0}</div>
           <div class="hub-standings-cell">${(st.pf||0).toFixed(1)}</div>
           <div class="hub-standings-cell">${(st.pa||0).toFixed(1)}</div>
-        </div>`;
+        </button>`;
       }).join('')}
     `;
+    bindHubStandingsInteractions(standingsEl);
   }
   const myRoster=G.rosters[mp]||[];
   const captainOptions=myRoster.map(p=>`<option value="${p.id}" ${weekPowerups.captain_mode.targetId===p.id?'selected':''}>${p.name} (${p.pos})</option>`).join('');
@@ -4318,7 +4505,7 @@ function renderHub(){
       </div>
       <div class="hub-powerup-status" style="color:${slot.active?'#86efac':'#cbd5e1'};border-color:${slot.active?'#166534':'#24324a'};background:${slot.active?'#0f2418':'#0f1724'};">${powerupStatusLabel(id)}</div>
       <div class="hub-powerup-copy">${meta.description}</div>
-      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` Â· Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
+      <div class="hub-powerup-foot">Inventory: <span style="color:#f8fafc;font-family:var(--fb);font-weight:800;">${inv.owned}</span>${G.week<inv.cooldownUntilWeek?` · Ready in Week ${inv.cooldownUntilWeek}`:''}</div>
       ${action}
     </div>`;
   }).join('');
@@ -4344,6 +4531,12 @@ function renderHub(){
       </div>
     </div>`;
   }).join(''):'<div style="padding:12px;color:var(--text3);font-size:12px;text-align:center;">Bye week</div>';
+  const activityMeta=document.getElementById('hubActivityMeta');
+  if(activityMeta){
+    activityMeta.textContent=(G.activityLog?.length)
+      ? `${Math.min(G.activityLog.length,8)} live update${Math.min(G.activityLog.length,8)===1?'':'s'}`
+      : 'Quiet now';
+  }
   document.getElementById('hubActivity').innerHTML=(G.activityLog?.length?G.activityLog.slice(0,8).map(item=>{
     const accent=item.type==='trade'?'#8b5cf6':item.type==='waiver'?'#22c55e':item.type==='reveal'?'#f59e0b':'var(--accent)';
     const teamColor=item.teamIdx>=0?TCOLORS[item.teamIdx%TCOLORS.length]:'#475569';
@@ -4536,7 +4729,7 @@ function renderMatchup(){
   const day=matchupViewDay;
   const week=weekForDay(day);
   const matchup=getMatchupForTeamDay(D.myPos,day);
-  document.getElementById('mWk').textContent=`Week ${week} Â· ${DAY_NAMES[dayOfWeek(day)-1]} ${getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'})}`;
+  document.getElementById('mWk').textContent=`Week ${week} · ${DAY_NAMES[dayOfWeek(day)-1]} ${getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'})}`;
   if(!matchup){
     document.getElementById('matchupContent').innerHTML=`<div style="padding:20px;">
       <div class="season-table-card season-card-pad" style="text-align:center;">
@@ -4603,7 +4796,7 @@ function renderMatchup(){
             <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
             <div class="season-player-wrap" style="min-width:0;">
               <div class="season-player-name" style="font-weight:700;color:#f8fafc;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-              <div class="season-soft-muted">${p.team} ${p.pos} Â· ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+              <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
             </div>
           </div>
         </td>
@@ -4620,7 +4813,7 @@ function renderMatchup(){
           <div style="min-width:0;">
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;font-weight:700;">${sideLabel}</div>
             <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${teamName}</div>
-            <div class="season-soft-muted" style="margin-top:6px;">${standing.w}-${standing.l} Â· ${weekTotal.toFixed(1)} week revealed</div>
+            <div class="season-soft-muted" style="margin-top:6px;">${standing.w}-${standing.l} · ${weekTotal.toFixed(1)} week revealed</div>
           </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -4655,9 +4848,9 @@ function renderMatchup(){
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="font-size:14px;color:#dbe4f0;">Matchup Day:</span>
-          <button class="season-back" onclick="matchupViewDay=Math.max(1,matchupViewDay-1);renderMatchup()">â€¹</button>
+          <button class="season-back" onclick="matchupViewDay=Math.max(1,matchupViewDay-1);renderMatchup()">‹</button>
           ${dayChips}
-          <button class="season-back" onclick="matchupViewDay=Math.min(TOTAL_DAYS(),matchupViewDay+1);renderMatchup()">â€º</button>
+          <button class="season-back" onclick="matchupViewDay=Math.min(TOTAL_DAYS(),matchupViewDay+1);renderMatchup()">›</button>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="season-stat-pill">Week ${week}</span>
@@ -4824,7 +5017,7 @@ function renderRoster(){
         <td${rowCellAttr}>${entry.slot}</td>
         <td${rowCellAttr}>
           <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
-            <div class="pav" style="background:#1f2937;width:34px;height:34px;font-size:12px;color:#94a3b8;">â€”</div>
+            <div class="pav" style="background:#1f2937;width:34px;height:34px;font-size:12px;color:#94a3b8;">—</div>
             <div class="season-player-wrap" style="min-width:0;">
               <div style="font-weight:700;color:#94a3b8;">Empty ${entry.slot} slot</div>
               <div class="season-soft-muted">${entry.isIL?'Stash an injured player here to open an active roster spot.':'Choose an eligible player from your bench or IL to fill this spot.'}</div>
@@ -4903,7 +5096,7 @@ function renderRoster(){
           <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
           <div class="season-player-wrap" style="min-width:0;">
             <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-            <div class="season-soft-muted">${p.team} ${p.pos} Â· ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+            <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
           </div>
         </div>
       </td>
@@ -4932,7 +5125,7 @@ function renderRoster(){
           <div class="pav" style="background:${tc(p.team)};width:34px;height:34px;font-size:12px;">${ini(p.name)}</div>
           <div class="season-player-wrap" style="min-width:0;">
             <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-            <div class="season-soft-muted">${entry.slot==='BN'?'Bench':entry.slot} Â· ${p.team} ${p.pos}</div>
+            <div class="season-soft-muted">${entry.slot==='BN'?'Bench':entry.slot} · ${p.team} ${p.pos}</div>
           </div>
         </div>
       </td>
@@ -4950,7 +5143,7 @@ function renderRoster(){
         <button type="button" class="season-mini-tab ${rosterTab==='schedule'?'on':''}" onclick="rosterTab='schedule';renderRoster()">Schedule</button>
       </div>`;
   const dateSummary=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <div class="season-soft-muted" style="font-size:14px;white-space:nowrap;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} Â· Week ${week}</div>
+    <div class="season-soft-muted" style="font-size:14px;white-space:nowrap;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} · Week ${week}</div>
     ${rosterTab==='stats' ? `<span class="season-stat-pill">${isPast?'Revealed Score: '+Number(revealedScore||0).toFixed(1):'Results hidden until reveal'}</span>` : ''}
   </div>`;
   const rosterMain=rosterTab==='schedule'
@@ -5006,7 +5199,7 @@ function renderRoster(){
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
               <div style="font-family:var(--fb);font-size:26px;font-weight:800;color:#f8fafc;">${D.teamName}</div>
-              <div class="season-soft-muted" style="font-size:14px;">${myStanding.w}-${myStanding.l} (${rk>0?ord(rk):'â€”'} of ${D.teams.length})</div>
+              <div class="season-soft-muted" style="font-size:14px;">${myStanding.w}-${myStanding.l} (${rk>0?ord(rk):'—'} of ${D.teams.length})</div>
             </div>
             <div class="season-team-link" style="margin-top:6px;">${D.leagueName||'RosterBate League'}</div>
             <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;">
@@ -5028,9 +5221,9 @@ function renderRoster(){
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span style="font-size:14px;color:#dbe4f0;">Set Lineup:</span>
-          <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">â€¹</button>
+          <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">‹</button>
           ${dayChips}
-          <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">â€º</button>
+          <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">›</button>
           ${dateSummary}
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:5;pointer-events:auto;">
@@ -5075,7 +5268,7 @@ function pRow(p,slot,isS,day,isPast){
     const hlColor=game.isHome?'var(--text2)':'#93c5fd';
     gameInfo=`<div style="display:flex;align-items:center;gap:5px;margin-top:2px;flex-wrap:wrap;">
       <span style="font-family:var(--fd);font-size:11px;font-weight:800;color:${hlColor};">${matchup}</span>
-      <span style="font-size:10px;color:var(--text3);">Â·</span>
+      <span style="font-size:10px;color:var(--text3);">·</span>
       <span style="font-size:10px;color:var(--text3);">${game.time}</span>
       <span style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:3px;padding:0px 4px;font-family:var(--fd);font-size:9px;font-weight:800;color:var(--green);">${game.isHome?'HOME':'AWAY'}</span>
     </div>`;
@@ -5099,7 +5292,7 @@ function pRow(p,slot,isS,day,isPast){
         <span class="pb2">${p.pos}</span>
         ${injuryBadge}
       </div>
-      <div class="pd">${p.team} Â· ${p.fp}fp Â· ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
+      <div class="pd">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
       ${gameInfo}
     </div>
     ${actionBtn}
@@ -5205,7 +5398,7 @@ function toggleStartDay(pid,day){
   if(current.includes(pid)){
     updated=current.filter(id=>id!==pid);
   } else {
-    if(current.length>=STARTERS){toast('Starter slots full â€” bench someone first');return;}
+    if(current.length>=STARTERS){toast('Starter slots full — bench someone first');return;}
     const selected=roster.filter(p=>current.includes(p.id));
     const trial=buildBestLineupIdsForRoster([...selected,player],day);
     if(!trial.includes(pid)){toast('That player does not fit an open starter slot.');return;}
@@ -5531,6 +5724,44 @@ function confirmWaiver(){
   wAdd=null;wDrop=null;renderWaiver();renderHub();
 }
 
+function getTradeOfferImpact(offer, viewerTeam=D?.myPos){
+  if(!offer) return null;
+  const targetTeam=Number(viewerTeam ?? 0);
+  const teamReceives=Number(offer.toTeam)===targetTeam ? Number(offer.fromTeam) : Number(offer.toTeam);
+  const sendIds=Number(offer.toTeam)===targetTeam ? (offer.get||[]) : (offer.give||[]);
+  const receiveIds=Number(offer.toTeam)===targetTeam ? (offer.give||[]) : (offer.get||[]);
+  const teamRoster=G.rosters?.[targetTeam]||[];
+  const partnerRoster=G.rosters?.[teamReceives]||[];
+  const starterSet=new Set((G.starters?.[targetTeam]||[]).filter(Boolean));
+  const sendPlayers=sendIds.map(id=>teamRoster.find(player=>Number(player?.id)===Number(id))).filter(Boolean);
+  const receivePlayers=receiveIds.map(id=>partnerRoster.find(player=>Number(player?.id)===Number(id))).filter(Boolean);
+  const startersTouched=sendPlayers.filter(player=>starterSet.has(player.id)).length;
+  const sendFp=sendPlayers.reduce((sum,player)=>sum+Number(player?.fp||0),0);
+  const receiveFp=receivePlayers.reduce((sum,player)=>sum+Number(player?.fp||0),0);
+  return {
+    sendPlayers,
+    receivePlayers,
+    startersTouched,
+    sendFp,
+    receiveFp,
+    delta: +(receiveFp-sendFp).toFixed(1)
+  };
+}
+
+function renderTradeImpactPills(impact){
+  if(!impact) return '';
+  const deltaTone=impact.delta>0
+    ? 'rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.32)'
+    : impact.delta<0
+      ? 'rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.3)'
+      : 'rgba(148,163,184,.10);color:#cbd5e1;border-color:rgba(148,163,184,.26)';
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+    <span class="season-stat-pill" style="border-color:#24324a;">${impact.receivePlayers.length} in / ${impact.sendPlayers.length} out</span>
+    <span class="season-stat-pill" style="${deltaTone}">Value ${impact.delta>=0?'+':''}${impact.delta.toFixed(1)} FP</span>
+    <span class="season-stat-pill" style="border-color:${impact.startersTouched?'rgba(249,115,22,.35)':'#24324a'};color:${impact.startersTouched?'#fdba74':'#cbd5e1'};background:${impact.startersTouched?'rgba(249,115,22,.12)':'#0f1724'};">${impact.startersTouched?impact.startersTouched+' starter'+(impact.startersTouched===1?'':'s')+' touched':'Bench-only swap'}</span>
+  </div>`;
+}
+
 function renderTrades(){
   setSeasonSidePanelVisible('tradesPowerups', true);
   renderSidePowerups('tradesPowerups');
@@ -5540,6 +5771,35 @@ function renderTrades(){
   const pend=G.tradeOffers.filter(t=>t.toTeam===mp&&t.status==='pending');
   const sent=G.tradeOffers.filter(t=>t.fromTeam===mp);
   const leaguePend=G.tradeOffers.filter(t=>t.status==='pending');
+  const answered=sent.filter(t=>t.status!=='pending');
+  const tradeUrgencyCards=[
+    buildSeasonNowCard({
+      tone:pend.length?'alert':'info',
+      label:'Response Queue',
+      value:pend.length?`${pend.length} Needed`:'Inbox Clear',
+      copy:pend.length?'You have trade offers waiting on your answer right now. Review them before the next reveal window closes.':'No one is waiting on your response right now.',
+      actionLabel:pend.length?'Review Incoming':'Propose Trade',
+      action:pend.length?"document.getElementById('incomingTradeSection')?.scrollIntoView({behavior:'smooth',block:'start'})":"document.getElementById('proposeTradeSection')?.scrollIntoView({behavior:'smooth',block:'start'})"
+    }),
+    buildSeasonNowCard({
+      tone:sent.some(t=>t.status==='pending')?'live':'info',
+      label:'Sent Offers',
+      value:sent.some(t=>t.status==='pending')?`${sent.filter(t=>t.status==='pending').length} Waiting`:`${answered.length} Closed`,
+      copy:sent.some(t=>t.status==='pending')?'Your outgoing offers are live. Be ready if another manager counters with urgency.':'No live sent offers right now. Send a fresh package if you want to create movement.',
+      actionLabel:'View Sent',
+      action:"document.getElementById('sentTradeSection')?.scrollIntoView({behavior:'smooth',block:'start'})"
+    }),
+    buildSeasonNowCard({
+      tone:leaguePend.length?'info':'info',
+      label:'League Review',
+      value:`${leaguePend.length} Pending`,
+      copy:isComm
+        ? (leaguePend.length?'Commissioner tools are active. You can resolve stuck deals or override bad states.':'No league-wide trade review is needed right now.')
+        : (leaguePend.length?'The league trade market is moving. Pending deals will sit until the receiving team answers.':'The trade desk is quiet right now.'),
+      actionLabel:isComm?'Commissioner Desk':'Open Trade Desk',
+      action:isComm?"document.getElementById('leagueTradeDeskSection')?.scrollIntoView({behavior:'smooth',block:'start'})":"goPage('trades')"
+    })
+  ].join('');
   let h='';
   if(isComm){
     h+=`<div class="card" style="margin-bottom:10px;border-color:rgba(249,115,22,.3);background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(15,23,42,.9));">
@@ -5547,21 +5807,30 @@ function renderTrades(){
       <div style="font-size:12px;color:var(--text2);line-height:1.6;">Single Player leagues default you as commissioner. You can force trades through, reject any pending offer, and still use the normal team-side accept/reject flow.</div>
     </div>`;
   }
-  h+=`<div class="card" style="margin-bottom:10px;">
+  h+=`<div class="season-hero-card season-card-pad" style="margin-bottom:10px;">
     <div style="font-family:var(--fd);font-size:14px;font-weight:800;margin-bottom:4px;">Trade Desk</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6;">${isMultiplayerLeague?'Send offers to other managers in your league. Pending trades stay in the shared season until the receiving team accepts or rejects them.':'Offer player-for-player deals to the other teams in your league. In solo leagues, AI teams will review offers automatically.'}</div>
+    <div class="season-now-band" style="margin-top:14px;">${tradeUrgencyCards}</div>
   </div>`;
   if(pend.length){
-    h+=`<div class="sl" style="margin-top:0;color:var(--accent);">Incoming Offers (${pend.length})</div>`;
+    h+=`<div id="incomingTradeSection" class="sl" style="margin-top:0;color:var(--accent);">Incoming Offers (${pend.length})</div>`;
     pend.forEach(o=>{
       const gn=o.give.map(id=>G.rosters[o.fromTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
       const getn=o.get.map(id=>G.rosters[mp]?.find(p=>p.id===id)?.name||'?').join(', ');
-      h+=`<div class="card" style="margin-bottom:8px;border-color:rgba(249,115,22,.3);">
-        <div style="font-family:var(--fd);font-size:14px;font-weight:800;margin-bottom:8px;">From ${D.teams[o.fromTeam]||'Team'}</div>
+      const impact=getTradeOfferImpact(o, mp);
+      h+=`<div class="card" style="margin-bottom:8px;border-color:rgba(249,115,22,.3);background:linear-gradient(180deg,rgba(35,24,16,.9),rgba(18,26,41,.98));">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+          <div>
+            <div style="font-family:var(--fd);font-size:14px;font-weight:800;margin-bottom:4px;">From ${D.teams[o.fromTeam]||'Team'}</div>
+            <div style="font-size:11px;color:#fdba74;text-transform:uppercase;letter-spacing:.07em;font-weight:800;">Response needed now</div>
+          </div>
+          <span class="season-stat-pill" style="border-color:rgba(249,115,22,.35);color:#fdba74;background:rgba(249,115,22,.12);">Pending</span>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
           <div style="background:var(--bg3);border-radius:8px;padding:9px;"><div style="font-size:10px;color:var(--green);font-family:var(--fd);font-weight:700;text-transform:uppercase;margin-bottom:4px;">You Receive</div><div style="font-size:12px;">${gn}</div></div>
           <div style="background:var(--bg3);border-radius:8px;padding:9px;"><div style="font-size:10px;color:var(--red);font-family:var(--fd);font-weight:700;text-transform:uppercase;margin-bottom:4px;">You Send</div><div style="font-size:12px;">${getn}</div></div>
         </div>
+        ${renderTradeImpactPills(impact)}
         <div style="display:flex;gap:8px;">
           <button onclick="rejectTrade('${o.id}')" style="flex:1;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px;font-family:var(--fd);font-size:14px;font-weight:800;color:var(--red);cursor:pointer;">Reject</button>
           <button onclick="acceptTrade('${o.id}')" style="flex:1;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:10px;font-family:var(--fd);font-size:14px;font-weight:800;color:var(--green);cursor:pointer;">Accept</button>
@@ -5573,30 +5842,35 @@ function renderTrades(){
       </div>`;
     });
   }
-  h+=`<div class="sl" style="${pend.length?'':'margin-top:0;'}">Propose a Trade</div>`;
+  h+=`<div id="tradeBuilderMount"></div><div id="proposeTradeSection" class="sl" style="${pend.length?'':'margin-top:0;'}">Propose a Trade</div>`;
   D.teams.forEach((nm,ti)=>{
     if(ti===mp)return;
     const col=TCOLORS[ti%TCOLORS.length];
-    h+=`<div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;width:100%;margin-bottom:6px;font-family:var(--fb);color:var(--text);">
+    const theirPending=G.tradeOffers.filter(t=>Number(t.fromTeam)===mp && Number(t.toTeam)===ti && t.status==='pending').length;
+    const incomingFromThem=G.tradeOffers.filter(t=>Number(t.fromTeam)===ti && Number(t.toTeam)===mp && t.status==='pending').length;
+    h+=`<button type="button" data-trade-team="${ti}" style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;width:100%;margin-bottom:6px;font-family:var(--fb);color:var(--text);cursor:pointer;position:relative;z-index:4;pointer-events:auto;text-align:left;">
       <div class="pav" style="background:${col};width:36px;height:36px;font-size:14px;">${nm[0]}</div>
       <div style="flex:1;min-width:0;"><div style="font-family:var(--fd);font-size:15px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${nm}</div>
-      <div style="font-size:11px;color:var(--text2);">${G.rosters[ti]?.length||0} players</div></div>
-      <button type="button" onclick="openTrade(${ti})" style="margin-left:auto;background:#0f1724;border:1px solid #24324a;border-radius:999px;padding:10px 14px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#fdba74;cursor:pointer;white-space:nowrap;">Propose Trade</button>
-    </div>`;
+      <div style="font-size:11px;color:var(--text2);">${G.rosters[ti]?.length||0} players${theirPending?` | ${theirPending} waiting on them`:incomingFromThem?` | ${incomingFromThem} waiting on you`:''}</div></div>
+      <span style="margin-left:auto;background:#0f1724;border:1px solid #24324a;border-radius:999px;padding:10px 14px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#fdba74;white-space:nowrap;pointer-events:none;">Propose Trade</span>
+    </button>`;
   });
   if(sent.length){
-    h+=`<div class="sl">Sent Offers</div>`;
+    h+=`<div id="sentTradeSection" class="sl">Sent Offers</div>`;
     sent.forEach(o=>{
       const sc={pending:'var(--text3)',accepted:'var(--green)',rejected:'var(--red)'}[o.status];
       const giveNames=o.give.map(id=>G.rosters[o.fromTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
       const getNames=o.get.map(id=>G.rosters[o.toTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
-      h+=`<div class="card" style="margin-bottom:6px;">
+      const impact=getTradeOfferImpact(o, mp);
+      const pendingCopy=o.status==='pending'&&isMultiplayerLeague?`Waiting on ${D.teams[o.toTeam]||'that manager'} to respond.`:o.status==='accepted'?'This deal has already been accepted and applied.':o.status==='rejected'?'This offer was rejected, so you can rework the package if you still want the player.':'';
+      h+=`<div class="card" style="margin-bottom:6px;border-color:${o.status==='pending'?'rgba(59,130,246,.24)':'#24324a'};background:${o.status==='pending'?'linear-gradient(180deg,rgba(15,33,56,.9),rgba(18,26,41,.98))':'#121a29'};">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
           <div><div style="font-family:var(--fd);font-size:13px;font-weight:700;">To ${D.teams[o.toTeam]||'Team'}</div>
           <div style="font-size:11px;color:var(--text2);">${giveNames} for ${getNames}</div></div>
           <div style="font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:${sc};">${o.status}</div>
         </div>
-        ${o.status==='pending'&&isMultiplayerLeague?`<div style="margin-top:8px;font-size:11px;color:var(--text2);">Waiting on ${D.teams[o.toTeam]||'that manager'} to respond.</div>`:''}
+        ${renderTradeImpactPills(impact)}
+        ${pendingCopy?`<div style="margin-top:8px;font-size:11px;color:var(--text2);">${pendingCopy}</div>`:''}
         ${isComm&&o.status==='pending'?`<div style="display:flex;gap:8px;margin-top:8px;">
           <button onclick="forceRejectTrade('${o.id}')" style="flex:1;background:rgba(239,68,68,.08);border:1px dashed rgba(239,68,68,.35);border-radius:8px;padding:9px;font-family:var(--fd);font-size:12px;font-weight:800;color:var(--red);cursor:pointer;">Force Reject</button>
           <button onclick="forceAcceptTrade('${o.id}')" style="flex:1;background:rgba(34,197,94,.08);border:1px dashed rgba(34,197,94,.35);border-radius:8px;padding:9px;font-family:var(--fd);font-size:12px;font-weight:800;color:var(--green);cursor:pointer;">Force Accept</button>
@@ -5605,13 +5879,13 @@ function renderTrades(){
     });
   }
   if(isComm&&leaguePend.length){
-    h+=`<div class="sl">League Trade Desk</div>`;
+    h+=`<div id="leagueTradeDeskSection" class="sl">League Trade Desk</div>`;
     leaguePend.forEach(o=>{
       const fromName=D.teams[o.fromTeam]||'Team';
       const toName=D.teams[o.toTeam]||'Team';
       const giveNames=o.give.map(id=>G.rosters[o.fromTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
       const getNames=o.get.map(id=>G.rosters[o.toTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
-      h+=`<div class="card" style="margin-bottom:8px;border-color:rgba(96,165,250,.28);">
+      h+=`<div class="card" style="margin-bottom:8px;border-color:rgba(96,165,250,.28);background:linear-gradient(180deg,rgba(15,33,56,.9),rgba(18,26,41,.98));">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
           <div style="font-family:var(--fd);font-size:13px;font-weight:800;">${fromName} to ${toName}</div>
           <div style="font-size:10px;color:var(--accent);font-family:var(--fd);font-weight:800;text-transform:uppercase;">Pending Review</div>
@@ -5620,6 +5894,7 @@ function renderTrades(){
           <div style="background:var(--bg3);border-radius:8px;padding:9px;"><div style="font-size:10px;color:var(--green);font-family:var(--fd);font-weight:700;text-transform:uppercase;margin-bottom:4px;">${fromName} Sends</div><div style="font-size:12px;">${giveNames}</div></div>
           <div style="background:var(--bg3);border-radius:8px;padding:9px;"><div style="font-size:10px;color:var(--accent);font-family:var(--fd);font-weight:700;text-transform:uppercase;margin-bottom:4px;">${toName} Sends</div><div style="font-size:12px;">${getNames}</div></div>
         </div>
+        <div style="font-size:11px;color:#bfdbfe;margin-bottom:10px;">Commissioner lane: resolve this if it gets stuck, invalid, or needs a league-level override.</div>
         <div style="display:flex;gap:8px;">
           <button onclick="forceRejectTrade('${o.id}')" style="flex:1;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px;font-family:var(--fd);font-size:13px;font-weight:800;color:var(--red);cursor:pointer;">Force Reject</button>
           <button onclick="forceAcceptTrade('${o.id}')" style="flex:1;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:10px;font-family:var(--fd);font-size:13px;font-weight:800;color:var(--green);cursor:pointer;">Force Trade Through</button>
@@ -5627,46 +5902,109 @@ function renderTrades(){
       </div>`;
     });
   }
-  document.getElementById('tradesContent').innerHTML=h;
+  const tradesContent=document.getElementById('tradesContent');
+  if(!tradesContent) return;
+  tradesContent.innerHTML=h;
+  tradesContent.querySelectorAll('[data-trade-team]').forEach(btn=>{
+    btn.addEventListener('click', event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      openTrade(Number(btn.dataset.tradeTeam));
+    });
+  });
 }
 
-function openTrade(ti){
-  const modal=document.getElementById('trModal');
-  const label=document.getElementById('trWith');
-  if(!modal || !label){
-    toast('Trade modal failed to open.');
-    return;
-  }
-  trP={ti,give:[],get:[]};
-  label.textContent='Trading with: '+D.teams[ti];
-  renderTradeForm();
-  modal.style.display='flex';
-  requestAnimationFrame(()=>modal.classList.add('open'));
+function closeInlineTradeBuilder(){
+  const mount=document.getElementById('tradeBuilderMount');
+  if(mount) mount.innerHTML='';
 }
 
-function renderTradeForm(){
-  const myR=G.rosters[D.myPos]||[],thR=G.rosters[trP.ti]||[];
-  function pr(p,side){
-    const sel=trP[side].includes(p.id);
-    const bg=side==='give'?(sel?'rgba(34,197,94,.1)':'var(--bg3)'):(sel?'rgba(249,115,22,.1)':'var(--bg3)');
-    const bd=side==='give'?(sel?'rgba(34,197,94,.4)':'var(--border)'):(sel?'rgba(249,115,22,.4)':'var(--border)');
-    return`<div onclick="toggleTr('${side}',${p.id})" style="display:flex;align-items:center;gap:6px;background:${bg};border:1px solid ${bd};border-radius:7px;padding:7px 9px;cursor:pointer;margin-bottom:4px;">
-      <div class="pav" style="background:${tc(p.team)};width:26px;height:26px;font-size:10px;">${ini(p.name)}</div>
-      <div style="flex:1;min-width:0;"><div style="font-family:var(--fd);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-      <div style="font-size:10px;color:var(--text3);">${p.pos} Â· ${p.fp}fp</div></div>
-      ${sel?`<span style="color:${side==='give'?'var(--green)':'var(--accent)'};font-size:14px;">?</span>`:''}
-    </div>`;
-  }
-  document.getElementById('trGive').innerHTML=myR.map(p=>pr(p,'give')).join('');
-  document.getElementById('trGet').innerHTML=thR.map(p=>pr(p,'get')).join('');
+function renderInlineTradeBuilder(){
+  const mount=document.getElementById('tradeBuilderMount');
+  if(!mount || !Number.isFinite(Number(trP?.ti)) || trP.ti<0) return;
+  const teamName=D?.teams?.[trP.ti]||('Team '+(Number(trP.ti)+1));
+  const myR=G.rosters[D.myPos]||[];
+  const thR=G.rosters[trP.ti]||[];
+  const givePlayers=trP.give.map(id=>myR.find(x=>x.id===id)).filter(Boolean);
+  const getPlayers=trP.get.map(id=>thR.find(x=>x.id===id)).filter(Boolean);
+  const starterSet=new Set((G.starters?.[D.myPos]||[]).filter(Boolean));
+  const startersTouched=givePlayers.filter(player=>starterSet.has(player.id)).length;
   const gv=trP.give.reduce((s,id)=>{const p=myR.find(x=>x.id===id);return s+(p?p.fp:0);},0);
   const gt=trP.get.reduce((s,id)=>{const p=thR.find(x=>x.id===id);return s+(p?p.fp:0);},0);
   const d=(gt-gv).toFixed(1);
-  document.getElementById('trFair').textContent=trP.give.length&&trP.get.length?(Math.abs(gt-gv)<10?'? Fair trade':gt>gv?'?? Favors you (+'+d+' FP)':'?? Favors them ('+d+' FP)'):'Select players to send and receive.';
-  document.getElementById('trConfirm').disabled=!(trP.give.length&&trP.get.length);
+  const offerReady=trP.give.length&&trP.get.length;
+  const fairCopy=trP.give.length&&trP.get.length?(Math.abs(gt-gv)<10?'Fair trade range. Both sides are close on raw fantasy value.':gt>gv?'This package currently favors you by +'+d+' FP. Expect the other manager to push back unless the fit is better for them.':'This package currently favors them by '+d+' FP. You may want more back before you send it.'):'Select players to send and receive.';
+  const pr=(p,side)=>{
+    const sel=trP[side].includes(p.id);
+    const stateClass=sel?(side==='give'?'selected-give':'selected-get'):'';
+    return `<button type="button" onclick="toggleTr('${side}',${p.id})" class="trade-builder-player ${stateClass}">
+      <div class="pav" style="background:${tc(p.team)};width:28px;height:28px;font-size:10px;">${ini(p.name)}</div>
+      <div class="trade-builder-player-copy">
+        <div style="font-family:var(--fd);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+        <div class="trade-builder-player-meta">${p.pos} · ${Number(p.fp||0).toFixed(1)} fp</div>
+      </div>
+      ${sel?`<span class="trade-builder-player-flag ${side==='give'?'send':'get'}">${side==='give'?'Sending':'Receiving'}</span>`:''}
+    </button>`;
+  };
+  mount.innerHTML=`<div class="season-table-card season-card-pad trade-builder-shell">
+    <div class="trade-builder-head">
+      <div>
+        <div style="font-family:var(--fb);font-size:22px;font-weight:800;color:#f8fafc;">Build Trade With ${teamName}</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:4px;">Pick the players you would send, then the ones you want back.</div>
+      </div>
+      <button type="button" onclick="closeInlineTradeBuilder()" class="season-outline-btn">Close Builder</button>
+    </div>
+    <div class="trade-builder-badges" style="margin-bottom:12px;">
+      <span class="season-stat-pill">${myR.length} on your roster</span>
+      <span class="season-stat-pill">${thR.length} on their roster</span>
+      <span class="season-stat-pill">Live trade builder</span>
+    </div>
+    <div class="trade-builder-summary" style="margin-bottom:12px;">
+      <div class="trade-builder-summary-card send">
+        <div style="font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#86efac;">You Send</div>
+        <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;margin-top:6px;">${trP.give.length||0} Player${trP.give.length===1?'':'s'}</div>
+        <div style="font-size:12px;color:#cbd5e1;line-height:1.45;margin-top:6px;">${givePlayers.length?givePlayers.map(player=>player.name).join(', '):'No outgoing players selected yet.'}</div>
+      </div>
+      <div class="trade-builder-summary-card get">
+        <div style="font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fdba74;">You Receive</div>
+        <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;margin-top:6px;">${trP.get.length||0} Player${trP.get.length===1?'':'s'}</div>
+        <div style="font-size:12px;color:#cbd5e1;line-height:1.45;margin-top:6px;">${getPlayers.length?getPlayers.map(player=>player.name).join(', '):'No incoming players selected yet.'}</div>
+      </div>
+    </div>
+    ${offerReady?`<div class="trade-builder-ready">
+      <div class="trade-builder-ready-title">Offer Ready</div>
+      <div class="trade-builder-ready-copy">You are sending ${trP.give.length} player${trP.give.length===1?'':'s'} and receiving ${trP.get.length}. ${startersTouched?startersTouched+' starter'+(startersTouched===1?'':'s')+' are leaving your lineup. ':'Bench pieces stay intact. '}${Math.abs(gt-gv)<10?'The value is in a realistic range.':gt>gv?'This currently leans your way on raw value.':'This currently leans toward them on raw value.'}</div>
+    </div>`:''}
+    <div class="trade-builder-impact" style="margin-bottom:12px;">
+      <span class="season-stat-pill" style="border-color:#24324a;">${trP.give.length} out / ${trP.get.length} in</span>
+      <span class="season-stat-pill" style="${gt>gv?'rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.32)':gt<gv?'rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.3)':'rgba(148,163,184,.10);color:#cbd5e1;border-color:rgba(148,163,184,.26)'}">Value ${gt-gv>=0?'+':''}${d} FP</span>
+      <span class="season-stat-pill" style="border-color:${startersTouched?'rgba(249,115,22,.35)':'#24324a'};color:${startersTouched?'#fdba74':'#cbd5e1'};background:${startersTouched?'rgba(249,115,22,.12)':'#0f1724'};">${startersTouched?startersTouched+' starter'+(startersTouched===1?'':'s')+' touched':'Bench package'}</span>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--text3);margin-bottom:14px;">${fairCopy}</div>
+    <div class="trade-builder-grid">
+      <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--green);margin-bottom:8px;">You Give</div><div class="trade-builder-roster">${myR.map(p=>pr(p,'give')).join('')}</div></div>
+      <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">You Get</div><div class="trade-builder-roster">${thR.map(p=>pr(p,'get')).join('')}</div></div>
+    </div>
+    <div class="trade-builder-actions" style="margin-top:14px;">
+      <button type="button" onclick="closeInlineTradeBuilder()" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
+      <button type="button" onclick="submitTrade()" class="bg" ${!(trP.give.length&&trP.get.length)?'disabled':''}>Send Offer</button>
+    </div>
+  </div>`;
 }
 
-function toggleTr(side,pid){const arr=trP[side],i=arr.indexOf(pid);if(i>=0)arr.splice(i,1);else arr.push(pid);renderTradeForm();}
+function openTrade(ti){
+  if(!document.getElementById('tradeBuilderMount')) return;
+  trP={ti,give:[],get:[]};
+  renderInlineTradeBuilder();
+  document.getElementById('tradeBuilderMount')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function toggleTr(side,pid){
+  const arr=trP[side],i=arr.indexOf(pid);
+  if(i>=0) arr.splice(i,1);
+  else arr.push(pid);
+  renderInlineTradeBuilder();
+}
 
 function findTradeOffer(id){
   return (G.tradeOffers||[]).find(t=>String(t.id)===String(id))||null;
@@ -5710,7 +6048,7 @@ function submitTrade(){
   const giveNames=o.give.map(id=>G.rosters[o.fromTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
   const getNames=o.get.map(id=>G.rosters[o.toTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
   logActivity('trade','Trade offer sent',teamName(o.fromTeam)+' offered '+giveNames+' to '+teamName(o.toTeam)+' for '+getNames+'.',o.fromTeam,'?');
-  document.getElementById('trModal').classList.remove('open');
+  closeInlineTradeBuilder();
   toast('Trade sent to '+D.teams[trP.ti]+'!');
   queueSharedSeasonSave('submit_trade');
   if(!D?.multiplayer) setTimeout(()=>cpuTrade(o.id),2500);
@@ -5794,39 +6132,91 @@ function renderStandingsTeamDetails(teamIdx){
   if(!Number.isFinite(Number(teamIdx))) return '';
   const ti=Number(teamIdx);
   const nm=D.teams[ti]||('Team '+(ti+1));
+  const im=ti===D.myPos;
   const roster=G.rosters[ti]||[];
   const starterIds=getStarterIdsForTeamDay(ti,G.day);
   const starterSet=new Set(starterIds.filter(Boolean));
   const starters=starterIds.map((id,index)=>({slot:SLOT_LABELS[index]||'UTIL',player:roster.find(p=>p.id===id)||null})).filter(entry=>entry.player);
   const bench=roster.filter(p=>!starterSet.has(p.id));
   const st=getLiveStandingsSnapshot().find(entry=>entry.teamIdx===ti)||G.standings[ti]||{w:0,l:0,pf:0,pa:0};
+  const revealedWeekTotal=getTeamWeekRevealedScore(ti,G.week);
+  const openSlots=Math.max(0,STARTERS-starters.length);
+  const strkColor=st.streakW?'#16a34a':'#dc2626';
+  const strkText=(st.w+st.l>0)?(st.streakW?'W':'L')+(st.streak||0):'—';
+  const tradeCounts=getPendingTradeCounts(ti);
+  const recentForm=Array.from({length:Math.min(5,Math.max(0,Number(G.week||1)-1))},(_,idx)=>{
+    const wk=Math.max(1,Number(G.week||1)-idx-1);
+    return getTeamWeekRevealedScore(ti,wk).toFixed(1);
+  }).filter(Boolean);
+  const matchup=weekGames(G.week).find(g=>g.home===ti||g.away===ti);
+  const oppIdx=matchup?(matchup.home===ti?matchup.away:matchup.home):-1;
+  const oppName=oppIdx>=0?(D.teams[oppIdx]||('Team '+(oppIdx+1))):'Bye';
+  const oppScore=oppIdx>=0?getTeamWeekRevealedScore(oppIdx,G.week).toFixed(1):'--';
+  const renderNowCard=(tone,label,value,copy)=>`<div class="season-now-card ${tone}">
+    <div class="season-now-label">${label}</div>
+    <div class="season-now-value">${value}</div>
+    <div class="season-now-copy">${copy}</div>
+  </div>`;
   const renderRow=(entry,slot)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #1d283b;">
     <div style="width:38px;font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;flex-shrink:0;">${slot}</div>
     <div class="pav" style="background:${tc(entry.team)};width:32px;height:32px;font-size:12px;">${ini(entry.name)}</div>
     <div style="min-width:0;flex:1;">
       <div style="font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.name}</div>
-      <div style="font-size:12px;color:#94a3b8;">${entry.team} ${entry.pos} Â· ${getRosterbatePlayerSummary(entry,CURRENT_SPORT)}</div>
+      <div style="font-size:12px;color:#94a3b8;">${entry.team} ${entry.pos} · ${getRosterbatePlayerSummary(entry,CURRENT_SPORT)}</div>
     </div>
   </div>`;
   return `<div class="season-table-card">
-    <div class="season-card-pad" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
-      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-        <div class="pav" style="background:${TCOLORS[ti%TCOLORS.length]};width:54px;height:54px;font-size:20px;">${ini(nm)}</div>
-        <div style="min-width:0;">
-          <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;">${nm}</div>
-          <div style="font-size:13px;color:#94a3b8;margin-top:6px;">${(st.w||0)}-${(st.l||0)} Â· ${(st.pf||0).toFixed(1)} PF Â· ${(st.pa||0).toFixed(1)} PA</div>
+    <div class="season-card-pad" style="display:grid;gap:16px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #24324a;padding-bottom:16px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;min-width:0;flex:1;">
+          <div class="pav" style="background:${TCOLORS[ti%TCOLORS.length]};width:58px;height:58px;font-size:22px;">${ini(nm)}</div>
+          <div style="min-width:0;flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div style="font-family:var(--fb);font-size:24px;font-weight:800;color:#f8fafc;line-height:1.1;">${nm}</div>
+              ${im?'<span class="season-stat-pill" style="border-color:#7c4a18;color:#fdba74;background:rgba(249,115,22,.12);">Your Team</span>':''}
+              <span class="season-stat-pill" style="color:${strkColor};border-color:${st.streakW?'rgba(34,197,94,.32)':'rgba(239,68,68,.3)'};background:${st.streakW?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)'};">${strkText} streak</span>
+            </div>
+            <div style="font-size:13px;color:#94a3b8;margin-top:6px;">${(st.w||0)}-${(st.l||0)} · ${(st.pf||0).toFixed(1)} PF · ${(st.pa||0).toFixed(1)} PA</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+              <span class="season-stat-pill">${revealedWeekTotal.toFixed(1)} revealed</span>
+              <span class="season-stat-pill">${roster.length} players</span>
+              <span class="season-stat-pill">${openSlots?openSlots+' slot'+(openSlots===1?'':'s')+' open':'Lineup set'}</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${im
+            ? `<button type="button" onclick="goPage('roster')" class="season-chip-link solid">Edit My Team</button>
+               <button type="button" onclick="goPage('matchup')" class="season-chip-link">Inspect Matchup</button>`
+            : `<button type="button" onclick="goPage('trades');setTimeout(()=>openTrade(${ti}),120);" class="season-chip-link solid">Propose Trade</button>
+               <button type="button" onclick="goPage('matchup')" class="season-chip-link">Inspect Matchup</button>`
+          }
+          <button type="button" onclick="selectedStandingsTeamIdx=null;renderStandings()" class="season-chip-link">Close</button>
         </div>
       </div>
-      <button type="button" onclick="selectedStandingsTeamIdx=null;renderStandings()" class="season-outline-btn">Close</button>
-    </div>
-    <div class="season-card-pad" style="display:grid;gap:16px;">
-      <div>
-        <div style="font-family:var(--fb);font-size:12px;font-weight:800;color:#22c55e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Starting Lineup</div>
-        <div>${starters.length?starters.map(entry=>renderRow(entry.player,entry.slot)).join(''):'<div style="color:#94a3b8;font-size:13px;">No starters set.</div>'}</div>
+      <div class="season-now-band">
+        ${renderNowCard(openSlots?'alert':'live','Lineup Status',openSlots?`${openSlots} slot${openSlots===1?'':'s'} open`:'Board ready',openSlots?'This team still has starter spots to clean up before the slate tightens.':'This lineup is set and ready to roll.')}
+        ${renderNowCard('info','Recent Form',recentForm.length?recentForm.join(' · '):'No sample yet',recentForm.length?'Last completed weeks for this team. Useful for momentum, not a projection.':'The season is still too early for a strong recent-form read.')}
+        ${renderNowCard((tradeCounts.incoming||tradeCounts.outgoing)?'alert':'info',im?'Trade Desk':'Trade Lane',(tradeCounts.incoming||tradeCounts.outgoing)?`${tradeCounts.incoming||tradeCounts.outgoing} pending`:(im?'Quiet now':'No pending deals'),(tradeCounts.incoming||tradeCounts.outgoing)?(tradeCounts.incoming?`${tradeCounts.incoming} response${tradeCounts.incoming===1?'':'s'} needed right now.`:`${tradeCounts.outgoing} sent offer${tradeCounts.outgoing===1?'':'s'} still waiting.`):(im?'No one is waiting on your response right now.':'No current trade pressure on this roster.') )}
       </div>
-      <div>
-        <div style="font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Bench</div>
-        <div>${bench.length?bench.map(player=>renderRow(player,'BN')).join(''):'<div style="color:#94a3b8;font-size:13px;">Empty bench.</div>'}</div>
+      <div style="background:#0f1724;border:1px solid #24324a;border-radius:12px;padding:12px 14px;font-size:12px;color:#cbd5e1;">
+        <b style="color:#f8fafc;">Week ${G.week} matchup:</b> ${oppName}${oppIdx>=0?` · ${revealedWeekTotal.toFixed(1)} vs ${oppScore} revealed`:''}
+      </div>
+      <div class="standings-team-detail-grid">
+        <div class="viewer-panel">
+          <div class="viewer-panel-head">
+            <div class="viewer-panel-title">Starting Lineup</div>
+            <div class="viewer-panel-copy">Current starters and revealed scoring context.</div>
+          </div>
+          <div class="viewer-list">${starters.length?starters.map(entry=>renderRow(entry.player,entry.slot)).join(''):'<div style="color:#94a3b8;font-size:13px;padding:14px 0;">No starters set.</div>'}</div>
+        </div>
+        <div class="viewer-panel">
+          <div class="viewer-panel-head">
+            <div class="viewer-panel-title">Bench</div>
+            <div class="viewer-panel-copy">Depth pieces, stash options, and swap pressure.</div>
+          </div>
+          <div class="viewer-list">${bench.length?bench.map(player=>renderRow(player,'BN')).join(''):'<div style="color:#94a3b8;font-size:13px;padding:14px 0;">Empty bench.</div>'}</div>
+        </div>
       </div>
     </div>
   </div>`;
@@ -5841,7 +6231,7 @@ function renderStandings(){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
         <div>
           <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">${D.leagueName||'RosterBate League'}</div>
-          <div class="season-subbar-copy">Standings</div>
+          <div class="season-subbar-copy">Standings · Select any team to inspect roster, form, and trade pressure.</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <span class="season-stat-pill">${sorted.length} teams</span>
@@ -5856,16 +6246,16 @@ function renderStandings(){
           <tbody>`;
   sorted.forEach((st,rk)=>{
     const im=st.teamIdx===D.myPos,sc=st.streakW?'#16a34a':'#dc2626';
-    h+=`<tr onclick="selectedStandingsTeamIdx=${st.teamIdx};renderStandings()" style="cursor:pointer;">
+    h+=`<tr onclick="openStandingsTeam(${st.teamIdx})" style="cursor:pointer;">
       <td style="font-family:var(--fb);font-weight:800;color:${rk<3?'#f59e0b':'#6b7280'};">${medals[rk]||rk+1}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px;min-width:220px;">
           <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:30px;height:30px;font-size:11px;">${ini(D?.teams?.[st.teamIdx] || ('Team '+(st.teamIdx+1)))}</div>
           <div style="min-width:0;">
-            <button type="button" onclick="event.stopPropagation();selectedStandingsTeamIdx=${st.teamIdx};renderStandings()" class="season-team-link-btn" style="font-weight:700;color:${im?'#fdba74':'#f8fafc'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-align:left;">
+            <button type="button" onclick="event.stopPropagation();openStandingsTeam(${st.teamIdx})" class="season-team-link-btn" style="font-weight:700;color:${im?'#fdba74':'#f8fafc'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-align:left;">
               ${D.teams[st.teamIdx]||'Team '+(st.teamIdx+1)}${im?' ?':''}
             </button>
-            <div class="season-soft-muted">${(st.pf||0).toFixed(1)} PF Â· ${(st.pa||0).toFixed(1)} PA</div>
+            <div class="season-soft-muted">${(st.pf||0).toFixed(1)} PF · ${(st.pa||0).toFixed(1)} PA</div>
           </div>
         </div>
       </td>
@@ -5873,7 +6263,7 @@ function renderStandings(){
       <td>${st.l}</td>
       <td style="font-family:var(--fb);font-weight:800;">${(st.pf||0).toFixed(0)}</td>
       <td style="font-family:var(--fb);font-weight:800;">${(st.pa||0).toFixed(0)}</td>
-      <td style="font-family:var(--fb);font-weight:800;color:${sc};">${st.w+st.l>0?(st.streakW?'W':'L')+(st.streak||0):'â€”'}</td>
+      <td style="font-family:var(--fb);font-weight:800;color:${sc};">${st.w+st.l>0?(st.streakW?'W':'L')+(st.streak||0):'—'}</td>
       <td>${getTeamWeekRevealedScore(st.teamIdx,G.week).toFixed(1)}</td>
     </tr>`;
   });
@@ -5888,13 +6278,14 @@ function renderStandings(){
       const hw=g.winner===g.home;
       h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid #1d283b;background:#121a29;">
         <span style="font-family:var(--fb);font-size:14px;font-weight:700;color:${hw?'#f8fafc':'#94a3b8'};">${D.teams[g.home]||'T'+g.home}</span>
-        <div style="text-align:center;flex-shrink:0;padding:0 8px;"><div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${g.homeScore.toFixed(1)} â€“ ${g.awayScore.toFixed(1)}</div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;">Final</div></div>
+        <div style="text-align:center;flex-shrink:0;padding:0 8px;"><div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${g.homeScore.toFixed(1)} – ${g.awayScore.toFixed(1)}</div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;">Final</div></div>
         <span style="font-family:var(--fb);font-size:14px;font-weight:700;color:${hw?'#94a3b8':'#f8fafc'};">${D.teams[g.away]||'T'+g.away}</span>
       </div>`;
     });
     h+=`</div>`;
   }
   document.getElementById('standingsContent').innerHTML=h;
+  bindHubStandingsInteractions(document.getElementById('standingsContent'));
 }
 
 function openPicker(){
@@ -5904,17 +6295,45 @@ function openPicker(){
     const ti=st.teamIdx,im=ti===D.myPos;
     const nm=D.teams[ti]||'Team '+(ti+1),col=TCOLORS[ti%TCOLORS.length];
     const sc=st.streakW?'var(--green)':'var(--red)';
-    const strk=(st.w+st.l>0)?(st.streakW?'W':'L')+st.streak:'â€”';
-    return`<div onclick="openViewer(${ti})" style="display:flex;align-items:center;gap:12px;background:#121a29;border:1px solid ${im?'#7c4a18':'#24324a'};border-radius:14px;padding:12px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(2,6,23,.2);margin-bottom:8px;">
-      <div style="width:24px;font-family:var(--fb);font-size:15px;font-weight:800;color:${rk<3?'#f59e0b':'#94a3b8'};text-align:center;">${medals[rk]||rk+1}</div>
-      <div class="pav" style="background:${col};width:40px;height:40px;font-size:14px;">${ini(nm)}</div>
-      <div style="flex:1;min-width:0;"><div style="font-family:var(--fb);font-size:16px;font-weight:700;color:${im?'#fdba74':'#f8fafc'};">${nm}${im?' ?':''}</div>
-      <div style="font-size:12px;color:#94a3b8;margin-top:2px;">${st.w}â€“${st.l} Â· ${(st.pf||0).toFixed(1)} PF Â· ${(st.pa||0).toFixed(1)} PA</div></div>
-      <div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--fb);font-size:13px;font-weight:800;color:${sc};">${strk}</div>
-      <div style="font-size:11px;color:#94a3b8;">${getTeamWeekRevealedScore(ti,G.week).toFixed(1)} revealed</div></div>
-    </div>`;
+    const strk=(st.w+st.l>0)?(st.streakW?'W':'L')+st.streak:'-';
+    const revealedWeekTotal=getTeamWeekRevealedScore(ti,G.week).toFixed(1);
+    const openSlots=Math.max(0,STARTERS-(getStarterIdsForTeamDay(ti,G.day)||[]).filter(Boolean).length);
+    return`<button type="button" onclick="openViewer(${ti})" class="picker-card${im?' mine':''}">
+      <div class="picker-rank" style="color:${rk<3?'#f59e0b':'#94a3b8'};">${medals[rk]||rk+1}</div>
+      <div class="pav" style="background:${col};width:42px;height:42px;font-size:14px;">${ini(nm)}</div>
+      <div class="picker-copy">
+        <div class="picker-name-row">
+          <div class="picker-name" style="color:${im?'#fdba74':'#f8fafc'};">${nm}</div>
+          ${im?'<span class="season-stat-pill" style="border-color:#7c4a18;color:#fdba74;background:rgba(249,115,22,.12);">Your Team</span>':''}
+        </div>
+        <div class="picker-meta">${st.w}-${st.l} · ${(st.pf||0).toFixed(1)} PF · ${(st.pa||0).toFixed(1)} PA</div>
+        <div class="picker-pills">
+          <span class="season-stat-pill">${revealedWeekTotal} revealed</span>
+          <span class="season-stat-pill" style="color:${sc};border-color:${st.streakW?'rgba(34,197,94,.32)':'rgba(239,68,68,.3)'};background:${st.streakW?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)'};">${strk} streak</span>
+          <span class="season-stat-pill">${openSlots?openSlots+' slot'+(openSlots===1?'':'s')+' open':'Lineup set'}</span>
+        </div>
+      </div>
+      <div class="picker-side">
+        <div class="picker-side-value">${rk===0?'League lead':rk<4?'Playoff pace':'Inspect roster'}</div>
+        <div class="picker-side-copy">${im?'Open your control view':'Open starters, bench, and trade view'}</div>
+      </div>
+    </button>`;
   }).join('');
-  document.getElementById('pickerModal').classList.add('open');
+  const modal=document.getElementById('pickerModal');
+  if(!modal) return;
+  modal.style.display='flex';
+  modal.style.alignItems='center';
+  modal.style.justifyContent='center';
+  requestAnimationFrame(()=>modal.classList.add('open'));
+}
+
+function closePickerModal(){
+  const modal=document.getElementById('pickerModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  setTimeout(()=>{
+    if(!modal.classList.contains('open')) modal.style.display='none';
+  },180);
 }
 
 function closeFullSchedule(){
@@ -5987,7 +6406,7 @@ function openFullSchedule(){
 }
 
 function openViewer(ti){
-  document.getElementById('pickerModal').classList.remove('open');
+  closePickerModal();
   const nm=D.teams[ti]||'Team '+(ti+1),im=ti===D.myPos;
   const col=TCOLORS[ti%TCOLORS.length],st=getLiveStandingsSnapshot().find(entry=>entry.teamIdx===ti)||G.standings[ti];
   const roster=G.rosters[ti]||[],sIds=getStarterIdsForTeamDay(ti,G.day);
@@ -5998,24 +6417,50 @@ function openViewer(ti){
 
   const av=document.getElementById('vAv');av.textContent=ini(nm);av.style.background=col;
   document.getElementById('vName').textContent=nm;
-  document.getElementById('vRec').textContent=(st?.w||0)+'â€“'+(st?.l||0)+' Â· '+(st?.pf||0).toFixed(1)+' PF Â· '+(st?.pa||0).toFixed(1)+' PA';
+  document.getElementById('vRec').textContent=(st?.w||0)+'-'+(st?.l||0)+' · '+(st?.pf||0).toFixed(1)+' PF · '+(st?.pa||0).toFixed(1)+' PA';
   document.getElementById('vMe').style.display=im?'block':'none';
 
   const strkC=(st?.streakW)?'#16a34a':'#dc2626';
-  const strkT=(st&&(st.w+st.l>0))?(st.streakW?'W':'L')+st.streak:'â€”';
+  const strkT=(st&&(st.w+st.l>0))?(st.streakW?'W':'L')+st.streak:'-';
+  const openSlots=Math.max(0,STARTERS-starters.length);
+  const recentForm=Array.from({length:Math.min(5,Math.max(0,Number(G.week||1)-1))},(_,idx)=>{
+    const week=Number(G.week||1)-idx-1;
+    if(week<1) return null;
+    const gm=weekGames(week).find(game=>game.home===ti||game.away===ti);
+    if(!gm) return null;
+    const winner=gm.winner;
+    if(winner==null) return '•';
+    return winner===ti?'W':'L';
+  }).filter(Boolean).reverse();
   document.getElementById('vStats').innerHTML=[
     [revealedWeekTotal.toFixed(1),'Revealed FP','#c2410c'],
-    [(st?.w||0)+'â€“'+(st?.l||0),'Record','#111827'],
+    [(st?.w||0)+'-'+(st?.l||0),'Record','#111827'],
     [strkT,'Streak',strkC],
     [roster.length,'Players','#111827']
   ].map(([v,l,c])=>`<div style="background:#121a29;border:1px solid #24324a;border-radius:12px;padding:10px 14px;text-align:center;min-width:92px;"><div style="font-family:var(--fb);font-size:24px;font-weight:800;color:${c};line-height:1;">${v}</div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-top:8px;">${l}</div></div>`).join('');
+  document.getElementById('vNowBand').innerHTML=`
+    <div class="viewer-now-card ${openSlots?'alert':'live'}">
+      <div class="season-now-label">Lineup Status</div>
+      <div class="season-now-value">${openSlots?openSlots+' slot'+(openSlots===1?'':'s')+' open':'Board ready'}</div>
+      <div class="season-now-copy">${openSlots?'This team still has lineup pressure today. Inspect the starters and bench before reveal locks in.':'This team has a full starter board set for today.'}</div>
+    </div>
+    <div class="viewer-now-card info">
+      <div class="season-now-label">Recent Form</div>
+      <div class="season-now-value">${recentForm.length?recentForm.join(' '):'No sample yet'}</div>
+      <div class="season-now-copy">${recentForm.length?'Last completed weeks for this team. Use it as a quick momentum read, not a full projection.':'The season is too early for a meaningful recent-form sample.'}</div>
+    </div>
+    <div class="viewer-now-card ${im?'live':'info'}">
+      <div class="season-now-label">${im?'Next Action':'Trade Lane'}</div>
+      <div class="season-now-value">${im?'Set lineup faster':'Inspect then trade'}</div>
+      <div class="season-now-copy">${im?'Jump from this overlay straight into roster management if you need to move players before the next reveal.':'Scan the starter core and bench depth here, then jump into Trade Desk if the roster fit is right.'}</div>
+    </div>`;
 
   const mm=weekGames(G.week).find(g=>g.home===ti||g.away===ti);
   if(mm){
     const oi=mm.home===ti?mm.away:mm.home;
-    document.getElementById('vMatchup').innerHTML=`<b style="color:#f8fafc">Week ${G.week}:</b> vs ${D.teams[oi]||'Team '+(oi+1)} &nbsp;Â·&nbsp; ${revealedWeekTotal.toFixed(1)} vs ${getTeamWeekRevealedScore(oi,G.week).toFixed(1)} revealed`;
+    document.getElementById('vMatchup').innerHTML=`<b style="color:#f8fafc">Week ${G.week} matchup:</b> vs ${D.teams[oi]||'Team '+(oi+1)} &nbsp;·&nbsp; ${revealedWeekTotal.toFixed(1)} vs ${getTeamWeekRevealedScore(oi,G.week).toFixed(1)} revealed`;
   } else {
-    document.getElementById('vMatchup').innerHTML=`<b style="color:#f8fafc">Week ${G.week}:</b> <span style="color:#94a3b8">Bye week</span>`;
+    document.getElementById('vMatchup').innerHTML=`<b style="color:#f8fafc">Week ${G.week} matchup:</b> <span style="color:#94a3b8">Bye week</span>`;
   }
   document.getElementById('vMatchup').style.background='#121a29';
   document.getElementById('vMatchup').style.border='1px solid #24324a';
@@ -6025,39 +6470,29 @@ function openViewer(ti){
     const inj=getInjuryStatus(p,G.week);
     const injBadge=inj?`<span style="background:${inj.color}22;border:1px solid ${inj.color}55;border-radius:999px;padding:2px 7px;font-family:var(--fb);font-size:10px;font-weight:700;color:${inj.color};margin-left:4px;">${inj.label}</span>`:'';
     const game=getGameInfo(p,G.day);
-    const gameInfo=game?`<span style="font-size:11px;color:#94a3b8;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} Â· ${game.time}</span>`:`<span style="font-size:11px;color:#64748b;margin-top:1px;display:block;">No game today</span>`;
+    const gameInfo=game?`<span style="font-size:11px;color:#94a3b8;margin-top:1px;display:block;">${game.isHome?'vs':'@'} ${game.opp} · ${game.time}</span>`:`<span style="font-size:11px;color:#64748b;margin-top:1px;display:block;">No game today</span>`;
     return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #24324a;">
       <div style="width:34px;font-family:var(--fb);font-size:12px;font-weight:800;color:#94a3b8;flex-shrink:0;">${slot}</div>
       <div class="pav" style="background:${tc(p.team)};width:32px;height:32px;font-size:12px;">${ini(p.name)}</div>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;flex-wrap:wrap;"><span style="font-family:var(--fb);font-size:15px;font-weight:700;color:#f8fafc;">${p.name}</span><span style="display:inline-block;padding:2px 6px;border-radius:999px;font-family:var(--fb);font-size:10px;font-weight:700;margin-left:6px;background:#eff6ff;color:#2563eb;">${p.pos}</span>${injBadge}</div>
-        <div style="font-size:12px;color:#94a3b8;">${p.team} Â· ${p.fp}fp Â· ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
+        <div style="font-size:12px;color:#94a3b8;">${p.team} · ${p.fp}fp · ${getRosterbatePlayerSummary(p, CURRENT_SPORT)}</div>
         ${gameInfo}
       </div>
       <span style="background:${isS?'rgba(34,197,94,.14)':'#0f1724'};border:1px solid ${isS?'rgba(34,197,94,.35)':'#24324a'};border-radius:999px;padding:3px 9px;font-family:var(--fb);font-size:10px;font-weight:700;color:${isS?'#86efac':'#94a3b8'};">${isS?'START':'BN'}</span>
     </div>`;
   }
 
-  document.getElementById('vStarters').innerHTML=`<div class="season-table-card" style="overflow:hidden;">
-    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #24324a;">
-      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;">Starting Lineup</div>
-      <div class="season-soft-muted" style="margin-top:4px;">Current starters and active matchup context.</div>
-    </div>
-    <div style="padding:0 18px 6px;">${starters.length?starters.map((p,i)=>vPRow(p,slots[i]||'UTIL',true)).join(''):'<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center;">No starters set</div>'}</div>
-  </div>`;
-  document.getElementById('vBench').innerHTML=`<div class="season-table-card" style="overflow:hidden;">
-    <div class="season-card-pad" style="padding-bottom:10px;border-bottom:1px solid #24324a;">
-      <div style="font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;">Bench</div>
-      <div class="season-soft-muted" style="margin-top:4px;">Depth pieces and reserves.</div>
-    </div>
-    <div style="padding:0 18px 6px;">${bench.length?bench.map(p=>vPRow(p,'BN',false)).join(''):'<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center;">Empty bench</div>'}</div>
-  </div>`;
+  document.getElementById('vStarters').innerHTML=starters.length?starters.map((p,i)=>vPRow(p,slots[i]||'UTIL',true)).join(''):'<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center;">No starters set</div>';
+  document.getElementById('vBench').innerHTML=bench.length?bench.map(p=>vPRow(p,'BN',false)).join(''):'<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center;">Empty bench</div>';
 
   const act=document.getElementById('vActions');
   if(im){
-    act.innerHTML=`<button onclick="closeViewerModal();goPage('roster');" class="season-chip-link solid">Edit My Lineup</button>`;
+    act.innerHTML=`<button onclick="closeViewerModal();goPage('roster');" class="season-chip-link solid">Edit My Lineup</button>
+      <button onclick="closeViewerModal();goPage('matchup');" class="season-chip-link">Inspect Matchup</button>`;
   } else {
-    act.innerHTML=`<button onclick="closeViewerModal();goPage('trades');setTimeout(()=>openTrade(${ti}),120);" class="season-chip-link solid">Propose Trade with ${nm}</button>`;
+    act.innerHTML=`<button onclick="closeViewerModal();goPage('trades');setTimeout(()=>openTrade(${ti}),120);" class="season-chip-link solid">Propose Trade</button>
+      <button onclick="closeViewerModal();goPage('standings');" class="season-chip-link">View Standings</button>`;
   }
   act.innerHTML+=`<button onclick="closeViewerModal()" class="season-chip-link">Close</button>`;
   const modal=document.getElementById('viewerModal');
@@ -6400,6 +6835,127 @@ function syncSportSlotsFromCommissioner(){
   syncExistingLineupsToCurrentSlots(previousSlots);
 }
 
+function getCommissionerOverviewState(){
+  initCS();
+  const pendingTrades=(G.tradeOffers||[]).filter(t=>t.status==='pending');
+  const recentDrops=(G.recentDrops||[]).filter(drop=>!drop.undone);
+  const watchHits=(D.watchlist||[]).filter(pid=>(G.waiver||[]).some(player=>Number(player?.id)===Number(pid))).length;
+  const commissionerIdx=Number.isFinite(Number(D?.commissionerTeamIdx))?Number(D.commissionerTeamIdx):Number(D?.myPos||0);
+  const commissionerName=teamName(commissionerIdx);
+  const actions=[
+    pendingTrades.length?{
+      tone:'alert',
+      title:`${pendingTrades.length} trade${pendingTrades.length===1?'':'s'} need attention`,
+      copy:D?.isCommissioner===false?'The league has pending deals moving through review right now.':'Open the trade controls if you need to resolve, veto, or force through a league-critical deal.',
+      actionLabel:'Open Trades',
+      action:"openCommissionerTab('trades')"
+    }:null,
+    recentDrops.length?{
+      tone:'alert',
+      title:`${recentDrops.length} recent drop${recentDrops.length===1?'':'s'} can be restored`,
+      copy:'Use the waiver controls to undo accidental drops before managers claim those players back off the wire.',
+      actionLabel:'Open Waivers',
+      action:"openCommissionerTab('acq')"
+    }:null,
+    watchHits?{
+      tone:'live',
+      title:`${watchHits} watched target${watchHits===1?'':'s'} available now`,
+      copy:'The wire is live. Double-check waiver settings while managers still have a real decision to make.',
+      actionLabel:'Review Wire Rules',
+      action:"openCommissionerTab('acq')"
+    }:null,
+    {
+      tone:'info',
+      title:D?.isCommissioner===false?'Commissioner console is view only':'League settings are steady',
+      copy:D?.isCommissioner===false?`${commissionerName} currently controls league-wide changes. You can still inspect every rules lane from here.`:'Tune roster rules, scoring, and playoff structure here before the next major league event.',
+      actionLabel:'Open Basic',
+      action:"openCommissionerTab('basic')"
+    }
+  ].filter(Boolean).slice(0,3);
+  return {
+    pendingTrades,
+    recentDrops,
+    watchHits,
+    commissionerName,
+    actions
+  };
+}
+
+function renderCommissionerOverview(){
+  const mount=document.getElementById('commOverview');
+  if(!mount) return;
+  const state=getCommissionerOverviewState();
+  const nextAction=state.actions[0]||null;
+  mount.innerHTML=`<div class="comm-hero">
+    <div class="comm-hero-top">
+      <div>
+        <div class="comm-hero-title">League Control Room</div>
+        <div class="comm-hero-copy">${D?.isCommissioner===false?'You are viewing the commissioner console in read-only mode. Track what is active now and route the current commissioner to the right settings lane fast.':'Tune rules, monitor live league pressure, and jump directly to the lane that needs attention before the next reveal or transaction window.'}</div>
+      </div>
+      ${nextAction?`<button class="comm-action-btn" onclick="${nextAction.action}">${nextAction.actionLabel}</button>`:''}
+    </div>
+    <div class="comm-hero-badges">
+      <span class="season-stat-pill">${CS?.isPublic?'Public':'Private'} League</span>
+      <span class="season-stat-pill">${CS?.format||'Standard'} Format</span>
+      <span class="season-stat-pill">${CS?.scoringType||'H2H Points'}</span>
+      <span class="season-stat-pill">Commissioner: ${state.commissionerName}</span>
+    </div>
+    <div class="comm-hero-stats">
+      <div class="comm-hero-stat"><div class="comm-hero-stat-value">${D?.teams?.length||CS?.numTeams||0}</div><div class="comm-hero-stat-label">Teams In League</div></div>
+      <div class="comm-hero-stat"><div class="comm-hero-stat-value">${state.pendingTrades.length}</div><div class="comm-hero-stat-label">Pending Trades</div></div>
+      <div class="comm-hero-stat"><div class="comm-hero-stat-value">${state.recentDrops.length}</div><div class="comm-hero-stat-label">Recent Drops</div></div>
+      <div class="comm-hero-stat"><div class="comm-hero-stat-value">${state.watchHits}</div><div class="comm-hero-stat-label">Watchlist Hits</div></div>
+    </div>
+  </div>
+  <div class="comm-overview-grid">
+    <div class="comm-overview-card">
+      <div class="comm-overview-label">Active Now</div>
+      <div class="comm-action-list" style="margin-top:12px;">
+        ${state.actions.map(action=>`<div class="comm-action-item ${action.tone||''}">
+          <div class="comm-action-text">
+            <div class="comm-action-title">${action.title}</div>
+            <div class="comm-action-copy">${action.copy}</div>
+          </div>
+          <button class="comm-action-btn" onclick="${action.action}">${action.actionLabel}</button>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="comm-overview-card">
+      <div class="comm-overview-label">Commissioner Posture</div>
+      <div class="comm-overview-value">${D?.isCommissioner===false?'View Only':'Live Control'}</div>
+      <div class="comm-overview-copy">${D?.isCommissioner===false?'You can inspect rules, scoring, waivers, trades, and playoff structure here, but only the active commissioner can change league-wide settings.':'This screen is your control room for rules, structure, and emergency overrides. The most urgent settings lanes are highlighted below.'}</div>
+      <div class="trade-builder-badges" style="margin-top:12px;">
+        <span class="season-stat-pill">Draft ${CS?.draftType||'Snake'}</span>
+        <span class="season-stat-pill">Review ${CS?.tradeReviewPeriod||0}d</span>
+        <span class="season-stat-pill">${CS?.lineupChanges||'Daily'} Lineups</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateCommissionerTabState(){
+  const pendingTrades=(G.tradeOffers||[]).filter(t=>t.status==='pending').length;
+  const recentDrops=(G.recentDrops||[]).filter(drop=>!drop.undone).length;
+  document.querySelectorAll('#commissioner .ctab').forEach(btn=>{
+    btn.classList.remove('alert','live');
+    const target=btn.getAttribute('onclick')||'';
+    if(target.includes("'trades'") && pendingTrades) btn.classList.add('alert');
+    if(target.includes("'acq'") && recentDrops) btn.classList.add('alert');
+    if(target.includes("'basic'") && !pendingTrades && !recentDrops) btn.classList.add('live');
+  });
+}
+
+function openCommissionerTab(tab){
+  const content=document.getElementById('commContent');
+  if(String(activeCommTab||'')===String(tab||'')){
+    content?.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  const btn=document.querySelector(`#commissioner .ctab[onclick*="'${tab}'"]`);
+  switchCommTab(tab, btn || null);
+  content?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function hydrateSeasonSteppers(root){
   (root||document).querySelectorAll('input[type="number"]').forEach(function(input){
     if(input.closest('.cnum-wrap')) return;
@@ -6436,10 +6992,12 @@ function renderCommissioner(){
   renderSidePowerups('commPowerups');
   try{
     initCS();
+    renderCommissionerOverview();
     switchCommTab(activeCommTab || 'basic', document.querySelector(`.ctab[onclick*="${activeCommTab || 'basic'}"]`) || document.querySelector('.ctab'));
   }catch(err){
     console.error('Commissioner render failed. Resetting settings.', err);
     rebuildCommissionerSettings();
+    renderCommissionerOverview();
     const content=document.getElementById('commContent');
     if(content){
       try{
@@ -6454,6 +7012,7 @@ function renderCommissioner(){
   }
   const el=document.getElementById('commNav');
   if(el) el.innerHTML=PAGES.map(pg=>`<button class="nb${pg==='commissioner'?' on':''}" onclick="goPage('${pg}')">${PLABELS[pg]}</button>`).join('');
+  updateCommissionerTabState();
 }
 
 let activeCommTab='basic';
@@ -6477,6 +7036,7 @@ function switchCommTab(tab, btn){
   }
   hydrateSeasonSteppers(el);
   renderSidePowerups('commPowerups');
+  updateCommissionerTabState();
 }
 
 // -- helpers --
@@ -6519,7 +7079,13 @@ function row(label,control,sub){
 
 // -- BASIC --
 function commBasic(){
+  const commissionerName=teamName(Number.isFinite(Number(D?.commissionerTeamIdx))?Number(D.commissionerTeamIdx):Number(D?.myPos||0));
   document.getElementById('commContent').innerHTML=`
+    <div class="comm-overview-card" style="margin-bottom:14px;">
+      <div class="comm-overview-label">League Identity</div>
+      <div class="comm-overview-value">${CS.leagueName||'My RosterBate League'}</div>
+      <div class="comm-overview-copy">${D?.isCommissioner===false?'This league is currently controlled by '+commissionerName+'. Use this section to inspect the league foundation and confirm ownership, format, and reveal posture.':'Use this lane to lock in the league’s name, ownership, format, and reveal posture before managers start reacting to the season state.'}</div>
+    </div>
     <div class="csection">Basic Settings</div>
     <div class="card" style="padding:0 14px;">
       ${row('League Name',commText('leagueName','My League'))}
@@ -6623,11 +7189,18 @@ function commAcq(){
       <div class="crow">
         <div>
           <div class="clabel">${drop.player.name}</div>
-          <div class="csub">${drop.teamName} Â· ${drop.fromIL?getIlSlotKey():'Roster'} Â· ${activityAge(drop.droppedAt)}</div>
+          <div class="csub">${drop.teamName} · ${drop.fromIL?getIlSlotKey():'Roster'} · ${activityAge(drop.droppedAt)}</div>
         </div>
         <button class="season-outline-btn" style="padding:8px 14px;" onclick="undoRecentDrop('${drop.id}')">Undo Drop</button>
       </div>`).join('');
+  const pendingRecentDrops=(G.recentDrops||[]).filter(d=>!d.undone).length;
+  const watchHits=(D.watchlist||[]).filter(pid=>(G.waiver||[]).some(player=>Number(player?.id)===Number(pid))).length;
   document.getElementById('commContent').innerHTML=`
+    <div class="comm-overview-card" style="margin-bottom:14px;">
+      <div class="comm-overview-label">Wire Pressure</div>
+      <div class="comm-overview-value">${pendingRecentDrops?pendingRecentDrops+' recent drop'+(pendingRecentDrops===1?'':'s'):'Waiver lane is stable'}</div>
+      <div class="comm-overview-copy">${pendingRecentDrops?'There are recent drops that can still be restored, so this is the right moment to review undo policy and waiver timing. ':''}${watchHits?watchHits+' watched target'+(watchHits===1?'':'s')+' are available on the wire right now.':''}${!pendingRecentDrops&&!watchHits?'Managers have a quiet wire right now, so this is a safe moment to tune acquisition rules.' : ''}</div>
+    </div>
     <div class="csection">Lineup Changes</div>
     <div class="card" style="padding:0 14px;">
       ${row('Lineup Changes',commSel('lineupChanges',['Daily','Weekly - Lock at First Game','Always - No Locks']),'Daily = Lock individually at scheduled gametime.')}
@@ -6654,7 +7227,13 @@ function commAcq(){
 
 // -- TRADES --
 function commTrades(){
+  const pendingTrades=(G.tradeOffers||[]).filter(t=>t.status==='pending').length;
   document.getElementById('commContent').innerHTML=`
+    <div class="comm-overview-card" style="margin-bottom:14px;">
+      <div class="comm-overview-label">Trade Review State</div>
+      <div class="comm-overview-value">${pendingTrades?pendingTrades+' pending trade'+(pendingTrades===1?'':'s'):'No pending trades'}</div>
+      <div class="comm-overview-copy">${pendingTrades?'Managers have live offers in motion right now. Tighten the review window or veto threshold here if you want a faster or more commissioner-controlled trade market.':'The trade market is quiet right now, so this is a safe time to adjust deadlines, review period, and keeper behavior.'}</div>
+    </div>
     <div class="csection">Trade Settings</div>
     <div class="card" style="padding:0 14px;">
       ${row('Trade Limit',commSel('tradeLimit',['No Limit','5','10','15','20']))}
@@ -6884,7 +7463,7 @@ function rbTime(ts){
   if(diff<60000) return 'just now';
   if(diff<3600000) return Math.floor(diff/60000)+'m ago';
   if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' Â· '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  return d.toLocaleDateString([],{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 }
 
 function rbEscHtml(s){
@@ -6932,7 +7511,7 @@ function rbRenderReplyBar(){
       <div class="rb-chat-replymeta">Replying to ${rbEscHtml(msg.sender)}</div>
       <div class="rb-chat-replytext">${rbEscHtml(preview)}</div>
     </div>
-    <button class="rb-chat-replyclose" onclick="rbClearReply()" aria-label="Cancel reply">Ã—</button>
+    <button class="rb-chat-replyclose" onclick="rbClearReply()" aria-label="Cancel reply">&times;</button>
   `;
   bar.style.display='flex';
 }
@@ -6994,7 +7573,7 @@ function rbRenderMsg(m){
   return `<div class="rb-msg${isMe?' me':''}">
     <div class="rb-msg-av" style="background:${col}">${rbGetTeamAvatar(m.sender)}</div>
     <div class="rb-msg-body">
-      <div class="rb-msg-name">${rbEscHtml(isMe ? `${m.sender} Â· You` : m.sender)}</div>
+      <div class="rb-msg-name">${rbEscHtml(isMe ? `${m.sender} · You` : m.sender)}</div>
       <div class="rb-bubble-wrap">
         ${replyHtml}
         ${bubbleInner}
@@ -7006,7 +7585,7 @@ function rbRenderMsg(m){
       ${hasReacts?`<div class="rb-reactions">${reactHtml}</div>`:''}
       <div class="rb-msg-time">${rbTime(m.ts)}</div>
     </div>
-    <button class="rb-msg-react-btn" data-msgid="${m.id}">??</button>
+    <button class="rb-msg-react-btn" data-msgid="${m.id}">&#128515;</button>
   </div>`;
 }
 
@@ -7019,8 +7598,15 @@ function rbRender(){
   const seasonLabel = Array.isArray(D?.teams) && D.teams.length ? `${D.teams.length} teams talking` : 'Season-long multiplayer thread';
   const onlineEl = document.getElementById('rbOnlineCount');
   if(onlineEl) onlineEl.textContent = seasonLabel;
+  const promptEl = document.getElementById('rbChatPrompt');
+  const latestMsg = msgs[msgs.length-1];
+  if(promptEl){
+    promptEl.textContent = latestMsg
+      ? `Latest from ${latestMsg.sender} · ${rbTime(latestMsg.ts)}`
+      : 'Call your shot, answer trades, or stir the room before the next reveal.';
+  }
   if(!msgs.length){
-    el.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);padding:22px 0;"><div style="font-size:34px;">??</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No trash talk yet</div><div style="font-size:12px;">Start the season-long thread.</div></div>';
+    el.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);padding:22px 0;"><div style="font-size:34px;">&#128172;</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No trash talk yet</div><div style="font-size:12px;">Start the season-long thread.</div></div>';
     rbLastRenderedCount = 0;
     return;
   }
