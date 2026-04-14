@@ -208,14 +208,14 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-action-title{font-family:var(--fb);font-size:16px;font-weight:700;letter-spacing:.1px;}
     .hub-action-sub{font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.35;}
     .hub-lower{display:grid;gap:16px;grid-template-rows:auto auto;}
-    .activity-feed{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
-    .activity-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;padding:12px 6px;border-bottom:1px solid rgba(214,232,255,.1);background:transparent;}
+    .activity-feed{display:flex;flex-direction:column;gap:10px;border-top:none;}
+    .activity-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;padding:14px 12px;border:1px solid rgba(214,232,255,.12);border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
     .activity-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:4px;}
     .activity-copy{min-width:0;flex:1;}
     .activity-title{font-family:var(--fb);font-size:13px;font-weight:700;line-height:1.15;color:#f8fafc;}
     .activity-meta{font-size:11px;color:#94a3b8;line-height:1.35;}
     .activity-text{font-size:13px;color:#dbe4f0;line-height:1.45;margin-top:2px;}
-    .hub-team-card{text-align:center;padding-top:18px;padding-bottom:18px;}
+    .hub-team-card{text-align:center;padding-top:18px;padding-bottom:18px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
     .hub-team-name{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;margin-top:12px;}
     .hub-team-record{font-size:13px;color:#d7e4f6;margin-top:4px;}
 .season-league-hero{position:relative;isolation:isolate;}
@@ -256,6 +256,22 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 #hub #advBtn:disabled::before{opacity:.4;animation:none;}
 #hub #advBtn.is-done::after{background:linear-gradient(135deg,rgba(30,41,59,.92),rgba(51,65,85,.92));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 12px 28px rgba(2,6,23,.28);}
 #hub #advBtn.is-done::before{background:radial-gradient(circle at 50% 50%,rgba(148,163,184,.34),rgba(15,23,42,0) 75%);}
+.hub-column > .hub-card,.hub-side-left > .hub-card,.hub-side-aux > .hub-card{background:linear-gradient(180deg,rgba(18,26,39,.7),rgba(10,16,27,.82));border:1px solid rgba(214,232,255,.16);box-shadow:0 22px 42px rgba(2,6,23,.3),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+.hub-card.compact{background:linear-gradient(180deg,rgba(18,26,39,.72),rgba(10,16,27,.84));}
+.hub-card-head{margin-bottom:16px;}
+.hub-card-title{color:#f8fbff;}
+.hub-card-sub{color:#c1d0e3;}
+.hub-card-meta{color:#b7ddff;}
+.hub-powerup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.hub-powerup-tile{border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:182px;border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 28px rgba(2,6,23,.24);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.hub-powerup-top{display:flex;align-items:flex-start;gap:10px;}
+.hub-powerup-title{font-family:var(--fb);font-size:12px;font-weight:800;line-height:1.15;color:#f8fbff;}
+.hub-powerup-meta{font-size:10px;color:#c2d3e6;text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.hub-powerup-copy{font-size:12px;color:#ecf4ff;line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.hub-powerup-foot{font-size:11px;color:#d7e4f6;}
+.hub-powerup-status{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;padding:4px 9px;border-radius:999px;background:rgba(10,16,27,.45);border:1px solid rgba(255,255,255,.16);font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;color:#eef6ff;}
+.hub-powerup-tile .season-outline-btn{background:rgba(10,16,27,.46);border-color:rgba(255,255,255,.18);color:#eaf4ff;}
+.hub-powerup-tile .season-outline-btn:hover{border-color:rgba(251,146,60,.42);color:#fff7ed;}
 .season-reveal-btn-label,.season-reveal-btn-sub{position:relative;z-index:1;}
 .season-reveal-btn-label{font-family:var(--fb);font-size:22px;font-weight:800;line-height:1.05;color:#f8fff7;letter-spacing:.04em;text-align:center;}
 .season-reveal-btn-sub{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(220,252,231,.88);text-align:center;}
@@ -466,11 +482,11 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-team-link-btn[data-open-picker]{position:relative;z-index:12;pointer-events:auto;cursor:pointer;}
     #hub .sb{background-color:#07111d;}
     #hub .bg{background:#2563eb;color:#fff;border:none;}
-    #hub .rb-chat-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;box-shadow:0 10px 28px rgba(2,6,23,.28);height:420px;max-height:420px;overflow:hidden;}
-    #hub .rb-chat-hdr,#hub .rb-chat-input-area{background:#121a29;}
+    #hub .rb-chat-panel{background:linear-gradient(180deg,rgba(18,26,39,.72),rgba(10,16,27,.84));border:1px solid rgba(214,232,255,.16);border-radius:18px;box-shadow:0 22px 42px rgba(2,6,23,.32),inset 0 1px 0 rgba(255,255,255,.08);height:420px;max-height:420px;overflow:hidden;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+    #hub .rb-chat-hdr,#hub .rb-chat-input-area{background:transparent;}
     #hub .rb-chat-hdr{justify-content:center;text-align:center;}
     #hub .rb-chat-hdr > div{flex:none !important;}
-    #hub .rb-chat-msgs{background:#0f1724;}
+    #hub .rb-chat-msgs{background:linear-gradient(180deg,rgba(7,12,20,.18),rgba(7,12,20,.34));}
     ::-webkit-scrollbar{width:10px;height:10px;}
     ::-webkit-scrollbar-track{background:#0f1724;}
     ::-webkit-scrollbar-thumb{background:#334155;border-radius:999px;border:2px solid #0f1724;}
@@ -3616,13 +3632,15 @@ function waiverCell(player,key){
     else if(signals.radarTarget) tags.push(`<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(34,197,94,.34);background:rgba(21,128,61,.18);color:#86efac;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Radar #${signals.radarRank+1}</span>`);
     if(signals.recentDrop) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#fdba74;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Recent Drop</span>');
     if(watched) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(250,204,21,.34);background:rgba(250,204,21,.14);color:#fde68a;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Watching</span>');
-    return `<div style="display:flex;align-items:flex-start;gap:10px;min-width:220px;">
+    return `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:220px;">
       <div style="display:flex;align-items:flex-start;gap:9px;min-width:0;flex:1;">
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
-      <div style="min-width:0;display:flex;flex-direction:column;gap:7px;">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:7px;flex:1;">
         <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
         ${tags.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${tags.join('')}</div>`:''}
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:2px;">
         <button
           type="button"
           onclick="toggleWatchList(${player.id})"
@@ -3636,8 +3654,6 @@ function waiverCell(player,key){
           class="season-outline-btn"
           style="padding:7px 12px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;white-space:nowrap;"
         >Add Player</button>
-        </div>
-      </div>
       </div>
     </div>`;
   }

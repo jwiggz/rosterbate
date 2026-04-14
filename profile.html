@@ -10,46 +10,83 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <style>
 :root{
-  --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+  --bg:#05070e;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#29415f;
   --accent:#f97316;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;
-  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --text:#f1f5f9;--text2:#b8c7dc;--text3:#7f93ad;
   --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,rgba(249,115,22,.15) 0%,transparent 60%);pointer-events:none;}
-.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:20px 18px 60px;}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px;}
+html,body{min-height:100%;color:var(--text);font-family:var(--fb);}
+body{
+  background:
+    linear-gradient(180deg,rgba(4,7,13,.18),rgba(4,8,15,.74) 24%,rgba(4,8,15,.94) 100%),
+    radial-gradient(circle at top,rgba(251,146,60,.2),transparent 24%),
+    radial-gradient(circle at 18% 18%,rgba(255,255,255,.08),transparent 22%),
+    url('/hero-hall-of-fame.avif') center/cover fixed no-repeat,
+    var(--bg);
+  position:relative;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.03),transparent 18%,transparent 82%,rgba(255,255,255,.03)),
+    linear-gradient(180deg,rgba(255,255,255,.02),transparent 14%,transparent 80%,rgba(255,255,255,.05));
+  pointer-events:none;
+}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:20px 18px 60px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px;padding:14px 16px;border:1px solid rgba(148,223,255,.24);border-radius:18px;background:linear-gradient(180deg,rgba(29,44,65,.48),rgba(10,16,28,.72));box-shadow:0 12px 34px rgba(0,0,0,.22),0 0 24px rgba(125,211,252,.08);backdrop-filter:blur(20px);}
 .brand{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
 .brand span{color:var(--accent);}
 .top-actions{display:flex;gap:8px;align-items:center;}
-.btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;}
-.btn.primary{background:var(--accent);color:#fff;}
-.btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;}
+.btn:hover{transform:translateY(-1px);}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#f59e0b);box-shadow:0 14px 26px rgba(249,115,22,.22);color:#fff;}
+.btn.secondary{background:rgba(19,31,49,.72);border:1px solid rgba(148,223,255,.18);color:#e6efff;}
 .btn.danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
-.hero{background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(59,130,246,.08));border:1px solid rgba(249,115,22,.22);border-radius:20px;padding:20px;margin-bottom:14px;}
-.hero-title{font-family:var(--fd);font-size:30px;font-weight:900;text-transform:uppercase;line-height:.95;}
-.hero-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-top:8px;max-width:420px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
-.section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:12px;}
+.hero{background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(13,22,36,.42),rgba(13,22,36,.66));border:1px solid rgba(165,214,255,.22);border-radius:24px;padding:24px;margin-bottom:14px;box-shadow:0 24px 56px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(22px);}
+.hero-title{font-family:var(--fd);font-size:34px;font-weight:900;text-transform:uppercase;line-height:.95;}
+.hero-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-top:8px;max-width:520px;}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px;}
+.summary-card{padding:14px 15px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(15,24,39,.58),rgba(10,17,29,.82));border:1px solid rgba(162,214,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 26px rgba(0,0,0,.18);backdrop-filter:blur(18px);}
+.summary-value{font-family:var(--fd);font-size:26px;font-weight:900;line-height:1;}
+.summary-label{margin-top:8px;color:#dce8f7;font-size:11px;letter-spacing:.8px;text-transform:uppercase;}
+.summary-copy{margin-top:6px;color:var(--text2);font-size:12px;line-height:1.45;}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:14px;align-items:start;}
+.stack{display:flex;flex-direction:column;gap:12px;}
+.card{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(15,24,39,.56),rgba(10,17,29,.82));border:1px solid rgba(162,214,255,.18);border-radius:20px;padding:18px;margin-bottom:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 28px rgba(0,0,0,.18);backdrop-filter:blur(18px);}
+.section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#c6d5e8;margin-bottom:12px;}
 .profile-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.avatar{width:96px;height:96px;border-radius:24px;background:var(--bg3);border:1px solid var(--border);object-fit:cover;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:34px;font-weight:900;color:var(--accent);overflow:hidden;}
+.avatar{width:104px;height:104px;border-radius:28px;background:rgba(15,24,39,.64);border:1px solid rgba(162,214,255,.18);object-fit:cover;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:34px;font-weight:900;color:var(--accent);overflow:hidden;box-shadow:0 16px 26px rgba(0,0,0,.18);}
 .meta{flex:1;min-width:220px;}
-.display-name{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;}
+.display-name{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;}
 .meta-line{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;}
 .field{margin-bottom:12px;}
 .label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:var(--fd);font-weight:700;}
-.input,.textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 13px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;}
+.input,.textarea{width:100%;background:rgba(19,31,49,.72);border:1px solid rgba(148,223,255,.16);border-radius:14px;padding:12px 13px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;}
 .input:focus,.textarea:focus{border-color:var(--accent);}
 .textarea{min-height:88px;resize:vertical;}
 .help{font-size:11px;color:var(--text3);line-height:1.5;margin-top:6px;}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .preview-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;}
-.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 10px;font-size:11px;color:var(--text2);}
-.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-.theme-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;transition:.18s border-color,.18s transform;color:var(--text);font-family:var(--fb);text-align:left;}
-.theme-card:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.35);}
-.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(249,115,22,.18) inset;}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(19,31,49,.62);border:1px solid rgba(148,223,255,.14);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
+.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.theme-card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(19,31,49,.72),rgba(10,16,28,.84));border:1px solid rgba(148,223,255,.14);border-radius:18px;padding:14px;cursor:pointer;transition:.18s border-color,.18s transform,color .18s ease,box-shadow .18s ease,background-color .18s ease;color:var(--text);font-family:var(--fb);text-align:left;}
+.theme-card:hover{transform:translateY(-2px);border-color:rgba(249,115,22,.35);box-shadow:0 16px 28px rgba(0,0,0,.18);}
+.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(249,115,22,.18) inset,0 16px 30px rgba(249,115,22,.10);}
+.theme-preview{position:relative;height:118px;border-radius:16px;padding:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 18% 18%,color-mix(in srgb,var(--theme-a) 58%,transparent),transparent 34%),radial-gradient(circle at 82% 22%,color-mix(in srgb,var(--theme-b) 54%,transparent),transparent 36%),linear-gradient(135deg,color-mix(in srgb,var(--theme-c) 78%,#05070e),color-mix(in srgb,var(--theme-c) 92%,#111827));box-shadow:inset 0 1px 0 rgba(255,255,255,.12);}
+.theme-preview::after{content:'';position:absolute;inset:auto -18% 8px 42%;height:54px;border-radius:999px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--theme-b) 64%,transparent),transparent);opacity:.42;filter:blur(20px);}
+.theme-preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;}
+.theme-chip{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;background:rgba(7,12,22,.42);border:1px solid rgba(255,255,255,.14);color:#f8fbff;font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.75px;text-transform:uppercase;}
+.theme-orb{width:28px;height:28px;border-radius:999px;background:radial-gradient(circle at 32% 32%,rgba(255,255,255,.94),var(--theme-a) 34%,var(--theme-b) 74%,rgba(8,15,27,.1) 100%);border:1px solid rgba(255,255,255,.28);box-shadow:0 0 18px color-mix(in srgb,var(--theme-b) 38%,transparent);flex-shrink:0;}
+.theme-preview-title{position:relative;z-index:1;margin-top:16px;font-family:var(--fd);font-size:22px;font-weight:900;line-height:.9;text-transform:uppercase;color:#fff;max-width:150px;text-shadow:0 10px 22px rgba(0,0,0,.36);}
+.theme-preview-lines{position:relative;z-index:1;display:grid;gap:6px;margin-top:14px;}
+.theme-preview-lines span{display:block;height:7px;border-radius:999px;background:rgba(255,255,255,.14);}
+.theme-preview-lines span:nth-child(1){width:74%;}
+.theme-preview-lines span:nth-child(2){width:58%;}
+.theme-copy{padding-top:12px;}
 .theme-name{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;}
 .theme-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.45;}
 .swatches{display:flex;gap:6px;margin-top:10px;}
@@ -59,12 +96,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .status.success{color:#86efac;}
 .auth-lock{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
 .auth-lock.open{display:flex;}
-.auth-lock-card{max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;text-align:center;}
+.auth-lock-card{max-width:420px;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(15,24,39,.56),rgba(10,17,29,.82));border:1px solid rgba(162,214,255,.18);border-radius:24px;padding:22px;text-align:center;box-shadow:0 24px 56px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(18px);}
+@media (max-width:860px){
+  .content-grid{grid-template-columns:1fr;}
+  .summary-grid{grid-template-columns:1fr 1fr;}
+}
 @media (max-width:560px){
   .split{grid-template-columns:1fr;}
   .topbar{align-items:flex-start;flex-direction:column;}
   .top-actions{width:100%;}
   .top-actions .btn{flex:1;}
+  .summary-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -91,75 +133,109 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="hero">
     <div class="hero-title">Profile Settings</div>
     <div class="hero-sub">Customize your username, add an about section, and give your public page a look that feels like your team.</div>
+    <div class="hero-actions">
+      <button class="btn secondary" onclick="window.location.href='my-leagues.html'">My Leagues</button>
+      <button class="btn secondary" onclick="window.location.href='messages.html'">Messages</button>
+      <button class="btn primary" id="heroPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="section-title">Account</div>
-    <div class="profile-head">
-      <div id="avatarPreview" class="avatar">RB</div>
-      <div class="meta">
-        <div id="displayName" class="display-name">Manager</div>
-        <div id="memberLine" class="meta-line">Member #—</div>
-        <div id="emailLine" class="meta-line">email@example.com</div>
-        <div id="providerLine" class="meta-line">Signed in with password</div>
+  <div class="summary-grid" id="profileSummary">
+    <div class="summary-card">
+      <div class="summary-value">-</div>
+      <div class="summary-label">Member Status</div>
+      <div class="summary-copy">Waiting on account details.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">-</div>
+      <div class="summary-label">Public Page</div>
+      <div class="summary-copy">Preparing your public profile link.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">-</div>
+      <div class="summary-label">Current Theme</div>
+      <div class="summary-copy">Checking your active style preset.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">-</div>
+      <div class="summary-label">Account Access</div>
+      <div class="summary-copy">Loading sign-in and inbox state.</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="stack">
+      <div class="card">
+        <div class="section-title">Account</div>
+        <div class="profile-head">
+          <div id="avatarPreview" class="avatar">RB</div>
+          <div class="meta">
+            <div id="displayName" class="display-name">Manager</div>
+            <div id="memberLine" class="meta-line">Member #—</div>
+            <div id="emailLine" class="meta-line">email@example.com</div>
+            <div id="providerLine" class="meta-line">Signed in with password</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Public Page</div>
+        <div class="help">Every registered user gets a public member page with lifetime stats, a short bio, and a custom style preset.</div>
+        <div class="preview-row" style="margin-top:12px;">
+          <button class="btn secondary" id="viewPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
+          <button class="btn secondary" onclick="window.location.href='messages.html'">Open Inbox</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Identity</div>
+        <div class="field">
+          <label class="label" for="usernameInput">Username</label>
+          <input id="usernameInput" class="input" type="text" maxlength="20" placeholder="Your username">
+          <div class="help">This is the public name people will see around the site.</div>
+        </div>
+        <div class="field">
+          <label class="label" for="aboutMeInput">About Me</label>
+          <textarea id="aboutMeInput" class="textarea" maxlength="220" placeholder="Tell your league what kind of manager you are. Trade shark, waiver goblin, title hunter, whatever fits."></textarea>
+          <div class="help">This shows up on your public member page under your header.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Save Changes</div>
+        <div class="pill">Email stays tied to your sign-in method</div>
+        <div class="pill">Username can be changed anytime</div>
+        <div class="status" id="saveStatus"></div>
+        <div class="preview-row">
+          <button class="btn primary" onclick="saveProfile()">Save Profile</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="section-title">Public Page</div>
-    <div class="help">Every registered user gets a public member page with lifetime stats, a short bio, and a custom style preset.</div>
-    <div class="preview-row" style="margin-top:12px;">
-      <button class="btn secondary" id="viewPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
-      <button class="btn secondary" onclick="window.location.href='messages.html'">Open Inbox</button>
-    </div>
-  </div>
+    <div class="stack">
+      <div class="card">
+        <div class="section-title">Public Page Style</div>
+        <div class="help" style="margin-bottom:12px;">A few strong presets keep pages unique without getting messy. Pick the one that feels most like your squad.</div>
+        <div class="option-grid" id="themeOptions"></div>
+      </div>
 
-  <div class="card">
-    <div class="section-title">Identity</div>
-    <div class="field">
-      <label class="label" for="usernameInput">Username</label>
-      <input id="usernameInput" class="input" type="text" maxlength="20" placeholder="Your username">
-      <div class="help">This is the public name people will see around the site.</div>
-    </div>
-    <div class="field">
-      <label class="label" for="aboutMeInput">About Me</label>
-      <textarea id="aboutMeInput" class="textarea" maxlength="220" placeholder="Tell your league what kind of manager you are. Trade shark, waiver goblin, title hunter, whatever fits."></textarea>
-      <div class="help">This shows up on your public member page under your header.</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-title">Public Page Style</div>
-    <div class="help" style="margin-bottom:12px;">A few strong presets keep pages unique without getting messy. Pick the one that feels most like your squad.</div>
-    <div class="option-grid" id="themeOptions"></div>
-  </div>
-
-  <div class="card">
-    <div class="section-title">Profile Picture</div>
-    <div class="field">
-      <label class="label" for="avatarUrlInput">Image or GIF URL</label>
-      <input id="avatarUrlInput" class="input" type="url" placeholder="https://example.com/your-gif.gif">
-      <div class="help">Paste a direct image or GIF link if you want an animated profile picture.</div>
-    </div>
-    <div class="field">
-      <label class="label" for="avatarFileInput">Upload Image or GIF</label>
-      <input id="avatarFileInput" class="input" type="file" accept="image/*">
-      <div class="help">Uploads are saved directly to your user profile. Keep files under 350 KB for best results.</div>
-    </div>
-    <div class="preview-row">
-      <button class="btn secondary" onclick="applyAvatarUrl()">Preview URL</button>
-      <button class="btn secondary" onclick="clearAvatar()">Clear Picture</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-title">Save Changes</div>
-    <div class="pill">Email stays tied to your sign-in method</div>
-    <div class="pill">Username can be changed anytime</div>
-    <div class="status" id="saveStatus"></div>
-    <div class="preview-row">
-      <button class="btn primary" onclick="saveProfile()">Save Profile</button>
+      <div class="card">
+        <div class="section-title">Profile Picture</div>
+        <div class="field">
+          <label class="label" for="avatarUrlInput">Image or GIF URL</label>
+          <input id="avatarUrlInput" class="input" type="url" placeholder="https://example.com/your-gif.gif">
+          <div class="help">Paste a direct image or GIF link if you want an animated profile picture.</div>
+        </div>
+        <div class="field">
+          <label class="label" for="avatarFileInput">Upload Image or GIF</label>
+          <input id="avatarFileInput" class="input" type="file" accept="image/*">
+          <div class="help">Uploads are saved directly to your user profile. Keep files under 350 KB for best results.</div>
+        </div>
+        <div class="preview-row">
+          <button class="btn secondary" onclick="applyAvatarUrl()">Preview URL</button>
+          <button class="btn secondary" onclick="clearAvatar()">Clear Picture</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -187,10 +263,14 @@ let pendingAvatar = '';
 let selectedThemeKey = 'ember';
 
 const PROFILE_THEMES = {
-  ember:{name:'Ember',sub:'Warm orange and dark-card energy.',swatches:['#f97316','#fb923c','#111827']},
-  voltage:{name:'Voltage',sub:'Sharper blue with a faster feel.',swatches:['#38bdf8','#22d3ee','#0f172a']},
-  mint:{name:'Mint',sub:'Fresh green with a cleaner board.',swatches:['#22c55e','#14b8a6','#10231f']},
-  royal:{name:'Royal',sub:'Purple and gold with trophy vibes.',swatches:['#8b5cf6','#f59e0b','#19142b']}
+  ember:{name:'Ember',kicker:'Heat Check',preview:'Trade Night',sub:'Warm orange and dark-card energy.',swatches:['#f97316','#fb923c','#111827']},
+  voltage:{name:'Voltage',kicker:'Fast Lane',preview:'Game Day',sub:'Sharper blue with a faster feel.',swatches:['#38bdf8','#22d3ee','#0f172a']},
+  mint:{name:'Mint',kicker:'Clean Board',preview:'Waiver Run',sub:'Fresh green with a cleaner board.',swatches:['#22c55e','#14b8a6','#10231f']},
+  royal:{name:'Royal',kicker:'Trophy Case',preview:'Title Mode',sub:'Purple and gold with trophy vibes.',swatches:['#8b5cf6','#f59e0b','#19142b']},
+  aurora:{name:'Aurora',kicker:'Night Lights',preview:'Prime Time',sub:'Teal and violet with a colder spotlight feel.',swatches:['#2dd4bf','#8b5cf6','#08111f']},
+  crimson:{name:'Crimson',kicker:'Rival Week',preview:'Red Zone',sub:'Deep red with a sharper, more aggressive edge.',swatches:['#ef4444','#f97316','#170b11']},
+  steel:{name:'Steel',kicker:'Lockdown',preview:'Film Room',sub:'Gunmetal and electric blue for a heavier, modern board.',swatches:['#94a3b8','#38bdf8','#0b1220']},
+  sunset:{name:'Sunset',kicker:'Coast Glow',preview:'Late Slate',sub:'Pink-orange glow with a softer nightlife feel.',swatches:['#fb7185','#f59e0b','#24101d']}
 };
 
 function normalizeUsername(value){
@@ -272,9 +352,19 @@ function renderThemeOptions(){
   const wrap = document.getElementById('themeOptions');
   wrap.innerHTML = Object.entries(PROFILE_THEMES).map(([key, theme]) => `
     <button type="button" class="theme-card${selectedThemeKey === key ? ' active' : ''}" onclick="selectTheme('${key}')">
-      <div class="theme-name">${theme.name}</div>
-      <div class="theme-sub">${theme.sub}</div>
-      <div class="swatches">${theme.swatches.map(color => `<span class="swatch" style="background:${color};"></span>`).join('')}</div>
+      <div class="theme-preview" style="--theme-a:${theme.swatches[0]};--theme-b:${theme.swatches[1]};--theme-c:${theme.swatches[2]};">
+        <div class="theme-preview-top">
+          <span class="theme-chip">${theme.kicker}</span>
+          <span class="theme-orb" aria-hidden="true"></span>
+        </div>
+        <div class="theme-preview-title">${theme.preview}</div>
+        <div class="theme-preview-lines" aria-hidden="true"><span></span><span></span></div>
+      </div>
+      <div class="theme-copy">
+        <div class="theme-name">${theme.name}</div>
+        <div class="theme-sub">${theme.sub}</div>
+        <div class="swatches">${theme.swatches.map(color => `<span class="swatch" style="background:${color};"></span>`).join('')}</div>
+      </div>
     </button>
   `).join('');
 }
@@ -282,6 +372,45 @@ function renderThemeOptions(){
 function selectTheme(key){
   selectedThemeKey = PROFILE_THEMES[key] ? key : 'ember';
   renderThemeOptions();
+  if(currentUser){
+    renderProfileSummary(currentUser, {
+      ...(currentProfile || {}),
+      themeKey: selectedThemeKey,
+      aboutMe: document.getElementById('aboutMeInput')?.value || currentProfile?.aboutMe || ''
+    });
+  }
+}
+
+function renderProfileSummary(user, profile){
+  const host = document.getElementById('profileSummary');
+  if(!host) return;
+  const userNumber = Number(profile?.userNumber || 0);
+  const isAdmin = [1,2,3,4,5].includes(userNumber);
+  const theme = PROFILE_THEMES[profile?.themeKey] || PROFILE_THEMES[selectedThemeKey] || PROFILE_THEMES.ember;
+  const aboutLength = String(profile?.aboutMe || '').trim().length;
+  const provider = String(profile?.provider || user?.providerData?.[0]?.providerId || 'account');
+  host.innerHTML = `
+    <div class="summary-card">
+      <div class="summary-value">${userNumber > 0 ? '#' + userNumber : 'Pending'}</div>
+      <div class="summary-label">Member Status</div>
+      <div class="summary-copy">${isAdmin ? 'Administrator tools are active on this account.' : 'Your member profile is live and ready to personalize.'}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">${userNumber > 0 ? 'Live' : 'Locked'}</div>
+      <div class="summary-label">Public Page</div>
+      <div class="summary-copy">${userNumber > 0 ? 'Your public page can be opened and shared right now.' : 'Finish account setup to unlock your public member page.'}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">${theme.name}</div>
+      <div class="summary-label">Current Theme</div>
+      <div class="summary-copy">${theme.sub}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">${aboutLength || '0'}</div>
+      <div class="summary-label">Profile Copy</div>
+      <div class="summary-copy">${provider.replace('password','password login')} · ${aboutLength ? 'Bio is filled in and ready.' : 'Add a short manager bio to complete your page.'}</div>
+    </div>
+  `;
 }
 
 function applyProfileToUI(user, profile){
@@ -299,8 +428,10 @@ function applyProfileToUI(user, profile){
   pendingAvatar = photoURL || '';
   selectedThemeKey = PROFILE_THEMES[profile?.themeKey] ? profile.themeKey : 'ember';
   document.getElementById('viewPublicPageBtn').disabled = !(userNumber > 0);
+  document.getElementById('heroPublicPageBtn').disabled = !(userNumber > 0);
   renderAvatar(pendingAvatar, username);
   renderThemeOptions();
+  renderProfileSummary(user, profile);
 }
 
 function openPublicPage(){
@@ -438,7 +569,9 @@ async function saveProfile(){
     document.getElementById('displayName').textContent = username;
     document.getElementById('memberLine').textContent = 'Member #' + userNumber + (isAdmin ? ' · Administrator' : '');
     document.getElementById('viewPublicPageBtn').disabled = false;
+    document.getElementById('heroPublicPageBtn').disabled = false;
     renderAvatar(selectedAvatar, username);
+    renderProfileSummary(currentUser, currentProfile);
     setStatus('Profile saved.', 'success');
   } catch (error){
     setStatus(error.message || 'Could not save profile.', 'error');
@@ -512,6 +645,5 @@ auth.onAuthStateChanged(async user => {
   applyProfileToUI(user, currentProfile);
 });
 </script>
-<script src="/site-background.js"></script>
 </body>
 </html>

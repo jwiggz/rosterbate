@@ -10,46 +10,100 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <style>
   :root{
-    --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
+    --bg:#05070e;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#29415f;
     --accent:#f97316;--accent2:#fb923c;--green:#22c55e;--blue:#60a5fa;--red:#ef4444;
-    --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+    --text:#f1f5f9;--text2:#b8c7dc;--text3:#7f93ad;
     --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+    --landing-image:url('/myleauge landing page.jpg');
+    --landing-overlay:linear-gradient(180deg,rgba(4,7,13,.2),rgba(4,8,15,.78) 24%,rgba(4,8,15,.94) 100%);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:radial-gradient(circle at top,rgba(249,115,22,.08),transparent 30%),var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh}
+  body{
+    background:
+      var(--landing-overlay),
+      radial-gradient(circle at top,rgba(251,146,60,.22),transparent 24%),
+      radial-gradient(circle at 18% 18%,rgba(255,255,255,.1),transparent 22%),
+      var(--landing-image) center/cover fixed no-repeat,
+      var(--bg);
+    color:var(--text);font-family:var(--fb);min-height:100vh;position:relative;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.03),transparent 18%,transparent 82%,rgba(255,255,255,.03)),
+      linear-gradient(180deg,rgba(255,255,255,.02),transparent 14%,transparent 80%,rgba(255,255,255,.05));
+    pointer-events:none;z-index:-1;
+  }
   a{text-decoration:none;color:inherit}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);background:rgba(10,14,26,.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;padding:18px 22px;
+    border-bottom:1px solid rgba(148,223,255,.34);
+    background:linear-gradient(180deg,rgba(29,44,65,.52),rgba(10,16,28,.74));
+    box-shadow:0 10px 34px rgba(0,0,0,.28),0 0 26px rgba(125,211,252,.14);
+    backdrop-filter:blur(22px);position:sticky;top:0;z-index:20
+  }
   .brand{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
   .brand span{color:var(--accent)}
   .top-actions{display:flex;gap:10px;align-items:center}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:11px 16px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;border:none}
-  .btn.primary{background:var(--accent);color:#fff}
-  .btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:11px 16px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;border:none;transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),#f59e0b);box-shadow:0 14px 26px rgba(249,115,22,.24);color:#fff}
+  .btn.secondary{background:rgba(19,31,49,.72);border:1px solid rgba(148,223,255,.18);color:#e6efff}
   .btn.danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.32);color:#fca5a5}
   .btn.small{padding:9px 12px;font-size:13px}
-  .shell{max-width:1320px;margin:0 auto;padding:28px 20px 40px}
-  .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:24px}
+  .shell{max-width:1320px;margin:0 auto;padding:28px 20px 48px}
+  .hero{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:24px;
+    padding:28px;border:1px solid rgba(165,214,255,.26);border-radius:28px;
+    background:
+      linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.04) 38%,rgba(8,15,27,.26) 100%),
+      linear-gradient(180deg,rgba(13,22,36,.56),rgba(13,22,36,.78));
+    box-shadow:0 24px 60px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.18);
+    backdrop-filter:blur(24px);
+  }
+  .hero-copy{display:flex;flex-direction:column;gap:12px}
   .hero h1{font-family:var(--fd);font-size:42px;font-weight:900;letter-spacing:.4px}
   .hero p{color:var(--text2);font-size:15px;line-height:1.6;max-width:760px}
+  .hero-kicker{display:inline-flex;align-items:center;gap:8px;width:max-content;padding:7px 12px;border-radius:999px;background:rgba(10,19,33,.58);border:1px solid rgba(255,255,255,.14);font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#ffd8b1}
+  .hero-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .hero-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+  .hero-stat{
+    padding:14px 16px;border-radius:18px;
+    background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04)),rgba(13,22,36,.64);
+    border:1px solid rgba(162,214,255,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter:blur(18px);
+  }
+  .hero-stat-value{font-family:var(--fd);font-size:32px;font-weight:900;line-height:1}
+  .hero-stat-label{margin-top:8px;color:#dce8f7;font-size:11px;letter-spacing:.8px;text-transform:uppercase}
+  .hero-stat-copy{margin-top:6px;color:var(--text2);font-size:12px;line-height:1.45}
   .section{margin-top:22px}
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
   .section-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.6px}
-  .section-sub{color:var(--text3);font-size:12px;text-transform:uppercase;letter-spacing:.9px}
+  .section-sub{color:#c6d5e8;font-size:12px;text-transform:uppercase;letter-spacing:.9px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
-  .league-card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:210px}
-  .league-card.complete{border-color:rgba(34,197,94,.24)}
-  .league-card.waiting{border-color:rgba(96,165,250,.22)}
+  .league-card{
+    background:
+      linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 38%,rgba(6,12,22,.28) 100%),
+      linear-gradient(180deg,rgba(12,19,32,.58),rgba(12,19,32,.82));
+    border:1px solid rgba(162,214,255,.22);
+    border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:220px;
+    box-shadow:0 18px 42px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.14);
+    backdrop-filter:blur(20px)
+  }
+  .league-card.complete{border-color:rgba(34,197,94,.3)}
+  .league-card.waiting{border-color:rgba(96,165,250,.3)}
   .league-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
   .league-title{font-family:var(--fd);font-size:28px;font-weight:900;line-height:1}
   .league-meta{display:flex;flex-wrap:wrap;gap:6px}
-  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;background:rgba(18,31,49,.68);border:1px solid rgba(152,201,255,.16);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#d8e5f5}
   .pill.live{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
   .pill.waiting{color:#93c5fd;border-color:rgba(96,165,250,.26);background:rgba(96,165,250,.08)}
   .pill.complete{color:#fde68a;border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.08)}
   .pill.solo{color:#c4b5fd;border-color:rgba(139,92,246,.26);background:rgba(139,92,246,.08)}
   .pill.multi{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
   .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  .stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  .stat{background:rgba(15,24,39,.56);border:1px solid rgba(152,201,255,.16);border-radius:16px;padding:12px 13px;backdrop-filter:blur(18px)}
   .stat-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1}
   .stat-label{margin-top:6px;color:var(--text3);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
   .league-copy{color:var(--text2);font-size:13px;line-height:1.6;min-height:42px}
@@ -60,17 +114,22 @@
   .urgency-chip.info{border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.1);color:#bfdbfe}
   .urgency-chip.muted{color:var(--text2)}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
-  .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:32px 20px;text-align:center}
+  .empty{background:linear-gradient(180deg,rgba(15,24,39,.68),rgba(10,17,29,.82));border:1px dashed rgba(162,214,255,.22);border-radius:24px;padding:32px 20px;text-align:center;backdrop-filter:blur(18px)}
   .empty h3{font-family:var(--fd);font-size:24px;font-weight:900;margin-bottom:8px}
   .empty p{color:var(--text2);font-size:14px;line-height:1.6}
-  .banner{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-align:center;color:var(--text2);font-size:13px;margin-bottom:16px}
+  .banner{
+    background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04) 42%,rgba(8,15,27,.26) 100%),rgba(15,24,39,.74);
+    border:1px solid rgba(152,201,255,.18);border-radius:18px;padding:14px 18px;text-align:center;color:#e2edf9;font-size:13px;margin-bottom:16px;
+    backdrop-filter:blur(18px);box-shadow:0 12px 30px rgba(0,0,0,.2)
+  }
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:14px 20px;border-radius:12px;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:50}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
   .toast.error{background:var(--red)}
   @media (max-width:720px){
     .topbar{padding:16px}
-    .hero{flex-direction:column;align-items:flex-start}
+    .hero{flex-direction:column;align-items:flex-start;padding:22px}
     .hero h1{font-size:34px}
+    .hero-summary{grid-template-columns:1fr 1fr}
     .grid{grid-template-columns:1fr}
   }
 </style>
@@ -85,12 +144,38 @@
   </div>
 
   <div class="shell">
+    <div class="hero-summary" id="heroSummary">
+      <div class="hero-stat">
+        <div class="hero-stat-value">-</div>
+        <div class="hero-stat-label">Active Drafts</div>
+        <div class="hero-stat-copy">Loading your rooms and queues.</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">-</div>
+        <div class="hero-stat-label">Season Pressure</div>
+        <div class="hero-stat-copy">Looking for trade and waiver activity.</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">-</div>
+        <div class="hero-stat-label">Watch Targets</div>
+        <div class="hero-stat-copy">Checking saved player targets.</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">-</div>
+        <div class="hero-stat-label">Solo Saves</div>
+        <div class="hero-stat-copy">Finding your personal seasons.</div>
+      </div>
+    </div>
     <div class="hero">
-      <div>
+      <div class="hero-copy">
+        <div class="hero-kicker">Control Room Entry</div>
         <h1>My Leagues</h1>
         <p>All your draft rooms, shared seasons, and solo leagues. Draft rooms stay grouped separately from shared season leagues so it's easy to reopen the right experience.</p>
       </div>
-      <a href="rosterbate-matchmaking.html" class="btn primary">Create or Join League</a>
+      <div class="hero-actions">
+        <a href="rosterbate-matchmaking.html" class="btn primary">Create or Join League</a>
+        <a href="rosterbate-matchmaking.html?tab=private" class="btn secondary">Enter League Code</a>
+      </div>
     </div>
 
     <div class="banner" id="leagueBanner">Loading your leagues…</div>
@@ -148,6 +233,7 @@ let currentUserNumber = 0;
 let currentUsername = '';
 const localPlayerId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
 const localPlayerName = String(localStorage.getItem('rbPlayerName') || '').trim() || 'Manager';
+const MY_LEAGUES_ART = '/myleauge landing page.jpg';
 
 // Global arrays to store loaded leagues
 let drafts = [];
@@ -172,6 +258,56 @@ function setBanner(msg){
   }
   el.style.display='block';
   el.textContent=msg;
+}
+
+function renderHeroSummary(){
+  const host=document.getElementById('heroSummary');
+  if(!host) return;
+  const liveDrafts=drafts.filter(row=>String(row.status||'').toLowerCase()==='started').length;
+  const waitingDrafts=drafts.filter(row=>String(row.status||'').toLowerCase()!=='started').length;
+  const activeSeasons=seasons.filter(row=>!row.complete);
+  const pendingTrades=activeSeasons.reduce((sum,row)=>sum+getSeasonPendingTradeCount(row.payload,row.mySeat),0);
+  const recentDrops=activeSeasons.reduce((sum,row)=>sum+getSeasonRecentDropCount(row.payload),0);
+  const watchTargets=activeSeasons.reduce((sum,row)=>sum+getSeasonWatchCount(row.payload),0);
+  const soloSaves=solo.length;
+  host.innerHTML=`
+    <div class="hero-stat">
+      <div class="hero-stat-value">${liveDrafts || waitingDrafts || 0}</div>
+      <div class="hero-stat-label">Draft Rooms</div>
+      <div class="hero-stat-copy">${liveDrafts ? `${liveDrafts} live now` : waitingDrafts ? `${waitingDrafts} waiting to fill` : 'No multiplayer rooms open yet.'}</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-value">${pendingTrades || recentDrops || 0}</div>
+      <div class="hero-stat-label">Season Pressure</div>
+      <div class="hero-stat-copy">${pendingTrades ? `${pendingTrades} trade response${pendingTrades===1?'':'s'} waiting` : recentDrops ? `${recentDrops} recent drop${recentDrops===1?'':'s'} to review` : 'No urgent league actions right now.'}</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-value">${watchTargets || 0}</div>
+      <div class="hero-stat-label">Watch Targets</div>
+      <div class="hero-stat-copy">${watchTargets ? 'Saved free agents are ready to revisit.' : 'Start a watch list to keep the best names surfaced.'}</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-value">${soloSaves || 0}</div>
+      <div class="hero-stat-label">Solo Saves</div>
+      <div class="hero-stat-copy">${soloSaves ? 'Your personal seasons are ready to reopen.' : 'Your next solo run will show up here.'}</div>
+    </div>
+  `;
+}
+
+function applyLandingArt(sport){
+  document.documentElement.style.setProperty('--landing-image', `url('${MY_LEAGUES_ART}')`);
+}
+
+function pickHeroSport(){
+  const activeSeason=seasons.find(row=>!row.complete && row.sport);
+  if(activeSeason) return activeSeason.sport;
+  const liveDraft=drafts.find(row=>String(row.status||'').toLowerCase()==='started' && row.sport);
+  if(liveDraft) return liveDraft.sport;
+  const waitingDraft=drafts.find(row=>row.sport);
+  if(waitingDraft) return waitingDraft.sport;
+  const recentSolo=solo.find(row=>row.sport);
+  if(recentSolo) return recentSolo.sport;
+  return 'nba';
 }
 
 function escapeHtml(str){
@@ -765,7 +901,9 @@ async function loadMyLeagues(){
   }
 
   window.__rbSoloRows=solo;
+  applyLandingArt(pickHeroSport());
   setBanner('');
+  renderHeroSummary();
   renderDrafts(drafts);
   renderSeasons(seasons);
   renderSolo(solo);
@@ -1046,7 +1184,9 @@ auth.onAuthStateChanged(async user=>{
     await loadMyLeagues();
   }catch(e){
     console.error(e);
+    applyLandingArt('nba');
     setBanner('Could not load your leagues right now.');
+    renderHeroSummary();
     renderEmpty('draftList','Unable to Load Draft Rooms','Try refreshing in a moment.');
     renderEmpty('seasonList','Unable to Load Season Leagues','Try refreshing in a moment.');
     renderEmpty('soloList','Unable to Load Solo Leagues','Try refreshing in a moment.');
@@ -1054,6 +1194,5 @@ auth.onAuthStateChanged(async user=>{
   }
 });
 </script>
-<script src="/site-background.js"></script>
 </body>
 </html>
