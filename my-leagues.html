@@ -290,6 +290,25 @@ function buildLobbyStateFromSeason(id,payload,member){
   };
 }
 
+function isFallbackSeasonSource(source){
+  return source==='userSeasons-fallback';
+}
+
+function isLegacySeasonSource(source){
+  return source==='sharedSeasons-legacy';
+}
+
+async function removePersonalSeasonIndex(seasonId){
+  if(!currentUser || !seasonId) return false;
+  try{
+    await db.ref(`userSeasons/${currentUser.uid}/${seasonId}`).remove();
+    return true;
+  }catch(err){
+    console.warn('Could not remove personal season index:', seasonId, err);
+    return false;
+  }
+}
+
 function renderEmpty(hostId,title,copy){
   const host=document.getElementById(hostId);
   if(!host) return;
@@ -344,6 +363,8 @@ function renderSeasons(rows){
           <div class="league-title">${escapeHtml(row.name)}</div>
           <div class="league-meta" style="margin-top:8px;">
             <span class="pill ${row.complete?'complete':'live'}">${row.complete?'Completed':'Season Active'}</span>
+            ${isFallbackSeasonSource(row.source)?'<span class="pill">Fallback Index</span>':''}
+            ${isLegacySeasonSource(row.source)?'<span class="pill">Legacy Source</span>':''}
             <span class="pill">${escapeHtml(sportLabel(row.sport))}</span>
             <span class="pill">${escapeHtml(formatLabel(row.format))}</span>
             <span class="pill">${escapeHtml(scoringLabel(row.scoring))}</span>
@@ -461,7 +482,8 @@ async function loadMyLeagues(){
         updatedAt:Number(payload.updatedAt||0),
         updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
         payload,
-        member
+        member,
+        source:'multiplayerSeasons'
       });
     });
   }
@@ -486,7 +508,7 @@ async function loadMyLeagues(){
         updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
         payload,
         member,
-        source:'sharedSeasons'
+        source:'sharedSeasons-legacy'
       });
     });
   }
@@ -520,7 +542,7 @@ async function loadMyLeagues(){
                 id:data.myPlayerId||'local',
                 teamIdx:data.myPos||0
               },
-              source:'userSeasons' // Flag to identify this came from userSeasons
+              source:'userSeasons-fallback' // Personal fallback/index record, not canonical multiplayer storage
             });
           }
         });
@@ -801,6 +823,77 @@ async function deleteSoloLeague(seasonId){
     toast('Failed to delete solo league.','var(--red)');
   }
 }
+
+leaveSeasonLeague = async function(id){
+  const row=seasons.find(x=>x.id===id);
+  if(!row) return;
+  if(!confirm(`Leave ${row.name}? You can rejoin if someone invites you back.`)) return;
+
+  setBanner('Removing league...');
+
+  try{
+    console.log('Leaving season:', {id, name: row.name, source: row.source, currentUser: !!currentUser});
+    const member=row.member;
+    if(!member){
+      console.error('No member found');
+      toast('Could not identify your player ID in this season.','var(--red)');
+      setBanner('');
+      await loadMyLeagues();
+      return;
+    }
+    const patch=buildLeftMemberPatch(member);
+
+    try{
+      await db.ref(SHARED_SEASON_ROOT+'/'+id+'/leftMembers').update(patch);
+      console.log('Marked as left in canonical multiplayerSeasons');
+    }catch(canonicalErr){
+      console.warn('Could not update canonical multiplayerSeasons leftMembers:', canonicalErr);
+      if(!isFallbackSeasonSource(row.source)) throw canonicalErr;
+    }
+
+    if(isLegacySeasonSource(row.source)){
+      try{
+        await db.ref('sharedSeasons/'+id+'/leftMembers').update(patch);
+        console.log('Marked as left in legacy sharedSeasons');
+      }catch(legacyErr){
+        console.warn('Could not update legacy sharedSeasons leftMembers:', legacyErr);
+      }
+    }
+
+    if(isFallbackSeasonSource(row.source)){
+      await removePersonalSeasonIndex(id);
+      console.log('Removed personal fallback season index');
+    }
+
+    try{
+      const saved=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
+      if(saved?.lobbyId===id || saved?.seasonId===id) {
+        localStorage.removeItem('rbMultiplayerLobby');
+        console.log('Cleared from localStorage');
+      }
+    }catch(e){}
+
+    const idx = seasons.findIndex(s => s.id === id);
+    if(idx !== -1){
+      seasons.splice(idx, 1);
+      console.log('Removed from local array');
+    }
+
+    renderSeasons(seasons);
+    toast('Season removed from your leagues.');
+
+    setTimeout(async () => {
+      console.log('Reloading leagues from Firebase...');
+      await loadMyLeagues();
+    }, 500);
+
+  }catch(e){
+    console.error('Failed to leave season:', e);
+    toast('Could not leave that season: ' + (e.message || 'Unknown error'),'var(--red)');
+    setBanner('');
+    await loadMyLeagues();
+  }
+};
 
 auth.onAuthStateChanged(async user=>{
   currentUser=user||null;

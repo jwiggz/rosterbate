@@ -162,6 +162,62 @@ function dmThreadId(a,b){
   return 'dm_'+ids[0]+'_'+ids[1];
 }
 
+function parseLegacyDmThreadParticipants(threadId){
+  const match=String(threadId||'').match(/^dm_(\d+)_(\d+)$/);
+  if(!match) return null;
+  return {
+    low:Number(match[1]||0),
+    high:Number(match[2]||0)
+  };
+}
+
+function getOtherUserNumberFromLegacyThreadId(threadId, myNumber){
+  const pair=parseLegacyDmThreadParticipants(threadId);
+  const mine=Number(myNumber||0);
+  if(!pair || !(mine>0)) return 0;
+  if(pair.low===mine) return pair.high;
+  if(pair.high===mine) return pair.low;
+  return 0;
+}
+
+function hasLegacyThreadMembership(threadData, myNumber, otherUserNumber){
+  const mine=Number(myNumber||0);
+  const other=Number(otherUserNumber||0);
+  const members=threadData?.members;
+  if(!(mine>0) || !(other>0) || members==null) return false;
+  if(Array.isArray(members)){
+    return members[mine]===true && members[other]===true;
+  }
+  if(typeof members==='object'){
+    return members[String(mine)]===true && members[String(other)]===true;
+  }
+  return false;
+}
+
+function hasUidThreadMembership(threadData, myUid, otherUid){
+  const mine=String(myUid||'').trim();
+  const other=String(otherUid||'').trim();
+  const members=threadData?.members;
+  if(!mine || !other || !members || Array.isArray(members) || typeof members!=='object') return false;
+  return members[mine]===true && members[other]===true;
+}
+
+function buildDirectThreadMembershipPatch(threadData, threadId, myNumber, otherUserNumber, myUid, otherUid){
+  const patch={};
+  if(!threadData) patch.createdAt=Date.now();
+  patch.updatedAt=Date.now();
+  if(myUid) patch['members/' + myUid]=true;
+  if(otherUid) patch['members/' + otherUid]=true;
+  if(Number(myNumber)>0) patch['members/' + Number(myNumber)]=true;
+  if(Number(otherUserNumber)>0) patch['members/' + Number(otherUserNumber)]=true;
+  const pair=parseLegacyDmThreadParticipants(threadId);
+  if(pair){
+    if(pair.low>0) patch['members/' + pair.low]=true;
+    if(pair.high>0) patch['members/' + pair.high]=true;
+  }
+  return patch;
+}
+
 function formatTime(ts){
   if(!ts) return '';
   try{
@@ -330,17 +386,32 @@ async function ensureDirectThreadMembership(threadId, otherUserNumber){
   const myUid=String(currentUser.uid || '').trim();
   const myNumber=Number(currentProfile.userNumber || 0);
   if(!myUid || !(myNumber>0)) return false;
-  const otherProfile=await getPublicUserProfile(otherUserNumber);
-  const otherUid=String(otherProfile?.uid || '').trim();
-  if(!(Number(otherUserNumber)>0) || !otherUid) return false;
   const threadRef=db.ref('directThreads/' + threadId);
   const snap=await threadRef.once('value').catch(() => null);
-  const patch={};
-  if(!snap?.exists?.()) patch.createdAt=Date.now();
-  patch['members/' + myUid]=true;
-  patch['members/' + otherUid]=true;
-  await threadRef.update(patch);
-  return true;
+  const threadData=snap?.val?.() || null;
+  let resolvedOtherNumber=Number(otherUserNumber || 0);
+  if(!(resolvedOtherNumber>0)){
+    resolvedOtherNumber=getOtherUserNumberFromLegacyThreadId(threadId, myNumber);
+  }
+  if(threadData && hasLegacyThreadMembership(threadData, myNumber, resolvedOtherNumber)){
+    if(!Number.isFinite(Number(otherUserNumber)) || !(Number(otherUserNumber)>0)){
+      return true;
+    }
+  }
+  const otherProfile=await getPublicUserProfile(resolvedOtherNumber);
+  const otherUid=String(otherProfile?.uid || '').trim();
+  if(!(resolvedOtherNumber>0)) return false;
+  const hasLegacyAccess=!!threadData && hasLegacyThreadMembership(threadData, myNumber, resolvedOtherNumber);
+  const hasUidAccess=!!threadData && hasUidThreadMembership(threadData, myUid, otherUid);
+  if(!otherUid){
+    return hasLegacyAccess;
+  }
+  const patch=buildDirectThreadMembershipPatch(threadData, threadId, myNumber, resolvedOtherNumber, myUid, otherUid);
+  if(hasLegacyAccess || hasUidAccess || !threadData){
+    await threadRef.update(patch);
+    return true;
+  }
+  return false;
 }
 
 async function openThread(threadId, otherUserNumber){
@@ -352,6 +423,9 @@ async function openThread(threadId, otherUserNumber){
   if(!(resolvedOtherUserNumber>0) && currentProfile?.userNumber){
     const metaSnap=await db.ref('userThreads/' + Number(currentProfile.userNumber || 0) + '/' + threadId).once('value').catch(() => null);
     resolvedOtherUserNumber=Number(metaSnap?.val?.()?.otherUserNumber || 0);
+  }
+  if(!(resolvedOtherUserNumber>0) && currentProfile?.userNumber){
+    resolvedOtherUserNumber=getOtherUserNumberFromLegacyThreadId(threadId, Number(currentProfile.userNumber || 0));
   }
   if(resolvedOtherUserNumber>0){
     await ensureDirectThreadMembership(threadId, resolvedOtherUserNumber).catch(() => {});
@@ -398,6 +472,7 @@ async function sendMessage(){
   const ref=db.ref('directMessages/' + activeThreadId).push();
   const message={
     fromUserNumber: myNumber,
+    fromUid: String(currentUser.uid || '').trim(),
     username: currentProfile.username || 'Manager',
     photoURL: currentProfile.photoURL || '',
     text,
@@ -432,9 +507,27 @@ async function loadSidebarData(){
   ]);
   const requests=Object.values(requestsSnap?.val?.() || {}).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const friends=Object.values(friendsSnap?.val?.() || {}).sort((a,b)=>String(a.username||'').localeCompare(String(b.username||'')));
-  const threads=Object.entries(threadsSnap?.val?.() || {}).map(([threadId, thread]) => ({ threadId, ...thread })).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  const rawThreads=Object.entries(threadsSnap?.val?.() || {}).map(([threadId, thread]) => ({ threadId, ...thread }));
   friendDirectory={};
   friends.forEach(friend => { friendDirectory[Number(friend.userNumber || 0)] = friend; });
+  const threads=await Promise.all(rawThreads.map(async thread=>{
+    let otherUserNumber=Number(thread.otherUserNumber || 0);
+    if(!(otherUserNumber>0)){
+      otherUserNumber=getOtherUserNumberFromLegacyThreadId(thread.threadId, myNumber);
+    }
+    const friendMeta=friendDirectory[otherUserNumber] || {};
+    let publicMeta=null;
+    if(!(friendMeta.userNumber>0) && otherUserNumber>0){
+      publicMeta=await getPublicUserProfile(otherUserNumber).catch(()=>null);
+    }
+    return {
+      ...thread,
+      otherUserNumber,
+      otherUsername: thread.otherUsername || friendMeta.username || publicMeta?.username || 'Manager',
+      otherPhotoURL: thread.otherPhotoURL || friendMeta.photoURL || publicMeta?.photoURL || ''
+    };
+  }));
+  threads.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
   renderRequestList(requests);
   renderFriendsList(friends);
   renderThreadList(threads);

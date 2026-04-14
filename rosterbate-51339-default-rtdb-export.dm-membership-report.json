@@ -1,0 +1,49 @@
+{
+  "summary": {
+    "threadCount": 2,
+    "patchedThreadCount": 2,
+    "skippedThreadCount": 0,
+    "updateCount": 4,
+    "resolvedUserCount": 8
+  },
+  "threads": [
+    {
+      "threadId": "dm_1_2",
+      "status": "patched",
+      "participants": [
+        {
+          "userNumber": 1,
+          "uid": "ZqytkFsUCYZylOgWF6OZf2714w12"
+        },
+        {
+          "userNumber": 2,
+          "uid": "sAu0wDTK33ensoTQ3reEXvzpkbv2"
+        }
+      ],
+      "existingUidMembers": [],
+      "addedUidMembers": [
+        "ZqytkFsUCYZylOgWF6OZf2714w12",
+        "sAu0wDTK33ensoTQ3reEXvzpkbv2"
+      ]
+    },
+    {
+      "threadId": "dm_1_6",
+      "status": "patched",
+      "participants": [
+        {
+          "userNumber": 1,
+          "uid": "ZqytkFsUCYZylOgWF6OZf2714w12"
+        },
+        {
+          "userNumber": 6,
+          "uid": "eUJGxi9B97Y8hPLgXWBi4CYItnB2"
+        }
+      ],
+      "existingUidMembers": [],
+      "addedUidMembers": [
+        "ZqytkFsUCYZylOgWF6OZf2714w12",
+        "eUJGxi9B97Y8hPLgXWBi4CYItnB2"
+      ]
+    }
+  ]
+}

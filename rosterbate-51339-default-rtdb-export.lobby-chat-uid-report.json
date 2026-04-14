@@ -1,0 +1,84 @@
+{
+  "summary": {
+    "lobbyCount": 8,
+    "patchedLobbyCount": 3,
+    "waitingRoomMessagesPatched": 0,
+    "draftMessagesPatched": 9,
+    "updateCount": 9,
+    "resolvedUserCount": 8
+  },
+  "lobbies": [
+    {
+      "lobbyId": "-Oq-IUu5y_uFM9o-OPKA",
+      "waitingRoomMessagesPatched": [],
+      "draftMessagesPatched": [
+        {
+          "messageId": "-Oq-JYmsNjZ98fXRdUac",
+          "playerId": "p_1775069322616_90vf",
+          "userNumber": 1,
+          "uid": "ZqytkFsUCYZylOgWF6OZf2714w12"
+        },
+        {
+          "messageId": "-Oq-JZm5GsGHgQOeFeTV",
+          "playerId": "p_1775957917161_w1n0",
+          "userNumber": 7,
+          "uid": "WPblWKjfuKQkFkYtaRseGQtKZl23"
+        }
+      ]
+    },
+    {
+      "lobbyId": "-Oq-MHSa_vNZJv4sRC_i",
+      "waitingRoomMessagesPatched": [],
+      "draftMessagesPatched": [
+        {
+          "messageId": "-Oq-MRwaAAh590RT6id8",
+          "playerId": "p_1775957917161_w1n0",
+          "userNumber": 7,
+          "uid": "WPblWKjfuKQkFkYtaRseGQtKZl23"
+        },
+        {
+          "messageId": "-Oq-MSvRxtzO_lT9tbAQ",
+          "playerId": "p_1775069322616_90vf",
+          "userNumber": 1,
+          "uid": "ZqytkFsUCYZylOgWF6OZf2714w12"
+        },
+        {
+          "messageId": "-Oq-MVotqgO3YHTMnB5P",
+          "playerId": "p_1775957917161_w1n0",
+          "userNumber": 7,
+          "uid": "WPblWKjfuKQkFkYtaRseGQtKZl23"
+        }
+      ]
+    },
+    {
+      "lobbyId": "-Oq1FYXvksZjiD2HwwVn",
+      "waitingRoomMessagesPatched": [],
+      "draftMessagesPatched": [
+        {
+          "messageId": "-Oq1IM9mSGSdTNb3OmS_",
+          "playerId": "p_1775069322616_90vf",
+          "userNumber": 1,
+          "uid": "ZqytkFsUCYZylOgWF6OZf2714w12"
+        },
+        {
+          "messageId": "-Oq1INKhOAjGAtTSXGHD",
+          "playerId": "p_1775957917161_w1n0",
+          "userNumber": 7,
+          "uid": "WPblWKjfuKQkFkYtaRseGQtKZl23"
+        },
+        {
+          "messageId": "-Oq1IPMwm5VclvGHN7Qd",
+          "playerId": "p_1775069322616_90vf",
+          "userNumber": 1,
+          "uid": "ZqytkFsUCYZylOgWF6OZf2714w12"
+        },
+        {
+          "messageId": "-Oq1IQewQ7hd8y8PTtt7",
+          "playerId": "p_1775957917161_w1n0",
+          "userNumber": 7,
+          "uid": "WPblWKjfuKQkFkYtaRseGQtKZl23"
+        }
+      ]
+    }
+  ]
+}

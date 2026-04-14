@@ -678,7 +678,9 @@ async function ensureDirectThreadWithProfile(){
     createdAt: now,
     updatedAt: now,
     ['members/' + myUid]: true,
-    ['members/' + targetUid]: true
+    ['members/' + targetUid]: true,
+    ['members/' + myNumber]: true,
+    ['members/' + targetNumber]: true
   });
   const updates={};
   updates['userThreads/'+myNumber+'/'+threadId]={

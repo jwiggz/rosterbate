@@ -986,6 +986,7 @@ let pendingWaiverAdd=null;
 let currentRbUser=null;
 let sharedSeasonRef=null;
 let sharedSeasonListener=null;
+let sharedSeasonSubscriptionPath='';
 let sharedSeasonHydrating=false;
 let sharedSeasonSaveTimer=null;
 let sharedSeasonLastUpdatedAt=0;
@@ -1201,12 +1202,59 @@ function getSharedSeasonKey(){
   const lobbyState=getSavedMultiplayerLobbyState();
   return D?.sharedSeasonId || D?.seasonId || D?.lobbyId || lobbyState?.sharedSeasonId || lobbyState?.seasonId || lobbyState?.lobbyId || null;
 }
-function getSharedSeasonPath(){
+function getCanonicalMultiplayerSeasonKey(){
+  return getSharedSeasonKey();
+}
+function getCanonicalMultiplayerSeasonPath(){
+  const key=getCanonicalMultiplayerSeasonKey();
+  return key ? (SHARED_SEASON_ROOT+'/'+key) : '';
+}
+function getLegacySharedSeasonPath(){
+  const key=getSharedSeasonKey();
+  return key ? ('sharedSeasons/'+key) : '';
+}
+function getLobbySeasonStatePath(){
   const lobbyState=getSavedMultiplayerLobbyState();
   const lobbyId=String(D?.lobbyId || lobbyState?.lobbyId || '').trim();
-  if(lobbyId) return 'lobbies/'+lobbyId+'/seasonState';
-  const key=getSharedSeasonKey();
-  return key ? (SHARED_SEASON_ROOT+'/'+key) : '';
+  return lobbyId ? ('lobbies/'+lobbyId+'/seasonState') : '';
+}
+function getSharedSeasonPath(){
+  return getCanonicalMultiplayerSeasonPath() || getLobbySeasonStatePath() || getLegacySharedSeasonPath();
+}
+function getSharedSeasonLoadPaths(){
+  const ordered=[
+    { kind:'canonical', path:getCanonicalMultiplayerSeasonPath() },
+    { kind:'lobby', path:getLobbySeasonStatePath() },
+    { kind:'legacy', path:getLegacySharedSeasonPath() }
+  ];
+  const seen=new Set();
+  return ordered.filter(entry=>{
+    const path=String(entry?.path||'').trim();
+    if(!path || seen.has(path)) return false;
+    seen.add(path);
+    return true;
+  });
+}
+async function readSharedSeasonCandidate(path){
+  if(!path) return null;
+  try{
+    const snap=await db.ref(path).once('value');
+    return { path, snap, readable:true };
+  }catch(err){
+    if(String(err?.code||'').toLowerCase()==='permission_denied'){
+      console.warn('Shared season path is not readable for this client, skipping path:', path, err);
+      return { path, snap:null, readable:false, permissionDenied:true };
+    }
+    throw err;
+  }
+}
+function buildSharedSeasonUpdates(payload){
+  const updates={};
+  const canonicalPath=getCanonicalMultiplayerSeasonPath();
+  const lobbyPath=getLobbySeasonStatePath();
+  if(canonicalPath) updates[canonicalPath]=payload;
+  if(lobbyPath) updates[lobbyPath]=payload;
+  return updates;
 }
 function cloneJsonSafe(value){
   return JSON.parse(JSON.stringify(value));
@@ -1398,10 +1446,25 @@ function ensureSeasonWaiverPool(force){
     return G.waiver;
   }
   const rebuiltIds = new Set(rebuilt.map(player=>Number(player.id)));
-  G.waiver = (G.waiver||[])
-    .filter(player=>player && Number.isFinite(Number(player.id)) && rebuiltIds.has(Number(player.id)))
-    .map(player=>({...player}));
-  if(!G.waiver.length && rebuilt.length) G.waiver = rebuilt;
+  const rebuiltById = new Map(rebuilt.map(player=>[Number(player.id), player]));
+  const merged = [];
+  const seenIds = new Set();
+  (G.waiver||[]).forEach(player=>{
+    const pid = Number(player?.id);
+    if(!player || !Number.isFinite(pid) || !rebuiltIds.has(pid) || seenIds.has(pid)) return;
+    seenIds.add(pid);
+    merged.push({
+      ...player,
+      ...rebuiltById.get(pid)
+    });
+  });
+  rebuilt.forEach(player=>{
+    const pid = Number(player?.id);
+    if(!Number.isFinite(pid) || seenIds.has(pid)) return;
+    seenIds.add(pid);
+    merged.push({...player});
+  });
+  G.waiver = merged.length ? merged : rebuilt;
   return G.waiver;
 }
 
@@ -1437,8 +1500,8 @@ function renderActiveSeasonPage(){
 }
 async function saveSharedSeason(force, reason){
   if(sharedSeasonHydrating || !D?.multiplayer) return false;
-  const path=getSharedSeasonPath();
-  if(!path) return false;
+  const updates=buildSharedSeasonUpdates(null);
+  if(!Object.keys(updates).length) return false;
   syncGameStateToD();
   const payload={
     version:1,
@@ -1450,7 +1513,8 @@ async function saveSharedSeason(force, reason){
     game:serializeSharedGameState()
   };
   sharedSeasonLastUpdatedAt=payload.updatedAt;
-  await db.ref(path).set(payload);
+  const writeUpdates=buildSharedSeasonUpdates(payload);
+  await db.ref().update(writeUpdates);
   return true;
 }
 
@@ -1508,10 +1572,11 @@ function queueSharedSeasonSave(reason, delay){
     saveSharedSeason(false, reason).catch(err=>console.error('Shared season save failed', err));
   }, delay==null?450:delay);
 }
-function subscribeToSharedSeason(){
-  const path=getSharedSeasonPath();
+function subscribeToSharedSeason(pathOverride){
+  const path=String(pathOverride || getCanonicalMultiplayerSeasonPath() || getLobbySeasonStatePath() || getLegacySharedSeasonPath() || '').trim();
   if(!path) return;
   if(sharedSeasonRef && sharedSeasonListener) sharedSeasonRef.off('value', sharedSeasonListener);
+  sharedSeasonSubscriptionPath=path;
   sharedSeasonRef=db.ref(path);
   sharedSeasonListener=snap=>{
     const payload=snap.val();
@@ -1526,20 +1591,25 @@ function subscribeToSharedSeason(){
 async function loadOrCreateSharedSeason(){
   hydrateDraftUserContextFromLobby();
   if(!D?.multiplayer) return false;
-  const path=getSharedSeasonPath();
-  if(!path) return false;
-  let snap=null;
-  try{
-    snap=await db.ref(path).once('value');
-  }catch(err){
-    if(String(err?.code||'').toLowerCase()==='permission_denied'){
-      console.warn('Shared season path is not readable for this client, skipping shared sync.', err);
-      return false;
-    }
-    throw err;
+  const candidates=getSharedSeasonLoadPaths();
+  if(!candidates.length) return false;
+  let loadedCandidate=null;
+  for(const candidate of candidates){
+    const result=await readSharedSeasonCandidate(candidate.path);
+    if(!result?.snap?.exists?.()) continue;
+    if(!applySharedSeasonPayload(result.snap.val())) continue;
+    loadedCandidate=candidate;
+    break;
   }
-  if(snap.exists() && applySharedSeasonPayload(snap.val())){
-    subscribeToSharedSeason();
+  if(loadedCandidate){
+    if(loadedCandidate.kind!=='canonical'){
+      try{
+        await saveSharedSeason(true,'canonical_backfill');
+      }catch(err){
+        console.warn('Canonical shared season backfill failed', err);
+      }
+    }
+    subscribeToSharedSeason(getCanonicalMultiplayerSeasonPath() || loadedCandidate.path);
     return true;
   }
   if(!Array.isArray(D?.allRosters) || !D.allRosters.length) return false;
@@ -1549,7 +1619,7 @@ async function loadOrCreateSharedSeason(){
   }catch(err){
     console.warn('Initial shared season save failed', err);
   }
-  subscribeToSharedSeason();
+  subscribeToSharedSeason(getCanonicalMultiplayerSeasonPath() || getLobbySeasonStatePath() || getLegacySharedSeasonPath());
   return true;
 }
 window.addEventListener('beforeunload', ()=>{
@@ -3357,27 +3427,76 @@ function rebuildDemoSeasonData(sport){
   return {...demoData};
 }
 
+function buildSeasonPlayerKey(player){
+  return `${String(player?.name||'').trim().toLowerCase()}|${String(player?.team||'').trim().toLowerCase()}`;
+}
+
+function getSeasonCanonicalMaps(sport){
+  if(String(sport||CURRENT_SPORT).toLowerCase()!=='nba') return null;
+  const pool=Array.isArray(window.RB_IMPORTED_POOLS?.nba) ? window.RB_IMPORTED_POOLS.nba : [];
+  if(!pool.length) return null;
+  const byKey=new Map();
+  const byName=new Map();
+  const nameCounts=new Map();
+  pool.forEach(player=>{
+    if(!player) return;
+    byKey.set(buildSeasonPlayerKey(player), player);
+    const nameKey=String(player?.name||'').trim().toLowerCase();
+    if(!nameKey) return;
+    nameCounts.set(nameKey, (nameCounts.get(nameKey)||0)+1);
+  });
+  pool.forEach(player=>{
+    const nameKey=String(player?.name||'').trim().toLowerCase();
+    if(nameKey && nameCounts.get(nameKey)===1) byName.set(nameKey, player);
+  });
+  return {byKey, byName};
+}
+
+function normalizeSeasonPlayer(player, sport){
+  const clone={...(player||{})};
+  if(String(sport||CURRENT_SPORT).toLowerCase()!=='nba') return clone;
+  const canonicalMaps=getSeasonCanonicalMaps(sport);
+  if(!canonicalMaps) return clone;
+  const canonical=canonicalMaps.byKey.get(buildSeasonPlayerKey(clone))
+    || canonicalMaps.byName.get(String(clone?.name||'').trim().toLowerCase());
+  if(!canonical) return clone;
+  return {
+    ...clone,
+    team: canonical.team || clone.team,
+    pos: canonical.pos || clone.pos,
+    fp: Number.isFinite(Number(canonical.fp)) ? Number(canonical.fp) : clone.fp,
+    statValues: canonical.statValues || clone.statValues,
+    statSummary: canonical.statSummary || clone.statSummary
+  };
+}
+
+function normalizeSeasonPlayerPool(players, sport){
+  return (Array.isArray(players) ? players : [])
+    .filter(Boolean)
+    .map(player=>normalizeSeasonPlayer(player, sport));
+}
+
 function getSeasonPlayerPool(){
   const source=String(D?.playerPoolSource || '').trim().toLowerCase();
-  const savedFreeAgents = Array.isArray(D?.freeAgents) ? D.freeAgents.filter(Boolean).map(p=>({...p})) : [];
-  const savedWaiver = Array.isArray(D?.waiver) ? D.waiver.filter(Boolean).map(p=>({...p})) : [];
+  const savedFreeAgents = normalizeSeasonPlayerPool(Array.isArray(D?.freeAgents) ? D.freeAgents : [], CURRENT_SPORT);
+  const savedWaiver = normalizeSeasonPlayerPool(Array.isArray(D?.waiver) ? D.waiver : [], CURRENT_SPORT);
   const savedPool = savedFreeAgents.length ? savedFreeAgents : savedWaiver;
   const nbaStaticFallback = (CURRENT_SPORT==='nba' && typeof getRosterbateDemoPlayers==='function')
-    ? (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}))
+    ? normalizeSeasonPlayerPool(getRosterbateDemoPlayers('nba') || [], 'nba')
     : [];
   if(CURRENT_SPORT==='nba' && typeof getRosterbateDemoPlayers==='function' && (source==='static_2024_25' || !source)){
-    const demoPool = (getRosterbateDemoPlayers('nba') || []).map(p=>({...p}));
+    const demoPool = normalizeSeasonPlayerPool(getRosterbateDemoPlayers('nba') || [], 'nba');
     return demoPool.length ? demoPool : savedPool;
   }
   if(D?.isDemo === true && typeof getRosterbateDemoPlayers==='function'){
-    const demoPool = (getRosterbateDemoPlayers(CURRENT_SPORT) || []).map(p=>({...p}));
+    const demoPool = normalizeSeasonPlayerPool(getRosterbateDemoPlayers(CURRENT_SPORT) || [], CURRENT_SPORT);
     return demoPool.length ? demoPool : savedPool;
   }
   if(typeof buildRosterbateSportPlayerPool === 'function'){
     const importedPoolLimit=typeof getRosterbatePlayerPoolLimit === 'function'
       ? getRosterbatePlayerPoolLimit(CURRENT_SPORT)
       : (CURRENT_SPORT==='nba' ? 500 : 320);
-    const importedPool = buildRosterbateSportPlayerPool(CURRENT_SPORT, importedPoolLimit);
+    const importedPool = normalizeSeasonPlayerPool(buildRosterbateSportPlayerPool(CURRENT_SPORT, importedPoolLimit), CURRENT_SPORT);
     if(Array.isArray(importedPool) && importedPool.length) return importedPool;
     if(nbaStaticFallback.length) return nbaStaticFallback;
     return savedPool;

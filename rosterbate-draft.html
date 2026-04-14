@@ -1066,6 +1066,110 @@ function persistMultiplayerLobbySeasonInfo(seasonId){
   }catch(e){}
 }
 
+function buildInitialSeasonSchedule(teamCount,weeks){
+  if(teamCount<2) return [];
+  const schedule=[];
+  const teams=Array.from({length:teamCount},(_,i)=>i);
+  for(let weekIndex=0;weekIndex<weeks;weekIndex++){
+    for(let i=0;i<Math.floor(teamCount/2);i++){
+      schedule.push({week:weekIndex+1,home:teams[i],away:teams[teamCount-1-i],homeScore:0,awayScore:0,winner:-1});
+    }
+    teams.splice(1,0,teams.pop());
+  }
+  return schedule;
+}
+
+function buildInitialPowerupInventory(){
+  return {
+    captain_mode:{owned:1,cooldownUntilWeek:1,lastUsedWeek:null},
+    white_gloves:{owned:1,cooldownUntilWeek:1,lastUsedWeek:null},
+    bench_boost:{owned:1,cooldownUntilWeek:1,lastUsedWeek:null},
+    sunday_surge:{owned:0,cooldownUntilWeek:1,lastUsedWeek:null}
+  };
+}
+
+function buildInitialMultiplayerSeasonPayload(draftData){
+  const draft=JSON.parse(JSON.stringify(draftData||{}));
+  const teamCount=Number(draft.leagueSize || draft.teams?.length || draft.allRosters?.length || 0);
+  const totalWeeks=17;
+  const totalStarters=Number(draft?.commissionerSettings?.totalStarters || (typeof SPORT_RULES!=='undefined' ? SPORT_RULES.starters : 9) || 9);
+  const rosters=(Array.isArray(draft.allRosters) ? draft.allRosters : []).map(roster=>(Array.isArray(roster)?roster:[]).map(player=>({...player})));
+  const starters=rosters.map(roster=>roster.slice(0,totalStarters).map(player=>player.id).filter(id=>id!=null));
+  const standings=Array.from({length:teamCount},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
+  const powerupInventory=buildInitialPowerupInventory();
+  const game={
+    week:1,
+    totalWeeks,
+    day:1,
+    rosters,
+    ilByTeam:Array.from({length:teamCount},()=>[]),
+    starters,
+    dailyLineups:{},
+    dailyLineupsByTeam:{},
+    waiver:(Array.isArray(draft.waiver) ? draft.waiver : []).map(player=>({...player})),
+    schedule:buildInitialSeasonSchedule(teamCount,totalWeeks),
+    standings,
+    tradeOffers:[],
+    processed:[],
+    powerupsByWeek:{},
+    powerupInventory:JSON.parse(JSON.stringify(powerupInventory)),
+    powerupDropsByWeek:{},
+    dayResults:{},
+    revealedDays:{},
+    settledWeeks:{},
+    isSeasonComplete:false,
+    activityLog:[],
+    recentDrops:[],
+    moneyBallLocks:{},
+    waiverPriority:{}
+  };
+  draft.currentWeek=1;
+  draft.currentDay=1;
+  draft.lastRevealedDay=0;
+  draft.standings=standings.map(row=>({...row}));
+  draft.isSeasonComplete=false;
+  draft.starters=starters.map(lineup=>lineup.slice());
+  draft.ilRosters=Array.from({length:teamCount},()=>[]);
+  draft.dailyLineups={};
+  draft.dailyLineupsByTeam={};
+  draft.tradeOffers=[];
+  draft.processed=[];
+  draft.powerupsByWeek={};
+  draft.powerupInventory=JSON.parse(JSON.stringify(powerupInventory));
+  draft.powerupDropsByWeek={};
+  draft.dayResults={};
+  draft.revealedDays={};
+  draft.settledWeeks={};
+  draft.activityLog=[];
+  draft.recentDrops=[];
+  draft.moneyBallLocks={};
+  draft.waiverPriority={};
+  return {
+    version:1,
+    reason:'draft_complete_seed',
+    updatedAt:Date.now(),
+    updatedBy:String(currentRbUser?.uid || draft.userId || draft.myPlayerId || 'draft'),
+    updatedClientId:'draft_'+Math.random().toString(36).slice(2,10)+'_'+Date.now().toString(36),
+    draft,
+    game
+  };
+}
+
+async function seedCanonicalMultiplayerSeason(draftData, seasonId){
+  const finalId=String(seasonId || draftData?.sharedSeasonId || draftData?.seasonId || '').trim();
+  if(!db || !finalId || !draftData?.multiplayer) return false;
+  draftData.seasonId=finalId;
+  draftData.sharedSeasonId=finalId;
+  const payload=buildInitialMultiplayerSeasonPayload(draftData);
+  const updates={
+    ['multiplayerSeasons/'+finalId]:payload
+  };
+  const lobbyId=String(draftData?.lobbyId || '').trim();
+  if(lobbyId) updates['lobbies/'+lobbyId+'/seasonState']=payload;
+  await db.ref().update(updates);
+  return true;
+}
+
 function rosterbateScoreDayKey(){
   return new Date().toLocaleDateString('en-CA');
 }
@@ -4055,6 +4159,12 @@ async function endDraft(){
         if (isMultiplayer) {
           draftData.sharedSeasonId = seasonId;
           persistMultiplayerLobbySeasonInfo(seasonId);
+          try{
+            await seedCanonicalMultiplayerSeason(draftData, seasonId);
+            console.log('Seeded canonical multiplayer season:', seasonId);
+          }catch(seedErr){
+            console.warn('Could not seed canonical multiplayer season', seedErr);
+          }
         }
         console.log('✅ Draft data updated with seasonId:', seasonId);
       }
@@ -4869,6 +4979,7 @@ async function rbPostMsg(extra){
     const messageData = {
       sender:rbGetMyChatName(),
       playerId:RB_MY_ID,
+      uid:String(currentRbUser?.uid||''),
       userNumber:rbGetMyChatUserNumber(),
       ts:Date.now(),
       reactions:{},
@@ -4893,6 +5004,7 @@ async function rbPostMsg(extra){
     id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
     sender:rbGetMyChatName(),
     playerId:RB_MY_ID,
+    uid:String(currentRbUser?.uid||''),
     userNumber:rbGetMyChatUserNumber(),
     ts:Date.now(),
     reactions:{},
