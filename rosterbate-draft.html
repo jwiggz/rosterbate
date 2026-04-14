@@ -2124,9 +2124,9 @@ function applySavedLobbySettings(){
     if(!raw) return;
     const state=JSON.parse(raw);
     if(!state || (state.sport && state.sport!==SPORT)) return;
-    const params=new URLSearchParams(window.location.search||'');
-    const hasLobbyParam=!!params.get('lobby');
+    const hasLobbyParam=isLobbyDraftContext();
     const allowSoloLobby=!!(hasLobbyParam && state.soloTest && state.lobbyId);
+    if(!hasLobbyParam) return;
     if(state.myName) document.getElementById('iName').value=state.myName;
     if(state.leagueName || state.name) document.getElementById('iLeagueName').value=state.leagueName||state.name;
     if(state.teamSize){
@@ -2167,6 +2167,11 @@ function getSavedMultiplayerLobbyState(){
   }
 }
 
+function isLobbyDraftContext(){
+  const params=new URLSearchParams(window.location.search||'');
+  return !!String(params.get('lobby')||'').trim();
+}
+
 async function ensureLobbyPlayerIndex(lobbyId, userId) {
   if (!db || !lobbyId || !userId) return;
   const indexRef = db.ref(`lobbyPlayersByUid/${lobbyId}/${userId}`);
@@ -2205,7 +2210,7 @@ function finishDraftBoot(targetScreen){
 
 function getRealtimeMultiplayerLobbyId(){
   const state=getSavedMultiplayerLobbyState();
-  if(!state?.lobbyId || state?.soloTest || !db) return '';
+  if(!isLobbyDraftContext() || !state?.lobbyId || state?.soloTest || !db) return '';
   return String(state.lobbyId);
 }
 
@@ -2378,8 +2383,7 @@ function subscribeRealtimeDraftState(){
 
 function isSoloTestDraft(){
   const state=getSavedMultiplayerLobbyState();
-  const params=new URLSearchParams(window.location.search||'');
-  return !!(params.get('lobby') && state?.soloTest && state?.lobbyId);
+  return !!(isLobbyDraftContext() && state?.soloTest && state?.lobbyId);
 }
 
 function isLocalDraftTesting(){
@@ -2444,11 +2448,13 @@ function getDraftAiNames(){
 }
 
 function getScheduledDraftStartAt(){
+  if(!isLobbyDraftContext()) return 0;
   const state=getSavedMultiplayerLobbyState();
   return Number(state?.scheduledStartAt||0);
 }
 
 function isScheduledMultiplayerDraft(){
+  if(!isLobbyDraftContext()) return false;
   return !!(getSavedMultiplayerLobbyState()?.lobbyId && getScheduledDraftStartAt());
 }
 
@@ -2476,7 +2482,8 @@ function startDraft(){
   const sp=parseInt(document.getElementById('iSpot').value);
   const rd=rules.rosterSize;
   const lobbyState=getSavedMultiplayerLobbyState();
-  const allowSoloTest=!!(lobbyState?.soloTest && lobbyState?.lobbyId);
+  const useLobbyDraft=isLobbyDraftContext();
+  const allowSoloTest=!!(useLobbyDraft && lobbyState?.soloTest && lobbyState?.lobbyId);
   const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
@@ -2501,7 +2508,7 @@ function startDraft(){
   initPauseState();
   rbResetDraftRoomChat();
   const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
-  if(lobbyState?.lobbyId && orderedLobbyPlayers.length===ls){
+  if(useLobbyDraft && lobbyState?.lobbyId && orderedLobbyPlayers.length===ls){
     const myLobbyIdx=orderedLobbyPlayers.findIndex(player=>player?.id===lobbyState.myId);
     if(myLobbyIdx>=0){
       S.myPos=myLobbyIdx;
@@ -2525,6 +2532,7 @@ function startDraft(){
   document.getElementById('draft').classList.add('active');
   document.getElementById('statHeader').style.display='flex';
   rPlayers();rMyTeam();rOtherTeams();rBoard();upHdr();updateTradeBtn();
+  updateAutoDraftButton();
   startCountdown();
   awardRosterbateScore('create_league', 10).catch(() => {});
   // NOTE: advance() is called in launchDraft() — nothing picks until countdown ends
