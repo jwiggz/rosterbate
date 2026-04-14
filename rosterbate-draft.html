@@ -20,7 +20,16 @@
     --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
+  html,body{
+    height:100%;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(249,115,22,.18), transparent 34%),
+      radial-gradient(circle at 12% 20%, rgba(59,130,246,.11), transparent 26%),
+      linear-gradient(180deg, #09111d 0%, #070b13 54%, #05080f 100%);
+    color:var(--text);
+    font-family:var(--fb);
+    overflow:hidden;
+  }
   .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
   .screen.active{display:flex;}
   body[data-draft-boot="loading"] .screen.active{display:none !important;}
@@ -35,7 +44,11 @@
   .logo .draft-logo-wordmark{font-family:var(--fd);font-size:34px;font-weight:900;letter-spacing:1px;text-transform:uppercase;line-height:1;}
   .logo .draft-logo-wordmark span{color:var(--accent);}
   .logo p{color:var(--text2);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:0;}
-  .pill{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:5px 14px;font-size:11px;color:#4ade80;text-align:center;font-weight:600;}
+  .pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:999px;padding:7px 14px;font-size:11px;color:#d8fbe2;text-align:center;font-weight:800;letter-spacing:.55px;text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 20px rgba(0,0,0,.14);}
+  .pill.open,.pill.live{border-color:rgba(134,239,172,.34);background:rgba(22,101,52,.22);color:#86efac;}
+  .pill.soon{border-color:rgba(253,224,71,.34);background:rgba(120,88,14,.18);color:#fde68a;}
+  .pill.info{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
+  .pill.warn{border-color:rgba(252,165,165,.34);background:rgba(127,29,29,.18);color:#fecaca;}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;width:100%;max-width:440px;}
   .card h2{font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;color:var(--text2);}
   .fr{margin-bottom:10px;}
@@ -59,9 +72,29 @@
   .errmsg.show{display:block;}
 
   /* PRE-DRAFT COUNTDOWN BAR */
-  .pdc-bar{background:linear-gradient(90deg,rgba(249,115,22,.15),rgba(249,115,22,.08));border-bottom:1px solid rgba(249,115,22,.25);padding:6px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .pdc-bar{background:linear-gradient(90deg,rgba(249,115,22,.15),rgba(249,115,22,.08));border-bottom:1px solid rgba(249,115,22,.25);padding:6px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
   .pdc-bar.hidden{display:none;}
-  .pdc-icon{font-size:14px;flex-shrink:0;}
+  .pdc-bar.countdown{background:linear-gradient(90deg,rgba(59,130,246,.18),rgba(37,99,235,.09));border-bottom-color:rgba(96,165,250,.28);}
+  .pdc-bar.scheduled{background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(180,83,9,.08));border-bottom-color:rgba(253,224,71,.24);}
+  .pdc-bar.live-ready{background:linear-gradient(90deg,rgba(22,163,74,.18),rgba(21,128,61,.08));border-bottom-color:rgba(134,239,172,.24);}
+  .pdc-icon{
+    min-width:44px;
+    height:24px;
+    padding:0 10px;
+    border-radius:999px;
+    border:1px solid rgba(249,115,22,.34);
+    background:rgba(249,115,22,.14);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--fd);
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    color:var(--accent);
+    flex-shrink:0;
+  }
   .pdc-text{flex:1;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.3px;}
   .pdc-text strong{color:var(--accent);}
   .pdc-time{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-0.5px;flex-shrink:0;min-width:40px;text-align:right;}
@@ -73,12 +106,70 @@
   .pdc-strip-fill.urgent{background:var(--red);}
 
   /* DRAFT */
-  #draft{background:var(--bg);}
-  .dh{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 12px 7px;flex-shrink:0;}
-  .dh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-  .dtitle{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;}
-  .dtitle span{color:var(--accent);}
-  .clk-badge{background:var(--accent);color:#fff;font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:3px 8px;border-radius:20px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #draft{
+    background:
+      radial-gradient(circle at 50% -8%, rgba(249,115,22,.13), transparent 26%),
+      linear-gradient(180deg, rgba(7,10,17,.98), rgba(5,7,12,1));
+    position:relative;
+  }
+  .dh{
+    background:linear-gradient(180deg, rgba(20,30,48,.96), rgba(12,18,30,.96));
+    border-bottom:1px solid rgba(61,84,118,.42);
+    box-shadow:0 18px 36px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.04);
+    padding:10px 14px 9px;
+    flex-shrink:0;
+  }
+  .dh-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:7px;}
+  .dtitle{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:var(--text);
+    text-decoration:none;
+  }
+  .draft-brand-img{
+    height:34px;
+    width:auto;
+    display:block;
+    filter:drop-shadow(0 8px 14px rgba(249,115,22,.18));
+  }
+  .dtitle-copy{display:flex;flex-direction:column;line-height:1;}
+  .dtitle-kicker{
+    font-family:var(--fd);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    color:var(--text2);
+    margin-bottom:2px;
+  }
+  .dtitle-main{
+    font-family:var(--fd);
+    font-size:18px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .dtitle-main span{color:var(--accent);}
+  .clk-badge{
+    background:linear-gradient(180deg, var(--accent), #ea580c);
+    color:#fff;
+    font-family:var(--fd);
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    padding:5px 10px;
+    border-radius:999px;
+    max-width:170px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    box-shadow:0 10px 18px rgba(249,115,22,.22);
+  }
+  .clk-badge.mine{background:linear-gradient(180deg, var(--accent), #ea580c);box-shadow:0 10px 18px rgba(249,115,22,.22),0 0 18px rgba(249,115,22,.18);}
+  .clk-badge.other{background:linear-gradient(180deg, rgba(71,85,105,.94), rgba(51,65,85,.96));color:#e2e8f0;box-shadow:0 10px 18px rgba(15,23,42,.18);}
+  .clk-badge.done{background:linear-gradient(180deg, rgba(22,163,74,.94), rgba(21,128,61,.96));color:#ecfdf5;box-shadow:0 10px 18px rgba(22,163,74,.2);}
   .clk-badge.w{background:var(--text3);}
   .dmeta{display:flex;gap:12px;flex-wrap:wrap;}
   .mi{display:flex;flex-direction:column;}
@@ -86,20 +177,52 @@
   .mv{font-family:var(--fd);font-size:14px;font-weight:700;}
   .mv.ac{color:var(--accent);}
   .mbadge{font-size:9px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--text3);font-family:var(--fd);font-weight:700;}
+  .pick-signal{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.95fr) auto;gap:10px;align-items:center;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(71,85,105,.34);background:linear-gradient(180deg,rgba(11,17,28,.9),rgba(8,12,20,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+  .pick-signal.live{border-color:rgba(134,239,172,.18);background:linear-gradient(180deg,rgba(13,29,22,.94),rgba(8,18,16,.98));}
+  .pick-signal.alert{border-color:rgba(249,115,22,.22);background:linear-gradient(180deg,rgba(41,20,11,.94),rgba(20,11,8,.98));}
+  .pick-signal.done{border-color:rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(14,24,42,.94),rgba(9,14,24,.98));}
+  .pick-signal-main,.pick-signal-side{min-width:0;}
+  .pick-signal-kicker,.pick-signal-side-label{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);}
+  .pick-signal-headline{margin-top:3px;font-family:var(--fd);font-size:22px;font-weight:900;letter-spacing:.2px;line-height:.95;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pick-signal-copy{margin-top:5px;font-size:12px;line-height:1.5;color:#b8c4d6;}
+  .pick-signal-side-value{margin-top:4px;font-family:var(--fd);font-size:16px;font-weight:800;line-height:1;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pick-signal-tag{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(9,13,20,.55);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#e5edf8;white-space:nowrap;}
+  .pick-signal-tag.live{border-color:rgba(134,239,172,.34);background:rgba(22,101,52,.2);color:#86efac;}
+  .pick-signal-tag.alert{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.22);color:#fdba74;}
+  .pick-signal-tag.done{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
   .tbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px;}
   .tfill{height:100%;background:var(--accent);border-radius:2px;transition:width .9s linear;}
   .tfill.urg{background:var(--red);}
-  .draft-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
-  .draft-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
-  .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+  .draft-layout{
+    flex:1;
+    display:flex;
+    min-height:0;
+    overflow:hidden;
+    gap:14px;
+    padding:14px;
+  }
+  .draft-main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    overflow:hidden;
+    border:1px solid rgba(45,63,92,.6);
+    border-radius:20px;
+    background:linear-gradient(180deg, rgba(16,24,39,.9), rgba(11,17,28,.96));
+    box-shadow:0 28px 48px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .tabs{display:flex;background:rgba(11,17,28,.82);border-bottom:1px solid rgba(45,63,92,.6);flex-shrink:0;padding:0 8px;}
   .tb{flex:1;padding:9px 4px;font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;}
   .tb.on{color:var(--accent);border-bottom-color:var(--accent);}
+  .tb.live{color:#86efac;border-bottom-color:#22c55e;background:linear-gradient(180deg,rgba(22,101,52,.16),rgba(22,101,52,0));}
+  .tb.alert{color:#fdba74;border-bottom-color:#f97316;background:linear-gradient(180deg,rgba(154,52,18,.16),rgba(154,52,18,0));}
   .dc{flex:1;overflow:hidden;position:relative;}
   .tp{display:none;height:100%;flex-direction:column;overflow:hidden;}
   .tp.on{display:flex;}
 
   /* PLAYERS */
-  .pf{padding:7px 10px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;}
+  .pf{padding:9px 12px;background:rgba(12,18,30,.82);border-bottom:1px solid rgba(45,63,92,.45);display:flex;gap:6px;flex-shrink:0;}
   .sw{flex:1;position:relative;}
   .sw input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 9px 7px 28px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;}
   .sw::before{content:'🔍';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;}
@@ -107,10 +230,29 @@
   .posf::-webkit-scrollbar{display:none;}
   .pb{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
   .pb.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .decision-strip{display:flex;align-items:center;gap:12px;padding:12px;background:linear-gradient(180deg,rgba(16,24,39,.96),rgba(10,15,25,.98));border-bottom:1px solid rgba(45,63,92,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
+  .decision-strip.live{background:linear-gradient(180deg,rgba(16,46,33,.98),rgba(10,27,20,.99));border-bottom-color:rgba(74,222,128,.18);}
+  .decision-strip.alert{background:linear-gradient(180deg,rgba(48,24,12,.98),rgba(24,13,9,.99));border-bottom-color:rgba(249,115,22,.22);}
+  .decision-strip.ready{background:linear-gradient(180deg,rgba(17,31,52,.98),rgba(10,18,31,.99));border-bottom-color:rgba(96,165,250,.2);}
+  .decision-strip-main{flex:1;min-width:0;}
+  .decision-strip-kicker{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);}
+  .decision-strip-headline{margin-top:4px;font-family:var(--fd);font-size:19px;font-weight:900;line-height:1;letter-spacing:.2px;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .decision-strip-copy{margin-top:5px;font-size:12px;line-height:1.45;color:#c2cfdf;}
+  .decision-strip-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .decision-chip{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.22);background:rgba(10,15,24,.55);font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#e2e8f0;white-space:nowrap;}
+  .decision-chip.live{border-color:rgba(74,222,128,.34);background:rgba(22,101,52,.22);color:#86efac;}
+  .decision-chip.alert{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.2);color:#fdba74;}
+  .decision-chip.ready{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
+  .decision-chip.muted{color:var(--text3);}
+  .decision-action{border:none;border-radius:999px;padding:10px 14px;background:linear-gradient(180deg,var(--accent),#ea580c);color:#fff;font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;white-space:nowrap;box-shadow:0 14px 26px rgba(249,115,22,.22);}
+  .decision-action.secondary{background:rgba(15,23,42,.86);border:1px solid rgba(71,85,105,.58);color:#dbe7f5;box-shadow:none;}
   .pl{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .pr{display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;cursor:pointer;transition:background .1s;}
   .pr:active{background:rgba(249,115,22,.07);}
   .pr.drafted{opacity:.28;pointer-events:none;}
+  .pr.queue-focus{background:linear-gradient(90deg,rgba(249,115,22,.12),rgba(249,115,22,0));}
+  .pr.best-focus{background:linear-gradient(90deg,rgba(59,130,246,.12),rgba(59,130,246,0));}
+  .pr.fit-focus{background:linear-gradient(90deg,rgba(34,197,94,.1),rgba(34,197,94,0));}
   .pstat{min-width:32px;font-size:11px;font-weight:600;color:var(--text2);text-align:left;flex-shrink:0;}
   .pstat-header{display:flex;align-items:center;padding:8px 11px;gap:9px;border-bottom:2px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:10;}
   .pstat-label{min-width:32px;font-size:10px;font-weight:800;color:var(--text3);text-align:left;flex-shrink:0;text-transform:uppercase;cursor:pointer;user-select:none;}
@@ -124,6 +266,11 @@
   .pdet{font-size:11px;color:var(--text2);margin-top:1px;}
   .pmeta-row{display:flex;align-items:center;gap:8px;margin-top:5px;min-width:0;}
   .pfp-chip{font-family:var(--fd);font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+  .p-rec-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;}
+  .p-rec-tag{display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(148,163,184,.22);background:rgba(10,15,24,.5);font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;color:#dbe7f5;white-space:nowrap;}
+  .p-rec-tag.queue{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#fdba74;}
+  .p-rec-tag.best{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
+  .p-rec-tag.fit{border-color:rgba(74,222,128,.34);background:rgba(21,128,61,.18);color:#86efac;}
   .pos-badge{display:inline-block;padding:1px 4px;border-radius:3px;font-family:var(--fd);font-size:10px;font-weight:700;margin-left:3px;}
   .pos-PG{background:rgba(59,130,246,.2);color:#60a5fa;}
   .pos-SG{background:rgba(168,85,247,.2);color:#c084fc;}
@@ -357,6 +504,15 @@
   .fav-remove:active{color:var(--red);}
   .fav-auto-badge{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:5px;padding:2px 6px;font-family:var(--fd);font-size:9px;font-weight:800;color:var(--accent);letter-spacing:.5px;flex-shrink:0;}
   .tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;font-size:9px;font-weight:800;border-radius:10px;padding:1px 5px;margin-left:3px;font-family:var(--fd);min-width:14px;}
+  .queue-signal{margin:10px 9px 0;padding:12px 13px;border:1px solid rgba(45,63,92,.58);border-radius:12px;background:linear-gradient(180deg,rgba(16,24,39,.92),rgba(10,15,25,.98));display:flex;align-items:center;gap:12px;}
+  .queue-signal.live{border-color:rgba(74,222,128,.2);background:linear-gradient(180deg,rgba(16,46,33,.96),rgba(10,27,20,.99));}
+  .queue-signal.alert{border-color:rgba(249,115,22,.2);background:linear-gradient(180deg,rgba(48,24,12,.96),rgba(24,13,9,.99));}
+  .queue-signal-copy{flex:1;min-width:0;}
+  .queue-signal-title{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);}
+  .queue-signal-headline{margin-top:4px;font-family:var(--fd);font-size:17px;font-weight:900;line-height:1;color:#f8fafc;}
+  .queue-signal-text{margin-top:5px;font-size:12px;line-height:1.45;color:#c2cfdf;}
+  .queue-signal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .queue-signal .decision-action{padding:9px 12px;}
   
 /* RosterBate Home Header */
 .rb-home-bar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:10px 14px;flex-shrink:0;}
@@ -422,11 +578,11 @@
 <!-- LOBBY -->
 <div id="lobby" class="screen">
   <div class="logo">
-    <div class="ball" id="sportLogoBall">🏀</div>
+    <div class="ball" id="sportLogoBall">RB</div>
     <a href="index.html" class="draft-logo-link" aria-label="RosterBate home"><div class="draft-logo-wordmark">Roster<span>Bate</span></div></a>
     <p id="sportLogoSub">Draft Room</p>
   </div>
-  <div class="pill" id="sportLobbyPill">✅ 2024-25 Pro Sports Season · 30 Teams · 500 Players</div>
+  <div class="pill" id="sportLobbyPill">Live pro sports season | 30 teams | 500 players</div>
   <div class="card">
     <h2>League Settings</h2>
     <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Tommy's Minions"/></div>
@@ -533,7 +689,7 @@
 
   <!-- COUNTDOWN BAR (sits above header, hidden once draft starts) -->
   <div class="pdc-bar" id="pdcBar">
-    <div class="pdc-icon" id="sportCountdownIcon">🏀</div>
+    <div class="pdc-icon" id="sportCountdownIcon">Live</div>
     <div class="pdc-text"><strong>Draft starts in</strong> — browse players &amp; set your queue!</div>
     <div class="pdc-time" id="pdcTime">2:00</div>
     <button class="pdc-start" onclick="launchDraft()">Start</button>
@@ -542,7 +698,7 @@
 
   <div class="dh">
     <div class="dh-top">
-      <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">🏀 Roster<span>Bate</span></div></a>
+      <a href="index.html" style="text-decoration:none;"><div class="dtitle" id="sportDraftTitle">Roster<span>Bate</span> Control Room</div></a>
       <div style="display:flex;align-items:center;gap:7px">
         <button class="auto-btn off" id="autoDraftBtn" onclick="toggleAutoDraft()">Auto Draft Off</button>
         <button class="pause-btn" id="pauseBtn" onclick="handlePauseBtn()">⏸ Pause</button>
@@ -557,6 +713,18 @@
       <div class="mi"><span class="ml">Your Next</span><span class="mv ac" id="mNext">—</span></div>
       <div class="mi"><span class="ml">Timer</span><span class="mv ac" id="mTimer">1:30</span></div>
       <div class="mi"><span class="ml">Format</span><span class="mbadge" id="mFmt">SNAKE</span></div>
+    </div>
+    <div class="pick-signal alert" id="pickSignal">
+      <div class="pick-signal-main">
+        <div class="pick-signal-kicker" id="pickSignalKicker">Board Status</div>
+        <div class="pick-signal-headline" id="pickSignalHeadline">Draft Room Ready</div>
+        <div class="pick-signal-copy" id="pickSignalCopy">Browse the board, watch the timer, and set your queue before the draft goes live.</div>
+      </div>
+      <div class="pick-signal-side">
+        <div class="pick-signal-side-label" id="pickSignalSideLabel">Next Up</div>
+        <div class="pick-signal-side-value" id="pickSignalSideValue">Your room</div>
+      </div>
+      <div class="pick-signal-tag alert" id="pickSignalTag">Prep Now</div>
     </div>
     <div class="tbar"><div class="tfill" id="tFill"></div></div>
   </div>
@@ -574,6 +742,18 @@
           <div class="pf"><div class="sw"><input type="text" id="srch" placeholder="Search players…" oninput="rPlayers()"/></div></div>
           <div class="pf" style="padding-top:0;padding-bottom:7px">
             <div class="posf" id="posFilterBar"></div>
+          </div>
+          <div class="decision-strip ready" id="playerDecisionStrip">
+            <div class="decision-strip-main">
+              <div class="decision-strip-kicker" id="playerDecisionKicker">Board Pulse</div>
+              <div class="decision-strip-headline" id="playerDecisionHeadline">Build Your Queue Now</div>
+              <div class="decision-strip-copy" id="playerDecisionCopy">Star your favorite targets so the room is ready before the board goes live.</div>
+            </div>
+            <div class="decision-strip-meta">
+              <div class="decision-chip ready" id="playerDecisionChip">Queue Empty</div>
+              <div class="decision-chip muted" id="playerDecisionMeta">Best Available</div>
+              <button class="decision-action" id="playerDecisionAction" onclick="goToDraftTab('favs')">Open Queue</button>
+            </div>
           </div>
           <div id="statHeader" class="pstat-header" style="display:none;">
             <div class="pstat-label" onclick="sortPlayers('adp')" style="width:22px;text-align:center;cursor:pointer;" title="Sort by rank">#</div>
@@ -597,14 +777,27 @@
         <div id="tp-myteam" class="tp"><div class="mtw" id="myTeam"></div></div>
         <div id="tp-teams" class="tp"><div class="team-menu" id="otherTeams"></div></div>
         <div id="tp-board" class="tp"><div class="bw" id="board"></div></div>
-        <div id="tp-favs" class="tp"><div class="fav-tab-wrap" id="favList"></div></div>
+        <div id="tp-favs" class="tp">
+          <div class="queue-signal alert" id="queueSignal">
+            <div class="queue-signal-copy">
+              <div class="queue-signal-title" id="queueSignalTitle">Queue Status</div>
+              <div class="queue-signal-headline" id="queueSignalHeadline">Need More Targets</div>
+              <div class="queue-signal-text" id="queueSignalText">Queue your best fits here so auto-draft has a smart fallback and your next turn is easier.</div>
+            </div>
+            <div class="queue-signal-actions">
+              <div class="decision-chip alert" id="queueSignalChip">0 / 10 Ready</div>
+              <button class="decision-action secondary" id="queueSignalAction" onclick="goToDraftTab('players')">Browse Players</button>
+            </div>
+          </div>
+          <div class="fav-tab-wrap" id="favList"></div>
+        </div>
       </div>
     </div>
 
     <div class="rb-chat-panel" id="rbChatPanel">
       <div class="rb-chat-hdr">
         <div style="flex:1">
-          <div class="rb-chat-title">💬 League Chat</div>
+          <div class="rb-chat-title">League Chat</div>
           <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
         </div>
       </div>
@@ -612,7 +805,7 @@
       <div class="rb-chat-tabs">
         <button class="rb-chat-tab on" onclick="rbSwitchTab('draft',this)">Draft Room</button>
         <button class="rb-chat-tab" onclick="rbSwitchTab('trades',this)">Trades</button>
-        <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk 🔥</button>
+        <button class="rb-chat-tab" onclick="rbSwitchTab('trash',this)">Trash Talk</button>
       </div>
 
       <div class="rb-chat-msgs" id="rbMsgs"></div>
@@ -636,7 +829,7 @@
         </div>
 
         <div class="rb-chat-row">
-          <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Message the league…" rows="1"
+          <textarea class="rb-chat-textarea" id="rbInput" maxlength="280" placeholder="Message the league..." rows="1"
             oninput="rbAutoResize(this);rbUpdateSendBtn()"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rbSend();}"></textarea>
           <button class="rb-chat-send" id="rbSendBtn" onclick="rbSend()" disabled>➤</button>
@@ -800,7 +993,7 @@
   </div>
 </div>
 
-<div class="ocb" id="ocBanner"><p id="ocText">⏰ You're On The Clock!</p></div>
+<div class="ocb" id="ocBanner"><p id="ocText">You're On The Clock!</p></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1312,6 +1505,9 @@ function rFavs(){
     }
   }
   wrap.innerHTML=html;
+  updateQueueSignal();
+  updatePlayerDecisionStrip();
+  updateQueueTabUrgency();
 }
 
 // Drag-to-reorder
@@ -2056,6 +2252,158 @@ function getLivePoolUpdatedTimestampLabel(sport){
   return formatRosterbatePoolUpdatedDate(getLivePoolUpdatedDate(sport));
 }
 
+function applyDraftRoomShellEnhancements(){
+  const logoBall=document.getElementById('sportLogoBall');
+  if(logoBall) logoBall.textContent=String(SPORT_CFG?.label||SPORT||'').slice(0,3).toUpperCase() || 'RB';
+
+  const lobbyPill=document.getElementById('sportLobbyPill');
+  if(lobbyPill) setDraftLobbyPill(lobbyPill.textContent||'', lobbyPill.classList.contains('warn') ? 'warn' : 'info');
+
+  const countdownIcon=document.getElementById('sportCountdownIcon');
+  if(countdownIcon) countdownIcon.textContent='Live';
+
+  const draftTitle=document.getElementById('sportDraftTitle');
+  if(draftTitle){
+    draftTitle.innerHTML =
+      '<img src="rosterbate-main-logo-final.png" alt="RosterBate" class="draft-brand-img">' +
+      '<div class="dtitle-copy">' +
+        '<div class="dtitle-kicker">' + String(SPORT_CFG?.label||SPORT||'').toUpperCase() + ' Draft</div>' +
+        '<div class="dtitle-main">Roster<span>Bate</span> Control Room</div>' +
+      '</div>';
+    draftTitle.style.textDecoration='none';
+  }
+
+  const searchInput=document.getElementById('srch');
+  if(searchInput) searchInput.placeholder='Search players...';
+
+  const titleEl=document.querySelector('.rb-chat-title');
+  if(titleEl) titleEl.textContent='League Chat';
+
+  const trashTab=document.querySelector(".rb-chat-tab[onclick*=\"'trash'\"]");
+  if(trashTab) trashTab.textContent='Trash Talk';
+
+  const gifSearch=document.getElementById('rbGifSearch');
+  if(gifSearch) gifSearch.placeholder='Search GIFs... (e.g. basketball, dunk)';
+
+  const gifLoading=document.querySelector('.rb-gif-loading');
+  if(gifLoading) gifLoading.textContent='Type to search GIFs';
+
+  const toolbarButtons=document.querySelectorAll('.rb-chat-toolbar .rb-tool-btn');
+  if(toolbarButtons[0]) toolbarButtons[0].textContent='Mood';
+  if(toolbarButtons[2]){
+    toolbarButtons[2].textContent='News';
+    toolbarButtons[2].setAttribute('onclick', "rbInsertAt('[NEWS] ')");
+  }
+  if(toolbarButtons[3]){
+    toolbarButtons[3].textContent='Heat';
+    toolbarButtons[3].setAttribute('onclick', "rbInsertAt('[HEAT] ')");
+  }
+
+  const rbInput=document.getElementById('rbInput');
+  if(rbInput) rbInput.placeholder='Message the league...';
+
+  const sendBtn=document.getElementById('rbSendBtn');
+  if(sendBtn) sendBtn.textContent='Go';
+
+  const tradeHeaderBtn=document.getElementById('tradeHeaderBtn');
+  if(tradeHeaderBtn) tradeHeaderBtn.textContent='Trade Pick';
+
+  const tradeOpponent=document.getElementById('trade2Opponent');
+  if(tradeOpponent) tradeOpponent.textContent='With: --';
+
+  const nextPick=document.getElementById('mNext');
+  if(nextPick && /[^0-9A-Za-z:-]/.test(nextPick.textContent||'')) nextPick.textContent='--';
+
+  const timerEl=document.getElementById('mTimer');
+  if(timerEl && !S.tmax) timerEl.textContent='--';
+
+  const countdownCopy=document.querySelector('#pdcBar .pdc-text');
+  if(countdownCopy && /Draft starts in/i.test(countdownCopy.textContent||'')){
+    countdownCopy.innerHTML='<strong>Draft starts in</strong> - browse players and set your queue.';
+  }
+
+  const startCopy=document.querySelector('#pdcBar .pdc-start');
+  if(startCopy && /^scheduled$/i.test(startCopy.textContent||'')){
+    const countdownCopyScheduled=document.querySelector('#pdcBar .pdc-text');
+    if(countdownCopyScheduled){
+      countdownCopyScheduled.innerHTML='<strong>Room opens now</strong> - draft order is locked, so set your queue before launch.';
+    }
+  }
+  updatePickSignal();
+  updatePlayerDecisionStrip();
+  updateQueueSignal();
+  updateQueueTabUrgency();
+}
+
+function sanitizeDraftStatusText(text){
+  return String(text||'')
+    .replace(/[^\x20-\x7E]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\s[|]\s/g, ' | ')
+    .replace(/\s[.]\s/g, ' | ');
+}
+
+function setDraftLobbyPill(text, tone='info'){
+  const pill=document.getElementById('sportLobbyPill');
+  if(!pill) return;
+  pill.textContent=sanitizeDraftStatusText(text);
+  pill.className='pill'+(tone ? ' '+tone : '');
+}
+
+function setDraftCountdownMode(mode='countdown'){
+  const bar=document.getElementById('pdcBar');
+  if(bar){
+    const hidden=bar.classList.contains('hidden');
+    bar.className='pdc-bar'+(mode ? ' '+mode : '')+(hidden ? ' hidden' : '');
+  }
+  const icon=document.getElementById('sportCountdownIcon');
+  if(icon){
+    icon.textContent = mode==='scheduled'
+      ? 'Room Open'
+      : mode==='live-ready'
+        ? 'Live Now'
+        : 'Board Ready';
+  }
+}
+
+function getDraftLobbyTone(options={}){
+  if(options.warn) return 'warn';
+  if(options.started) return 'live';
+  if(options.scheduled) return 'soon';
+  const isMultiplayerDraft=isMultiplayerDraftContext();
+  const useStaticSoloData=SPORT==='nba';
+  const isLiveServiceSportForDraft=typeof isRosterbateLiveServiceSport === 'function'
+    ? isRosterbateLiveServiceSport(SPORT)
+    : SPORT==='mlb';
+  if(isMultiplayerDraft || isLiveServiceSportForDraft) return 'open';
+  if(useStaticSoloData) return 'info';
+  return 'info';
+}
+
+function buildDraftLobbyPillText(options={}){
+  const teamCount = SPORT_CFG?.teamCodes?.length || Number(document.getElementById('iSize')?.value) || 0;
+  const playerCount = Array.isArray(PLAYERS) ? PLAYERS.length : 0;
+  const isMultiplayerDraft=isMultiplayerDraftContext();
+  const useStaticSoloData=SPORT==='nba';
+  const isLiveServiceSportForDraft=typeof isRosterbateLiveServiceSport === 'function'
+    ? isRosterbateLiveServiceSport(SPORT)
+    : SPORT==='mlb';
+  const liveUpdatedLabel=getLivePoolUpdatedTimestampLabel(SPORT);
+  const detailBits=[];
+  if(teamCount) detailBits.push(teamCount + ' Teams');
+  if(playerCount) detailBits.push(playerCount + ' Players');
+  if(!options.started && isLiveServiceSportForDraft && liveUpdatedLabel) detailBits.push('Updated ' + liveUpdatedLabel);
+  const detailText=detailBits.length ? ' | ' + detailBits.join(' | ') : '';
+  if(options.warn) return options.warn + detailText;
+  if(options.started) return (isMultiplayerDraft ? 'Draft Live' : 'Demo Draft Live') + detailText;
+  if(options.scheduled) return 'Room Open Now' + detailText;
+  if(isMultiplayerDraft) return 'Draft Room Open' + detailText;
+  if(useStaticSoloData) return 'Demo Draft Open' + detailText;
+  if(isLiveServiceSportForDraft) return 'Board Ready Now' + detailText;
+  return 'Imported Board Ready' + detailText;
+}
+
 function applySportToDraftUI(){
   const isMultiplayerDraft=isMultiplayerDraftContext();
   const useStaticSoloData=SPORT==='nba';
@@ -2073,10 +2421,12 @@ function applySportToDraftUI(){
   }
   PLAYERS = normalizeDraftPlayerRanks(PLAYERS);
   if(!PLAYERS || !PLAYERS.length){
-    const pill=document.getElementById('sportLobbyPill');
-    if(pill) pill.textContent=useStaticSoloData
-      ? '⚠️ 2024-25 player data failed to load'
-      : (isLiveServiceSportForDraft ? '⚠️ Live player data failed to load' : '⚠️ Imported player data failed to load');
+    setDraftLobbyPill(
+      useStaticSoloData
+        ? '2024-25 player data failed to load'
+        : (isLiveServiceSportForDraft ? 'Live player data failed to load' : 'Imported player data failed to load'),
+      'warn'
+    );
     throw new Error('RosterBate player pool missing for '+SPORT);
   }
   const teamPlaceholders = {
@@ -2085,18 +2435,20 @@ function applySportToDraftUI(){
     mlb:'e.g. Dugout Dogs'
   };
   document.title = 'RosterBate ' + SPORT_CFG.label + ' Draft';
-  document.getElementById('sportLogoBall').textContent = SPORT_CFG.icon;
+  document.getElementById('sportLogoBall').textContent = SPORT_CFG.shortLabel || SPORT_CFG.label.slice(0,3).toUpperCase();
   document.getElementById('sportLogoSub').textContent = SPORT_CFG.label + ' Draft Room';
   const liveUpdatedLabel=getLivePoolUpdatedTimestampLabel(SPORT);
   document.getElementById('sportLobbyPill').textContent = useStaticSoloData
-    ? ('✅ 2024-25 ' + SPORT_CFG.leagueLabel + ' Season · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
+    ? ('2024-25 ' + SPORT_CFG.leagueLabel + ' Season | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players')
     : (
       isLiveServiceSportForDraft
-        ? ('✅ Live ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' · Updated ' + liveUpdatedLabel : ''))
-        : ('✅ Imported ' + SPORT_CFG.leagueLabel + ' Pool · ' + SPORT_CFG.teamCodes.length + ' Teams · ' + PLAYERS.length + ' Players')
+        ? ('Live ' + SPORT_CFG.leagueLabel + ' Pool | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' | Updated ' + liveUpdatedLabel : ''))
+        : ('Imported ' + SPORT_CFG.leagueLabel + ' Pool | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players')
     );
-  document.getElementById('sportCountdownIcon').textContent = SPORT_CFG.icon;
-  document.getElementById('sportDraftTitle').innerHTML = SPORT_CFG.icon + ' Roster<span>Bate</span>';
+  document.getElementById('sportCountdownIcon').textContent = 'Live';
+  setDraftLobbyPill(buildDraftLobbyPillText(), getDraftLobbyTone());
+  setDraftCountdownMode('countdown');
+  document.getElementById('sportDraftTitle').innerHTML = '<img src="logos/rosterbate-wordmark.png" alt="RosterBate" class="draft-brand-img"><div class="dtitle-copy"><div class="dtitle-kicker">' + SPORT_CFG.label + ' Draft</div><div class="dtitle-main">RosterBate Control Room</div></div>';
   document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';
   document.getElementById('iName').placeholder = teamPlaceholders[SPORT] || teamPlaceholders.nba;
   const leaguePlaceholders=getLeagueNamePlaceholders();
@@ -2306,6 +2658,7 @@ function renderDraftFromSharedState(){
   updateAutoDraftButton();
   syncAutoDraftTurn();
   renderPendingPickTradePrompt();
+  applyDraftRoomShellEnhancements();
 }
 
 function applyRealtimeDraftState(state){
@@ -2524,6 +2877,7 @@ function startDraft(){
   S.order=pickOrder(ls,rd,S.fmt);
   document.getElementById('mFmt').textContent=S.fmt.toUpperCase();
   syncDraftTimerDisplay();
+  applyDraftRoomShellEnhancements();
   updateSoloSimButton();
   subscribeRealtimeDraftState();
 
@@ -2534,6 +2888,7 @@ function startDraft(){
   rPlayers();rMyTeam();rOtherTeams();rBoard();upHdr();updateTradeBtn();
   updateAutoDraftButton();
   startCountdown();
+  applyDraftRoomShellEnhancements();
   awardRosterbateScore('create_league', 10).catch(() => {});
   // NOTE: advance() is called in launchDraft() — nothing picks until countdown ends
 }
@@ -2548,7 +2903,9 @@ function startCountdown(){
     let remaining=scheduledDuration;
     document.getElementById('pdcBar').classList.remove('hidden');
     document.getElementById('pdcStrip').style.display='block';
-    document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Scheduled draft starts in</strong> — draft order is locked and the room is now open.';
+    setDraftCountdownMode('scheduled');
+    setDraftLobbyPill(buildDraftLobbyPillText({scheduled:true}), getDraftLobbyTone({scheduled:true}));
+    document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Room opens now</strong> - draft order is locked, so set your queue before launch.';
     const startBtn=document.querySelector('#pdcBar .pdc-start');
     if(startBtn){
       startBtn.textContent='Scheduled';
@@ -2586,8 +2943,9 @@ function startCountdown(){
   let remaining=CD_DURATION;
   document.getElementById('pdcBar').classList.remove('hidden');
   document.getElementById('pdcStrip').style.display='block';
+  setDraftCountdownMode('countdown');
+  setDraftLobbyPill(buildDraftLobbyPillText(), getDraftLobbyTone());
   const startBtn=document.querySelector('#pdcBar .pdc-start');
-  document.querySelector('#pdcBar .pdc-text').innerHTML='<strong>Draft starts in</strong> — browse players &amp; set your queue!';
   if(startBtn){
     startBtn.textContent='Start';
     startBtn.disabled=false;
@@ -2616,14 +2974,16 @@ function startCountdown(){
 function launchDraft(){
   const scheduledStartAt=getScheduledDraftStartAt();
   if(scheduledStartAt && Date.now() < scheduledStartAt){
-    showToast('⏰ This scheduled draft has not started yet');
+    showToast('This scheduled draft has not started yet');
     return;
   }
   S.started=true;
   clearInterval(cdInt);
+  setDraftCountdownMode('live-ready');
+  setDraftLobbyPill(buildDraftLobbyPillText({started:true}), getDraftLobbyTone({started:true}));
   document.getElementById('pdcBar').classList.add('hidden');
   document.getElementById('pdcStrip').style.display='none';
-  showBanner('🏀 Draft is Live — Make Your Picks!');
+  showBanner('Draft is live. Make your picks.');
   if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
   if(S.fmt==='auction') aucNext(); else advance();
 }
@@ -3120,6 +3480,17 @@ function rPlayers(){
   });
   const myTurn=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
   const myNomTurn=S.fmt==='auction'&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId);
+  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
+  const onDeck=S.started && myOffset>0 && myOffset<=2;
+  const topQueued=getTopQueuedPlayer();
+  const bestAvailable=getAvailablePlayersSorted()[0] || null;
+  const fitCandidates=(myTurn||onDeck)
+    ? getAvailablePlayersSorted()
+        .filter(p=>getStarterNeedDelta(S.myPos,p)>0)
+        .slice(0,3)
+        .map(p=>p.id)
+    : [];
+  const fitCandidateSet=new Set(fitCandidates);
   const col=tc=>tcolor(tc);
   document.getElementById('pList').innerHTML=list.map(p=>{
     const drafted=S.drafted.has(p.id);
@@ -3133,9 +3504,22 @@ function rPlayers(){
     const draftLabel=S.fmt==='auction'?'Nominate':'Draft';
     const inlineDraftBtn=!drafted?`<button class="dbtn${btnClass}" ${btnClick}>${draftLabel}</button>`:'';
     const avatarOrButton=inlineDraftBtn||`<div class="pav" style="background:${col(p.team)}">${initials(p.name)}</div>`;
+    const recoTags=[];
+    let rowTone='';
+    if(!drafted && topQueued && p.id===topQueued.id){
+      recoTags.push('<span class="p-rec-tag queue">Top Queue</span>');
+      rowTone=' queue-focus';
+    }else if(!drafted && bestAvailable && p.id===bestAvailable.id){
+      recoTags.push('<span class="p-rec-tag best">Best Available</span>');
+      rowTone=' best-focus';
+    }
+    if(!drafted && fitCandidateSet.has(p.id)){
+      recoTags.push(`<span class="p-rec-tag fit">${myTurn?'Pick Fit':'On Deck Fit'}</span>`);
+      if(!rowTone) rowTone=' fit-focus';
+    }
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
-      :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div></div>`;
+      :`<div class="pmeta-row"><div class="pfp-chip">${fp} FP</div>${recoTags.length?`<div class="p-rec-tags">${recoTags.join('')}</div>`:''}</div>`;
     // Get stats from statValues object - this is where the real data lives
     const sv = p.statValues || {};
     const pts = sv.PTS || 0;
@@ -3154,7 +3538,7 @@ function rPlayers(){
     const fga = sv.FGA || (fgm / (fgp / 100));
     const ftm = sv.FTM || (pts * 0.15);
     const fta = sv.FTA || (ftm / (ftp / 100));
-    return`<div class="pr${drafted?' drafted':''}" onclick="${drafted?'':"openPModal("+idx+")"}">
+    return`<div class="pr${drafted?' drafted':''}${rowTone}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       ${avatarOrButton}
       <div class="pinfo">
@@ -3180,6 +3564,9 @@ function rPlayers(){
       <div class="pstat">${pts.toFixed(1)}</div>
     </div>`;
   }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
+  updatePlayerDecisionStrip();
+  updateQueueSignal();
+  updateQueueTabUrgency();
 }
 let sortStat='adp';
 let sortDir=1;
@@ -3569,23 +3956,299 @@ async function declinePendingPickTrade(){
   showToast('Trade declined.');
 }
 
+function updatePickSignal(){
+  const signal=document.getElementById('pickSignal');
+  const kicker=document.getElementById('pickSignalKicker');
+  const headline=document.getElementById('pickSignalHeadline');
+  const copy=document.getElementById('pickSignalCopy');
+  const sideLabel=document.getElementById('pickSignalSideLabel');
+  const sideValue=document.getElementById('pickSignalSideValue');
+  const tag=document.getElementById('pickSignalTag');
+  if(!signal || !kicker || !headline || !copy || !sideLabel || !sideValue || !tag) return;
+
+  if(!S.started){
+    signal.className='pick-signal alert';
+    kicker.textContent='Board Status';
+    headline.textContent='Draft Room Ready';
+    copy.textContent='Browse the board, watch the timer, and set your queue before the draft goes live.';
+    sideLabel.textContent='Next Up';
+    sideValue.textContent=isMultiplayerDraftContext() ? 'Live room' : 'Demo reps';
+    tag.className='pick-signal-tag alert';
+    tag.textContent='Prep Now';
+    return;
+  }
+
+  if(S.cur>=S.total){
+    signal.className='pick-signal done';
+    kicker.textContent='Draft Complete';
+    headline.textContent='Board Locked In';
+    copy.textContent='Your room is fully drafted. Review the board, roster balance, and final results before moving on.';
+    sideLabel.textContent='Result';
+    sideValue.textContent=S.picks.length + ' Picks Made';
+    tag.className='pick-signal-tag done';
+    tag.textContent='Complete';
+    return;
+  }
+
+  const currentTeamIdx=S.order[S.cur];
+  const currentTeamName=S.teams[currentTeamIdx] || ('Team ' + (currentTeamIdx+1));
+  const mine=currentTeamIdx===S.myPos;
+  const nextTeamIdx=S.cur+1<S.total ? S.order[S.cur+1] : -1;
+  const nextTeamName=nextTeamIdx>=0 ? (S.teams[nextTeamIdx] || ('Team ' + (nextTeamIdx+1))) : 'Final pick';
+  const isAuction=S.fmt==='auction';
+
+  signal.className='pick-signal '+(mine ? 'live' : 'alert');
+  kicker.textContent=isAuction ? 'Live Nomination' : 'Current Pick';
+  headline.textContent=isAuction
+    ? (mine ? 'Your nomination window' : currentTeamName + ' is nominating')
+    : (mine ? 'You are on the clock' : currentTeamName + ' is picking');
+  copy.textContent=isAuction
+    ? (mine
+        ? 'Nominate the player you want the room to fight over, or let auto-draft nominate for you.'
+        : 'Watch the nomination, keep your budget in mind, and be ready to counter when the bidding opens.')
+    : (mine
+        ? 'Make your pick, send a trade request, or trust your queue before the timer runs out.'
+        : 'Track this pick, watch how the board changes, and prep your queue before your turn arrives.');
+  sideLabel.textContent='Next Up';
+  sideValue.textContent=nextTeamName;
+  tag.className='pick-signal-tag '+(mine ? 'live' : 'alert');
+  tag.textContent=mine ? (isAuction ? 'Nominate Now' : 'Pick Now') : 'Watch Live';
+}
+
+function goToDraftTab(name){
+  const map={
+    players:'.tabs .tb:nth-child(1)',
+    myteam:'.tabs .tb:nth-child(2)',
+    teams:'.tabs .tb:nth-child(3)',
+    board:'.tabs .tb:nth-child(4)',
+    favs:'#favTab'
+  };
+  const btn=document.querySelector(map[name] || '');
+  if(btn) btn.click();
+}
+
+function getDraftTurnOffsetForTeam(teamIdx){
+  for(let i=S.cur;i<S.total;i++){
+    if(S.order[i]===teamIdx) return i-S.cur;
+  }
+  return -1;
+}
+
+function getTopQueuedPlayer(){
+  for(const id of FAVS){
+    if(S.drafted.has(id)) continue;
+    const player=PLAYERS.find(x=>x.id===id);
+    if(player) return player;
+  }
+  return null;
+}
+
+function updatePlayerDecisionStrip(){
+  const strip=document.getElementById('playerDecisionStrip');
+  const kicker=document.getElementById('playerDecisionKicker');
+  const headline=document.getElementById('playerDecisionHeadline');
+  const copy=document.getElementById('playerDecisionCopy');
+  const chip=document.getElementById('playerDecisionChip');
+  const meta=document.getElementById('playerDecisionMeta');
+  const action=document.getElementById('playerDecisionAction');
+  if(!strip || !kicker || !headline || !copy || !chip || !meta || !action) return;
+
+  const activeQueue=FAVS.filter(id=>!S.drafted.has(id));
+  const topQueued=getTopQueuedPlayer();
+  const bestAvailable=getAvailablePlayersSorted()[0] || null;
+  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
+  const onDeck=myOffset>0 && myOffset<=2;
+  const myTurn=S.started && myOffset===0;
+  const queueCount=activeQueue.length;
+
+  strip.className='decision-strip ready';
+  chip.className='decision-chip ready';
+  action.className='decision-action';
+
+  if(!S.started){
+    kicker.textContent='Board Pulse';
+    headline.textContent=queueCount ? 'Queue Ready For Launch' : 'Build Your Queue Now';
+    copy.textContent=queueCount
+      ? 'Your room is almost live. Keep starring targets so the board opens with a clean fallback plan.'
+      : 'Star your favorite targets so the room is ready before the board goes live.';
+    chip.textContent=queueCount ? queueCount+' queued' : 'Queue Empty';
+    meta.textContent=topQueued ? 'Top target: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board loading');
+    action.textContent=queueCount ? 'Refine Queue' : 'Open Queue';
+    action.onclick=()=>goToDraftTab('favs');
+    return;
+  }
+
+  if(S.cur>=S.total){
+    strip.className='decision-strip ready';
+    kicker.textContent='Board Pulse';
+    headline.textContent='Draft Board Locked';
+    copy.textContent='The room is finished. Review the board, final roster build, and any queue names you still want to remember.';
+    chip.className='decision-chip muted';
+    chip.textContent='Complete';
+    meta.textContent=topQueued ? 'Queued leftover: '+topQueued.name : 'No queued leftovers';
+    action.className='decision-action secondary';
+    action.textContent='Open Queue';
+    action.onclick=()=>goToDraftTab('favs');
+    return;
+  }
+
+  if(myTurn){
+    strip.className='decision-strip live';
+    kicker.textContent=S.fmt==='auction' ? 'Nomination Window' : 'Your Pick';
+    headline.textContent=topQueued ? 'Pick From Your Queue' : 'You Are Live On The Clock';
+    copy.textContent=topQueued
+      ? 'Your highest queued player is still available. Lock them in now or pivot before the timer runs out.'
+      : 'You are live with no queue safety net. Grab your best fit now or add a couple quick targets.';
+    chip.className='decision-chip live';
+    chip.textContent=topQueued ? 'Queue Ready' : 'Queue Needed';
+    meta.textContent=topQueued ? 'Top target: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Best available loading');
+    action.textContent=topQueued ? 'Open Queue' : 'Browse Queue';
+    action.onclick=()=>goToDraftTab('favs');
+    return;
+  }
+
+  if(onDeck){
+    strip.className='decision-strip alert';
+    kicker.textContent='Board Pulse';
+    headline.textContent='You Are On Deck';
+    copy.textContent=queueCount
+      ? 'Your turn is coming fast. Reorder your queue now so auto-draft and panic pivots both stay clean.'
+      : 'Your turn is close and the queue is empty. Add two or three fallback names before the board swings back.';
+    chip.className='decision-chip alert';
+    chip.textContent=myOffset===1 ? 'Next Pick +1' : 'Next Pick +'+myOffset;
+    meta.textContent=topQueued ? 'Queue lead: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board moving');
+    action.textContent=queueCount ? 'Tune Queue' : 'Set Queue';
+    action.onclick=()=>goToDraftTab('favs');
+    return;
+  }
+
+  kicker.textContent='Board Pulse';
+  headline.textContent=queueCount ? 'Queue Ready For The Turn Ahead' : 'Best Available Live';
+  copy.textContent=queueCount
+    ? 'Track the live board and keep the queue fresh so your next turn stays simple.'
+    : 'Browse the board, star a few targets, and keep an eye on how the room is shifting.';
+  chip.textContent=myOffset<0 ? 'No picks left' : (myOffset===1 ? 'Next pick +1' : 'Next pick +'+myOffset);
+  meta.textContent=topQueued ? 'Queue lead: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board moving');
+  action.textContent=queueCount ? 'Open Queue' : 'Queue Targets';
+  action.onclick=()=>goToDraftTab('favs');
+}
+
+function updateQueueSignal(){
+  const signal=document.getElementById('queueSignal');
+  const title=document.getElementById('queueSignalTitle');
+  const headline=document.getElementById('queueSignalHeadline');
+  const text=document.getElementById('queueSignalText');
+  const chip=document.getElementById('queueSignalChip');
+  const action=document.getElementById('queueSignalAction');
+  if(!signal || !title || !headline || !text || !chip || !action) return;
+
+  const activeQueue=FAVS.filter(id=>!S.drafted.has(id));
+  const topQueued=getTopQueuedPlayer();
+  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
+  const myTurn=S.started && myOffset===0;
+  const onDeck=myOffset>0 && myOffset<=2;
+
+  signal.className='queue-signal alert';
+  chip.className='decision-chip alert';
+  action.className='decision-action secondary';
+
+  if(S.cur>=S.total){
+    signal.className='queue-signal';
+    title.textContent='Queue Wrap';
+    headline.textContent=topQueued ? 'Leftover Targets Saved' : 'Queue Cleared Down';
+    text.textContent=topQueued
+      ? 'These names were never drafted. Keep them in mind when you move into season management.'
+      : 'Your queue is empty now. The draft is complete and there are no pending fallback names left.';
+    chip.className='decision-chip muted';
+    chip.textContent=activeQueue.length+' / '+MAX_FAVS+' ready';
+    action.textContent='Browse Players';
+    action.onclick=()=>goToDraftTab('players');
+    return;
+  }
+
+  if(myTurn){
+    signal.className='queue-signal live';
+    title.textContent='Queue Status';
+    headline.textContent=topQueued ? 'Top Queue Target Is Live' : 'No Queue Safety Net';
+    text.textContent=topQueued
+      ? 'If the timer gets away from you, auto-draft will take '+topQueued.name+'. Reorder now if that is not the plan.'
+      : 'Your pick is live and the queue is empty. Add an emergency fallback or commit to the board right now.';
+    chip.className='decision-chip live';
+    chip.textContent=activeQueue.length+' / '+MAX_FAVS+' ready';
+    action.textContent=topQueued ? 'Browse Players' : 'Add Targets';
+    action.onclick=()=>goToDraftTab('players');
+    return;
+  }
+
+  if(onDeck){
+    title.textContent='Queue Status';
+    headline.textContent=activeQueue.length ? 'Queue Ready For Your Next Turn' : 'Queue Needs Two More Names';
+    text.textContent=activeQueue.length
+      ? 'Your turn is close. Make sure '+(topQueued ? topQueued.name : 'your top target')+' is still the first call if the board flips quickly.'
+      : 'You are almost up. Queue a couple fallback names now so the room cannot surprise you.';
+    chip.textContent='Pick in +'+myOffset;
+    action.textContent=activeQueue.length ? 'Browse Players' : 'Add Targets';
+    action.onclick=()=>goToDraftTab('players');
+    return;
+  }
+
+  title.textContent='Queue Status';
+  headline.textContent=activeQueue.length ? 'Auto-Draft Queue Ready' : 'Need More Targets';
+  text.textContent=activeQueue.length
+    ? 'Your queue has '+activeQueue.length+' live target'+(activeQueue.length===1 ? '' : 's')+'. Keep it fresh as the board changes.'
+    : 'Queue your best fits here so auto-draft has a smart fallback and your next turn is easier.';
+  chip.textContent=activeQueue.length+' / '+MAX_FAVS+' ready';
+  action.textContent='Browse Players';
+  action.onclick=()=>goToDraftTab('players');
+}
+
+function updateQueueTabUrgency(){
+  const favTab=document.getElementById('favTab');
+  if(!favTab) return;
+  favTab.classList.remove('live','alert');
+  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
+  const activeQueue=FAVS.filter(id=>!S.drafted.has(id)).length;
+  if(!S.started || S.cur>=S.total) return;
+  if(myOffset===0){
+    favTab.classList.add(activeQueue ? 'live' : 'alert');
+    return;
+  }
+  if(myOffset>0 && myOffset<=2){
+    favTab.classList.add(activeQueue ? 'alert' : 'live');
+  }
+}
+
 function upHdr(){
   const round=Math.min(Math.floor(S.cur/S.ls)+1,S.rds);
   const pir=(S.cur%S.ls)+1;
   document.getElementById('mRound').textContent=round+'/'+S.rds;
   document.getElementById('mPick').textContent=(S.cur+1)+'/'+S.total;
-  let nxt='—';
+  let nxt='--';
   for(let i=S.cur;i<S.total;i++){
     if(S.order[i]===S.myPos){const a=i-S.cur;nxt=a===0?'NOW!':'+'+a;break;}
   }
   document.getElementById('mNext').textContent=nxt;
   const badge=document.getElementById('clkBadge');
-  if(S.cur>=S.total){badge.textContent='Draft Complete 🏆';badge.className='clk-badge w';updateTradeBtn();updateSoloSimButton();return;}
+  if(S.cur>=S.total){
+    badge.textContent='Draft Complete';
+    badge.className='clk-badge done';
+    updatePickSignal();
+    updatePlayerDecisionStrip();
+    updateQueueSignal();
+    updateQueueTabUrgency();
+    updateTradeBtn();
+    updateSoloSimButton();
+    return;
+  }
   const mine=S.order[S.cur]===S.myPos;
   badge.textContent=S.fmt==='auction'
-    ?(mine?'Your Nomination ⏰':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
-    :(mine?'On The Clock ⏰':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
-  badge.className='clk-badge'+(mine?'':' w');
+    ?(mine?'Your Nomination':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
+    :(mine?'On The Clock':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
+  badge.className='clk-badge '+(mine?'mine':'other');
+  updatePickSignal();
+  updatePlayerDecisionStrip();
+  updateQueueSignal();
+  updateQueueTabUrgency();
   updateTradeBtn();
   updateSoloSimButton();
 }
@@ -3593,7 +4256,7 @@ function upHdr(){
 // TIMER
 function resetTimer(){
   clearInterval(S.timerInt);
-  if(!S.tmax){document.getElementById('mTimer').textContent='—';document.getElementById('tFill').style.width='100%';return;}
+  if(!S.tmax){document.getElementById('mTimer').textContent='--';document.getElementById('tFill').style.width='100%';return;}
   S.timer=S.tmax;upTimer();
   S.timerInt=setInterval(()=>{S.timer--;upTimer();if(S.timer<=0){clearInterval(S.timerInt);autoP();}},1000);
 }
@@ -3653,6 +4316,9 @@ function sTab(n,btn){
   document.getElementById('tp-'+n).classList.add('on');btn.classList.add('on');
   if(n==='favs') rFavs();
   if(n==='teams') rOtherTeams();
+  updatePlayerDecisionStrip();
+  updateQueueSignal();
+  updateQueueTabUrgency();
 }
 function showSeasonToastStub(){} // season toast defined in season block below
 
@@ -4391,7 +5057,7 @@ async function startYourSeason(){
 <!-- DRAFT COMPLETE SCREEN -->
 <div id="draftComplete" class="screen" style="background:var(--bg);flex-direction:column;overflow:hidden;">
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;flex-shrink:0;text-align:center;">
-    <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;">🏆 Draft Complete!</div>
+    <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;">Draft Complete</div>
   </div>
   <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:12px;">
 
@@ -4582,16 +5248,28 @@ async function startYourSeason(){
 
 <style>
 /* ── CHAT PANEL ── */
-.rb-chat-panel{width:360px;max-width:360px;height:auto;min-height:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;box-shadow:inset 1px 0 0 rgba(255,255,255,.02);}
+.rb-chat-panel{
+  width:360px;
+  max-width:360px;
+  height:auto;
+  min-height:0;
+  background:linear-gradient(180deg, rgba(17,24,39,.94), rgba(11,16,26,.98));
+  border:1px solid rgba(45,63,92,.6);
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 26px 46px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.03);
+}
 
 /* Header */
-.rb-chat-hdr{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);}
-.rb-chat-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;flex:1;}
+.rb-chat-hdr{display:flex;align-items:center;gap:10px;padding:15px 15px 13px;border-bottom:1px solid rgba(45,63,92,.6);flex-shrink:0;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);}
+.rb-chat-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;flex:1;}
 .rb-chat-online{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;}
 .rb-chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
 
 /* Tab bar */
-.rb-chat-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rb-chat-tabs{display:flex;border-bottom:1px solid rgba(45,63,92,.55);flex-shrink:0;padding:0 8px;}
 .rb-chat-tab{flex:1;padding:8px 4px;font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;}
 .rb-chat-tab.on{color:var(--accent);border-bottom-color:var(--accent);}
 
@@ -4630,7 +5308,7 @@ async function startYourSeason(){
 .rb-sys-msg{text-align:center;font-size:11px;color:var(--text3);padding:4px 0;font-family:var(--fd);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
 
 /* Input area */
-.rb-chat-input-area{border-top:1px solid var(--border);padding:8px 10px;flex-shrink:0;background:var(--bg2);}
+.rb-chat-input-area{border-top:1px solid rgba(45,63,92,.55);padding:10px 12px;flex-shrink:0;background:rgba(11,16,26,.96);}
 .rb-chat-toolbar{display:flex;gap:4px;margin-bottom:6px;}
 .rb-tool-btn{background:none;border:none;font-size:18px;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--text2);transition:background .1s;}
 .rb-tool-btn:active{background:var(--bg3);}
@@ -4646,8 +5324,8 @@ async function startYourSeason(){
 .rb-emoji-picker.open{display:block;}
 
 @media (max-width: 1099px){
-  .draft-layout{flex-direction:column;}
-  .rb-chat-panel{width:100%;max-width:none;min-height:280px;border-left:none;border-top:1px solid var(--border);}
+  .draft-layout{flex-direction:column;padding:10px;}
+  .rb-chat-panel{width:100%;max-width:none;min-height:280px;}
 }
 .rb-emoji-cats{display:flex;gap:4px;margin-bottom:6px;overflow-x:auto;padding-bottom:4px;}
 .rb-emoji-cat{background:none;border:none;font-size:16px;cursor:pointer;padding:3px 6px;border-radius:6px;}
@@ -5349,6 +6027,7 @@ function rbEnsureChatListenerActive() {
   try{
     await ensureRosterbatePools();
     applySportToDraftUI();
+    applyDraftRoomShellEnhancements();
     applySavedLobbySettings();
     hydrateStepperInputs(document);
     document.getElementById('iSize')?.addEventListener('input', syncDraftSpotBounds);
@@ -5422,5 +6101,6 @@ window.addEventListener('beforeunload', ()=>{
 <script src="/site-background.js"></script>
 </body>
 </html>
+
 
 

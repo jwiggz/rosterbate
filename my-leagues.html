@@ -53,6 +53,12 @@
   .stat-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1}
   .stat-label{margin-top:6px;color:var(--text3);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
   .league-copy{color:var(--text2);font-size:13px;line-height:1.6;min-height:42px}
+  .league-urgency{display:flex;flex-wrap:wrap;gap:8px;margin-top:-2px}
+  .urgency-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:rgba(15,23,42,.78);border:1px solid var(--border);font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:#dbe7f5}
+  .urgency-chip.live{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#86efac}
+  .urgency-chip.alert{border-color:rgba(249,115,22,.34);background:rgba(249,115,22,.1);color:#fdba74}
+  .urgency-chip.info{border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.1);color:#bfdbfe}
+  .urgency-chip.muted{color:var(--text2)}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
   .empty{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:32px 20px;text-align:center}
   .empty h3{font-family:var(--fd);font-size:24px;font-weight:900;margin-bottom:8px}
@@ -298,6 +304,111 @@ function isLegacySeasonSource(source){
   return source==='sharedSeasons-legacy';
 }
 
+function getSeasonWatchCount(payload){
+  if(!payload || typeof payload !== 'object') return 0;
+  const draftPayload=(payload.draft && typeof payload.draft === 'object') ? payload.draft : payload;
+  return Array.isArray(draftPayload?.watchList) ? Number(draftPayload.watchList.length||0) : 0;
+}
+
+function getSeasonGamePayload(payload){
+  if(!payload || typeof payload !== 'object') return {};
+  return (payload.game && typeof payload.game === 'object') ? payload.game : payload;
+}
+
+function getSeasonWaiverCount(payload){
+  const gamePayload=getSeasonGamePayload(payload);
+  if(Array.isArray(gamePayload?.waiver)) return Number(gamePayload.waiver.length||0);
+  if(Array.isArray(gamePayload?.freeAgents)) return Number(gamePayload.freeAgents.length||0);
+  return 0;
+}
+
+function getSeasonRecentDropCount(payload){
+  const gamePayload=getSeasonGamePayload(payload);
+  return Array.isArray(gamePayload?.recentDrops) ? Number(gamePayload.recentDrops.filter(Boolean).length||0) : 0;
+}
+
+function getSeasonPendingTradeCount(payload,mySeat){
+  const gamePayload=getSeasonGamePayload(payload);
+  const teamIdx=Math.max(0, Number(mySeat||1)-1);
+  if(!Array.isArray(gamePayload?.tradeOffers)) return 0;
+  return gamePayload.tradeOffers.filter(trade=>trade && Number(trade.toTeam)===teamIdx && String(trade.status||'').toLowerCase()==='pending').length;
+}
+
+function getSeasonUrgency(row){
+  const watchCount=getSeasonWatchCount(row.payload);
+  const waiverCount=getSeasonWaiverCount(row.payload);
+  const recentDropCount=getSeasonRecentDropCount(row.payload);
+  const incomingTrades=getSeasonPendingTradeCount(row.payload,row.mySeat);
+  if(row.complete){
+    return {
+      chips:[
+        {tone:'muted',label:'History Review'},
+        {tone:'info',label:(watchCount||0)+' watched names saved'}
+      ],
+      copy:'Reopen standings, matchup history, and saved targets from this finished season.',
+      actionLabel:'Review Season'
+    };
+  }
+  const chips=[];
+  if(incomingTrades>0) chips.push({tone:'alert',label:incomingTrades+' trade offer'+(incomingTrades===1?'':'s')});
+  if(recentDropCount>0) chips.push({tone:'alert',label:recentDropCount+' recent drop'+(recentDropCount===1?'':'s')});
+  if(watchCount>0) chips.push({tone:'live',label:watchCount+' watched target'+(watchCount===1?'':'s')});
+  if(!chips.length) chips.push({tone:'info',label:(waiverCount||0)+' free agent'+(waiverCount===1?'':'s')});
+
+  let copy='Open the shared season manager and continue playing through the real season.';
+  let actionLabel='Open Season';
+  let secondaryLabel='Open Watch List';
+  let secondaryArgs=['waiver','watch'];
+
+  if(incomingTrades>0){
+    copy='You have trade desk activity waiting. Jump back in and answer incoming offers before the league shifts.';
+    actionLabel='Open Trade Desk';
+    secondaryLabel='Open Season';
+    secondaryArgs=['','',''];
+  }else if(recentDropCount>0){
+    copy='Fresh waiver movement is live right now. Check recent drops before the rest of the league reacts.';
+    actionLabel='Open Waivers';
+    secondaryLabel=watchCount?'Open Watch List':'Open Season';
+    secondaryArgs=watchCount?['waiver','watch']:['','',''];
+  }else if(watchCount>0){
+    copy='Your watch list already has live targets. Reopen the wire and move on your tracked names quickly.';
+    actionLabel='Open Watch List';
+    secondaryLabel='Open Season';
+    secondaryArgs=['','',''];
+  }else{
+    copy='The player pool is open. Reopen the league hub and start building a sharper watch list.';
+  }
+
+  return {chips,copy,actionLabel,secondaryLabel,secondaryArgs};
+}
+
+function getDraftUrgency(row){
+  const joined=Number(row.joinedCount||0);
+  const teamSize=Math.max(1, Number(row.teamSize||0));
+  const spotsLeft=Math.max(0, teamSize-joined);
+  const ready=Math.max(0, Math.min(joined, teamSize));
+  if(String(row.status||'').toLowerCase()==='started'){
+    return {
+      chips:[
+        {tone:'live',label:'Draft Open'},
+        {tone:'info',label:ready+' teams ready'}
+      ],
+      copy:'Your room is live now. Rejoin the board, check the queue, and keep the clock moving.',
+      actionLabel:'Open Draft'
+    };
+  }
+  return {
+    chips:[
+      {tone:spotsLeft>0?'alert':'live',label:spotsLeft>0?spotsLeft+' spots left':'Room Full'},
+      {tone:'info',label:ready+' teams ready'}
+    ],
+    copy:spotsLeft>0
+      ? 'The waiting room is still filling. Reopen it now to keep managers moving and launch on time.'
+      : 'Everyone is in. Reopen the waiting room and push the draft toward launch.',
+    actionLabel:'Open Lobby'
+  };
+}
+
 async function removePersonalSeasonIndex(seasonId){
   if(!currentUser || !seasonId) return false;
   try{
@@ -322,7 +433,9 @@ function renderDrafts(rows){
     renderEmpty('draftList','No Draft Rooms Yet','When you join or create a multiplayer draft, it will show up here.');
     return;
   }
-  host.innerHTML=rows.map(row=>`
+  host.innerHTML=rows.map(row=>{
+    const urgency=getDraftUrgency(row);
+    return `
     <div class="league-card ${row.status==='waiting'?'waiting':''}">
       <div class="league-card-top">
         <div>
@@ -335,18 +448,21 @@ function renderDrafts(rows){
           </div>
         </div>
       </div>
+      <div class="league-urgency">
+        ${urgency.chips.map(chip=>`<span class="urgency-chip ${chip.tone}">${escapeHtml(chip.label)}</span>`).join('')}
+      </div>
       <div class="stats">
         <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
         <div class="stat"><div class="stat-value">${Number(row.joinedCount||0)}</div><div class="stat-label">Joined</div></div>
         <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'—'))}</div><div class="stat-label">My Seat</div></div>
       </div>
-      <div class="league-copy">Created ${escapeHtml(formatDate(row.createdAt))}. ${row.status==='started'?'Jump back into the live board.':'Open the waiting room and keep the league moving.'}</div>
+      <div class="league-copy">Created ${escapeHtml(formatDate(row.createdAt))}. ${escapeHtml(urgency.copy)}</div>
       <div class="actions">
-        <button class="btn primary small" onclick="openDraftLeague('${row.id}')">${row.status==='started'?'Open Draft':'Open Lobby'}</button>
+        <button class="btn primary small" onclick="openDraftLeague('${row.id}')">${escapeHtml(urgency.actionLabel)}</button>
         <button class="btn danger small" onclick="leaveDraftLeague('${row.id}')">Leave League</button>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function renderSeasons(rows){
@@ -356,7 +472,16 @@ function renderSeasons(rows){
     renderEmpty('seasonList','No Shared Seasons Yet','Finish a multiplayer draft and its season league will appear here.');
     return;
   }
-  host.innerHTML=rows.map(row=>`
+  host.innerHTML=rows.map(row=>{
+    const urgency=getSeasonUrgency(row);
+    let primaryAction=`openSeasonLeague('${row.id}','${row.sport}')`;
+    if(urgency.actionLabel==='Open Trade Desk') primaryAction=`openSeasonLeague('${row.id}','${row.sport}','trades')`;
+    else if(urgency.actionLabel==='Open Waivers') primaryAction=`openSeasonLeague('${row.id}','${row.sport}','waiver')`;
+    else if(urgency.actionLabel==='Open Watch List') primaryAction=`openSeasonLeague('${row.id}','${row.sport}','waiver','watch')`;
+    const secondaryAction=urgency.secondaryLabel==='Open Watch List'
+      ? `openSeasonLeague('${row.id}','${row.sport}','waiver','watch')`
+      : `openSeasonLeague('${row.id}','${row.sport}')`;
+    return `
     <div class="league-card ${row.complete?'complete':''}">
       <div class="league-card-top">
         <div>
@@ -371,20 +496,24 @@ function renderSeasons(rows){
           </div>
         </div>
       </div>
+      <div class="league-urgency">
+        ${urgency.chips.map(chip=>`<span class="urgency-chip ${chip.tone}">${escapeHtml(chip.label)}</span>`).join('')}
+      </div>
       <div class="stats">
         <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
-        <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'—'))}</div><div class="stat-label">My Seat</div></div>
-        <div class="stat"><div class="stat-value">${escapeHtml(String(row.updatedLabel||'—'))}</div><div class="stat-label">Updated</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'-'))}</div><div class="stat-label">My Seat</div></div>
+        <div class="stat"><div class="stat-value">${getSeasonWatchCount(row.payload)}</div><div class="stat-label">Watch List</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.updatedLabel||'-'))}</div><div class="stat-label">Updated</div></div>
       </div>
-      <div class="league-copy">${row.complete?'This season is already finished, but you can reopen it to review standings and league history.':'Open the shared season manager and continue playing through the real season.'}</div>
+      <div class="league-copy">${escapeHtml(urgency.copy)}</div>
       <div class="actions">
-        <button class="btn primary small" onclick="openSeasonLeague('${row.id}','${row.sport}')">${row.complete?'Review Season':'Open Season'}</button>
+        <button class="btn primary small" onclick="${primaryAction}">${escapeHtml(urgency.actionLabel)}</button>
+        ${row.complete?'':`<button class="btn small" onclick="${secondaryAction}">${escapeHtml(urgency.secondaryLabel||'Open Season')}</button>`}
         <button class="btn danger small" onclick="leaveSeasonLeague('${row.id}')">Leave League</button>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
-
 function renderSolo(rows){
   const host=document.getElementById('soloList');
   if(!host) return;
@@ -682,7 +811,7 @@ async function leaveDraftLeague(id){
   }
 }
 
-function openSeasonLeague(id,sport){
+function openSeasonLeague(id,sport,page='',waiver=''){
   const row=seasons.find(x=>x.id===id);
   if(!row) return;
   const state=buildLobbyStateFromSeason(id,row.payload,row.member);
@@ -693,7 +822,12 @@ function openSeasonLeague(id,sport){
       localStorage.setItem('rosterbateDraft', JSON.stringify(draftPayload));
     }
   }catch(e){}
-  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(sport||row.sport||'nba')+'&league='+encodeURIComponent(id);
+  const params=new URLSearchParams();
+  params.set('sport', sport||row.sport||'nba');
+  params.set('league', id);
+  if(page) params.set('page', page);
+  if(waiver) params.set('waiver', waiver);
+  window.location.href='rosterbate-season.html?'+params.toString();
 }
 
 async function leaveSeasonLeague(id){

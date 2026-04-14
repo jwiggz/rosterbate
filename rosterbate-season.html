@@ -79,11 +79,28 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-summary-meta{padding:6px 0 0 16px;border-left:1px solid #24324a;text-align:left;min-width:170px;}
     .hub-summary-meta .eyebrow{font-family:var(--fb);font-size:12px;font-weight:700;color:#94a3b8;}
     .hub-summary-meta .opp{font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;margin-top:4px;}
-    .hub-summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
+.hub-summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
     .hub-stat{background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px 12px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:82px;}
     .hub-stat-value{font-family:var(--fb);font-size:28px;font-weight:800;line-height:1.05;color:#f8fafc;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;text-wrap:balance;}
     .hub-stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;margin-top:8px;letter-spacing:.8px;font-weight:700;text-align:center;}
-    .hub-actions{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;}
+    .hub-now-band{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px;position:relative;z-index:1;}
+    .hub-now-card{background:#0f1724;border:1px solid #24324a;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:108px;}
+    .hub-now-card.alert{border-color:rgba(249,115,22,.3);background:linear-gradient(180deg,rgba(46,23,12,.92),rgba(15,23,36,.98));}
+    .hub-now-card.live{border-color:rgba(34,197,94,.26);background:linear-gradient(180deg,rgba(16,44,29,.92),rgba(15,23,36,.98));}
+.hub-now-label{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#94a3b8;}
+.hub-now-value{font-family:var(--fb);font-size:18px;font-weight:800;line-height:1.1;color:#f8fafc;}
+.hub-now-copy{font-size:12px;color:#cbd5e1;line-height:1.45;flex:1;}
+.hub-now-link{font-size:12px;font-weight:700;color:#93c5fd;text-decoration:none;cursor:pointer;}
+.season-now-band{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;}
+.season-now-card{background:#0f1724;border:1px solid #24324a;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:108px;}
+.season-now-card.alert{border-color:rgba(249,115,22,.3);background:linear-gradient(180deg,rgba(46,23,12,.92),rgba(15,23,36,.98));}
+.season-now-card.live{border-color:rgba(34,197,94,.26);background:linear-gradient(180deg,rgba(16,44,29,.92),rgba(15,23,36,.98));}
+.season-now-card.info{border-color:rgba(59,130,246,.28);background:linear-gradient(180deg,rgba(15,33,56,.9),rgba(15,23,36,.98));}
+.season-now-label{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#94a3b8;}
+.season-now-value{font-family:var(--fb);font-size:18px;font-weight:800;line-height:1.1;color:#f8fafc;}
+.season-now-copy{font-size:12px;color:#cbd5e1;line-height:1.45;flex:1;}
+.season-now-link{font-size:12px;font-weight:700;color:#93c5fd;text-decoration:none;cursor:pointer;background:none;border:none;padding:0;text-align:left;font-family:var(--fb);}
+.hub-actions{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;}
     .hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:96px;border:1px solid #24324a;background:#121a29;color:#f8fafc;width:100%;border-radius:12px;padding:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;}
     .hub-action:hover{transform:translateY(-1px);border-color:#f59e0b;box-shadow:0 14px 26px rgba(2,6,23,.3);}
     .hub-action-icon{font-size:22px;line-height:1;margin-top:2px;flex-shrink:0;}
@@ -265,7 +282,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     @media (max-width: 720px){
       .hub-summary-top{grid-template-columns:1fr;}
       .hub-summary-meta{padding:12px 0 0 0;border-left:none;border-top:1px solid #e5e7eb;}
-      .hub-summary-stats,.hub-actions{grid-template-columns:1fr;}
+      .hub-summary-stats,.hub-actions,.hub-now-band{grid-template-columns:1fr;}
       .hub-powerup-grid{grid-template-columns:1fr;}
       .activity-item{grid-template-columns:28px minmax(0,1fr);}
     }
@@ -398,11 +415,12 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             <div class="hub-stat"><div id="hubOppProj" class="hub-stat-value" style="color:var(--text2);">â€”</div><div class="hub-stat-label">Opp Revealed</div></div>
             <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">â€”</div><div class="hub-stat-label">Streak</div></div>
           </div>
+          <div class="hub-now-band" id="hubNowBand"></div>
           <div class="hub-actions" style="margin-top:12px;">
             <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">&#128101;</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
             <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div class="hub-action-title">Matchup</div><div class="hub-action-sub">Open the head-to-head box score</div></div></button>
-            <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">??</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">â€” available</div></div></button>
-            <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">??</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">â€”</div></div></button>
+            <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">-- available</div></div></button>
+            <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">&#127942;</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">--</div></div></button>
           </div>
         </div>
         <button id="advBtn" onclick="advanceWeek()" class="bg">? Advance to Next Week</button>
@@ -465,7 +483,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <div id="roster" class="screen">
   <div class="season-subbar">
     <div class="season-subbar-left">
-      <button class="season-back" onclick="goPage('hub')">?</button>
+      <button class="season-back" onclick="goPage('hub')">‹</button>
       <div>
         <div class="season-subbar-title">My Team</div>
         <div class="season-subbar-copy" id="rWk"></div>
@@ -529,7 +547,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   <div class="season-filterbar">
     <div style="flex:1;min-width:240px;position:relative;">
       <input type="text" id="wSrch" placeholder="Player name" oninput="renderWaiver()" class="season-filter-input">
-      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#9ca3af;">??</span>
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#9ca3af;font-family:var(--fd);font-weight:700;">Find</span>
     </div>
     <select id="wPos" onchange="renderWaiver()" class="season-filter-select"></select>
   </div>
@@ -838,6 +856,14 @@ function ensureRosterbatePools(){
 }
 
 function tc(t){return getRosterbateTeamColor(CURRENT_SPORT, t)||'#334155';}
+function escapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 function ini(n){if(!n||typeof n!=='string')return'??';const p=n.trim().split(' ').filter(Boolean);if(!p.length)return'??';return(p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();}
 function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
@@ -1415,12 +1441,29 @@ function rebuildSeasonWaiverPool(){
   ]);
   const sourcePool = getSeasonPlayerPool();
   const seenIds = new Set();
-  return sourcePool.filter(player=>{
+  const rebuilt = sourcePool.filter(player=>{
     const pid = Number(player?.id);
     if(!player || !Number.isFinite(pid) || rosterIds.has(pid) || seenIds.has(pid)) return false;
     seenIds.add(pid);
     return true;
   }).map(player=>({...player}));
+  const rosterCoverage = sourcePool.length ? (rosterIds.size / sourcePool.length) : 0;
+  if(sourcePool.length && (!rebuilt.length || rosterCoverage >= 0.9)){
+    console.warn('Season waiver pool looked corrupted; falling back to canonical player pool.', {
+      sourcePool: sourcePool.length,
+      rosterIds: rosterIds.size,
+      rebuilt: rebuilt.length,
+      rosterCoverage
+    });
+    const canonicalSeen = new Set();
+    return sourcePool.filter(player=>{
+      const pid = Number(player?.id);
+      if(!player || !Number.isFinite(pid) || canonicalSeen.has(pid)) return false;
+      canonicalSeen.add(pid);
+      return true;
+    }).map(player=>({...player}));
+  }
+  return rebuilt;
 }
 
 function ensureSeasonWaiverPool(force){
@@ -1512,6 +1555,18 @@ function repairSeasonUiIcons(){
   const replacements=['&#128101;','&#9876;','&#128269;','&#127942;'];
   actionIcons.forEach((icon,idx)=>{
     if(icon && replacements[idx] && /\?/.test(icon.textContent||'')) icon.innerHTML=replacements[idx];
+  });
+}
+function applySeasonShellEnhancements(){
+  repairSeasonUiIcons();
+  const homeLabel='&#127968; Roster<span style="color:var(--accent)">Bate</span>';
+  ['seasonHomeLink','rosterHomeLink','waiverHomeLink','tradesHomeLink'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML=homeLabel;
+  });
+  const subbarTitles=document.querySelectorAll('.season-subbar-title');
+  subbarTitles.forEach(title=>{
+    if(title && /\?/.test(title.textContent||'')) title.textContent=title.textContent.replace(/\?/g,'').trim() || 'RosterBate';
   });
 }
 let rosterRenderQueued=false;
@@ -1686,12 +1741,12 @@ function applySportContext(sport){
   STARTERS = SPORT_CFG.starterSlots.length;
   SLOT_LABELS = [...SPORT_CFG.starterSlots];
   setSelectedRosterbateSport(CURRENT_SPORT);
-  const homeLabel = SPORT_CFG.icon + ' Roster<span style="color:var(--accent)">Bate</span>';
+  const homeLabel = '&#127968; Roster<span style="color:var(--accent)">Bate</span>';
   ['seasonHomeLink','rosterHomeLink','waiverHomeLink','tradesHomeLink'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.innerHTML = homeLabel;
   });
-  document.title = 'RosterBate â€” ' + SPORT_CFG.label + ' Season Manager';
+  document.title = 'RosterBate - ' + SPORT_CFG.label + ' Season Manager';
   document.getElementById('seasonEmptyIcon').textContent = SPORT_CFG.icon;
   document.getElementById('seasonEmptyTitle').textContent = SPORT_CFG.label + ' Season Manager';
   document.getElementById('seasonEmptyCopy').textContent = getSeasonEmptyStateCopy(CURRENT_SPORT);
@@ -1699,6 +1754,7 @@ function applySportContext(sport){
   if(wPos){
     wPos.innerHTML = SPORT_CFG.waiverPositions.map(pos => `<option value="${pos}">${pos}</option>`).join('');
   }
+  applySeasonShellEnhancements();
 }
 // -- Pro Sports GAME SCHEDULE SIMULATION --------------------------
 const SPORT_SEASON_META={
@@ -2970,6 +3026,226 @@ function getWaiverRadarCandidates(limit=4){
     .slice(0, Math.max(1, limit));
 }
 
+function getWatchedWaiverTargets(limit=4){
+  const watchIds=new Set(getWatchListIds().map(Number));
+  if(!watchIds.size) return [];
+  return (G.waiver||[])
+    .filter(Boolean)
+    .filter(player=>watchIds.has(Number(player.id)))
+    .sort((a,b)=>Number(b.fp||0)-Number(a.fp||0))
+    .slice(0, Math.max(1, limit));
+}
+
+function getRecentDroppedWaiverTargets(limit=4){
+  const recentDropIds=new Set((G.recentDrops||[]).map(drop=>Number(drop?.player?.id)).filter(Number.isFinite));
+  if(!recentDropIds.size) return [];
+  return (G.waiver||[])
+    .filter(Boolean)
+    .filter(player=>recentDropIds.has(Number(player.id)))
+    .sort((a,b)=>Number(b.fp||0)-Number(a.fp||0))
+    .slice(0, Math.max(1, limit));
+}
+
+function getWaiverRowSignals(player){
+  const playerId=Number(player?.id);
+  const watched=isWatchListed(playerId);
+  const recentDropIds=new Set((G.recentDrops||[]).map(drop=>Number(drop?.player?.id)).filter(Number.isFinite));
+  const recentDrop=recentDropIds.has(playerId);
+  const radarRank=getWaiverRadarCandidates(10).findIndex(entry=>Number(entry?.player?.id)===playerId);
+  return {
+    watched,
+    recentDrop,
+    bestPickup: radarRank===0,
+    radarRank,
+    radarTarget: radarRank>=0 && radarRank<5
+  };
+}
+
+function getPendingTradeCounts(teamIdx=D?.myPos){
+  const targetTeam=Number(teamIdx ?? 0);
+  const offers=Array.isArray(G?.tradeOffers) ? G.tradeOffers : [];
+  const incoming=offers.filter(offer=>Number(offer?.toTeam)===targetTeam && offer?.status==='pending').length;
+  const outgoing=offers.filter(offer=>Number(offer?.fromTeam)===targetTeam && offer?.status==='pending').length;
+  return { incoming, outgoing, total: incoming + outgoing };
+}
+
+function buildSeasonNowCard(card){
+  if(!card) return '';
+  const tone=card.tone||'';
+  const action=(card.action && card.actionLabel)
+    ? `<button type="button" class="season-now-link" onclick="${card.action}">${card.actionLabel}</button>`
+    : '';
+  return `<div class="season-now-card ${tone}">
+    <div class="season-now-label">${card.label||''}</div>
+    <div class="season-now-value">${card.value||''}</div>
+    <div class="season-now-copy">${card.copy||''}</div>
+    ${action}
+  </div>`;
+}
+
+function getRevealStateCard(day){
+  const selectedDay=Number(day||G?.day||1);
+  const isToday=selectedDay===Number(G?.day||1);
+  const revealed=isDayRevealed(selectedDay);
+  if(revealed){
+    return {
+      tone:'live',
+      label:'Reveal State',
+      value:'Scores Live',
+      copy:`Day ${selectedDay} is unlocked. Box scores and matchup swings are visible now.`,
+      actionLabel:'Open Matchup',
+      action:"goPage('matchup')"
+    };
+  }
+  if(isToday){
+    return {
+      tone:'alert',
+      label:'Reveal State',
+      value:'Reveal Tonight',
+      copy:'Today is still hidden. Final lineup swaps, IL moves, and adds matter before the reveal.',
+      actionLabel:'Set Lineup',
+      action:"goPage('roster')"
+    };
+  }
+  if(selectedDay < Number(G?.day||1)){
+    return {
+      tone:'info',
+      label:'Reveal State',
+      value:'Locked In',
+      copy:`Day ${selectedDay} is in the books. Your lineup is frozen until those results are revealed.`,
+      actionLabel:'Review Matchup',
+      action:"goPage('matchup')"
+    };
+  }
+  return {
+    tone:'info',
+    label:'Reveal State',
+    value:'Upcoming Day',
+    copy:`Day ${selectedDay} is ahead. Prep the board early so you are not chasing lineup fixes later.`,
+    actionLabel:'Set Lineup',
+    action:"goPage('roster')"
+  };
+}
+
+function getRosterUrgencyCards(day, context={}){
+  const selectedDay=Number(day||G?.day||1);
+  const roster=Array.isArray(context.roster) ? context.roster : (G?.rosters?.[D?.myPos]||[]);
+  const ilRoster=Array.isArray(context.ilRoster) ? context.ilRoster : getIlRoster(D?.myPos);
+  const starterIds=Array.isArray(context.starterIds) ? context.starterIds : getLineupForDay(selectedDay);
+  const starterSlots=Math.max(0, Array.isArray(SLOT_LABELS) ? SLOT_LABELS.length : Number(STARTERS||0));
+  const filledStarters=starterIds.filter(Boolean).length;
+  const missingStarters=Math.max(0, starterSlots - filledStarters);
+  const week=Number(context.week||weekForDay(selectedDay));
+  const benchIlEligible=roster.filter(player=>!starterIds.includes(player?.id) && isIlEligiblePlayer(player,getInjuryStatus(player,week)));
+  const watchedTargets=getWatchedWaiverTargets(3);
+  const recentDropTargets=getRecentDroppedWaiverTargets(3);
+  const radarTargets=getWaiverRadarCandidates(3);
+  const tradeCounts=getPendingTradeCounts(D?.myPos);
+  const cards=[getRevealStateCard(selectedDay)];
+
+  if(missingStarters){
+    cards.push({
+      tone:'alert',
+      label:'Lineup Action',
+      value:`${missingStarters} Slot${missingStarters===1?'':'s'} Open`,
+      copy:missingStarters===1
+        ? 'One starter spot is still empty. Lock in a body before the reveal closes this day.'
+        : `${missingStarters} starter spots are still empty. Set the lineup now so you do not bleed free points.`,
+      actionLabel:'Set Lineup',
+      action:"goPage('roster')"
+    });
+  } else if(selectedDay===Number(G?.day||1) && !isDayRevealed(selectedDay)){
+    cards.push({
+      tone:'live',
+      label:'Lineup Action',
+      value:'Board Ready',
+      copy:'Your starters are filled for today. If a late scratch hits, you have room to react before reveal.',
+      actionLabel:'Review Matchup',
+      action:"goPage('matchup')"
+    });
+  } else {
+    cards.push({
+      tone:'info',
+      label:'Lineup Action',
+      value:'Lineup Set',
+      copy:'The current day board is covered. Use future days to queue schedule and injury decisions early.',
+      actionLabel:'View Schedule',
+      action:"rosterTab='schedule';renderRoster()"
+    });
+  }
+
+  if(ilRoster.length || benchIlEligible.length || pendingWaiverAdd || radarTargets.length){
+    const watchedCount=watchedTargets.length;
+    const recentDrops=recentDropTargets.length;
+    const bestTarget=radarTargets[0]?.player;
+    let value='Wire Active';
+    let copy='The wire is moving. Review adds, drops, and stash spots before your next reveal window.';
+    let actionLabel='Open Waivers';
+    let action="goPage('waiver')";
+    let tone='info';
+    if(ilRoster.length){
+      value=`${ilRoster.length} ${getIlSlotKey()} Filled`;
+      copy=`You have ${ilRoster.length} player${ilRoster.length===1?'':'s'} on ${getIlSlotKey()}. Clear space or activate healthy bodies before crunch time.`;
+      actionLabel='Manage IL';
+      action="handleRosterAction('il')";
+      tone='alert';
+    } else if(benchIlEligible.length){
+      value=`${benchIlEligible.length} ${getIlSlotKey()} Fit${benchIlEligible.length===1?'':'s'}`;
+      copy=`${benchIlEligible[0]?.name||'A bench player'} can be stashed in ${getIlSlotKey()} right now to free an active roster spot.`;
+      actionLabel='Manage IL';
+      action="handleRosterAction('il')";
+      tone='alert';
+    } else if(pendingWaiverAdd){
+      value='Swap Ready';
+      copy=`Finish the drop decision so ${pendingWaiverAdd?.name||'your target'} can land on your roster before someone else grabs the add.`;
+      actionLabel='Complete Add';
+      action="handleRosterAction('drop')";
+      tone='alert';
+    } else if(watchedCount){
+      value=`${watchedCount} Watched Live`;
+      copy=`${watchedTargets[0]?.name||'A watch list target'} is on the wire now. Stay ahead of your own watch list before the room reacts.`;
+      actionLabel='Open Watch List';
+      action='openWatchList()';
+      tone='live';
+    } else if(recentDrops){
+      value=`${recentDrops} Recent Drop${recentDrops===1?'':'s'}`;
+      copy=`${recentDropTargets[0]?.name||'A recent drop'} just hit the wire. Fresh value is available if you act early.`;
+      tone='live';
+    } else if(bestTarget){
+      value='Best Pickup Live';
+      copy=`${bestTarget.name} is the strongest available add in your current player pool.`;
+      tone='live';
+    }
+    cards.push({ tone, label:'Add / IL Pressure', value, copy, actionLabel, action });
+  }
+
+  if(tradeCounts.total){
+    cards.push({
+      tone:tradeCounts.incoming ? 'alert' : 'info',
+      label:'Trade Desk',
+      value:tradeCounts.incoming
+        ? `${tradeCounts.incoming} Response${tradeCounts.incoming===1?'':'s'} Needed`
+        : `${tradeCounts.outgoing} Sent Pending`,
+      copy:tradeCounts.incoming
+        ? 'Another manager is waiting on your answer. Review the offer before today gets away from you.'
+        : `You have ${tradeCounts.outgoing} offer${tradeCounts.outgoing===1?'':'s'} still waiting on another manager.`,
+      actionLabel:'Open Trade Desk',
+      action:"goPage('trades')"
+    });
+  } else {
+    cards.push({
+      tone:'info',
+      label:'Trade Desk',
+      value:'No Trade Pressure',
+      copy:'Nothing needs an answer right now. Use the desk when you want to shop upgrades or clear roster clutter.',
+      actionLabel:'Open Trade Desk',
+      action:"goPage('trades')"
+    });
+  }
+
+  return cards.slice(0,4);
+}
+
 function claimWaiverPlayerToTeam(playerToAdd,droppedPlayer=null){
   if(!playerToAdd) return false;
   const targetId=Number(playerToAdd.id);
@@ -3066,13 +3342,20 @@ function waiverStatValue(player,key){
 
 function waiverCell(player,key){
   if(key==='name'){
-    const watched=isWatchListed(player.id);
+    const signals=getWaiverRowSignals(player);
+    const watched=signals.watched;
+    const tags=[];
+    if(signals.bestPickup) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Best Pickup</span>');
+    else if(signals.radarTarget) tags.push(`<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(34,197,94,.34);background:rgba(21,128,61,.18);color:#86efac;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Radar #${signals.radarRank+1}</span>`);
+    if(signals.recentDrop) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#fdba74;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Recent Drop</span>');
+    if(watched) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(250,204,21,.34);background:rgba(250,204,21,.14);color:#fde68a;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Watching</span>');
     return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:220px;">
       <div style="display:flex;align-items:center;gap:9px;min-width:0;flex:1;">
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
       <div style="min-width:0;">
         <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
         <div style="font-size:11px;color:#6b7280;">${player.team} Â· ${player.pos}</div>
+        ${tags.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${tags.join('')}</div>`:''}
       </div>
       </div>
       <div style="display:flex;align-items:flex-end;gap:8px;flex-shrink:0;">
@@ -3145,6 +3428,27 @@ function resetWaiverFilters(){
 function setWaiverTab(tab){
   waiverTab=tab==='schedule'?'schedule':'stats';
   renderWaiver();
+}
+
+function applyRequestedSeasonView(defaultPage='hub'){
+  const params = new URLSearchParams(window.location.search || '');
+  const requestedPage = String(params.get('page') || '').trim().toLowerCase();
+  const requestedWaiver = String(params.get('waiver') || '').trim().toLowerCase();
+  if (requestedWaiver === 'watch') waiverListMode = 'watch';
+  else if (requestedWaiver === 'all') waiverListMode = 'all';
+  const pageMap = {
+    hub: 'hub',
+    roster: 'roster',
+    matchup: 'matchup',
+    waiver: 'waiver',
+    wire: 'waiver',
+    trade: 'trades',
+    trades: 'trades',
+    standings: 'standings',
+    commissioner: 'commissioner',
+    comm: 'commissioner'
+  };
+  goPage(pageMap[requestedPage] || defaultPage);
 }
 
 window.onload=async function(){
@@ -3253,7 +3557,7 @@ window.onload=async function(){
                   }
                 }
                 
-                goPage('hub');
+                applyRequestedSeasonView();
                 return;
               }
             } catch(e) {
@@ -3323,7 +3627,7 @@ window.onload=async function(){
             }
           }
           
-          goPage('hub');
+          applyRequestedSeasonView();
           return;
         } else {
           console.warn('?? League not found in Firebase:', leagueId);
@@ -3377,7 +3681,7 @@ window.onload=async function(){
             return;
           }
         }
-        goPage('hub');
+        applyRequestedSeasonView();
         return;
       }
     }catch(e){console.error(e);}
@@ -3409,12 +3713,12 @@ window.onload=async function(){
         seasonLoaded=false;
       }
       if(seasonLoaded){
-        goPage('hub');
+        applyRequestedSeasonView();
         return;
       }
       try{
         initSeason();
-        goPage('hub');
+        applyRequestedSeasonView();
         return;
       }catch(initErr){
         console.error('Lobby season fallback init failed.', initErr);
@@ -3474,7 +3778,7 @@ async function loadDemo(){
     console.log('? initSeason() completed');
     console.log('?? G.rosters:', G.rosters);
     console.log('?? G.waiver:', G.waiver);
-    goPage('hub');
+    applyRequestedSeasonView();
     console.log('? Navigated to hub');
   } catch(e) {
     console.error('? Demo season init failed:', e);
@@ -3597,18 +3901,10 @@ function initSeason(){
   G.starters=G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
   console.log('? G.starters populated:', G.starters);
   
-  const waiverPool = getSeasonPlayerPool();
-  const rebuildWaiverPool = ()=>{
-    const rosterIds=new Set(G.rosters.flat().map(p=>p.id));
-    const seenIds=new Set();
-    return waiverPool
-      .filter(p=>p && p.id!=null && !rosterIds.has(p.id) && !seenIds.has(p.id) && seenIds.add(p.id))
-      .map(p=>({...p}));
-  };
   const initialRosterIds=new Set(G.rosters.flat().map(p=>p.id));
   console.log('?? Total drafted player IDs:', initialRosterIds.size);
-  console.log('?? Waiver pool size:', waiverPool.length);
-  G.waiver=rebuildWaiverPool();
+  console.log('?? Waiver pool size:', getSeasonPlayerPool().length);
+  G.waiver=rebuildSeasonWaiverPool();
   console.log('?? G.waiver populated:', G.waiver.length, 'players');
   console.log('?? Sample waiver players:', G.waiver.slice(0, 3));
   
@@ -3640,7 +3936,7 @@ function initSeason(){
     G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
     const savedFreeAgents=Array.isArray(D.freeAgents) ? D.freeAgents : null;
     const savedWaiver=Array.isArray(D.waiver) ? D.waiver : null;
-    const rebuiltWaiver=rebuildWaiverPool();
+    const rebuiltWaiver=rebuildSeasonWaiverPool();
     if(rebuiltWaiver.length){
       G.waiver=rebuiltWaiver;
     } else if(savedFreeAgents && savedFreeAgents.length){
@@ -3677,7 +3973,25 @@ function initSeason(){
     awardRosterbateScore('season_manager', 5).catch(() => {});
   }
   
+  ensureRosterbatePools()
+    .then(()=>{
+      refreshSeasonPlayerUniverse();
+    })
+    .catch(err=>{
+      console.warn('Season player universe refresh skipped because player pools failed to load.', err);
+    });
+
   console.log('? initSeason() completed successfully');
+}
+
+function refreshSeasonPlayerUniverse(){
+  if(!D || !G || !Array.isArray(G.rosters)) return;
+  const beforeCount=Array.isArray(G.waiver) ? G.waiver.length : 0;
+  const refreshed=ensureSeasonWaiverPool(true);
+  const afterCount=Array.isArray(refreshed) ? refreshed.length : 0;
+  if(afterCount===beforeCount && afterCount>0) return;
+  if(document.getElementById('hub')?.classList.contains('active')) renderHub();
+  if(document.getElementById('waiver')?.classList.contains('active')) renderWaiver();
 }
 
 function buildSched(n,weeks){
@@ -3893,9 +4207,11 @@ function dayOfWeek(day){
 const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function renderHub(){
+  applySeasonShellEnhancements();
   repairSeasonUiIcons();
   const liveStandings=getLiveStandingsSnapshot();
   const mp=D.myPos,myS=liveStandings.find(st=>st.teamIdx===mp)||(G.standings||[])[mp];
+  const watchIds=getWatchListIds();
   const weekPowerups=getWeekPowerups(G.week);
   const revealedToday=isDayRevealed(G.day);
   const weekStart=(G.week-1)*DAYS_PER_WEEK+1;
@@ -3911,8 +4227,8 @@ function renderHub(){
   document.getElementById('hubFormat').textContent=CS?.format||'Standard';
   document.getElementById('hubScoringType').textContent=CS?.scoringType||'Head to Head Points';
   document.getElementById('hubTeamCount').textContent=(D.teams?.length||0)||10;
-  document.getElementById('hubWeek').textContent='Wk '+G.week+'/'+G.totalWeeks+' Â· Day '+G.day;
-  document.getElementById('hubRec').textContent=(myS?.w||0)+'â€“'+(myS?.l||0)+' Â· '+(myS?.pf||0).toFixed(1)+' PF Â· '+(myS?.pa||0).toFixed(1)+' PA';
+  document.getElementById('hubWeek').textContent='Wk '+G.week+'/'+G.totalWeeks+' | Day '+G.day;
+  document.getElementById('hubRec').textContent=(myS?.w||0)+'-'+(myS?.l||0)+' | '+(myS?.pf||0).toFixed(1)+' PF | '+(myS?.pa||0).toFixed(1)+' PA';
   if(dataStampEl){
     if(statsThroughDate){
       dataStampEl.style.display='block';
@@ -3922,23 +4238,38 @@ function renderHub(){
       dataStampEl.textContent='';
     }
   }
-  document.getElementById('rWk').textContent='Wk '+G.week+' Â· Day '+G.day;
+  document.getElementById('rWk').textContent='Wk '+G.week+' | Day '+G.day;
   document.getElementById('sWk').textContent=revealedCount+'/'+(weekEnd-weekStart+1)+' days revealed';
   const stEl=document.getElementById('hubStreak');
   if(myS&&(myS.w+myS.l>0)){stEl.textContent=(myS.streakW?'W':'L')+myS.streak;stEl.style.color=myS.streakW?'var(--green)':'var(--red)';}
-  else stEl.textContent='â€”';
+  else stEl.textContent='--';
   const mm=weekGames(G.week).find(g=>g.home===mp||g.away===mp);
   const oi=mm?(mm.home===mp?mm.away:mm.home):-1;
   document.getElementById('hubOpp').textContent=oi>=0?(D.teams[oi]||'Team '+(oi+1)):'Bye';
   const mp2=getTeamWeekRevealedScore(mp,G.week),op=oi>=0?getTeamWeekRevealedScore(oi,G.week):0;
   const hpEl=document.getElementById('hubProj');hpEl.textContent=mp2.toFixed(1);hpEl.style.color=mp2>=op?'var(--green)':'var(--red)';
-  document.getElementById('hubOppProj').textContent=op>0?op.toFixed(1):'â€”';
+  document.getElementById('hubOppProj').textContent=op>0?op.toFixed(1):'--';
   document.getElementById('hubWC').textContent=(G.waiver||[]).length+' available';
   const pend=(G.tradeOffers||[]).filter(t=>t.toTeam===mp&&t.status==='pending').length;
   const sentPend=(G.tradeOffers||[]).filter(t=>t.fromTeam===mp&&t.status==='pending').length;
+  const watchCount=watchIds.length;
+  const radarCandidates=getWaiverRadarCandidates(6);
+  const radarPreview=radarCandidates[0];
+  const watchedTargets=getWatchedWaiverTargets(3);
+  const recentDropTargets=getRecentDroppedWaiverTargets(3);
+  const watchSummary=watchCount
+    ? (radarPreview ? radarPreview.player.name+' leading your board' : watchCount+' players tracked')
+    : 'Track free agents before the room shifts';
   const srt=[...liveStandings].sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
   const rk=srt.findIndex(s=>s.teamIdx===mp)+1;
-  document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'â€”';
+  document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'--';
+  const playersCard=document.getElementById('hubWC');
+  if(playersCard){
+    if(pend>0) playersCard.textContent=(G.waiver||[]).length+' available | '+pend+' trade offer'+(pend===1?'':'s');
+    else if(recentDropTargets.length) playersCard.textContent=(G.waiver||[]).length+' available | '+recentDropTargets.length+' recent drop'+(recentDropTargets.length===1?'':'s');
+    else if(watchCount) playersCard.textContent=(G.waiver||[]).length+' available | '+watchCount+' watched';
+    else playersCard.textContent=(G.waiver||[]).length+' available';
+  }
   const games=weekGames(G.week);
   const standingsEl=document.getElementById('hubStandingsMini');
   if(standingsEl){
@@ -4028,11 +4359,76 @@ function renderHub(){
       </div>
     </div>`;
   }).join(''):'<div style="padding:14px 4px;text-align:center;color:var(--text3);font-size:12px;">League moves will show up here as managers add, drop, and trade.</div>');
+  const hubNowBand=document.getElementById('hubNowBand');
+  if(hubNowBand){
+    const nowCards=[];
+    if(pend>0){
+      nowCards.push({
+        tone:'alert',
+        label:'Trade Desk',
+        value:pend+' incoming',
+        copy:'Incoming offers are waiting on your response right now.',
+        action:"goPage('trades')",
+        link:'Open trade desk'
+      });
+    } else {
+      nowCards.push({
+        tone:watchCount?'live':'',
+        label:'Watch List',
+        value:watchCount?watchCount+' tracked':'Start tracking',
+        copy:watchCount
+          ? (watchedTargets[0] ? watchedTargets[0].name+' is still available on the wire.' : 'Your tracked names are ready for another look.')
+          : 'Star a few waiver targets so the best names stay surfaced every visit.',
+        action:'openWatchList()',
+        link:watchCount?'Open watch list':'Build watch list'
+      });
+    }
+    nowCards.push({
+      tone:recentDropTargets.length?'alert':(radarPreview?'live':''),
+      label:'Waiver Radar',
+      value:recentDropTargets.length ? recentDropTargets.length+' fresh drop'+(recentDropTargets.length===1?'':'s') : ((radarCandidates.length||0)+' targets'),
+      copy:recentDropTargets.length
+        ? recentDropTargets[0].name+' is a fresh cut. Check the wire before the league reacts.'
+        : (radarPreview ? radarPreview.player.name+' is the best available pickup right now.' : 'The wire is quiet right now, but the full pool is ready when you are.'),
+      action:"goPage('waiver')",
+      link:'Open players'
+    });
+    nowCards.push({
+      tone:G.isSeasonComplete?'':'live',
+      label:'Next Action',
+      value:G.isSeasonComplete ? 'Season wrapped' : ('Reveal Day '+G.day),
+      copy:G.isSeasonComplete
+        ? 'Everything is locked in. Review standings and league history from the hub.'
+        : (revealedToday
+            ? 'Today is already revealed. Set tomorrow’s lineup or hunt the wire before the next results drop.'
+            : 'Results for today are still pending. Reveal them when you are ready, then make your next move.'),
+      action:G.isSeasonComplete?"goPage('standings')":(revealedToday?"goPage('roster')":"advanceWeek()"),
+      link:G.isSeasonComplete?'Review standings':(revealedToday?'Set lineup':'Reveal results')
+    });
+    hubNowBand.innerHTML=nowCards.map(card=>`<div class="hub-now-card ${card.tone||''}">
+      <div class="hub-now-label">${card.label}</div>
+      <div class="hub-now-value">${card.value}</div>
+      <div class="hub-now-copy">${card.copy}</div>
+      <a href="javascript:void(0)" onclick="${card.action}" class="hub-now-link">${card.link}</a>
+    </div>`).join('');
+  }
   const ab=document.getElementById('advBtn');
   if(G.isSeasonComplete){ab.textContent='Season Complete';ab.style.background='var(--text3)';ab.disabled=true;}
   else{ab.textContent='Reveal Day '+G.day+' Results';ab.style.background='var(--green)';ab.disabled=false;}
   const hubActions=document.querySelector('#hub .hub-actions');
   if(hubActions){
+    let watchCard=document.getElementById('hubWatchListCard');
+    if(!watchCard){
+      watchCard=document.createElement('button');
+      watchCard.type='button';
+      watchCard.id='hubWatchListCard';
+      watchCard.className='card hub-action';
+      watchCard.onclick=()=>openWatchList();
+      const standingsCard=hubActions.querySelector('button[onclick*="standings"]');
+      if(standingsCard) hubActions.insertBefore(watchCard, standingsCard);
+      else hubActions.appendChild(watchCard);
+    }
+    watchCard.innerHTML=`<div class="hub-action-icon">&#9733;</div><div><div class="hub-action-title">Watch List</div><div class="hub-action-sub">${watchCount?watchCount+' tracked | '+watchSummary:watchSummary}</div></div>`;
     const tradeSummary=pend
       ? `${pend} incoming offer${pend===1?'':'s'}`
       : (sentPend ? `${sentPend} pending sent offer${sentPend===1?'':'s'}` : 'Open the league trade desk');
@@ -4059,6 +4455,80 @@ function getMatchupForTeamDay(teamIdx,day){
   return weekGames(weekForDay(day)).find(g=>g.home===teamIdx||g.away===teamIdx)||null;
 }
 
+function getMatchupUrgencyCards(day, matchup){
+  const selectedDay=Number(day||G?.day||1);
+  const cards=[getRevealStateCard(selectedDay)];
+  if(!matchup) return cards;
+  const myTeam=Number(D?.myPos||0);
+  const oppTeam=Number(matchup.home)===myTeam ? Number(matchup.away) : Number(matchup.home);
+  const myDetail=getTeamDayScoreDetails(myTeam,selectedDay);
+  const oppDetail=getTeamDayScoreDetails(oppTeam,selectedDay);
+  const revealed=isDayRevealed(selectedDay);
+  const myScore=revealed ? Number(getDayResult(myTeam,selectedDay)?.total||0) : Number(myDetail?.total||0);
+  const oppScore=revealed ? Number(getDayResult(oppTeam,selectedDay)?.total||0) : Number(oppDetail?.total||0);
+  const margin=Math.abs(myScore-oppScore);
+  const diff=myScore-oppScore;
+  const myMissing=Math.max(0,(Array.isArray(SLOT_LABELS)?SLOT_LABELS.length:Number(STARTERS||0))-(getStarterIdsForTeamDay(myTeam,selectedDay).filter(Boolean).length));
+  if(diff>0){
+    cards.push({
+      tone:'live',
+      label:'Matchup State',
+      value:revealed ? `Up ${margin.toFixed(1)}` : `Projected +${margin.toFixed(1)}`,
+      copy:revealed ? 'You are ahead on the revealed board right now. Protect the edge with clean lineup management.' : 'Your current board is ahead. Stay sharp on late swaps and injury news.',
+      actionLabel:'Review Roster',
+      action:"goPage('roster')"
+    });
+  } else if(diff<0){
+    cards.push({
+      tone:'alert',
+      label:'Matchup State',
+      value:revealed ? `Down ${margin.toFixed(1)}` : `Projected -${margin.toFixed(1)}`,
+      copy:revealed ? 'You are chasing on the live scoreboard. Focus on lineup fixes, pickups, and trade leverage.' : 'You are trailing on the current board. One clean roster move can still change the day.',
+      actionLabel:'Open Waivers',
+      action:"goPage('waiver')"
+    });
+  } else {
+    cards.push({
+      tone:'info',
+      label:'Matchup State',
+      value:'Even Battle',
+      copy:'This matchup is effectively tied. Small lineup edges and roster reactions matter more than usual.',
+      actionLabel:'Review Matchup',
+      action:"goPage('matchup')"
+    });
+  }
+  const tradeCounts=getPendingTradeCounts(myTeam);
+  if(myMissing){
+    cards.push({
+      tone:'alert',
+      label:'Lineup Pressure',
+      value:`${myMissing} Slot${myMissing===1?'':'s'} Open`,
+      copy:'Your matchup board still has empty starters for this day. Fill them before reveal locks the scoreboard.',
+      actionLabel:'Set Lineup',
+      action:"goPage('roster')"
+    });
+  } else if(tradeCounts.incoming){
+    cards.push({
+      tone:'alert',
+      label:'Trade Desk',
+      value:`${tradeCounts.incoming} Response${tradeCounts.incoming===1?'':'s'} Needed`,
+      copy:'A pending offer is waiting on your answer while this matchup is live.',
+      actionLabel:'Open Trade Desk',
+      action:"goPage('trades')"
+    });
+  } else {
+    cards.push({
+      tone:'info',
+      label:'Lineup Pressure',
+      value:revealed ? 'Board Locked' : 'Board Ready',
+      copy:revealed ? 'The selected day is already live, so use this view to read momentum and prep the next window.' : 'Your board is covered for this day. Use matchup context to decide whether you need upside or stability next.',
+      actionLabel:'Review Schedule',
+      action:"goPage('roster')"
+    });
+  }
+  return cards.slice(0,3);
+}
+
 function renderMatchup(){
   setSeasonSidePanelVisible('matchupPowerups', true);
   renderSidePowerups('matchupPowerups');
@@ -4081,6 +4551,7 @@ function renderMatchup(){
   const dateLabel=getSeasonDayDate(day).toLocaleDateString([],{month:'short',day:'numeric'});
   const isRevealed=isDayRevealed(day);
   const statusText=isRevealed?'Revealed':'Projected';
+  const matchupUrgency=getMatchupUrgencyCards(day, matchup).map(buildSeasonNowCard).join('');
   const weekStart=(week-1)*DAYS_PER_WEEK+1;
   const weekEnd=Math.min(TOTAL_DAYS(),weekStart+DAYS_PER_WEEK-1);
   const dayChips=Array.from({length:weekEnd-weekStart+1},(_,idx)=>{
@@ -4193,6 +4664,7 @@ function renderMatchup(){
           <span class="season-stat-pill">${isRevealed?'Scores revealed':'Pre-reveal day view'}</span>
         </div>
       </div>
+      <div class="season-card-pad"><div class="season-now-band">${matchupUrgency}</div></div>
     </div>
     <div class="season-matchup-grid">
       ${buildTeamPanel(leftIdx,leftIdx===D.myPos?'Your Team':'Opponent')}
@@ -4334,6 +4806,7 @@ function renderRoster(){
     return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:62px;padding:4px 8px;border-radius:999px;border:1px solid ${bd};background:${bg};color:${fg};font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;">${label}</span>`;
   };
   const isPitcherPlayer=p=>['P','SP','RP'].includes(String(p?.pos||'').toUpperCase());
+  const rosterUrgency=getRosterUrgencyCards(day,{roster,ilRoster,starterIds,week}).map(buildSeasonNowCard).join('');
   function buildRows(entries, cols){
     return entries.map(entry=>{
     const safePlayer=entry.player||null;
@@ -4549,6 +5022,7 @@ function renderRoster(){
         ${matchupCard('Last Matchup',prevMatch,false)}
         ${matchupCard('Current Matchup',currentMatch,true)}
       </div>
+      <div class="season-now-band" style="margin-top:18px;">${rosterUrgency}</div>
     </div>
     <div class="season-table-card">
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
@@ -4786,6 +5260,7 @@ function autoSetDay(day){
 function autoSet(){autoSetDay(rosterViewDay||G.day);}
 
 function renderWaiver(){
+  applySeasonShellEnhancements();
   setSeasonSidePanelVisible('waiverPowerups', false);
   const waiverPowerups=document.getElementById('waiverPowerups');
   if(waiverPowerups) waiverPowerups.innerHTML='';
@@ -4793,7 +5268,9 @@ function renderWaiver(){
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
   const watchIds=getWatchListIds();
-  const radar=getWaiverRadarCandidates(4);
+  const radar=getWaiverRadarCandidates(6);
+  const watchedTargets=getWatchedWaiverTargets(4);
+  const recentDrops=getRecentDroppedWaiverTargets(4);
   const unavailableIds=new Set([
     ...(G.rosters||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite),
     ...(G.ilByTeam||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite)
@@ -4912,6 +5389,50 @@ function renderWaiver(){
           }).join('')}
         </div>
       </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+        <div class="season-table-card season-card-pad">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+            <div>
+              <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Watch List Snapshot</div>
+              <div class="season-subbar-copy">The free agents you tagged to revisit later.</div>
+            </div>
+            <span class="season-stat-pill">${watchIds.length} tracked</span>
+          </div>
+          ${watchedTargets.length
+            ? `<div style="display:flex;flex-direction:column;gap:10px;">${watchedTargets.map(p=>`<button type="button" onclick="openWaiver(${Number(p.id)})" style="display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #24324a;background:#101826;border-radius:14px;padding:12px;color:#f8fafc;cursor:pointer;">
+                <div>
+                  <div style="font-family:var(--fb);font-size:15px;font-weight:800;">${escapeHtml(p.name||'Player')}</div>
+                  <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} | ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:var(--fb);font-size:15px;color:#38bdf8;">${Number(p.fp||0).toFixed(1)}</div>
+                  <div style="font-size:11px;color:#fde68a;">Watching</div>
+                </div>
+              </button>`).join('')}</div>`
+            : `<div class="season-soft-muted" style="font-size:13px;">Star any free agent below and they will stay surfaced here every time you come back.</div>`}
+        </div>
+        <div class="season-table-card season-card-pad">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+            <div>
+              <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Recent Drops</div>
+              <div class="season-subbar-copy">Fresh cuts that could turn into cheap wins.</div>
+            </div>
+            <span class="season-stat-pill">${recentDrops.length} live</span>
+          </div>
+          ${recentDrops.length
+            ? `<div style="display:flex;flex-direction:column;gap:10px;">${recentDrops.map(p=>`<button type="button" onclick="openWaiver(${Number(p.id)})" style="display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid rgba(249,115,22,.22);background:linear-gradient(180deg,rgba(33,22,16,.72),rgba(16,24,38,.95));border-radius:14px;padding:12px;color:#f8fafc;cursor:pointer;">
+                <div>
+                  <div style="font-family:var(--fb);font-size:15px;font-weight:800;">${escapeHtml(p.name||'Player')}</div>
+                  <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} | ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:var(--fb);font-size:15px;color:#fdba74;">${Number(p.fp||0).toFixed(1)}</div>
+                  <div style="font-size:11px;color:#fdba74;">Recently dropped</div>
+                </div>
+              </button>`).join('')}</div>`
+            : `<div class="season-soft-muted" style="font-size:13px;">No recent drop candidates are floating in free agency right now.</div>`}
+        </div>
+      </div>
       <div class="season-table-card">
         <div class="season-mini-tabs">
           <button type="button" class="season-mini-tab ${waiverTab==='stats'?'on':''}" onclick="setWaiverTab('stats')">Stats</button>
@@ -4937,9 +5458,19 @@ function renderWaiver(){
               </tr>
             </thead>
             <tbody>
-              ${list.map(p=>`<tr>
+              ${list.map(p=>{
+                const signals=getWaiverRowSignals(p);
+                const rowStyle=signals.bestPickup
+                  ? 'background:linear-gradient(90deg,rgba(30,64,175,.14),rgba(15,23,36,0));'
+                  : signals.recentDrop
+                    ? 'background:linear-gradient(90deg,rgba(154,52,18,.14),rgba(15,23,36,0));'
+                    : signals.watched
+                      ? 'background:linear-gradient(90deg,rgba(250,204,21,.1),rgba(15,23,36,0));'
+                      : '';
+                return `<tr style="${rowStyle}">
                 ${cols.map(col=>`<td style="text-align:${col.align||'right'};${col.key==='fp'?'font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);':''}">${waiverCell(p,col.key)}</td>`).join('')}
-              </tr>`).join('')}
+              </tr>`;
+              }).join('')}
             </tbody>
           </table>`}
         </div>

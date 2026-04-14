@@ -61,8 +61,9 @@ body::after{content:'';position:fixed;inset:0;background:
   border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 28px rgba(0,0,0,.2);}
 .ct{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
-.btn-p{background:linear-gradient(180deg,#ffbd70 0%,#ffa447 40%,#f28721 72%,#db6e14 100%);border:1px solid rgba(255,214,163,.4);border-radius:12px;padding:14px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#2f1908;cursor:pointer;width:100%;transition:opacity .15s,transform .15s;box-shadow:inset 0 2px 0 rgba(255,240,217,.95),inset 0 -4px 10px rgba(161,79,11,.28),0 12px 18px rgba(0,0,0,.22);}
+.btn-p{background:linear-gradient(180deg,#ffbd70 0%,#ffa447 40%,#f28721 72%,#db6e14 100%);border:1px solid rgba(255,214,163,.4);border-radius:12px;padding:14px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#2f1908;cursor:pointer;width:100%;transition:opacity .15s,transform .16s ease,box-shadow .16s ease,filter .16s ease;box-shadow:inset 0 2px 0 rgba(255,240,217,.95),inset 0 -4px 10px rgba(161,79,11,.28),0 12px 18px rgba(0,0,0,.22);}
 .btn-p:disabled{opacity:.5;cursor:not-allowed;}
+.btn-p:hover:not(:disabled){transform:translateY(-1px);filter:saturate(1.05);box-shadow:inset 0 2px 0 rgba(255,240,217,.98),inset 0 -4px 10px rgba(161,79,11,.32),0 16px 24px rgba(0,0,0,.24),0 0 20px rgba(255,163,71,.16);}
 @keyframes mmButtonShimmer{
   0%{transform:translateX(-165%) skewX(-18deg);opacity:0;}
   4%{opacity:.2;}
@@ -70,9 +71,12 @@ body::after{content:'';position:fixed;inset:0;background:
   15%{transform:translateX(165%) skewX(-18deg);opacity:0;}
   100%{transform:translateX(165%) skewX(-18deg);opacity:0;}
 }
-.btn-g{background:linear-gradient(180deg,#68f1a0 0%,#38d377 40%,#20b75d 72%,#14974b 100%);border:1px solid rgba(169,255,205,.34);border-radius:12px;padding:14px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#062413;cursor:pointer;width:100%;box-shadow:inset 0 2px 0 rgba(232,255,241,.96),inset 0 -4px 10px rgba(10,105,49,.28),0 12px 18px rgba(0,0,0,.2);}
-.btn-s{background:linear-gradient(180deg,#586173,#363e4e);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:#eef4fc;cursor:pointer;width:100%;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px rgba(0,0,0,.2);}
-.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:800;color:var(--red);cursor:pointer;width:100%;}
+.btn-g{background:linear-gradient(180deg,#68f1a0 0%,#38d377 40%,#20b75d 72%,#14974b 100%);border:1px solid rgba(169,255,205,.34);border-radius:12px;padding:14px;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#062413;cursor:pointer;width:100%;box-shadow:inset 0 2px 0 rgba(232,255,241,.96),inset 0 -4px 10px rgba(10,105,49,.28),0 12px 18px rgba(0,0,0,.2);transition:transform .16s ease,box-shadow .16s ease;}
+.btn-g:hover{transform:translateY(-1px);box-shadow:inset 0 2px 0 rgba(232,255,241,.98),inset 0 -4px 10px rgba(10,105,49,.3),0 16px 24px rgba(0,0,0,.22),0 0 20px rgba(56,211,119,.12);}
+.btn-s{background:linear-gradient(180deg,#586173,#363e4e);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:#eef4fc;cursor:pointer;width:100%;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px rgba(0,0,0,.2);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,color .16s ease;}
+.btn-s:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 22px rgba(0,0,0,.22);color:#ffffff;}
+.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:800;color:var(--red);cursor:pointer;width:100%;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease;}
+.btn-danger:hover{transform:translateY(-1px);border-color:rgba(239,68,68,.48);background:rgba(239,68,68,.18);box-shadow:0 12px 20px rgba(0,0,0,.18);}
 .input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;width:100%;}
 .input:focus{border-color:var(--accent);}
 .schedule-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.35fr);gap:10px;align-items:start;}
@@ -134,6 +138,58 @@ body.mm-create-shimmer-ready .schedule-action::after{
   linear-gradient(135deg,#17243b,#0f1726);
   border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 28px rgba(0,0,0,.18);}
 .lobby-card:hover{border-color:rgba(247,164,87,.3);}
+.mm-hero{padding:18px 18px 16px;}
+.mm-hero-title{font-family:var(--fd);font-size:34px;font-weight:900;line-height:.92;text-transform:uppercase;letter-spacing:.4px;color:#f8fafc;}
+.mm-hero-title .accent{color:#f4a34d;}
+.mm-hero-sub{margin-top:8px;font-size:13px;line-height:1.7;color:#c7d3e4;max-width:720px;}
+.mm-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.mm-hero-pill{display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(10,17,28,.58);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#dbe6f5;}
+.mm-hero-pill.accent{border-color:rgba(247,164,87,.38);color:#ffd6a2;background:rgba(56,33,18,.5);}
+.mm-grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-items:start;}
+.mm-stack{display:flex;flex-direction:column;gap:14px;}
+.mm-section-label{font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#97abc6;margin-bottom:10px;}
+.mm-note{font-size:12px;color:var(--text2);line-height:1.65;}
+.mm-empty-icon{width:46px;height:46px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(70,102,164,.2),rgba(15,24,39,.92));border:1px solid rgba(247,164,87,.26);font-family:var(--fd);font-size:18px;font-weight:900;color:#ffd29b;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 22px rgba(0,0,0,.16);}
+.mm-action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.mm-meta-card{padding:16px 18px;position:relative;overflow:hidden;}
+.mm-meta-card::before{content:'';position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.14) 18%,rgba(247,164,87,.28) 50%,rgba(255,255,255,.14) 82%,rgba(255,255,255,0));pointer-events:none;}
+.mm-meta-title{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;color:#f8fafc;}
+.mm-meta-copy{margin-top:4px;font-size:12px;color:#9fb1c8;line-height:1.6;}
+.mm-flow-list{display:grid;gap:10px;margin-top:14px;}
+.mm-flow-item{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));}
+.mm-flow-step{width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:rgba(249,115,22,.16);border:1px solid rgba(249,115,22,.32);font-family:var(--fd);font-size:12px;font-weight:900;color:#ffd39b;box-shadow:0 8px 18px rgba(0,0,0,.16);}
+.mm-flow-head{font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;color:#f8fafc;line-height:1.05;}
+.mm-flow-copy{margin-top:4px;font-size:12px;color:#9fb1c8;line-height:1.55;}
+.mm-inline-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.mm-inline-primary,.mm-inline-secondary,.mm-inline-danger{border-radius:9px;padding:10px 13px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background .15s ease;color .15s ease;}
+.mm-inline-primary{background:linear-gradient(180deg,#ffbd70 0%,#ffa447 40%,#f28721 72%,#db6e14 100%);border:1px solid rgba(255,214,163,.4);color:#2f1908;box-shadow:inset 0 2px 0 rgba(255,240,217,.95),0 10px 18px rgba(0,0,0,.18);}
+.mm-inline-secondary{background:linear-gradient(180deg,#586173,#363e4e);border:1px solid rgba(255,255,255,.12);color:#eef4fc;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px rgba(0,0,0,.16);}
+.mm-inline-danger{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.32);color:#fca5a5;}
+.mm-inline-primary:hover,.mm-inline-secondary:hover,.mm-inline-danger:hover{transform:translateY(-1px);}
+.wr-shell{display:grid;gap:14px;}
+.wr-hero{padding:20px 20px 18px;}
+.wr-hero-title{font-family:var(--fd);font-size:34px;font-weight:900;line-height:.92;text-transform:uppercase;letter-spacing:.4px;color:#f8fafc;}
+.wr-hero-title .accent{color:#f4a34d;}
+.wr-hero-sub{margin-top:8px;font-size:13px;line-height:1.7;color:#c7d3e4;max-width:760px;}
+.wr-top-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:14px;align-items:start;}
+.wr-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.wr-panel-title{font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;color:#f8fafc;line-height:1;}
+.wr-panel-copy{margin-top:5px;font-size:12px;color:#9fb1c8;line-height:1.6;max-width:520px;}
+.wr-panel-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(10,17,28,.58);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#dbe6f5;}
+.wr-panel-pill.accent{border-color:rgba(247,164,87,.38);color:#ffd6a2;background:rgba(56,33,18,.5);}
+.wr-pill-row{display:flex;flex-wrap:wrap;gap:8px;}
+.wr-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px;}
+.wr-info-stat{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;background:linear-gradient(180deg,rgba(17,28,44,.84),rgba(11,17,28,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.wr-info-stat-value{font-family:var(--fd);font-size:22px;font-weight:900;color:#f8fafc;line-height:1;}
+.wr-info-stat-label{margin-top:6px;font-size:11px;color:#8fa0b8;text-transform:uppercase;letter-spacing:.65px;}
+.wr-guidance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;}
+.wr-guidance-card{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.wr-guidance-kicker{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#9fb1c8;}
+.wr-guidance-title{margin-top:6px;font-family:var(--fd);font-size:15px;font-weight:900;text-transform:uppercase;color:#f8fafc;line-height:1.05;}
+.wr-guidance-copy{margin-top:6px;font-size:12px;color:#9fb1c8;line-height:1.55;}
+.wr-order-shell{display:flex;flex-direction:column;gap:14px;}
+.wr-chat-card{min-height:340px;}
+.wr-chat-card #wrChat{min-height:170px;max-height:280px;}
 .lobby-card-top{display:flex;align-items:center;justify-content:space-between;}
 .lobby-name{font-family:var(--fd);font-size:16px;font-weight:800;}
 .lobby-status{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:20px;}
@@ -143,15 +199,34 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .lobby-status.locked{background:rgba(245,158,11,.15);color:#fbbf24;}
 .lobby-tags{display:flex;flex-wrap:wrap;gap:5px;}
 .lobby-tag{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--text2);font-family:var(--fd);font-weight:700;text-transform:uppercase;}
+.lobby-tag.open{border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.12);color:#86efac;}
+.lobby-tag.ready{border-color:rgba(96,165,250,.28);background:rgba(30,64,175,.18);color:#bfdbfe;}
+.lobby-tag.soon{border-color:rgba(245,158,11,.28);background:rgba(120,88,14,.2);color:#fde68a;}
+.lobby-tag.spots{border-color:rgba(249,115,22,.28);background:rgba(124,45,18,.2);color:#fdba74;}
+.lobby-tag.info{color:#dbe6f5;}
 .lobby-av{width:24px;height:24px;border-radius:50%;border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:9px;font-weight:800;color:#fff;margin-left:-4px;}
 .lobby-av:first-child{margin-left:0;}
 .lobby-slots{font-size:11px;color:var(--text2);margin-left:8px;}
-.wr-player{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:6px;}
+.lobby-subline{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.55;}
+.lobby-meta-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;}
+.lobby-availability{display:flex;align-items:center;min-width:0;}
+.lobby-state-note{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.lobby-action-row{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;}
+.lobby-action-row .btn-p,
+.lobby-action-row .btn-s,
+.lobby-action-row .btn-danger{margin:0;min-width:120px;justify-content:center;}
+.wr-player{display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(20,31,48,.84),rgba(11,17,28,.98));border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
 .wr-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
-.wr-slot{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:9px 12px;margin-bottom:6px;opacity:.45;}
+.wr-slot{display:flex;align-items:center;gap:10px;background:rgba(12,18,29,.5);border:1px dashed rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;margin-bottom:8px;opacity:.58;}
 .wr-slot-av{width:34px;height:34px;border-radius:50%;background:var(--bg2);border:1px dashed var(--border);flex-shrink:0;}
-.ready-btn{background:var(--green);border:none;border-radius:11px;padding:15px;font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;width:100%;}
+.ready-btn{background:var(--green);border:none;border-radius:12px;padding:15px;font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;cursor:pointer;width:100%;box-shadow:inset 0 2px 0 rgba(232,255,241,.96),inset 0 -4px 10px rgba(10,105,49,.28),0 14px 22px rgba(0,0,0,.22);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;}
+.ready-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:inset 0 2px 0 rgba(232,255,241,.98),inset 0 -4px 10px rgba(10,105,49,.32),0 18px 24px rgba(0,0,0,.24);filter:saturate(1.03);}
 .ready-btn.is-ready{background:var(--text3);}
+.wr-action-stack{display:flex;flex-direction:column;gap:10px;}
+.wr-action-note{margin-top:10px;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));font-size:12px;color:#aab7c9;line-height:1.6;}
+.wr-action-note strong{color:#f8fafc;}
+.wr-action-note.host{border-color:rgba(249,115,22,.22);}
+.wr-countdown-note{margin-top:12px;font-size:12px;color:#9fb1c8;line-height:1.55;}
 .ready-btn.draft-room-open-flash{animation:mmDraftRoomOpenFlash .9s ease-out 1;}
 @keyframes mmDraftRoomOpenFlash{
   0%{transform:scale(1);box-shadow:0 0 0 rgba(34,197,94,0);}
@@ -232,6 +307,10 @@ body.mm-create-shimmer-ready .schedule-action::after{
   .inline-pos-grid{grid-template-columns:1fr;}
   .scoregrid{grid-template-columns:1fr;}
   .schedule-top-row{grid-template-columns:1fr;}
+  .mm-grid-2{grid-template-columns:1fr;}
+  .wr-top-grid{grid-template-columns:1fr;}
+  .wr-info-grid{grid-template-columns:1fr;}
+  .wr-guidance-grid{grid-template-columns:1fr;}
 }
 @media (max-width: 640px){
   .rules-left{grid-template-columns:1fr;}
@@ -276,30 +355,52 @@ body.mm-create-shimmer-ready .schedule-action::after{
     <div id="wrCode" style="margin-left:auto;font-family:var(--fd);font-size:13px;font-weight:800;color:var(--accent);"></div>
   </div>
   <div class="sb">
-    <div class="card" id="wrInfo"></div>
-    <div>
-      <div class="sl">Players</div>
-      <div id="wrPlayers"></div>
-    </div>
-    <div id="wrReadySection">
-      <button class="ready-btn" id="wrReadyBtn" onclick="mmToggleReady()">Ready Up</button>
-      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3);" id="wrReadyCount"></div>
-      <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="margin-top:10px;display:none;">Start Solo Test</button>
-      <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>
-    </div>
-    <div id="wrCountdown" style="display:none;text-align:center;padding:10px 0;">
-      <div style="font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Draft starts in</div>
-      <div class="countdown-ring">
-        <svg width="100" height="100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--border)" stroke-width="6"/><circle id="cdCircle" cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="6" stroke-dasharray="276" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear;"/></svg>
-        <div class="countdown-num" id="cdNum">5</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ct">Lobby Chat</div>
-      <div id="wrChat" style="min-height:110px;max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;padding-right:2px;"></div>
-      <div style="display:flex;gap:6px;">
-        <input type="text" class="input" id="wrChatInput" placeholder="Say something..." onkeydown="if(event.key==='Enter')mmSendLobbyChat()" style="flex:1;">
-        <button onclick="mmSendLobbyChat()" style="background:var(--accent);border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:16px;cursor:pointer;">Send</button>
+    <div class="wr-shell">
+      <div class="card mm-hero wr-hero" id="wrHero"></div>
+      <div class="wr-top-grid">
+        <div class="mm-stack">
+          <div class="card" id="wrInfo"></div>
+          <div id="wrOrderMount" class="wr-order-shell"></div>
+          <div class="card">
+            <div class="wr-panel-head">
+              <div>
+                <div class="ct">Managers</div>
+                <div class="wr-panel-title">Room Lineup</div>
+                <div class="wr-panel-copy">Track who is in, who is ready, and who still needs to arrive before the board opens.</div>
+              </div>
+              <div class="wr-panel-pill" id="wrReadyCount">0/0 ready</div>
+            </div>
+            <div id="wrPlayers"></div>
+          </div>
+        </div>
+        <div class="mm-stack">
+          <div class="card" id="wrReadySection">
+            <button class="ready-btn" id="wrReadyBtn" onclick="mmToggleReady()">Ready Up</button>
+            <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="margin-top:10px;display:none;">Start Solo Test</button>
+            <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>
+          </div>
+          <div class="card" id="wrCountdown" style="display:none;text-align:center;padding:14px 10px;">
+            <div style="font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Draft starts in</div>
+            <div class="countdown-ring">
+              <svg width="100" height="100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--border)" stroke-width="6"/><circle id="cdCircle" cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="6" stroke-dasharray="276" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear;"/></svg>
+              <div class="countdown-num" id="cdNum">5</div>
+            </div>
+          </div>
+          <div class="card wr-chat-card">
+            <div class="wr-panel-head">
+              <div>
+                <div class="ct">Lobby Chat</div>
+                <div class="wr-panel-title">Pre-Draft Chat</div>
+                <div class="wr-panel-copy">Handle invite questions, last-minute swaps, and keep the room warm before the draft board unlocks.</div>
+              </div>
+            </div>
+            <div id="wrChat" style="overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;padding-right:2px;"></div>
+            <div style="display:flex;gap:6px;">
+              <input type="text" class="input" id="wrChatInput" placeholder="Message the room..." onkeydown="if(event.key==='Enter')mmSendLobbyChat()" style="flex:1;">
+              <button onclick="mmSendLobbyChat()" style="background:var(--accent);border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:16px;cursor:pointer;">Send</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -494,6 +595,18 @@ function mmTab(tab, btn){
   document.querySelectorAll('.mm-tab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   ({live:renderLive, browse:renderBrowse, create:renderCreate, private:renderPrivate})[tab]?.();
+}
+function mmSportName(){
+  return ({nba:'Basketball',nfl:'Football',mlb:'Baseball'})[normalizeRosterbateSport(MM_SPORT)] || 'Fantasy';
+}
+function mmHeroCard(title, subtitle, pills=[]){
+  return `
+    <div class="card mm-hero">
+      <div class="mm-hero-title">${title}</div>
+      <div class="mm-hero-sub">${subtitle}</div>
+      ${pills.length ? `<div class="mm-hero-pills">${pills.map(p=>`<span class="mm-hero-pill${p.accent?' accent':''}">${p.label}</span>`).join('')}</div>` : ''}
+    </div>
+  `;
 }
 function globalChatShell(){
   return `
@@ -783,6 +896,36 @@ function formatCountdown(ms){
   if(hrs>0) return hrs+'h '+String(mins).padStart(2,'0')+'m';
   const secs=total%60;
   return mins+'m '+String(secs).padStart(2,'0')+'s';
+}
+
+function getLobbyUrgencyPills(lobby){
+  const items=[];
+  const count=teamCount(lobby);
+  const size=Math.max(0, Number(lobby?.teamSize||0));
+  const open=Math.max(0, size-count);
+  const readyCount=Object.values(lobby?.players||{}).filter(player=>!!player?.ready).length;
+  const scheduledStart=Number(lobby?.scheduledStartAt||0);
+  const now=Date.now();
+
+  if(canOpenDraftRoom(lobby) || String(lobby?.status||'')==='started'){
+    items.push({ text:'Draft Open', tone:'open' });
+  } else if(isScheduledLobby(lobby) && scheduledStart > now){
+    if(scheduledStart - now <= 12*60*60*1000){
+      items.push({ text:'Starts Tonight', tone:'soon' });
+    } else {
+      items.push({ text:'Scheduled', tone:'soon' });
+    }
+  } else if(open > 0){
+    items.push({ text:`${open} Spot${open!==1?'s':''} Left`, tone:'spots' });
+  }
+
+  if(count > 0 && readyCount > 0 && !canOpenDraftRoom(lobby)){
+    items.push({ text:`${readyCount}/${count} Ready`, tone:'ready' });
+  }
+
+  items.push({ text:formatLabel(lobby?.format), tone:'info' });
+  items.push({ text:scoringLabel(lobby?.scoring), tone:'info' });
+  return items.slice(0,4);
 }
 
 function toDatetimeLocalValue(ts){
@@ -1581,13 +1724,24 @@ async function startSearch(){
 // Ã¢â€â‚¬Ã¢â€â‚¬ LIVE DRAFTS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 function renderLive(){
   document.getElementById('mmTabContent').innerHTML=`
-    <div style="text-align:center;padding:4px 0 8px;">
-      <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;">Live Drafts</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:4px;">See active ${String(MM_SPORT||'').toUpperCase()} draft rooms and jump back into the ones you joined</div>
-    </div>
-    <div id="liveDraftList"><div class="empty"><div class="empty-icon">??</div><div class="empty-title">Loading...</div></div></div>
-    <button class="btn-s" onclick="loadLiveDrafts()">Refresh</button>
-    ${globalChatShell()}`;
+    ${mmHeroCard(`Live <span class="accent">${mmSportName()}</span> Drafts`,'Step back into rooms you already joined, catch scheduled leagues as they unlock, and reopen draft rooms without digging through old links.',[
+      {label:'Resume Joined Lobbies',accent:true},
+      {label:'Scheduled Unlock Tracking'},
+      {label:'Fast Re-entry'}
+    ])}
+    <div class="mm-grid-2">
+      <div class="mm-stack">
+        <div class="card mm-meta-card">
+          <div class="mm-meta-title">Active Rooms</div>
+          <div class="mm-meta-copy">Every live or upcoming room you belong to shows here, with draft-room timing and quick re-entry.</div>
+        </div>
+        <div id="liveDraftList"><div class="empty"><div class="mm-empty-icon">LD</div><div class="empty-title">Loading...</div></div></div>
+        <button class="btn-s" onclick="loadLiveDrafts()">Refresh Live Drafts</button>
+      </div>
+      <div class="mm-stack">
+        ${globalChatShell()}
+      </div>
+    </div>`;
   loadLiveDrafts();
   attachGlobalChat();
 }
@@ -1632,20 +1786,23 @@ async function loadLiveDrafts(){
         : (lobby.status==='draft_room_open' && Number(lobby.scheduledStartAt||0)>Date.now()
             ? `Draft starts ${formatDraftDateTime(lobby.scheduledStartAt)}`
             : (isJoined ? `You joined ${joined}` : `${teamCount(lobby)}/${lobby.teamSize} teams in room`));
+      const urgencyTags=getLobbyUrgencyPills(lobby).map(tag=>`<span class="lobby-tag ${tag.tone||''}">${tag.text}</span>`).join('');
       return `<div class="lobby-card" style="margin-bottom:8px;">
         <div class="lobby-card-top">
           <div class="lobby-name">${lobby.name||'League'}</div>
           <div class="lobby-status ${statusClass}">${statusLabel}</div>
         </div>
         <div class="lobby-tags">
-          <span class="lobby-tag">${formatLabel(lobby.format)}</span>
-          <span class="lobby-tag">${scoringLabel(lobby.scoring)}</span>
+          ${urgencyTags}
           <span class="lobby-tag">${teamCount(lobby)}/${lobby.teamSize} teams</span>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${subline}</div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button onclick="${isJoined?`resumeLiveDraft('${lobby.id}')`:(canJoinLobbyNow(lobby)?`joinLobby('${lobby.id}')`:`resumeLiveDraft('${lobby.id}')`)}" style="flex:1;background:var(--accent);border:none;border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">${isJoined?(canOpenDraftRoom(lobby)?'Open Draft':'View Lobby'):(canJoinLobbyNow(lobby)?'Join Lobby':'View Lobby')}</button>
-          ${isJoined?`<button onclick="leaveLeague('${lobby.id}', true)" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:7px;padding:10px 12px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:var(--red);cursor:pointer;">Leave</button>`:''}
+        <div class="lobby-subline">${subline}</div>
+        <div class="lobby-meta-row">
+          <div class="lobby-state-note">${isJoined?(canOpenDraftRoom(lobby)?'Your room is open now':'You are staged in this room'):(canJoinLobbyNow(lobby)?'Room is taking managers now':'Room is visible, but entry is locked')}</div>
+          <div class="lobby-action-row">
+            <button class="${isJoined||canJoinLobbyNow(lobby)?'btn-p':'btn-s'}" onclick="${isJoined?`resumeLiveDraft('${lobby.id}')`:(canJoinLobbyNow(lobby)?`joinLobby('${lobby.id}')`:`resumeLiveDraft('${lobby.id}')`)}">${isJoined?(canOpenDraftRoom(lobby)?'Open Draft':'View Lobby'):(canJoinLobbyNow(lobby)?'Join Lobby':'View Lobby')}</button>
+            ${isJoined?`<button class="btn-danger" onclick="leaveLeague('${lobby.id}', true)">Leave</button>`:''}
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -1675,35 +1832,71 @@ async function resumeLiveDraft(lobbyId){
 // â”€â”€ BROWSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderBrowse(){
   document.getElementById('mmTabContent').innerHTML=`
-    <div class="card">
-      <div class="ct">Filter by Format</div>
-      <div class="chips">
-        <div class="chip filter-active" onclick="setBrowseFilter('format',null,this)">Any</div>
-        <div class="chip" onclick="setBrowseFilter('format','snake',this)">Snake</div>
-        <div class="chip" onclick="setBrowseFilter('format','auction',this)">Auction</div>
+    ${mmHeroCard(`Browse <span class="accent">${mmSportName()}</span> Leagues`,'Search the open room board by format and team size, jump into public rooms, or refresh for a cleaner look at what is forming right now.',[
+      {label:'Open Rooms'},
+      {label:'Format Filters'},
+      {label:'Join Fast',accent:true}
+    ])}
+    <div class="mm-grid-2">
+      <div class="mm-stack">
+        <div class="card">
+          <div class="mm-section-label">Filter The Board</div>
+          <div class="ct">Filter by Format</div>
+          <div class="chips">
+            <div class="chip filter-active" onclick="setBrowseFilter('format',null,this)">Any</div>
+            <div class="chip" onclick="setBrowseFilter('format','snake',this)">Snake</div>
+            <div class="chip" onclick="setBrowseFilter('format','auction',this)">Auction</div>
+          </div>
+          <div class="ct" style="margin-top:10px;">Filter by Size</div>
+          <div class="chips">
+            <div class="chip filter-active" onclick="setBrowseFilter('teamSize',null,this)">Any</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',2,this)">2</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',3,this)">3</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',4,this)">4</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',5,this)">5</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',6,this)">6</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',7,this)">7</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',8,this)">8</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',9,this)">9</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',10,this)">10</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',11,this)">11</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',12,this)">12</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',13,this)">13</div>
+            <div class="chip" onclick="setBrowseFilter('teamSize',14,this)">14</div>
+          </div>
+        </div>
+        <div class="card mm-meta-card">
+          <div class="mm-meta-title">Open Leagues</div>
+          <div class="mm-meta-copy">Public rooms stay here until they fill, lock for a scheduled start, or go stale.</div>
+        </div>
+        <div class="card mm-meta-card">
+          <div class="mm-meta-title">Featured Ways To Play</div>
+          <div class="mm-meta-copy">Keep the shelf tight: draft rooms, private-code lobbies, and mock-draft reps are the three clearest entry points on this screen.</div>
+          <div class="mm-flow-list">
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">1</div>
+              <div><div class="mm-flow-head">Join Open Rooms</div><div class="mm-flow-copy">Use the board below when you want live availability, spots-left urgency, and quick public entry.</div></div>
+            </div>
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">2</div>
+              <div><div class="mm-flow-head">Use A League Code</div><div class="mm-flow-copy">Jump to the private tab when a commissioner already shared the room and you just need the fastest possible entry.</div></div>
+            </div>
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">3</div>
+              <div><div class="mm-flow-head">Run Draft Reps</div><div class="mm-flow-copy">Open a demo draft in the single-player board if you want to test format, timing, and the flow before your real room opens.</div></div>
+            </div>
+          </div>
+          <div class="mm-inline-actions">
+            <a class="mm-inline-secondary" href="rosterbate-draft.html?sport=${MM_SPORT}" style="text-decoration:none;">Try A Demo Draft</a>
+          </div>
+        </div>
+        <div id="browseList"><div class="empty"><div class="mm-empty-icon">BR</div><div class="empty-title">Loading...</div></div></div>
+        <button class="btn-s" onclick="loadBrowse()">Refresh Open Leagues</button>
       </div>
-      <div class="ct" style="margin-top:10px;">Filter by Size</div>
-      <div class="chips">
-        <div class="chip filter-active" onclick="setBrowseFilter('teamSize',null,this)">Any</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',2,this)">2</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',3,this)">3</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',4,this)">4</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',5,this)">5</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',6,this)">6</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',7,this)">7</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',8,this)">8</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',9,this)">9</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',10,this)">10</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',11,this)">11</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',12,this)">12</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',13,this)">13</div>
-        <div class="chip" onclick="setBrowseFilter('teamSize',14,this)">14</div>
+      <div class="mm-stack">
+        ${globalChatShell()}
       </div>
-    </div>
-    <div class="sl" style="margin-top:4px;">Open Leagues</div>
-    <div id="browseList"><div class="empty"><div class="empty-icon">??</div><div class="empty-title">Loading...</div></div></div>
-    <button class="btn-s" onclick="loadBrowse()">Refresh</button>
-    ${globalChatShell()}`;
+    </div>`;
   loadBrowse();
   attachGlobalChat();
 }
@@ -1769,22 +1962,24 @@ async function loadBrowse(){
       const metaLine=scheduled
         ? `Starts ${formatDraftDateTime(l.scheduledStartAt)} · Draft room opens ${formatDraftDateTime(l.draftAccessAt)}`
         : `${count}/${l.teamSize} joined`;
+      const urgencyTags=getLobbyUrgencyPills(l).map(tag=>`<span class="lobby-tag ${tag.tone||''}">${tag.text}</span>`).join('');
       return `<div class="lobby-card" style="margin-bottom:8px;">
         <div class="lobby-card-top">
           <div class="lobby-name">${l.name||'League'}</div>
           <div class="lobby-status ${statusClass}">${statusLabel}</div>
         </div>
         <div class="lobby-tags">
-          <span class="lobby-tag">${fmtLabel}</span>
-          <span class="lobby-tag">${scrLabel}</span>
+          ${urgencyTags}
           <span class="lobby-tag">${l.teamSize} teams</span>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
-          <div style="display:flex;align-items:center;">
+        <div class="lobby-meta-row">
+          <div class="lobby-availability">
             <div style="display:flex;">${avs}</div>
             <span class="lobby-slots" style="margin-left:${players.length?8:0}px;">${metaLine}</span>
           </div>
-          ${canJoinLobbyNow(l)?`<button onclick="joinLobby('${l.id}')" style="background:var(--accent);border:none;border-radius:7px;padding:7px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;">Join</button>`:`<span style="font-size:11px;color:var(--text3);">${full?'Full':(locked?'Locked':'Unavailable')}</span>`}
+          <div class="lobby-action-row">
+            ${canJoinLobbyNow(l)?`<button class="btn-p" onclick="joinLobby('${l.id}')">Join Room</button>`:`<span class="lobby-state-note">${full?'Room Full':(locked?'Join Locked':'Unavailable')}</span>`}
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -1805,100 +2000,132 @@ function getLeagueNamePlaceholder(){
 // â”€â”€ CREATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderCreate(){
   document.getElementById('mmTabContent').innerHTML=`
-    <div class="card">
-      <div class="ct">Your Team Name</div>
-      <input type="text" class="input" id="cName" placeholder="Your team name..." value="${myName}" oninput="myName=this.value;localStorage.setItem('rbPlayerName',this.value)">
-    </div>
-    <div class="card">
-      <div class="ct">League Name</div>
-      <input type="text" class="input" id="cLeague" placeholder="${getLeagueNamePlaceholder()}">
-    </div>
-    <div class="card">
-      <div class="ct">Draft Format</div>
-      <div class="format-row">
-        <div class="chips">
-          <div class="chip ${createOpts.format==='snake'?'on':''}" onclick="setCreate('format','snake',this)">Snake</div>
-          <div class="chip ${createOpts.format==='auction'?'on':''}" onclick="setCreate('format','auction',this)">Auction</div>
+    ${mmHeroCard(`Create A <span class="accent">${mmSportName()}</span> League`,'Build a room with the same premium feel as the homepage: set your draft format, scoring system, timing, and league rules, then drop straight into the waiting room with a polished invite flow.',[
+      {label:'Public Or Private'},
+      {label:'Scheduled Drafts',accent:true},
+      {label:'Moneyball Ready'}
+    ])}
+    <div class="mm-grid-2">
+      <div class="mm-stack">
+        <div class="card">
+          <div class="mm-section-label">League Setup</div>
+          <div class="ct">Your Team Name</div>
+          <input type="text" class="input" id="cName" placeholder="Your team name..." value="${myName}" oninput="myName=this.value;localStorage.setItem('rbPlayerName',this.value)">
+          <div class="ct" style="margin-top:10px;">League Name</div>
+          <input type="text" class="input" id="cLeague" placeholder="${getLeagueNamePlaceholder()}">
         </div>
-        <div class="auction-budget-wrap" id="auctionBudgetWrap" style="${createOpts.format==='auction'?'display:inline-flex;':''}">
-          <span class="auction-budget-label">Budget</span>
-          <input type="number" class="input auction-budget-input" id="auctionBudgetInput" min="1" step="1" value="${Math.max(1, Number(createOpts.auctionBudget||200))}" oninput="setCreateBudget(this.value)">
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ct">Scoring Format</div>
-      <div class="chips" id="mmCreateScoring">
-        <div class="chip on" onclick="setCreate('scoring','h2h_pts',this)">H2H Pts</div>
-        <div class="chip" onclick="setCreate('scoring','h2h_cat',this)">H2H Cat</div>
-        <div class="chip" onclick="setCreate('scoring','roto',this)">Roto</div>
-        <div class="chip" onclick="setCreate('scoring','points',this)">Points Only</div>
-        <div class="chip moneyball" onclick="setCreate('scoring','moneyball_pts',this)">Moneyball H2H Pts</div>
-        <div class="chip moneyball" onclick="setCreate('scoring','moneyball_cat',this)">Moneyball Cat</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ct">League Size</div>
-      <div class="chips">
-        ${buildTeamSizeChips(createOpts.teamSize,'setCreateTeamSize',true)}
-      </div>
-    </div>
-    <div class="card">
-      <div class="ct">Visibility</div>
-      <div class="chips">
-        <div class="chip on" onclick="setCreate('isPrivate',false,this)">Public</div>
-        <div class="chip" onclick="setCreate('isPrivate',true,this)">Private</div>
-      </div>
-    </div>
-    <div class="card">
-      <div id="mmScheduleWrap">
-        <div class="schedule-top-row">
-          <div class="schedule-timing-wrap">
-            <div class="ct">Draft Timing</div>
-            <div class="schedule-locked">Schedule Draft</div>
-          </div>
-          <div class="schedule-date-wrap">
-            <div class="ct">Draft Date</div>
-            <input type="date" class="input" id="cStartDate" value="${toDateInputValue(createOpts.scheduledStartAt)}" min="${getMinimumScheduleDateValue()}" onchange="syncScheduledTimeInputs()">
-          </div>
-          <div class="schedule-time-wrap">
-            <div class="ct">Draft Time</div>
-            <div class="schedule-time-grid">
-              <div class="schedule-picker">
-                <select class="input" id="cStartHour" onchange="syncScheduledTimeInputs()">
-                  ${buildScheduleSelectOptions([1,2,3,4,5,6,7,8,9,10,11,12], toScheduleHourValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
-                </select>
-                <div class="sl">Hour</div>
-              </div>
-              <div class="schedule-picker">
-                <select class="input" id="cStartMinute" onchange="syncScheduledTimeInputs()">
-                  ${buildScheduleSelectOptions(['00','15','30','45'], toScheduleMinuteValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
-                </select>
-                <div class="sl">Minute</div>
-              </div>
-              <div class="schedule-picker">
-                <select class="input" id="cStartMeridiem" onchange="syncScheduledTimeInputs()">
-                  ${buildScheduleSelectOptions(['AM','PM'], toScheduleMeridiemValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
-                </select>
-                <div class="sl">AM / PM</div>
-              </div>
+        <div class="card">
+          <div class="ct">Draft Format</div>
+          <div class="format-row">
+            <div class="chips">
+              <div class="chip ${createOpts.format==='snake'?'on':''}" onclick="setCreate('format','snake',this)">Snake</div>
+              <div class="chip ${createOpts.format==='auction'?'on':''}" onclick="setCreate('format','auction',this)">Auction</div>
+            </div>
+            <div class="auction-budget-wrap" id="auctionBudgetWrap" style="${createOpts.format==='auction'?'display:inline-flex;':''}">
+              <span class="auction-budget-label">Budget</span>
+              <input type="number" class="input auction-budget-input" id="auctionBudgetInput" min="1" step="1" value="${Math.max(1, Number(createOpts.auctionBudget||200))}" oninput="setCreateBudget(this.value)">
             </div>
           </div>
+          <div class="ct" style="margin-top:12px;">Scoring Format</div>
+          <div class="chips" id="mmCreateScoring">
+            <div class="chip on" onclick="setCreate('scoring','h2h_pts',this)">H2H Pts</div>
+            <div class="chip" onclick="setCreate('scoring','h2h_cat',this)">H2H Cat</div>
+            <div class="chip" onclick="setCreate('scoring','roto',this)">Roto</div>
+            <div class="chip" onclick="setCreate('scoring','points',this)">Points Only</div>
+            <div class="chip moneyball" onclick="setCreate('scoring','moneyball_pts',this)">Moneyball H2H Pts</div>
+            <div class="chip moneyball" onclick="setCreate('scoring','moneyball_cat',this)">Moneyball Cat</div>
+          </div>
         </div>
-        <button class="btn-p schedule-action" id="createBtn" onclick="doCreate()">Create League</button>
-        <div class="schedule-helper">Managers can enter the draft room 5 minutes before the scheduled start. Draft order randomization also happens at that unlock time.</div>
+        <div class="card">
+          <div class="ct">League Size</div>
+          <div class="chips">
+            ${buildTeamSizeChips(createOpts.teamSize,'setCreateTeamSize',true)}
+          </div>
+          <div class="ct" style="margin-top:12px;">Visibility</div>
+          <div class="chips">
+            <div class="chip on" onclick="setCreate('isPrivate',false,this)">Public</div>
+            <div class="chip" onclick="setCreate('isPrivate',true,this)">Private</div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="mmScheduleWrap">
+            <div class="mm-section-label">Draft Schedule</div>
+            <div class="schedule-top-row">
+              <div class="schedule-timing-wrap">
+                <div class="ct">Draft Timing</div>
+                <div class="schedule-locked">Schedule Draft</div>
+              </div>
+              <div class="schedule-date-wrap">
+                <div class="ct">Draft Date</div>
+                <input type="date" class="input" id="cStartDate" value="${toDateInputValue(createOpts.scheduledStartAt)}" min="${getMinimumScheduleDateValue()}" onchange="syncScheduledTimeInputs()">
+              </div>
+              <div class="schedule-time-wrap">
+                <div class="ct">Draft Time</div>
+                <div class="schedule-time-grid">
+                  <div class="schedule-picker">
+                    <select class="input" id="cStartHour" onchange="syncScheduledTimeInputs()">
+                      ${buildScheduleSelectOptions([1,2,3,4,5,6,7,8,9,10,11,12], toScheduleHourValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
+                    </select>
+                    <div class="sl">Hour</div>
+                  </div>
+                  <div class="schedule-picker">
+                    <select class="input" id="cStartMinute" onchange="syncScheduledTimeInputs()">
+                      ${buildScheduleSelectOptions(['00','15','30','45'], toScheduleMinuteValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
+                    </select>
+                    <div class="sl">Minute</div>
+                  </div>
+                  <div class="schedule-picker">
+                    <select class="input" id="cStartMeridiem" onchange="syncScheduledTimeInputs()">
+                      ${buildScheduleSelectOptions(['AM','PM'], toScheduleMeridiemValue(createOpts.scheduledStartAt||getMinimumScheduledStartRounded()), value=>value)}
+                    </select>
+                    <div class="sl">AM / PM</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-p schedule-action" id="createBtn" onclick="doCreate()">Create League</button>
+            <div class="schedule-helper">Managers can enter the draft room 5 minutes before the scheduled start. Draft order randomization also happens at that unlock time.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct">Draft Order</div>
+          <div class="chips">
+            <div class="chip ${createOpts.draftOrderMode==='random_30m'?'on':''}" onclick="setCreate('draftOrderMode','random_30m',this)">Randomize 5 Min Before</div>
+            <div class="chip ${createOpts.draftOrderMode==='manual'?'on':''}" onclick="setCreate('draftOrderMode','manual',this)">Set In Waiting Room</div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.55;">Manual order is set by the host from the waiting room once teams join. Random order locks in 5 minutes before scheduled start.</div>
+        </div>
+        ${renderCreateRulesSection()}
       </div>
-    </div>
-    <div class="card">
-      <div class="ct">Draft Order</div>
-      <div class="chips">
-        <div class="chip ${createOpts.draftOrderMode==='random_30m'?'on':''}" onclick="setCreate('draftOrderMode','random_30m',this)">Randomize 5 Min Before</div>
-        <div class="chip ${createOpts.draftOrderMode==='manual'?'on':''}" onclick="setCreate('draftOrderMode','manual',this)">Set In Waiting Room</div>
+      <div class="mm-stack">
+        <div class="card mm-meta-card">
+          <div class="mm-meta-title">What Happens Next</div>
+          <div class="mm-meta-copy">Create the room, invite friends or leave it public, then control draft order and readiness from the waiting room before the board opens.</div>
+          <div class="mm-flow-list">
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">1</div>
+              <div><div class="mm-flow-head">Build The Room</div><div class="mm-flow-copy">Lock in format, scoring, timing, and roster rules so everyone joins the same draft experience.</div></div>
+            </div>
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">2</div>
+              <div><div class="mm-flow-head">Fill The Waiting Room</div><div class="mm-flow-copy">Share the code or leave it public, then manage readiness and draft order from the control-room view.</div></div>
+            </div>
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">3</div>
+              <div><div class="mm-flow-head">Open The Board</div><div class="mm-flow-copy">Once the room is ready, everyone jumps directly into the live draft without needing a second link.</div></div>
+            </div>
+          </div>
+          <div class="mm-action-row">
+            <span class="mm-hero-pill accent">Waiting Room Host Tools</span>
+            <span class="mm-hero-pill">Private League Codes</span>
+          </div>
+          <div class="mm-inline-actions">
+            <a class="mm-inline-secondary" href="rosterbate-draft.html?sport=${MM_SPORT}" style="text-decoration:none;">Try A Demo Draft</a>
+          </div>
+        </div>
+        ${globalChatShell()}
       </div>
-      <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.55;">Manual order is set by the host from the waiting room once teams join. Random order locks in 5 minutes before scheduled start.</div>
-    </div>
-    ${renderCreateRulesSection()}
-    ${globalChatShell()}`;
+    </div>`;
   syncCreateRules();
   updateCreatePositionSummary();
   hydrateStepperInputs(document.getElementById('mmTabContent'));
@@ -1979,20 +2206,42 @@ async function doCreate(){
 // â”€â”€ PRIVATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderPrivate(){
   document.getElementById('mmTabContent').innerHTML=`
-    <div style="text-align:center;padding:8px 0;">
-      <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;margin-bottom:4px;">League Code</div>
-      <div style="font-size:12px;color:var(--text3);">Join an existing league with a code from your friend</div>
-    </div>
-    <div class="card">
-      <div class="ct">Your Team Name</div>
-      <input type="text" class="input" id="pvName" value="${myName}" oninput="myName=this.value;localStorage.setItem('rbPlayerName',this.value)">
-    </div>
-    <div class="card">
-      <div class="ct">League Code</div>
-      <input type="text" class="input" id="pvCode" placeholder="Enter code..." maxlength="8" style="text-transform:uppercase;letter-spacing:4px;font-family:var(--fd);font-size:20px;font-weight:800;text-align:center;">
-    </div>
-    <button class="btn-p" onclick="doJoinPrivate()">Join League</button>
-    ${globalChatShell()}`;
+    ${mmHeroCard('Join By <span class="accent">League Code</span>','Drop into a private room with the exact code your commissioner shared. This is the fast lane for friend groups that already know where they are playing.',[
+      {label:'Private Rooms',accent:true},
+      {label:'Code Based Entry'}
+    ])}
+    <div class="mm-grid-2">
+      <div class="mm-stack">
+        <div class="card">
+          <div class="ct">Your Team Name</div>
+          <input type="text" class="input" id="pvName" value="${myName}" oninput="myName=this.value;localStorage.setItem('rbPlayerName',this.value)">
+          <div class="ct" style="margin-top:10px;">League Code</div>
+          <input type="text" class="input" id="pvCode" placeholder="Enter code..." maxlength="8" style="text-transform:uppercase;letter-spacing:4px;font-family:var(--fd);font-size:20px;font-weight:800;text-align:center;">
+          <button class="btn-p" style="margin-top:14px;" onclick="doJoinPrivate()">Join League</button>
+        </div>
+        <div class="card mm-meta-card">
+          <div class="mm-meta-title">Private League Flow</div>
+          <div class="mm-meta-copy">Private codes should feel like a fast lane, not a dead end. Here is exactly what happens after you enter the room code.</div>
+          <div class="mm-flow-list">
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">1</div>
+              <div><div class="mm-flow-head">Enter The Code</div><div class="mm-flow-copy">Use the exact room code from your commissioner and lock in the team name you want everyone else to see.</div></div>
+            </div>
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">2</div>
+              <div><div class="mm-flow-head">Land In The Right State</div><div class="mm-flow-copy">If the room is still filling, you drop into the waiting room. If the host already opened the board, you jump into the live lobby view instead.</div></div>
+            </div>
+            <div class="mm-flow-item">
+              <div class="mm-flow-step">3</div>
+              <div><div class="mm-flow-head">Confirm And Draft</div><div class="mm-flow-copy">Check the order board, ready up if needed, and use chat for any final coordination before the live draft opens.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mm-stack">
+        ${globalChatShell()}
+      </div>
+    </div>`;
   attachGlobalChat();
 }
 
@@ -2143,15 +2392,17 @@ function showWaitingRoom(lobbyId){
 function renderWaitingRoom(lobby){
   const titleEl=document.getElementById('wrTitle');
   const codeEl=document.getElementById('wrCode');
+  const heroEl=document.getElementById('wrHero');
   const infoEl=document.getElementById('wrInfo');
   const playersEl=document.getElementById('wrPlayers');
   const readySectionRoot=document.getElementById('wrReadySection');
   const countdownRoot=document.getElementById('wrCountdown');
-  if(!titleEl || !codeEl || !infoEl || !playersEl || !readySectionRoot || !countdownRoot) return;
+  const orderMount=document.getElementById('wrOrderMount');
+  if(!titleEl || !codeEl || !heroEl || !infoEl || !playersEl || !readySectionRoot || !countdownRoot || !orderMount) return;
   const selfPlayerId=syncLocalPlayerIdToLobby(lobby) || String(myId || '').trim();
   const draftAccessAt=computeDraftAccessAt(lobby?.scheduledStartAt||lobby?.draftAccessAt||0);
   titleEl.textContent=lobby.name||'Waiting Room';
-  codeEl.textContent='#'+lobby.code;
+  codeEl.textContent='Code ' + lobby.code;
 
   const fmtLabel={snake:'Snake',auction:'Auction'}[lobby.format]||lobby.format;
   const scrLabel={h2h_pts:'H2H Pts',h2h_cat:'H2H Cat',roto:'Roto',points:'Points Only',moneyball_pts:'Moneyball H2H Pts',moneyball_cat:'Moneyball Cat'}[lobby.scoring]||lobby.scoring;
@@ -2159,20 +2410,60 @@ function renderWaitingRoom(lobby){
   const canOpenRoom=canOpenDraftRoom(lobby);
   const orderIsManual=String(lobby.draftOrderMode||'random_30m')==='manual';
   const orderLocked=Array.isArray(lobby.finalDraftOrder) && lobby.finalDraftOrder.length===Number(lobby.teamSize||0);
+  const players=Object.values(lobby.players||{});
+  const readyCount=players.filter(p=>p.ready).length;
+  const openSpots=Math.max(0, Number(lobby.teamSize||0)-players.length);
+  const roomStatus=scheduled ? (canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby') : (openSpots>0 ? openSpots+' spot'+(openSpots!==1?'s':'')+' open' : 'Room filling now');
+  heroEl.innerHTML=`
+    <div class="wr-hero-title">Pre-Draft <span class="accent">Control Room</span></div>
+    <div class="wr-hero-sub">Keep the room moving, confirm readiness, lock draft order, and open the board at the right moment without leaving the premium matchmaking flow.</div>
+    <div class="wr-pill-row" style="margin-top:14px;">
+      <span class="wr-panel-pill accent">${fmtLabel}</span>
+      <span class="wr-panel-pill">${scrLabel}</span>
+      <span class="wr-panel-pill">${lobby.teamSize} Teams</span>
+      <span class="wr-panel-pill">${readyCount}/${players.length || 0} Ready</span>
+      <span class="wr-panel-pill">${roomStatus}</span>
+    </div>`;
   infoEl.innerHTML=`
-    <div style="display:flex;flex-wrap:wrap;gap:6px;">
-      <span style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--accent);">${fmtLabel}</span>
-      <span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);">${scrLabel}</span>
-      <span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text2);">${lobby.teamSize} Teams</span>
+    <div class="wr-panel-head">
+      <div>
+        <div class="ct">Room Snapshot</div>
+        <div class="wr-panel-title">League Setup</div>
+        <div class="wr-panel-copy">${scheduled?'Everyone can stage here until the scheduled unlock, then the draft room opens automatically.':'As soon as everyone is ready, the countdown starts and the room flips into the draft board.'}</div>
+      </div>
+      ${lobby.isPrivate?`<button onclick="navigator.clipboard&&navigator.clipboard.writeText('${lobby.code}').then(()=>toast('Copied!'))" class="btn-s" style="width:auto;padding:10px 14px;">Copy Code</button>`:`<span class="wr-panel-pill">${lobby.isPrivate?'Private':'Public'} Room</span>`}
     </div>
-    ${scheduled?`<div style="margin-top:10px;font-size:11px;color:var(--text2);line-height:1.6;">
+    <div class="wr-info-grid">
+      <div class="wr-info-stat">
+        <div class="wr-info-stat-value">${players.length}/${lobby.teamSize}</div>
+        <div class="wr-info-stat-label">Managers Joined</div>
+      </div>
+      <div class="wr-info-stat">
+        <div class="wr-info-stat-value">${orderIsManual?'Manual':'Random'}</div>
+        <div class="wr-info-stat-label">Draft Order Mode</div>
+      </div>
+      <div class="wr-info-stat">
+        <div class="wr-info-stat-value">${scheduled?formatDraftDateTime(draftAccessAt):'Now'}</div>
+        <div class="wr-info-stat-label">${scheduled?'Room Unlock':'Draft Access'}</div>
+      </div>
+    </div>
+    <div class="wr-guidance-grid">
+      <div class="wr-guidance-card">
+        <div class="wr-guidance-kicker">What Happens Next</div>
+        <div class="wr-guidance-title">${scheduled?'Stage Then Unlock':'Ready Then Countdown'}</div>
+        <div class="wr-guidance-copy">${scheduled?'Managers can join, chat, and confirm setup here until the draft room unlocks automatically five minutes before the scheduled start.':'As soon as every joined manager is ready, the room flips into a short countdown and then opens the live draft board.'}</div>
+      </div>
+      <div class="wr-guidance-card">
+        <div class="wr-guidance-kicker">${lobby.createdBy===selfPlayerId?'Host Focus':'Your Focus'}</div>
+        <div class="wr-guidance-title">${lobby.createdBy===selfPlayerId?(orderIsManual?'Set The Order':'Keep The Room Moving'):'Stay Ready To Draft'}</div>
+        <div class="wr-guidance-copy">${lobby.createdBy===selfPlayerId?(orderIsManual?'Use the order board below to place every manager, then lock it in before the draft room opens.':'Share the code, watch readiness, and reopen the room the moment the draft board becomes available.'):'Confirm your team name, ready up, and use chat for any last-minute questions before the board opens.'}</div>
+      </div>
+    </div>
+    ${scheduled?`<div style="margin-top:12px;font-size:12px;color:var(--text2);line-height:1.65;">
       <div>Scheduled start: <strong style="color:var(--text);">${formatDraftDateTime(lobby.scheduledStartAt)}</strong></div>
       <div>Draft room opens: <strong style="color:var(--text);">${formatDraftDateTime(draftAccessAt)}</strong></div>
-      <div>Draft order: <strong style="color:var(--text);">${orderIsManual?'Manual (host sets it here)':'Randomize 5 minutes before start'}</strong></div>
-    </div>`:''}
-    ${lobby.isPrivate?`<div style="margin-top:10px;font-size:11px;color:var(--text3);">Share code: <strong style="color:var(--accent);letter-spacing:2px;font-family:var(--fd);font-size:14px;">${lobby.code}</strong> <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${lobby.code}').then(()=>toast('Copied!'))" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text3);font-size:11px;cursor:pointer;">Copy</button></div>`:''}`;
+    </div>`:''}`;
 
-  const players=Object.values(lobby.players||{});
   let ph=players.map(p=>`
     <div class="wr-player">
       <div class="wr-av" style="background:${playerColor(p.id)}">${ini(p.name)}</div>
@@ -2185,7 +2476,6 @@ function renderWaitingRoom(lobby){
   for(let i=players.length;i<lobby.teamSize;i++) ph+=`<div class="wr-slot"><div class="wr-slot-av"></div><div style="font-size:13px;color:var(--text3);">Waiting for player ${i+1}...</div></div>`;
   playersEl.innerHTML=ph;
 
-  const readyCount=players.filter(p=>p.ready).length;
   const readyCountEl=document.getElementById('wrReadyCount');
   if(readyCountEl) readyCountEl.textContent=readyCount+'/'+players.length+' ready';
   const myP=lobby.players?.[selfPlayerId];
@@ -2209,32 +2499,57 @@ function renderWaitingRoom(lobby){
   if(readySection){
     if(!scheduled){
       readySection.innerHTML=`
-        <button class="${myReady?'ready-btn is-ready':'ready-btn'}" id="wrReadyBtn" onclick="mmToggleReady()">${myReady?'Ready!':'Ready Up'}</button>
-        <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3);" id="wrReadyCount">${readyCount}/${players.length} ready</div>
-        <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="margin-top:10px;display:${lobby.createdBy===selfPlayerId && players.length===1?'block':'none'};">Start Solo Test</button>
-        <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
+        <div class="wr-panel-head" style="margin-bottom:10px;">
+          <div>
+            <div class="ct">Ready Check</div>
+            <div class="wr-panel-title">Open The Draft</div>
+            <div class="wr-panel-copy">Every joined manager needs to be ready before the room can start its final countdown.</div>
+          </div>
+          <span class="wr-panel-pill accent" id="wrReadyCount">${readyCount}/${players.length} ready</span>
+        </div>
+        <div class="wr-action-stack">
+          <button class="${myReady?'ready-btn is-ready':'ready-btn'}" id="wrReadyBtn" onclick="mmToggleReady()">${myReady?'Locked In':'Ready Up'}</button>
+          <button class="btn-s" id="wrSoloBtn" onclick="mmStartSoloTest()" style="display:${lobby.createdBy===selfPlayerId && players.length===1?'block':'none'};">Start Solo Test</button>
+          <button class="btn-danger" onclick="mmLeaveWaiting()">Leave League</button>
+        </div>
+        <div class="wr-action-note ${lobby.createdBy===selfPlayerId?'host':''}">
+          <strong>${lobby.createdBy===selfPlayerId?'Host task:' : 'Next step:'}</strong>
+          ${lobby.createdBy===selfPlayerId
+            ? (orderIsManual ? 'Set the final draft order below, then keep everyone ready so the room can flip cleanly into the live board.' : 'Watch the ready count and keep the room full. Once everybody is ready, the draft countdown begins automatically.')
+            : 'Ready up, stay in chat, and wait for the host and room to finish the final countdown.'}
+        </div>`;
     } else {
       readySection.innerHTML=`
         <div class="card" style="padding:12px;margin-bottom:10px;background:rgba(15,23,42,.5);">
           <div id="wrScheduledStatus" style="font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:${canOpenRoom?'var(--green)':'var(--accent)'};">${canOpenRoom?'Draft Room Open':'Scheduled Draft Lobby'}</div>
           <div id="wrScheduledCopy" style="margin-top:6px;font-size:12px;color:var(--text2);line-height:1.55;"></div>
         </div>
-        <button id="wrOpenDraftBtn" class="ready-btn ${canOpenRoom?'draft-room-open-flash':''}" onclick="${canOpenRoom?`resumeLiveDraft('${lobby.id}')`:''}" ${canOpenRoom?'':'disabled'} style="${canOpenRoom?'background:var(--green);':'opacity:.5;cursor:not-allowed;background:var(--text3);'}">${canOpenRoom?'Draft Room Open':'Draft Room Locked'}</button>
-        <button class="btn-danger" onclick="mmLeaveWaiting()" style="margin-top:10px;">Leave League</button>`;
+        <div class="wr-action-stack">
+          <button id="wrOpenDraftBtn" class="ready-btn ${canOpenRoom?'draft-room-open-flash':''}" onclick="${canOpenRoom?`resumeLiveDraft('${lobby.id}')`:''}" ${canOpenRoom?'':'disabled'} style="${canOpenRoom?'background:var(--green);':'opacity:.5;cursor:not-allowed;background:var(--text3);'}">${canOpenRoom?'Enter Draft Room':'Draft Room Locked'}</button>
+          <button class="btn-danger" onclick="mmLeaveWaiting()">Leave League</button>
+        </div>
+        <div class="wr-action-note">
+          <strong>Scheduled flow:</strong> The room stays open for chat and setup until the unlock time. Once the board is open, everyone uses the same button here to jump straight into the live draft.
+        </div>`;
       startScheduledCountdown(lobby);
     }
   }
 
-  const existingOrderCard=document.getElementById('wrOrderCard');
-  if(existingOrderCard) existingOrderCard.remove();
+  orderMount.innerHTML='';
   if(scheduled){
     const orderRows=getCurrentDraftOrder(lobby);
     const card=document.createElement('div');
     card.id='wrOrderCard';
     card.className='card';
     card.innerHTML=`
-      <div class="ct">Draft Order</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">${orderIsManual?'Host can stack managers top to bottom here before the room opens.':'Order will randomize automatically 5 minutes before start.'}</div>
+      <div class="wr-panel-head">
+        <div>
+          <div class="ct">Draft Order</div>
+          <div class="wr-panel-title">Order Board</div>
+          <div class="wr-panel-copy">${orderIsManual?'Host can stack managers top to bottom here before the room opens.':'Order will randomize automatically five minutes before start.'}</div>
+        </div>
+        <span class="wr-panel-pill ${orderIsManual?'accent':''}">${orderLocked?'Locked In':(orderIsManual?'Host Controlled':'Auto Random')}</span>
+      </div>
       ${orderIsManual && orderRows.length<2 ? `<div style="margin-bottom:10px;padding:10px 12px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.18);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5;">A second manager needs to join before there is anything to reorder.</div>`:''}
       <div style="display:flex;flex-direction:column;gap:8px;">${orderRows.map((player,idx)=>`
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
@@ -2253,8 +2568,8 @@ function renderWaitingRoom(lobby){
             </div>
           `:''}
         </div>`).join('')}</div>
-      ${orderIsManual && lobby.createdBy===selfPlayerId && !canOpenRoom?`<button class="btn-p" onclick="finalizeJoinOrder('${lobby.id}')">${orderLocked?'Save Draft Order':'Use Current Order'}</button>`:''}`;
-    document.querySelector('#mmWaiting .sb')?.insertBefore(card, document.getElementById('wrCountdown'));
+      ${orderIsManual && lobby.createdBy===selfPlayerId && !canOpenRoom?`<button class="btn-p" onclick="finalizeJoinOrder('${lobby.id}')">${orderLocked?'Save Draft Order':'Lock Current Order'}</button>`:''}`;
+    orderMount.appendChild(card);
   }
 
   // Render chat

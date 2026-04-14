@@ -308,10 +308,36 @@
     border-color:rgba(239,68,68,.44);
   }
   .promo-card.trade .promo-tag{border-color:rgba(239,68,68,.34);color:#fca5a5;background:rgba(239,68,68,.1);box-shadow:inset 0 1px 0 rgba(252,165,165,.14), 0 4px 12px rgba(0,0,0,.16), 0 0 18px rgba(239,68,68,.08);}
+  .promo-meta-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+  .promo-status-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.56);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#e8eef8;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+  .promo-status-pill.open{border-color:rgba(134,239,172,.34);color:#86efac;background:rgba(22,101,52,.22);}
+  .promo-status-pill.soon{border-color:rgba(253,224,71,.34);color:#fde68a;background:rgba(120,88,14,.22);}
+  .promo-status-pill.alert{border-color:rgba(252,165,165,.34);color:#fecaca;background:rgba(127,29,29,.2);}
   .promo-action{margin-top:0;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,rgba(21,38,28,.96),rgba(14,28,20,.92));border:2px solid rgba(134,239,172,.55);border-radius:999px;padding:10px 18px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#f7fff7;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(134,239,172,.16),0 0 18px rgba(34,197,94,.22),0 8px 20px rgba(0,0,0,.28);align-self:flex-start;}
   .promo-action:hover{transform:translateY(-1px) scale(1.015);filter:brightness(1.06);}
   .promo-card.powerups .promo-action{background:linear-gradient(180deg,rgba(54,43,14,.96),rgba(37,30,10,.92));border-color:rgba(253,224,71,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(253,224,71,.16),0 0 18px rgba(234,179,8,.24),0 8px 20px rgba(0,0,0,.28);}
   .promo-card.trade .promo-action{background:linear-gradient(180deg,rgba(63,24,18,.96),rgba(39,14,10,.92));border-color:rgba(252,165,165,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(252,165,165,.16),0 0 18px rgba(239,68,68,.24),0 8px 20px rgba(0,0,0,.28);}
+  .feature-shelf{max-width:980px;margin:16px auto 0;padding:16px 18px 18px;border-radius:18px;background:linear-gradient(180deg,rgba(17,24,37,.88),rgba(10,15,24,.96));border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 34px rgba(0,0,0,.24);position:relative;overflow:hidden;}
+  .feature-shelf::before{content:'';position:absolute;inset:-1px auto auto 18px;width:180px;height:1px;background:linear-gradient(90deg,rgba(134,239,172,.8),rgba(96,165,250,.35),transparent);}
+  .feature-shelf-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .feature-shelf-title{font-family:var(--fd);font-size:15px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;color:#f8fafc;}
+  .feature-shelf-copy{max-width:560px;font-size:12px;line-height:1.6;color:#aebacf;}
+  .feature-shelf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px;}
+  .feature-shelf-card{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.8),rgba(10,16,26,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:226px;}
+  .feature-shelf-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(255,255,255,.08),transparent 36%);pointer-events:none;opacity:.9;}
+  .feature-shelf-card:nth-child(1){background:linear-gradient(180deg,rgba(14,33,29,.92),rgba(7,18,18,.98));border-color:rgba(134,239,172,.15);}
+  .feature-shelf-card:nth-child(2){background:linear-gradient(180deg,rgba(20,27,42,.92),rgba(11,16,28,.98));border-color:rgba(96,165,250,.14);}
+  .feature-shelf-card:nth-child(3){background:linear-gradient(180deg,rgba(39,31,16,.92),rgba(21,16,8,.98));border-color:rgba(253,224,71,.14);}
+  .feature-shelf-kicker{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#9fb1c8;}
+  .feature-shelf-card-title{margin-top:6px;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;color:#f8fafc;line-height:1;}
+  .feature-shelf-card-copy{margin-top:8px;font-size:12px;line-height:1.55;color:#aebacf;}
+  .feature-shelf-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+  .feature-shelf-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.56);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#e8eef8;}
+  .feature-shelf-pill.open{border-color:rgba(134,239,172,.34);color:#86efac;background:rgba(22,101,52,.22);}
+  .feature-shelf-pill.soon{border-color:rgba(253,224,71,.34);color:#fde68a;background:rgba(120,88,14,.22);}
+  .feature-shelf-pill.info{border-color:rgba(96,165,250,.34);color:#bfdbfe;background:rgba(30,64,175,.2);}
+  .feature-shelf-link{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,#586173,#363e4e);font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;color:#eef4fc;text-decoration:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px rgba(0,0,0,.16);align-self:flex-start;}
+  .feature-shelf-link:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 22px rgba(0,0,0,.18);}
   .info-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:320;align-items:center;justify-content:center;padding:20px;}
   .info-modal.open{display:flex;}
   .info-panel{
@@ -542,6 +568,11 @@
   .cta-title span{display:block;font-size:16px;font-weight:700;text-transform:none;letter-spacing:0;color:#d4dceb;margin-top:7px;}
   .cta-card.orange .cta-title span{color:#f7a457;}
   .cta-card.multiplayer-glow .cta-title span{color:#6fe1a1 !important;}
+  .cta-meta-row{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px;}
+  .cta-meta-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.5);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#eef4fc;}
+  .cta-meta-pill.open{border-color:rgba(134,239,172,.34);color:#86efac;background:rgba(22,101,52,.2);}
+  .cta-meta-pill.soon{border-color:rgba(253,224,71,.34);color:#fde68a;background:rgba(120,88,14,.18);}
+  .cta-meta-pill.info{border-color:rgba(96,165,250,.34);color:#bfdbfe;background:rgba(30,64,175,.18);}
   .cta-desc{display:none;}
   @keyframes ctaButtonShimmer{
     0%{transform:translateX(-165%) skewX(-18deg);opacity:0;}
@@ -646,6 +677,18 @@
   .cta-star.s2{top:44%;left:38%;width:10px;height:10px;}
   .cta-star.s3{top:46%;right:30%;width:8px;height:8px;}
   .cta-star.s4{top:34%;right:14%;width:12px;height:12px;}
+  .mock-strip{max-width:980px;margin:14px auto 0;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.82),rgba(10,16,26,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 34px rgba(0,0,0,.22);display:grid;grid-template-columns:minmax(0,1.2fr) auto;gap:14px;align-items:center;position:relative;overflow:hidden;}
+  .mock-strip::before{content:'';position:absolute;inset:auto -14% -52% auto;width:290px;height:290px;border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.18),transparent 64%);pointer-events:none;}
+  .mock-strip-copy{min-width:0;}
+  .mock-strip-kicker{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#97abc6;}
+  .mock-strip-title{margin-top:4px;font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;color:#f8fafc;line-height:.95;}
+  .mock-strip-desc{margin-top:6px;font-size:12px;line-height:1.6;color:#aebacf;max-width:620px;}
+  .mock-strip-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+  .mock-strip-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.5);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#eef4fc;}
+  .mock-strip-pill.info{border-color:rgba(96,165,250,.34);color:#bfdbfe;background:rgba(30,64,175,.18);}
+  .mock-strip-pill.open{border-color:rgba(134,239,172,.34);color:#86efac;background:rgba(22,101,52,.2);}
+  .mock-strip-cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 18px;border-radius:999px;background:linear-gradient(180deg,#586173,#363e4e);border:1px solid rgba(255,255,255,.16);font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;color:#eef4fc;text-decoration:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 20px rgba(0,0,0,.18);white-space:nowrap;position:relative;z-index:1;}
+  .mock-strip-cta:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 22px rgba(0,0,0,.2);}
   .cta-card:hover .cta-star,
   .cta-card:focus-visible .cta-star{
     opacity:1;
@@ -928,6 +971,8 @@
     .leaderboard-score{grid-column:2;justify-self:start;text-align:left;}
     .leaderboard-rules{grid-template-columns:1fr;}
     .feat-grid{grid-template-columns:1fr;}
+    .feature-shelf-grid{grid-template-columns:1fr;}
+    .mock-strip{grid-template-columns:1fr;}
     .step{grid-template-columns:1fr auto;}
     .step h3{font-size:23px;}
   }
@@ -972,19 +1017,71 @@
       <div class="promo-card moneyball has-photo" id="moneyballFeatureCard">
         <div class="promo-content">
           <div class="promo-title">Moneyball Modes</div>
+          <div class="promo-meta-row">
+            <span class="promo-status-pill open" id="moneyballStatus">Live Strategy</span>
+            <span class="promo-status-pill" id="moneyballMeta">3 sports active</span>
+          </div>
           <button class="promo-action" onclick="openMoneyballExplainer()">How This Works</button>
         </div>
       </div>
       <div class="promo-card powerups has-photo" id="powerupsFeatureCard">
         <div class="promo-content">
           <div class="promo-title">Boost Your Team</div>
+          <div class="promo-meta-row">
+            <span class="promo-status-pill soon" id="powerupsStatus">Draft Open</span>
+            <span class="promo-status-pill" id="powerupsMeta">Use weekly boosts</span>
+          </div>
           <button class="promo-action" onclick="openPowerupExplainer()">How This Works</button>
         </div>
       </div>
       <div class="promo-card trade has-photo" id="tradeFeatureCard">
         <div class="promo-content">
           <div class="promo-title">Draft Pick Swaps</div>
+          <div class="promo-meta-row">
+            <span class="promo-status-pill alert" id="tradeStatus">Pre-Draft Window</span>
+            <span class="promo-status-pill" id="tradeMeta">Trade slots before lock</span>
+          </div>
           <button class="promo-action" onclick="openSwapExplainer()">How This Works</button>
+        </div>
+      </div>
+    </div>
+    <div class="feature-shelf">
+      <div class="feature-shelf-head">
+        <div>
+          <div class="feature-shelf-title">Featured Right Now</div>
+          <div class="feature-shelf-copy">Borrowing Sleeper's clarity, not its clutter: here are the three most important ways to jump into RosterBate right now.</div>
+        </div>
+      </div>
+      <div class="feature-shelf-grid">
+        <div class="feature-shelf-card">
+          <div class="feature-shelf-kicker">Room Visibility</div>
+          <div class="feature-shelf-card-title">Live Draft Rooms</div>
+          <div class="feature-shelf-meta">
+            <span class="feature-shelf-pill open" id="featureLiveRoomsStatus">Draft Open</span>
+            <span class="feature-shelf-pill info" id="featureLiveRoomsMeta">Public + Private</span>
+          </div>
+          <div class="feature-shelf-card-copy">Browse open rooms, watch ready counts, and see when a scheduled lobby is unlocking before you ever join.</div>
+          <a class="feature-shelf-link" id="featureLiveRoomsLink" href="rosterbate-matchmaking.html?sport=nba">Browse Rooms</a>
+        </div>
+        <div class="feature-shelf-card">
+          <div class="feature-shelf-kicker">Featured Modes</div>
+          <div class="feature-shelf-card-title">Moneyball + Swaps</div>
+          <div class="feature-shelf-meta">
+            <span class="feature-shelf-pill open" id="featureModesStatus">Mode Ready</span>
+            <span class="feature-shelf-pill info" id="featureModesMeta">3 signature systems</span>
+          </div>
+          <div class="feature-shelf-card-copy">Moneyball Modes, Boosts, and Draft Pick Swaps are surfaced as featured systems instead of getting buried under a giant product shelf.</div>
+          <a class="feature-shelf-link" href="javascript:void(0)" onclick="openMoneyballExplainer()">View Featured Modes</a>
+        </div>
+        <div class="feature-shelf-card">
+          <div class="feature-shelf-kicker">Fastest Entry</div>
+          <div class="feature-shelf-card-title">Mock Draft Lab</div>
+          <div class="feature-shelf-meta">
+            <span class="feature-shelf-pill soon" id="featureMockStatus">Try Now</span>
+            <span class="feature-shelf-pill info" id="featureMockMeta">Snake · Auction</span>
+          </div>
+          <div class="feature-shelf-card-copy">Open the draft board without waiting on a room so you can test formats, timers, and roster shapes before your real league goes live.</div>
+          <a class="feature-shelf-link" id="featureMockLink" href="rosterbate-draft.html?sport=nba">Try A Demo Draft</a>
         </div>
       </div>
     </div>
@@ -1030,6 +1127,10 @@
           </svg>
         </div>
       </div>
+      <div class="cta-meta-row">
+        <span class="cta-meta-pill open" id="singlePlayerMetaPrimary">Draft Board Ready</span>
+        <span class="cta-meta-pill info" id="singlePlayerMetaSecondary">AI GM Active</span>
+      </div>
       <div class="cta-desc">Set up your league, customize scoring and roster settings, then draft live with a pick timer, auto-draft queue, and full pick trading before the draft even starts.</div>
       <div class="cta-btn">
         <span class="cta-btn-label">Create Your League</span>
@@ -1055,6 +1156,10 @@
           </svg>
         </div>
       </div>
+      <div class="cta-meta-row">
+        <span class="cta-meta-pill open" id="multiPlayerMetaPrimary">Draft Open</span>
+        <span class="cta-meta-pill info" id="multiPlayerMetaSecondary">Public + Private Rooms</span>
+      </div>
       <div class="cta-desc">Quick Match finds leagues by draft format, scoring type, and team size. Browse open leagues, create a private one, or join with a share code.</div>
       <div class="cta-btn">
         <span class="cta-btn-label">Find a League</span>
@@ -1065,6 +1170,19 @@
       </div>
     </a>
 
+  </div>
+  <div class="mock-strip">
+    <div class="mock-strip-copy">
+      <div class="mock-strip-kicker">Fastest Way To Learn The Board</div>
+      <div class="mock-strip-title">Try A Demo Draft</div>
+      <div class="mock-strip-desc">Use the single-player draft board as a mock-draft lab. Test snake or auction settings, learn the flow, and get comfortable before your real room opens.</div>
+      <div class="mock-strip-pills">
+        <span class="mock-strip-pill open" id="mockStripStatus">Open Now</span>
+        <span class="mock-strip-pill info">Snake · Auction</span>
+        <span class="mock-strip-pill info">Solo Reps</span>
+      </div>
+    </div>
+    <a class="mock-strip-cta" id="mockDraftLink" href="rosterbate-draft.html?sport=nba">Launch Demo Draft</a>
   </div>
 
   <!-- Leaderboard -->
@@ -1528,6 +1646,65 @@ const HOME_SPORT_IMAGES = {
     trade: 'baseball stock.jpg'
   }
 };
+const HOME_SPORT_SIGNALS = {
+  nba: {
+    moneyballStatus:'Live Strategy',
+    moneyballMeta:'Weekly best-game locks',
+    powerupsStatus:'Draft Open',
+    powerupsMeta:'Use weekly boosts',
+    tradeStatus:'Pre-Draft Window',
+    tradeMeta:'Swap draft slots before lock',
+    singlePrimary:'2024-25 Player Pool',
+    singleSecondary:'AI GM Active',
+    multiPrimary:'Public Rooms Open',
+    multiSecondary:'2-12 Teams',
+    liveRoomsStatus:'Draft Open',
+    liveRoomsMeta:'Basketball rooms forming',
+    modesStatus:'Mode Ready',
+    modesMeta:'Moneyball · Boosts · Swaps',
+    mockStatus:'Try Now',
+    mockMeta:'Snake · Auction',
+    mockStripStatus:'Open Now'
+  },
+  nfl: {
+    moneyballStatus:'Draft Open',
+    moneyballMeta:'Best-game locks for Sundays',
+    powerupsStatus:'Season Starts Sep 5',
+    powerupsMeta:'Preseason boost planning',
+    tradeStatus:'Pre-Draft Window',
+    tradeMeta:'Trade draft positions early',
+    singlePrimary:'Football Board Ready',
+    singleSecondary:'AI GM Active',
+    multiPrimary:'Rooms Filling Fast',
+    multiSecondary:'Draft Open · Sep 5',
+    liveRoomsStatus:'Starts Tonight',
+    liveRoomsMeta:'Football rooms filling',
+    modesStatus:'Mode Ready',
+    modesMeta:'Moneyball · Boosts · Swaps',
+    mockStatus:'Draft Reps',
+    mockMeta:'Snake · Auction',
+    mockStripStatus:'Starts Now'
+  },
+  mlb: {
+    moneyballStatus:'Season Live',
+    moneyballMeta:'Pitch your best game',
+    powerupsStatus:'Daily Edge',
+    powerupsMeta:'Use boosts all season',
+    tradeStatus:'Pre-Draft Window',
+    tradeMeta:'Clean slot-for-slot swaps',
+    singlePrimary:'Baseball Board Ready',
+    singleSecondary:'AI GM Active',
+    multiPrimary:'Open Leagues',
+    multiSecondary:'Public + Private Rooms',
+    liveRoomsStatus:'Draft Open',
+    liveRoomsMeta:'Baseball rooms forming',
+    modesStatus:'Mode Ready',
+    modesMeta:'Moneyball · Boosts · Swaps',
+    mockStatus:'Try Now',
+    mockMeta:'Snake · Auction',
+    mockStripStatus:'Open Now'
+  }
+};
 let selectedHomeSport = getSelectedRosterbateSport();
 let navFriendRequestListener = null;
 let navThreadListener = null;
@@ -1584,6 +1761,7 @@ function subscribeNavNotifications(userNumber){
 
 function updateHomeSportUI(){
   const sport = normalizeRosterbateSport(selectedHomeSport);
+  const signals = HOME_SPORT_SIGNALS[sport] || HOME_SPORT_SIGNALS.nba;
   setSelectedRosterbateSport(sport);
   document.querySelectorAll('.sport-card[data-sport]').forEach(card => {
     card.classList.toggle('active', card.dataset.sport === sport);
@@ -1591,6 +1769,14 @@ function updateHomeSportUI(){
   document.getElementById('sportSectionLabel').textContent = 'Get Started — ' + HOME_SPORT_LABELS[sport];
   document.getElementById('single-player-card').href = 'rosterbate-draft.html?sport=' + sport;
   document.getElementById('multiplayer-card').href = 'rosterbate-matchmaking.html?sport=' + sport;
+  const mockDraftHref='rosterbate-draft.html?sport=' + sport;
+  const liveRoomsHref='rosterbate-matchmaking.html?sport=' + sport;
+  const mockDraftLink=document.getElementById('mockDraftLink');
+  const featureLiveRoomsLink=document.getElementById('featureLiveRoomsLink');
+  const featureMockLink=document.getElementById('featureMockLink');
+  if(mockDraftLink) mockDraftLink.href=mockDraftHref;
+  if(featureMockLink) featureMockLink.href=mockDraftHref;
+  if(featureLiveRoomsLink) featureLiveRoomsLink.href=liveRoomsHref;
   const assets=HOME_SPORT_IMAGES[sport] || HOME_SPORT_IMAGES.nba;
   const backdrop=document.getElementById('sportBackdrop');
   const backdropAlt=document.getElementById('sportBackdropAlt');
@@ -1602,6 +1788,29 @@ function updateHomeSportUI(){
   if(moneyballCard) moneyballCard.style.setProperty('--promo-photo', `url(\"${assets.moneyball}\")`);
   if(powerupsCard) powerupsCard.style.setProperty('--promo-photo', `url(\"${assets.powerups}\")`);
   if(tradeCard) tradeCard.style.setProperty('--promo-photo', `url(\"${assets.trade}\")`);
+  const textMap={
+    moneyballStatus:signals.moneyballStatus,
+    moneyballMeta:signals.moneyballMeta,
+    powerupsStatus:signals.powerupsStatus,
+    powerupsMeta:signals.powerupsMeta,
+    tradeStatus:signals.tradeStatus,
+    tradeMeta:signals.tradeMeta,
+    singlePlayerMetaPrimary:signals.singlePrimary,
+    singlePlayerMetaSecondary:signals.singleSecondary,
+    multiPlayerMetaPrimary:signals.multiPrimary,
+    multiPlayerMetaSecondary:signals.multiSecondary,
+    featureLiveRoomsStatus:signals.liveRoomsStatus,
+    featureLiveRoomsMeta:signals.liveRoomsMeta,
+    featureModesStatus:signals.modesStatus,
+    featureModesMeta:signals.modesMeta,
+    featureMockStatus:signals.mockStatus,
+    featureMockMeta:signals.mockMeta,
+    mockStripStatus:signals.mockStripStatus
+  };
+  Object.entries(textMap).forEach(([id,text])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=text;
+  });
 }
 
 function selectSportCard(sport){
