@@ -668,11 +668,19 @@ async function ensureDirectThreadWithProfile(){
   const myProfile=mySnap?.val?.() || {};
   const threadId=dmThreadId(myNumber,targetNumber);
   const now=Date.now();
+  const myUid=String(currentAuthUser.uid || '').trim();
+  const targetUid=String(currentViewedProfile.uid || '').trim();
+  if(!myUid || !targetUid){
+    alert('That member is not ready for messaging yet.');
+    return;
+  }
+  await db.ref('directThreads/' + threadId).update({
+    createdAt: now,
+    updatedAt: now,
+    ['members/' + myUid]: true,
+    ['members/' + targetUid]: true
+  });
   const updates={};
-  updates['directThreads/'+threadId+'/createdAt']=now;
-  updates['directThreads/'+threadId+'/updatedAt']=now;
-  updates['directThreads/'+threadId+'/members/'+myNumber]=true;
-  updates['directThreads/'+threadId+'/members/'+targetNumber]=true;
   updates['userThreads/'+myNumber+'/'+threadId]={
     otherUserNumber: targetNumber,
     otherUsername: currentViewedProfile.username || 'Manager',

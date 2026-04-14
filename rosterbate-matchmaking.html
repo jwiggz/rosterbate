@@ -480,6 +480,7 @@ function isChatBanned(playerId){
 }
 
 function renderGlobalChat(){
+  if(!myId) return;
   const feed = document.getElementById('mmGlobalChatFeed');
   if(!feed) return;
   if(!globalChatMessages.length){
@@ -1244,6 +1245,16 @@ function hydrateStepperInputs(root){
     plus.addEventListener('click',function(){ nudge(1); });
     minus.addEventListener('click',function(){ nudge(-1); });
   });
+}
+
+async function ensureLobbyPlayerIndex(lobbyId, userId) {
+  if (!db || !lobbyId || !userId) return;
+  const indexRef = db.ref(`lobbyPlayersByUid/${lobbyId}/${userId}`);
+  const snapshot = await indexRef.once('value');
+  if (!snapshot.exists()) {
+    await indexRef.set(true);
+    console.log('Created lobby player index for', userId);
+  }
 }
 
 function teamCount(lobby){
@@ -2044,6 +2055,9 @@ async function joinLobby(lobbyId){
     joinedAt:Date.now(),
     ready:false
   });
+  if (currentRbUser?.uid) {
+    ensureLobbyPlayerIndex(lobbyId, currentRbUser.uid).catch(()=>{});
+  }
   currentLobbyId=lobbyId;
   myReady=false;
   awardRosterbateScore('multiplayer', 20).catch(() => {});

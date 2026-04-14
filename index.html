@@ -293,7 +293,7 @@
   .soon-badge{position:absolute;top:7px;right:7px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:var(--fd);font-size:8px;font-weight:700;text-transform:uppercase;color:var(--text3);}
 
   /* MAIN CTAs */
-  .cta-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;align-items:stretch;}
+  .cta-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:0 auto 24px;align-items:stretch;max-width:980px;}
   .cta-card{display:flex;flex-direction:column;text-decoration:none;background:linear-gradient(135deg,var(--card),var(--bg3));border:2px solid var(--border);border-radius:16px;padding:14px 14px 12px;transition:all .2s;position:relative;overflow:hidden;color:var(--text);}
   .cta-corner-badge{position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;line-height:1;pointer-events:none;}
   .cta-corner-badge.ai{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;}
@@ -456,7 +456,7 @@
     .hero-logo-wrap{width:min(500px,52vw);height:128px;}
     .promo-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
     .sport-grid{grid-template-columns:repeat(3,minmax(0,180px));justify-content:center;}
-    .cta-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .cta-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
     .steps{grid-template-columns:repeat(2,minmax(0,1fr));}
     .feat-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
   }
@@ -585,7 +585,7 @@
       <div class="cta-corner-badge ai">Play vs AI</div>
       <div class="cta-top">
         <div class="cta-emoji">🎯</div>
-        <div class="cta-title">Draft Your Team<span>Start a new league &amp; draft your team</span></div>
+        <div class="cta-title">Single Player<span>Start a new league &amp; draft your team</span></div>
       </div>
       <div class="cta-desc">Set up your league, customize scoring and roster settings, then draft live with a pick timer, auto-draft queue, and full pick trading before the draft even starts.</div>
 <div class="cta-btn">Create Your League →</div>
@@ -617,22 +617,6 @@
       </div>
     </a>
 
-  <a href="rosterbate-season.html?sport=nba" class="cta-card green" id="season-card">
-      <div class="cta-top">
-        <div class="cta-emoji">🏆</div>
-        <div class="cta-title">TRY IT NOW<span>Manage your team all season</span></div>
-      </div>
-      <div class="cta-desc">Set daily lineups, work the waiver wire, propose trades, track standings, and compete in weekly head-to-head matchups against real people or AI.</div>
-      <div class="cta-btn">Open Season Manager →</div>
-      <div class="cta-tags">
-        <span class="tag">Daily lineups</span>
-        <span class="tag">Waiver wire</span>
-        <span class="tag">Trades</span>
-        <span class="tag">Standings</span>
-        <span class="tag">Injury status</span>
-        <span class="tag">Commissioner tools</span>
-      </div>
-    </a>
   </div>
 
   <!-- Leaderboard -->
@@ -1079,7 +1063,6 @@ function updateHomeSportUI(){
   document.getElementById('sportSectionLabel').textContent = 'Get Started — ' + HOME_SPORT_LABELS[sport];
   document.getElementById('single-player-card').href = 'rosterbate-draft.html?sport=' + sport;
   document.getElementById('multiplayer-card').href = 'rosterbate-matchmaking.html?sport=' + sport;
-  document.getElementById('season-card').href = 'rosterbate-season.html?sport=' + sport;
 }
 
 function selectSportCard(sport){

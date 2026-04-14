@@ -1,0 +1,343 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+
+        "email": {
+          ".validate": "newData.isString() && auth.token.email != null && newData.val() === auth.token.email"
+        },
+        "username": {
+          ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 20"
+        },
+        "userNumber": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && (!data.exists() || newData.val() === data.val())"
+        },
+        "memberSince": {
+          ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val())"
+        },
+        "photoURL": {
+          ".validate": "newData.isString() && newData.val().length <= 500000"
+        },
+        "aboutMe": {
+          ".validate": "newData.isString() && newData.val().length <= 220"
+        },
+        "themeKey": {
+          ".validate": "newData.isString()"
+        },
+        "isAdmin": {
+          ".validate": "newData.isBoolean() && (data.exists() ? newData.val() === data.val() : newData.val() === false)"
+        },
+        "score": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "scoreCooldowns": {
+          "$action": {
+            ".validate": "newData.isString()"
+          }
+        },
+        "provider": {
+          ".validate": "newData.isString()"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": true
+        }
+      }
+    },
+
+    "usernames": {
+      ".read": true,
+      "$key": {
+        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || (data.exists() && data.child('uid').val() === auth.uid) || !newData.exists())",
+        "uid": {
+          ".validate": "newData.isString()"
+        },
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        "username": {
+          ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 20"
+        },
+        "userNumber": {
+          ".validate": "newData.isNumber() && newData.val() >= 1"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+
+    "publicUsers": {
+      ".read": true,
+      "$userNumber": {
+        ".write": "auth != null && (((!data.exists()) && newData.child('uid').val() === auth.uid && (newData.child('userNumber').val() + '') === $userNumber) || (data.exists() && data.child('uid').val() === auth.uid))",
+        "uid": {
+          ".validate": "newData.isString()"
+        },
+        "userNumber": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && (newData.val() + '') === $userNumber"
+        },
+        "username": {
+          ".validate": "!newData.exists() || (newData.isString() && newData.val().length >= 3 && newData.val().length <= 20)"
+        },
+        "email": {
+          ".validate": "!newData.exists() || newData.isString()"
+        },
+        "photoURL": {
+          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 500000)"
+        },
+        "aboutMe": {
+          ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 220)"
+        },
+        "score": {
+          ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "lifetime": {
+          ".validate": "!newData.exists() || (newData.hasChildren(['seasonsPlayed', 'regularSeasonWins', 'regularSeasonLosses', 'pointsFor', 'pointsAgainst', 'championships', 'podiums', 'bestFinish', 'lastFinish', 'updatedAt']) && newData.child('seasonsPlayed').isNumber() && newData.child('regularSeasonWins').isNumber() && newData.child('regularSeasonLosses').isNumber() && newData.child('pointsFor').isNumber() && newData.child('pointsAgainst').isNumber() && newData.child('championships').isNumber() && newData.child('podiums').isNumber() && newData.child('bestFinish').isNumber() && newData.child('lastFinish').isNumber() && newData.child('updatedAt').isNumber())"
+        },
+        "isAdmin": {
+          ".validate": "newData.isBoolean() && (data.exists() ? newData.val() === data.val() : newData.val() === false)"
+        },
+        "$other": {
+          ".validate": true
+        }
+      }
+    },
+
+    "publicUserSeasons": {
+      ".read": true,
+      "$userNumber": {
+        "$seasonId": {
+          ".write": "auth != null && root.child('publicUsers/'+$userNumber+'/uid').val() === auth.uid",
+          ".validate": "newData.exists()"
+        }
+      }
+    },
+
+    "userSeasonHistory": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "userSeasons": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || auth.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12' || auth.uid === 'sAu0wDTK33ensoTQ3reEXvzpkbv2')",
+        ".write": "auth != null && auth.uid === $userId",
+        "$seasonId": {
+          ".validate": "newData.hasChildren(['sport', 'leagueName', 'createdAt']) || !newData.exists()"
+        }
+      }
+    },
+
+    "allSeasons": {
+      ".read": "auth != null && (auth.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12' || auth.uid === 'sAu0wDTK33ensoTQ3reEXvzpkbv2')",
+      "$seasonId": {
+        ".write": "auth != null && (auth.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12' || auth.uid === 'sAu0wDTK33ensoTQ3reEXvzpkbv2')",
+        ".validate": "newData.hasChildren(['userId', 'sport', 'leagueName', 'createdAt']) || !newData.exists()"
+      }
+    },
+
+    "sharedSeasons": {
+      "$seasonId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".validate": true
+      }
+    },
+
+    "multiplayerSeasons": {
+      "$seasonId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".validate": true
+      }
+    },
+
+    "meta": {
+      "nextUserNumber": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || newData.val() === data.val() + 1)",
+        ".validate": "newData.isNumber() && newData.val() >= 1"
+      },
+      "nextSeasonNumber": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || newData.val() === data.val() + 1)",
+        ".validate": "newData.isNumber() && newData.val() >= 1"
+      }
+    },
+
+    "profileViews": {
+      "$userNumber": {
+        "$viewerId": {
+          ".read": true,
+          ".write": "auth != null",
+          ".validate": "newData.isNumber()"
+        }
+      }
+    },
+
+    "profileViewCounts": {
+      ".read": true,
+      "$userNumber": {
+        ".write": "auth != null",
+        ".validate": "newData.isNumber() && newData.val() >= 0"
+      }
+    },
+
+    "friendRequests": {
+      "$targetUserNumber": {
+        ".read": "auth != null && (auth.uid === root.child('publicUsers/'+$targetUserNumber+'/uid').val() || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+        "$fromUserNumber": {
+          ".write": "auth != null && (auth.uid === root.child('publicUsers/'+$targetUserNumber+'/uid').val() || auth.uid === root.child('publicUsers/'+$fromUserNumber+'/uid').val())",
+          ".validate": true
+        }
+      }
+    },
+
+    "friends": {
+      "$userNumber": {
+        ".read": true,
+        "$friendUserNumber": {
+          ".write": "auth != null && (auth.uid === root.child('publicUsers/'+$userNumber+'/uid').val() || auth.uid === root.child('publicUsers/'+$friendUserNumber+'/uid').val())",
+          ".validate": true
+        }
+      }
+    },
+
+    "userThreads": {
+      "$userNumber": {
+        ".read": "auth != null && auth.uid === root.child('publicUsers/'+$userNumber+'/uid').val()",
+        "$threadId": {
+          ".write": "auth != null && (auth.uid === root.child('publicUsers/'+$userNumber+'/uid').val() || root.child('directThreads/'+$threadId+'/members/'+auth.uid).exists())",
+          ".validate": true
+        }
+      }
+    },
+
+    "directThreads": {
+      "$threadId": {
+        ".read": "auth != null && data.child('members/'+auth.uid).exists()",
+        ".write": "auth != null && (!data.exists() ? newData.child('members/'+auth.uid).val() === true : data.child('members/'+auth.uid).exists())",
+        "members": {
+          "$uid": {
+            ".validate": "newData.val() === true || !newData.exists()"
+          }
+        },
+        "$other": {
+          ".validate": true
+        }
+      }
+    },
+
+    "directMessages": {
+      "$threadId": {
+        ".read": "auth != null && root.child('directThreads/'+$threadId+'/members/'+auth.uid).exists()",
+        "$messageId": {
+          ".write": "auth != null && root.child('directThreads/'+$threadId+'/members/'+auth.uid).exists()",
+          ".validate": true
+        }
+      }
+    },
+
+    "guestbooks": {
+      "$userNumber": {
+        ".read": true,
+        "$entryId": {
+          ".write": "auth != null",
+          ".validate": true
+        }
+      }
+    },
+
+    "lobbies": {
+      ".read": true,
+      "$lobbyId": {
+        ".write": "auth != null && (!data.exists() || root.child('lobbyPlayersByUid/'+$lobbyId+'/'+auth.uid).exists() || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+        ".validate": true,
+
+        "players": {
+          "$playerId": {
+            ".write": "auth != null && (((!data.exists()) && newData.child('uid').val() === auth.uid) || (data.exists() && data.child('uid').val() === auth.uid) || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+            ".validate": "!newData.exists() || (newData.hasChildren(['id', 'name', 'joinedAt']) && newData.child('id').isString() && (!newData.child('uid').exists() || newData.child('uid').isString()) && newData.child('name').isString() && newData.child('joinedAt').isNumber() && (!newData.child('ready').exists() || newData.child('ready').isBoolean()) && (!newData.child('userNumber').exists() || newData.child('userNumber').isNumber()))"
+          }
+        },
+
+        "chat": {
+          "$messageId": {
+            ".read": true,
+            ".write": "auth != null && (root.child('lobbyPlayersByUid/'+$lobbyId+'/'+auth.uid).exists() || root.child('users/'+auth.uid+'/isAdmin').val() === true) && (!newData.exists() || newData.child('uid').val() === auth.uid)",
+            ".validate": "!newData.exists() || (newData.hasChildren(['playerId', 'uid', 'userNumber', 'name', 'text', 'ts']) && newData.child('playerId').isString() && newData.child('uid').isString() && newData.child('userNumber').isNumber() && newData.child('name').isString() && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 280 && newData.child('ts').isNumber())"
+          }
+        },
+
+        "draftChat": {
+          "messages": {
+            "$messageId": {
+              ".read": true,
+              ".write": "auth != null && (root.child('lobbyPlayersByUid/'+$lobbyId+'/'+auth.uid).exists() || root.child('users/'+auth.uid+'/isAdmin').val() === true) && (!newData.exists() || (!newData.child('uid').exists() || newData.child('uid').val() === auth.uid))",
+              ".validate": "!newData.exists() || (newData.hasChildren(['playerId', 'ts']) && newData.child('playerId').isString() && newData.child('ts').isNumber())"
+            }
+          },
+          "presence": {
+            "$playerId": {
+              ".read": true,
+              ".write": "auth != null && (root.child('lobbyPlayersByUid/'+$lobbyId+'/'+auth.uid).exists() || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+              ".validate": "newData.exists() ? true : true"
+            }
+          }
+        },
+
+        "seasonState": {
+          ".read": "auth != null && (root.child('lobbyPlayersByUid/'+$lobbyId+'/'+auth.uid).exists() || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+          ".write": "auth != null && (root.child('lobbyPlayersByUid/'+$lobbyId+'/'+auth.uid).exists() || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+          ".validate": true
+        }
+      }
+    },
+
+    "lobbyPlayersByUid": {
+      "$lobbyId": {
+        "$uid": {
+          ".read": "auth != null && (auth.uid === $uid || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.val() === true || !newData.exists()"
+        }
+      }
+    },
+
+    "matchmakingGlobalChat": {
+      "messages": {
+        "$messageId": {
+          ".read": true,
+          ".write": "auth != null",
+          ".validate": "!newData.exists() || (newData.hasChildren(['playerId', 'userNumber', 'name', 'text', 'ts']) && newData.child('playerId').isString() && newData.child('userNumber').isNumber() && newData.child('name').isString() && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 280 && newData.child('ts').isNumber())"
+        }
+      }
+    },
+
+    "matchmakingGlobalChatBans": {
+      ".read": true,
+      "$userNumber": {
+        ".write": "auth != null && (auth.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12' || auth.uid === 'sAu0wDTK33ensoTQ3reEXvzpkbv2' || root.child('users/'+auth.uid+'/isAdmin').val() === true) && root.child('users/'+root.child('publicUsers/'+$userNumber+'/uid').val()+'/isAdmin').val() !== true",
+        ".validate": "newData.hasChildren(['active']) && newData.child('active').isBoolean() && (!newData.child('name').exists() || newData.child('name').isString()) && (!newData.child('bannedBy').exists() || newData.child('bannedBy').isString()) && (!newData.child('bannedAt').exists() || newData.child('bannedAt').isNumber())"
+      }
+    },
+
+    "presence": {
+      "$presenceId": {
+        ".read": true,
+        ".write": "auth != null",
+        ".validate": "!newData.exists() || ((!newData.child('name').exists() || newData.child('name').isString()) && (!newData.child('ts').exists() || newData.child('ts').isNumber()))"
+      }
+    }
+  }
+}

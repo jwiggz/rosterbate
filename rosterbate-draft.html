@@ -2063,6 +2063,16 @@ function getSavedMultiplayerLobbyState(){
   }
 }
 
+async function ensureLobbyPlayerIndex(lobbyId, userId) {
+  if (!db || !lobbyId || !userId) return;
+  const indexRef = db.ref(`lobbyPlayersByUid/${lobbyId}/${userId}`);
+  const snapshot = await indexRef.once('value');
+  if (!snapshot.exists()) {
+    await indexRef.set(true);
+    console.log('Created lobby player index for', userId);
+  }
+}
+
 function getLeagueNamePlaceholders(){
   return {
     nba:'e.g. Friday Night Hoops',
@@ -4637,6 +4647,7 @@ function rbResetDraftRoomChat(){
 
 // Load from localStorage
 function rbLoadChat(){
+  if(typeof S === 'undefined' || !S) return;
   if(rbUseRealtimeDraftChat()) return;
   try{
     const key=rbRefreshChatKey();
@@ -5241,6 +5252,10 @@ function rbEnsureChatListenerActive() {
       startDraft();
       finishDraftBoot('draft');
     } else {
+      const lobbyState = getSavedMultiplayerLobbyState();
+      if (currentRbUser && lobbyState?.lobbyId) {
+        ensureLobbyPlayerIndex(lobbyState.lobbyId, currentRbUser.uid).catch(()=>{});
+      }
       finishDraftBoot('lobby');
     }
 

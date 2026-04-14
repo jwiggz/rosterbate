@@ -12590,7 +12590,27 @@
   // Get all demo players for waiver wire
   window.getRosterbateDemoPlayers = function(sport) {
     const normalized = (sport || 'nba').toLowerCase();
-    if (normalized === 'nba') return NBA_DEMO_PLAYERS;
-    return [];
+    if (normalized !== 'nba') return [];
+
+    const importedPool = (window.RB_IMPORTED_POOLS && Array.isArray(window.RB_IMPORTED_POOLS.nba))
+      ? window.RB_IMPORTED_POOLS.nba
+      : [];
+
+    if (!importedPool.length) return NBA_DEMO_PLAYERS;
+
+    const canonicalPositions = new Map(
+      importedPool.map(function(player) {
+        return [
+          String(player && player.name || '').trim().toLowerCase() + '|' + String(player && player.team || '').trim().toLowerCase(),
+          String(player && player.pos || '').trim().toUpperCase()
+        ];
+      })
+    );
+
+    return NBA_DEMO_PLAYERS.map(function(player) {
+      const canonicalKey = String(player && player.name || '').trim().toLowerCase() + '|' + String(player && player.team || '').trim().toLowerCase();
+      const canonicalPos = canonicalPositions.get(canonicalKey);
+      return canonicalPos ? Object.assign({}, player, { pos: canonicalPos }) : player;
+    });
   };
 })();

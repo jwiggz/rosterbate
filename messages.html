@@ -132,6 +132,7 @@ let currentProfile=null;
 let activeThreadId='';
 let messageRef=null;
 let friendDirectory={};
+let publicUserCache={};
 
 function initials(name){
   const parts=String(name||'RB').trim().split(/\s+/).filter(Boolean);
@@ -223,7 +224,7 @@ function renderThreadList(threads){
     return;
   }
   host.innerHTML=threads.map(thread=>`
-    <div class="thread-item${thread.threadId===activeThreadId ? ' active' : ''}" onclick="openThread('${thread.threadId}')">
+    <div class="thread-item${thread.threadId===activeThreadId ? ' active' : ''}" onclick="openThread('${thread.threadId}', ${Number(thread.otherUserNumber || 0)})">
       <div class="avatar">${avatarMarkup(thread.otherPhotoURL, thread.otherUsername)}</div>
       <div class="copy">
         <div class="name">${escapeHtml(thread.otherUsername || 'Manager')}</div>
@@ -289,11 +290,13 @@ async function openOrCreateThread(otherUserNumber){
   const friendMeta=friendDirectory[otherUserNumber] || {};
   const threadId=dmThreadId(myNumber,otherUserNumber);
   const now=Date.now();
+  const hasAccess=await ensureDirectThreadMembership(threadId, otherUserNumber);
+  if(!hasAccess){
+    alert('Could not open this conversation right now.');
+    return;
+  }
   const updates={};
-  updates['directThreads/'+threadId+'/createdAt']=now;
   updates['directThreads/'+threadId+'/updatedAt']=now;
-  updates['directThreads/'+threadId+'/members/'+myNumber]=true;
-  updates['directThreads/'+threadId+'/members/'+otherUserNumber]=true;
   updates['userThreads/'+myNumber+'/'+threadId]={
     otherUserNumber,
     otherUsername: friendMeta.username || 'Manager',
@@ -307,14 +310,52 @@ async function openOrCreateThread(otherUserNumber){
   updates['userThreads/'+otherUserNumber+'/'+threadId+'/updatedAt']=now;
   updates['userThreads/'+otherUserNumber+'/'+threadId+'/lastSender']=0;
   await db.ref().update(updates);
-  openThread(threadId);
+  openThread(threadId, otherUserNumber);
 }
 
-function openThread(threadId){
+async function getPublicUserProfile(userNumber){
+  const key=Number(userNumber || 0);
+  if(!(key>0)) return null;
+  if(Object.prototype.hasOwnProperty.call(publicUserCache, key)){
+    return publicUserCache[key];
+  }
+  const snap=await db.ref('publicUsers/' + key).once('value').catch(() => null);
+  const profile=snap?.val?.() || null;
+  publicUserCache[key]=profile;
+  return profile;
+}
+
+async function ensureDirectThreadMembership(threadId, otherUserNumber){
+  if(!currentUser || !currentProfile || !threadId) return false;
+  const myUid=String(currentUser.uid || '').trim();
+  const myNumber=Number(currentProfile.userNumber || 0);
+  if(!myUid || !(myNumber>0)) return false;
+  const otherProfile=await getPublicUserProfile(otherUserNumber);
+  const otherUid=String(otherProfile?.uid || '').trim();
+  if(!(Number(otherUserNumber)>0) || !otherUid) return false;
+  const threadRef=db.ref('directThreads/' + threadId);
+  const snap=await threadRef.once('value').catch(() => null);
+  const patch={};
+  if(!snap?.exists?.()) patch.createdAt=Date.now();
+  patch['members/' + myUid]=true;
+  patch['members/' + otherUid]=true;
+  await threadRef.update(patch);
+  return true;
+}
+
+async function openThread(threadId, otherUserNumber){
   activeThreadId=threadId;
   const params=new URLSearchParams(window.location.search);
   params.set('thread', threadId);
   history.replaceState(null, '', 'messages.html?' + params.toString());
+  let resolvedOtherUserNumber=Number(otherUserNumber || 0);
+  if(!(resolvedOtherUserNumber>0) && currentProfile?.userNumber){
+    const metaSnap=await db.ref('userThreads/' + Number(currentProfile.userNumber || 0) + '/' + threadId).once('value').catch(() => null);
+    resolvedOtherUserNumber=Number(metaSnap?.val?.()?.otherUserNumber || 0);
+  }
+  if(resolvedOtherUserNumber>0){
+    await ensureDirectThreadMembership(threadId, resolvedOtherUserNumber).catch(() => {});
+  }
   subscribeToMessages(threadId);
   loadSidebarData();
 }
@@ -347,6 +388,11 @@ async function sendMessage(){
   if(!(myNumber>0)) return;
   const otherMetaSnap=await db.ref('userThreads/' + myNumber + '/' + activeThreadId).once('value').catch(() => null);
   const threadMeta=otherMetaSnap?.val?.() || {};
+  const hasAccess=await ensureDirectThreadMembership(activeThreadId, Number(threadMeta.otherUserNumber || 0));
+  if(!hasAccess){
+    alert('Could not send this message right now.');
+    return;
+  }
   const now=Date.now();
   const serverNow=firebase.database.ServerValue.TIMESTAMP;
   const ref=db.ref('directMessages/' + activeThreadId).push();
@@ -421,7 +467,10 @@ auth.onAuthStateChanged(async user => {
   localStorage.setItem('rbMessagesLastSeen', String(Date.now()));
   activeThreadId=getThreadParam();
   await loadSidebarData();
-  if(activeThreadId) subscribeToMessages(activeThreadId);
+  if(activeThreadId){
+    const metaSnap=await db.ref('userThreads/' + currentProfile.userNumber + '/' + activeThreadId).once('value').catch(() => null);
+    await openThread(activeThreadId, Number(metaSnap?.val?.()?.otherUserNumber || 0));
+  }
 });
 
 document.getElementById('messageInput').addEventListener('keydown', e => {

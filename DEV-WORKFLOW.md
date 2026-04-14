@@ -9,11 +9,17 @@ cd "C:\Users\jabro\Desktop\Fantasy Project"
 .\Start-Local-Dev.bat
 ```
 
+The canonical app root is this repo:
+
+`C:\Users\jabro\Desktop\Fantasy Project\rosterbate`
+
 Then open:
 
 - `http://localhost:8080/`
 - `http://localhost:8080/rosterbate-draft.html?sport=nfl`
 - `http://localhost:8080/rosterbate-season.html?sport=nba`
+
+The root workspace launcher is configured to serve this `rosterbate/` directory by default.
 
 This does not create a Netlify deploy, so it does not spend production deploy credits.
 
