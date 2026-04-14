@@ -2943,6 +2943,33 @@ function toggleWatchList(pid){
   renderWaiver();
 }
 
+function getWaiverRadarCandidates(limit=4){
+  const watchIds=new Set(getWatchListIds().map(Number));
+  const unavailableIds=new Set([
+    ...(G.rosters||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite),
+    ...(G.ilByTeam||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite)
+  ]);
+  const recentDropIds=new Set((G.recentDrops||[]).map(drop=>Number(drop?.player?.id)).filter(Number.isFinite));
+  return (G.waiver||[])
+    .filter(Boolean)
+    .filter(player=>player.id!=null && !unavailableIds.has(Number(player.id)))
+    .map(player=>{
+      const playerId=Number(player.id);
+      let score=Number(player.fp||0);
+      if(watchIds.has(playerId)) score += 40;
+      if(recentDropIds.has(playerId)) score += 18;
+      if(Number(player.pts||0) >= 20) score += 8;
+      return {
+        player,
+        score,
+        watched:watchIds.has(playerId),
+        recentDrop:recentDropIds.has(playerId)
+      };
+    })
+    .sort((a,b)=>b.score-a.score)
+    .slice(0, Math.max(1, limit));
+}
+
 function claimWaiverPlayerToTeam(playerToAdd,droppedPlayer=null){
   if(!playerToAdd) return false;
   const targetId=Number(playerToAdd.id);
@@ -4766,6 +4793,7 @@ function renderWaiver(){
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
   const watchIds=getWatchListIds();
+  const radar=getWaiverRadarCandidates(4);
   const unavailableIds=new Set([
     ...(G.rosters||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite),
     ...(G.ilByTeam||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite)
@@ -4844,6 +4872,44 @@ function renderWaiver(){
             </div>
           </div>
           <button class="season-outline-btn" onclick="resetWaiverFilters()">Reset All</button>
+        </div>
+      </div>
+      <div class="season-table-card season-card-pad">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+          <div>
+            <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Waiver Radar</div>
+            <div style="font-size:13px;color:#94a3b8;max-width:560px;">Surface the strongest free-agent targets instantly. Watch-listed players and recently dropped names get priority so you can move faster every time you open the wire.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="season-outline-btn" onclick="setWaiverListMode('watch')">Open Watch List ${watchIds.length?`(${watchIds.length})`:''}</button>
+            <button class="season-outline-btn" onclick="setWaiverListMode('all')">Show Full Pool</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+          ${radar.map(entry=>{
+            const p=entry.player||{};
+            return `<div style="border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;background:linear-gradient(180deg,rgba(19,30,48,.92),rgba(12,18,29,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                <div>
+                  <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;">${escapeHtml(p.name||'Player')}</div>
+                  <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} · ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
+                </div>
+                <button
+                  type="button"
+                  onclick="toggleWatchList(${Number(p.id)})"
+                  title="${entry.watched?'Remove from':'Add to'} watch list"
+                  style="width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${entry.watched?'rgba(250,204,21,.45)':'#24324a'};background:${entry.watched?'rgba(250,204,21,.14)':'#0f1724'};color:${entry.watched?'#facc15':'#94a3b8'};font-size:17px;font-weight:900;cursor:pointer;flex-shrink:0;"
+                >${entry.watched?'★':'☆'}</button>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="season-stat-pill">${Number(p.fp||0).toFixed(1)} fantasy</span>
+                ${entry.recentDrop?'<span class="season-stat-pill" style="border-color:rgba(249,115,22,.35);color:#fdba74;background:rgba(249,115,22,.12);">Recent Drop</span>':''}
+                ${entry.watched?'<span class="season-stat-pill" style="border-color:rgba(250,204,21,.35);color:#fde68a;background:rgba(250,204,21,.12);">Watching</span>':''}
+              </div>
+              <div style="font-size:12px;color:#94a3b8;">PTS ${Number(p.pts||0).toFixed(1)} · REB ${Number(p.reb||0).toFixed(1)} · AST ${Number(p.ast||0).toFixed(1)}</div>
+              <button class="season-outline-btn" onclick="openWaiver(${Number(p.id)})">Add Player</button>
+            </div>`;
+          }).join('')}
         </div>
       </div>
       <div class="season-table-card">

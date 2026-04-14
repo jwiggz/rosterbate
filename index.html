@@ -870,6 +870,14 @@
     flex-shrink:0;
     order:2;
   }
+  .step-num.step-icon{padding:12px;}
+  .step-num.step-icon svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 6px 14px rgba(0,0,0,.22));}
+  .step-num.step-icon .icon-stroke{fill:none;stroke:#e7eef9;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round;}
+  .step-num.step-icon .icon-fill{fill:#f4a34d;}
+  .step-num.step-icon.blue .icon-fill{fill:#74b8ff;}
+  .step-num.step-icon.green .icon-fill{fill:#6fe1a1;}
+  .step-num.step-icon.gold .icon-fill{fill:#f7c56d;}
+  .step-num.step-icon.orange .icon-fill{fill:#ff9f5a;}
   .step-copy{min-width:0;}
   .step h3{font-family:var(--fd);font-size:27px;font-weight:900;text-transform:uppercase;line-height:.92;margin-bottom:0;color:#f6f8fb;}
   .step h3 .accent{color:#f4a34d;}
@@ -1098,42 +1106,102 @@
         <h3>Pick Your <span class="accent">Sport & Mode</span></h3>
         <p>Choose from Basketball, Football, and Baseball. Play solo against AI or invite real people to your league.</p>
       </div>
-      <div class="step-num">🏀</div>
+      <div class="step-num step-icon orange" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="presentation" focusable="false">
+          <circle class="icon-fill" cx="14" cy="16" r="6"></circle>
+          <path class="icon-stroke" d="M10 10c5 1 8 4 10 10"></path>
+          <path class="icon-stroke" d="M8 18c5-1 10 1 14 5"></path>
+          <path class="icon-stroke" d="M13 22c4 3 5 8 4 13"></path>
+          <path class="icon-stroke" d="M22 15h14l4 4v17H22l-4-4V19z"></path>
+          <path class="icon-stroke" d="M26 19h10"></path>
+          <path class="icon-stroke" d="M26 24h10"></path>
+        </svg>
+      </div>
     </div>
       <div class="step">
       <div class="step-copy">
         <h3>Set Up <span class="accent">Your League</span></h3>
         <p>Customize teams, scoring format, roster settings, draft style, and all commissioner rules.</p>
       </div>
-      <div class="step-num">📋</div>
+      <div class="step-num step-icon blue" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="presentation" focusable="false">
+          <rect class="icon-stroke" x="11" y="10" width="26" height="30" rx="4"></rect>
+          <rect class="icon-fill" x="18" y="7" width="12" height="6" rx="2"></rect>
+          <path class="icon-stroke" d="M17 20h14"></path>
+          <path class="icon-stroke" d="M17 26h14"></path>
+          <path class="icon-stroke" d="M17 32h9"></path>
+          <path class="icon-stroke" d="M31 28l4 4"></path>
+          <path class="icon-stroke" d="M29 34l6-6"></path>
+        </svg>
+      </div>
     </div>
       <div class="step">
       <div class="step-copy">
         <h3>Draft Your <span class="accent">Roster</span></h3>
         <p>Snake or auction draft with live pick timers, an auto-draft queue, and mid-draft pick trades.</p>
       </div>
-      <div class="step-num">🕒</div>
+      <div class="step-num step-icon gold" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="presentation" focusable="false">
+          <rect class="icon-stroke" x="8" y="10" width="22" height="28" rx="4"></rect>
+          <path class="icon-stroke" d="M13 16h12"></path>
+          <path class="icon-stroke" d="M13 22h12"></path>
+          <path class="icon-stroke" d="M13 28h8"></path>
+          <circle class="icon-fill" cx="36" cy="30" r="6"></circle>
+          <path class="icon-stroke" d="M36 25v5l3 2"></path>
+        </svg>
+      </div>
     </div>
       <div class="step">
       <div class="step-copy">
         <h3>Manage <span class="accent">All Season</span></h3>
         <p>Set lineups every single day, stream free agents off waivers, propose trades, and track your standings.</p>
       </div>
-      <div class="step-num">🧑‍💼</div>
+      <div class="step-num step-icon green" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="presentation" focusable="false">
+          <rect class="icon-stroke" x="8" y="10" width="32" height="24" rx="4"></rect>
+          <path class="icon-stroke" d="M14 17h20"></path>
+          <path class="icon-stroke" d="M14 23h12"></path>
+          <circle class="icon-fill" cx="16" cy="39" r="3"></circle>
+          <circle class="icon-fill" cx="24" cy="39" r="3"></circle>
+          <circle class="icon-fill" cx="32" cy="39" r="3"></circle>
+          <path class="icon-stroke" d="M16 34v2"></path>
+          <path class="icon-stroke" d="M24 34v2"></path>
+          <path class="icon-stroke" d="M32 34v2"></path>
+        </svg>
+      </div>
     </div>
       <div class="step">
       <div class="step-copy">
         <h3>Win The <span class="accent">Championship</span></h3>
         <p>Top teams advance to the playoffs. Full bracket, seeding, and championship round with reseeding options.</p>
       </div>
-      <div class="step-num">🏆</div>
+      <div class="step-num step-icon gold" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="presentation" focusable="false">
+          <path class="icon-fill" d="M17 10h14v6c0 5-3 9-7 11-4-2-7-6-7-11z"></path>
+          <path class="icon-stroke" d="M17 10h14v6c0 5-3 9-7 11-4-2-7-6-7-11z"></path>
+          <path class="icon-stroke" d="M17 13h-4c0 5 2 8 6 9"></path>
+          <path class="icon-stroke" d="M31 13h4c0 5-2 8-6 9"></path>
+          <path class="icon-stroke" d="M24 27v7"></path>
+          <path class="icon-stroke" d="M18 39h12"></path>
+          <path class="icon-stroke" d="M20 34h8v5h-8z"></path>
+        </svg>
+      </div>
     </div>
       <div class="step">
       <div class="step-copy">
         <h3>Earn Profile <span class="accent">Awards</span></h3>
         <p>Win a multiplayer season and unlock profile awards that show off your championships, dominance, and long-term bragging rights.</p>
       </div>
-      <div class="step-num">🛡️</div>
+      <div class="step-num step-icon blue" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="presentation" focusable="false">
+          <path class="icon-fill" d="M24 9l11 4v9c0 8-4.4 13-11 17-6.6-4-11-9-11-17v-9z"></path>
+          <path class="icon-stroke" d="M24 9l11 4v9c0 8-4.4 13-11 17-6.6-4-11-9-11-17v-9z"></path>
+          <path class="icon-stroke" d="M24 17v11"></path>
+          <path class="icon-stroke" d="M19 22h10"></path>
+          <circle class="icon-fill" cx="14" cy="34" r="3"></circle>
+          <circle class="icon-fill" cx="34" cy="34" r="3"></circle>
+        </svg>
+      </div>
     </div>
   </div>
 
