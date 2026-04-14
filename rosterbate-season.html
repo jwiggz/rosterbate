@@ -12,7 +12,7 @@
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <style>
-:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;--accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;}
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;--accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--hub-landing-image:none;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
 input[type=number]{-moz-appearance:textfield;appearance:textfield;}
@@ -64,15 +64,16 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .mc-score.trailing{color:#fca5a5;border-color:#7f1d1d;background:#221313;}
     .hub-shell{display:grid;gap:18px;align-items:start;max-width:1680px;width:100%;margin:0 auto;}
     .hub-side-aux,.hub-side-left,.hub-main,.hub-column{display:flex;flex-direction:column;gap:16px;min-width:0;}
-    .hub-card{background:#121a29;border:1px solid #24324a;border-radius:14px;padding:16px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
+    .hub-card{background:linear-gradient(180deg,rgba(21,28,40,.72),rgba(12,18,29,.82));border:1px solid rgba(214,232,255,.18);border-radius:18px;padding:16px;box-shadow:0 18px 40px rgba(2,6,23,.34),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
     .hub-card.compact{padding:14px 16px;}
 .hub-card-title{font-family:var(--fb);font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:14px;text-align:center;}
 .hub-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
 .hub-card-head-copy{min-width:0;flex:1;}
 .hub-card-sub{font-size:11px;color:#94a3b8;line-height:1.45;margin-top:4px;}
 .hub-card-meta{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;white-space:nowrap;}
-.hub-summary{position:relative;overflow:hidden;background:linear-gradient(135deg,#121a29 0%,#172234 100%);border:1px solid #24324a;border-radius:14px;padding:18px 18px 16px;box-shadow:0 10px 28px rgba(2,6,23,.28);}
-.hub-summary:before{content:'';position:absolute;inset:auto -40px -10px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(251,146,60,.12),transparent 62%);pointer-events:none;}
+.hub-summary{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(33,26,22,.48) 0%,rgba(19,25,37,.7) 48%,rgba(28,35,48,.62) 100%);border:1px solid rgba(248,202,173,.24);border-radius:22px;padding:20px 20px 18px;box-shadow:0 24px 48px rgba(2,6,23,.38),inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.hub-summary:before{content:'';position:absolute;inset:auto -40px -10px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(251,146,60,.18),transparent 64%);pointer-events:none;}
+.hub-summary:after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.05),transparent 32%,transparent 70%,rgba(125,211,252,.08));pointer-events:none;}
     .hub-summary-top{display:grid;grid-template-columns:minmax(320px,1fr) minmax(180px,220px);align-items:start;gap:18px;margin-bottom:16px;position:relative;z-index:1;}
     .hub-summary-ident{display:flex;align-items:flex-start;gap:14px;min-width:0;}
     .hub-summary-copy{min-width:0;}
@@ -84,13 +85,13 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-summary-meta .eyebrow{font-family:var(--fb);font-size:12px;font-weight:700;color:#94a3b8;}
     .hub-summary-meta .opp{font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;margin-top:4px;}
 .hub-summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
-    .hub-stat{background:#0f1724;border:1px solid #24324a;border-radius:10px;padding:12px 12px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:82px;}
+    .hub-stat{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:12px 12px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:82px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);}
     .hub-stat-value{font-family:var(--fb);font-size:28px;font-weight:800;line-height:1.05;color:#f8fafc;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;text-wrap:balance;}
     .hub-stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;margin-top:8px;letter-spacing:.8px;font-weight:700;text-align:center;}
     .hub-now-band{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px;position:relative;z-index:1;}
-    .hub-now-card{background:#0f1724;border:1px solid #24324a;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:108px;}
-    .hub-now-card.alert{border-color:rgba(249,115,22,.3);background:linear-gradient(180deg,rgba(46,23,12,.92),rgba(15,23,36,.98));}
-    .hub-now-card.live{border-color:rgba(34,197,94,.26);background:linear-gradient(180deg,rgba(16,44,29,.92),rgba(15,23,36,.98));}
+    .hub-now-card{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:108px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+    .hub-now-card.alert{border-color:rgba(249,115,22,.38);background:linear-gradient(180deg,rgba(87,39,14,.62),rgba(20,24,36,.84));}
+    .hub-now-card.live{border-color:rgba(74,222,128,.34);background:linear-gradient(180deg,rgba(13,75,43,.56),rgba(18,25,36,.84));}
 .hub-now-label{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#94a3b8;}
 .hub-now-value{font-family:var(--fb);font-size:18px;font-weight:800;line-height:1.1;color:#f8fafc;}
 .hub-now-copy{font-size:12px;color:#cbd5e1;line-height:1.45;flex:1;}
@@ -201,14 +202,14 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   .trade-builder-roster{max-height:none;}
 }
 .hub-actions{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;}
-    .hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:96px;border:1px solid #24324a;background:#121a29;color:#f8fafc;width:100%;border-radius:12px;padding:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;}
-    .hub-action:hover{transform:translateY(-1px);border-color:#f59e0b;box-shadow:0 14px 26px rgba(2,6,23,.3);}
+    .hub-action{display:flex;align-items:flex-start;gap:10px;text-align:left;cursor:pointer;min-height:96px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));color:#f8fafc;width:100%;border-radius:16px;padding:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease,background .14s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+    .hub-action:hover{transform:translateY(-1px);border-color:rgba(251,146,60,.55);background:linear-gradient(180deg,rgba(251,146,60,.14),rgba(255,255,255,.05));box-shadow:0 18px 28px rgba(2,6,23,.34);}
     .hub-action-icon{font-size:22px;line-height:1;margin-top:2px;flex-shrink:0;}
     .hub-action-title{font-family:var(--fb);font-size:16px;font-weight:700;letter-spacing:.1px;}
     .hub-action-sub{font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.35;}
     .hub-lower{display:grid;gap:16px;grid-template-rows:auto auto;}
     .activity-feed{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
-    .activity-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;padding:12px 6px;border-bottom:1px solid #1d283b;background:#121a29;}
+    .activity-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;padding:12px 6px;border-bottom:1px solid rgba(214,232,255,.1);background:transparent;}
     .activity-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:4px;}
     .activity-copy{min-width:0;flex:1;}
     .activity-title{font-family:var(--fb);font-size:13px;font-weight:700;line-height:1.15;color:#f8fafc;}
@@ -216,7 +217,71 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .activity-text{font-size:13px;color:#dbe4f0;line-height:1.45;margin-top:2px;}
     .hub-team-card{text-align:center;padding-top:18px;padding-bottom:18px;}
     .hub-team-name{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;margin-top:12px;}
-    .hub-team-record{font-size:13px;color:#94a3b8;margin-top:4px;}
+    .hub-team-record{font-size:13px;color:#d7e4f6;margin-top:4px;}
+.season-league-hero{position:relative;isolation:isolate;}
+#hub .rb-home-bar{background:linear-gradient(180deg,rgba(18,24,36,.58),rgba(16,22,34,.3));border-bottom:1px solid rgba(176,226,255,.26);box-shadow:0 10px 30px rgba(3,10,20,.26),inset 0 -1px 0 rgba(255,255,255,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+#hub .season-topbar{background:linear-gradient(180deg,rgba(16,24,36,.52),rgba(11,18,29,.24));border-bottom:1px solid rgba(176,226,255,.18);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 14px 32px rgba(3,10,20,.2),inset 0 -1px 0 rgba(255,255,255,.06);}
+#hub .season-chip{background:rgba(12,18,29,.42);border-color:rgba(176,226,255,.22);color:#e2ebf7;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+#hub .season-chip.action{background:rgba(15,23,36,.52);border-color:rgba(176,226,255,.24);}
+#hub .season-chip.primary{background:rgba(86,39,15,.44);border-color:rgba(251,146,60,.38);color:#fed7aa;}
+#hub .sb{position:relative;padding:18px 18px 28px;background-color:#07111d;background-size:cover;background-position:center top;background-repeat:no-repeat;}
+#hub .sb:before{content:'';position:absolute;inset:0;background:
+  radial-gradient(circle at 50% 0%,rgba(255,255,255,.18),transparent 18%),
+  linear-gradient(180deg,rgba(6,10,18,.18),rgba(7,11,19,.48) 18%,rgba(6,10,18,.72) 100%);
+  pointer-events:none;z-index:0;}
+#hub .sb > *{position:relative;z-index:1;}
+#hub #advBtn{position:relative;isolation:isolate;overflow:hidden;border:none;border-radius:24px;padding:18px 24px;font-family:var(--fb);font-size:20px;font-weight:800;letter-spacing:.04em;background:transparent !important;box-shadow:none;color:#f8fff7;text-shadow:0 1px 2px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:74px;transition:transform .16s ease,filter .16s ease;}
+#hub #advBtn::before{content:'';position:absolute;inset:-22% -10%;border-radius:38px;background:
+  radial-gradient(16% 88% at 2% 50%,rgba(249,115,22,0) 0%,rgba(249,115,22,.94) 30%,rgba(251,191,36,.36) 52%,rgba(249,115,22,0) 72%),
+  radial-gradient(16% 88% at 98% 50%,rgba(249,115,22,0) 0%,rgba(249,115,22,.94) 30%,rgba(251,191,36,.36) 52%,rgba(249,115,22,0) 72%),
+  radial-gradient(12% 68% at 7% 35%,rgba(251,146,60,.0) 0%,rgba(251,146,60,.72) 34%,rgba(249,115,22,0) 68%),
+  radial-gradient(12% 68% at 93% 65%,rgba(251,146,60,.0) 0%,rgba(251,146,60,.72) 34%,rgba(249,115,22,0) 68%),
+  radial-gradient(28% 90% at 8% 50%,rgba(34,197,94,.0) 0%,rgba(34,197,94,.0) 18%,rgba(74,222,128,.88) 38%,rgba(187,247,208,.18) 58%,rgba(34,197,94,0) 74%),
+  radial-gradient(26% 88% at 34% 50%,rgba(34,197,94,0) 0%,rgba(34,197,94,0) 16%,rgba(74,222,128,.62) 34%,rgba(255,255,255,.16) 56%,rgba(34,197,94,0) 72%),
+  radial-gradient(32% 92% at 62% 50%,rgba(34,197,94,0) 0%,rgba(34,197,94,0) 16%,rgba(134,239,172,.74) 36%,rgba(255,255,255,.14) 54%,rgba(34,197,94,0) 74%),
+  radial-gradient(28% 86% at 88% 50%,rgba(34,197,94,0) 0%,rgba(34,197,94,0) 18%,rgba(74,222,128,.86) 38%,rgba(187,247,208,.2) 56%,rgba(34,197,94,0) 72%);
+  background-size:140% 170%,140% 170%,120% 140%,120% 140%,220% 160%,220% 160%,220% 160%,220% 160%;
+  background-position:-3% 50%,103% 50%,3% 35%,97% 65%,0% 50%,30% 50%,65% 50%,100% 50%;
+  filter:blur(14px);
+  opacity:.96;
+  z-index:-2;
+  animation:seasonRevealFlow 8.2s linear infinite,seasonRevealEdgeFlame 3.2s ease-in-out infinite alternate;}
+#hub #advBtn::after{content:'';position:absolute;inset:0;border-radius:24px;background:
+  linear-gradient(135deg,rgba(4,20,11,.96) 0%,rgba(8,42,20,.94) 24%,rgba(15,92,46,.96) 52%,rgba(9,40,22,.96) 100%),
+  radial-gradient(circle at 50% 48%,rgba(187,247,208,.18),transparent 54%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),inset 0 10px 22px rgba(255,255,255,.08),0 0 0 2px rgba(255,255,255,.08),0 16px 34px rgba(2,6,23,.34),0 0 32px rgba(34,197,94,.34),0 0 18px rgba(249,115,22,.34);
+  z-index:-1;}
+#hub #advBtn:hover{transform:translateY(-1px);filter:saturate(1.06);}
+#hub #advBtn:disabled{cursor:default;filter:saturate(.72);}
+#hub #advBtn:disabled::before{opacity:.4;animation:none;}
+#hub #advBtn.is-done::after{background:linear-gradient(135deg,rgba(30,41,59,.92),rgba(51,65,85,.92));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 12px 28px rgba(2,6,23,.28);}
+#hub #advBtn.is-done::before{background:radial-gradient(circle at 50% 50%,rgba(148,163,184,.34),rgba(15,23,42,0) 75%);}
+.season-reveal-btn-label,.season-reveal-btn-sub{position:relative;z-index:1;}
+.season-reveal-btn-label{font-family:var(--fb);font-size:22px;font-weight:800;line-height:1.05;color:#f8fff7;letter-spacing:.04em;text-align:center;}
+.season-reveal-btn-sub{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(220,252,231,.88);text-align:center;}
+@keyframes seasonRevealPulse{
+  0%,100%{transform:scale(.98);opacity:.82;}
+  50%{transform:scale(1.02);opacity:1;}
+}
+@keyframes seasonRevealFlow{
+  0%{background-position:-8% 50%,18% 50%,55% 50%,92% 50%;}
+  50%{background-position:35% 50%,58% 50%,94% 50%,132% 50%;}
+  100%{background-position:78% 50%,102% 50%,138% 50%,176% 50%;}
+}
+@keyframes seasonRevealEdgeFlame{
+  0%{
+    filter:blur(12px) saturate(1);
+    transform:translateY(-1px) scaleX(.995);
+  }
+  50%{
+    filter:blur(15px) saturate(1.14);
+    transform:translateY(1px) scaleX(1.01);
+  }
+  100%{
+    filter:blur(13px) saturate(1.08);
+    transform:translateY(-2px) scaleX(1.005);
+  }
+}
     .hub-mini-link{display:inline-block;margin-top:14px;font-size:13px;color:#93c5fd;text-decoration:none;font-weight:600;}
     .hub-scoreboard{display:flex;flex-direction:column;gap:0;}
     .hub-score-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #1d283b;}
@@ -399,7 +464,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .season-chip.action{background:#121a29;color:#f8fafc;position:relative;z-index:12;pointer-events:auto;cursor:pointer;}
 .tpb{position:relative;z-index:12;pointer-events:auto;}
 .season-team-link-btn[data-open-picker]{position:relative;z-index:12;pointer-events:auto;cursor:pointer;}
-    #hub .sb{background:#0b1220;}
+    #hub .sb{background-color:#07111d;}
     #hub .bg{background:#2563eb;color:#fff;border:none;}
     #hub .rb-chat-panel{background:#121a29;border:1px solid #24324a;border-radius:14px;box-shadow:0 10px 28px rgba(2,6,23,.28);height:420px;max-height:420px;overflow:hidden;}
     #hub .rb-chat-hdr,#hub .rb-chat-input-area{background:#121a29;}
@@ -1927,6 +1992,22 @@ function applySportContext(sport){
   STARTERS = SPORT_CFG.starterSlots.length;
   SLOT_LABELS = [...SPORT_CFG.starterSlots];
   setSelectedRosterbateSport(CURRENT_SPORT);
+  const landingImages={
+    nba:'/basketball landing page 2.jpg',
+    nfl:'/football landing page.jpg',
+    mlb:'/baseball landing page.jpg'
+  };
+  const landingFile=landingImages[CURRENT_SPORT] || '/basketball landing page 2.jpg';
+  const landingUrl=encodeURI(landingFile);
+  document.documentElement.style.setProperty('--hub-landing-image', `url("${landingUrl}")`);
+  const hubScroller=document.querySelector('#hub .sb');
+  if(hubScroller){
+    hubScroller.style.backgroundImage=[
+      'radial-gradient(circle at top center, rgba(255,255,255,.14), transparent 22%)',
+      'linear-gradient(180deg, rgba(6,10,18,.18), rgba(7,11,19,.48) 18%, rgba(6,10,18,.72) 100%)',
+      `url("${landingUrl}")`
+    ].join(',');
+  }
   const homeLabel = '&#127968; Roster<span style="color:var(--accent)">Bate</span>';
   ['seasonHomeLink','rosterHomeLink','waiverHomeLink','tradesHomeLink'].forEach(id => {
     const el = document.getElementById(id);
@@ -3535,29 +3616,28 @@ function waiverCell(player,key){
     else if(signals.radarTarget) tags.push(`<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(34,197,94,.34);background:rgba(21,128,61,.18);color:#86efac;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Radar #${signals.radarRank+1}</span>`);
     if(signals.recentDrop) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#fdba74;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Recent Drop</span>');
     if(watched) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(250,204,21,.34);background:rgba(250,204,21,.14);color:#fde68a;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Watching</span>');
-    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:220px;">
-      <div style="display:flex;align-items:center;gap:9px;min-width:0;flex:1;">
+    return `<div style="display:flex;align-items:flex-start;gap:10px;min-width:220px;">
+      <div style="display:flex;align-items:flex-start;gap:9px;min-width:0;flex:1;">
       <div class="pav" style="background:${tc(player.team)};width:34px;height:34px;font-size:12px;flex-shrink:0;">${ini(player.name)}</div>
-      <div style="min-width:0;">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:7px;">
         <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
-        <div style="font-size:11px;color:#6b7280;">${player.team} · ${player.pos}</div>
         ${tags.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${tags.join('')}</div>`:''}
-      </div>
-      </div>
-      <div style="display:flex;align-items:flex-end;gap:8px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <button
           type="button"
           onclick="toggleWatchList(${player.id})"
           title="${watched?'Remove from':'Add to'} watch list"
           aria-label="${watched?'Remove from':'Add to'} watch list"
           style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${watched?'rgba(250,204,21,.45)':'#24324a'};background:${watched?'rgba(250,204,21,.14)':'#0f1724'};color:${watched?'#facc15':'#94a3b8'};font-size:16px;font-weight:900;cursor:pointer;flex-shrink:0;transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;"
-        >${watched?'?':'?'}</button>
+        >${watched?'&#9733;':'&#9734;'}</button>
         <button
           type="button"
           onclick="openWaiver(${player.id})"
           class="season-outline-btn"
           style="padding:7px 12px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;white-space:nowrap;"
         >Add Player</button>
+        </div>
+      </div>
       </div>
     </div>`;
   }
@@ -4606,8 +4686,15 @@ function renderHub(){
     </div>`).join('');
   }
   const ab=document.getElementById('advBtn');
-  if(G.isSeasonComplete){ab.textContent='Season Complete';ab.style.background='var(--text3)';ab.disabled=true;}
-  else{ab.textContent='Reveal Day '+G.day+' Results';ab.style.background='var(--green)';ab.disabled=false;}
+  if(G.isSeasonComplete){
+    ab.classList.add('is-done');
+    ab.innerHTML='<span class="season-reveal-btn-label">Season Complete</span><span class="season-reveal-btn-sub">League history locked in</span>';
+    ab.disabled=true;
+  }else{
+    ab.classList.remove('is-done');
+    ab.innerHTML=`<span class="season-reveal-btn-label">Reveal Day ${G.day} Results</span><span class="season-reveal-btn-sub">Update scores and league activity</span>`;
+    ab.disabled=false;
+  }
   const hubActions=document.querySelector('#hub .hub-actions');
   if(hubActions){
     let watchCard=document.getElementById('hubWatchListCard');
@@ -5558,26 +5645,39 @@ function renderWaiver(){
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
           ${radar.map(entry=>{
             const p=entry.player||{};
+            const radarStats=[
+              ['PTS', Number(p.pts||0)],
+              ['REB', Number(p.reb||0)],
+              ['AST', Number(p.ast||0)],
+              ['STL', Number(p.stl||0)],
+              ['BLK', Number(p.blk||0)],
+              ['3PM', Number(p.tpm||0)]
+            ].filter(([,value])=>value>0);
+            const radarSummary=radarStats.length
+              ? radarStats.slice(0,3).map(([label,value])=>`${label} ${value.toFixed(1)}`).join(' · ')
+              : getRosterbatePlayerSummary(p,CURRENT_SPORT);
             return `<div style="border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;background:linear-gradient(180deg,rgba(19,30,48,.92),rgba(12,18,29,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
                 <div>
                   <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;">${escapeHtml(p.name||'Player')}</div>
                   <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} · ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
                 </div>
-                <button
-                  type="button"
-                  onclick="toggleWatchList(${Number(p.id)})"
-                  title="${entry.watched?'Remove from':'Add to'} watch list"
-                  style="width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${entry.watched?'rgba(250,204,21,.45)':'#24324a'};background:${entry.watched?'rgba(250,204,21,.14)':'#0f1724'};color:${entry.watched?'#facc15':'#94a3b8'};font-size:17px;font-weight:900;cursor:pointer;flex-shrink:0;"
-                >${entry.watched?'★':'☆'}</button>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                  <button
+                    type="button"
+                    onclick="toggleWatchList(${Number(p.id)})"
+                    title="${entry.watched?'Remove from':'Add to'} watch list"
+                    style="width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${entry.watched?'rgba(250,204,21,.45)':'#24324a'};background:${entry.watched?'rgba(250,204,21,.14)':'#0f1724'};color:${entry.watched?'#facc15':'#94a3b8'};font-size:17px;font-weight:900;cursor:pointer;flex-shrink:0;"
+                  >${entry.watched?'&#9733;':'&#9734;'}</button>
+                  <button class="season-outline-btn" onclick="openWaiver(${Number(p.id)})" style="padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;white-space:nowrap;">Add Player</button>
+                </div>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <span class="season-stat-pill">${Number(p.fp||0).toFixed(1)} fantasy</span>
                 ${entry.recentDrop?'<span class="season-stat-pill" style="border-color:rgba(249,115,22,.35);color:#fdba74;background:rgba(249,115,22,.12);">Recent Drop</span>':''}
                 ${entry.watched?'<span class="season-stat-pill" style="border-color:rgba(250,204,21,.35);color:#fde68a;background:rgba(250,204,21,.12);">Watching</span>':''}
               </div>
-              <div style="font-size:12px;color:#94a3b8;">PTS ${Number(p.pts||0).toFixed(1)} · REB ${Number(p.reb||0).toFixed(1)} · AST ${Number(p.ast||0).toFixed(1)}</div>
-              <button class="season-outline-btn" onclick="openWaiver(${Number(p.id)})">Add Player</button>
+              <div style="font-size:12px;color:#94a3b8;">${escapeHtml(radarSummary||'Ready for a closer look on the full wire.')}</div>
             </div>`;
           }).join('')}
         </div>
@@ -7879,7 +7979,6 @@ function rbClosePickersAll(){
 })();
 </script>
 
-<script src="/site-background.js"></script>
 </body>
 </html>
 
