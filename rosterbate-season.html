@@ -1498,6 +1498,17 @@ function renderActiveSeasonPage(){
   const active=document.querySelector('.screen.active')?.id || 'hub';
   ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[active]?.();
 }
+let rosterRenderQueued=false;
+function scheduleRosterRender(){
+  if(rosterRenderQueued) return;
+  rosterRenderQueued=true;
+  requestAnimationFrame(()=>{
+    rosterRenderQueued=false;
+    if(document.getElementById('roster')?.classList.contains('active')){
+      renderRoster();
+    }
+  });
+}
 async function saveSharedSeason(force, reason){
   if(sharedSeasonHydrating || !D?.multiplayer) return false;
   const updates=buildSharedSeasonUpdates(null);
@@ -2436,9 +2447,27 @@ function normalizeStarterIdList(source){
   return Array.from({length:STARTERS},()=>null);
 }
 
+function hasInvalidStarterLayout(starterIds, roster){
+  const normalized=normalizeStarterIdList(starterIds);
+  return normalized.some((playerId,index)=>{
+    if(!playerId) return false;
+    const player=(roster||[]).find(p=>Number(p?.id)===Number(playerId));
+    if(!player) return true;
+    return !canPlayerFillSlot(player, SLOT_LABELS[index]||'UTIL');
+  });
+}
+
+function repairStarterLayoutForRoster(starterIds, roster, day){
+  if(!hasInvalidStarterLayout(starterIds, roster)) return normalizeStarterIdList(starterIds);
+  return normalizeStarterIdList(buildBestLineupIdsForRoster(roster||[], day));
+}
+
 function getStarterIdsForTeamDay(teamIdx,day){
   if(teamIdx===D.myPos) return normalizeStarterIdList(getLineupForDay(day));
-  return normalizeStarterIdList(G.starters[teamIdx]);
+  const roster=G.rosters[teamIdx]||[];
+  const repaired=repairStarterLayoutForRoster(G.starters[teamIdx], roster, day);
+  G.starters[teamIdx]=[...repaired];
+  return repaired;
 }
 
 function canPlayerFillSlot(player, slot){
@@ -2729,7 +2758,7 @@ function buildBestLineupIdsForRoster(roster, day){
       lineupBySlot[index]=match.player.id;
     }
   });
-  return lineupBySlot.filter(Boolean);
+  return normalizeStarterIdList(lineupBySlot);
 }
 
 function getSportAwareFantasyScore(player){
@@ -3758,7 +3787,11 @@ async function recordLifetimeSeasonStats(){
 function getLineupForDay(day){
   const teamLineups=getDailyLineupStore(D.myPos);
   const source=teamLineups[day]||G.starters[D.myPos]||[];
-  return Array.from({length:STARTERS},(_,index)=>source[index]||null);
+  const roster=G.rosters[D.myPos]||[];
+  const repaired=repairStarterLayoutForRoster(source, roster, day);
+  teamLineups[day]=[...repaired];
+  G.starters[D.myPos]=[...repaired];
+  return repaired;
 }
 
 function setLineupForDay(day,starterIds){
