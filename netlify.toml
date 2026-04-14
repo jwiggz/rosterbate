@@ -6,8 +6,3 @@
   port = 8888
   targetPort = 8080
   autoLaunch = false
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Content-Encoding = "br"
-    Content-Encoding = "gzip"
