@@ -1578,6 +1578,12 @@ function cloneJsonSafe(value){
 function hydrateDraftUserContextFromLobby(){
   const lobby=getSavedMultiplayerLobbyState();
   if(!D) return;
+  const explicitMultiplayerContext=!!(
+    D?.multiplayer ||
+    D?.lobbyId ||
+    D?.sharedSeasonId ||
+    (D?.teamUsers && typeof D.teamUsers==='object' && Object.keys(D.teamUsers).length)
+  );
   const seasonKeys=new Set([
     String(D?.seasonId || '').trim(),
     String(D?.sharedSeasonId || '').trim(),
@@ -1589,7 +1595,7 @@ function hydrateDraftUserContextFromLobby(){
     String(lobby?.lobbyId || '').trim()
   ].filter(Boolean);
   const lobbyMatchesSeason=!!(seasonKeys.size && lobbyKeys.some(key=>seasonKeys.has(key)));
-  const shouldUseLobby=!!(D?.multiplayer || lobbyMatchesSeason);
+  const shouldUseLobby=!!(explicitMultiplayerContext && lobbyMatchesSeason);
   if(lobby?.lobbyId && shouldUseLobby){
     D.multiplayer=true;
     if(!D.lobbyId) D.lobbyId=lobby.lobbyId;
