@@ -3846,6 +3846,15 @@ window.onload=async function(){
       console.log('🚀 Found pending fresh season handoff for this league. Using it before cloud restore.');
       D = pendingSeasonLaunch.data;
       D.isFreshDraftLaunch = true;
+      console.log('🧭 Pending season handoff payload summary:', {
+        leagueId,
+        leagueSize: Number(D?.leagueSize || 0),
+        teams: Array.isArray(D?.teams) ? D.teams : [],
+        allRosters: Array.isArray(D?.allRosters) ? D.allRosters.length : 0,
+        currentWeek: Number(D?.currentWeek || 0),
+        currentDay: Number(D?.currentDay || 0),
+        isFreshDraftLaunch: !!D?.isFreshDraftLaunch
+      });
       if (!D.myPos && D.myPos !== 0) D.myPos = 0;
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();

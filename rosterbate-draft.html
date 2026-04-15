@@ -2800,6 +2800,52 @@ function getDraftAiNames(){
   return names.length ? names : getSportOpponentNames(SPORT).slice(0, 7);
 }
 
+function getCompletedDraftTeamCount(){
+  const configuredSize=parseInt(document.getElementById('iSize')?.value,10)||0;
+  const stateSize=Number(S?.ls||0);
+  const rounds=Number(S?.rds||currentLeagueRules()?.rosterSize||0);
+  const maxPickTeam=Array.isArray(S?.picks)
+    ? S.picks.reduce((maxIdx,pick)=>Math.max(maxIdx, Number(pick?.ti||0)), -1) + 1
+    : 0;
+  const inferredFromPicks=(rounds>0 && Array.isArray(S?.picks))
+    ? Math.round(S.picks.length / rounds)
+    : 0;
+  return Math.max(configuredSize, stateSize, maxPickTeam, inferredFromPicks, 2);
+}
+
+function buildSoloDraftTeams(teamName, teamCount, myPos){
+  const opponentNames=getSportOpponentNames(SPORT);
+  return Array.from({length:teamCount},(_,idx)=>{
+    if(idx===myPos) return teamName;
+    const opponentIdx=idx < myPos ? idx : idx - 1;
+    return opponentNames[opponentIdx] || ('Team ' + (idx + 1));
+  });
+}
+
+function normalizeCompletedDraftContext(){
+  const useLobbyDraft=isLobbyDraftContext();
+  const lobbyState=useLobbyDraft ? getSavedMultiplayerLobbyState() : null;
+  const orderedLobbyPlayers=useLobbyDraft ? getOrderedLobbyPlayers(lobbyState) : [];
+  const teamCount=getCompletedDraftTeamCount();
+  let myPos=Math.max(0, Math.min(teamCount-1, Number(S?.myPos||0)));
+  let teamName=(document.getElementById('iName')?.value||'').trim().replace(/\s+/g,' ') || S.name || 'My Team';
+  let teams=[];
+  const isMultiplayer=!!(useLobbyDraft && lobbyState?.lobbyId && orderedLobbyPlayers.length===teamCount);
+  if(isMultiplayer){
+    const myLobbyIdx=orderedLobbyPlayers.findIndex(player=>player?.id===lobbyState?.myId);
+    if(myLobbyIdx>=0) myPos=myLobbyIdx;
+    teamName=orderedLobbyPlayers[myPos]?.name || teamName;
+    teams=orderedLobbyPlayers.map((player,idx)=>player?.name || ('Team '+(idx+1)));
+  }else{
+    teams=buildSoloDraftTeams(teamName, teamCount, myPos);
+  }
+  S.ls=teamCount;
+  S.myPos=myPos;
+  S.name=teamName;
+  S.teams=teams.slice();
+  return { lobbyState, orderedLobbyPlayers, teamCount, myPos, teamName, teams, isMultiplayer };
+}
+
 function getScheduledDraftStartAt(){
   if(!isLobbyDraftContext()) return 0;
   const state=getSavedMultiplayerLobbyState();
@@ -2834,8 +2880,8 @@ function startDraft(){
   const ls=parseInt(document.getElementById('iSize').value);
   const sp=parseInt(document.getElementById('iSpot').value);
   const rd=rules.rosterSize;
-  const lobbyState=getSavedMultiplayerLobbyState();
   const useLobbyDraft=isLobbyDraftContext();
+  const lobbyState=useLobbyDraft ? getSavedMultiplayerLobbyState() : null;
   const allowSoloTest=!!(useLobbyDraft && lobbyState?.soloTest && lobbyState?.lobbyId);
   const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
@@ -2873,6 +2919,14 @@ function startDraft(){
     const tn=getSportOpponentNames(SPORT);
     S.teams=Array.from({length:ls},(_,i)=>i===S.myPos?S.name:(tn[i]||'Team '+(i+1)));
   }
+  console.log('🎛️ Draft start context:', {
+    leagueSize: ls,
+    draftSpot: sp,
+    rounds: rd,
+    useLobbyDraft,
+    lobbyId: lobbyState?.lobbyId || null,
+    teams: S.teams
+  });
   S.cpuBuds=Array.from({length:ls},()=>S.abud);
   S.order=pickOrder(ls,rd,S.fmt);
   document.getElementById('mFmt').textContent=S.fmt.toUpperCase();
@@ -4726,11 +4780,12 @@ async function endDraft(){
   if(completeEl) completeEl.classList.add('active');
   console.log('✓ Draft screen hidden, complete screen shown');
   try{
-    const lobbyState=getSavedMultiplayerLobbyState();
-    const orderedLobbyPlayers=getOrderedLobbyPlayers(lobbyState);
-    const teamCount=Array.isArray(S.teams)?S.teams.length:0;
-    const isMultiplayer=!!(lobbyState?.lobbyId && orderedLobbyPlayers.length===teamCount);
-    const currentLeagueName=(document.getElementById('iLeagueName')?.value||'').trim() || lobbyState?.name || lobbyState?.leagueName || S.league || 'RosterBate League';
+    const normalizedDraft=normalizeCompletedDraftContext();
+    const lobbyState=normalizedDraft.lobbyState;
+    const orderedLobbyPlayers=normalizedDraft.orderedLobbyPlayers;
+    const teamCount=normalizedDraft.teamCount;
+    const isMultiplayer=normalizedDraft.isMultiplayer;
+    const currentLeagueName=(document.getElementById('iLeagueName')?.value||'').trim() || (isMultiplayer ? (lobbyState?.name || lobbyState?.leagueName) : '') || S.league || 'RosterBate League';
     const teamUsers=isMultiplayer
       ? orderedLobbyPlayers.reduce((acc,player,idx)=>{
         if(player?.id){
@@ -4778,15 +4833,15 @@ async function endDraft(){
       playerPoolSource: (SPORT==='nba' && !isMultiplayer)
         ? 'static_2024_25'
         : ((typeof isRosterbateLiveServiceSport === 'function' && isRosterbateLiveServiceSport(SPORT)) ? 'live' : 'imported_snapshot'),
-      teamName: S.name,
+      teamName: normalizedDraft.teamName,
       leagueName: currentLeagueName,
-      leagueSize: S.ls,
+      leagueSize: teamCount,
       scoringFormat: S.scr,
       draftFormat: S.fmt,
       rounds: S.rds,
       customRules: S.rules,
       commissionerSettings: {
-        numTeams:S.ls,
+        numTeams:teamCount,
         draftType:S.fmt.charAt(0).toUpperCase()+S.fmt.slice(1),
         timePerPick:S.tmax,
         scoringType:S.scr==='h2h_cat'?'H2H Categories':S.scr==='moneyball_cat'?'Moneyball Categories':S.scr==='moneyball_pts'?'Moneyball H2H Points':S.scr==='roto'?'Rotisserie':S.scr==='points'?'Points Only':'H2H Points',
@@ -4796,13 +4851,13 @@ async function endDraft(){
         irSlots:S.rules?.irSlots||(typeof SPORT_RULES!=='undefined'?SPORT_RULES.irSlots:1),
         scoring:S.rules?.scoring||(typeof SPORT_RULES!=='undefined'?SPORT_RULES.scoring:{})
       },
-      myPos: S.myPos,
-      teams: Array.isArray(S.teams)?S.teams:[],
+      myPos: normalizedDraft.myPos,
+      teams: normalizedDraft.teams.slice(),
       picks: Array.isArray(S.picks)?S.picks:[],
       myRoster: (Array.isArray(S.myTeam)?S.myTeam:[]).map(serializePlayer),
       freeAgents: undraftedPlayers.map(p=>({...p})),
       waiver: undraftedPlayers.map(p=>({...p})),
-      allRosters: (Array.isArray(S.teams)?S.teams:[]).map((_,ti)=>{
+      allRosters: Array.from({length:teamCount},(_,ti)=>{
         return (Array.isArray(S.picks)?S.picks:[]).filter(pk=>pk.ti===ti).map(pk=>{
           const p=PLAYERS.find(x=>x.id===pk.pid);
           return p?serializePlayer(p):null;
@@ -4836,6 +4891,13 @@ async function endDraft(){
       waiverPriority: {},
       isFreshDraftLaunch: true
     };
+    console.log('🎯 Completed draft handoff payload:', {
+      leagueSize: draftData.leagueSize,
+      teams: draftData.teams,
+      picks: Array.isArray(draftData.picks) ? draftData.picks.length : 0,
+      rounds: draftData.rounds,
+      multiplayer: draftData.multiplayer
+    });
 
     if(isMultiplayer && lobbyState?.lobbyId){
       const sharedSeasonId=await ensureMultiplayerLobbySeasonId(lobbyState.lobbyId);
