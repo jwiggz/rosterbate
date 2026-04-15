@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="audit-logger.js"></script>
 <script src="sport-config.js"></script>
 
 <style>
@@ -2303,6 +2304,22 @@ async function createAndJoinLobby(opts){
   await newRef.set(lobby);
   if(!newRef.key) throw new Error('Could not create lobby key');
   currentLobbyId=newRef.key;
+  if(window.RosterbateAudit){
+    window.RosterbateAudit.logLeagueAuditEvent({
+      entityId:newRef.key,
+      scope:'lobby',
+      action:'league_created',
+      sport:opts.sport || SPORT,
+      isMultiplayer:true,
+      lobbyId:newRef.key,
+      metadata:{
+        source:'matchmaking_create',
+        isPrivate:!!opts.isPrivate,
+        teamSize:Number(opts.size || opts.teamSize || 0) || null,
+        draftTiming:scheduledStartAt ? 'scheduled' : 'now'
+      }
+    }).catch(()=>{});
+  }
   await joinLobby(newRef.key);
 }
 
@@ -2371,6 +2388,21 @@ async function joinLobby(lobbyId){
   currentLobbyId=lobbyId;
   myReady=false;
   awardRosterbateScore('multiplayer', 20).catch(() => {});
+  if(window.RosterbateAudit){
+    window.RosterbateAudit.logLeagueAuditEvent({
+      entityId:lobbyId,
+      scope:'lobby',
+      action:'league_joined',
+      sport:lobby.sport || SPORT,
+      isMultiplayer:true,
+      lobbyId,
+      metadata:{
+        source:'matchmaking_join',
+        joinedCount:Object.keys(lobby.players||{}).length + (((lobby.players||{})[myId]) ? 0 : 1),
+        leagueName:String(lobby.name || lobby.leagueName || '').trim() || null
+      }
+    }).catch(()=>{});
+  }
   showWaitingRoom(lobbyId);
 }
 

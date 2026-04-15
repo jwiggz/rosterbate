@@ -193,6 +193,14 @@
       }
     },
 
+    "leagueAudit": {
+      "$entityId": {
+        ".read": "auth != null && (auth.uid === 'ZqytkFsUCYZylOgWF6OZf2714w12' || auth.uid === 'sAu0wDTK33ensoTQ3reEXvzpkbv2' || root.child('users/'+auth.uid+'/isAdmin').val() === true)",
+        ".write": "auth != null",
+        ".validate": true
+      }
+    },
+
     "friendRequests": {
       "$targetUserNumber": {
         ".read": "auth != null && (auth.uid === root.child('publicUsers/'+$targetUserNumber+'/uid').val() || root.child('users/'+auth.uid+'/isAdmin').val() === true)",

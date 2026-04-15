@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="audit-logger.js"></script>
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <style>
@@ -125,6 +126,23 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .trade-builder-player-flag{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 8px;border:1px solid currentColor;}
 .trade-builder-player-flag.send{color:#86efac;background:rgba(34,197,94,.14);}
 .trade-builder-player-flag.get{color:#fdba74;background:rgba(249,115,22,.14);}
+.trade-dialog-shell{margin-top:14px;border-radius:14px;border:1px solid rgba(56,189,248,.24);background:linear-gradient(180deg,rgba(15,33,56,.92),rgba(12,18,29,.98));overflow:hidden;}
+.trade-dialog-head{padding:14px 16px 12px;border-bottom:1px solid rgba(56,189,248,.14);}
+.trade-dialog-title{font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;}
+.trade-dialog-copy{font-size:12px;color:#cbd5e1;line-height:1.45;margin-top:4px;}
+.trade-dialog-msgs{max-height:240px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.trade-dialog-empty{padding:18px 12px;text-align:center;color:#94a3b8;font-size:12px;line-height:1.55;}
+.trade-dialog-msg{display:flex;flex-direction:column;gap:4px;max-width:82%;}
+.trade-dialog-msg.mine{align-self:flex-end;align-items:flex-end;}
+.trade-dialog-msg.theirs{align-self:flex-start;align-items:flex-start;}
+.trade-dialog-meta{font-size:10px;color:#94a3b8;font-family:var(--fd);font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.trade-dialog-bubble{padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(15,23,36,.94);color:#f8fafc;font-size:13px;line-height:1.45;}
+.trade-dialog-msg.mine .trade-dialog-bubble{background:rgba(249,115,22,.14);border-color:rgba(249,115,22,.34);color:#fff7ed;}
+.trade-dialog-input{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid rgba(56,189,248,.14);align-items:flex-end;}
+.trade-dialog-textarea{flex:1;min-height:42px;max-height:90px;resize:none;border-radius:16px;border:1px solid #24324a;background:#0f1724;color:#f8fafc;padding:10px 14px;font-size:14px;font-family:var(--fb);outline:none;}
+.trade-dialog-textarea:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.12);}
+.trade-dialog-send{border:none;border-radius:999px;background:linear-gradient(180deg,#38bdf8,#2563eb);color:#fff;padding:11px 16px;font-family:var(--fb);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.trade-dialog-send:disabled{opacity:.4;cursor:not-allowed;filter:saturate(.65);}
 .picker-shell{display:grid;gap:10px;}
 .picker-card{display:flex;align-items:center;gap:12px;background:#121a29;border:1px solid #24324a;border-radius:16px;padding:14px;cursor:pointer;box-shadow:0 10px 24px rgba(2,6,23,.2);transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
 .picker-card:hover{transform:translateY(-1px);border-color:#3b82f6;box-shadow:0 16px 28px rgba(2,6,23,.26);}
@@ -4624,6 +4642,24 @@ function initSeason(){
       console.warn('Season player universe refresh skipped because player pools failed to load.', err);
     });
 
+  if(window.RosterbateAudit && D?.seasonId && currentRbUser){
+    window.RosterbateAudit.logLeaguePlayOnce({
+      entityId:String(D.seasonId),
+      scope:'season',
+      action:'league_played',
+      sport:D?.sport || CURRENT_SPORT || 'nba',
+      isMultiplayer:!!D?.multiplayer,
+      seasonId:String(D.seasonId),
+      lobbyId:String(D?.lobbyId || D?.sharedSeasonId || '').trim() || null,
+      metadata:{
+        source:'season_manager_open',
+        currentWeek:Number(G?.week || D?.currentWeek || 1) || 1,
+        currentDay:Number(G?.day || D?.currentDay || 1) || 1,
+        leagueName:D?.leagueName || 'RosterBate League'
+      }
+    }).catch(()=>{});
+  }
+
   console.log('? initSeason() completed successfully');
 }
 
@@ -5374,6 +5410,9 @@ function renderRoster(){
   const roster=G.rosters[D.myPos]||[];
   const ilRoster=getIlRoster(D.myPos);
   const starterIds=getLineupForDay(day);
+  const starterSlots=Math.max(0, Array.isArray(SLOT_LABELS) ? SLOT_LABELS.length : Number(STARTERS||0));
+  const filledStarters=starterIds.filter(Boolean).length;
+  const missingStarters=Math.max(0, starterSlots-filledStarters);
   const starterRows=SLOT_LABELS.map((slot,index)=>({player:starterIds[index]?roster.find(p=>p.id===starterIds[index])||null:null,slot,index,isStarter:true,isEmptyStarter:!starterIds[index]}));
   const activeStarterIds=starterIds.filter(Boolean);
   const bench=roster.filter(p=>!activeStarterIds.includes(p.id));
@@ -5381,6 +5420,8 @@ function renderRoster(){
   const ilPlayers=[...ilRoster];
   const ilSlotKey=getIlSlotKey();
   const ilOpenSlots=Math.max(0,getIlSlotCount()-ilPlayers.length);
+  const benchIlEligible=roster.filter(player=>!starterIds.includes(player?.id) && isIlEligiblePlayer(player,getInjuryStatus(player,week)));
+  const openAddSlot=hasOpenTotalRosterSlot(D.myPos);
   const statCols=getRosterTableColumns();
   const battingCols=getRosterTableColumns('batting');
   const pitchingCols=getRosterTableColumns('pitching');
@@ -5404,6 +5445,87 @@ function renderRoster(){
   ];
   const movePlayer=(moveCtx && moveCtx.day===day)?((roster.find(p=>p.id===moveCtx.pid)||ilRoster.find(p=>p.id===moveCtx.pid))||null):null;
   const moveSourceSlot=movePlayer?getCurrentRosterSlot(movePlayer.id,day):'';
+  const rosterActionDeck=[
+    buildSeasonNowCard(
+      missingStarters
+        ? {
+            tone:'alert',
+            label:'Lineup Status',
+            value:`${missingStarters} Open`,
+            copy:`${filledStarters}/${starterSlots} starter slots are filled for ${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel}.`,
+            actionLabel:'Set Lineup',
+            action:"document.getElementById('rosterContent')?.scrollIntoView({behavior:'smooth',block:'start'})"
+          }
+        : {
+            tone:isLocked?'info':'live',
+            label:'Lineup Status',
+            value:isLocked?'Locked In':'Board Ready',
+            copy:isLocked?'This day is locked. Use schedule view to plan ahead.':'Your starters are set for this day, so you can shift into optimization mode.',
+            actionLabel:isLocked?'View Schedule':'Open Matchup',
+            action:isLocked?"rosterTab='schedule';renderRoster()":"goPage('matchup')"
+          }
+    ),
+    buildSeasonNowCard(
+      pendingWaiverAdd
+        ? {
+            tone:'alert',
+            label:'Add Flow',
+            value:'Swap Waiting',
+            copy:`Drop one player to complete the add for ${pendingWaiverAdd.name}.`,
+            actionLabel:'Finish Swap',
+            action:"handleRosterAction('drop')"
+          }
+        : movePlayer
+          ? {
+              tone:'live',
+              label:'Move Mode',
+              value:`Moving ${movePlayer.name}`,
+              copy:`Choose a new slot for ${movePlayer.name} or cancel move mode if you changed your mind.`,
+              actionLabel:'Cancel Move',
+              action:"clearMoveMode()"
+            }
+          : {
+              tone:openAddSlot?'live':'info',
+              label:'Roster Space',
+              value:openAddSlot?'Open Add Slot':'Roster Full',
+              copy:openAddSlot?'You can add from waivers without making a cut right now.':'Any add will require a drop unless you free space with an IL move.',
+              actionLabel:openAddSlot?'Open Waivers':'Review Drops',
+              action:openAddSlot?"goPage('waiver')":"handleRosterAction('drop')"
+            }
+    ),
+    buildSeasonNowCard(
+      ilRoster.length
+        ? {
+            tone:'alert',
+            label:`${ilSlotKey} Desk`,
+            value:`${ilRoster.length} Stored`,
+            copy:`${ilRoster[0]?.name||'An injured player'} is parked in ${ilSlotKey}. Reopen those slots when your roster is healthy.`,
+            actionLabel:'Manage IL',
+            action:"handleRosterAction('il')"
+          }
+        : benchIlEligible.length
+          ? {
+              tone:'alert',
+              label:`${ilSlotKey} Desk`,
+              value:`${benchIlEligible.length} Eligible`,
+              copy:`${benchIlEligible[0]?.name||'A bench player'} can move into ${ilSlotKey} to free an active roster spot.`,
+              actionLabel:'Manage IL',
+              action:"handleRosterAction('il')"
+            }
+          : {
+              tone:'info',
+              label:'Next Move',
+              value:rosterActionPane==='drop'?'Drop Mode':rosterActionPane==='il'?'IL Mode':'Lineup Focus',
+              copy:rosterActionPane==='drop'
+                ? 'Drop mode is live. Use the action column to clear a roster spot fast.'
+                : rosterActionPane==='il'
+                  ? `IL management is live. Eligible players can be stashed into ${ilSlotKey}.`
+                  : 'No action mode is active. Use the buttons below to move, stash, add, or cut players.',
+              actionLabel:rosterActionPane?'Close Mode':'Open Waivers',
+              action:rosterActionPane==="drop"?"handleRosterAction('drop')":rosterActionPane==="il"?"handleRosterAction('il')":"goPage('waiver')"
+            }
+    )
+  ].join('');
   const matchupCard=(label,matchup,isCurrent)=>{ 
     if(!matchup) return `<div class="season-table-card season-card-pad"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${label}</div><div style="margin-top:10px;font-size:13px;color:#94a3b8;">No matchup available.</div></div>`;
     const a=matchup.home, b=matchup.away;
@@ -5681,14 +5803,28 @@ function renderRoster(){
       </div>
       <div class="season-now-band" style="margin-top:18px;">${rosterUrgency}</div>
     </div>
+    <div class="season-now-band">${rosterActionDeck}</div>
     <div class="season-table-card">
       <div class="season-card-pad" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #24324a;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span style="font-size:14px;color:#dbe4f0;">Set Lineup:</span>
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:0;flex:1;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Roster Operations</div>
+              <div class="season-subbar-copy">${pendingWaiverAdd?`Finish the swap for ${pendingWaiverAdd.name} or cancel it before changing direction.`:movePlayer?`Move mode is active from ${moveSourceSlot||'your current slot'}. Choose the landing spot in the action column.`:'Set the lineup, manage IL, or route into waivers from one command strip.'}</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="season-stat-pill">${filledStarters}/${starterSlots} starters set</span>
+              <span class="season-stat-pill">${openAddSlot?'Open add slot':'Drop needed for add'}</span>
+              <span class="season-stat-pill">${ilRoster.length} ${ilSlotKey}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="font-size:14px;color:#dbe4f0;">Set Lineup:</span>
           <button class="season-back" onclick="rosterViewDay=Math.max(1,rosterViewDay-1);renderRoster()">‹</button>
           ${dayChips}
           <button class="season-back" onclick="rosterViewDay=Math.min(TOTAL_DAYS(),rosterViewDay+1);renderRoster()">›</button>
           ${dateSummary}
+        </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:5;pointer-events:auto;">
           <button id="rosterMatchupBtn" data-roster-action="matchup" type="button" onclick="handleRosterAction('matchup')" class="season-outline-btn" style="pointer-events:auto;">Matchup</button>
@@ -5924,10 +6060,14 @@ function renderWaiver(){
   ensureSeasonWaiverPool(false);
   const s=(document.getElementById('wSrch')?.value||'').toLowerCase();
   const pf=document.getElementById('wPos')?.value||'ALL';
+  const myRoster=G.rosters[D.myPos]||[];
+  const ilRoster=getIlRoster(D.myPos);
   const watchIds=getWatchListIds();
   const radar=getWaiverRadarCandidates(6);
   const watchedTargets=getWatchedWaiverTargets(4);
   const recentDrops=getRecentDroppedWaiverTargets(4);
+  const benchIlEligible=myRoster.filter(player=>isIlEligiblePlayer(player,getInjuryStatus(player,weekForDay(G.day||1))));
+  const openSpot=hasOpenTotalRosterSlot(D.myPos);
   const unavailableIds=new Set([
     ...(G.rosters||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite),
     ...(G.ilByTeam||[]).flat().map(p=>Number(p?.id)).filter(Number.isFinite)
@@ -5935,6 +6075,86 @@ function renderWaiver(){
   const cols=getWaiverColumns();
   const waiverTableWidth=412 + ((cols.length-1) * 96) + 110;
   const scheduleDays=Array.from({length:14},(_,idx)=>(G.day||1)+idx).filter(d=>d<=TOTAL_DAYS());
+  const bestTarget=radar[0]?.player||null;
+  const watchLead=watchedTargets[0]||null;
+  const recentDropLead=recentDrops[0]||null;
+  const postureCards=[
+    pendingWaiverAdd
+      ? {
+          tone:'alert',
+          label:'Roster Pressure',
+          value:'Swap Required',
+          copy:`Finish the drop decision so ${pendingWaiverAdd.name} can land before another manager gets there.`,
+          actionLabel:'Complete Add',
+          action:"goPage('roster')"
+        }
+      : openSpot
+        ? {
+            tone:'live',
+            label:'Roster Pressure',
+            value:'Open Spot Ready',
+            copy:'You can add directly from the wire right now without cutting anyone from your roster.',
+            actionLabel:'Browse Targets',
+            action:"document.getElementById('waiverContent')?.scrollIntoView({behavior:'smooth',block:'start'})"
+          }
+        : {
+            tone:'info',
+            label:'Roster Pressure',
+            value:'Drop Needed',
+            copy:'Your roster is full, so any add will require a cut unless you open space with an IL move first.',
+            actionLabel:'Review Roster',
+            action:"goPage('roster')"
+          },
+    watchIds.length
+      ? {
+          tone:'live',
+          label:'Watch List',
+          value:`${watchIds.length} Tracked`,
+          copy:`${watchLead?.name||'Your top target'} is still being monitored so you can revisit the board faster.`,
+          actionLabel:'Open Watch List',
+          action:"setWaiverListMode('watch')"
+        }
+      : {
+          tone:'info',
+          label:'Watch List',
+          value:'Build Your Board',
+          copy:'Star free agents you like so the wire keeps the best follow-up names surfaced for you.',
+          actionLabel:'Show Radar',
+          action:"document.getElementById('waiverRadarSection')?.scrollIntoView({behavior:'smooth',block:'start'})"
+        },
+    ilRoster.length
+      ? {
+          tone:'alert',
+          label:`${getIlSlotKey()} Pressure`,
+          value:`${ilRoster.length} Stored`,
+          copy:`${ilRoster[0]?.name||'An injured player'} is stashed in ${getIlSlotKey()}. Reopen those slots when healthy bodies are ready.`,
+          actionLabel:'Manage IL',
+          action:"goPage('roster')"
+        }
+      : benchIlEligible.length
+        ? {
+            tone:'alert',
+            label:`${getIlSlotKey()} Opportunity`,
+            value:`${benchIlEligible.length} Eligible`,
+            copy:`${benchIlEligible[0]?.name||'A bench player'} can be stashed in ${getIlSlotKey()} to free an active roster slot.`,
+            actionLabel:'Manage IL',
+            action:"goPage('roster')"
+          }
+        : {
+            tone:'info',
+            label:'Market Pulse',
+            value:recentDrops.length?`${recentDrops.length} Fresh Drop${recentDrops.length===1?'':'s'}`:(bestTarget?'Best Pickup Live':'Wire Stable'),
+            copy:recentDropLead
+              ? `${recentDropLead.name} is a newly available target on the wire.`
+              : bestTarget
+                ? `${bestTarget.name} leads the board as the strongest available add right now.`
+                : 'No urgent market swings are standing out right now, so this is a good moment to scout depth.',
+            actionLabel:recentDrops.length?'Review Drops':'Scan Board',
+            action:recentDrops.length
+              ? "document.getElementById('waiverRecentDropsSection')?.scrollIntoView({behavior:'smooth',block:'start'})"
+              : "document.getElementById('waiverRadarSection')?.scrollIntoView({behavior:'smooth',block:'start'})"
+          }
+  ].map(buildSeasonNowCard).join('');
   const posChips=(SPORT_CFG.waiverPositions||['ALL']).map(pos=>{
     const label=pos==='ALL'?'All Players':pos;
     return `<button class="season-stat-pill btn ${pf===pos?'on':''}" onclick="setWaiverPosition('${pos}')" type="button">${label}</button>`;
@@ -5995,24 +6215,31 @@ function renderWaiver(){
       <div class="season-hero-card season-card-pad">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
           <div>
-            <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Free Agents</div>
-            <div class="season-subbar-copy">${D.leagueName||'RosterBate League'}</div>
+            <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Free Agents Control Room</div>
+            <div class="season-subbar-copy">${D.leagueName||'RosterBate League'} · Scout the market, flag targets, and make your next add with a clearer read on roster pressure.</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
               <button class="season-stat-pill btn ${waiverListMode==='all'?'on':''}" onclick="setWaiverListMode('all')" type="button">All Players</button>
               <button class="season-stat-pill btn ${waiverListMode==='watch'?'on':''}" onclick="setWaiverListMode('watch')" type="button">Watch List ${watchIds.length?`(${watchIds.length})`:''}</button>
               ${posChips}
               <span class="season-stat-pill">${list.length} available</span>
               <span class="season-stat-pill">Sorted by ${cols.find(c=>c.key===waiverSortKey)?.label||'Fantasy'}</span>
+              <span class="season-stat-pill">${openSpot?'Open add slot':'Roster full'}</span>
             </div>
           </div>
-          <button class="season-outline-btn" onclick="resetWaiverFilters()">Reset All</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+            <button class="season-outline-btn" onclick="setWaiverListMode('watch')">Open Watch List</button>
+            <button class="season-outline-btn" onclick="resetWaiverFilters()">Reset All</button>
+          </div>
         </div>
       </div>
-      <div class="season-table-card season-card-pad">
+      <div class="season-now-band">
+        ${postureCards}
+      </div>
+      <div class="season-table-card season-card-pad" id="waiverRadarSection">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
           <div>
             <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Waiver Radar</div>
-            <div style="font-size:13px;color:#94a3b8;max-width:560px;">Surface the strongest free-agent targets instantly. Watch-listed players and recently dropped names get priority so you can move faster every time you open the wire.</div>
+            <div style="font-size:13px;color:#94a3b8;max-width:560px;">Surface the strongest free-agent targets instantly. Watch-listed players and recently dropped names stay prioritized so your best next move is visible the moment the page opens.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="season-outline-btn" onclick="setWaiverListMode('watch')">Open Watch List ${watchIds.length?`(${watchIds.length})`:''}</button>
@@ -6081,7 +6308,7 @@ function renderWaiver(){
               </button>`).join('')}</div>`
             : `<div class="season-soft-muted" style="font-size:13px;">Star any free agent below and they will stay surfaced here every time you come back.</div>`}
         </div>
-        <div class="season-table-card season-card-pad">
+        <div class="season-table-card season-card-pad" id="waiverRecentDropsSection">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
             <div>
               <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Recent Drops</div>
@@ -6239,6 +6466,96 @@ function renderTradeImpactPills(impact){
   </div>`;
 }
 
+function ensureTradeConversationState(){
+  if(!D || typeof D!=='object') return;
+  if(!D.tradeConversations || typeof D.tradeConversations!=='object') D.tradeConversations={};
+}
+
+function getTradeConversationKey(teamA,teamB){
+  const ids=[Number(teamA),Number(teamB)].sort((a,b)=>a-b);
+  return `tc_${ids[0]}_${ids[1]}`;
+}
+
+function getTradeConversation(teamIdx){
+  ensureTradeConversationState();
+  const key=getTradeConversationKey(D?.myPos, teamIdx);
+  if(!Array.isArray(D.tradeConversations[key])) D.tradeConversations[key]=[];
+  return D.tradeConversations[key];
+}
+
+function saveTradeConversation(){
+  ensureTradeConversationState();
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  if(typeof queueSharedSeasonSave==='function' && D?.multiplayer){
+    queueSharedSeasonSave('trade_conversation');
+  }
+}
+
+function tradeConversationTime(ts){
+  const date=new Date(ts||Date.now());
+  return date.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+}
+
+function renderTradeConversation(teamIdx){
+  if(!D?.multiplayer || !Number.isFinite(Number(teamIdx))) return '';
+  const partnerName=D?.teams?.[teamIdx]||('Team '+(Number(teamIdx)+1));
+  const msgs=getTradeConversation(teamIdx);
+  const body=msgs.length
+    ? msgs.map(msg=>`<div class="trade-dialog-msg ${Number(msg.senderTeam)===Number(D?.myPos)?'mine':'theirs'}">
+        <div class="trade-dialog-meta">${escapeHtml(msg.senderName||teamName(msg.senderTeam)||'Manager')} · ${tradeConversationTime(msg.ts)}</div>
+        <div class="trade-dialog-bubble">${escapeHtml(msg.text||'')}</div>
+      </div>`).join('')
+    : `<div class="trade-dialog-empty">No direct messages with ${escapeHtml(partnerName)} yet. Start the dialogue before you send a package so the trade builder feels like a conversation, not a cold offer.</div>`;
+  return `<div class="trade-dialog-shell">
+    <div class="trade-dialog-head">
+      <div class="trade-dialog-title">Manager Dialogue</div>
+      <div class="trade-dialog-copy">Message ${escapeHtml(partnerName)} directly about deal ideas, counters, or roster needs. This private lane only appears in multiplayer leagues.</div>
+    </div>
+    <div class="trade-dialog-msgs" id="tradeDialogMsgs">${body}</div>
+    <div class="trade-dialog-input">
+      <textarea id="tradeDialogInput" class="trade-dialog-textarea" maxlength="280" placeholder="Open the trade conversation..." oninput="updateTradeConversationSendBtn();this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px';" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendTradeConversation(${Number(teamIdx)});}"></textarea>
+      <button id="tradeDialogSendBtn" type="button" class="trade-dialog-send" onclick="sendTradeConversation(${Number(teamIdx)})" disabled>Send Message</button>
+    </div>
+  </div>`;
+}
+
+function updateTradeConversationSendBtn(){
+  const input=document.getElementById('tradeDialogInput');
+  const btn=document.getElementById('tradeDialogSendBtn');
+  if(btn) btn.disabled=!String(input?.value||'').trim();
+}
+
+function scrollTradeConversationBottom(){
+  const el=document.getElementById('tradeDialogMsgs');
+  if(el) el.scrollTop=el.scrollHeight;
+}
+
+function sendTradeConversation(teamIdx){
+  if(!D?.multiplayer){ toast('Direct manager dialogue is only available in multiplayer leagues.'); return; }
+  const input=document.getElementById('tradeDialogInput');
+  const text=String(input?.value||'').trim();
+  if(!text) return;
+  const msgs=getTradeConversation(teamIdx);
+  msgs.push({
+    id:'td_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    senderTeam:Number(D?.myPos||0),
+    senderName:teamName(D?.myPos||0),
+    text,
+    ts:Date.now()
+  });
+  saveTradeConversation();
+  renderInlineTradeBuilder();
+  setTimeout(()=>{
+    const refreshed=document.getElementById('tradeDialogInput');
+    if(refreshed){
+      refreshed.focus();
+      refreshed.value='';
+      updateTradeConversationSendBtn();
+    }
+    scrollTradeConversationBottom();
+  },30);
+}
+
 function renderTrades(){
   setSeasonSidePanelVisible('tradesPowerups', true);
   renderSidePowerups('tradesPowerups');
@@ -6249,6 +6566,14 @@ function renderTrades(){
   const sent=G.tradeOffers.filter(t=>t.fromTeam===mp);
   const leaguePend=G.tradeOffers.filter(t=>t.status==='pending');
   const answered=sent.filter(t=>t.status!=='pending');
+  const tradeTargets=D.teams.map((nm,ti)=>{
+    if(ti===mp) return null;
+    const theirPending=G.tradeOffers.filter(t=>Number(t.fromTeam)===mp && Number(t.toTeam)===ti && t.status==='pending').length;
+    const incomingFromThem=G.tradeOffers.filter(t=>Number(t.fromTeam)===ti && Number(t.toTeam)===mp && t.status==='pending').length;
+    const theirRoster=G.rosters[ti]||[];
+    const topPlayer=[...theirRoster].sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0))[0]||null;
+    return { ti, name:nm, theirPending, incomingFromThem, theirRoster, topPlayer };
+  }).filter(Boolean);
   const tradeUrgencyCards=[
     buildSeasonNowCard({
       tone:pend.length?'alert':'info',
@@ -6285,9 +6610,54 @@ function renderTrades(){
     </div>`;
   }
   h+=`<div class="season-hero-card season-card-pad" style="margin-bottom:10px;">
-    <div style="font-family:var(--fd);font-size:14px;font-weight:800;margin-bottom:4px;">Trade Desk</div>
-    <div style="font-size:12px;color:var(--text2);line-height:1.6;">${isMultiplayerLeague?'Send offers to other managers in your league. Pending trades stay in the shared season until the receiving team accepts or rejects them.':'Offer player-for-player deals to the other teams in your league. In solo leagues, AI teams will review offers automatically.'}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Trade Desk Control Room</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-top:6px;max-width:760px;">${isMultiplayerLeague?'Send offers to other managers in your league. Pending trades stay live in the shared season until the receiving team answers, so this page is built to show you who needs a reply and who is worth approaching next.':'Offer player-for-player deals to the other teams in your league. In solo leagues, AI teams will review offers automatically, so use this desk to target the right roster fit instead of blindly sending packages.'}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <span class="season-stat-pill">${pend.length} incoming</span>
+        <span class="season-stat-pill">${sent.filter(t=>t.status==='pending').length} sent pending</span>
+        <span class="season-stat-pill">${leaguePend.length} league pending</span>
+      </div>
+    </div>
     <div class="season-now-band" style="margin-top:14px;">${tradeUrgencyCards}</div>
+  </div>`;
+  h+=`<div id="proposeTradeSection" class="season-table-card season-card-pad" style="margin-bottom:12px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+      <div>
+        <div style="font-family:var(--fb);font-size:20px;font-weight:800;color:#f8fafc;">Open A Conversation</div>
+        <div class="season-subbar-copy">${isMultiplayerLeague?'Pick the manager you want to pressure next.':'Pick the roster you want to test for an AI-reviewed deal.'}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="season-stat-pill">${tradeTargets.length} trade partners</span>
+        <span class="season-stat-pill">${answered.length} closed offers</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+      ${tradeTargets.map(target=>{
+        const col=TCOLORS[target.ti%TCOLORS.length];
+        const posture=target.incomingFromThem
+          ? `<span class="season-stat-pill" style="border-color:rgba(249,115,22,.35);color:#fdba74;background:rgba(249,115,22,.12);">${target.incomingFromThem} waiting on you</span>`
+          : target.theirPending
+            ? `<span class="season-stat-pill" style="border-color:rgba(59,130,246,.34);color:#93c5fd;background:rgba(59,130,246,.12);">${target.theirPending} waiting on them</span>`
+            : `<span class="season-stat-pill">No live offer</span>`;
+        return `<button type="button" data-trade-team="${target.ti}" style="display:flex;flex-direction:column;gap:12px;text-align:left;border:1px solid rgba(214,232,255,.14);background:linear-gradient(180deg,rgba(18,26,41,.96),rgba(12,18,29,.98));border-radius:16px;padding:14px;color:#f8fafc;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <div class="pav" style="background:${col};width:38px;height:38px;font-size:14px;">${target.name[0]}</div>
+              <div style="min-width:0;">
+                <div style="font-family:var(--fd);font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${target.name}</div>
+                <div style="font-size:11px;color:#94a3b8;">${target.theirRoster.length} players</div>
+              </div>
+            </div>
+            <span style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fdba74;">Build</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">${posture}</div>
+          <div style="font-size:12px;color:#cbd5e1;line-height:1.45;">${target.topPlayer?`${target.topPlayer.name} is their top fantasy producer at ${Number(target.topPlayer.fp||0).toFixed(1)} FP.`:'Their roster is ready for a closer look.'}</div>
+        </button>`;
+      }).join('')}
+    </div>
   </div>`;
   if(pend.length){
     h+=`<div id="incomingTradeSection" class="sl" style="margin-top:0;color:var(--accent);">Incoming Offers (${pend.length})</div>`;
@@ -6319,19 +6689,7 @@ function renderTrades(){
       </div>`;
     });
   }
-  h+=`<div id="tradeBuilderMount"></div><div id="proposeTradeSection" class="sl" style="${pend.length?'':'margin-top:0;'}">Propose a Trade</div>`;
-  D.teams.forEach((nm,ti)=>{
-    if(ti===mp)return;
-    const col=TCOLORS[ti%TCOLORS.length];
-    const theirPending=G.tradeOffers.filter(t=>Number(t.fromTeam)===mp && Number(t.toTeam)===ti && t.status==='pending').length;
-    const incomingFromThem=G.tradeOffers.filter(t=>Number(t.fromTeam)===ti && Number(t.toTeam)===mp && t.status==='pending').length;
-    h+=`<button type="button" data-trade-team="${ti}" style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;width:100%;margin-bottom:6px;font-family:var(--fb);color:var(--text);cursor:pointer;position:relative;z-index:4;pointer-events:auto;text-align:left;">
-      <div class="pav" style="background:${col};width:36px;height:36px;font-size:14px;">${nm[0]}</div>
-      <div style="flex:1;min-width:0;"><div style="font-family:var(--fd);font-size:15px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${nm}</div>
-      <div style="font-size:11px;color:var(--text2);">${G.rosters[ti]?.length||0} players${theirPending?` | ${theirPending} waiting on them`:incomingFromThem?` | ${incomingFromThem} waiting on you`:''}</div></div>
-      <span style="margin-left:auto;background:#0f1724;border:1px solid #24324a;border-radius:999px;padding:10px 14px;font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#fdba74;white-space:nowrap;pointer-events:none;">Propose Trade</span>
-    </button>`;
-  });
+  h+=`<div id="tradeBuilderMount"></div>`;
   if(sent.length){
     h+=`<div id="sentTradeSection" class="sl">Sent Offers</div>`;
     sent.forEach(o=>{
@@ -6466,7 +6824,10 @@ function renderInlineTradeBuilder(){
       <button type="button" onclick="closeInlineTradeBuilder()" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
       <button type="button" onclick="submitTrade()" class="bg" ${!(trP.give.length&&trP.get.length)?'disabled':''}>Send Offer</button>
     </div>
+    ${renderTradeConversation(trP.ti)}
   </div>`;
+  updateTradeConversationSendBtn();
+  setTimeout(()=>scrollTradeConversationBottom(),30);
 }
 
 function openTrade(ti){

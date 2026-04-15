@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="audit-logger.js"></script>
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <style>
@@ -1208,6 +1209,24 @@ async function saveLeagueToFirebase(draftData) {
       createdAt: draftData.savedAt || Date.now(),
       updatedAt: Date.now()
     });
+
+    if(window.RosterbateAudit){
+      window.RosterbateAudit.logLeagueAuditEvent({
+        entityId:seasonId,
+        scope:'season',
+        action:'league_created',
+        sport:draftData.sport || 'nba',
+        isMultiplayer:!!draftData.multiplayer,
+        seasonId,
+        metadata:{
+          source:'draft_save_to_firebase',
+          teamName:draftData.teamName || 'My Team',
+          leagueName:draftData.leagueName || 'RosterBate League',
+          leagueSize:Number(draftData.leagueSize || 0) || null,
+          draftFormat:draftData.draftFormat || 'snake'
+        }
+      }).catch(()=>{});
+    }
     
     // Update draftData with the seasonId for localStorage
     draftData.seasonId = seasonId;
@@ -1367,6 +1386,23 @@ async function seedCanonicalMultiplayerSeason(draftData, seasonId){
   const lobbyId=String(draftData?.lobbyId || '').trim();
   if(lobbyId) updates['lobbies/'+lobbyId+'/seasonState']=payload;
   await db.ref().update(updates);
+  if(window.RosterbateAudit){
+    window.RosterbateAudit.logLeagueAuditEvent({
+      entityId:finalId,
+      scope:'season',
+      action:'league_created',
+      sport:draftData?.sport || SPORT || 'nba',
+      isMultiplayer:true,
+      seasonId:finalId,
+      lobbyId:lobbyId || null,
+      metadata:{
+        source:'draft_seed_multiplayer_season',
+        leagueName:draftData?.leagueName || 'RosterBate League',
+        leagueSize:Number(draftData?.leagueSize || 0) || null,
+        teamCount:Number(draftData?.teams?.length || draftData?.allRosters?.length || 0) || null
+      }
+    }).catch(()=>{});
+  }
   return true;
 }
 
@@ -5543,6 +5579,21 @@ let rbRealtimePresenceRef = null;
 let rbRealtimePresenceListener = null;
 let rbRealtimePresenceSelfRef = null;
 
+function rbHasExtendedDraftChat(){
+  return RB_CONTEXT!=='draft' || isMultiplayerDraftContext();
+}
+
+function rbApplyDraftChatMode(){
+  const extended=rbHasExtendedDraftChat();
+  const tradeTab=document.querySelector(".rb-chat-tab[onclick*=\"'trades'\"]");
+  const trashTab=document.querySelector(".rb-chat-tab[onclick*=\"'trash'\"]");
+  if(tradeTab) tradeTab.style.display=extended ? '' : 'none';
+  if(trashTab) trashTab.style.display=extended ? '' : 'none';
+  if(!extended && rbActiveTab!=='draft') rbActiveTab='draft';
+  const onlineEl=document.getElementById('rbOnlineCount');
+  if(onlineEl && !extended) onlineEl.textContent='Draft room chat';
+}
+
 function rbGetRoomId(){
   if(RB_CONTEXT!=='draft') return 'season';
   return S?.roomId || '';
@@ -5600,6 +5651,7 @@ function rbFocusInput(){
 }
 
 function rbUpdateChatPulse(){
+  rbApplyDraftChatMode();
   const kicker=document.getElementById('rbChatPulseKicker');
   const title=document.getElementById('rbChatPulseTitle');
   const text=document.getElementById('rbChatPulseText');
@@ -5607,7 +5659,7 @@ function rbUpdateChatPulse(){
   if(!kicker || !title || !text || !action) return;
 
   const msgs=rbFilteredMsgs();
-  const unseen=(rbActiveTab==='trades' || rbActiveTab==='trash') ? rbCountUnseenByTag(rbActiveTab) : 0;
+  const unseen=rbHasExtendedDraftChat() && (rbActiveTab==='trades' || rbActiveTab==='trash') ? rbCountUnseenByTag(rbActiveTab) : 0;
   const configs={
     draft:{
       kicker:'Draft Room Lane',
@@ -5649,6 +5701,7 @@ function rbResetDraftRoomChat(){
   rbRefreshChatKey();
   rbSaveChat();
   rbActiveTab='draft';
+  rbApplyDraftChatMode();
   document.querySelectorAll('.rb-chat-tab').forEach((btn,idx)=>btn.classList.toggle('on', idx===0));
 }
 
@@ -5706,6 +5759,7 @@ function rbTime(ts){
 // ── OPEN/CLOSE ──────────────────────────────────────────────
 function rbToggleChat(){
   rbChatOpen = true;
+  rbApplyDraftChatMode();
   rbLoadChat();
   rbRender();
   rbMarkSeen();
@@ -5717,7 +5771,7 @@ function rbMarkSeen(){
   const now=Date.now();
   rbChat.lastSeen = now;
   rbEnsureSeenState();
-  if(rbActiveTab==='trades' || rbActiveTab==='trash'){
+  if(rbHasExtendedDraftChat() && (rbActiveTab==='trades' || rbActiveTab==='trash')){
     rbChat.lastSeenByTag[rbActiveTab]=now;
   }
   rbSaveChat();
@@ -5727,6 +5781,11 @@ function rbMarkSeen(){
 }
 
 function rbUpdateUnread(){
+  if(!rbHasExtendedDraftChat()){
+    document.getElementById('rbUnread')?.classList.remove('show');
+    document.getElementById('rbTrashUnread')?.classList.remove('show');
+    return;
+  }
   const unseen = rbCountUnseenByTag('trades') + rbCountUnseenByTag('trash');
   const el = document.getElementById('rbUnread');
   if(el){
@@ -5743,6 +5802,7 @@ function rbUpdateUnread(){
 
 // ── TABS ────────────────────────────────────────────────────
 function rbSwitchTab(tab,btn){
+  if(!rbHasExtendedDraftChat() && tab!=='draft') return;
   rbActiveTab=tab;
   document.querySelectorAll('.rb-chat-tab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
@@ -5751,6 +5811,7 @@ function rbSwitchTab(tab,btn){
 }
 
 function rbFilteredMsgs(){
+  if(!rbHasExtendedDraftChat()) return rbChat.msgs.filter(m=>m.tag==='draft');
   if(rbActiveTab==='draft') return rbChat.msgs.filter(m=>m.tag==='draft'||m.tag==='trades');
   if(rbActiveTab==='trades') return rbChat.msgs.filter(m=>m.tag==='trades');
   if(rbActiveTab==='trash') return rbChat.msgs.filter(m=>m.tag==='trash');
@@ -5759,6 +5820,7 @@ function rbFilteredMsgs(){
 
 // ── RENDER ──────────────────────────────────────────────────
 function rbRender(){
+  rbApplyDraftChatMode();
   const msgs = rbFilteredMsgs();
   const el = document.getElementById('rbMsgs');
   if(!el) return;
@@ -5857,7 +5919,7 @@ async function rbSend(){
     return;
   }
   
-  const chatTag=rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft';
+  const chatTag=!rbHasExtendedDraftChat() ? 'draft' : (rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft');
   
   // Clear input and disable button to prevent double-send
   const originalText = text;
@@ -6093,7 +6155,7 @@ function rbSearchGifs(query){
 }
 
 function rbSendGif(url){
-  const chatTag=rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft';
+  const chatTag=!rbHasExtendedDraftChat() ? 'draft' : (rbActiveTab==='trades'?'trades':rbActiveTab==='trash'?'trash':'draft');
   rbPostMsg({type:'gif',gifUrl:url,text:'[GIF]',tag:chatTag}).catch(e=>{
     console.error('Draft chat GIF send failed', e);
   });
@@ -6153,7 +6215,7 @@ function rbSimulateActivity(){
       sender:name,
       type:'text',
       text,
-      tag,
+      tag: rbHasExtendedDraftChat() ? tag : 'draft',
       ts:now-(count-i)*180000-(Math.random()*60000|0),
       reactions:{}
     });
@@ -6178,7 +6240,7 @@ function rbScheduleAiMsg(){
     const [tmpl,tag]=RB_AI_MSGS[Math.floor(Math.random()*RB_AI_MSGS.length)];
     const player=RB_AI_PLAYERS[Math.floor(Math.random()*RB_AI_PLAYERS.length)];
     const text=tmpl.replace('{player}',player);
-    rbPostMsg({sender:name,type:'text',text,tag,ts:Date.now(),reactions:{},id:'ai_live_'+Date.now()});
+    rbPostMsg({sender:name,type:'text',text,tag:rbHasExtendedDraftChat()?tag:'draft',ts:Date.now(),reactions:{},id:'ai_live_'+Date.now()});
     // Override sender since rbPostMsg uses the active chat identity helper
     rbLoadChat();
     const last=rbChat.msgs[rbChat.msgs.length-1];

@@ -19,8 +19,18 @@
   --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 50% at 50% -5%,var(--accentSoft) 0%,transparent 60%),radial-gradient(circle at 20% 14%,var(--heroGlow) 0%,transparent 28%);pointer-events:none;}
+html,body{min-height:100%;background:#040507;color:var(--text);font-family:var(--fb);}
+body{position:relative;overflow-x:hidden;}
+body::before{display:none;}
+.member-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.member-bg::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(circle at center,rgba(24,24,27,.92) 0%,rgba(9,9,11,.98) 55%,rgba(0,0,0,1) 100%);
+}
+.member-bg::after{content:'';position:absolute;inset:0;background:
+  radial-gradient(circle at 50% 18%,rgba(255,255,255,.03),transparent 42%);
+  opacity:.82;
+}
+.member-bg-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:20px 18px 48px;}
 .page-shell{opacity:0;transform:translateY(8px);transition:opacity .18s ease,transform .18s ease;}
 .page-shell.ready{opacity:1;transform:none;}
@@ -40,6 +50,26 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .meta-row{display:flex;flex-wrap:wrap;gap:8px;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:var(--pillBg);border:1px solid var(--pillBorder);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--pillText);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
 .sport-pill{gap:7px;}
+.achievement-pane{margin:0 0 14px;padding:16px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(135deg,rgba(249,115,22,.16),rgba(59,130,246,.08) 42%,rgba(15,23,42,.92) 100%);box-shadow:0 20px 36px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.08);}
+.achievement-pane-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.achievement-pane-kicker{font-family:var(--fd);font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:#fdba74;}
+.achievement-pane-title{font-family:var(--fd);font-size:26px;font-weight:900;text-transform:uppercase;line-height:.95;color:#f8fafc;margin-top:4px;}
+.achievement-pane-copy{font-size:12px;color:#cbd5e1;line-height:1.55;margin-top:6px;max-width:620px;}
+.achievement-total{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-width:96px;}
+.achievement-total-value{font-family:var(--fd);font-size:42px;font-weight:900;line-height:.9;color:#fff;}
+.achievement-total-label{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#94a3b8;margin-top:6px;}
+.achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.achievement-card{position:relative;overflow:hidden;border-radius:16px;padding:14px 14px 13px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(10,16,27,.82));box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.achievement-card::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));opacity:.92;}
+.achievement-card-football::before{background:linear-gradient(180deg,#60a5fa,#3b82f6);}
+.achievement-card-baseball::before{background:linear-gradient(180deg,#fda4af,#fb7185);}
+.achievement-card-basketball::before{background:linear-gradient(180deg,#fdba74,#f97316);}
+.achievement-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.achievement-card-label{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.75px;text-transform:uppercase;color:#cbd5e1;}
+.achievement-card-icon{width:28px;height:28px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#f8fafc;flex-shrink:0;}
+.achievement-card-icon svg{width:15px;height:15px;display:block;}
+.achievement-card-value{font-family:var(--fd);font-size:34px;font-weight:900;line-height:.9;color:#fff;margin-top:10px;}
+.achievement-card-meta{font-size:12px;color:#94a3b8;line-height:1.45;margin-top:8px;}
 .sport-icon{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sport-icon svg{width:14px;height:14px;display:block;}
 .owner-pill{
@@ -203,12 +233,43 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .hero-action-btn.primary{background:var(--accent);color:#fff;}
 .hero-action-btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
 .hero-action-btn.accept{background:var(--green);color:#fff;}
+.hero-action-btn.audit{background:rgba(59,130,246,.14);border:1px solid rgba(96,165,250,.32);color:#dbeafe;}
 .section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
 .season-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
 .season-item{position:relative;overflow:hidden;background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 90%,var(--accentSoft)),color-mix(in srgb,var(--surface) 98%,#060912));border:1px solid color-mix(in srgb,var(--border) 72%,var(--accent2));border-radius:12px;padding:12px;box-shadow:0 14px 26px color-mix(in srgb,var(--cardGlow) 88%,transparent),inset 0 1px 0 rgba(255,255,255,.05);}
 .season-item::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));opacity:.95;}
 .season-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;}
 .season-meta{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;}
+.admin-audit-card{display:none;margin-bottom:14px;padding:18px;border-radius:18px;border:1px solid rgba(96,165,250,.26);background:linear-gradient(180deg,rgba(14,22,36,.96),rgba(8,12,22,.98));box-shadow:0 18px 34px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06);}
+.admin-audit-card.active{display:block;}
+.admin-audit-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.admin-audit-kicker{font-family:var(--fd);font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:#93c5fd;}
+.admin-audit-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;line-height:.95;color:#f8fafc;margin-top:4px;}
+.admin-audit-copy{font-size:12px;color:#cbd5e1;line-height:1.6;margin-top:6px;max-width:720px;}
+.admin-audit-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.admin-audit-pill{display:inline-flex;align-items:center;justify-content:center;padding:7px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#cbd5e1;}
+.admin-audit-pill.warn{border-color:rgba(251,191,36,.3);background:rgba(245,158,11,.1);color:#fde68a;}
+.admin-audit-pill.ok{border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.1);color:#bbf7d0;}
+.admin-audit-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:12px;}
+.admin-audit-list{display:grid;gap:10px;}
+.admin-audit-entry{position:relative;overflow:hidden;padding:14px 14px 13px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(8,13,23,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
+.admin-audit-entry::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,#60a5fa,#22d3ee);}
+.admin-audit-entry-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.admin-audit-entry-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;color:#f8fafc;line-height:1;}
+.admin-audit-entry-sub{font-size:12px;color:#93c5fd;line-height:1.5;margin-top:6px;}
+.admin-audit-entry-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;}
+.admin-audit-entry-stat{padding:9px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);}
+.admin-audit-entry-label{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#64748b;}
+.admin-audit-entry-value{font-size:13px;color:#e2e8f0;line-height:1.5;margin-top:4px;word-break:break-word;}
+.admin-audit-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.admin-audit-btn{border:none;border-radius:10px;padding:9px 12px;font-family:var(--fd);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;cursor:pointer;}
+.admin-audit-btn.primary{background:rgba(59,130,246,.16);border:1px solid rgba(96,165,250,.34);color:#dbeafe;}
+.admin-audit-btn.secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;}
+.admin-audit-side{display:grid;gap:10px;}
+.admin-audit-side-card{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(7,10,18,.92));}
+.admin-audit-side-title{font-family:var(--fd);font-size:12px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#f8fafc;}
+.admin-audit-side-copy{font-size:12px;color:#cbd5e1;line-height:1.6;margin-top:8px;}
+.admin-audit-empty{padding:18px;border-radius:14px;border:1px dashed rgba(96,165,250,.24);background:rgba(15,23,42,.46);font-size:13px;color:#94a3b8;text-align:center;}
 .about-copy{font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
 .friend-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
 .friend-item{display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 88%,var(--accentSoft)),color-mix(in srgb,var(--surface) 98%,#07101c));border:1px solid color-mix(in srgb,var(--border) 72%,var(--accent2));border-radius:12px;padding:10px;text-decoration:none;color:inherit;box-shadow:0 12px 24px color-mix(in srgb,var(--cardGlow) 82%,transparent),inset 0 1px 0 rgba(255,255,255,.05);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
@@ -240,6 +301,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   .avatar{margin:0 auto;}
   .meta{justify-content:center;}
   .hero-actions{justify-content:center;}
+  .achievement-pane-head{justify-content:center;text-align:center;}
+  .achievement-total{align-items:center;}
+  .achievement-grid{grid-template-columns:1fr;}
+  .admin-audit-grid{grid-template-columns:1fr;}
+  .admin-audit-entry-meta{grid-template-columns:1fr;}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .season-list{grid-template-columns:1fr;}
   .friend-list{grid-template-columns:1fr;}
@@ -248,6 +314,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </style>
 </head>
 <body>
+<div class="member-bg" aria-hidden="true">
+  <canvas class="member-bg-canvas" id="memberBgCanvas"></canvas>
+</div>
 <div class="wrap page-shell" id="pageShell">
   <div class="topbar">
     <a href="index.html" class="brand">Roster<span>Bate</span></a>
@@ -289,39 +358,95 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             </span>
           </div>
         </div>
-        <div class="meta-row">
-          <div class="pill" id="titlePill">Championships 0</div>
-          <div class="pill sport-pill" id="footballTitlePill">
-            <span class="sport-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M6.5 16.8c2.6 2.6 8.4 2.6 11 0 2.6-2.6 2.6-8.4 0-11-2.6-2.6-8.4-2.6-11 0-2.6 2.6-2.6 8.4 0 11Z" fill="currentColor" opacity=".22"/>
-                <path d="M8.2 15.1c1.9 1.9 5.7 1.9 7.6 0 1.9-1.9 1.9-5.7 0-7.6-1.9-1.9-5.7-1.9-7.6 0-1.9 1.9-1.9 5.7 0 7.6Z" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M9.5 9.5h5M10.3 12h3.4M11 8l2 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </span>
-            Football 0
-          </div>
-          <div class="pill sport-pill" id="baseballTitlePill">
-            <span class="sport-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M8.7 6.6c1.3 1.4 2 3.4 2 5.4s-.7 4-2 5.4M15.3 6.6c-1.3 1.4-2 3.4-2 5.4s.7 4 2 5.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </span>
-            Baseball 0
-          </div>
-          <div class="pill sport-pill" id="basketballTitlePill">
-            <span class="sport-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M3.8 12h16.4M12 3.8c2.4 2.1 3.7 5 3.7 8.2S14.4 18.1 12 20.2M12 3.8C9.6 5.9 8.3 8.8 8.3 12s1.3 6.1 3.7 8.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </span>
-            Basketball 0
-          </div>
-        </div>
       </div>
       <div class="hero-actions" id="profileActions"></div>
+    </div>
+  </div>
+
+  <div class="achievement-pane">
+    <div class="achievement-pane-head">
+      <div>
+        <div class="achievement-pane-kicker">Trophy Case</div>
+        <div class="achievement-pane-title">League Titles</div>
+        <div class="achievement-pane-copy">This manager's multiplayer championship history across sports. Only shared league titles count here, so the total reflects wins against real managers.</div>
+      </div>
+      <div class="achievement-total">
+        <div class="achievement-total-value" id="titlePill">0</div>
+        <div class="achievement-total-label">Championships</div>
+      </div>
+    </div>
+    <div class="achievement-grid">
+      <div class="achievement-card achievement-card-football">
+        <div class="achievement-card-top">
+          <div class="achievement-card-label">Football</div>
+          <div class="achievement-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6.5 16.8c2.6 2.6 8.4 2.6 11 0 2.6-2.6 2.6-8.4 0-11-2.6-2.6-8.4-2.6-11 0-2.6 2.6-2.6 8.4 0 11Z" fill="currentColor" opacity=".22"/>
+              <path d="M8.2 15.1c1.9 1.9 5.7 1.9 7.6 0 1.9-1.9 1.9-5.7 0-7.6-1.9-1.9-5.7-1.9-7.6 0-1.9 1.9-1.9 5.7 0 7.6Z" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M9.5 9.5h5M10.3 12h3.4M11 8l2 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="achievement-card-value" id="footballTitlePill">0</div>
+        <div class="achievement-card-meta">Gridiron titles captured in shared multiplayer leagues.</div>
+      </div>
+      <div class="achievement-card achievement-card-baseball">
+        <div class="achievement-card-top">
+          <div class="achievement-card-label">Baseball</div>
+          <div class="achievement-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M8.7 6.6c1.3 1.4 2 3.4 2 5.4s-.7 4-2 5.4M15.3 6.6c-1.3 1.4-2 3.4-2 5.4s.7 4 2 5.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="achievement-card-value" id="baseballTitlePill">0</div>
+        <div class="achievement-card-meta">Diamond titles earned against real managers.</div>
+      </div>
+      <div class="achievement-card achievement-card-basketball">
+        <div class="achievement-card-top">
+          <div class="achievement-card-label">Basketball</div>
+          <div class="achievement-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M3.8 12h16.4M12 3.8c2.4 2.1 3.7 5 3.7 8.2S14.4 18.1 12 20.2M12 3.8C9.6 5.9 8.3 8.8 8.3 12s1.3 6.1 3.7 8.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="achievement-card-value" id="basketballTitlePill">0</div>
+        <div class="achievement-card-meta">Hoops championships lifted in multiplayer competition.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-audit-card" id="adminAuditCard">
+    <div class="admin-audit-head">
+      <div>
+        <div class="admin-audit-kicker">Administrator Audit</div>
+        <div class="admin-audit-title">Championship Review</div>
+        <div class="admin-audit-copy">Use this lane to verify every multiplayer title behind the trophy case. Open the season, copy the league ID, and compare the member's title count to their recorded league history.</div>
+        <div class="admin-audit-pills">
+          <div class="admin-audit-pill ok" id="adminAuditAccessPill">Admin verified</div>
+          <div class="admin-audit-pill" id="adminAuditTitlePill">0 multiplayer titles</div>
+          <div class="admin-audit-pill warn" id="adminAuditIpPill">IP/device logs not shown here yet</div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-audit-grid">
+      <div>
+        <div class="section-title" style="margin-bottom:10px;">Championship Seasons</div>
+        <div class="admin-audit-list" id="adminAuditList"></div>
+      </div>
+      <div class="admin-audit-side">
+        <div class="admin-audit-side-card">
+          <div class="admin-audit-side-title">Audit Notes</div>
+          <div class="admin-audit-side-copy" id="adminAuditSummary">Load an administrator account to inspect championship league history here.</div>
+        </div>
+        <div class="admin-audit-side-card">
+          <div class="admin-audit-side-title">IP Review</div>
+          <div class="admin-audit-side-copy" id="adminAuditIpCopy">League create, join, and play events can be logged for newer activity, but this profile page does not surface that audit trail yet.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -389,6 +514,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+const ROSTERBATE_ADMIN_UIDS=new Set(["ZqytkFsUCYZylOgWF6OZf2714w12","sAu0wDTK33ensoTQ3reEXvzpkbv2"]);
 
 const PROFILE_THEMES = {
   ember:{accent:'#f97316',accent2:'#fb923c',accentSoft:'rgba(249,115,22,.14)',hero2:'rgba(59,130,246,.08)',surface:'#161d2e',heroGlow:'rgba(249,115,22,.18)',heroEdge:'rgba(255,214,170,.16)',cardTint:'rgba(249,115,22,.03)',cardGlow:'rgba(249,115,22,.10)',pillBg:'rgba(249,115,22,.08)',pillBorder:'rgba(251,146,60,.16)',pillText:'#fed7aa'},
@@ -403,6 +529,8 @@ const PROFILE_THEMES = {
 let currentAuthUser=null;
 let currentViewedProfile=null;
 let currentGuestbookEntries={};
+let currentViewerProfile=null;
+let currentViewerAdminAuthority='';
 
 function revealPage(){
   document.getElementById('pageShell')?.classList.add('ready');
@@ -461,6 +589,12 @@ function dmThreadId(a,b){
   return 'dm_'+ids[0]+'_'+ids[1];
 }
 
+function getAdminAuthority(profile,user){
+  if(profile?.isAdmin===true) return 'Account flag';
+  if(user?.uid && ROSTERBATE_ADMIN_UIDS.has(user.uid)) return 'Protected UID';
+  return '';
+}
+
 function getProfileViewerId(){
   try{
     let id=localStorage.getItem('rbProfileViewerId');
@@ -492,14 +626,230 @@ function buildSeasonAggregates(seasons){
   const agg={championships:0,nbaTitles:0,nflTitles:0,mlbTitles:0};
   rows.forEach(season=>{
     const won=Number(season?.finalRank||0)===1;
+    const isMultiplayerSeason=!!(
+      season?.isMultiplayer ||
+      season?.multiplayer ||
+      String(season?.sharedSeasonId || '').trim() ||
+      String(season?.lobbyId || '').trim()
+    );
     const sport=String(season?.sport||'').toLowerCase();
-    if(!won) return;
+    if(!won || !isMultiplayerSeason) return;
     agg.championships++;
     if(sport==='nba') agg.nbaTitles++;
     if(sport==='nfl') agg.nflTitles++;
     if(sport==='mlb') agg.mlbTitles++;
   });
   return agg;
+}
+
+function getMultiplayerTitleSeasons(seasons){
+  return Object.entries(seasons||{}).map(([id,season])=>({id,...(season||{})})).filter(season=>{
+    const won=Number(season.finalRank||0)===1;
+    const isMultiplayerSeason=!!(
+      season.isMultiplayer ||
+      season.multiplayer ||
+      String(season.sharedSeasonId || '').trim() ||
+      String(season.lobbyId || '').trim()
+    );
+    return won && isMultiplayerSeason;
+  }).sort((a,b)=>Number(b.completedAt||b.updatedAt||0)-Number(a.completedAt||a.updatedAt||0));
+}
+
+function auditSportLabel(sport){
+  return {nba:'Basketball',nfl:'Football',mlb:'Baseball'}[String(sport||'').toLowerCase()] || String(sport||'Unknown').toUpperCase();
+}
+
+function adminAuditDate(ts){
+  if(!ts) return 'Unavailable';
+  try{
+    return new Date(Number(ts)).toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    return 'Unavailable';
+  }
+}
+
+async function copyAdminAuditLeagueId(seasonId){
+  try{
+    await navigator.clipboard.writeText(String(seasonId||''));
+  }catch(e){}
+}
+
+function openAdminAuditSeason(seasonId,sport){
+  const params=new URLSearchParams();
+  params.set('sport', String(sport||'nba').toLowerCase() || 'nba');
+  params.set('league', String(seasonId||''));
+  window.open('rosterbate-season.html?'+params.toString(), '_blank');
+}
+
+async function loadLeagueAuditBundle(entityId){
+  const id=String(entityId||'').trim();
+  if(!id || !db || !currentViewerAdminAuthority) return null;
+  try{
+    const snap=await db.ref('leagueAudit/' + id).once('value');
+    return snap?.val?.() || null;
+  }catch(e){
+    return null;
+  }
+}
+
+function summarizeLeagueAuditMember(bundle, profile){
+  const members=bundle?.members || {};
+  const profileUid=String(profile?.uid || '').trim();
+  const profileUserNumber=Number(profile?.userNumber || 0);
+  const rows=Object.values(members).filter(Boolean);
+  const byUid=profileUid ? rows.find(row=>String(row?.uid || '').trim()===profileUid) : null;
+  if(byUid) return byUid;
+  if(profileUserNumber>0){
+    const byUserNumber=rows.find(row=>Number(row?.userNumber || 0)===profileUserNumber);
+    if(byUserNumber) return byUserNumber;
+  }
+  return null;
+}
+
+function formatAuditLocation(row){
+  const parts=[row?.city,row?.region,row?.country].map(value=>String(value||'').trim()).filter(Boolean);
+  return parts.length ? parts.join(', ') : 'Unavailable';
+}
+
+async function renderAdminAudit(seasons){
+  const card=document.getElementById('adminAuditCard');
+  const list=document.getElementById('adminAuditList');
+  const accessPill=document.getElementById('adminAuditAccessPill');
+  const titlePill=document.getElementById('adminAuditTitlePill');
+  const summary=document.getElementById('adminAuditSummary');
+  const ipPill=document.getElementById('adminAuditIpPill');
+  const ipCopy=document.getElementById('adminAuditIpCopy');
+  if(!card || !list || !accessPill || !titlePill || !summary || !ipPill || !ipCopy) return;
+  if(!currentViewerAdminAuthority){
+    card.classList.remove('active');
+    return;
+  }
+  const titles=getMultiplayerTitleSeasons(seasons);
+  card.classList.add('active');
+  accessPill.textContent='Admin verified · ' + currentViewerAdminAuthority;
+  titlePill.textContent=titles.length + ' multiplayer title' + (titles.length===1?'':'s');
+  ipPill.textContent='IP/device logs not shown here yet';
+  ipCopy.textContent='League create, join, and play events can be logged for newer activity, but this profile page does not surface that audit trail yet.';
+  summary.textContent=titles.length
+    ? 'Each title below comes from a recorded multiplayer season finish of 1st place. Use Open Season for a deeper league inspection or copy the league ID for cross-checks in administrator surfaces.'
+    : 'No multiplayer championships are recorded for this member right now, so the trophy case and audit list are both clear.';
+  if(!titles.length){
+    accessPill.textContent='Admin verified - ' + currentViewerAdminAuthority;
+    ipPill.textContent='No audit trail needed';
+    ipCopy.textContent='There are no multiplayer title leagues to inspect on this profile right now.';
+    list.innerHTML='<div class="admin-audit-empty">No multiplayer championship seasons are recorded for this member yet.</div>';
+    return;
+  }
+  list.innerHTML=titles.map(season=>{
+    const seasonKey=String(season.sharedSeasonId || season.seasonId || season.lobbyId || season.id || '').trim();
+    const leagueName=escapeHtml(season.leagueName || 'RosterBate League');
+    const teamName=escapeHtml(season.teamName || 'RosterBate Team');
+    const sport=auditSportLabel(season.sport);
+    return `<div class="admin-audit-entry">
+      <div class="admin-audit-entry-head">
+        <div>
+          <div class="admin-audit-entry-title">${leagueName}</div>
+          <div class="admin-audit-entry-sub">${escapeHtml(sport)} title won by ${teamName}</div>
+        </div>
+        <div class="admin-audit-pill ok">Champion</div>
+      </div>
+      <div class="admin-audit-entry-meta">
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">League ID</div>
+          <div class="admin-audit-entry-value">${escapeHtml(seasonKey)}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Completed</div>
+          <div class="admin-audit-entry-value">${escapeHtml(adminAuditDate(season.completedAt || season.updatedAt || 0))}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Record</div>
+          <div class="admin-audit-entry-value">${escapeHtml(String(season.regularSeasonWins || 0))}-${escapeHtml(String(season.regularSeasonLosses || 0))}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Points</div>
+          <div class="admin-audit-entry-value">PF ${escapeHtml(Number(season.pointsFor || 0).toFixed(1))} · PA ${escapeHtml(Number(season.pointsAgainst || 0).toFixed(1))}</div>
+        </div>
+      </div>
+      <div class="admin-audit-actions">
+        <button type="button" class="admin-audit-btn primary" onclick="openAdminAuditSeason(${JSON.stringify(seasonKey)},${JSON.stringify(String(season.sport || 'nba'))})">Open Season</button>
+        <button type="button" class="admin-audit-btn secondary" onclick="copyAdminAuditLeagueId(${JSON.stringify(seasonKey)})">Copy League ID</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const auditBundles=await Promise.all(titles.map(season=>{
+    const seasonKey=String(season.sharedSeasonId || season.seasonId || season.lobbyId || season.id || '').trim();
+    return loadLeagueAuditBundle(seasonKey);
+  }));
+  const matchedAuditCount=auditBundles.filter(bundle=>bundle && (bundle.summary || bundle.members || bundle.events)).length;
+  accessPill.textContent='Admin verified - ' + currentViewerAdminAuthority;
+  ipPill.textContent=matchedAuditCount ? matchedAuditCount + ' audit log' + (matchedAuditCount===1?'':'s') + ' found' : 'No audit logs found yet';
+  ipCopy.textContent=matchedAuditCount
+    ? 'The cards below surface the last recorded action, latest IP/location context, and device label for this member when league audit data exists.'
+    : 'Older titles may predate the new logging system. Newer create, join, and play events should begin appearing here as league activity is recorded.';
+  list.innerHTML=titles.map((season,index)=>{
+    const seasonKey=String(season.sharedSeasonId || season.seasonId || season.lobbyId || season.id || '').trim();
+    const leagueName=escapeHtml(season.leagueName || 'RosterBate League');
+    const teamName=escapeHtml(season.teamName || 'RosterBate Team');
+    const sport=auditSportLabel(season.sport);
+    const auditBundle=auditBundles[index] || null;
+    const memberAudit=summarizeLeagueAuditMember(auditBundle, currentViewedProfile);
+    const summaryAudit=auditBundle?.summary || {};
+    const lastSeenAt=memberAudit?.lastSeenAt || summaryAudit?.lastSeenAt || 0;
+    const lastAction=String(memberAudit?.lastAction || summaryAudit?.lastAction || '').trim() || 'No logged action yet';
+    const lastIp=String(memberAudit?.lastIp || summaryAudit?.lastIp || '').trim() || 'Unavailable';
+    const lastDevice=String(memberAudit?.deviceLabel || '').trim() || 'Unavailable';
+    const lastLocation=formatAuditLocation(memberAudit || summaryAudit || {});
+    const lastUser=String(memberAudit?.username || memberAudit?.userNumber || '').trim();
+    return `<div class="admin-audit-entry">
+      <div class="admin-audit-entry-head">
+        <div>
+          <div class="admin-audit-entry-title">${leagueName}</div>
+          <div class="admin-audit-entry-sub">${escapeHtml(sport)} title won by ${teamName}</div>
+        </div>
+        <div class="admin-audit-pill ${memberAudit || summaryAudit?.lastSeenAt ? 'ok' : 'warn'}">${memberAudit || summaryAudit?.lastSeenAt ? 'Audit trail found' : 'No audit trail yet'}</div>
+      </div>
+      <div class="admin-audit-entry-meta">
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">League ID</div>
+          <div class="admin-audit-entry-value">${escapeHtml(seasonKey)}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Completed</div>
+          <div class="admin-audit-entry-value">${escapeHtml(adminAuditDate(season.completedAt || season.updatedAt || 0))}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Record</div>
+          <div class="admin-audit-entry-value">${escapeHtml(String(season.regularSeasonWins || 0))}-${escapeHtml(String(season.regularSeasonLosses || 0))}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Points</div>
+          <div class="admin-audit-entry-value">PF ${escapeHtml(Number(season.pointsFor || 0).toFixed(1))} - PA ${escapeHtml(Number(season.pointsAgainst || 0).toFixed(1))}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Last Logged Action</div>
+          <div class="admin-audit-entry-value">${escapeHtml(lastAction)}${lastSeenAt ? ' on ' + escapeHtml(adminAuditDate(lastSeenAt)) : ''}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Latest IP / Location</div>
+          <div class="admin-audit-entry-value">${escapeHtml(lastIp)}${lastLocation!=='Unavailable' ? ' - ' + escapeHtml(lastLocation) : ''}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Device</div>
+          <div class="admin-audit-entry-value">${escapeHtml(lastDevice)}</div>
+        </div>
+        <div class="admin-audit-entry-stat">
+          <div class="admin-audit-entry-label">Matched Member</div>
+          <div class="admin-audit-entry-value">${escapeHtml(lastUser || (memberAudit ? 'Tracked member' : 'No matched member log yet'))}</div>
+        </div>
+      </div>
+      <div class="admin-audit-actions">
+        <button type="button" class="admin-audit-btn primary" onclick="openAdminAuditSeason(${JSON.stringify(seasonKey)},${JSON.stringify(String(season.sport || 'nba'))})">Open Season</button>
+        <button type="button" class="admin-audit-btn secondary" onclick="copyAdminAuditLeagueId(${JSON.stringify(seasonKey)})">Copy League ID</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function guestbookDate(ts){
@@ -712,6 +1062,10 @@ function renderProfileActions(profile, social){
   const memberNumber=Number(profile?.userNumber || 0);
   const viewerNumber=Number(localStorage.getItem('rbUserNumber') || 0);
   if(!(memberNumber>0) || !(viewerNumber>0) || memberNumber===viewerNumber){
+    if(currentViewerAdminAuthority && memberNumber>0){
+      host.innerHTML='<button class="hero-action-btn audit" type="button" onclick="document.getElementById(\'adminAuditCard\')?.scrollIntoView({behavior:\'smooth\',block:\'start\'})">Review Championship Audit</button>';
+      return;
+    }
     host.innerHTML='';
     return;
   }
@@ -729,6 +1083,7 @@ function renderProfileActions(profile, social){
     parts.push('<button class="hero-action-btn primary" onclick="sendFriendRequestToProfile()">Add Friend</button>');
   }
   parts.push('<button class="hero-action-btn secondary" onclick="ensureDirectThreadWithProfile()">Message</button>');
+  if(currentViewerAdminAuthority) parts.push('<button class="hero-action-btn audit" type="button" onclick="document.getElementById(\'adminAuditCard\')?.scrollIntoView({behavior:\'smooth\',block:\'start\'})">Review Championship Audit</button>');
   host.innerHTML=parts.join('');
 }
 
@@ -763,10 +1118,10 @@ function renderProfile(profile, aggregates, viewsCount, social){
   document.getElementById('memberLine').textContent = isAdmin ? 'Administrator with authority to moderate chat and manage bans across RosterBate.' : 'Lifetime league stats, finishes, style, and public identity for this manager.';
   document.getElementById('memberSince').textContent = formatDate(profile?.memberSince);
   document.getElementById('viewCountPill').textContent = 'Views ' + Number(viewsCount || 0);
-  document.getElementById('titlePill').textContent = 'Championships ' + Number(meta.championships || stats.championships || 0);
-  document.getElementById('footballTitlePill').lastChild.textContent = ' Football ' + Number(meta.nflTitles || 0);
-  document.getElementById('baseballTitlePill').lastChild.textContent = ' Baseball ' + Number(meta.mlbTitles || 0);
-  document.getElementById('basketballTitlePill').lastChild.textContent = ' Basketball ' + Number(meta.nbaTitles || 0);
+  document.getElementById('titlePill').textContent = String(Number(meta.championships || stats.championships || 0));
+  document.getElementById('footballTitlePill').textContent = String(Number(meta.nflTitles || 0));
+  document.getElementById('baseballTitlePill').textContent = String(Number(meta.mlbTitles || 0));
+  document.getElementById('basketballTitlePill').textContent = String(Number(meta.nbaTitles || 0));
   document.getElementById('rolePill').className = 'pill ' + (isOwner ? 'owner-pill' : 'loads-master-pill');
   document.getElementById('rolePill').textContent = isOwner ? 'Owner' : 'Loads Master';
   document.getElementById('rolePill').style.display = (isOwner || isLoadsMaster) ? 'inline-flex' : 'none';
@@ -847,6 +1202,7 @@ async function loadMemberPage(userNumber){
     incomingRequest: incomingSnap?.val?.() || null
   };
   renderProfile(profile, buildSeasonAggregates(seasons), viewsCount, social);
+  renderAdminAudit(seasons);
   renderGuestbookEntries(currentGuestbookEntries);
   renderSeasons(seasons);
   revealPage();
@@ -854,6 +1210,13 @@ async function loadMemberPage(userNumber){
 
 auth.onAuthStateChanged(async user => {
   currentAuthUser=user || null;
+  currentViewerProfile=null;
+  currentViewerAdminAuthority='';
+  if(user){
+    const viewerSnap=await db.ref('users/' + user.uid).once('value').catch(() => null);
+    currentViewerProfile=viewerSnap?.val?.() || {};
+    currentViewerAdminAuthority=getAdminAuthority(currentViewerProfile,currentAuthUser);
+  }
   let userNumber = parseUserNumber();
   if(!(userNumber > 0) && user){
     const snap = await db.ref('users/' + user.uid + '/userNumber').once('value').catch(() => null);
@@ -861,7 +1224,185 @@ auth.onAuthStateChanged(async user => {
   }
   loadMemberPage(userNumber);
 });
+
+(function initMemberBalloonBackground(){
+  const canvas=document.getElementById('memberBgCanvas');
+  if(!(canvas instanceof HTMLCanvasElement)) return;
+  const ctx=canvas.getContext('2d');
+  if(!ctx) return;
+
+  const colors=[
+    { base:'#ff2e63', light:'#ff6b8f', dark:'#9d0b2e' },
+    { base:'#00d2ff', light:'#80eaff', dark:'#006a80' },
+    { base:'#ffd700', light:'#fff080', dark:'#998100' },
+    { base:'#9d50bb', light:'#c089d8', dark:'#4f285e' },
+    { base:'#43e97b', light:'#a6f7c1', dark:'#1e6a38' },
+    { base:'#ff9a9e', light:'#fecfef', dark:'#cc7a7e' },
+    { base:'#00c9ff', light:'#92fe9d', dark:'#00607a' }
+  ];
+  const mouse={ x:-2000, y:-2000 };
+  const reducedMotion=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const balloonCount=30;
+  let balloons=[];
+  let particles=[];
+  let rafId=0;
+
+  class Particle{
+    constructor(x,y,color){
+      this.x=x;
+      this.y=y;
+      this.color=color;
+      this.size=Math.random()*3+1;
+      this.speedX=(Math.random()-0.5)*12;
+      this.speedY=(Math.random()-0.5)*12;
+      this.gravity=0.2;
+      this.opacity=1;
+    }
+    update(){
+      this.x+=this.speedX;
+      this.y+=this.speedY;
+      this.speedY+=this.gravity;
+      this.opacity-=0.025;
+    }
+    draw(){
+      ctx.save();
+      ctx.globalAlpha=Math.max(0,this.opacity);
+      ctx.fillStyle=this.color;
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  class Balloon{
+    constructor(first){
+      this.init(first);
+    }
+    init(firstLoad){
+      this.r=Math.random()*15+30;
+      this.x=Math.random()*window.innerWidth;
+      this.y=firstLoad ? Math.random()*window.innerHeight : window.innerHeight+this.r+200;
+      this.colorSet=colors[Math.floor(Math.random()*colors.length)];
+      this.speed=Math.random()*1+0.4;
+      this.wobbleSpeed=Math.random()*0.02+0.01;
+      this.angle=Math.random()*Math.PI*2;
+      this.popped=false;
+      this.prevX=this.x;
+      this.tailMidY=this.r+40;
+      this.tailEndY=this.r+120;
+      this.tailVelMid=0;
+      this.tailVelEnd=0;
+    }
+    drawBalloonPath(r){
+      ctx.beginPath();
+      ctx.moveTo(0,r);
+      ctx.bezierCurveTo(-r*1.2,r*0.8,-r*1.3,-r*1.2,0,-r*1.2);
+      ctx.bezierCurveTo(r*1.3,-r*1.2,r*1.2,r*0.8,0,r);
+      ctx.closePath();
+    }
+    drawString(){
+      const dx=this.x-this.prevX;
+      this.prevX=this.x;
+      const stiffness=0.08;
+      const damping=0.85;
+      const gravity=0.35;
+      const midTarget=this.r+40+Math.abs(dx)*8;
+      this.tailVelMid+=(midTarget-this.tailMidY)*stiffness;
+      this.tailVelMid*=damping;
+      this.tailMidY+=this.tailVelMid;
+      const endTarget=this.r+120+Math.abs(dx)*14;
+      this.tailVelEnd+=(endTarget-this.tailEndY)*stiffness;
+      this.tailVelEnd*=damping;
+      this.tailVelEnd+=gravity;
+      this.tailEndY+=this.tailVelEnd;
+      const sway=Math.sin(this.angle*1.8)*6+dx*4;
+      ctx.beginPath();
+      ctx.moveTo(0,this.r+5);
+      ctx.bezierCurveTo(sway,this.tailMidY*0.5,-sway,this.tailMidY,sway*0.6,this.tailEndY);
+      ctx.strokeStyle='rgba(255,255,255,0.25)';
+      ctx.lineWidth=1.3;
+      ctx.stroke();
+    }
+    pop(){
+      if(this.popped) return;
+      this.popped=true;
+      for(let i=0;i<20;i+=1) particles.push(new Particle(this.x,this.y,this.colorSet.base));
+      window.setTimeout(()=>this.init(false),1000+Math.random()*1000);
+    }
+    update(){
+      if(this.popped) return;
+      this.y-=this.speed;
+      this.angle+=this.wobbleSpeed;
+      this.x+=Math.sin(this.angle*0.6)*0.8;
+      const dx=this.x-mouse.x;
+      const dy=this.y-this.r*0.2-mouse.y;
+      if(Math.sqrt(dx*dx+dy*dy)<this.r+10) this.pop();
+      if(this.y<-this.r-200) this.init(false);
+      this.draw();
+    }
+    draw(){
+      ctx.save();
+      ctx.translate(this.x,this.y);
+      ctx.rotate(Math.sin(this.angle)*0.06);
+      this.drawString();
+      this.drawBalloonPath(this.r);
+      const grad=ctx.createRadialGradient(-this.r*0.3,-this.r*0.5,this.r*0.1,0,0,this.r*1.5);
+      grad.addColorStop(0,this.colorSet.light);
+      grad.addColorStop(0.4,this.colorSet.base);
+      grad.addColorStop(1,this.colorSet.dark);
+      ctx.fillStyle=grad;
+      ctx.globalAlpha=0.92;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function resize(){
+    const dpr=window.devicePixelRatio||1;
+    canvas.width=Math.floor(window.innerWidth*dpr);
+    canvas.height=Math.floor(window.innerHeight*dpr);
+    canvas.style.width=window.innerWidth+'px';
+    canvas.style.height=window.innerHeight+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    balloons=[];
+    for(let i=0;i<balloonCount;i+=1) balloons.push(new Balloon(true));
+  }
+
+  function drawFrame(){
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+    particles=particles.filter(p=>p.opacity>0);
+    particles.forEach(p=>{
+      p.update();
+      p.draw();
+    });
+    balloons.forEach(balloon=>balloon.update());
+    rafId=window.requestAnimationFrame(drawFrame);
+  }
+
+  function drawStatic(){
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+    balloons.forEach(balloon=>balloon.draw());
+  }
+
+  function onMouseMove(event){
+    mouse.x=event.clientX;
+    mouse.y=event.clientY;
+  }
+
+  resize();
+  if(reducedMotion) drawStatic();
+  else rafId=window.requestAnimationFrame(drawFrame);
+
+  window.addEventListener('resize',resize);
+  window.addEventListener('mousemove',onMouseMove);
+  window.addEventListener('beforeunload',function cleanupMemberBg(){
+    if(rafId) window.cancelAnimationFrame(rafId);
+    window.removeEventListener('resize',resize);
+    window.removeEventListener('mousemove',onMouseMove);
+    window.removeEventListener('beforeunload',cleanupMemberBg);
+  });
+})();
 </script>
-<script src="/site-background.js"></script>
 </body>
 </html>
