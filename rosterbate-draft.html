@@ -4714,6 +4714,7 @@ function updateTradeBtn(){
 
 // ─── SEASON MANAGEMENT ────────────────────────────────────
 let autoSeasonRedirectTimer = null;
+let completedDraftSeasonData = null;
 async function endDraft(){
   console.log('🏆 Draft ending, switching to completion screen...');
   clearInterval(S.timerInt);
@@ -4862,6 +4863,7 @@ async function endDraft(){
 
     // Save to localStorage (backup for offline access) - now includes seasonId
     try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+    try{ completedDraftSeasonData = JSON.parse(JSON.stringify(draftData)); }catch(e){ completedDraftSeasonData = draftData; }
 
     const myRoster = Array.isArray(S.myTeam)?S.myTeam.filter(Boolean):[];
     const teamNameEl=document.getElementById('dcTeamName');
@@ -4951,9 +4953,13 @@ async function resolveSeasonManagerUrl(){
   const params=new URLSearchParams(window.location.search||'');
   const urlLobbyId=String(params.get('lobby')||'').trim();
   const lobbyId=String(lobbyState?.lobbyId || urlLobbyId || '').trim();
+  if(completedDraftSeasonData && Array.isArray(completedDraftSeasonData.teams) && completedDraftSeasonData.teams.length){
+    draftData = JSON.parse(JSON.stringify(completedDraftSeasonData));
+    seasonId = draftData.seasonId || draftData.sharedSeasonId || draftData.lobbyId || null;
+  }
   try {
     const saved = localStorage.getItem('rosterbateDraft');
-    if (saved) {
+    if (!draftData && saved) {
       draftData = JSON.parse(saved);
       seasonId = draftData.seasonId || draftData.sharedSeasonId || draftData.lobbyId || null;
     }
@@ -4994,6 +5000,7 @@ async function resolveSeasonManagerUrl(){
           persistMultiplayerLobbySeasonInfo(savedSeasonId);
         }
         try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+        try{ completedDraftSeasonData = JSON.parse(JSON.stringify(draftData)); }catch(e){ completedDraftSeasonData = draftData; }
       }
     } catch (err) {
       console.warn('Could not create sequential season ID before opening season manager:', err);

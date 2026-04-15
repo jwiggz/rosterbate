@@ -4168,7 +4168,12 @@ function initSeason(){
   applySportContext(D?.sport || CURRENT_SPORT);
   console.log('? Sport context applied:', CURRENT_SPORT);
   
-  const n=D.leagueSize;
+  const n=Math.max(
+    Number(D?.leagueSize)||0,
+    Array.isArray(D?.teams) ? D.teams.length : 0,
+    Array.isArray(D?.allRosters) ? D.allRosters.length : 0
+  );
+  D.leagueSize=n;
   console.log('?? League size:', n);
   
   if(!D.seasonId) D.seasonId=getRequestedLeagueId() || D.leagueId || null;
@@ -4193,8 +4198,19 @@ function initSeason(){
   G.schedule=buildSched(n,G.totalWeeks);
   console.log('?? G.schedule populated:', G.schedule.length, 'matchups');
   
+  const hasCompatibleSavedState = !!(
+    Number.isFinite(Number(D?.currentWeek)) &&
+    Number.isFinite(Number(D?.currentDay)) &&
+    Array.isArray(D?.standings) &&
+    D.standings.length===n &&
+    Array.isArray(D?.allRosters) &&
+    D.allRosters.length===n &&
+    (!Array.isArray(D?.starters) || D.starters.length===n) &&
+    (!Array.isArray(D?.ilRosters) || D.ilRosters.length===n)
+  );
+
   // Check if we have saved game state in D - if so, restore it
-  if (D.currentWeek && D.currentDay && D.standings) {
+  if (hasCompatibleSavedState) {
     console.log('?? Restoring saved game state from D...');
     G.week = D.currentWeek || 1;
     G.day = D.currentDay || 1;
@@ -4238,7 +4254,34 @@ function initSeason(){
     
     console.log('? Restored game state - Week', G.week, 'Day', G.day);
   } else {
+    if (D?.currentWeek || D?.currentDay || Array.isArray(D?.standings)) {
+      console.warn('?? Ignoring stale or incompatible saved season state. Starting from a fresh day-1 season.', {
+        savedWeek: D?.currentWeek,
+        savedDay: D?.currentDay,
+        savedStandings: Array.isArray(D?.standings) ? D.standings.length : 0,
+        leagueSize: n,
+        rosterCount: Array.isArray(D?.allRosters) ? D.allRosters.length : 0
+      });
+    }
     console.log('?? Fresh season - initializing from scratch');
+    D.currentWeek=1;
+    D.currentDay=1;
+    D.lastRevealedDay=0;
+    D.isSeasonComplete=false;
+    D.processed=[];
+    D.tradeOffers=[];
+    D.dailyLineups={};
+    D.dailyLineupsByTeam={};
+    D.powerupsByWeek={};
+    D.powerupInventory=null;
+    D.powerupDropsByWeek={};
+    D.dayResults={};
+    D.revealedDays={};
+    D.settledWeeks={};
+    D.activityLog=[];
+    D.recentDrops=[];
+    D.moneyBallLocks={};
+    D.waiverPriority={};
     G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
     G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];G.moneyBallLocks={};
   }
