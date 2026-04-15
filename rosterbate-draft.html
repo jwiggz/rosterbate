@@ -4814,7 +4814,27 @@ async function endDraft(){
       sharedSeasonId: isMultiplayer ? lobbyState.lobbyId : null,
       myPlayerId: isMultiplayer ? (lobbyState.myId||null) : null,
       teamUsers: teamUsers,
-      savedAt: Date.now()
+      savedAt: Date.now(),
+      currentWeek: 1,
+      currentDay: 1,
+      lastRevealedDay: 0,
+      isSeasonComplete: false,
+      standings: [],
+      processed: [],
+      tradeOffers: [],
+      dailyLineups: {},
+      dailyLineupsByTeam: {},
+      powerupsByWeek: {},
+      powerupInventory: null,
+      powerupDropsByWeek: {},
+      dayResults: {},
+      revealedDays: {},
+      settledWeeks: {},
+      activityLog: [],
+      recentDrops: [],
+      moneyBallLocks: {},
+      waiverPriority: {},
+      isFreshDraftLaunch: true
     };
 
     if(isMultiplayer && lobbyState?.lobbyId){

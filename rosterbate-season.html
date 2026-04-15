@@ -3845,6 +3845,7 @@ window.onload=async function(){
     if (pendingSeasonLaunch?.data) {
       console.log('🚀 Found pending fresh season handoff for this league. Using it before cloud restore.');
       D = pendingSeasonLaunch.data;
+      D.isFreshDraftLaunch = true;
       if (!D.myPos && D.myPos !== 0) D.myPos = 0;
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();
@@ -4360,12 +4361,95 @@ function getSeasonPlayerPool(){
   }
   return savedPool.length ? savedPool : nbaStaticFallback;
 }
+
+function getFallbackLeagueTeamNames(sport){
+  return (DEMO_TEAM_NAMES[normalizeRosterbateSport(sport)] || DEMO_TEAM_NAMES.nba)
+    .filter(name => name !== 'My Demo Team');
+}
+
+function repairDraftLeagueShapeFromPicks(){
+  if(!D || typeof D!=='object') return false;
+  const picks=Array.isArray(D.picks) ? D.picks : [];
+  const pickTeamCount=picks.length ? (Math.max(...picks.map(pk=>Number(pk?.ti)||0)) + 1) : 0;
+  const expected=Math.max(
+    Number(D.leagueSize)||0,
+    Array.isArray(D.teams) ? D.teams.length : 0,
+    Array.isArray(D.allRosters) ? D.allRosters.length : 0,
+    pickTeamCount
+  );
+  if(expected < 3) return false;
+  const currentTeams=Array.isArray(D.teams) ? D.teams.filter(Boolean) : [];
+  const currentRosters=Array.isArray(D.allRosters) ? D.allRosters : [];
+  const needsRepair = currentTeams.length < expected || currentRosters.length < expected;
+  if(!needsRepair || !picks.length) return false;
+
+  const myPos=Number.isFinite(Number(D.myPos)) ? Number(D.myPos) : 0;
+  const myTeamName=String(D.teamName || currentTeams[myPos] || 'My Team').trim() || 'My Team';
+  const fallbackNames=getFallbackLeagueTeamNames(CURRENT_SPORT);
+  const usedNames=new Set(currentTeams.filter(Boolean));
+  usedNames.add(myTeamName);
+  const rebuiltTeams=Array.from({length:expected}, (_,ti)=>{
+    if(ti===myPos) return myTeamName;
+    const existing=String(currentTeams[ti] || '').trim();
+    if(existing) return existing;
+    const nextName=fallbackNames.find(name=>!usedNames.has(name)) || ('Team ' + (ti+1));
+    usedNames.add(nextName);
+    return nextName;
+  });
+
+  const playerMap=new Map((Array.isArray(PLAYERS) ? PLAYERS : []).map(player=>[Number(player.id), normalizeSeasonPlayer(player, CURRENT_SPORT)]));
+  const rebuiltRosters=Array.from({length:expected}, ()=>[]);
+  picks.forEach(pk=>{
+    const teamIdx=Number(pk?.ti);
+    if(!(teamIdx>=0) || teamIdx>=expected) return;
+    const basePlayer = pk?.player || playerMap.get(Number(pk?.pid)) || null;
+    const normalized = basePlayer ? normalizeSeasonPlayer(basePlayer, CURRENT_SPORT) : null;
+    if(normalized) rebuiltRosters[teamIdx].push({...normalized});
+  });
+
+  if(!rebuiltRosters.some(roster=>roster.length)) return false;
+
+  D.teams=rebuiltTeams;
+  D.allRosters=rebuiltRosters;
+  D.leagueSize=expected;
+  if(!Array.isArray(D.ilRosters) || D.ilRosters.length!==expected){
+    D.ilRosters=Array.from({length:expected}, ()=>[]);
+  }
+  D.currentWeek=1;
+  D.currentDay=1;
+  D.lastRevealedDay=0;
+  D.isSeasonComplete=false;
+  D.standings=[];
+  D.processed=[];
+  D.tradeOffers=[];
+  D.dailyLineups={};
+  D.dailyLineupsByTeam={};
+  D.powerupsByWeek={};
+  D.powerupInventory=null;
+  D.powerupDropsByWeek={};
+  D.dayResults={};
+  D.revealedDays={};
+  D.settledWeeks={};
+  D.activityLog=[];
+  D.recentDrops=[];
+  D.moneyBallLocks={};
+  D.waiverPriority={};
+  D.isFreshDraftLaunch=true;
+  console.warn('⚠️ Repaired incomplete fresh-draft league payload from saved picks.', {
+    expectedTeams: expected,
+    rebuiltTeams: rebuiltTeams.length,
+    repairedFromPicks: picks.length
+  });
+  return true;
+}
+
 function initSeason(){
   console.log('?? initSeason() started');
   console.log('?? D object:', D);
   
   applySportContext(D?.sport || CURRENT_SPORT);
   console.log('? Sport context applied:', CURRENT_SPORT);
+  repairDraftLeagueShapeFromPicks();
   
   const n=Math.max(
     Number(D?.leagueSize)||0,
@@ -4398,6 +4482,7 @@ function initSeason(){
   console.log('?? G.schedule populated:', G.schedule.length, 'matchups');
   
   const hasCompatibleSavedState = !!(
+    !D?.isFreshDraftLaunch &&
     Number.isFinite(Number(D?.currentWeek)) &&
     Number.isFinite(Number(D?.currentDay)) &&
     Array.isArray(D?.standings) &&
