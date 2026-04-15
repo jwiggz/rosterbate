@@ -355,6 +355,34 @@
   .feature-shelf-link:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 22px rgba(0,0,0,.18);}
   .info-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:320;align-items:center;justify-content:center;padding:20px;}
   .info-modal.open{display:flex;}
+  .league-picker-panel{width:100%;max-width:980px;background:radial-gradient(120% 150% at 50% -4%,rgba(255,255,255,.12),transparent 34%),radial-gradient(100% 120% at 50% 0%,rgba(108,160,255,.16),transparent 42%),linear-gradient(180deg,rgba(20,30,47,.96),rgba(10,16,28,.98));border:1px solid rgba(162,214,255,.2);border-radius:28px;padding:22px;box-shadow:0 28px 90px rgba(0,0,0,.56),0 0 36px rgba(96,165,250,.1),inset 0 1px 0 rgba(255,255,255,.1);position:relative;overflow:hidden;}
+  .league-picker-panel::before{content:'';position:absolute;inset:14px;border-radius:22px;border:1px solid rgba(255,214,161,.12);pointer-events:none;}
+  .league-picker-panel::after{content:'';position:absolute;left:22px;right:22px;top:0;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.5) 18%,rgba(96,165,250,.4) 52%,rgba(255,255,255,.5) 82%,rgba(255,255,255,0));opacity:.8;pointer-events:none;}
+  .league-picker-panel[data-mode="single"]{box-shadow:0 28px 90px rgba(0,0,0,.56),0 0 36px rgba(255,156,74,.12),inset 0 1px 0 rgba(255,255,255,.1);}
+  .league-picker-panel[data-mode="multi"]{box-shadow:0 28px 90px rgba(0,0,0,.56),0 0 36px rgba(111,225,161,.1),inset 0 1px 0 rgba(255,255,255,.1);}
+  .league-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px;position:relative;z-index:1;padding-bottom:14px;border-bottom:1px solid rgba(162,214,255,.12);}
+  .league-picker-title{font-family:var(--fd);font-size:34px;font-weight:900;text-transform:uppercase;line-height:.92;color:#f7f7f4;text-shadow:0 0 18px rgba(255,255,255,.08);}
+  .league-picker-sub{font-family:var(--fm);font-size:13px;font-weight:600;color:#c0d2f0;line-height:1.68;letter-spacing:-.01em;max-width:620px;margin-top:8px;}
+  .league-picker-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;position:relative;z-index:1;}
+  .league-picker-card{border-radius:22px;border:1px solid rgba(162,214,255,.2);background:linear-gradient(180deg,rgba(28,40,60,.92),rgba(12,18,30,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 28px rgba(0,0,0,.18);padding:16px 16px 15px;display:flex;flex-direction:column;gap:10px;min-height:212px;position:relative;overflow:hidden;}
+  .league-picker-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(255,255,255,.08),transparent 34%);pointer-events:none;opacity:.9;}
+  .league-picker-card.single{border-color:rgba(255,156,74,.22);background:linear-gradient(180deg,rgba(56,35,22,.4),rgba(18,20,29,.98) 38%),linear-gradient(180deg,rgba(28,40,60,.92),rgba(12,18,30,.98));}
+  .league-picker-card.multi{border-color:rgba(111,225,161,.18);background:linear-gradient(180deg,rgba(21,48,34,.34),rgba(14,20,28,.98) 38%),linear-gradient(180deg,rgba(28,40,60,.92),rgba(12,18,30,.98));}
+  .league-picker-card-title{font-family:var(--fd);font-size:26px;font-weight:900;text-transform:uppercase;line-height:.92;color:#f8fafc;max-width:92%;}
+  .league-picker-kicker{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#97abc6;}
+  .league-picker-meta{display:flex;flex-wrap:wrap;gap:7px;}
+  .league-picker-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.5);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#eef4fc;}
+  .league-picker-pill.single{border-color:rgba(255,156,74,.28);color:#fdba74;background:rgba(124,45,18,.16);}
+  .league-picker-pill.multi{border-color:rgba(111,225,161,.24);color:#86efac;background:rgba(20,83,45,.16);}
+  .league-picker-pill.info{border-color:rgba(96,165,250,.34);color:#bfdbfe;background:rgba(30,64,175,.18);}
+  .league-picker-copy{font-size:13px;line-height:1.6;color:#b8c7dc;min-height:40px;max-width:95%;}
+  .league-picker-action{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;padding:12px 15px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,#586173,#363e4e);font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;color:#eef4fc;text-decoration:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 18px rgba(0,0,0,.16);width:100%;}
+  .league-picker-card.single .league-picker-action{background:linear-gradient(180deg,#ffb055,#eb7f14);color:#221202;border-color:rgba(255,214,161,.42);box-shadow:inset 0 1px 0 rgba(255,244,220,.35),0 10px 18px rgba(235,127,20,.18);}
+  .league-picker-card.multi .league-picker-action{background:linear-gradient(180deg,#4fe089,#15b956);color:#072313;border-color:rgba(187,247,208,.4);box-shadow:inset 0 1px 0 rgba(236,253,245,.28),0 10px 18px rgba(34,197,94,.16);}
+  .league-picker-empty{grid-column:1 / -1;border-radius:24px;border:1px dashed rgba(162,214,255,.22);background:linear-gradient(180deg,rgba(15,24,39,.78),rgba(10,17,29,.9));padding:34px 24px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+  .league-picker-empty-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;color:#f8fafc;}
+  .league-picker-empty-copy{margin-top:8px;color:#b8c7dc;font-size:14px;line-height:1.65;max-width:540px;margin-left:auto;margin-right:auto;}
+  .league-picker-empty-actions{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;}
   .info-panel{
     width:100%;
     max-width:860px;
@@ -466,14 +494,20 @@
 
   /* MAIN CTAs */
   .cta-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:0 auto 28px;align-items:stretch;max-width:820px;}
+  .league-shortcut-grid{display:grid;grid-template-columns:1fr;gap:14px;margin:0 auto 18px;align-items:start;justify-items:center;max-width:820px;}
+  .league-shortcut-btn{display:inline-flex;align-items:center;justify-content:center;width:min(84%,340px);padding:11px 18px;border-radius:16px;border:1px solid rgba(162,214,255,.18);background:linear-gradient(180deg,rgba(20,29,44,.88),rgba(10,16,26,.92));color:#eef4fc;font-family:var(--fd);font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.42px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 24px rgba(0,0,0,.22);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+  .league-shortcut-btn:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 16px 28px rgba(0,0,0,.26);}
+  .league-shortcut-btn.single{border-color:rgba(255,156,74,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,156,74,.08),0 12px 24px rgba(0,0,0,.22);}
+  .league-shortcut-btn.multi{border-color:rgba(111,225,161,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(111,225,161,.08),0 12px 24px rgba(0,0,0,.22);}
   .cta-card{
     display:flex;
     flex-direction:column;
     text-decoration:none;
     background:
-      linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.04) 12%,transparent 13%),
-      linear-gradient(180deg,#596172 0%,#424a5a 24%,#313847 58%,#242a37 100%);
-    border:1px solid rgba(162,214,255,.18);
+      radial-gradient(140% 90% at 50% -8%,rgba(255,255,255,.24),transparent 42%),
+      linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03) 14%,transparent 15%),
+      linear-gradient(180deg,#5d6677 0%,#474f5f 22%,#323949 58%,#232a36 100%);
+    border:1px solid rgba(196,220,255,.22);
     border-radius:24px;
     padding:20px 22px 18px;
     transition:all .2s;
@@ -481,20 +515,20 @@
     overflow:visible;
     color:var(--text);
     box-shadow:
-      0 26px 44px rgba(0,0,0,.32),
-      0 14px 22px rgba(0,0,0,.24),
+      0 22px 42px rgba(0,0,0,.34),
+      0 10px 18px rgba(0,0,0,.22),
       inset 0 1px 0 rgba(255,255,255,.18),
-      inset 0 -10px 20px rgba(7,10,16,.28);
+      inset 0 -14px 26px rgba(7,10,16,.22);
     backdrop-filter:blur(18px);
   }
   .cta-card::before{
     content:'';
     position:absolute;
-    inset:-14px;
+    inset:-12px;
     border-radius:30px;
-    background:radial-gradient(circle at center,rgba(255,255,255,.14),transparent 70%);
-    opacity:.36;
-    filter:blur(16px);
+    background:radial-gradient(circle at center,rgba(255,255,255,.12),transparent 72%);
+    opacity:.42;
+    filter:blur(18px);
     z-index:-1;
     pointer-events:none;
   }
@@ -504,8 +538,9 @@
     inset:2px;
     border-radius:18px;
     background:
-      radial-gradient(120% 90% at 50% -8%,rgba(255,255,255,.22),transparent 46%),
-      linear-gradient(180deg,rgba(255,255,255,.08),transparent 32%,transparent 68%,rgba(0,0,0,.08) 100%);
+      radial-gradient(120% 90% at 50% -8%,rgba(255,255,255,.2),transparent 42%),
+      linear-gradient(180deg,rgba(255,255,255,.06),transparent 30%,transparent 68%,rgba(0,0,0,.1) 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
     pointer-events:none;
     opacity:.95;
   }
@@ -515,37 +550,43 @@
   .cta-card:hover{
     transform:translateY(-3px);
     box-shadow:
-      0 32px 60px rgba(0,0,0,.38),
-      0 16px 26px rgba(0,0,0,.28),
+      0 30px 56px rgba(0,0,0,.38),
+      0 14px 24px rgba(0,0,0,.28),
       inset 0 1px 0 rgba(255,255,255,.2),
-      inset 0 -10px 20px rgba(7,10,16,.28);
-    border-color:rgba(255,255,255,.28);
+      inset 0 -14px 26px rgba(7,10,16,.24);
+    border-color:rgba(230,240,255,.3);
   }
   .cta-card.orange{
     background:
+      radial-gradient(120% 120% at 12% 0%,rgba(255,160,74,.2),transparent 38%),
+      radial-gradient(90% 70% at 100% 100%,rgba(255,255,255,.05),transparent 48%),
       linear-gradient(180deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.045) 12%,transparent 13%),
       linear-gradient(180deg,#5f6676 0%,#474e5e 24%,#343b4a 58%,#262c39 100%);
+    border-color:rgba(255,186,122,.24);
     box-shadow:
-      0 26px 44px rgba(0,0,0,.32),
-      0 14px 22px rgba(0,0,0,.24),
+      0 22px 42px rgba(0,0,0,.34),
+      0 10px 18px rgba(0,0,0,.22),
       inset 0 1px 0 rgba(255,255,255,.18),
-      inset 0 -10px 20px rgba(7,10,16,.28),
-      0 0 26px rgba(255,156,74,.14);
+      inset 0 -14px 26px rgba(7,10,16,.22),
+      0 0 28px rgba(255,156,74,.16);
   }
-  .cta-card.orange::before{background:radial-gradient(circle at center,rgba(255,156,74,.24),transparent 70%);}
+  .cta-card.orange::before{background:radial-gradient(circle at center,rgba(255,156,74,.22),transparent 70%);}
   .cta-card.multiplayer-glow{
     background:
+      radial-gradient(120% 120% at 88% 0%,rgba(111,225,161,.18),transparent 38%),
+      radial-gradient(90% 70% at 0% 100%,rgba(255,255,255,.05),transparent 48%),
       linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 12%,transparent 13%),
       linear-gradient(180deg,#626a7c 0%,#4c5465 24%,#373f4d 58%,#292f3b 100%);
+    border-color:rgba(161,246,195,.22);
     box-shadow:
-      0 26px 44px rgba(0,0,0,.32),
-      0 14px 22px rgba(0,0,0,.24),
+      0 22px 42px rgba(0,0,0,.34),
+      0 10px 18px rgba(0,0,0,.22),
       inset 0 1px 0 rgba(255,255,255,.18),
-      inset 0 -10px 20px rgba(7,10,16,.28),
-      0 0 26px rgba(255,255,255,.12);
+      inset 0 -14px 26px rgba(7,10,16,.22),
+      0 0 28px rgba(111,225,161,.12);
   }
-  .cta-card.multiplayer-glow::before{background:radial-gradient(circle at center,rgba(255,255,255,.22),transparent 72%);}
-  .cta-top{display:flex;flex-direction:row;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:12px;text-align:left;}
+  .cta-card.multiplayer-glow::before{background:radial-gradient(circle at center,rgba(111,225,161,.18),transparent 72%);}
+  .cta-top{display:flex;flex-direction:row;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:14px;text-align:left;}
   .cta-copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;min-width:0;flex:1;text-align:left;}
   .cta-emoji{
     display:flex;
@@ -553,6 +594,10 @@
     justify-content:center;
     min-width:68px;
     min-height:68px;
+    background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 18px rgba(0,0,0,.16);
     line-height:1;
     flex-shrink:0;
     color:#eef3fb;
@@ -584,8 +629,8 @@
   .cta-title span{display:block;font-size:16px;font-weight:700;text-transform:none;letter-spacing:0;color:#d4dceb;margin-top:7px;}
   .cta-card.orange .cta-title span{color:#f7a457;}
   .cta-card.multiplayer-glow .cta-title span{color:#6fe1a1 !important;}
-  .cta-meta-row{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px;}
-  .cta-meta-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.5);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#eef4fc;}
+  .cta-meta-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;}
+  .cta-meta-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(9,13,20,.4);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#eef4fc;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
   .cta-meta-pill.open{border-color:rgba(134,239,172,.34);color:#86efac;background:rgba(22,101,52,.2);}
   .cta-meta-pill.soon{border-color:rgba(253,224,71,.34);color:#fde68a;background:rgba(120,88,14,.18);}
   .cta-meta-pill.info{border-color:rgba(96,165,250,.34);color:#bfdbfe;background:rgba(30,64,175,.18);}
@@ -637,9 +682,9 @@
     border:1px solid rgba(255,255,255,.62);
     box-shadow:
       inset 0 2px 0 rgba(255,255,255,1),
-      inset 0 -4px 10px rgba(134,146,168,.28),
+      inset 0 -5px 12px rgba(134,146,168,.24),
       inset 0 0 0 1px rgba(255,255,255,.45),
-      0 16px 22px rgba(0,0,0,.28),
+      0 14px 20px rgba(0,0,0,.24),
       0 6px 12px rgba(255,255,255,.12),
       0 2px 0 rgba(112,122,138,.2);
   }
@@ -978,6 +1023,7 @@
     .promo-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
     .sport-grid{grid-template-columns:repeat(3,minmax(0,180px));justify-content:center;}
     .cta-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .league-shortcut-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
     .steps{grid-template-columns:repeat(3,minmax(0,1fr));}
     .feat-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
     .leaderboard-list{grid-template-columns:repeat(3,minmax(0,1fr));}
@@ -1005,6 +1051,7 @@
     .leaderboard-row{grid-template-columns:44px minmax(0,1fr);align-items:flex-start;}
     .leaderboard-score{grid-column:2;justify-self:start;text-align:left;}
     .leaderboard-rules{grid-template-columns:1fr;}
+    .league-picker-list{grid-template-columns:1fr;}
     .feat-grid{grid-template-columns:1fr;}
     .feature-shelf-grid{grid-template-columns:1fr;}
     .mock-strip{grid-template-columns:1fr;}
@@ -1113,11 +1160,14 @@
               </div>
               <div class="cta-emoji" aria-hidden="true">
                 <svg viewBox="0 0 64 64" role="presentation" focusable="false">
-                  <circle class="icon-stroke" cx="28" cy="35" r="20"></circle>
-                  <circle class="icon-stroke" cx="28" cy="35" r="10"></circle>
-                  <path class="icon-stroke" d="M35 28 L48 15"></path>
-                  <path class="icon-stroke" d="M48 15 L55 8"></path>
-                  <path class="icon-stroke" d="M46 8 H55 V17"></path>
+                  <rect class="icon-stroke" x="16" y="18" width="32" height="24" rx="8"></rect>
+                  <circle class="icon-fill" cx="26" cy="30" r="3.2"></circle>
+                  <circle class="icon-fill" cx="38" cy="30" r="3.2"></circle>
+                  <path class="icon-stroke" d="M26 18v-5"></path>
+                  <path class="icon-stroke" d="M38 18v-5"></path>
+                  <path class="icon-stroke" d="M28 40h8"></path>
+                  <path class="icon-stroke" d="M24 46h16"></path>
+                  <path class="icon-stroke" d="M32 42v4"></path>
                 </svg>
               </div>
             </div>
@@ -1142,10 +1192,10 @@
               </div>
               <div class="cta-emoji" aria-hidden="true">
                 <svg viewBox="0 0 64 64" role="presentation" focusable="false">
-                  <circle class="icon-fill" cx="22" cy="20" r="8.2"></circle>
-                  <circle class="icon-fill" cx="43" cy="20" r="8.2"></circle>
-                  <path class="icon-fill" d="M8 47c0-7.2 6.3-12.6 14.4-12.6S36.8 39.8 36.8 47v3.2H8z"></path>
-                  <path class="icon-fill" d="M28.5 47c0-7 6-12.1 13.6-12.1 7.4 0 13.4 5.1 13.4 12.1V50H28.5z"></path>
+                  <circle class="icon-fill" cx="24" cy="22" r="7"></circle>
+                  <circle class="icon-fill" cx="40" cy="22" r="7"></circle>
+                  <path class="icon-fill" d="M14 47c0-6.5 5.3-11.3 12-11.3S38 40.5 38 47v3H14z"></path>
+                  <path class="icon-fill" d="M26 47c0-6.5 5.3-11.3 12-11.3S50 40.5 50 47v3H26z"></path>
                 </svg>
               </div>
             </div>
@@ -1163,9 +1213,13 @@
             </div>
           </a>
         </div>
+        <div class="league-shortcut-grid">
+          <button class="league-shortcut-btn single" type="button" onclick="openLeaguePicker('single')">My Single Player Leagues</button>
+          <button class="league-shortcut-btn multi" type="button" onclick="openLeaguePicker('multi')">My Multiplayer Leagues</button>
+        </div>
       </div>
     </div>
-    </div>
+  </div>
   </div>
   <div class="mock-strip">
     <div class="mock-strip-copy">
@@ -1326,6 +1380,18 @@
     <p style="margin-top:12px;font-size:11px;line-height:1.6;color:var(--text3);max-width:760px;margin-left:auto;margin-right:auto;">RosterBate is an independent fantasy sports platform not affiliated with or endorsed by the NBA, NFL, MLB, or any of their teams.</p>
   </footer>
 
+</div>
+<div id="leaguePickerModal" class="info-modal" onclick="if(event.target===this)closeLeaguePicker()">
+  <div class="league-picker-panel">
+    <div class="league-picker-head">
+      <div>
+        <div class="league-picker-title" id="leaguePickerTitle">My Leagues</div>
+        <div class="league-picker-sub" id="leaguePickerSub">Choose a league to reopen.</div>
+      </div>
+      <button class="nav-auth-btn secondary" onclick="closeLeaguePicker()">Close</button>
+    </div>
+    <div class="league-picker-list" id="leaguePickerList"></div>
+  </div>
 </div>
 <div id="swapExplainer" class="info-modal" onclick="if(event.target===this)closeSwapExplainer()">
   <div class="info-panel">
@@ -1704,6 +1770,11 @@ const HOME_SPORT_SIGNALS = {
 let selectedHomeSport = getSelectedRosterbateSport();
 let navFriendRequestListener = null;
 let navThreadListener = null;
+const HOMEPAGE_SHARED_SEASON_ROOT = 'multiplayerSeasons';
+const HOMEPAGE_LOCAL_PLAYER_ID = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+let homeLeaguePickerMode = 'single';
+let homeLeaguePickerSolo = [];
+let homeLeaguePickerMulti = [];
 const SHEMMY_SEQUENCE = 'shemmy';
 let shemmyBuffer = '';
 let shemmyLastPlayedAt = 0;
@@ -2013,6 +2084,250 @@ function openMessages(){
 function openMyLeagues(){
   closeAccountMenu();
   window.location.href='my-leagues.html';
+}
+function closeLeaguePicker(){
+  const modal=document.getElementById('leaguePickerModal');
+  if(modal) modal.classList.remove('open');
+}
+function homePickerUserNumber(){
+  return Number(localStorage.getItem('rbUserNumber') || 0);
+}
+function homePickerUsername(){
+  return normalizeUsername(localStorage.getItem('rbPlayerName') || '') || 'Manager';
+}
+function homePickerGetSeasonMember(payload){
+  if(!payload || !payload.draft) return null;
+  const draft=payload.draft;
+  const uid=String(auth.currentUser?.uid || '');
+  const userNumber=homePickerUserNumber();
+  if(!draft.teamUsers || typeof draft.teamUsers !== 'object') return null;
+  for(const key of Object.keys(draft.teamUsers)){
+    const member=draft.teamUsers[key];
+    if(uid && String(member?.uid || '')===uid) return member;
+    if(userNumber>0 && Number(member?.userNumber || 0)===userNumber) return member;
+    if(String(member?.id || '')===HOMEPAGE_LOCAL_PLAYER_ID) return member;
+  }
+  return null;
+}
+function homePickerMemberIsMarkedLeft(payload, member){
+  if(!payload || !member) return false;
+  const leftMembers=payload.leftMembers || {};
+  const memberId=String(member.id || member.uid || '');
+  return !!(memberId && leftMembers[memberId]);
+}
+function homePickerBuildLobbyStateFromSeason(id,payload,member){
+  const draft=(payload?.draft && typeof payload.draft==='object') ? payload.draft : (payload || {});
+  const teamUsers=Object.values(draft.teamUsers || {});
+  return {
+    lobbyId:id,
+    seasonId:id,
+    sharedSeasonId:String(draft.sharedSeasonId || draft.seasonId || draft.lobbyId || id),
+    name:draft.leagueName || 'RosterBate League',
+    sport:draft.sport || 'nba',
+    format:draft.draftFormat || 'snake',
+    scoring:draft.scoringFormat || 'h2h_pts',
+    teamSize:Number(draft.leagueSize || teamUsers.length || 0),
+    settings:draft.customRules || null,
+    myId:(member?.id || HOMEPAGE_LOCAL_PLAYER_ID || ''),
+    myName:(member?.name || homePickerUsername() || 'Manager'),
+    myUid:(member?.uid || auth.currentUser?.uid || null),
+    myUserNumber:Number(member?.userNumber || homePickerUserNumber() || 0),
+    players:teamUsers
+  };
+}
+function openHomepageSoloLeague(seasonId){
+  const row=homeLeaguePickerSolo.find(x=>x.id===seasonId);
+  if(!row) return;
+  try{
+    localStorage.setItem('rosterbateDraft', JSON.stringify(row.data));
+  }catch(_error){}
+  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport || 'nba')+'&league='+encodeURIComponent(seasonId);
+}
+function openHomepageSeasonLeague(seasonId){
+  const row=homeLeaguePickerMulti.find(x=>x.id===seasonId);
+  if(!row) return;
+  const state=homePickerBuildLobbyStateFromSeason(seasonId,row.payload,row.member);
+  try{
+    localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
+    const draftPayload=(row.payload?.draft && typeof row.payload.draft==='object') ? row.payload.draft : row.payload;
+    if(draftPayload && typeof draftPayload==='object'){
+      localStorage.setItem('rosterbateDraft', JSON.stringify(draftPayload));
+    }
+  }catch(_error){}
+  const params=new URLSearchParams();
+  params.set('sport', row.sport || 'nba');
+  params.set('league', seasonId);
+  window.location.href='rosterbate-season.html?'+params.toString();
+}
+function renderLeaguePickerEmpty(title, copy, withLogin){
+  const host=document.getElementById('leaguePickerList');
+  if(!host) return;
+  host.innerHTML=`<div class="league-picker-empty">
+    <div class="league-picker-empty-title">${escapeHtml(title)}</div>
+    <div class="league-picker-empty-copy">${escapeHtml(copy)}</div>
+    <div class="league-picker-empty-actions">
+      ${withLogin ? "<button class=\"nav-auth-btn\" type=\"button\" onclick=\"closeLeaguePicker();openAuthModal('login')\">Sign In</button>" : ''}
+      <button class="nav-auth-btn secondary" type="button" onclick="closeLeaguePicker()">Close</button>
+    </div>
+  </div>`;
+}
+function renderLeaguePickerList(mode){
+  const host=document.getElementById('leaguePickerList');
+  if(!host) return;
+  const rows=mode==='single' ? homeLeaguePickerSolo : homeLeaguePickerMulti;
+  if(!rows.length){
+    if(mode==='single'){
+      renderLeaguePickerEmpty('No Single Player Leagues Yet','Finish a solo draft and it will show up here for quick reopen access.', !auth.currentUser && !localStorage.getItem('rosterbateDraft'));
+    }else if(!auth.currentUser){
+      renderLeaguePickerEmpty('Sign In For Multiplayer Leagues','Your shared season leagues are tied to your account, so sign in to reopen them here.', true);
+    }else{
+      renderLeaguePickerEmpty('No Multiplayer Leagues Yet','Finish or join a multiplayer season and it will show up here for quick access.', false);
+    }
+    return;
+  }
+  host.innerHTML=rows.map(row=>{
+    const sport=HOME_SPORT_LABELS[row.sport] || HOME_SPORT_LABELS.nba;
+    const typePill=mode==='single'
+      ? '<span class="league-picker-pill single">Single Player</span>'
+      : '<span class="league-picker-pill multi">Multiplayer</span>';
+    const action=mode==='single'
+      ? `openHomepageSoloLeague('${escapeHtml(row.id)}')`
+      : `openHomepageSeasonLeague('${escapeHtml(row.id)}')`;
+    const subtitle=mode==='single'
+      ? `${sport} · ${row.teamName || 'My Team'}`
+      : `${sport} · ${row.complete ? 'Season Complete' : 'Season Live'}`;
+    const stamp=mode==='single'
+      ? (row.savedLabel || 'Saved recently')
+      : (row.updatedLabel || 'Updated recently');
+    const copy=mode==='single'
+      ? 'Reopen your personal season manager and pick up exactly where your solo run left off.'
+      : 'Jump back into your shared season hub, standings, waivers, trades, and roster management.';
+    const kicker=mode==='single' ? 'Personal Season Save' : 'Shared Season Access';
+    return `<div class="league-picker-card ${mode==='single' ? 'single' : 'multi'}">
+      <div class="league-picker-kicker">${escapeHtml(kicker)}</div>
+      <div class="league-picker-card-title">${escapeHtml(row.name || 'RosterBate League')}</div>
+      <div class="league-picker-meta">
+        ${typePill}
+        <span class="league-picker-pill info">${escapeHtml(subtitle)}</span>
+        <span class="league-picker-pill info">${escapeHtml(stamp)}</span>
+      </div>
+      <div class="league-picker-copy">${escapeHtml(copy)}</div>
+      <button class="league-picker-action" type="button" onclick="${action}">Open League</button>
+    </div>`;
+  }).join('');
+}
+async function loadHomepageSingleLeagues(){
+  const rows=[];
+  if(auth.currentUser){
+    const userSeasonsSnap=await db.ref(`userSeasons/${auth.currentUser.uid}`).once('value').catch(() => null);
+    if(userSeasonsSnap?.exists?.()){
+      userSeasonsSnap.forEach(child=>{
+        const data=child.val() || {};
+        if(data.isMultiplayer || data.multiplayer || data.isDemo) return;
+        rows.push({
+          id:child.key,
+          name:data.leagueName || 'RosterBate League',
+          sport:data.sport || 'nba',
+          teamName:data.teamName || 'My Team',
+          updatedAt:Number(data.updatedAt || data.savedAt || data.createdAt || 0),
+          savedLabel:(data.updatedAt || data.savedAt) ? new Date(Number(data.updatedAt || data.savedAt)).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : 'Saved locally',
+          data
+        });
+      });
+    }
+  }
+  if(!rows.length){
+    try{
+      const saved=localStorage.getItem('rosterbateDraft');
+      if(saved){
+        const data=JSON.parse(saved);
+        if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
+          rows.push({
+            id:'local',
+            name:data.leagueName || 'RosterBate League',
+            sport:data.sport || 'nba',
+            teamName:data.teamName || 'My Team',
+            updatedAt:Number(data.updatedAt || data.savedAt || 0),
+            savedLabel:(data.updatedAt || data.savedAt) ? new Date(Number(data.updatedAt || data.savedAt)).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : 'Saved locally',
+            data
+          });
+        }
+      }
+    }catch(_error){}
+  }
+  rows.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  homeLeaguePickerSolo=rows;
+}
+async function loadHomepageMultiplayerLeagues(){
+  if(!auth.currentUser){
+    homeLeaguePickerMulti=[];
+    return;
+  }
+  const rows=[];
+  const [seasonsSnap, legacySeasonsSnap, userSeasonsSnap] = await Promise.all([
+    db.ref(HOMEPAGE_SHARED_SEASON_ROOT).once('value').catch(() => null),
+    db.ref('sharedSeasons').once('value').catch(() => null),
+    db.ref(`userSeasons/${auth.currentUser.uid}`).once('value').catch(() => null)
+  ]);
+  const pushSeason=(id,payload,source)=>{
+    if(rows.find(x=>x.id===id)) return;
+    const member=homePickerGetSeasonMember(payload);
+    if(!member || homePickerMemberIsMarkedLeft(payload, member)) return;
+    const draft=payload.draft || {};
+    rows.push({
+      id,
+      name:draft.leagueName || 'RosterBate League',
+      sport:draft.sport || 'nba',
+      complete:!!payload.game?.isSeasonComplete,
+      updatedAt:Number(payload.updatedAt || 0),
+      updatedLabel:payload.updatedAt ? new Date(Number(payload.updatedAt)).toLocaleDateString([], {month:'short',day:'numeric'}) : 'Updated recently',
+      payload,
+      member,
+      source
+    });
+  };
+  if(seasonsSnap?.exists?.()) seasonsSnap.forEach(child=>pushSeason(child.key, child.val() || {}, 'multiplayerSeasons'));
+  if(legacySeasonsSnap?.exists?.()) legacySeasonsSnap.forEach(child=>pushSeason(child.key, child.val() || {}, 'sharedSeasons'));
+  if(userSeasonsSnap?.exists?.()){
+    userSeasonsSnap.forEach(child=>{
+      const data=child.val() || {};
+      if(!(data.multiplayer || data.isMultiplayer) || rows.find(x=>x.id===child.key)) return;
+      rows.push({
+        id:child.key,
+        name:data.leagueName || 'RosterBate League',
+        sport:data.sport || 'nba',
+        complete:!!data.isSeasonComplete,
+        updatedAt:Number(data.updatedAt || data.savedAt || 0),
+        updatedLabel:(data.updatedAt || data.savedAt) ? new Date(Number(data.updatedAt || data.savedAt)).toLocaleDateString([], {month:'short',day:'numeric'}) : 'Updated recently',
+        payload:data,
+        member:{id:data.myPlayerId || 'local', teamIdx:data.myPos || 0, userNumber:homePickerUserNumber(), name:homePickerUsername(), uid:auth.currentUser.uid},
+        source:'userSeasons-fallback'
+      });
+    });
+  }
+  rows.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  homeLeaguePickerMulti=rows;
+}
+async function openLeaguePicker(mode){
+  homeLeaguePickerMode=mode === 'multi' ? 'multi' : 'single';
+  const modal=document.getElementById('leaguePickerModal');
+  const title=document.getElementById('leaguePickerTitle');
+  const sub=document.getElementById('leaguePickerSub');
+  const host=document.getElementById('leaguePickerList');
+  if(!modal || !title || !sub || !host) return;
+  modal.querySelector('.league-picker-panel')?.setAttribute('data-mode', homeLeaguePickerMode);
+  title.textContent=homeLeaguePickerMode === 'single' ? 'My Single Player Leagues' : 'My Multiplayer Leagues';
+  sub.textContent=homeLeaguePickerMode === 'single'
+    ? 'Choose one of your solo saves to reopen your personal season manager.'
+    : 'Choose one of your shared season leagues to jump back into live multiplayer play.';
+  host.innerHTML='<div class="league-picker-empty"><div class="league-picker-empty-title">Loading Leagues</div><div class="league-picker-empty-copy">Pulling your saved league list now.</div></div>';
+  modal.classList.add('open');
+  if(homeLeaguePickerMode === 'single'){
+    await loadHomepageSingleLeagues();
+  }else{
+    await loadHomepageMultiplayerLeagues();
+  }
+  renderLeaguePickerList(homeLeaguePickerMode);
 }
 function openAdministrator(){
   closeAccountMenu();
