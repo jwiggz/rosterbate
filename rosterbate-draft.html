@@ -117,16 +117,19 @@
     position:fixed;
     inset:0;
     display:none;
+    opacity:0;
     pointer-events:none;
     overflow:hidden;
     z-index:0;
+    transition:opacity .22s ease;
   }
   body.retro-nba-on .retro-nba-stage{display:block;}
-  body.retro-nba-on #lobby,
-  body.retro-nba-on #draft{
+  body.retro-nba-ready .retro-nba-stage{opacity:1;}
+  body.retro-nba-ready #lobby,
+  body.retro-nba-ready #draft{
     background:transparent;
   }
-  body.retro-nba-on #lobby::before{display:none;}
+  body.retro-nba-ready #lobby::before{display:none;}
   .retro-nba-room,
   .retro-nba-room-fallback,
   .retro-nba-overlay,
@@ -2123,10 +2126,27 @@ function initRetroNbaDraftBackdrop(){
   document.body.classList.add('retro-nba-on');
   if(lobbyEl) lobbyEl.classList.add('retro-nba-on');
   draftEl.classList.add('retro-nba-on');
+  let roomReady=false;
+  let mediaReady=false;
+  let mediaResolved=false;
+
+  function maybeRevealRetroStage(){
+    if(roomReady && (mediaReady || mediaResolved)){
+      document.body.classList.add('retro-nba-ready');
+    }
+  }
 
   if(roomImg instanceof HTMLImageElement){
-    roomImg.addEventListener('load', ()=>{ roomImg.hidden=false; }, { once:true });
-    roomImg.addEventListener('error', ()=>{ roomImg.hidden=true; }, { once:true });
+    roomImg.addEventListener('load', ()=>{
+      roomImg.hidden=false;
+      roomReady=true;
+      maybeRevealRetroStage();
+    }, { once:true });
+    roomImg.addEventListener('error', ()=>{
+      roomImg.hidden=true;
+      roomReady=true;
+      maybeRevealRetroStage();
+    }, { once:true });
     roomImg.src=RETRO_NBA_ROOM_ASSET;
   }
 
@@ -2143,6 +2163,8 @@ function initRetroNbaDraftBackdrop(){
       videoEl.pause();
       videoEl.removeAttribute('src');
       videoEl.load();
+      mediaResolved=true;
+      maybeRevealRetroStage();
       return;
     }
     const asset=candidates[index++];
@@ -2156,6 +2178,9 @@ function initRetroNbaDraftBackdrop(){
       videoEl.hidden=false;
       videoEl.oncanplay=()=>{
         videoEl.hidden=false;
+        mediaReady=true;
+        mediaResolved=true;
+        maybeRevealRetroStage();
         videoEl.play().catch(()=>{});
       };
       videoEl.onerror=()=>tryNext();
@@ -2168,6 +2193,9 @@ function initRetroNbaDraftBackdrop(){
     videoEl.removeAttribute('src');
     gifEl.onload=()=>{
       gifEl.hidden=false;
+      mediaReady=true;
+      mediaResolved=true;
+      maybeRevealRetroStage();
     };
     gifEl.onerror=()=>tryNext();
     gifEl.hidden=false;
