@@ -1405,6 +1405,62 @@ function getSavedMultiplayerLobbyState(){
     return null;
   }
 }
+
+function getMatchingLocalLeagueData(requestedLeagueId){
+  const target=String(requestedLeagueId || '').trim();
+  if(!target) return null;
+  try{
+    const raw=localStorage.getItem('rosterbateDraft');
+    if(!raw) return null;
+    const parsed=JSON.parse(raw);
+    if(!parsed || typeof parsed!=='object') return null;
+    return String(parsed.seasonId || '').trim()===target ? parsed : null;
+  }catch(e){
+    console.warn('Failed to parse local draft data for league comparison:', e);
+    return null;
+  }
+}
+
+function getLeagueTeamCount(data){
+  if(!data || typeof data!=='object') return 0;
+  return Math.max(
+    Number(data.leagueSize || 0),
+    Array.isArray(data.teams) ? data.teams.length : 0,
+    Array.isArray(data.allRosters) ? data.allRosters.length : 0
+  );
+}
+
+function getLeagueFreshnessTs(data){
+  if(!data || typeof data!=='object') return 0;
+  return Math.max(
+    Number(data.updatedAt || 0),
+    Number(data.savedAt || 0),
+    Number(data.createdAt || 0)
+  );
+}
+
+function isFreshDayOneLeagueState(data){
+  if(!data || typeof data!=='object') return false;
+  return (
+    Number(data.currentWeek || 1) <= 1 &&
+    Number(data.currentDay || 1) <= 1 &&
+    !data.isSeasonComplete
+  );
+}
+
+function shouldPreferLocalLeagueData(localData, remoteData, requestedLeagueId){
+  const target=String(requestedLeagueId || '').trim();
+  if(!target || !localData || String(localData.seasonId || '').trim()!==target) return false;
+  if(!remoteData) return true;
+  const localTeams=getLeagueTeamCount(localData);
+  const remoteTeams=getLeagueTeamCount(remoteData);
+  if(localTeams > remoteTeams) return true;
+  if(isFreshDayOneLeagueState(localData) && !isFreshDayOneLeagueState(remoteData)) return true;
+  const localTs=getLeagueFreshnessTs(localData);
+  const remoteTs=getLeagueFreshnessTs(remoteData);
+  if(localTs && remoteTs && localTs > remoteTs + 1000) return true;
+  return false;
+}
 function getSharedSeasonActorId(){
   const lobby=getSavedMultiplayerLobbyState();
   return String(currentRbUser?.uid || lobby?.myId || D?.myPlayerId || D?.teamName || 'guest');
@@ -3756,6 +3812,7 @@ window.onload=async function(){
     if (currentRbUser) {
       try {
         const userId = currentRbUser.uid;
+        const localLeagueData = getMatchingLocalLeagueData(leagueId);
         let snapshot = await db.ref(`userSeasons/${userId}/${leagueId}`).once('value');
         
         // If not found in current user's seasons, check if it's in localStorage from a fresh draft
@@ -3858,7 +3915,48 @@ window.onload=async function(){
         }
         
         if (snapshot.exists()) {
-          const leagueData = snapshot.val();
+          const firebaseLeagueData = snapshot.val();
+          const preferLocalLeagueData = shouldPreferLocalLeagueData(localLeagueData, firebaseLeagueData, leagueId);
+          const leagueData = preferLocalLeagueData ? localLeagueData : firebaseLeagueData;
+          if (preferLocalLeagueData) {
+            console.warn('⚠️ Local draft data is newer or more complete than Firebase for this league. Overwriting stale cloud copy.', {
+              leagueId,
+              localTeams: getLeagueTeamCount(localLeagueData),
+              firebaseTeams: getLeagueTeamCount(firebaseLeagueData),
+              localWeek: Number(localLeagueData?.currentWeek || 1),
+              localDay: Number(localLeagueData?.currentDay || 1),
+              firebaseWeek: Number(firebaseLeagueData?.currentWeek || 1),
+              firebaseDay: Number(firebaseLeagueData?.currentDay || 1)
+            });
+            try {
+              const saveData = {
+                ...leagueData,
+                seasonId: leagueId,
+                userId: userId,
+                userEmail: currentRbUser.email || 'unknown',
+                createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                updatedAt: Date.now()
+              };
+              await db.ref(`userSeasons/${userId}/${leagueId}`).set(removeUndefined(saveData));
+              await db.ref(`allSeasons/${leagueId}`).set(removeUndefined({
+                seasonId: leagueId,
+                userId: userId,
+                userEmail: currentRbUser.email || 'unknown',
+                sport: leagueData.sport || 'nba',
+                leagueName: leagueData.leagueName || 'RosterBate League',
+                teamName: leagueData.teamName || 'My Team',
+                isMultiplayer: !!leagueData.multiplayer,
+                leagueSize: getLeagueTeamCount(leagueData),
+                scoringFormat: leagueData.scoringFormat || 'h2h_pts',
+                draftFormat: leagueData.draftFormat || 'snake',
+                currentWeek: Number(leagueData.currentWeek || 1),
+                createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                updatedAt: Date.now()
+              }));
+            } catch(saveErr) {
+              console.warn('Failed to refresh stale Firebase season with local draft data:', saveErr);
+            }
+          }
           console.log('? Loaded league from Firebase:', leagueId);
           console.log('?? League data structure:', Object.keys(leagueData));
           
