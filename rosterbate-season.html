@@ -1578,12 +1578,28 @@ function cloneJsonSafe(value){
 function hydrateDraftUserContextFromLobby(){
   const lobby=getSavedMultiplayerLobbyState();
   if(!D) return;
-  if(lobby?.lobbyId){
+  const seasonKeys=new Set([
+    String(D?.seasonId || '').trim(),
+    String(D?.sharedSeasonId || '').trim(),
+    String(D?.lobbyId || '').trim()
+  ].filter(Boolean));
+  const lobbyKeys=[
+    String(lobby?.seasonId || '').trim(),
+    String(lobby?.sharedSeasonId || '').trim(),
+    String(lobby?.lobbyId || '').trim()
+  ].filter(Boolean);
+  const lobbyMatchesSeason=!!(seasonKeys.size && lobbyKeys.some(key=>seasonKeys.has(key)));
+  const shouldUseLobby=!!(D?.multiplayer || lobbyMatchesSeason);
+  if(lobby?.lobbyId && shouldUseLobby){
     D.multiplayer=true;
     if(!D.lobbyId) D.lobbyId=lobby.lobbyId;
     if(!D.seasonId && lobby.seasonId) D.seasonId=lobby.seasonId;
     if(!D.sharedSeasonId) D.sharedSeasonId=lobby.sharedSeasonId || lobby.seasonId || lobby.lobbyId;
     if(!D.leagueName && lobby.name) D.leagueName=lobby.name;
+  }
+  if(!shouldUseLobby){
+    refreshCommissionerAccess();
+    return;
   }
   const myPlayerId=lobby?.myId || D.myPlayerId;
   if(myPlayerId) D.myPlayerId=myPlayerId;
