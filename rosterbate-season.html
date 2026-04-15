@@ -495,6 +495,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .ctab.on{color:var(--accent);border-bottom-color:var(--accent);}
 .crow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
 .crow:last-child{border-bottom:none;}
+.crow.disabled{opacity:.58;}
 .clabel{font-size:13px;color:var(--text);font-weight:500;}
 .csub{font-size:11px;color:var(--text3);margin-top:2px;max-width:200px;}
 .cval{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);text-align:right;flex-shrink:0;}
@@ -502,6 +503,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .cinput:focus{border-color:var(--accent);}
 .cnum-wrap{display:inline-flex;align-items:stretch;background:linear-gradient(180deg,var(--bg3),#141d2d);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.02);}
 .cnum-wrap:focus-within{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.cnum-wrap.disabled{opacity:.62;filter:saturate(.65);}
 .cnum-input{width:82px;background:transparent;border:none;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;text-align:right;padding:8px 10px;-moz-appearance:textfield;}
 .cnum-input::-webkit-outer-spin-button,
 .cnum-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
@@ -511,6 +513,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .cnum-step:active{background:rgba(249,115,22,.22);}
 .cnum-step + .cnum-step{border-top:1px solid var(--border);}
 .cnum-wrap.readonly .cnum-steps{display:none;}
+.cnum-wrap.disabled .cnum-input{color:var(--text2);cursor:not-allowed;}
 .cselect{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;appearance:none;cursor:pointer;max-width:160px;}
 .cselect:focus{border-color:var(--accent);}
 .ctoggle{display:flex;align-items:center;gap:8px;}
@@ -4860,7 +4863,7 @@ function renderHub(){
   const statsThroughDate=getImportedStatsThroughDate();
   const dataStampEl=document.getElementById('hubDataStamp');
   const chatPanel=document.getElementById('rbChatPanel');
-  if(chatPanel) chatPanel.style.display = D?.isDemo ? 'none' : '';
+  if(chatPanel) chatPanel.style.display = rbTrashTalkEnabled() ? '' : 'none';
   setAvatarNode(document.getElementById('hubAv'),D.teamName,74,'var(--accent)',getCurrentTeamAvatarUrl(),'box-shadow:0 12px 24px rgba(249,115,22,.18);margin:8px auto 0;');
   document.getElementById('hubName').textContent=D.teamName;
   document.getElementById('hubLeagueName').textContent=D.leagueName||'RosterBate League';
@@ -7532,6 +7535,12 @@ function commNum(key,min,max,step){
       </div>
     </div>`;
 }
+function commLockedNum(value){
+  const displayValue=Number.isFinite(Number(value))?Number(value):0;
+  return `<div class="cnum-wrap readonly disabled" aria-disabled="true">
+      <input type="number" class="cnum-input" value="${displayValue}" readonly tabindex="-1">
+    </div>`;
+}
 function commStep(btn,dir,min,max,step){
   const input=btn.closest('.cnum-wrap')?.querySelector('.cnum-input');
   if(!input) return;
@@ -7550,10 +7559,14 @@ function commText(key,placeholder){
 function row(label,control,sub){
   return `<div class="crow"><div><div class="clabel">${label}</div>${sub?`<div class="csub">${sub}</div>`:''}</div>${control}</div>`;
 }
+function rowDisabled(label,control,sub){
+  return `<div class="crow disabled"><div><div class="clabel">${label}</div>${sub?`<div class="csub">${sub}</div>`:''}</div>${control}</div>`;
+}
 
 // -- BASIC --
 function commBasic(){
   const commissionerName=teamName(Number.isFinite(Number(D?.commissionerTeamIdx))?Number(D.commissionerTeamIdx):Number(D?.myPos||0));
+  const isSoloLeague=!D?.multiplayer;
   document.getElementById('commContent').innerHTML=`
     <div class="comm-overview-card" style="margin-bottom:14px;">
       <div class="comm-overview-label">League Identity</div>
@@ -7564,7 +7577,9 @@ function commBasic(){
     <div class="card" style="padding:0 14px;">
       ${row('League Name',commText('leagueName','My League'))}
       ${row('Commissioner',`<select class="cselect" onchange="setCommissionerTeam(this.value)">${commissionerTeamOptions()}</select>`,'Only the current commissioner can transfer league control to another team manager.')}
-      ${row('Number of Teams',commNum('numTeams',2,30))}
+      ${isSoloLeague
+        ? rowDisabled('Number of Teams',commLockedNum(CS.numTeams||D?.leagueSize||D?.teams?.length||0),'Unavailable in single-player leagues because RosterBate cannot place random managers onto newly added teams.')
+        : row('Number of Teams',commNum('numTeams',2,30))}
       ${row('Scoring Type',commSel('scoringType',['H2H Points','Money Ball','H2H Categories','Rotisserie','Points Only']))}
       ${row('Format',commSel('format',['Standard','Keeper','Dynasty']))}
       ${row('Make League Public',commToggle('isPublic'))}
@@ -7852,6 +7867,10 @@ let rbGifTimer = null;
 let rbReplyToId = null;
 let rbLastRenderedCount = 0;
 
+function rbTrashTalkEnabled(){
+  return !!D?.multiplayer && !D?.isDemo;
+}
+
 function rbLeagueKey(){
   return (D?.sharedSeasonId || D?.lobbyId || D?.leagueId || `${CURRENT_SPORT||'sport'}-solo`).toString();
 }
@@ -7882,6 +7901,10 @@ function rbEnsureChatState(){
 
 function rbLoadChat(){
   if(!D || typeof D !== 'object') return; // Don't load chat if D doesn't exist yet
+  if(!rbTrashTalkEnabled()){
+    rbChat = { msgs:[], lastSeen:0 };
+    return;
+  }
   rbEnsureChatState();
   let local = { msgs:[], lastSeen:0 };
   try{
@@ -7908,6 +7931,7 @@ function rbLoadChat(){
 
 function rbSyncChatIntoSeason(shouldSave){
   if(!D || typeof D !== 'object') return; // Don't sync if D doesn't exist yet
+  if(!rbTrashTalkEnabled()) return;
   rbEnsureChatState();
   if(!D.trashTalkThread) return; // Extra safety check
   D.trashTalkThread.msgs = Array.isArray(rbChat.msgs) ? rbChat.msgs : [];
@@ -7953,11 +7977,13 @@ function rbFindMsg(id){
 }
 
 function rbMarkSeen(){
+  if(!rbTrashTalkEnabled()) return;
   rbChat.lastSeen = Date.now();
   rbSyncChatIntoSeason(false);
 }
 
 function rbToggleChat(){
+  if(!rbTrashTalkEnabled()) return;
   rbLoadChat();
   rbRender();
   rbMarkSeen();
@@ -8064,6 +8090,7 @@ function rbRenderMsg(m){
 }
 
 function rbRender(){
+  if(!rbTrashTalkEnabled()) return;
   rbLoadChat();
   rbRenderReplyBar();
   const el = document.getElementById('rbMsgs');
@@ -8099,6 +8126,7 @@ function rbRender(){
 }
 
 function rbUpdateSendBtn(){
+  if(!rbTrashTalkEnabled()) return;
   const v=(document.getElementById('rbInput')?.value||'').trim();
   const btn=document.getElementById('rbSendBtn');
   if(btn) btn.disabled=!v;
@@ -8120,6 +8148,7 @@ function rbInsertAt(text){
 }
 
 function rbSend(){
+  if(!rbTrashTalkEnabled()) return;
   const input=document.getElementById('rbInput');
   const text=(input?.value||'').trim();
   if(!text) return;
@@ -8190,6 +8219,7 @@ const RB_EMOJI_CATS = {
 let rbEmojiCat = '??';
 
 function rbToggleEmoji(){
+  if(!rbTrashTalkEnabled()) return;
   const ep=document.getElementById('rbEmojiPicker');
   const gp=document.getElementById('rbGifPicker');
   gp.classList.remove('open');
@@ -8198,6 +8228,7 @@ function rbToggleEmoji(){
 }
 
 function rbRenderEmoji(){
+  if(!rbTrashTalkEnabled()) return;
   // Category buttons
   document.getElementById('rbEmojiCats').innerHTML=Object.keys(RB_EMOJI_CATS).map(k=>
     `<button class="rb-emoji-cat${k===rbEmojiCat?' on':''}" onclick="rbEmojiCat='${k}';rbRenderEmoji()">${k}</button>`
@@ -8260,6 +8291,7 @@ const RB_FALLBACK_GIFS = [
 ].map(item=>({...item, preview:item.url}));
 
 function rbToggleGif(){
+  if(!rbTrashTalkEnabled()) return;
   const gp=document.getElementById('rbGifPicker');
   const ep=document.getElementById('rbEmojiPicker');
   ep.classList.remove('open');
@@ -8271,6 +8303,7 @@ function rbToggleGif(){
 }
 
 function rbShowFallbackGifs(){
+  if(!rbTrashTalkEnabled()) return;
   document.getElementById('rbGifGrid').innerHTML=RB_FALLBACK_GIFS.map(g=>
     `<div class="rb-gif-item" onclick="rbSendGif('${g.url}')">
       <img src="${g.preview}" loading="lazy" alt="GIF">
@@ -8279,6 +8312,7 @@ function rbShowFallbackGifs(){
 }
 
 function rbSearchGifs(query){
+  if(!rbTrashTalkEnabled()) return;
   clearTimeout(rbGifTimer);
   if(!query.trim()){rbShowFallbackGifs();return;}
   rbGifTimer=setTimeout(async()=>{
@@ -8299,6 +8333,7 @@ function rbSearchGifs(query){
 }
 
 function rbSendGif(url){
+  if(!rbTrashTalkEnabled()) return;
   rbLoadChat();
   rbChat.msgs.push({
     id:'g_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
@@ -8325,9 +8360,11 @@ function rbClosePickersAll(){
 // -- INIT ----------------------------------------------------
 (function(){
   rbLoadChat();
-  rbRender();
-  rbMarkSeen();
-  setTimeout(()=>rbScrollBottom(),100);
+  if(rbTrashTalkEnabled()){
+    rbRender();
+    rbMarkSeen();
+    setTimeout(()=>rbScrollBottom(),100);
+  }
 
   // Close pickers when clicking outside
   document.addEventListener('click',e=>{
@@ -8341,7 +8378,7 @@ function rbClosePickersAll(){
 
   // Poll for new messages from other sessions every 5 seconds
   setInterval(()=>{
-    if(rbChatOpen){
+    if(rbChatOpen && rbTrashTalkEnabled()){
       rbLoadChat();
       if(rbChat.msgs.length!==rbLastRenderedCount){
         const stickToBottom = Math.abs((document.getElementById('rbMsgs')?.scrollHeight || 0) - ((document.getElementById('rbMsgs')?.scrollTop || 0) + (document.getElementById('rbMsgs')?.clientHeight || 0))) < 80;
