@@ -95,10 +95,10 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:6px 0 8px;
-    min-height:52px;
+    padding:2px 0 4px;
+    min-height:42px;
     position:relative;
-    margin-bottom:4px;
+    margin-bottom:0;
   }
   nav::after{
     content:'';
@@ -112,8 +112,8 @@
     box-shadow:0 1px 0 rgba(255,255,255,.04);
     pointer-events:none;
   }
-  .nav-logo{display:inline-flex;align-items:center;gap:10px;background:none;border:none;color:var(--text);cursor:pointer;}
-  .nav-logo img{height:72px;width:auto;display:block;filter:drop-shadow(0 12px 28px rgba(0,0,0,.36));}
+  .nav-logo{display:inline-flex;align-items:center;gap:10px;background:none;border:none;color:var(--text);cursor:pointer;position:relative;height:42px;min-width:208px;overflow:visible;flex:0 0 auto;}
+  .nav-logo img{position:absolute;left:0;top:50%;height:88px;width:auto;display:block;transform:translateY(-50%);filter:drop-shadow(0 12px 28px rgba(0,0,0,.34));}
   .nav-actions{display:flex;align-items:center;gap:8px;}
   .nav-actions.auth-pending .nav-auth-btn,
   .nav-actions.auth-pending .account-wrap{visibility:hidden;pointer-events:none;}
@@ -138,15 +138,13 @@
   .hero-badge{display:none;}
   .hero-shell{
     max-width:1020px;
-    margin:0 auto 16px;
-    padding:22px 22px 18px;
-    border-radius:28px;
-    border:1px solid rgba(165,214,255,.22);
-    background:
-      linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 38%,rgba(8,15,27,.18) 100%),
-      linear-gradient(180deg,rgba(13,22,36,.34),rgba(13,22,36,.58));
-    box-shadow:0 26px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.14);
-    backdrop-filter:blur(20px);
+    margin:0 auto 14px;
+    padding:10px 0 8px;
+    border-radius:0;
+    border:none;
+    background:none;
+    box-shadow:none;
+    backdrop-filter:none;
   }
   @keyframes heroLogoIntro{
     0%{opacity:0;transform:translateY(10px) scale(.965);}
@@ -159,17 +157,14 @@
     58%{transform:translateX(135%) skewX(-18deg);opacity:0;}
     100%{transform:translateX(135%) skewX(-18deg);opacity:0;}
   }
-  .hero-logo-wrap{width:min(468px,78vw);height:132px;margin:0 auto 8px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;animation:heroLogoIntro .52s cubic-bezier(.22,.61,.36,1) both;}
+  .hero-logo-wrap{width:min(440px,76vw);height:118px;margin:0 auto 4px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;animation:heroLogoIntro .52s cubic-bezier(.22,.61,.36,1) both;}
   .hero-logo-wrap::after{content:'';position:absolute;top:8%;bottom:8%;width:22%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);filter:blur(8px);mix-blend-mode:screen;pointer-events:none;animation:heroLogoSheen 1.05s ease-out .16s both;}
   body.cta-logo-sync .hero-logo-wrap::after{animation:ctaButtonShimmer 10s ease-in-out infinite;}
   .hero-logo{display:block;width:100%;height:100%;object-fit:cover;object-position:center 50%;filter:drop-shadow(0 10px 24px rgba(0,0,0,.32));transform:scale(1.02);}
-  .hero-sub{font-family:var(--fm);font-size:16px;font-weight:600;color:#d0d7e4;line-height:1.6;max-width:640px;margin:0 auto 18px;}
+  .hero-sub{font-family:var(--fm);font-size:16px;font-weight:600;color:#d0d7e4;line-height:1.6;max-width:640px;margin:0 auto 8px;}
   .hero-sub strong{color:var(--text);}
   .hero-sub .hero-accent-ai{color:#f7a457;}
   .hero-sub .hero-accent-real{color:#6fe1a1;}
-  .hero-quick-links{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px auto 0;}
-  .hero-quick-link{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;background:linear-gradient(180deg,rgba(23,36,56,.88),rgba(12,19,31,.92));border:1px solid rgba(165,214,255,.18);color:#edf5ff;text-decoration:none;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 10px 18px rgba(0,0,0,.18);}
-  .hero-quick-link:hover{transform:translateY(-1px);}
   .promo-grid{display:grid;grid-template-columns:1fr;gap:14px;max-width:980px;margin:18px auto 0;}
   @keyframes feature-border-rotate{
     from{transform:rotate(0deg);}
@@ -204,6 +199,7 @@
     background-size:auto,auto,cover;
     background-position:center,center,right center;
     background-repeat:no-repeat;}
+  .promo-card.moneyball.has-photo::after{background-position:center,center,calc(100% + 18px) center;}
   .promo-card::before{
     content:'';
     position:absolute;
@@ -332,11 +328,15 @@
   .promo-action:hover{transform:translateY(-1px) scale(1.015);filter:brightness(1.06);}
   .promo-card.powerups .promo-action{background:linear-gradient(180deg,rgba(54,43,14,.96),rgba(37,30,10,.92));border-color:rgba(253,224,71,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(253,224,71,.16),0 0 18px rgba(234,179,8,.24),0 8px 20px rgba(0,0,0,.28);}
   .promo-card.trade .promo-action{background:linear-gradient(180deg,rgba(63,24,18,.96),rgba(39,14,10,.92));border-color:rgba(252,165,165,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(252,165,165,.16),0 0 18px rgba(239,68,68,.24),0 8px 20px rgba(0,0,0,.28);}
-  .feature-shelf{max-width:980px;margin:16px auto 0;padding:18px 20px 20px;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 44%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(17,24,37,.58),rgba(10,15,24,.82));border:1px solid rgba(162,214,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 46px rgba(0,0,0,.24);position:relative;overflow:hidden;backdrop-filter:blur(18px);}
-  .feature-shelf::before{content:'';position:absolute;inset:-1px auto auto 18px;width:220px;height:1px;background:linear-gradient(90deg,rgba(134,239,172,.84),rgba(96,165,250,.45),transparent);}
+  .feature-shelf{max-width:980px;margin:24px auto 0;padding:0;border-radius:0;background:none;border:none;box-shadow:none;position:relative;overflow:visible;backdrop-filter:none;}
+  .feature-shelf::before{display:none;}
   .feature-shelf-head{display:flex;align-items:flex-start;justify-content:center;gap:14px;flex-wrap:wrap;text-align:center;}
   .feature-shelf-title{font-family:var(--fd);font-size:15px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;color:#f8fafc;}
   .feature-shelf-copy{max-width:560px;font-size:12px;line-height:1.6;color:#aebacf;margin:0 auto;}
+  .feature-shelf-actions{margin-top:18px;}
+  .feature-shelf .sport-section{margin:0 auto 20px;max-width:720px;}
+  .feature-shelf .section-label{margin-bottom:14px;}
+  .feature-shelf .cta-grid{margin:0 auto;max-width:860px;}
   .feature-shelf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px;}
   .feature-shelf-card{padding:15px 15px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(19,29,45,.7),rgba(10,16,26,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 26px rgba(0,0,0,.14);position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:226px;backdrop-filter:blur(16px);}
   .feature-shelf-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(255,255,255,.08),transparent 36%);pointer-events:none;opacity:.9;}
@@ -985,10 +985,11 @@
 
   @media (max-width: 680px){
     .wrap{padding:0 16px 34px;}
-    nav{padding:6px 0 8px;min-height:52px;}
-    .nav-logo img{height:54px;}
+    nav{padding:2px 0 4px;min-height:40px;}
+    .nav-logo{height:40px;min-width:176px;}
+    .nav-logo img{height:74px;}
     .hero{padding:8px 0 8px;}
-    .hero-shell{padding:20px 18px 16px;border-radius:22px;}
+    .hero-shell{padding:10px 0 10px;border-radius:0;}
     .hero h1{font-size:46px;}
     .hero-logo-wrap{width:min(340px,84vw);height:96px;}
     .hero-sub{font-size:14px;}
@@ -1048,17 +1049,11 @@
     <div class="hero-shell">
     <div class="hero-logo-wrap"><img class="hero-logo" src="rosterbate-main-logo-final.png" alt="RosterBate"></div>
     <p class="hero-sub">The ultimate fantasy sports experience. Play against <strong class="hero-accent-real">real people</strong> or challenge <strong class="hero-accent-ai">AI opponents</strong> across multiple sports — all season long.</p>
-    <div class="hero-quick-links">
-      <a href="my-leagues.html" class="hero-quick-link">Open My Leagues</a>
-      <a href="rosterbate-matchmaking.html?sport=nba" class="hero-quick-link">Browse Rooms</a>
-      <a href="rosterbate-draft.html?sport=nba" class="hero-quick-link">Try Demo Draft</a>
-    </div>
     <div class="promo-grid">
       <div class="promo-card moneyball has-photo" id="moneyballFeatureCard">
         <div class="promo-content">
           <div class="promo-title">Moneyball Modes</div>
           <div class="promo-meta-row">
-            <span class="promo-status-pill open" id="moneyballStatus">Live Strategy</span>
             <span class="promo-status-pill" id="moneyballMeta">3 sports active</span>
           </div>
           <button class="promo-action" onclick="openMoneyballExplainer()">How This Works</button>
@@ -1068,7 +1063,6 @@
         <div class="promo-content">
           <div class="promo-title">Boost Your Team</div>
           <div class="promo-meta-row">
-            <span class="promo-status-pill soon" id="powerupsStatus">Draft Open</span>
             <span class="promo-status-pill" id="powerupsMeta">Use weekly boosts</span>
           </div>
           <button class="promo-action" onclick="openPowerupExplainer()">How This Works</button>
@@ -1078,7 +1072,6 @@
         <div class="promo-content">
           <div class="promo-title">Draft Pick Swaps</div>
           <div class="promo-meta-row">
-            <span class="promo-status-pill alert" id="tradeStatus">Pre-Draft Window</span>
             <span class="promo-status-pill" id="tradeMeta">Trade slots before lock</span>
           </div>
           <button class="promo-action" onclick="openSwapExplainer()">How This Works</button>
@@ -1088,129 +1081,91 @@
     <div class="feature-shelf">
       <div class="feature-shelf-head">
         <div>
-          <div class="feature-shelf-title">Featured Right Now</div>
-          <div class="feature-shelf-copy">Borrowing Sleeper's clarity, not its clutter: here are the three most important ways to jump into RosterBate right now.</div>
+          <div class="feature-shelf-title">Choose Your Sport And Jump In</div>
+          <div class="feature-shelf-copy">Pick your league first, then head straight into a solo board or live rooms from the hero instead of scrolling into a second, repeated start section.</div>
         </div>
       </div>
-      <div class="feature-shelf-grid">
-        <div class="feature-shelf-card">
-          <div class="feature-shelf-kicker">Room Visibility</div>
-          <div class="feature-shelf-card-title">Live Draft Rooms</div>
-          <div class="feature-shelf-meta">
-            <span class="feature-shelf-pill open" id="featureLiveRoomsStatus">Draft Open</span>
-            <span class="feature-shelf-pill info" id="featureLiveRoomsMeta">Public + Private</span>
+      <div class="feature-shelf-actions">
+        <div class="sport-section">
+          <div class="section-label">Choose Your Sport</div>
+          <div class="sport-grid">
+            <div class="sport-card active" data-sport="nba" onclick="selectSportCard('nba')">
+              <div class="sport-icon">🏀</div>
+              <div class="sport-name">Basketball</div>
+            </div>
+            <div class="sport-card" data-sport="nfl" onclick="selectSportCard('nfl')">
+              <div class="sport-icon">🏈</div>
+              <div class="sport-name">Football</div>
+            </div>
+            <div class="sport-card" data-sport="mlb" onclick="selectSportCard('mlb')">
+              <div class="sport-icon">⚾</div>
+              <div class="sport-name">Baseball</div>
+            </div>
           </div>
-          <div class="feature-shelf-card-copy">Browse open rooms, watch ready counts, and see when a scheduled lobby is unlocking before you ever join.</div>
-          <a class="feature-shelf-link" id="featureLiveRoomsLink" href="rosterbate-matchmaking.html?sport=nba">Browse Rooms</a>
         </div>
-        <div class="feature-shelf-card">
-          <div class="feature-shelf-kicker">Featured Modes</div>
-          <div class="feature-shelf-card-title">Moneyball + Swaps</div>
-          <div class="feature-shelf-meta">
-            <span class="feature-shelf-pill open" id="featureModesStatus">Mode Ready</span>
-            <span class="feature-shelf-pill info" id="featureModesMeta">3 signature systems</span>
-          </div>
-          <div class="feature-shelf-card-copy">Moneyball Modes, Boosts, and Draft Pick Swaps are surfaced as featured systems instead of getting buried under a giant product shelf.</div>
-          <a class="feature-shelf-link" href="javascript:void(0)" onclick="openMoneyballExplainer()">View Featured Modes</a>
-        </div>
-        <div class="feature-shelf-card">
-          <div class="feature-shelf-kicker">Fastest Entry</div>
-          <div class="feature-shelf-card-title">Mock Draft Lab</div>
-          <div class="feature-shelf-meta">
-            <span class="feature-shelf-pill soon" id="featureMockStatus">Try Now</span>
-            <span class="feature-shelf-pill info" id="featureMockMeta">Snake · Auction</span>
-          </div>
-          <div class="feature-shelf-card-copy">Open the draft board without waiting on a room so you can test formats, timers, and roster shapes before your real league goes live.</div>
-          <a class="feature-shelf-link" id="featureMockLink" href="rosterbate-draft.html?sport=nba">Try A Demo Draft</a>
+
+        <div class="section-label" id="sportSectionLabel">Get Started — Basketball</div>
+        <div class="cta-grid">
+          <a href="rosterbate-draft.html?sport=nba" class="cta-card orange" id="single-player-card">
+            <div class="cta-top">
+              <div class="cta-copy">
+                <div class="cta-title">Single Player<span>Play vs AI</span></div>
+              </div>
+              <div class="cta-emoji" aria-hidden="true">
+                <svg viewBox="0 0 64 64" role="presentation" focusable="false">
+                  <circle class="icon-stroke" cx="28" cy="35" r="20"></circle>
+                  <circle class="icon-stroke" cx="28" cy="35" r="10"></circle>
+                  <path class="icon-stroke" d="M35 28 L48 15"></path>
+                  <path class="icon-stroke" d="M48 15 L55 8"></path>
+                  <path class="icon-stroke" d="M46 8 H55 V17"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="cta-meta-row">
+              <span class="cta-meta-pill open" id="singlePlayerMetaPrimary">Draft Board Ready</span>
+              <span class="cta-meta-pill info" id="singlePlayerMetaSecondary">AI GM Active</span>
+            </div>
+            <div class="cta-desc">Set up your league, customize scoring and roster settings, then draft live with a pick timer, auto-draft queue, and full pick trading before the draft even starts.</div>
+            <div class="cta-btn">
+              <span class="cta-btn-label">Create Your League</span>
+              <span class="cta-star s1" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+              <span class="cta-star s2" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+              <span class="cta-star s3" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+              <span class="cta-star s4" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+            </div>
+          </a>
+
+          <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" class="cta-card multiplayer-glow" style="display:block;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+            <div class="cta-top">
+              <div class="cta-copy">
+                <div class="cta-title">Multiplayer<span style="color:var(--text2);">Play vs Real People</span></div>
+              </div>
+              <div class="cta-emoji" aria-hidden="true">
+                <svg viewBox="0 0 64 64" role="presentation" focusable="false">
+                  <circle class="icon-fill" cx="22" cy="20" r="8.2"></circle>
+                  <circle class="icon-fill" cx="43" cy="20" r="8.2"></circle>
+                  <path class="icon-fill" d="M8 47c0-7.2 6.3-12.6 14.4-12.6S36.8 39.8 36.8 47v3.2H8z"></path>
+                  <path class="icon-fill" d="M28.5 47c0-7 6-12.1 13.6-12.1 7.4 0 13.4 5.1 13.4 12.1V50H28.5z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="cta-meta-row">
+              <span class="cta-meta-pill open" id="multiPlayerMetaPrimary">Draft Open</span>
+              <span class="cta-meta-pill info" id="multiPlayerMetaSecondary">Public + Private Rooms</span>
+            </div>
+            <div class="cta-desc">Quick Match finds leagues by draft format, scoring type, and team size. Browse open leagues, create a private one, or join with a share code.</div>
+            <div class="cta-btn">
+              <span class="cta-btn-label">Find a League</span>
+              <span class="cta-star s1" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+              <span class="cta-star s2" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+              <span class="cta-star s3" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+              <span class="cta-star s4" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
+            </div>
+          </a>
         </div>
       </div>
     </div>
     </div>
-  </div>
-
-  <!-- Sports -->
-  <div class="sport-section">
-    <div class="section-label">Choose Your Sport</div>
-    <div class="sport-grid">
-      <div class="sport-card active" data-sport="nba" onclick="selectSportCard('nba')">
-        <div class="sport-icon">🏀</div>
-        <div class="sport-name">Basketball</div>
-      </div>
-      <div class="sport-card" data-sport="nfl" onclick="selectSportCard('nfl')">
-        <div class="sport-icon">🏈</div>
-        <div class="sport-name">Football</div>
-      </div>
-      <div class="sport-card" data-sport="mlb" onclick="selectSportCard('mlb')">
-        <div class="sport-icon">⚾</div>
-        <div class="sport-name">Baseball</div>
-      </div>
-      
-      
-      
-    </div>
-  </div>
-
-  <!-- Main CTAs -->
-  <div class="section-label" id="sportSectionLabel">Get Started — Basketball</div>
-  <div class="cta-grid">
-  <a href="rosterbate-draft.html?sport=nba" class="cta-card orange" id="single-player-card">
-      <div class="cta-top">
-        <div class="cta-copy">
-          <div class="cta-title">Single Player<span>Play vs AI</span></div>
-        </div>
-        <div class="cta-emoji" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="presentation" focusable="false">
-            <circle class="icon-stroke" cx="28" cy="35" r="20"></circle>
-            <circle class="icon-stroke" cx="28" cy="35" r="10"></circle>
-            <path class="icon-stroke" d="M35 28 L48 15"></path>
-            <path class="icon-stroke" d="M48 15 L55 8"></path>
-            <path class="icon-stroke" d="M46 8 H55 V17"></path>
-          </svg>
-        </div>
-      </div>
-      <div class="cta-meta-row">
-        <span class="cta-meta-pill open" id="singlePlayerMetaPrimary">Draft Board Ready</span>
-        <span class="cta-meta-pill info" id="singlePlayerMetaSecondary">AI GM Active</span>
-      </div>
-      <div class="cta-desc">Set up your league, customize scoring and roster settings, then draft live with a pick timer, auto-draft queue, and full pick trading before the draft even starts.</div>
-      <div class="cta-btn">
-        <span class="cta-btn-label">Create Your League</span>
-        <span class="cta-star s1" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-        <span class="cta-star s2" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-        <span class="cta-star s3" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-        <span class="cta-star s4" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-      </div>
-    </a>
-
-    <!-- Multiplayer matchmaking card -->
-  <a href="rosterbate-matchmaking.html?sport=nba" id="multiplayer-card" class="cta-card multiplayer-glow" style="display:block;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
-      <div class="cta-top">
-        <div class="cta-copy">
-          <div class="cta-title">Multiplayer<span style="color:var(--text2);">Play vs Real People</span></div>
-        </div>
-        <div class="cta-emoji" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="presentation" focusable="false">
-            <circle class="icon-fill" cx="22" cy="20" r="8.2"></circle>
-            <circle class="icon-fill" cx="43" cy="20" r="8.2"></circle>
-            <path class="icon-fill" d="M8 47c0-7.2 6.3-12.6 14.4-12.6S36.8 39.8 36.8 47v3.2H8z"></path>
-            <path class="icon-fill" d="M28.5 47c0-7 6-12.1 13.6-12.1 7.4 0 13.4 5.1 13.4 12.1V50H28.5z"></path>
-          </svg>
-        </div>
-      </div>
-      <div class="cta-meta-row">
-        <span class="cta-meta-pill open" id="multiPlayerMetaPrimary">Draft Open</span>
-        <span class="cta-meta-pill info" id="multiPlayerMetaSecondary">Public + Private Rooms</span>
-      </div>
-      <div class="cta-desc">Quick Match finds leagues by draft format, scoring type, and team size. Browse open leagues, create a private one, or join with a share code.</div>
-      <div class="cta-btn">
-        <span class="cta-btn-label">Find a League</span>
-        <span class="cta-star s1" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-        <span class="cta-star s2" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-        <span class="cta-star s3" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-        <span class="cta-star s4" aria-hidden="true"><svg viewBox="0 0 784.11 815.53" focusable="false"><path d="M392.05 0c-20.9 210.08-184.06 378.41-392.05 407.78 207.96 29.37 371.12 197.68 392.05 407.74 20.93-210.06 184.09-378.37 392.05-407.74C576.13 378.4 412.95 210.09 392.05 0z"/></svg></span>
-      </div>
-    </a>
-
   </div>
   <div class="mock-strip">
     <div class="mock-strip-copy">
@@ -1830,11 +1785,8 @@ function updateHomeSportUI(){
   if(powerupsCard) powerupsCard.style.setProperty('--promo-photo', `url(\"${assets.powerups}\")`);
   if(tradeCard) tradeCard.style.setProperty('--promo-photo', `url(\"${assets.trade}\")`);
   const textMap={
-    moneyballStatus:signals.moneyballStatus,
     moneyballMeta:signals.moneyballMeta,
-    powerupsStatus:signals.powerupsStatus,
     powerupsMeta:signals.powerupsMeta,
-    tradeStatus:signals.tradeStatus,
     tradeMeta:signals.tradeMeta,
     singlePlayerMetaPrimary:signals.singlePrimary,
     singlePlayerMetaSecondary:signals.singleSecondary,
