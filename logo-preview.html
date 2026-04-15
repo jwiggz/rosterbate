@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RosterBate Brand Preview</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="global-nav.css">
+  <script src="global-nav.js" defer></script>
   <style>
     :root{
       --bg:#07111f;
@@ -46,6 +48,7 @@
       padding:16px 20px;
       margin-bottom:18px;
     }
+    .topbar{display:none !important}
     .brand{font-family:var(--fd);font-size:30px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}
     .brand span{color:var(--accent)}
     .top-actions,.hero-actions,.hero-pills,.preview-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -203,6 +206,13 @@
   </style>
 </head>
 <body>
+  <nav class="rb-global-nav">
+    <button class="rb-global-logo" type="button" onclick="window.location.href='index.html'"><img src="rosterbate-main-logo-final.png" alt="RosterBate"></button>
+    <div class="rb-global-actions">
+      <div class="rb-global-badge">Beta</div>
+      <button id="rbGlobalProfileBtn" class="rb-global-profile" type="button" onclick="window.location.href='profile.html'">Profile</button>
+    </div>
+  </nav>
   <div class="shell">
     <div class="topbar">
       <div class="brand">Roster<span>Bate</span></div>

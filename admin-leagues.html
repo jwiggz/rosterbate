@@ -5,15 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>RosterBate - Administrator</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="global-nav.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script src="global-nav.js" defer></script>
 <style>
   :root{--bg:#07111f;--card:#101a2c;--line:rgba(148,163,184,.18);--text:#eef4ff;--muted:#9fb0c9;--soft:#6c7f9b;--accent:#f97316;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--shadow:0 20px 60px rgba(0,0,0,.28)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{min-height:100vh;color:var(--text);font-family:var(--fb);background:radial-gradient(circle at 12% 10%, rgba(249,115,22,.18), transparent 28%),radial-gradient(circle at 88% 18%, rgba(96,165,250,.16), transparent 24%),linear-gradient(180deg,#09111e 0%,#07111f 40%,#081321 100%)}
   a{text-decoration:none;color:inherit} button,input,select{font:inherit}
   .topbar{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--line);background:rgba(6,12,22,.82);backdrop-filter:blur(18px)}
+  .topbar{display:none !important}
   .topbar-inner,.shell{max-width:1540px;margin:0 auto;padding:16px 22px}
   .topbar-inner,.brand-wrap,.top-actions,.hero-meta,.results-tags,.league-meta,.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .topbar-inner{justify-content:space-between}
@@ -80,6 +83,13 @@
 </style>
 </head>
 <body>
+  <nav class="rb-global-nav">
+    <button class="rb-global-logo" type="button" onclick="window.location.href='index.html'"><img src="rosterbate-main-logo-final.png" alt="RosterBate"></button>
+    <div class="rb-global-actions">
+      <div class="rb-global-badge">Beta</div>
+      <button id="rbGlobalProfileBtn" class="rb-global-profile" type="button" onclick="window.location.href='profile.html'">Profile</button>
+    </div>
+  </nav>
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand-wrap">

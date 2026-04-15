@@ -1,0 +1,124 @@
+:root{
+  --rb-nav-height:48px;
+}
+
+body{
+  padding-top:var(--rb-nav-height);
+}
+
+.rb-global-nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+  height:var(--rb-nav-height);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:2px 24px 4px;
+  background:linear-gradient(180deg,rgba(16,22,32,.26),rgba(10,14,22,.08));
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  box-shadow:none;
+}
+
+.rb-global-nav::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:100vw;
+  height:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.2) 14%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.2) 86%,rgba(255,255,255,0));
+  box-shadow:0 1px 0 rgba(255,255,255,.04);
+  pointer-events:none;
+}
+
+.rb-global-logo{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  background:none;
+  border:none;
+  color:#f1f5f9;
+  cursor:pointer;
+  position:relative;
+  height:42px;
+  min-width:208px;
+  overflow:visible;
+  flex:0 0 auto;
+}
+
+.rb-global-logo img{
+  position:absolute;
+  left:0;
+  top:50%;
+  height:88px;
+  width:auto;
+  display:block;
+  transform:translateY(-50%);
+  filter:drop-shadow(0 12px 28px rgba(0,0,0,.34));
+}
+
+.rb-global-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.rb-global-badge{
+  background:linear-gradient(180deg,#efb16b,#d98a37);
+  border:1px solid rgba(255,214,153,.25);
+  border-radius:9px;
+  padding:4px 9px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  color:#251709;
+  box-shadow:0 8px 16px rgba(0,0,0,.22);
+}
+
+.rb-global-profile{
+  background:linear-gradient(180deg,#5b6272,#343a48);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:8px 14px;
+  min-width:110px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#f8fafc;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 22px rgba(0,0,0,.22);
+}
+
+@media (max-width: 720px){
+  :root{
+    --rb-nav-height:46px;
+  }
+
+  .rb-global-nav{
+    padding:2px 16px 4px;
+  }
+
+  .rb-global-logo{
+    min-width:176px;
+    height:40px;
+  }
+
+  .rb-global-logo img{
+    height:74px;
+  }
+
+  .rb-global-profile{
+    min-width:96px;
+    padding:8px 12px;
+  }
+}

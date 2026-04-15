@@ -7,12 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RosterBate Draft</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="global-nav.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <script src="audit-logger.js"></script>
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
+<script src="global-nav.js" defer></script>
 <style>
   :root{
     --bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;
@@ -31,7 +33,8 @@
     font-family:var(--fb);
     overflow:hidden;
   }
-  .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
+  body{padding-top:0;}
+  .screen{display:none;flex-direction:column;height:calc(100dvh - var(--rb-nav-height));margin-top:var(--rb-nav-height);overflow:hidden;}
   .screen.active{display:flex;}
   body[data-draft-boot="loading"] .screen.active{display:none !important;}
 
@@ -701,6 +704,13 @@
 </style>
 </head>
 <body data-draft-boot="loading">
+<nav class="rb-global-nav">
+  <button class="rb-global-logo" type="button" onclick="window.location.href='index.html'"><img src="rosterbate-main-logo-final.png" alt="RosterBate"></button>
+  <div class="rb-global-actions">
+    <div class="rb-global-badge">Beta</div>
+    <button id="rbGlobalProfileBtn" class="rb-global-profile" type="button" onclick="window.location.href='profile.html'">Profile</button>
+  </div>
+</nav>
 <div class="retro-nba-stage" id="retroNbaStage" aria-hidden="true">
   <div class="retro-nba-room-fallback"></div>
   <img class="retro-nba-room" id="retroNbaRoomImage" alt="" hidden>

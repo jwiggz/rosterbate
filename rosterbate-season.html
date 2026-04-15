@@ -6,23 +6,27 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>RosterBate - Season Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="global-nav.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <script src="audit-logger.js"></script>
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
+<script src="global-nav.js" defer></script>
 <style>
 :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#1e2d45;--accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--hub-landing-image:none;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fb);overflow:hidden;}
+body{padding-top:0;}
 input[type=number]{-moz-appearance:textfield;appearance:textfield;}
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-.screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
+.screen{display:none;flex-direction:column;height:calc(100dvh - var(--rb-nav-height));margin-top:var(--rb-nav-height);overflow:hidden;}
 .screen.active{display:flex;}
 body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .ph{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;}
+.ph{display:none !important;}
 .pt{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;}
 .bb{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px 6px;}
 .sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px;}
@@ -557,6 +561,13 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 </style>
 </head>
 <body>
+<nav class="rb-global-nav">
+  <button class="rb-global-logo" type="button" onclick="window.location.href='index.html'"><img src="rosterbate-main-logo-final.png" alt="RosterBate"></button>
+  <div class="rb-global-actions">
+    <div class="rb-global-badge">Beta</div>
+    <button id="rbGlobalProfileBtn" class="rb-global-profile" type="button" onclick="window.location.href='profile.html'">Profile</button>
+  </div>
+</nav>
 
 <!-- NO DATA -->
 <div id="noData" class="screen active">
