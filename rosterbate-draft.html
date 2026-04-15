@@ -4715,6 +4715,7 @@ function updateTradeBtn(){
 // ─── SEASON MANAGEMENT ────────────────────────────────────
 let autoSeasonRedirectTimer = null;
 let completedDraftSeasonData = null;
+const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';
 async function endDraft(){
   console.log('🏆 Draft ending, switching to completion screen...');
   clearInterval(S.timerInt);
@@ -4864,6 +4865,7 @@ async function endDraft(){
     // Save to localStorage (backup for offline access) - now includes seasonId
     try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
     try{ completedDraftSeasonData = JSON.parse(JSON.stringify(draftData)); }catch(e){ completedDraftSeasonData = draftData; }
+    persistPendingSeasonLaunch(draftData);
 
     const myRoster = Array.isArray(S.myTeam)?S.myTeam.filter(Boolean):[];
     const teamNameEl=document.getElementById('dcTeamName');
@@ -5001,6 +5003,7 @@ async function resolveSeasonManagerUrl(){
         }
         try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
         try{ completedDraftSeasonData = JSON.parse(JSON.stringify(draftData)); }catch(e){ completedDraftSeasonData = draftData; }
+        persistPendingSeasonLaunch(draftData);
       }
     } catch (err) {
       console.warn('Could not create sequential season ID before opening season manager:', err);
@@ -5010,6 +5013,21 @@ async function resolveSeasonManagerUrl(){
   return seasonId
     ? ('rosterbate-season.html?sport=' + encodeURIComponent(SPORT) + '&league=' + encodeURIComponent(seasonId))
     : '';
+}
+
+function persistPendingSeasonLaunch(draftData){
+  try{
+    if(!draftData || typeof draftData!=='object') return;
+    const payload = {
+      seasonId: String(draftData.seasonId || draftData.sharedSeasonId || draftData.lobbyId || '').trim(),
+      savedAt: Number(draftData.savedAt || Date.now()),
+      data: JSON.parse(JSON.stringify(draftData))
+    };
+    if(!payload.seasonId) return;
+    localStorage.setItem(RB_PENDING_SEASON_KEY, JSON.stringify(payload));
+  }catch(e){
+    console.warn('Could not persist pending season handoff:', e);
+  }
 }
 
 async function openSeasonManager(){

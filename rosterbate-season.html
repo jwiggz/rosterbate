@@ -1406,6 +1406,42 @@ function getSavedMultiplayerLobbyState(){
   }
 }
 
+const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';
+
+function getPendingSeasonLaunch(requestedLeagueId){
+  const target=String(requestedLeagueId || '').trim();
+  if(!target) return null;
+  try{
+    const raw=localStorage.getItem(RB_PENDING_SEASON_KEY);
+    if(!raw) return null;
+    const parsed=JSON.parse(raw);
+    if(!parsed || typeof parsed!=='object') return null;
+    const pendingSeasonId=String(parsed.seasonId || '').trim();
+    if(pendingSeasonId!==target) return null;
+    const pendingData=parsed.data;
+    if(!pendingData || typeof pendingData!=='object') return null;
+    return {
+      seasonId: pendingSeasonId,
+      savedAt: Number(parsed.savedAt || pendingData.savedAt || 0),
+      data: pendingData
+    };
+  }catch(e){
+    console.warn('Failed to parse pending season launch data:', e);
+    return null;
+  }
+}
+
+function clearPendingSeasonLaunch(requestedLeagueId){
+  try{
+    if(!requestedLeagueId){
+      localStorage.removeItem(RB_PENDING_SEASON_KEY);
+      return;
+    }
+    const pending=getPendingSeasonLaunch(requestedLeagueId);
+    if(pending) localStorage.removeItem(RB_PENDING_SEASON_KEY);
+  }catch(e){}
+}
+
 function getMatchingLocalLeagueData(requestedLeagueId){
   const target=String(requestedLeagueId || '').trim();
   if(!target) return null;
@@ -3805,6 +3841,71 @@ window.onload=async function(){
   // If league ID is provided, try to load from Firebase first
   if (leagueId && leagueId !== 'demo') {
     console.log('?? Loading specific league from URL:', leagueId);
+    const pendingSeasonLaunch = getPendingSeasonLaunch(leagueId);
+    if (pendingSeasonLaunch?.data) {
+      console.log('🚀 Found pending fresh season handoff for this league. Using it before cloud restore.');
+      D = pendingSeasonLaunch.data;
+      if (!D.myPos && D.myPos !== 0) D.myPos = 0;
+      applySportContext(D.sport || requestedSport);
+      hydrateDraftUserContextFromLobby();
+      refreshCommissionerAccess();
+      try {
+        localStorage.setItem('rosterbateDraft', JSON.stringify(D));
+      } catch(e) {}
+      await authReady;
+      if (currentRbUser) {
+        try {
+          const userId = currentRbUser.uid;
+          const saveData = {
+            ...D,
+            seasonId: leagueId,
+            userId: userId,
+            userEmail: currentRbUser.email || 'unknown',
+            createdAt: D.createdAt || D.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
+            updatedAt: Date.now()
+          };
+          await db.ref(`userSeasons/${userId}/${leagueId}`).set(removeUndefined(saveData));
+          await db.ref(`allSeasons/${leagueId}`).set(removeUndefined({
+            seasonId: leagueId,
+            userId: userId,
+            userEmail: currentRbUser.email || 'unknown',
+            sport: D.sport || 'nba',
+            leagueName: D.leagueName || 'RosterBate League',
+            teamName: D.teamName || 'My Team',
+            isMultiplayer: !!D.multiplayer,
+            leagueSize: getLeagueTeamCount(D),
+            scoringFormat: D.scoringFormat || 'h2h_pts',
+            draftFormat: D.draftFormat || 'snake',
+            currentWeek: Number(D.currentWeek || 1),
+            createdAt: D.createdAt || D.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
+            updatedAt: Date.now()
+          }));
+        } catch(saveErr) {
+          console.warn('Pending season handoff could not refresh Firebase before opening:', saveErr);
+        }
+      }
+      let seasonLoaded = false;
+      if (D.multiplayer) {
+        try {
+          seasonLoaded = await loadOrCreateSharedSeason();
+        } catch(e) {
+          console.error('Shared season load failed:', e);
+          seasonLoaded = false;
+        }
+      }
+      if (!seasonLoaded) {
+        try {
+          initSeason();
+        } catch(initErr) {
+          console.error('? Season init failed from pending handoff:', initErr);
+          toast('Could not open the league: ' + initErr.message);
+          return;
+        }
+      }
+      clearPendingSeasonLaunch(leagueId);
+      applyRequestedSeasonView();
+      return;
+    }
     
     // Wait for auth to be ready
     await authReady;
