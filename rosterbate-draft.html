@@ -113,6 +113,129 @@
       linear-gradient(180deg, rgba(7,10,17,.98), rgba(5,7,12,1));
     position:relative;
   }
+  .retro-nba-stage{
+    position:fixed;
+    inset:0;
+    display:none;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+  }
+  body.retro-nba-on .retro-nba-stage{display:block;}
+  body.retro-nba-on #lobby,
+  body.retro-nba-on #draft{
+    background:transparent;
+  }
+  body.retro-nba-on #lobby::before{display:none;}
+  .retro-nba-room,
+  .retro-nba-room-fallback,
+  .retro-nba-overlay,
+  .retro-nba-glow,
+  .retro-nba-vignette,
+  .retro-nba-tv-wrap{
+    position:absolute;
+    inset:0;
+  }
+  .retro-nba-room{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:.86;
+    filter:saturate(.92) contrast(1.02) brightness(.7);
+  }
+  .retro-nba-room-fallback{
+    background:
+      radial-gradient(circle at 18% 18%, rgba(255,191,128,.16), transparent 22%),
+      radial-gradient(circle at 78% 22%, rgba(96,165,250,.12), transparent 20%),
+      linear-gradient(180deg, rgba(45,28,18,.92), rgba(18,12,9,.96) 36%, rgba(8,8,10,.98) 100%);
+  }
+  .retro-nba-overlay{
+    background:
+      linear-gradient(180deg, rgba(4,5,8,.32), rgba(4,5,8,.54) 58%, rgba(3,4,7,.76) 100%);
+  }
+  .retro-nba-glow{
+    background:
+      radial-gradient(circle at 50% 36%, rgba(255,171,92,.16), transparent 20%),
+      radial-gradient(circle at 50% 36%, rgba(255,255,255,.08), transparent 10%);
+    mix-blend-mode:screen;
+    opacity:.75;
+  }
+  .retro-nba-vignette{
+    background:
+      radial-gradient(circle at center, transparent 34%, rgba(2,3,6,.3) 70%, rgba(2,3,6,.68) 100%);
+  }
+  .retro-nba-tv-wrap{padding:0;}
+  .retro-nba-tv{
+    position:relative;
+    width:100%;
+    height:100%;
+    background:none;
+    border:none;
+    border-radius:0;
+    box-shadow:none;
+  }
+  .retro-nba-tv::before,
+  .retro-nba-tv-frame,
+  .retro-nba-tv-frame-fallback{display:none;}
+  .retro-nba-tv-screen{
+    position:absolute;
+    left:18.05%;
+    top:18.75%;
+    width:17.58%;
+    height:36.5%;
+    overflow:hidden;
+    border-radius:0;
+    clip-path:polygon(0.1% 0.3%,98.7% 1.4%,100% 78.2%,95.2% 90.1%,0% 99.6%);
+    background:
+      radial-gradient(circle at center, rgba(87,255,136,.16), transparent 52%),
+      linear-gradient(180deg, rgba(7,18,11,.78), rgba(2,8,4,.94));
+    box-shadow:
+      inset 0 0 0 1px rgba(168,255,189,.1),
+      inset 0 0 46px rgba(0,0,0,.42),
+      0 0 22px rgba(74,222,128,.18);
+    transform:none;
+    z-index:1;
+  }
+  .retro-nba-tv-screen::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,0) 2px 4px);
+    mix-blend-mode:screen;
+    opacity:.18;
+    z-index:3;
+  }
+  .retro-nba-tv-screen::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at center, transparent 42%, rgba(0,0,0,.26) 100%);
+    z-index:3;
+  }
+  .retro-nba-tv-media{
+    position:absolute;
+    top:-38% !important;
+    left:0;
+    width:100%;
+    height:148% !important;
+    object-fit:cover;
+    object-position:center top !important;
+    opacity:.92;
+    filter:saturate(.95) contrast(1.08) brightness(.9);
+    transform:none !important;
+  }
+  .retro-nba-tv-empty{
+    display:none !important;
+  }
+  #draft.retro-nba-on .dh,
+  #draft.retro-nba-on .pdc-bar,
+  #draft.retro-nba-on .pdc-strip,
+  #draft.retro-nba-on .draft-layout{
+    position:relative;
+    z-index:2;
+  }
   .dh{
     background:linear-gradient(180deg, rgba(20,30,48,.96), rgba(12,18,30,.96));
     border-bottom:1px solid rgba(61,84,118,.42);
@@ -575,6 +698,27 @@
 </style>
 </head>
 <body data-draft-boot="loading">
+<div class="retro-nba-stage" id="retroNbaStage" aria-hidden="true">
+  <div class="retro-nba-room-fallback"></div>
+  <img class="retro-nba-room" id="retroNbaRoomImage" alt="" hidden>
+  <div class="retro-nba-glow"></div>
+  <div class="retro-nba-overlay"></div>
+  <div class="retro-nba-tv-wrap">
+    <div class="retro-nba-tv" id="retroNbaTv">
+      <div class="retro-nba-tv-screen">
+        <img class="retro-nba-tv-media" id="retroNbaTvGif" alt="" hidden>
+        <video class="retro-nba-tv-media" id="retroNbaTvVideo" muted loop playsinline autoplay hidden></video>
+        <div class="retro-nba-tv-empty" id="retroNbaTvEmpty">
+          <div class="retro-nba-tv-empty-card">
+            <div class="retro-nba-tv-empty-kicker">NBA Retro TV Placeholder</div>
+            <div class="retro-nba-tv-empty-copy">Drop your room image and favorite game loops into <code>assets/retro-draft/</code> to bring this set to life.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="retro-nba-vignette"></div>
+</div>
 
 <!-- LOBBY -->
 <div id="lobby" class="screen">
@@ -687,7 +831,6 @@
 
 <!-- DRAFT -->
 <div id="draft" class="screen">
-
   <!-- COUNTDOWN BAR (sits above header, hidden once draft starts) -->
   <div class="pdc-bar" id="pdcBar">
     <div class="pdc-icon" id="sportCountdownIcon">Live</div>
@@ -1953,6 +2096,88 @@ const SPORT_RULES = getRosterbateLeagueRuleDefaults(SPORT);
 const POSITION_LABELS = getRosterbatePositionLabels(SPORT);
 let PLAYERS = [];
 let DRAFT_POSITION_RULES = JSON.parse(JSON.stringify(SPORT_RULES.positions||{}));
+const RETRO_NBA_ROOM_ASSET='assets/retro-draft/new bedroom background.png';
+const RETRO_NBA_TV_MEDIA_ASSETS=[
+  { src:'assets/retro-draft/nba-tv-loop-01.gif', type:'image' },
+  { src:'assets/retro-draft/nba-tv-loop-02.gif', type:'image' },
+  { src:'assets/retro-draft/nba-tv-loop-03.gif', type:'image' },
+  { src:'assets/retro-draft/nba-tv-loop-04.mp4', type:'video' }
+];
+
+function shuffleRetroDraftAssets(list){
+  const copy=[...(list||[])];
+  for(let i=copy.length-1;i>0;i-=1){
+    const j=Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]]=[copy[j],copy[i]];
+  }
+  return copy;
+}
+
+function initRetroNbaDraftBackdrop(){
+  const draftEl=document.getElementById('draft');
+  const lobbyEl=document.getElementById('lobby');
+  if(!draftEl || SPORT!=='nba') return;
+  const roomImg=document.getElementById('retroNbaRoomImage');
+  const gifEl=document.getElementById('retroNbaTvGif');
+  const videoEl=document.getElementById('retroNbaTvVideo');
+  document.body.classList.add('retro-nba-on');
+  if(lobbyEl) lobbyEl.classList.add('retro-nba-on');
+  draftEl.classList.add('retro-nba-on');
+
+  if(roomImg instanceof HTMLImageElement){
+    roomImg.addEventListener('load', ()=>{ roomImg.hidden=false; }, { once:true });
+    roomImg.addEventListener('error', ()=>{ roomImg.hidden=true; }, { once:true });
+    roomImg.src=RETRO_NBA_ROOM_ASSET;
+  }
+
+  if(!(gifEl instanceof HTMLImageElement) || !(videoEl instanceof HTMLVideoElement)) return;
+
+  const candidates=shuffleRetroDraftAssets(RETRO_NBA_TV_MEDIA_ASSETS);
+  let index=0;
+
+  function tryNext(){
+    if(index>=candidates.length){
+      gifEl.hidden=true;
+      gifEl.removeAttribute('src');
+      videoEl.hidden=true;
+      videoEl.pause();
+      videoEl.removeAttribute('src');
+      videoEl.load();
+      return;
+    }
+    const asset=candidates[index++];
+    if(!asset || !asset.src){
+      tryNext();
+      return;
+    }
+    if(asset.type==='video'){
+      gifEl.hidden=true;
+      gifEl.removeAttribute('src');
+      videoEl.hidden=false;
+      videoEl.oncanplay=()=>{
+        videoEl.hidden=false;
+        videoEl.play().catch(()=>{});
+      };
+      videoEl.onerror=()=>tryNext();
+      videoEl.src=asset.src;
+      videoEl.load();
+      return;
+    }
+    videoEl.hidden=true;
+    videoEl.pause();
+    videoEl.removeAttribute('src');
+    gifEl.onload=()=>{
+      gifEl.hidden=false;
+    };
+    gifEl.onerror=()=>tryNext();
+    gifEl.hidden=false;
+    gifEl.src=asset.src;
+  }
+
+  tryNext();
+}
+
+initRetroNbaDraftBackdrop();
 
 function getDraftStarterPositionKeys(){
   return Object.keys(DRAFT_POSITION_RULES||{}).filter(key=>{
@@ -6391,7 +6616,6 @@ window.addEventListener('beforeunload', ()=>{
 });
 </script>
 
-<script src="/site-background.js"></script>
 </body>
 </html>
 

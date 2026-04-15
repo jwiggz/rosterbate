@@ -1228,6 +1228,11 @@ auth.onAuthStateChanged(async user => {
 (function initMemberBalloonBackground(){
   const canvas=document.getElementById('memberBgCanvas');
   if(!(canvas instanceof HTMLCanvasElement)) return;
+  const viewedUserNumber=Number(parseUserNumber() || 0);
+  if(viewedUserNumber !== 1){
+    canvas.style.display='none';
+    return;
+  }
   const ctx=canvas.getContext('2d');
   if(!ctx) return;
 
