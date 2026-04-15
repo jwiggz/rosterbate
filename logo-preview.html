@@ -3,30 +3,328 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Go Away I'm BATING Preview</title>
+  <title>RosterBate Brand Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    html,body{height:100%;margin:0}
+    :root{
+      --bg:#07111f;
+      --card:rgba(10,18,31,.9);
+      --line:rgba(148,163,184,.18);
+      --text:#eef4ff;
+      --muted:#a8b8cf;
+      --soft:#71839d;
+      --accent:#f97316;
+      --accent-soft:rgba(249,115,22,.14);
+      --blue-soft:rgba(96,165,250,.14);
+      --fd:'Barlow Condensed',sans-serif;
+      --fb:'Barlow',sans-serif;
+      --shadow:0 20px 60px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
     body{
+      min-height:100vh;
+      color:var(--text);
+      font-family:var(--fb);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(249,115,22,.2), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(96,165,250,.16), transparent 26%),
+        linear-gradient(180deg, #09111e 0%, #07111f 48%, #081321 100%);
+    }
+    a{text-decoration:none;color:inherit}
+    .shell{max-width:1480px;margin:0 auto;padding:28px 22px 48px}
+    .topbar,.hero,.summary-card,.panel,.preview-card{
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),var(--card);
+      box-shadow:var(--shadow);
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 20px;
+      margin-bottom:18px;
+    }
+    .brand{font-family:var(--fd);font-size:30px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}
+    .brand span{color:var(--accent)}
+    .top-actions,.hero-actions,.hero-pills,.preview-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .btn,.pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      font-family:var(--fd);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.55px;
+    }
+    .btn{
+      padding:10px 16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      transition:transform .18s ease, filter .18s ease;
+      font-size:13px;
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+    .btn.primary{
+      border-color:rgba(249,115,22,.26);
+      background:linear-gradient(135deg,#ff8b38 0%,#f97316 60%,#dd5d08 100%);
+      color:#fff;
+    }
+    .pill{
+      padding:7px 12px;
+      font-size:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+    }
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(0,1.2fr) minmax(320px,.9fr);
+      gap:18px;
+      padding:28px;
+      margin-bottom:18px;
+    }
+    .hero-kicker,.section-kicker{
+      display:inline-flex;
+      width:max-content;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,.24);
+      background:var(--accent-soft);
+      color:#ffd8b1;
+      font-family:var(--fd);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+    }
+    .hero h1,.section-title,.preview-title{
+      font-family:var(--fd);
+      font-weight:900;
+      text-transform:uppercase;
+    }
+    .hero h1{
+      font-size:52px;
+      line-height:.94;
+      margin:12px 0;
+    }
+    .hero-copy,.panel-copy,.summary-copy,.preview-copy{
+      color:var(--muted);
+      line-height:1.65;
+    }
+    .hero-side{
+      display:grid;
+      gap:12px;
+    }
+    .panel{padding:18px}
+    .panel-title,.summary-label{
+      color:var(--soft);
+      font-family:var(--fd);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.75px;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .summary-card{padding:18px;min-height:118px}
+    .summary-value{
+      font-family:var(--fd);
+      font-size:38px;
+      line-height:1;
+      font-weight:900;
+    }
+    .preview-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    .preview-card{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-height:320px;
+    }
+    .preview-title{font-size:28px;line-height:1}
+    .preview-meta{display:flex;gap:8px;flex-wrap:wrap}
+    .preview-stage{
+      flex:1;
+      min-height:180px;
+      border:1px solid var(--line);
+      border-radius:20px;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:radial-gradient(circle at top,#162239 0%,#0d1320 52%,#070b13 100%);
-      font-family:Arial,sans-serif;
+      padding:26px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(255,255,255,.02);
     }
-    .frame{
-      width:min(1120px,92vw);
-      padding:28px;
-      border-radius:28px;
-      background:rgba(8,12,20,.72);
-      border:1px solid rgba(255,166,77,.22);
-      box-shadow:0 30px 90px rgba(0,0,0,.45),0 0 50px rgba(255,132,31,.16);
+    .preview-stage.dark{background:radial-gradient(circle at top, rgba(255,255,255,.04), transparent 40%), #09111d}
+    .preview-stage.light{background:linear-gradient(180deg,#f8fafc 0%,#e2e8f0 100%)}
+    .preview-stage.grid{
+      background:
+        linear-gradient(45deg, rgba(255,255,255,.04) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.04) 75%),
+        linear-gradient(45deg, rgba(255,255,255,.04) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.04) 75%),
+        #0b1525;
+      background-size:28px 28px;
+      background-position:0 0, 14px 14px;
     }
-    img{display:block;width:100%;height:auto}
+    .preview-stage img{display:block;max-width:100%;max-height:260px;width:auto;height:auto}
+    .preview-stage svg{display:block;width:min(100%,560px);height:auto}
+    .section-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .section-title{font-size:32px;letter-spacing:.3px}
+    @media (max-width:1100px){
+      .hero,.preview-grid,.summary-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:720px){
+      .shell{padding-left:16px;padding-right:16px}
+      .topbar{flex-direction:column;align-items:flex-start}
+      .hero{padding:22px}
+      .hero h1{font-size:40px}
+    }
   </style>
 </head>
 <body>
-  <div class="frame">
-    <img src="go-away-im-batin-logo-transparent.png" alt="Go Away I'm BATIN' logo">
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">Roster<span>Bate</span></div>
+      <div class="top-actions">
+        <a class="btn" href="index.html">Open Homepage</a>
+        <a class="btn" href="profile.html">Open Profile</a>
+        <a class="btn primary" href="admin-leagues.html">Administrator</a>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div>
+        <div class="hero-kicker">Brand Utility Surface</div>
+        <h1>Preview the logo system in a cleaner control-room layout.</h1>
+        <p class="hero-copy">This page used to be a single raw image preview. It now follows the same clarity system as the rest of the site: quick context, fast actions, and multiple useful preview lanes for the actual assets living in the repo.</p>
+        <div class="hero-pills" style="margin-top:18px">
+          <div class="pill">4 preview lanes</div>
+          <div class="pill">Transparent, dark, light, and legacy</div>
+          <div class="pill">Brand check utility</div>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="panel">
+          <div class="panel-title">What This Page Is For</div>
+          <div class="panel-copy">Use it when you want to sanity-check brand assets against dark shells, light surfaces, or transparent-grid contexts before dropping them into another page.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Best Next Move</div>
+          <div class="panel-copy">If a logo looks weak here, it will usually read weak in cards, heroes, or overlays elsewhere in RosterBate too.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Primary Asset</div>
+        <div class="summary-value">PNG</div>
+        <div class="summary-copy">Transparent logo for dark glass and layered hero use.</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Vector Option</div>
+        <div class="summary-value">SVG</div>
+        <div class="summary-copy">Sharper for scaling checks and lightweight markup previews.</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Legacy Flat</div>
+        <div class="summary-value">JPG</div>
+        <div class="summary-copy">Useful when checking fallback or export behavior.</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Preview Goal</div>
+        <div class="summary-value">Readability</div>
+        <div class="summary-copy">Make sure the mark stays clear across atmosphere shifts.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Preview Lanes</div>
+          <div class="section-title">Logo Variants In Context</div>
+        </div>
+      </div>
+
+      <div class="preview-grid">
+        <article class="preview-card">
+          <div>
+            <div class="preview-title">Transparent Hero Mark</div>
+            <div class="preview-copy">Best fit for glass-heavy shells and darker cinematic surfaces.</div>
+          </div>
+          <div class="preview-meta">
+            <div class="pill">PNG</div>
+            <div class="pill">Dark Surface</div>
+          </div>
+          <div class="preview-stage dark">
+            <img src="go-away-im-batin-logo-transparent.png" alt="Transparent Go Away I'm BATIN' logo">
+          </div>
+        </article>
+
+        <article class="preview-card">
+          <div>
+            <div class="preview-title">Vector Check</div>
+            <div class="preview-copy">A fast read on whether the logo silhouette and stroke weight still hold up when scaled cleanly.</div>
+          </div>
+          <div class="preview-meta">
+            <div class="pill">SVG</div>
+            <div class="pill">Grid Background</div>
+          </div>
+          <div class="preview-stage grid">
+            <img src="go-away-im-bating-logo.svg" alt="SVG Go Away I'm BATIN' logo">
+          </div>
+        </article>
+
+        <article class="preview-card">
+          <div>
+            <div class="preview-title">Light Surface Read</div>
+            <div class="preview-copy">Checks whether the mark still carries enough definition when it leaves the usual dark-shell environment.</div>
+          </div>
+          <div class="preview-meta">
+            <div class="pill">Transparent</div>
+            <div class="pill">Light Surface</div>
+          </div>
+          <div class="preview-stage light">
+            <img src="go-away-im-batin-logo-transparent.png" alt="Transparent logo on light background preview">
+          </div>
+        </article>
+
+        <article class="preview-card">
+          <div>
+            <div class="preview-title">Legacy Flat Export</div>
+            <div class="preview-copy">Useful for comparing the old flattened treatment against the cleaner transparent versions.</div>
+          </div>
+          <div class="preview-meta">
+            <div class="pill">JPG</div>
+            <div class="pill">Fallback</div>
+          </div>
+          <div class="preview-stage dark">
+            <img src="go-away-im-batin-logo.jpg" alt="JPG Go Away I'm BATIN' logo">
+          </div>
+        </article>
+      </div>
+    </section>
   </div>
 </body>
 </html>
