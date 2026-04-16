@@ -342,6 +342,7 @@
   }
   .clk-badge.mine{background:linear-gradient(180deg, var(--accent), #ea580c);box-shadow:0 10px 18px rgba(249,115,22,.22),0 0 18px rgba(249,115,22,.18);}
   .clk-badge.other{background:linear-gradient(180deg, rgba(71,85,105,.94), rgba(51,65,85,.96));color:#e2e8f0;box-shadow:0 10px 18px rgba(15,23,42,.18);}
+  .clk-badge.alert{background:linear-gradient(180deg, rgba(180,83,9,.95), rgba(146,64,14,.98));color:#ffedd5;box-shadow:0 10px 18px rgba(180,83,9,.24);}
   .clk-badge.done{background:linear-gradient(180deg, rgba(22,163,74,.94), rgba(21,128,61,.96));color:#ecfdf5;box-shadow:0 10px 18px rgba(22,163,74,.2);}
   .clk-badge.w{background:var(--text3);}
   .dmeta{display:flex;gap:12px;flex-wrap:wrap;}
@@ -349,6 +350,10 @@
   .ml{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);}
   .mv{font-family:var(--fd);font-size:14px;font-weight:700;}
   .mv.ac{color:var(--accent);}
+  .mv.live{color:#86efac;}
+  .mv.alert{color:#fdba74;}
+  .mv.ready,.mv.watch{color:#bfdbfe;}
+  .mv.done{color:#e2e8f0;}
   .mbadge{font-size:9px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--text3);font-family:var(--fd);font-weight:700;}
   .pick-signal{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.95fr) auto;gap:10px;align-items:center;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(71,85,105,.34);background:linear-gradient(180deg,rgba(11,17,28,.9),rgba(8,12,20,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
   .pick-signal.live{border-color:rgba(134,239,172,.18);background:linear-gradient(180deg,rgba(13,29,22,.94),rgba(8,18,16,.98));}
@@ -363,6 +368,17 @@
   .pick-signal-tag.live{border-color:rgba(134,239,172,.34);background:rgba(22,101,52,.2);color:#86efac;}
   .pick-signal-tag.alert{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.22);color:#fdba74;}
   .pick-signal-tag.done{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
+  .trade-spotlight{display:flex;align-items:center;gap:12px;margin-top:9px;padding:12px 13px;border-radius:14px;border:1px solid rgba(129,140,248,.28);background:linear-gradient(180deg,rgba(25,21,52,.94),rgba(14,13,31,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+  .trade-spotlight.live{border-color:rgba(196,181,253,.4);background:linear-gradient(180deg,rgba(52,28,94,.96),rgba(24,16,52,.99));}
+  .trade-spotlight.alert{border-color:rgba(249,115,22,.28);background:linear-gradient(180deg,rgba(48,24,12,.96),rgba(24,13,9,.99));}
+  .trade-spotlight.pending{border-color:rgba(96,165,250,.34);background:linear-gradient(180deg,rgba(17,31,52,.96),rgba(10,18,31,.99));}
+  .trade-spotlight-copy{flex:1;min-width:0;}
+  .trade-spotlight-kicker{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:#c4b5fd;}
+  .trade-spotlight-headline{margin-top:4px;font-family:var(--fd);font-size:18px;font-weight:900;line-height:1;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .trade-spotlight-text{margin-top:5px;font-size:12px;line-height:1.5;color:#d3dbec;}
+  .trade-spotlight-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .trade-spotlight .decision-action{padding:9px 12px;box-shadow:none;}
+  .trade-spotlight .decision-action.secondary{border-color:rgba(129,140,248,.42);color:#e9ddff;background:rgba(32,25,63,.88);}
   .tbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px;}
   .tfill{height:100%;background:var(--accent);border-radius:2px;transition:width .9s linear;}
   .tfill.urg{background:var(--red);}
@@ -419,6 +435,23 @@
   .decision-chip.muted{color:var(--text3);}
   .decision-action{border:none;border-radius:999px;padding:10px 14px;background:linear-gradient(180deg,var(--accent),#ea580c);color:#fff;font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;white-space:nowrap;box-shadow:0 14px 26px rgba(249,115,22,.22);}
   .decision-action.secondary{background:rgba(15,23,42,.86);border:1px solid rgba(71,85,105,.58);color:#dbe7f5;box-shadow:none;}
+  .draft-focus-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px 12px;border-bottom:1px solid rgba(45,63,92,.5);background:rgba(11,17,28,.86);flex-shrink:0;}
+  .draft-focus-card{border:none;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;padding:12px 13px;border-radius:14px;border:1px solid rgba(71,85,105,.26);background:linear-gradient(180deg,rgba(17,24,39,.94),rgba(10,15,25,.99));color:inherit;cursor:pointer;text-align:left;box-shadow:inset 0 1px 0 rgba(255,255,255,.03);transition:transform .15s,border-color .15s,box-shadow .15s;}
+  .draft-focus-card:hover{transform:translateY(-1px);box-shadow:0 16px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);}
+  .draft-focus-card.current{border-color:rgba(96,165,250,.24);}
+  .draft-focus-card.current.live{border-color:rgba(74,222,128,.32);background:linear-gradient(180deg,rgba(16,46,33,.96),rgba(10,27,20,.99));}
+  .draft-focus-card.current.alert{border-color:rgba(249,115,22,.32);background:linear-gradient(180deg,rgba(48,24,12,.96),rgba(24,13,9,.99));}
+  .draft-focus-card.current.ready,.draft-focus-card.current.watch{border-color:rgba(96,165,250,.24);}
+  .draft-focus-card.current.done{border-color:rgba(96,165,250,.3);background:linear-gradient(180deg,rgba(14,24,42,.94),rgba(9,14,24,.98));}
+  .draft-focus-card.queue{border-color:rgba(249,115,22,.28);}
+  .draft-focus-card.queue.ready{background:linear-gradient(180deg,rgba(48,24,12,.96),rgba(24,13,9,.99));}
+  .draft-focus-card.fit{border-color:rgba(74,222,128,.28);}
+  .draft-focus-card.fit.live{background:linear-gradient(180deg,rgba(16,46,33,.96),rgba(10,27,20,.99));}
+  .draft-focus-card.fit.watch{background:linear-gradient(180deg,rgba(17,31,52,.96),rgba(10,18,31,.99));border-color:rgba(96,165,250,.3);}
+  .draft-focus-kicker{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);}
+  .draft-focus-headline{width:100%;margin-top:1px;font-family:var(--fd);font-size:18px;font-weight:900;line-height:1;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .draft-focus-meta{width:100%;font-size:11px;line-height:1.5;color:#c2cfdf;min-height:33px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .draft-focus-action{margin-top:auto;display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.42);font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#e5edf8;white-space:nowrap;}
   .pl{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .pr{display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid rgba(30,45,69,.6);gap:9px;cursor:pointer;transition:background .1s;}
   .pr:active{background:rgba(249,115,22,.07);}
@@ -537,11 +570,20 @@
   .qbb{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 11px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
   .qbb:active{background:var(--accent);color:#fff;border-color:var(--accent);}
   .qbb.off{opacity:.35;cursor:not-allowed;filter:grayscale(.2);}
+  .bcx:disabled,.bdc:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
+  @media (max-width: 1180px){
+    .draft-focus-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .draft-focus-card.fit{grid-column:1 / -1;}
+  }
   @media (max-width: 900px){
     .ao{right:12px;bottom:12px;}
     .rules-layout{grid-template-columns:1fr;}
     .rules-left{grid-template-columns:repeat(2,minmax(0,1fr));}
     .inline-pos-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width: 760px){
+    .draft-focus-grid{grid-template-columns:1fr;}
+    .draft-focus-card.fit{grid-column:auto;}
   }
 
   /* TRADE MODAL */
@@ -912,6 +954,8 @@
       <div class="mi"><span class="ml">Pick</span><span class="mv" id="mPick">1</span></div>
       <div class="mi"><span class="ml">Your Next</span><span class="mv ac" id="mNext">—</span></div>
       <div class="mi"><span class="ml">Timer</span><span class="mv ac" id="mTimer">1:30</span></div>
+      <div class="mi"><span class="ml">Current</span><span class="mv ready" id="mCurrent">Lobby</span></div>
+      <div class="mi"><span class="ml">Urgency</span><span class="mv ready" id="mUrgency">Prep Window</span></div>
       <div class="mi"><span class="ml">Format</span><span class="mbadge" id="mFmt">SNAKE</span></div>
     </div>
     <div class="pick-signal alert" id="pickSignal">
@@ -925,6 +969,17 @@
         <div class="pick-signal-side-value" id="pickSignalSideValue">Your room</div>
       </div>
       <div class="pick-signal-tag alert" id="pickSignalTag">Prep Now</div>
+    </div>
+    <div class="trade-spotlight" id="tradeSpotlight">
+      <div class="trade-spotlight-copy">
+        <div class="trade-spotlight-kicker" id="tradeSpotlightKicker">Featured Mode</div>
+        <div class="trade-spotlight-headline" id="tradeSpotlightHeadline">Draft Pick Swaps</div>
+        <div class="trade-spotlight-text" id="tradeSpotlightText">RosterBate lets managers swap live draft slots cleanly during snake drafts, without messy compensation picks.</div>
+      </div>
+      <div class="trade-spotlight-actions">
+        <div class="decision-chip ready" id="tradeSpotlightChip">Signature Feature</div>
+        <button class="decision-action secondary" id="tradeSpotlightAction" onclick="openTradeModal()">Open Pick Swap Desk</button>
+      </div>
     </div>
     <div class="tbar"><div class="tfill" id="tFill"></div></div>
   </div>
@@ -954,6 +1009,26 @@
               <div class="decision-chip muted" id="playerDecisionMeta">Best Available</div>
               <button class="decision-action" id="playerDecisionAction" onclick="goToDraftTab('favs')">Open Queue</button>
             </div>
+          </div>
+          <div class="draft-focus-grid" id="draftFocusGrid">
+            <button type="button" class="draft-focus-card current ready" id="focusCardCurrent" onclick="handleDraftFocusCard('current')">
+              <div class="draft-focus-kicker" id="focusCurrentKicker">Current Drafter</div>
+              <div class="draft-focus-headline" id="focusCurrentHeadline">Draft Room</div>
+              <div class="draft-focus-meta" id="focusCurrentMeta">The board is waiting for launch. Use this window to scout the room and spot your first tier.</div>
+              <div class="draft-focus-action" id="focusCurrentAction">Open Board</div>
+            </button>
+            <button type="button" class="draft-focus-card queue" id="focusCardQueue" onclick="handleDraftFocusCard('queue')">
+              <div class="draft-focus-kicker" id="focusQueueKicker">Queue Lead</div>
+              <div class="draft-focus-headline" id="focusQueueHeadline">Queue is empty</div>
+              <div class="draft-focus-meta" id="focusQueueMeta">Add a few fallback names so auto-draft and panic pivots both stay clean.</div>
+              <div class="draft-focus-action" id="focusQueueAction">Open Queue</div>
+            </button>
+            <button type="button" class="draft-focus-card fit watch" id="focusCardFit" onclick="handleDraftFocusCard('fit')">
+              <div class="draft-focus-kicker" id="focusFitKicker">Best Fit</div>
+              <div class="draft-focus-headline" id="focusFitHeadline">Board loading</div>
+              <div class="draft-focus-meta" id="focusFitMeta">Your cleanest roster fit will surface here once the board is live.</div>
+              <div class="draft-focus-action" id="focusFitAction">Browse Players</div>
+            </button>
           </div>
           <div id="statHeader" class="pstat-header" style="display:none;">
             <div class="pstat-label" onclick="sortPlayers('adp')" style="width:22px;text-align:center;cursor:pointer;" title="Sort by rank">#</div>
@@ -1093,8 +1168,8 @@
       <div class="qbb" data-bid="max" onclick="qBid(S.myBudget)">Max</div>
     </div>
     <div class="ma">
-      <button class="bcx" onclick="passAuction()">Pass</button>
-      <button class="bdc" onclick="confAuction()">Bid & Draft</button>
+      <button class="bcx" id="auctionPassBtn" onclick="passAuction()">Pass</button>
+      <button class="bdc" id="auctionConfirmBtn" onclick="confAuction()">Bid & Draft</button>
     </div>
   </div>
 </div>
@@ -1103,8 +1178,8 @@
 <div class="tro" id="tradeModal">
   <div class="trs">
     <div class="mh"></div>
-    <div class="tr-title">⇄ Trade Pick</div>
-    <div class="tr-sub" id="trSubText">You're on the clock with pick <strong id="trMyPick">#1</strong>. Select a team to trade with. In snake drafts, teams only swap draft positions. No extra picks are exchanged.</div>
+    <div class="tr-title">⇄ Pick Swap Desk</div>
+    <div class="tr-sub" id="trSubText">This is a RosterBate signature mode. Offer pick <strong id="trMyPick">#1</strong> and swap draft slots cleanly in snake drafts without messy compensation picks.</div>
     <div class="tr-teams" id="trTeamList"></div>
     <div class="tr-preview" id="trPreview">
       <div class="tr-preview-title">📋 Trade Preview</div>
@@ -2435,6 +2510,8 @@ let S={
   autoDraft:false,
 };
 let autoDraftKickoffTimer=null;
+let cpuPickSequenceTimer=null;
+let auctionCpuActionTimer=null;
 
 function updatePosFilterBar(){
   const bar = document.getElementById('posFilterBar');
@@ -3321,6 +3398,8 @@ function launchDraft(){
     showToast('This scheduled draft has not started yet');
     return;
   }
+  clearCpuPickSequence();
+  clearAuctionCpuAction();
   S.started=true;
   clearInterval(cdInt);
   setDraftCountdownMode('live-ready');
@@ -3347,6 +3426,10 @@ function getAvailablePlayersSorted(){
     .filter(p=>!S.drafted.has(p.id))
     .slice()
     .sort((a,b)=>(a.adp||9999)-(b.adp||9999) || calcFP(b)-calcFP(a) || a.name.localeCompare(b.name));
+}
+function getBestFitPlayerForTeam(ti, available){
+  const av=Array.isArray(available) ? available : getAvailablePlayersSorted();
+  return av.find(player=>getStarterNeedDelta(ti,player)>0) || null;
 }
 function getTeamDraftedPlayers(ti){
   if(ti===S.myPos) return S.myTeam.slice();
@@ -3416,11 +3499,118 @@ function getStarterNeedDelta(ti,p){
   const after=getStarterNeedSnapshot(roster.concat([p])).filled;
   return after-before;
 }
+function clearCpuPickSequence(){
+  if(cpuPickSequenceTimer){
+    clearTimeout(cpuPickSequenceTimer);
+    cpuPickSequenceTimer=null;
+  }
+}
+function clearAuctionCpuAction(){
+  if(auctionCpuActionTimer){
+    clearTimeout(auctionCpuActionTimer);
+    auctionCpuActionTimer=null;
+  }
+  if(S.auc) S.auc.cpuThinking=false;
+}
+function getCpuThinkDelay(min=650,max=1200){
+  return Math.round(min + Math.random() * (max-min));
+}
 function clearAutoDraftTurn(){
   if(autoDraftKickoffTimer){
     clearTimeout(autoDraftKickoffTimer);
     autoDraftKickoffTimer=null;
   }
+}
+function formatDraftWindow(offset){
+  if(offset<0) return 'No picks left';
+  if(offset===0) return 'Now';
+  if(offset===1) return 'On deck';
+  return '+'+offset;
+}
+function getDraftUrgencyState(myTurn,onDeck,myOffset){
+  if(!S.started) return {label:'Prep Window',tone:'ready'};
+  if(S.cur>=S.total) return {label:'Complete',tone:'done'};
+  if(PS.isPaused) return {label:'Paused',tone:'watch'};
+  if(myTurn){
+    if(!S.tmax) return {label:S.fmt==='auction'?'Nominate Now':'Pick Now',tone:'live'};
+    if(S.timer<=10) return {label:'Critical',tone:'alert'};
+    if(S.timer<=25) return {label:'Hot Clock',tone:'alert'};
+    return {label:S.fmt==='auction'?'Nomination Live':'On The Clock',tone:'live'};
+  }
+  if(onDeck) return {label:myOffset===1?'On Deck':'Window +'+myOffset,tone:'alert'};
+  if(myOffset>0 && myOffset<=5) return {label:'Prep Window',tone:'watch'};
+  return {label:'Watch Board',tone:'watch'};
+}
+function getDraftFocusSnapshot(){
+  const available=getAvailablePlayersSorted();
+  const currentTeamIdx=S.cur<S.total ? S.order[S.cur] : -1;
+  const currentTeamName=currentTeamIdx>=0 ? (S.teams[currentTeamIdx] || ('Team '+(currentTeamIdx+1))) : 'Draft room';
+  const nextTeamIdx=S.cur+1<S.total ? S.order[S.cur+1] : -1;
+  const nextTeamName=nextTeamIdx>=0 ? (S.teams[nextTeamIdx] || ('Team '+(nextTeamIdx+1))) : 'Final pick';
+  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
+  const myTurn=S.started && myOffset===0;
+  const onDeck=S.started && myOffset>0 && myOffset<=2;
+  const activeQueue=FAVS.filter(id=>!S.drafted.has(id));
+  const topQueued=getTopQueuedPlayer();
+  const bestAvailable=available[0] || null;
+  const bestFit=getBestFitPlayerForTeam(S.myPos,available);
+  const urgency=getDraftUrgencyState(myTurn,onDeck,myOffset);
+  const currentBudget=S.fmt==='auction' && currentTeamIdx>=0
+    ? (currentTeamIdx===S.myPos ? S.myBudget : Math.max(0, Number(S.cpuBuds[currentTeamIdx]||0)))
+    : null;
+  return {
+    available,
+    currentTeamIdx,
+    currentTeamName,
+    nextTeamIdx,
+    nextTeamName,
+    myOffset,
+    myTurn,
+    onDeck,
+    queueCount:activeQueue.length,
+    topQueued,
+    bestAvailable,
+    bestFit,
+    urgencyLabel:urgency.label,
+    urgencyTone:urgency.tone,
+    currentBudget,
+    done:S.cur>=S.total,
+    isAuction:S.fmt==='auction'
+  };
+}
+function getTradeMarketSnapshot(){
+  const myPickIdx=nextPickForTeam(S.myPos, S.cur);
+  const hasPendingTrade=!!(S.pendingPickTrade && S.pendingPickTrade.status==='pending');
+  const pendingRole=hasPendingTrade ? getPendingPickTradeRole() : '';
+  const candidates=[];
+  if(myPickIdx>=0){
+    for(let ti=0;ti<S.ls;ti++){
+      if(ti===S.myPos) continue;
+      const theirPickIdx=nextPickForTeam(ti, S.cur);
+      if(theirPickIdx<0) continue;
+      candidates.push({
+        teamIdx:ti,
+        teamName:S.teams[ti]||('Team '+(ti+1)),
+        pickIdx:theirPickIdx,
+        distance:theirPickIdx-myPickIdx
+      });
+    }
+  }
+  const moveUp=candidates
+    .filter(entry=>entry.distance<0)
+    .sort((a,b)=>Math.abs(a.distance)-Math.abs(b.distance))[0] || null;
+  const moveBack=candidates
+    .filter(entry=>entry.distance>0)
+    .sort((a,b)=>a.distance-b.distance)[0] || null;
+  return {
+    myPickIdx,
+    myPickNum:myPickIdx>=0 ? myPickIdx+1 : -1,
+    partnerCount:candidates.length,
+    moveUp,
+    moveBack,
+    hasPendingTrade,
+    pendingRole
+  };
 }
 function updateAutoDraftButton(){
   const btn=document.getElementById('autoDraftBtn');
@@ -3486,6 +3676,8 @@ function simulateDraftToFinish(){
     return;
   }
   clearInterval(S.timerInt);
+  clearCpuPickSequence();
+  clearAuctionCpuAction();
   hideBanner();
   document.getElementById('pModal')?.classList.remove('open');
   document.getElementById('aModal')?.classList.remove('open');
@@ -3537,10 +3729,21 @@ function simulateDraftToFinish(){
 // ─── DRAFT FLOW ───────────────────────────────────────────
 function advance(){
   if(PS.isPaused) return; // don't advance while paused
-  if(!isRealtimeMultiplayerDraft()){
-    while(S.cur<S.total&&S.order[S.cur]!==S.myPos) cpuPick();
-  }
+  clearCpuPickSequence();
   upHdr();rPlayers();rOtherTeams();rBoard();
+  if(!isRealtimeMultiplayerDraft() && S.fmt!=='auction' && S.cur<S.total && S.order[S.cur]!==S.myPos){
+    const currentTeamName=S.teams[S.order[S.cur]]||'CPU';
+    showBanner('📋 '+currentTeamName+' is deciding...');
+    cpuPickSequenceTimer=setTimeout(()=>{
+      cpuPickSequenceTimer=null;
+      if(PS.isPaused || isRealtimeMultiplayerDraft() || S.fmt==='auction') return;
+      if(S.cur>=S.total){ endDraft(); return; }
+      if(S.order[S.cur]===S.myPos){ advance(); return; }
+      cpuPick();
+      advance();
+    }, getCpuThinkDelay(650,1100));
+    return;
+  }
   if(S.cur<S.total&&S.order[S.cur]===S.myPos){
     showBanner('⏰ You\'re On The Clock!');
     if(S.tmax>0) resetTimer();
@@ -3556,6 +3759,8 @@ function cpuPick(){
 }
 function doPick(p,ti){
   clearAutoDraftTurn();
+  clearCpuPickSequence();
+  clearAuctionCpuAction();
   const pickNumber=S.cur+1;
   const roundNumber=Math.floor(S.cur/S.ls)+1;
   const teamName=S.teams[ti]||('Team '+(ti+1));
@@ -3634,6 +3839,32 @@ function nextCpuAuctionPush(currentBid,targetBid){
   const jump = Math.max(1, Math.round(gap*(aggression + Math.random()*0.18)));
   return Math.min(targetBid, currentBid + jump);
 }
+function setAuctionMarketCopy(copy){
+  const market=document.getElementById('aMarket');
+  if(market) market.textContent=copy;
+}
+function buildAuctionMarketCopy(player,nominator,cpuWinner,targetBid){
+  const nomName=nominator===S.myPos?'You':(S.teams[nominator]||'CPU');
+  if(cpuWinner>=0){
+    const cpuName=S.teams[cpuWinner]||'CPU';
+    return nomName+' tossed '+player.name+' into the room. '+cpuName+' looks live up to about $'+Math.max(1,targetBid)+'.';
+  }
+  return nomName+' tossed '+player.name+' into the room. No CPU team is showing real pressure above a $1 flyer.';
+}
+function setAuctionControlsLocked(locked){
+  const input=document.getElementById('bInput');
+  const confirmBtn=document.getElementById('auctionConfirmBtn');
+  if(input){
+    input.disabled=locked || getAuctionMinBid()>S.myBudget;
+  }
+  document.querySelectorAll('.qbb[data-bid]').forEach(btn=>{
+    btn.style.pointerEvents=locked?'none':'';
+    if(locked) btn.classList.add('off');
+  });
+  if(confirmBtn){
+    confirmBtn.disabled=!!locked || getAuctionMinBid()>S.myBudget;
+  }
+}
 function aucNext(){
   if(S.cur>=S.total){endDraft();return;}
   const nom=S.order[S.cur];
@@ -3646,7 +3877,14 @@ function aucNext(){
     if(S.tmax>0) resetTimer();
   } else {
     const p=chooseAuctionCpuPlayer(av);
-    openAuc(p,nom);
+    upHdr();rPlayers();
+    showBanner('💰 '+(S.teams[nom]||'CPU')+' is lining up a nomination...');
+    clearAuctionCpuAction();
+    auctionCpuActionTimer=setTimeout(()=>{
+      auctionCpuActionTimer=null;
+      if(PS.isPaused || S.cur>=S.total || S.order[S.cur]!==nom) return;
+      openAuc(p,nom);
+    }, getCpuThinkDelay(700,1250));
   }
 }
 function openAuc(p,nominator){
@@ -3654,26 +3892,30 @@ function openAuc(p,nominator){
   const cpuCap=cpuWinner>=0 ? (S.cpuBuds[cpuWinner]||0) : 0;
   const targetBid=cpuWinner>=0 ? Math.max(1, Math.min(getAuctionTargetPrice(p), cpuCap||1)) : 0;
   if(nominator!==S.myPos && cpuWinner>=0 && S.myBudget<Math.max(1,targetBid)){
-    S.selP=p;
-    S.auc={playerId:p.id,nominator,currentBid:targetBid,targetBid:Math.max(1,targetBid),cpuWinner};
-    S.cpuBuds[cpuWinner]=Math.max(0,cpuCap-Math.max(1,targetBid));
-    doPick(p,cpuWinner);
-    rBoard();rPlayers();upHdr();
-    setTimeout(aucNext,180);
+    showToast('💰 '+(S.teams[nominator]||'CPU')+' nominated '+p.name+'. '+(S.teams[cpuWinner]||'CPU')+' closes it around $'+Math.max(1,targetBid)+'.');
+    clearAuctionCpuAction();
+    auctionCpuActionTimer=setTimeout(()=>{
+      auctionCpuActionTimer=null;
+      if(S.cur>=S.total || S.order[S.cur]!==nominator) return;
+      S.selP=p;
+      S.auc={playerId:p.id,nominator,currentBid:targetBid,targetBid:Math.max(1,targetBid),cpuWinner,cpuThinking:false};
+      S.cpuBuds[cpuWinner]=Math.max(0,cpuCap-Math.max(1,targetBid));
+      doPick(p,cpuWinner);
+      rBoard();rPlayers();upHdr();
+      setTimeout(aucNext,280);
+    }, getCpuThinkDelay(550,950));
     return;
   }
-  S.auc={playerId:p.id,nominator,currentBid:0,targetBid:Math.max(1,targetBid),cpuWinner};
+  S.auc={playerId:p.id,nominator,currentBid:0,targetBid:Math.max(1,targetBid),cpuWinner,cpuThinking:false};
   S.selP=p;
   document.getElementById('aPname').textContent=initials(p.name)+' '+p.name+' — '+p.team+' · '+p.pos+' · Rank #'+p.adp;
-  const nomName=nominator===S.myPos?'You':(S.teams[nominator]||'CPU');
-  document.getElementById('aMarket').textContent=cpuWinner>=0
-    ?(nomName+' nominated this player. AI market usually lands around $'+Math.max(1,targetBid)+'.')
-    :(nomName+' nominated this player. No CPU teams can top a $1 bid right now.');
+  setAuctionMarketCopy(buildAuctionMarketCopy(p,nominator,cpuWinner,targetBid));
   document.getElementById('aBudget').textContent='$'+S.myBudget;
   const pct=(S.myBudget/S.abud)*100;
   document.getElementById('bFill').style.width=pct+'%';
   document.getElementById('bFill').className='bf'+(pct<25?' lo':'');
   updateAuctionBidControls();
+  setAuctionControlsLocked(false);
   document.getElementById('aModal').classList.add('open');
 }
 function getAuctionMinBid(){
@@ -3688,16 +3930,20 @@ function updateAuctionBidControls(){
     input.min=minBid;
     const nextValue=Math.min(S.myBudget, Math.max(minBid, parseInt(input.value)||minBid));
     input.value=nextValue;
-    input.disabled=minBid>S.myBudget;
+    input.disabled=minBid>S.myBudget || !!S.auc?.cpuThinking;
   }
   document.querySelectorAll('.qbb[data-bid]').forEach(btn=>{
     const raw=btn.dataset.bid;
     const target=raw==='max'?S.myBudget:parseInt(raw,10);
-    const allowed=target>=minBid && target<=S.myBudget;
+    const allowed=target>=minBid && target<=S.myBudget && !S.auc?.cpuThinking;
     btn.classList.toggle('off', !allowed);
+    btn.style.pointerEvents=allowed?'':'none';
   });
+  const confirmBtn=document.getElementById('auctionConfirmBtn');
+  if(confirmBtn) confirmBtn.disabled=minBid>S.myBudget || !!S.auc?.cpuThinking;
 }
 function qBid(a){
+  if(S.auc?.cpuThinking) return;
   const minBid=getAuctionMinBid();
   const next=Math.min(a,S.myBudget);
   if(next<minBid) return;
@@ -3705,6 +3951,7 @@ function qBid(a){
 }
 function closeAuctionPanel(){ passAuction(); }
 function passAuction(){
+  clearAuctionCpuAction();
   document.getElementById('aModal').classList.remove('open');
   if(S.selP){
     const winner = S.auc?.cpuWinner>=0 ? S.auc.cpuWinner : chooseAuctionCpuWinner(S.selP,1);
@@ -3720,16 +3967,31 @@ function passAuction(){
   setTimeout(aucNext,250);
 }
 function confAuction(){
+  if(S.auc?.cpuThinking){showToast('CPU is still thinking...');return;}
   const bid=parseInt(document.getElementById('bInput').value)||1;
   const minBid=getAuctionMinBid();
   if(bid>S.myBudget){showToast('⚠️ Over budget!');return;}
   if(bid<minBid){showToast('⚠️ Bid must be at least $'+minBid+'.'); updateAuctionBidControls(); return;}
   const targetBid = S.auc?.targetBid || 1;
+  S.auc.currentBid=bid;
+  updateAuctionBidControls();
   if((S.auc?.cpuWinner>=0) && bid<targetBid){
-    const cpuBid = nextCpuAuctionPush(bid,targetBid);
-    S.auc.currentBid=cpuBid;
-    updateAuctionBidControls();
-    showToast('💰 '+S.teams[S.auc.cpuWinner]+' pushes it to $'+cpuBid+'.');
+    const cpuName=S.teams[S.auc.cpuWinner]||'CPU';
+    S.auc.cpuThinking=true;
+    setAuctionControlsLocked(true);
+    setAuctionMarketCopy(cpuName+' is thinking about a counter. Expected ceiling is around $'+targetBid+'.');
+    clearAuctionCpuAction();
+    auctionCpuActionTimer=setTimeout(()=>{
+      auctionCpuActionTimer=null;
+      if(!S.auc || S.auc.playerId!==S.selP?.id) return;
+      const cpuBid = nextCpuAuctionPush(bid,targetBid);
+      S.auc.cpuThinking=false;
+      S.auc.currentBid=cpuBid;
+      setAuctionControlsLocked(false);
+      updateAuctionBidControls();
+      setAuctionMarketCopy(cpuName+' pushes the room to $'+cpuBid+'. Expected ceiling: about $'+targetBid+'.');
+      showToast('💰 '+cpuName+' pushes it to $'+cpuBid+'.');
+    }, getCpuThinkDelay(550,1150));
     return;
   }
   document.getElementById('aModal').classList.remove('open');
@@ -4309,6 +4571,7 @@ function updatePickSignal(){
   const sideValue=document.getElementById('pickSignalSideValue');
   const tag=document.getElementById('pickSignalTag');
   if(!signal || !kicker || !headline || !copy || !sideLabel || !sideValue || !tag) return;
+  const snap=getDraftFocusSnapshot();
 
   if(!S.started){
     signal.className='pick-signal alert';
@@ -4334,29 +4597,41 @@ function updatePickSignal(){
     return;
   }
 
-  const currentTeamIdx=S.order[S.cur];
-  const currentTeamName=S.teams[currentTeamIdx] || ('Team ' + (currentTeamIdx+1));
-  const mine=currentTeamIdx===S.myPos;
-  const nextTeamIdx=S.cur+1<S.total ? S.order[S.cur+1] : -1;
-  const nextTeamName=nextTeamIdx>=0 ? (S.teams[nextTeamIdx] || ('Team ' + (nextTeamIdx+1))) : 'Final pick';
-  const isAuction=S.fmt==='auction';
+  signal.className='pick-signal '+(snap.myTurn ? 'live' : (snap.onDeck ? 'alert' : ''));
+  if(snap.myTurn){
+    kicker.textContent=snap.isAuction ? 'Nomination Window' : 'Current Drafter';
+    headline.textContent=snap.isAuction ? 'You control the room right now' : 'You are on the clock';
+    copy.textContent=snap.topQueued
+      ? ((snap.bestFit && snap.bestFit.id!==snap.topQueued.id)
+          ? 'Queue lead '+snap.topQueued.name+' is still available. If you pivot, '+snap.bestFit.name+' is the cleanest fit on the board.'
+          : 'Queue lead '+snap.topQueued.name+' is still available. Decide now before the clock gets hot.')
+      : (snap.bestFit
+          ? snap.bestFit.name+' is the cleanest roster fit on the board right now. Make the pick or queue a fallback immediately.'
+          : 'No queue safety net right now. Make the pick or add a quick fallback before the timer burns down.');
+    sideLabel.textContent=snap.topQueued ? 'Queue Lead' : (snap.bestFit ? 'Best Fit' : 'Best Available');
+    sideValue.textContent=snap.topQueued ? snap.topQueued.name : ((snap.bestFit || snap.bestAvailable || {}).name || 'Board live');
+    tag.className='pick-signal-tag '+(snap.urgencyTone==='alert' ? 'alert' : 'live');
+    tag.textContent=snap.urgencyLabel;
+    return;
+  }
 
-  signal.className='pick-signal '+(mine ? 'live' : 'alert');
-  kicker.textContent=isAuction ? 'Live Nomination' : 'Current Pick';
-  headline.textContent=isAuction
-    ? (mine ? 'Your nomination window' : currentTeamName + ' is nominating')
-    : (mine ? 'You are on the clock' : currentTeamName + ' is picking');
-  copy.textContent=isAuction
-    ? (mine
-        ? 'Nominate the player you want the room to fight over, or let auto-draft nominate for you.'
-        : 'Watch the nomination, keep your budget in mind, and be ready to counter when the bidding opens.')
-    : (mine
-        ? 'Make your pick, send a trade request, or trust your queue before the timer runs out.'
-        : 'Track this pick, watch how the board changes, and prep your queue before your turn arrives.');
-  sideLabel.textContent='Next Up';
-  sideValue.textContent=nextTeamName;
-  tag.className='pick-signal-tag '+(mine ? 'live' : 'alert');
-  tag.textContent=mine ? (isAuction ? 'Nominate Now' : 'Pick Now') : 'Watch Live';
+  kicker.textContent=snap.isAuction ? 'Current Nominator' : 'Current Drafter';
+  headline.textContent=snap.isAuction
+    ? (snap.currentTeamName + ' is nominating')
+    : (snap.currentTeamName + ' is picking');
+  copy.textContent=snap.onDeck
+    ? ((snap.topQueued
+        ? 'You are on deck. Queue lead '+snap.topQueued.name+' is loaded'
+        : 'You are on deck with no queue lead')
+        +(snap.bestFit ? ', and '+snap.bestFit.name+' is your cleanest pivot.' : '.'))
+    : ((snap.topQueued
+        ? 'Track this pick and keep '+snap.topQueued.name+' at the top if that is still the plan.'
+        : 'Track this pick, watch how the board changes, and prep your queue before your turn arrives.')
+        +(snap.bestFit ? ' Best fit on the board: '+snap.bestFit.name+'.' : ''));
+  sideLabel.textContent='Your Window';
+  sideValue.textContent=formatDraftWindow(snap.myOffset);
+  tag.className='pick-signal-tag '+(snap.onDeck ? 'alert' : 'done');
+  tag.textContent=snap.onDeck ? 'On Deck' : snap.urgencyLabel;
 }
 
 function goToDraftTab(name){
@@ -4386,6 +4661,83 @@ function getTopQueuedPlayer(){
   }
   return null;
 }
+function openDraftPlayerById(id){
+  const idx=PLAYERS.findIndex(player=>player.id===id);
+  if(idx>=0) openPModal(idx);
+}
+function handleDraftFocusCard(type){
+  const snap=getDraftFocusSnapshot();
+  if(type==='current'){
+    goToDraftTab('board');
+    return;
+  }
+  if(type==='queue'){
+    goToDraftTab(snap.queueCount ? 'favs' : 'players');
+    return;
+  }
+  const target=snap.bestFit || snap.bestAvailable || null;
+  if(target){
+    openDraftPlayerById(target.id);
+  }else{
+    goToDraftTab('players');
+  }
+}
+function updateDraftFocusRail(){
+  const currentCard=document.getElementById('focusCardCurrent');
+  const queueCard=document.getElementById('focusCardQueue');
+  const fitCard=document.getElementById('focusCardFit');
+  if(!currentCard || !queueCard || !fitCard) return;
+  const snap=getDraftFocusSnapshot();
+  const currentKicker=document.getElementById('focusCurrentKicker');
+  const currentHeadline=document.getElementById('focusCurrentHeadline');
+  const currentMeta=document.getElementById('focusCurrentMeta');
+  const currentAction=document.getElementById('focusCurrentAction');
+  const queueKicker=document.getElementById('focusQueueKicker');
+  const queueHeadline=document.getElementById('focusQueueHeadline');
+  const queueMeta=document.getElementById('focusQueueMeta');
+  const queueAction=document.getElementById('focusQueueAction');
+  const fitKicker=document.getElementById('focusFitKicker');
+  const fitHeadline=document.getElementById('focusFitHeadline');
+  const fitMeta=document.getElementById('focusFitMeta');
+  const fitAction=document.getElementById('focusFitAction');
+
+  currentCard.className='draft-focus-card current '+snap.urgencyTone;
+  if(!S.started){
+    currentKicker.textContent='Current Drafter';
+    currentHeadline.textContent='Draft Room';
+    currentMeta.textContent='The board is waiting for launch. Use this window to scout the room and spot your first tier.';
+    currentAction.textContent='Open Board';
+  }else if(snap.done){
+    currentKicker.textContent='Current Drafter';
+    currentHeadline.textContent='Board Locked';
+    currentMeta.textContent=S.picks.length+' picks are in. Review the final board and roster build before moving on.';
+    currentAction.textContent='Review Board';
+  }else{
+    currentKicker.textContent=snap.isAuction?'Current Nominator':'Current Drafter';
+    currentHeadline.textContent=snap.myTurn?'You':snap.currentTeamName;
+    currentMeta.textContent=snap.isAuction
+      ? ('Pick '+(S.cur+1)+'/'+S.total+' · '+(snap.currentBudget!=null?('$'+snap.currentBudget+' budget left'):snap.nextTeamName))
+      : ('Pick '+(S.cur+1)+'/'+S.total+' · Your window '+formatDraftWindow(snap.myOffset));
+    currentAction.textContent=snap.onDeck?'Watch Board':'Open Board';
+  }
+
+  queueCard.className='draft-focus-card queue'+(snap.queueCount?' ready':'');
+  queueKicker.textContent='Queue Lead';
+  queueHeadline.textContent=snap.topQueued ? snap.topQueued.name : 'Queue is empty';
+  queueMeta.textContent=snap.queueCount
+    ? (snap.queueCount+'/'+MAX_FAVS+' ready · Auto-draft uses the top live target if the timer gets away from you.')
+    : 'Add a few fallback names so the room cannot surprise you when the board flips fast.';
+  queueAction.textContent=snap.queueCount?'Open Queue':'Add Targets';
+
+  const fitTarget=snap.bestFit || snap.bestAvailable || null;
+  fitCard.className='draft-focus-card fit '+(snap.bestFit?'live':'watch');
+  fitKicker.textContent=snap.bestFit?'Best Fit':'Best Available';
+  fitHeadline.textContent=fitTarget ? fitTarget.name : 'Board loading';
+  fitMeta.textContent=fitTarget
+    ? (fitTarget.team+' · '+fitTarget.pos+' · '+calcFP(fitTarget).toFixed(1)+' FP'+(snap.bestFit?' · cleanest roster fit':' · safest best-available path'))
+    : 'Your cleanest roster fit will surface here once the board is live.';
+  fitAction.textContent=fitTarget?'View Player':'Browse Players';
+}
 
 function updatePlayerDecisionStrip(){
   const strip=document.getElementById('playerDecisionStrip');
@@ -4397,13 +4749,14 @@ function updatePlayerDecisionStrip(){
   const action=document.getElementById('playerDecisionAction');
   if(!strip || !kicker || !headline || !copy || !chip || !meta || !action) return;
 
-  const activeQueue=FAVS.filter(id=>!S.drafted.has(id));
-  const topQueued=getTopQueuedPlayer();
-  const bestAvailable=getAvailablePlayersSorted()[0] || null;
-  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
-  const onDeck=myOffset>0 && myOffset<=2;
-  const myTurn=S.started && myOffset===0;
-  const queueCount=activeQueue.length;
+  const snap=getDraftFocusSnapshot();
+  const queueCount=snap.queueCount;
+  const topQueued=snap.topQueued;
+  const bestAvailable=snap.bestAvailable;
+  const bestFit=snap.bestFit;
+  const myOffset=snap.myOffset;
+  const onDeck=snap.onDeck;
+  const myTurn=snap.myTurn;
 
   strip.className='decision-strip ready';
   chip.className='decision-chip ready';
@@ -4416,9 +4769,12 @@ function updatePlayerDecisionStrip(){
       ? 'Your room is almost live. Keep starring targets so the board opens with a clean fallback plan.'
       : 'Star your favorite targets so the room is ready before the board goes live.';
     chip.textContent=queueCount ? queueCount+' queued' : 'Queue Empty';
-    meta.textContent=topQueued ? 'Top target: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board loading');
+    meta.textContent=topQueued
+      ? 'Top target: '+topQueued.name
+      : (bestFit ? 'Best fit after launch: '+bestFit.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board loading'));
     action.textContent=queueCount ? 'Refine Queue' : 'Open Queue';
     action.onclick=()=>goToDraftTab('favs');
+    updateDraftFocusRail();
     return;
   }
 
@@ -4433,21 +4789,35 @@ function updatePlayerDecisionStrip(){
     action.className='decision-action secondary';
     action.textContent='Open Queue';
     action.onclick=()=>goToDraftTab('favs');
+    updateDraftFocusRail();
     return;
   }
 
   if(myTurn){
     strip.className='decision-strip live';
     kicker.textContent=S.fmt==='auction' ? 'Nomination Window' : 'Your Pick';
-    headline.textContent=topQueued ? 'Pick From Your Queue' : 'You Are Live On The Clock';
+    headline.textContent=topQueued ? topQueued.name+' Is Live' : 'You Are Live On The Clock';
     copy.textContent=topQueued
-      ? 'Your highest queued player is still available. Lock them in now or pivot before the timer runs out.'
-      : 'You are live with no queue safety net. Grab your best fit now or add a couple quick targets.';
+      ? ((bestFit && bestFit.id!==topQueued.id)
+          ? topQueued.name+' is still queued first. If you pivot, '+bestFit.name+' is the cleanest fit on the board.'
+          : 'Your highest queued player is still available. Lock them in now or pivot before the timer runs out.')
+      : (bestFit
+          ? 'You are live with no queue lead. '+bestFit.name+' is the cleanest roster fit on the board right now.'
+          : 'You are live with no queue safety net. Grab your best available player or add a couple quick targets.');
     chip.className='decision-chip live';
-    chip.textContent=topQueued ? 'Queue Ready' : 'Queue Needed';
-    meta.textContent=topQueued ? 'Top target: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Best available loading');
-    action.textContent=topQueued ? 'Open Queue' : 'Browse Queue';
-    action.onclick=()=>goToDraftTab('favs');
+    chip.textContent=snap.urgencyLabel;
+    meta.textContent=bestFit ? 'Best fit: '+bestFit.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board loading');
+    if(topQueued){
+      action.textContent='Open Queue';
+      action.onclick=()=>goToDraftTab('favs');
+    }else if(bestFit){
+      action.textContent='View Best Fit';
+      action.onclick=()=>openDraftPlayerById(bestFit.id);
+    }else{
+      action.textContent='Browse Queue';
+      action.onclick=()=>goToDraftTab('players');
+    }
+    updateDraftFocusRail();
     return;
   }
 
@@ -4456,25 +4826,47 @@ function updatePlayerDecisionStrip(){
     kicker.textContent='Board Pulse';
     headline.textContent='You Are On Deck';
     copy.textContent=queueCount
-      ? 'Your turn is coming fast. Reorder your queue now so auto-draft and panic pivots both stay clean.'
-      : 'Your turn is close and the queue is empty. Add two or three fallback names before the board swings back.';
+      ? ((bestFit && (!topQueued || bestFit.id!==topQueued.id))
+          ? 'Your turn is coming fast. Queue lead '+topQueued.name+' is set, and '+bestFit.name+' is the best pivot if the room snipes your first call.'
+          : 'Your turn is coming fast. Reorder your queue now so auto-draft and panic pivots both stay clean.')
+      : ((bestFit ? bestFit.name+' is the cleanest fit to queue next.' : 'Your turn is close and the queue is empty.')+' Add two or three fallback names before the board swings back.');
     chip.className='decision-chip alert';
     chip.textContent=myOffset===1 ? 'Next Pick +1' : 'Next Pick +'+myOffset;
-    meta.textContent=topQueued ? 'Queue lead: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board moving');
-    action.textContent=queueCount ? 'Tune Queue' : 'Set Queue';
-    action.onclick=()=>goToDraftTab('favs');
+    meta.textContent=topQueued ? 'Queue lead: '+topQueued.name : (bestFit ? 'Best fit: '+bestFit.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board moving'));
+    if(queueCount){
+      action.textContent='Tune Queue';
+      action.onclick=()=>goToDraftTab('favs');
+    }else if(bestFit){
+      action.textContent='View Best Fit';
+      action.onclick=()=>openDraftPlayerById(bestFit.id);
+    }else{
+      action.textContent='Set Queue';
+      action.onclick=()=>goToDraftTab('favs');
+    }
+    updateDraftFocusRail();
     return;
   }
 
   kicker.textContent='Board Pulse';
   headline.textContent=queueCount ? 'Queue Ready For The Turn Ahead' : 'Best Available Live';
   copy.textContent=queueCount
-    ? 'Track the live board and keep the queue fresh so your next turn stays simple.'
-    : 'Browse the board, star a few targets, and keep an eye on how the room is shifting.';
+    ? ((bestFit && (!topQueued || bestFit.id!==topQueued.id))
+        ? 'Track the live board. Queue lead '+topQueued.name+' is ready, and '+bestFit.name+' is the cleanest fit if you need to pivot.'
+        : 'Track the live board and keep the queue fresh so your next turn stays simple.')
+    : (bestFit ? bestFit.name+' is the cleanest fit on the board right now.' : 'Browse the board, star a few targets, and keep an eye on how the room is shifting.');
   chip.textContent=myOffset<0 ? 'No picks left' : (myOffset===1 ? 'Next pick +1' : 'Next pick +'+myOffset);
-  meta.textContent=topQueued ? 'Queue lead: '+topQueued.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board moving');
-  action.textContent=queueCount ? 'Open Queue' : 'Queue Targets';
-  action.onclick=()=>goToDraftTab('favs');
+  meta.textContent=topQueued ? 'Queue lead: '+topQueued.name : (bestFit ? 'Best fit: '+bestFit.name : (bestAvailable ? 'Best available: '+bestAvailable.name : 'Board moving'));
+  if(queueCount){
+    action.textContent='Open Queue';
+    action.onclick=()=>goToDraftTab('favs');
+  }else if(bestFit){
+    action.textContent='View Best Fit';
+    action.onclick=()=>openDraftPlayerById(bestFit.id);
+  }else{
+    action.textContent='Queue Targets';
+    action.onclick=()=>goToDraftTab('favs');
+  }
+  updateDraftFocusRail();
 }
 
 function updateQueueSignal(){
@@ -4486,11 +4878,14 @@ function updateQueueSignal(){
   const action=document.getElementById('queueSignalAction');
   if(!signal || !title || !headline || !text || !chip || !action) return;
 
+  const snap=getDraftFocusSnapshot();
   const activeQueue=FAVS.filter(id=>!S.drafted.has(id));
-  const topQueued=getTopQueuedPlayer();
-  const myOffset=getDraftTurnOffsetForTeam(S.myPos);
-  const myTurn=S.started && myOffset===0;
-  const onDeck=myOffset>0 && myOffset<=2;
+  const topQueued=snap.topQueued;
+  const myOffset=snap.myOffset;
+  const myTurn=snap.myTurn;
+  const onDeck=snap.onDeck;
+  const bestFit=snap.bestFit;
+  const bestAvailable=snap.bestAvailable;
 
   signal.className='queue-signal alert';
   chip.className='decision-chip alert';
@@ -4513,37 +4908,66 @@ function updateQueueSignal(){
   if(myTurn){
     signal.className='queue-signal live';
     title.textContent='Queue Status';
-    headline.textContent=topQueued ? 'Top Queue Target Is Live' : 'No Queue Safety Net';
+    headline.textContent=topQueued ? topQueued.name+' Is Your Fallback' : 'No Queue Safety Net';
     text.textContent=topQueued
-      ? 'If the timer gets away from you, auto-draft will take '+topQueued.name+'. Reorder now if that is not the plan.'
-      : 'Your pick is live and the queue is empty. Add an emergency fallback or commit to the board right now.';
+      ? ((bestFit && bestFit.id!==topQueued.id)
+          ? 'If the timer gets away from you, auto-draft takes '+topQueued.name+'. If you pivot, '+bestFit.name+' is the cleanest fit on the board.'
+          : 'If the timer gets away from you, auto-draft will take '+topQueued.name+'. Reorder now if that is not the plan.')
+      : (bestFit
+          ? bestFit.name+' is the cleanest fit on the board right now. Add them to the queue or commit to the pick.'
+          : (bestAvailable ? bestAvailable.name+' is the safest best-available fallback right now.' : 'Your pick is live and the queue is empty.'));
     chip.className='decision-chip live';
     chip.textContent=activeQueue.length+' / '+MAX_FAVS+' ready';
-    action.textContent=topQueued ? 'Browse Players' : 'Add Targets';
-    action.onclick=()=>goToDraftTab('players');
+    if(topQueued){
+      action.textContent='Browse Players';
+      action.onclick=()=>goToDraftTab('players');
+    }else if(bestFit){
+      action.textContent='View Best Fit';
+      action.onclick=()=>openDraftPlayerById(bestFit.id);
+    }else{
+      action.textContent='Add Targets';
+      action.onclick=()=>goToDraftTab('players');
+    }
     return;
   }
 
   if(onDeck){
     title.textContent='Queue Status';
-    headline.textContent=activeQueue.length ? 'Queue Ready For Your Next Turn' : 'Queue Needs Two More Names';
+    headline.textContent=activeQueue.length ? (topQueued ? 'Queue Lead: '+topQueued.name : 'Queue Ready For Your Next Turn') : 'Queue Needs Two More Names';
     text.textContent=activeQueue.length
-      ? 'Your turn is close. Make sure '+(topQueued ? topQueued.name : 'your top target')+' is still the first call if the board flips quickly.'
-      : 'You are almost up. Queue a couple fallback names now so the room cannot surprise you.';
+      ? ((bestFit && (!topQueued || bestFit.id!==topQueued.id))
+          ? 'Your turn is close. '+(topQueued ? topQueued.name : 'Your queue lead')+' is first up, and '+bestFit.name+' is the cleanest pivot if the room snipes your top call.'
+          : 'Your turn is close. Make sure '+(topQueued ? topQueued.name : 'your top target')+' is still the first call if the board flips quickly.')
+      : ((bestFit ? bestFit.name+' is the cleanest fit to queue next.' : 'You are almost up.')+' Queue a couple fallback names now so the room cannot surprise you.');
     chip.textContent='Pick in +'+myOffset;
-    action.textContent=activeQueue.length ? 'Browse Players' : 'Add Targets';
-    action.onclick=()=>goToDraftTab('players');
+    if(activeQueue.length){
+      action.textContent='Browse Players';
+      action.onclick=()=>goToDraftTab('players');
+    }else if(bestFit){
+      action.textContent='View Best Fit';
+      action.onclick=()=>openDraftPlayerById(bestFit.id);
+    }else{
+      action.textContent='Add Targets';
+      action.onclick=()=>goToDraftTab('players');
+    }
     return;
   }
 
   title.textContent='Queue Status';
-  headline.textContent=activeQueue.length ? 'Auto-Draft Queue Ready' : 'Need More Targets';
+  headline.textContent=activeQueue.length ? (topQueued ? 'Queue Lead: '+topQueued.name : 'Auto-Draft Queue Ready') : 'Need More Targets';
   text.textContent=activeQueue.length
-    ? 'Your queue has '+activeQueue.length+' live target'+(activeQueue.length===1 ? '' : 's')+'. Keep it fresh as the board changes.'
-    : 'Queue your best fits here so auto-draft has a smart fallback and your next turn is easier.';
+    ? ((bestFit && (!topQueued || bestFit.id!==topQueued.id))
+        ? 'Your queue has '+activeQueue.length+' live target'+(activeQueue.length===1 ? '' : 's')+'. Keep '+topQueued.name+' first if that is still the plan, and remember '+bestFit.name+' as your cleanest pivot.'
+        : 'Your queue has '+activeQueue.length+' live target'+(activeQueue.length===1 ? '' : 's')+'. Keep it fresh as the board changes.')
+    : (bestFit ? bestFit.name+' is the cleanest fit on the board right now.' : 'Queue your best fits here so auto-draft has a smart fallback and your next turn is easier.');
   chip.textContent=activeQueue.length+' / '+MAX_FAVS+' ready';
-  action.textContent='Browse Players';
-  action.onclick=()=>goToDraftTab('players');
+  if(bestFit){
+    action.textContent=activeQueue.length ? 'Browse Players' : 'View Best Fit';
+    action.onclick=()=>activeQueue.length ? goToDraftTab('players') : openDraftPlayerById(bestFit.id);
+  }else{
+    action.textContent='Browse Players';
+    action.onclick=()=>goToDraftTab('players');
+  }
 }
 
 function updateQueueTabUrgency(){
@@ -4563,8 +4987,8 @@ function updateQueueTabUrgency(){
 }
 
 function upHdr(){
+  const snap=getDraftFocusSnapshot();
   const round=Math.min(Math.floor(S.cur/S.ls)+1,S.rds);
-  const pir=(S.cur%S.ls)+1;
   document.getElementById('mRound').textContent=round+'/'+S.rds;
   document.getElementById('mPick').textContent=(S.cur+1)+'/'+S.total;
   let nxt='--';
@@ -4572,6 +4996,10 @@ function upHdr(){
     if(S.order[i]===S.myPos){const a=i-S.cur;nxt=a===0?'NOW!':'+'+a;break;}
   }
   document.getElementById('mNext').textContent=nxt;
+  document.getElementById('mCurrent').textContent=!S.started ? 'Lobby' : (snap.done ? 'Final Board' : snap.currentTeamName);
+  const urgencyEl=document.getElementById('mUrgency');
+  urgencyEl.textContent=snap.urgencyLabel;
+  urgencyEl.className='mv '+snap.urgencyTone;
   const badge=document.getElementById('clkBadge');
   if(S.cur>=S.total){
     badge.textContent='Draft Complete';
@@ -4584,11 +5012,19 @@ function upHdr(){
     updateSoloSimButton();
     return;
   }
-  const mine=S.order[S.cur]===S.myPos;
-  badge.textContent=S.fmt==='auction'
-    ?(mine?'Your Nomination':(S.teams[S.order[S.cur]]||'CPU')+' nomination')
-    :(mine?'On The Clock':(S.teams[S.order[S.cur]]||'CPU')+'\'s Pick');
-  badge.className='clk-badge '+(mine?'mine':'other');
+  if(!S.started){
+    badge.textContent='Draft Lobby';
+    badge.className='clk-badge other';
+  }else if(snap.myTurn){
+    badge.textContent=S.fmt==='auction'?'Nominate Now':'On The Clock';
+    badge.className='clk-badge mine';
+  }else if(snap.onDeck){
+    badge.textContent='On Deck';
+    badge.className='clk-badge alert';
+  }else{
+    badge.textContent=S.fmt==='auction'?'CPU Nominating':'CPU Picking';
+    badge.className='clk-badge other';
+  }
   updatePickSignal();
   updatePlayerDecisionStrip();
   updateQueueSignal();
@@ -4610,6 +5046,7 @@ function upTimer(){
   const pct=(S.timer/S.tmax)*100;
   document.getElementById('tFill').style.width=pct+'%';
   document.getElementById('tFill').className='tfill'+(S.timer<=15?' urg':'');
+  if(S.started && S.cur<=S.total) upHdr();
 }
 function autoP(forceBestFit=false){
   if(S.fmt==='auction'&&S.cur<S.total&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId)){
@@ -4933,7 +5370,7 @@ function openTradeModal(){
   document.getElementById('trMyPick').textContent='#'+(myNextPick+1);
 
   // Update subtitle to reflect the pick being offered
-  document.getElementById('trSubText').innerHTML=`You're offering pick <strong id="trMyPick">#${myNextPick+1}</strong> (Round ${Math.floor(myNextPick/S.ls)+1}). In snake drafts, this trade only swaps draft positions. No compensation picks are added.`;
+  document.getElementById('trSubText').innerHTML=`RosterBate signature mode: you're offering pick <strong id="trMyPick">#${myNextPick+1}</strong> (Round ${Math.floor(myNextPick/S.ls)+1}). In snake drafts, this desk swaps draft positions cleanly without adding messy compensation picks.`;
 
   // Build team list — every other team that has a future pick
   let html='';
@@ -4998,7 +5435,7 @@ function selectTradeTeam(ti){
   document.getElementById('trSummary').innerHTML=`<strong>${moveLine}</strong><br>No compensation pick is added in snake drafts.`;
   document.getElementById('trPreview').classList.add('show');
   document.getElementById('trConfirmBtn').disabled=false;
-  document.getElementById('trConfirmBtn').textContent=`Trade with ${theirName}`;
+  document.getElementById('trConfirmBtn').textContent=`Send swap to ${theirName}`;
 }
 
 function confirmTrade(){
@@ -5044,16 +5481,128 @@ function confirmTrade(){
   if(isRealtimeMultiplayerDraft()) publishRealtimeDraftState();
 }
 
+function updateTradeSpotlight(){
+  const wrap=document.getElementById('tradeSpotlight');
+  const kicker=document.getElementById('tradeSpotlightKicker');
+  const headline=document.getElementById('tradeSpotlightHeadline');
+  const text=document.getElementById('tradeSpotlightText');
+  const chip=document.getElementById('tradeSpotlightChip');
+  const action=document.getElementById('tradeSpotlightAction');
+  if(!wrap || !kicker || !headline || !text || !chip || !action) return;
+  if(S.fmt==='auction'){
+    wrap.style.display='none';
+    return;
+  }
+  wrap.style.display='flex';
+  const draftSnap=getDraftFocusSnapshot();
+  const tradeSnap=getTradeMarketSnapshot();
+  wrap.className='trade-spotlight';
+  chip.className='decision-chip ready';
+  action.className='decision-action secondary';
+  action.disabled=false;
+  action.onclick=()=>openTradeModal();
+
+  if(!S.started){
+    kicker.textContent='Featured Mode';
+    headline.textContent='Draft Pick Swaps Are Live Here';
+    text.textContent='RosterBate lets managers swap live draft slots cleanly during snake drafts without compensation-pick clutter. Build around that now instead of waiting for the room to lock in.';
+    chip.textContent='Signature Feature';
+    action.textContent='Open Pick Swap Desk';
+    return;
+  }
+
+  if(S.cur>=S.total || tradeSnap.myPickIdx<0){
+    wrap.className='trade-spotlight pending';
+    kicker.textContent='Pick Swap Desk';
+    headline.textContent='Pick Swaps Closed';
+    text.textContent='Your draft slots are already spent. Review the swap log if you want to revisit how the board moved.';
+    chip.className='decision-chip muted';
+    chip.textContent='No picks left';
+    action.textContent='Swap Desk Closed';
+    action.disabled=true;
+    action.onclick=()=>{};
+    return;
+  }
+
+  if(tradeSnap.hasPendingTrade){
+    wrap.className='trade-spotlight pending';
+    const pending=S.pendingPickTrade||{};
+    const otherName=tradeSnap.pendingRole==='recipient'
+      ? (pending.fromTeamName||'Another manager')
+      : (pending.toTeamName||'Another manager');
+    const yourPick=tradeSnap.pendingRole==='recipient' ? Number(pending.toPickIdx||0)+1 : Number(pending.fromPickIdx||0)+1;
+    const theirPick=tradeSnap.pendingRole==='recipient' ? Number(pending.fromPickIdx||0)+1 : Number(pending.toPickIdx||0)+1;
+    kicker.textContent='Pick Swap Request';
+    headline.textContent=tradeSnap.pendingRole==='recipient' ? otherName+' wants your slot' : 'Swap offer sent to '+otherName;
+    text.textContent='Live swap on the table: your pick #'+yourPick+' versus pick #'+theirPick+'. This is one of RosterBate’s signature draft advantages, so decide before the board swings.';
+    chip.className='decision-chip ready';
+    chip.textContent=tradeSnap.pendingRole==='recipient' ? 'Action Needed' : 'Pending Reply';
+    action.textContent=tradeSnap.pendingRole==='recipient' ? 'Review Offer' : 'Open Pick Swap Desk';
+    action.disabled=false;
+    return;
+  }
+
+  if(draftSnap.myTurn){
+    wrap.className='trade-spotlight live';
+    kicker.textContent='Signature Move';
+    headline.textContent='Trade This Pick Before You Lock It';
+    if(tradeSnap.moveUp){
+      text.textContent='You are holding pick #'+tradeSnap.myPickNum+'. Move up '+Math.abs(tradeSnap.moveUp.distance)+' spots by swapping with '+tradeSnap.moveUp.teamName+', or slide back if you want more board information before committing.';
+    }else if(tradeSnap.moveBack){
+      text.textContent='You are holding pick #'+tradeSnap.myPickNum+'. No earlier live swap is available, but you can move back '+tradeSnap.moveBack.distance+' spots with '+tradeSnap.moveBack.teamName+' if you want to stretch value.';
+    }else{
+      text.textContent='You are holding pick #'+tradeSnap.myPickNum+'. This is the window to use RosterBate’s clean pick-swap desk before the room moves on.';
+    }
+    chip.className='decision-chip live';
+    chip.textContent=tradeSnap.partnerCount+' swap targets';
+    action.textContent='Open Pick Swap Desk';
+    action.disabled=false;
+    return;
+  }
+
+  if(draftSnap.onDeck){
+    wrap.className='trade-spotlight alert';
+    kicker.textContent='Signature Move';
+    headline.textContent='Line Up A Pick Swap Before Your Turn';
+    text.textContent=tradeSnap.moveUp
+      ? 'Your next pick is #'+tradeSnap.myPickNum+'. Move up '+Math.abs(tradeSnap.moveUp.distance)+' spots with '+tradeSnap.moveUp.teamName+' if you want to attack your tier early.'
+      : 'Your next pick is #'+tradeSnap.myPickNum+'. The desk is open now, so you can still shop the slot before you go live.';
+    chip.className='decision-chip alert';
+    chip.textContent='Pick #'+tradeSnap.myPickNum;
+    action.textContent='Shop Pick Swap';
+    action.disabled=false;
+    return;
+  }
+
+  kicker.textContent='Pick Swap Desk';
+  headline.textContent='Keep Draft Pick Swaps In Play';
+  if(tradeSnap.moveUp && tradeSnap.moveBack){
+    text.textContent='Your next pick is #'+tradeSnap.myPickNum+'. Move up '+Math.abs(tradeSnap.moveUp.distance)+' spots with '+tradeSnap.moveUp.teamName+' or slide back '+tradeSnap.moveBack.distance+' spots with '+tradeSnap.moveBack.teamName+' if your tier still holds.';
+  }else if(tradeSnap.moveUp){
+    text.textContent='Your next pick is #'+tradeSnap.myPickNum+'. There is at least one clean move-up path live right now with '+tradeSnap.moveUp.teamName+'.';
+  }else if(tradeSnap.moveBack){
+    text.textContent='Your next pick is #'+tradeSnap.myPickNum+'. You can move back '+tradeSnap.moveBack.distance+' spots with '+tradeSnap.moveBack.teamName+' if you want to stretch value without compensation-pick noise.';
+  }else{
+    text.textContent='Your next pick is #'+tradeSnap.myPickNum+'. Even if the market is thin right now, the desk stays live because RosterBate treats pick swaps as a real draft weapon.';
+  }
+  chip.textContent=tradeSnap.partnerCount+' swap targets';
+  action.textContent='Open Pick Swap Desk';
+  action.disabled=false;
+}
+
 // Trade button always visible during draft (not just on your turn)
 function updateTradeBtn(){
   const btn=document.getElementById('tradeHeaderBtn');
   if(!btn) return;
   const hasFuturePick=nextPickForTeam(S.myPos, S.cur)>=0;
   const hasPendingTrade=!!(S.pendingPickTrade && S.pendingPickTrade.status==='pending');
+  const draftSnap=getDraftFocusSnapshot();
   btn.style.display=(S.fmt!=='auction'&&S.cur<S.total&&hasFuturePick)?'block':'none';
+  btn.textContent=hasPendingTrade ? '⇄ Pick Swap Pending' : (draftSnap.myTurn ? '⇄ Swap This Pick' : '⇄ Pick Swap Desk');
   btn.disabled=hasPendingTrade;
   btn.style.opacity=hasPendingTrade?'.45':'1';
   btn.style.cursor=hasPendingTrade?'not-allowed':'pointer';
+  updateTradeSpotlight();
 }
 
 // ─── SEASON MANAGEMENT ────────────────────────────────────
