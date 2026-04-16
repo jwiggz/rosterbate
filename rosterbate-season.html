@@ -301,6 +301,63 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .hub-powerup-tile .season-outline-btn:hover{border-color:rgba(251,146,60,.42);color:#fff7ed;}
 .hub-powerup-tile select,.hub-powerup-tile button{font-size:11px !important;padding:8px 10px !important;border-radius:9px !important;}
 .hub-powerup-tile svg,.hub-powerup-tile img{width:38px !important;height:38px !important;}
+.hub-reveal-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(31,47,24,.74),rgba(13,26,18,.88) 28%,rgba(10,16,27,.92) 100%);border:1px solid rgba(96,165,250,.18);}
+.hub-reveal-card::before{content:'';position:absolute;inset:auto -10% -42% auto;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(74,222,128,.18),transparent 64%);pointer-events:none;}
+.hub-reveal-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(220px,.9fr);gap:12px;position:relative;z-index:1;}
+.hub-reveal-copy{min-width:0;}
+.hub-reveal-kicker{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#86efac;}
+.hub-reveal-title{font-family:var(--fd);font-size:28px;font-weight:700;line-height:.92;color:#f8fafc;text-transform:uppercase;margin-top:4px;}
+.hub-reveal-sub{font-size:12px;color:#d7e4f6;line-height:1.55;margin-top:8px;max-width:620px;}
+.hub-reveal-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.hub-reveal-pill{display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(9,13,20,.46);font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#eef4fc;}
+.hub-reveal-pill.green{border-color:rgba(74,222,128,.3);color:#86efac;background:rgba(20,83,45,.2);}
+.hub-reveal-pill.blue{border-color:rgba(96,165,250,.3);color:#bfdbfe;background:rgba(30,64,175,.18);}
+.hub-reveal-pill.orange{border-color:rgba(251,146,60,.3);color:#fdba74;background:rgba(124,45,18,.18);}
+.hub-reveal-stats{display:grid;gap:8px;}
+.hub-reveal-stat{border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));padding:10px 11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.hub-reveal-stat-label{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9fb1c8;}
+.hub-reveal-stat-value{font-family:var(--fd);font-size:22px;font-weight:700;line-height:.94;color:#f8fafc;margin-top:5px;text-transform:uppercase;}
+.hub-reveal-stat-copy{font-size:11px;color:#c6d3e4;line-height:1.45;margin-top:5px;}
+.hub-reveal-action{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,#3e8458,#205636);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#effcf3;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 22px rgba(0,0,0,.18);}
+.hub-reveal-empty{padding:20px 6px;text-align:center;color:#9fb1c8;font-size:12px;line-height:1.6;}
+.reveal-modal-card{max-width:980px !important;width:min(94vw,980px) !important;border-radius:24px !important;padding:20px 20px 26px !important;background:
+  radial-gradient(90% 120% at 50% 0%,rgba(74,222,128,.12),transparent 44%),
+  linear-gradient(180deg,rgba(18,26,39,.96),rgba(9,14,22,.98)) !important;
+  border:1px solid rgba(134,239,172,.18) !important;
+  box-shadow:0 28px 80px rgba(2,6,23,.54),inset 0 1px 0 rgba(255,255,255,.08) !important;}
+.reveal-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;}
+.reveal-modal-title{font-family:var(--fd);font-size:34px;font-weight:700;line-height:.9;color:#f8fafc;text-transform:uppercase;}
+.reveal-modal-sub{font-size:13px;color:#c7d4e4;line-height:1.6;max-width:640px;margin-top:8px;}
+.reveal-modal-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.reveal-modal-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);gap:14px;}
+.reveal-panel{border-radius:18px;border:1px solid rgba(214,232,255,.14);background:linear-gradient(180deg,rgba(18,26,39,.82),rgba(10,16,27,.92));padding:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.reveal-panel-title{font-family:var(--fd);font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#f8fafc;}
+.reveal-panel-copy{font-size:12px;color:#aebacf;line-height:1.55;margin-top:6px;}
+.reveal-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px;}
+.reveal-summary-stat{border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));padding:12px;}
+.reveal-summary-stat .value{font-family:var(--fd);font-size:24px;font-weight:700;line-height:.92;color:#f8fafc;text-transform:uppercase;}
+.reveal-summary-stat .label{font-size:10px;color:#9fb1c8;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-top:7px;}
+.reveal-summary-stat .copy{font-size:11px;color:#c7d4e4;line-height:1.45;margin-top:6px;}
+.reveal-top-list,.reveal-transaction-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.reveal-top-item,.reveal-transaction-item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(15,23,36,.72);padding:10px 11px;}
+.reveal-top-rank{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#223145;border:1px solid rgba(255,255,255,.1);font-family:var(--fd);font-size:12px;font-weight:800;color:#f8fafc;flex-shrink:0;}
+.reveal-top-copy,.reveal-transaction-copy{min-width:0;flex:1;}
+.reveal-top-name,.reveal-transaction-name{font-family:var(--fb);font-size:13px;font-weight:700;color:#f8fafc;line-height:1.2;}
+.reveal-top-meta,.reveal-transaction-meta{font-size:11px;color:#9fb1c8;line-height:1.45;margin-top:4px;}
+.reveal-top-score{font-family:var(--fd);font-size:20px;font-weight:700;color:#86efac;line-height:1;flex-shrink:0;}
+.reveal-transaction-count{font-family:var(--fd);font-size:20px;font-weight:700;color:#bfdbfe;line-height:1;flex-shrink:0;}
+.reveal-matchup-list,.reveal-movement-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.reveal-matchup-item,.reveal-movement-item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(15,23,36,.72);padding:10px 11px;}
+.reveal-matchup-copy,.reveal-movement-copy{min-width:0;flex:1;}
+.reveal-matchup-title,.reveal-movement-title{font-family:var(--fb);font-size:13px;font-weight:700;color:#f8fafc;line-height:1.2;}
+.reveal-matchup-meta,.reveal-movement-meta{font-size:11px;color:#9fb1c8;line-height:1.45;margin-top:4px;}
+.reveal-matchup-state,.reveal-movement-swing{font-family:var(--fd);font-size:18px;font-weight:700;line-height:1;color:#fdba74;flex-shrink:0;text-transform:uppercase;}
+.reveal-matchup-state.live{color:#86efac;}
+.reveal-matchup-state.flip{color:#bfdbfe;}
+.reveal-movement-swing.up{color:#86efac;}
+.reveal-movement-swing.down{color:#fca5a5;}
+.reveal-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
+.reveal-empty{padding:18px 12px;text-align:center;color:#94a3b8;font-size:12px;line-height:1.6;}
 .season-reveal-btn-label,.season-reveal-btn-sub{position:relative;z-index:1;}
 .season-reveal-btn-label{font-family:var(--fb);font-size:19px;font-weight:800;line-height:1.05;color:#f8fff7;letter-spacing:.035em;text-align:center;}
 .season-reveal-btn-sub{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(220,252,231,.88);text-align:center;}
@@ -335,9 +392,10 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-score-name{font-size:13px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .hub-score-val{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;}
     .hub-standings-table{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
-.hub-standings-head,.hub-standings-row{display:grid;grid-template-columns:minmax(0,1fr) 26px 26px 50px 50px;gap:6px;align-items:center;padding:7px 0;}
+.hub-standings-head,.hub-standings-row{display:grid;grid-template-columns:30px minmax(0,1fr) 26px 26px 50px 50px;gap:6px;align-items:center;padding:7px 0;}
 .hub-standings-head{font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.65px;}
 .hub-standings-row{border-top:1px solid #1d283b;background:transparent;color:inherit;font:inherit;appearance:none;-webkit-appearance:none;position:relative;z-index:6;pointer-events:auto;}
+.hub-standings-rank{font-family:var(--fd);font-size:12px;font-weight:700;color:#f8fafc;text-align:center;}
 .hub-standings-team{display:flex;align-items:center;gap:7px;min-width:0;}
 .hub-standings-name{font-size:12px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hub-standings-cell{font-size:11px;color:#dbe4f0;text-align:right;}
@@ -494,6 +552,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       .hub-summary-meta{padding:12px 0 0 0;border-left:none;border-top:1px solid #e5e7eb;}
       .hub-summary-stats,.hub-actions,.hub-now-band{grid-template-columns:1fr;}
       .hub-powerup-grid{grid-template-columns:1fr;}
+      .hub-reveal-grid,.reveal-modal-grid,.reveal-summary-grid{grid-template-columns:1fr;}
       .activity-item{grid-template-columns:28px minmax(0,1fr);}
     }
 
@@ -590,6 +649,13 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   </div>
 </div>
 
+<div class="mo" id="revealReportModal" onclick="if(event.target===this)closeRevealReportModal()">
+  <div class="ms reveal-modal-card">
+    <div class="mh"></div>
+    <div id="revealReportContent"></div>
+  </div>
+</div>
+
 <!-- HUB -->
 <div id="hub" class="screen">
   <div class="sb">
@@ -641,6 +707,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
         </div>
         <button id="advBtn" onclick="advanceWeek()" class="bg">? Advance to Next Week</button>
         <div class="hub-lower">
+          <div class="hub-card compact hub-reveal-card" id="hubRevealReportCard"></div>
           <div class="hub-card compact" style="display:flex;flex-direction:column;min-height:0;">
             <div class="hub-card-head">
               <div class="hub-card-head-copy">
@@ -1231,9 +1298,379 @@ function activityAge(ts){
   const days=Math.floor(hrs/24);
   return days+'d ago';
 }
+function getLatestRevealReportDay(){
+  const days=Object.keys(G?.dailyRevealReports||{}).map(day=>Number(day)||0).filter(day=>day>0).sort((a,b)=>b-a);
+  return days[0]||0;
+}
+function getDailyRevealReport(day){
+  const key=String(Number(day)||0);
+  return G?.dailyRevealReports?.[key] || null;
+}
+function getRevealWindowActivities(day, generatedAt){
+  const currentDay=Number(day)||0;
+  const previousDay=Math.max(0,...Object.keys(G?.dailyRevealReports||{}).map(value=>Number(value)||0).filter(value=>value<currentDay));
+  const previousReport=previousDay?getDailyRevealReport(previousDay):null;
+  const minTs=Number(previousReport?.generatedAt||0);
+  const maxTs=Number(generatedAt||Date.now());
+  return (G.activityLog||[]).filter(item=>{
+    const ts=Number(item?.ts||0);
+    return ts>minTs && ts<=maxTs;
+  });
+}
+function summarizeRevealTransactions(activities){
+  const summary=[
+    {key:'adds', label:'Waiver Adds', count:0, copy:'Claims that landed before the reveal window closed.'},
+    {key:'drops', label:'Drops', count:0, copy:'Players released to the wire before results locked in.'},
+    {key:'restores', label:'Restores', count:0, copy:'Commissioner reversals that changed the player pool.'},
+    {key:'trades', label:'Trade Moves', count:0, copy:'Trade desk actions logged during the same reveal window.'}
+  ];
+  (activities||[]).forEach(item=>{
+    const title=String(item?.title||'').toLowerCase();
+    const type=String(item?.type||'').toLowerCase();
+    if(type==='waiver'){
+      if(title.includes('dropped')) summary[1].count++;
+      else if(title.includes('restored')) summary[2].count++;
+      else summary[0].count++;
+      return;
+    }
+    if(type==='trade') summary[3].count++;
+  });
+  return summary;
+}
+function buildRevealWeekMovement(week, day){
+  const dayResults=G?.dayResults?.[day] || {};
+  const board=(G.rosters||[]).map((_,teamIdx)=>({
+    teamIdx,
+    teamName:teamName(teamIdx),
+    dayTotal:Number(dayResults?.[teamIdx]?.total||0),
+    afterTotal:Number(getTeamWeekRevealedScore(teamIdx,week)||0)
+  }));
+  board.forEach(entry=>{
+    entry.beforeTotal=Math.max(0, entry.afterTotal - entry.dayTotal);
+  });
+  const beforeOrder=[...board].sort((a,b)=>b.beforeTotal-a.beforeTotal || a.teamName.localeCompare(b.teamName));
+  const afterOrder=[...board].sort((a,b)=>b.afterTotal-a.afterTotal || a.teamName.localeCompare(b.teamName));
+  const beforeRanks=new Map(beforeOrder.map((entry,index)=>[entry.teamIdx,index+1]));
+  const afterRanks=new Map(afterOrder.map((entry,index)=>[entry.teamIdx,index+1]));
+  board.forEach(entry=>{
+    entry.beforeRank=beforeRanks.get(entry.teamIdx) || 0;
+    entry.afterRank=afterRanks.get(entry.teamIdx) || 0;
+    entry.delta=(entry.beforeRank||0) - (entry.afterRank||0);
+  });
+  const biggestRiser=[...board].filter(entry=>entry.delta>0).sort((a,b)=>b.delta-a.delta || b.dayTotal-a.dayTotal)[0] || null;
+  const biggestFaller=[...board].filter(entry=>entry.delta<0).sort((a,b)=>a.delta-b.delta || a.dayTotal-b.dayTotal)[0] || null;
+  return { board:afterOrder, biggestRiser, biggestFaller };
+}
+function buildRevealMatchupStories(week, day){
+  const dayResults=G?.dayResults?.[day] || {};
+  const start=(week-1)*DAYS_PER_WEEK+1;
+  const end=Math.min(TOTAL_DAYS(), start + DAYS_PER_WEEK - 1);
+  const isFinalDay=Number(day||0) >= end;
+  return weekGames(week).map(game=>{
+    const homeDay=Number(dayResults?.[game.home]?.total||0);
+    const awayDay=Number(dayResults?.[game.away]?.total||0);
+    const homeAfter=Number(getTeamWeekRevealedScore(game.home,week)||0);
+    const awayAfter=Number(getTeamWeekRevealedScore(game.away,week)||0);
+    const homeBefore=Math.max(0, homeAfter - homeDay);
+    const awayBefore=Math.max(0, awayAfter - awayDay);
+    const beforeLeader=homeBefore===awayBefore?null:(homeBefore>awayBefore?game.home:game.away);
+    const afterLeader=homeAfter===awayAfter?null:(homeAfter>awayAfter?game.home:game.away);
+    const dayWinner=homeDay===awayDay?null:(homeDay>awayDay?game.home:game.away);
+    const leadChanged=beforeLeader!==afterLeader && !!afterLeader;
+    const margin=Math.abs(homeAfter-awayAfter);
+    const leaderName=afterLeader!==null?teamName(afterLeader):'Dead Heat';
+    const trailerIdx=afterLeader===game.home?game.away:(afterLeader===game.away?game.home:null);
+    const trailerName=trailerIdx!==null?teamName(trailerIdx):'Even';
+    let meta='';
+    if(afterLeader===null){
+      meta=`${teamName(game.home)} and ${teamName(game.away)} are level at ${homeAfter.toFixed(1)}.`;
+    } else if(isFinalDay){
+      meta=`${leaderName} closes the week ${homeAfter.toFixed(1)} to ${awayAfter.toFixed(1)} over ${trailerName}.`;
+    } else if(leadChanged){
+      meta=`The reveal flipped this matchup from ${teamName(beforeLeader)} to ${leaderName}.`;
+    } else {
+      meta=`${leaderName} leads ${trailerName} ${homeAfter.toFixed(1)} to ${awayAfter.toFixed(1)}.`;
+    }
+    if(dayWinner!==null){
+      meta += ` ${teamName(dayWinner)} won the day by ${Math.abs(homeDay-awayDay).toFixed(1)}.`;
+    }
+    return {
+      gameId:`${week}_${game.home}_${game.away}`,
+      week,
+      day,
+      isFinal:isFinalDay,
+      homeName:teamName(game.home),
+      awayName:teamName(game.away),
+      homeScore:homeAfter,
+      awayScore:awayAfter,
+      leaderName,
+      trailerName,
+      margin,
+      leadChanged,
+      dayWinnerName:dayWinner!==null?teamName(dayWinner):'Even',
+      daySwing:homeDay-awayDay,
+      stateLabel:afterLeader===null?'Tied':(isFinalDay?'Final':(leadChanged?'Flip':'Live')),
+      stateTone:afterLeader===null?'':' '+(leadChanged?'flip':'live'),
+      meta
+    };
+  }).sort((a,b)=>
+    Number(b.leadChanged)-Number(a.leadChanged) ||
+    Number(b.isFinal)-Number(a.isFinal) ||
+    Math.abs(b.daySwing)-Math.abs(a.daySwing) ||
+    a.margin-b.margin
+  ).slice(0,4);
+}
+function buildRevealNarrative(day, leader, movement, matchups, totalTransactions){
+  const topMatchup=(matchups||[])[0] || null;
+  const riser=movement?.biggestRiser || null;
+  const faller=movement?.biggestFaller || null;
+  let headline=`Day ${day} Reveal Is Live`;
+  let subheadline='The latest scoring, board movement, and league transactions are now official.';
+  if(topMatchup?.isFinal && topMatchup.leaderName!=='Dead Heat'){
+    headline=`${topMatchup.leaderName} Closes The Week`;
+    subheadline=`${topMatchup.meta}${riser?` ${riser.teamName} made the biggest climb, jumping ${Math.abs(riser.delta)} spot${Math.abs(riser.delta)===1?'':'s'} on the revealed board.`:''}`;
+  } else if(topMatchup?.leadChanged && topMatchup.leaderName!=='Dead Heat'){
+    headline=`${topMatchup.leaderName} Flips The Matchup`;
+    subheadline=`${topMatchup.meta}${leader?` ${leader.teamName} still owned the day overall with ${leader.total.toFixed(1)} points.`:''}`;
+  } else if(leader){
+    headline=`${leader.teamName} Owns Day ${day}`;
+    subheadline=`${leader.teamName} paced the board with ${leader.total.toFixed(1)} revealed points.${riser?` ${riser.teamName} climbed ${Math.abs(riser.delta)} spot${Math.abs(riser.delta)===1?'':'s'} on the week board.`:''}${!riser&&faller?` ${faller.teamName} took the sharpest slide of the day.`:''}${totalTransactions?` ${totalTransactions} market move${totalTransactions===1?'':'s'} also landed before lock.`:''}`;
+  }
+  return { headline, subheadline };
+}
+function buildDailyRevealReport(day, generatedAt){
+  const currentDay=Number(day)||0;
+  const week=weekForDay(currentDay);
+  const results=G?.dayResults?.[currentDay] || {};
+  const teams=Object.keys(results).map(teamIdx=>{
+    const numericTeam=Number(teamIdx);
+    const detail=results[teamIdx] || { total:0, entries:[] };
+    return {
+      teamIdx:numericTeam,
+      teamName:teamName(numericTeam),
+      total:Number(detail.total||0),
+      detail
+    };
+  }).sort((a,b)=>b.total-a.total);
+  const myTeamIdx=Number(D?.myPos||0);
+  const myTeam=teams.find(team=>team.teamIdx===myTeamIdx) || null;
+  const playerLeaders=teams.flatMap(team=>
+    (team.detail?.entries||[]).map(entry=>({
+      name:entry?.player?.name||'Unknown',
+      team:entry?.player?.team||team.teamName,
+      source:entry?.source||'starter',
+      score:Number(entry?.finalScore||0),
+      rosterTeamName:team.teamName,
+      pos:entry?.player?.pos||''
+    }))
+  ).sort((a,b)=>b.score-a.score).slice(0,4);
+  const totalLeaguePoints=teams.reduce((sum,team)=>sum + Number(team.total||0),0);
+  const activities=getRevealWindowActivities(currentDay, generatedAt);
+  const transactions=summarizeRevealTransactions(activities);
+  const totalTransactions=transactions.reduce((sum,item)=>sum + Number(item.count||0),0);
+  const leader=teams[0] || null;
+  const leaderMargin=(teams.length>1 && leader) ? (Number(leader.total||0) - Number(teams[1]?.total||0)) : 0;
+  const movement=buildRevealWeekMovement(week, currentDay);
+  const matchups=buildRevealMatchupStories(week, currentDay);
+  const story=buildRevealNarrative(currentDay, leader ? {
+    teamIdx:leader.teamIdx,
+    teamName:leader.teamName,
+    total:leader.total,
+    margin:leaderMargin
+  } : null, movement, matchups, totalTransactions);
+  return {
+    day:currentDay,
+    generatedAt:Number(generatedAt||Date.now()),
+    week,
+    leader:leader ? {
+      teamIdx:leader.teamIdx,
+      teamName:leader.teamName,
+      total:leader.total,
+      margin:leaderMargin
+    } : null,
+    myTeam:myTeam ? {
+      teamIdx:myTeam.teamIdx,
+      teamName:myTeam.teamName,
+      total:myTeam.total,
+      rank:Math.max(1,teams.findIndex(team=>team.teamIdx===myTeam.teamIdx)+1)
+    } : null,
+    totalLeaguePoints,
+    story,
+    movement,
+    matchups,
+    topPerformers:playerLeaders,
+    transactions,
+    totalTransactions,
+    activitySample:activities.slice(0,6).map(item=>({
+      id:item.id,
+      title:item.title,
+      text:item.text,
+      type:item.type,
+      teamIdx:item.teamIdx,
+      icon:item.icon,
+      ts:item.ts
+    }))
+  };
+}
+function renderRevealSummaryStats(report){
+  if(!report) return '';
+  const leaderCopy=report.leader
+    ? `${report.leader.teamName} led the day${report.leader.margin>0.1?` by ${report.leader.margin.toFixed(1)} points`:'.'}`
+    : 'No leader data is available for this reveal yet.';
+  const myCopy=report.myTeam
+    ? `${report.myTeam.teamName} finished Day ${report.day} in ${ord(report.myTeam.rank)} place.`
+    : 'Your team report will appear once rosters are loaded.';
+  const riser=report?.movement?.biggestRiser;
+  const faller=report?.movement?.biggestFaller;
+  const moveCopy=report.totalTransactions
+    ? `${report.totalTransactions} transaction${report.totalTransactions===1?'':'s'} hit the wire before results locked.`
+    : 'The player market stayed quiet in this reveal window.';
+  return `
+    <div class="reveal-summary-grid">
+      <div class="reveal-summary-stat">
+        <div class="value">${report.totalLeaguePoints.toFixed(1)}</div>
+        <div class="label">League Points Revealed</div>
+        <div class="copy">${leaderCopy}</div>
+      </div>
+      <div class="reveal-summary-stat">
+        <div class="value">${report.myTeam?report.myTeam.total.toFixed(1):'--'}</div>
+        <div class="label">Your Day Score</div>
+        <div class="copy">${myCopy}</div>
+      </div>
+      <div class="reveal-summary-stat">
+        <div class="value">${riser?`+${Math.abs(riser.delta)}`:'--'}</div>
+        <div class="label">Biggest Riser</div>
+        <div class="copy">${riser?`${riser.teamName} climbed from ${ord(riser.beforeRank)} to ${ord(riser.afterRank)}.`:'No team changed positions on this reveal.'}</div>
+      </div>
+      <div class="reveal-summary-stat">
+        <div class="value">${faller?`-${Math.abs(faller.delta)}`:'--'}</div>
+        <div class="label">Biggest Faller</div>
+        <div class="copy">${faller?`${faller.teamName} slipped from ${ord(faller.beforeRank)} to ${ord(faller.afterRank)}.`:moveCopy}</div>
+      </div>
+    </div>
+  `;
+}
+function renderRevealMatchups(report){
+  if(!report?.matchups?.length) return '<div class="reveal-empty">No matchup story is available for this reveal window yet.</div>';
+  return `<div class="reveal-matchup-list">${report.matchups.map(entry=>`
+    <div class="reveal-matchup-item">
+      <div class="reveal-matchup-copy">
+        <div class="reveal-matchup-title">${entry.homeName} vs ${entry.awayName}</div>
+        <div class="reveal-matchup-meta">${entry.meta}</div>
+      </div>
+      <div class="reveal-matchup-state${entry.stateTone||''}">${entry.stateLabel}</div>
+    </div>
+  `).join('')}</div>`;
+}
+function renderRevealMovement(report){
+  const riser=report?.movement?.biggestRiser || null;
+  const faller=report?.movement?.biggestFaller || null;
+  if(!riser && !faller) return '<div class="reveal-empty">No board movement registered off this reveal.</div>';
+  return `<div class="reveal-movement-list">
+    ${riser ? `
+      <div class="reveal-movement-item">
+        <div class="reveal-movement-copy">
+          <div class="reveal-movement-title">${riser.teamName}</div>
+          <div class="reveal-movement-meta">Jumped from ${ord(riser.beforeRank)} to ${ord(riser.afterRank)} on the revealed week board with ${riser.dayTotal.toFixed(1)} points today.</div>
+        </div>
+        <div class="reveal-movement-swing up">+${Math.abs(riser.delta)}</div>
+      </div>
+    ` : ''}
+    ${faller ? `
+      <div class="reveal-movement-item">
+        <div class="reveal-movement-copy">
+          <div class="reveal-movement-title">${faller.teamName}</div>
+          <div class="reveal-movement-meta">Dropped from ${ord(faller.beforeRank)} to ${ord(faller.afterRank)} as the rest of the board moved around this reveal.</div>
+        </div>
+        <div class="reveal-movement-swing down">-${Math.abs(faller.delta)}</div>
+      </div>
+    ` : ''}
+  </div>`;
+}
+function renderRevealTopPerformers(report){
+  if(!report?.topPerformers?.length) return '<div class="reveal-empty">No standout player lines were logged for this day yet.</div>';
+  return `<div class="reveal-top-list">${report.topPerformers.map((entry,index)=>`
+    <div class="reveal-top-item">
+      <div class="reveal-top-rank">${index+1}</div>
+      <div class="reveal-top-copy">
+        <div class="reveal-top-name">${entry.name}</div>
+        <div class="reveal-top-meta">${entry.team} ${entry.pos?`· ${entry.pos} `:''}· ${entry.rosterTeamName} · ${entry.source==='bench'?'Bench Boost':'Starter line'}</div>
+      </div>
+      <div class="reveal-top-score">${entry.score.toFixed(1)}</div>
+    </div>
+  `).join('')}</div>`;
+}
+function renderRevealTransactions(report){
+  if(!report?.transactions?.length) return '<div class="reveal-empty">No move summary is available for this reveal window yet.</div>';
+  return `<div class="reveal-transaction-list">${report.transactions.map(item=>`
+    <div class="reveal-transaction-item">
+      <div class="reveal-transaction-copy">
+        <div class="reveal-transaction-name">${item.label}</div>
+        <div class="reveal-transaction-meta">${item.copy}</div>
+      </div>
+      <div class="reveal-transaction-count">${item.count}</div>
+    </div>
+  `).join('')}</div>`;
+}
+function closeRevealReportModal(){
+  document.getElementById('revealReportModal')?.classList.remove('open');
+}
+function openRevealReport(day){
+  const report=getDailyRevealReport(day || getLatestRevealReportDay());
+  const mount=document.getElementById('revealReportContent');
+  if(!mount || !report) return;
+  mount.innerHTML=`
+    <div class="reveal-modal-head">
+      <div>
+        <div class="hub-reveal-kicker">Day ${report.day} Reveal Report</div>
+        <div class="reveal-modal-title">${report.story?.headline || ('Day '+report.day+' Reveal Report')}</div>
+        <div class="reveal-modal-sub">${report.story?.subheadline || 'Daily results are live. This recap packages the revealed scoring, top player lines, and the waiver / trade movement that shaped the day before it locked.'}</div>
+        <div class="reveal-modal-badges">
+          <span class="hub-reveal-pill green">Week ${report.week}</span>
+          <span class="hub-reveal-pill blue">${report.totalLeaguePoints.toFixed(1)} points revealed</span>
+          <span class="hub-reveal-pill orange">${report.totalTransactions} move${report.totalTransactions===1?'':'s'} logged</span>
+          ${report.movement?.biggestRiser ? `<span class="hub-reveal-pill blue">${report.movement.biggestRiser.teamName} +${Math.abs(report.movement.biggestRiser.delta)}</span>` : ''}
+        </div>
+      </div>
+      <button type="button" onclick="closeRevealReportModal()" class="season-chip-link">Close</button>
+    </div>
+    <div class="reveal-panel">
+      <div class="reveal-panel-title">League Snapshot</div>
+      <div class="reveal-panel-copy">This is the fastest read on what just became official across the league.</div>
+      ${renderRevealSummaryStats(report)}
+    </div>
+    <div class="reveal-modal-grid" style="margin-top:14px;">
+      <div class="reveal-panel">
+        <div class="reveal-panel-title">Matchup Board</div>
+        <div class="reveal-panel-copy">The head-to-head stories that moved the most when this day went public.</div>
+        ${renderRevealMatchups(report)}
+      </div>
+      <div class="reveal-panel">
+        <div class="reveal-panel-title">Movement Board</div>
+        <div class="reveal-panel-copy">The biggest riser and faller on the revealed week ladder.</div>
+        ${renderRevealMovement(report)}
+      </div>
+      <div class="reveal-panel">
+        <div class="reveal-panel-title">Top Performers</div>
+        <div class="reveal-panel-copy">The best fantasy lines from the day that just hit the public board.</div>
+        ${renderRevealTopPerformers(report)}
+      </div>
+      <div class="reveal-panel">
+        <div class="reveal-panel-title">Transaction Window</div>
+        <div class="reveal-panel-copy">Adds, drops, restores, and trade movement logged between reveals.</div>
+        ${renderRevealTransactions(report)}
+      </div>
+    </div>
+    <div class="reveal-modal-actions">
+      <button type="button" onclick="closeRevealReportModal()" class="bs" style="width:auto;padding:11px 16px;">Close</button>
+      <button type="button" onclick="closeRevealReportModal();goPage('waiver');" class="bg" style="width:auto;padding:11px 16px;">Open Waivers</button>
+    </div>
+  `;
+  document.getElementById('revealReportModal')?.classList.add('open');
+}
 
 let D=null;
-let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{}};
+let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{},dailyRevealReports:{}};
 let selectedStandingsTeamIdx=null;
 let moveCtx=null;
 let rosterTab='stats';
@@ -1764,6 +2201,7 @@ function normalizeSharedGameState(){
   if(!G.powerupInventory || typeof G.powerupInventory!=='object') G.powerupInventory={};
   if(!G.powerupsByWeek || typeof G.powerupsByWeek!=='object') G.powerupsByWeek={};
   if(!G.powerupDropsByWeek || typeof G.powerupDropsByWeek!=='object') G.powerupDropsByWeek={};
+  if(!G.dailyRevealReports || typeof G.dailyRevealReports!=='object') G.dailyRevealReports={};
   if(!G.waiverPriority || typeof G.waiverPriority!=='object') G.waiverPriority={};
   G.processed=new Set(Array.isArray(G.processed) ? G.processed : Array.from(G.processed||[]));
 }
@@ -2038,6 +2476,7 @@ function syncGameStateToD() {
   if (G.waiver) D.waiver = G.waiver;
   if (G.tradeOffers) D.tradeOffers = G.tradeOffers;
   if (G.activityLog) D.activityLog = G.activityLog;
+  if (G.dailyRevealReports) D.dailyRevealReports = G.dailyRevealReports;
   if (G.recentDrops) D.recentDrops = G.recentDrops;
   if (G.powerupInventory) D.powerupInventory = G.powerupInventory;
   if (G.powerupsByWeek) D.powerupsByWeek = G.powerupsByWeek;
@@ -3605,15 +4044,26 @@ function getLiveStandingsSnapshot(){
   }
   return Array.from(byTeam.values());
 }
+function getSortedStandingsForRank(standings){
+  return [...(Array.isArray(standings)?standings:[])].sort((a,b)=>
+    Number(b?.w||0)-Number(a?.w||0) ||
+    Number(b?.pf||0)-Number(a?.pf||0) ||
+    Number(a?.l||0)-Number(b?.l||0) ||
+    teamName(Number(a?.teamIdx||0)).localeCompare(teamName(Number(b?.teamIdx||0)))
+  );
+}
 function syncCalendarFromDay(){G.week=Math.min(G.totalWeeks,Math.max(1,weekForDay(G.day)));}
 function revealDay(day){
   if(day!==G.day) return;
   if(isDayRevealed(day)) return;
   if(!G.dayResults || typeof G.dayResults!=='object') G.dayResults={};
   if(!G.revealedDays || typeof G.revealedDays!=='object') G.revealedDays={};
+  if(!G.dailyRevealReports || typeof G.dailyRevealReports!=='object') G.dailyRevealReports={};
+  const generatedAt=Date.now();
   G.dayResults[day]={};
   for(let ti=0;ti<G.rosters.length;ti++) G.dayResults[day][ti]=getTeamDayScoreDetails(ti,day);
   G.revealedDays[day]=true;
+  G.dailyRevealReports[String(day)] = buildDailyRevealReport(day, generatedAt);
   D.lastRevealedDay=Math.max(Number(D.lastRevealedDay||0), Number(day||0));
   logActivity('reveal','Day '+day+' revealed','Official scores for Day '+day+' are now live league-wide.',D.myPos,'???');
   queueSharedSeasonSave('reveal_day');
@@ -4755,6 +5205,7 @@ function repairDraftLeagueShapeFromPicks(){
   D.revealedDays={};
   D.settledWeeks={};
   D.activityLog=[];
+  D.dailyRevealReports={};
   D.recentDrops=[];
   D.moneyBallLocks={};
   D.waiverPriority={};
@@ -4837,6 +5288,7 @@ function initSeason(){
     G.revealedDays = D.revealedDays || {};
     G.settledWeeks = D.settledWeeks || {};
     G.activityLog = D.activityLog || [];
+    G.dailyRevealReports = D.dailyRevealReports || {};
     G.recentDrops = D.recentDrops || [];
     G.moneyBallLocks = D.moneyBallLocks || {};
     G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
@@ -4887,11 +5339,12 @@ function initSeason(){
     D.revealedDays={};
     D.settledWeeks={};
     D.activityLog=[];
+    D.dailyRevealReports={};
     D.recentDrops=[];
     D.moneyBallLocks={};
     D.waiverPriority={};
     G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
-    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.recentDrops=[];G.moneyBallLocks={};
+    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.dailyRevealReports={};G.recentDrops=[];G.moneyBallLocks={};
   }
   
   console.log('? All G properties initialized');
@@ -4997,6 +5450,7 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     queueSharedSeasonSave('season_complete');
     toast('Final day revealed. Season complete!');
     renderHub();
+    setTimeout(()=>openRevealReport(revealDayNo),120);
     if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
     return;
   }
@@ -5014,11 +5468,12 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     toast('Day '+revealDayNo+' results revealed.');
   }
   queueSharedSeasonSave('advance_day'); advanceWeek.disabled=false; renderHub();
+  setTimeout(()=>openRevealReport(revealDayNo),120);
   if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
 }
 
 function buildLifetimeSeasonPayload(userNumber){
-  const sorted=[...G.standings].sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
+  const sorted=getSortedStandingsForRank(G.standings);
   const myStanding=G.standings[D.myPos] || {w:0,l:0,pf:0,pa:0};
   const finalRank=sorted.findIndex(s=>s.teamIdx===D.myPos)+1;
   return {
@@ -5218,7 +5673,7 @@ function renderHub(){
   const watchSummary=watchCount
     ? (radarPreview ? radarPreview.player.name+' leading your board' : watchCount+' players tracked')
     : 'Track free agents before the room shifts';
-  const srt=[...liveStandings].sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
+  const srt=getSortedStandingsForRank(liveStandings);
   const rk=srt.findIndex(s=>s.teamIdx===mp)+1;
   document.getElementById('hubRank').textContent=rk>0?ord(rk)+' place':'--';
   const playersCard=document.getElementById('hubWC');
@@ -5229,20 +5684,63 @@ function renderHub(){
     else playersCard.textContent=(G.waiver||[]).length+' available';
   }
   const games=weekGames(G.week);
+  const latestRevealReport=getDailyRevealReport(getLatestRevealReportDay());
+  const revealMount=document.getElementById('hubRevealReportCard');
+  if(revealMount){
+    revealMount.innerHTML=latestRevealReport ? `
+      <div class="hub-reveal-grid">
+        <div class="hub-reveal-copy">
+          <div class="hub-reveal-kicker">Daily Reveal Report</div>
+          <div class="hub-reveal-title">${latestRevealReport.story?.headline || ('Day '+latestRevealReport.day+' Is Official')}</div>
+          <div class="hub-reveal-sub">${latestRevealReport.story?.subheadline || (latestRevealReport.leader ? `${latestRevealReport.leader.teamName} led the board with ${latestRevealReport.leader.total.toFixed(1)} points.` : 'Scores are now live league-wide.')}</div>
+          <div class="hub-reveal-pills">
+            <span class="hub-reveal-pill green">Week ${latestRevealReport.week}</span>
+            <span class="hub-reveal-pill blue">${latestRevealReport.totalLeaguePoints.toFixed(1)} league points</span>
+            <span class="hub-reveal-pill orange">${latestRevealReport.matchups?.[0]?.leaderName || latestRevealReport.topPerformers?.[0]?.name || 'No top line yet'}</span>
+            ${latestRevealReport.movement?.biggestRiser ? `<span class="hub-reveal-pill blue">${latestRevealReport.movement.biggestRiser.teamName} +${Math.abs(latestRevealReport.movement.biggestRiser.delta)}</span>` : ''}
+          </div>
+          <button type="button" onclick="openRevealReport(${latestRevealReport.day})" class="hub-reveal-action">Open Full Reveal Report</button>
+        </div>
+        <div class="hub-reveal-stats">
+          <div class="hub-reveal-stat">
+            <div class="hub-reveal-stat-label">Top Team</div>
+            <div class="hub-reveal-stat-value">${latestRevealReport.leader ? latestRevealReport.leader.teamName : '—'}</div>
+            <div class="hub-reveal-stat-copy">${latestRevealReport.leader ? latestRevealReport.leader.total.toFixed(1)+' points revealed' : 'No team summary yet.'}</div>
+          </div>
+          <div class="hub-reveal-stat">
+            <div class="hub-reveal-stat-label">Matchup Swing</div>
+            <div class="hub-reveal-stat-value">${latestRevealReport.matchups?.[0]?.stateLabel || '--'}</div>
+            <div class="hub-reveal-stat-copy">${latestRevealReport.matchups?.[0]?.meta || 'The lead board story will appear here after the first reveal.'}</div>
+          </div>
+          <div class="hub-reveal-stat">
+            <div class="hub-reveal-stat-label">Biggest Mover</div>
+            <div class="hub-reveal-stat-value">${latestRevealReport.movement?.biggestRiser ? `+${Math.abs(latestRevealReport.movement.biggestRiser.delta)}` : '--'}</div>
+            <div class="hub-reveal-stat-copy">${latestRevealReport.movement?.biggestRiser ? `${latestRevealReport.movement.biggestRiser.teamName} climbed ${Math.abs(latestRevealReport.movement.biggestRiser.delta)} spot${Math.abs(latestRevealReport.movement.biggestRiser.delta)===1?'':'s'}.` : (latestRevealReport.myTeam ? latestRevealReport.myTeam.teamName+' finished '+ord(latestRevealReport.myTeam.rank) : 'Your team will populate here once loaded.')}</div>
+          </div>
+        </div>
+      </div>
+    ` : `
+      <div class="hub-reveal-empty">
+        Reveal reports will appear here once the first day is unlocked. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the new scores, top performers, and waiver/trade movement from that window.
+      </div>
+    `;
+  }
   const standingsEl=document.getElementById('hubStandingsMini');
   if(standingsEl){
     const leader=srt[0];
     standingsEl.innerHTML=`
       <div class="hub-standings-head">
+        <div style="text-align:center;">#</div>
         <div>Team</div>
         <div style="text-align:right;">W</div>
         <div style="text-align:right;">L</div>
         <div style="text-align:right;">PF</div>
         <div style="text-align:right;">PA</div>
       </div>
-      ${srt.slice(0,10).map(st=>{
+      ${srt.slice(0,10).map((st,rk)=>{
         const isMine=st.teamIdx===mp;
         return `<button type="button" class="hub-standings-row" onclick="openStandingsTeam(${st.teamIdx})" aria-label="Open ${D.teams[st.teamIdx]||('Team '+(st.teamIdx+1))}" style="width:100%;border:none;text-align:left;cursor:pointer;${isMine?'background:#1b2432;border:1px solid #7c4a18;border-radius:8px;padding-left:6px;padding-right:6px;':''}">
+          <div class="hub-standings-rank"${rk<3?' style="color:#f59e0b;"':''}>${rk+1}</div>
           <div class="hub-standings-team">
             <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:24px;height:24px;font-size:10px;">${ini(D?.teams?.[st.teamIdx] || ('Team '+(st.teamIdx+1)))}</div>
             <div class="hub-standings-name"${isMine?' style="color:#fdba74;"':''}>${D.teams[st.teamIdx]||('Team '+(st.teamIdx+1))}</div>
@@ -5712,7 +6210,7 @@ function renderRoster(){
   const rosterInlineSearch=(document.getElementById('rosterInlineSearch')?.value||'').trim().toLowerCase();
   const weekPowerups=getWeekPowerups(week);
   const myStanding=G.standings[D.myPos]||{w:0,l:0,pf:0};
-  const rk=[...G.standings].sort((a,b)=>b.w-a.w||(b.pf-a.pf)).findIndex(s=>s.teamIdx===D.myPos)+1;
+  const rk=getSortedStandingsForRank(G.standings).findIndex(s=>s.teamIdx===D.myPos)+1;
   const currentMatch=weekGames(week).find(g=>g.home===D.myPos||g.away===D.myPos);
   const prevMatch=week>1?weekGames(week-1).find(g=>g.home===D.myPos||g.away===D.myPos):null;
   const rowData=[
@@ -7341,8 +7839,7 @@ function renderStandingsTeamDetails(teamIdx){
 
 function renderStandings(){
   setSeasonSidePanelVisible('standingsPowerups', false);
-  const sorted=getLiveStandingsSnapshot().sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
-  const medals=['&#129351;','&#129352;','&#129353;'];
+  const sorted=getSortedStandingsForRank(getLiveStandingsSnapshot());
   let h=`<div style="display:flex;flex-direction:column;gap:18px;">
     <div class="season-hero-card season-card-pad">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
@@ -7364,7 +7861,7 @@ function renderStandings(){
   sorted.forEach((st,rk)=>{
     const im=st.teamIdx===D.myPos,sc=st.streakW?'#16a34a':'#dc2626';
     h+=`<tr onclick="openStandingsTeam(${st.teamIdx})" style="cursor:pointer;">
-      <td style="font-family:var(--fb);font-weight:800;color:${rk<3?'#f59e0b':'#6b7280'};">${medals[rk]||rk+1}</td>
+      <td style="font-family:var(--fb);font-weight:800;color:${rk<3?'#f59e0b':'#6b7280'};">${rk+1}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px;min-width:220px;">
           <div class="pav" style="background:${TCOLORS[st.teamIdx%TCOLORS.length]};width:30px;height:30px;font-size:11px;">${ini(D?.teams?.[st.teamIdx] || ('Team '+(st.teamIdx+1)))}</div>
@@ -7406,7 +7903,7 @@ function renderStandings(){
 }
 
 function openPicker(){
-  const sorted=getLiveStandingsSnapshot().sort((a,b)=>b.w-a.w||(a.l-b.l)||(b.pf-a.pf));
+  const sorted=getSortedStandingsForRank(getLiveStandingsSnapshot());
   const medals=['&#129351;','&#129352;','&#129353;'];
   document.getElementById('pickerList').innerHTML=sorted.map((st,rk)=>{
     const ti=st.teamIdx,im=ti===D.myPos;
