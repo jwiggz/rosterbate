@@ -54,6 +54,13 @@
   .pill.info{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
   .pill.warn{border-color:rgba(252,165,165,.34);background:rgba(127,29,29,.18);color:#fecaca;}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;width:100%;max-width:440px;}
+  .lobby-settings-card{
+    background:linear-gradient(180deg, rgba(16,24,39,.62), rgba(11,17,28,.54));
+    border-color:rgba(71,85,105,.52);
+    box-shadow:0 24px 44px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
   .card h2{font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;color:var(--text2);}
   .fr{margin-bottom:10px;}
   .fr label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);display:block;margin-bottom:4px;}
@@ -146,8 +153,9 @@
     width:100%;
     height:100%;
     object-fit:cover;
-    opacity:.86;
-    filter:saturate(.92) contrast(1.02) brightness(.7);
+    object-position:center center;
+    opacity:.9;
+    filter:saturate(.9) contrast(1.04) brightness(.68);
   }
   .retro-nba-room-fallback{
     background:
@@ -157,20 +165,35 @@
   }
   .retro-nba-overlay{
     background:
-      linear-gradient(180deg, rgba(4,5,8,.32), rgba(4,5,8,.54) 58%, rgba(3,4,7,.76) 100%);
+      radial-gradient(circle at 23% 28%, rgba(179,255,199,.08), transparent 14%),
+      radial-gradient(circle at 62% 12%, rgba(255,255,255,.05), transparent 18%),
+      linear-gradient(180deg, rgba(4,5,8,.22), rgba(4,5,8,.5) 56%, rgba(3,4,7,.74) 100%);
   }
   .retro-nba-glow{
     background:
-      radial-gradient(circle at 50% 36%, rgba(255,171,92,.16), transparent 20%),
-      radial-gradient(circle at 50% 36%, rgba(255,255,255,.08), transparent 10%);
+      radial-gradient(circle at 21.6% 36.5%, rgba(111,255,152,.18), transparent 10%),
+      radial-gradient(circle at 21.5% 36.5%, rgba(255,248,190,.07), transparent 4.5%),
+      radial-gradient(circle at 50% 36%, rgba(255,171,92,.1), transparent 20%);
     mix-blend-mode:screen;
-    opacity:.75;
+    opacity:.88;
   }
   .retro-nba-vignette{
     background:
-      radial-gradient(circle at center, transparent 34%, rgba(2,3,6,.3) 70%, rgba(2,3,6,.68) 100%);
+      radial-gradient(circle at center, transparent 30%, rgba(2,3,6,.28) 68%, rgba(2,3,6,.72) 100%);
   }
-  .retro-nba-tv-wrap{padding:0;}
+  .retro-nba-stage::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      repeating-linear-gradient(180deg, rgba(255,255,255,.018) 0 1px, rgba(0,0,0,0) 1px 3px),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,.03), transparent 55%);
+    opacity:.34;
+    mix-blend-mode:screen;
+    pointer-events:none;
+    z-index:1;
+  }
+  .retro-nba-tv-wrap{padding:0;display:none;}
   .retro-nba-tv{
     position:relative;
     width:100%;
@@ -185,20 +208,21 @@
   .retro-nba-tv-frame-fallback{display:none;}
   .retro-nba-tv-screen{
     position:absolute;
-    left:18.05%;
-    top:18.75%;
-    width:17.58%;
-    height:36.5%;
+    left:73.9%;
+    top:56.45%;
+    width:8.05%;
+    height:11.75%;
     overflow:hidden;
     border-radius:0;
-    clip-path:polygon(0.1% 0.3%,98.7% 1.4%,100% 78.2%,95.2% 90.1%,0% 99.6%);
+    clip-path:polygon(2% 3%, 93% 0.8%, 98% 96%, 4% 99%);
     background:
-      radial-gradient(circle at center, rgba(87,255,136,.16), transparent 52%),
-      linear-gradient(180deg, rgba(7,18,11,.78), rgba(2,8,4,.94));
+      radial-gradient(circle at 46% 42%, rgba(124,255,170,.08), transparent 48%),
+      linear-gradient(180deg, rgba(7,10,14,.86), rgba(1,4,7,.94));
     box-shadow:
-      inset 0 0 0 1px rgba(168,255,189,.1),
-      inset 0 0 46px rgba(0,0,0,.42),
-      0 0 22px rgba(74,222,128,.18);
+      inset 0 0 0 1px rgba(168,255,189,.06),
+      inset 0 0 18px rgba(0,0,0,.38),
+      0 0 8px rgba(74,222,128,.08),
+      0 0 18px rgba(74,222,128,.04);
     transform:none;
     z-index:1;
   }
@@ -207,9 +231,10 @@
     position:absolute;
     inset:0;
     background:
-      repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,0) 2px 4px);
+      linear-gradient(112deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 24%, rgba(255,255,255,0) 70%, rgba(255,255,255,.06) 100%),
+      repeating-linear-gradient(180deg, rgba(255,255,255,.035) 0 2px, rgba(0,0,0,0) 2px 4px);
     mix-blend-mode:screen;
-    opacity:.18;
+    opacity:.28;
     z-index:3;
   }
   .retro-nba-tv-screen::after{
@@ -217,20 +242,38 @@
     position:absolute;
     inset:0;
     background:
-      radial-gradient(circle at center, transparent 42%, rgba(0,0,0,.26) 100%);
+      radial-gradient(circle at 50% 42%, transparent 45%, rgba(0,0,0,.22) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0) 20%, rgba(0,0,0,0) 72%, rgba(0,0,0,.18));
     z-index:3;
   }
   .retro-nba-tv-media{
     position:absolute;
-    top:-38% !important;
+    top:0 !important;
     left:0;
     width:100%;
-    height:148% !important;
+    height:100% !important;
     object-fit:cover;
-    object-position:center top !important;
-    opacity:.92;
-    filter:saturate(.95) contrast(1.08) brightness(.9);
+    object-position:center center !important;
+    opacity:1;
+    filter:saturate(.94) contrast(1.03) brightness(.9);
     transform:none !important;
+  }
+  .retro-nba-tv-screen .retro-nba-tv-media:first-of-type,
+  .retro-nba-tv-screen .retro-nba-tv-media:last-of-type{
+    mix-blend-mode:normal;
+  }
+  body.retro-nba-ready #lobby::after,
+  body.retro-nba-ready #draft::after{
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at 18% 38%, rgba(255,255,255,.035), transparent 18%),
+      radial-gradient(circle at 80% 16%, rgba(255,255,255,.03), transparent 14%),
+      linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0) 22%, rgba(0,0,0,0) 68%, rgba(0,0,0,.08));
+    mix-blend-mode:screen;
+    pointer-events:none;
+    z-index:1;
   }
   .retro-nba-tv-empty{
     display:none !important;
@@ -741,7 +784,7 @@
     <p id="sportLogoSub">Draft Room</p>
   </div>
   <div class="pill" id="sportLobbyPill">Live pro sports season | 30 teams | 500 players</div>
-  <div class="card">
+  <div class="card lobby-settings-card">
     <h2>League Settings</h2>
     <div class="fr"><label>Your Team Name</label><input type="text" id="iName" placeholder="e.g. Tommy's Minions"/></div>
     <div class="fr"><label>Your League Name</label><input type="text" id="iLeagueName" placeholder="e.g. Friday Night Hoops"/></div>
@@ -2109,7 +2152,7 @@ const SPORT_RULES = getRosterbateLeagueRuleDefaults(SPORT);
 const POSITION_LABELS = getRosterbatePositionLabels(SPORT);
 let PLAYERS = [];
 let DRAFT_POSITION_RULES = JSON.parse(JSON.stringify(SPORT_RULES.positions||{}));
-const RETRO_NBA_ROOM_ASSET='assets/retro-draft/new bedroom background.png';
+const RETRO_NBA_ROOM_ASSET='assets/retro-draft/new placeholder room.png';
 const RETRO_NBA_TV_MEDIA_ASSETS=[
   { src:'assets/retro-draft/nba-tv-loop-01.gif', type:'image' },
   { src:'assets/retro-draft/nba-tv-loop-02.gif', type:'image' },
@@ -2131,14 +2174,12 @@ function initRetroNbaDraftBackdrop(){
   const lobbyEl=document.getElementById('lobby');
   if(!draftEl || SPORT!=='nba') return;
   const roomImg=document.getElementById('retroNbaRoomImage');
-  const gifEl=document.getElementById('retroNbaTvGif');
-  const videoEl=document.getElementById('retroNbaTvVideo');
   document.body.classList.add('retro-nba-on');
   if(lobbyEl) lobbyEl.classList.add('retro-nba-on');
   draftEl.classList.add('retro-nba-on');
   let roomReady=false;
-  let mediaReady=false;
-  let mediaResolved=false;
+  let mediaReady=true;
+  let mediaResolved=true;
 
   function maybeRevealRetroStage(){
     if(roomReady && (mediaReady || mediaResolved)){
@@ -2158,61 +2199,10 @@ function initRetroNbaDraftBackdrop(){
       maybeRevealRetroStage();
     }, { once:true });
     roomImg.src=RETRO_NBA_ROOM_ASSET;
+  }else{
+    roomReady=true;
+    maybeRevealRetroStage();
   }
-
-  if(!(gifEl instanceof HTMLImageElement) || !(videoEl instanceof HTMLVideoElement)) return;
-
-  const candidates=shuffleRetroDraftAssets(RETRO_NBA_TV_MEDIA_ASSETS);
-  let index=0;
-
-  function tryNext(){
-    if(index>=candidates.length){
-      gifEl.hidden=true;
-      gifEl.removeAttribute('src');
-      videoEl.hidden=true;
-      videoEl.pause();
-      videoEl.removeAttribute('src');
-      videoEl.load();
-      mediaResolved=true;
-      maybeRevealRetroStage();
-      return;
-    }
-    const asset=candidates[index++];
-    if(!asset || !asset.src){
-      tryNext();
-      return;
-    }
-    if(asset.type==='video'){
-      gifEl.hidden=true;
-      gifEl.removeAttribute('src');
-      videoEl.hidden=false;
-      videoEl.oncanplay=()=>{
-        videoEl.hidden=false;
-        mediaReady=true;
-        mediaResolved=true;
-        maybeRevealRetroStage();
-        videoEl.play().catch(()=>{});
-      };
-      videoEl.onerror=()=>tryNext();
-      videoEl.src=asset.src;
-      videoEl.load();
-      return;
-    }
-    videoEl.hidden=true;
-    videoEl.pause();
-    videoEl.removeAttribute('src');
-    gifEl.onload=()=>{
-      gifEl.hidden=false;
-      mediaReady=true;
-      mediaResolved=true;
-      maybeRevealRetroStage();
-    };
-    gifEl.onerror=()=>tryNext();
-    gifEl.hidden=false;
-    gifEl.src=asset.src;
-  }
-
-  tryNext();
 }
 
 initRetroNbaDraftBackdrop();

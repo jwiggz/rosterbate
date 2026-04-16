@@ -79,15 +79,15 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .hub-summary{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(33,26,22,.48) 0%,rgba(19,25,37,.7) 48%,rgba(28,35,48,.62) 100%);border:1px solid rgba(248,202,173,.24);border-radius:22px;padding:20px 20px 18px;box-shadow:0 24px 48px rgba(2,6,23,.38),inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
 .hub-summary:before{content:'';position:absolute;inset:auto -40px -10px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(251,146,60,.18),transparent 64%);pointer-events:none;}
 .hub-summary:after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.05),transparent 32%,transparent 70%,rgba(125,211,252,.08));pointer-events:none;}
-    .hub-summary-top{display:grid;grid-template-columns:minmax(320px,1fr) minmax(180px,220px);align-items:start;gap:18px;margin-bottom:16px;position:relative;z-index:1;}
+    .hub-summary-top{display:grid;grid-template-columns:minmax(320px,1fr) minmax(240px,300px);align-items:start;gap:18px;margin-bottom:16px;position:relative;z-index:1;}
     .hub-summary-ident{display:flex;align-items:flex-start;gap:14px;min-width:0;}
     .hub-summary-copy{min-width:0;}
     .hub-summary-kicker{font-family:var(--fb);font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:6px;}
     .hub-summary-name{font-family:var(--fb);font-size:24px;font-weight:800;line-height:1.15;color:#f8fafc;}
     .hub-summary-rec{font-size:13px;color:#cbd5e1;margin-top:8px;}
     .hub-summary-data{font-size:11px;color:#94a3b8;margin-top:6px;text-transform:uppercase;letter-spacing:.6px;}
-    .hub-summary-meta{padding:6px 0 0 16px;border-left:1px solid #24324a;text-align:left;min-width:170px;}
-    .hub-summary-meta .eyebrow{font-family:var(--fb);font-size:12px;font-weight:700;color:#94a3b8;}
+    .hub-summary-meta{padding:6px 0 0 18px;border-left:1px solid #24324a;text-align:left;min-width:220px;display:grid;gap:8px;}
+    .hub-summary-meta .eyebrow{font-family:var(--fb);font-size:12px;font-weight:700;color:#94a3b8;line-height:1.35;}
     .hub-summary-meta .opp{font-family:var(--fb);font-size:18px;font-weight:700;color:#f8fafc;margin-top:4px;}
 .hub-summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative;z-index:1;}
     .hub-stat{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:12px 12px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:82px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);}
@@ -231,6 +231,11 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-action-sub{font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.35;}
     .hub-lower{display:grid;gap:16px;grid-template-rows:auto auto;}
     .activity-feed{display:flex;flex-direction:column;gap:10px;border-top:none;}
+    .hub-activity-feed{flex:1;max-height:320px;overflow-y:auto;padding-right:4px;}
+    .hub-activity-feed::-webkit-scrollbar{width:10px;}
+    .hub-activity-feed::-webkit-scrollbar-track{background:rgba(15,23,36,.42);border-radius:999px;}
+    .hub-activity-feed::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(59,130,246,.76),rgba(37,99,235,.56));border-radius:999px;border:2px solid rgba(15,23,36,.7);}
+    .hub-activity-feed{scrollbar-width:thin;scrollbar-color:rgba(59,130,246,.76) rgba(15,23,36,.42);}
     .activity-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;padding:14px 12px;border:1px solid rgba(214,232,255,.12);border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
     .activity-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:4px;}
     .activity-copy{min-width:0;flex:1;}
@@ -242,7 +247,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-team-record{font-size:13px;color:#d7e4f6;margin-top:4px;}
 .season-league-hero{position:relative;isolation:isolate;}
 #hub .rb-home-bar{background:linear-gradient(180deg,rgba(18,24,36,.58),rgba(16,22,34,.3));border-bottom:1px solid rgba(176,226,255,.26);box-shadow:0 10px 30px rgba(3,10,20,.26),inset 0 -1px 0 rgba(255,255,255,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
-#hub .season-topbar{background:linear-gradient(180deg,rgba(16,24,36,.52),rgba(11,18,29,.24));border-bottom:1px solid rgba(176,226,255,.18);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 14px 32px rgba(3,10,20,.2),inset 0 -1px 0 rgba(255,255,255,.06);}
+#hub .season-topbar{display:none !important;}
 #hub .season-chip{background:rgba(12,18,29,.42);border-color:rgba(176,226,255,.22);color:#e2ebf7;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
 #hub .season-chip.action{background:rgba(15,23,36,.52);border-color:rgba(176,226,255,.24);}
 #hub .season-chip.primary{background:rgba(86,39,15,.44);border-color:rgba(251,146,60,.38);color:#fed7aa;}
@@ -585,13 +590,6 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 
 <!-- HUB -->
 <div id="hub" class="screen">
-  <div class="season-topbar">
-    <a href="index.html" class="rb-home-link" style="font-size:19px;" id="seasonHomeLink">&#127968; Roster<span style="color:var(--accent)">Bate</span></a>
-    <div class="season-topmeta">
-      <div id="hubWeek" class="season-chip"></div>
-      <button type="button" class="season-chip action" onclick="openLeagueTeams()"><span aria-hidden="true">&#128101;</span> League Teams</button>
-    </div>
-  </div>
   <div class="sb">
     <div class="hub-shell">
       <div class="hub-side-aux">
@@ -619,6 +617,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
               </div>
             </div>
             <div class="hub-summary-meta">
+              <div class="eyebrow">Cycle: <span id="hubCycleMeta">Wk 1/17 · Day 1</span></div>
               <div class="eyebrow">Format: <span id="hubFormat">Standard</span></div>
               <div class="eyebrow" style="margin-top:6px;">Scoring: <span id="hubScoringType">Head to Head Points</span></div>
               <div class="eyebrow" style="margin-top:6px;">Teams: <span id="hubTeamCount">10</span></div>
@@ -648,7 +647,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
               </div>
               <div class="hub-card-meta" id="hubActivityMeta">Quiet now</div>
             </div>
-            <div id="hubActivity" style="flex:1;"></div>
+            <div id="hubActivity" class="hub-activity-feed"></div>
           </div>
           <div class="hub-card compact rb-chat-panel" id="rbChatPanel">
             <div class="rb-chat-hdr">
@@ -2368,6 +2367,196 @@ function hasOpenTotalRosterSlot(teamIdx){
   const ilCount=(getIlRoster(idx)||[]).length;
   return (activeCount + ilCount) < getTotalRosterCapacity();
 }
+
+function isCpuManagedTeam(teamIdx){
+  return !D?.multiplayer && Number.isInteger(teamIdx) && teamIdx!==Number(D?.myPos??0);
+}
+
+function normalizeCpuTeamLineups(teamIdx){
+  const roster=G.rosters[teamIdx]||[];
+  const teamDailyLineups=getDailyLineupStore(teamIdx);
+  G.starters[teamIdx]=buildBestLineupIdsForRoster(roster,G.day||1);
+  Object.keys(teamDailyLineups||{}).forEach(dayKey=>{
+    const day=Number(dayKey);
+    if(!Number.isFinite(day) || day < (G.day||1) || isDayRevealed(day)) return;
+    teamDailyLineups[day]=buildBestLineupIdsForRoster(roster,day);
+  });
+}
+
+function getMissingStarterSlotsForTeam(teamIdx, day){
+  const starterIds=getStarterIdsForTeamDay(teamIdx, day);
+  return Array.from({length:STARTERS},(_,index)=>({
+    index,
+    slot:SLOT_LABELS[index]||'UTIL',
+    playerId:starterIds[index]||null
+  }))
+    .filter(entry=>!entry.playerId)
+    .sort((a,b)=>{
+      const priorityDiff=slotPriority(a.slot)-slotPriority(b.slot);
+      return priorityDiff!==0 ? priorityDiff : (a.index-b.index);
+    });
+}
+
+function getBestCpuWaiverCandidateForSlot(slot, day){
+  const week=weekForDay(day);
+  const candidates=(G.waiver||[])
+    .filter(Boolean)
+    .filter(player=>canPlayerFillSlot(player, slot))
+    .map(player=>{
+      const injury=getInjuryStatus(player, week);
+      const unavailable=isUnavailableInjury(injury);
+      const game=getGameInfo(player, day);
+      const exactPos=String(player?.pos||'').toUpperCase()===String(slot||'').toUpperCase();
+      const score=Number(player?.fp||0)
+        + (game ? 500 : 0)
+        + (exactPos ? 24 : 0)
+        + (unavailable ? -1000 : injury ? -200 : 0);
+      return {player,score};
+    })
+    .sort((a,b)=>b.score-a.score);
+  return candidates[0]?.player || null;
+}
+
+function getCpuWaiverDropCandidate(teamIdx, day, targetSlot){
+  const roster=G.rosters[teamIdx]||[];
+  const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean));
+  const scoreCandidate=player=>{
+    const injury=getInjuryStatus(player, weekForDay(day));
+    const unavailable=isUnavailableInjury(injury);
+    const game=getGameInfo(player, day);
+    const canCoverTarget=targetSlot ? canPlayerFillSlot(player, targetSlot) : false;
+    return Number(player?.fp||0)
+      + (game ? 40 : 0)
+      + (canCoverTarget ? 120 : 0)
+      + (unavailable ? -250 : injury ? -60 : 0);
+  };
+  const benchCandidates=roster
+    .filter(player=>!starterSet.has(Number(player?.id)))
+    .map(player=>{
+      return {player,score:scoreCandidate(player)};
+    })
+    .sort((a,b)=>a.score-b.score);
+  if(benchCandidates.length) return benchCandidates[0]?.player || null;
+  const fallbackCandidates=roster
+    .map(player=>({player,score:scoreCandidate(player)}))
+    .sort((a,b)=>a.score-b.score);
+  return fallbackCandidates[0]?.player || null;
+}
+
+function fillCpuTeamStarterNeedsFromWaivers(teamIdx, options){
+  if(!isCpuManagedTeam(teamIdx)) return {changed:false,adds:0,drops:0};
+  const opts=options||{};
+  const day=Number(opts.day || G.day || 1);
+  let adds=0;
+  let drops=0;
+  let changed=false;
+  let safety=0;
+  while(safety<8){
+    safety++;
+    normalizeCpuTeamLineups(teamIdx);
+    const needs=getMissingStarterSlotsForTeam(teamIdx, day);
+    if(!needs.length) break;
+    let filled=false;
+    for(const need of needs){
+      const addCandidate=getBestCpuWaiverCandidateForSlot(need.slot, day);
+      if(!addCandidate) continue;
+      let dropCandidate=null;
+      if(!hasOpenTotalRosterSlot(teamIdx)){
+        dropCandidate=getCpuWaiverDropCandidate(teamIdx, day, need.slot);
+        if(!dropCandidate) continue;
+      }
+      const claimed=claimWaiverPlayerForTeam(teamIdx, {...addCandidate}, dropCandidate?{...dropCandidate}:null, {
+        toast:false,
+        save:false,
+        activityTitle:'CPU waiver move',
+        activityIcon:'🤖'
+      });
+      if(claimed){
+        adds++;
+        if(dropCandidate) drops++;
+        changed=true;
+        filled=true;
+        break;
+      }
+    }
+    if(!filled) break;
+  }
+  normalizeCpuTeamLineups(teamIdx);
+  return {changed,adds,drops};
+}
+
+function maintainCpuTeamRoster(teamIdx, options){
+  if(!isCpuManagedTeam(teamIdx)) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
+  const opts=options||{};
+  const day=Number(opts.day || G.day || 1);
+  const week=weekForDay(day);
+  const roster=G.rosters[teamIdx]||[];
+  const ilRoster=getIlRoster(teamIdx);
+  const ilSlots=Math.max(0, getIlSlotCount());
+  let movedToIl=0;
+  let activated=0;
+
+  if(ilSlots>0){
+    const ilCandidates=[...roster]
+      .filter(player=>isIlEligiblePlayer(player,getInjuryStatus(player,week)))
+      .sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0));
+    ilCandidates.forEach(player=>{
+      if(ilRoster.length>=ilSlots) return;
+      const rosterIndex=roster.findIndex(entry=>Number(entry?.id)===Number(player?.id));
+      if(rosterIndex<0) return;
+      const [moved]=roster.splice(rosterIndex,1);
+      ilRoster.push(moved);
+      movedToIl++;
+    });
+
+    const activeCapacity=getActiveRosterCapacity();
+    const activationCandidates=[...ilRoster]
+      .filter(player=>!isIlEligiblePlayer(player,getInjuryStatus(player,week)))
+      .sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0));
+    activationCandidates.forEach(player=>{
+      if(roster.length>=activeCapacity) return;
+      const ilIndex=ilRoster.findIndex(entry=>Number(entry?.id)===Number(player?.id));
+      if(ilIndex<0) return;
+      const [moved]=ilRoster.splice(ilIndex,1);
+      roster.push(moved);
+      activated++;
+    });
+  }
+
+  normalizeCpuTeamLineups(teamIdx);
+  const waiverResult=fillCpuTeamStarterNeedsFromWaivers(teamIdx, { day });
+  const changed=!!(movedToIl || activated || waiverResult.changed);
+  return {changed,movedToIl,activated,waiverAdds:Number(waiverResult.adds||0),waiverDrops:Number(waiverResult.drops||0)};
+}
+
+function maintainCpuLeagueRosters(options){
+  if(D?.multiplayer || !Array.isArray(G?.rosters) || G.rosters.length<2) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
+  let changed=false;
+  let movedToIl=0;
+  let activated=0;
+  let waiverAdds=0;
+  let waiverDrops=0;
+  for(let teamIdx=0; teamIdx<G.rosters.length; teamIdx++){
+    const result=maintainCpuTeamRoster(teamIdx, options);
+    if(!result) continue;
+    changed = changed || !!result.changed;
+    movedToIl += Number(result.movedToIl||0);
+    activated += Number(result.activated||0);
+    waiverAdds += Number(result.waiverAdds||0);
+    waiverDrops += Number(result.waiverDrops||0);
+  }
+  if(changed){
+    logActivity(
+      'league',
+      'CPU lineup maintenance',
+      `AI teams auto-managed ${movedToIl} ${getIlSlotKey()} move${movedToIl===1?'':'s'}, ${activated} activation${activated===1?'':'s'}, and ${waiverAdds} waiver add${waiverAdds===1?'':'s'} to keep solo rosters legal.`,
+      D.myPos,
+      '🤖'
+    );
+  }
+  return {changed,movedToIl,activated,waiverAdds,waiverDrops};
+}
+
 function closeDropModal(){
   dropCandidate=null;
   const modal=document.getElementById('dModal');
@@ -3675,33 +3864,54 @@ function getRosterUrgencyCards(day, context={}){
   return cards.slice(0,4);
 }
 
-function claimWaiverPlayerToTeam(playerToAdd,droppedPlayer=null){
+function claimWaiverPlayerForTeam(teamIdx, playerToAdd, droppedPlayer=null, options){
+  if(!playerToAdd) return false;
+  const opts=options||{};
+  const targetTeam=Number.isInteger(teamIdx)?teamIdx:(D?.myPos??0);
   if(!playerToAdd) return false;
   const targetId=Number(playerToAdd.id);
   const alreadyRostered=(G.rosters||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId))
     || (G.ilByTeam||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId));
   if(alreadyRostered){
     G.waiver=G.waiver.filter(p=>Number(p.id)!==targetId);
-    toast(playerToAdd.name+' is already on a roster.');
+    if(opts.toast!==false) toast(playerToAdd.name+' is already on a roster.');
     return false;
   }
-  const roster=G.rosters[D.myPos]||[];
+  const roster=G.rosters[targetTeam]||[];
+  let removedPlayer=null;
+  if(droppedPlayer){
+    const droppedId=Number(droppedPlayer.id);
+    const dropIndex=roster.findIndex(p=>Number(p?.id)===droppedId);
+    if(dropIndex>=0){
+      removedPlayer=roster.splice(dropIndex,1)[0];
+    }
+  }
   roster.push(playerToAdd);
   G.waiver=G.waiver.filter(p=>Number(p.id)!==targetId);
-  if(droppedPlayer) G.waiver.unshift({...droppedPlayer});
-  G.starters[D.myPos]=buildBestLineupIdsForRoster(G.rosters[D.myPos],G.day);
+  if(removedPlayer) G.waiver.unshift({...removedPlayer});
+  normalizeCpuTeamLineups(targetTeam);
   logActivity(
     'waiver',
-    'Waiver move',
-    droppedPlayer
-      ? (teamName(D.myPos)+' added '+playerToAdd.name+' and dropped '+droppedPlayer.name+'.')
-      : (teamName(D.myPos)+' added '+playerToAdd.name+' into an open roster spot.'),
-    D.myPos,
-    '??'
+    opts.activityTitle || 'Waiver move',
+    removedPlayer
+      ? (teamName(targetTeam)+' added '+playerToAdd.name+' and dropped '+removedPlayer.name+'.')
+      : (teamName(targetTeam)+' added '+playerToAdd.name+' into an open roster spot.'),
+    targetTeam,
+    opts.activityIcon || '📥'
   );
-  queueSharedSeasonSave('waiver_move');
-  toast(droppedPlayer?('Claimed '+playerToAdd.name+', dropped '+droppedPlayer.name):('Claimed '+playerToAdd.name));
+  if(opts.save!==false) queueSharedSeasonSave(opts.saveReason || 'waiver_move');
+  if(opts.toast!==false) toast(removedPlayer?('Claimed '+playerToAdd.name+', dropped '+removedPlayer.name):('Claimed '+playerToAdd.name));
   return true;
+}
+
+function claimWaiverPlayerToTeam(playerToAdd,droppedPlayer=null){
+  return claimWaiverPlayerForTeam(D?.myPos??0, playerToAdd, droppedPlayer, {
+    toast:true,
+    save:true,
+    saveReason:'waiver_move',
+    activityTitle:'Waiver move',
+    activityIcon:'📥'
+  });
 }
 
 function getWaiverColumns(){
@@ -4636,6 +4846,8 @@ function initSeason(){
   console.log('? All G properties initialized');
   console.log('?? Final G state:', G);
   
+  const cpuMaintenanceSummary=maintainCpuLeagueRosters({ day:G.day||1 });
+
   ensurePowerupState();
   
   // Only roll powerups and log activity for fresh seasons
@@ -4672,6 +4884,9 @@ function initSeason(){
   }
 
   console.log('? initSeason() completed successfully');
+  if(cpuMaintenanceSummary?.changed){
+    queueSharedSeasonSave('cpu_roster_bootstrap', 150);
+  }
 }
 
 function refreshSeasonPlayerUniverse(){
@@ -4737,6 +4952,7 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
   G.day++;
   const previousWeek=G.week;
   syncCalendarFromDay();
+  maintainCpuLeagueRosters({ day:G.day||1 });
   if(G.week!==previousWeek){
     const drop=rollWeeklyPowerupDrops(G.week);
     const dropNames=drop.drops.map(id=>POWERUP_LIBRARY[id].name).join(', ');
@@ -4917,7 +5133,8 @@ function renderHub(){
   document.getElementById('hubFormat').textContent=CS?.format||'Standard';
   document.getElementById('hubScoringType').textContent=CS?.scoringType||'Head to Head Points';
   document.getElementById('hubTeamCount').textContent=(D.teams?.length||0)||10;
-  document.getElementById('hubWeek').textContent='Wk '+G.week+'/'+G.totalWeeks+' | Day '+G.day;
+  const hubCycleMeta=document.getElementById('hubCycleMeta');
+  if(hubCycleMeta) hubCycleMeta.textContent='Wk '+G.week+'/'+G.totalWeeks+' · Day '+G.day;
   document.getElementById('hubRec').textContent=(myS?.w||0)+'-'+(myS?.l||0)+' | '+(myS?.pf||0).toFixed(1)+' PF | '+(myS?.pa||0).toFixed(1)+' PA';
   if(dataStampEl){
     if(statsThroughDate){
