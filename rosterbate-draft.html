@@ -51,7 +51,9 @@
   body{padding-top:0;}
   .screen{display:none;position:relative;z-index:1;flex-direction:column;height:calc(100dvh - var(--rb-nav-height));margin-top:var(--rb-nav-height);overflow:hidden;}
   .screen.active{display:flex;}
-  body[data-draft-boot="loading"] .screen.active{display:none !important;}
+  body[data-draft-boot="loading"] #lobby{display:flex !important;}
+  body[data-draft-boot="loading"] #draft,
+  body[data-draft-boot="loading"] #draftComplete{display:none !important;}
 
   /* LOBBY */
   #lobby{background:linear-gradient(160deg,#0d1220 0%,#0a0e1a 60%);align-items:center;padding:14px 14px 30px;gap:12px;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;}
@@ -480,7 +482,7 @@
     position:relative;
     overflow:hidden;
     display:grid;
-    grid-template-columns:minmax(0,1.08fr) minmax(116px,.22fr) minmax(520px,1.1fr);
+    grid-template-columns:minmax(0,1.08fr) minmax(180px,.34fr) minmax(116px,.22fr) minmax(420px,.9fr);
     gap:10px;
     align-items:center;
     min-height:92px;
@@ -502,7 +504,13 @@
   .pick-signal.live{border-color:rgba(77,224,164,.24);background:linear-gradient(145deg, rgba(12,34,24,.96), rgba(7,19,15,.98));}
   .pick-signal.alert{border-color:rgba(255,138,43,.28);background:linear-gradient(145deg, rgba(49,25,14,.96), rgba(19,11,8,.99));}
   .pick-signal.done{border-color:rgba(126,200,255,.24);background:linear-gradient(145deg, rgba(15,30,49,.96), rgba(9,15,24,.99));}
-  .pick-signal-main,.pick-signal-side{min-width:0;}
+  .pick-signal-main,.pick-signal-side,.pick-signal-fit-wrap{min-width:0;}
+  .pick-signal-fit-wrap{
+    padding-left:10px;
+    border-left:1px solid rgba(255,255,255,.1);
+    align-self:stretch;
+    display:flex;
+  }
   .pick-signal-side{
     padding-left:10px;
     border-left:1px solid rgba(255,255,255,.1);
@@ -510,7 +518,7 @@
   .pick-signal-deck{
     min-width:0;
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:8px;
     padding-left:10px;
     border-left:1px solid rgba(255,255,255,.1);
@@ -630,25 +638,28 @@
     flex-direction:column;
     overflow:hidden;
   }
+  .pick-signal-fit-wrap .draft-focus-card,
   .pick-signal-deck .trade-spotlight,
   .draft-side-stack .trade-spotlight,
   .player-intel-rail .trade-spotlight{
     min-height:0;
-    padding:10px 11px;
-    gap:8px;
+    padding:12px 13px;
+    gap:10px;
     border-radius:14px;
   }
+  .pick-signal-fit-wrap .draft-focus-headline,
   .pick-signal-deck .trade-spotlight-headline,
   .draft-side-stack .trade-spotlight-headline,
   .player-intel-rail .trade-spotlight-headline{
-    font-size:17px;
+    font-size:21px;
     white-space:normal;
   }
   .pick-signal-deck .trade-spotlight-text,
+  .pick-signal-fit-wrap .draft-focus-meta,
   .draft-side-stack .trade-spotlight-text,
   .player-intel-rail .trade-spotlight-text{
-    font-size:9px;
-    line-height:1.35;
+    font-size:11px;
+    line-height:1.5;
     display:-webkit-box;
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
@@ -660,11 +671,13 @@
     gap:6px;
     justify-content:flex-start;
   }
+  .pick-signal-fit-wrap .draft-focus-action,
   .pick-signal-deck .decision-action,
   .draft-side-stack .decision-action,
   .player-intel-rail .decision-action{
-    padding:5px 8px;
-    font-size:9px;
+    min-height:26px;
+    padding:7px 10px;
+    font-size:11px;
   }
   .draft-main{
     flex:1 1 auto;
@@ -714,6 +727,9 @@
   .decision-strip-headline{margin-top:4px;font-family:var(--fd);font-size:20px;font-weight:600;line-height:.92;letter-spacing:.04em;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .decision-strip-copy{margin-top:4px;font-size:10px;line-height:1.4;color:#d2dceb;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
   .decision-strip-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  #playerDecisionChip{order:1;}
+  #playerDecisionMeta{order:2;}
+  #playerDecisionAction{order:3;}
   .decision-chip{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.22);background:rgba(10,15,24,.55);font-family:var(--fd);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#e2e8f0;white-space:nowrap;}
   .decision-chip.live{border-color:rgba(74,222,128,.34);background:rgba(22,101,52,.22);color:#86efac;}
   .decision-chip.alert{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.2);color:#fdba74;}
@@ -742,54 +758,62 @@
   .draft-focus-headline{width:100%;margin-top:1px;font-family:var(--fd);font-size:18px;font-weight:600;line-height:.92;letter-spacing:.04em;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .draft-focus-meta{width:100%;font-size:11px;line-height:1.45;color:#d2dceb;min-height:32px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .draft-focus-action{margin-top:auto;display:inline-flex;align-items:center;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(9,13,20,.5);font-family:var(--fd);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#e5edf8;white-space:nowrap;}
+  .pick-signal-fit-wrap .draft-focus-card,
   .pick-signal-deck .draft-focus-card,
   .draft-side-stack .draft-focus-card,
   .player-intel-rail .draft-focus-card{
-    min-height:78px;
-    padding:9px 10px;
-    gap:3px;
+    min-height:94px;
+    padding:11px 12px;
+    gap:5px;
     border-radius:13px;
   }
+  .pick-signal-fit-wrap .draft-focus-headline,
   .pick-signal-deck .draft-focus-headline,
   .draft-side-stack .draft-focus-headline,
   .player-intel-rail .draft-focus-headline{
-    font-size:14px;
+    font-size:18px;
   }
+  .pick-signal-fit-wrap .draft-focus-meta,
   .pick-signal-deck .draft-focus-meta,
   .draft-side-stack .draft-focus-meta,
   .player-intel-rail .draft-focus-meta{
     min-height:0;
-    font-size:9px;
-    line-height:1.35;
+    font-size:11px;
+    line-height:1.5;
   }
+  .pick-signal-fit-wrap .draft-focus-action,
   .pick-signal-deck .draft-focus-action,
   .draft-side-stack .draft-focus-action,
   .player-intel-rail .draft-focus-action{
-    padding:4px 7px;
-    font-size:8px;
+    min-height:26px;
+    padding:6px 10px;
+    font-size:11px;
+  }
+  .pick-signal-fit-wrap .draft-focus-card{
+    width:100%;
   }
   .pick-signal-deck .trade-spotlight,
   .pick-signal-deck .draft-focus-card{
-    min-height:76px;
-    padding:9px 10px;
-    gap:4px;
+    min-height:98px;
+    padding:11px 12px;
+    gap:6px;
   }
   .pick-signal-deck .trade-spotlight-headline,
   .pick-signal-deck .draft-focus-headline{
-    font-size:13px;
-    line-height:1;
+    font-size:19px;
+    line-height:1.05;
   }
   .pick-signal-deck .trade-spotlight-text,
   .pick-signal-deck .draft-focus-meta{
-    font-size:9px;
-    line-height:1.3;
+    font-size:11px;
+    line-height:1.5;
     -webkit-line-clamp:2;
   }
   .pick-signal-deck .decision-chip,
   .pick-signal-deck .draft-focus-action{
-    min-height:22px;
-    padding:0 7px;
-    font-size:8px;
+    min-height:28px;
+    padding:0 10px;
+    font-size:11px;
   }
   .pl{flex:1 1 0;height:0;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .pr{position:relative;display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid rgba(35,48,68,.52);gap:12px;cursor:pointer;transition:background .14s ease,transform .14s ease;}
@@ -919,9 +943,9 @@
     .trade-spotlight{min-height:0;}
     .players-board-shell{grid-template-columns:1fr;}
     .pick-signal{
-      grid-template-columns:minmax(0,1fr) minmax(100px,.22fr) minmax(420px,1fr);
+      grid-template-columns:minmax(0,1fr) minmax(180px,.34fr) minmax(100px,.22fr) minmax(300px,.72fr);
     }
-    .pick-signal-deck{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .pick-signal-deck{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
   @media (max-width: 900px){
     #draft{overflow-y:auto;}
@@ -941,7 +965,7 @@
     .mi{min-height:60px;padding:10px;}
     .mv{font-size:20px;}
     .pick-signal{grid-template-columns:1fr;}
-    .pick-signal-side,.pick-signal-deck,.signal-pulse{padding-left:0;border-left:none;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);}
+    .pick-signal-fit-wrap,.pick-signal-side,.pick-signal-deck,.signal-pulse{padding-left:0;border-left:none;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);}
     .pick-signal-deck{grid-template-columns:1fr;}
     .pick-signal{min-height:0;padding:14px 15px;}
     .pick-signal-headline{font-size:clamp(24px,8vw,34px);}
@@ -1017,14 +1041,15 @@
     .pick-signal{
       min-height:0;
       padding:14px 15px;
-      grid-template-columns:minmax(0,1fr) minmax(0,.55fr) minmax(360px,1fr);
+      grid-template-columns:minmax(0,1fr) minmax(180px,.42fr) minmax(110px,.24fr) minmax(280px,.78fr);
       gap:12px;
     }
     .pick-signal-headline{font-size:clamp(18px,2.6vw,24px);}
     .pick-signal-copy{font-size:11px;line-height:1.45;}
     .pick-signal-side-value{font-size:17px;}
+    .pick-signal-fit-wrap .draft-focus-card,
     .pick-signal-deck .trade-spotlight,
-    .pick-signal-deck .draft-focus-card{min-height:68px;}
+    .pick-signal-deck .draft-focus-card{min-height:88px;}
     .pick-signal-tag{padding:8px 11px;font-size:12px;}
     .tbar{margin-top:12px;}
     .draft-layout{
@@ -1054,40 +1079,49 @@
   }
   @media (max-height: 880px) and (max-width: 900px){
     .pick-signal{grid-template-columns:1fr;}
-    .pick-signal-side,.pick-signal-deck,.signal-pulse{padding-left:0;border-left:none;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);}
+    .pick-signal-fit-wrap,.pick-signal-side,.pick-signal-deck,.signal-pulse{padding-left:0;border-left:none;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);}
   }
 
   /* TRADE MODAL */
-  .tro{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:120;align-items:flex-end;justify-content:center;}
+  .tro{display:none;position:fixed;inset:0;background:linear-gradient(180deg, rgba(3,6,12,.72), rgba(2,4,8,.88));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:120;align-items:flex-end;justify-content:center;padding:10px 12px 0;}
   .tro.open{display:flex;}
-  .trs{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 40px;width:100%;max-width:500px;border-top:1px solid var(--border);animation:su .2s ease;max-height:85dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .tr-title{font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
-  .tr-sub{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.5;}
-  .tr-teams{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
-  .tr-team-btn{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:all .15s;text-align:left;}
-  .tr-team-btn:active{background:rgba(249,115,22,.08);}
-  .tr-team-btn.selected{border-color:var(--accent);background:rgba(249,115,22,.08);}
-  .tr-team-btn.disabled{opacity:.35;pointer-events:none;}
-  .tr-team-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+  .trs{position:relative;background:
+      radial-gradient(circle at top right, rgba(126,200,255,.12), transparent 28%),
+      radial-gradient(circle at top left, rgba(255,138,43,.12), transparent 32%),
+      linear-gradient(180deg, rgba(14,20,30,.98), rgba(8,12,19,.995));
+    border-radius:24px 24px 0 0;padding:10px 12px 14px;width:100%;max-width:620px;border:1px solid rgba(110,130,160,.24);border-bottom:none;box-shadow:0 -28px 64px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);animation:su .2s ease;max-height:calc(100dvh - 10px);overflow:hidden;}
+  .tro .mh{display:none;}
+  .trs::before{content:'';display:block;width:38px;height:4px;border-radius:999px;background:rgba(148,163,184,.45);margin:0 auto 8px;box-shadow:0 1px 0 rgba(255,255,255,.08) inset;}
+  .tr-title{font-family:var(--fd);font-size:20px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px;color:#f8fafc;line-height:.94;}
+  .tr-sub{font-size:10px;color:#aebed2;margin-bottom:8px;line-height:1.35;max-width:62ch;}
+  .tr-sub strong{color:#f8fafc;font-family:var(--fd);font-weight:600;letter-spacing:.04em;}
+  .tr-teams{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;}
+  .tr-team-btn{display:flex;align-items:center;gap:9px;background:linear-gradient(180deg, rgba(16,24,39,.94), rgba(10,15,24,.99));border:1px solid rgba(65,85,115,.46);border-radius:13px;padding:7px 9px;cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,background .15s ease;text-align:left;color:var(--text);}
+  .tr-team-btn:hover{transform:translateY(-1px);border-color:rgba(126,200,255,.34);box-shadow:0 18px 28px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.04);}
+  .tr-team-btn:active{background:linear-gradient(180deg, rgba(24,32,48,.98), rgba(12,18,28,.99));}
+  .tr-team-btn.selected{border-color:rgba(255,138,43,.55);background:linear-gradient(180deg, rgba(53,29,16,.98), rgba(22,14,11,.99));box-shadow:0 20px 30px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.05);}
+  .tr-team-btn.disabled{opacity:.35;pointer-events:none;filter:saturate(.7);}
+  .tr-team-av{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:12px;font-weight:600;color:#fff;flex-shrink:0;box-shadow:0 8px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.18);}
   .tr-team-info{flex:1;min-width:0;}
-  .tr-team-name{font-family:var(--fd);font-size:15px;font-weight:700;}
-  .tr-team-pick{font-size:11px;color:var(--text2);margin-top:2px;}
-  .tr-check{font-size:18px;opacity:0;transition:opacity .15s;}
+  .tr-team-name{font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:.03em;line-height:.95;color:#f3f7fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tr-team-pick{font-size:9px;color:#b8c7d8;margin-top:2px;line-height:1.25;}
+  .tr-check{font-size:16px;opacity:0;transition:opacity .15s;color:#ffd29f;}
   .tr-team-btn.selected .tr-check{opacity:1;}
-  .tr-preview{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:none;}
+  .tr-preview{background:linear-gradient(180deg, rgba(11,17,27,.96), rgba(8,12,18,.99));border:1px solid rgba(110,130,160,.22);border-radius:14px;padding:8px 9px;margin-bottom:8px;display:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
   .tr-preview.show{display:block;}
-  .tr-preview-title{font-family:var(--fd);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
-  .tr-swap-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+  .tr-preview-title{font-family:var(--fd);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:6px;}
+  .tr-swap-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
   .tr-swap-row:last-child{margin-bottom:0;}
-  .tr-swap-pill{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:var(--fd);font-size:13px;font-weight:700;flex:1;text-align:center;}
-  .tr-swap-pill.gain{border-color:rgba(34,197,94,.4);color:#4ade80;background:rgba(34,197,94,.07);}
-  .tr-swap-pill.lose{border-color:rgba(239,68,68,.3);color:#f87171;background:rgba(239,68,68,.06);}
-  .tr-arrow{font-size:14px;color:var(--text3);flex-shrink:0;}
-  .tr-swap-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:5px;font-family:var(--fd);font-weight:700;}
-  .tr-btn-row{display:flex;gap:8px;}
-  .tr-confirm{flex:1;background:var(--green);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;transition:opacity .15s;}
-  .tr-confirm:disabled{opacity:.35;cursor:not-allowed;}
-  .tr-cancel{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
+  .tr-swap-pill{background:linear-gradient(180deg, rgba(16,24,39,.94), rgba(10,15,24,.99));border:1px solid rgba(110,130,160,.2);border-radius:10px;padding:5px 7px;font-family:var(--fd);font-size:11px;font-weight:600;flex:1;text-align:center;color:#eef4fb;}
+  .tr-swap-pill.gain{border-color:rgba(34,197,94,.34);color:#86efac;background:linear-gradient(180deg, rgba(15,52,34,.94), rgba(10,28,20,.98));}
+  .tr-swap-pill.lose{border-color:rgba(239,68,68,.26);color:#fca5a5;background:linear-gradient(180deg, rgba(59,24,24,.94), rgba(28,14,14,.98));}
+  .tr-arrow{font-size:12px;color:#8aa1bf;flex-shrink:0;}
+  .tr-swap-label{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#7f95b2;margin-bottom:3px;font-family:var(--fd);font-weight:600;}
+  .tr-btn-row{display:flex;gap:7px;}
+  .tr-confirm{flex:1;background:linear-gradient(180deg,var(--green),#18b874);border:none;border-radius:12px;padding:10px 11px;font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fff;cursor:pointer;transition:opacity .15s,transform .15s ease,filter .15s ease;box-shadow:0 18px 28px rgba(24,184,116,.22), inset 0 1px 0 rgba(255,255,255,.18);}
+  .tr-confirm:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.03);}
+  .tr-confirm:disabled{opacity:.35;cursor:not-allowed;box-shadow:none;}
+  .tr-cancel{background:rgba(8,12,18,.72);border:1px solid rgba(110,130,160,.24);border-radius:12px;padding:10px 12px;font-family:var(--fd);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#d6e0ed;cursor:pointer;}
   .trade-btn,.auto-btn,.pause-btn,.sim-btn{background:rgba(6,10,16,.58);border:1px solid rgba(110,130,160,.24);border-radius:12px;padding:0 12px;min-height:34px;font-family:var(--fd);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:#d2dceb;cursor:pointer;flex-shrink:0;transition:transform .15s ease,border-color .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
   .trade-btn:hover,.auto-btn:hover,.pause-btn:hover,.sim-btn:hover{transform:translateY(-1px);}
   .trade-btn{background:rgba(94,84,200,.16);border-color:rgba(129,140,248,.3);color:#d8d2ff;}
@@ -1438,6 +1472,14 @@
           <div class="pick-signal-headline" id="pickSignalHeadline">Draft Room Ready</div>
           <div class="pick-signal-copy" id="pickSignalCopy">Browse the board, watch the timer, and set your queue before the draft goes live.</div>
         </div>
+        <div class="pick-signal-fit-wrap">
+          <button type="button" class="draft-focus-card fit watch" id="focusCardFit" onclick="handleDraftFocusCard('fit')">
+            <div class="draft-focus-kicker" id="focusFitKicker">Best Fit</div>
+            <div class="draft-focus-headline" id="focusFitHeadline">Board loading</div>
+            <div class="draft-focus-meta" id="focusFitMeta">Your cleanest roster fit will surface here once the board is live.</div>
+            <div class="draft-focus-action" id="focusFitAction">Browse Players</div>
+          </button>
+        </div>
         <div class="pick-signal-side">
           <div class="pick-signal-side-label" id="pickSignalSideLabel">Next Up</div>
           <div class="pick-signal-side-value" id="pickSignalSideValue">Your room</div>
@@ -1454,12 +1496,6 @@
               <button class="decision-action secondary" id="tradeSpotlightAction" onclick="openTradeModal()">Open Pick Swap Desk</button>
             </div>
           </div>
-          <button type="button" class="draft-focus-card fit watch" id="focusCardFit" onclick="handleDraftFocusCard('fit')">
-            <div class="draft-focus-kicker" id="focusFitKicker">Best Fit</div>
-            <div class="draft-focus-headline" id="focusFitHeadline">Board loading</div>
-            <div class="draft-focus-meta" id="focusFitMeta">Your cleanest roster fit will surface here once the board is live.</div>
-            <div class="draft-focus-action" id="focusFitAction">Browse Players</div>
-          </button>
           <button type="button" class="draft-focus-card queue" id="focusCardQueue" onclick="handleDraftFocusCard('queue')">
             <div class="draft-focus-kicker" id="focusQueueKicker">Queue Lead</div>
             <div class="draft-focus-headline" id="focusQueueHeadline">Queue is empty</div>
@@ -1549,15 +1585,6 @@
           <div class="rb-chat-title">League Chat</div>
           <div class="rb-chat-online" id="rbOnlineCount">10 online</div>
         </div>
-      </div>
-
-      <div class="rb-chat-pulse">
-        <div class="rb-chat-pulse-copy">
-          <div class="rb-chat-pulse-kicker" id="rbChatPulseKicker">Draft Room Lane</div>
-          <div class="rb-chat-pulse-title" id="rbChatPulseTitle">Keep the room moving</div>
-          <div class="rb-chat-pulse-text" id="rbChatPulseText">Use chat for live board reads, quick trade pressure, and clear next-pick reactions.</div>
-        </div>
-        <button class="rb-chat-pulse-action" id="rbChatPulseAction" onclick="rbFocusInput()">Message League</button>
       </div>
 
       <div class="rb-chat-tabs">
@@ -1665,13 +1692,13 @@
         <div class="tr-arrow">⇄</div>
         <div class="tr-swap-pill gain" id="trYouGet">You get: —</div>
       </div>
-      <div class="tr-swap-label" style="margin-top:10px">No Compensation Picks</div>
+      <div class="tr-swap-label" style="margin-top:6px">No Compensation Picks</div>
       <div class="tr-swap-row">
         <div class="tr-swap-pill gain" id="trCompGet">No extra picks exchanged</div>
         <div class="tr-arrow">⇄</div>
         <div class="tr-swap-pill lose" id="trCompGive">Snake draft keeps this clean</div>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:10px;line-height:1.5" id="trSummary"></div>
+      <div style="font-size:9px;color:var(--text3);margin-top:6px;line-height:1.35" id="trSummary"></div>
     </div>
     <div class="tr-btn-row">
       <button class="tr-cancel" onclick="closeTradeModal()">Cancel</button>
@@ -4994,6 +5021,26 @@ function clearPendingPickTradePrompt(){
   if(modal) modal.style.display='none';
 }
 
+function closeOpenTradeLayers(){
+  let closed=false;
+  const tradeModal=document.getElementById('tradeModal');
+  if(tradeModal?.classList.contains('open')){
+    closeTradeModal();
+    closed=true;
+  }
+  const requestModal=document.getElementById('pickTradeRequestModal');
+  if(requestModal && requestModal.style.display!=='none' && requestModal.style.display!==''){
+    requestModal.style.display='none';
+    closed=true;
+  }
+  const legacyTradeModal=document.getElementById('tradeModal2');
+  if(legacyTradeModal && legacyTradeModal.style.display!=='none' && legacyTradeModal.style.display!==''){
+    legacyTradeModal.style.display='none';
+    closed=true;
+  }
+  return closed;
+}
+
 function canApplyPendingPickTrade(trade){
   if(!trade) return false;
   const fromIdx=Number(trade.fromPickIdx);
@@ -6730,12 +6777,11 @@ async function startYourSeason(){
 .rb-chat-title{font-family:var(--fd);font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:.92;flex:1;}
 .rb-chat-online{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-family:var(--fd);font-weight:500;letter-spacing:.12em;text-transform:uppercase;}
 .rb-chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-.rb-chat-pulse{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 8px 8px;padding:10px;border:1px solid rgba(255,138,43,.22);border-radius:15px;background:linear-gradient(135deg,rgba(255,138,43,.16),rgba(126,200,255,.08));box-shadow:0 14px 22px rgba(0,0,0,.14);}
+.rb-chat-pulse{display:flex;align-items:flex-start;justify-content:flex-start;gap:8px;margin:0 8px 8px;padding:10px;border:1px solid rgba(255,138,43,.22);border-radius:15px;background:linear-gradient(135deg,rgba(255,138,43,.16),rgba(126,200,255,.08));box-shadow:0 14px 22px rgba(0,0,0,.14);}
 .rb-chat-pulse-copy{display:flex;flex-direction:column;gap:3px;min-width:0;}
 .rb-chat-pulse-kicker{font-family:var(--fd);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#ffd9b3;}
 .rb-chat-pulse-title{font-family:var(--fd);font-size:18px;font-weight:600;letter-spacing:.04em;line-height:.92;color:var(--text);}
 .rb-chat-pulse-text{font-size:10px;line-height:1.35;color:#dce6f4;}
-.rb-chat-pulse-action{flex:none;padding:7px 10px;border-radius:11px;border:1px solid rgba(255,196,136,.24);background:linear-gradient(180deg,var(--accent),#cf5d10);color:#fff;font-family:var(--fd);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;box-shadow:0 12px 20px rgba(255,138,43,.16),inset 0 1px 0 rgba(255,255,255,.16);}
 
 /* Tab bar */
 .rb-chat-tabs{display:flex;gap:6px;border-bottom:1px solid rgba(45,63,92,.42);flex-shrink:0;padding:0 8px 0;}
@@ -6974,8 +7020,7 @@ function rbUpdateChatPulse(){
   const kicker=document.getElementById('rbChatPulseKicker');
   const title=document.getElementById('rbChatPulseTitle');
   const text=document.getElementById('rbChatPulseText');
-  const action=document.getElementById('rbChatPulseAction');
-  if(!kicker || !title || !text || !action) return;
+  if(!kicker || !title || !text) return;
 
   const msgs=rbFilteredMsgs();
   const unseen=rbHasExtendedDraftChat() && (rbActiveTab==='trades' || rbActiveTab==='trash') ? rbCountUnseenByTag(rbActiveTab) : 0;
@@ -6983,27 +7028,23 @@ function rbUpdateChatPulse(){
     draft:{
       kicker:'Draft Room Lane',
       title:msgs.length ? 'Board reads are live' : 'Open the room conversation',
-      text:msgs.length ? 'Use this lane for live player reactions, nomination pressure, and quick fallback calls before the next pick flips.' : 'Start the room chatter with a board read, player callout, or quick temperature check before the draft speeds up.',
-      action:'Message League'
+      text:msgs.length ? 'Use this lane for live player reactions, nomination pressure, and quick fallback calls before the next pick flips.' : 'Start the room chatter with a board read, player callout, or quick temperature check before the draft speeds up.'
     },
     trades:{
       kicker:'Trade Lane',
       title:msgs.length ? 'Trade chatter is moving' : 'Open trade talk',
-      text:msgs.length ? 'Keep offers, counters, and commissioner-level nudges in one place so managers can act fast.' : 'Use this tab for clean offer talk, swap ideas, and fast yes-no follow-ups without cluttering the main room.',
-      action:'Talk Trades'
+      text:msgs.length ? 'Keep offers, counters, and commissioner-level nudges in one place so managers can act fast.' : 'Use this tab for clean offer talk, swap ideas, and fast yes-no follow-ups without cluttering the main room.'
     },
     trash:{
       kicker:'Trash Talk Lane',
       title:msgs.length ? 'Energy is up' : 'Break the ice',
-      text:msgs.length ? 'Keep the heat fun and readable while the board stays active.' : 'A little personality helps the room feel alive. Start light and keep the board fun without drowning out actual picks.',
-      action:'Stir The Room'
+      text:msgs.length ? 'Keep the heat fun and readable while the board stays active.' : 'A little personality helps the room feel alive. Start light and keep the board fun without drowning out actual picks.'
     }
   };
   const cfg=configs[rbActiveTab] || configs.draft;
   kicker.textContent=cfg.kicker;
   title.textContent=unseen>0 ? unseen + ' unread message' + (unseen===1 ? '' : 's') : cfg.title;
   text.textContent=unseen>0 ? 'There is fresh league chat waiting in this lane. Catch up quickly, then jump back to the board.' : cfg.text;
-  action.textContent=cfg.action;
 }
 
 function rbRefreshChatKey(){
@@ -7637,6 +7678,9 @@ function rbEnsureChatListenerActive() {
 // Post system message on load
 (async function(){
   try{
+    document.getElementById('lobby')?.classList.add('active');
+    document.getElementById('draft')?.classList.remove('active');
+    document.getElementById('draftComplete')?.classList.remove('active');
     await ensureRosterbatePools();
     applySportToDraftUI();
     applyDraftRoomShellEnhancements();
@@ -7677,6 +7721,12 @@ function rbEnsureChatListenerActive() {
       }
       if(!e.target.closest('#rbGifPicker')&&!e.target.closest('.rb-tool-btn[onclick*="Gif"]')){
         document.getElementById('rbGifPicker')?.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key!=='Escape') return;
+      if(closeOpenTradeLayers()){
+        e.preventDefault();
       }
     });
 
