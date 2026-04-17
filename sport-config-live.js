@@ -119,8 +119,9 @@
     const configs = {
       nba: {
         icon: '🏀',
-        label: 'NBA',
-        leagueLabel: 'NBA',
+        label: 'Basketball',
+        shortLabel: 'BKB',
+        leagueLabel: 'Basketball',
         defaultLeagueSize: 10,
         defaultRounds: 15,
         defaultScoring: 'h2h_pts',
@@ -141,8 +142,9 @@
       },
       nfl: {
         icon: '🏈',
-        label: 'NFL',
-        leagueLabel: 'NFL',
+        label: 'Football',
+        shortLabel: 'FTB',
+        leagueLabel: 'Football',
         defaultLeagueSize: 10,
         defaultRounds: 17,
         defaultScoring: 'h2h_pts',
@@ -161,8 +163,9 @@
       },
       mlb: {
         icon: '⚾',
-        label: 'MLB',
-        leagueLabel: 'MLB',
+        label: 'Baseball',
+        shortLabel: 'BSB',
+        leagueLabel: 'Baseball',
         defaultLeagueSize: 10,
         defaultRounds: 16,
         defaultScoring: 'h2h_cat',

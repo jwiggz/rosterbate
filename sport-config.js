@@ -56,7 +56,7 @@
 
   const SPORT_CONFIG = {
     nba:{
-      key:'nba',label:'NBA',icon:'\u{1F3C0}',leagueLabel:'Pro Hoops Season',defaultLeagueSize:10,defaultRounds:13,defaultScoring:'h2h_cat',defaultFormat:'snake',timer:90,playerCount:240,
+      key:'nba',label:'Basketball',shortLabel:'BKB',icon:'\u{1F3C0}',leagueLabel:'Pro Basketball Season',defaultLeagueSize:10,defaultRounds:13,defaultScoring:'h2h_cat',defaultFormat:'snake',timer:90,playerCount:240,
       filters:['ALL','PG','SG','SF','PF','C'],waiverPositions:['ALL','PG','SG','SF','PF','C'],
       starterSlots:['PG','SG','SF','PF','C','G','F','UTIL'],myTeamSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','IR'],
       commissionerScoringType:'H2H Points',
@@ -64,7 +64,7 @@ scoringInfo:{h2h_cat:'Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK
       teamCodes:['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS']
     },
     nfl:{
-      key:'nfl',label:'NFL',icon:'\u{1F3C8}',leagueLabel:'Pro Football Season',defaultLeagueSize:12,defaultRounds:16,defaultScoring:'h2h_pts',defaultFormat:'snake',timer:90,playerCount:300,
+      key:'nfl',label:'Football',shortLabel:'FTB',icon:'\u{1F3C8}',leagueLabel:'Pro Football Season',defaultLeagueSize:12,defaultRounds:16,defaultScoring:'h2h_pts',defaultFormat:'snake',timer:90,playerCount:300,
       filters:['ALL','QB','RB','WR','TE','K','DST'],waiverPositions:['ALL','QB','RB','WR','TE','K','DST'],
       starterSlots:['QB','RB','RB','WR','WR','TE','FLEX','K','DST'],myTeamSlots:['QB','RB','RB','WR','WR','TE','FLEX','K','DST','BN','BN','BN','BN','BN','BN','BN','BN','BN'],
       commissionerScoringType:'H2H Points',
@@ -72,7 +72,7 @@ scoringInfo:{h2h_cat:'Standard NFL leagues use points scoring. Category play is 
       teamCodes:['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LV','LAC','LAR','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS']
     },
     mlb:{
-      key:'mlb',label:'MLB',icon:'\u{26BE}',leagueLabel:'Pro Baseball Season',defaultLeagueSize:10,defaultRounds:20,defaultScoring:'points',defaultFormat:'snake',timer:90,playerCount:320,
+      key:'mlb',label:'Baseball',shortLabel:'BSB',icon:'\u{26BE}',leagueLabel:'Pro Baseball Season',defaultLeagueSize:10,defaultRounds:20,defaultScoring:'points',defaultFormat:'snake',timer:90,playerCount:320,
       filters:['ALL','C','1B','2B','3B','SS','OF','P','SP','RP'],waiverPositions:['ALL','C','1B','2B','3B','SS','OF','P','SP','RP'],
       starterSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P'],myTeamSlots:['C','1B','2B','3B','SS','OF','OF','OF','UTIL','P','P','P','P','P','P','BN','BN','BN','IL','IL','IL'],
       commissionerScoringType:'Points',
