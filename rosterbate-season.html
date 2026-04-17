@@ -14,6 +14,15 @@
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <script src="global-nav.js" defer></script>
+<script>
+try{
+  const params=new URLSearchParams(window.location.search || '');
+  const requestedLeague=(params.get('league')||'').trim();
+  if(requestedLeague && requestedLeague!=='demo'){
+    document.documentElement.dataset.seasonRoute='league';
+  }
+}catch(e){}
+</script>
 <style>
 :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#223145;--accent:#ff8a2b;--green:#4de0a4;--red:#ef4444;--gold:#f7c76a;--text:#f7f4ee;--text2:#b6c4d6;--text3:#6b7c93;--fd:'Teko',sans-serif;--fb:'IBM Plex Sans',sans-serif;--hub-landing-image:none;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -24,6 +33,7 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .screen{display:none;flex-direction:column;height:calc(100dvh - var(--rb-nav-height));margin-top:var(--rb-nav-height);overflow:hidden;}
 .screen.active{display:flex;}
+html[data-season-route="league"] #seasonEmptyActions{display:none !important;}
 body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .ph{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;display:flex;align-items:center;gap:10px;}
 .ph{display:none !important;}
@@ -498,24 +508,25 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-card-pad{padding:18px;}
 .season-table-wrap{overflow-x:auto;overflow-y:hidden;}
 .season-data-table{width:100%;border-collapse:collapse;min-width:920px;background:#121a29;}
-.season-data-table th{padding:8px 10px;background:#182235;border-bottom:1px solid #24324a;font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;text-align:left;white-space:nowrap;}
-.season-data-table td{padding:9px 10px;border-bottom:1px solid #1d283b;font-size:12px;color:#dbe4f0;vertical-align:middle;background:#121a29;}
+.season-data-table th{padding:8px 8px;background:#182235;border-bottom:1px solid #24324a;font-family:var(--fb);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;text-align:left;white-space:nowrap;}
+.season-data-table td{padding:9px 8px;border-bottom:1px solid #1d283b;font-size:12px;color:#dbe4f0;vertical-align:middle;background:#121a29;}
 .season-data-table tr:hover td{background:#182235;}
-.season-roster-table{table-layout:fixed;width:auto;min-width:0;}
-.season-roster-table th:nth-child(1),.season-roster-table td:nth-child(1){width:70px;}
-.season-roster-table th:nth-child(2),.season-roster-table td:nth-child(2){width:240px;}
-.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:150px;text-align:center;}
-.season-roster-table th:nth-child(4),.season-roster-table td:nth-child(4){width:76px;}
-.season-roster-table th:nth-child(5),.season-roster-table td:nth-child(5){width:86px;}
+.season-roster-table{table-layout:fixed;width:100% !important;min-width:0 !important;}
+.season-roster-table th:nth-child(1),.season-roster-table td:nth-child(1){width:56px;}
+.season-roster-table th:nth-child(2),.season-roster-table td:nth-child(2){width:210px;}
+.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:96px;text-align:center;}
+.season-roster-table th:nth-child(4),.season-roster-table td:nth-child(4){width:64px;}
+.season-roster-table th:nth-child(5),.season-roster-table td:nth-child(5){width:72px;}
 .season-roster-table th:nth-child(6),.season-roster-table td:nth-child(6){width:86px;}
-.season-roster-table th:nth-child(7),.season-roster-table td:nth-child(7){width:74px;text-align:right;}
-.season-roster-table .stat-col{width:60px;text-align:right;}
+.season-roster-table th:nth-child(7),.season-roster-table td:nth-child(7){width:60px;text-align:right;}
+.season-roster-table .stat-col{width:46px;text-align:right;}
 .season-roster-table .stat-head{color:#cbd5e1;text-align:right;}
 .season-fp-val{font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);}
 .season-roster-table td:nth-child(2) .season-player-wrap{min-width:0;max-width:100%;}
 .season-roster-table td:nth-child(2) .season-player-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .season-roster-table td:nth-child(3),.season-roster-table th:nth-child(3){padding-left:8px;padding-right:8px;text-align:center;}
 .season-roster-table td:nth-child(3) .lineup-move-btn{margin-left:auto;margin-right:auto;}
+.season-roster-table .season-soft-muted.compact-player-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .season-chip-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(126,200,255,.26);border-radius:999px;background:rgba(8,12,18,.68);color:#cfe6ff;padding:10px 18px;font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;}
 .season-chip-link.solid{background:linear-gradient(180deg,var(--accent),#cf5d10);border-color:rgba(255,196,136,.24);color:#fff;}
 .season-mini-tabs{display:flex;gap:26px;border-bottom:1px solid #24324a;padding:0 18px;}
@@ -1844,6 +1855,7 @@ function getRequestedLeagueId(){
 }
 
 function setSeasonEmptyState(mode){
+  document.documentElement.removeAttribute('data-season-route');
   const emptyScreen=document.getElementById('noData');
   const title=document.getElementById('seasonEmptyTitle');
   const copy=document.getElementById('seasonEmptyCopy');
@@ -1880,6 +1892,7 @@ function setSeasonEmptyState(mode){
 }
 
 function hideSeasonEmptyState(){
+  document.documentElement.removeAttribute('data-season-route');
   document.body.dataset.seasonBoot='idle';
   const emptyScreen=document.getElementById('noData');
   if(emptyScreen) emptyScreen.classList.remove('active');
@@ -6501,11 +6514,11 @@ function renderRoster(){
       return `<tr>
         <td${rowCellAttr}>${entry.slot}</td>
         <td${rowCellAttr}>
-          <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;max-width:100%;">
             <div class="pav" style="background:#1f2937;width:34px;height:34px;font-size:12px;color:#94a3b8;">—</div>
             <div class="season-player-wrap" style="min-width:0;">
               <div style="font-weight:700;color:#94a3b8;">Empty ${entry.slot} slot</div>
-              <div class="season-soft-muted">${entry.isIL?'Stash an injured player here to open an active roster spot.':'Choose an eligible player from your bench or IL to fill this spot.'}</div>
+              <div class="season-soft-muted compact-player-meta">${entry.isIL?'Stash an injured player here to open an active roster spot.':'Choose an eligible player from your bench or IL to fill this spot.'}</div>
             </div>
           </div>
         </td>
@@ -6577,11 +6590,11 @@ function renderRoster(){
     return `<tr>
       <td${rowCellAttr}>${entry.slot}</td>
       <td${rowCellAttr}>
-        <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;max-width:100%;">
           ${renderTeamInitialAvatar(p.name,p.team,34)}
           <div class="season-player-wrap" style="min-width:0;">
             <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-            <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+            <div class="season-soft-muted compact-player-meta">${p.team} ${p.pos}</div>
           </div>
         </div>
       </td>
@@ -6655,21 +6668,21 @@ function renderRoster(){
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div>
             <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${CURRENT_SPORT==='mlb'?'Batters':'Starters'}</div></div>
-            <table class="season-data-table season-roster-table" style="width:${812 + (CURRENT_SPORT==='mlb'?battingCols.length:statCols.length)*60}px;min-width:${812 + (CURRENT_SPORT==='mlb'?battingCols.length:statCols.length)*60}px;">
+            <table class="season-data-table season-roster-table">
               <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${(CURRENT_SPORT==='mlb'?battingCols:statCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
               <tbody>${starterRowsHtml || `<tr><td colspan="${7+(CURRENT_SPORT==='mlb'?battingCols.length:statCols.length)}" style="text-align:center;color:#6b7280;">No starters found.</td></tr>`}</tbody>
             </table>
           </div>
           <div>
             <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Reserves / IL</div></div>
-            <table class="season-data-table season-roster-table" style="width:${812 + (CURRENT_SPORT==='mlb'?Math.max(battingCols.length,pitchingCols.length):statCols.length)*60}px;min-width:${812 + (CURRENT_SPORT==='mlb'?Math.max(battingCols.length,pitchingCols.length):statCols.length)*60}px;">
+            <table class="season-data-table season-roster-table">
               <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${(CURRENT_SPORT==='mlb'?(isPitcherPlayer(movePlayer)?pitchingCols:battingCols):statCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
               <tbody>${reserveRows || `<tr><td colspan="${7+(CURRENT_SPORT==='mlb'?Math.max(battingCols.length,pitchingCols.length):statCols.length)}" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}</tbody>
             </table>
           </div>
           ${CURRENT_SPORT==='mlb' ? `<div>
             <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Pitchers</div></div>
-            <table class="season-data-table season-roster-table" style="width:${812 + pitchingCols.length*60}px;min-width:${812 + pitchingCols.length*60}px;">
+            <table class="season-data-table season-roster-table">
               <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${pitchingCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
               <tbody>${pitcherRows || `<tr><td colspan="${7+pitchingCols.length}" style="text-align:center;color:#6b7280;">No pitchers found.</td></tr>`}</tbody>
             </table>

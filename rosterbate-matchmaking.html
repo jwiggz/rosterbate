@@ -144,6 +144,11 @@ body.mm-create-shimmer-ready .schedule-action::after{
   border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 28px rgba(0,0,0,.18);}
 .lobby-card:hover{border-color:rgba(247,164,87,.3);}
 .mm-hero{padding:18px 18px 16px;}
+.mm-hero-shell{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(320px,.76fr);gap:14px;align-items:stretch;}
+.mm-hero-shell .mm-hero{height:100%;}
+.mm-hero-side{padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;}
+.mm-hero-side .mm-side-list{margin-top:12px;}
+.mm-hero-side .mm-side-actions{margin-top:12px;}
 .mm-hero-title{font-family:var(--fd);font-size:34px;font-weight:900;line-height:.92;text-transform:uppercase;letter-spacing:.4px;color:#f8fafc;}
 .mm-hero-title .accent{color:#f4a34d;}
 .mm-hero-sub{margin-top:8px;font-size:13px;line-height:1.7;color:#c7d3e4;max-width:720px;}
@@ -152,6 +157,44 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .mm-hero-pill.accent{border-color:rgba(247,164,87,.38);color:#ffd6a2;background:rgba(56,33,18,.5);}
 .mm-grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-items:start;}
 .mm-stack{display:flex;flex-direction:column;gap:14px;}
+.mm-browse-floor{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(320px,.78fr);gap:14px;align-items:start;}
+.mm-browse-shell{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(300px,.78fr);gap:14px;align-items:start;}
+.mm-open-board{padding:14px 16px 12px;}
+.mm-open-board-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.mm-open-board-title{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;line-height:.94;color:#f8fafc;}
+.mm-open-board-copy{margin-top:4px;font-size:12px;line-height:1.52;color:#c2d0e2;max-width:700px;}
+.mm-filter-rack{display:grid;grid-template-columns:minmax(0,.38fr) minmax(0,1.62fr);gap:8px 12px;margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:
+  radial-gradient(80% 120% at 10% 0%,rgba(247,164,87,.12),transparent 52%),
+  linear-gradient(180deg,rgba(26,38,58,.82),rgba(11,17,28,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.mm-filter-row{display:grid;grid-template-columns:74px minmax(0,1fr);gap:8px;align-items:center;}
+.mm-filter-row .ct{margin:0;padding-top:0;}
+.mm-filter-row .chips{gap:6px;}
+.mm-filter-row .chip{padding:7px 10px;min-width:38px;text-align:center;}
+.mm-open-board-list{margin-top:8px;display:grid;gap:10px;}
+.mm-open-board-list .empty{padding:16px 12px;}
+.mm-open-board-list .empty-icon{font-size:22px;margin-bottom:4px;}
+.mm-open-board-list .empty-title{font-size:13px;margin-bottom:3px;}
+.mm-open-board-list .empty-desc{font-size:10px;line-height:1.45;}
+.mm-open-board-actions{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.mm-open-board-actions .btn-s{width:min(100%,240px);padding:12px 18px;}
+.mm-open-board-actions .mm-inline-secondary,.mm-open-board-actions .mm-inline-primary{min-width:152px;text-align:center;text-decoration:none;}
+.mm-side-card{padding:14px 16px;}
+.mm-dashboard-card{align-self:end;}
+.mm-side-title{font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;line-height:1;color:#f8fafc;}
+.mm-side-copy{margin-top:6px;font-size:12px;color:#9fb1c8;line-height:1.65;}
+.mm-side-list{display:grid;gap:10px;margin-top:14px;}
+.mm-side-item{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));}
+.mm-side-step{width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:rgba(249,115,22,.16);border:1px solid rgba(249,115,22,.32);font-family:var(--fd);font-size:12px;font-weight:900;color:#ffd39b;box-shadow:0 8px 18px rgba(0,0,0,.16);}
+.mm-side-item-title{font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;color:#f8fafc;line-height:1.05;}
+.mm-side-item-copy{margin-top:4px;font-size:12px;color:#9fb1c8;line-height:1.55;}
+.mm-side-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.mm-side-actions .mm-inline-secondary,.mm-side-actions .mm-inline-primary{min-width:148px;text-align:center;text-decoration:none;}
+.mm-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
+.mm-dashboard-stat{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 11px;background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.mm-dashboard-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1;color:#f8fafc;}
+.mm-dashboard-label{margin-top:6px;font-size:11px;color:#8fa0b8;text-transform:uppercase;letter-spacing:.65px;}
+.mm-dashboard-note{margin-top:10px;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));font-size:11px;color:#aab7c9;line-height:1.5;}
+.mm-browse-chat-wide{grid-column:1 / -1;margin-top:-2px;}
 .mm-section-label{font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#97abc6;margin-bottom:10px;}
 .mm-note{font-size:12px;color:var(--text2);line-height:1.65;}
 .mm-empty-icon{width:46px;height:46px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(70,102,164,.2),rgba(15,24,39,.92));border:1px solid rgba(247,164,87,.26);font-family:var(--fd);font-size:18px;font-weight:900;color:#ffd29b;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 22px rgba(0,0,0,.16);}
@@ -258,6 +301,12 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .global-chat-text{font-size:13px;color:var(--text);line-height:1.55;word-break:break-word;}
 .global-chat-compose{display:flex;gap:8px;align-items:stretch;margin-top:12px;}
 .global-chat-input{min-height:48px;height:48px;max-height:48px;resize:none;overflow-y:auto;padding-top:12px;padding-bottom:12px;}
+.global-chat.global-chat-wide{min-height:0;}
+.global-chat.global-chat-wide .global-chat-feed{min-height:170px;max-height:210px;}
+.global-chat.global-chat-wide .empty{padding:18px 14px;}
+.global-chat.global-chat-wide .empty-icon{font-size:30px;margin-bottom:6px;}
+.global-chat.global-chat-wide .empty-title{font-size:14px;margin-bottom:4px;}
+.global-chat.global-chat-wide .empty-desc{font-size:11px;line-height:1.45;}
 .advbox{margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,.5);}
 .advtitle{font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
 .advsub{font-size:11px;color:var(--text3);margin-top:3px;}
@@ -312,13 +361,21 @@ body.mm-create-shimmer-ready .schedule-action::after{
   .inline-pos-grid{grid-template-columns:1fr;}
   .scoregrid{grid-template-columns:1fr;}
   .schedule-top-row{grid-template-columns:1fr;}
+  .mm-hero-shell{grid-template-columns:1fr;}
   .mm-grid-2{grid-template-columns:1fr;}
+  .mm-browse-floor{grid-template-columns:1fr;}
+  .mm-browse-shell{grid-template-columns:1fr;}
+  .mm-filter-rack{grid-template-columns:1fr;}
+  .mm-filter-row{grid-template-columns:1fr;}
+  .mm-dashboard-grid{grid-template-columns:1fr;}
   .wr-top-grid{grid-template-columns:1fr;}
   .wr-info-grid{grid-template-columns:1fr;}
   .wr-guidance-grid{grid-template-columns:1fr;}
 }
 @media (max-width: 640px){
   .rules-left{grid-template-columns:1fr;}
+  .mm-open-board{padding:16px 14px 14px;}
+  .mm-open-board-title{font-size:24px;}
 }
 
 /* RosterBate Home Header */
@@ -351,10 +408,10 @@ body.mm-create-shimmer-ready .schedule-action::after{
     <div id="mmOnline" style="margin-left:auto;font-family:var(--fd);font-size:11px;font-weight:700;color:var(--green);">connecting...</div>
   </div>
   <div class="mm-tabs">
-    <button class="mm-tab on" onclick="mmTab('create',this)">+ Create</button>
-    <button class="mm-tab" onclick="mmTab('browse',this)">Browse</button>
-    <button class="mm-tab" onclick="mmTab('live',this)">Live Drafts</button>
-    <button class="mm-tab" onclick="mmTab('private',this)">League Code</button>
+    <button class="mm-tab on" data-mm-tab="browse" onclick="mmTab('browse',this)">Browse</button>
+    <button class="mm-tab" data-mm-tab="create" onclick="mmTab('create',this)">+ Create</button>
+    <button class="mm-tab" data-mm-tab="live" onclick="mmTab('live',this)">Live Drafts</button>
+    <button class="mm-tab" data-mm-tab="private" onclick="mmTab('private',this)">League Code</button>
   </div>
   <div class="sb" id="mmTabContent"></div>
 </div>
@@ -604,9 +661,13 @@ const browseFilters = { format:null, teamSize:null };
 
 // â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function mmTab(tab, btn){
+  const targetBtn = btn || document.querySelector(`.mm-tab[data-mm-tab="${tab}"]`);
   document.querySelectorAll('.mm-tab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
+  if(targetBtn) targetBtn.classList.add('on');
   ({live:renderLive, browse:renderBrowse, create:renderCreate, private:renderPrivate})[tab]?.();
+}
+function mmActivateTab(tab){
+  mmTab(tab);
 }
 function mmSportName(){
   return ({nba:'Basketball',nfl:'Football',mlb:'Baseball'})[normalizeRosterbateSport(MM_SPORT)] || 'Fantasy';
@@ -617,6 +678,30 @@ function mmHeroCard(title, subtitle, pills=[]){
       <div class="mm-hero-title">${title}</div>
       <div class="mm-hero-sub">${subtitle}</div>
       ${pills.length ? `<div class="mm-hero-pills">${pills.map(p=>`<span class="mm-hero-pill${p.accent?' accent':''}">${p.label}</span>`).join('')}</div>` : ''}
+    </div>
+  `;
+}
+function matchmakingDashboardShell(){
+  return `
+    <div class="card mm-side-card mm-dashboard-card">
+      <div class="mm-section-label">Live Dashboard</div>
+      <div class="mm-side-title">Matchmaking Snapshot</div>
+      <div class="mm-side-copy">A compact read on who is on the floor, who is already drafting, and how many active managers are still shopping open rooms.</div>
+      <div class="mm-dashboard-grid">
+        <div class="mm-dashboard-stat">
+          <div class="mm-dashboard-value" id="mmDashOnline">--</div>
+          <div class="mm-dashboard-label">Online Users</div>
+        </div>
+        <div class="mm-dashboard-stat">
+          <div class="mm-dashboard-value" id="mmDashDrafting">--</div>
+          <div class="mm-dashboard-label">Currently Drafting</div>
+        </div>
+        <div class="mm-dashboard-stat">
+          <div class="mm-dashboard-value" id="mmDashFloor">--</div>
+          <div class="mm-dashboard-label">In Matchmaking</div>
+        </div>
+      </div>
+      <div class="mm-dashboard-note" id="mmDashNote">Refreshing the live floor snapshot...</div>
     </div>
   `;
 }
@@ -1765,6 +1850,8 @@ async function loadLiveDrafts(){
   try{
     const snap=await db.ref('lobbies').once('value');
     if(!snap.exists()){ list.innerHTML=emptyHtml('No live drafts','When one of your leagues starts, it will appear here.'); return; }
+    const now=Date.now();
+    const TWO_HOURS=2*60*60*1000;
     const live=[];
     const seenIds=new Set();
     const tasks=[];
@@ -1773,10 +1860,18 @@ async function loadLiveDrafts(){
       if((lobby.sport||MM_SPORT)!==MM_SPORT) return;
       tasks.push(ensureScheduledLobbyState(c.key,lobby).then(next=>{
         const target={id:c.key,...(next||lobby)};
-        if(isCompletedOrStaleLobby(target)) return;
-        const isJoined=!!(target.players||{})[myId];
-        const isVisibleStatus=['draft_room_open','started'].includes(target.status)
-          || (isJoined && ['scheduled','waiting'].includes(target.status));
+        const count=teamCount(target);
+        if(isCompletedOrStaleLobby(target)){
+          db.ref('lobbies/'+c.key).remove().catch(()=>{});
+          return;
+        }
+        if(count===0 || (!isScheduledLobby(target) && Number(target.createdAt||0) && now-Number(target.createdAt||0)>TWO_HOURS)){
+          db.ref('lobbies/'+c.key).remove().catch(()=>{});
+          return;
+        }
+        const isJoined=!!getLobbySelfPlayerId(target);
+        if(!isJoined) return;
+        const isVisibleStatus=['draft_room_open','started','scheduled','waiting'].includes(String(target.status||''));
         if(isVisibleStatus && !seenIds.has(target.id)){
           seenIds.add(target.id);
           live.push(target);
@@ -1844,72 +1939,58 @@ async function resumeLiveDraft(lobbyId){
 // â”€â”€ BROWSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderBrowse(){
   document.getElementById('mmTabContent').innerHTML=`
-    ${mmHeroCard(`Browse <span class="accent">${mmSportName()}</span> Leagues`,'Search the open room board by format and team size, jump into public rooms, or refresh for a cleaner look at what is forming right now.',[
-      {label:'Open Rooms'},
-      {label:'Format Filters'},
-      {label:'Join Fast',accent:true}
-    ])}
-    <div class="mm-grid-2">
-      <div class="mm-stack">
-        <div class="card">
-          <div class="mm-section-label">Filter The Board</div>
-          <div class="ct">Filter by Format</div>
-          <div class="chips">
-            <div class="chip filter-active" onclick="setBrowseFilter('format',null,this)">Any</div>
-            <div class="chip" onclick="setBrowseFilter('format','snake',this)">Snake</div>
-            <div class="chip" onclick="setBrowseFilter('format','auction',this)">Auction</div>
-          </div>
-          <div class="ct" style="margin-top:10px;">Filter by Size</div>
-          <div class="chips">
-            <div class="chip filter-active" onclick="setBrowseFilter('teamSize',null,this)">Any</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',2,this)">2</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',3,this)">3</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',4,this)">4</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',5,this)">5</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',6,this)">6</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',7,this)">7</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',8,this)">8</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',9,this)">9</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',10,this)">10</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',11,this)">11</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',12,this)">12</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',13,this)">13</div>
-            <div class="chip" onclick="setBrowseFilter('teamSize',14,this)">14</div>
+    <div class="mm-browse-floor">
+      <div class="card mm-open-board">
+        <div class="mm-open-board-head">
+          <div>
+            <div class="mm-section-label">Now Forming</div>
+            <div class="mm-open-board-title">Open Leagues</div>
+            <div class="mm-open-board-copy">Open leagues are the main event here. Scan what is filling now, filter the board fast, and jump straight into the rooms that already have momentum.</div>
           </div>
         </div>
-        <div class="card mm-meta-card">
-          <div class="mm-meta-title">Open Leagues</div>
-          <div class="mm-meta-copy">Public rooms stay here until they fill, lock for a scheduled start, or go stale.</div>
-        </div>
-        <div class="card mm-meta-card">
-          <div class="mm-meta-title">Featured Ways To Play</div>
-          <div class="mm-meta-copy">Keep the shelf tight: draft rooms, private-code lobbies, and mock-draft reps are the three clearest entry points on this screen.</div>
-          <div class="mm-flow-list">
-            <div class="mm-flow-item">
-              <div class="mm-flow-step">1</div>
-              <div><div class="mm-flow-head">Join Open Rooms</div><div class="mm-flow-copy">Use the board below when you want live availability, spots-left urgency, and quick public entry.</div></div>
-            </div>
-            <div class="mm-flow-item">
-              <div class="mm-flow-step">2</div>
-              <div><div class="mm-flow-head">Use A League Code</div><div class="mm-flow-copy">Jump to the private tab when a commissioner already shared the room and you just need the fastest possible entry.</div></div>
-            </div>
-            <div class="mm-flow-item">
-              <div class="mm-flow-step">3</div>
-              <div><div class="mm-flow-head">Run Draft Reps</div><div class="mm-flow-copy">Open a demo draft in the single-player board if you want to test format, timing, and the flow before your real room opens.</div></div>
+        <div class="mm-filter-rack">
+          <div class="mm-filter-row">
+            <div class="ct">Format</div>
+            <div class="chips">
+              <div class="chip filter-active" onclick="setBrowseFilter('format',null,this)">Any</div>
+              <div class="chip" onclick="setBrowseFilter('format','snake',this)">Snake</div>
+              <div class="chip" onclick="setBrowseFilter('format','auction',this)">Auction</div>
             </div>
           </div>
-          <div class="mm-inline-actions">
-            <a class="mm-inline-secondary" href="rosterbate-draft.html?sport=${MM_SPORT}" style="text-decoration:none;">Try A Demo Draft</a>
+          <div class="mm-filter-row">
+            <div class="ct">League Size</div>
+            <div class="chips">
+              <div class="chip filter-active" onclick="setBrowseFilter('teamSize',null,this)">Any</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',2,this)">2</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',3,this)">3</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',4,this)">4</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',5,this)">5</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',6,this)">6</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',7,this)">7</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',8,this)">8</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',9,this)">9</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',10,this)">10</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',11,this)">11</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',12,this)">12</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',13,this)">13</div>
+              <div class="chip" onclick="setBrowseFilter('teamSize',14,this)">14</div>
+            </div>
           </div>
         </div>
-        <div id="browseList"><div class="empty"><div class="mm-empty-icon">BR</div><div class="empty-title">Loading...</div></div></div>
-        <button class="btn-s" onclick="loadBrowse()">Refresh Open Leagues</button>
+        <div id="browseList" class="mm-open-board-list"><div class="empty"><div class="mm-empty-icon">BR</div><div class="empty-title">Loading...</div></div></div>
+        <div class="mm-open-board-actions">
+          <button class="mm-inline-secondary" type="button" onclick="mmActivateTab('private')">Use League Code</button>
+          <a class="mm-inline-primary" href="rosterbate-draft.html?sport=${MM_SPORT}">Try A Demo Draft</a>
+          <button class="btn-s" onclick="loadBrowse()">Refresh Open Leagues</button>
+        </div>
       </div>
-      <div class="mm-stack">
-        ${globalChatShell()}
+      ${matchmakingDashboardShell()}
+      <div class="mm-browse-chat-wide">
+        ${globalChatShell().replace('class="card global-chat"','class="card global-chat global-chat-wide"')}
       </div>
     </div>`;
   loadBrowse();
+  loadMatchmakingDashboard();
   attachGlobalChat();
 }
 
@@ -1957,6 +2038,19 @@ async function loadBrowse(){
     });
     if(tasks.length) await Promise.all(tasks);
 
+    results.sort((a,b)=>{
+      const joinableDelta=Number(canJoinLobbyNow(b))-Number(canJoinLobbyNow(a));
+      if(joinableDelta) return joinableDelta;
+      const occupancyA=teamCount(a)/Math.max(1,Number(a.teamSize||1));
+      const occupancyB=teamCount(b)/Math.max(1,Number(b.teamSize||1));
+      if(occupancyB!==occupancyA) return occupancyB-occupancyA;
+      const scheduledA=Number(a.scheduledStartAt||0);
+      const scheduledB=Number(b.scheduledStartAt||0);
+      if(scheduledA&&scheduledB&&scheduledA!==scheduledB) return scheduledA-scheduledB;
+      if(scheduledA!==scheduledB) return scheduledA?1:-1;
+      return (Number(b.createdAt||0)-Number(a.createdAt||0));
+    });
+
     if(!results.length){ list.innerHTML=emptyHtml('No open leagues','Try different filters or create a league!'); return; }
 
     list.innerHTML=results.map(l=>{
@@ -1999,6 +2093,59 @@ async function loadBrowse(){
 }
 
 function emptyHtml(title,desc){ return `<div class="empty"><div class="empty-icon">-</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`; }
+
+let mmDashboardRequestToken = 0;
+async function loadMatchmakingDashboard(){
+  const onlineEl=document.getElementById('mmDashOnline');
+  const draftingEl=document.getElementById('mmDashDrafting');
+  const floorEl=document.getElementById('mmDashFloor');
+  const noteEl=document.getElementById('mmDashNote');
+  if(!onlineEl || !draftingEl || !floorEl || !noteEl) return;
+  const token=++mmDashboardRequestToken;
+  try{
+    const [presenceSnap, lobbySnap] = await Promise.all([
+      db.ref('presence').once('value'),
+      db.ref('lobbies').once('value')
+    ]);
+    if(token!==mmDashboardRequestToken) return;
+    const now=Date.now();
+    const activePresenceIds=new Set();
+    if(presenceSnap.exists()){
+      presenceSnap.forEach(c=>{
+        const row=c.val()||{};
+        if(now-Number(row.ts||0)<30000) activePresenceIds.add(String(c.key));
+      });
+    }
+    const draftingPlayerIds=new Set();
+    let liveRoomCount=0;
+    if(lobbySnap.exists()){
+      lobbySnap.forEach(c=>{
+        const lobby={id:c.key,...(c.val()||{})};
+        if((lobby.sport||MM_SPORT)!==MM_SPORT) return;
+        if(isCompletedOrStaleLobby(lobby)) return;
+        const status=String(lobby.status||'');
+        if(['started','draft_room_open'].includes(status)){
+          liveRoomCount++;
+          Object.keys(lobby.players||{}).forEach(id=>draftingPlayerIds.add(String(id)));
+        }
+      });
+    }
+    const matchmakingOnlyCount=[...activePresenceIds].filter(id=>!draftingPlayerIds.has(id)).length;
+    onlineEl.textContent=String(activePresenceIds.size);
+    draftingEl.textContent=String(draftingPlayerIds.size);
+    floorEl.textContent=String(matchmakingOnlyCount);
+    noteEl.textContent=liveRoomCount
+      ? `${liveRoomCount} live room${liveRoomCount!==1?'s':''} open right now. Matchmaking counts reflect active users on this page who are not already in a draft room.`
+      : 'No live draft rooms are open right now. The floor count reflects active users still browsing and forming rooms here.';
+  }catch(e){
+    if(token!==mmDashboardRequestToken) return;
+    console.error('Failed to load matchmaking dashboard', e);
+    onlineEl.textContent='--';
+    draftingEl.textContent='--';
+    floorEl.textContent='--';
+    noteEl.textContent='Could not refresh the live floor snapshot right now.';
+  }
+}
 
 function getLeagueNamePlaceholder(){
   const placeholders = {
@@ -2841,6 +2988,7 @@ async function updatePresence(){
     const now=Date.now();let count=0;
     snap.forEach(c=>{ if(now-c.val().ts<30000) count++; });
     document.getElementById('mmOnline').textContent=count+' online';
+    if(document.getElementById('mmDashOnline')) loadMatchmakingDashboard();
   }catch(e){ document.getElementById('mmOnline').textContent='offline'; }
 }
 
@@ -2881,7 +3029,7 @@ syncMatchmakingIdentity().finally(async ()=>{
   }
   if(!restored){
     restoreMatchmakingBaseUrl();
-    renderCreate();
+    renderBrowse();
   }
 });
 applyMatchmakingTheme();
