@@ -616,6 +616,29 @@
   .trade-spotlight.live{border-color:rgba(196,181,253,.4);background:linear-gradient(155deg, rgba(52,28,94,.96), rgba(24,16,52,.99));}
   .trade-spotlight.alert{border-color:rgba(255,138,43,.3);background:linear-gradient(155deg, rgba(48,24,12,.96), rgba(24,13,9,.99));}
   .trade-spotlight.pending{border-color:rgba(126,200,255,.34);background:linear-gradient(155deg, rgba(17,31,52,.96), rgba(10,18,31,.99));}
+  .trade-spotlight.auction-muted{
+    border-color:rgba(110,130,160,.22);
+    background:linear-gradient(155deg, rgba(20,24,34,.92), rgba(10,13,20,.98));
+    box-shadow:0 18px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+    opacity:.72;
+    filter:saturate(.58);
+  }
+  .trade-spotlight.auction-muted::before{
+    background:
+      linear-gradient(120deg, rgba(255,255,255,.02), transparent 24%, transparent 78%, rgba(255,255,255,.01)),
+      radial-gradient(circle at top right, rgba(148,163,184,.08), transparent 34%);
+  }
+  .trade-spotlight.auction-muted .trade-spotlight-kicker,
+  .trade-spotlight.auction-muted .trade-spotlight-headline,
+  .trade-spotlight.auction-muted .trade-spotlight-text{
+    color:#c5d0df;
+  }
+  .trade-spotlight.auction-muted .decision-action{
+    border-color:rgba(110,130,160,.2);
+    color:#95a4bb;
+    background:rgba(18,24,34,.84);
+    cursor:not-allowed;
+  }
   .trade-spotlight-copy{flex:1;min-width:0;}
   .trade-spotlight-kicker{font-family:var(--fd);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#d6cbff;}
   .trade-spotlight-headline{margin-top:4px;font-family:var(--fd);font-size:24px;font-weight:600;line-height:.92;letter-spacing:.04em;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -969,6 +992,36 @@
   .ma{display:flex;gap:7px;}
   .bdc{flex:1;background:var(--accent);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:17px;font-weight:800;text-transform:uppercase;color:#fff;cursor:pointer;}
   .bcx{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px 14px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;}
+  .draft-celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:235;pointer-events:none;padding:24px;background:radial-gradient(circle at 50% 38%, rgba(249,115,22,.16), transparent 40%),rgba(6,10,16,.28);}
+  .draft-celebrate.open{display:flex;animation:draftCelebrateBackdrop .32s ease;}
+  @keyframes draftCelebrateBackdrop{from{opacity:0}to{opacity:1}}
+  .draft-celebrate-card{position:relative;width:min(540px,calc(100vw - 28px));background:
+    linear-gradient(140deg, rgba(16,23,38,.98), rgba(10,14,24,.99)),
+    linear-gradient(90deg, rgba(249,115,22,.15), rgba(59,130,246,.08));
+    border:1px solid rgba(255,188,125,.28);border-radius:28px;padding:20px 22px 18px;box-shadow:0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04) inset;overflow:hidden;pointer-events:auto;animation:draftCelebrateCard .42s cubic-bezier(.2,.8,.2,1);}
+  .draft-celebrate-card::before{content:'';position:absolute;inset:-22% -12% auto;height:72%;background:radial-gradient(circle, rgba(249,115,22,.22), transparent 62%);filter:blur(28px);pointer-events:none;}
+  .draft-celebrate-card::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg, transparent 0 12%, rgba(255,255,255,.05) 12% 14%, transparent 14% 84%, rgba(255,255,255,.05) 84% 86%, transparent 86%);mix-blend-mode:screen;opacity:.42;pointer-events:none;}
+  @keyframes draftCelebrateCard{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .draft-celebrate-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .draft-celebrate-kicker{font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#ffcf9e;}
+  .draft-celebrate-title{font-family:var(--fd);font-size:clamp(34px,7vw,54px);font-weight:700;line-height:.88;letter-spacing:.02em;color:#f8fafc;margin-top:6px;}
+  .draft-celebrate-sub{margin-top:8px;font-size:14px;line-height:1.6;color:#dbe6f5;max-width:380px;}
+  .draft-celebrate-badge{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(249,115,22,.34);background:rgba(154,52,18,.18);font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#ffd7af;white-space:nowrap;}
+  .draft-celebrate-body{display:grid;grid-template-columns:114px minmax(0,1fr);gap:16px;align-items:center;margin-top:18px;}
+  .draft-celebrate-avatar{width:104px;height:118px;display:block;position:relative;justify-self:center;}
+  .draft-celebrate-name{font-family:var(--fd);font-size:clamp(26px,6vw,38px);font-weight:700;line-height:.9;color:#f8fafc;}
+  .draft-celebrate-meta{margin-top:6px;font-size:13px;line-height:1.5;color:#c8d6ea;}
+  .draft-celebrate-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .draft-celebrate-chip{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 11px;border-radius:999px;border:1px solid rgba(110,130,160,.24);background:rgba(9,13,20,.58);font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#dce6f4;}
+  .draft-celebrate-chip.value{border-color:rgba(77,224,164,.3);background:rgba(22,101,52,.2);color:#b9ffd8;}
+  .draft-celebrate-chip.cost{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#ffd7af;}
+  .draft-celebrate-chip.rank{border-color:rgba(126,200,255,.28);background:rgba(30,64,175,.18);color:#d8edff;}
+  .draft-celebrate-note{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;line-height:1.6;color:#d6e1f1;}
+  @media (max-width: 640px){
+    .draft-celebrate-card{padding:18px 18px 16px;border-radius:24px;}
+    .draft-celebrate-body{grid-template-columns:1fr;justify-items:flex-start;}
+    .draft-celebrate-avatar{justify-self:flex-start;}
+  }
 
   /* AUCTION */
   .ao{display:none;position:fixed;right:calc(50% - 280px);bottom:22px;z-index:110;align-items:flex-end;justify-content:flex-end;pointer-events:none;}
@@ -1844,6 +1897,28 @@
   </div>
 </div>
 
+<div class="draft-celebrate" id="draftCelebrate" onclick="hideDraftPickCelebration()">
+  <div class="draft-celebrate-card" onclick="event.stopPropagation()">
+    <div class="draft-celebrate-top">
+      <div>
+        <div class="draft-celebrate-kicker" id="draftCelebrateKicker">Pick Secured</div>
+        <div class="draft-celebrate-title" id="draftCelebrateTitle">RosterBate</div>
+        <div class="draft-celebrate-sub" id="draftCelebrateSub">Your board just moved.</div>
+      </div>
+      <div class="draft-celebrate-badge" id="draftCelebrateBadge">Drafted</div>
+    </div>
+    <div class="draft-celebrate-body">
+      <div class="draft-celebrate-avatar rb-jersey-avatar" id="draftCelebrateAvatar"></div>
+      <div>
+        <div class="draft-celebrate-name" id="draftCelebrateName">Player Name</div>
+        <div class="draft-celebrate-meta" id="draftCelebrateMeta">TEAM · POS</div>
+        <div class="draft-celebrate-chips" id="draftCelebrateChips"></div>
+        <div class="draft-celebrate-note" id="draftCelebrateNote">Your roster just got stronger.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- VOTE BAR (shown to all when pause is requested but not yet passed) -->
 <div id="voteBar">
   <div class="vote-bar-top">
@@ -2352,8 +2427,7 @@ function getDraftModalChipTone(label){
   if(value.includes('fit')) return 'fit';
   return '';
 }
-function setDraftModalAvatar(p){
-  const el=document.getElementById('mAv');
+function renderDraftJerseyAvatar(el,p,fontSize='20px'){
   if(!el || !p) return;
   const palette=tpalette(p.team);
   const primary=palette.primary||tcolor(p.team)||'#334155';
@@ -2365,8 +2439,52 @@ function setDraftModalAvatar(p){
   el.style.setProperty('--jersey-secondary', secondary);
   el.style.setProperty('--jersey-ink', ink);
   el.style.setProperty('--jersey-shadow', shadow);
-  el.style.setProperty('--jersey-font', '20px');
+  el.style.setProperty('--jersey-font', fontSize);
   el.innerHTML=`<span class="rb-jersey-shell" aria-hidden="true"></span><span class="rb-jersey-letters">${initials(p.name)}</span><span class="rb-jersey-hem" aria-hidden="true"></span>`;
+}
+function setDraftModalAvatar(p){
+  renderDraftJerseyAvatar(document.getElementById('mAv'),p,'20px');
+}
+let draftCelebrateTimer=null;
+function hideDraftPickCelebration(){
+  if(draftCelebrateTimer){
+    clearTimeout(draftCelebrateTimer);
+    draftCelebrateTimer=null;
+  }
+  document.getElementById('draftCelebrate')?.classList.remove('open');
+}
+function showDraftPickCelebration(player,meta={}){
+  if(!player) return;
+  const overlay=document.getElementById('draftCelebrate');
+  if(!overlay) return;
+  if(draftCelebrateTimer){
+    clearTimeout(draftCelebrateTimer);
+    draftCelebrateTimer=null;
+  }
+  const pickNumber=Number.isFinite(meta.pickNumber) ? meta.pickNumber : (S.cur+1);
+  const mode=meta.mode==='auction' ? 'auction' : 'draft';
+  const cost=Math.max(0, Number(meta.cost||0));
+  document.getElementById('draftCelebrateKicker').textContent=mode==='auction' ? 'Auction Won' : 'Pick Secured';
+  document.getElementById('draftCelebrateTitle').textContent=mode==='auction' ? 'Board Closed' : 'Card Turned In';
+  document.getElementById('draftCelebrateSub').textContent=mode==='auction'
+    ? 'The room let the clock run out and the player is yours.'
+    : 'Your draft slot is locked and your room moves forward.';
+  document.getElementById('draftCelebrateBadge').textContent=mode==='auction' ? `Won For $${cost}` : `Pick #${pickNumber}`;
+  renderDraftJerseyAvatar(document.getElementById('draftCelebrateAvatar'),player,'28px');
+  document.getElementById('draftCelebrateName').textContent=player.name;
+  document.getElementById('draftCelebrateMeta').textContent=`${player.team} · ${player.pos} · Rank #${player.adp}`;
+  const chips=[
+    `<span class="draft-celebrate-chip value">${formatDraftModalStatValue(calcFP(player))} FP</span>`,
+    `<span class="draft-celebrate-chip rank">Best Fit: ${getStarterNeedDelta(S.myPos,player)>0?'Yes':'Board Value'}</span>`
+  ];
+  if(mode==='auction') chips.splice(1,0,`<span class="draft-celebrate-chip cost">$${cost}</span>`);
+  document.getElementById('draftCelebrateChips').innerHTML=chips.join('');
+  const note=mode==='auction'
+    ? `${player.name} is yours at $${cost}. The room never got past your number before the horn.`
+    : `${player.name} is locked into your build. Queue the next layer now before the board turns.`;
+  document.getElementById('draftCelebrateNote').textContent=note;
+  overlay.classList.add('open');
+  draftCelebrateTimer=setTimeout(()=>hideDraftPickCelebration(), 1900);
 }
 function getDraftModalRead(p){
   const topQueued=getTopQueuedPlayer();
@@ -4614,10 +4732,12 @@ function userPick(p){
   if(!S.started){ showToast('⏰ Draft hasn\'t started yet'); return; }
   if(PS.isPaused){ showToast('⏸ Draft is paused'); return; }
   if(S.drafted.has(p.id)||S.order[S.cur]!==S.myPos)return;
+  const pickNumber=S.cur+1;
   clearAutoDraftTurn();
   clearInterval(S.timerInt);
   document.getElementById('pModal').classList.remove('open');
   doPick(p,S.myPos);
+  showDraftPickCelebration(p,{mode:'draft',pickNumber});
   hideBanner();showToast('✅ '+p.name+' drafted!');
   rBoard();upHdr();rPlayers();rOtherTeams();
   setTimeout(advance,500);
@@ -4731,6 +4851,7 @@ function getAuctionSpendCapForTeam(ti){
 function getAuctionTargetPrice(p){
   if(!p) return 1;
   if(S.auctionTargets[p.id]) return S.auctionTargets[p.id];
+  const room=ensureAuctionRoomProfile();
   const topPlayer = PLAYERS[0];
   const topFp = Math.max(1, calcFP(topPlayer));
   const rank = Math.max(1, p.adp || (PLAYERS.findIndex(x=>x.id===p.id)+1) || 1);
@@ -4745,6 +4866,21 @@ function getAuctionTargetPrice(p){
     const hardCap = rank===2 ? 0.24 : rank<=5 ? 0.18 : rank<=12 ? 0.11 : 0.08;
     pct = Math.min(hardCap, Math.max(0.01, pct));
   }
+  let marketSoftness;
+  if(rank===1){
+    marketSoftness=0.97 + Math.random()*0.08;
+  }else if(rank<=8){
+    marketSoftness=0.88 + Math.random()*0.18;
+  }else if(rank<=30){
+    marketSoftness=0.74 + Math.random()*0.32;
+  }else if(rank<=90){
+    marketSoftness=0.62 + Math.random()*0.4;
+  }else{
+    marketSoftness=0.54 + Math.random()*0.44;
+  }
+  if(room.valueHunt>1.03 && rank>12) marketSoftness-=0.04;
+  if(room.heat>1.08 && rank<=12) marketSoftness+=0.04;
+  pct *= Math.max(0.5, Math.min(1.12, marketSoftness));
   const dollars = Math.max(1, Math.min(S.abud, Math.round(S.abud*pct)));
   S.auctionTargets[p.id]=dollars;
   return dollars;
@@ -4826,23 +4962,56 @@ function getAuctionCpuMaxBidForTeam(ti,player){
   return Math.max(1, Math.min(hardCap, Math.round(target)));
 }
 function buildAuctionCpuBidders(player){
+  const room=ensureAuctionRoomProfile();
+  const starTier=getAuctionStarTier(player);
   ensureAuctionCpuProfiles();
   return Array.from({length:S.ls},(_,ti)=>{
     if(ti===S.myPos) return null;
     const maxBid=getAuctionCpuMaxBidForTeam(ti,player);
     if(maxBid<1) return null;
     const profile=getAuctionCpuProfile(ti);
+    const slotsLeft=getAuctionRemainingSlotsForTeam(ti);
+    const valueEdge=Math.max(0, getAuctionPlayerValueSignal(player));
+    let softPct=starTier>=2 ? (0.9 + Math.random()*0.12) : starTier===1 ? (0.8 + Math.random()*0.18) : (0.64 + Math.random()*0.26);
+    if(profile.key==='budget_hawk') softPct-=0.08;
+    if(profile.key==='room_heater') softPct+=0.08;
+    if(profile.key==='star_hunter' && starTier>=2) softPct+=0.07;
+    if(profile.key==='closer' && slotsLeft<=Math.max(3, Math.round(S.rds*0.35))) softPct+=0.06;
+    if(valueEdge>=4 && slotsLeft<=Math.max(4, Math.round(S.rds*0.5))) softPct+=0.08*room.valueHunt;
+    if(room.heat>1.08 && starTier>=1) softPct+=0.05;
+    softPct=Math.max(0.52, Math.min(1, softPct));
+    const softCap=maxBid<=2 ? maxBid : Math.max(1, Math.min(maxBid, Math.round(maxBid*softPct)));
     return {
       teamIdx:ti,
       maxBid,
+      softCap,
       label:profile.label,
       aggression:profile.valueMult + profile.starOverpay + profile.jumpiness,
       jumpiness:profile.jumpiness
     };
-  }).filter(Boolean).sort((a,b)=>b.maxBid-a.maxBid || b.aggression-a.aggression);
+  }).filter(Boolean).sort((a,b)=>b.softCap-a.softCap || b.maxBid-a.maxBid || b.aggression-a.aggression);
+}
+function getAuctionBidCap(bidder,currentBid=0){
+  if(!bidder) return 0;
+  const baseCap=Math.max(1, Number(bidder.softCap||bidder.maxBid||0));
+  const ceiling=Math.max(baseCap, Number(bidder.maxBid||baseCap));
+  if(ceiling<=baseCap) return ceiling;
+  const roomHeat=S.selP ? getAuctionRoomHeat(S.selP,currentBid) : ensureAuctionRoomProfile().heat;
+  const starTier=getAuctionStarTier(S.selP);
+  const valueEdge=Math.max(0, getAuctionPlayerValueSignal(S.selP));
+  let stretchPct=0;
+  if(starTier>=2){
+    stretchPct=0.26 + bidder.jumpiness*0.35 + Math.max(0, roomHeat-1)*0.75;
+  }else if(valueEdge>=4){
+    stretchPct=0.1 + Math.max(0, bidder.aggression-1)*0.18;
+  }else if(roomHeat>=1.12 && bidder.aggression>1.06){
+    stretchPct=0.08 + bidder.jumpiness*0.18 + Math.max(0, roomHeat-1)*0.52;
+  }
+  const stretch=Math.max(0, Math.round((ceiling-baseCap) * Math.min(0.92, stretchPct)));
+  return Math.max(1, Math.min(ceiling, baseCap + stretch));
 }
 function chooseAuctionCpuWinner(player,minBid){
-  const bidders=buildAuctionCpuBidders(player).filter(b=>b.maxBid>=Math.max(1, Number(minBid||1)));
+  const bidders=buildAuctionCpuBidders(player).filter(b=>getAuctionBidCap(b,Math.max(0, Number(minBid||1)-1))>=Math.max(1, Number(minBid||1)));
   return bidders[0]?.teamIdx ?? -1;
 }
 function chooseAuctionCpuPlayer(av){
@@ -4894,9 +5063,10 @@ function chooseAuctionCpuPlayer(av){
 }
 function getAuctionActiveCpuBidders(minBid=1,excludeTeamIdx=-1){
   const bidders=Array.isArray(S.auc?.cpuBidders) ? S.auc.cpuBidders : [];
+  const currentBid=Math.max(0, minBid-1);
   return bidders
-    .filter(b=>b.teamIdx!==excludeTeamIdx && b.maxBid>=minBid)
-    .sort((a,b)=>b.maxBid-a.maxBid || b.aggression-a.aggression);
+    .filter(b=>b.teamIdx!==excludeTeamIdx && getAuctionBidCap(b,currentBid)>=minBid)
+    .sort((a,b)=>getAuctionBidCap(b,currentBid)-getAuctionBidCap(a,currentBid) || b.maxBid-a.maxBid || b.aggression-a.aggression);
 }
 function chooseAuctionCpuChallenger(minBid=1,excludeTeamIdx=-1){
   const candidates=getAuctionActiveCpuBidders(minBid,excludeTeamIdx);
@@ -4904,7 +5074,7 @@ function chooseAuctionCpuChallenger(minBid=1,excludeTeamIdx=-1){
   const roomHeat=S.selP ? getAuctionRoomHeat(S.selP, Number(S.auc?.currentBid||0)) : ensureAuctionRoomProfile().heat;
   const weighted=candidates.map((bidder,index)=>({
     bidder,
-    weight:Math.max(1,(bidder.maxBid-minBid+1)) * Math.max(0.75,bidder.aggression) * roomHeat * (index===0 ? (roomHeat>1.04 ? 1.22 : 1.08) : 1)
+    weight:Math.max(1,(getAuctionBidCap(bidder, Number(S.auc?.currentBid||0))-minBid+1)) * Math.max(0.75,bidder.aggression) * roomHeat * (index===0 ? (roomHeat>1.04 ? 1.22 : 1.08) : 1)
   }));
   const total=weighted.reduce((sum,row)=>sum+row.weight,0);
   let roll=Math.random()*total;
@@ -4933,8 +5103,9 @@ function nextCpuAuctionPush(currentBid,bidder,nextPressureBid=0,isOpening=false)
   const room=ensureAuctionRoomProfile();
   const starTier=getAuctionStarTier(S.selP);
   const minBid=isOpening ? 1 : Math.max(1, currentBid + getAuctionBidIncrement(currentBid));
-  if(isOpening) return Math.min(bidder.maxBid, getAuctionOpeningBid(bidder));
-  const gap=Math.max(1, bidder.maxBid-currentBid);
+  const bidCap=getAuctionBidCap(bidder,currentBid);
+  if(isOpening) return Math.min(bidCap, getAuctionOpeningBid(bidder));
+  const gap=Math.max(1, bidCap-currentBid);
   const increment=getAuctionBidIncrement(currentBid);
   const roomHeat=getAuctionRoomHeat(S.selP,currentBid);
   const activePressure=getAuctionActiveCpuBidders(minBid, bidder.teamIdx).length;
@@ -4943,12 +5114,12 @@ function nextCpuAuctionPush(currentBid,bidder,nextPressureBid=0,isOpening=false)
   if(gap > increment*11) steps += 1;
   if(starTier>=2 && roomHeat>1.02) steps += 1;
   if(activePressure>=2 && roomHeat>1.05) steps += 1;
-  if(currentBid >= bidder.maxBid*0.82 || gap <= increment*3) steps=1;
+  if(currentBid >= bidCap*0.82 || gap <= increment*3) steps=1;
   if(starTier===0 && roomHeat<0.96) steps=Math.min(steps,2);
   if(Math.random() < (0.18 + bidder.jumpiness*room.jumpiness)) steps += (gap > increment*4 ? 1 : 0);
   let desired=currentBid + (increment * steps);
   if(nextPressureBid>currentBid){
-    const pressured=Math.min(bidder.maxBid, nextPressureBid + getAuctionBidIncrement(nextPressureBid));
+    const pressured=Math.min(bidCap, nextPressureBid + getAuctionBidIncrement(nextPressureBid));
     desired=(starTier>=2 || roomHeat>1.06)
       ? Math.max(desired, pressured)
       : Math.max(minBid, Math.min(desired, pressured));
@@ -4956,7 +5127,7 @@ function nextCpuAuctionPush(currentBid,bidder,nextPressureBid=0,isOpening=false)
   if(gap <= increment*5 || Math.random() < Math.max(0.16, 0.42 - bidder.jumpiness)){
     desired=Math.max(minBid, Math.min(desired, currentBid + increment * (starTier>=2 && roomHeat>1.08 ? 2 : 1)));
   }
-  return Math.min(bidder.maxBid, Math.max(minBid, desired));
+  return Math.min(bidCap, Math.max(minBid, desired));
 }
 function setAuctionMarketCopy(copy){
   const market=document.getElementById('aMarket');
@@ -4968,15 +5139,16 @@ function buildAuctionMarketCopy(player,nominator,cpuBidders,currentBid=0,leaderT
     return nomName+' tossed '+player.name+' into the room. No CPU team wants to chase more than a $1 flyer.';
   }
   const liveTeams=cpuBidders
-    .filter(b=>b.maxBid>=Math.max(1,currentBid+getAuctionBidIncrement(currentBid||0)))
+    .filter(b=>getAuctionBidCap(b,currentBid)>=Math.max(1,currentBid+getAuctionBidIncrement(currentBid||0)))
     .slice(0,3)
     .map(b=>S.teams[b.teamIdx]||'CPU');
   const strongest=cpuBidders[0];
+  const strongestCap=getAuctionBidCap(strongest,currentBid);
   const leaderName=leaderType==='cpu' && leaderTeamIdx>=0 ? (S.teams[leaderTeamIdx]||'CPU') : (leaderType==='user'?'You':'');
   if(cpuBidders.length===1){
-    return nomName+' tossed '+player.name+' into the room. '+(S.teams[strongest.teamIdx]||'CPU')+' is the lone serious buyer, probably topping out near $'+strongest.maxBid+'.';
+    return nomName+' tossed '+player.name+' into the room. '+(S.teams[strongest.teamIdx]||'CPU')+' is the lone serious buyer, probably feeling comfortable around $'+strongestCap+'.';
   }
-  let copy=nomName+' tossed '+player.name+' into the room. Live pressure: '+liveTeams.join(', ')+'. Strongest ceiling looks around $'+strongest.maxBid+'.';
+  let copy=nomName+' tossed '+player.name+' into the room. Live pressure: '+liveTeams.join(', ')+'. Room comfort looks around $'+strongestCap+'.';
   if(leaderName){
     copy+=' Current high side: '+leaderName+'.';
   }
@@ -5055,7 +5227,10 @@ function queueAuctionCpuBid(isOpening=false){
 function resolveAuctionPassOutcome(){
   if(!S.auc || !S.selP) return null;
   const currentBid=Math.max(0, Number(S.auc.currentBid||0));
-  const cpuBidders=(Array.isArray(S.auc.cpuBidders)?S.auc.cpuBidders:[]).slice().sort((a,b)=>b.maxBid-a.maxBid || b.aggression-a.aggression);
+  const cpuBidders=(Array.isArray(S.auc.cpuBidders)?S.auc.cpuBidders:[])
+    .map(b=>({...b,bidCap:getAuctionBidCap(b,currentBid)}))
+    .slice()
+    .sort((a,b)=>b.bidCap-a.bidCap || b.maxBid-a.maxBid || b.aggression-a.aggression);
   const increment=getAuctionBidIncrement(currentBid);
   if(!cpuBidders.length){
     if(S.auc.leaderType==='user' && currentBid>0){
@@ -5067,33 +5242,33 @@ function resolveAuctionPassOutcome(){
     const winner=cpuBidders[0];
     const runner=cpuBidders[1]||null;
     const closeBid=runner
-      ? Math.min(winner.maxBid, Math.max(1, runner.maxBid + getAuctionBidIncrement(runner.maxBid)))
+      ? Math.min(winner.bidCap, Math.max(1, runner.bidCap + getAuctionBidIncrement(runner.bidCap)))
       : 1;
     return {winnerType:'cpu',teamIdx:winner.teamIdx,bid:Math.max(1, closeBid)};
   }
   if(S.auc.leaderType==='user'){
-    const challengers=cpuBidders.filter(b=>b.maxBid>=currentBid+increment);
+    const challengers=cpuBidders.filter(b=>b.bidCap>=currentBid+increment);
     if(!challengers.length){
       return {winnerType:'user',teamIdx:S.myPos,bid:currentBid};
     }
     const winner=challengers[0];
-    const runnerCap=Math.max(currentBid, challengers[1]?.maxBid || currentBid);
-    const closeBid=Math.min(winner.maxBid, Math.max(currentBid+increment, runnerCap + getAuctionBidIncrement(runnerCap)));
+    const runnerCap=Math.max(currentBid, challengers[1]?.bidCap || currentBid);
+    const closeBid=Math.min(winner.bidCap, Math.max(currentBid+increment, runnerCap + getAuctionBidIncrement(runnerCap)));
     return {winnerType:'cpu',teamIdx:winner.teamIdx,bid:Math.max(currentBid+increment, closeBid)};
   }
   const currentLeaderTeam=S.auc.leaderType==='cpu' ? Number(S.auc.leaderTeamIdx) : -1;
   const currentLeader=currentLeaderTeam>=0 ? cpuBidders.find(b=>b.teamIdx===currentLeaderTeam) : null;
-  const challengers=cpuBidders.filter(b=>b.teamIdx!==currentLeaderTeam && b.maxBid>=currentBid+increment);
+  const challengers=cpuBidders.filter(b=>b.teamIdx!==currentLeaderTeam && b.bidCap>=currentBid+increment);
   if(!challengers.length){
     if(currentLeader){
       return {winnerType:'cpu',teamIdx:currentLeader.teamIdx,bid:Math.max(1,currentBid)};
     }
     return {winnerType:'cpu',teamIdx:cpuBidders[0].teamIdx,bid:Math.max(1,currentBid)};
   }
-  const pool=[...(currentLeader?[currentLeader]:[]), ...challengers].sort((a,b)=>b.maxBid-a.maxBid || b.aggression-a.aggression);
+  const pool=[...(currentLeader?[currentLeader]:[]), ...challengers].sort((a,b)=>b.bidCap-a.bidCap || b.maxBid-a.maxBid || b.aggression-a.aggression);
   const winner=pool[0];
-  const runnerCap=Math.max(currentBid, pool[1]?.maxBid || currentBid);
-  const closeBid=Math.min(winner.maxBid, Math.max(currentBid+increment, runnerCap + getAuctionBidIncrement(runnerCap)));
+  const runnerCap=Math.max(currentBid, pool[1]?.bidCap || currentBid);
+  const closeBid=Math.min(winner.bidCap, Math.max(currentBid+increment, runnerCap + getAuctionBidIncrement(runnerCap)));
   return {winnerType:'cpu',teamIdx:winner.teamIdx,bid:Math.max(currentBid+increment, closeBid)};
 }
 function aucNext(){
@@ -5129,7 +5304,7 @@ function aucNext(){
 }
 function openAuc(p,nominator){
   const cpuBidders=buildAuctionCpuBidders(p);
-  const targetBid=cpuBidders[0]?.maxBid || 1;
+  const targetBid=cpuBidders[0] ? getAuctionBidCap(cpuBidders[0],0) : 1;
   S.auc={
     playerId:p.id,
     nominator,
@@ -5196,6 +5371,7 @@ function passAuction(){
   clearAuctionClock();
   document.getElementById('aModal').classList.remove('open');
   if(S.selP){
+    const auctionWinner=S.selP;
     let outcome=resolveAuctionPassOutcome();
     if(!outcome){
       if(S.auc?.nominator===S.myPos && S.myBudget>=1){
@@ -5206,14 +5382,15 @@ function passAuction(){
     }
     if(outcome?.winnerType==='user'){
       S.myBudget=Math.max(0,S.myBudget-Math.max(1,Number(outcome.bid||1)));
-      doPick(S.selP,S.myPos);
-      showToast('✅ '+S.selP.name+' — $'+Math.max(1,Number(outcome.bid||1))+'!');
+      doPick(auctionWinner,S.myPos);
+      showDraftPickCelebration(auctionWinner,{mode:'auction',cost:Math.max(1,Number(outcome.bid||1))});
+      showToast('✅ '+auctionWinner.name+' — $'+Math.max(1,Number(outcome.bid||1))+'!');
     }else if(outcome?.winnerType==='cpu' && outcome.teamIdx>=0){
       const cpuBudget=Math.max(0,S.cpuBuds[outcome.teamIdx]||0);
       const bid=Math.max(1, Math.min(Number(outcome.bid||1), cpuBudget||1));
       S.cpuBuds[outcome.teamIdx]=Math.max(0,cpuBudget-bid);
-      doPick(S.selP,outcome.teamIdx);
-      showToast('💰 '+(S.teams[outcome.teamIdx]||'CPU')+' closes '+S.selP.name+' at $'+bid+'.');
+      doPick(auctionWinner,outcome.teamIdx);
+      showToast('💰 '+(S.teams[outcome.teamIdx]||'CPU')+' closes '+auctionWinner.name+' at $'+bid+'.');
     }
   }
   S.auc=null;
@@ -5239,14 +5416,7 @@ function confAuction(){
   if(queueAuctionCpuBid(false)){
     return;
   }
-  document.getElementById('aModal').classList.remove('open');
-  clearAuctionClock();
-  S.myBudget-=bid;
-  doPick(S.selP,S.myPos);
-  S.auc=null;
-  showToast('✅ '+S.selP.name+' — $'+bid+'!');
-  rBoard();rPlayers();rMyTeam();upHdr();
-  setTimeout(aucNext,900);
+  setAuctionMarketCopy('No CPU team is pushing past your number. Hold through the horn and the room will close the player to you.');
 }
 
 function startAuctionNomination(p){
@@ -5720,6 +5890,10 @@ function getPendingPickTradeRole(){
 function renderPendingPickTradePrompt(){
   const modal=document.getElementById('pickTradeRequestModal');
   if(!modal) return;
+  if(!isPickSwapEnabled()){
+    modal.style.display='none';
+    return;
+  }
   const trade=S.pendingPickTrade;
   const role=getPendingPickTradeRole();
   if(!trade || trade.status!=='pending' || role!=='recipient'){
@@ -5769,6 +5943,7 @@ function closeOpenTradeLayers(){
 }
 
 function canApplyPendingPickTrade(trade){
+  if(!isPickSwapEnabled()) return false;
   if(!trade) return false;
   const fromIdx=Number(trade.fromPickIdx);
   const toIdx=Number(trade.toPickIdx);
@@ -5781,6 +5956,7 @@ function canApplyPendingPickTrade(trade){
 }
 
 function buildPendingPickTrade(targetTeamIdx){
+  if(!isPickSwapEnabled()) return null;
   const myPickIdx=nextPickForTeam(S.myPos, S.cur);
   const theirPickIdx=nextPickForTeam(targetTeamIdx, S.cur);
   if(myPickIdx<0 || theirPickIdx<0) return null;
@@ -6428,13 +6604,19 @@ function refreshPauseBtn(){
   }
 }
 
+function requiresPauseVote(){
+  return isMultiplayerDraftContext() && !isSoloTestDraft();
+}
+
 function handlePauseBtn(){
   if(PS.isPaused){
-    if(PS.isAdmin) resumeDraft();
+    if(PS.isAdmin || !requiresPauseVote()) resumeDraft();
     else showToast('Only the commissioner can resume');
     return;
   }
-  if(PS.isAdmin){
+  if(!requiresPauseVote()){
+    triggerPause('Draft paused.', true);
+  } else if(PS.isAdmin){
     // Admin instant pause
     triggerPause('Commissioner paused the draft.', true);
   } else {
@@ -6455,8 +6637,8 @@ function triggerPause(reason, isAdmin=false){
   // Show pause overlay
   document.getElementById('pauseReason').textContent = reason;
   document.getElementById('pauseOverlay').classList.add('show');
-  // Show resume button only to admin
-  document.getElementById('pauseResumeBtn').className = 'pause-resume-btn' + (PS.isAdmin ? ' show' : '');
+  // Show resume button to commissioner in multiplayer, or always in single-player
+  document.getElementById('pauseResumeBtn').className = 'pause-resume-btn' + ((PS.isAdmin || !requiresPauseVote()) ? ' show' : '');
   // Start pause elapsed clock
   clearInterval(PS.pauseElapsedInt);
   PS.pauseElapsedInt = setInterval(updatePauseClock, 1000);
@@ -6472,7 +6654,7 @@ function updatePauseClock(){
 }
 
 function resumeDraft(){
-  if(!PS.isAdmin){ showToast('Only the commissioner can resume'); return; }
+  if(!PS.isAdmin && requiresPauseVote()){ showToast('Only the commissioner can resume'); return; }
   PS.isPaused = false;
   PS.totalPausedMs += (Date.now() - PS.pausedAt);
   clearInterval(PS.pauseElapsedInt);
@@ -6616,6 +6798,10 @@ function initPauseState(){
 let tradeLog=[];
 let trSelectedTeam=null; // team index of selected trade partner
 
+function isPickSwapEnabled(){
+  return S.fmt!=='auction';
+}
+
 // Find the next pick index for a given team, starting from position `from`
 function nextPickForTeam(teamIdx, from){
   for(let i=from;i<S.total;i++){
@@ -6637,6 +6823,10 @@ function nthPickForTeam(teamIdx, from, nth){
 }
 
 function openTradeModal(){
+  if(!isPickSwapEnabled()){
+    showToast('Pick swap is disabled in auction drafts.');
+    return;
+  }
   // Find MY next upcoming pick (could be during countdown or mid-draft)
   const myNextPick = nextPickForTeam(S.myPos, S.cur);
   if(myNextPick < 0){ showToast("No picks left to trade!"); return; }
@@ -6768,6 +6958,24 @@ function updateTradeSpotlight(){
   const action=document.getElementById('tradeSpotlightAction');
   if(!wrap || !kicker || !headline || !text || !chip || !action) return;
   if(S.fmt==='auction'){
+    closeTradeModal();
+    clearPendingPickTradePrompt();
+    wrap.style.display='flex';
+    wrap.className='trade-spotlight auction-muted';
+    kicker.textContent='Snake-Only Feature';
+    headline.textContent='Pick Swaps Sit Out In Auction';
+    text.textContent='Auction rooms win on patience and price discipline instead. Wait for softness, stay under the room, and steal players when bidding cools.';
+    chip.className='decision-chip muted';
+    chip.textContent='Auction Mode';
+    action.className='decision-action secondary';
+    action.textContent='Swap Desk Offline';
+    action.disabled=true;
+    action.onclick=()=>{};
+    return;
+  }
+  if(!isPickSwapEnabled()){
+    closeTradeModal();
+    clearPendingPickTradePrompt();
     wrap.style.display='none';
     return;
   }
@@ -6872,10 +7080,18 @@ function updateTradeSpotlight(){
 function updateTradeBtn(){
   const btn=document.getElementById('tradeHeaderBtn');
   if(!btn) return;
+  if(!isPickSwapEnabled()){
+    btn.style.display='none';
+    btn.disabled=true;
+    btn.style.opacity='1';
+    btn.style.cursor='default';
+    updateTradeSpotlight();
+    return;
+  }
   const hasFuturePick=nextPickForTeam(S.myPos, S.cur)>=0;
   const hasPendingTrade=!!(S.pendingPickTrade && S.pendingPickTrade.status==='pending');
   const draftSnap=getDraftFocusSnapshot();
-  btn.style.display=(S.fmt!=='auction'&&S.cur<S.total&&hasFuturePick)?'block':'none';
+  btn.style.display=(S.cur<S.total&&hasFuturePick)?'block':'none';
   btn.textContent=hasPendingTrade ? '⇄ Pick Swap Pending' : (draftSnap.myTurn ? '⇄ Swap This Pick' : '⇄ Pick Swap Desk');
   btn.disabled=hasPendingTrade;
   btn.style.opacity=hasPendingTrade?'.45':'1';
