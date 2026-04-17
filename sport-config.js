@@ -1,7 +1,55 @@
 (function(){
   const STORAGE_KEY = 'rosterbateSelectedSport';
+  function hexToRgba(hex, alpha){
+    const value=String(hex||'').replace('#','').trim();
+    if(!/^[0-9a-fA-F]{6}$/.test(value)) return `rgba(51,65,85,${alpha})`;
+    const r=parseInt(value.slice(0,2),16), g=parseInt(value.slice(2,4),16), b=parseInt(value.slice(4,6),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  function createPalette(primary, secondary, ink){
+    return {
+      primary,
+      secondary,
+      ink,
+      glow:hexToRgba(primary,.28),
+      ring:hexToRgba(secondary,.42),
+      shadow:hexToRgba(primary,.18)
+    };
+  }
+  const NBA_SAFE_INSPIRED_TEAM_PALETTES = {
+    ATL:createPalette('#D76849','#F2B56E','#211412'),
+    BOS:createPalette('#2F8F5B','#D6C27A','#121811'),
+    BKN:createPalette('#4D5564','#D6DEE8','#13151A'),
+    CHA:createPalette('#4B58C7','#42D8C6','#111426'),
+    CHI:createPalette('#D84D63','#161D28','#130F12'),
+    CLE:createPalette('#8C4A7A','#F0A65F','#1B1218'),
+    DAL:createPalette('#2B7AB8','#76D0D4','#101B25'),
+    DEN:createPalette('#3F5FA7','#F2AB46','#151628'),
+    DET:createPalette('#4E6DD1','#DC6A4A','#131824'),
+    GSW:createPalette('#2F5AC6','#F1B34F','#11182A'),
+    HOU:createPalette('#C94B57','#EF8B6F','#1A1012'),
+    IND:createPalette('#36569F','#F0BF67','#151824'),
+    LAC:createPalette('#2C7DB2','#F26C4D','#111A23'),
+    LAL:createPalette('#7D4EC9','#FFC76A','#171123'),
+    MEM:createPalette('#5A7BC7','#9FD8CC','#111B25'),
+    MIA:createPalette('#EF6B76','#31D0B4','#1C1014'),
+    MIL:createPalette('#2F7E58','#D7C38A','#111814'),
+    MIN:createPalette('#3F69B6','#61C8D7','#101826'),
+    NOP:createPalette('#315987','#E28B52','#131824'),
+    NYK:createPalette('#2F7FE2','#F5A153','#101A27'),
+    OKC:createPalette('#2AA8D6','#FFB357','#101A21'),
+    ORL:createPalette('#3D73DB','#B7D6FF','#11182A'),
+    PHI:createPalette('#3C67D6','#FF725C','#131927'),
+    PHX:createPalette('#8D55D6','#F89D53','#1A1224'),
+    POR:createPalette('#DC5D5C','#2D3949','#171113'),
+    SAC:createPalette('#8D56C7','#C2BDD6','#171225'),
+    SAS:createPalette('#7B8697','#D9DFEB','#14181E'),
+    TOR:createPalette('#D65E68','#5F748D','#171216'),
+    UTA:createPalette('#3EA670','#E8BB5D','#121912'),
+    WAS:createPalette('#4C78D4','#D96B63','#131925')
+  };
   const TEAM_COLORS = {
-    NBA:{ATL:'#C1272D',BOS:'#007A33',BKN:'#000000',CHA:'#00788C',CHI:'#CE1141',CLE:'#860038',DAL:'#00538C',DEN:'#0E2240',DET:'#C8102E',GSW:'#1D428A',HOU:'#CE1141',IND:'#002D62',LAC:'#C8102E',LAL:'#552583',MEM:'#5D76A9',MIA:'#98002E',MIL:'#00471B',MIN:'#0C2340',NOP:'#0C2340',NYK:'#F58426',OKC:'#007AC1',ORL:'#0077C0',PHI:'#006BB6',PHX:'#1D1160',POR:'#E03A3E',SAC:'#5A2D81',SAS:'#C4CED4',TOR:'#CE1141',UTA:'#002B5C',WAS:'#002B5C'},
+    NBA:Object.fromEntries(Object.entries(NBA_SAFE_INSPIRED_TEAM_PALETTES).map(function(entry){ return [entry[0], entry[1].primary]; })),
     NFL:{ARI:'#97233F',ATL:'#A71930',BAL:'#241773',BUF:'#00338D',CAR:'#0085CA',CHI:'#0B162A',CIN:'#FB4F14',CLE:'#311D00',DAL:'#003594',DEN:'#FB4F14',DET:'#0076B6',GB:'#203731',HOU:'#03202F',IND:'#002C5F',JAX:'#006778',KC:'#E31837',LV:'#000000',LAC:'#0080C6',LAR:'#003594',MIA:'#008E97',MIN:'#4F2683',NE:'#002244',NO:'#D3BC8D',NYG:'#0B2265',NYJ:'#125740',PHI:'#004C54',PIT:'#FFB612',SEA:'#002244',SF:'#AA0000',TB:'#D50A0A',TEN:'#0C2340',WAS:'#5A1414'},
     MLB:{ARI:'#A71930',ATL:'#CE1141',BAL:'#DF4601',BOS:'#BD3039',CHC:'#0E3386',CWS:'#27251F',CIN:'#C6011F',CLE:'#E31937',COL:'#33006F',DET:'#0C2340',HOU:'#EB6E1F',KC:'#004687',LAA:'#BA0021',LAD:'#005A9C',MIA:'#00A3E0',MIL:'#12284B',MIN:'#002B5C',NYM:'#002D72',NYY:'#0C2340',OAK:'#003831',PHI:'#E81828',PIT:'#FDB827',SD:'#2F241D',SEA:'#0C2C56',SF:'#FD5A1E',STL:'#C41E3A',TB:'#092C5C',TEX:'#003278',TOR:'#134A8E',WSH:'#AB0003'}
   };
@@ -48,6 +96,12 @@ scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in 
   function setSelectedSport(sport){ const normalized=normalizeSportKey(sport); try{localStorage.setItem(STORAGE_KEY,normalized);}catch(e){} return normalized; }
   function getSportConfig(sport){ return SPORT_CONFIG[normalizeSportKey(sport)]; }
   function getTeamColor(sport,code){ const map=TEAM_COLORS[getSportConfig(sport).label]||{}; return map[code]||'#334155'; }
+  function getTeamPalette(sport,code){
+    const league=getSportConfig(sport).label;
+    if(league==='NBA' && NBA_SAFE_INSPIRED_TEAM_PALETTES[code]) return Object.assign({}, NBA_SAFE_INSPIRED_TEAM_PALETTES[code]);
+    const color=getTeamColor(sport,code);
+    return createPalette(color,color,'#0f172a');
+  }
   function fixed(n){ return Math.round(n*10)/10; }
   function buildName(i,a,b){ return a[i%a.length]+' '+b[Math.floor(i/a.length)%b.length]; }
   function assignAdp(players){ return players.sort((a,b)=>b.fp-a.fp).map((p,i)=>Object.assign(p,{adp:i+1})); }
@@ -188,9 +242,11 @@ scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in 
   window.buildRosterbateSportPlayerPool = buildSportPlayerPool;
   window.getRosterbatePlayerFantasyScore = getPlayerFantasyScore;
   window.getRosterbateTeamColor = getTeamColor;
+  window.getRosterbateTeamPalette = getTeamPalette;
   window.getRosterbatePlayerSummary = getPlayerSummary;
   window.getRosterbatePlayerDetailStats = getPlayerDetailStats;
   window.getRosterbateCommissionerDefaults = getCommissionerDefaults;
   window.getRosterbateLeagueRuleDefaults = getLeagueRuleDefaults;
   window.getRosterbatePositionLabels = getPositionLabels;
+  window.RB_SAFE_NBA_TEAM_PALETTES = NBA_SAFE_INSPIRED_TEAM_PALETTES;
 })();

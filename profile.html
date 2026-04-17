@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RosterBate - Profile Settings</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<title>RosterBate - Profile Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="global-nav.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -12,18 +12,19 @@
 <script src="global-nav.js" defer></script>
 <style>
 :root{
-  --bg:#05070e;--bg2:#111827;--bg3:#1c2333;--card:#161d2e;--border:#29415f;
-  --accent:#f97316;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;
-  --text:#f1f5f9;--text2:#b8c7dc;--text3:#7f93ad;
-  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+  --bg:#06090f;--bg2:#0d1421;--bg3:#172235;--panel:#0f1827;--panel2:#131f33;
+  --border:rgba(136,157,189,.18);--border-strong:rgba(255,148,63,.34);
+  --accent:#ff8a1e;--accent-2:#ffc15a;--green:#2ed37a;--red:#ff6d78;--blue:#5d8dff;--teal:#36c7d9;
+  --text:#f3f6fb;--text2:#b9c7dc;--text3:#7f93ae;
+  --fd:'Teko',sans-serif;--fb:'IBM Plex Sans',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{min-height:100%;color:var(--text);font-family:var(--fb);}
 body{
   background:
-    linear-gradient(180deg,rgba(4,7,13,.18),rgba(4,8,15,.74) 24%,rgba(4,8,15,.94) 100%),
-    radial-gradient(circle at top,rgba(251,146,60,.2),transparent 24%),
-    radial-gradient(circle at 18% 18%,rgba(255,255,255,.08),transparent 22%),
+    linear-gradient(180deg,rgba(5,9,14,.22),rgba(6,10,18,.74) 22%,rgba(6,10,18,.95) 100%),
+    radial-gradient(circle at top,rgba(255,138,30,.18),transparent 26%),
+    radial-gradient(circle at 18% 22%,rgba(255,255,255,.07),transparent 22%),
     url('/hero-hall-of-fame.avif') center/cover fixed no-repeat,
     var(--bg);
   position:relative;
@@ -33,83 +34,515 @@ body::before{
   position:fixed;
   inset:0;
   background:
-    linear-gradient(90deg,rgba(255,255,255,.03),transparent 18%,transparent 82%,rgba(255,255,255,.03)),
-    linear-gradient(180deg,rgba(255,255,255,.02),transparent 14%,transparent 80%,rgba(255,255,255,.05));
+    linear-gradient(90deg,rgba(255,255,255,.03),transparent 14%,transparent 86%,rgba(255,255,255,.03)),
+    linear-gradient(180deg,rgba(255,255,255,.03),transparent 12%,transparent 82%,rgba(255,255,255,.05));
   pointer-events:none;
 }
-.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:20px 18px 60px;}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px;padding:14px 16px;border:1px solid rgba(148,223,255,.24);border-radius:18px;background:linear-gradient(180deg,rgba(29,44,65,.48),rgba(10,16,28,.72));box-shadow:0 12px 34px rgba(0,0,0,.22),0 0 24px rgba(125,211,252,.08);backdrop-filter:blur(20px);}
-.brand{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text);text-decoration:none;}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.028) 0,rgba(255,255,255,.028) 1px,transparent 1px,transparent 120px);
+  opacity:.24;
+  mix-blend-mode:screen;
+  pointer-events:none;
+}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:86px 16px 60px;}
+.topbar{display:none !important;}
+.brand{font-family:var(--fd);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text);text-decoration:none;}
 .brand span{color:var(--accent);}
 .top-actions{display:flex;gap:8px;align-items:center;}
-.btn{border:none;border-radius:12px;padding:11px 14px;font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;}
+.btn{
+  border:none;
+  border-radius:14px;
+  padding:11px 15px 10px;
+  font-family:var(--fd);
+  font-size:16px;
+  line-height:1;
+  letter-spacing:.08em;
+  font-weight:600;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease,color .18s ease;
+}
 .btn:hover{transform:translateY(-1px);}
-.btn.primary{background:linear-gradient(135deg,var(--accent),#f59e0b);box-shadow:0 14px 26px rgba(249,115,22,.22);color:#fff;}
-.btn.secondary{background:rgba(19,31,49,.72);border:1px solid rgba(148,223,255,.18);color:#e6efff;}
-.btn.danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
-.hero{background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(13,22,36,.42),rgba(13,22,36,.66));border:1px solid rgba(165,214,255,.22);border-radius:24px;padding:24px;margin-bottom:14px;box-shadow:0 24px 56px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(22px);}
-.hero-title{font-family:var(--fd);font-size:34px;font-weight:900;text-transform:uppercase;line-height:.95;}
-.hero-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-top:8px;max-width:520px;}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.btn.primary{
+  background:linear-gradient(135deg,var(--accent),#f59e0b);
+  box-shadow:0 18px 30px rgba(255,138,30,.24),inset 0 1px 0 rgba(255,244,225,.28);
+  color:#fff7ee;
+}
+.btn.secondary{
+  background:linear-gradient(180deg,rgba(23,34,54,.9),rgba(11,18,30,.92));
+  border:1px solid rgba(121,145,181,.24);
+  color:#eef4ff;
+}
+.btn.danger{
+  background:linear-gradient(180deg,rgba(68,20,28,.54),rgba(42,14,20,.82));
+  border:1px solid rgba(255,109,120,.28);
+  color:#ffc3c9;
+}
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.03) 38%,rgba(8,13,24,.04) 100%),
+    linear-gradient(90deg,rgba(11,18,29,.94),rgba(17,27,43,.9) 48%,rgba(13,20,33,.95));
+  border:1px solid rgba(132,156,191,.2);
+  border-radius:24px;
+  padding:20px;
+  margin-bottom:14px;
+  box-shadow:0 24px 58px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,138,30,.06);
+  backdrop-filter:blur(20px);
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),rgba(255,193,90,.86),rgba(54,199,217,.22));
+}
+.hero::after{
+  content:'';
+  position:absolute;
+  inset:auto -8% -52% 46%;
+  height:260px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,148,63,.18),transparent 70%);
+  filter:blur(14px);
+  pointer-events:none;
+}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(280px,.9fr);gap:14px;align-items:stretch;}
+.hero-main{display:flex;flex-direction:column;justify-content:space-between;min-height:184px;position:relative;z-index:1;}
+.hero-kicker{
+  font-family:var(--fd);
+  font-size:14px;
+  line-height:1;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:rgba(255,193,90,.9);
+}
+.hero-title{
+  margin-top:12px;
+  font-family:var(--fd);
+  font-size:54px;
+  font-weight:700;
+  text-transform:uppercase;
+  line-height:.82;
+  letter-spacing:.02em;
+  max-width:560px;
+}
+.hero-sub{
+  margin-top:10px;
+  max-width:560px;
+  font-size:13px;
+  color:var(--text2);
+  line-height:1.65;
+}
+.hero-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.hero-side{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  min-height:100%;
+  padding:16px 16px 14px;
+  border-radius:20px;
+  background:
+    linear-gradient(180deg,rgba(23,34,54,.84),rgba(10,18,30,.92)),
+    linear-gradient(135deg,rgba(255,255,255,.06),transparent);
+  border:1px solid rgba(93,141,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px rgba(0,0,0,.22);
+}
+.hero-side::before{
+  content:'';
+  position:absolute;
+  inset:0 auto 0 0;
+  width:3px;
+  border-radius:24px 0 0 24px;
+  background:linear-gradient(180deg,rgba(93,141,255,.86),rgba(54,199,217,.72));
+}
+.hero-side-kicker,.card-kicker{
+  font-family:var(--fd);
+  font-size:13px;
+  line-height:1;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+.hero-side-title,.card-headline{
+  margin-top:4px;
+  font-family:var(--fd);
+  font-size:26px;
+  font-weight:700;
+  line-height:.84;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+}
+.hero-side-copy,.card-copy{
+  margin-top:5px;
+  font-size:12px;
+  line-height:1.68;
+  color:var(--text2);
+}
+.hero-side-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:6px;}
+.hero-side-pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  border:1px solid rgba(121,145,181,.22);
+  background:rgba(9,15,24,.48);
+  color:#ecf4ff;
+  font-family:var(--fd);
+  font-size:13px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
 .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px;}
-.summary-card{padding:14px 15px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(15,24,39,.58),rgba(10,17,29,.82));border:1px solid rgba(162,214,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 26px rgba(0,0,0,.18);backdrop-filter:blur(18px);}
-.summary-value{font-family:var(--fd);font-size:26px;font-weight:900;line-height:1;}
-.summary-label{margin-top:8px;color:#dce8f7;font-size:11px;letter-spacing:.8px;text-transform:uppercase;}
-.summary-copy{margin-top:6px;color:var(--text2);font-size:12px;line-height:1.45;}
-.content-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:14px;align-items:start;}
-.stack{display:flex;flex-direction:column;gap:12px;}
-.card{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(15,24,39,.56),rgba(10,17,29,.82));border:1px solid rgba(162,214,255,.18);border-radius:20px;padding:18px;margin-bottom:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 28px rgba(0,0,0,.18);backdrop-filter:blur(18px);}
-.section-title{font-family:var(--fd);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#c6d5e8;margin-bottom:12px;}
-.profile-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.avatar{width:104px;height:104px;border-radius:28px;background:rgba(15,24,39,.64);border:1px solid rgba(162,214,255,.18);object-fit:cover;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:34px;font-weight:900;color:var(--accent);overflow:hidden;box-shadow:0 16px 26px rgba(0,0,0,.18);}
-.meta{flex:1;min-width:220px;}
-.display-name{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;}
-.meta-line{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;}
-.field{margin-bottom:12px;}
-.label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:var(--fd);font-weight:700;}
-.input,.textarea{width:100%;background:rgba(19,31,49,.72);border:1px solid rgba(148,223,255,.16);border-radius:14px;padding:12px 13px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;}
-.input:focus,.textarea:focus{border-color:var(--accent);}
-.textarea{min-height:88px;resize:vertical;}
-.help{font-size:11px;color:var(--text3);line-height:1.5;margin-top:6px;}
+.summary-card{
+  position:relative;
+  min-height:128px;
+  padding:14px;
+  border-radius:20px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(16,24,39,.82),rgba(10,16,28,.92)),
+    linear-gradient(135deg,rgba(255,255,255,.08),transparent);
+  border:1px solid rgba(127,153,188,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 34px rgba(0,0,0,.22);
+  backdrop-filter:blur(16px);
+}
+.summary-card::before{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:2px;
+  background:linear-gradient(90deg,rgba(255,138,30,.72),rgba(93,141,255,.38),transparent);
+}
+.summary-card:nth-child(2)::before{background:linear-gradient(90deg,rgba(54,199,217,.74),rgba(93,141,255,.42),transparent);}
+.summary-card:nth-child(3)::before{background:linear-gradient(90deg,rgba(255,193,90,.74),rgba(255,138,30,.38),transparent);}
+.summary-card:nth-child(4)::before{background:linear-gradient(90deg,rgba(46,211,122,.74),rgba(54,199,217,.38),transparent);}
+.summary-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.summary-label{
+  color:#d4deed;
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-family:var(--fd);
+  line-height:1;
+}
+.summary-chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:26px;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid rgba(126,149,185,.18);
+  background:rgba(8,14,24,.48);
+  font-family:var(--fd);
+  font-size:12px;
+  line-height:1;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#edf4ff;
+  white-space:nowrap;
+}
+.summary-value{
+  margin-top:12px;
+  font-family:var(--fd);
+  font-size:32px;
+  font-weight:700;
+  line-height:.82;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+}
+.summary-copy{
+  margin-top:10px;
+  color:var(--text2);
+  font-size:11px;
+  line-height:1.6;
+}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.14fr) minmax(290px,.86fr);gap:14px;align-items:start;}
+.stack{display:flex;flex-direction:column;gap:14px;}
+.card{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(15,24,39,.9),rgba(11,18,30,.94)),
+    linear-gradient(135deg,rgba(255,255,255,.08),transparent);
+  border:1px solid rgba(127,153,188,.17);
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 38px rgba(0,0,0,.22);
+  backdrop-filter:blur(18px);
+}
+.card::before{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:2px;
+  background:linear-gradient(90deg,rgba(255,138,30,.82),rgba(255,193,90,.32),transparent);
+}
+.account-card::after,.save-card::after,.theme-studio-card::after,.avatar-card::after{
+  content:'';
+  position:absolute;
+  inset:auto -14% -42% 56%;
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,138,30,.12),transparent 70%);
+  pointer-events:none;
+}
+.section-title{display:none;}
+.profile-head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1;}
+.avatar{
+  width:110px;
+  height:110px;
+  border-radius:28px;
+  background:
+    linear-gradient(180deg,rgba(25,37,57,.9),rgba(12,18,30,.94)),
+    linear-gradient(135deg,rgba(255,255,255,.08),transparent);
+  border:1px solid rgba(255,255,255,.14);
+  object-fit:cover;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--fd);
+  font-size:42px;
+  font-weight:700;
+  color:var(--accent);
+  overflow:hidden;
+  box-shadow:0 22px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.meta{flex:1;min-width:220px;display:grid;gap:8px;}
+.display-name{
+  font-family:var(--fd);
+  font-size:34px;
+  font-weight:700;
+  line-height:.82;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+}
+.meta-line{
+  display:flex;
+  align-items:center;
+  min-height:36px;
+  padding:0 11px;
+  border-radius:14px;
+  border:1px solid rgba(127,153,188,.14);
+  background:rgba(8,14,24,.52);
+  font-size:11px;
+  color:var(--text2);
+  line-height:1.5;
+}
+.field{margin-top:14px;}
+.label{
+  display:block;
+  font-size:12px;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  margin-bottom:6px;
+  font-family:var(--fd);
+  font-weight:500;
+}
+.input,.textarea{
+  width:100%;
+  background:linear-gradient(180deg,rgba(16,25,40,.92),rgba(11,18,30,.98));
+  border:1px solid rgba(127,153,188,.16);
+  border-radius:16px;
+  padding:12px 13px;
+  color:var(--text);
+  font-size:13px;
+  line-height:1.5;
+  font-family:var(--fb);
+  outline:none;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.input:focus,.textarea:focus{
+  border-color:rgba(255,138,30,.55);
+  box-shadow:0 0 0 3px rgba(255,138,30,.12);
+}
+.textarea{min-height:120px;resize:vertical;}
+.help{
+  font-size:11px;
+  color:var(--text3);
+  line-height:1.55;
+  margin-top:6px;
+}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.preview-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;}
-.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(19,31,49,.62);border:1px solid rgba(148,223,255,.14);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--text2);}
-.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
-.theme-card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(19,31,49,.72),rgba(10,16,28,.84));border:1px solid rgba(148,223,255,.14);border-radius:18px;padding:14px;cursor:pointer;transition:.18s border-color,.18s transform,color .18s ease,box-shadow .18s ease,background-color .18s ease;color:var(--text);font-family:var(--fb);text-align:left;}
-.theme-card:hover{transform:translateY(-2px);border-color:rgba(249,115,22,.35);box-shadow:0 16px 28px rgba(0,0,0,.18);}
-.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(249,115,22,.18) inset,0 16px 30px rgba(249,115,22,.10);}
-.theme-preview{position:relative;height:118px;border-radius:16px;padding:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 18% 18%,color-mix(in srgb,var(--theme-a) 58%,transparent),transparent 34%),radial-gradient(circle at 82% 22%,color-mix(in srgb,var(--theme-b) 54%,transparent),transparent 36%),linear-gradient(135deg,color-mix(in srgb,var(--theme-c) 78%,#05070e),color-mix(in srgb,var(--theme-c) 92%,#111827));box-shadow:inset 0 1px 0 rgba(255,255,255,.12);}
-.theme-preview::after{content:'';position:absolute;inset:auto -18% 8px 42%;height:54px;border-radius:999px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--theme-b) 64%,transparent),transparent);opacity:.42;filter:blur(20px);}
+.preview-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1;}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  gap:6px;
+  background:rgba(12,19,30,.68);
+  border:1px solid rgba(127,153,188,.16);
+  border-radius:999px;
+  padding:0 10px;
+  font-size:12px;
+  color:var(--text2);
+  font-family:var(--fd);
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.save-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px;}
+.theme-card{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,rgba(19,31,49,.84),rgba(10,16,28,.94));
+  border:1px solid rgba(127,153,188,.15);
+  border-radius:18px;
+  padding:12px;
+  cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background-color .18s ease;
+  color:var(--text);
+  font-family:var(--fb);
+  text-align:left;
+}
+.theme-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,138,30,.34);
+  box-shadow:0 18px 34px rgba(0,0,0,.22);
+}
+.theme-card.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(255,138,30,.16) inset,0 18px 34px rgba(255,138,30,.12);
+}
+.theme-card.active::after{
+  content:'Selected';
+  position:absolute;
+  top:10px;
+  right:10px;
+  min-height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  background:rgba(255,138,30,.18);
+  border:1px solid rgba(255,138,30,.34);
+  color:#fff2e5;
+  font-family:var(--fd);
+  font-size:11px;
+  line-height:24px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.theme-preview{
+  position:relative;
+  height:108px;
+  border-radius:14px;
+  padding:11px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  background:
+    radial-gradient(circle at 18% 18%,color-mix(in srgb,var(--theme-a) 58%,transparent),transparent 34%),
+    radial-gradient(circle at 82% 22%,color-mix(in srgb,var(--theme-b) 54%,transparent),transparent 36%),
+    linear-gradient(135deg,color-mix(in srgb,var(--theme-c) 78%,#05070e),color-mix(in srgb,var(--theme-c) 92%,#111827));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+.theme-preview::after{
+  content:'';
+  position:absolute;
+  inset:auto -18% 10px 42%;
+  height:48px;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--theme-b) 64%,transparent),transparent);
+  opacity:.48;
+  filter:blur(20px);
+}
 .theme-preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;}
-.theme-chip{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;background:rgba(7,12,22,.42);border:1px solid rgba(255,255,255,.14);color:#f8fbff;font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.75px;text-transform:uppercase;}
-.theme-orb{width:28px;height:28px;border-radius:999px;background:radial-gradient(circle at 32% 32%,rgba(255,255,255,.94),var(--theme-a) 34%,var(--theme-b) 74%,rgba(8,15,27,.1) 100%);border:1px solid rgba(255,255,255,.28);box-shadow:0 0 18px color-mix(in srgb,var(--theme-b) 38%,transparent);flex-shrink:0;}
-.theme-preview-title{position:relative;z-index:1;margin-top:16px;font-family:var(--fd);font-size:22px;font-weight:900;line-height:.9;text-transform:uppercase;color:#fff;max-width:150px;text-shadow:0 10px 22px rgba(0,0,0,.36);}
-.theme-preview-lines{position:relative;z-index:1;display:grid;gap:6px;margin-top:14px;}
-.theme-preview-lines span{display:block;height:7px;border-radius:999px;background:rgba(255,255,255,.14);}
+.theme-chip{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:4px 7px;
+  background:rgba(7,12,22,.42);
+  border:1px solid rgba(255,255,255,.14);
+  color:#f8fbff;
+  font-family:var(--fd);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.theme-orb{
+  width:24px;
+  height:24px;
+  border-radius:999px;
+  background:radial-gradient(circle at 32% 32%,rgba(255,255,255,.94),var(--theme-a) 34%,var(--theme-b) 74%,rgba(8,15,27,.1) 100%);
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 0 18px color-mix(in srgb,var(--theme-b) 38%,transparent);
+  flex-shrink:0;
+}
+.theme-preview-title{
+  position:relative;
+  z-index:1;
+  margin-top:12px;
+  font-family:var(--fd);
+  font-size:22px;
+  font-weight:700;
+  line-height:.84;
+  text-transform:uppercase;
+  color:#fff;
+  max-width:130px;
+  text-shadow:0 10px 22px rgba(0,0,0,.36);
+}
+.theme-preview-lines{position:relative;z-index:1;display:grid;gap:5px;margin-top:12px;}
+.theme-preview-lines span{display:block;height:6px;border-radius:999px;background:rgba(255,255,255,.14);}
 .theme-preview-lines span:nth-child(1){width:74%;}
 .theme-preview-lines span:nth-child(2){width:58%;}
-.theme-copy{padding-top:12px;}
-.theme-name{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;}
-.theme-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.45;}
-.swatches{display:flex;gap:6px;margin-top:10px;}
+.theme-copy{padding-top:10px;}
+.theme-name{
+  font-family:var(--fd);
+  font-size:18px;
+  font-weight:700;
+  line-height:.86;
+  text-transform:uppercase;
+}
+.theme-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.55;}
+.swatches{display:flex;gap:6px;margin-top:8px;}
 .swatch{width:16px;height:16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);}
-.status{min-height:18px;font-size:12px;color:var(--text2);margin-top:10px;}
-.status.error{color:#fca5a5;}
-.status.success{color:#86efac;}
+.status{min-height:18px;font-size:11px;color:var(--text2);margin-top:14px;line-height:1.5;}
+.status.error{color:#fecaca;}
+.status.success{color:#bbf7d0;}
 .auth-lock{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
 .auth-lock.open{display:flex;}
-.auth-lock-card{max-width:420px;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05) 42%,rgba(8,15,27,.18) 100%),linear-gradient(180deg,rgba(15,24,39,.56),rgba(10,17,29,.82));border:1px solid rgba(162,214,255,.18);border-radius:24px;padding:22px;text-align:center;box-shadow:0 24px 56px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(18px);}
-.topbar{display:none !important;}
-@media (max-width:860px){
-  .content-grid{grid-template-columns:1fr;}
-  .summary-grid{grid-template-columns:1fr 1fr;}
+.auth-lock-card{
+  max-width:460px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.03) 42%,rgba(8,15,27,.08) 100%),
+    linear-gradient(180deg,rgba(15,24,39,.88),rgba(10,17,29,.94));
+  border:1px solid rgba(162,214,255,.18);
+  border-radius:28px;
+  padding:24px;
+  text-align:center;
+  box-shadow:0 24px 56px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.1);
+  backdrop-filter:blur(18px);
+}
+@media (max-width:1080px){
+  .wrap{padding-top:82px;}
+  .hero-grid,.content-grid{grid-template-columns:1fr;}
+  .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:760px){
+  .hero{padding:18px 16px;}
+  .hero-title{font-size:42px;}
+  .hero-side-title,.card-headline{font-size:22px;}
+  .summary-grid,.option-grid{grid-template-columns:1fr;}
+  .avatar{width:96px;height:96px;border-radius:24px;font-size:36px;}
+  .display-name{font-size:28px;}
 }
 @media (max-width:560px){
-  .split{grid-template-columns:1fr;}
-  .topbar{align-items:flex-start;flex-direction:column;}
-  .top-actions{width:100%;}
-  .top-actions .btn{flex:1;}
-  .summary-grid{grid-template-columns:1fr;}
+  .wrap{padding:78px 12px 48px;}
+  .hero-title{font-size:36px;}
+  .hero-actions .btn,.preview-row .btn{width:100%;}
+  .summary-card{min-height:0;}
+  .card{padding:16px;}
 }
 </style>
 </head>
@@ -141,64 +574,98 @@ body::before{
   </div>
 
   <div class="hero">
-    <div class="hero-title">Profile Settings</div>
-    <div class="hero-sub">Customize your username, add an about section, and give your public page a look that feels like your team.</div>
-    <div class="hero-actions">
-      <button class="btn secondary" onclick="window.location.href='my-leagues.html'">My Leagues</button>
-      <button class="btn secondary" onclick="window.location.href='messages.html'">Messages</button>
-      <button class="btn primary" id="heroPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
+    <div class="hero-grid">
+      <div class="hero-main">
+        <div>
+          <div class="hero-kicker">Manager Control Room</div>
+          <div class="hero-title">Profile Studio</div>
+          <div class="hero-sub">Tune your name, avatar, and public-page identity so every RosterBate surface feels like your franchise walking into the room.</div>
+        </div>
+        <div class="hero-actions">
+          <button class="btn secondary" onclick="window.location.href='my-leagues.html'">My Leagues</button>
+          <button class="btn secondary" onclick="window.location.href='messages.html'">Messages</button>
+          <button class="btn primary" id="heroPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="hero-side-kicker">Broadcast Sheet</div>
+        <div class="hero-side-title">Build a sharper public identity</div>
+        <div class="hero-side-copy">Your member page is part player card, part franchise dossier. Set the visual tone here so leagues, inboxes, and public pages all feel like one premium system.</div>
+        <div class="hero-side-pills">
+          <span class="hero-side-pill">Public page live</span>
+          <span class="hero-side-pill">Theme presets</span>
+          <span class="hero-side-pill">Avatar + GIF support</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="summary-grid" id="profileSummary">
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Member Status</div>
+        <div class="summary-chip">Loading</div>
+      </div>
       <div class="summary-value">-</div>
-      <div class="summary-label">Member Status</div>
       <div class="summary-copy">Waiting on account details.</div>
     </div>
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Public Page</div>
+        <div class="summary-chip">Status</div>
+      </div>
       <div class="summary-value">-</div>
-      <div class="summary-label">Public Page</div>
       <div class="summary-copy">Preparing your public profile link.</div>
     </div>
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Current Theme</div>
+        <div class="summary-chip">Deck</div>
+      </div>
       <div class="summary-value">-</div>
-      <div class="summary-label">Current Theme</div>
       <div class="summary-copy">Checking your active style preset.</div>
     </div>
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Profile Copy</div>
+        <div class="summary-chip">Ready</div>
+      </div>
       <div class="summary-value">-</div>
-      <div class="summary-label">Account Access</div>
       <div class="summary-copy">Loading sign-in and inbox state.</div>
     </div>
   </div>
 
   <div class="content-grid">
     <div class="stack">
-      <div class="card">
-        <div class="section-title">Account</div>
+      <div class="card account-card">
+        <div class="card-kicker">Manager File</div>
+        <div class="card-headline">Account Deck</div>
+        <div class="card-copy">This identity block follows you across public pages, league views, and messages. Keep it clean and unmistakably yours.</div>
         <div class="profile-head">
           <div id="avatarPreview" class="avatar">RB</div>
           <div class="meta">
             <div id="displayName" class="display-name">Manager</div>
-            <div id="memberLine" class="meta-line">Member #—</div>
+            <div id="memberLine" class="meta-line">Member number pending</div>
             <div id="emailLine" class="meta-line">email@example.com</div>
-            <div id="providerLine" class="meta-line">Signed in with password</div>
+            <div id="providerLine" class="meta-line">Sign-in method: Password</div>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="section-title">Public Page</div>
-        <div class="help">Every registered user gets a public member page with lifetime stats, a short bio, and a custom style preset.</div>
-        <div class="preview-row" style="margin-top:12px;">
+      <div class="card public-card">
+        <div class="card-kicker">Public Member Page</div>
+        <div class="card-headline">Open the page other managers see</div>
+        <div class="card-copy">Every registered user gets a public member page with lifetime stats, a short bio, and a controlled style preset that matches the rest of the platform.</div>
+        <div class="preview-row">
           <button class="btn secondary" id="viewPublicPageBtn" onclick="openPublicPage()">Open My Page</button>
           <button class="btn secondary" onclick="window.location.href='messages.html'">Open Inbox</button>
         </div>
       </div>
 
-      <div class="card">
-        <div class="section-title">Identity</div>
+      <div class="card identity-card">
+        <div class="card-kicker">Identity Editor</div>
+        <div class="card-headline">Manager name and bio</div>
+        <div class="card-copy">Set the name everyone sees and add a short scouting report for your public page.</div>
         <div class="field">
           <label class="label" for="usernameInput">Username</label>
           <input id="usernameInput" class="input" type="text" maxlength="20" placeholder="Your username">
@@ -211,10 +678,14 @@ body::before{
         </div>
       </div>
 
-      <div class="card">
-        <div class="section-title">Save Changes</div>
-        <div class="pill">Email stays tied to your sign-in method</div>
-        <div class="pill">Username can be changed anytime</div>
+      <div class="card save-card">
+        <div class="card-kicker">Commit Changes</div>
+        <div class="card-headline">Push the update live</div>
+        <div class="card-copy">Your public page updates the moment you save, so this is the final checkpoint before the new look goes on air.</div>
+        <div class="save-pills">
+          <div class="pill">Email stays tied to sign-in</div>
+          <div class="pill">Username can be changed anytime</div>
+        </div>
         <div class="status" id="saveStatus"></div>
         <div class="preview-row">
           <button class="btn primary" onclick="saveProfile()">Save Profile</button>
@@ -223,14 +694,17 @@ body::before{
     </div>
 
     <div class="stack">
-      <div class="card">
-        <div class="section-title">Public Page Style</div>
-        <div class="help" style="margin-bottom:12px;">A few strong presets keep pages unique without getting messy. Pick the one that feels most like your squad.</div>
+      <div class="card theme-studio-card">
+        <div class="card-kicker">Theme Studio</div>
+        <div class="card-headline">Pick your house look</div>
+        <div class="card-copy">A tighter set of presets keeps profile pages distinctive without letting them drift into chaos. Choose the one that feels most like your squad.</div>
         <div class="option-grid" id="themeOptions"></div>
       </div>
 
-      <div class="card">
-        <div class="section-title">Profile Picture</div>
+      <div class="card avatar-card">
+        <div class="card-kicker">Avatar Desk</div>
+        <div class="card-headline">Photo or GIF upload</div>
+        <div class="card-copy">Use a direct image link or upload a lightweight file. Animated GIFs work well when you want the profile to feel louder.</div>
         <div class="field">
           <label class="label" for="avatarUrlInput">Image or GIF URL</label>
           <input id="avatarUrlInput" class="input" type="url" placeholder="https://example.com/your-gif.gif">
@@ -321,6 +795,17 @@ function parseCreatedAt(user, fallbackValue){
   return Number.isFinite(created) ? created : fallbackValue;
 }
 
+function formatProviderLabel(value){
+  const raw = String(value || 'account').toLowerCase().trim();
+  if(!raw) return 'Account';
+  if(raw.includes('password')) return 'Password';
+  if(raw.includes('google')) return 'Google';
+  if(raw.includes('github')) return 'GitHub';
+  if(raw.includes('facebook')) return 'Facebook';
+  if(raw.includes('twitter')) return 'Twitter';
+  return raw.replace(/\.com$/,'').replace(/[_-]+/g,' ').replace(/\b\w/g, char => char.toUpperCase());
+}
+
 function allocateNextUserNumber(){
   return new Promise((resolve, reject) => {
     db.ref('meta/nextUserNumber').transaction(
@@ -399,26 +884,39 @@ function renderProfileSummary(user, profile){
   const theme = PROFILE_THEMES[profile?.themeKey] || PROFILE_THEMES[selectedThemeKey] || PROFILE_THEMES.ember;
   const aboutLength = String(profile?.aboutMe || '').trim().length;
   const provider = String(profile?.provider || user?.providerData?.[0]?.providerId || 'account');
+  const providerLabel = formatProviderLabel(provider);
   host.innerHTML = `
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Member Status</div>
+        <div class="summary-chip">${isAdmin ? 'Admin access' : userNumber > 0 ? 'Active file' : 'Pending'}</div>
+      </div>
       <div class="summary-value">${userNumber > 0 ? '#' + userNumber : 'Pending'}</div>
-      <div class="summary-label">Member Status</div>
       <div class="summary-copy">${isAdmin ? 'Administrator tools are active on this account.' : 'Your member profile is live and ready to personalize.'}</div>
     </div>
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Public Page</div>
+        <div class="summary-chip">${userNumber > 0 ? 'Ready' : 'Locked'}</div>
+      </div>
       <div class="summary-value">${userNumber > 0 ? 'Live' : 'Locked'}</div>
-      <div class="summary-label">Public Page</div>
       <div class="summary-copy">${userNumber > 0 ? 'Your public page can be opened and shared right now.' : 'Finish account setup to unlock your public member page.'}</div>
     </div>
     <div class="summary-card">
+      <div class="summary-top">
+        <div class="summary-label">Current Theme</div>
+        <div class="summary-chip">Theme deck</div>
+      </div>
       <div class="summary-value">${theme.name}</div>
-      <div class="summary-label">Current Theme</div>
       <div class="summary-copy">${theme.sub}</div>
     </div>
     <div class="summary-card">
-      <div class="summary-value">${aboutLength || '0'}</div>
-      <div class="summary-label">Profile Copy</div>
-      <div class="summary-copy">${provider.replace('password','password login')} · ${aboutLength ? 'Bio is filled in and ready.' : 'Add a short manager bio to complete your page.'}</div>
+      <div class="summary-top">
+        <div class="summary-label">Profile Copy</div>
+        <div class="summary-chip">${providerLabel}</div>
+      </div>
+      <div class="summary-value">${aboutLength ? aboutLength + '/220' : '0/220'}</div>
+      <div class="summary-copy">${aboutLength ? 'Bio is filled in and ready for your public page.' : 'Add a short manager bio to complete your public page.'}</div>
     </div>
   `;
 }
@@ -428,10 +926,11 @@ function applyProfileToUI(user, profile){
   const photoURL = profile?.photoURL || user.photoURL || '';
   const userNumber = Number(profile?.userNumber || 0);
   const isAdmin = [1,2,3,4,5].includes(userNumber);
+  const providerLabel = formatProviderLabel(profile?.provider || user.providerData?.[0]?.providerId || 'account');
   document.getElementById('displayName').textContent = username;
-  document.getElementById('memberLine').textContent = userNumber > 0 ? 'Member #' + userNumber + (isAdmin ? ' · Administrator' : '') : 'Member number pending';
+  document.getElementById('memberLine').textContent = userNumber > 0 ? 'Member #' + userNumber + (isAdmin ? ' - Administrator' : '') : 'Member number pending';
   document.getElementById('emailLine').textContent = user.email || 'No email found';
-  document.getElementById('providerLine').textContent = 'Signed in with ' + (profile?.provider || user.providerData?.[0]?.providerId || 'account');
+  document.getElementById('providerLine').textContent = 'Sign-in method: ' + providerLabel;
   document.getElementById('usernameInput').value = username;
   document.getElementById('aboutMeInput').value = String(profile?.aboutMe || '').slice(0,220);
   document.getElementById('avatarUrlInput').value = photoURL && !photoURL.startsWith('data:') ? photoURL : '';
@@ -474,6 +973,28 @@ function clearAvatar(){
   setStatus('Profile picture cleared. Save to apply.', 'success');
 }
 
+document.addEventListener('input', event => {
+  if(!currentUser) return;
+  if(event.target.id === 'usernameInput'){
+    const username = normalizeUsername(event.target.value) || fallbackUsernameFromUser(currentUser);
+    document.getElementById('displayName').textContent = username;
+    if(!getSelectedAvatar()) renderAvatar('', username);
+    renderProfileSummary(currentUser, {
+      ...(currentProfile || {}),
+      username,
+      aboutMe: document.getElementById('aboutMeInput')?.value || currentProfile?.aboutMe || '',
+      themeKey: selectedThemeKey
+    });
+  }
+  if(event.target.id === 'aboutMeInput'){
+    renderProfileSummary(currentUser, {
+      ...(currentProfile || {}),
+      username: document.getElementById('usernameInput')?.value || currentProfile?.username || '',
+      aboutMe: event.target.value || '',
+      themeKey: selectedThemeKey
+    });
+  }
+});
 document.addEventListener('change', event => {
   if(event.target.id !== 'avatarFileInput') return;
   const file = event.target.files?.[0];
@@ -577,7 +1098,7 @@ async function saveProfile(){
       updatedAt
     };
     document.getElementById('displayName').textContent = username;
-    document.getElementById('memberLine').textContent = 'Member #' + userNumber + (isAdmin ? ' · Administrator' : '');
+    document.getElementById('memberLine').textContent = 'Member #' + userNumber + (isAdmin ? ' - Administrator' : '');
     document.getElementById('viewPublicPageBtn').disabled = false;
     document.getElementById('heroPublicPageBtn').disabled = false;
     renderAvatar(selectedAvatar, username);
@@ -657,3 +1178,4 @@ auth.onAuthStateChanged(async user => {
 </script>
 </body>
 </html>
+

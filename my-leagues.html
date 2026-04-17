@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -105,8 +105,12 @@
   .pill.solo{color:#c4b5fd;border-color:rgba(139,92,246,.26);background:rgba(139,92,246,.08)}
   .pill.multi{color:#86efac;border-color:rgba(34,197,94,.26);background:rgba(34,197,94,.08)}
   .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .stats.solo-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stat{background:rgba(15,24,39,.56);border:1px solid rgba(152,201,255,.16);border-radius:16px;padding:12px 13px;backdrop-filter:blur(18px)}
   .stat-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1}
+  .stat-value.timestamp{display:flex;flex-direction:column;gap:3px;font-size:18px;line-height:1.05}
+  .stat-value.timestamp .date{font-size:20px}
+  .stat-value.timestamp .time{font-size:13px;letter-spacing:.03em;color:#d7e4f5}
   .stat-label{margin-top:6px;color:var(--text3);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
   .league-copy{color:var(--text2);font-size:13px;line-height:1.6;min-height:42px}
   .league-urgency{display:flex;flex-wrap:wrap;gap:8px;margin-top:-2px}
@@ -188,7 +192,7 @@
       </div>
     </div>
 
-    <div class="banner" id="leagueBanner">Loading your leagues…</div>
+    <div class="banner" id="leagueBanner">Loading your leaguesâ€¦</div>
 
     <div class="section">
       <div class="section-head">
@@ -238,6 +242,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 const SHARED_SEASON_ROOT = 'multiplayerSeasons';
+const SOLO_LAST_ACCESSED_STORAGE_KEY = 'rbSoloLeagueLastAccessed';
 let currentUser = null;
 let currentUserNumber = 0;
 let currentUsername = '';
@@ -327,8 +332,72 @@ function escapeHtml(str){
 }
 
 function formatDate(ts){
-  if(!ts) return '—';
+  if(!ts) return 'â€”';
   return new Date(ts).toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
+}
+
+function formatDateTime(ts){
+  if(!ts) return '-';
+  return new Date(ts).toLocaleString([],{
+    month:'short',
+    day:'numeric',
+    year:'numeric',
+    hour:'numeric',
+    minute:'2-digit'
+  });
+}
+
+function formatDateTimeParts(ts){
+  if(!ts) return {date:'-',time:''};
+  const date=new Date(ts);
+  return {
+    date:date.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}),
+    time:date.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})
+  };
+}
+
+function renderTimestampStat(ts){
+  if(!ts) return `<div class="stat-value timestamp">-</div>`;
+  const parts=formatDateTimeParts(ts);
+  return `<div class="stat-value timestamp"><span class="date">${escapeHtml(parts.date)}</span><span class="time">${escapeHtml(parts.time)}</span></div>`;
+}
+
+function readSoloLastAccessMap(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(SOLO_LAST_ACCESSED_STORAGE_KEY)||'{}');
+    return raw && typeof raw==='object' ? raw : {};
+  }catch(e){
+    return {};
+  }
+}
+
+function getStoredSoloLastAccess(id){
+  const map=readSoloLastAccessMap();
+  return Number(map[id]||0);
+}
+
+function setStoredSoloLastAccess(id, ts){
+  if(!id || !ts) return;
+  try{
+    const map=readSoloLastAccessMap();
+    map[id]=Number(ts);
+    localStorage.setItem(SOLO_LAST_ACCESSED_STORAGE_KEY, JSON.stringify(map));
+  }catch(e){}
+}
+
+function noteSoloLeagueAccess(row){
+  if(!row || !row.id) return 0;
+  const ts=Date.now();
+  setStoredSoloLastAccess(row.id, ts);
+  if(row.data && typeof row.data==='object') row.data.lastAccessedAt=ts;
+  if(currentUser && row.id!=='local'){
+    db.ref(`userSeasons/${currentUser.uid}/${row.id}/lastAccessedAt`).set(ts).catch(err=>{
+      console.warn('Could not persist solo lastAccessedAt:', row.id, err);
+    });
+  }
+  row.lastAccessedAt=ts;
+  row.lastAccessedLabel=formatDateTime(ts);
+  return ts;
 }
 
 function sportLabel(sport){
@@ -600,7 +669,7 @@ function renderDrafts(rows){
       <div class="stats">
         <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
         <div class="stat"><div class="stat-value">${Number(row.joinedCount||0)}</div><div class="stat-label">Joined</div></div>
-        <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'—'))}</div><div class="stat-label">My Seat</div></div>
+        <div class="stat"><div class="stat-value">${escapeHtml(String(row.mySeat||'â€”'))}</div><div class="stat-label">My Seat</div></div>
       </div>
       <div class="league-copy">Created ${escapeHtml(formatDate(row.createdAt))}. ${escapeHtml(urgency.copy)}</div>
       <div class="actions">
@@ -667,7 +736,10 @@ function renderSolo(rows){
     renderEmpty('soloList','No Solo Leagues Yet','Complete a solo draft and it will appear here.');
     return;
   }
-  host.innerHTML=rows.map(row=>`
+  host.innerHTML=rows.map(row=>{
+    const savedAt=Number(row.savedAt||row.updatedAt||row.data?.savedAt||row.data?.updatedAt||0);
+    const lastAccessedAt=Number(row.lastAccessedAt||row.data?.lastAccessedAt||getStoredSoloLastAccess(row.id)||0);
+    return `
     <div class="league-card">
       <div class="league-card-top">
         <div>
@@ -680,10 +752,11 @@ function renderSolo(rows){
           </div>
         </div>
       </div>
-      <div class="stats">
+      <div class="stats solo-stats">
         <div class="stat"><div class="stat-value">${Number(row.teamSize||0)}</div><div class="stat-label">Teams</div></div>
         <div class="stat"><div class="stat-value">${escapeHtml(row.teamName||'My Team')}</div><div class="stat-label">My Team</div></div>
-        <div class="stat"><div class="stat-value">${escapeHtml(String(row.savedLabel||'—'))}</div><div class="stat-label">Last Saved</div></div>
+        <div class="stat">${renderTimestampStat(savedAt)}<div class="stat-label">Last Saved</div></div>
+        <div class="stat">${renderTimestampStat(lastAccessedAt)}<div class="stat-label">Last Accessed</div></div>
       </div>
       <div class="league-copy">Your personal single-player league. ${row.id==='local'?'Saved locally in browser.':'Saved to cloud - accessible anywhere!'}</div>
       <div class="actions">
@@ -691,12 +764,12 @@ function renderSolo(rows){
         <button class="btn danger small" onclick="deleteSoloLeague('${row.id}')">Delete League</button>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 async function loadMyLeagues(){
-  console.log('🔄 Loading leagues...');
-  setBanner('Loading your leagues…');
+  console.log('ðŸ”„ Loading leagues...');
+  setBanner('Loading your leaguesâ€¦');
   
   const [lobbiesSnap,seasonsSnap,legacySeasonsSnap]=await Promise.all([
     db.ref('lobbies').once('value').catch(()=>null),
@@ -734,7 +807,7 @@ async function loadMyLeagues(){
     });
   }
   drafts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  console.log('✅ Found', drafts.length, 'draft rooms');
+  console.log('âœ… Found', drafts.length, 'draft rooms');
 
   // SEASON LEAGUES - use global variable
   seasons=[];
@@ -755,7 +828,7 @@ async function loadMyLeagues(){
         mySeat:Number(member.teamIdx||0)+1,
         complete:!!payload.game?.isSeasonComplete,
         updatedAt:Number(payload.updatedAt||0),
-        updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
+        updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : 'â€”',
         payload,
         member,
         source:'multiplayerSeasons'
@@ -780,14 +853,14 @@ async function loadMyLeagues(){
         mySeat:Number(member.teamIdx||0)+1,
         complete:!!payload.game?.isSeasonComplete,
         updatedAt:Number(payload.updatedAt||0),
-        updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
+        updatedLabel:payload.updatedAt ? new Date(payload.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : 'â€”',
         payload,
         member,
         source:'sharedSeasons-legacy'
       });
     });
   }
-  console.log('✅ Found', seasons.length, 'shared seasons from sharedSeasons/');
+  console.log('âœ… Found', seasons.length, 'shared seasons from sharedSeasons/');
   
   // ALSO load multiplayer leagues from userSeasons (for leagues saved there instead of sharedSeasons)
   if(currentUser){
@@ -800,7 +873,7 @@ async function loadMyLeagues(){
           
           // Only add multiplayer leagues that aren't already in seasons array
           if((data.multiplayer || data.isMultiplayer) && !seasons.find(s=>s.id===child.key)){
-            console.log('📦 Found multiplayer league in userSeasons:', child.key, data.leagueName);
+            console.log('ðŸ“¦ Found multiplayer league in userSeasons:', child.key, data.leagueName);
             seasons.push({
               id:child.key,
               name:data.leagueName||'RosterBate League',
@@ -811,7 +884,7 @@ async function loadMyLeagues(){
               mySeat:Number(data.myPos||0)+1,
               complete:!!data.isSeasonComplete,
               updatedAt:Number(data.updatedAt||data.savedAt||0),
-              updatedLabel:data.updatedAt ? new Date(data.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : '—',
+              updatedLabel:data.updatedAt ? new Date(data.updatedAt).toLocaleDateString([], {month:'short',day:'numeric'}) : 'â€”',
               payload:data,
               member:{
                 id:data.myPlayerId||'local',
@@ -822,7 +895,7 @@ async function loadMyLeagues(){
           }
         });
       }
-      console.log('✅ Total seasons after userSeasons check:', seasons.length);
+      console.log('âœ… Total seasons after userSeasons check:', seasons.length);
     }catch(e){
       console.error('Failed to load multiplayer leagues from userSeasons:', e);
     }
@@ -853,14 +926,14 @@ async function loadMyLeagues(){
               currentWeek:Number(data.currentWeek||1),
               createdAt:Number(data.createdAt||0),
               updatedAt:Number(data.updatedAt||0),
-              savedLabel:data.updatedAt ? new Date(data.updatedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : '—',
+              savedLabel:data.updatedAt ? new Date(data.updatedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : 'â€”',
               data
             });
           }
         });
       }
       solo.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-      console.log('✅ Found', solo.length, 'solo leagues');
+      console.log('âœ… Found', solo.length, 'solo leagues');
     }catch(e){
       console.error('Failed to load solo leagues from Firebase:', e);
       
@@ -879,7 +952,7 @@ async function loadMyLeagues(){
               teamSize:Number(data.leagueSize||0),
               teamName:data.teamName||'My Team',
               savedAt:Number(data.savedAt||0),
-              savedLabel:data.savedAt ? new Date(data.savedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : '—',
+              savedLabel:data.savedAt ? new Date(data.savedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : 'â€”',
               data
             });
           }
@@ -902,7 +975,7 @@ async function loadMyLeagues(){
             teamSize:Number(data.leagueSize||0),
             teamName:data.teamName||'My Team',
             savedAt:Number(data.savedAt||0),
-            savedLabel:data.savedAt ? new Date(data.savedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : '—',
+            savedLabel:data.savedAt ? new Date(data.savedAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : 'â€”',
             data
           });
         }
@@ -987,48 +1060,48 @@ async function leaveSeasonLeague(id){
   setBanner('Removing league...');
   
   try{
-    console.log('🚪 Leaving season:', {id, name: row.name, source: row.source, currentUser: !!currentUser});
+    console.log('ðŸšª Leaving season:', {id, name: row.name, source: row.source, currentUser: !!currentUser});
     
     // Check if this league is from userSeasons or sharedSeasons
     if(row.source === 'userSeasons'){
       // For leagues in userSeasons, just delete the league data
       if(!currentUser){
-        console.error('❌ Not logged in');
+        console.error('âŒ Not logged in');
         toast('Must be logged in to leave this league','var(--red)');
         setBanner('');
         return;
       }
       
       const userId = currentUser.uid;
-      console.log('🗑️ Deleting from userSeasons:', `userSeasons/${userId}/${id}`);
+      console.log('ðŸ—‘ï¸ Deleting from userSeasons:', `userSeasons/${userId}/${id}`);
       await db.ref(`userSeasons/${userId}/${id}`).remove();
-      console.log('✅ Removed league from userSeasons');
+      console.log('âœ… Removed league from userSeasons');
       
       // Also try to remove from allSeasons if it exists there
       try{
-        console.log('🗑️ Trying to delete from allSeasons:', `allSeasons/${id}`);
+        console.log('ðŸ—‘ï¸ Trying to delete from allSeasons:', `allSeasons/${id}`);
         await db.ref(`allSeasons/${id}`).remove();
-        console.log('✅ Removed league from allSeasons');
+        console.log('âœ… Removed league from allSeasons');
       }catch(e){
         console.warn('Could not remove from allSeasons (might not exist there):', e);
       }
       
     } else {
       // For leagues in sharedSeasons, mark as left
-      console.log('📝 Marking as left in sharedSeasons');
+      console.log('ðŸ“ Marking as left in sharedSeasons');
       const seasonRef=db.ref(SHARED_SEASON_ROOT+'/'+id);
       const member=row.member;
       if(!member){
-        console.error('❌ No member found');
+        console.error('âŒ No member found');
         toast('Could not identify your player ID in this season.','var(--red)');
         setBanner('');
         await loadMyLeagues();
         return;
       }
       const patch=buildLeftMemberPatch(member);
-      console.log('📝 Updating leftMembers:', patch);
+      console.log('ðŸ“ Updating leftMembers:', patch);
       await seasonRef.child('leftMembers').update(patch);
-      console.log('✅ Marked as left in sharedSeasons');
+      console.log('âœ… Marked as left in sharedSeasons');
     }
     
     // Clear from localStorage if it's the active lobby
@@ -1036,7 +1109,7 @@ async function leaveSeasonLeague(id){
       const saved=JSON.parse(localStorage.getItem('rbMultiplayerLobby')||'null');
       if(saved?.lobbyId===id || saved?.seasonId===id) {
         localStorage.removeItem('rbMultiplayerLobby');
-        console.log('✅ Cleared from localStorage');
+        console.log('âœ… Cleared from localStorage');
       }
     }catch(e){}
     
@@ -1044,7 +1117,7 @@ async function leaveSeasonLeague(id){
     const idx = seasons.findIndex(s => s.id === id);
     if(idx !== -1){
       seasons.splice(idx, 1);
-      console.log('✅ Removed from local array');
+      console.log('âœ… Removed from local array');
     }
     
     // Re-render immediately
@@ -1054,12 +1127,12 @@ async function leaveSeasonLeague(id){
     
     // Reload from Firebase after a short delay to confirm
     setTimeout(async () => {
-      console.log('🔄 Reloading leagues from Firebase...');
+      console.log('ðŸ”„ Reloading leagues from Firebase...');
       await loadMyLeagues();
     }, 500);
     
   }catch(e){
-    console.error('❌ Failed to leave season:', e);
+    console.error('âŒ Failed to leave season:', e);
     toast('Could not leave that season: ' + (e.message || 'Unknown error'),'var(--red)');
     setBanner('');
     // Reload to show current state
@@ -1070,10 +1143,12 @@ async function leaveSeasonLeague(id){
 function openSoloLeague(seasonId){
   const row=(window.__rbSoloRows||[]).find(x=>x.id===seasonId);
   if(!row) return;
+  const accessTs=noteSoloLeagueAccess(row);
+  const payload=(row.data && typeof row.data==='object') ? {...row.data, lastAccessedAt:accessTs} : {lastAccessedAt:accessTs};
   
   // Load the league data into localStorage so season manager can use it
   try{
-    localStorage.setItem('rosterbateDraft', JSON.stringify(row.data));
+    localStorage.setItem('rosterbateDraft', JSON.stringify(payload));
   }catch(e){
     console.error('Failed to load league into localStorage:', e);
   }
@@ -1206,3 +1281,5 @@ auth.onAuthStateChanged(async user=>{
 </script>
 </body>
 </html>
+
+

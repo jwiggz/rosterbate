@@ -172,6 +172,18 @@
     from{transform:rotate(0deg);}
     to{transform:rotate(360deg);}
   }
+  .promo-grid{
+    transition:opacity .24s ease,transform .28s ease,filter .24s ease;
+  }
+  body.homepage-booting .promo-grid{
+    opacity:0;
+    transform:translateY(10px);
+    filter:blur(8px);
+    pointer-events:none;
+  }
+  body.homepage-booting .promo-card::before{
+    animation-play-state:paused;
+  }
   .promo-card{
     --feature-bg:linear-gradient(135deg,rgba(20,24,34,.92),rgba(24,31,44,.86));
     --feature-primary:#584827;
@@ -1501,7 +1513,7 @@
   }
 </style>
 </head>
-<body>
+<body class="homepage-booting">
 <div class="site-bg" aria-hidden="true">
   <div class="sport-backdrop" id="sportBackdrop"></div>
   <div class="sport-backdrop-alt" id="sportBackdropAlt"></div>
@@ -2306,6 +2318,45 @@ const SHEMMY_SEQUENCE = 'shemmy';
 let shemmyBuffer = '';
 let shemmyLastPlayedAt = 0;
 let shemmyAudioPrimed = false;
+let homepageHeroBootReleased = false;
+
+function preloadHomepageImage(src){
+  return new Promise(resolve => {
+    if(!src) return resolve();
+    const img = new Image();
+    let settled = false;
+    const done = () => {
+      if(settled) return;
+      settled = true;
+      resolve();
+    };
+    img.onload = done;
+    img.onerror = done;
+    img.src = src;
+    if(img.complete) done();
+  });
+}
+
+function releaseHomepageHeroBoot(){
+  if(homepageHeroBootReleased) return;
+  homepageHeroBootReleased = true;
+  const reveal = () => document.body.classList.remove('homepage-booting');
+  if(typeof requestAnimationFrame === 'function'){
+    requestAnimationFrame(() => requestAnimationFrame(reveal));
+  } else {
+    setTimeout(reveal, 0);
+  }
+}
+
+function settleHomepageHeroBoot(){
+  const sport = normalizeRosterbateSport(selectedHomeSport);
+  const assets = HOME_SPORT_IMAGES[sport] || HOME_SPORT_IMAGES.nba;
+  Promise.all([
+    preloadHomepageImage(assets.moneyball),
+    preloadHomepageImage(assets.powerups),
+    preloadHomepageImage(assets.trade)
+  ]).finally(releaseHomepageHeroBoot);
+}
 
 function updateNavNotificationBadge(count){
   const badge = document.getElementById('navNotify');
@@ -2413,6 +2464,8 @@ function selectSportCard(sport){
 
 let authMode = 'signup';
 updateHomeSportUI();
+settleHomepageHeroBoot();
+window.addEventListener('load', releaseHomepageHeroBoot, { once:true });
 setTimeout(()=>document.body.classList.add('cta-shimmer-ready'), 2000);
 setTimeout(()=>document.body.classList.add('cta-logo-sync'), 12000);
 

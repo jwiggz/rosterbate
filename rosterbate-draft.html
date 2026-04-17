@@ -993,7 +993,7 @@
     .rb-chat-title{font-size:24px;}
     .rb-chat-pulse-title{font-size:26px;}
   }
-  @media (max-height: 880px){
+@media (max-height: 880px){
     html,body{overflow-y:auto;}
     .screen{
       height:auto;
@@ -1053,14 +1053,14 @@
     .pick-signal-tag{padding:8px 11px;font-size:12px;}
     .tbar{margin-top:12px;}
     .draft-layout{
-      flex-direction:column;
-      gap:12px;
-      padding:12px 14px 14px;
-      overflow:visible;
+      gap:10px;
+      padding:10px 12px 12px;
+      overflow:hidden;
     }
+    .draft-side-column{width:clamp(320px,24vw,400px);min-width:320px;max-width:400px;}
     .player-intel-rail{grid-template-columns:1fr;}
-    .draft-main{flex:none;min-height:500px;}
-    .rb-chat-panel{width:100%;max-width:none;min-height:360px;}
+    .draft-main{min-height:0;}
+    .rb-chat-panel{width:100%;max-width:none;min-height:0;}
     .tabs{padding:10px 10px 0;gap:6px;}
     .tb{padding:10px 6px 8px;font-size:13px;}
     .pf{padding:10px 12px;}
@@ -2205,15 +2205,8 @@ async function awardRosterbateScore(actionKey, points){
   return true;
 }
 // ─── TEAM COLORS ──────────────────────────────────────────
-const TC={
-  ATL:'#C1272D',BOS:'#007A33',BKN:'#000000',CHA:'#1D1160',CHI:'#CE1141',
-  CLE:'#860038',DAL:'#00538C',DEN:'#0E2240',DET:'#C8102E',GSW:'#1D428A',
-  HOU:'#CE1141',IND:'#002D62',LAC:'#C8102E',LAL:'#552583',MEM:'#5D76A9',
-  MIA:'#98002E',MIL:'#00471B',MIN:'#0C2340',NOP:'#0C2340',NYK:'#F58426',
-  OKC:'#007AC1',ORL:'#0077C0',PHI:'#006BB6',PHX:'#1D1160',POR:'#E03A3E',
-  SAC:'#5A2D81',SAS:'#C4CED4',TOR:'#CE1141',UTA:'#002B5C',WAS:'#002B5C',
-};
 function tcolor(tm){return getRosterbateTeamColor(SPORT, tm);}
+function tpalette(tm){return typeof getRosterbateTeamPalette==='function' ? getRosterbateTeamPalette(SPORT, tm) : {primary:tcolor(tm)};}
 function initials(n){
   if(!n) return '?';
   const p=n.trim().split(' ');
@@ -3216,7 +3209,9 @@ function applyDraftViewportFit(){
   const chatPanel=document.getElementById('rbChatPanel');
   if(!draft || !layout || !chatPanel) return;
 
-  if(window.innerWidth<=900 || window.innerHeight<=880){
+  const layoutStyle=getComputedStyle(layout);
+  const isStacked=layoutStyle.flexDirection==='column';
+  if(window.innerWidth<=900 || isStacked){
     layout.style.height='';
     layout.style.minHeight='';
     chatPanel.style.height='';
@@ -6873,6 +6868,7 @@ async function startYourSeason(){
 
 @media (max-width: 1320px){
   .draft-layout{flex-direction:column;padding:12px;}
+  .draft-side-column{width:100%;min-width:0;max-width:none;}
   .rb-chat-panel{width:100%;max-width:none;min-height:280px;}
   .rb-chat-pulse{flex-direction:column;align-items:flex-start;}
 }

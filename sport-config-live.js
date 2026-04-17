@@ -1,5 +1,58 @@
 // RosterBate Sport Configuration
 (function() {
+  function hexToRgba(hex, alpha) {
+    const value = String(hex || '').replace('#', '').trim();
+    if (!/^[0-9a-fA-F]{6}$/.test(value)) return `rgba(102,102,102,${alpha})`;
+    const r = parseInt(value.slice(0, 2), 16);
+    const g = parseInt(value.slice(2, 4), 16);
+    const b = parseInt(value.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function createPalette(primary, secondary, ink) {
+    return {
+      primary,
+      secondary,
+      ink,
+      glow: hexToRgba(primary, 0.28),
+      ring: hexToRgba(secondary, 0.42),
+      shadow: hexToRgba(primary, 0.18)
+    };
+  }
+
+  const NBA_SAFE_INSPIRED_TEAM_PALETTES = {
+    ATL: createPalette('#D76849', '#F2B56E', '#211412'),
+    BOS: createPalette('#2F8F5B', '#D6C27A', '#121811'),
+    BKN: createPalette('#4D5564', '#D6DEE8', '#13151A'),
+    CHA: createPalette('#4B58C7', '#42D8C6', '#111426'),
+    CHI: createPalette('#D84D63', '#161D28', '#130F12'),
+    CLE: createPalette('#8C4A7A', '#F0A65F', '#1B1218'),
+    DAL: createPalette('#2B7AB8', '#76D0D4', '#101B25'),
+    DEN: createPalette('#3F5FA7', '#F2AB46', '#151628'),
+    DET: createPalette('#4E6DD1', '#DC6A4A', '#131824'),
+    GSW: createPalette('#2F5AC6', '#F1B34F', '#11182A'),
+    HOU: createPalette('#C94B57', '#EF8B6F', '#1A1012'),
+    IND: createPalette('#36569F', '#F0BF67', '#151824'),
+    LAC: createPalette('#2C7DB2', '#F26C4D', '#111A23'),
+    LAL: createPalette('#7D4EC9', '#FFC76A', '#171123'),
+    MEM: createPalette('#5A7BC7', '#9FD8CC', '#111B25'),
+    MIA: createPalette('#EF6B76', '#31D0B4', '#1C1014'),
+    MIL: createPalette('#2F7E58', '#D7C38A', '#111814'),
+    MIN: createPalette('#3F69B6', '#61C8D7', '#101826'),
+    NOP: createPalette('#315987', '#E28B52', '#131824'),
+    NYK: createPalette('#2F7FE2', '#F5A153', '#101A27'),
+    OKC: createPalette('#2AA8D6', '#FFB357', '#101A21'),
+    ORL: createPalette('#3D73DB', '#B7D6FF', '#11182A'),
+    PHI: createPalette('#3C67D6', '#FF725C', '#131927'),
+    PHX: createPalette('#8D55D6', '#F89D53', '#1A1224'),
+    POR: createPalette('#DC5D5C', '#2D3949', '#171113'),
+    SAC: createPalette('#8D56C7', '#C2BDD6', '#171225'),
+    SAS: createPalette('#7B8697', '#D9DFEB', '#14181E'),
+    TOR: createPalette('#D65E68', '#5F748D', '#171216'),
+    UTA: createPalette('#3EA670', '#E8BB5D', '#121912'),
+    WAS: createPalette('#4C78D4', '#D96B63', '#131925')
+  };
+
   window.normalizeRosterbateSport = function(sport) {
     const normalized = String(sport || '').toLowerCase().trim();
     return ['nba', 'nfl', 'mlb'].includes(normalized) ? normalized : 'nba';
@@ -312,14 +365,7 @@
   // Get team colors for display
   window.getRosterbateTeamColor = function(sport, teamCode) {
     const colors = {
-      nba: {
-        ATL: '#E03A3E', BOS: '#007A33', BKN: '#000000', CHA: '#1D1160', CHI: '#CE1141',
-        CLE: '#860038', DAL: '#00538C', DEN: '#0E2240', DET: '#C8102E', GSW: '#1D428A',
-        HOU: '#CE1141', IND: '#002D62', LAC: '#C8102E', LAL: '#552583', MEM: '#5D76A9',
-        MIA: '#98002E', MIL: '#00471B', MIN: '#0C2340', NOP: '#0C2340', NYK: '#006BB6',
-        OKC: '#007AC1', ORL: '#0077C0', PHI: '#006BB6', PHX: '#1D1160', POR: '#E03A3E',
-        SAC: '#5A2D81', SAS: '#C4CED4', TOR: '#CE1141', UTA: '#002B5C', WAS: '#002B5C'
-      },
+      nba: Object.fromEntries(Object.entries(NBA_SAFE_INSPIRED_TEAM_PALETTES).map(([code, palette]) => [code, palette.primary])),
       nfl: {
         ARI: '#97233F', ATL: '#A71930', BAL: '#241773', BUF: '#00338D', CAR: '#0085CA',
         CHI: '#0B162A', CIN: '#FB4F14', CLE: '#311D00', DAL: '#041E42', DEN: '#FB4F14',
@@ -341,4 +387,15 @@
     const sportColors = colors[sport] || colors.nba;
     return sportColors[teamCode] || '#666666';
   };
+
+  window.getRosterbateTeamPalette = function(sport, teamCode) {
+    const normalized = normalizeRosterbateSport(sport);
+    if (normalized === 'nba' && NBA_SAFE_INSPIRED_TEAM_PALETTES[teamCode]) {
+      return Object.assign({}, NBA_SAFE_INSPIRED_TEAM_PALETTES[teamCode]);
+    }
+    const primary = window.getRosterbateTeamColor(normalized, teamCode);
+    return createPalette(primary, primary, '#0f172a');
+  };
+
+  window.RB_SAFE_NBA_TEAM_PALETTES = NBA_SAFE_INSPIRED_TEAM_PALETTES;
 })();
