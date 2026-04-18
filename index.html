@@ -989,6 +989,14 @@
     border-color:rgba(191,219,254,.38);
     box-shadow:inset 0 2px 0 rgba(239,246,255,.28),0 14px 22px rgba(0,0,0,.22),0 6px 14px rgba(59,130,246,.2);
   }
+  .historical-btn.tertiary{
+    background:
+      linear-gradient(180deg,rgba(245,248,255,.96) 0%,rgba(198,209,230,.72) 8%,rgba(148,163,184,.18) 9%,transparent 12%),
+      linear-gradient(180deg,#6d778a 0%,#4a5568 40%,#334155 72%,#1f2937 100%);
+    color:#eef4ff;
+    border-color:rgba(203,213,225,.34);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.22),0 14px 22px rgba(0,0,0,.22),0 6px 14px rgba(51,65,85,.2);
+  }
   .historical-btn.disabled,
   .historical-btn[aria-disabled="true"]{
     pointer-events:none;
@@ -1809,6 +1817,7 @@
                 </div>
               </div>
               <div class="historical-action-row">
+                <a id="historicalBrowseLink" class="historical-btn tertiary" href="historic-seasons.html?sport=nba">Browse Historic Seasons</a>
                 <a id="historicalSeasonLink" class="historical-btn primary" href="rosterbate-season.html?sport=nba&historical=dev">Play The Real Season</a>
                 <a id="historicalDraftLink" class="historical-btn secondary" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
               </div>
@@ -2347,8 +2356,9 @@ const HOME_HISTORICAL_SURFACE = {
   title: '1995-96 NBA Universe',
   description: 'Load the full historical player pool, relive the real season, or redraft the era with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the league in one alternate-history sandbox.',
   teamCount: 29,
-  playerCount: 445,
+  playerCount: 436,
   gameCount: 183,
+  browserUrl: 'historic-seasons.html?sport=nba',
   seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev',
   draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev'
 };
@@ -2555,6 +2565,7 @@ function updateHistoricalEntrySurface(){
   const gamesEl = document.getElementById('historicalGamesCount');
   const statusEl = document.getElementById('historicalEntryStatus');
   const noteEl = document.getElementById('historicalEntryNote');
+  const browseLink = document.getElementById('historicalBrowseLink');
   const seasonLink = document.getElementById('historicalSeasonLink');
   const draftLink = document.getElementById('historicalDraftLink');
   if(titleEl) titleEl.textContent = surface.title;
@@ -2567,6 +2578,12 @@ function updateHistoricalEntrySurface(){
     noteEl.textContent = isLocalHistorical
       ? 'Historic mode is now a real product lane: franchise runs, daily reveal seasons, and full-pool fantasy drafts from a loaded era pack.'
       : 'Historic Seasons is being developed as a flagship mode. Basketball is the first universe coming online before wider release.';
+  }
+  if(browseLink){
+    browseLink.textContent = 'Browse Historic Seasons';
+    browseLink.href = surface.browserUrl;
+    browseLink.classList.remove('disabled');
+    browseLink.removeAttribute('aria-disabled');
   }
   [
     [seasonLink, surface.seasonUrl, 'Play The Real Season'],

@@ -5,6 +5,7 @@
   const baseUrl=currentScript && currentScript.src ? currentScript.src.replace(/[^/]+$/,'') : '';
   const DEFAULT_PACK_ID='nba_1996_full_season_v1';
   const DEFAULT_PACK_ROOT='historical-packs/';
+  const DEFAULT_CATALOG_PATH='historical-packs/catalog.json';
 
   function resolveUrl(path){
     try{
@@ -76,9 +77,19 @@
     return loadPackById(DEFAULT_PACK_ID);
   }
 
+  async function loadCatalog(){
+    const catalog=await fetchJson(resolveUrl(DEFAULT_CATALOG_PATH));
+    if(!Array.isArray(catalog)){
+      throw new Error('historical_catalog_invalid');
+    }
+    return deepClone(catalog);
+  }
+
   const api={
     defaultPackId: DEFAULT_PACK_ID,
     packRoot: DEFAULT_PACK_ROOT,
+    catalogPath: DEFAULT_CATALOG_PATH,
+    loadCatalog: loadCatalog,
     loadPackById: loadPackById,
     loadDefaultPack: loadDefaultPack,
     loadPackBundleFromRoot: loadPackBundleFromRoot,

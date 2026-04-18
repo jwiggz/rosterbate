@@ -56,6 +56,21 @@
     "reviewStatus": "draft",
     "importNotes": "Historical pack cleanup removed unmatched non-roster players and made Victor Alexander an explicit roster-only zero-stat case so seasonStats coverage is effectively complete without synthetic fallback."
   },
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 435,
+      "playerCount": 436,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 1,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 9,
+      "label": "Removed invalid players"
+    }
+  },
   "notes": [
     "Historical players now carry real 1995-96 regular-season totals and derived per-game stats.",
     "Known invalid pack leftovers were removed when they could not be found on any 1995-96 team page.",

@@ -1,0 +1,111 @@
+[
+  {
+    "packId": "nba_1996_full_season_v1",
+    "sport": "nba",
+    "seasonLabel": "1995-96 NBA Historic Season",
+    "shortLabel": "1995-96",
+    "era": "1990s",
+    "availability": "playable",
+    "statusLabel": "Playable Now",
+    "significanceLabel": "Dynasty Peak",
+    "significanceTone": "dynasty",
+    "completenessLabel": "Playable foundation",
+    "completenessPercent": 82,
+    "tagline": "Rewrite the greatest regular season ever.",
+    "summary": "Full-league historical universe with real season stats, real-season boot, and Draft The Era support.",
+    "whyItMatters": "This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.",
+    "focusTeamName": "Chicago Bulls",
+    "plannedModes": [
+      "Play The Real Season",
+      "Draft The Era",
+      "Reimagined Season"
+    ],
+    "previewStars": [
+      "Michael Jordan",
+      "Hakeem Olajuwon",
+      "Shaquille O'Neal"
+    ],
+    "seasonUrl": "rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1",
+    "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1"
+  },
+  {
+    "packId": "nba_1987_full_season_v1",
+    "sport": "nba",
+    "seasonLabel": "1986-87 NBA Historic Season",
+    "shortLabel": "1986-87",
+    "era": "1980s",
+    "availability": "preview",
+    "statusLabel": "Archive Preview",
+    "significanceLabel": "Rivalry Apex",
+    "significanceTone": "heritage",
+    "completenessLabel": "Concept framing",
+    "completenessPercent": 18,
+    "tagline": "Bird, Magic, and a young Jordan in one league.",
+    "summary": "A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.",
+    "whyItMatters": "This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.",
+    "focusTeamName": "Los Angeles Lakers",
+    "plannedModes": [
+      "Play The Real Season",
+      "Draft The Era"
+    ],
+    "previewStars": [
+      "Magic Johnson",
+      "Larry Bird",
+      "Michael Jordan"
+    ]
+  },
+  {
+    "packId": "nba_2001_full_season_v1",
+    "sport": "nba",
+    "seasonLabel": "2000-01 NBA Historic Season",
+    "shortLabel": "2000-01",
+    "era": "2000s",
+    "availability": "preview",
+    "statusLabel": "Authoring Next",
+    "significanceLabel": "Superstar Pivot",
+    "significanceTone": "spotlight",
+    "completenessLabel": "Research + roadmap",
+    "completenessPercent": 12,
+    "tagline": "Shaq and Kobe, AI's run, Duncan in his prime.",
+    "summary": "A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.",
+    "whyItMatters": "This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.",
+    "focusTeamName": "Los Angeles Lakers",
+    "plannedModes": [
+      "Play The Real Season",
+      "Draft The Era",
+      "Historic Challenges"
+    ],
+    "previewStars": [
+      "Shaquille O'Neal",
+      "Allen Iverson",
+      "Tim Duncan"
+    ]
+  },
+  {
+    "packId": "nba_2016_full_season_v1",
+    "sport": "nba",
+    "seasonLabel": "2015-16 NBA Historic Season",
+    "shortLabel": "2015-16",
+    "era": "2010s",
+    "availability": "preview",
+    "statusLabel": "Roadmap",
+    "significanceLabel": "Style Breakthrough",
+    "significanceTone": "modern",
+    "completenessLabel": "Archive target",
+    "completenessPercent": 8,
+    "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
+    "summary": "A future pace-and-space universe built around the Warriors, Cavs, and one of the most recognizable modern NBA seasons.",
+    "whyItMatters": "This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.",
+    "focusTeamName": "Golden State Warriors",
+    "plannedModes": [
+      "Play The Real Season",
+      "Draft The Era",
+      "Reimagined Season"
+    ],
+    "previewStars": [
+      "Stephen Curry",
+      "LeBron James",
+      "Kawhi Leonard"
+    ]
+  }
+]

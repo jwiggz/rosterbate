@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="RosterBate Historic Seasons - Play classic seasons, draft full historical player pools, and launch alternate basketball universes.">
+<title>RosterBate - Historic Seasons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="sport-config.js"></script>
+<script src="historical-pack-loader.js"></script>
+<script src="historical-pack-dev-runner.js" defer></script>
+<style>
+  :root{
+    --bg:#060a13;
+    --bg-soft:#0c1425;
+    --ink:#f8f4ec;
+    --muted:#9bb0cf;
+    --line:rgba(255,255,255,.1);
+    --glass:rgba(11,19,34,.82);
+    --glass-strong:rgba(9,14,25,.92);
+    --accent:#f5a34b;
+    --accent-soft:#ffd7a7;
+    --green:#5ae3a0;
+    --blue:#7dc4ff;
+    --red:#ff907f;
+    --teko:'Teko', Impact, sans-serif;
+    --plex:'IBM Plex Sans', 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--plex)}
+  body{
+    background:
+      radial-gradient(42% 24% at 50% 0%,rgba(245,163,75,.16),transparent 65%),
+      linear-gradient(180deg,rgba(7,12,22,.72),rgba(6,10,19,.96)),
+      url("hero-hall-of-fame.avif") center top / cover no-repeat fixed;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+      linear-gradient(180deg,rgba(6,10,18,.55) 0%,rgba(6,10,18,.72) 32%,rgba(5,8,14,.92) 100%),
+      radial-gradient(28% 20% at 14% 22%,rgba(255,255,255,.11),transparent 70%),
+      radial-gradient(26% 18% at 86% 24%,rgba(255,255,255,.08),transparent 72%);
+    pointer-events:none;
+  }
+  .wrap{position:relative;z-index:1;max-width:1380px;margin:0 auto;padding:0 24px 48px}
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:14px 0 8px;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .nav-logo{display:inline-flex;align-items:center}
+  .nav-logo img{width:118px;height:auto;display:block;filter:drop-shadow(0 10px 24px rgba(0,0,0,.3))}
+  .nav-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .nav-link{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:42px;padding:0 16px;border-radius:999px;border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(39,47,63,.92),rgba(24,30,43,.94));
+    color:#edf4ff;text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.06em;text-transform:uppercase;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 22px rgba(0,0,0,.2);
+  }
+  .nav-link.accent{
+    background:linear-gradient(180deg,#ffbb6e,#f08a27);
+    color:#241205;border-color:rgba(255,220,176,.45)
+  }
+
+  .hero{
+    display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);
+    gap:18px;margin-top:18px;align-items:stretch;
+  }
+  .panel{
+    position:relative;overflow:hidden;border-radius:28px;border:1px solid rgba(255,182,109,.18);
+    background:linear-gradient(180deg,rgba(18,29,49,.88),rgba(8,14,24,.94));
+    box-shadow:0 24px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .panel::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(90% 120% at 0% 0%,rgba(125,182,255,.14),transparent 54%),radial-gradient(70% 90% at 100% 0%,rgba(245,163,75,.12),transparent 52%);
+    pointer-events:none;
+  }
+  .hero-main{padding:30px 30px 28px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 12px;border-radius:999px;border:1px solid rgba(255,182,109,.22);
+    background:rgba(15,20,31,.58);font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-soft)
+  }
+  .eyebrow::before{
+    content:"";width:8px;height:8px;border-radius:999px;background:var(--accent);
+    box-shadow:0 0 0 4px rgba(245,163,75,.12),0 0 18px rgba(245,163,75,.38)
+  }
+  .hero-title{
+    margin:18px 0 0;font:700 clamp(56px,7vw,96px)/.88 var(--teko);letter-spacing:.02em;text-transform:uppercase;
+    text-shadow:0 18px 40px rgba(0,0,0,.38)
+  }
+  .hero-title span{display:block;color:var(--accent)}
+  .hero-copy{max-width:58ch;margin-top:14px;font-size:16px;line-height:1.72;color:#d7e4f5}
+  .hero-chip-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .hero-chip{
+    display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.09);background:rgba(9,15,26,.52);font:700 11px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#d9e9ff
+  }
+  .hero-foot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}
+  .hero-stat{
+    padding:14px 14px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(20,30,48,.86),rgba(12,18,31,.94))
+  }
+  .hero-stat-value{font:700 36px/.9 var(--teko)}
+  .hero-stat-label{margin-top:6px;font:700 11px/1 var(--plex);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+  .hero-side{padding:24px 24px 22px;display:flex;flex-direction:column}
+  .hero-side-kicker{font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#9ec8ff}
+  .hero-side-title{margin-top:10px;font:700 42px/.9 var(--teko);text-transform:uppercase}
+  .hero-side-copy{margin-top:12px;font-size:14px;line-height:1.68;color:#d1dff2}
+  .snapshot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+  .snapshot-card{
+    padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(12,18,30,.92),rgba(8,12,22,.96))
+  }
+  .snapshot-value{font:700 30px/.9 var(--teko)}
+  .snapshot-label{margin-top:5px;font:700 10px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .snapshot-card.warn .snapshot-value{color:var(--accent-soft)}
+  .snapshot-card.good .snapshot-value{color:var(--green)}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;margin-top:18px;align-items:start}
+  .browser-panel{padding:24px}
+  .section-kicker{font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#9ec8ff}
+  .section-title{margin-top:10px;font:700 44px/.92 var(--teko);text-transform:uppercase}
+  .section-copy{margin-top:10px;max-width:60ch;font-size:15px;line-height:1.68;color:#cbd8eb}
+
+  .archive-browser-shell{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;margin-top:20px;align-items:start}
+  .archive-rail{display:grid;gap:12px;align-content:start}
+  .archive-card{
+    position:relative;padding:16px 16px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,13,23,.98));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 14px 24px rgba(0,0,0,.14);
+    cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease;
+    text-align:left;color:inherit;font:inherit
+  }
+  .archive-card:hover{transform:translateY(-1px);border-color:rgba(255,182,109,.18);filter:brightness(1.03)}
+  .archive-card.active{
+    border-color:rgba(255,182,109,.34);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 22px 36px rgba(0,0,0,.2),0 0 0 1px rgba(255,182,109,.16)
+  }
+  .archive-card.preview{
+    border-color:rgba(125,196,255,.14);
+    background:linear-gradient(180deg,rgba(16,24,39,.92),rgba(9,13,23,.98))
+  }
+  .archive-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .archive-card-era{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#a9bdd8}
+  .archive-card-status{
+    display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;
+    border:1px solid rgba(91,227,161,.2);background:rgba(9,28,21,.7);
+    font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#d8fff0;white-space:nowrap
+  }
+  .archive-card.preview .archive-card-status{
+    border-color:rgba(125,196,255,.18);background:rgba(15,27,44,.78);color:#d8ebff
+  }
+  .archive-card-title{margin-top:10px;font:700 34px/.9 var(--teko);text-transform:uppercase}
+  .archive-card-tagline{margin-top:6px;font:700 15px/1.2 var(--teko);letter-spacing:.03em;color:var(--accent-soft)}
+  .archive-card-summary{margin-top:10px;font-size:13px;line-height:1.58;color:#d0dced}
+  .archive-card-why{margin-top:10px;font-size:12px;line-height:1.58;color:#bcd0e8}
+  .archive-significance{
+    display:inline-flex;align-items:center;justify-content:center;margin-top:10px;padding:7px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);font:700 10px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase
+  }
+  .archive-significance.dynasty{background:rgba(39,24,8,.72);border-color:rgba(255,183,102,.24);color:#ffd7a5}
+  .archive-significance.heritage{background:rgba(25,18,44,.72);border-color:rgba(180,159,255,.22);color:#d7cbff}
+  .archive-significance.spotlight{background:rgba(22,25,49,.76);border-color:rgba(122,196,255,.24);color:#d7ecff}
+  .archive-significance.modern{background:rgba(10,33,29,.78);border-color:rgba(90,227,160,.24);color:#d8fff0}
+  .archive-significance.default{background:rgba(17,23,35,.76);border-color:rgba(255,255,255,.12);color:#edf5ff}
+  .archive-card-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .archive-meta-pill{
+    display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.08);background:rgba(7,14,25,.66);
+    font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb
+  }
+  .archive-meta-pill.completeness{border-color:rgba(255,182,109,.18);background:rgba(42,24,10,.62);color:#ffe0bc}
+  .archive-detail{display:grid;gap:0}
+  .detail-note{margin-top:14px;font-size:12px;line-height:1.55;color:#cad7e8}
+
+  .pack-card{
+    padding:20px;border-radius:24px;border:1px solid rgba(255,182,109,.18);
+    background:
+      radial-gradient(90% 120% at 100% 0%,rgba(255,173,94,.12),transparent 48%),
+      linear-gradient(180deg,rgba(20,29,47,.94),rgba(10,16,28,.98));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 34px rgba(0,0,0,.18)
+  }
+  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:start}
+  .pack-label{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#a8bddc}
+  .pack-title{margin-top:8px;font:700 48px/.88 var(--teko);text-transform:uppercase}
+  .pack-tagline{margin-top:8px;font:700 18px/1.2 var(--teko);letter-spacing:.03em;color:var(--accent-soft)}
+  .pack-desc{margin-top:12px;max-width:62ch;font-size:15px;line-height:1.72;color:#d7e4f4}
+  .pack-status{
+    display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:999px;
+    border:1px solid rgba(91,227,161,.24);background:rgba(9,28,21,.74);font:700 12px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#cffff0
+  }
+  .pack-status.preview{border-color:rgba(255,194,122,.24);background:rgba(43,25,10,.68);color:#ffddb3}
+
+  .pack-health{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+  .health-card{
+    padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(13,20,33,.94),rgba(8,13,23,.98))
+  }
+  .health-card.good{border-color:rgba(91,227,161,.18);background:linear-gradient(180deg,rgba(10,29,24,.94),rgba(8,15,22,.98))}
+  .health-card.warn{border-color:rgba(255,190,112,.18);background:linear-gradient(180deg,rgba(37,24,13,.94),rgba(11,13,22,.98))}
+  .health-value{font:700 34px/.9 var(--teko)}
+  .health-card.good .health-value{color:var(--green)}
+  .health-card.warn .health-value{color:var(--accent-soft)}
+  .health-label{margin-top:5px;font:700 10px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .health-sub{margin-top:6px;font-size:12px;line-height:1.45;color:#c9d7ea}
+
+  .pack-lower{display:grid;grid-template-columns:1fr;gap:18px;margin-top:20px}
+  .pack-box{
+    padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(9,13,23,.98))
+  }
+  .pack-box-title{font:700 26px/.94 var(--teko);text-transform:uppercase}
+  .star-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .spotlight-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+  .star-pill{
+    display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:999px;border:1px solid rgba(125,196,255,.16);
+    background:rgba(9,17,29,.7);font:700 12px/1 var(--plex);letter-spacing:.04em;color:#eef5ff
+  }
+  .spotlight{
+    width:100%;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.07);
+    background:linear-gradient(180deg,rgba(14,21,34,.92),rgba(9,13,23,.98))
+  }
+  .spotlight-title{font:700 18px/.95 var(--teko);text-transform:uppercase}
+  .spotlight-copy{margin-top:8px;font-size:13px;line-height:1.58;color:#cfdbeb}
+  .spotlight-copy strong{color:#fff3df}
+  .roadmap-mode-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .roadmap-mode{
+    display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:999px;
+    border:1px solid rgba(125,196,255,.14);background:rgba(10,19,33,.72);
+    font:700 11px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#e6f1ff
+  }
+  .selector-shell{display:grid;gap:12px;align-content:start}
+  .selector-label{font:700 11px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#a7bddb}
+  .selector{
+    width:100%;padding:14px 42px 14px 14px;border-radius:16px;border:1px solid rgba(255,182,109,.18);
+    background:linear-gradient(135deg,rgba(25,38,61,.96),rgba(12,18,30,.98));color:#fbf7f1;
+    font:700 14px/1 var(--plex);outline:none;appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,#ffbd78 50%),linear-gradient(135deg,#ffbd78 50%,transparent 50%);
+    background-position:calc(100% - 18px) 20px,calc(100% - 12px) 20px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;
+  }
+  .selector:focus{border-color:rgba(255,193,133,.42);box-shadow:0 0 0 3px rgba(245,163,75,.12)}
+  .selector:disabled{opacity:.6;cursor:not-allowed}
+  .mode-buttons{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:12px;max-width:520px}
+  .mode-btn{
+    display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 18px;border-radius:18px;
+    border:1px solid rgba(255,255,255,.1);text-decoration:none;cursor:pointer;
+    font:700 15px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 28px rgba(0,0,0,.24);
+    transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
+  }
+  .mode-btn:hover{transform:translateY(-1px);filter:brightness(1.04)}
+  .mode-btn.primary{
+    background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);
+    color:#082312;border-color:rgba(187,247,208,.34)
+  }
+  .mode-btn.secondary{
+    background:linear-gradient(180deg,#91cbff,#5aa8ff 42%,#2d84ea 74%,#1768cb 100%);
+    color:#081b36;border-color:rgba(191,219,254,.38)
+  }
+  .mode-btn.disabled{pointer-events:none;opacity:.58;filter:saturate(.66)}
+  .mode-note{font-size:12px;line-height:1.55;color:#cad7e8}
+
+  .side-stack{display:grid;gap:18px}
+  .future-card{padding:22px}
+  .future-title{font:700 34px/.92 var(--teko);text-transform:uppercase}
+  .future-copy{margin-top:10px;font-size:14px;line-height:1.68;color:#d3deed}
+  .future-list{display:grid;gap:10px;margin-top:16px}
+  .future-item{
+    padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
+  }
+  .future-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
+  .future-item span{display:block;margin-top:6px;font-size:13px;line-height:1.55;color:#cdd9ea}
+  .status-bar{
+    margin-top:18px;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(16,24,40,.9),rgba(10,16,27,.96));font-size:13px;line-height:1.55;color:#d7e4f5
+  }
+  .status-bar strong{color:#fff}
+  .page-status-inline{color:var(--accent-soft)}
+
+  @media (max-width: 1080px){
+    .hero,.grid,.pack-lower,.archive-browser-shell{grid-template-columns:1fr}
+    .snapshot-grid,.pack-health{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+  @media (max-width: 760px){
+    .wrap{padding:0 14px 30px}
+    .nav{padding-top:10px}
+    .hero-main,.hero-side,.browser-panel,.future-card{padding:18px}
+    .hero-title{font-size:54px}
+    .section-title,.pack-title,.future-title{font-size:34px}
+    .hero-foot,.snapshot-grid,.pack-health,.mode-buttons,.spotlight-list{grid-template-columns:1fr}
+    .pack-top{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="nav">
+      <a class="nav-logo" href="index.html" aria-label="RosterBate home">
+        <img src="rosterbate-main-logo-transparent-v3.png" alt="RosterBate">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="rosterbate-season.html?sport=nba&historical=dev">Real Season</a>
+        <a class="nav-link accent" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="panel hero-main">
+        <div class="eyebrow">Archive Browser</div>
+        <h1 class="hero-title">Historic <span>Seasons</span></h1>
+        <div class="hero-copy">
+          Open a complete era as its own playable universe. Keep history intact, redraft the entire league, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
+        </div>
+        <div class="hero-chip-row">
+          <div class="hero-chip">Full-League Player Pool</div>
+          <div class="hero-chip">Real Season Path</div>
+          <div class="hero-chip">Draft The Era</div>
+          <div class="hero-chip">Daily Reveal Compatible</div>
+        </div>
+        <div class="hero-foot">
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="heroPackCount">0</div>
+            <div class="hero-stat-label">Archive Slots</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="heroPlayerCount">--</div>
+            <div class="hero-stat-label">Historical Players</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="heroCoverageValue">--</div>
+            <div class="hero-stat-label">Real Stat Coverage</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel hero-side">
+        <div class="hero-side-kicker">Flagship Universe</div>
+        <div class="hero-side-title" id="heroPackTitle">Historic Pack</div>
+        <div class="hero-side-copy" id="heroPackSummary">Loading pack summary...</div>
+        <div class="snapshot-grid">
+          <div class="snapshot-card good">
+            <div class="snapshot-value" id="heroAuditCoverage">--</div>
+            <div class="snapshot-label">Real Stat Coverage</div>
+          </div>
+          <div class="snapshot-card warn">
+            <div class="snapshot-value" id="heroZeroGames">--</div>
+            <div class="snapshot-label">Zero-Game Players</div>
+          </div>
+          <div class="snapshot-card warn">
+            <div class="snapshot-value" id="heroRemovedCount">--</div>
+            <div class="snapshot-label">Removed Invalid</div>
+          </div>
+        </div>
+        <div class="status-bar" id="pageStatus">
+          <strong>Status:</strong> <span class="page-status-inline">Loading historical pack browser...</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid">
+      <main class="panel browser-panel">
+        <div class="section-kicker">Archive Shelf</div>
+        <div class="section-title">Browse The Era</div>
+        <div class="section-copy">
+          Historic mode is no longer a hidden tool. This browser is the front door to full-season universes, classic franchise runs, and alternate-history drafts built from real packs instead of one-off demos.
+        </div>
+
+        <div class="archive-browser-shell">
+          <div class="archive-rail" id="archiveShelf">
+            <button class="archive-card active" type="button">
+              <div class="archive-card-head">
+                <div class="archive-card-era">Loading Archive</div>
+                <div class="archive-card-status">Loading</div>
+              </div>
+              <div class="archive-card-title">Loading Pack</div>
+              <div class="archive-card-tagline">Preparing the shelf...</div>
+              <div class="archive-card-summary">Pulling historical catalog metadata.</div>
+            </button>
+          </div>
+
+          <div class="archive-detail">
+            <div class="pack-card" id="packCard">
+              <div class="pack-top">
+                <div>
+                  <div class="pack-label" id="packEraLabel">Historic Archive</div>
+                  <div class="pack-title" id="packTitle">Loading Pack...</div>
+                  <div class="pack-tagline" id="packTagline">Loading...</div>
+                  <div class="pack-desc" id="packDesc">Pulling live pack metadata from the historical loader.</div>
+                </div>
+                <div class="pack-status" id="packStatusPill">Loading</div>
+              </div>
+
+              <div class="pack-health" id="packHealth">
+                <div class="health-card">
+                  <div class="health-value">--</div>
+                  <div class="health-label">Real Stat Coverage</div>
+                  <div class="health-sub">Loading audit...</div>
+                </div>
+                <div class="health-card">
+                  <div class="health-value">--</div>
+                  <div class="health-label">Zero-Game Players</div>
+                  <div class="health-sub">Loading audit...</div>
+                </div>
+                <div class="health-card">
+                  <div class="health-value">--</div>
+                  <div class="health-label">Removed Invalid</div>
+                  <div class="health-sub">Loading audit...</div>
+                </div>
+              </div>
+
+              <div class="pack-lower">
+                <div class="pack-box">
+                  <div class="pack-box-title">Featured Stars</div>
+                  <div class="star-row" id="featuredStars">
+                    <span class="star-pill">Loading...</span>
+                  </div>
+                  <div class="pack-box-title" style="margin-top:18px">Team Spotlights</div>
+                  <div class="spotlight-list" id="teamSpotlights">
+                    <div class="spotlight">
+                      <div class="spotlight-title">Loading</div>
+                      <div class="spotlight-copy">Preparing team spotlight summaries.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pack-box selector-shell">
+                  <div>
+                    <div class="selector-label">Featured Team</div>
+                    <select class="selector" id="featuredTeamSelect">
+                      <option>Loading teams...</option>
+                    </select>
+                  </div>
+                  <div class="mode-buttons">
+                    <a href="#" class="mode-btn primary" id="playRealSeasonBtn">Play The Real Season</a>
+                    <a href="#" class="mode-btn secondary" id="draftEraBtn">Draft The Era</a>
+                  </div>
+                  <div class="mode-note" id="modeNote">
+                    On localhost, team selection is staged before launch so the historical universe opens from the featured path you choose here.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="detail-note" id="detailNote">Loading archive note...</div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="side-stack">
+        <div class="panel future-card">
+          <div class="section-kicker">Mode Stack</div>
+          <div class="future-title">What This Lane Becomes</div>
+          <div class="future-copy">
+            The goal is not one nostalgia gimmick. The goal is a reusable archive layer where every season can support three different products at once.
+          </div>
+          <div class="future-list">
+            <div class="future-item">
+              <strong>Play The Real Season</strong>
+              <span>Launch the era with historical rosters intact and let the daily reveal system make the season feel lived-in.</span>
+            </div>
+            <div class="future-item">
+              <strong>Draft The Era</strong>
+              <span>Open the entire player pool from that year and build an alternate-history league around the best names of the season.</span>
+            </div>
+            <div class="future-item">
+              <strong>Reimagined Season</strong>
+              <span>Future direction: sim the season into a new branch before the user even drafts, so the same era can be replayed in a different reality.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel future-card">
+          <div class="section-kicker">Audit Mindset</div>
+          <div class="future-title">Pack Truth Over Hype</div>
+          <div class="future-copy">
+            Historical mode only works if users trust it. This browser keeps the pack health visible: real-stat coverage, zero-game roster-only cases, and removed invalid players stay front-and-center so future eras can be audited quickly.
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  const FALLBACK_CATALOG = [
+    {
+      packId: 'nba_1996_full_season_v1',
+      sport: 'nba',
+      seasonLabel: '1995-96 NBA Historic Season',
+      shortLabel: '1995-96',
+      era: '1990s',
+      availability: 'playable',
+      statusLabel: 'Playable Now',
+      significanceLabel: 'Dynasty Peak',
+      significanceTone: 'dynasty',
+      completenessLabel: 'Playable foundation',
+      completenessPercent: 82,
+      tagline: 'Rewrite the greatest regular season ever.',
+      summary: 'Full-league historical universe with real season stats, real-season boot, and Draft The Era support.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.',
+      focusTeamName: 'Chicago Bulls',
+      plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
+      previewStars: ['Michael Jordan', 'Hakeem Olajuwon', "Shaquille O'Neal"],
+      seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1',
+      draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1'
+    },
+    {
+      packId: 'nba_1987_full_season_v1',
+      sport: 'nba',
+      seasonLabel: '1986-87 NBA Historic Season',
+      shortLabel: '1986-87',
+      era: '1980s',
+      availability: 'preview',
+      statusLabel: 'Archive Preview',
+      significanceLabel: 'Rivalry Apex',
+      significanceTone: 'heritage',
+      completenessLabel: 'Concept framing',
+      completenessPercent: 18,
+      tagline: 'Bird, Magic, and a young Jordan in one league.',
+      summary: 'A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.',
+      whyItMatters: 'This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.',
+      focusTeamName: 'Los Angeles Lakers',
+      plannedModes: ['Play The Real Season', 'Draft The Era'],
+      previewStars: ['Magic Johnson', 'Larry Bird', 'Michael Jordan']
+    },
+    {
+      packId: 'nba_2001_full_season_v1',
+      sport: 'nba',
+      seasonLabel: '2000-01 NBA Historic Season',
+      shortLabel: '2000-01',
+      era: '2000s',
+      availability: 'preview',
+      statusLabel: 'Authoring Next',
+      significanceLabel: 'Superstar Pivot',
+      significanceTone: 'spotlight',
+      completenessLabel: 'Research + roadmap',
+      completenessPercent: 12,
+      tagline: "Shaq and Kobe, AI's run, Duncan in his prime.",
+      summary: 'A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.',
+      whyItMatters: 'This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.',
+      focusTeamName: 'Los Angeles Lakers',
+      plannedModes: ['Play The Real Season', 'Draft The Era', 'Historic Challenges'],
+      previewStars: ["Shaquille O'Neal", 'Allen Iverson', 'Tim Duncan']
+    },
+    {
+      packId: 'nba_2016_full_season_v1',
+      sport: 'nba',
+      seasonLabel: '2015-16 NBA Historic Season',
+      shortLabel: '2015-16',
+      era: '2010s',
+      availability: 'preview',
+      statusLabel: 'Roadmap',
+      significanceLabel: 'Style Breakthrough',
+      significanceTone: 'modern',
+      completenessLabel: 'Archive target',
+      completenessPercent: 8,
+      tagline: 'Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.',
+      summary: 'A future pace-and-space universe built around the Warriors, Cavs, and one of the most recognizable modern NBA seasons.',
+      whyItMatters: 'This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.',
+      focusTeamName: 'Golden State Warriors',
+      plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
+      previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard']
+    }
+  ];
+
+  const host = String(window.location.hostname || '').toLowerCase();
+  const isLocalHistorical = host === 'localhost' || host === '127.0.0.1';
+  const bundleCache = new Map();
+  let activeCatalog = [];
+  let activePackId = '';
+
+  function clone(value){
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function getBrowserSport(){
+    try{
+      const params = new URLSearchParams(window.location.search);
+      return String(params.get('sport') || 'nba').trim().toLowerCase() || 'nba';
+    }catch(error){
+      return 'nba';
+    }
+  }
+
+  function setStatus(message, tone){
+    const el = document.getElementById('pageStatus');
+    if(!el) return;
+    el.innerHTML = '<strong>Status:</strong> <span class="page-status-inline">' + message + '</span>';
+    el.style.borderColor = tone === 'warn'
+      ? 'rgba(255,190,112,.2)'
+      : (tone === 'good' ? 'rgba(91,227,161,.2)' : 'rgba(255,255,255,.08)');
+  }
+
+  function buildFallbackCatalog(){
+    return clone(FALLBACK_CATALOG);
+  }
+
+  function getConfigById(packId){
+    return activeCatalog.find(entry => String(entry.packId) === String(packId)) || null;
+  }
+
+  function teamDisplayName(team){
+    if(!team) return 'Unknown Team';
+    return team.displayName || [team.city, team.name].filter(Boolean).join(' ') || team.teamId || 'Unknown Team';
+  }
+
+  function deriveAuditSummary(bundle, config){
+    const manifestAudit = bundle && bundle.manifest && bundle.manifest.auditSummary ? bundle.manifest.auditSummary : null;
+    const summariesAudit = bundle && bundle.summaries && bundle.summaries.auditSummary ? bundle.summaries.auditSummary : null;
+    const configAudit = config && config.auditSummary ? config.auditSummary : null;
+    if(manifestAudit || summariesAudit || configAudit){
+      return Object.assign({}, summariesAudit || {}, configAudit || {}, manifestAudit || {});
+    }
+    const players = Array.isArray(bundle && bundle.players) ? bundle.players : [];
+    const realSeason = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) > 0).length;
+    const zeroGames = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) <= 0).length;
+    return {
+      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Real season stats' },
+      zeroGamePlayers: { count: zeroGames, label: 'Zero-game players' },
+      removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
+    };
+  }
+
+  function buildPlayerMap(bundle){
+    const map = new Map();
+    (bundle && bundle.players || []).forEach(player => map.set(String(player.playerId), player));
+    return map;
+  }
+
+  function buildTeamMap(bundle){
+    const map = new Map();
+    (bundle && bundle.teams || []).forEach(team => map.set(String(team.teamId), team));
+    return map;
+  }
+
+  function buildLaunchUrl(config, mode){
+    const fallback = mode === 'draft'
+      ? 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=' + encodeURIComponent(String(config.packId || ''))
+      : 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=' + encodeURIComponent(String(config.packId || ''));
+    return String(mode === 'draft' ? (config.draftUrl || fallback) : (config.seasonUrl || fallback));
+  }
+
+  function renderHealthCards(audit){
+    const real = audit && audit.realStatCoverage ? audit.realStatCoverage : {};
+    const zero = audit && audit.zeroGamePlayers ? audit.zeroGamePlayers : {};
+    const removed = audit && audit.removedInvalidPlayers ? audit.removedInvalidPlayers : {};
+    const covered = Number(real.playersWithRealSeasonStats || real.playersWithSeasonStats || 0);
+    const total = Number(real.playerCount || 0);
+    const zeroCount = Number(zero.count || 0);
+    const removedCount = removed.count == null ? null : Number(removed.count || 0);
+    document.getElementById('packHealth').innerHTML = [
+      {
+        tone: covered && total && covered === total ? 'good' : '',
+        value: (covered || 0) + ' / ' + (total || 0),
+        label: real.label || 'Real Stat Coverage',
+        sub: 'players with real season production'
+      },
+      {
+        tone: zeroCount === 0 ? 'good' : 'warn',
+        value: String(zeroCount || 0),
+        label: zero.label || 'Zero-Game Players',
+        sub: 'explicit roster-only edge cases'
+      },
+      {
+        tone: removedCount && removedCount > 0 ? 'warn' : '',
+        value: removedCount == null ? '--' : String(removedCount),
+        label: removed.label || 'Removed Invalid',
+        sub: removedCount == null ? 'not published by pack' : 'cleanup removals tracked'
+      }
+    ].map(item => [
+      '<div class="health-card ' + item.tone + '">',
+      '<div class="health-value">' + item.value + '</div>',
+      '<div class="health-label">' + item.label + '</div>',
+      '<div class="health-sub">' + item.sub + '</div>',
+      '</div>'
+    ].join('')).join('');
+    document.getElementById('heroAuditCoverage').textContent = (covered || 0) + ' / ' + (total || 0);
+    document.getElementById('heroCoverageValue').textContent = (covered || 0) + ' / ' + (total || 0);
+    document.getElementById('heroZeroGames').textContent = String(zeroCount || 0);
+    document.getElementById('heroRemovedCount').textContent = removedCount == null ? '--' : String(removedCount);
+  }
+
+  function renderShelf(){
+    const shelf = document.getElementById('archiveShelf');
+    shelf.innerHTML = activeCatalog.map(function(config){
+      const isActive = String(config.packId) === String(activePackId);
+      const previewClass = config.availability === 'playable' ? '' : ' preview';
+      const activeClass = isActive ? ' active' : '';
+      const stars = Array.isArray(config.previewStars) ? config.previewStars.slice(0, 3) : [];
+      const plannedModes = Array.isArray(config.plannedModes) ? config.plannedModes.slice(0, 3) : [];
+      const significanceTone = String(config.significanceTone || 'default').trim().toLowerCase() || 'default';
+      const significance = config.significanceLabel
+        ? '<div class="archive-significance ' + significanceTone + '">' + config.significanceLabel + '</div>'
+        : '';
+      const completeness = config.completenessLabel
+        ? '<span class="archive-meta-pill completeness">' + config.completenessLabel + (config.completenessPercent != null ? ' - ' + config.completenessPercent + '%' : '') + '</span>'
+        : '';
+      const meta = [
+          config.focusTeamName ? '<span class="archive-meta-pill">' + config.focusTeamName + '</span>' : '',
+          config.availability === 'playable' ? '<span class="archive-meta-pill">Real Pack</span>' : '<span class="archive-meta-pill">Preview Only</span>',
+          completeness
+        ].filter(Boolean).join('');
+      return [
+        '<button class="archive-card' + previewClass + activeClass + '" type="button" data-pack-id="' + config.packId + '">',
+        '<div class="archive-card-head">',
+        '<div class="archive-card-era">' + (config.era || 'Historic Era') + '</div>',
+        '<div class="archive-card-status">' + (config.statusLabel || (config.availability === 'playable' ? 'Playable' : 'Preview')) + '</div>',
+        '</div>',
+        '<div class="archive-card-title">' + (config.shortLabel || config.seasonLabel || config.packId) + '</div>',
+        '<div class="archive-card-tagline">' + (config.tagline || 'Historic season archive.') + '</div>',
+        significance,
+        '<div class="archive-card-summary">' + (config.summary || 'Historical season preview.') + '</div>',
+        config.whyItMatters ? '<div class="archive-card-why"><strong>Why this matters:</strong> ' + config.whyItMatters + '</div>' : '',
+        meta ? '<div class="archive-card-meta">' + meta + '</div>' : '',
+        plannedModes.length ? '<div class="archive-card-meta">' + plannedModes.map(function(mode){ return '<span class="archive-meta-pill">' + mode + '</span>'; }).join('') + '</div>' : '',
+        stars.length ? '<div class="archive-card-meta">' + stars.map(function(name){ return '<span class="archive-meta-pill">' + name + '</span>'; }).join('') + '</div>' : '',
+        '</button>'
+      ].join('');
+    }).join('');
+
+    shelf.querySelectorAll('[data-pack-id]').forEach(function(button){
+      button.addEventListener('click', function(){
+        const packId = String(button.getAttribute('data-pack-id') || '').trim();
+        if(packId) setActivePack(packId);
+      });
+    });
+  }
+
+  async function loadBundleForConfig(config){
+    if(!config || config.availability !== 'playable'){
+      return null;
+    }
+    if(bundleCache.has(config.packId)){
+      return bundleCache.get(config.packId);
+    }
+    if(!(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadPackById === 'function')){
+      throw new Error('historical_pack_loader_unavailable');
+    }
+    const bundle = await window.RosterBateHistoricalPackLoader.loadPackById(config.packId);
+    bundleCache.set(config.packId, bundle);
+    return bundle;
+  }
+
+  async function stageSelectedTeam(config, selectedTeamId){
+    if(!isLocalHistorical) return false;
+    if(!(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled)) return false;
+    await window.rbHistoricalPackDev.ready();
+    if(selectedTeamId){
+      await window.rbHistoricalPackDev.setSelectedTeam(selectedTeamId);
+    }
+    await window.rbHistoricalPackDev.applyFixtureToLocalState(config.packId, { selectedTeamId: selectedTeamId });
+    return true;
+  }
+
+  function renderPack(config, bundle){
+    const manifest = bundle && bundle.manifest ? bundle.manifest : {};
+    const presentation = bundle && bundle.presentation ? bundle.presentation : {};
+    const summaries = bundle && bundle.summaries ? bundle.summaries : {};
+    const playerMap = buildPlayerMap(bundle);
+    const teamMap = buildTeamMap(bundle);
+    const audit = deriveAuditSummary(bundle, config);
+    const teams = Array.isArray(bundle && bundle.teams) ? bundle.teams : [];
+    const players = Array.isArray(bundle && bundle.players) ? bundle.players : [];
+    const packLabel = manifest.seasonLabel || config.seasonLabel || 'Historic Pack';
+    const packSummary = summaries.packSummary || manifest.description || config.summary || 'A historical season pack built for RosterBate.';
+    const plannedModes = Array.isArray(config.plannedModes) ? config.plannedModes : [];
+    const completenessText = config.completenessLabel
+      ? (config.completenessLabel + (config.completenessPercent != null ? ' - ' + config.completenessPercent + '%' : ''))
+      : 'Pack completeness not published';
+
+    document.getElementById('heroPackTitle').textContent = packLabel;
+    document.getElementById('heroPackSummary').textContent = packSummary;
+    document.getElementById('heroPackCount').textContent = String(activeCatalog.length || 0);
+    document.getElementById('heroPlayerCount').textContent = players.length ? String(players.length) : '--';
+
+    document.getElementById('packEraLabel').textContent = (manifest.era || config.era || 'Historic').toUpperCase() + ' Archive';
+    document.getElementById('packTitle').textContent = packLabel;
+    document.getElementById('packTagline').textContent = manifest.tagline || config.tagline || 'Play the real season or draft the era.';
+    document.getElementById('packDesc').textContent = config.whyItMatters
+      ? ((manifest.description || config.summary || packSummary) + ' Why this season matters: ' + config.whyItMatters)
+      : (manifest.description || config.summary || packSummary);
+
+    const statusPill = document.getElementById('packStatusPill');
+    statusPill.textContent = config.availability === 'playable'
+      ? (isLocalHistorical ? 'Localhost Playable' : 'Playable Pack')
+      : (config.statusLabel || 'Archive Preview');
+    statusPill.classList.toggle('preview', config.availability !== 'playable');
+
+    renderHealthCards(audit);
+
+    const featuredStars = Array.isArray(presentation.featuredStars)
+      ? presentation.featuredStars.map(function(id){ return playerMap.get(String(id)); }).filter(Boolean)
+      : [];
+    const starNames = featuredStars.length
+      ? featuredStars.slice(0, 8).map(function(player){ return player.displayName; })
+      : (Array.isArray(config.previewStars) ? config.previewStars : []);
+    document.getElementById('featuredStars').innerHTML = starNames.length
+      ? starNames.map(function(name){ return '<span class="star-pill">' + name + '</span>'; }).join('')
+      : '<span class="star-pill">Star slate not published yet</span>';
+
+    const teamSpotlights = Array.isArray(summaries.teamSpotlights) ? summaries.teamSpotlights.slice(0, 4) : [];
+      const spotlightMarkup = teamSpotlights.length
+        ? teamSpotlights.map(function(spotlight){
+            const team = teamMap.get(String(spotlight.teamId));
+            return [
+              '<div class="spotlight">',
+            '<div class="spotlight-title">' + teamDisplayName(team) + '</div>',
+            '<div class="spotlight-copy">' + (spotlight.summary || '') + '</div>',
+            '</div>'
+          ].join('');
+          }).join('')
+        : [
+            '<div class="spotlight">',
+            '<div class="spotlight-title">Why This Season Matters</div>',
+            '<div class="spotlight-copy">' + (config.whyItMatters || config.summary || 'This archive slot is visible now so the shelf can grow before every pack becomes playable.') + '</div>',
+            '</div>',
+            '<div class="spotlight">',
+            '<div class="spotlight-title">Planned Modes</div>',
+            '<div class="roadmap-mode-list">' + (plannedModes.length
+              ? plannedModes.map(function(mode){ return '<span class="roadmap-mode">' + mode + '</span>'; }).join('')
+              : '<span class="roadmap-mode">Archive Preview</span>') + '</div>',
+            '<div class="spotlight-copy"><strong>Pack completeness:</strong> ' + completenessText + '</div>',
+            '</div>'
+          ].join('');
+      document.getElementById('teamSpotlights').innerHTML = spotlightMarkup;
+
+    const select = document.getElementById('featuredTeamSelect');
+    if(teams.length){
+      const sortedTeams = teams.slice().sort(function(a, b){
+        return teamDisplayName(a).localeCompare(teamDisplayName(b));
+      });
+      select.innerHTML = sortedTeams.map(function(team){
+        const abbr = String(team.abbreviation || '').trim().toUpperCase();
+        return '<option value="' + team.teamId + '">' + teamDisplayName(team) + (abbr ? ' (' + abbr + ')' : '') + '</option>';
+      }).join('');
+      select.disabled = false;
+      select.value = String(presentation.featuredTeamId || manifest.focusTeamId || (sortedTeams[0] && sortedTeams[0].teamId) || '');
+    } else {
+      select.innerHTML = '<option value="">' + (config.focusTeamName || 'Archive preview team') + '</option>';
+      select.disabled = true;
+    }
+
+    const playBtn = document.getElementById('playRealSeasonBtn');
+    const draftBtn = document.getElementById('draftEraBtn');
+    const playableHere = config.availability === 'playable' && isLocalHistorical;
+    playBtn.classList.toggle('disabled', !playableHere);
+    draftBtn.classList.toggle('disabled', !playableHere);
+    playBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'season') : '#');
+    draftBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'draft') : '#');
+
+    document.getElementById('modeNote').textContent = playableHere
+      ? 'On localhost, launching from here stages the selected team before opening the historical season or draft.'
+      : (config.availability === 'playable'
+        ? 'This pack is real, but direct launch stays localhost-first until the lane graduates from preview.'
+        : 'Preview packs stay visible early on purpose. Planned modes: ' + (plannedModes.length ? plannedModes.join(', ') : 'Archive preview') + '.');
+
+    document.getElementById('detailNote').textContent = config.availability === 'playable'
+      ? 'This pack is being read from the real historical pack artifact. The shelf is ready for more eras whenever the next pack lands.'
+      : 'Preview packs are intentionally listed before they are playable. Completeness: ' + completenessText + '. Why this season matters: ' + (config.whyItMatters || 'This archive slot is here to make the roadmap feel tangible before the pack is authored.');
+
+    playBtn.onclick = async function(event){
+      event.preventDefault();
+      if(!playableHere){
+        setStatus(config.availability === 'playable'
+          ? 'This pack is playable, but direct launch remains localhost-first for now.'
+          : 'This archive slot is a preview. It is visible now so the shelf reads like a real archive, not a single-pack experiment.', 'warn');
+        return;
+      }
+      setStatus('Staging selected team and opening the real historical season...', 'good');
+      try{
+        await stageSelectedTeam(config, String(select.value || '').trim());
+        window.location.href = buildLaunchUrl(config, 'season');
+      }catch(error){
+        setStatus('Could not stage historical season: ' + (error && error.message ? error.message : String(error)), 'warn');
+      }
+    };
+
+    draftBtn.onclick = async function(event){
+      event.preventDefault();
+      if(!playableHere){
+        setStatus(config.availability === 'playable'
+          ? 'This pack is playable, but Draft The Era remains localhost-first for now.'
+          : 'This archive slot is a preview. Draft The Era will light up once the pack is authored and imported.', 'warn');
+        return;
+      }
+      setStatus('Staging selected team and opening Draft The Era...', 'good');
+      try{
+        if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
+          await window.rbHistoricalPackDev.ready();
+          await window.rbHistoricalPackDev.setSelectedTeam(String(select.value || '').trim());
+          await window.rbHistoricalPackDev.applyFixtureToLocalState(config.packId, { selectedTeamId: String(select.value || '').trim() });
+          window.location.href = buildLaunchUrl(config, 'draft');
+          return;
+        }
+        window.location.href = buildLaunchUrl(config, 'draft');
+      }catch(error){
+        setStatus('Could not open Draft The Era: ' + (error && error.message ? error.message : String(error)), 'warn');
+      }
+    };
+
+    setStatus(
+      config.availability === 'playable'
+        ? (isLocalHistorical
+          ? 'Historical browser loaded from a real on-disk pack. Select a team and launch directly.'
+          : 'Pack browser loaded from a real pack artifact. Direct launch stays localhost-first for now.')
+        : 'Archive shelf loaded. Preview packs are intentionally visible before they become playable.',
+      config.availability === 'playable' ? 'good' : 'warn'
+    );
+  }
+
+  async function setActivePack(packId){
+    const config = getConfigById(packId);
+    if(!config) return;
+    activePackId = config.packId;
+    renderShelf();
+    try{
+      const bundle = await loadBundleForConfig(config);
+      renderPack(config, bundle);
+    }catch(error){
+      console.error('[Historic Seasons] Failed to load active pack', error);
+      renderPack(config, null);
+      setStatus('Could not load pack "' + config.packId + '": ' + (error && error.message ? error.message : String(error)), 'warn');
+    }
+  }
+
+  async function boot(){
+    const browserSport = getBrowserSport();
+    let catalog = [];
+    try{
+      if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadCatalog === 'function'){
+        catalog = await window.RosterBateHistoricalPackLoader.loadCatalog();
+      }
+    }catch(error){
+      console.warn('[Historic Seasons] Falling back to embedded catalog', error);
+    }
+    if(!Array.isArray(catalog) || !catalog.length){
+      catalog = buildFallbackCatalog();
+    }
+    activeCatalog = catalog.filter(function(entry){
+      return String(entry.sport || browserSport).toLowerCase() === browserSport;
+    });
+    if(!activeCatalog.length){
+      activeCatalog = buildFallbackCatalog().filter(function(entry){
+        return String(entry.sport || 'nba').toLowerCase() === browserSport;
+      });
+    }
+    if(!activeCatalog.length){
+      setStatus('No historical packs are cataloged for this sport yet.', 'warn');
+      return;
+    }
+    const firstPlayable = activeCatalog.find(function(entry){ return entry.availability === 'playable'; });
+    await setActivePack(firstPlayable ? firstPlayable.packId : activeCatalog[0].packId);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot, { once:true });
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>

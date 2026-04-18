@@ -25,6 +25,7 @@
   const TEAM_SELECTION_KEY='rbHistoricalPackDevSelectedTeamId';
   const TEAM_SELECT_ID=PANEL_ROOT_ID+'_teamSelect';
   const FIXTURE_META_ID=PANEL_ROOT_ID+'_fixtureMeta';
+  const HEALTH_PANEL_ID=PANEL_ROOT_ID+'_health';
 
   function resolveUrl(file){
     try{
@@ -149,6 +150,14 @@
       '#'+PANEL_ROOT_ID+' .rbh-status[data-tone="warn"]{border-color:rgba(255,179,86,.28);color:#ffe2b8;}'+
       '#'+PANEL_ROOT_ID+' .rbh-status[data-tone="error"]{border-color:rgba(255,107,107,.3);color:#ffd1d1;}'+
       '#'+PANEL_ROOT_ID+' .rbh-status[data-tone="success"]{border-color:rgba(83,233,162,.26);color:#d8ffef;}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px;}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-card{padding:10px 10px 11px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(16,24,40,.96),rgba(10,15,26,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-label{display:block;margin-bottom:7px;font:700 9px/1 IBM Plex Sans,Segoe UI,Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase;color:rgba(186,205,236,.72);}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-value{display:block;font:700 22px/1 Teko,Impact,sans-serif;letter-spacing:.03em;color:#fff8ee;}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-sub{display:block;margin-top:5px;font:600 10px/1.35 IBM Plex Sans,Segoe UI,Arial,sans-serif;color:rgba(206,220,244,.7);}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-card[data-tone="success"]{border-color:rgba(88,230,163,.18);background:linear-gradient(180deg,rgba(10,31,24,.94),rgba(9,20,22,.96));}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-card[data-tone="warn"]{border-color:rgba(255,176,92,.2);background:linear-gradient(180deg,rgba(42,25,12,.94),rgba(18,16,24,.96));}'+
+      '#'+PANEL_ROOT_ID+' .rbh-health-card[data-tone="neutral"] .rbh-health-value{color:#dce9ff;}'+
       '#'+PANEL_ROOT_ID+' .rbh-select-shell{margin-bottom:12px;padding:10px 11px 11px;border-radius:13px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(14,21,34,.94),rgba(11,16,27,.94));}'+
       '#'+PANEL_ROOT_ID+' .rbh-select-label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font:700 10px/1 IBM Plex Sans,Segoe UI,Arial,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:rgba(186,205,236,.82);}'+
       '#'+PANEL_ROOT_ID+' .rbh-select-hint{font:600 9px/1 IBM Plex Sans,Segoe UI,Arial,sans-serif;letter-spacing:.06em;color:rgba(255,186,125,.82);}'+
@@ -218,6 +227,101 @@
     if(result.message) pieces.push(result.message);
     if(result.writerError) pieces.push('Writer error: '+result.writerError);
     return pieces.join('<br>');
+  }
+
+  function sanitizeCount(value){
+    const num=Number(value);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function formatCount(value){
+    const num=sanitizeCount(value);
+    return num==null ? '—' : String(num);
+  }
+
+  function formatCoverageText(covered, total){
+    const c=sanitizeCount(covered);
+    const t=sanitizeCount(total);
+    if(c==null && t==null) return '—';
+    if(c!=null && t!=null) return c+' / '+t;
+    return String(c!=null ? c : t);
+  }
+
+  function buildAuditSummaryFromBundle(bundle){
+    const manifestAudit=bundle && bundle.manifest && bundle.manifest.auditSummary ? bundle.manifest.auditSummary : null;
+    const summariesAudit=bundle && bundle.summaries && bundle.summaries.auditSummary ? bundle.summaries.auditSummary : null;
+    if(manifestAudit || summariesAudit){
+      const merged=Object.assign({}, summariesAudit || {}, manifestAudit || {});
+      return {
+        realStatCoverage: merged.realStatCoverage || null,
+        zeroGamePlayers: merged.zeroGamePlayers || null,
+        removedInvalidPlayers: merged.removedInvalidPlayers || null
+      };
+    }
+    const players=bundle && Array.isArray(bundle.players) ? bundle.players : [];
+    if(!players.length){
+      return {
+        realStatCoverage: null,
+        zeroGamePlayers: null,
+        removedInvalidPlayers: null
+      };
+    }
+    const playersWithSeasonStats=players.filter(function(player){
+      return !!(player && player.seasonStats);
+    }).length;
+    const playersWithRealSeasonStats=players.filter(function(player){
+      const stats=player && player.seasonStats ? player.seasonStats : null;
+      return !!(stats && Number(stats.games || 0)>0);
+    }).length;
+    const zeroGamePlayers=players.filter(function(player){
+      const stats=player && player.seasonStats ? player.seasonStats : null;
+      return !!stats && Number(stats.games || 0)<=0;
+    }).length;
+    return {
+      realStatCoverage: {
+        playersWithRealSeasonStats: playersWithRealSeasonStats,
+        playerCount: players.length,
+        playersWithSeasonStats: playersWithSeasonStats,
+        label: 'Real season stats'
+      },
+      zeroGamePlayers: {
+        count: zeroGamePlayers,
+        label: 'Zero-game players'
+      },
+      removedInvalidPlayers: {
+        count: null,
+        label: 'Removed invalid players'
+      }
+    };
+  }
+
+  function renderPackAuditSummary(bundle){
+    const health=panelNode(HEALTH_PANEL_ID);
+    if(!health) return;
+    const audit=buildAuditSummaryFromBundle(bundle);
+    const real=audit && audit.realStatCoverage ? audit.realStatCoverage : {};
+    const zero=audit && audit.zeroGamePlayers ? audit.zeroGamePlayers : {};
+    const removed=audit && audit.removedInvalidPlayers ? audit.removedInvalidPlayers : {};
+    const coverageCovered=sanitizeCount(real.playersWithRealSeasonStats!=null ? real.playersWithRealSeasonStats : real.playersWithSeasonStats);
+    const coverageTotal=sanitizeCount(real.playerCount);
+    const zeroCount=sanitizeCount(zero.count);
+    const removedCount=sanitizeCount(removed.count);
+    health.innerHTML=
+      '<div class="rbh-health-card" data-tone="'+(coverageCovered!=null && coverageTotal!=null && coverageCovered===coverageTotal ? 'success' : 'neutral')+'">'+
+        '<span class="rbh-health-label">'+(real.label || 'Real stat coverage')+'</span>'+
+        '<span class="rbh-health-value">'+formatCoverageText(coverageCovered, coverageTotal)+'</span>'+
+        '<span class="rbh-health-sub">'+(coverageTotal!=null ? 'players with real season lines' : 'coverage not published')+'</span>'+
+      '</div>'+
+      '<div class="rbh-health-card" data-tone="'+(zeroCount===0 ? 'success' : 'warn')+'">'+
+        '<span class="rbh-health-label">'+(zero.label || 'Zero-game players')+'</span>'+
+        '<span class="rbh-health-value">'+formatCount(zeroCount)+'</span>'+
+        '<span class="rbh-health-sub">explicit roster-only cases</span>'+
+      '</div>'+
+      '<div class="rbh-health-card" data-tone="'+(removedCount!=null && removedCount>0 ? 'warn' : 'neutral')+'">'+
+        '<span class="rbh-health-label">'+(removed.label || 'Removed invalid players')+'</span>'+
+        '<span class="rbh-health-value">'+formatCount(removedCount)+'</span>'+
+        '<span class="rbh-health-sub">'+(removedCount!=null ? 'cleanup removals tracked' : 'not reported by pack')+'</span>'+
+      '</div>';
   }
 
   function localStorageAvailable(){
@@ -344,6 +448,7 @@
       if(fixtureMeta){
         fixtureMeta.textContent='Fixture: '+DEFAULT_FIXTURE_ID+' • '+teams.length+' teams • '+players.length+' players';
       }
+      renderPackAuditSummary(fixture);
       return fixture;
     }catch(error){
       if(global.console && typeof global.console.warn==='function'){
@@ -424,6 +529,11 @@
         '<div class="rbh-body">'+
           '<div class="rbh-title"><div><strong>Pack Dev</strong><span>Localhost-only runner for the `1995-96` historical fixture.</span></div></div>'+
           '<div class="rbh-status" id="'+PANEL_ROOT_ID+'_status" data-tone="neutral"><strong>Idle</strong><br>Use Validate or Dry Import to test the sample pack.</div>'+
+          '<div class="rbh-health" id="'+HEALTH_PANEL_ID+'">'+
+            '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Real stat coverage</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
+            '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Zero-game players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
+            '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Removed invalid players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
+          '</div>'+
           '<div class="rbh-select-shell">'+
             '<div class="rbh-select-label"><span>Featured Team</span><span class="rbh-select-hint">Staged for season boot</span></div>'+
             '<select class="rbh-select" id="'+TEAM_SELECT_ID+'" data-role="team-select"><option value="">Loading teams…</option></select>'+

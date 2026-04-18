@@ -36,5 +36,25 @@
       "mode": "historical_draft",
       "summary": "Remix the full-league 1995-96 player universe and discover what the era looks like with custom rosters."
     }
+  ],
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 435,
+      "playerCount": 436,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 1,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 9,
+      "label": "Removed invalid players"
+    }
+  },
+  "auditNotes": [
+    "Historical ranking now prefers real 1995-96 season production.",
+    "Victor Alexander remains the explicit roster-only zero-game case.",
+    "Known invalid leftovers removed from the pack are tracked as an audit count instead of staying hidden in cleanup notes."
   ]
 }
