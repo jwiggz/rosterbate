@@ -5476,7 +5476,11 @@ function getAuctionRoomHeat(player,currentBid=0){
   const room=ensureAuctionRoomProfile();
   const starTier=getAuctionStarTier(player);
   const nextMin=Math.max(1, Number(currentBid||0) + getAuctionBidIncrement(Number(currentBid||0)));
-  const activeCount=getAuctionActiveCpuBidders(nextMin).length;
+  const bidders=Array.isArray(S.auc?.cpuBidders) ? S.auc.cpuBidders : [];
+  const activeCount=bidders.filter(b=>{
+    const rawCap=Math.max(1, Number(b?.softCap || b?.maxBid || 0));
+    return rawCap >= nextMin;
+  }).length;
   const budgetSummary=getAuctionRoomBudgetSummary();
   let heat=room.heat + (starTier*0.08) + Math.min(0.16, activeCount*0.028);
   if(currentBid < Math.max(1, getAuctionTargetPrice(player) * 0.58)) heat += 0.06;
