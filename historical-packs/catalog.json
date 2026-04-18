@@ -15,6 +15,12 @@
     "summary": "Full-league historical universe with real season stats, real-season boot, and Draft The Era support.",
     "whyItMatters": "This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.",
     "focusTeamName": "Chicago Bulls",
+    "art": {
+      "theme": "dynasty",
+      "eyebrow": "1990s Archive",
+      "headline": "72-Win\nEmpire",
+      "subline": "Jordan, Hakeem, Shaq, and the full season universe."
+    },
     "plannedModes": [
       "Play The Real Season",
       "Draft The Era",
@@ -44,6 +50,12 @@
     "summary": "A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.",
     "whyItMatters": "This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.",
     "focusTeamName": "Los Angeles Lakers",
+    "art": {
+      "theme": "heritage",
+      "eyebrow": "1980s Rivalry",
+      "headline": "Bird.\nMagic.\nJordan.",
+      "subline": "Peak Celtics-Lakers tension with a young Jordan entering the frame."
+    },
     "plannedModes": [
       "Play The Real Season",
       "Draft The Era"
@@ -70,6 +82,12 @@
     "summary": "A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.",
     "whyItMatters": "This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.",
     "focusTeamName": "Los Angeles Lakers",
+    "art": {
+      "theme": "spotlight",
+      "eyebrow": "Turn-of-Century",
+      "headline": "Shaq.\nKobe.\nAI.",
+      "subline": "An era built on dominant bigs, electric guards, and playoff gravity."
+    },
     "plannedModes": [
       "Play The Real Season",
       "Draft The Era",
@@ -97,6 +115,12 @@
     "summary": "A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.",
     "whyItMatters": "This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.",
     "focusTeamName": "Golden State Warriors",
+    "art": {
+      "theme": "modern",
+      "eyebrow": "Modern Breakthrough",
+      "headline": "73 Wins.\n3-1 Swing.",
+      "subline": "Unanimous MVP energy and the most volatile Finals pivot of the era."
+    },
     "plannedModes": [
       "Play The Real Season",
       "Draft The Era",

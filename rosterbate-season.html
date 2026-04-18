@@ -13,6 +13,7 @@
 <script src="audit-logger.js"></script>
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
+<script src="historical-universe-slots.js"></script>
 <script src="global-nav.js" defer></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <script>
@@ -20,12 +21,13 @@ try{
   const params=new URLSearchParams(window.location.search || '');
   const requestedLeague=(params.get('league')||'').trim();
   const requestedHistorical=(params.get('historical')||'').trim().toLowerCase();
+  const requestedHistoricalUniverse=(params.get('historicalUniverse')||'').trim();
   let historicalPending=false;
   try{
     const host=String(window.location.hostname||'').trim().toLowerCase();
     historicalPending=(host==='localhost' || host==='127.0.0.1') && !!window.localStorage.getItem('rbHistoricalPackDevPendingSeasonBoot');
   }catch(e){}
-  if(requestedHistorical==='dev' || requestedHistorical==='reimagined' || historicalPending){
+  if(requestedHistoricalUniverse || requestedHistorical==='dev' || requestedHistorical==='reimagined' || historicalPending){
     document.documentElement.dataset.seasonRoute='historical';
   }else if(requestedLeague && requestedLeague!=='demo'){
     document.documentElement.dataset.seasonRoute='league';
@@ -2073,6 +2075,42 @@ function getRequestedHistoricalPackId(params){
   return String(params?.get('historicalPackId')||'').trim();
 }
 
+function getRequestedHistoricalUniverseSlotId(params){
+  return String(params?.get('historicalUniverse')||'').trim();
+}
+
+function loadHistoricalUniverseSlotState(slotId, requestedSport){
+  const api=window.RosterBateHistoricalUniverseSlots;
+  const targetSlotId=String(slotId||'').trim();
+  if(!api || !targetSlotId) return null;
+  const state=api.getState(targetSlotId);
+  if(!state || typeof state!=='object') return null;
+  const stateSport=normalizeRosterbateSport(state?.sport || CURRENT_SPORT);
+  const requestedSportNormalized=normalizeRosterbateSport(requestedSport || stateSport);
+  if(stateSport!==requestedSportNormalized) return null;
+  return state;
+}
+
+function persistHistoricalUniverseSlotSnapshot(reason){
+  const api=window.RosterBateHistoricalUniverseSlots;
+  if(!api || !D || typeof D!=='object' || !D.historicalPackId) return null;
+  try{
+    const persisted=api.upsertFromState(D,{
+      slotId:String(D.historicalUniverseSlotId||'').trim() || null,
+      reason:String(reason||'').trim() || 'historical_save'
+    });
+    if(persisted?.slotId){
+      D.historicalUniverseSlotId=persisted.slotId;
+      D.historicalUniverseCreatedAt=Number(persisted.metadata?.createdAt || D.historicalUniverseCreatedAt || Date.now());
+      try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+    }
+    return persisted;
+  }catch(e){
+    console.warn('Historical universe slot save skipped:', e);
+    return null;
+  }
+}
+
 function shouldBootHistoricalDevSeason(leagueId, requestedSport, params){
   if(!isHistoricalDevHost()) return false;
   const requestedLeague=String(leagueId||'').trim();
@@ -3150,6 +3188,7 @@ function queueSharedSeasonSave(reason, delay){
 
   // Save to localStorage for all leagues
   try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  persistHistoricalUniverseSlotSnapshot(reason || 'shared_save');
 
   // Save to Firebase for solo leagues (async, non-blocking)
   if(!D?.multiplayer) {
@@ -5339,8 +5378,32 @@ window.onload=async function(){
   const urlParams = new URLSearchParams(window.location.search || '');
   const leagueId = urlParams.get('league');
   const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
+  const requestedHistoricalUniverse = getRequestedHistoricalUniverseSlotId(urlParams);
   if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
   else setSeasonEmptyState('idle');
+
+  if (requestedHistoricalUniverse) {
+    const slotState = loadHistoricalUniverseSlotState(requestedHistoricalUniverse, requestedSport);
+    if (slotState) {
+      console.log('🗂️ Loading saved historical universe slot...', {
+        slotId: requestedHistoricalUniverse,
+        packId: slotState.historicalPackId || null,
+        seasonId: slotState.seasonId || null,
+        entryMode: slotState.historicalEntryMode || null
+      });
+      hideSeasonEmptyState();
+      D = slotState;
+      D.historicalUniverseSlotId = requestedHistoricalUniverse;
+      applySportContext(D.sport || requestedSport);
+      hydrateDraftUserContextFromLobby();
+      refreshCommissionerAccess();
+      try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+      initSeason();
+      applyRequestedSeasonView();
+      return;
+    }
+    console.warn('Requested historical universe slot was not found. Falling back to normal season routing.', requestedHistoricalUniverse);
+  }
 
   if (shouldBootHistoricalDevSeason(leagueId, requestedSport, urlParams)) {
     try {
@@ -6171,6 +6234,7 @@ function initSeason(){
   }
 
   console.log('? initSeason() completed successfully');
+  persistHistoricalUniverseSlotSnapshot('season_boot');
   if(cpuMaintenanceSummary?.changed){
     queueSharedSeasonSave('cpu_roster_bootstrap', 150);
   }

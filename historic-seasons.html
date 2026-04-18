@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="sport-config.js"></script>
 <script src="historical-pack-loader.js"></script>
+<script src="historical-universe-slots.js"></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <style>
   :root{
@@ -137,6 +138,36 @@
     cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease;
     text-align:left;color:inherit;font:inherit
   }
+  .archive-card-art{
+    margin-top:12px;min-height:112px;padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(255,183,102,.18),transparent 42%),
+      linear-gradient(180deg,rgba(28,37,57,.94),rgba(11,17,29,.98))
+  }
+  .archive-card-art.theme-dynasty{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(255,170,94,.2),transparent 42%),
+      linear-gradient(180deg,rgba(61,44,33,.94),rgba(13,19,31,.98))
+  }
+  .archive-card-art.theme-heritage{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(181,161,255,.18),transparent 42%),
+      linear-gradient(180deg,rgba(45,39,73,.94),rgba(12,18,31,.98))
+  }
+  .archive-card-art.theme-spotlight{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(116,179,255,.18),transparent 42%),
+      linear-gradient(180deg,rgba(26,43,72,.94),rgba(11,17,31,.98))
+  }
+  .archive-card-art.theme-modern{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(92,239,160,.18),transparent 42%),
+      linear-gradient(180deg,rgba(18,54,53,.94),rgba(11,18,29,.98))
+  }
+  .archive-art-eyebrow{font:700 9px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#dbe6f4}
+  .archive-art-headline{font:700 34px/.9 var(--teko);text-transform:uppercase;max-width:8ch}
+  .archive-art-subline{font:700 11px/1.45 var(--plex);letter-spacing:.04em;color:#ebf4ff}
   .archive-card:hover{transform:translateY(-1px);border-color:rgba(255,182,109,.18);filter:brightness(1.03)}
   .archive-card.active{
     border-color:rgba(255,182,109,.34);
@@ -186,11 +217,41 @@
       linear-gradient(180deg,rgba(20,29,47,.94),rgba(10,16,28,.98));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 34px rgba(0,0,0,.18)
   }
-  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start}
+  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) 220px auto;gap:24px;align-items:start}
   .pack-label{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#a8bddc}
   .pack-title{margin-top:8px;font:700 54px/.88 var(--teko);text-transform:uppercase}
   .pack-tagline{margin-top:8px;font:700 18px/1.2 var(--teko);letter-spacing:.03em;color:var(--accent-soft)}
   .pack-desc{margin-top:12px;max-width:70ch;font-size:15px;line-height:1.72;color:#d7e4f4}
+  .pack-poster{
+    min-height:240px;padding:18px;border-radius:22px;border:1px solid rgba(255,255,255,.08);
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(255,183,102,.18),transparent 42%),
+      linear-gradient(180deg,rgba(28,37,57,.94),rgba(11,17,29,.98))
+  }
+  .pack-poster.theme-dynasty{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(255,170,94,.2),transparent 42%),
+      linear-gradient(180deg,rgba(61,44,33,.94),rgba(13,19,31,.98))
+  }
+  .pack-poster.theme-heritage{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(181,161,255,.18),transparent 42%),
+      linear-gradient(180deg,rgba(45,39,73,.94),rgba(12,18,31,.98))
+  }
+  .pack-poster.theme-spotlight{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(116,179,255,.18),transparent 42%),
+      linear-gradient(180deg,rgba(26,43,72,.94),rgba(11,17,31,.98))
+  }
+  .pack-poster.theme-modern{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(92,239,160,.18),transparent 42%),
+      linear-gradient(180deg,rgba(18,54,53,.94),rgba(11,18,29,.98))
+  }
+  .pack-poster-eyebrow{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#dce7f4}
+  .pack-poster-headline{font:700 56px/.86 var(--teko);text-transform:uppercase;max-width:7ch}
+  .pack-poster-subline{font:700 12px/1.5 var(--plex);letter-spacing:.04em;color:#eff6ff}
   .pack-status{
     display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:999px;
     border:1px solid rgba(91,227,161,.24);background:rgba(9,28,21,.74);font:700 12px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#cffff0
@@ -280,6 +341,101 @@
   }
   .future-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
   .future-item span{display:block;margin-top:6px;font-size:13px;line-height:1.55;color:#cdd9ea}
+  .saved-universe-panel{display:grid;gap:14px}
+  .saved-universe-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .saved-universe-count{
+    display:inline-flex;align-items:center;justify-content:center;min-width:40px;padding:8px 11px;border-radius:999px;
+    border:1px solid rgba(255,194,122,.2);background:rgba(36,24,12,.64);font:700 12px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#ffe0b9
+  }
+  .saved-universe-list{display:grid;gap:10px}
+  .saved-universe-card{
+    padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
+  }
+  .saved-universe-card.active-pack{
+    border-color:rgba(125,196,255,.2);
+    box-shadow:inset 0 0 0 1px rgba(125,196,255,.06)
+  }
+  .saved-universe-card.tone-real{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(92,239,160,.12),transparent 44%),
+      linear-gradient(180deg,rgba(13,20,33,.94),rgba(8,12,22,.98))
+  }
+  .saved-universe-card.tone-draft{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(91,168,255,.12),transparent 44%),
+      linear-gradient(180deg,rgba(13,20,33,.94),rgba(8,12,22,.98))
+  }
+  .saved-universe-card.tone-reimagined{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(245,181,85,.14),transparent 44%),
+      linear-gradient(180deg,rgba(13,20,33,.94),rgba(8,12,22,.98))
+  }
+  .saved-universe-top{display:grid;grid-template-columns:84px minmax(0,1fr);gap:14px;align-items:start}
+  .saved-universe-art{
+    min-height:112px;border-radius:18px;border:1px solid rgba(255,255,255,.08);padding:10px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:
+      radial-gradient(110% 110% at 100% 0%,rgba(255,190,112,.16),transparent 40%),
+      linear-gradient(180deg,rgba(30,41,64,.92),rgba(11,18,30,.98))
+  }
+  .saved-universe-art.era-1980s{
+    background:
+      radial-gradient(110% 110% at 100% 0%,rgba(255,211,149,.16),transparent 42%),
+      linear-gradient(180deg,rgba(52,44,80,.94),rgba(16,18,32,.98))
+  }
+  .saved-universe-art.era-1990s{
+    background:
+      radial-gradient(110% 110% at 100% 0%,rgba(255,178,95,.16),transparent 42%),
+      linear-gradient(180deg,rgba(62,45,34,.94),rgba(12,18,30,.98))
+  }
+  .saved-universe-art.era-2000s{
+    background:
+      radial-gradient(110% 110% at 100% 0%,rgba(114,168,255,.16),transparent 42%),
+      linear-gradient(180deg,rgba(27,44,71,.94),rgba(11,17,30,.98))
+  }
+  .saved-universe-art.era-2010s{
+    background:
+      radial-gradient(110% 110% at 100% 0%,rgba(109,236,188,.16),transparent 42%),
+      linear-gradient(180deg,rgba(21,55,53,.94),rgba(10,17,28,.98))
+  }
+  .saved-universe-era{font:700 9px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#d6e2f1}
+  .saved-universe-season{font:700 30px/.88 var(--teko);text-transform:uppercase}
+  .saved-universe-significance{
+    display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(10,18,30,.76);font:700 9px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#f4e2c7
+  }
+  .saved-universe-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .saved-universe-title{font:700 24px/.92 var(--teko);text-transform:uppercase}
+  .saved-universe-mode{
+    display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(10,18,30,.74);font:700 10px/1 var(--plex);letter-spacing:.1em;text-transform:uppercase;color:#dce8f7;white-space:nowrap
+  }
+  .saved-universe-mode.tone-real{background:rgba(9,35,22,.76);border-color:rgba(187,247,208,.2);color:#cbf7de}
+  .saved-universe-mode.tone-draft{background:rgba(10,26,48,.8);border-color:rgba(191,219,254,.18);color:#d8e8ff}
+  .saved-universe-mode.tone-reimagined{background:rgba(45,30,10,.8);border-color:rgba(248,225,161,.2);color:#ffe5b8}
+  .saved-universe-subtitle{margin-top:8px;font-size:13px;line-height:1.52;color:#d2ddef}
+  .saved-universe-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .saved-universe-pill{
+    display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(10,18,30,.72);font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#cfe0f7
+  }
+  .saved-universe-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+  .saved-universe-progress-card{
+    padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(9,15,24,.72)
+  }
+  .saved-universe-progress-value{font:700 24px/.92 var(--teko)}
+  .saved-universe-progress-label{margin-top:4px;font:700 9px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#afc3df}
+  .saved-universe-actions{display:flex;gap:10px;margin-top:12px}
+  .saved-universe-btn{
+    display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);
+    text-decoration:none;cursor:pointer;font:700 13px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase
+  }
+  .saved-universe-btn.open{background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);color:#072314;border-color:rgba(187,247,208,.34)}
+  .saved-universe-btn.delete{background:linear-gradient(180deg,#263246,#151e2e);color:#eef5ff}
+  .saved-universe-empty{
+    padding:14px;border-radius:18px;border:1px dashed rgba(255,255,255,.12);background:rgba(9,14,24,.7);font-size:13px;line-height:1.6;color:#c8d6ea
+  }
   .status-bar{
     margin-top:18px;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
     background:linear-gradient(180deg,rgba(16,24,40,.9),rgba(10,16,27,.96));font-size:13px;line-height:1.55;color:#d7e4f5
@@ -292,10 +448,14 @@
     .grid{grid-template-columns:minmax(0,1.18fr) minmax(330px,.82fr)}
     .archive-browser-shell{grid-template-columns:270px minmax(0,1fr)}
     .pack-title{font-size:48px}
+    .pack-top{grid-template-columns:minmax(0,1fr) 190px auto}
+    .pack-poster-headline{font-size:46px}
   }
   @media (max-width: 1080px){
     .hero,.grid,.pack-lower,.archive-browser-shell{grid-template-columns:1fr}
     .snapshot-grid,.pack-health{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .pack-top{grid-template-columns:minmax(0,1fr) 200px}
+    .pack-status{justify-self:start}
   }
   @media (max-width: 760px){
     .wrap{padding:0 14px 30px}
@@ -305,6 +465,8 @@
     .section-title,.pack-title,.future-title{font-size:34px}
     .hero-foot,.snapshot-grid,.pack-health,.mode-buttons,.spotlight-list{grid-template-columns:1fr}
     .pack-top{grid-template-columns:1fr}
+    .saved-universe-top,.saved-universe-progress{grid-template-columns:1fr}
+    .pack-poster-headline,.archive-art-headline{font-size:34px}
   }
 </style>
 </head>
@@ -391,6 +553,11 @@
               </div>
               <div class="archive-card-title">Loading Pack</div>
               <div class="archive-card-tagline">Preparing the shelf...</div>
+              <div class="archive-card-art theme-spotlight">
+                <div class="archive-art-eyebrow">Historic Archive</div>
+                <div class="archive-art-headline">Loading Pack</div>
+                <div class="archive-art-subline">Pulling authored art from the historical catalog.</div>
+              </div>
               <div class="archive-card-summary">Pulling historical catalog metadata.</div>
             </button>
           </div>
@@ -403,6 +570,13 @@
                   <div class="pack-title" id="packTitle">Loading Pack...</div>
                   <div class="pack-tagline" id="packTagline">Loading...</div>
                   <div class="pack-desc" id="packDesc">Pulling live pack metadata from the historical loader.</div>
+                </div>
+                <div id="packPosterSlot">
+                  <div class="pack-poster theme-spotlight">
+                    <div class="pack-poster-eyebrow">Historic Archive</div>
+                    <div class="pack-poster-headline">Loading Pack</div>
+                    <div class="pack-poster-subline">Pulling authored art from the historical catalog.</div>
+                  </div>
                 </div>
                 <div class="pack-status" id="packStatusPill">Loading</div>
               </div>
@@ -486,6 +660,22 @@
           </div>
         </div>
 
+        <div class="panel future-card saved-universe-panel">
+          <div class="saved-universe-head">
+            <div>
+              <div class="section-kicker">Saved Universes</div>
+              <div class="future-title">Keep The Timeline</div>
+            </div>
+            <div class="saved-universe-count" id="savedUniverseCount">0</div>
+          </div>
+          <div class="future-copy">
+            Every real season, reimagined branch, and drafted universe can live here as its own revisit-able archive slot.
+          </div>
+          <div class="saved-universe-list" id="savedUniversesList">
+            <div class="saved-universe-empty">Loading saved universes...</div>
+          </div>
+        </div>
+
         <div class="panel future-card">
           <div class="section-kicker">Audit Mindset</div>
           <div class="future-title">Pack Truth Over Hype</div>
@@ -518,6 +708,12 @@
       summary: 'Full-league historical universe with real season stats, real-season boot, and Draft The Era support.',
       whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.',
       focusTeamName: 'Chicago Bulls',
+      art: {
+        theme: 'dynasty',
+        eyebrow: '1990s Archive',
+        headline: '72-Win Empire',
+        subline: 'Jordan, Hakeem, Shaq, and the full season universe.'
+      },
       plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
       previewStars: ['Michael Jordan', 'Hakeem Olajuwon', "Shaquille O'Neal"],
       seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1',
@@ -539,6 +735,12 @@
       summary: 'A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.',
       whyItMatters: 'This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.',
       focusTeamName: 'Los Angeles Lakers',
+      art: {
+        theme: 'heritage',
+        eyebrow: '1980s Rivalry',
+        headline: 'Bird. Magic. Jordan.',
+        subline: 'Peak Celtics-Lakers tension with a young Jordan entering the frame.'
+      },
       plannedModes: ['Play The Real Season', 'Draft The Era'],
       previewStars: ['Magic Johnson', 'Larry Bird', 'Michael Jordan']
     },
@@ -558,6 +760,12 @@
       summary: 'A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.',
       whyItMatters: 'This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.',
       focusTeamName: 'Los Angeles Lakers',
+      art: {
+        theme: 'spotlight',
+        eyebrow: 'Turn-of-Century',
+        headline: 'Shaq. Kobe. AI.',
+        subline: 'An era built on dominant bigs, electric guards, and playoff gravity.'
+      },
       plannedModes: ['Play The Real Season', 'Draft The Era', 'Historic Challenges'],
       previewStars: ["Shaquille O'Neal", 'Allen Iverson', 'Tim Duncan']
     },
@@ -577,6 +785,12 @@
       summary: 'A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.',
       whyItMatters: 'This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.',
       focusTeamName: 'Golden State Warriors',
+      art: {
+        theme: 'modern',
+        eyebrow: 'Modern Breakthrough',
+        headline: '73 Wins. 3-1 Swing.',
+        subline: 'Unanimous MVP energy and the most volatile Finals pivot of the era.'
+      },
       plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
       previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard'],
       seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
@@ -593,6 +807,15 @@
 
   function clone(value){
     return JSON.parse(JSON.stringify(value));
+  }
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   function getBrowserSport(){
@@ -619,6 +842,32 @@
 
   function getConfigById(packId){
     return activeCatalog.find(entry => String(entry.packId) === String(packId)) || null;
+  }
+
+  function getPackArt(config){
+    const art = config && typeof config.art === 'object' && config.art ? config.art : {};
+    return {
+      theme: String(art.theme || config?.significanceTone || 'spotlight').trim().toLowerCase() || 'spotlight',
+      eyebrow: String(art.eyebrow || ((config?.era || 'Historic') + ' Archive')).trim() || 'Historic Archive',
+      headline: String(art.headline || config?.shortLabel || config?.seasonLabel || 'Historic Pack').trim() || 'Historic Pack',
+      subline: String(art.subline || config?.tagline || config?.significanceLabel || 'Historical season archive').trim() || 'Historical season archive'
+    };
+  }
+
+  function renderCatalogArt(config, variant){
+    const art = getPackArt(config);
+    const isPoster = variant === 'poster';
+    const shellClass = isPoster ? 'pack-poster' : 'archive-card-art';
+    const eyebrowClass = isPoster ? 'pack-poster-eyebrow' : 'archive-art-eyebrow';
+    const headlineClass = isPoster ? 'pack-poster-headline' : 'archive-art-headline';
+    const sublineClass = isPoster ? 'pack-poster-subline' : 'archive-art-subline';
+    return [
+      '<div class="' + shellClass + ' theme-' + escapeHtml(art.theme) + '">',
+      '<div class="' + eyebrowClass + '">' + escapeHtml(art.eyebrow) + '</div>',
+      '<div class="' + headlineClass + '">' + escapeHtml(art.headline) + '</div>',
+      '<div class="' + sublineClass + '">' + escapeHtml(art.subline) + '</div>',
+      '</div>'
+    ].join('');
   }
 
   function teamDisplayName(team){
@@ -734,6 +983,7 @@
         '</div>',
         '<div class="archive-card-title">' + (config.shortLabel || config.seasonLabel || config.packId) + '</div>',
         '<div class="archive-card-tagline">' + (config.tagline || 'Historic season archive.') + '</div>',
+        renderCatalogArt(config, 'card'),
         significance,
         '<div class="archive-card-summary">' + (config.summary || 'Historical season preview.') + '</div>',
         config.whyItMatters ? '<div class="archive-card-why"><strong>Why this matters:</strong> ' + config.whyItMatters + '</div>' : '',
@@ -748,6 +998,96 @@
       button.addEventListener('click', function(){
         const packId = String(button.getAttribute('data-pack-id') || '').trim();
         if(packId) setActivePack(packId);
+      });
+    });
+  }
+
+  function renderSavedUniverses(){
+    const listEl = document.getElementById('savedUniversesList');
+    const countEl = document.getElementById('savedUniverseCount');
+    if(!listEl || !countEl) return;
+    const api = window.RosterBateHistoricalUniverseSlots;
+    if(!api){
+      countEl.textContent = '--';
+      listEl.innerHTML = '<div class="saved-universe-empty">Historical universe slots are unavailable in this build.</div>';
+      return;
+    }
+    const slots = api.listSlots({ sport:getBrowserSport() });
+    countEl.textContent = String(slots.length || 0);
+    if(!slots.length){
+      listEl.innerHTML = '<div class="saved-universe-empty">No saved historical universes yet. Launch a real season, a reimagined branch, or complete a historical draft and it will show up here.</div>';
+      return;
+    }
+    listEl.innerHTML = slots.map(function(slot){
+      const config = getConfigById(slot.historicalPackId) || {};
+      const isActivePack = String(slot.historicalPackId || '') === String(activePackId || '');
+      const openUrl = api.buildSeasonUrl(slot, getBrowserSport());
+      const modeTone = String(slot.modeTone || api.getModeTone(slot.historicalEntryMode) || 'real').trim().toLowerCase();
+      const eraClass = 'era-' + String(config.era || '').trim().toLowerCase();
+      const significance = String(config.significanceLabel || 'Historical Run').trim();
+      const shortLabel = String(config.shortLabel || slot.historicalSeasonId || 'Historic').trim();
+      const rankText = Number.isFinite(Number(slot.teamRank)) ? ('#' + Number(slot.teamRank)) : '--';
+      const recordText = Number.isFinite(Number(slot.wins)) && Number.isFinite(Number(slot.losses))
+        ? (Number(slot.wins) + '-' + Number(slot.losses))
+        : '--';
+      const pfText = Number.isFinite(Number(slot.pf)) ? Number(slot.pf).toFixed(1) : '--';
+      const progressText = String(slot.progressLabel || 'In progress').trim();
+      return [
+        '<article class="saved-universe-card tone-' + modeTone + (isActivePack ? ' active-pack' : '') + '">',
+          '<div class="saved-universe-top">',
+            '<div class="saved-universe-art ' + escapeHtml(eraClass) + '">',
+              '<div class="saved-universe-era">' + escapeHtml(config.era || 'Historic Era') + '</div>',
+              '<div class="saved-universe-season">' + escapeHtml(shortLabel) + '</div>',
+              '<div class="saved-universe-significance">' + escapeHtml(significance) + '</div>',
+            '</div>',
+            '<div>',
+              '<div class="saved-universe-title-row">',
+                '<div class="saved-universe-title">' + escapeHtml(slot.title || 'Historical Universe') + '</div>',
+                '<div class="saved-universe-mode tone-' + modeTone + '">' + escapeHtml(api.getModeLabel(slot.historicalEntryMode)) + '</div>',
+              '</div>',
+              '<div class="saved-universe-subtitle">' + escapeHtml(slot.subtitle || 'Historical universe save') + '</div>',
+              '<div class="saved-universe-meta">',
+                '<span class="saved-universe-pill">' + escapeHtml(slot.historicalPackId || 'historic_pack') + '</span>',
+                '<span class="saved-universe-pill">' + escapeHtml(progressText) + '</span>',
+                '<span class="saved-universe-pill">' + escapeHtml(config.significanceLabel || 'Archive Run') + '</span>',
+              '</div>',
+            '</div>',
+          '</div>',
+          '<div class="saved-universe-progress">',
+            '<div class="saved-universe-progress-card">',
+              '<div class="saved-universe-progress-value">' + escapeHtml(rankText) + '</div>',
+              '<div class="saved-universe-progress-label">Current Rank</div>',
+            '</div>',
+            '<div class="saved-universe-progress-card">',
+              '<div class="saved-universe-progress-value">' + escapeHtml(recordText) + '</div>',
+              '<div class="saved-universe-progress-label">Record</div>',
+            '</div>',
+            '<div class="saved-universe-progress-card">',
+              '<div class="saved-universe-progress-value">' + escapeHtml(pfText) + '</div>',
+              '<div class="saved-universe-progress-label">Fantasy Points For</div>',
+            '</div>',
+          '</div>',
+          '<div class="saved-universe-meta">',
+            '<span class="saved-universe-pill">' + escapeHtml(slot.teamName || config.focusTeamName || 'Featured team') + '</span>',
+            '<span class="saved-universe-pill">' + escapeHtml(String(slot.leagueSize || 0)) + ' teams</span>',
+            '<span class="saved-universe-pill">' + escapeHtml(String(slot.playerPoolCount || 0)) + ' player pool</span>',
+          '</div>',
+          '<div class="saved-universe-actions">',
+            '<a class="saved-universe-btn open" href="' + escapeHtml(openUrl) + '">Open</a>',
+            '<button class="saved-universe-btn delete" type="button" data-delete-slot="' + escapeHtml(slot.slotId) + '">Delete</button>',
+          '</div>',
+        '</article>'
+      ].join('');
+    }).join('');
+    listEl.querySelectorAll('[data-delete-slot]').forEach(function(button){
+      button.addEventListener('click', function(){
+        const slotId = String(button.getAttribute('data-delete-slot') || '').trim();
+        if(!slotId) return;
+        const slot = api.getSlot(slotId);
+        const title = slot?.title || 'this saved universe';
+        if(!window.confirm('Delete ' + title + '?')) return;
+        api.deleteSlot(slotId);
+        renderSavedUniverses();
       });
     });
   }
@@ -805,6 +1145,7 @@
     document.getElementById('packDesc').textContent = config.whyItMatters
       ? ((manifest.description || config.summary || packSummary) + ' Why this season matters: ' + config.whyItMatters)
       : (manifest.description || config.summary || packSummary);
+    document.getElementById('packPosterSlot').innerHTML = renderCatalogArt(config, 'poster');
 
     const statusPill = document.getElementById('packStatusPill');
     statusPill.textContent = config.availability === 'playable'
@@ -961,6 +1302,7 @@
         : 'Archive shelf loaded. Preview packs are intentionally visible before they become playable.',
       config.availability === 'playable' ? 'good' : 'warn'
     );
+    renderSavedUniverses();
   }
 
   async function setActivePack(packId){
@@ -1001,6 +1343,7 @@
     }
     if(!activeCatalog.length){
       setStatus('No historical packs are cataloged for this sport yet.', 'warn');
+      renderSavedUniverses();
       return;
     }
     const firstPlayable = activeCatalog.find(function(entry){ return entry.availability === 'playable'; });
