@@ -1,0 +1,437 @@
+[
+  {
+    "teamId": "nba_1996_atl",
+    "seasonId": "nba_1996_historic",
+    "city": "Atlanta",
+    "name": "Hawks",
+    "displayName": "Atlanta Hawks",
+    "abbreviation": "ATL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#a11f31",
+      "secondary": "#d9c2a3"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_bos",
+    "seasonId": "nba_1996_historic",
+    "city": "Boston",
+    "name": "Celtics",
+    "displayName": "Boston Celtics",
+    "abbreviation": "BOS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#176b52",
+      "secondary": "#efe8d8"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_cha",
+    "seasonId": "nba_1996_historic",
+    "city": "Charlotte",
+    "name": "Hornets",
+    "displayName": "Charlotte Hornets",
+    "abbreviation": "CHA",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#0f5d91",
+      "secondary": "#5e2a83"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_chi",
+    "seasonId": "nba_1996_historic",
+    "city": "Chicago",
+    "name": "Bulls",
+    "displayName": "Chicago Bulls",
+    "abbreviation": "CHI",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#7a1821",
+      "secondary": "#111111"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_cle",
+    "seasonId": "nba_1996_historic",
+    "city": "Cleveland",
+    "name": "Cavaliers",
+    "displayName": "Cleveland Cavaliers",
+    "abbreviation": "CLE",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#6b2031",
+      "secondary": "#f0c997"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_det",
+    "seasonId": "nba_1996_historic",
+    "city": "Detroit",
+    "name": "Pistons",
+    "displayName": "Detroit Pistons",
+    "abbreviation": "DET",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#0f3d78",
+      "secondary": "#c13b3b"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_ind",
+    "seasonId": "nba_1996_historic",
+    "city": "Indiana",
+    "name": "Pacers",
+    "displayName": "Indiana Pacers",
+    "abbreviation": "IND",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#173b74",
+      "secondary": "#f2c94c"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_mil",
+    "seasonId": "nba_1996_historic",
+    "city": "Milwaukee",
+    "name": "Bucks",
+    "displayName": "Milwaukee Bucks",
+    "abbreviation": "MIL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#0e5a44",
+      "secondary": "#c13a2b"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_mia",
+    "seasonId": "nba_1996_historic",
+    "city": "Miami",
+    "name": "Heat",
+    "displayName": "Miami Heat",
+    "abbreviation": "MIA",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#111111",
+      "secondary": "#b42830"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_njn",
+    "seasonId": "nba_1996_historic",
+    "city": "New Jersey",
+    "name": "Nets",
+    "displayName": "New Jersey Nets",
+    "abbreviation": "NJN",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#163f77",
+      "secondary": "#d52d2d"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_nyk",
+    "seasonId": "nba_1996_historic",
+    "city": "New York",
+    "name": "Knicks",
+    "displayName": "New York Knicks",
+    "abbreviation": "NYK",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#275f9a",
+      "secondary": "#d97829"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_orl",
+    "seasonId": "nba_1996_historic",
+    "city": "Orlando",
+    "name": "Magic",
+    "displayName": "Orlando Magic",
+    "abbreviation": "ORL",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#2467a4",
+      "secondary": "#111111"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_phi",
+    "seasonId": "nba_1996_historic",
+    "city": "Philadelphia",
+    "name": "76ers",
+    "displayName": "Philadelphia 76ers",
+    "abbreviation": "PHI",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#123c76",
+      "secondary": "#d94f4f"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_tor",
+    "seasonId": "nba_1996_historic",
+    "city": "Toronto",
+    "name": "Raptors",
+    "displayName": "Toronto Raptors",
+    "abbreviation": "TOR",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#5d2d84",
+      "secondary": "#c23b3b"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_was",
+    "seasonId": "nba_1996_historic",
+    "city": "Washington",
+    "name": "Bullets",
+    "displayName": "Washington Bullets",
+    "abbreviation": "WAS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#1a4e85",
+      "secondary": "#d64040"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_dal",
+    "seasonId": "nba_1996_historic",
+    "city": "Dallas",
+    "name": "Mavericks",
+    "displayName": "Dallas Mavericks",
+    "abbreviation": "DAL",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#125780",
+      "secondary": "#2aa1d3"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_den",
+    "seasonId": "nba_1996_historic",
+    "city": "Denver",
+    "name": "Nuggets",
+    "displayName": "Denver Nuggets",
+    "abbreviation": "DEN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#1e5d86",
+      "secondary": "#d6a43b"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_hou",
+    "seasonId": "nba_1996_historic",
+    "city": "Houston",
+    "name": "Rockets",
+    "displayName": "Houston Rockets",
+    "abbreviation": "HOU",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#7e1e2d",
+      "secondary": "#f1c26d"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_min",
+    "seasonId": "nba_1996_historic",
+    "city": "Minnesota",
+    "name": "Timberwolves",
+    "displayName": "Minnesota Timberwolves",
+    "abbreviation": "MIN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#134f84",
+      "secondary": "#2e9ccf"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_sas",
+    "seasonId": "nba_1996_historic",
+    "city": "San Antonio",
+    "name": "Spurs",
+    "displayName": "San Antonio Spurs",
+    "abbreviation": "SAS",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#a7a9ac",
+      "secondary": "#111111"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_uta",
+    "seasonId": "nba_1996_historic",
+    "city": "Utah",
+    "name": "Jazz",
+    "displayName": "Utah Jazz",
+    "abbreviation": "UTA",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#5f2f63",
+      "secondary": "#1d6e5d"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_van",
+    "seasonId": "nba_1996_historic",
+    "city": "Vancouver",
+    "name": "Grizzlies",
+    "displayName": "Vancouver Grizzlies",
+    "abbreviation": "VAN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#0d7468",
+      "secondary": "#cf4141"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_gsw",
+    "seasonId": "nba_1996_historic",
+    "city": "Golden State",
+    "name": "Warriors",
+    "displayName": "Golden State Warriors",
+    "abbreviation": "GSW",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1e4d8f",
+      "secondary": "#e0ad3a"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_lac",
+    "seasonId": "nba_1996_historic",
+    "city": "Los Angeles",
+    "name": "Clippers",
+    "displayName": "Los Angeles Clippers",
+    "abbreviation": "LAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#b22f3f",
+      "secondary": "#2d5f96"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_lal",
+    "seasonId": "nba_1996_historic",
+    "city": "Los Angeles",
+    "name": "Lakers",
+    "displayName": "Los Angeles Lakers",
+    "abbreviation": "LAL",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5f2d84",
+      "secondary": "#f0c54b"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_phx",
+    "seasonId": "nba_1996_historic",
+    "city": "Phoenix",
+    "name": "Suns",
+    "displayName": "Phoenix Suns",
+    "abbreviation": "PHX",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#6e2f83",
+      "secondary": "#e38b2c"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_por",
+    "seasonId": "nba_1996_historic",
+    "city": "Portland",
+    "name": "Trail Blazers",
+    "displayName": "Portland Trail Blazers",
+    "abbreviation": "POR",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#99212d",
+      "secondary": "#111111"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_sac",
+    "seasonId": "nba_1996_historic",
+    "city": "Sacramento",
+    "name": "Kings",
+    "displayName": "Sacramento Kings",
+    "abbreviation": "SAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5f2d84",
+      "secondary": "#c0c6d1"
+    },
+    "externalRefs": {}
+  },
+  {
+    "teamId": "nba_1996_sea",
+    "seasonId": "nba_1996_historic",
+    "city": "Seattle",
+    "name": "SuperSonics",
+    "displayName": "Seattle SuperSonics",
+    "abbreviation": "SEA",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1e744f",
+      "secondary": "#d2a84f"
+    },
+    "externalRefs": {}
+  }
+]

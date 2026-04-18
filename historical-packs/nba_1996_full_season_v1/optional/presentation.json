@@ -1,0 +1,34 @@
+{
+  "heroTitle": "1995-96 NBA Historic Season",
+  "heroSubtitle": "Play the real season or draft the era.",
+  "featuredTeamId": "nba_1996_chi",
+  "featuredStars": [
+    "nba_1996_michael_jordan",
+    "nba_1996_hakeem_olajuwon",
+    "nba_1996_shaquille_oneal",
+    "nba_1996_charles_barkley",
+    "nba_1996_gary_payton",
+    "nba_1996_david_robinson"
+  ],
+  "artDirection": {
+    "heroTone": "dynasty",
+    "primaryPalette": [
+      "#7a1821",
+      "#111111",
+      "#f1c26d"
+    ],
+    "backgroundStyle": "historic_arena_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "real_season",
+      "label": "Play The Real Season",
+      "description": "Step into the 1995-96 season with historical rosters intact."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the 1995-96 player pool and build an alternate-history league."
+    }
+  ]
+}

@@ -6,6 +6,7 @@
   const enabled=isBrowser && (hostname==='localhost' || hostname==='127.0.0.1');
   const dependencyDefs=[
     {key:'validator', globalName:'RosterBateHistoricalPackValidator', file:'historical-pack-validator.js'},
+    {key:'loader', globalName:'RosterBateHistoricalPackLoader', file:'historical-pack-loader.js'},
     {key:'fixtures', globalName:'RosterBateHistoricalPackFixtures', file:'historical-pack-fixtures.js'},
     {key:'importer', globalName:'RosterBateHistoricalPackImporter', file:'historical-pack-importer.js'}
   ];
@@ -97,9 +98,25 @@
     await ensureReady();
     return {
       validator: global.RosterBateHistoricalPackValidator,
+      loader: global.RosterBateHistoricalPackLoader,
       fixtures: global.RosterBateHistoricalPackFixtures,
       importer: global.RosterBateHistoricalPackImporter
     };
+  }
+
+  async function loadBundleForPack(packId){
+    const deps=await getDependencies();
+    const id=packId || DEFAULT_FIXTURE_ID;
+    if(deps.loader && typeof deps.loader.loadPackById==='function'){
+      try{
+        return await deps.loader.loadPackById(id);
+      }catch(error){
+        if(global.console && typeof global.console.warn==='function'){
+          global.console.warn('[RosterBate dev] Real pack load failed, falling back to embedded fixture:', error && error.message ? error.message : error);
+        }
+      }
+    }
+    return deps.fixtures.getFixtureById(id);
   }
 
   function disabledResponse(){
@@ -297,6 +314,10 @@
     return true;
   }
 
+  function buildHistoricalDraftUrl(){
+    return 'rosterbate-draft.html?sport=nba&historical=dev';
+  }
+
   function buildTeamOptionMarkup(team){
     const label=team.displayName || [team.city, team.name].filter(Boolean).join(' ') || team.teamId;
     const abbr=String(team.abbreviation || '').trim().toUpperCase();
@@ -306,8 +327,7 @@
   async function syncPanelFixtureContext(){
     if(!enabled || !panelReady) return null;
     try{
-      const deps=await getDependencies();
-      const fixture=deps.fixtures.getFixtureById(DEFAULT_FIXTURE_ID);
+      const fixture=await loadBundleForPack(DEFAULT_FIXTURE_ID);
       if(!fixture) return null;
       const teams=Array.isArray(fixture.teams) ? fixture.teams.slice() : [];
       const players=Array.isArray(fixture.players) ? fixture.players : [];
@@ -376,6 +396,11 @@
         ].filter(Boolean);
         setPanelStatus('<strong>Applied To Local State</strong><br>'+savedBits.join(' • ')+'<br>Saved under <code>'+LOCAL_STATE_KEY+'</code> and staged for the next season boot.', result.status==='import_applied' ? 'success' : 'warn');
         if(global.console && typeof global.console.log==='function') global.console.log('[RosterBate dev] Applied import result', result);
+        return;
+      }
+      if(action==='draft'){
+        const result=await api.openHistoricalDraft();
+        setPanelStatus('<strong>Opening Draft The Era</strong><br>'+result.url, 'success');
       }
     }catch(error){
       setPanelStatus('<strong>Runner error</strong><br>'+(error && error.message ? error.message : String(error)), 'error');
@@ -408,6 +433,7 @@
             '<button type="button" class="rbh-btn" data-role="action" data-action="validate">Validate</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="import">Dry Import</button>'+
             '<button type="button" class="rbh-btn rbh-btn--success" data-role="action" data-action="apply">Apply To Local</button>'+
+            '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="draft">Open Draft The Era</button>'+
           '</div>'+
           '<div class="rbh-footer">'+
             '<div class="rbh-footnote" id="'+FIXTURE_META_ID+'">Fixture: '+DEFAULT_FIXTURE_ID+'</div>'+
@@ -450,6 +476,7 @@
             'await rbHistoricalPackDev.validateFixture()',
             'await rbHistoricalPackDev.importFixture()',
             'await rbHistoricalPackDev.applyFixtureToLocalState()',
+            'await rbHistoricalPackDev.openHistoricalDraft()',
             'rbHistoricalPackDev.getSelectedTeam()',
             'await rbHistoricalPackDev.validateBundle(bundle)',
             'await rbHistoricalPackDev.importBundle(bundle)',
@@ -469,6 +496,7 @@
           'await rbHistoricalPackDev.validateFixture("nba_1996_full_season_v1")',
           'await rbHistoricalPackDev.importFixture("nba_1996_full_season_v1")',
           'await rbHistoricalPackDev.applyFixtureToLocalState("nba_1996_full_season_v1")',
+          'await rbHistoricalPackDev.openHistoricalDraft()',
           'rbHistoricalPackDev.getSelectedTeam()',
           'rbHistoricalPackDev.setSelectedTeam("nba_1996_sea")',
           'rbHistoricalPackDev.readAppliedLocalState()',
@@ -484,14 +512,13 @@
     },
     async getFixture(packId){
       if(!enabled) return disabledResponse();
-      const deps=await getDependencies();
-      return deps.fixtures.getFixtureById(packId || DEFAULT_FIXTURE_ID);
+      return loadBundleForPack(packId || DEFAULT_FIXTURE_ID);
     },
     async validateFixture(packId){
       if(!enabled) return disabledResponse();
       const deps=await getDependencies();
       const id=packId || DEFAULT_FIXTURE_ID;
-      const bundle=deps.fixtures.getFixtureById(id);
+      const bundle=await loadBundleForPack(id);
       if(!bundle){
         return {status:'fixture_not_found', packId:id};
       }
@@ -500,18 +527,41 @@
     async importFixture(packId, options){
       if(!enabled) return disabledResponse();
       const deps=await getDependencies();
-      return deps.importer.importHistoricalPackFixture(packId || DEFAULT_FIXTURE_ID, options || {});
+      const id=packId || DEFAULT_FIXTURE_ID;
+      const bundle=await loadBundleForPack(id);
+      if(!bundle){
+        return {status:'fixture_not_found', packId:id};
+      }
+      return deps.importer.importHistoricalPackBundle(bundle, options || {});
     },
     async applyFixtureToLocalState(packId, options){
       if(!enabled) return disabledResponse();
       const deps=await getDependencies();
+      const id=packId || DEFAULT_FIXTURE_ID;
+      const bundle=await loadBundleForPack(id);
+      if(!bundle){
+        return {status:'fixture_not_found', packId:id};
+      }
       const selectedTeamId=String(options && options.selectedTeamId || getPanelSelectedTeamId()).trim();
-      return deps.importer.importHistoricalPackFixture(packId || DEFAULT_FIXTURE_ID, {
+      return deps.importer.importHistoricalPackBundle(bundle, {
         dryRun: false,
         writer: function(importResult){
           return writeImportToLocalState(importResult, {selectedTeamId:selectedTeamId});
         }
       });
+    },
+    async openHistoricalDraft(){
+      if(!enabled) return disabledResponse();
+      const selectedTeamId=String(getPanelSelectedTeamId() || getPersistedSelectedTeamId() || '').trim();
+      await api.applyFixtureToLocalState(DEFAULT_FIXTURE_ID, {selectedTeamId:selectedTeamId});
+      if(isBrowser && global.location){
+        global.location.href=buildHistoricalDraftUrl();
+      }
+      return {
+        status:'navigating_to_historical_draft',
+        url:buildHistoricalDraftUrl(),
+        selectedTeamId:selectedTeamId || null
+      };
     },
     async validateBundle(bundle){
       if(!enabled) return disabledResponse();
@@ -525,16 +575,14 @@
     },
     async getSelectedTeam(){
       if(!enabled) return disabledResponse();
-      const deps=await getDependencies();
-      const fixture=deps.fixtures.getFixtureById(DEFAULT_FIXTURE_ID);
+      const fixture=await loadBundleForPack(DEFAULT_FIXTURE_ID);
       const selectedTeamId=getPanelSelectedTeamId() || getPersistedSelectedTeamId();
       const teams=fixture && Array.isArray(fixture.teams) ? fixture.teams : [];
       return teams.find(function(team){ return String(team.teamId)===String(selectedTeamId); }) || null;
     },
     async setSelectedTeam(teamId){
       if(!enabled) return disabledResponse();
-      const deps=await getDependencies();
-      const fixture=deps.fixtures.getFixtureById(DEFAULT_FIXTURE_ID);
+      const fixture=await loadBundleForPack(DEFAULT_FIXTURE_ID);
       const teams=fixture && Array.isArray(fixture.teams) ? fixture.teams : [];
       const nextId=String(teamId || '').trim();
       if(!teams.some(function(team){ return String(team.teamId)===nextId; })){

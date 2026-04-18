@@ -1,0 +1,19 @@
+{
+  "seasonId": "nba_1996_historic",
+  "sport": "nba",
+  "league": "nba",
+  "label": "1995-96 NBA Historic Season",
+  "startDate": "1995-11-03",
+  "endDate": "1996-04-21",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "eraTags": [
+    "1990s",
+    "Jordan Era",
+    "Historic Season"
+  ],
+  "notes": [
+    "Full-league historical foundation pack for 1995-96.",
+    "Supports both franchise-path play and historical fantasy draft experiments."
+  ]
+}

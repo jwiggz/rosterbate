@@ -14,6 +14,7 @@
 <script src="audit-logger.js"></script>
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
+<script src="historical-pack-loader.js"></script>
 <script src="global-nav.js" defer></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <style>
@@ -3338,6 +3339,78 @@ let autoDraftKickoffTimer=null;
 let cpuPickSequenceTimer=null;
 let auctionCpuActionTimer=null;
 let auctionClockInt=null;
+const RB_HISTORICAL_PACK_LOCAL_STATE_KEY='rbHistoricalPackDevLocalState';
+let HISTORICAL_DRAFT_CONTEXT=null;
+
+function cloneDraftJsonSafe(value){
+  return JSON.parse(JSON.stringify(value));
+}
+
+function isHistoricalDraftLocalhost(){
+  const host=String(window.location.hostname||'').trim().toLowerCase();
+  return host==='localhost' || host==='127.0.0.1';
+}
+
+function getHistoricalDraftQueryMode(){
+  try{
+    const params=new URLSearchParams(window.location.search||'');
+    return String(params.get('historical')||'').trim().toLowerCase();
+  }catch(e){
+    return '';
+  }
+}
+
+function shouldBootHistoricalDraft(){
+  return isHistoricalDraftLocalhost() && getHistoricalDraftQueryMode()==='dev';
+}
+
+function readHistoricalDraftLocalState(){
+  try{
+    const raw=localStorage.getItem(RB_HISTORICAL_PACK_LOCAL_STATE_KEY);
+    if(!raw) return null;
+    const parsed=JSON.parse(raw);
+    return parsed && typeof parsed==='object' ? parsed : null;
+  }catch(e){
+    console.warn('Could not read historical draft local state:', e);
+    return null;
+  }
+}
+
+function roundHistoricalDraftStat(value){
+  const num=Number(value||0);
+  return Number.isFinite(num) ? Math.round(num*10)/10 : 0;
+}
+
+function computeHistoricalDraftFantasyPoints(stats){
+  return roundHistoricalDraftStat(
+    Number(stats?.pts||0)
+    + (Number(stats?.reb||0) * 1.2)
+    + (Number(stats?.ast||0) * 1.5)
+    + (Number(stats?.stl||0) * 3)
+    + (Number(stats?.blk||0) * 3)
+    - Number(stats?.to||0)
+  );
+}
+
+function getHistoricalDraftPositionTemplate(position, rosterRole){
+  const templates={
+    PG:{pts:16.4,reb:3.5,ast:8.3,stl:1.5,blk:0.2,to:2.8,min:34.0,fgm:6.1,fga:13.4,ftm:2.3,fta:2.9,threes:1.9},
+    SG:{pts:19.1,reb:4.3,ast:4.1,stl:1.4,blk:0.4,to:2.5,min:35.0,fgm:7.1,fga:15.8,ftm:3.2,fta:4.1,threes:1.8},
+    SF:{pts:17.6,reb:5.9,ast:4.0,stl:1.2,blk:0.6,to:2.4,min:35.0,fgm:6.6,fga:14.6,ftm:2.8,fta:3.6,threes:1.3},
+    PF:{pts:18.7,reb:8.7,ast:3.1,stl:1.0,blk:0.9,to:2.4,min:36.0,fgm:7.0,fga:14.8,ftm:3.5,fta:4.5,threes:0.4},
+    C:{pts:20.1,reb:10.6,ast:2.6,stl:0.8,blk:1.9,to:2.7,min:36.0,fgm:7.7,fga:15.5,ftm:4.2,fta:5.7,threes:0.1}
+  };
+  const base=cloneDraftJsonSafe(templates[String(position||'').toUpperCase()] || templates.SF);
+  if(String(rosterRole||'').toLowerCase()==='rotation'){
+    Object.keys(base).forEach(key=>{
+      if(key==='min') base[key]=roundHistoricalDraftStat(base[key]-8);
+      else if(key==='to') base[key]=roundHistoricalDraftStat(Math.max(0.8, base[key]-0.7));
+      else if(key==='threes') base[key]=roundHistoricalDraftStat(Math.max(0, base[key]-0.4));
+      else base[key]=roundHistoricalDraftStat(Math.max(0.4, base[key]*0.68));
+    });
+  }
+  return base;
+}
 
 function updatePosFilterBar(){
   const bar = document.getElementById('posFilterBar');
@@ -3407,6 +3480,218 @@ function normalizeDraftPlayerRanks(players){
     .sort((a,b)=>(Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name))
     .map((player,index)=>({...player, adp:index+1}));
 }
+
+function buildHistoricalDraftContextFromSource(source, requestedSport){
+  const canonical=source?.canonical || null;
+  const authored=source?.authored || {};
+  const manifest=source?.manifest || null;
+  const season=canonical?.season || null;
+  const teams=Array.isArray(canonical?.teams) ? canonical.teams : [];
+  const players=Array.isArray(canonical?.players) ? canonical.players : [];
+  const rosterSnapshots=Array.isArray(canonical?.rosterSnapshots) ? canonical.rosterSnapshots : [];
+  const playerGameStats=Array.isArray(canonical?.playerGameStats) ? canonical.playerGameStats : [];
+  if(!season || !teams.length || !players.length) return null;
+  const seasonSport=normalizeRosterbateSport(season.sport || requestedSport || SPORT || 'nba');
+  if(seasonSport!==normalizeRosterbateSport(requestedSport || SPORT || 'nba')) return null;
+
+  const teamAbbrById=new Map();
+  const teamDisplayById=new Map();
+  teams.forEach((team, index)=>{
+    const abbr=String(team?.abbreviation || team?.name || ('T'+(index+1))).trim().toUpperCase().slice(0,4);
+    teamAbbrById.set(team.teamId, abbr);
+    teamDisplayById.set(team.teamId, team.displayName || [team.city, team.name].filter(Boolean).join(' ') || ('Team '+(index+1)));
+  });
+
+  const rosterRoleByPlayerId=new Map();
+  rosterSnapshots.forEach(snapshot=>{
+    const playerId=String(snapshot?.playerId||'').trim();
+    if(playerId && !rosterRoleByPlayerId.has(playerId)){
+      rosterRoleByPlayerId.set(playerId, String(snapshot?.rosterRole||'starter').trim().toLowerCase() || 'starter');
+    }
+  });
+
+  const statsByPlayerId=new Map();
+  playerGameStats.forEach(row=>{
+    const playerId=String(row?.playerId||'').trim();
+    if(!playerId) return;
+    const current=statsByPlayerId.get(playerId) || {
+      count:0, pts:0, reb:0, ast:0, stl:0, blk:0, to:0, min:0, fgm:0, fga:0, ftm:0, fta:0, threes:0
+    };
+    current.count += 1;
+    current.pts += Number(row?.points||0);
+    current.reb += Number(row?.rebounds||0);
+    current.ast += Number(row?.assists||0);
+    current.stl += Number(row?.steals||0);
+    current.blk += Number(row?.blocks||0);
+    current.to += Number(row?.turnovers||0);
+    current.min += Number(row?.minutes||0);
+    current.fgm += Number(row?.fgm||0);
+    current.fga += Number(row?.fga||0);
+    current.ftm += Number(row?.ftm||0);
+    current.fta += Number(row?.fta||0);
+    current.threes += Number(row?.threePointersMade||0);
+    statsByPlayerId.set(playerId, current);
+  });
+
+  const latestStatsDate=(Array.isArray(canonical?.schedule) ? canonical.schedule : [])
+    .map(game=>String(game?.gameDate||'').trim())
+    .filter(Boolean)
+    .sort()
+    .pop() || String(season.endDate || '').trim() || '';
+
+  const selectedTeamId=String(
+    source?.selectedTeamId ||
+    source?.pendingBoot?.selectedTeamId ||
+    authored?.presentation?.featuredTeamId ||
+    manifest?.focusTeamId ||
+    season.focusTeamId ||
+    ''
+  ).trim();
+
+  const selectedTeamLabel=teamDisplayById.get(selectedTeamId) || '';
+  const seasonLabel=String(manifest?.seasonLabel || season.label || 'Historical NBA Season').trim();
+  const packId=String(source?.packId || manifest?.packId || '').trim() || null;
+  const packSummary=String(authored?.summaries?.packSummary || manifest?.description || '').trim();
+
+  const playerPool=normalizeDraftPlayerRanks(players.map((player, index)=>{
+    const playerId=String(player?.playerId||'').trim();
+    const rosterRole=rosterRoleByPlayerId.get(playerId) || 'rotation';
+    const aggregate=statsByPlayerId.get(playerId);
+    const statLine=(aggregate && aggregate.count)
+      ? {
+          pts: roundHistoricalDraftStat(aggregate.pts / aggregate.count),
+          reb: roundHistoricalDraftStat(aggregate.reb / aggregate.count),
+          ast: roundHistoricalDraftStat(aggregate.ast / aggregate.count),
+          stl: roundHistoricalDraftStat(aggregate.stl / aggregate.count),
+          blk: roundHistoricalDraftStat(aggregate.blk / aggregate.count),
+          to: roundHistoricalDraftStat(aggregate.to / aggregate.count),
+          min: roundHistoricalDraftStat(aggregate.min / aggregate.count),
+          fgm: roundHistoricalDraftStat(aggregate.fgm / aggregate.count),
+          fga: roundHistoricalDraftStat(aggregate.fga / aggregate.count),
+          ftm: roundHistoricalDraftStat(aggregate.ftm / aggregate.count),
+          fta: roundHistoricalDraftStat(aggregate.fta / aggregate.count),
+          threes: roundHistoricalDraftStat(aggregate.threes / aggregate.count)
+        }
+      : getHistoricalDraftPositionTemplate(player?.primaryPosition, rosterRole);
+    const teamAbbr=teamAbbrById.get(player.teamId) || 'HIS';
+    const pos=String(player?.primaryPosition||'UTIL').toUpperCase();
+    const fp=computeHistoricalDraftFantasyPoints(statLine);
+    return {
+      id: 950001 + index,
+      historicalPlayerId: playerId,
+      historicalTeamId: player.teamId,
+      historicalSeasonId: season.seasonId,
+      name: player.displayName || [player.firstName, player.lastName].filter(Boolean).join(' ') || ('Historical Player '+(index+1)),
+      firstName: player.firstName || '',
+      lastName: player.lastName || '',
+      team: teamAbbr,
+      pos: pos,
+      fp: fp,
+      pts: statLine.pts,
+      reb: statLine.reb,
+      ast: statLine.ast,
+      stl: statLine.stl,
+      blk: statLine.blk,
+      to: statLine.to,
+      fgp: statLine.fga ? roundHistoricalDraftStat((statLine.fgm / statLine.fga) * 100) : 0,
+      ftp: statLine.fta ? roundHistoricalDraftStat((statLine.ftm / statLine.fta) * 100) : 0,
+      tpm: statLine.threes,
+      statValues:{
+        PTS: statLine.pts,
+        REB: statLine.reb,
+        AST: statLine.ast,
+        STL: statLine.stl,
+        BLK: statLine.blk,
+        TO: statLine.to,
+        MIN: statLine.min,
+        FGM: statLine.fgm,
+        FGA: statLine.fga,
+        FTM: statLine.ftm,
+        FTA: statLine.fta,
+        '3PM': statLine.threes
+      },
+      statSummary:`${teamAbbr} ${pos} · ${statLine.pts.toFixed(1)} pts - ${statLine.reb.toFixed(1)} reb - ${statLine.ast.toFixed(1)} ast`,
+      designation:'ACTIVE',
+      draftEligible: player?.draftEligible!==false,
+      statsThroughDate: latestStatsDate,
+      bio: player?.bio || ''
+    };
+  }));
+
+  return {
+    sport: seasonSport,
+    packId: packId,
+    seasonId: String(season.seasonId || manifest?.seasonId || 'historical_pack').trim(),
+    seasonLabel: seasonLabel,
+    subtitle: String(manifest?.subtitle || 'Draft the full historical player pool and rewrite the era.').trim(),
+    playerPool: playerPool,
+    historicalPlayerPool: playerPool.map(player=>cloneDraftJsonSafe(player)),
+    teamCount: teams.length,
+    featuredTeamId: selectedTeamId || null,
+    featuredTeamLabel: selectedTeamLabel || null,
+    draftTitleKicker: seasonLabel + ' Draft The Era',
+    lobbySubLabel: seasonLabel + ' Historical Pool',
+    lobbyPillText: 'Draft The Era | ' + teams.length + ' Teams | ' + playerPool.length + ' Players' + (selectedTeamLabel ? ' | Featured: ' + selectedTeamLabel : ''),
+    entryButtonLabel: 'Enter Draft The Era',
+    leagueNamePlaceholder: 'e.g. 1995-96 Dream Draft',
+    teamNamePlaceholder: 'e.g. Era Legends',
+    packSummary: packSummary,
+    presentation: cloneDraftJsonSafe(authored?.presentation || null),
+    packChallenges: cloneDraftJsonSafe(authored?.packChallenges || null),
+    summaries: cloneDraftJsonSafe(authored?.summaries || null),
+    isHistoricalPack: true,
+    isHistoricalPackDev: true,
+    devLocalOnly: true
+  };
+}
+
+async function resolveHistoricalDraftContext(requestedSport){
+  if(!shouldBootHistoricalDraft()) return null;
+  const requestedSportKey=normalizeRosterbateSport(requestedSport || SPORT || 'nba');
+  const localState=readHistoricalDraftLocalState();
+  if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadDefaultPack==='function'){
+    const bundle=await window.RosterBateHistoricalPackLoader.loadDefaultPack();
+    return buildHistoricalDraftContextFromSource({
+      packId: bundle?.manifest?.packId || null,
+      selectedTeamId: localState?.selectedTeamId || null,
+      canonical:{
+        season:bundle?.season || null,
+        teams:bundle?.teams || [],
+        players:bundle?.players || [],
+        rosterSnapshots:bundle?.rosterSnapshots || [],
+        schedule:bundle?.schedule || [],
+        games:bundle?.games || [],
+        playerGameStats:bundle?.playerGameStats || []
+      },
+      authored:{
+        packChallenges:bundle?.packChallenges || null,
+        presentation:bundle?.presentation || null,
+        summaries:bundle?.summaries || null
+      },
+      manifest:bundle?.manifest || null
+    }, requestedSportKey);
+  }
+  if(localState?.importPlan?.canonical?.seasons?.length){
+    const importPlan=localState.importPlan;
+    return buildHistoricalDraftContextFromSource({
+      packId: localState.packId || importPlan?.metadata?.packId || null,
+      selectedTeamId: localState.selectedTeamId || null,
+      pendingBoot: localState.pendingBoot || null,
+      canonical:{
+        season:Array.isArray(importPlan.canonical.seasons) ? importPlan.canonical.seasons[0] : null,
+        teams:importPlan.canonical.teams || [],
+        players:importPlan.canonical.players || [],
+        rosterSnapshots:importPlan.canonical.rosterSnapshots || [],
+        schedule:importPlan.canonical.schedule || [],
+        games:importPlan.canonical.games || [],
+        playerGameStats:importPlan.canonical.playerGameStats || []
+      },
+      authored:importPlan.authored || {}
+    }, requestedSportKey);
+  }
+  return null;
+}
+
 function formatRosterbatePoolUpdatedDate(rawDate){
   const value=String(rawDate||'').trim();
   if(!value) return '';
@@ -3453,10 +3738,13 @@ function getLivePoolUpdatedTimestampLabel(sport){
 
 function applyDraftRoomShellEnhancements(){
   const lobbyPill=document.getElementById('sportLobbyPill');
-  if(lobbyPill) setDraftLobbyPill(lobbyPill.textContent||'', lobbyPill.classList.contains('warn') ? 'warn' : 'info');
+  if(lobbyPill) setDraftLobbyPill(
+    HISTORICAL_DRAFT_CONTEXT?.lobbyPillText || lobbyPill.textContent || '',
+    HISTORICAL_DRAFT_CONTEXT ? 'open' : (lobbyPill.classList.contains('warn') ? 'warn' : 'info')
+  );
 
   const countdownIcon=document.getElementById('sportCountdownIcon');
-  if(countdownIcon) countdownIcon.textContent='Live';
+  if(countdownIcon) countdownIcon.textContent=HISTORICAL_DRAFT_CONTEXT ? 'Era' : 'Live';
 
   const draftTitle=document.getElementById('sportDraftTitle');
   if(draftTitle){
@@ -3464,7 +3752,7 @@ function applyDraftRoomShellEnhancements(){
       '<img src="rosterbate-main-logo-final.png" alt="RosterBate" class="draft-brand-img">' +
       '<div class="dtitle-copy">' +
         '<div class="dtitle-main">Roster<span>Bate</span> Control Room</div>' +
-        '<div class="dtitle-kicker">' + String(SPORT_CFG?.label||SPORT||'') + ' Draft</div>' +
+        '<div class="dtitle-kicker">' + String(HISTORICAL_DRAFT_CONTEXT?.draftTitleKicker || (String(SPORT_CFG?.label||SPORT||'') + ' Draft')) + '</div>' +
       '</div>';
     draftTitle.style.textDecoration='none';
   }
@@ -3590,6 +3878,7 @@ function setDraftCountdownMode(mode='countdown'){
 }
 
 function getDraftLobbyTone(options={}){
+  if(HISTORICAL_DRAFT_CONTEXT) return 'open';
   if(options.warn) return 'warn';
   if(options.started) return 'live';
   if(options.scheduled) return 'soon';
@@ -3604,6 +3893,10 @@ function getDraftLobbyTone(options={}){
 }
 
 function buildDraftLobbyPillText(options={}){
+  if(HISTORICAL_DRAFT_CONTEXT){
+    if(options.warn) return options.warn;
+    return HISTORICAL_DRAFT_CONTEXT.lobbyPillText;
+  }
   const teamCount = SPORT_CFG?.teamCodes?.length || Number(document.getElementById('iSize')?.value) || 0;
   const playerCount = Array.isArray(PLAYERS) ? PLAYERS.length : 0;
   const isMultiplayerDraft=isMultiplayerDraftContext();
@@ -3627,15 +3920,18 @@ function buildDraftLobbyPillText(options={}){
 }
 
 function applySportToDraftUI(){
+  const historicalContext=HISTORICAL_DRAFT_CONTEXT;
   const isMultiplayerDraft=isMultiplayerDraftContext();
-  const useStaticSoloData=SPORT==='nba';
+  const useStaticSoloData=!historicalContext && SPORT==='nba';
   const isLiveServiceSportForDraft=typeof isRosterbateLiveServiceSport === 'function'
     ? isRosterbateLiveServiceSport(SPORT)
     : SPORT==='mlb';
   const importedPoolLimit=typeof getRosterbatePlayerPoolLimit === 'function'
     ? getRosterbatePlayerPoolLimit(SPORT)
     : (SPORT === 'nba' ? 500 : 320);
-  PLAYERS = useStaticSoloData
+  PLAYERS = historicalContext
+    ? historicalContext.playerPool.map(player=>cloneDraftJsonSafe(player))
+    : useStaticSoloData
     ? getStaticSoloDraftPlayers()
     : buildRosterbateSportPlayerPool(SPORT, importedPoolLimit);
   if(!useStaticSoloData && SPORT === 'nba' && (!PLAYERS || !PLAYERS.length)){
@@ -3656,24 +3952,33 @@ function applySportToDraftUI(){
     nfl:'e.g. Fourth & Gold',
     mlb:'e.g. Dugout Dogs'
   };
-  document.title = 'RosterBate ' + SPORT_CFG.label + ' Draft';
-  document.getElementById('sportLogoSub').textContent = SPORT_CFG.label + ' Draft Room';
+  document.title = historicalContext
+    ? ('RosterBate ' + historicalContext.seasonLabel + ' Draft The Era')
+    : ('RosterBate ' + SPORT_CFG.label + ' Draft');
+  document.getElementById('sportLogoSub').textContent = historicalContext
+    ? historicalContext.lobbySubLabel
+    : (SPORT_CFG.label + ' Draft Room');
   const liveUpdatedLabel=getLivePoolUpdatedTimestampLabel(SPORT);
-  document.getElementById('sportLobbyPill').textContent = useStaticSoloData
+  document.getElementById('sportLobbyPill').textContent = historicalContext
+    ? historicalContext.lobbyPillText
+    : useStaticSoloData
     ? ('2024-25 ' + SPORT_CFG.leagueLabel + ' Season | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players')
     : (
       isLiveServiceSportForDraft
         ? ('Live ' + SPORT_CFG.leagueLabel + ' Pool | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' | Updated ' + liveUpdatedLabel : ''))
         : ('Imported ' + SPORT_CFG.leagueLabel + ' Pool | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players')
     );
-  document.getElementById('sportCountdownIcon').textContent = 'Live';
+  document.getElementById('sportCountdownIcon').textContent = historicalContext ? 'Era' : 'Live';
   setDraftLobbyPill(buildDraftLobbyPillText(), getDraftLobbyTone());
   setDraftCountdownMode('countdown');
-  document.getElementById('sportDraftTitle').innerHTML = '<img src="rosterbate-main-logo-final.png" alt="RosterBate" class="draft-brand-img"><div class="dtitle-copy"><div class="dtitle-main">Roster<span>Bate</span> Control Room</div><div class="dtitle-kicker">' + SPORT_CFG.label + ' Draft</div></div>';
-  document.getElementById('enterDraftBtn').textContent = 'Enter ' + SPORT_CFG.label + ' Draft Room';
-  document.getElementById('iName').placeholder = teamPlaceholders[SPORT] || teamPlaceholders.nba;
+  document.getElementById('sportDraftTitle').innerHTML = '<img src="rosterbate-main-logo-final.png" alt="RosterBate" class="draft-brand-img"><div class="dtitle-copy"><div class="dtitle-main">Roster<span>Bate</span> Control Room</div><div class="dtitle-kicker">' + String(historicalContext?.draftTitleKicker || (SPORT_CFG.label + ' Draft')) + '</div></div>';
+  document.getElementById('enterDraftBtn').textContent = historicalContext ? historicalContext.entryButtonLabel : ('Enter ' + SPORT_CFG.label + ' Draft Room');
+  document.getElementById('iName').placeholder = historicalContext?.teamNamePlaceholder || teamPlaceholders[SPORT] || teamPlaceholders.nba;
   const leaguePlaceholders=getLeagueNamePlaceholders();
-  document.getElementById('iLeagueName').placeholder = leaguePlaceholders[SPORT] || leaguePlaceholders.nba;
+  document.getElementById('iLeagueName').placeholder = historicalContext?.leagueNamePlaceholder || leaguePlaceholders[SPORT] || leaguePlaceholders.nba;
+  if(historicalContext && !document.getElementById('iLeagueName').value.trim()){
+    document.getElementById('iLeagueName').value='1995-96 Draft The Era';
+  }
   document.getElementById('iSize').value = SPORT_CFG.defaultLeagueSize;
   document.getElementById('iSpot').value = 1;
   document.getElementById('iRounds').value = SPORT_CFG.defaultRounds;
@@ -7136,11 +7441,15 @@ async function endDraft(){
         },{})
       : null;
 
+    const isHistoricalDraft=!!HISTORICAL_DRAFT_CONTEXT;
     const serializePlayer=p=>({
       id:p?.id,
+      historicalPlayerId:p?.historicalPlayerId||null,
+      historicalTeamId:p?.historicalTeamId||null,
+      historicalSeasonId:p?.historicalSeasonId||null,
       name:p?.name||'Unknown Player',
       team:p?.team||'FA',
-      pos:p?.pos||'—',
+      pos:p?.pos||'UTIL',
       pts:p?.pts,
       reb:p?.reb,
       ast:p?.ast,
@@ -7152,7 +7461,11 @@ async function endDraft(){
       tpm:p?.tpm,
       fp:p?.fp,
       statValues:p?.statValues||null,
-      statSummary:p?.statSummary||''
+      statSummary:p?.statSummary||'',
+      draftEligible:p?.draftEligible!==false,
+      designation:p?.designation||'ACTIVE',
+      statsThroughDate:p?.statsThroughDate||'',
+      bio:p?.bio||''
     });
 
     // Save draft data to localStorage for the season manager to pick up
@@ -7164,7 +7477,9 @@ async function endDraft(){
 
     const draftData = {
       sport: SPORT,
-      playerPoolSource: (SPORT==='nba' && !isMultiplayer)
+      playerPoolSource: isHistoricalDraft
+        ? 'historical_pack'
+        : (SPORT==='nba' && !isMultiplayer)
         ? 'static_2024_25'
         : ((typeof isRosterbateLiveServiceSport === 'function' && isRosterbateLiveServiceSport(SPORT)) ? 'live' : 'imported_snapshot'),
       teamName: normalizedDraft.teamName,
@@ -7189,6 +7504,7 @@ async function endDraft(){
       teams: normalizedDraft.teams.slice(),
       picks: Array.isArray(S.picks)?S.picks:[],
       myRoster: (Array.isArray(S.myTeam)?S.myTeam:[]).map(serializePlayer),
+      historicalPlayerPool: isHistoricalDraft ? (Array.isArray(PLAYERS) ? PLAYERS : []).map(serializePlayer) : null,
       freeAgents: undraftedPlayers.map(p=>({...p})),
       waiver: undraftedPlayers.map(p=>({...p})),
       allRosters: Array.from({length:teamCount},(_,ti)=>{
@@ -7223,6 +7539,16 @@ async function endDraft(){
       recentDrops: [],
       moneyBallLocks: {},
       waiverPriority: {},
+      historicalPackId: isHistoricalDraft ? HISTORICAL_DRAFT_CONTEXT?.packId || null : null,
+      historicalSeasonId: isHistoricalDraft ? HISTORICAL_DRAFT_CONTEXT?.seasonId || null : null,
+      historicalEntryMode: isHistoricalDraft ? 'historical_draft' : null,
+      historicalPresentation: isHistoricalDraft ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT?.presentation || null) : null,
+      historicalChallenges: isHistoricalDraft ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT?.packChallenges || null) : null,
+      historicalSummaries: isHistoricalDraft ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT?.summaries || null) : null,
+      historicalPackSummary: isHistoricalDraft ? String(HISTORICAL_DRAFT_CONTEXT?.packSummary || '').trim() : '',
+      isHistoricalPack: isHistoricalDraft,
+      isHistoricalPackDev: isHistoricalDraft,
+      devLocalOnly: isHistoricalDraft,
       isFreshDraftLaunch: true
     };
     console.log('🎯 Completed draft handoff payload:', {
@@ -7241,8 +7567,12 @@ async function endDraft(){
         persistMultiplayerLobbySeasonInfo(sharedSeasonId);
       }
     }
+    if(isHistoricalDraft && !draftData.seasonId){
+      draftData.seasonId='historical_draft_'+Date.now();
+    }
     
     // Save to Firebase first to get the sequential seasonId
+    if(!isHistoricalDraft){
     try {
       const seasonId = await saveLeagueToFirebase(draftData);
       if (seasonId) {
@@ -7263,6 +7593,13 @@ async function endDraft(){
     } catch(err) {
       console.warn('⚠️ Firebase save failed (league will save locally):', err);
       delete draftData.seasonId;
+    }
+    } else {
+      console.log('Historical Draft The Era complete. Keeping handoff local-only.', {
+        seasonId:draftData.seasonId,
+        historicalPackId:draftData.historicalPackId,
+        playerCount:Array.isArray(draftData.historicalPlayerPool) ? draftData.historicalPlayerPool.length : 0
+      });
     }
     
     if(isMultiplayer && lobbyState?.lobbyId && typeof db!=='undefined'){
@@ -8623,7 +8960,17 @@ function rbEnsureChatListenerActive() {
     document.getElementById('lobby')?.classList.add('active');
     document.getElementById('draft')?.classList.remove('active');
     document.getElementById('draftComplete')?.classList.remove('active');
-    await ensureRosterbatePools();
+    HISTORICAL_DRAFT_CONTEXT=await resolveHistoricalDraftContext(SPORT);
+    if(HISTORICAL_DRAFT_CONTEXT){
+      console.log('🕰️ Booting Draft The Era from historical pack...', {
+        packId:HISTORICAL_DRAFT_CONTEXT.packId,
+        seasonId:HISTORICAL_DRAFT_CONTEXT.seasonId,
+        playerCount:Array.isArray(HISTORICAL_DRAFT_CONTEXT.playerPool) ? HISTORICAL_DRAFT_CONTEXT.playerPool.length : 0,
+        featuredTeam:HISTORICAL_DRAFT_CONTEXT.featuredTeamLabel || null
+      });
+    } else {
+      await ensureRosterbatePools();
+    }
     applySportToDraftUI();
     applyDraftRoomShellEnhancements();
     applySavedLobbySettings();

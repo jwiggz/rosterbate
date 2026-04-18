@@ -1,0 +1,4007 @@
+[
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_mookie_blaylock",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_steve_smith",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_stacey_augmon",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_christian_laettner",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_dikembe_mutombo",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_craig_ehlo",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_tyrone_corbin",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_grant_long",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_alan_henderson",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_dana_barros",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_dee_brown",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_rick_fox",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_dino_radja",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_david_wesley",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_eric_montross",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_todd_day",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_xavier_mcdaniel",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_sherman_douglas",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_muggsy_bogues",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_dell_curry",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_glen_rice",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_larry_johnson",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_matt_geiger",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_scott_burrell",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_tony_smith",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_david_wingate",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_george_zidek",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_ron_harper",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_michael_jordan",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_scottie_pippen",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_dennis_rodman",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_luc_longley",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_toni_kukoc",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_steve_kerr",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_bill_wennington",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_jud_buechler",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_terrell_brandon",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_bobby_phills",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_chris_mills",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_tyrone_hill",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_danny_ferry",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_brevin_knight",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_hot_rod_williams",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_tony_campbell",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_antonio_lang",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_lindsey_hunter",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_joe_dumars",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_grant_hill",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_allan_houston",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_otis_thorpe",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_theo_ratliff",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_terry_mills",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_michael_curry",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_don_reid",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_mark_jackson",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_reggie_miller",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_derrick_mckey",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_dale_davis",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_rik_smits",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_antonio_davis",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_haywoode_workman",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_travis_best",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_duane_ferrell",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_eric_murdock",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_jon_barry",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_glenn_robinson",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_vin_baker",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_andrew_lang",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_ricky_pierce",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_terry_cummings",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_lee_mayberry",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_marty_conlon",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_tim_hardaway",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_voshon_lenard",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_kevin_willis",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_pj_brown",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_alonzo_mourning",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_dan_majerle",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_kurt_thomas",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_bimbo_coles",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_sasha_danilovic",
+    "rosterRole": "rotation",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_kenny_anderson",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_kendall_gill",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_kevin_edwards",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_chris_morris",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_jayson_williams",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_armon_gilliam",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_chris_childs",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_ed_obannon",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_yinka_dare",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_derek_harper",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_john_starks",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_anthony_mason",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_charles_oakley",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_patrick_ewing",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_hubert_davis",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_charlie_ward",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_herb_williams",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_doc_rivers",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_anfernee_hardaway",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_nick_anderson",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_dennis_scott",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_horace_grant",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_shaquille_oneal",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_brian_shaw",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_donald_royal",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_anthony_bowie",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_jon_koncak",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_doug_overton",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_jerry_stackhouse",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_rex_walters",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_clarence_weatherspoon",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_derrick_coleman",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_shawn_bradley",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_trevor_ruffin",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_scott_williams",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_tony_massenburg",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_damon_stoudamire",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_alvin_robertson",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_doug_christie",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_carlos_rogers",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_oliver_miller",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_acie_earl",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_zan_tabak",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_victor_alexander",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_ed_pinckney",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_rod_strickland",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_calbert_cheaney",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_juwan_howard",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_chris_webber",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_gheorghe_muresan",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_tim_legler",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_tracy_murray",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_harvey_grant",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_terry_davis",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_jason_kidd",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_jim_jackson",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_jamal_mashburn",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_george_mccloud",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_popeye_jones",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_lorenzo_williams",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_doug_smith",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_cherokee_parks",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_eric_strickland",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_mahmoud_abdul_rauf",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_bryant_stith",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_jalen_rose",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_laphonso_ellis",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_antonio_mcdyess",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_dale_ellis",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_robert_pack",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_reggie_williams",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_mark_bryant",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_sam_cassell",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_clyde_drexler",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_mario_elie",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_robert_horry",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_hakeem_olajuwon",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_chucky_brown",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_vernon_maxwell",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_pete_chilcutt",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_sam_mack",
+    "rosterRole": "rotation",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_terry_porter",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_isaiah_rider",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_kevin_garnett",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_tom_gugliotta",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_felton_spencer",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_sam_mitchell",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_doug_west",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_dean_garrett",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_darrick_martin",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_avery_johnson",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_vinny_del_negro",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_sean_elliott",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_chuck_person",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_david_robinson",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_monty_williams",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_willie_anderson",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_carl_herrera",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_will_perdue",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_john_stockton",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_jeff_hornacek",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_bryon_russell",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_karl_malone",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_greg_ostertag",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_antoine_carr",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_howard_eisley",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_shandon_anderson",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_david_benoit",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_greg_anthony",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_blue_edwards",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_george_lynch",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_antonio_harvey",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_bryant_reeves",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_eric_mobley",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_chris_king",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_larry_stewart",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_grant_gondrezick",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_bj_armstrong",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_latrell_sprewell",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_chris_mullin",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_joe_smith",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_rony_seikaly",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_donyell_marshall",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_chris_gatling",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_jerome_kersey",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_sarunas_marciulionis",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_pooh_richardson",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_brent_barry",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_malik_sealy",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_loy_vaught",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_rodney_rogers",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_lamond_murray",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_brian_williams",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_eric_piatkowski",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_benoit_benjamin",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_nick_van_exel",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_eddie_jones",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_cedric_ceballos",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_elden_campbell",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_vlade_divac",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_anthony_peeler",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_sedale_threatt",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_byron_scott",
+    "rosterRole": "rotation",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_corie_blount",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_kevin_johnson",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_wesley_person",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_michael_finley",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_charles_barkley",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_danny_manning",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_ac_green",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_mark_west",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_elliot_perry",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_wayman_tisdale",
+    "rosterRole": "rotation",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_james_robinson",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_aaron_mckie",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_mitchell_butler",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_clifford_robinson",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_arvydas_sabonis",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_buck_williams",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_gary_trent",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_chris_dudley",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_rasheed_wallace",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_tyus_edney",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_mitch_richmond",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_walt_williams",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_brian_grant",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_olden_polynice",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_corliss_williamson",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_michael_smith",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_bobby_hurley",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_lionel_simmons",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_gary_payton",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_hersey_hawkins",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_detlef_schrempf",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_shawn_kemp",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_sam_perkins",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_nate_mcmillan",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_vincent_askew",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_ervin_johnson",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_frank_brickowski",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_donnie_boyce",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_matt_bullard",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_ron_grandison",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_reggie_jordan",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_tim_kempton",
+    "rosterRole": "bench",
+    "depthTag": "PF6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_todd_mundt",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_howard_nathan",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_ken_norman",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_sean_rooks",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_atl",
+    "playerId": "nba_1996_spud_webb",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_junior_burrough",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_charles_claxton",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_pervis_ellison",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_thomas_hamilton",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_alton_lister",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_greg_minor",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_larry_sykes",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_bos",
+    "playerId": "nba_1996_eric_williams",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_michael_adams",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_rafael_addison",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_corey_beck",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_gerald_glass",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_anthony_goldwire",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_darrin_hancock",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_donald_hodge",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_pete_myers",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_robert_parish",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_khalid_reeves",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_greg_sutton",
+    "rosterRole": "bench",
+    "depthTag": "PG8",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_joe_wolf",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cha",
+    "playerId": "nba_1996_george_z_dek",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_randy_brown",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_jason_caffey",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_james_edwards",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_jack_haley",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_toni_kuko",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_john_salley",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_chi",
+    "playerId": "nba_1996_dickey_simpkins",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_john_amaechi",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_michael_cage",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_joe_courtney",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_john_crotty",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_darryl_johnson",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_donny_marshall",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_harold_miner",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_cle",
+    "playerId": "nba_1996_bob_sura",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_steve_bardo",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_eric_leckner",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_mark_macon",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_det",
+    "playerId": "nba_1996_lou_roe",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_adrian_caldwell",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_fred_hoiberg",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_eddie_johnson",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_ind",
+    "playerId": "nba_1996_dwayne_schintzius",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_kevin_duckworth",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_randolph_keys",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_johnny_newman",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_mike_peplowski",
+    "rosterRole": "bench",
+    "depthTag": "C7",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_shawn_respert",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mil",
+    "playerId": "nba_1996_jerry_reynolds",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_keith_askins",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_rex_chapman",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_sasha_danilovi",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_leron_ellis",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_kevin_gamble",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_stacey_king",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_jeff_malone",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_billy_owens",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_terrence_rencher",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_mia",
+    "playerId": "nba_1996_danny_schayes",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_vern_fleming",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_armen_gilliam",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_greg_graham",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_rick_mahorn",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_tim_perry",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_njn",
+    "playerId": "nba_1996_robert_werdann",
+    "rosterRole": "bench",
+    "depthTag": "C6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_matt_fish",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_gary_grant",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_brad_lohaus",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_jr_reid",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_nyk",
+    "playerId": "nba_1996_charles_smith",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_darrell_armstrong",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_anthony_bonner",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_geert_hammink",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_brooks_thompson",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_jeff_turner",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_orl",
+    "playerId": "nba_1996_david_vaughn",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_derrick_alston",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_elmer_bennett",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_mike_brown",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_richard_dumas",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_greg_grant",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_sean_higgins",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_scott_skiles",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_lasalle_thompson",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_trevor_wilson",
+    "rosterRole": "bench",
+    "depthTag": "PF6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phi",
+    "playerId": "nba_1996_sharone_wright",
+    "rosterRole": "bench",
+    "depthTag": "C6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_vincenzo_esposito",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_jimmy_king",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_martin_lewis",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_dan_osullivan",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_an_tabak",
+    "rosterRole": "bench",
+    "depthTag": "C6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_tor",
+    "playerId": "nba_1996_dwayne_whitfield",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_ledell_eackles",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_cedric_lewis",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_bob_mccann",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_jim_mcilvaine",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_gheorghe_mure_an",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_brent_price",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_mark_price",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_kevin_pritchard",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_bob_thornton",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_jeff_webster",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_was",
+    "playerId": "nba_1996_chris_whitney",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_scott_brooks",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_tony_dumas",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_lucious_harris",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_loren_meyer",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_reggie_slater",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_dal",
+    "playerId": "nba_1996_david_wood",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_rastko_cvetkovi",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_tom_hammonds",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_don_maclean",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_elmore_spencer",
+    "rosterRole": "bench",
+    "depthTag": "C6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_den",
+    "playerId": "nba_1996_randy_woods",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_melvin_booker",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_tim_breaux",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_alvin_heggs",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_jaren_jackson",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_henry_james",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_charles_jones",
+    "rosterRole": "bench",
+    "depthTag": "PF6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_tracy_moore",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_eldridge_recasner",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_hou",
+    "playerId": "nba_1996_kenny_smith",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_jerome_allen",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_marques_bragg",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_mark_davis",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_eric_riley",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_min",
+    "playerId": "nba_1996_micheal_williams",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_cory_alexander",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_greg_anderson",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sas",
+    "playerId": "nba_1996_dell_demps",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_greg_foster",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_adam_keefe",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_andy_toolson",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_uta",
+    "playerId": "nba_1996_jamie_watson",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_ashraf_amaya",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_anthony_avent",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_doug_edwards",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_kenny_gattison",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_rich_manning",
+    "rosterRole": "bench",
+    "depthTag": "PF6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_cuonzo_martin",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_lawrence_moten",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_van",
+    "playerId": "nba_1996_gerald_wilkins",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_robert_churchwell",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_andrew_declercq",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_gsw",
+    "playerId": "nba_1996_clifford_rozier",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_terry_dehere",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_bison_dele",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_bo_outlaw",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_stanley_roberts",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_keith_tower",
+    "rosterRole": "bench",
+    "depthTag": "C5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lac",
+    "playerId": "nba_1996_logan_vander_velden",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_magic_johnson",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_frankie_king",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_anthony_miller",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_fred_roberts",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_lal",
+    "playerId": "nba_1996_derek_strong",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_mario_bennett",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_chris_carr",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_john_coker",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_joe_kleine",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_phx",
+    "playerId": "nba_1996_stefano_rusconi",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_randolph_childress",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_anthony_cook",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_rumeal_robinson",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_por",
+    "playerId": "nba_1996_dontonio_wingfield",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_duane_causwell",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_byron_houston",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_ar_nas_mar_iulionis",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sac",
+    "playerId": "nba_1996_clint_mcdaniel",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_sherell_ford",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_steve_scheffler",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  },
+  {
+    "seasonId": "nba_1996_historic",
+    "teamId": "nba_1996_sea",
+    "playerId": "nba_1996_eric_snow",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1995-11-03",
+    "endDate": "1996-04-21"
+  }
+]

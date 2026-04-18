@@ -1,0 +1,59 @@
+{
+  "packId": "nba_1996_full_season_v1",
+  "version": 1,
+  "challengeGroups": [
+    {
+      "groupId": "real_season_paths",
+      "label": "Play The Real Season",
+      "mode": "real_season"
+    },
+    {
+      "groupId": "draft_the_era_paths",
+      "label": "Draft The Era",
+      "mode": "historical_draft"
+    }
+  ],
+  "challenges": [
+    {
+      "challengeId": "bulls_72_wins",
+      "mode": "real_season",
+      "path": "bulls_featured_path",
+      "title": "Match 72 Wins",
+      "description": "Finish the season with at least 72 wins.",
+      "type": "season_wins_min",
+      "target": 72,
+      "evaluation": "season_end",
+      "reward": "72-Win Standard",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "open_team_above_500",
+      "mode": "real_season",
+      "path": "open_team_path",
+      "title": "Flip The Season",
+      "description": "Choose any included team and finish above .500.",
+      "type": "season_finish_record_min",
+      "target": {
+        "wins": 42
+      },
+      "evaluation": "season_end",
+      "reward": "Turnaround Season",
+      "required": false,
+      "featured": false
+    },
+    {
+      "challengeId": "draft_era_60_wins",
+      "mode": "historical_draft",
+      "path": "alternate_history_success",
+      "title": "Build A 60-Win Team",
+      "description": "Complete a historical fantasy draft and finish with at least 60 wins.",
+      "type": "season_wins_min",
+      "target": 60,
+      "evaluation": "season_end",
+      "reward": "Alternate-History Contender",
+      "required": false,
+      "featured": true
+    }
+  ]
+}

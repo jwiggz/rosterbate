@@ -1,0 +1,40 @@
+{
+  "packSummary": "The 1995-96 NBA season pack now carries a much fuller historical universe: all 29 franchises, a deeper 445-player pool, and expanded game/stat coverage so season boots and Draft The Era runs have more texture right away.",
+  "featuredStorylines": [
+    "The 72-win Bulls chase",
+    "A full-league Draft The Era sandbox",
+    "Deeper authored schedule and stat coverage across the 1995-96 universe"
+  ],
+  "teamSpotlights": [
+    {
+      "teamId": "nba_1996_chi",
+      "summary": "Chicago remains the flagship path and the benchmark every historical run will be measured against."
+    },
+    {
+      "teamId": "nba_1996_hou",
+      "summary": "Houston anchors the elite center fantasy of the era behind Hakeem Olajuwon."
+    },
+    {
+      "teamId": "nba_1996_orl",
+      "summary": "Orlando gives the pack a Shaq-and-Penny superstar route with a different ceiling than Chicago."
+    },
+    {
+      "teamId": "nba_1996_sea",
+      "summary": "Seattle offers a speed-and-athleticism contender path built around Payton and Kemp."
+    },
+    {
+      "teamId": "nba_1996_sas",
+      "summary": "San Antonio gives you an MVP-level interior anchor through David Robinson."
+    }
+  ],
+  "modeSummaries": [
+    {
+      "mode": "real_season",
+      "summary": "Keep history intact and see whether you can match or beat the era-defining outcomes."
+    },
+    {
+      "mode": "historical_draft",
+      "summary": "Remix the full-league 1995-96 player universe and discover what the era looks like with custom rosters."
+    }
+  ]
+}

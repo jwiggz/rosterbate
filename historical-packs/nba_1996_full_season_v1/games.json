@@ -1,0 +1,1649 @@
+[
+  {
+    "gameId": "nba_1996_game_0001",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 100,
+    "awayScore": 97,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0002",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 109,
+    "awayScore": 80,
+    "winnerTeamId": "nba_1996_chi",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0003",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 109,
+    "awayScore": 100,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_cle"
+  },
+  {
+    "gameId": "nba_1996_game_0004",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 107,
+    "awayScore": 103,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_ind"
+  },
+  {
+    "gameId": "nba_1996_game_0005",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 108,
+    "awayScore": 106,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0006",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 104,
+    "awayScore": 99,
+    "winnerTeamId": "nba_1996_njn",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0007",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 86,
+    "awayScore": 120,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0008",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 107,
+    "awayScore": 101,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0009",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 112,
+    "awayScore": 105,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0010",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 112,
+    "awayScore": 90,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0011",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 107,
+    "awayScore": 82,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0012",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 109,
+    "awayScore": 112,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_lal"
+  },
+  {
+    "gameId": "nba_1996_game_0013",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 98,
+    "awayScore": 85,
+    "winnerTeamId": "nba_1996_por",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0014",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 100,
+    "awayScore": 111,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0015",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 96,
+    "awayScore": 97,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0016",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 130,
+    "awayScore": 143,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0017",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 156,
+    "awayScore": 125,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0018",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 129,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_chi",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0019",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 145,
+    "awayScore": 153,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_cle"
+  },
+  {
+    "gameId": "nba_1996_game_0020",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 140,
+    "awayScore": 143,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_lal"
+  },
+  {
+    "gameId": "nba_1996_game_0021",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 165,
+    "awayScore": 124,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0022",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 152,
+    "awayScore": 146,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0023",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 161,
+    "awayScore": 122,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0024",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 146,
+    "awayScore": 139,
+    "winnerTeamId": "nba_1996_uta",
+    "loserTeamId": "nba_1996_njn"
+  },
+  {
+    "gameId": "nba_1996_game_0025",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 130,
+    "awayScore": 162,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0026",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 155,
+    "awayScore": 153,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0027",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 139,
+    "awayScore": 151,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0028",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 145,
+    "awayScore": 106,
+    "winnerTeamId": "nba_1996_den",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0029",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 156,
+    "awayScore": 157,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_was"
+  },
+  {
+    "gameId": "nba_1996_game_0030",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 134,
+    "awayScore": 147,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0031",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 125,
+    "winnerTeamId": "nba_1996_por",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0032",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 155,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_cha"
+  },
+  {
+    "gameId": "nba_1996_game_0033",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 124,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0034",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 128,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0035",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 164,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_gsw"
+  },
+  {
+    "gameId": "nba_1996_game_0036",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 169,
+    "awayScore": 123,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0037",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 145,
+    "awayScore": 129,
+    "winnerTeamId": "nba_1996_uta",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0038",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 145,
+    "awayScore": 152,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_mia"
+  },
+  {
+    "gameId": "nba_1996_game_0039",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 171,
+    "awayScore": 141,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_njn"
+  },
+  {
+    "gameId": "nba_1996_game_0040",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 144,
+    "awayScore": 145,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0041",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 148,
+    "winnerTeamId": "nba_1996_orl",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0042",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 128,
+    "awayScore": 154,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0043",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 159,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0044",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 119,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0045",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 143,
+    "winnerTeamId": "nba_1996_sea",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0046",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 170,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0047",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 143,
+    "awayScore": 117,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0048",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 140,
+    "awayScore": 132,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0049",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 160,
+    "awayScore": 135,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0050",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 129,
+    "awayScore": 141,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0051",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 155,
+    "awayScore": 149,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_sas"
+  },
+  {
+    "gameId": "nba_1996_game_0052",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 142,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0053",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 143,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_hou"
+  },
+  {
+    "gameId": "nba_1996_game_0054",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 150,
+    "awayScore": 151,
+    "winnerTeamId": "nba_1996_njn",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0055",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 141,
+    "awayScore": 155,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0056",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 145,
+    "awayScore": 144,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0057",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 122,
+    "winnerTeamId": "nba_1996_phi",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0058",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 139,
+    "awayScore": 138,
+    "winnerTeamId": "nba_1996_por",
+    "loserTeamId": "nba_1996_atl"
+  },
+  {
+    "gameId": "nba_1996_game_0059",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 126,
+    "awayScore": 157,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0060",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 121,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0061",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0062",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 164,
+    "awayScore": 142,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0063",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 124,
+    "winnerTeamId": "nba_1996_uta",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0064",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 134,
+    "awayScore": 166,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_cle"
+  },
+  {
+    "gameId": "nba_1996_game_0065",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 141,
+    "awayScore": 154,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_min"
+  },
+  {
+    "gameId": "nba_1996_game_0066",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 163,
+    "awayScore": 140,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_hou"
+  },
+  {
+    "gameId": "nba_1996_game_0067",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 153,
+    "awayScore": 142,
+    "winnerTeamId": "nba_1996_den",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0068",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 152,
+    "awayScore": 168,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_mia"
+  },
+  {
+    "gameId": "nba_1996_game_0069",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 171,
+    "awayScore": 141,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_njn"
+  },
+  {
+    "gameId": "nba_1996_game_0070",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 133,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_nyk",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0071",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 142,
+    "awayScore": 141,
+    "winnerTeamId": "nba_1996_phi",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0072",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 165,
+    "awayScore": 149,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_phx"
+  },
+  {
+    "gameId": "nba_1996_game_0073",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 133,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0074",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 126,
+    "awayScore": 133,
+    "winnerTeamId": "nba_1996_lac",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0075",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 143,
+    "awayScore": 110,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0076",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 129,
+    "awayScore": 145,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0077",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 153,
+    "awayScore": 160,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_cha"
+  },
+  {
+    "gameId": "nba_1996_game_0078",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 154,
+    "awayScore": 137,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0079",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 152,
+    "awayScore": 137,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_hou"
+  },
+  {
+    "gameId": "nba_1996_game_0080",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 140,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0081",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 167,
+    "awayScore": 163,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_dal"
+  },
+  {
+    "gameId": "nba_1996_game_0082",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 156,
+    "awayScore": 140,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0083",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 153,
+    "awayScore": 112,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0084",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 123,
+    "awayScore": 155,
+    "winnerTeamId": "nba_1996_njn",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0085",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 125,
+    "awayScore": 140,
+    "winnerTeamId": "nba_1996_orl",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0086",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 149,
+    "awayScore": 148,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_atl"
+  },
+  {
+    "gameId": "nba_1996_game_0087",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 155,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0088",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 139,
+    "awayScore": 137,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0089",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 126,
+    "awayScore": 128,
+    "winnerTeamId": "nba_1996_van",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0090",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 124,
+    "winnerTeamId": "nba_1996_uta",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0091",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 153,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0092",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 150,
+    "awayScore": 145,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_hou"
+  },
+  {
+    "gameId": "nba_1996_game_0093",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 134,
+    "awayScore": 132,
+    "winnerTeamId": "nba_1996_den",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0094",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 148,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_cle"
+  },
+  {
+    "gameId": "nba_1996_game_0095",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 159,
+    "awayScore": 156,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_det"
+  },
+  {
+    "gameId": "nba_1996_game_0096",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 174,
+    "awayScore": 124,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0097",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 133,
+    "awayScore": 137,
+    "winnerTeamId": "nba_1996_mil",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0098",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 136,
+    "awayScore": 148,
+    "winnerTeamId": "nba_1996_orl",
+    "loserTeamId": "nba_1996_mia"
+  },
+  {
+    "gameId": "nba_1996_game_0099",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 128,
+    "awayScore": 152,
+    "winnerTeamId": "nba_1996_njn",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0100",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 119,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0101",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 137,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_lal"
+  },
+  {
+    "gameId": "nba_1996_game_0102",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 141,
+    "awayScore": 125,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0103",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 119,
+    "awayScore": 128,
+    "winnerTeamId": "nba_1996_por",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0104",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 121,
+    "awayScore": 166,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0105",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 154,
+    "awayScore": 122,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0106",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 142,
+    "awayScore": 146,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0107",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 166,
+    "awayScore": 151,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_dal"
+  },
+  {
+    "gameId": "nba_1996_game_0108",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 134,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0109",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 143,
+    "awayScore": 114,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0110",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 144,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0111",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 164,
+    "awayScore": 158,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0112",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 129,
+    "awayScore": 142,
+    "winnerTeamId": "nba_1996_mil",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0113",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 141,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_njn"
+  },
+  {
+    "gameId": "nba_1996_game_0114",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 143,
+    "awayScore": 160,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_gsw"
+  },
+  {
+    "gameId": "nba_1996_game_0115",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 131,
+    "awayScore": 117,
+    "winnerTeamId": "nba_1996_lac",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0116",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 111,
+    "awayScore": 154,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0117",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 142,
+    "awayScore": 162,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_phx"
+  },
+  {
+    "gameId": "nba_1996_game_0118",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 141,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0119",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 120,
+    "awayScore": 147,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0120",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_den",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0121",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 165,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0122",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 169,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0123",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 120,
+    "awayScore": 122,
+    "winnerTeamId": "nba_1996_chi",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0124",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 145,
+    "awayScore": 151,
+    "winnerTeamId": "nba_1996_orl",
+    "loserTeamId": "nba_1996_cle"
+  },
+  {
+    "gameId": "nba_1996_game_0125",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 128,
+    "awayScore": 146,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0126",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 152,
+    "winnerTeamId": "nba_1996_njn",
+    "loserTeamId": "nba_1996_ind"
+  },
+  {
+    "gameId": "nba_1996_game_0127",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 142,
+    "awayScore": 125,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0128",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 176,
+    "awayScore": 109,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0129",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 113,
+    "awayScore": 144,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0130",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 152,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0131",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 168,
+    "awayScore": 161,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_lal"
+  },
+  {
+    "gameId": "nba_1996_game_0132",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 124,
+    "awayScore": 156,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_phx"
+  },
+  {
+    "gameId": "nba_1996_game_0133",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 133,
+    "winnerTeamId": "nba_1996_den",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0134",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 130,
+    "awayScore": 151,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0135",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 173,
+    "awayScore": 123,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0136",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 133,
+    "awayScore": 135,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0137",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 152,
+    "awayScore": 149,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0138",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 144,
+    "awayScore": 131,
+    "winnerTeamId": "nba_1996_nyk",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0139",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 157,
+    "awayScore": 156,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_njn"
+  },
+  {
+    "gameId": "nba_1996_game_0140",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 158,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_mia"
+  },
+  {
+    "gameId": "nba_1996_game_0141",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 133,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0142",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 154,
+    "winnerTeamId": "nba_1996_atl",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0143",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 125,
+    "awayScore": 172,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0144",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 157,
+    "awayScore": 155,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_gsw"
+  },
+  {
+    "gameId": "nba_1996_game_0145",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 128,
+    "awayScore": 163,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0146",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 138,
+    "awayScore": 147,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0147",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 142,
+    "awayScore": 165,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_phx"
+  },
+  {
+    "gameId": "nba_1996_game_0148",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 160,
+    "awayScore": 148,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0149",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 131,
+    "winnerTeamId": "nba_1996_tor",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0150",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 146,
+    "awayScore": 127,
+    "winnerTeamId": "nba_1996_phi",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0151",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 125,
+    "awayScore": 136,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_nyk"
+  },
+  {
+    "gameId": "nba_1996_game_0152",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 171,
+    "awayScore": 149,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_njn"
+  },
+  {
+    "gameId": "nba_1996_game_0153",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 126,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0154",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 155,
+    "awayScore": 144,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0155",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 140,
+    "awayScore": 144,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_ind"
+  },
+  {
+    "gameId": "nba_1996_game_0156",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 139,
+    "awayScore": 159,
+    "winnerTeamId": "nba_1996_sas",
+    "loserTeamId": "nba_1996_atl"
+  },
+  {
+    "gameId": "nba_1996_game_0157",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 149,
+    "awayScore": 134,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0158",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 127,
+    "awayScore": 154,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0159",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 151,
+    "awayScore": 154,
+    "winnerTeamId": "nba_1996_gsw",
+    "loserTeamId": "nba_1996_den"
+  },
+  {
+    "gameId": "nba_1996_game_0160",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 134,
+    "awayScore": 147,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0161",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 159,
+    "awayScore": 123,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_lal"
+  },
+  {
+    "gameId": "nba_1996_game_0162",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 129,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_tor"
+  },
+  {
+    "gameId": "nba_1996_game_0163",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 143,
+    "awayScore": 138,
+    "winnerTeamId": "nba_1996_phi",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0164",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 114,
+    "awayScore": 152,
+    "winnerTeamId": "nba_1996_orl",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0165",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 144,
+    "winnerTeamId": "nba_1996_nyk",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0166",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 138,
+    "awayScore": 142,
+    "winnerTeamId": "nba_1996_bos",
+    "loserTeamId": "nba_1996_mia"
+  },
+  {
+    "gameId": "nba_1996_game_0167",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 163,
+    "awayScore": 141,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_mil"
+  },
+  {
+    "gameId": "nba_1996_game_0168",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 153,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_chi"
+  },
+  {
+    "gameId": "nba_1996_game_0169",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 149,
+    "awayScore": 153,
+    "winnerTeamId": "nba_1996_det",
+    "loserTeamId": "nba_1996_cle"
+  },
+  {
+    "gameId": "nba_1996_game_0170",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 159,
+    "awayScore": 149,
+    "winnerTeamId": "nba_1996_min",
+    "loserTeamId": "nba_1996_atl"
+  },
+  {
+    "gameId": "nba_1996_game_0171",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 151,
+    "winnerTeamId": "nba_1996_hou",
+    "loserTeamId": "nba_1996_sas"
+  },
+  {
+    "gameId": "nba_1996_game_0172",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 137,
+    "awayScore": 121,
+    "winnerTeamId": "nba_1996_den",
+    "loserTeamId": "nba_1996_uta"
+  },
+  {
+    "gameId": "nba_1996_game_0173",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 136,
+    "awayScore": 164,
+    "winnerTeamId": "nba_1996_dal",
+    "loserTeamId": "nba_1996_van"
+  },
+  {
+    "gameId": "nba_1996_game_0174",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 159,
+    "awayScore": 137,
+    "winnerTeamId": "nba_1996_was",
+    "loserTeamId": "nba_1996_gsw"
+  },
+  {
+    "gameId": "nba_1996_game_0175",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 129,
+    "awayScore": 138,
+    "winnerTeamId": "nba_1996_tor",
+    "loserTeamId": "nba_1996_lac"
+  },
+  {
+    "gameId": "nba_1996_game_0176",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 121,
+    "awayScore": 146,
+    "winnerTeamId": "nba_1996_lal",
+    "loserTeamId": "nba_1996_phi"
+  },
+  {
+    "gameId": "nba_1996_game_0177",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 141,
+    "awayScore": 133,
+    "winnerTeamId": "nba_1996_phx",
+    "loserTeamId": "nba_1996_orl"
+  },
+  {
+    "gameId": "nba_1996_game_0178",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 133,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_nyk",
+    "loserTeamId": "nba_1996_por"
+  },
+  {
+    "gameId": "nba_1996_game_0179",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 120,
+    "awayScore": 163,
+    "winnerTeamId": "nba_1996_njn",
+    "loserTeamId": "nba_1996_sac"
+  },
+  {
+    "gameId": "nba_1996_game_0180",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 147,
+    "awayScore": 136,
+    "winnerTeamId": "nba_1996_mia",
+    "loserTeamId": "nba_1996_sea"
+  },
+  {
+    "gameId": "nba_1996_game_0181",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 148,
+    "awayScore": 146,
+    "winnerTeamId": "nba_1996_ind",
+    "loserTeamId": "nba_1996_bos"
+  },
+  {
+    "gameId": "nba_1996_game_0182",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 162,
+    "awayScore": 143,
+    "winnerTeamId": "nba_1996_cha",
+    "loserTeamId": "nba_1996_det"
+  },
+  {
+    "gameId": "nba_1996_game_0183",
+    "seasonId": "nba_1996_historic",
+    "status": "final",
+    "homeScore": 150,
+    "awayScore": 130,
+    "winnerTeamId": "nba_1996_cle",
+    "loserTeamId": "nba_1996_chi"
+  }
+]
