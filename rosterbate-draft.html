@@ -872,7 +872,7 @@
   }
   .pl{flex:1 1 0;height:0;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .players-board-main{
-    --player-board-grid: 30px 56px minmax(248px, 300px) repeat(13, minmax(46px, 52px));
+    --player-board-grid: 30px 56px minmax(232px, 284px) repeat(14, minmax(42px, 48px));
   }
   .pr{position:relative;display:grid;grid-template-columns:var(--player-board-grid);align-items:center;padding:15px 16px;border-bottom:1px solid rgba(35,48,68,.52);column-gap:10px;cursor:pointer;transition:background .14s ease,transform .14s ease;}
   .pr::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:999px;background:transparent;opacity:.4;transition:opacity .14s ease,background .14s ease;}
@@ -892,6 +892,7 @@
   .pstat-header{display:grid;grid-template-columns:var(--player-board-grid);align-items:center;padding:13px 16px;column-gap:10px;border-bottom:1px solid rgba(255,196,136,.14);background:linear-gradient(180deg,rgba(9,13,20,.98),rgba(12,16,24,.98));position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
   .pstat-label{min-width:0;font-size:12px;font-weight:600;color:var(--text3);text-align:center;display:flex;align-items:center;justify-content:center;text-transform:uppercase;cursor:pointer;user-select:none;letter-spacing:.1em;font-family:var(--fd);}
   .pstat.fp,.pstat-label.fp{color:var(--green);text-shadow:0 0 10px rgba(77,224,164,.14);}
+  .pstat.tfp,.pstat-label.tfp{color:#7cc8ff;text-shadow:0 0 10px rgba(124,200,255,.14);}
   .pstat-label:hover{color:var(--accent);}
   .pstat-label.rank,.prank{justify-content:center;text-align:center;}
   .pheader-spacer{min-width:0;}
@@ -1062,7 +1063,7 @@
     .trade-spotlight{min-height:0;}
     .players-board-shell{grid-template-columns:1fr;}
     .players-board-main{
-      --player-board-grid: 28px 52px minmax(218px, 260px) repeat(13, minmax(42px, 46px));
+      --player-board-grid: 28px 52px minmax(204px, 244px) repeat(14, minmax(38px, 44px));
     }
     .pick-signal{
       grid-template-columns:minmax(0,1fr) minmax(180px,.34fr) minmax(100px,.22fr) minmax(300px,.72fr);
@@ -1100,7 +1101,7 @@
     .decision-strip-headline{font-size:24px;}
     .decision-strip-copy{font-size:12px;}
     .players-board-main{
-      --player-board-grid: 28px 48px minmax(180px, 210px) repeat(13, minmax(38px, 42px));
+      --player-board-grid: 28px 48px minmax(170px, 198px) repeat(14, minmax(34px, 40px));
     }
     .pname{font-size:18px;}
     .pstat,.pstat-label{font-size:10px;}
@@ -1672,6 +1673,7 @@
                 <div class="paction-slot" aria-hidden="true"></div>
                 <div class="pheader-spacer" aria-hidden="true"></div>
                 <div class="pstat-label fp" onclick="sortPlayers('fp')">FP</div>
+                <div class="pstat-label tfp" onclick="sortPlayers('tfp')">TFP</div>
                 <div class="pstat-label" onclick="sortPlayers('fgm')">FGM</div>
                 <div class="pstat-label" onclick="sortPlayers('fga')">FGA</div>
                 <div class="pstat-label" onclick="sortPlayers('ftm')">FTM</div>
@@ -1764,6 +1766,7 @@
     </div>
     <div class="mchips">
       <div class="mchip accent" id="mProjChip">-</div>
+      <div class="mchip" id="mTotalChip">-</div>
       <div class="mchip" id="mFormatChip">-</div>
       <div class="mchip" id="mQueueChip">-</div>
     </div>
@@ -2475,10 +2478,12 @@ function showDraftPickCelebration(player,meta={}){
   renderDraftJerseyAvatar(document.getElementById('draftCelebrateAvatar'),player,'28px');
   document.getElementById('draftCelebrateName').textContent=player.name;
   document.getElementById('draftCelebrateMeta').textContent=`${player.team} · ${player.pos} · Rank #${player.adp}`;
+  const totalFantasyPoints=getDraftTotalFantasyPoints(player);
   const chips=[
-    `<span class="draft-celebrate-chip value">${formatDraftModalStatValue(calcFP(player))} FP</span>`,
+    `<span class="draft-celebrate-chip value">${formatDraftModalStatValue(calcFP(player))} FP/G</span>`,
+    totalFantasyPoints>0 ? `<span class="draft-celebrate-chip rank">${formatDraftModalStatValue(totalFantasyPoints)} TFP</span>` : '',
     `<span class="draft-celebrate-chip rank">Best Fit: ${getStarterNeedDelta(S.myPos,player)>0?'Yes':'Board Value'}</span>`
-  ];
+  ].filter(Boolean);
   if(mode==='auction') chips.splice(1,0,`<span class="draft-celebrate-chip cost">$${cost}</span>`);
   document.getElementById('draftCelebrateChips').innerHTML=chips.join('');
   const note=mode==='auction'
@@ -3012,14 +3017,153 @@ const RAW=[
 ["Cedi Osman","SAS","SF",8.5,3.5,2.0,0.7,0.3,1.0,42.0,80.0,2.0],
 ];
 
+const NBA_PROJECTION_CONTEXT={byKey:new Map(),loaded:false,loading:null};
+function getDraftRuntimeSport(){
+  try{
+    return SPORT;
+  }catch(_err){
+    return typeof getSelectedRosterbateSport==='function' ? getSelectedRosterbateSport() : 'nba';
+  }
+}
+function clampDraftProjectionValue(value,min,max){
+  return Math.max(min, Math.min(max, value));
+}
+function getDraftProjectionPlayerKey(name, team){
+  return `${String(name||'').trim().toLowerCase()}|${String(team||'').trim().toLowerCase()}`;
+}
+function estimateNbaDraftMinutes(player){
+  const sv=player?.statValues || {};
+  const pts=Number(sv.PTS ?? player?.pts ?? 0);
+  const reb=Number(sv.REB ?? player?.reb ?? 0);
+  const ast=Number(sv.AST ?? player?.ast ?? 0);
+  const stl=Number(sv.STL ?? player?.stl ?? 0);
+  const blk=Number(sv.BLK ?? player?.blk ?? 0);
+  const to=Number(sv.TO ?? player?.to ?? 0);
+  const tpm=Number(sv['3PM'] ?? player?.tpm ?? 0);
+  const roleLoad=(pts*0.62)+(reb*0.24)+(ast*0.34)+(stl*1.2)+(blk*1.35)+(tpm*0.22)-(to*0.08);
+  return Math.round(clampDraftProjectionValue(10 + roleLoad, 8, 37) * 10) / 10;
+}
+async function ensureNbaProjectionContext(){
+  if(getDraftRuntimeSport()!=='nba') return NBA_PROJECTION_CONTEXT.byKey;
+  if(NBA_PROJECTION_CONTEXT.loaded) return NBA_PROJECTION_CONTEXT.byKey;
+  if(NBA_PROJECTION_CONTEXT.loading) return NBA_PROJECTION_CONTEXT.loading;
+  NBA_PROJECTION_CONTEXT.loading=fetch('Nba500.csv',{cache:'no-store'})
+    .then(response=>{
+      if(!response.ok) throw new Error(`Failed to load Nba500.csv (${response.status})`);
+      return response.text();
+    })
+    .then(text=>{
+      const lines=String(text||'').trim().split(/\r?\n/).filter(Boolean);
+      const header=String(lines.shift()||'').split(',').map(col=>col.trim().toUpperCase());
+      const indexOf=(name)=>header.indexOf(String(name||'').trim().toUpperCase());
+      const playerIdx=indexOf('PLAYER');
+      const teamIdx=indexOf('TEAM');
+      const gpIdx=indexOf('GP');
+      const minIdx=indexOf('MIN');
+      const byKey=new Map();
+      lines.forEach(line=>{
+        const cols=line.split(',');
+        const name=String(cols[playerIdx]||'').trim();
+        const team=String(cols[teamIdx]||'').trim().toUpperCase();
+        const gp=Number(cols[gpIdx]||0);
+        const totalMinutes=Number(cols[minIdx]||0);
+        if(!name || !team || !(gp>0) || !(totalMinutes>0)) return;
+        const mpg=Math.round((totalMinutes/gp)*10)/10;
+        byKey.set(getDraftProjectionPlayerKey(name, team), { gp, mpg, totalMinutes, estimated:false });
+      });
+      NBA_PROJECTION_CONTEXT.byKey=byKey;
+      NBA_PROJECTION_CONTEXT.loaded=true;
+      return byKey;
+    })
+    .catch(error=>{
+      console.warn('Draft minute context failed to load from Nba500.csv', error);
+      NBA_PROJECTION_CONTEXT.byKey=new Map();
+      NBA_PROJECTION_CONTEXT.loaded=true;
+      return NBA_PROJECTION_CONTEXT.byKey;
+    })
+    .finally(()=>{
+      NBA_PROJECTION_CONTEXT.loading=null;
+    });
+  return NBA_PROJECTION_CONTEXT.loading;
+}
+function getNbaProjectionContext(player){
+  const key=getDraftProjectionPlayerKey(player?.name, player?.team);
+  const exact=NBA_PROJECTION_CONTEXT.byKey.get(key);
+  if(exact) return exact;
+  return {
+    gp:0,
+    mpg:estimateNbaDraftMinutes(player),
+    totalMinutes:0,
+    estimated:true
+  };
+}
+function getDraftProjectionMinutes(player){
+  const explicit=Number(player?.statValues?.MIN ?? player?.min ?? 0);
+  if(Number.isFinite(explicit) && explicit>0) return explicit;
+  if(getDraftRuntimeSport()!=='nba') return 0;
+  const projectionContext=getNbaProjectionContext(player);
+  return Number(projectionContext?.mpg || 0);
+}
+function getDraftRawFantasyPointsPerGame(player){
+  if(!player) return 0;
+  if(getDraftRuntimeSport()!=='nba') return Number(player?.fp || 0);
+  const sv=player?.statValues || {};
+  return fpRaw(
+    Number(sv.PTS ?? player?.pts ?? 0),
+    Number(sv.REB ?? player?.reb ?? 0),
+    Number(sv.AST ?? player?.ast ?? 0),
+    Number(sv.STL ?? player?.stl ?? 0),
+    Number(sv.BLK ?? player?.blk ?? 0),
+    Number(sv.TO ?? player?.to ?? 0),
+    Number(sv['3PM'] ?? player?.tpm ?? 0)
+  );
+}
+function getDraftGamesPlayed(player){
+  const explicit=Number(player?.gp ?? player?.statValues?.GP ?? 0);
+  if(Number.isFinite(explicit) && explicit>0) return explicit;
+  if(getDraftRuntimeSport()!=='nba') return 0;
+  const projectionContext=getNbaProjectionContext(player);
+  return Number(projectionContext?.gp || 0);
+}
+function getDraftTotalFantasyPoints(player){
+  const explicit=Number(player?.totalFantasyPoints ?? player?.statValues?.TFP ?? 0);
+  if(Number.isFinite(explicit) && explicit>0) return Math.round(explicit * 10) / 10;
+  const gp=getDraftGamesPlayed(player);
+  if(!(gp>0)) return 0;
+  return Math.round(getDraftRawFantasyPointsPerGame(player) * gp * 10) / 10;
+}
+function applyNbaDraftProjectionAdjustment(baseFp, player){
+  if(getDraftRuntimeSport()!=='nba') return Math.round(Number(baseFp||0) * 10) / 10;
+  const mpg=getDraftProjectionMinutes(player);
+  if(!(mpg>0)) return Math.round(Number(baseFp||0) * 10) / 10;
+  const minuteConfidence=clampDraftProjectionValue(0.62, 1, 0.5 + 0.5 * (Math.min(30, mpg) / 30));
+  return Math.round(Number(baseFp||0) * minuteConfidence * 10) / 10;
+}
+
 // Build player objects, rank by fantasy pts
 function fpRaw(p,r,a,s,b,t,tp){return Math.round((p+r*1.2+a*1.5+s*3+b*3-t+tp*0.5)*10)/10;}
-const NBA_PLAYERS = RAW.map(([nm,tm,pos,pts,reb,ast,stl,blk,to,fgp,ftp,tpm],i)=>({
-  id:i+1,name:nm,team:tm,pos,
-  pts:+pts,reb:+reb,ast:+ast,stl:+stl,blk:+blk,to:+to,
-  fgp:+fgp,ftp:+ftp,tpm:+tpm,
-  fp:fpRaw(pts,reb,ast,stl,blk,to,tpm),adp:0,
-})).sort((a,b)=>b.fp-a.fp).map((p,i)=>({...p,adp:i+1}));
+const NBA_PLAYERS = RAW.map(([nm,tm,pos,pts,reb,ast,stl,blk,to,fgp,ftp,tpm],i)=>{
+  const basePlayer={
+    id:i+1,name:nm,team:tm,pos,
+    pts:+pts,reb:+reb,ast:+ast,stl:+stl,blk:+blk,to:+to,
+    fgp:+fgp,ftp:+ftp,tpm:+tpm
+  };
+  const estimatedMin=estimateNbaDraftMinutes(basePlayer);
+  const statValues={
+    PTS:+pts,REB:+reb,AST:+ast,STL:+stl,BLK:+blk,TO:+to,
+    MIN:estimatedMin,FGP:+fgp,FTP:+ftp,'3PM':+tpm
+  };
+  const baseFp=fpRaw(pts,reb,ast,stl,blk,to,tpm);
+  return {
+    ...basePlayer,
+    min:estimatedMin,
+    gp:0,
+    totalFantasyPoints:0,
+    statValues,
+    fp:applyNbaDraftProjectionAdjustment(baseFp, { ...basePlayer, statValues, min:estimatedMin }),
+    adp:0
+  };
+}).sort((a,b)=>b.fp-a.fp).map((p,i)=>({...p,adp:i+1}));
 
 // ─── SETTINGS ─────────────────────────────────────────────
 const FMT_INFO={
@@ -3401,15 +3545,107 @@ function getHistoricalDraftPositionTemplate(position, rosterRole){
     C:{pts:20.1,reb:10.6,ast:2.6,stl:0.8,blk:1.9,to:2.7,min:36.0,fgm:7.7,fga:15.5,ftm:4.2,fta:5.7,threes:0.1}
   };
   const base=cloneDraftJsonSafe(templates[String(position||'').toUpperCase()] || templates.SF);
-  if(String(rosterRole||'').toLowerCase()==='rotation'){
+  const role=String(rosterRole||'').toLowerCase();
+  if(role==='rotation' || role==='bench'){
+    const valueMult=role==='bench' ? 0.52 : 0.68;
+    const minuteCut=role==='bench' ? 14 : 8;
+    const turnoverFloor=role==='bench' ? 0.5 : 0.8;
+    const turnoverCut=role==='bench' ? 1.1 : 0.7;
+    const threeCut=role==='bench' ? 0.7 : 0.4;
     Object.keys(base).forEach(key=>{
-      if(key==='min') base[key]=roundHistoricalDraftStat(base[key]-8);
-      else if(key==='to') base[key]=roundHistoricalDraftStat(Math.max(0.8, base[key]-0.7));
-      else if(key==='threes') base[key]=roundHistoricalDraftStat(Math.max(0, base[key]-0.4));
-      else base[key]=roundHistoricalDraftStat(Math.max(0.4, base[key]*0.68));
+      if(key==='min') base[key]=roundHistoricalDraftStat(base[key]-minuteCut);
+      else if(key==='to') base[key]=roundHistoricalDraftStat(Math.max(turnoverFloor, base[key]-turnoverCut));
+      else if(key==='threes') base[key]=roundHistoricalDraftStat(Math.max(0, base[key]-threeCut));
+      else base[key]=roundHistoricalDraftStat(Math.max(0.3, base[key]*valueMult));
     });
   }
   return base;
+}
+
+function isLikelyGeneratedHistoricalDraftRow(row){
+  const source=String(row?.statSource||'').trim().toLowerCase();
+  if(source==='generated_coverage') return true;
+  if(source==='foundation_seed' || source==='authored_seed') return false;
+  return ['minutes','points','rebounds','assists','steals','blocks','turnovers','threePointersMade','fgm','fga','ftm','fta']
+    .some(key=>{
+      const num=Number(row?.[key]||0);
+      return Number.isFinite(num) && Math.abs(num-Math.round(num))>1e-9;
+    });
+}
+
+function accumulateHistoricalDraftAggregate(target, row){
+  target.count += 1;
+  target.pts += Number(row?.points||0);
+  target.reb += Number(row?.rebounds||0);
+  target.ast += Number(row?.assists||0);
+  target.stl += Number(row?.steals||0);
+  target.blk += Number(row?.blocks||0);
+  target.to += Number(row?.turnovers||0);
+  target.min += Number(row?.minutes||0);
+  target.fgm += Number(row?.fgm||0);
+  target.fga += Number(row?.fga||0);
+  target.ftm += Number(row?.ftm||0);
+  target.fta += Number(row?.fta||0);
+  target.threes += Number(row?.threePointersMade||0);
+  return target;
+}
+
+function averageHistoricalDraftAggregate(aggregate){
+  if(!(aggregate && aggregate.count)) return null;
+  return {
+    pts: roundHistoricalDraftStat(aggregate.pts / aggregate.count),
+    reb: roundHistoricalDraftStat(aggregate.reb / aggregate.count),
+    ast: roundHistoricalDraftStat(aggregate.ast / aggregate.count),
+    stl: roundHistoricalDraftStat(aggregate.stl / aggregate.count),
+    blk: roundHistoricalDraftStat(aggregate.blk / aggregate.count),
+    to: roundHistoricalDraftStat(aggregate.to / aggregate.count),
+    min: roundHistoricalDraftStat(aggregate.min / aggregate.count),
+    fgm: roundHistoricalDraftStat(aggregate.fgm / aggregate.count),
+    fga: roundHistoricalDraftStat(aggregate.fga / aggregate.count),
+    ftm: roundHistoricalDraftStat(aggregate.ftm / aggregate.count),
+    fta: roundHistoricalDraftStat(aggregate.fta / aggregate.count),
+    threes: roundHistoricalDraftStat(aggregate.threes / aggregate.count)
+  };
+}
+
+function getHistoricalDraftSeasonStatProfile(player){
+  const seasonStats=player?.seasonStats;
+  if(!(seasonStats && typeof seasonStats==='object')) return null;
+  const gp=Math.max(0, Number(seasonStats.games||0));
+  const perGame=seasonStats.perGame || {};
+  const totals=seasonStats.totals || {};
+  const statLine={
+    pts: roundHistoricalDraftStat(perGame.pts),
+    reb: roundHistoricalDraftStat(perGame.reb),
+    ast: roundHistoricalDraftStat(perGame.ast),
+    stl: roundHistoricalDraftStat(perGame.stl),
+    blk: roundHistoricalDraftStat(perGame.blk),
+    to: roundHistoricalDraftStat(perGame.to),
+    min: roundHistoricalDraftStat(perGame.min),
+    fgm: roundHistoricalDraftStat(perGame.fgm),
+    fga: roundHistoricalDraftStat(perGame.fga),
+    ftm: roundHistoricalDraftStat(perGame.ftm),
+    fta: roundHistoricalDraftStat(perGame.fta),
+    threes: roundHistoricalDraftStat(perGame.threes)
+  };
+  const totalFantasyPoints=computeHistoricalDraftFantasyPoints({
+    pts: Number.isFinite(Number(totals.pts)) ? Number(totals.pts) : statLine.pts * gp,
+    reb: Number.isFinite(Number(totals.reb)) ? Number(totals.reb) : statLine.reb * gp,
+    ast: Number.isFinite(Number(totals.ast)) ? Number(totals.ast) : statLine.ast * gp,
+    stl: Number.isFinite(Number(totals.stl)) ? Number(totals.stl) : statLine.stl * gp,
+    blk: Number.isFinite(Number(totals.blk)) ? Number(totals.blk) : statLine.blk * gp,
+    to: Number.isFinite(Number(totals.to)) ? Number(totals.to) : statLine.to * gp,
+    threes: Number.isFinite(Number(totals.threes)) ? Number(totals.threes) : statLine.threes * gp
+  });
+  return { gp, statLine, totalFantasyPoints };
+}
+
+function applyHistoricalDraftAvailabilityAdjustment(fp, gp){
+  const baseFp=Number(fp||0);
+  const games=Math.max(0, Number(gp||0));
+  if(!Number.isFinite(baseFp) || baseFp<=0 || !games) return 0;
+  const factor=Math.max(0.35, Math.min(1, 0.35 + (0.65 * (games / 82))));
+  return roundHistoricalDraftStat(baseFp * factor);
 }
 
 function updatePosFilterBar(){
@@ -3442,6 +3678,21 @@ function getStaticSoloDraftPlayers(){
   const players=(getRosterbateDemoPlayers('nba')||[]).map((player)=>{
     const canonicalKey=`${String(player?.name||'').trim().toLowerCase()}|${String(player?.team||'').trim().toLowerCase()}`;
     const canonicalPos=canonicalPositions.get(canonicalKey);
+    const projectionContext=getNbaProjectionContext(player);
+    const projectionMin=Number(player?.statValues?.MIN ?? player?.min ?? projectionContext?.mpg ?? 0);
+    const baseFp=Number(player?.fp ?? fpRaw(
+      player?.statValues?.PTS ?? 0,
+      player?.statValues?.REB ?? 0,
+      player?.statValues?.AST ?? 0,
+      player?.statValues?.STL ?? 0,
+      player?.statValues?.BLK ?? 0,
+      player?.statValues?.TO ?? 0,
+      player?.statValues?.['3PM'] ?? 0
+    ));
+    const statValues={
+      ...(player?.statValues||{}),
+      MIN:projectionMin
+    };
     return {
       id:player.id,
       name:player.name||'Unknown Player',
@@ -3456,17 +3707,12 @@ function getStaticSoloDraftPlayers(){
       fgp:Number(player?.statValues?.FGP ?? player?.fgp ?? 0),
       ftp:Number(player?.statValues?.FTP ?? player?.ftp ?? 0),
       tpm:Number(player?.statValues?.['3PM'] ?? player?.tpm ?? 0),
-      fp:Number(player?.fp ?? fpRaw(
-        player?.statValues?.PTS ?? 0,
-        player?.statValues?.REB ?? 0,
-        player?.statValues?.AST ?? 0,
-        player?.statValues?.STL ?? 0,
-        player?.statValues?.BLK ?? 0,
-        player?.statValues?.TO ?? 0,
-        player?.statValues?.['3PM'] ?? 0
-      )),
+      min:projectionMin,
+      gp:Number(player?.gp ?? projectionContext?.gp ?? 0),
+      totalFantasyPoints:Number(player?.totalFantasyPoints ?? player?.statValues?.TFP ?? ((projectionContext?.gp||0) > 0 ? (baseFp * Number(projectionContext.gp||0)) : 0)),
+      fp:applyNbaDraftProjectionAdjustment(baseFp, { ...player, team:player?.team, statValues, min:projectionMin }),
       adp:Number(player?.adp || 0),
-      statValues:player?.statValues||null,
+      statValues:statValues,
       statSummary:player?.statSummary||''
     };
   }).sort((a,b)=>(b.fp||0)-(a.fp||0) || a.name.localeCompare(b.name))
@@ -3514,22 +3760,11 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
   playerGameStats.forEach(row=>{
     const playerId=String(row?.playerId||'').trim();
     if(!playerId) return;
+    if(isLikelyGeneratedHistoricalDraftRow(row)) return;
     const current=statsByPlayerId.get(playerId) || {
       count:0, pts:0, reb:0, ast:0, stl:0, blk:0, to:0, min:0, fgm:0, fga:0, ftm:0, fta:0, threes:0
     };
-    current.count += 1;
-    current.pts += Number(row?.points||0);
-    current.reb += Number(row?.rebounds||0);
-    current.ast += Number(row?.assists||0);
-    current.stl += Number(row?.steals||0);
-    current.blk += Number(row?.blocks||0);
-    current.to += Number(row?.turnovers||0);
-    current.min += Number(row?.minutes||0);
-    current.fgm += Number(row?.fgm||0);
-    current.fga += Number(row?.fga||0);
-    current.ftm += Number(row?.ftm||0);
-    current.fta += Number(row?.fta||0);
-    current.threes += Number(row?.threePointersMade||0);
+    accumulateHistoricalDraftAggregate(current, row);
     statsByPlayerId.set(playerId, current);
   });
 
@@ -3557,25 +3792,34 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
     const playerId=String(player?.playerId||'').trim();
     const rosterRole=rosterRoleByPlayerId.get(playerId) || 'rotation';
     const aggregate=statsByPlayerId.get(playerId);
-    const statLine=(aggregate && aggregate.count)
-      ? {
-          pts: roundHistoricalDraftStat(aggregate.pts / aggregate.count),
-          reb: roundHistoricalDraftStat(aggregate.reb / aggregate.count),
-          ast: roundHistoricalDraftStat(aggregate.ast / aggregate.count),
-          stl: roundHistoricalDraftStat(aggregate.stl / aggregate.count),
-          blk: roundHistoricalDraftStat(aggregate.blk / aggregate.count),
-          to: roundHistoricalDraftStat(aggregate.to / aggregate.count),
-          min: roundHistoricalDraftStat(aggregate.min / aggregate.count),
-          fgm: roundHistoricalDraftStat(aggregate.fgm / aggregate.count),
-          fga: roundHistoricalDraftStat(aggregate.fga / aggregate.count),
-          ftm: roundHistoricalDraftStat(aggregate.ftm / aggregate.count),
-          fta: roundHistoricalDraftStat(aggregate.fta / aggregate.count),
-          threes: roundHistoricalDraftStat(aggregate.threes / aggregate.count)
-        }
-      : getHistoricalDraftPositionTemplate(player?.primaryPosition, rosterRole);
+    const seasonProfile=getHistoricalDraftSeasonStatProfile(player);
+    const statLine=seasonProfile?.statLine || ((aggregate && aggregate.count)
+      ? averageHistoricalDraftAggregate(aggregate)
+      : {
+          pts:0, reb:0, ast:0, stl:0, blk:0, to:0, min:0, fgm:0, fga:0, ftm:0, fta:0, threes:0
+        });
     const teamAbbr=teamAbbrById.get(player.teamId) || 'HIS';
     const pos=String(player?.primaryPosition||'UTIL').toUpperCase();
-    const fp=computeHistoricalDraftFantasyPoints(statLine);
+    const totalFantasyPoints=(seasonProfile && Number.isFinite(seasonProfile.totalFantasyPoints))
+      ? seasonProfile.totalFantasyPoints
+      : (aggregate && aggregate.count)
+      ? computeHistoricalDraftFantasyPoints({
+          pts: aggregate.pts,
+          reb: aggregate.reb,
+          ast: aggregate.ast,
+          stl: aggregate.stl,
+          blk: aggregate.blk,
+          to: aggregate.to,
+          threes: aggregate.threes
+        })
+      : 0;
+    const fp=applyNbaDraftProjectionAdjustment(
+      applyHistoricalDraftAvailabilityAdjustment(
+        computeHistoricalDraftFantasyPoints(statLine),
+        seasonProfile?.gp || aggregate?.count || 0
+      ),
+      { ...player, team:teamAbbr, statValues:{ MIN: statLine.min }, min:statLine.min }
+    );
     return {
       id: 950001 + index,
       historicalPlayerId: playerId,
@@ -3587,6 +3831,8 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
       team: teamAbbr,
       pos: pos,
       fp: fp,
+      gp: seasonProfile?.gp || aggregate?.count || 0,
+      totalFantasyPoints,
       pts: statLine.pts,
       reb: statLine.reb,
       ast: statLine.ast,
@@ -3604,6 +3850,8 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
         BLK: statLine.blk,
         TO: statLine.to,
         MIN: statLine.min,
+        GP: aggregate?.count || 0,
+        TFP: totalFantasyPoints,
         FGM: statLine.fgm,
         FGA: statLine.fga,
         FTM: statLine.ftm,
@@ -5764,7 +6012,7 @@ function calcFP(p){
     
     const total = (pts * ptsVal) + (reb * rebVal) + (ast * astVal) + 
                   (stl * stlVal) + (blk * blkVal) + (to * toVal) + (tpm * tpmVal);
-    return Math.round(total * 10) / 10;
+    return applyNbaDraftProjectionAdjustment(total, p);
   }
   
   // For category leagues, return the base fp from the data
@@ -5780,7 +6028,9 @@ function openPModal(idx){
   setDraftModalAvatar(p);
   document.getElementById('mName').textContent=p.name;
   document.getElementById('mSub').textContent=p.team+' · '+p.pos+' · Rank #'+p.adp;
-  document.getElementById('mProjChip').textContent=formatDraftModalStatValue(calcFP(p))+' FP';
+  document.getElementById('mProjChip').textContent=formatDraftModalStatValue(calcFP(p))+' FP/G';
+  const totalFantasyPoints=getDraftTotalFantasyPoints(p);
+  document.getElementById('mTotalChip').textContent=totalFantasyPoints>0 ? (formatDraftModalStatValue(totalFantasyPoints)+' TFP') : 'TFP --';
   document.getElementById('mFormatChip').textContent=scoringLabel;
   const signalChip=document.getElementById('mQueueChip');
   signalChip.textContent=modalRead.signal;
@@ -5867,6 +6117,7 @@ function rPlayers(){
     const stl = sv.STL || 0;
     const blk = sv.BLK || 0;
     const to = sv.TO || 0;
+    const tfp = getDraftTotalFantasyPoints(p);
     
     // Estimate missing values for display
     const fgp = p.fgp || 45;
@@ -5889,6 +6140,7 @@ function rPlayers(){
         ${actionRow}
       </div>
       <div class="pstat fp">${fp.toFixed(1)}</div>
+      <div class="pstat tfp">${tfp>0?tfp.toFixed(1):'--'}</div>
       <div class="pstat">${fgm.toFixed(1)}</div>
       <div class="pstat">${fga.toFixed(1)}</div>
       <div class="pstat">${ftm.toFixed(1)}</div>
@@ -5925,6 +6177,9 @@ function sortPlayers(stat){
     }else if(stat==='fp'){
       aVal = calcFP(a);
       bVal = calcFP(b);
+    }else if(stat==='tfp'){
+      aVal = getDraftTotalFantasyPoints(a);
+      bVal = getDraftTotalFantasyPoints(b);
     }else if(stat==='min'){
       const aPts = a.statValues?.PTS || 0;
       const bPts = b.statValues?.PTS || 0;
@@ -7634,8 +7889,8 @@ async function endDraft(){
       topPickEl.textContent = topPick ? topPick.name + ' (' + topPick.pos + ' · ' + topPick.team + ')' : '—';
     }
 
-    const projTotal = myRoster.reduce((s,p)=>s+(Number(calcFP(p))||0),0).toFixed(1);
-    if(projEl) projEl.textContent = projTotal + ' FP';
+    const totalFantasyPoints = myRoster.reduce((s,p)=>s+(Number(getDraftTotalFantasyPoints(p))||0),0).toFixed(1);
+    if(projEl) projEl.textContent = totalFantasyPoints + ' TFP';
 
     // Build sport-aware roster list with safe fallbacks
     const slots=(Array.isArray(SPORT_CFG?.myTeamSlots)&&SPORT_CFG.myTeamSlots.length?SPORT_CFG.myTeamSlots.slice():[]);
@@ -7643,6 +7898,7 @@ async function endDraft(){
       rosterEl.innerHTML = myRoster.length ? myRoster.map((p,i)=>{
         const col=tcolor(p.team);
         const fpValue=Number.isFinite(Number(p.fp))?Number(p.fp):Number(calcFP(p))||0;
+        const totalFantasyPoints=Number(getDraftTotalFantasyPoints(p))||0;
         return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);">'
           +'<div style="width:34px;font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0;">'+(slots[i]||'BN')+'</div>'
           +'<div style="width:30px;height:30px;border-radius:50%;background:'+col+';display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+initials(p.name)+'</div>'
@@ -7854,8 +8110,8 @@ async function startYourSeason(){
           <div id="dcTopPick" style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text);">—</div>
         </div>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px;">
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;margin-bottom:4px;">Proj. Total</div>
-          <div id="dcProjTotal" style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);">0 FP</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--fd);font-weight:700;margin-bottom:4px;">Total Fantasy Points</div>
+          <div id="dcProjTotal" style="font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);">0 TFP</div>
         </div>
       </div>
     </div>
@@ -8971,6 +9227,7 @@ function rbEnsureChatListenerActive() {
     } else {
       await ensureRosterbatePools();
     }
+    await ensureNbaProjectionContext();
     applySportToDraftUI();
     applyDraftRoomShellEnhancements();
     applySavedLobbySettings();

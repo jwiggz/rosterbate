@@ -1,9 +1,9 @@
 {
-  "packSummary": "The 1995-96 NBA season pack now carries a much fuller historical universe: all 29 franchises, a deeper 445-player pool, and expanded game/stat coverage so season boots and Draft The Era runs have more texture right away.",
+  "packSummary": "The 1995-96 NBA season pack now removes unmatched non-roster leftovers and treats roster-only no-stat cases explicitly, giving historical ranking a cleaner real-data base.",
   "featuredStorylines": [
-    "The 72-win Bulls chase",
-    "A full-league Draft The Era sandbox",
-    "Deeper authored schedule and stat coverage across the 1995-96 universe"
+    "Real 1995-96 season production now drives historical rankings",
+    "Draft The Era pulls from actual season performance instead of seed-only snapshots",
+    "The historical pack keeps authored schedule coverage while ranking from real era data"
   ],
   "teamSpotlights": [
     {

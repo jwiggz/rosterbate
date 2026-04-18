@@ -12,7 +12,10 @@
       "primary": "#a11f31",
       "secondary": "#d9c2a3"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "ATL",
+      "basketballReferenceSeasonUrl": "/teams/ATL/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_bos",
@@ -27,7 +30,10 @@
       "primary": "#176b52",
       "secondary": "#efe8d8"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "BOS",
+      "basketballReferenceSeasonUrl": "/teams/BOS/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_cha",
@@ -42,7 +48,10 @@
       "primary": "#0f5d91",
       "secondary": "#5e2a83"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "CHH",
+      "basketballReferenceSeasonUrl": "/teams/CHH/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_chi",
@@ -57,7 +66,10 @@
       "primary": "#7a1821",
       "secondary": "#111111"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "CHI",
+      "basketballReferenceSeasonUrl": "/teams/CHI/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_cle",
@@ -72,7 +84,10 @@
       "primary": "#6b2031",
       "secondary": "#f0c997"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "CLE",
+      "basketballReferenceSeasonUrl": "/teams/CLE/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_det",
@@ -87,7 +102,10 @@
       "primary": "#0f3d78",
       "secondary": "#c13b3b"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "DET",
+      "basketballReferenceSeasonUrl": "/teams/DET/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_ind",
@@ -102,7 +120,10 @@
       "primary": "#173b74",
       "secondary": "#f2c94c"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "IND",
+      "basketballReferenceSeasonUrl": "/teams/IND/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_mil",
@@ -117,7 +138,10 @@
       "primary": "#0e5a44",
       "secondary": "#c13a2b"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "MIL",
+      "basketballReferenceSeasonUrl": "/teams/MIL/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_mia",
@@ -132,7 +156,10 @@
       "primary": "#111111",
       "secondary": "#b42830"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "MIA",
+      "basketballReferenceSeasonUrl": "/teams/MIA/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_njn",
@@ -147,7 +174,10 @@
       "primary": "#163f77",
       "secondary": "#d52d2d"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "NJN",
+      "basketballReferenceSeasonUrl": "/teams/NJN/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_nyk",
@@ -162,7 +192,10 @@
       "primary": "#275f9a",
       "secondary": "#d97829"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "NYK",
+      "basketballReferenceSeasonUrl": "/teams/NYK/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_orl",
@@ -177,7 +210,10 @@
       "primary": "#2467a4",
       "secondary": "#111111"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "ORL",
+      "basketballReferenceSeasonUrl": "/teams/ORL/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_phi",
@@ -192,7 +228,10 @@
       "primary": "#123c76",
       "secondary": "#d94f4f"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "PHI",
+      "basketballReferenceSeasonUrl": "/teams/PHI/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_tor",
@@ -207,7 +246,10 @@
       "primary": "#5d2d84",
       "secondary": "#c23b3b"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "TOR",
+      "basketballReferenceSeasonUrl": "/teams/TOR/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_was",
@@ -222,7 +264,10 @@
       "primary": "#1a4e85",
       "secondary": "#d64040"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "WSB",
+      "basketballReferenceSeasonUrl": "/teams/WSB/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_dal",
@@ -237,7 +282,10 @@
       "primary": "#125780",
       "secondary": "#2aa1d3"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "DAL",
+      "basketballReferenceSeasonUrl": "/teams/DAL/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_den",
@@ -252,7 +300,10 @@
       "primary": "#1e5d86",
       "secondary": "#d6a43b"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "DEN",
+      "basketballReferenceSeasonUrl": "/teams/DEN/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_hou",
@@ -267,7 +318,10 @@
       "primary": "#7e1e2d",
       "secondary": "#f1c26d"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "HOU",
+      "basketballReferenceSeasonUrl": "/teams/HOU/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_min",
@@ -282,7 +336,10 @@
       "primary": "#134f84",
       "secondary": "#2e9ccf"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "MIN",
+      "basketballReferenceSeasonUrl": "/teams/MIN/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_sas",
@@ -297,7 +354,10 @@
       "primary": "#a7a9ac",
       "secondary": "#111111"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "SAS",
+      "basketballReferenceSeasonUrl": "/teams/SAS/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_uta",
@@ -312,7 +372,10 @@
       "primary": "#5f2f63",
       "secondary": "#1d6e5d"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "UTA",
+      "basketballReferenceSeasonUrl": "/teams/UTA/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_van",
@@ -327,7 +390,10 @@
       "primary": "#0d7468",
       "secondary": "#cf4141"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "VAN",
+      "basketballReferenceSeasonUrl": "/teams/VAN/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_gsw",
@@ -342,7 +408,10 @@
       "primary": "#1e4d8f",
       "secondary": "#e0ad3a"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "GSW",
+      "basketballReferenceSeasonUrl": "/teams/GSW/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_lac",
@@ -357,7 +426,10 @@
       "primary": "#b22f3f",
       "secondary": "#2d5f96"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "LAC",
+      "basketballReferenceSeasonUrl": "/teams/LAC/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_lal",
@@ -372,7 +444,10 @@
       "primary": "#5f2d84",
       "secondary": "#f0c54b"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "LAL",
+      "basketballReferenceSeasonUrl": "/teams/LAL/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_phx",
@@ -387,7 +462,10 @@
       "primary": "#6e2f83",
       "secondary": "#e38b2c"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "PHO",
+      "basketballReferenceSeasonUrl": "/teams/PHO/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_por",
@@ -402,7 +480,10 @@
       "primary": "#99212d",
       "secondary": "#111111"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "POR",
+      "basketballReferenceSeasonUrl": "/teams/POR/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_sac",
@@ -417,7 +498,10 @@
       "primary": "#5f2d84",
       "secondary": "#c0c6d1"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "SAC",
+      "basketballReferenceSeasonUrl": "/teams/SAC/1996.html"
+    }
   },
   {
     "teamId": "nba_1996_sea",
@@ -432,6 +516,9 @@
       "primary": "#1e744f",
       "secondary": "#d2a84f"
     },
-    "externalRefs": {}
+    "externalRefs": {
+      "basketballReferenceTeamCode": "SEA",
+      "basketballReferenceSeasonUrl": "/teams/SEA/1996.html"
+    }
   }
 ]

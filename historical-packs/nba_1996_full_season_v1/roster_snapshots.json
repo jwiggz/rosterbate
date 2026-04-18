@@ -37,7 +37,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_atl",
+    "teamId": "nba_1996_den",
     "playerId": "nba_1996_dikembe_mutombo",
     "rosterRole": "starter",
     "depthTag": "C1",
@@ -55,7 +55,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_atl",
+    "teamId": "nba_1996_sac",
     "playerId": "nba_1996_tyrone_corbin",
     "rosterRole": "rotation",
     "depthTag": "SF2",
@@ -146,15 +146,6 @@
   {
     "seasonId": "nba_1996_historic",
     "teamId": "nba_1996_bos",
-    "playerId": "nba_1996_xavier_mcdaniel",
-    "rosterRole": "rotation",
-    "depthTag": "SF3",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_bos",
     "playerId": "nba_1996_sherman_douglas",
     "rosterRole": "rotation",
     "depthTag": "PG2",
@@ -217,7 +208,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_cha",
+    "teamId": "nba_1996_phx",
     "playerId": "nba_1996_tony_smith",
     "rosterRole": "rotation",
     "depthTag": "PG2",
@@ -226,7 +217,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_cha",
+    "teamId": "nba_1996_sea",
     "playerId": "nba_1996_david_wingate",
     "rosterRole": "rotation",
     "depthTag": "SG2",
@@ -370,28 +361,10 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_cle",
-    "playerId": "nba_1996_brevin_knight",
-    "rosterRole": "rotation",
-    "depthTag": "PG2",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_cle",
+    "teamId": "nba_1996_phx",
     "playerId": "nba_1996_hot_rod_williams",
     "rosterRole": "rotation",
     "depthTag": "C1",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_cle",
-    "playerId": "nba_1996_tony_campbell",
-    "rosterRole": "rotation",
-    "depthTag": "SG2",
     "startDate": "1995-11-03",
     "endDate": "1996-04-21"
   },
@@ -577,7 +550,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_mil",
+    "teamId": "nba_1996_gsw",
     "playerId": "nba_1996_jon_barry",
     "rosterRole": "starter",
     "depthTag": "SG1",
@@ -604,7 +577,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_mil",
+    "teamId": "nba_1996_atl",
     "playerId": "nba_1996_andrew_lang",
     "rosterRole": "starter",
     "depthTag": "C1",
@@ -613,7 +586,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_mil",
+    "teamId": "nba_1996_ind",
     "playerId": "nba_1996_ricky_pierce",
     "rosterRole": "rotation",
     "depthTag": "SG2",
@@ -676,7 +649,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_mia",
+    "teamId": "nba_1996_njn",
     "playerId": "nba_1996_pj_brown",
     "rosterRole": "starter",
     "depthTag": "PF1",
@@ -694,7 +667,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_mia",
+    "teamId": "nba_1996_cle",
     "playerId": "nba_1996_dan_majerle",
     "rosterRole": "rotation",
     "depthTag": "SG2",
@@ -757,7 +730,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_njn",
+    "teamId": "nba_1996_uta",
     "playerId": "nba_1996_chris_morris",
     "rosterRole": "starter",
     "depthTag": "SF1",
@@ -770,15 +743,6 @@
     "playerId": "nba_1996_jayson_williams",
     "rosterRole": "starter",
     "depthTag": "C1",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_njn",
-    "playerId": "nba_1996_armon_gilliam",
-    "rosterRole": "rotation",
-    "depthTag": "PF2",
     "startDate": "1995-11-03",
     "endDate": "1996-04-21"
   },
@@ -883,7 +847,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_nyk",
+    "teamId": "nba_1996_sas",
     "playerId": "nba_1996_doc_rivers",
     "rosterRole": "rotation",
     "depthTag": "PG3",
@@ -973,7 +937,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_phi",
+    "teamId": "nba_1996_den",
     "playerId": "nba_1996_doug_overton",
     "rosterRole": "starter",
     "depthTag": "PG1",
@@ -1135,7 +1099,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_was",
+    "teamId": "nba_1996_por",
     "playerId": "nba_1996_rod_strickland",
     "rosterRole": "starter",
     "depthTag": "PG1",
@@ -1189,7 +1153,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_was",
+    "teamId": "nba_1996_tor",
     "playerId": "nba_1996_tracy_murray",
     "rosterRole": "rotation",
     "depthTag": "SF2",
@@ -1198,7 +1162,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_was",
+    "teamId": "nba_1996_por",
     "playerId": "nba_1996_harvey_grant",
     "rosterRole": "rotation",
     "depthTag": "PF3",
@@ -1207,7 +1171,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_was",
+    "teamId": "nba_1996_dal",
     "playerId": "nba_1996_terry_davis",
     "rosterRole": "rotation",
     "depthTag": "C2",
@@ -1270,7 +1234,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_dal",
+    "teamId": "nba_1996_bos",
     "playerId": "nba_1996_doug_smith",
     "rosterRole": "rotation",
     "depthTag": "PF2",
@@ -1283,15 +1247,6 @@
     "playerId": "nba_1996_cherokee_parks",
     "rosterRole": "rotation",
     "depthTag": "C2",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_dal",
-    "playerId": "nba_1996_eric_strickland",
-    "rosterRole": "rotation",
-    "depthTag": "PG2",
     "startDate": "1995-11-03",
     "endDate": "1996-04-21"
   },
@@ -1351,7 +1306,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_den",
+    "teamId": "nba_1996_was",
     "playerId": "nba_1996_robert_pack",
     "rosterRole": "rotation",
     "depthTag": "PG2",
@@ -1369,7 +1324,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_den",
+    "teamId": "nba_1996_hou",
     "playerId": "nba_1996_mark_bryant",
     "rosterRole": "rotation",
     "depthTag": "C2",
@@ -1432,7 +1387,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_hou",
+    "teamId": "nba_1996_phi",
     "playerId": "nba_1996_vernon_maxwell",
     "rosterRole": "rotation",
     "depthTag": "SG2",
@@ -1495,7 +1450,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_min",
+    "teamId": "nba_1996_uta",
     "playerId": "nba_1996_felton_spencer",
     "rosterRole": "starter",
     "depthTag": "C1",
@@ -1517,15 +1472,6 @@
     "playerId": "nba_1996_doug_west",
     "rosterRole": "rotation",
     "depthTag": "SG2",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_min",
-    "playerId": "nba_1996_dean_garrett",
-    "rosterRole": "rotation",
-    "depthTag": "C2",
     "startDate": "1995-11-03",
     "endDate": "1996-04-21"
   },
@@ -1594,7 +1540,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_sas",
+    "teamId": "nba_1996_tor",
     "playerId": "nba_1996_willie_anderson",
     "rosterRole": "rotation",
     "depthTag": "SG2",
@@ -1685,15 +1631,6 @@
   {
     "seasonId": "nba_1996_historic",
     "teamId": "nba_1996_uta",
-    "playerId": "nba_1996_shandon_anderson",
-    "rosterRole": "rotation",
-    "depthTag": "SG2",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_uta",
     "playerId": "nba_1996_david_benoit",
     "rosterRole": "rotation",
     "depthTag": "SF2",
@@ -1720,7 +1657,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_van",
+    "teamId": "nba_1996_lal",
     "playerId": "nba_1996_george_lynch",
     "rosterRole": "starter",
     "depthTag": "SF1",
@@ -1760,24 +1697,6 @@
     "playerId": "nba_1996_chris_king",
     "rosterRole": "rotation",
     "depthTag": "SF2",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_van",
-    "playerId": "nba_1996_larry_stewart",
-    "rosterRole": "rotation",
-    "depthTag": "SF3",
-    "startDate": "1995-11-03",
-    "endDate": "1996-04-21"
-  },
-  {
-    "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_van",
-    "playerId": "nba_1996_grant_gondrezick",
-    "rosterRole": "rotation",
-    "depthTag": "SG2",
     "startDate": "1995-11-03",
     "endDate": "1996-04-21"
   },
@@ -1855,7 +1774,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_gsw",
+    "teamId": "nba_1996_sac",
     "playerId": "nba_1996_sarunas_marciulionis",
     "rosterRole": "rotation",
     "depthTag": "SG2",
@@ -1936,7 +1855,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_lac",
+    "teamId": "nba_1996_mil",
     "playerId": "nba_1996_benoit_benjamin",
     "rosterRole": "rotation",
     "depthTag": "C2",
@@ -2008,7 +1927,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_lal",
+    "teamId": "nba_1996_van",
     "playerId": "nba_1996_byron_scott",
     "rosterRole": "rotation",
     "depthTag": "SG3",
@@ -2080,7 +1999,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_phx",
+    "teamId": "nba_1996_det",
     "playerId": "nba_1996_mark_west",
     "rosterRole": "rotation",
     "depthTag": "C1",
@@ -2125,7 +2044,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_por",
+    "teamId": "nba_1996_was",
     "playerId": "nba_1996_mitchell_butler",
     "rosterRole": "starter",
     "depthTag": "SF1",
@@ -2179,7 +2098,7 @@
   },
   {
     "seasonId": "nba_1996_historic",
-    "teamId": "nba_1996_por",
+    "teamId": "nba_1996_was",
     "playerId": "nba_1996_rasheed_wallace",
     "rosterRole": "rotation",
     "depthTag": "PF2",

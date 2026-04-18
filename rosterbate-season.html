@@ -523,13 +523,14 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-data-table tr:hover td{background:#182235;}
 .season-roster-table{table-layout:fixed;width:100% !important;min-width:0 !important;}
 .season-roster-table th:nth-child(1),.season-roster-table td:nth-child(1){width:56px;}
-.season-roster-table th:nth-child(2),.season-roster-table td:nth-child(2){width:210px;}
-.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:96px;text-align:center;}
-.season-roster-table th:nth-child(4),.season-roster-table td:nth-child(4){width:64px;}
-.season-roster-table th:nth-child(5),.season-roster-table td:nth-child(5){width:72px;}
-.season-roster-table th:nth-child(6),.season-roster-table td:nth-child(6){width:86px;}
-.season-roster-table th:nth-child(7),.season-roster-table td:nth-child(7){width:60px;text-align:right;}
-.season-roster-table .stat-col{width:46px;text-align:right;}
+.season-roster-table th:nth-child(2),.season-roster-table td:nth-child(2){width:196px;}
+.season-roster-table th:nth-child(3),.season-roster-table td:nth-child(3){width:88px;text-align:center;}
+.season-roster-table th:nth-child(4),.season-roster-table td:nth-child(4){width:58px;}
+.season-roster-table th:nth-child(5),.season-roster-table td:nth-child(5){width:64px;}
+.season-roster-table th:nth-child(6),.season-roster-table td:nth-child(6){width:78px;}
+.season-roster-table th:nth-child(7),.season-roster-table td:nth-child(7){width:54px;text-align:right;}
+.season-roster-table th:nth-child(8),.season-roster-table td:nth-child(8){width:68px;text-align:right;}
+.season-roster-table .stat-col{width:42px;text-align:right;}
 .season-roster-table .stat-head{color:#cbd5e1;text-align:right;}
 .season-fp-val{font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);}
 .season-roster-table td:nth-child(2) .season-player-wrap{min-width:0;max-width:100%;}
@@ -2142,15 +2143,107 @@ function getHistoricalPositionTemplate(position, rosterRole){
     C:{pts:20.1,reb:10.6,ast:2.6,stl:0.8,blk:1.9,to:2.7,min:36.0,fgm:7.7,fga:15.5,ftm:4.2,fta:5.7,'3pm':0.1}
   };
   const base=cloneJsonSafe(templates[String(position||'').toUpperCase()] || templates.SF);
-  if(String(rosterRole||'').toLowerCase()==='rotation'){
+  const role=String(rosterRole||'').toLowerCase();
+  if(role==='rotation' || role==='bench'){
+    const valueMult=role==='bench' ? 0.52 : 0.68;
+    const minuteCut=role==='bench' ? 14 : 8;
+    const turnoverFloor=role==='bench' ? 0.5 : 0.8;
+    const turnoverCut=role==='bench' ? 1.1 : 0.7;
+    const threeCut=role==='bench' ? 0.7 : 0.4;
     Object.keys(base).forEach(key=>{
-      if(key==='min') base[key]=roundHistoricalStat(base[key]-8);
-      else if(key==='to') base[key]=roundHistoricalStat(Math.max(0.8, base[key]-0.7));
-      else if(key==='3pm') base[key]=roundHistoricalStat(Math.max(0, base[key]-0.4));
-      else base[key]=roundHistoricalStat(Math.max(0.4, base[key]*0.68));
+      if(key==='min') base[key]=roundHistoricalStat(base[key]-minuteCut);
+      else if(key==='to') base[key]=roundHistoricalStat(Math.max(turnoverFloor, base[key]-turnoverCut));
+      else if(key==='3pm') base[key]=roundHistoricalStat(Math.max(0, base[key]-threeCut));
+      else base[key]=roundHistoricalStat(Math.max(0.3, base[key]*valueMult));
     });
   }
   return base;
+}
+
+function isLikelyGeneratedHistoricalRow(row){
+  const source=String(row?.statSource||'').trim().toLowerCase();
+  if(source==='generated_coverage') return true;
+  if(source==='foundation_seed' || source==='authored_seed') return false;
+  return ['minutes','points','rebounds','assists','steals','blocks','turnovers','threePointersMade','fgm','fga','ftm','fta']
+    .some(key=>{
+      const num=Number(row?.[key]||0);
+      return Number.isFinite(num) && Math.abs(num-Math.round(num))>1e-9;
+    });
+}
+
+function accumulateHistoricalAggregate(target, row){
+  target.count += 1;
+  target.pts += Number(row?.points||0);
+  target.reb += Number(row?.rebounds||0);
+  target.ast += Number(row?.assists||0);
+  target.stl += Number(row?.steals||0);
+  target.blk += Number(row?.blocks||0);
+  target.to += Number(row?.turnovers||0);
+  target.min += Number(row?.minutes||0);
+  target.fgm += Number(row?.fgm||0);
+  target.fga += Number(row?.fga||0);
+  target.ftm += Number(row?.ftm||0);
+  target.fta += Number(row?.fta||0);
+  target.threes += Number(row?.threePointersMade||0);
+  return target;
+}
+
+function averageHistoricalAggregate(aggregate){
+  if(!(aggregate && aggregate.count)) return null;
+  return {
+    pts: roundHistoricalStat(aggregate.pts / aggregate.count),
+    reb: roundHistoricalStat(aggregate.reb / aggregate.count),
+    ast: roundHistoricalStat(aggregate.ast / aggregate.count),
+    stl: roundHistoricalStat(aggregate.stl / aggregate.count),
+    blk: roundHistoricalStat(aggregate.blk / aggregate.count),
+    to: roundHistoricalStat(aggregate.to / aggregate.count),
+    min: roundHistoricalStat(aggregate.min / aggregate.count),
+    fgm: roundHistoricalStat(aggregate.fgm / aggregate.count),
+    fga: roundHistoricalStat(aggregate.fga / aggregate.count),
+    ftm: roundHistoricalStat(aggregate.ftm / aggregate.count),
+    fta: roundHistoricalStat(aggregate.fta / aggregate.count),
+    threes: roundHistoricalStat(aggregate.threes / aggregate.count)
+  };
+}
+
+function getHistoricalSeasonStatProfile(player){
+  const seasonStats=player?.seasonStats;
+  if(!(seasonStats && typeof seasonStats==='object')) return null;
+  const gp=Math.max(0, Number(seasonStats.games||0));
+  const perGame=seasonStats.perGame || {};
+  const totals=seasonStats.totals || {};
+  const statLine={
+    pts: roundHistoricalStat(perGame.pts),
+    reb: roundHistoricalStat(perGame.reb),
+    ast: roundHistoricalStat(perGame.ast),
+    stl: roundHistoricalStat(perGame.stl),
+    blk: roundHistoricalStat(perGame.blk),
+    to: roundHistoricalStat(perGame.to),
+    min: roundHistoricalStat(perGame.min),
+    fgm: roundHistoricalStat(perGame.fgm),
+    fga: roundHistoricalStat(perGame.fga),
+    ftm: roundHistoricalStat(perGame.ftm),
+    fta: roundHistoricalStat(perGame.fta),
+    threes: roundHistoricalStat(perGame.threes)
+  };
+  const totalFantasyPoints=computeHistoricalFantasyPoints({
+    pts: Number.isFinite(Number(totals.pts)) ? Number(totals.pts) : statLine.pts * gp,
+    reb: Number.isFinite(Number(totals.reb)) ? Number(totals.reb) : statLine.reb * gp,
+    ast: Number.isFinite(Number(totals.ast)) ? Number(totals.ast) : statLine.ast * gp,
+    stl: Number.isFinite(Number(totals.stl)) ? Number(totals.stl) : statLine.stl * gp,
+    blk: Number.isFinite(Number(totals.blk)) ? Number(totals.blk) : statLine.blk * gp,
+    to: Number.isFinite(Number(totals.to)) ? Number(totals.to) : statLine.to * gp,
+    threes: Number.isFinite(Number(totals.threes)) ? Number(totals.threes) : statLine.threes * gp
+  });
+  return { gp, statLine, totalFantasyPoints };
+}
+
+function applyHistoricalSeasonAvailabilityAdjustment(fp, gp){
+  const baseFp=Number(fp||0);
+  const games=Math.max(0, Number(gp||0));
+  if(!Number.isFinite(baseFp) || baseFp<=0 || !games) return 0;
+  const factor=Math.max(0.35, Math.min(1, 0.35 + (0.65 * (games / 82))));
+  return roundHistoricalStat(baseFp * factor);
 }
 
 function buildHistoricalSeasonLaunchData(devState, requestedSport){
@@ -2179,22 +2272,11 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
   playerGameStats.forEach(row=>{
     const playerId=String(row?.playerId||'').trim();
     if(!playerId) return;
+    if(isLikelyGeneratedHistoricalRow(row)) return;
     const current=statsByPlayerId.get(playerId) || {
       count:0, pts:0, reb:0, ast:0, stl:0, blk:0, to:0, min:0, fgm:0, fga:0, ftm:0, fta:0, threes:0
     };
-    current.count += 1;
-    current.pts += Number(row?.points||0);
-    current.reb += Number(row?.rebounds||0);
-    current.ast += Number(row?.assists||0);
-    current.stl += Number(row?.steals||0);
-    current.blk += Number(row?.blocks||0);
-    current.to += Number(row?.turnovers||0);
-    current.min += Number(row?.minutes||0);
-    current.fgm += Number(row?.fgm||0);
-    current.fga += Number(row?.fga||0);
-    current.ftm += Number(row?.ftm||0);
-    current.fta += Number(row?.fta||0);
-    current.threes += Number(row?.threePointersMade||0);
+    accumulateHistoricalAggregate(current, row);
     statsByPlayerId.set(playerId, current);
   });
 
@@ -2216,25 +2298,31 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
     const playerId=String(player?.playerId||'').trim();
     const rosterRole=rosterRoleByPlayerId.get(playerId) || 'rotation';
     const aggregate=statsByPlayerId.get(playerId);
-    const statLine=(aggregate && aggregate.count)
-      ? {
-          pts: roundHistoricalStat(aggregate.pts / aggregate.count),
-          reb: roundHistoricalStat(aggregate.reb / aggregate.count),
-          ast: roundHistoricalStat(aggregate.ast / aggregate.count),
-          stl: roundHistoricalStat(aggregate.stl / aggregate.count),
-          blk: roundHistoricalStat(aggregate.blk / aggregate.count),
-          to: roundHistoricalStat(aggregate.to / aggregate.count),
-          min: roundHistoricalStat(aggregate.min / aggregate.count),
-          fgm: roundHistoricalStat(aggregate.fgm / aggregate.count),
-          fga: roundHistoricalStat(aggregate.fga / aggregate.count),
-          ftm: roundHistoricalStat(aggregate.ftm / aggregate.count),
-          fta: roundHistoricalStat(aggregate.fta / aggregate.count),
-          threes: roundHistoricalStat(aggregate.threes / aggregate.count)
-        }
-      : getHistoricalPositionTemplate(player?.primaryPosition, rosterRole);
+    const seasonProfile=getHistoricalSeasonStatProfile(player);
+    const statLine=seasonProfile?.statLine || ((aggregate && aggregate.count)
+      ? averageHistoricalAggregate(aggregate)
+      : {
+          pts:0, reb:0, ast:0, stl:0, blk:0, to:0, min:0, fgm:0, fga:0, ftm:0, fta:0, threes:0
+        });
     const teamAbbr=teamAbbrById.get(player.teamId) || 'HIS';
     const pos=String(player?.primaryPosition||'UTIL').toUpperCase();
-    const fp=computeHistoricalFantasyPoints(statLine);
+    const fp=applyHistoricalSeasonAvailabilityAdjustment(
+      computeHistoricalFantasyPoints(statLine),
+      seasonProfile?.gp || aggregate?.count || 0
+    );
+    const totalFantasyPoints=(seasonProfile && Number.isFinite(seasonProfile.totalFantasyPoints))
+      ? seasonProfile.totalFantasyPoints
+      : (aggregate && aggregate.count)
+      ? computeHistoricalFantasyPoints({
+          pts: aggregate.pts,
+          reb: aggregate.reb,
+          ast: aggregate.ast,
+          stl: aggregate.stl,
+          blk: aggregate.blk,
+          to: aggregate.to,
+          threes: aggregate.threes
+        })
+      : 0;
     return {
       id: 950001 + index,
       historicalPlayerId: playerId,
@@ -2246,6 +2334,8 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
       team: teamAbbr,
       pos: pos,
       fp: fp,
+      gp: seasonProfile?.gp || aggregate?.count || 0,
+      totalFantasyPoints,
       pts: statLine.pts,
       reb: statLine.reb,
       ast: statLine.ast,
@@ -2259,6 +2349,8 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
         STL: statLine.stl,
         BLK: statLine.blk,
         TO: statLine.to,
+        GP: aggregate?.count || 0,
+        TFP: totalFantasyPoints,
         MIN: statLine.min,
         FGM: statLine.fgm,
         FGA: statLine.fga,
@@ -4415,6 +4507,89 @@ function getSportAwareFantasyScore(player){
   return getRosterbatePlayerFantasyScore(CURRENT_SPORT,player,CS?.scoring)||0;
 }
 
+const SEASON_NBA_REFERENCE_CONTEXT={byKey:new Map(),loaded:false,loading:null};
+function getSeasonPlayerKey(name, team){
+  return `${String(name||'').trim().toLowerCase()}|${String(team||'').trim().toUpperCase()}`;
+}
+async function ensureSeasonNbaReferenceContext(){
+  if(CURRENT_SPORT!=='nba') return SEASON_NBA_REFERENCE_CONTEXT;
+  if(SEASON_NBA_REFERENCE_CONTEXT.loaded) return SEASON_NBA_REFERENCE_CONTEXT;
+  if(SEASON_NBA_REFERENCE_CONTEXT.loading) return SEASON_NBA_REFERENCE_CONTEXT.loading;
+  SEASON_NBA_REFERENCE_CONTEXT.loading=fetch('Nba500.csv',{cache:'no-store'})
+    .then(res=>{
+      if(!res.ok) throw new Error('Failed to load Nba500.csv ('+res.status+')');
+      return res.text();
+    })
+    .then(text=>{
+      const lines=String(text||'').trim().split(/\r?\n/).filter(Boolean);
+      if(!lines.length) throw new Error('Nba500.csv was empty');
+      const headers=lines.shift().split(',').map(h=>h.trim());
+      const idx={
+        player: headers.indexOf('PLAYER'),
+        team: headers.indexOf('TEAM'),
+        gp: headers.indexOf('GP'),
+        min: headers.indexOf('MIN')
+      };
+      lines.forEach(line=>{
+        const cells=line.split(',');
+        const playerName=String(cells[idx.player]||'').trim();
+        const team=String(cells[idx.team]||'').trim().toUpperCase();
+        if(!playerName || !team) return;
+        const gp=Number(cells[idx.gp]||0);
+        const totalMinutes=Number(cells[idx.min]||0);
+        const mpg=gp>0 ? totalMinutes/gp : 0;
+        SEASON_NBA_REFERENCE_CONTEXT.byKey.set(getSeasonPlayerKey(playerName, team), {
+          gp,
+          mpg
+        });
+      });
+      SEASON_NBA_REFERENCE_CONTEXT.loaded=true;
+      return SEASON_NBA_REFERENCE_CONTEXT;
+    })
+    .catch(err=>{
+      console.warn('Season NBA reference context failed to load.', err);
+      SEASON_NBA_REFERENCE_CONTEXT.loaded=true;
+      return SEASON_NBA_REFERENCE_CONTEXT;
+    });
+  return SEASON_NBA_REFERENCE_CONTEXT.loading;
+}
+function getSeasonNbaReferenceEntry(player){
+  if(CURRENT_SPORT!=='nba') return null;
+  return SEASON_NBA_REFERENCE_CONTEXT.byKey.get(getSeasonPlayerKey(player?.name, player?.team)) || null;
+}
+function getSeasonRawFantasyPointsPerGame(player){
+  if(!player) return 0;
+  if(CURRENT_SPORT!=='nba') return Number(player?.fp || 0);
+  const statValues=player?.statValues || {};
+  return Math.round((
+    Number(statValues.PTS ?? player?.pts ?? 0)
+    + Number(statValues.REB ?? player?.reb ?? 0) * 1.2
+    + Number(statValues.AST ?? player?.ast ?? 0) * 1.5
+    + Number(statValues.STL ?? player?.stl ?? 0) * 3
+    + Number(statValues.BLK ?? player?.blk ?? 0) * 3
+    - Number(statValues.TO ?? player?.to ?? 0)
+    + Number(statValues['3PM'] ?? player?.tpm ?? 0) * 0.5
+  ) * 10) / 10;
+}
+function getSeasonPlayerGamesPlayed(player){
+  const explicit=Number(player?.gp ?? player?.statValues?.GP ?? 0);
+  if(Number.isFinite(explicit) && explicit>0) return explicit;
+  if(CURRENT_SPORT!=='nba') return 0;
+  return Number(getSeasonNbaReferenceEntry(player)?.gp || 0);
+}
+function getSeasonPlayerTotalFantasyPoints(player){
+  const explicit=Number(player?.totalFantasyPoints ?? player?.statValues?.TFP ?? 0);
+  if(Number.isFinite(explicit) && explicit>0) return Math.round(explicit * 10) / 10;
+  const gp=getSeasonPlayerGamesPlayed(player);
+  if(!(gp>0)) return null;
+  return Math.round(getSeasonRawFantasyPointsPerGame(player) * gp * 10) / 10;
+}
+function formatSeasonTotalFantasyPoints(player){
+  const total=getSeasonPlayerTotalFantasyPoints(player);
+  if(!(total>=0)) return '--';
+  return total.toFixed(1);
+}
+
 function getTeamDayScoreDetails(teamIdx,day){
   const week=weekForDay(day);
   const roster=G.rosters[teamIdx]||[];
@@ -5595,6 +5770,8 @@ function normalizeSeasonPlayer(player, sport){
     team: canonical.team || clone.team,
     pos: canonical.pos || clone.pos,
     fp: Number.isFinite(Number(canonical.fp)) ? Number(canonical.fp) : clone.fp,
+    gp: Number.isFinite(Number(canonical.gp)) ? Number(canonical.gp) : clone.gp,
+    totalFantasyPoints: Number.isFinite(Number(canonical.totalFantasyPoints)) ? Number(canonical.totalFantasyPoints) : clone.totalFantasyPoints,
     statValues: canonical.statValues || clone.statValues,
     statSummary: canonical.statSummary || clone.statSummary
   };
@@ -5867,6 +6044,16 @@ function initSeason(){
     })
     .catch(err=>{
       console.warn('Season player universe refresh skipped because player pools failed to load.', err);
+    });
+  ensureSeasonNbaReferenceContext()
+    .then(()=>{
+      if(document.getElementById('hub')?.classList.contains('active')) renderHub();
+      if(document.getElementById('roster')?.classList.contains('active')) renderRoster();
+      if(document.getElementById('matchup')?.classList.contains('active')) renderMatchup();
+      if(document.getElementById('teams')?.classList.contains('active')) renderTeams();
+    })
+    .catch(err=>{
+      console.warn('Season total fantasy point context failed to load.', err);
     });
 
   if(window.RosterbateAudit && D?.seasonId && currentRbUser){
@@ -6556,6 +6743,7 @@ function renderMatchup(){
           <td>--</td>
           <td>${renderStatusBadge('Open')}</td>
           <td><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
+          <td><span class="season-soft-muted" style="font-weight:700;">--</span></td>
         </tr>`;
       }
       const p=entry.player;
@@ -6573,7 +6761,7 @@ function renderMatchup(){
             ${renderTeamInitialAvatar(p.name,p.team,34)}
             <div class="season-player-wrap" style="min-width:0;">
               <div class="season-player-name" style="font-weight:700;color:#f8fafc;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
-              <div class="season-soft-muted">${p.team} ${p.pos} · ${getRosterbatePlayerSummary(p,CURRENT_SPORT)}</div>
+              <div class="season-soft-muted">${p.team} ${p.pos}</div>
             </div>
           </div>
         </td>
@@ -6581,6 +6769,7 @@ function renderMatchup(){
         <td>${time}</td>
         <td>${renderStatusBadge(status)}</td>
         <td><span class="season-fp-val">${fp}</span></td>
+        <td><span class="season-soft-muted" style="font-weight:700;">${formatSeasonTotalFantasyPoints(p)}</span></td>
       </tr>`;
     };
     return `<div class="season-table-card" style="overflow:hidden;">
@@ -6609,12 +6798,12 @@ function renderMatchup(){
       </div>
       <div class="season-table-wrap season-matchup-table-wrap">
         <table class="season-data-table season-roster-table season-matchup-table">
-          <thead><tr><th>Slot</th><th>Player</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th></tr></thead>
+          <thead><tr><th>Slot</th><th>Player</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th><th>TFP</th></tr></thead>
           <tbody>
-            <tr><td colspan="6" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Starters</td></tr>
+            <tr><td colspan="7" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Starters</td></tr>
             ${starterEntries.map(renderRow).join('')}
-            <tr><td colspan="6" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Bench / IL</td></tr>
-            ${(benchEntries.concat(ilEntries)).length ? benchEntries.concat(ilEntries).map(renderRow).join('') : `<tr><td colspan="6" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}
+            <tr><td colspan="7" style="background:#0f1724;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Bench / IL</td></tr>
+            ${(benchEntries.concat(ilEntries)).length ? benchEntries.concat(ilEntries).map(renderRow).join('') : `<tr><td colspan="7" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -6896,6 +7085,7 @@ function renderRoster(){
         <td${rowCellAttr}>${statusBadge(entry.isIL?entry.slot:'Open')}</td>
         <td${rowCellAttr}>--</td>
         <td${rowCellAttr}><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
+        <td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>
         ${cols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
       </tr>`;
     }
@@ -6909,6 +7099,7 @@ function renderRoster(){
         <td${rowCellAttr}>--</td>
         <td${rowCellAttr}>${statusBadge('Syncing')}</td>
         <td${rowCellAttr}><span class="season-fp-val" style="color:#64748b;text-shadow:none;">--</span></td>
+        <td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>
         ${cols.map(()=>`<td${rowCellAttr} class="stat-col"><span class="season-soft-muted">--</span></td>`).join('')}
       </tr>`;
     }
@@ -6968,6 +7159,7 @@ function renderRoster(){
       <td${rowCellAttr}>${time}</td>
       <td${rowCellAttr}>${statusBadge(status)}</td>
       <td${rowCellAttr}><span class="season-fp-val">${Number(p.fp||0).toFixed(1)}</span></td>
+      <td${rowCellAttr} class="stat-col">${formatSeasonTotalFantasyPoints(p)}</td>
       ${cols.map(col=>`<td${rowCellAttr} class="stat-col">${formatRosterStatValue(p,col.key)}</td>`).join('')}
     </tr>`;
   }).join('');
@@ -7034,22 +7226,22 @@ function renderRoster(){
           <div>
             <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${CURRENT_SPORT==='mlb'?'Batters':'Starters'}</div></div>
             <table class="season-data-table season-roster-table">
-              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${(CURRENT_SPORT==='mlb'?battingCols:statCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
-              <tbody>${starterRowsHtml || `<tr><td colspan="${7+(CURRENT_SPORT==='mlb'?battingCols.length:statCols.length)}" style="text-align:center;color:#6b7280;">No starters found.</td></tr>`}</tbody>
+              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th><th>TFP</th>${(CURRENT_SPORT==='mlb'?battingCols:statCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+              <tbody>${starterRowsHtml || `<tr><td colspan="${8+(CURRENT_SPORT==='mlb'?battingCols.length:statCols.length)}" style="text-align:center;color:#6b7280;">No starters found.</td></tr>`}</tbody>
             </table>
           </div>
           <div>
             <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Reserves / IL</div></div>
             <table class="season-data-table season-roster-table">
-              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${(CURRENT_SPORT==='mlb'?(isPitcherPlayer(movePlayer)?pitchingCols:battingCols):statCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
-              <tbody>${reserveRows || `<tr><td colspan="${7+(CURRENT_SPORT==='mlb'?Math.max(battingCols.length,pitchingCols.length):statCols.length)}" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}</tbody>
+              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th><th>TFP</th>${(CURRENT_SPORT==='mlb'?(isPitcherPlayer(movePlayer)?pitchingCols:battingCols):statCols).map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+              <tbody>${reserveRows || `<tr><td colspan="${8+(CURRENT_SPORT==='mlb'?Math.max(battingCols.length,pitchingCols.length):statCols.length)}" style="text-align:center;color:#6b7280;">No reserves found.</td></tr>`}</tbody>
             </table>
           </div>
           ${CURRENT_SPORT==='mlb' ? `<div>
             <div class="season-card-pad" style="padding-bottom:8px;"><div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">Pitchers</div></div>
             <table class="season-data-table season-roster-table">
-              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th>${pitchingCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
-              <tbody>${pitcherRows || `<tr><td colspan="${7+pitchingCols.length}" style="text-align:center;color:#6b7280;">No pitchers found.</td></tr>`}</tbody>
+              <thead><tr><th>Slot</th><th>Player</th><th>Action</th><th>Opp</th><th>Time</th><th>Status</th><th>FP</th><th>TFP</th>${pitchingCols.map(col=>`<th class="stat-head stat-col">${col.label}</th>`).join('')}</tr></thead>
+              <tbody>${pitcherRows || `<tr><td colspan="${8+pitchingCols.length}" style="text-align:center;color:#6b7280;">No pitchers found.</td></tr>`}</tbody>
             </table>
           </div>` : ''}
         </div>

@@ -178,6 +178,7 @@
       seasonId: seasonId,
       teamId: player.teamId,
       opponentTeamId: opponentTeamId,
+      statSource: 'foundation_seed',
       minutes: minutes,
       points: points,
       rebounds: rebounds,

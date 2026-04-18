@@ -9,7 +9,7 @@
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "1990s",
-  "version": 8,
+  "version": 14,
   "status": "concept",
   "sourceProfile": "historical_curated",
   "supportedModes": [
@@ -20,7 +20,7 @@
   "defaultEntryMode": "real_season",
   "focusTeamId": "nba_1996_chi",
   "subtitle": "Play the real season or draft the era.",
-  "description": "A fuller 1995-96 NBA historical foundation pack with full-league benches and expanded authored game/stat coverage for season boots and Draft The Era testing.",
+  "description": "A 1995-96 NBA historical season pack with real team-page season totals imported for player ranking, drafting, and season boots.",
   "tagline": "Rewrite the greatest regular season ever.",
   "eraTags": [
     "1990s",
@@ -54,13 +54,13 @@
     "sourceProfile": "historical_curated",
     "curationOwner": "RosterBate",
     "reviewStatus": "draft",
-    "importNotes": "Expanded from the full-league roster foundation with additional authored schedule, game, and player stat coverage while keeping the local historical pack format stable."
+    "importNotes": "Historical pack cleanup removed unmatched non-roster players and made Victor Alexander an explicit roster-only zero-stat case so seasonStats coverage is effectively complete without synthetic fallback."
   },
   "notes": [
-    "Carries a full-league 1995-96 player base for historical season and draft experiments.",
-    "Includes expanded authored schedule and generated stat coverage for richer historical boots.",
-    "Keeps the same local pack schema used by the validator, importer, and localhost dev runner."
+    "Historical players now carry real 1995-96 regular-season totals and derived per-game stats.",
+    "Known invalid pack leftovers were removed when they could not be found on any 1995-96 team page.",
+    "Roster-only zero-stat cases stay explicit instead of falling back to seed samples."
   ],
   "createdAt": "2026-04-17T00:00:00Z",
-  "updatedAt": "2026-04-18T00:48:02.803Z"
+  "updatedAt": "2026-04-18T05:04:22.579Z"
 }
