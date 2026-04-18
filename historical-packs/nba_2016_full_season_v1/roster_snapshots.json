@@ -1,0 +1,5366 @@
+[
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_alhorford_201143",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_paulmillsap_200794",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_kylekorver_2594",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_jeffteague_201952",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_kentbazemore_203145",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_thabosefolosha_200757",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_dennisschroder_203471",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_tiagosplitter_201168",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_timhardawayjr_203501",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_arsalankazemi_203529",
+    "rosterRole": "inactive",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_dequanjones_203199",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_earlbarron_2853",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_edgarsosa_1626293",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_edytavares_204002",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_lamarpatterson_203934",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_mikemuscala_203488",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_mikescott_203118",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_atl",
+    "playerId": "nba_2016_terranpetteway_1626189",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_isaiahthomas_202738",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_amirjohnson_101161",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_jaecrowder_203109",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_jaredsullinger_203096",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_averybradley_202340",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_evanturner_202323",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_marcussmart_203935",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_kellyolynyk_203482",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_davidlee_101135",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_tylerzeller_203092",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_coreywalden_1626258",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_cotyclarke_1626262",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_jamesyoung_203923",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_johnholland_204066",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_jonasjerebko_201973",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_jordanmickey_1626175",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_levirandolph_1626260",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_malcolmmiller_1626259",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_perryjonesiii_203103",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_rjhunter_1626154",
+    "rosterRole": "bench",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_bos",
+    "playerId": "nba_2016_terryrozier_1626179",
+    "rosterRole": "bench",
+    "depthTag": "SF14",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_joejohnson_2207",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_brooklopez_201572",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_thaddeusyoung_201152",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_wayneellington_201961",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_bojanbogdanovic_202711",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_donaldsloan_202388",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_jarrettjack_101127",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_rondaehollisjefferson_1626178",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_shanelarkin_203499",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_thomasrobinson_203080",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_markelbrown_203900",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_sergeykarasev_203508",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_chrismccullough_1626191",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_henrysims_203156",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_williereed_203186",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_andreabargnani_200745",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_chrisdaniels_202808",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_quincymiller_203113",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_ryanboatright_1626207",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_brk",
+    "playerId": "nba_2016_seankilpatrick_203930",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_kembawalker_202689",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_marvinwilliams_101107",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_nicolasbatum_201587",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_codyzeller_203469",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_pjhairston_203798",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_aljefferson_2744",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_jeremylin_202391",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_michaelkiddgilchrist_203077",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_spencerhawes_201150",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_frankkaminsky_1626163",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_aaronharrison_1626151",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_brianroberts_203148",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_damienwilkins_2863",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_jasonwashburn_1626279",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_jeremylamb_203087",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_jorgegutierrez_203268",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_samthompson_1626280",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_troydaniels_203584",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cha",
+    "playerId": "nba_2016_tylerhansbrough_201946",
+    "rosterRole": "bench",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_paugasol_2200",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_jimmybutler_202710",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_derrickrose_201565",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_tajgibson_201959",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_nikolamirotic_202703",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_tonysnell_203503",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_mikedunleavy_2399",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_etwaunmoore_202734",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_kirkhinrich_2550",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_justinholiday_203200",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_bobbyportis_1626171",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_cristianofelicio_1626245",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_dougmcdermott_203926",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_cameronbairstow_203946",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_joakimnoah_201149",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_aaronbrooks_201166",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_jakeanderson_202815",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_jordancrawford_202348",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_marcussimmons_204136",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_chi",
+    "playerId": "nba_2016_stefhonhannah_202513",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_jrsmith_2747",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_kevinlove_201567",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_lebronjames_2544",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_kyrieirving_202681",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_timofeymozgov_202389",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_tristanthompson_202684",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_matthewdellavedova_203521",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_mowilliams_2590",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_imanshumpert_202697",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_richardjefferson_2210",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_jaredcunningham_203099",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_jordanmcrae_203895",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_andersonvarejao_2760",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_austindaye_201948",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_chrisjohnson_202419",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_djstephens_203474",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_dahntayjones_2563",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_diontechristmas_202091",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_jamesjones_2592",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_joeharris_203925",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_nickminnerath_1626305",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_quinncook_1626188",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_cle",
+    "playerId": "nba_2016_sashakaun_201619",
+    "rosterRole": "bench",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_wesleymatthews_202083",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_dirknowitzki_1717",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_zazapachulia_2585",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_deronwilliams_101114",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_chandlerparsons_202718",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_raymondfelton_101109",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_jjbarea_200826",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_justinanderson_1626147",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_salahmejri_1626257",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_charlievillanueva_101111",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_dwightpowell_203939",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_javalemcgee_201580",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_jeremyevans_202379",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_brandonashley_1626165",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_devinharris_2734",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_jamilwilson_203966",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_jarridfamous_202820",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_mauricendour_1626254",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_dal",
+    "playerId": "nba_2016_samueldalembert_2223",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_garyharris_203914",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_emmanuelmudiay_1626144",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_kennethfaried_202702",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_nikolajokic_203999",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_danilogallinari_201568",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_darrellarthur_201589",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_jameernelson_2749",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_joffreylauvergne_203530",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_jjhickson_201581",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_randyfoye_200751",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_kostaspapanikolaou_203123",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_jusufnurkic_203994",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_mikemiller_2034",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_willbarton_203115",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_axeltoupane_1626253",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_djaugustin_201571",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_devinsweetney_202464",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_mattjanning_202394",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_nickjohnson_203910",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_oleksiypecherov_200762",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_den",
+    "playerId": "nba_2016_wilsonchandler_201163",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_andredrummond_203083",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_marcusmorrissr_202694",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_reggiejackson_202704",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_kentaviouscaldwellpope_203484",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_ersanilyasova_101141",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_stanleyjohnson_1626169",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_anthonytolliver_201229",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_darrunhilliard_1626199",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_steveblake_2581",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_aronbaynes_203382",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_adonisthomas_203519",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_cartiermartin_201858",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_dannygranger_101122",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_ericgriffin_203547",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_jodiemeeks_201975",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_joelanthony_201202",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_jordanbachynski_203947",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_justinharper_202712",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_reggiebullock_203493",
+    "rosterRole": "bench",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_det",
+    "playerId": "nba_2016_spencerdinwiddie_203915",
+    "rosterRole": "bench",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_draymondgreen_203110",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_klaythompson_202691",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_stephencurry_201939",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_andrewbogut_101106",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_harrisonbarnes_203084",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_brandonrush_201575",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_festusezeli_203105",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_shaunlivingston_2733",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_andreiguodala_2738",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_ianclark_203546",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_jamesmichaelmcadoo_203949",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_bengordon_2732",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_chrisbabb_203569",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_chrisudofia_1627224",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_juwanstaten_1626219",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_kevonlooney_1626172",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_leandrobarbosa_2571",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_marreesespeights_201578",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_tonymitchell_203502",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_gsw",
+    "playerId": "nba_2016_xavierhenry_202333",
+    "rosterRole": "inactive",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_jamesharden_201935",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_trevorariza_2772",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_dwighthoward_2730",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_patrickbeverley_201976",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_clintcapela_203991",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_donatasmotiejunas_202700",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_tylawson_201951",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_coreybrewer_201147",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_terrencejones_203093",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_marcusthornton_201977",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_jasonterry_1891",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_kjmcdaniels_203909",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_montrezlharrell_1626149",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_andrewgoudelock_202726",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_chriswalker_1626217",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_chuckhayes_101236",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_denzellivingston_1626269",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_jeremytyler_202719",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_joshuasmith_1626288",
+    "rosterRole": "inactive",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_michaelbeasley_201563",
+    "rosterRole": "bench",
+    "depthTag": "SF14",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_samdekker_1626155",
+    "rosterRole": "bench",
+    "depthTag": "SF15",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_hou",
+    "playerId": "nba_2016_willcummings_1626270",
+    "rosterRole": "inactive",
+    "depthTag": "SF16",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_montaellis_101145",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_paulgeorge_202331",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_georgehill_201588",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_ianmahinmi_101133",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_mylesturner_1626167",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_lavoyallen_202730",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_cjmiles_101139",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_jordanhill_201941",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_glennrobinsoniii_203922",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_solomonhill_203524",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_chasebudinger_201978",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_rodneystuckey_201155",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_cjfair_203927",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_joeyoung_1626202",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_kadeemjack_1627292",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_rakeemchristmas_1626176",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_ind",
+    "playerId": "nba_2016_shaynewhittington_203963",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_deandrejordan_201599",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_jjredick_200755",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_chrispaul_101108",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_lucmbahamoute_201601",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_paulpierce_1718",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_blakegriffin_201933",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_wesleyjohnson_202325",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_austinrivers_203085",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_joshsmith_2746",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_colealdrich_202332",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_jamalcrawford_2037",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_pabloprigioni_203143",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_brandendawson_1626183",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_cjwilcox_203912",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_jeffayres_201965",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lac",
+    "playerId": "nba_2016_nikoloztskitishvili_2401",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_royhibbert_201579",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_jordanclarkson_203903",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_kobebryant_977",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_juliusrandle_203944",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_dangelorussell_1626156",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_louwilliams_101150",
+    "rosterRole": "starter",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_larrynancejr_1626204",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_anthonybrown_1626148",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_mettaworldpeace_1897",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_nickyoung_201156",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_robertsacre_203135",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_brandonbass_101138",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_jabaribrown_203913",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_jonathanholmes_1626182",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_marcelohuertas_1626273",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_michaelfrazier_1626187",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_robertupshaw_1626193",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_ryankelly_203527",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_lal",
+    "playerId": "nba_2016_tarikblack_204028",
+    "rosterRole": "bench",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_courtneylee_201584",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_tonyallen_2754",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_mikeconley_201144",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_zachrandolph_2216",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_marcgasol_201188",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_mattbarnes_2440",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_jeffgreen_201145",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_chrisandersen_2365",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_jamychalgreen_203210",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_lancestephenson_202362",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_ryanhollins_200797",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_jordanfarmar_200770",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_mariochalmers_201596",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_brianteweber_1627362",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_vincecarter_1713",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_brandanwright_201148",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_alexstepheson_1627293",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_elliotwilliams_202343",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_jarellmartin_1626185",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_jordanadams_203919",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_lazericjones_1626272",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_michaelholyfield_1626261",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_russsmith_203893",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_sampsoncarter_1627258",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_xaviermunford_204098",
+    "rosterRole": "bench",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mem",
+    "playerId": "nba_2016_yakhoubadiawara_200821",
+    "rosterRole": "inactive",
+    "depthTag": "SF14",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_dwyanewade_2548",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_luoldeng_2736",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_gorandragic_201609",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_chrisbosh_2547",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_hassanwhiteside_202355",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_amarestoudemire_2405",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_geraldgreen_101123",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_justisewinslow_1626159",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_benoudrih_2757",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_tylerjohnson_204020",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_joshrichardson_1626196",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_joshmcroberts_201177",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_coreyhawkins_1626186",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_dorellwright_2748",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_gregwhittington_204222",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_jarnellstokes_203950",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_johnlucasiii_101249",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_keithbenson_202728",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_trekelley_201645",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mia",
+    "playerId": "nba_2016_udonishaslem_2617",
+    "rosterRole": "bench",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_giannisantetokounmpo_203507",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_khrismiddleton_203114",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_jabariparker_203953",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_gregmonroe_202328",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_michaelcarterwilliams_203487",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_ojmayo_201564",
+    "rosterRole": "starter",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_jerrydbayless_201573",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_milesplumlee_203101",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_tylerennis_203898",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_rashadvaughn_1626173",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_johnnyobryantiii_203948",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_chriscopeland_203142",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_damieninglis_203996",
+    "rosterRole": "bench",
+    "depthTag": "SG7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_johnhenson_203089",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_charliewestbrook_203586",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_greivisvasquez_202349",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_jonhorford_1626281",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_joshpowell_2694",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_mil",
+    "playerId": "nba_2016_marcuslandry_202068",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_karlanthonytowns_1626157",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_andrewwiggins_203952",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_rickyrubio_201937",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_tayshaunprince_2419",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_gorguidieng_203476",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_kevingarnett_708",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_zachlavine_203897",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_kevinmartin_2755",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_andremiller_1889",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_nikolapekovic_201593",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_adreianpayne_203940",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_damjanrudez_204014",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_gregsmith_202962",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_kleonpenn_1626285",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_nemanjabjelica_202357",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_nickwiggins_204289",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_shabazzmuhammad_203498",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_min",
+    "playerId": "nba_2016_tyusjones_1626145",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_omerasik_201600",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_anthonydavis_203076",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_dantecunningham_201967",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_ericgordon_201569",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_alonzogee_202087",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_tyrekeevans_201936",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_jrueholiday_201950",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_norriscole_202708",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_toneydouglas_201962",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_alexisajinca_201582",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_lukebabbitt_202337",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_brycedejeanjones_1626214",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_ryananderson_201583",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_jamesennisiii_203516",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_kendrickperkins_2570",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_jordanhamilton_202706",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_timfrazier_204025",
+    "rosterRole": "bench",
+    "depthTag": "SG7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_naterobinson_101126",
+    "rosterRole": "bench",
+    "depthTag": "SG8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_orlandojohnson_203111",
+    "rosterRole": "bench",
+    "depthTag": "SG9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_bomccalebb_1627322",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_chrisdouglasroberts_201604",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_coreywebster_1626290",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_jeffadrien_202399",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_jeromejordan_202366",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_jimmerfredette_202690",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nop",
+    "playerId": "nba_2016_quincypondexter_202347",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_robinlopez_201577",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_carmeloanthony_2546",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_josecalderon_101181",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_kristapsporzingis_204001",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_arronafflalo_201167",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_sashavujacic_2756",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_derrickwilliams_202682",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_langstongalloway_204038",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_jeriangrant_1626170",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_lancethomas_202498",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_cleanthonyearly_203921",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_kyleoquinn_203124",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_dajuansummers_201969",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_darionatkins_1626276",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_kevinseraphin_202338",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_louamundson_200811",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_thanasisantetokounmpo_203648",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_travistriceii_1626275",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_nyk",
+    "playerId": "nba_2016_wesleysaunders_1626201",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_russellwestbrook_201566",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_stevenadams_203500",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_sergeibaka_201586",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_kevindurant_201142",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_andreroberson_203460",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_dionwaiters_203079",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_anthonymorrow_201627",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_nickcollison_2555",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_kylesingler_202713",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_cameronpayne_1626166",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_eneskanter_202683",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_dezwells_1626190",
+    "rosterRole": "inactive",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_joshhuestis_203962",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_julyanstone_202933",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_michaelqualls_1626180",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_mitchmcgary_203956",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_nazrmohammed_1737",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_stevenovak_200779",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_okc",
+    "playerId": "nba_2016_talibzanna_204075",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_tobiasharris_202699",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_evanfournier_203095",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_elfridpayton_203901",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_nikolavucevic_202696",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_victoroladipo_203506",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_aarongordon_203932",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_channingfrye_101112",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_dewaynededmon_203473",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_mariohezonja_1626209",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_brandonjennings_201943",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_cjwatson_201228",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_jasonsmith_201160",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_andrewnicholson_203094",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_devynmarble_203906",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_gregstiemsma_201880",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_jordansibert_1626296",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_keithappling_203951",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_melvinejim_203929",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_nnannaegwu_1626295",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_orl",
+    "playerId": "nba_2016_shabazznapier_203894",
+    "rosterRole": "bench",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_nerlensnoel_203457",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_ishsmith_202397",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_jeramigrant_203924",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_robertcovington_203496",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_jahlilokafor_1626143",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_jakarrsampson_203960",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_isaiahcanaan_203477",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_nikstauskas_203917",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_hollisthompson_203138",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_tjmcconnell_204456",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_carllandry_201171",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_kendallmarshall_203088",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_tonywroten_203100",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_eltonbrand_1882",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_richaunholmes_1626158",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_christianwood_1626174",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_furkanaldemir_203128",
+    "rosterRole": "inactive",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_jptokoto_1626160",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_joelembiid_203954",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_philpressey_203515",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_pierrejackson_203510",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phi",
+    "playerId": "nba_2016_scottiewilbekin_203959",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_pjtucker_200782",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_tysonchandler_2199",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_devinbooker_1626164",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_brandonknight_202688",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_alexlen_203458",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_markieffmorris_202693",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_ericbledsoe_202339",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_jonleuer_202720",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_ronnieprice_101179",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_archiegoodwin_203462",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_tjwarren_203933",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_johnjenkins_203098",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_mirzateletovic_203141",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_alanwilliams_1626210",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_brycecotton_203955",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_coryjefferson_203928",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_kylecasey_1626271",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_lorenzobrown_203485",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_sonnyweems_201603",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_phx",
+    "playerId": "nba_2016_terricowhite_202358",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_alfarouqaminu_202329",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_masonplumlee_203486",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_cjmccollum_203468",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_damianlillard_203081",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_noahvonleh_203943",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_mauriceharkless_203090",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_meyersleonard_203086",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_allencrabbe_203459",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_chriskaman_2549",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_cliffalexander_1626146",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_eddavis_202334",
+    "rosterRole": "bench",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_geraldhenderson_201945",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_luismontero_1626242",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_omarijohnson_204179",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_por",
+    "playerId": "nba_2016_patconnaughton_1626192",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_rajonrondo_200765",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_rudygay_200752",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_demarcuscousins_202326",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_benmclemore_203463",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_williecauleystein_1626161",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_quincyacy_203112",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_omricasspi_201956",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_darrencollison_201954",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_jamesanderson_202341",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_kostakoufos_201585",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_sethcurry_203552",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_marcobelinelli_201158",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_caronbutler_2406",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_davidstockton_204065",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_dujedukan_1626251",
+    "rosterRole": "bench",
+    "depthTag": "SG6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_ericmoreland_203961",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_marshallhenderson_1626289",
+    "rosterRole": "inactive",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sac",
+    "playerId": "nba_2016_vincenthunter_1626205",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_dannygreen_201980",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_lamarcusaldridge_200746",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_kawhileonard_202695",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_tonyparker_2225",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_timduncan_1495",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_davidwest_2561",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_kyleanderson_203937",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_raymccallum_203492",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_bobanmarjanovic_1626246",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_borisdiaw_2564",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_pattymills_201988",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_jonathonsimmons_203613",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_mattbonner_2588",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_deshaunthomas_203472",
+    "rosterRole": "inactive",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_keifersykes_1626208",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_manuginobili_1938",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_rasualbutler_2446",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_reggiewilliams_202130",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_sas",
+    "playerId": "nba_2016_youssoundoye_1626304",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_demarderozan_201942",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_kylelowry_200768",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_luisscola_2449",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_jonasvalanciunas_202685",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_jamesjohnson_201949",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_normanpowell_1626181",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_bismackbiyombo_202687",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_demarrecarroll_201960",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_jasonthompson_201574",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_terrenceross_203082",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_coryjoseph_202709",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_brunocaboclo_203998",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_delonwright_1626153",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_lucasnogueira_203512",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_anthonybennett_203461",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_michalekyser_1626252",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_patrickpatterson_202335",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_ronaldrobertsjr_204040",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_tor",
+    "playerId": "nba_2016_shannonscott_1626263",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_gordonhayward_202330",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_rodneyhood_203918",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_rudygobert_203497",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_derrickfavors_202324",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_raulneto_203526",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_treylyles_1626168",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_shelvinmack_202714",
+    "rosterRole": "starter",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_jeffwithey_203481",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_alecburks_202692",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_chrisjohnson_203187",
+    "rosterRole": "bench",
+    "depthTag": "SG5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_joeingles_204060",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_trevorbooker_202344",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_danteexum_203957",
+    "rosterRole": "inactive",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_elijahmillsap_202407",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_erickgreen_203475",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_grantjerrett_203511",
+    "rosterRole": "inactive",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_jjobrien_1626266",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_jackcooley_204022",
+    "rosterRole": "inactive",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_tiborpleiss_202353",
+    "rosterRole": "bench",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_treveongraham_1626203",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_uta",
+    "playerId": "nba_2016_treyburke_203504",
+    "rosterRole": "bench",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_johnwall_202322",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_marcingortat_101162",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_ottoporterjr_203490",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_garretttemple_202066",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_jareddudley_201162",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_bradleybeal_203078",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_krishumphries_2743",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_nene_2403",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_kellyoubrejr_1626162",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_ramonsessions_201196",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_garyneal_202390",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_alananderson_101187",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_dejuanblair_201971",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_drewgooden_2400",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_jaleelroberts_1626294",
+    "rosterRole": "inactive",
+    "depthTag": "SF9",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_jarelleddie_204067",
+    "rosterRole": "bench",
+    "depthTag": "SF10",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_jaronjohnson_204189",
+    "rosterRole": "inactive",
+    "depthTag": "SF11",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_joshharrellson_202725",
+    "rosterRole": "inactive",
+    "depthTag": "SF12",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_martellwebster_101110",
+    "rosterRole": "inactive",
+    "depthTag": "SF13",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  },
+  {
+    "seasonId": "nba_2016_historic",
+    "teamId": "nba_2016_was",
+    "playerId": "nba_2016_touremurry_203315",
+    "rosterRole": "inactive",
+    "depthTag": "SF14",
+    "startDate": "2015-10-27",
+    "endDate": "2016-04-13"
+  }
+]

@@ -246,7 +246,7 @@
   }
   .selector:focus{border-color:rgba(255,193,133,.42);box-shadow:0 0 0 3px rgba(245,163,75,.12)}
   .selector:disabled{opacity:.6;cursor:not-allowed}
-  .mode-buttons{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:12px;max-width:520px}
+  .mode-buttons{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:12px;max-width:760px}
   .mode-btn{
     display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 18px;border-radius:18px;
     border:1px solid rgba(255,255,255,.1);text-decoration:none;cursor:pointer;
@@ -262,6 +262,10 @@
   .mode-btn.secondary{
     background:linear-gradient(180deg,#91cbff,#5aa8ff 42%,#2d84ea 74%,#1768cb 100%);
     color:#081b36;border-color:rgba(191,219,254,.38)
+  }
+  .mode-btn.tertiary{
+    background:linear-gradient(180deg,#f3d58a,#d2a84d 42%,#a56f1f 74%,#825413 100%);
+    color:#221507;border-color:rgba(248,225,161,.42)
   }
   .mode-btn.disabled{pointer-events:none;opacity:.58;filter:saturate(.66)}
   .mode-note{font-size:12px;line-height:1.55;color:#cad7e8}
@@ -440,6 +444,7 @@
                   <div class="mode-buttons">
                     <a href="#" class="mode-btn primary" id="playRealSeasonBtn">Play The Real Season</a>
                     <a href="#" class="mode-btn secondary" id="draftEraBtn">Draft The Era</a>
+                    <a href="#" class="mode-btn tertiary" id="reimaginedSeasonBtn">Reimagined Season</a>
                   </div>
                   <div class="mode-note" id="modeNote">
                     On localhost, team selection is staged before launch so the historical universe opens from the featured path you choose here.
@@ -556,18 +561,21 @@
       seasonLabel: '2015-16 NBA Historic Season',
       shortLabel: '2015-16',
       era: '2010s',
-      availability: 'preview',
-      statusLabel: 'Roadmap',
+      availability: 'playable',
+      statusLabel: 'Playable Now',
       significanceLabel: 'Style Breakthrough',
       significanceTone: 'modern',
-      completenessLabel: 'Archive target',
-      completenessPercent: 8,
+      completenessLabel: 'Playable modern foundation',
+      completenessPercent: 80,
       tagline: 'Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.',
-      summary: 'A future pace-and-space universe built around the Warriors, Cavs, and one of the most recognizable modern NBA seasons.',
+      summary: 'A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.',
       whyItMatters: 'This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.',
       focusTeamName: 'Golden State Warriors',
       plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
-      previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard']
+      previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard'],
+      seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
+      draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
+      reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2016_full_season_v1'
     }
   ];
 
@@ -642,10 +650,14 @@
   }
 
   function buildLaunchUrl(config, mode){
-    const fallback = mode === 'draft'
-      ? 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=' + encodeURIComponent(String(config.packId || ''))
-      : 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=' + encodeURIComponent(String(config.packId || ''));
-    return String(mode === 'draft' ? (config.draftUrl || fallback) : (config.seasonUrl || fallback));
+    const packId=encodeURIComponent(String(config.packId || ''));
+    if(mode === 'draft'){
+      return String(config.draftUrl || ('rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=' + packId));
+    }
+    if(mode === 'reimagined'){
+      return String(config.reimaginedUrl || ('rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=' + packId));
+    }
+    return String(config.seasonUrl || ('rosterbate-season.html?sport=nba&historical=dev&historicalPackId=' + packId));
   }
 
   function renderHealthCards(audit){
@@ -754,7 +766,7 @@
     if(!(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled)) return false;
     await window.rbHistoricalPackDev.ready();
     if(selectedTeamId){
-      await window.rbHistoricalPackDev.setSelectedTeam(selectedTeamId);
+      await window.rbHistoricalPackDev.setSelectedTeam(selectedTeamId, config.packId);
     }
     await window.rbHistoricalPackDev.applyFixtureToLocalState(config.packId, { selectedTeamId: selectedTeamId });
     return true;
@@ -850,11 +862,14 @@
 
     const playBtn = document.getElementById('playRealSeasonBtn');
     const draftBtn = document.getElementById('draftEraBtn');
+    const reimaginedBtn = document.getElementById('reimaginedSeasonBtn');
     const playableHere = config.availability === 'playable' && isLocalHistorical;
     playBtn.classList.toggle('disabled', !playableHere);
     draftBtn.classList.toggle('disabled', !playableHere);
+    reimaginedBtn.classList.toggle('disabled', !playableHere);
     playBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'season') : '#');
     draftBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'draft') : '#');
+    reimaginedBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'reimagined') : '#');
 
     document.getElementById('modeNote').textContent = playableHere
       ? 'On localhost, launching from here stages the selected team before opening the historical season or draft.'
@@ -895,7 +910,7 @@
       try{
         if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
           await window.rbHistoricalPackDev.ready();
-          await window.rbHistoricalPackDev.setSelectedTeam(String(select.value || '').trim());
+          await window.rbHistoricalPackDev.setSelectedTeam(String(select.value || '').trim(), config.packId);
           await window.rbHistoricalPackDev.applyFixtureToLocalState(config.packId, { selectedTeamId: String(select.value || '').trim() });
           window.location.href = buildLaunchUrl(config, 'draft');
           return;
@@ -903,6 +918,32 @@
         window.location.href = buildLaunchUrl(config, 'draft');
       }catch(error){
         setStatus('Could not open Draft The Era: ' + (error && error.message ? error.message : String(error)), 'warn');
+      }
+    };
+
+    reimaginedBtn.onclick = async function(event){
+      event.preventDefault();
+      if(!playableHere){
+        setStatus(config.availability === 'playable'
+          ? 'This pack is playable, but Reimagined Season remains localhost-first for now.'
+          : 'This archive slot is a preview. Reimagined Season will light up once the pack is authored and imported.', 'warn');
+        return;
+      }
+      setStatus('Staging selected team and opening Reimagined Season...', 'good');
+      try{
+        if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
+          await window.rbHistoricalPackDev.ready();
+          await window.rbHistoricalPackDev.setSelectedTeam(String(select.value || '').trim(), config.packId);
+          await window.rbHistoricalPackDev.applyFixtureToLocalState(config.packId, {
+            selectedTeamId: String(select.value || '').trim(),
+            entryMode: 'reimagined_season'
+          });
+          window.location.href = buildLaunchUrl(config, 'reimagined');
+          return;
+        }
+        window.location.href = buildLaunchUrl(config, 'reimagined');
+      }catch(error){
+        setStatus('Could not open Reimagined Season: ' + (error && error.message ? error.message : String(error)), 'warn');
       }
     };
 

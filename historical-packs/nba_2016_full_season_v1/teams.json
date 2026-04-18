@@ -1,0 +1,512 @@
+[
+  {
+    "teamId": "nba_2016_atl",
+    "seasonId": "nba_2016_historic",
+    "city": "Atlanta",
+    "name": "Hawks",
+    "displayName": "Atlanta Hawks",
+    "abbreviation": "ATL",
+    "conference": "East",
+    "division": "Southeast",
+    "palette": {
+      "primary": "#c73b52",
+      "secondary": "#f4dcc1"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ATL"
+    }
+  },
+  {
+    "teamId": "nba_2016_bos",
+    "seasonId": "nba_2016_historic",
+    "city": "Boston",
+    "name": "Celtics",
+    "displayName": "Boston Celtics",
+    "abbreviation": "BOS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#1f7a5b",
+      "secondary": "#efe7d2"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "BOS"
+    }
+  },
+  {
+    "teamId": "nba_2016_brk",
+    "seasonId": "nba_2016_historic",
+    "city": "Brooklyn",
+    "name": "Nets",
+    "displayName": "Brooklyn Nets",
+    "abbreviation": "BKN",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#1f2737",
+      "secondary": "#c8ced8"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "BKN"
+    }
+  },
+  {
+    "teamId": "nba_2016_cha",
+    "seasonId": "nba_2016_historic",
+    "city": "Charlotte",
+    "name": "Hornets",
+    "displayName": "Charlotte Hornets",
+    "abbreviation": "CHA",
+    "conference": "East",
+    "division": "Southeast",
+    "palette": {
+      "primary": "#0d6e7d",
+      "secondary": "#5d4f97"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHA"
+    }
+  },
+  {
+    "teamId": "nba_2016_chi",
+    "seasonId": "nba_2016_historic",
+    "city": "Chicago",
+    "name": "Bulls",
+    "displayName": "Chicago Bulls",
+    "abbreviation": "CHI",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#87232a",
+      "secondary": "#1a1a1a"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHI"
+    }
+  },
+  {
+    "teamId": "nba_2016_cle",
+    "seasonId": "nba_2016_historic",
+    "city": "Cleveland",
+    "name": "Cavaliers",
+    "displayName": "Cleveland Cavaliers",
+    "abbreviation": "CLE",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#7a1f2e",
+      "secondary": "#d4a65f"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CLE"
+    }
+  },
+  {
+    "teamId": "nba_2016_det",
+    "seasonId": "nba_2016_historic",
+    "city": "Detroit",
+    "name": "Pistons",
+    "displayName": "Detroit Pistons",
+    "abbreviation": "DET",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#2769c8",
+      "secondary": "#d54a45"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DET"
+    }
+  },
+  {
+    "teamId": "nba_2016_ind",
+    "seasonId": "nba_2016_historic",
+    "city": "Indiana",
+    "name": "Pacers",
+    "displayName": "Indiana Pacers",
+    "abbreviation": "IND",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#27498b",
+      "secondary": "#efc267"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "IND"
+    }
+  },
+  {
+    "teamId": "nba_2016_mia",
+    "seasonId": "nba_2016_historic",
+    "city": "Miami",
+    "name": "Heat",
+    "displayName": "Miami Heat",
+    "abbreviation": "MIA",
+    "conference": "East",
+    "division": "Southeast",
+    "palette": {
+      "primary": "#99243a",
+      "secondary": "#ffb45c"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIA"
+    }
+  },
+  {
+    "teamId": "nba_2016_mil",
+    "seasonId": "nba_2016_historic",
+    "city": "Milwaukee",
+    "name": "Bucks",
+    "displayName": "Milwaukee Bucks",
+    "abbreviation": "MIL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#1a6a4e",
+      "secondary": "#e2dcc8"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIL"
+    }
+  },
+  {
+    "teamId": "nba_2016_nyk",
+    "seasonId": "nba_2016_historic",
+    "city": "New York",
+    "name": "Knicks",
+    "displayName": "New York Knicks",
+    "abbreviation": "NYK",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#2561ad",
+      "secondary": "#f08c48"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NYK"
+    }
+  },
+  {
+    "teamId": "nba_2016_orl",
+    "seasonId": "nba_2016_historic",
+    "city": "Orlando",
+    "name": "Magic",
+    "displayName": "Orlando Magic",
+    "abbreviation": "ORL",
+    "conference": "East",
+    "division": "Southeast",
+    "palette": {
+      "primary": "#3177d8",
+      "secondary": "#dce6f4"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ORL"
+    }
+  },
+  {
+    "teamId": "nba_2016_phi",
+    "seasonId": "nba_2016_historic",
+    "city": "Philadelphia",
+    "name": "76ers",
+    "displayName": "Philadelphia 76ers",
+    "abbreviation": "PHI",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#2464b6",
+      "secondary": "#d54e45"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHI"
+    }
+  },
+  {
+    "teamId": "nba_2016_tor",
+    "seasonId": "nba_2016_historic",
+    "city": "Toronto",
+    "name": "Raptors",
+    "displayName": "Toronto Raptors",
+    "abbreviation": "TOR",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#7c2e36",
+      "secondary": "#bdb7ae"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "TOR"
+    }
+  },
+  {
+    "teamId": "nba_2016_was",
+    "seasonId": "nba_2016_historic",
+    "city": "Washington",
+    "name": "Wizards",
+    "displayName": "Washington Wizards",
+    "abbreviation": "WAS",
+    "conference": "East",
+    "division": "Southeast",
+    "palette": {
+      "primary": "#29518f",
+      "secondary": "#d44c45"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "WAS"
+    }
+  },
+  {
+    "teamId": "nba_2016_dal",
+    "seasonId": "nba_2016_historic",
+    "city": "Dallas",
+    "name": "Mavericks",
+    "displayName": "Dallas Mavericks",
+    "abbreviation": "DAL",
+    "conference": "West",
+    "division": "Southwest",
+    "palette": {
+      "primary": "#2462b4",
+      "secondary": "#cad7e7"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DAL"
+    }
+  },
+  {
+    "teamId": "nba_2016_den",
+    "seasonId": "nba_2016_historic",
+    "city": "Denver",
+    "name": "Nuggets",
+    "displayName": "Denver Nuggets",
+    "abbreviation": "DEN",
+    "conference": "West",
+    "division": "Northwest",
+    "palette": {
+      "primary": "#2d5a9b",
+      "secondary": "#f0c06c"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DEN"
+    }
+  },
+  {
+    "teamId": "nba_2016_gsw",
+    "seasonId": "nba_2016_historic",
+    "city": "Golden State",
+    "name": "Warriors",
+    "displayName": "Golden State Warriors",
+    "abbreviation": "GSW",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#2e65b8",
+      "secondary": "#efc55c"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "GSW"
+    }
+  },
+  {
+    "teamId": "nba_2016_hou",
+    "seasonId": "nba_2016_historic",
+    "city": "Houston",
+    "name": "Rockets",
+    "displayName": "Houston Rockets",
+    "abbreviation": "HOU",
+    "conference": "West",
+    "division": "Southwest",
+    "palette": {
+      "primary": "#9f2435",
+      "secondary": "#c4c9d1"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "HOU"
+    }
+  },
+  {
+    "teamId": "nba_2016_lac",
+    "seasonId": "nba_2016_historic",
+    "city": "Los Angeles",
+    "name": "Clippers",
+    "displayName": "LA Clippers",
+    "abbreviation": "LAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#2464b6",
+      "secondary": "#d74e48"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAC"
+    }
+  },
+  {
+    "teamId": "nba_2016_lal",
+    "seasonId": "nba_2016_historic",
+    "city": "Los Angeles",
+    "name": "Lakers",
+    "displayName": "Los Angeles Lakers",
+    "abbreviation": "LAL",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5f3293",
+      "secondary": "#f0c461"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAL"
+    }
+  },
+  {
+    "teamId": "nba_2016_mem",
+    "seasonId": "nba_2016_historic",
+    "city": "Memphis",
+    "name": "Grizzlies",
+    "displayName": "Memphis Grizzlies",
+    "abbreviation": "MEM",
+    "conference": "West",
+    "division": "Southwest",
+    "palette": {
+      "primary": "#375f8c",
+      "secondary": "#d8a65d"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MEM"
+    }
+  },
+  {
+    "teamId": "nba_2016_min",
+    "seasonId": "nba_2016_historic",
+    "city": "Minnesota",
+    "name": "Timberwolves",
+    "displayName": "Minnesota Timberwolves",
+    "abbreviation": "MIN",
+    "conference": "West",
+    "division": "Northwest",
+    "palette": {
+      "primary": "#236d4d",
+      "secondary": "#295993"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIN"
+    }
+  },
+  {
+    "teamId": "nba_2016_nop",
+    "seasonId": "nba_2016_historic",
+    "city": "New Orleans",
+    "name": "Pelicans",
+    "displayName": "New Orleans Pelicans",
+    "abbreviation": "NOP",
+    "conference": "West",
+    "division": "Southwest",
+    "palette": {
+      "primary": "#1b3568",
+      "secondary": "#d3a962"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NOP"
+    }
+  },
+  {
+    "teamId": "nba_2016_okc",
+    "seasonId": "nba_2016_historic",
+    "city": "Oklahoma City",
+    "name": "Thunder",
+    "displayName": "Oklahoma City Thunder",
+    "abbreviation": "OKC",
+    "conference": "West",
+    "division": "Northwest",
+    "palette": {
+      "primary": "#2469c2",
+      "secondary": "#f08d49"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "OKC"
+    }
+  },
+  {
+    "teamId": "nba_2016_phx",
+    "seasonId": "nba_2016_historic",
+    "city": "Phoenix",
+    "name": "Suns",
+    "displayName": "Phoenix Suns",
+    "abbreviation": "PHX",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5b2d87",
+      "secondary": "#ef9743"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHX"
+    }
+  },
+  {
+    "teamId": "nba_2016_por",
+    "seasonId": "nba_2016_historic",
+    "city": "Portland",
+    "name": "Trail Blazers",
+    "displayName": "Portland Trail Blazers",
+    "abbreviation": "POR",
+    "conference": "West",
+    "division": "Northwest",
+    "palette": {
+      "primary": "#992a31",
+      "secondary": "#1b1b1b"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "POR"
+    }
+  },
+  {
+    "teamId": "nba_2016_sac",
+    "seasonId": "nba_2016_historic",
+    "city": "Sacramento",
+    "name": "Kings",
+    "displayName": "Sacramento Kings",
+    "abbreviation": "SAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5f4091",
+      "secondary": "#d7d0c3"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAC"
+    }
+  },
+  {
+    "teamId": "nba_2016_sas",
+    "seasonId": "nba_2016_historic",
+    "city": "San Antonio",
+    "name": "Spurs",
+    "displayName": "San Antonio Spurs",
+    "abbreviation": "SAS",
+    "conference": "West",
+    "division": "Southwest",
+    "palette": {
+      "primary": "#222831",
+      "secondary": "#c9ced6"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAS"
+    }
+  },
+  {
+    "teamId": "nba_2016_uta",
+    "seasonId": "nba_2016_historic",
+    "city": "Utah",
+    "name": "Jazz",
+    "displayName": "Utah Jazz",
+    "abbreviation": "UTA",
+    "conference": "West",
+    "division": "Northwest",
+    "palette": {
+      "primary": "#1c6f5e",
+      "secondary": "#f2c96b"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "UTA"
+    }
+  }
+]

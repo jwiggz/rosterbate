@@ -1,0 +1,19 @@
+{
+  "seasonId": "nba_2016_historic",
+  "sport": "nba",
+  "league": "nba",
+  "label": "2015-16 NBA Historic Season",
+  "startDate": "2015-10-27",
+  "endDate": "2016-04-13",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "eraTags": [
+    "2010s",
+    "Pace and Space",
+    "Historic Season"
+  ],
+  "notes": [
+    "Full-league historical foundation pack for 2015-16.",
+    "Supports real-season boots, Draft The Era, and Reimagined Season."
+  ]
+}

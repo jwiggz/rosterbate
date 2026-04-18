@@ -7,7 +7,7 @@
   const ALLOWED_SEASON_TYPES=['historical_pack'];
   const ALLOWED_STATUS=['concept','draft','review','ready','deprecated'];
   const ALLOWED_SOURCE_PROFILES=['historical_curated','historical_internal','historical_partnered'];
-  const ALLOWED_SUPPORTED_MODES=['real_season','historical_draft','single_player_season'];
+  const ALLOWED_SUPPORTED_MODES=['real_season','historical_draft','single_player_season','reimagined_season'];
   const ALLOWED_DRAFT_MODES=['snake','auction'];
   const REQUIRED_CONTENT_FILE_KEYS=['season','teams','players','rosterSnapshots','schedule','games','playerGameStats'];
   const OPTIONAL_CONTENT_FILE_KEYS=['packChallenges','presentation','summaries'];

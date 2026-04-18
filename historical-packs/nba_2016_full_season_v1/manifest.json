@@ -1,0 +1,84 @@
+{
+  "packId": "nba_2016_full_season_v1",
+  "schemaVersion": 1,
+  "canonicalModelVersion": 1,
+  "sport": "nba",
+  "league": "nba",
+  "seasonId": "nba_2016_historic",
+  "seasonLabel": "2015-16 NBA Historic Season",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "era": "2010s",
+  "version": 1,
+  "status": "concept",
+  "sourceProfile": "historical_curated",
+  "supportedModes": [
+    "real_season",
+    "historical_draft",
+    "single_player_season",
+    "reimagined_season"
+  ],
+  "defaultEntryMode": "real_season",
+  "focusTeamId": "nba_2016_gsw",
+  "subtitle": "Play the real season, redraft the era, or branch into a reimagined universe.",
+  "description": "A 2015-16 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
+  "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
+  "eraTags": [
+    "2010s",
+    "Warriors Era",
+    "Historic Season"
+  ],
+  "packTags": [
+    "historical-full-league-foundation",
+    "single-player",
+    "historical-draft",
+    "reimagined-season",
+    "featured-pack"
+  ],
+  "playerPoolType": "full_season_player_pool",
+  "draftModes": [
+    "snake",
+    "auction"
+  ],
+  "challengeProfile": "featured_team_plus_open_draft",
+  "contentFiles": {
+    "season": "season.json",
+    "teams": "teams.json",
+    "players": "players.json",
+    "rosterSnapshots": "roster_snapshots.json",
+    "schedule": "schedule.json",
+    "games": "games.json",
+    "playerGameStats": "player_game_stats.json",
+    "packChallenges": "optional/pack_challenges.json",
+    "presentation": "optional/presentation.json",
+    "summaries": "optional/summaries.json"
+  },
+  "provenance": {
+    "sourceProfile": "historical_curated",
+    "curationOwner": "RosterBate",
+    "reviewStatus": "draft",
+    "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from real game details and the full regular-season schedule/results."
+  },
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 476,
+      "playerCount": 596,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 120,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "notes": [
+    "Player ranking is driven by real 2015-16 season production aggregated from real game-detail rows.",
+    "Schedule and game results span the full 2015-16 regular season.",
+    "Reimagined Season uses the same real historical player pool and pack health metadata."
+  ],
+  "createdAt": "2026-04-18T17:09:30.390Z",
+  "updatedAt": "2026-04-18T17:09:30.390Z"
+}

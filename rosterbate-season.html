@@ -25,10 +25,10 @@ try{
     const host=String(window.location.hostname||'').trim().toLowerCase();
     historicalPending=(host==='localhost' || host==='127.0.0.1') && !!window.localStorage.getItem('rbHistoricalPackDevPendingSeasonBoot');
   }catch(e){}
-  if(requestedLeague && requestedLeague!=='demo'){
-    document.documentElement.dataset.seasonRoute='league';
-  }else if(requestedHistorical==='dev' || historicalPending){
+  if(requestedHistorical==='dev' || requestedHistorical==='reimagined' || historicalPending){
     document.documentElement.dataset.seasonRoute='historical';
+  }else if(requestedLeague && requestedLeague!=='demo'){
+    document.documentElement.dataset.seasonRoute='league';
   }
 }catch(e){}
 </script>
@@ -2069,11 +2069,15 @@ function getHistoricalPackDevState(){
   }
 }
 
+function getRequestedHistoricalPackId(params){
+  return String(params?.get('historicalPackId')||'').trim();
+}
+
 function shouldBootHistoricalDevSeason(leagueId, requestedSport, params){
   if(!isHistoricalDevHost()) return false;
   const requestedLeague=String(leagueId||'').trim();
   const requestedHistorical=String(params?.get('historical')||'').trim().toLowerCase();
-  if(requestedHistorical==='dev' || requestedHistorical==='1' || requestedHistorical==='true') return true;
+  if(requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='1' || requestedHistorical==='true') return true;
   const pending=getHistoricalPackDevPendingBoot();
   const pendingState=getHistoricalPackDevState();
   if(!pendingState) return false;
@@ -2093,13 +2097,68 @@ function shouldBootHistoricalDevSeason(leagueId, requestedSport, params){
 
 async function resolveHistoricalDevBootState(requestedSport, params){
   const requestedHistorical=String(params?.get('historical')||'').trim().toLowerCase();
+  const requestedPackId=getRequestedHistoricalPackId(params);
   const stagedState=getHistoricalPackDevState();
   if(stagedState){
+    const stagedPackId=String(stagedState?.packId || stagedState?.importPlan?.metadata?.packId || '').trim();
+    if(!requestedPackId || requestedPackId===stagedPackId){
     console.log('🕰️ Found staged historical pack state in localStorage.');
     return stagedState;
+    }
   }
-  if(requestedHistorical!=='dev' && requestedHistorical!=='1' && requestedHistorical!=='true'){
+  if(requestedHistorical!=='dev' && requestedHistorical!=='reimagined' && requestedHistorical!=='1' && requestedHistorical!=='true'){
     return null;
+  }
+  if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadPackById==='function'){
+    try{
+      const directBundle=requestedPackId
+        ? await window.RosterBateHistoricalPackLoader.loadPackById(requestedPackId)
+        : (typeof window.RosterBateHistoricalPackLoader.loadDefaultPack==='function'
+          ? await window.RosterBateHistoricalPackLoader.loadDefaultPack()
+          : null);
+      if(directBundle?.manifest?.packId){
+        console.log('🕰️ Built historical pack state directly from the pack loader.', {
+          packId: directBundle.manifest.packId
+        });
+        return {
+          schemaVersion: 1,
+          savedAt: new Date().toISOString(),
+          source: 'historical-pack-loader',
+          packId: directBundle.manifest.packId,
+          seasonId: directBundle.manifest.seasonId || directBundle.season?.seasonId || null,
+          selectedTeamId: String(
+            stagedState?.selectedTeamId ||
+            stagedState?.pendingBoot?.selectedTeamId ||
+            directBundle.presentation?.featuredTeamId ||
+            directBundle.manifest?.focusTeamId ||
+            ''
+          ).trim() || null,
+          pendingBoot: getHistoricalPackDevPendingBoot(),
+          importPlan: {
+            metadata: {
+              packId: directBundle.manifest.packId,
+              seasonId: directBundle.manifest.seasonId || directBundle.season?.seasonId || null
+            },
+            canonical: {
+              seasons: directBundle.season ? [directBundle.season] : [],
+              teams: directBundle.teams || [],
+              players: directBundle.players || [],
+              rosterSnapshots: directBundle.rosterSnapshots || [],
+              schedule: directBundle.schedule || [],
+              games: directBundle.games || [],
+              playerGameStats: directBundle.playerGameStats || []
+            },
+            authored: {
+              packChallenges: directBundle.packChallenges || null,
+              presentation: directBundle.presentation || null,
+              summaries: directBundle.summaries || null
+            }
+          }
+        };
+      }
+    }catch(e){
+      console.warn('Historical pack-loader bootstrap failed:', e);
+    }
   }
   if(!window.rbHistoricalPackDev || typeof window.rbHistoricalPackDev.ready!=='function'){
     console.warn('Historical dev URL requested, but the dev runner API is unavailable.');
@@ -2107,7 +2166,7 @@ async function resolveHistoricalDevBootState(requestedSport, params){
   }
   try{
     await window.rbHistoricalPackDev.ready();
-    const directImport=await window.rbHistoricalPackDev.importFixture('nba_1996_full_season_v1');
+    const directImport=await window.rbHistoricalPackDev.importFixture(requestedPackId || 'nba_1996_full_season_v1');
     if(directImport?.importPlan?.canonical){
       console.log('🕰️ Built historical pack state directly from the dev fixture.');
       return directImport;
@@ -2246,7 +2305,37 @@ function applyHistoricalSeasonAvailabilityAdjustment(fp, gp){
   return roundHistoricalStat(baseFp * factor);
 }
 
-function buildHistoricalSeasonLaunchData(devState, requestedSport){
+function buildHistoricalSnakeDistributedRosters(playerPool, teamCount, startingTeamIndex){
+  const teams=Math.max(0, Number(teamCount||0));
+  const rosters=Array.from({length:teams},()=>[]);
+  if(!teams || !Array.isArray(playerPool) || !playerPool.length) return rosters;
+  const normalizedStart=((Number(startingTeamIndex)||0)%teams+teams)%teams;
+  const draftOrder=Array.from({length:teams},(_,index)=>(normalizedStart+index)%teams);
+  const sortedPool=playerPool
+    .map(player=>({...player}))
+    .sort((a,b)=>{
+      const fpDelta=Number(b?.fp||0)-Number(a?.fp||0);
+      if(Math.abs(fpDelta)>0.0001) return fpDelta;
+      const tfpDelta=Number(b?.totalFantasyPoints||0)-Number(a?.totalFantasyPoints||0);
+      if(Math.abs(tfpDelta)>0.0001) return tfpDelta;
+      return String(a?.name||'').localeCompare(String(b?.name||''));
+    });
+  sortedPool.forEach((player, pickIndex)=>{
+    const round=Math.floor(pickIndex / teams);
+    const slotIndex=pickIndex % teams;
+    const roundOrder=(round % 2===0) ? draftOrder : draftOrder.slice().reverse();
+    const teamIdx=roundOrder[slotIndex];
+    if(Number.isInteger(teamIdx) && rosters[teamIdx]){
+      rosters[teamIdx].push(player);
+    }
+  });
+  rosters.forEach(roster=>{
+    roster.sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0));
+  });
+  return rosters;
+}
+
+function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
   const importPlan=devState?.importPlan;
   const canonical=importPlan?.canonical;
   const authored=importPlan?.authored || {};
@@ -2379,11 +2468,6 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
     roster.sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0));
   });
 
-  const rosteredIds=new Set(allRosters.flat().map(player=>Number(player?.id)));
-  const freeAgents=historicalPlayerPool
-    .filter(player=>!rosteredIds.has(Number(player.id)))
-    .map(player=>({...player}));
-
   const selectedTeamId=String(
     devState?.selectedTeamId ||
     devState?.pendingBoot?.selectedTeamId ||
@@ -2394,9 +2478,19 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
   ).trim();
   const selectedTeamIndex=teams.findIndex(team=>String(team?.teamId||'').trim()===selectedTeamId);
   const myPos=Math.max(0, selectedTeamIndex);
-  const leagueName=season.label || authored?.presentation?.heroTitle || 'Historical NBA Season';
+  const historicalMode=String(entryMode || devState?.pendingBoot?.entryMode || 'real_season').trim().toLowerCase();
+  const isReimaginedSeason=historicalMode==='reimagined_season' || historicalMode==='reimagined';
+  const leagueNameBase=season.label || authored?.presentation?.heroTitle || 'Historical NBA Season';
+  const leagueName=isReimaginedSeason ? (leagueNameBase + ' Reimagined Season') : leagueNameBase;
   const teamNames=teams.map(team=>team.displayName || [team.city, team.name].filter(Boolean).join(' ') || 'Historical Team');
   const activeTeam=teams[myPos] || teams[0] || null;
+  const effectiveRosters=isReimaginedSeason
+    ? buildHistoricalSnakeDistributedRosters(historicalPlayerPool, teams.length, myPos)
+    : allRosters;
+  const rosteredIds=new Set(effectiveRosters.flat().map(player=>Number(player?.id)));
+  const freeAgents=historicalPlayerPool
+    .filter(player=>!rosteredIds.has(Number(player.id)))
+    .map(player=>({...player}));
 
   return {
     sport: seasonSport,
@@ -2405,12 +2499,12 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
     leagueName: leagueName,
     teamName: teamNames[myPos] || 'Historical Team',
     teams: teamNames,
-    allRosters: allRosters,
+    allRosters: effectiveRosters,
     leagueSize: teamNames.length,
     myPos: myPos,
     commissionerTeamIdx: myPos,
     multiplayer: false,
-    draftFormat: 'historical_real_season',
+    draftFormat: isReimaginedSeason ? 'historical_reimagined' : 'historical_real_season',
     scoringFormat: 'h2h_pts',
     currentWeek: 1,
     currentDay: 1,
@@ -2420,7 +2514,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport){
     playerPoolSource: 'historical_pack',
     historicalPackId: importPlan?.metadata?.packId || null,
     historicalSeasonId: season.seasonId || null,
-    historicalEntryMode: 'real_season',
+    historicalEntryMode: isReimaginedSeason ? 'reimagined_season' : 'real_season',
     historicalSelectedTeamId: activeTeam?.teamId || null,
     historicalPlayerPool: historicalPlayerPool.map(player=>({...player})),
     freeAgents: freeAgents,
@@ -5251,12 +5345,14 @@ window.onload=async function(){
   if (shouldBootHistoricalDevSeason(leagueId, requestedSport, urlParams)) {
     try {
       const historicalDevState = await resolveHistoricalDevBootState(requestedSport, urlParams);
-      const historicalLaunchData = buildHistoricalSeasonLaunchData(historicalDevState, requestedSport);
+      const historicalMode = String(urlParams.get('historical') || historicalDevState?.pendingBoot?.entryMode || 'dev').trim().toLowerCase();
+      const historicalLaunchData = buildHistoricalSeasonLaunchData(historicalDevState, requestedSport, historicalMode);
       if (historicalLaunchData) {
         console.log('🕰️ Booting localhost historical pack into Season Manager...', {
           packId: historicalLaunchData.historicalPackId,
           seasonId: historicalLaunchData.seasonId,
-          leagueSize: Number(historicalLaunchData.leagueSize || 0)
+          leagueSize: Number(historicalLaunchData.leagueSize || 0),
+          entryMode: historicalLaunchData.historicalEntryMode
         });
         hideSeasonEmptyState();
         D = historicalLaunchData;

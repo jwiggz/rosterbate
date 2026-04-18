@@ -1,0 +1,64 @@
+{
+  "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with real full-season player production, the full schedule/results grid, and a player pool built for real-season play, Draft The Era, and Reimagined Season.",
+  "featuredStorylines": [
+    "Seventy-three wins and unanimous-MVP gravity reshape the fantasy board.",
+    "LeBron, Steph, Kawhi, KD, Russ, and Harden collide in one modern historic pool.",
+    "The archive gains a modern tentpole with spacing, shot volume, and roster construction that feel different from the 1990s packs."
+  ],
+  "teamSpotlights": [
+    {
+      "teamId": "nba_2016_gsw",
+      "summary": "Golden State is the flagship modern path, built around Curry, motion offense, and the most famous regular season of the decade."
+    },
+    {
+      "teamId": "nba_2016_cle",
+      "summary": "Cleveland anchors the LeBron path and the team most associated with the 3-1 Finals comeback."
+    },
+    {
+      "teamId": "nba_2016_sas",
+      "summary": "San Antonio offers a disciplined contender route behind peak Kawhi and a deep veteran core."
+    },
+    {
+      "teamId": "nba_2016_okc",
+      "summary": "Oklahoma City gives the pack an elite superstar tandem universe with Durant and Westbrook."
+    },
+    {
+      "teamId": "nba_2016_tor",
+      "summary": "Toronto adds a strong East contender lane with Lowry and DeRozan leading the way."
+    }
+  ],
+  "modeSummaries": [
+    {
+      "mode": "real_season",
+      "summary": "Keep the 2015-16 season intact and see whether you can match or surpass the era-defining outcomes."
+    },
+    {
+      "mode": "historical_draft",
+      "summary": "Remix the full-league 2015-16 player universe and discover what the season becomes with custom rosters."
+    },
+    {
+      "mode": "reimagined_season",
+      "summary": "Launch a fully reshuffled version of 2015-16 and treat the season like an alternate-history branch from day one."
+    }
+  ],
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 476,
+      "playerCount": 596,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 120,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "auditNotes": [
+    "Real season stats cover every included player in the pack.",
+    "Schedule and results span the full regular season using real historical game records.",
+    "No synthetic player stat generation is used in this pack path."
+  ]
+}

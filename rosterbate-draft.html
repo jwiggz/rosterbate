@@ -3504,6 +3504,15 @@ function getHistoricalDraftQueryMode(){
   }
 }
 
+function getHistoricalDraftRequestedPackId(){
+  try{
+    const params=new URLSearchParams(window.location.search||'');
+    return String(params.get('historicalPackId')||'').trim();
+  }catch(e){
+    return '';
+  }
+}
+
 function shouldBootHistoricalDraft(){
   return isHistoricalDraftLocalhost() && getHistoricalDraftQueryMode()==='dev';
 }
@@ -3881,7 +3890,7 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
     lobbySubLabel: seasonLabel + ' Historical Pool',
     lobbyPillText: 'Draft The Era | ' + teams.length + ' Teams | ' + playerPool.length + ' Players' + (selectedTeamLabel ? ' | Featured: ' + selectedTeamLabel : ''),
     entryButtonLabel: 'Enter Draft The Era',
-    leagueNamePlaceholder: 'e.g. 1995-96 Dream Draft',
+    leagueNamePlaceholder: 'e.g. ' + seasonLabel + ' Dream Draft',
     teamNamePlaceholder: 'e.g. Era Legends',
     packSummary: packSummary,
     presentation: cloneDraftJsonSafe(authored?.presentation || null),
@@ -3897,8 +3906,14 @@ async function resolveHistoricalDraftContext(requestedSport){
   if(!shouldBootHistoricalDraft()) return null;
   const requestedSportKey=normalizeRosterbateSport(requestedSport || SPORT || 'nba');
   const localState=readHistoricalDraftLocalState();
-  if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadDefaultPack==='function'){
-    const bundle=await window.RosterBateHistoricalPackLoader.loadDefaultPack();
+  const requestedPackId=String(getHistoricalDraftRequestedPackId() || localState?.packId || '').trim();
+  if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadPackById==='function'){
+    const bundle=requestedPackId
+      ? await window.RosterBateHistoricalPackLoader.loadPackById(requestedPackId)
+      : (typeof window.RosterBateHistoricalPackLoader.loadDefaultPack==='function'
+        ? await window.RosterBateHistoricalPackLoader.loadDefaultPack()
+        : null);
+    if(bundle){
     return buildHistoricalDraftContextFromSource({
       packId: bundle?.manifest?.packId || null,
       selectedTeamId: localState?.selectedTeamId || null,
@@ -3918,6 +3933,7 @@ async function resolveHistoricalDraftContext(requestedSport){
       },
       manifest:bundle?.manifest || null
     }, requestedSportKey);
+    }
   }
   if(localState?.importPlan?.canonical?.seasons?.length){
     const importPlan=localState.importPlan;
@@ -4225,7 +4241,7 @@ function applySportToDraftUI(){
   const leaguePlaceholders=getLeagueNamePlaceholders();
   document.getElementById('iLeagueName').placeholder = historicalContext?.leagueNamePlaceholder || leaguePlaceholders[SPORT] || leaguePlaceholders.nba;
   if(historicalContext && !document.getElementById('iLeagueName').value.trim()){
-    document.getElementById('iLeagueName').value='1995-96 Draft The Era';
+    document.getElementById('iLeagueName').value=(historicalContext.seasonLabel || 'Historic Season') + ' Draft The Era';
   }
   document.getElementById('iSize').value = SPORT_CFG.defaultLeagueSize;
   document.getElementById('iSpot').value = 1;
@@ -5286,6 +5302,10 @@ function userPick(p){
   if(!S.started){ showToast('⏰ Draft hasn\'t started yet'); return; }
   if(PS.isPaused){ showToast('⏸ Draft is paused'); return; }
   if(S.drafted.has(p.id)||S.order[S.cur]!==S.myPos)return;
+  if(S.fmt==='auction'){
+    startAuctionNomination(p);
+    return;
+  }
   const pickNumber=S.cur+1;
   clearAutoDraftTurn();
   clearInterval(S.timerInt);

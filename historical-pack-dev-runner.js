@@ -23,6 +23,7 @@
   const LOCAL_STATE_KEY='rbHistoricalPackDevLocalState';
   const PENDING_BOOT_KEY='rbHistoricalPackDevPendingSeasonBoot';
   const TEAM_SELECTION_KEY='rbHistoricalPackDevSelectedTeamId';
+  const PACK_SELECTION_KEY='rbHistoricalPackDevSelectedPackId';
   const TEAM_SELECT_ID=PANEL_ROOT_ID+'_teamSelect';
   const FIXTURE_META_ID=PANEL_ROOT_ID+'_fixtureMeta';
   const HEALTH_PANEL_ID=PANEL_ROOT_ID+'_health';
@@ -328,22 +329,60 @@
     return isBrowser && typeof global.localStorage!=='undefined';
   }
 
-  function getPersistedSelectedTeamId(){
+  function getPersistedSelectedPackId(){
     if(!localStorageAvailable()) return '';
-    return String(global.localStorage.getItem(TEAM_SELECTION_KEY) || '').trim();
+    return String(global.localStorage.getItem(PACK_SELECTION_KEY) || '').trim();
   }
 
-  function persistSelectedTeamId(teamId){
+  function persistSelectedPackId(packId){
     if(!localStorageAvailable()) return '';
-    const normalized=String(teamId || '').trim();
-    if(normalized) global.localStorage.setItem(TEAM_SELECTION_KEY, normalized);
-    else global.localStorage.removeItem(TEAM_SELECTION_KEY);
+    const normalized=String(packId || '').trim();
+    if(normalized) global.localStorage.setItem(PACK_SELECTION_KEY, normalized);
+    else global.localStorage.removeItem(PACK_SELECTION_KEY);
     return normalized;
   }
 
-  function getPanelSelectedTeamId(){
+  function getCurrentPackId(packId){
+    return String(packId || getPersistedSelectedPackId() || DEFAULT_FIXTURE_ID).trim();
+  }
+
+  function getPersistedSelectedTeamId(packId){
+    if(!localStorageAvailable()) return '';
+    const targetPackId=getCurrentPackId(packId);
+    const raw=global.localStorage.getItem(TEAM_SELECTION_KEY);
+    if(!raw) return '';
+    try{
+      const parsed=JSON.parse(raw);
+      if(parsed && typeof parsed==='object' && !Array.isArray(parsed)){
+        return String(parsed[targetPackId] || '').trim();
+      }
+    }catch(e){}
+    return String(raw || '').trim();
+  }
+
+  function persistSelectedTeamId(teamId, packId){
+    if(!localStorageAvailable()) return '';
+    const normalized=String(teamId || '').trim();
+    const targetPackId=getCurrentPackId(packId);
+    let nextMap={};
+    const raw=global.localStorage.getItem(TEAM_SELECTION_KEY);
+    if(raw){
+      try{
+        const parsed=JSON.parse(raw);
+        if(parsed && typeof parsed==='object' && !Array.isArray(parsed)){
+          nextMap=Object.assign({}, parsed);
+        }
+      }catch(e){}
+    }
+    if(normalized) nextMap[targetPackId]=normalized;
+    else delete nextMap[targetPackId];
+    global.localStorage.setItem(TEAM_SELECTION_KEY, JSON.stringify(nextMap));
+    return normalized;
+  }
+
+  function getPanelSelectedTeamId(packId){
     const select=panelNode(TEAM_SELECT_ID);
-    return String((select && select.value) || getPersistedSelectedTeamId() || '').trim();
+    return String((select && select.value) || getPersistedSelectedTeamId(packId) || '').trim();
   }
 
   function getSelectedTeamLabel(){
@@ -357,6 +396,7 @@
     const importPlan=importResult && importResult.importPlan ? importResult.importPlan : null;
     const summary=importPlan && importPlan.summary ? importPlan.summary : null;
     const selectedTeamId=String(options && options.selectedTeamId || '').trim();
+    const entryMode=String(options && options.entryMode || 'real_season').trim() || 'real_season';
     return {
       schemaVersion: 1,
       savedAt: new Date().toISOString(),
@@ -364,6 +404,7 @@
       packId: importPlan && importPlan.metadata ? importPlan.metadata.packId : null,
       seasonId: importPlan && importPlan.metadata ? importPlan.metadata.seasonId : null,
       selectedTeamId: selectedTeamId || null,
+      entryMode: entryMode,
       validationStatus: importResult && importResult.validation ? importResult.validation.status : null,
       summary: summary,
       importPlan: importPlan
@@ -375,12 +416,14 @@
       throw new Error('local_storage_unavailable');
     }
     const payload=buildLocalStatePayload(importResult, options);
-    const selectedTeamId=persistSelectedTeamId(payload.selectedTeamId);
+    const packId=persistSelectedPackId(payload.packId);
+    const selectedTeamId=persistSelectedTeamId(payload.selectedTeamId, packId);
     global.localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(payload));
     global.localStorage.setItem(PENDING_BOOT_KEY, JSON.stringify({
-      packId: payload.packId,
+      packId: packId || payload.packId,
       seasonId: payload.seasonId,
       selectedTeamId: selectedTeamId || null,
+      entryMode: payload.entryMode,
       savedAt: payload.savedAt,
       source: payload.source
     }));
@@ -388,9 +431,10 @@
       key: LOCAL_STATE_KEY,
       pendingBootKey: PENDING_BOOT_KEY,
       savedAt: payload.savedAt,
-      packId: payload.packId,
+      packId: packId || payload.packId,
       seasonId: payload.seasonId,
       selectedTeamId: selectedTeamId || null,
+      entryMode: payload.entryMode,
       summary: payload.summary
     };
   }
@@ -418,8 +462,15 @@
     return true;
   }
 
-  function buildHistoricalDraftUrl(){
-    return 'rosterbate-draft.html?sport=nba&historical=dev';
+  function buildHistoricalDraftUrl(packId){
+    const id=getCurrentPackId(packId);
+    return 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId='+encodeURIComponent(id);
+  }
+
+  function buildHistoricalSeasonUrl(packId, historicalMode){
+    const id=getCurrentPackId(packId);
+    const mode=String(historicalMode || 'dev').trim() || 'dev';
+    return 'rosterbate-season.html?sport=nba&historical='+encodeURIComponent(mode)+'&historicalPackId='+encodeURIComponent(id);
   }
 
   function buildTeamOptionMarkup(team){
@@ -428,26 +479,28 @@
     return '<option value="'+String(team.teamId)+'">'+label+(abbr ? ' ('+abbr+')' : '')+'</option>';
   }
 
-  async function syncPanelFixtureContext(){
+  async function syncPanelFixtureContext(packId){
     if(!enabled || !panelReady) return null;
     try{
-      const fixture=await loadBundleForPack(DEFAULT_FIXTURE_ID);
+      const currentPackId=getCurrentPackId(packId);
+      const fixture=await loadBundleForPack(currentPackId);
       if(!fixture) return null;
       const teams=Array.isArray(fixture.teams) ? fixture.teams.slice() : [];
       const players=Array.isArray(fixture.players) ? fixture.players : [];
       const select=panelNode(TEAM_SELECT_ID);
       const fixtureMeta=panelNode(FIXTURE_META_ID);
       const fallback=String((fixture.presentation && fixture.presentation.featuredTeamId) || (teams[0] && teams[0].teamId) || '').trim();
-      const preferred=String(getPersistedSelectedTeamId() || fallback).trim();
+      const preferred=String(getPersistedSelectedTeamId(currentPackId) || fallback).trim();
       if(select){
         select.innerHTML=teams.map(buildTeamOptionMarkup).join('');
         const selectedExists=teams.some(function(team){ return String(team.teamId)===preferred; });
         select.value=selectedExists ? preferred : String((teams[0] && teams[0].teamId) || '');
-        persistSelectedTeamId(select.value);
+        persistSelectedTeamId(select.value, currentPackId);
       }
       if(fixtureMeta){
-        fixtureMeta.textContent='Fixture: '+DEFAULT_FIXTURE_ID+' • '+teams.length+' teams • '+players.length+' players';
+        fixtureMeta.textContent='Pack: '+currentPackId+' • '+teams.length+' teams • '+players.length+' players';
       }
+      persistSelectedPackId(currentPackId);
       renderPackAuditSummary(fixture);
       return fixture;
     }catch(error){
@@ -468,39 +521,46 @@
         return;
       }
       if(action==='fixture'){
-        const fixture=await api.getFixture(DEFAULT_FIXTURE_ID);
+        const currentPackId=getCurrentPackId();
+        const fixture=await api.getFixture(currentPackId);
         const playerCount=fixture && Array.isArray(fixture.players) ? fixture.players.length : 0;
         const teamCount=fixture && Array.isArray(fixture.teams) ? fixture.teams.length : 0;
-        setPanelStatus('<strong>Fixture loaded</strong><br>'+DEFAULT_FIXTURE_ID+'<br>'+teamCount+' teams • '+playerCount+' players','success');
+        setPanelStatus('<strong>Pack loaded</strong><br>'+currentPackId+'<br>'+teamCount+' teams • '+playerCount+' players','success');
         if(global.console && typeof global.console.log==='function') global.console.log('[RosterBate dev] Historical fixture', fixture);
         return;
       }
       if(action==='validate'){
-        const result=await api.validateFixture(DEFAULT_FIXTURE_ID);
+        const result=await api.validateFixture(getCurrentPackId());
         setPanelStatus(formatResultSummary({status:'validated', validation:result}), result.status==='validation_failed' ? 'error' : (result.warnings && result.warnings.length ? 'warn' : 'success'));
         if(global.console && typeof global.console.log==='function') global.console.log('[RosterBate dev] Validation report', result);
         return;
       }
       if(action==='import'){
-        const result=await api.importFixture(DEFAULT_FIXTURE_ID);
+        const result=await api.importFixture(getCurrentPackId());
         setPanelStatus(formatResultSummary(result), result.status==='dry_run_ready' ? 'success' : (String(result.status||'').includes('failed') ? 'error' : 'warn'));
         if(global.console && typeof global.console.log==='function') global.console.log('[RosterBate dev] Import result', result);
         return;
       }
       if(action==='apply'){
-        const selectedTeamId=getPanelSelectedTeamId();
+        const currentPackId=getCurrentPackId();
+        const selectedTeamId=getPanelSelectedTeamId(currentPackId);
         const selectedTeamLabel=getSelectedTeamLabel();
-        const result=await api.applyFixtureToLocalState(DEFAULT_FIXTURE_ID, {selectedTeamId:selectedTeamId});
+        const result=await api.applyFixtureToLocalState(currentPackId, {selectedTeamId:selectedTeamId});
         const writerResult=result && result.writerResult ? result.writerResult : null;
         const savedSummary=writerResult && writerResult.summary ? writerResult.summary : null;
         const savedBits=[
-          writerResult && writerResult.packId ? writerResult.packId : DEFAULT_FIXTURE_ID,
+          writerResult && writerResult.packId ? writerResult.packId : currentPackId,
           savedSummary && savedSummary.teamCount!=null ? savedSummary.teamCount+' teams' : '',
           savedSummary && savedSummary.playerCount!=null ? savedSummary.playerCount+' players' : '',
           selectedTeamLabel ? ('Team: '+selectedTeamLabel) : ''
         ].filter(Boolean);
         setPanelStatus('<strong>Applied To Local State</strong><br>'+savedBits.join(' • ')+'<br>Saved under <code>'+LOCAL_STATE_KEY+'</code> and staged for the next season boot.', result.status==='import_applied' ? 'success' : 'warn');
         if(global.console && typeof global.console.log==='function') global.console.log('[RosterBate dev] Applied import result', result);
+        return;
+      }
+      if(action==='season'){
+        const result=await api.openHistoricalSeason();
+        setPanelStatus('<strong>Opening Historical Season</strong><br>'+result.url, 'success');
         return;
       }
       if(action==='draft'){
@@ -527,8 +587,8 @@
           '<span class="rbh-toggle-meta" data-role="toggle-meta">Open</span>'+
         '</button>'+
         '<div class="rbh-body">'+
-          '<div class="rbh-title"><div><strong>Pack Dev</strong><span>Localhost-only runner for the `1995-96` historical fixture.</span></div></div>'+
-          '<div class="rbh-status" id="'+PANEL_ROOT_ID+'_status" data-tone="neutral"><strong>Idle</strong><br>Use Validate or Dry Import to test the sample pack.</div>'+
+          '<div class="rbh-title"><div><strong>Pack Dev</strong><span>Localhost-only runner for real historical packs and archive flows.</span></div></div>'+
+          '<div class="rbh-status" id="'+PANEL_ROOT_ID+'_status" data-tone="neutral"><strong>Idle</strong><br>Use Validate or Dry Import to test the selected historical pack.</div>'+
           '<div class="rbh-health" id="'+HEALTH_PANEL_ID+'">'+
             '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Real stat coverage</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
             '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Zero-game players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
@@ -543,11 +603,12 @@
             '<button type="button" class="rbh-btn" data-role="action" data-action="validate">Validate</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="import">Dry Import</button>'+
             '<button type="button" class="rbh-btn rbh-btn--success" data-role="action" data-action="apply">Apply To Local</button>'+
+            '<button type="button" class="rbh-btn" data-role="action" data-action="season">Open Real Season</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="draft">Open Draft The Era</button>'+
           '</div>'+
           '<div class="rbh-footer">'+
-            '<div class="rbh-footnote" id="'+FIXTURE_META_ID+'">Fixture: '+DEFAULT_FIXTURE_ID+'</div>'+
-            '<button type="button" class="rbh-link" data-role="action" data-action="fixture">Log Fixture</button>'+
+            '<div class="rbh-footnote" id="'+FIXTURE_META_ID+'">Pack: '+DEFAULT_FIXTURE_ID+'</div>'+
+            '<button type="button" class="rbh-link" data-role="action" data-action="fixture">Log Pack</button>'+
           '</div>'+
         '</div>'+
       '</div>';
@@ -563,7 +624,7 @@
     const teamSelect=root.querySelector('[data-role="team-select"]');
     if(teamSelect){
       teamSelect.addEventListener('change', function(){
-        persistSelectedTeamId(teamSelect.value);
+        persistSelectedTeamId(teamSelect.value, getCurrentPackId());
         setPanelStatus('<strong>Featured team staged</strong><br>Next local historical season boot will open as '+(getSelectedTeamLabel() || 'the selected team')+'.', 'success');
       });
     }
@@ -586,6 +647,7 @@
             'await rbHistoricalPackDev.validateFixture()',
             'await rbHistoricalPackDev.importFixture()',
             'await rbHistoricalPackDev.applyFixtureToLocalState()',
+            'await rbHistoricalPackDev.openHistoricalSeason()',
             'await rbHistoricalPackDev.openHistoricalDraft()',
             'rbHistoricalPackDev.getSelectedTeam()',
             'await rbHistoricalPackDev.validateBundle(bundle)',
@@ -603,10 +665,12 @@
         usage:[
           'await rbHistoricalPackDev.ready()',
           'await rbHistoricalPackDev.getFixture("nba_1996_full_season_v1")',
+          'await rbHistoricalPackDev.getFixture("nba_2016_full_season_v1")',
           'await rbHistoricalPackDev.validateFixture("nba_1996_full_season_v1")',
           'await rbHistoricalPackDev.importFixture("nba_1996_full_season_v1")',
           'await rbHistoricalPackDev.applyFixtureToLocalState("nba_1996_full_season_v1")',
-          'await rbHistoricalPackDev.openHistoricalDraft()',
+          'await rbHistoricalPackDev.openHistoricalSeason("nba_1996_full_season_v1")',
+          'await rbHistoricalPackDev.openHistoricalDraft("nba_1996_full_season_v1")',
           'rbHistoricalPackDev.getSelectedTeam()',
           'rbHistoricalPackDev.setSelectedTeam("nba_1996_sea")',
           'rbHistoricalPackDev.readAppliedLocalState()',
@@ -622,12 +686,12 @@
     },
     async getFixture(packId){
       if(!enabled) return disabledResponse();
-      return loadBundleForPack(packId || DEFAULT_FIXTURE_ID);
+      return loadBundleForPack(getCurrentPackId(packId));
     },
     async validateFixture(packId){
       if(!enabled) return disabledResponse();
       const deps=await getDependencies();
-      const id=packId || DEFAULT_FIXTURE_ID;
+      const id=getCurrentPackId(packId);
       const bundle=await loadBundleForPack(id);
       if(!bundle){
         return {status:'fixture_not_found', packId:id};
@@ -637,7 +701,7 @@
     async importFixture(packId, options){
       if(!enabled) return disabledResponse();
       const deps=await getDependencies();
-      const id=packId || DEFAULT_FIXTURE_ID;
+      const id=getCurrentPackId(packId);
       const bundle=await loadBundleForPack(id);
       if(!bundle){
         return {status:'fixture_not_found', packId:id};
@@ -647,29 +711,53 @@
     async applyFixtureToLocalState(packId, options){
       if(!enabled) return disabledResponse();
       const deps=await getDependencies();
-      const id=packId || DEFAULT_FIXTURE_ID;
+      const id=getCurrentPackId(packId);
       const bundle=await loadBundleForPack(id);
       if(!bundle){
         return {status:'fixture_not_found', packId:id};
       }
-      const selectedTeamId=String(options && options.selectedTeamId || getPanelSelectedTeamId()).trim();
+      const selectedTeamId=String(options && options.selectedTeamId || getPanelSelectedTeamId(id)).trim();
       return deps.importer.importHistoricalPackBundle(bundle, {
         dryRun: false,
         writer: function(importResult){
-          return writeImportToLocalState(importResult, {selectedTeamId:selectedTeamId});
+          return writeImportToLocalState(importResult, {
+            selectedTeamId:selectedTeamId,
+            entryMode:String(options && options.entryMode || 'real_season').trim() || 'real_season'
+          });
         }
       });
     },
-    async openHistoricalDraft(){
+    async openHistoricalSeason(packId, historicalMode){
       if(!enabled) return disabledResponse();
-      const selectedTeamId=String(getPanelSelectedTeamId() || getPersistedSelectedTeamId() || '').trim();
-      await api.applyFixtureToLocalState(DEFAULT_FIXTURE_ID, {selectedTeamId:selectedTeamId});
+      const id=getCurrentPackId(packId);
+      const selectedTeamId=String(getPanelSelectedTeamId(id) || getPersistedSelectedTeamId(id) || '').trim();
+      const mode=String(historicalMode || 'dev').trim() || 'dev';
+      await api.applyFixtureToLocalState(id, {selectedTeamId:selectedTeamId, entryMode: mode==='reimagined' ? 'reimagined_season' : 'real_season'});
+      const url=buildHistoricalSeasonUrl(id, mode);
       if(isBrowser && global.location){
-        global.location.href=buildHistoricalDraftUrl();
+        global.location.href=url;
+      }
+      return {
+        status:'navigating_to_historical_season',
+        url:url,
+        packId:id,
+        selectedTeamId:selectedTeamId || null,
+        historicalMode:mode
+      };
+    },
+    async openHistoricalDraft(packId){
+      if(!enabled) return disabledResponse();
+      const id=getCurrentPackId(packId);
+      const selectedTeamId=String(getPanelSelectedTeamId(id) || getPersistedSelectedTeamId(id) || '').trim();
+      await api.applyFixtureToLocalState(id, {selectedTeamId:selectedTeamId, entryMode:'historical_draft'});
+      const url=buildHistoricalDraftUrl(id);
+      if(isBrowser && global.location){
+        global.location.href=url;
       }
       return {
         status:'navigating_to_historical_draft',
-        url:buildHistoricalDraftUrl(),
+        url:url,
+        packId:id,
         selectedTeamId:selectedTeamId || null
       };
     },
@@ -685,20 +773,22 @@
     },
     async getSelectedTeam(){
       if(!enabled) return disabledResponse();
-      const fixture=await loadBundleForPack(DEFAULT_FIXTURE_ID);
-      const selectedTeamId=getPanelSelectedTeamId() || getPersistedSelectedTeamId();
+      const currentPackId=getCurrentPackId();
+      const fixture=await loadBundleForPack(currentPackId);
+      const selectedTeamId=getPanelSelectedTeamId(currentPackId) || getPersistedSelectedTeamId(currentPackId);
       const teams=fixture && Array.isArray(fixture.teams) ? fixture.teams : [];
       return teams.find(function(team){ return String(team.teamId)===String(selectedTeamId); }) || null;
     },
-    async setSelectedTeam(teamId){
+    async setSelectedTeam(teamId, packId){
       if(!enabled) return disabledResponse();
-      const fixture=await loadBundleForPack(DEFAULT_FIXTURE_ID);
+      const currentPackId=getCurrentPackId(packId);
+      const fixture=await loadBundleForPack(currentPackId);
       const teams=fixture && Array.isArray(fixture.teams) ? fixture.teams : [];
       const nextId=String(teamId || '').trim();
       if(!teams.some(function(team){ return String(team.teamId)===nextId; })){
         return {status:'team_not_found', teamId:nextId};
       }
-      persistSelectedTeamId(nextId);
+      persistSelectedTeamId(nextId, currentPackId);
       const select=panelNode(TEAM_SELECT_ID);
       if(select) select.value=nextId;
       return {status:'team_selected', teamId:nextId};
@@ -707,7 +797,8 @@
     clearAppliedLocalState: clearAppliedLocalState,
     localStateKey: LOCAL_STATE_KEY,
     pendingBootKey: PENDING_BOOT_KEY,
-    teamSelectionKey: TEAM_SELECTION_KEY
+    teamSelectionKey: TEAM_SELECTION_KEY,
+    packSelectionKey: PACK_SELECTION_KEY
   };
 
   global.rbHistoricalPackDev=api;

@@ -87,14 +87,14 @@
     "seasonLabel": "2015-16 NBA Historic Season",
     "shortLabel": "2015-16",
     "era": "2010s",
-    "availability": "preview",
-    "statusLabel": "Roadmap",
+    "availability": "playable",
+    "statusLabel": "Playable Now",
     "significanceLabel": "Style Breakthrough",
     "significanceTone": "modern",
-    "completenessLabel": "Archive target",
-    "completenessPercent": 8,
+    "completenessLabel": "Playable modern foundation",
+    "completenessPercent": 80,
     "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
-    "summary": "A future pace-and-space universe built around the Warriors, Cavs, and one of the most recognizable modern NBA seasons.",
+    "summary": "A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.",
     "whyItMatters": "This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.",
     "focusTeamName": "Golden State Warriors",
     "plannedModes": [
@@ -106,6 +106,9 @@
       "Stephen Curry",
       "LeBron James",
       "Kawhi Leonard"
-    ]
+    ],
+    "seasonUrl": "rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1",
+    "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1",
+    "reimaginedUrl": "rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2016_full_season_v1"
   }
 ]

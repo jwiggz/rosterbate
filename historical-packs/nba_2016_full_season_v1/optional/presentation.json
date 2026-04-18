@@ -1,0 +1,39 @@
+{
+  "heroTitle": "2015-16 NBA Historic Season",
+  "heroSubtitle": "Play the real season, draft the era, or branch into a reimagined universe.",
+  "featuredTeamId": "nba_2016_gsw",
+  "featuredStars": [
+    "nba_2016_stephencurry_201939",
+    "nba_2016_lebronjames_2544",
+    "nba_2016_kawhileonard_202695",
+    "nba_2016_kevindurant_201142",
+    "nba_2016_russellwestbrook_201566",
+    "nba_2016_jamesharden_201935"
+  ],
+  "artDirection": {
+    "heroTone": "modern",
+    "primaryPalette": [
+      "#2e65b8",
+      "#efc55c",
+      "#0f1626"
+    ],
+    "backgroundStyle": "historic_modern_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "real_season",
+      "label": "Play The Real Season",
+      "description": "Step into 2015-16 with historical rosters intact."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the full 2015-16 player pool into a new fantasy universe."
+    },
+    {
+      "mode": "reimagined_season",
+      "label": "Reimagined Season",
+      "description": "Launch a fully reshuffled 2015-16 and play the alternate branch from opening night."
+    }
+  ]
+}

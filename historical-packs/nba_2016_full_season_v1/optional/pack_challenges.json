@@ -1,0 +1,75 @@
+{
+  "packId": "nba_2016_full_season_v1",
+  "version": 1,
+  "challengeGroups": [
+    {
+      "groupId": "real_season_paths",
+      "label": "Play The Real Season",
+      "mode": "real_season"
+    },
+    {
+      "groupId": "draft_the_era_paths",
+      "label": "Draft The Era",
+      "mode": "historical_draft"
+    },
+    {
+      "groupId": "reimagined_paths",
+      "label": "Reimagined Season",
+      "mode": "reimagined_season"
+    }
+  ],
+  "challenges": [
+    {
+      "challengeId": "warriors_73_wins",
+      "mode": "real_season",
+      "path": "warriors_featured_path",
+      "title": "Match 73 Wins",
+      "description": "Finish the season with at least 73 wins.",
+      "type": "season_wins_min",
+      "target": 73,
+      "evaluation": "season_end",
+      "reward": "73-Win Standard",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "open_team_50_wins",
+      "mode": "real_season",
+      "path": "open_team_path",
+      "title": "Modern Contender",
+      "description": "Choose any included team and finish with at least 50 wins.",
+      "type": "season_wins_min",
+      "target": 50,
+      "evaluation": "season_end",
+      "reward": "Modern Contender",
+      "required": false,
+      "featured": false
+    },
+    {
+      "challengeId": "draft_era_65_wins",
+      "mode": "historical_draft",
+      "path": "alternate_history_success",
+      "title": "Build A 65-Win Team",
+      "description": "Complete a historical fantasy draft and finish with at least 65 wins.",
+      "type": "season_wins_min",
+      "target": 65,
+      "evaluation": "season_end",
+      "reward": "Alternate-History Juggernaut",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "reimagined_title",
+      "mode": "reimagined_season",
+      "path": "reshuffled_league",
+      "title": "Win The Reimagined League",
+      "description": "Take your selected franchise through the reshuffled 2015-16 universe and win the title.",
+      "type": "win_championship",
+      "target": true,
+      "evaluation": "season_end",
+      "reward": "Reimagined Champion",
+      "required": false,
+      "featured": true
+    }
+  ]
+}
