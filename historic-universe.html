@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="RosterBate Historical Universe Details - inspect saved historic runs, continue them, and manage your archive.">
+<title>RosterBate - Historical Universe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="sport-config.js"></script>
+<script src="historical-pack-loader.js"></script>
+<script src="historical-universe-slots.js"></script>
+<script src="historical-pack-dev-runner.js" defer></script>
+<style>
+  :root{
+    --bg:#060a13;
+    --bg-soft:#0c1425;
+    --ink:#f8f4ec;
+    --muted:#9bb0cf;
+    --line:rgba(255,255,255,.1);
+    --glass:rgba(11,19,34,.84);
+    --glass-strong:rgba(9,14,25,.94);
+    --accent:#f5a34b;
+    --accent-soft:#ffd7a7;
+    --green:#5ae3a0;
+    --blue:#7dc4ff;
+    --gold:#e6c36d;
+    --teko:'Teko', Impact, sans-serif;
+    --plex:'IBM Plex Sans', 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--plex)}
+  body{
+    background:
+      radial-gradient(42% 24% at 50% 0%,rgba(245,163,75,.16),transparent 65%),
+      linear-gradient(180deg,rgba(7,12,22,.72),rgba(6,10,19,.96)),
+      url("hero-hall-of-fame.avif") center top / cover no-repeat fixed;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;pointer-events:none;
+    background:
+      linear-gradient(180deg,rgba(6,10,18,.56) 0%,rgba(6,10,18,.74) 36%,rgba(5,8,14,.92) 100%),
+      radial-gradient(30% 20% at 16% 18%,rgba(255,255,255,.1),transparent 70%),
+      radial-gradient(28% 20% at 82% 20%,rgba(255,255,255,.08),transparent 72%);
+  }
+  .wrap{position:relative;z-index:1;max-width:1680px;margin:0 auto;padding:0 22px 52px}
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px 0 8px;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .nav-logo img{width:118px;height:auto;display:block;filter:drop-shadow(0 10px 24px rgba(0,0,0,.3))}
+  .nav-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .nav-link{
+    display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 16px;border-radius:999px;
+    border:1px solid var(--line);background:linear-gradient(180deg,rgba(39,47,63,.92),rgba(24,30,43,.94));
+    color:#edf4ff;text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.06em;text-transform:uppercase;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 22px rgba(0,0,0,.2);
+  }
+  .nav-link.accent{background:linear-gradient(180deg,#ffbb6e,#f08a27);color:#241205;border-color:rgba(255,220,176,.45)}
+  .nav-link.danger{background:linear-gradient(180deg,#57303a,#2f1620);color:#ffd4da;border-color:rgba(255,148,162,.2)}
+
+  .hero{
+    display:grid;grid-template-columns:minmax(0,1.18fr) minmax(380px,.82fr);gap:18px;margin-top:18px;align-items:stretch;
+  }
+  .panel{
+    position:relative;overflow:hidden;border-radius:28px;border:1px solid rgba(255,182,109,.18);
+    background:linear-gradient(180deg,rgba(18,29,49,.88),rgba(8,14,24,.94));
+    box-shadow:0 24px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .panel::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(90% 120% at 0% 0%,rgba(125,182,255,.14),transparent 54%),radial-gradient(70% 90% at 100% 0%,rgba(245,163,75,.12),transparent 52%);
+  }
+  .hero-main{padding:28px 30px 26px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+    border:1px solid rgba(255,182,109,.22);background:rgba(15,20,31,.58);
+    font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-soft)
+  }
+  .eyebrow::before{content:"";width:8px;height:8px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 4px rgba(245,163,75,.12),0 0 18px rgba(245,163,75,.38)}
+  .hero-title{margin:16px 0 0;font:700 clamp(52px,6vw,88px)/.88 var(--teko);text-transform:uppercase;text-shadow:0 18px 40px rgba(0,0,0,.38)}
+  .hero-title span{display:block;color:var(--accent)}
+  .hero-copy{max-width:60ch;margin-top:12px;font-size:15px;line-height:1.72;color:#d7e4f5}
+  .meta-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .meta-pill{
+    display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.09);background:rgba(9,15,26,.52);
+    font:700 11px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#d9e9ff
+  }
+  .hero-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+  .progress-card{
+    padding:14px 14px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(20,30,48,.86),rgba(12,18,31,.94))
+  }
+  .progress-value{font:700 34px/.9 var(--teko)}
+  .progress-label{margin-top:5px;font:700 10px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .progress-card.good .progress-value{color:var(--green)}
+  .progress-card.blue .progress-value{color:var(--blue)}
+  .progress-card.gold .progress-value{color:var(--gold)}
+
+  .hero-side{padding:24px;display:grid;gap:14px;align-content:start}
+  .universe-art{
+    min-height:236px;padding:18px;border-radius:24px;border:1px solid rgba(255,255,255,.08);
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(255,183,102,.18),transparent 42%),
+      linear-gradient(180deg,rgba(28,37,57,.94),rgba(11,17,29,.98))
+  }
+  .universe-art.theme-dynasty{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(255,170,94,.22),transparent 42%),
+      linear-gradient(180deg,rgba(61,44,33,.94),rgba(13,19,31,.98))
+  }
+  .universe-art.theme-heritage{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(181,161,255,.18),transparent 42%),
+      linear-gradient(180deg,rgba(45,39,73,.94),rgba(12,18,31,.98))
+  }
+  .universe-art.theme-spotlight{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(116,179,255,.18),transparent 42%),
+      linear-gradient(180deg,rgba(26,43,72,.94),rgba(11,17,31,.98))
+  }
+  .universe-art.theme-modern{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(92,239,160,.18),transparent 42%),
+      linear-gradient(180deg,rgba(18,54,53,.94),rgba(11,18,29,.98))
+  }
+  .universe-art-eyebrow{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#dce7f4}
+  .universe-art-headline{font:700 60px/.84 var(--teko);text-transform:uppercase;max-width:8ch}
+  .universe-art-subline{font:700 12px/1.5 var(--plex);letter-spacing:.04em;color:#eff6ff}
+  .side-stack{display:grid;gap:12px}
+  .action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .action-btn{
+    display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 18px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
+    text-decoration:none;cursor:pointer;font:700 15px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 28px rgba(0,0,0,.24)
+  }
+  .action-btn.primary{background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);color:#082312;border-color:rgba(187,247,208,.34)}
+  .action-btn.secondary{background:linear-gradient(180deg,#91cbff,#5aa8ff 42%,#2d84ea 74%,#1768cb 100%);color:#081b36;border-color:rgba(191,219,254,.38)}
+  .action-btn.neutral{background:linear-gradient(180deg,#3f4d64,#202b3f);color:#edf4ff}
+  .action-btn.delete{background:linear-gradient(180deg,#5a3039,#321822);color:#ffe0e3;border-color:rgba(255,148,162,.22)}
+  .status-note{padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(11,18,29,.64);font-size:13px;line-height:1.55;color:#d5e1f2}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);gap:18px;margin-top:18px;align-items:start}
+  .stack{display:grid;gap:18px}
+  .card-pad{padding:22px}
+  .section-kicker{font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#9ec8ff}
+  .section-title{margin-top:10px;font:700 34px/.92 var(--teko);text-transform:uppercase}
+  .section-copy{margin-top:8px;font-size:14px;line-height:1.66;color:#d2dfef}
+  .mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+  .mini-card{
+    padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
+  }
+  .mini-value{font:700 28px/.92 var(--teko)}
+  .mini-label{margin-top:5px;font:700 10px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#afc3df}
+  .mini-card.good .mini-value{color:var(--green)}
+  .mini-card.blue .mini-value{color:var(--blue)}
+  .mini-card.gold .mini-value{color:var(--gold)}
+  .timeline-list,.roster-list,.info-list{display:grid;gap:10px;margin-top:16px}
+  .timeline-item,.roster-item,.info-item{
+    padding:13px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
+  }
+  .timeline-item strong,.roster-item strong,.info-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
+  .timeline-item span,.roster-item span,.info-item span{display:block;margin-top:6px;font-size:13px;line-height:1.56;color:#cdd9ea}
+  .roster-item-meta,.info-item-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .pill{
+    display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(7,14,25,.66);font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb
+  }
+  .reveal-story{margin-top:16px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(14,21,34,.94),rgba(8,12,22,.98))}
+  .reveal-headline{font:700 24px/.95 var(--teko);text-transform:uppercase}
+  .reveal-copy{margin-top:8px;font-size:14px;line-height:1.62;color:#d3dfef}
+  .empty-state{
+    padding:44px 28px;border-radius:24px;border:1px solid rgba(255,182,109,.14);
+    background:linear-gradient(180deg,rgba(17,27,44,.92),rgba(9,14,24,.98));text-align:center
+  }
+  .empty-title{font:700 38px/.92 var(--teko);text-transform:uppercase}
+  .empty-copy{max-width:58ch;margin:10px auto 0;font-size:14px;line-height:1.7;color:#d3deed}
+  .empty-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+
+  @media (max-width:1200px){
+    .hero,.grid{grid-template-columns:1fr}
+    .hero-progress{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:760px){
+    .wrap{padding:0 14px 36px}
+    .hero-progress,.mini-grid,.action-grid{grid-template-columns:1fr}
+    .universe-art-headline{font-size:48px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="index.html" class="nav-logo" aria-label="RosterBate Home">
+        <img src="rosterbate-main-logo.png" alt="RosterBate">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" id="archiveNavLink" href="historic-seasons.html?sport=nba">Historic Seasons</a>
+        <a class="nav-link" id="continueNavLink" href="#">Continue Universe</a>
+        <a class="nav-link accent" id="seasonNavLink" href="#">Open Season</a>
+      </div>
+    </nav>
+
+    <div id="missingState" class="empty-state" style="display:none;margin-top:18px;">
+      <div class="empty-title">Universe Not Found</div>
+      <div class="empty-copy">This saved historical universe could not be found in local storage. It may have been deleted, or it may belong to a different browser profile.</div>
+      <div class="empty-actions">
+        <a class="action-btn neutral" id="missingArchiveLink" href="historic-seasons.html?sport=nba">Back To Archive</a>
+      </div>
+    </div>
+
+    <div id="detailsShell" style="display:none;">
+      <section class="hero">
+        <article class="panel hero-main">
+          <div class="eyebrow" id="heroEyebrow">Saved Historical Universe</div>
+          <h1 class="hero-title" id="heroTitle">Universe <span>Details</span></h1>
+          <div class="hero-copy" id="heroCopy">Loading saved universe context...</div>
+          <div class="meta-pills" id="heroPills"></div>
+          <div class="hero-progress">
+            <div class="progress-card gold">
+              <div class="progress-value" id="heroRank">--</div>
+              <div class="progress-label">Current Rank</div>
+            </div>
+            <div class="progress-card good">
+              <div class="progress-value" id="heroRecord">--</div>
+              <div class="progress-label">Record</div>
+            </div>
+            <div class="progress-card blue">
+              <div class="progress-value" id="heroPf">--</div>
+              <div class="progress-label">Fantasy Points For</div>
+            </div>
+            <div class="progress-card">
+              <div class="progress-value" id="heroProgress">--</div>
+              <div class="progress-label">Timeline</div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="panel hero-side">
+          <div id="universeArtSlot">
+            <div class="universe-art theme-spotlight">
+              <div class="universe-art-eyebrow">Historic Archive</div>
+              <div class="universe-art-headline">Loading</div>
+              <div class="universe-art-subline">Pulling saved universe details.</div>
+            </div>
+          </div>
+          <div class="side-stack">
+            <div class="action-grid">
+              <a href="#" class="action-btn primary" id="continueBtn">Continue Universe</a>
+              <a href="#" class="action-btn secondary" id="openSeasonBtn">Open Season</a>
+              <a href="#" class="action-btn neutral" id="backArchiveBtn">Back To Archive</a>
+              <button type="button" class="action-btn delete" id="deleteUniverseBtn">Delete Universe</button>
+            </div>
+            <div class="status-note" id="statusNote">Historical runs live locally for now. This page is the landing zone before you jump back into the season.</div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <div class="stack">
+          <article class="panel card-pad">
+            <div class="section-kicker">Universe Snapshot</div>
+            <div class="section-title">Where This Run Stands</div>
+            <div class="section-copy" id="snapshotCopy">Loading current universe status...</div>
+            <div class="mini-grid">
+              <div class="mini-card gold">
+                <div class="mini-value" id="miniLeagueSize">--</div>
+                <div class="mini-label">League Size</div>
+              </div>
+              <div class="mini-card blue">
+                <div class="mini-value" id="miniPlayerPool">--</div>
+                <div class="mini-label">Player Pool</div>
+              </div>
+              <div class="mini-card good">
+                <div class="mini-value" id="miniWeekDay">--</div>
+                <div class="mini-label">Current Week/Day</div>
+              </div>
+            </div>
+            <div class="reveal-story" id="revealStory">
+              <div class="reveal-headline" id="revealHeadline">No reveal story yet</div>
+              <div class="reveal-copy" id="revealCopy">As daily reveals land, this view will surface the latest headline so each universe feels like a living archive run.</div>
+            </div>
+          </article>
+
+          <article class="panel card-pad">
+            <div class="section-kicker">Core Rotation</div>
+            <div class="section-title">Who Defines This Universe</div>
+            <div class="section-copy">A quick read on the roster spine that will shape how this saved run feels when you jump back in.</div>
+            <div class="roster-list" id="rosterCoreList">
+              <div class="roster-item">
+                <strong>Loading roster core</strong>
+                <span>Preparing saved-team context.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="stack">
+          <article class="panel card-pad">
+            <div class="section-kicker">Archive Context</div>
+            <div class="section-title">Pack Identity</div>
+            <div class="section-copy" id="packContextCopy">Loading pack framing...</div>
+            <div class="info-list" id="packContextList">
+              <div class="info-item">
+                <strong>Loading pack metadata</strong>
+                <span>Preparing season context and authored framing.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel card-pad">
+            <div class="section-kicker">Timeline</div>
+            <div class="section-title">Archive Trail</div>
+            <div class="section-copy">Saved universes should feel collectible. This panel gives each one a traceable place in your archive.</div>
+            <div class="timeline-list" id="timelineList">
+              <div class="timeline-item">
+                <strong>Loading timeline</strong>
+                <span>Preparing save history.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  const FALLBACK_CATALOG = [
+    {
+      packId: 'nba_1996_full_season_v1',
+      seasonLabel: '1995-96 NBA Historic Season',
+      shortLabel: '1995-96',
+      era: '1990s',
+      significanceLabel: 'Dynasty Peak',
+      significanceTone: 'dynasty',
+      focusTeamName: 'Chicago Bulls',
+      tagline: 'Rewrite the greatest regular season ever.',
+      summary: 'Full-league historical universe with real season stats, real-season boot, and Draft The Era support.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.',
+      art: { theme:'dynasty', eyebrow:'1990s Archive', headline:'72-Win Empire', subline:'Jordan, Hakeem, Shaq, and the full season universe.' }
+    },
+    {
+      packId: 'nba_2016_full_season_v1',
+      seasonLabel: '2015-16 NBA Historic Season',
+      shortLabel: '2015-16',
+      era: '2010s',
+      significanceLabel: 'Style Breakthrough',
+      significanceTone: 'modern',
+      focusTeamName: 'Golden State Warriors',
+      tagline: 'Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.',
+      summary: 'A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.',
+      whyItMatters: 'This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.',
+      art: { theme:'modern', eyebrow:'Modern Breakthrough', headline:'73 Wins. 3-1 Swing.', subline:'Unanimous MVP energy and the most volatile Finals pivot of the era.' }
+    }
+  ];
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function getSport(){
+    try{
+      return String(new URLSearchParams(window.location.search).get('sport') || 'nba').trim().toLowerCase() || 'nba';
+    }catch(error){
+      return 'nba';
+    }
+  }
+
+  function getSlotId(){
+    try{
+      return String(new URLSearchParams(window.location.search).get('historicalUniverse') || '').trim();
+    }catch(error){
+      return '';
+    }
+  }
+
+  function normalizeDate(value){
+    const numeric = Number(value || 0);
+    if(!numeric) return 'Unknown';
+    try{
+      return new Date(numeric).toLocaleString();
+    }catch(error){
+      return 'Unknown';
+    }
+  }
+
+  function getCatalogArt(config){
+    const art = config && typeof config.art === 'object' && config.art ? config.art : {};
+    return {
+      theme: String(art.theme || config?.significanceTone || 'spotlight').trim().toLowerCase() || 'spotlight',
+      eyebrow: String(art.eyebrow || ((config?.era || 'Historic') + ' Archive')).trim() || 'Historic Archive',
+      headline: String(art.headline || config?.shortLabel || config?.seasonLabel || 'Historic Universe').trim() || 'Historic Universe',
+      subline: String(art.subline || config?.tagline || config?.significanceLabel || 'Saved historical run').trim() || 'Saved historical run'
+    };
+  }
+
+  function renderArt(config){
+    const art = getCatalogArt(config);
+    return [
+      '<div class="universe-art theme-' + escapeHtml(art.theme) + '">',
+      '<div class="universe-art-eyebrow">' + escapeHtml(art.eyebrow) + '</div>',
+      '<div class="universe-art-headline">' + escapeHtml(art.headline) + '</div>',
+      '<div class="universe-art-subline">' + escapeHtml(art.subline) + '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function buildFallbackCatalog(){
+    return JSON.parse(JSON.stringify(FALLBACK_CATALOG));
+  }
+
+  async function loadCatalog(){
+    try{
+      if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadCatalog === 'function'){
+        const catalog = await window.RosterBateHistoricalPackLoader.loadCatalog();
+        if(Array.isArray(catalog) && catalog.length) return catalog;
+      }
+    }catch(error){
+      console.warn('[Historic Universe] Falling back to embedded catalog', error);
+    }
+    return buildFallbackCatalog();
+  }
+
+  function getLatestRevealReport(state){
+    const reports = state && state.dailyRevealReports && typeof state.dailyRevealReports === 'object'
+      ? state.dailyRevealReports
+      : null;
+    if(!reports) return null;
+    const latestDay = Object.keys(reports)
+      .map(function(key){ return Number(key) || 0; })
+      .filter(function(day){ return day > 0; })
+      .sort(function(a, b){ return b - a; })[0];
+    return latestDay ? reports[String(latestDay)] : null;
+  }
+
+  function buildRosterCore(state){
+    const myPos = Number(state?.myPos);
+    const starters = Array.isArray(state?.starters) ? state.starters[myPos] : null;
+    const roster = Array.isArray(state?.rosters) ? state.rosters[myPos] : null;
+    const source = Array.isArray(starters) && starters.length ? starters : (Array.isArray(roster) ? roster : []);
+    const seen = new Set();
+    return source
+      .filter(function(player){
+        if(!player || !player.name) return false;
+        const key = String(player.id || player.name).trim();
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 8)
+      .map(function(player){
+        return {
+          name: String(player.name || 'Unknown Player').trim(),
+          team: String(player.team || '').trim(),
+          pos: String(player.pos || player.position || '').trim(),
+          fp: Number.isFinite(Number(player.fp)) ? Number(player.fp).toFixed(1) : '--',
+          tfp: Number.isFinite(Number(player.totalFantasyPoints)) ? Number(player.totalFantasyPoints).toFixed(1) : '--'
+        };
+      });
+  }
+
+  function getStandingContext(state){
+    const standings = Array.isArray(state?.standings) ? state.standings.slice() : [];
+    const myPos = Number(state?.myPos);
+    standings.sort(function(a, b){
+      const winDiff = Number(b?.w || 0) - Number(a?.w || 0);
+      if(winDiff) return winDiff;
+      const pfDiff = Number(b?.pf || 0) - Number(a?.pf || 0);
+      if(pfDiff) return pfDiff;
+      return Number(a?.l || 0) - Number(b?.l || 0);
+    });
+    const mine = standings.find(function(entry){ return Number(entry?.teamIdx) === myPos; }) || null;
+    const rank = mine ? standings.findIndex(function(entry){ return Number(entry?.teamIdx) === myPos; }) + 1 : null;
+    return {
+      mine: mine,
+      rank: rank > 0 ? rank : null
+    };
+  }
+
+  function renderMissingState(sport){
+    document.getElementById('detailsShell').style.display = 'none';
+    document.getElementById('missingState').style.display = 'block';
+    document.getElementById('missingArchiveLink').href = 'historic-seasons.html?sport=' + encodeURIComponent(sport);
+  }
+
+  function renderUniverse(slot, state, config){
+    const api = window.RosterBateHistoricalUniverseSlots;
+    const reveal = getLatestRevealReport(state);
+    const standing = getStandingContext(state);
+    const rosterCore = buildRosterCore(state);
+    const detailsUrl = api.buildDetailsUrl(slot, getSport());
+    const seasonUrl = api.buildSeasonUrl(slot, getSport());
+    const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
+    const modeLabel = api.getModeLabel(slot.historicalEntryMode);
+    const progressLabel = String(slot.progressLabel || 'In progress').trim();
+    const rankText = Number.isFinite(Number(slot.teamRank)) ? ('#' + Number(slot.teamRank)) : '--';
+    const recordText = Number.isFinite(Number(slot.wins)) && Number.isFinite(Number(slot.losses))
+      ? (Number(slot.wins) + '-' + Number(slot.losses))
+      : '--';
+    const pfText = Number.isFinite(Number(slot.pf)) ? Number(slot.pf).toFixed(1) : '--';
+    const weekDayText = 'W' + Number(slot.currentWeek || 1) + ' / D' + Number(slot.currentDay || 1);
+    const title = String(slot.title || config?.seasonLabel || 'Historical Universe').trim();
+    const heroTeam = String(slot.teamName || config?.focusTeamName || 'Featured Team').trim();
+    const heroCopy = config?.whyItMatters
+      ? (config.summary + ' This saved run keeps that pack alive through your own branch: ' + config.whyItMatters)
+      : (config?.summary || 'This saved universe captures a living historical branch you can revisit anytime.');
+
+    document.getElementById('missingState').style.display = 'none';
+    document.getElementById('detailsShell').style.display = '';
+    document.getElementById('archiveNavLink').href = archiveUrl;
+    document.getElementById('continueNavLink').href = seasonUrl;
+    document.getElementById('seasonNavLink').href = seasonUrl;
+    document.getElementById('heroEyebrow').textContent = modeLabel + ' - Saved Universe';
+    document.getElementById('heroTitle').innerHTML = escapeHtml(title) + '<span>' + escapeHtml(heroTeam) + '</span>';
+    document.getElementById('heroCopy').textContent = heroCopy;
+    document.getElementById('heroPills').innerHTML = [
+      '<span class="meta-pill">' + escapeHtml(config?.shortLabel || slot.historicalSeasonId || 'Historic') + '</span>',
+      '<span class="meta-pill">' + escapeHtml(config?.significanceLabel || 'Archive Run') + '</span>',
+      '<span class="meta-pill">' + escapeHtml(progressLabel) + '</span>',
+      '<span class="meta-pill">' + escapeHtml(String(slot.playerPoolCount || 0)) + ' player pool</span>'
+    ].join('');
+    document.getElementById('heroRank').textContent = rankText;
+    document.getElementById('heroRecord').textContent = recordText;
+    document.getElementById('heroPf').textContent = pfText;
+    document.getElementById('heroProgress').textContent = progressLabel;
+    document.getElementById('universeArtSlot').innerHTML = renderArt(config || {});
+    document.getElementById('continueBtn').href = seasonUrl;
+    document.getElementById('openSeasonBtn').href = seasonUrl;
+    document.getElementById('backArchiveBtn').href = archiveUrl;
+    document.getElementById('statusNote').textContent = modeLabel + ' is saved locally. Use this page as your archive stop before diving back into the season.';
+
+    document.getElementById('miniLeagueSize').textContent = String(slot.leagueSize || 0);
+    document.getElementById('miniPlayerPool').textContent = String(slot.playerPoolCount || 0);
+    document.getElementById('miniWeekDay').textContent = weekDayText;
+    document.getElementById('snapshotCopy').textContent = 'You are currently running ' + modeLabel + ' from the ' + (config?.seasonLabel || slot.historicalSeasonId || 'historic archive') + '.';
+
+    document.getElementById('revealHeadline').textContent = reveal?.story?.headline || 'No reveal story yet';
+    document.getElementById('revealCopy').textContent = reveal?.story?.subheadline || 'As daily reveals land, this page will surface the latest story beat so each universe reads like a living timeline instead of a raw save file.';
+
+    document.getElementById('rosterCoreList').innerHTML = rosterCore.length
+      ? rosterCore.map(function(player){
+          const meta = [player.team, player.pos].filter(Boolean).join(' - ') || 'Historical roster piece';
+          return [
+            '<div class="roster-item">',
+            '<strong>' + escapeHtml(player.name) + '</strong>',
+            '<span>' + escapeHtml(meta) + '</span>',
+            '<div class="roster-item-meta">',
+            '<span class="pill">FP ' + escapeHtml(player.fp) + '</span>',
+            '<span class="pill">TFP ' + escapeHtml(player.tfp) + '</span>',
+            '</div>',
+            '</div>'
+          ].join('');
+        }).join('')
+      : '<div class="roster-item"><strong>No roster core available</strong><span>This universe has not published a visible starter or roster slice yet.</span></div>';
+
+    document.getElementById('packContextCopy').textContent = config?.summary || 'This saved universe is attached to a historical pack in your archive.';
+    document.getElementById('packContextList').innerHTML = [
+      '<div class="info-item"><strong>Why this season matters</strong><span>' + escapeHtml(config?.whyItMatters || 'This universe keeps a historical season pack alive as a replayable archive branch.') + '</span></div>',
+      '<div class="info-item"><strong>Current team focus</strong><span>' + escapeHtml(heroTeam) + '</span><div class="info-item-meta"><span class="pill">' + escapeHtml(config?.focusTeamName || heroTeam) + '</span><span class="pill">' + escapeHtml(config?.significanceLabel || 'Historic Run') + '</span></div></div>',
+      '<div class="info-item"><strong>Standing context</strong><span>' + escapeHtml(standing.rank ? ('Currently ' + standing.rank + ' in the league with ' + recordText + '.') : 'Standing summary is not available yet.') + '</span></div>'
+    ].join('');
+
+    document.getElementById('timelineList').innerHTML = [
+      '<div class="timeline-item"><strong>Universe Created</strong><span>' + escapeHtml(normalizeDate(slot.createdAt)) + '</span></div>',
+      '<div class="timeline-item"><strong>Last Updated</strong><span>' + escapeHtml(normalizeDate(slot.updatedAt)) + '</span></div>',
+      '<div class="timeline-item"><strong>Archive Routing</strong><span>Pack ID: ' + escapeHtml(slot.historicalPackId || 'unknown') + ' - Season ID: ' + escapeHtml(slot.historicalSeasonId || 'unknown') + '</span></div>',
+      '<div class="timeline-item"><strong>Universe Link</strong><span>' + escapeHtml(detailsUrl) + '</span></div>'
+    ].join('');
+
+    document.getElementById('deleteUniverseBtn').onclick = function(){
+      if(!window.confirm('Delete ' + (slot.title || 'this saved universe') + '?')) return;
+      api.deleteSlot(slot.slotId);
+      window.location.href = archiveUrl;
+    };
+  }
+
+  async function boot(){
+    const api = window.RosterBateHistoricalUniverseSlots;
+    const sport = getSport();
+    const slotId = getSlotId();
+    if(!api || !slotId){
+      renderMissingState(sport);
+      return;
+    }
+    const slot = api.getSlot(slotId);
+    const state = api.getState(slotId);
+    if(!slot || !state){
+      renderMissingState(sport);
+      return;
+    }
+    const catalog = await loadCatalog();
+    const config = catalog.find(function(entry){ return String(entry.packId || '') === String(slot.historicalPackId || ''); }) ||
+      buildFallbackCatalog().find(function(entry){ return String(entry.packId || '') === String(slot.historicalPackId || ''); }) ||
+      {};
+    renderUniverse(slot, state, config);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot, { once:true });
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>

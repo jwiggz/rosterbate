@@ -874,6 +874,9 @@
   .players-board-main{
     --player-board-grid: 30px 56px minmax(232px, 284px) repeat(14, minmax(42px, 48px));
   }
+  .players-board-main.auction-board{
+    --player-board-grid: 30px 56px minmax(258px, 340px) repeat(12, minmax(48px, 60px));
+  }
   .pr{position:relative;display:grid;grid-template-columns:var(--player-board-grid);align-items:center;padding:15px 16px;border-bottom:1px solid rgba(35,48,68,.52);column-gap:10px;cursor:pointer;transition:background .14s ease,transform .14s ease;}
   .pr::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:999px;background:transparent;opacity:.4;transition:opacity .14s ease,background .14s ease;}
   .pr:hover{background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,0));}
@@ -885,6 +888,23 @@
   .pr.best-focus::before{background:var(--blue);opacity:1;}
   .pr.fit-focus{background:linear-gradient(90deg,rgba(77,224,164,.1),rgba(77,224,164,0));}
   .pr.fit-focus::before{background:var(--green);opacity:1;}
+  .pr.auction-live{background:linear-gradient(90deg,rgba(255,138,43,.16),rgba(255,138,43,0));animation:auctionRowPulse 1.9s ease-in-out infinite;}
+  .pr.auction-live::before{background:var(--accent);opacity:1;box-shadow:0 0 0 1px rgba(255,138,43,.18),0 0 18px rgba(255,138,43,.34);}
+  .pr.auction-live.auction-user-lead{background:linear-gradient(90deg,rgba(74,222,128,.18),rgba(74,222,128,0));}
+  .pr.auction-live.auction-user-lead::before{background:#4ade80;box-shadow:0 0 0 1px rgba(74,222,128,.18),0 0 18px rgba(74,222,128,.34);}
+  .pr.auction-live.auction-cpu-lead{background:linear-gradient(90deg,rgba(96,165,250,.18),rgba(96,165,250,0));}
+  .pr.auction-live.auction-cpu-lead::before{background:#60a5fa;box-shadow:0 0 0 1px rgba(96,165,250,.18),0 0 18px rgba(96,165,250,.34);}
+  .pr.auction-live.auction-live-urgent{background:linear-gradient(90deg,rgba(255,138,43,.24),rgba(255,138,43,0));animation-duration:1s;}
+  .pr.auction-live.auction-live-final{background:linear-gradient(90deg,rgba(239,68,68,.22),rgba(239,68,68,0));animation:auctionRowPulseFinal .58s ease-in-out infinite;}
+  .pr.auction-live.auction-live-final::before{background:#fb7185;box-shadow:0 0 0 1px rgba(251,113,133,.22),0 0 24px rgba(251,113,133,.48);}
+  @keyframes auctionRowPulse{
+    0%,100%{transform:translateX(0); box-shadow:inset 0 0 0 0 rgba(255,138,43,0);}
+    50%{transform:translateX(1px); box-shadow:inset 0 0 0 1px rgba(255,138,43,.12);}
+  }
+  @keyframes auctionRowPulseFinal{
+    0%,100%{transform:translateX(0); box-shadow:inset 0 0 0 0 rgba(251,113,133,0);}
+    50%{transform:translateX(1px); box-shadow:inset 0 0 0 1px rgba(251,113,133,.22);}
+  }
   .paction-slot{display:flex;align-items:center;justify-content:center;min-width:0;}
   .paction-slot .pav{margin:0 auto;}
   .paction-slot .dbtn{width:54px;padding:9px 0 8px;font-size:11px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;}
@@ -893,6 +913,12 @@
   .pstat-label{min-width:0;font-size:12px;font-weight:600;color:var(--text3);text-align:center;display:flex;align-items:center;justify-content:center;text-transform:uppercase;cursor:pointer;user-select:none;letter-spacing:.1em;font-family:var(--fd);}
   .pstat.fp,.pstat-label.fp{color:var(--green);text-shadow:0 0 10px rgba(77,224,164,.14);}
   .pstat.tfp,.pstat-label.tfp{color:#7cc8ff;text-shadow:0 0 10px rgba(124,200,255,.14);}
+  .pstat.price,.pstat-label.price{color:var(--gold);text-shadow:0 0 10px rgba(255,196,136,.14);}
+  .pstat.edge.plus,.pstat-label.edge{color:#86efac;}
+  .pstat.edge.minus{color:#fca5a5;}
+  .pstat.heat.hot,.pstat-label.heat{color:#fdba74;}
+  .pstat.heat.live{color:#bfdbfe;}
+  .pstat.heat.calm{color:var(--text2);}
   .pstat-label:hover{color:var(--accent);}
   .pstat-label.rank,.prank{justify-content:center;text-align:center;}
   .pheader-spacer{min-width:0;}
@@ -910,6 +936,23 @@
   .p-rec-tag.queue{border-color:rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#fdba74;}
   .p-rec-tag.best{border-color:rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;}
   .p-rec-tag.fit{border-color:rgba(74,222,128,.34);background:rgba(21,128,61,.18);color:#86efac;}
+  .p-rec-tag.live{border-color:rgba(249,115,22,.42);background:rgba(249,115,22,.18);color:#fed7aa;}
+  .p-rec-tag.live.auction-countdown-chip{border-color:rgba(255,138,43,.46);background:rgba(255,138,43,.22);color:#fff3d6;box-shadow:0 0 0 1px rgba(255,138,43,.12);}
+  .p-rec-tag.live.auction-countdown-chip.urgent{background:rgba(249,115,22,.28);color:#fff7ed;}
+  .p-rec-tag.live.auction-countdown-chip.final{background:rgba(190,24,93,.26);border-color:rgba(251,113,133,.44);color:#ffe4e6;}
+  .p-rec-tag.auction-leader-chip{border-color:rgba(148,163,184,.24);background:rgba(15,23,42,.52);color:#dbe7f5;}
+  .p-rec-tag.auction-leader-chip.user{border-color:rgba(74,222,128,.36);background:rgba(6,95,70,.24);color:#bbf7d0;}
+  .p-rec-tag.auction-leader-chip.cpu{border-color:rgba(96,165,250,.36);background:rgba(30,64,175,.24);color:#bfdbfe;}
+  .p-rec-tag.auction-leader-chip.open{border-color:rgba(245,158,11,.34);background:rgba(120,53,15,.2);color:#fde68a;}
+  .p-rec-tag.auction-bid-chip{border-color:rgba(255,196,136,.3);background:rgba(255,138,43,.2);color:#fff3d6;}
+  .p-rec-tag.auction-bid-chip.user{border-color:rgba(74,222,128,.36);background:rgba(6,95,70,.24);color:#dcfce7;}
+  .p-rec-tag.auction-bid-chip.cpu{border-color:rgba(96,165,250,.36);background:rgba(30,64,175,.24);color:#dbeafe;}
+  .p-rec-tag.auction-bid-chip.open{border-color:rgba(255,196,136,.3);background:rgba(255,138,43,.2);color:#fff3d6;}
+  .p-rec-tag.price{border-color:rgba(245,158,11,.34);background:rgba(120,53,15,.18);color:#fde68a;}
+  .p-rec-tag.hot{border-color:rgba(251,146,60,.34);background:rgba(154,52,18,.2);color:#fdba74;}
+  .p-rec-tag.value{border-color:rgba(74,222,128,.34);background:rgba(6,95,70,.22);color:#86efac;}
+  .p-rec-tag.stretch{border-color:rgba(248,113,113,.34);background:rgba(127,29,29,.2);color:#fecaca;}
+  .p-rec-tag.calm{border-color:rgba(148,163,184,.24);background:rgba(15,23,42,.48);color:#cbd5e1;}
   .pos-badge{display:inline-block;padding:2px 6px;border-radius:999px;font-family:var(--fd);font-size:11px;font-weight:500;letter-spacing:.08em;margin-left:4px;}
   .pos-PG{background:rgba(59,130,246,.2);color:#60a5fa;}
   .pos-SG{background:rgba(168,85,247,.2);color:#c084fc;}
@@ -4998,7 +5041,79 @@ function updateDraftClockDisplay(){
 function syncAuctionClockUI(){
   updateAuctionPhaseDisplay();
   updateDraftClockDisplay();
+  updateAuctionListLiveState();
   if(S.started && S.cur<=S.total) upHdr();
+}
+function updateAuctionListLiveState(){
+  const activeId=Number(S.auc?.playerId || 0);
+  const seconds=Math.max(0, Number(S.timer||0));
+  const phase=S.auc?.phase || '';
+  const leaderType=S.auc?.leaderType || '';
+  const allRows=document.querySelectorAll('.pr[data-player-id]');
+  allRows.forEach(row=>{
+    const rowId=Number(row.dataset.playerId||0);
+    const isActive=!!activeId && rowId===activeId;
+    row.classList.toggle('auction-live', isActive);
+    row.classList.toggle('auction-user-lead', isActive && leaderType==='user');
+    row.classList.toggle('auction-cpu-lead', isActive && leaderType==='cpu');
+    row.classList.toggle('auction-live-urgent', isActive && seconds<=5 && seconds>2);
+    row.classList.toggle('auction-live-final', isActive && seconds<=2);
+  });
+  document.querySelectorAll('.auction-countdown-chip').forEach(chip=>{
+    const chipId=Number(chip.dataset.playerId||0);
+    const isActive=!!activeId && chipId===activeId;
+    if(!isActive){
+      chip.textContent='On The Block';
+      chip.classList.remove('urgent','final');
+      return;
+    }
+    chip.textContent=(phase==='offering'?'Offering ':'Nomination ')+formatAuctionClock(seconds);
+    chip.classList.toggle('urgent', seconds<=5 && seconds>2);
+    chip.classList.toggle('final', seconds<=2);
+  });
+  document.querySelectorAll('.auction-leader-chip').forEach(chip=>{
+    const chipId=Number(chip.dataset.playerId||0);
+    const isActive=!!activeId && chipId===activeId;
+    chip.classList.remove('user','cpu','open');
+    if(!isActive){
+      chip.textContent='No Contest Yet';
+      chip.classList.add('open');
+      return;
+    }
+    if(leaderType==='user'){
+      chip.textContent='You Lead';
+      chip.classList.add('user');
+      return;
+    }
+    if(leaderType==='cpu'){
+      chip.textContent='CPU Leads';
+      chip.classList.add('cpu');
+      return;
+    }
+    chip.textContent='No Contest Yet';
+    chip.classList.add('open');
+  });
+  document.querySelectorAll('.auction-bid-chip').forEach(chip=>{
+    const chipId=Number(chip.dataset.playerId||0);
+    const isActive=!!activeId && chipId===activeId;
+    const liveBid=Math.max(1, Number(S.auc?.currentBid||0) || 1);
+    chip.classList.remove('user','cpu','open');
+    if(!isActive){
+      chip.textContent='Live $1';
+      chip.classList.add('open');
+      return;
+    }
+    chip.textContent='Live $'+liveBid;
+    if(leaderType==='user'){
+      chip.classList.add('user');
+      return;
+    }
+    if(leaderType==='cpu'){
+      chip.classList.add('cpu');
+      return;
+    }
+    chip.classList.add('open');
+  });
 }
 function touchAuctionOfferClock(){
   if(S.fmt!=='auction' || !S.auc || S.auc.phase!=='offering') return;
@@ -5903,6 +6018,7 @@ function openAuc(p,nominator){
   const pct=(S.myBudget/S.abud)*100;
   document.getElementById('bFill').style.width=pct+'%';
   document.getElementById('bFill').className='bf'+(pct<25?' lo':'');
+  rPlayers();
   updateAuctionBidControls();
   setAuctionControlsLocked(false);
   document.getElementById('aModal').classList.add('open');
@@ -6080,9 +6196,103 @@ function confDraft(){
   if(S.fmt!=='auction'&&S.order[S.cur]===S.myPos) userPick(S.selP);
 }
 
+function getAuctionHeatDisplayLabel(heat){
+  if(heat>=1.16) return {label:'HOT', tone:'hot'};
+  if(heat>=1.03) return {label:'LIVE', tone:'live'};
+  return {label:'CALM', tone:'calm'};
+}
+function getAuctionListMetrics(player){
+  const targetPrice=getAuctionTargetPrice(player);
+  const valueEdge=Math.round(getAuctionPlayerValueSignal(player));
+  const cpuBidders=buildAuctionCpuBidders(player);
+  const liveBidderCount=cpuBidders.filter(b=>Math.max(1, Number(b?.softCap || b?.maxBid || 0))>=Math.max(1, targetPrice)).length || cpuBidders.length;
+  const roomHeat=getAuctionRoomHeat(player,0);
+  const heatDisplay=getAuctionHeatDisplayLabel(roomHeat);
+  return {
+    targetPrice,
+    valueEdge,
+    liveBidderCount,
+    roomHeat,
+    heatLabel:heatDisplay.label,
+    heatTone:heatDisplay.tone,
+    budgetGap:Math.round(Number(S.myBudget||0) - targetPrice)
+  };
+}
+function getPlayerBoardColumns(){
+  if(S.fmt==='auction'){
+    return [
+      {key:'fp',label:'FP',className:'fp'},
+      {key:'tfp',label:'TFP',className:'tfp'},
+      {key:'auction_price',label:'$',className:'price'},
+      {key:'auction_edge',label:'EDGE',className:'edge'},
+      {key:'auction_bidders',label:'BIDS'},
+      {key:'auction_heat',label:'HEAT',className:'heat'},
+      {key:'pts',label:'PTS'},
+      {key:'reb',label:'REB'},
+      {key:'ast',label:'AST'},
+      {key:'blk',label:'BLK'},
+      {key:'tpm',label:'3PM'},
+      {key:'min',label:'MIN'}
+    ];
+  }
+  return [
+    {key:'fp',label:'FP',className:'fp'},
+    {key:'tfp',label:'TFP',className:'tfp'},
+    {key:'fgm',label:'FGM'},
+    {key:'fga',label:'FGA'},
+    {key:'ftm',label:'FTM'},
+    {key:'fta',label:'FTA'},
+    {key:'tpm',label:'3PM'},
+    {key:'reb',label:'REB'},
+    {key:'ast',label:'AST'},
+    {key:'stl',label:'STL'},
+    {key:'blk',label:'BLK'},
+    {key:'to',label:'TO'},
+    {key:'pts',label:'PTS'},
+    {key:'min',label:'MIN'}
+  ];
+}
+function renderPlayerBoardHeader(){
+  const header=document.getElementById('statHeader');
+  const boardMain=document.querySelector('.players-board-main');
+  if(!header || !boardMain) return;
+  boardMain.classList.toggle('auction-board', S.fmt==='auction');
+  const columns=getPlayerBoardColumns();
+  header.innerHTML=
+    `<div class="pstat-label rank" onclick="sortPlayers('adp')" title="Sort by rank">#</div>
+    <div class="paction-slot" aria-hidden="true"></div>
+    <div class="pheader-spacer" aria-hidden="true"></div>`+
+    columns.map(col=>`<div class="pstat-label${col.className?' '+col.className:''}" onclick="sortPlayers('${col.key}')">${col.label}</div>`).join('');
+  header.style.display='grid';
+}
+function renderPlayerBoardCell(column,values){
+  if(column.key==='auction_price'){
+    return `<div class="pstat price">$${Math.max(1, Number(values.auction_price||0))}</div>`;
+  }
+  if(column.key==='auction_edge'){
+    const edge=Math.round(Number(values.auction_edge||0));
+    return `<div class="pstat edge ${edge>=0?'plus':'minus'}">${edge>0?'+':''}${edge}</div>`;
+  }
+  if(column.key==='auction_bidders'){
+    return `<div class="pstat">${Math.max(0, Number(values.auction_bidders||0))}</div>`;
+  }
+  if(column.key==='auction_heat'){
+    return `<div class="pstat heat ${values.auctionHeatTone||'calm'}">${values.auctionHeatLabel||'CALM'}</div>`;
+  }
+  if(column.key==='fp'){
+    return `<div class="pstat fp">${Number(values.fp||0).toFixed(1)}</div>`;
+  }
+  if(column.key==='tfp'){
+    return `<div class="pstat tfp">${Number(values.tfp||0)>0?Number(values.tfp).toFixed(1):'--'}</div>`;
+  }
+  return `<div class="pstat">${Number(values[column.key]||0).toFixed(1)}</div>`;
+}
+
 // RENDER PLAYERS
 function rPlayers(){
+  renderPlayerBoardHeader();
   const srch=(document.getElementById('srch')?.value||'').toLowerCase();
+  const columns=getPlayerBoardColumns();
   const list=PLAYERS.filter(p=>{
     const mp=S.posF==='ALL'||p.pos===S.posF;
     const ms=!srch||p.name.toLowerCase().includes(srch)||p.team.toLowerCase().includes(srch);
@@ -6106,6 +6316,7 @@ function rPlayers(){
     const drafted=S.drafted.has(p.id);
     const idx=PLAYERS.indexOf(p);
     const fp=calcFP(p);
+    const auctionMetrics=S.fmt==='auction' ? getAuctionListMetrics(p) : null;
     const faved=isFav(p.id);
     const favBtn=drafted?'':`<button class="fav-btn${faved?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="${faved?'Remove from queue':'Add to queue'}">${faved?'★':'☆'}</button>`;
     const canActOnPlayer=(S.fmt==='auction'?myNomTurn:myTurn) && S.started;
@@ -6126,6 +6337,26 @@ function rPlayers(){
     if(!drafted && fitCandidateSet.has(p.id)){
       recoTags.push(`<span class="p-rec-tag fit">${myTurn?'Pick Fit':'On Deck Fit'}</span>`);
       if(!rowTone) rowTone=' fit-focus';
+    }
+    if(!drafted && S.fmt==='auction' && auctionMetrics){
+      recoTags.push(`<span class="p-rec-tag price">Target $${auctionMetrics.targetPrice}</span>`);
+      if(S.auc?.playerId===p.id){
+        recoTags.unshift(`<span class="p-rec-tag live auction-countdown-chip" data-player-id="${p.id}">On The Block</span>`);
+        recoTags.splice(1, 0, `<span class="p-rec-tag auction-leader-chip open" data-player-id="${p.id}">No Contest Yet</span>`);
+        recoTags.splice(2, 0, `<span class="p-rec-tag auction-bid-chip open" data-player-id="${p.id}">Live $1</span>`);
+        rowTone+=' auction-live';
+      }
+      if(auctionMetrics.liveBidderCount>=3 || auctionMetrics.roomHeat>=1.08){
+        recoTags.push('<span class="p-rec-tag hot">Likely Battle</span>');
+      }else if(auctionMetrics.liveBidderCount<=1){
+        recoTags.push('<span class="p-rec-tag calm">Quiet Room</span>');
+      }
+      if(auctionMetrics.valueEdge>=3 && auctionMetrics.budgetGap>=0){
+        recoTags.push('<span class="p-rec-tag value">Value Buy</span>');
+      }
+      if(auctionMetrics.budgetGap<0){
+        recoTags.push('<span class="p-rec-tag stretch">Budget Stretch</span>');
+      }
     }
     const actionRow=drafted
       ?`<div class="pmeta-row"><div class="dlbl">Drafted</div></div>`
@@ -6151,7 +6382,16 @@ function rPlayers(){
     const fga = sv.FGA || (fgm / (fgp / 100));
     const ftm = sv.FTM || (pts * 0.15);
     const fta = sv.FTA || (ftm / (ftp / 100));
-    return`<div class="pr${drafted?' drafted':''}${rowTone}" onclick="${drafted?'':"openPModal("+idx+")"}">
+    const boardValues={
+      fp, tfp, fgm, fga, ftm, fta, tpm, reb, ast, stl, blk, to, pts, min,
+      auction_price:auctionMetrics?.targetPrice || 0,
+      auction_edge:auctionMetrics?.valueEdge || 0,
+      auction_bidders:auctionMetrics?.liveBidderCount || 0,
+      auction_heat:auctionMetrics?.roomHeat || 0,
+      auctionHeatLabel:auctionMetrics?.heatLabel || 'CALM',
+      auctionHeatTone:auctionMetrics?.heatTone || 'calm'
+    };
+    return`<div class="pr${drafted?' drafted':''}${rowTone}" data-player-id="${p.id}" onclick="${drafted?'':"openPModal("+idx+")"}">
       <div class="prank">${p.adp}</div>
       <div class="paction-slot">${avatarOrButton}</div>
       <div class="pinfo">
@@ -6163,25 +6403,13 @@ function rPlayers(){
         <div class="pdet">${p.team}</div>
         ${actionRow}
       </div>
-      <div class="pstat fp">${fp.toFixed(1)}</div>
-      <div class="pstat tfp">${tfp>0?tfp.toFixed(1):'--'}</div>
-      <div class="pstat">${fgm.toFixed(1)}</div>
-      <div class="pstat">${fga.toFixed(1)}</div>
-      <div class="pstat">${ftm.toFixed(1)}</div>
-      <div class="pstat">${fta.toFixed(1)}</div>
-      <div class="pstat">${tpm.toFixed(1)}</div>
-      <div class="pstat">${reb.toFixed(1)}</div>
-      <div class="pstat">${ast.toFixed(1)}</div>
-      <div class="pstat">${stl.toFixed(1)}</div>
-      <div class="pstat">${blk.toFixed(1)}</div>
-      <div class="pstat">${to.toFixed(1)}</div>
-      <div class="pstat">${pts.toFixed(1)}</div>
-      <div class="pstat">${min.toFixed(1)}</div>
+      ${columns.map(column=>renderPlayerBoardCell(column, boardValues)).join('')}
     </div>`;
   }).join('')||`<div style="text-align:center;padding:40px;color:var(--text3)">No players found</div>`;
   updatePlayerDecisionStrip();
   updateQueueSignal();
   updateQueueTabUrgency();
+  updateAuctionListLiveState();
 }
 let sortStat='adp';
 let sortDir=1;
@@ -6204,6 +6432,18 @@ function sortPlayers(stat){
     }else if(stat==='tfp'){
       aVal = getDraftTotalFantasyPoints(a);
       bVal = getDraftTotalFantasyPoints(b);
+    }else if(stat==='auction_price'){
+      aVal = getAuctionTargetPrice(a);
+      bVal = getAuctionTargetPrice(b);
+    }else if(stat==='auction_edge'){
+      aVal = getAuctionPlayerValueSignal(a);
+      bVal = getAuctionPlayerValueSignal(b);
+    }else if(stat==='auction_bidders'){
+      aVal = getAuctionListMetrics(a).liveBidderCount;
+      bVal = getAuctionListMetrics(b).liveBidderCount;
+    }else if(stat==='auction_heat'){
+      aVal = getAuctionRoomHeat(a,0);
+      bVal = getAuctionRoomHeat(b,0);
     }else if(stat==='min'){
       const aPts = a.statValues?.PTS || 0;
       const bPts = b.statValues?.PTS || 0;

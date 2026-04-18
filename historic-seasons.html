@@ -47,7 +47,7 @@
       radial-gradient(26% 18% at 86% 24%,rgba(255,255,255,.08),transparent 72%);
     pointer-events:none;
   }
-  .wrap{position:relative;z-index:1;max-width:1660px;margin:0 auto;padding:0 20px 48px}
+  .wrap{position:relative;z-index:1;max-width:1840px;margin:0 auto;padding:0 24px 56px}
   .nav{
     display:flex;align-items:center;justify-content:space-between;gap:20px;
     padding:14px 0 8px;border-bottom:1px solid rgba(255,255,255,.08);
@@ -68,7 +68,7 @@
   }
 
   .hero{
-    display:grid;grid-template-columns:minmax(0,1.18fr) minmax(420px,.82fr);
+    display:grid;grid-template-columns:minmax(0,1.24fr) minmax(420px,.76fr);
     gap:18px;margin-top:18px;align-items:stretch;
   }
   .panel{
@@ -123,13 +123,13 @@
   .snapshot-card.warn .snapshot-value{color:var(--accent-soft)}
   .snapshot-card.good .snapshot-value{color:var(--green)}
 
-  .grid{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(360px,.72fr);gap:18px;margin-top:18px;align-items:start}
+  .grid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(340px,.58fr);gap:22px;margin-top:18px;align-items:start}
   .browser-panel{padding:24px}
   .section-kicker{font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#9ec8ff}
   .section-title{margin-top:10px;font:700 44px/.92 var(--teko);text-transform:uppercase}
   .section-copy{margin-top:10px;max-width:60ch;font-size:15px;line-height:1.68;color:#cbd8eb}
 
-  .archive-browser-shell{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;margin-top:20px;align-items:start}
+  .archive-browser-shell{display:grid;grid-template-columns:332px minmax(0,1fr);gap:22px;margin-top:20px;align-items:start}
   .archive-rail{display:grid;gap:12px;align-content:start}
   .archive-card{
     position:relative;padding:16px 16px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.08);
@@ -217,13 +217,13 @@
       linear-gradient(180deg,rgba(20,29,47,.94),rgba(10,16,28,.98));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 34px rgba(0,0,0,.18)
   }
-  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) 220px auto;gap:24px;align-items:start}
+  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) 244px auto;gap:28px;align-items:start}
   .pack-label{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#a8bddc}
-  .pack-title{margin-top:8px;font:700 54px/.88 var(--teko);text-transform:uppercase}
+  .pack-title{margin-top:8px;font:700 58px/.88 var(--teko);text-transform:uppercase}
   .pack-tagline{margin-top:8px;font:700 18px/1.2 var(--teko);letter-spacing:.03em;color:var(--accent-soft)}
   .pack-desc{margin-top:12px;max-width:70ch;font-size:15px;line-height:1.72;color:#d7e4f4}
   .pack-poster{
-    min-height:240px;padding:18px;border-radius:22px;border:1px solid rgba(255,255,255,.08);
+    min-height:260px;padding:20px;border-radius:22px;border:1px solid rgba(255,255,255,.08);
     display:flex;flex-direction:column;justify-content:space-between;
     background:
       radial-gradient(120% 120% at 100% 0%,rgba(255,183,102,.18),transparent 42%),
@@ -250,7 +250,7 @@
       linear-gradient(180deg,rgba(18,54,53,.94),rgba(11,18,29,.98))
   }
   .pack-poster-eyebrow{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#dce7f4}
-  .pack-poster-headline{font:700 56px/.86 var(--teko);text-transform:uppercase;max-width:7ch}
+  .pack-poster-headline{font:700 60px/.84 var(--teko);text-transform:uppercase;max-width:7ch}
   .pack-poster-subline{font:700 12px/1.5 var(--plex);letter-spacing:.04em;color:#eff6ff}
   .pack-status{
     display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:999px;
@@ -307,7 +307,7 @@
   }
   .selector:focus{border-color:rgba(255,193,133,.42);box-shadow:0 0 0 3px rgba(245,163,75,.12)}
   .selector:disabled{opacity:.6;cursor:not-allowed}
-  .mode-buttons{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:12px;max-width:840px}
+  .mode-buttons{display:grid;grid-template-columns:repeat(3,minmax(172px,1fr));gap:12px;max-width:920px}
   .mode-btn{
     display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 18px;border-radius:18px;
     border:1px solid rgba(255,255,255,.1);text-decoration:none;cursor:pointer;
@@ -444,11 +444,11 @@
   .page-status-inline{color:var(--accent-soft)}
 
   @media (max-width: 1320px){
-    .wrap{max-width:1440px;padding:0 18px 40px}
-    .grid{grid-template-columns:minmax(0,1.18fr) minmax(330px,.82fr)}
-    .archive-browser-shell{grid-template-columns:270px minmax(0,1fr)}
+    .wrap{max-width:1520px;padding:0 18px 40px}
+    .grid{grid-template-columns:minmax(0,1.26fr) minmax(320px,.74fr)}
+    .archive-browser-shell{grid-template-columns:286px minmax(0,1fr)}
     .pack-title{font-size:48px}
-    .pack-top{grid-template-columns:minmax(0,1fr) 190px auto}
+    .pack-top{grid-template-columns:minmax(0,1fr) 208px auto}
     .pack-poster-headline{font-size:46px}
   }
   @media (max-width: 1080px){
@@ -1021,7 +1021,7 @@
     listEl.innerHTML = slots.map(function(slot){
       const config = getConfigById(slot.historicalPackId) || {};
       const isActivePack = String(slot.historicalPackId || '') === String(activePackId || '');
-      const openUrl = api.buildSeasonUrl(slot, getBrowserSport());
+      const openUrl = api.buildDetailsUrl(slot, getBrowserSport());
       const modeTone = String(slot.modeTone || api.getModeTone(slot.historicalEntryMode) || 'real').trim().toLowerCase();
       const eraClass = 'era-' + String(config.era || '').trim().toLowerCase();
       const significance = String(config.significanceLabel || 'Historical Run').trim();
@@ -1073,7 +1073,7 @@
             '<span class="saved-universe-pill">' + escapeHtml(String(slot.playerPoolCount || 0)) + ' player pool</span>',
           '</div>',
           '<div class="saved-universe-actions">',
-            '<a class="saved-universe-btn open" href="' + escapeHtml(openUrl) + '">Open</a>',
+            '<a class="saved-universe-btn open" href="' + escapeHtml(openUrl) + '">Details</a>',
             '<button class="saved-universe-btn delete" type="button" data-delete-slot="' + escapeHtml(slot.slotId) + '">Delete</button>',
           '</div>',
         '</article>'

@@ -99,7 +99,7 @@
     const week = Number(state?.currentWeek || state?.week || 1) || 1;
     const day = Number(state?.currentDay || state?.day || 1) || 1;
     const base = teamName || 'Historical universe';
-    return base + ' • Wk ' + week + ' • Day ' + day;
+    return base + ' - Wk ' + week + ' - Day ' + day;
   }
 
   function getSortedStandings(standings){
@@ -135,11 +135,11 @@
     const week = Number(state?.currentWeek || state?.week || 1) || 1;
     const day = Number(state?.currentDay || state?.day || 1) || 1;
     if(state?.isSeasonComplete) return 'Season complete';
-    return 'Week ' + week + ' • Day ' + day;
+    return 'Week ' + week + ' - Day ' + day;
   }
 
   function summarizeState(state, slotId, existingMeta){
-    const title = getSeasonLabel(state) + ' • ' + getModeLabel(state?.historicalEntryMode);
+    const title = getSeasonLabel(state) + ' - ' + getModeLabel(state?.historicalEntryMode);
     const createdAt = Number(existingMeta?.createdAt || state?.historicalUniverseCreatedAt || state?.createdAt || state?.savedAt || Date.now());
     const updatedAt = Date.now();
     const standing = getUserStandingSummary(state);
@@ -250,12 +250,19 @@
     return 'rosterbate-season.html?sport=' + encodeURIComponent(targetSport) + '&historicalUniverse=' + encodeURIComponent(id);
   }
 
+  function buildDetailsUrl(slot, sport){
+    const targetSport = normalizeSport(sport || slot?.sport || 'nba');
+    const id = String(slot?.slotId || '').trim();
+    return 'historic-universe.html?sport=' + encodeURIComponent(targetSport) + '&historicalUniverse=' + encodeURIComponent(id);
+  }
+
   global.RosterBateHistoricalUniverseSlots = {
     indexKey: INDEX_KEY,
     statePrefix: STATE_PREFIX,
     getModeLabel,
     getModeTone,
     getSeasonLabel,
+    buildDetailsUrl,
     buildSeasonUrl,
     listSlots,
     getSlot,
