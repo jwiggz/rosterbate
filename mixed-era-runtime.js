@@ -392,15 +392,23 @@
     var mixedEraConfig=input.mixedEraConfig && typeof input.mixedEraConfig==='object'
       ? input.mixedEraConfig
       : null;
-    if(!mixedEraConfig) return null;
-
     var sourceEraLabels=normalizeStringList(
-      input.mixedEraSourceSeasonLabels || mixedEraConfig.sourceSeasonLabels
+      input.mixedEraSourceSeasonLabels || mixedEraConfig && mixedEraConfig.sourceSeasonLabels
     );
-    var topPlayersValue=Number(mixedEraConfig.topPlayersPerPack || 0);
+    var mixedEraConfigId=String(
+      input.mixedEraConfigId ||
+      mixedEraConfig && mixedEraConfig.mixedEraConfigId ||
+      ''
+    ).trim();
+    var topPlayersValue=Number(
+      input.mixedEraTopPlayersPerPack ||
+      mixedEraConfig && mixedEraConfig.topPlayersPerPack ||
+      0
+    );
     var topPlayersPerPack=Number.isFinite(topPlayersValue) && topPlayersValue>0
       ? (Math.max(1, Math.round(topPlayersValue)) || null)
       : null;
+    if(!mixedEraConfig && !mixedEraConfigId && !topPlayersPerPack && !sourceEraLabels.length) return null;
     var explainer=sourceEraLabels.length>=2
       ? ('Curated crossover universe built from ' + formatLabelList(sourceEraLabels) + '.')
       : 'Curated crossover universe built from real historical source packs.';

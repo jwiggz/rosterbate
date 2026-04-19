@@ -532,6 +532,8 @@
     const mixedEraSummary = mixedEraRuntime && typeof mixedEraRuntime.buildMixedEraUniverseSummary === 'function'
       ? mixedEraRuntime.buildMixedEraUniverseSummary({
           mixedEraConfig: state?.mixedEraConfig || null,
+          mixedEraConfigId: state?.mixedEraConfigId || slot?.mixedEraConfigId || '',
+          mixedEraTopPlayersPerPack: state?.mixedEraTopPlayersPerPack || slot?.mixedEraTopPlayersPerPack || null,
           mixedEraSourceSeasonLabels: state?.mixedEraSourceSeasonLabels || slot?.mixedEraSourceSeasonLabels || []
         })
       : null;
