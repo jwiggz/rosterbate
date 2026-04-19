@@ -11,6 +11,7 @@ const responses = new Map([
   }],
   ['historical-packs/mixed-era/1996-2016-top100.json', {
     packId: 'mixed_era_1996_2016_top100_v1',
+    mixedEraConfigId: 'override-me',
     sport: 'nba',
     seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
     shortLabel: '95-96 x 15-16',
@@ -47,10 +48,12 @@ const loader = require('../historical-pack-loader.js');
   const config = await loader.loadMixedEraConfigById('1996-2016-top100');
   assert.equal(config.topPlayersPerPack, 50);
   assert.equal(config.syntheticType, 'mixed_era');
+  assert.equal(config.mixedEraConfigId, '1996-2016-top100');
 
   const catalog = await loader.loadCatalog();
   assert.equal(catalog.some(entry => entry.packId === 'mixed_era_1996_2016_top100_v1'), true);
   assert.equal(catalog.filter(entry => entry.packId === 'mixed_era_1996_2016_top100_v1').length, 1);
+  assert.equal(catalog.find(entry => entry.packId === 'mixed_era_1996_2016_top100_v1').mixedEraConfigId, '1996-2016-top100');
 
   console.log('mixed-era loader smoke test passed');
 })().catch(error => {

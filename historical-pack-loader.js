@@ -90,6 +90,7 @@
       mixedEraCatalog=await loadMixedEraConfigs();
     }catch(error){
       console.warn('[Historical Pack Loader] Could not load mixed-era configs', error);
+      throw error;
     }
 
     const merged=baseCatalog.concat(mixedEraCatalog);
@@ -136,14 +137,18 @@
     const match=index.entries.find(function(entry){ return entry.id===normalizedId; });
     if(!match) throw new Error('mixed_era_config_not_found:'+normalizedId);
     const config=await loadMixedEraConfigFile(match.file);
-    return Object.assign({mixedEraConfigId: match.id}, deepClone(config));
+    const cloned=deepClone(config);
+    cloned.mixedEraConfigId=match.id;
+    return cloned;
   }
 
   async function loadMixedEraConfigs(){
     const index=await loadMixedEraIndex();
     return Promise.all(index.entries.map(async function(entry){
       const config=await loadMixedEraConfigFile(entry.file);
-      return Object.assign({mixedEraConfigId: entry.id}, deepClone(config));
+      const cloned=deepClone(config);
+      cloned.mixedEraConfigId=entry.id;
+      return cloned;
     }));
   }
 
