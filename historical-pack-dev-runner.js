@@ -24,6 +24,7 @@
   const PENDING_BOOT_KEY='rbHistoricalPackDevPendingSeasonBoot';
   const TEAM_SELECTION_KEY='rbHistoricalPackDevSelectedTeamId';
   const PACK_SELECTION_KEY='rbHistoricalPackDevSelectedPackId';
+  const DEFAULT_MIXED_ERA_PACK_IDS=['nba_1996_full_season_v1','nba_2016_full_season_v1'];
   const TEAM_SELECT_ID=PANEL_ROOT_ID+'_teamSelect';
   const FIXTURE_META_ID=PANEL_ROOT_ID+'_fixtureMeta';
   const HEALTH_PANEL_ID=PANEL_ROOT_ID+'_health';
@@ -467,6 +468,13 @@
     return 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId='+encodeURIComponent(id);
   }
 
+  function buildMixedEraDraftUrl(packIds){
+    const ids=(Array.isArray(packIds) ? packIds : DEFAULT_MIXED_ERA_PACK_IDS)
+      .map(function(id){ return String(id || '').trim(); })
+      .filter(Boolean);
+    return 'rosterbate-draft.html?sport=nba&historical=mixed&historicalPackIds='+encodeURIComponent(ids.join(','));
+  }
+
   function buildHistoricalSeasonUrl(packId, historicalMode){
     const id=getCurrentPackId(packId);
     const mode=String(historicalMode || 'dev').trim() || 'dev';
@@ -566,6 +574,11 @@
       if(action==='draft'){
         const result=await api.openHistoricalDraft();
         setPanelStatus('<strong>Opening Draft The Era</strong><br>'+result.url, 'success');
+        return;
+      }
+      if(action==='mixed'){
+        const result=await api.openMixedEraDraft();
+        setPanelStatus('<strong>Opening Mixed Era Draft</strong><br>'+result.url, 'success');
       }
     }catch(error){
       setPanelStatus('<strong>Runner error</strong><br>'+(error && error.message ? error.message : String(error)), 'error');
@@ -605,6 +618,7 @@
             '<button type="button" class="rbh-btn rbh-btn--success" data-role="action" data-action="apply">Apply To Local</button>'+
             '<button type="button" class="rbh-btn" data-role="action" data-action="season">Open Real Season</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="draft">Open Draft The Era</button>'+
+            '<button type="button" class="rbh-btn rbh-btn--ghost" data-role="action" data-action="mixed">Open Mixed Era</button>'+
           '</div>'+
           '<div class="rbh-footer">'+
             '<div class="rbh-footnote" id="'+FIXTURE_META_ID+'">Pack: '+DEFAULT_FIXTURE_ID+'</div>'+
@@ -764,6 +778,21 @@
         url:url,
         packId:id,
         selectedTeamId:selectedTeamId || null
+      };
+    },
+    async openMixedEraDraft(packIds){
+      if(!enabled) return disabledResponse();
+      const ids=(Array.isArray(packIds) ? packIds : DEFAULT_MIXED_ERA_PACK_IDS)
+        .map(function(id){ return String(id || '').trim(); })
+        .filter(Boolean);
+      const url=buildMixedEraDraftUrl(ids);
+      if(isBrowser && global.location){
+        global.location.href=url;
+      }
+      return {
+        status:'navigating_to_mixed_era_draft',
+        url:url,
+        packIds:ids
       };
     },
     async validateBundle(bundle){

@@ -15,6 +15,7 @@
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <script src="historical-pack-loader.js"></script>
+<script src="simulation-league-engine.js"></script>
 <script src="global-nav.js" defer></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <style>
@@ -3566,8 +3567,22 @@ function getHistoricalDraftRequestedPackId(){
   }
 }
 
+function getHistoricalDraftRequestedPackIds(){
+  try{
+    const params=new URLSearchParams(window.location.search||'');
+    return String(params.get('historicalPackIds')||'')
+      .split(',')
+      .map(id=>String(id||'').trim())
+      .filter(Boolean);
+  }catch(e){
+    return [];
+  }
+}
+
 function shouldBootHistoricalDraft(){
-  return isHistoricalDraftLocalhost() && getHistoricalDraftQueryMode()==='dev';
+  if(!isHistoricalDraftLocalhost()) return false;
+  const mode=getHistoricalDraftQueryMode();
+  return mode==='dev' || mode==='mixed';
 }
 
 function readHistoricalDraftLocalState(){
@@ -3789,6 +3804,148 @@ function normalizeDraftPlayerRanks(players){
     .map((player,index)=>({...player, adp:index+1}));
 }
 
+const DEFAULT_MIXED_ERA_DRAFT_PACK_IDS=['nba_1996_full_season_v1','nba_2016_full_season_v1'];
+const MIXED_ERA_TOP_PLAYERS_PER_PACK=50;
+
+function getMixedEraDraftPackIds(localState){
+  const queryIds=getHistoricalDraftRequestedPackIds();
+  const stagedIds=Array.isArray(localState?.mixedEraPackIds)
+    ? localState.mixedEraPackIds.map(id=>String(id||'').trim()).filter(Boolean)
+    : [];
+  const candidateIds=(queryIds.length ? queryIds : (stagedIds.length ? stagedIds : DEFAULT_MIXED_ERA_DRAFT_PACK_IDS))
+    .map(id=>String(id||'').trim())
+    .filter(Boolean);
+  return Array.from(new Set(candidateIds));
+}
+
+function getMixedEraOverallRating(simProfile){
+  return roundHistoricalDraftStat(Number(simProfile?.mixedEraRatings?.overall || 0));
+}
+
+function buildMixedEraDraftProjection(simProfile, gp, fallbackFp){
+  const mixedOverall=getMixedEraOverallRating(simProfile);
+  if(mixedOverall>0){
+    return applyHistoricalDraftAvailabilityAdjustment(roundHistoricalDraftStat(mixedOverall * 0.75), gp);
+  }
+  return applyHistoricalDraftAvailabilityAdjustment(Number(fallbackFp||0), gp);
+}
+
+function buildMixedEraDraftContextFromBundles(bundles, requestedSport){
+  const requestedSportKey=normalizeRosterbateSport(requestedSport || SPORT || 'nba');
+  const sourceContexts=(Array.isArray(bundles) ? bundles : [])
+    .map(bundle=>{
+      if(!(bundle && typeof bundle==='object')) return null;
+      return buildHistoricalDraftContextFromSource({
+        packId: bundle?.manifest?.packId || null,
+        canonical:{
+          season:bundle?.season || null,
+          teams:bundle?.teams || [],
+          players:bundle?.players || [],
+          rosterSnapshots:bundle?.rosterSnapshots || [],
+          schedule:bundle?.schedule || [],
+          games:bundle?.games || [],
+          playerGameStats:bundle?.playerGameStats || []
+        },
+        authored:{
+          packChallenges:bundle?.packChallenges || null,
+          presentation:bundle?.presentation || null,
+          summaries:bundle?.summaries || null
+        },
+        manifest:bundle?.manifest || null
+      }, requestedSportKey);
+    })
+    .filter(Boolean);
+  if(!sourceContexts.length) return null;
+
+  const simulationEngine=window.RosterBateSimulationEngine;
+  const curatedPlayers=sourceContexts.flatMap(context=>{
+    return (Array.isArray(context.playerPool) ? context.playerPool : [])
+      .map(player=>{
+        const existingProfile=player?.simProfile && typeof player.simProfile==='object'
+          ? cloneDraftJsonSafe(player.simProfile)
+          : null;
+        const rebuiltProfile=(!existingProfile && simulationEngine && typeof simulationEngine.buildPlayerSimulationProfile==='function')
+          ? simulationEngine.buildPlayerSimulationProfile({
+              ...player,
+              historicalPackId: context.packId,
+              seasonStats: cloneDraftJsonSafe(player?.seasonStats || null)
+            }, { packId:context.packId })
+          : null;
+        const simProfile=cloneDraftJsonSafe(existingProfile || rebuiltProfile || null);
+        const mixedEraOverall=getMixedEraOverallRating(simProfile);
+        const mixedEraProjection=buildMixedEraDraftProjection(simProfile, player?.gp, player?.fp);
+        return {
+          ...cloneDraftJsonSafe(player),
+          historicalPackId: context.packId,
+          historicalPackLabel: context.seasonLabel,
+          mixedEraOverall: mixedEraOverall,
+          mixedEraProjection: mixedEraProjection,
+          mixedEraContext: cloneDraftJsonSafe(simProfile?.mixedEraContext || null),
+          fp: mixedEraProjection,
+          simProfile: simProfile,
+          statValues:{
+            ...(player?.statValues || {}),
+            TFP:Number(player?.totalFantasyPoints || player?.statValues?.TFP || 0),
+            MXR:mixedEraOverall
+          },
+          statSummary:`${String(player?.team||'ERA')} ${String(player?.pos||'UTIL')} · ${mixedEraOverall.toFixed(1)} mixed-era · ${Number(player?.pts||0).toFixed(1)} pts`
+        };
+      })
+      .sort((a,b)=>(Number(b?.mixedEraOverall||0)-Number(a?.mixedEraOverall||0)) || (Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name))
+      .slice(0, MIXED_ERA_TOP_PLAYERS_PER_PACK);
+  });
+
+  const combinedSeasonLabels=sourceContexts.map(context=>String(context?.seasonLabel || '').trim()).filter(Boolean);
+  const combinedPackIds=sourceContexts.map(context=>String(context?.packId || '').trim()).filter(Boolean);
+  const combinedPlayerPool=curatedPlayers
+    .slice()
+    .sort((a,b)=>(Number(b?.mixedEraOverall||0)-Number(a?.mixedEraOverall||0)) || (Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name))
+    .map((player,index)=>({
+      ...player,
+      id:970001 + index,
+      adp:index + 1
+    }));
+
+  const mixedSeasonSlug=combinedSeasonLabels
+    .map(label=>String(label).replace(/[^0-9a-z]+/gi,'_').replace(/^_+|_+$/g,'').toLowerCase())
+    .filter(Boolean)
+    .join('_');
+  const mixedSeasonLabel=combinedSeasonLabels.join(' + ') || 'Mixed Era NBA Pool';
+  const syntheticId=('mixed_era_' + (mixedSeasonSlug || 'nba_pool') + '_top' + String(combinedPlayerPool.length || 0) + '_v1')
+    .replace(/_+/g,'_');
+
+  return {
+    sport: requestedSportKey,
+    packId: syntheticId,
+    seasonId: syntheticId,
+    seasonLabel: mixedSeasonLabel,
+    subtitle: 'Draft a curated top-player pool across both eras, ranked with era-normalized mixedEraRatings.',
+    playerPool: combinedPlayerPool,
+    historicalPlayerPool: combinedPlayerPool.map(player=>cloneDraftJsonSafe(player)),
+    teamCount: combinedPlayerPool.length,
+    featuredTeamId: null,
+    featuredTeamLabel: null,
+    draftTitleKicker: 'Mixed Era Draft The Era',
+    lobbySubLabel: combinedSeasonLabels.join(' + ') + ' Curated Pool',
+    lobbyPillText: 'Mixed Era | ' + sourceContexts.length + ' Eras | ' + combinedPlayerPool.length + ' Players | Era-Normalized',
+    entryButtonLabel: 'Enter Mixed Era Draft',
+    leagueNamePlaceholder: 'e.g. 90s vs 2010s Dream Draft',
+    teamNamePlaceholder: 'e.g. Timebreakers',
+    packSummary: 'Curated top-player pool pulled from ' + combinedSeasonLabels.join(' and ') + ' using era-normalized mixed-era ratings.',
+    presentation: null,
+    packChallenges: null,
+    summaries: null,
+    sourcePackIds: combinedPackIds,
+    sourceSeasonLabels: combinedSeasonLabels,
+    mixedEraPackIds: combinedPackIds,
+    mixedEraTopPlayersPerPack: MIXED_ERA_TOP_PLAYERS_PER_PACK,
+    isHistoricalPack: true,
+    isHistoricalPackDev: true,
+    isMixedEraDraft: true,
+    devLocalOnly: true
+  };
+}
+
 function buildHistoricalDraftContextFromSource(source, requestedSport){
   const canonical=source?.canonical || null;
   const authored=source?.authored || {};
@@ -3885,6 +4042,7 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
     return {
       id: 950001 + index,
       historicalPlayerId: playerId,
+      historicalPackId: packId,
       historicalTeamId: player.teamId,
       historicalSeasonId: season.seasonId,
       name: player.displayName || [player.firstName, player.lastName].filter(Boolean).join(' ') || ('Historical Player '+(index+1)),
@@ -3960,7 +4118,23 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
 async function resolveHistoricalDraftContext(requestedSport){
   if(!shouldBootHistoricalDraft()) return null;
   const requestedSportKey=normalizeRosterbateSport(requestedSport || SPORT || 'nba');
+  const queryMode=getHistoricalDraftQueryMode();
   const localState=readHistoricalDraftLocalState();
+  if(queryMode==='mixed'){
+    if(!(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadPackById==='function')) return null;
+    const packIds=getMixedEraDraftPackIds(localState);
+    if(!packIds.length) return null;
+    const bundles=(await Promise.all(packIds.map(async packId=>{
+      try{
+        return await window.RosterBateHistoricalPackLoader.loadPackById(packId);
+      }catch(error){
+        console.warn('Could not load mixed-era draft pack:', packId, error);
+        return null;
+      }
+    }))).filter(Boolean);
+    if(!bundles.length) return null;
+    return buildMixedEraDraftContextFromBundles(bundles, requestedSportKey);
+  }
   const requestedPackId=String(getHistoricalDraftRequestedPackId() || localState?.packId || '').trim();
   if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadPackById==='function'){
     const bundle=requestedPackId
@@ -8000,6 +8174,7 @@ async function endDraft(){
     const serializePlayer=p=>({
       id:p?.id,
       historicalPlayerId:p?.historicalPlayerId||null,
+      historicalPackId:p?.historicalPackId||null,
       historicalTeamId:p?.historicalTeamId||null,
       historicalSeasonId:p?.historicalSeasonId||null,
       name:p?.name||'Unknown Player',
@@ -8024,7 +8199,10 @@ async function endDraft(){
       statsThroughDate:p?.statsThroughDate||'',
       bio:p?.bio||'',
       seasonStats:p?.seasonStats ? cloneDraftJsonSafe(p.seasonStats) : null,
-      simProfile:p?.simProfile ? cloneDraftJsonSafe(p.simProfile) : null
+      simProfile:p?.simProfile ? cloneDraftJsonSafe(p.simProfile) : null,
+      mixedEraOverall:Number.isFinite(Number(p?.mixedEraOverall)) ? Number(p.mixedEraOverall) : null,
+      mixedEraProjection:Number.isFinite(Number(p?.mixedEraProjection)) ? Number(p.mixedEraProjection) : null,
+      mixedEraContext:p?.mixedEraContext ? cloneDraftJsonSafe(p.mixedEraContext) : null
     });
 
     // Save draft data to localStorage for the season manager to pick up
