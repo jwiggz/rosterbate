@@ -354,8 +354,13 @@
         if(!sourcePackIds.length){
           throw new Error('mixed_era_source_packs_missing');
         }
-        var bundles = (await Promise.all(sourcePackIds.map(function(packId){
-          return loader.loadPackById(packId);
+        var bundles = (await Promise.all(sourcePackIds.map(async function(packId){
+          try{
+            return await loader.loadPackById(packId);
+          }catch(error){
+            console.warn('[Mixed Era Audit] Failed to load source pack', packId, error);
+            return null;
+          }
         }))).filter(Boolean);
         if(!bundles.length){
           throw new Error('mixed_era_bundles_missing');

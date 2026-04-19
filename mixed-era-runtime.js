@@ -421,11 +421,24 @@
     };
   }
 
-  function buildSourceComposition(players, limit){
+  function collectAuditSourcePackIds(config, players){
+    var sourcePackIds=normalizeStringList(config && config.sourcePackIds);
+    (Array.isArray(players) ? players : []).forEach(function(player){
+      var packId=String(player && player.historicalPackId || '').trim();
+      if(packId && sourcePackIds.indexOf(packId)===-1) sourcePackIds.push(packId);
+    });
+    return sourcePackIds;
+  }
+
+  function buildSourceComposition(players, limit, sourcePackIds){
     var counts={};
+    normalizeStringList(sourcePackIds).forEach(function(packId){
+      counts[packId]=0;
+    });
     var normalizedPlayers=Array.isArray(players) ? players : [];
     normalizedPlayers.slice(0, limit > 0 ? limit : normalizedPlayers.length).forEach(function(player){
       var packId=String(player && player.historicalPackId || '').trim() || 'unknown_source_era';
+      if(!Object.prototype.hasOwnProperty.call(counts, packId)) counts[packId]=0;
       counts[packId]=(counts[packId] || 0) + 1;
     });
     return counts;
@@ -441,13 +454,23 @@
     return Math.max.apply(Math, counts) - Math.min.apply(Math, counts);
   }
 
+  function getRawFantasyPointsPerGame(player){
+    var gamesPlayed=Math.max(0, Number(player && player.gp || player && player.statValues && player.statValues.GP || 0));
+    var totalFantasyPoints=Number(player && (player.totalFantasyPoints || player.statValues && player.statValues.TFP) || 0);
+    if(gamesPlayed > 0 && Number.isFinite(totalFantasyPoints) && totalFantasyPoints > 0){
+      return roundStat(totalFantasyPoints / gamesPlayed);
+    }
+    return roundStat(player && player.fp || 0);
+  }
+
   function buildMixedEraAuditViewModel(options){
     var input=options && typeof options==='object' ? options : {};
     var config=input.config && typeof input.config==='object' ? input.config : {};
     var playerPool=(Array.isArray(input.playerPool) ? input.playerPool : []).slice().sort(comparePlayers);
-    var top10Composition=buildSourceComposition(playerPool, 10);
-    var top25Composition=buildSourceComposition(playerPool, 25);
-    var fullPoolComposition=buildSourceComposition(playerPool, 0);
+    var sourcePackIds=collectAuditSourcePackIds(config, playerPool);
+    var top10Composition=buildSourceComposition(playerPool, 10, sourcePackIds);
+    var top25Composition=buildSourceComposition(playerPool, 25, sourcePackIds);
+    var fullPoolComposition=buildSourceComposition(playerPool, 0, sourcePackIds);
     var warning=getCompositionSpread(top10Composition) >= 4
       ? 'Top-10 board heavily favors one source era.'
       : '';
@@ -466,7 +489,7 @@
           sourceEra: String(player && player.historicalPackId || '').trim(),
           mixedEraOverall: roundStat(player && player.mixedEraOverall || 0),
           projectedFp: roundStat(player && (player.mixedEraProjection || player.fp) || 0),
-          rawFp: roundStat(player && (player.totalFantasyPoints || player.statValues && player.statValues.TFP || player.fp) || 0),
+          rawFp: getRawFantasyPointsPerGame(player),
           gamesPlayed: Math.max(0, Number(player && player.gp || player && player.statValues && player.statValues.GP || 0))
         };
       })
