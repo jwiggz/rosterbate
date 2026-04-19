@@ -4026,7 +4026,10 @@ async function resolveHistoricalDraftContext(requestedSport){
     const mixedEraContext=runtime.buildMixedEraDraftContextFromBundles({
       config: config,
       bundles: bundles,
-      requestedSport: requestedSportKey
+      requestedSport: requestedSportKey,
+      buildPlayerSimulationProfile: (window.RosterBateSimulationEngine && typeof window.RosterBateSimulationEngine.buildPlayerSimulationProfile==='function')
+        ? window.RosterBateSimulationEngine.buildPlayerSimulationProfile
+        : null
     });
     if(mixedEraContext && typeof mixedEraContext==='object'){
       mixedEraContext.preferredDraftSpot=getRequestedMixedEraDraftSpot();
