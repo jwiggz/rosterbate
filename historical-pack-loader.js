@@ -6,6 +6,8 @@
   const DEFAULT_PACK_ID='nba_1996_full_season_v1';
   const DEFAULT_PACK_ROOT='historical-packs/';
   const DEFAULT_CATALOG_PATH='historical-packs/catalog.json';
+  const DEFAULT_MIXED_ERA_ROOT='historical-packs/mixed-era/';
+  const DEFAULT_MIXED_ERA_INDEX_PATH=DEFAULT_MIXED_ERA_ROOT+'index.json';
 
   function resolveUrl(path){
     try{
@@ -78,18 +80,83 @@
   }
 
   async function loadCatalog(){
-    const catalog=await fetchJson(resolveUrl(DEFAULT_CATALOG_PATH));
-    if(!Array.isArray(catalog)){
+    const baseCatalog=await fetchJson(resolveUrl(DEFAULT_CATALOG_PATH));
+    if(!Array.isArray(baseCatalog)){
       throw new Error('historical_catalog_invalid');
     }
-    return deepClone(catalog);
+
+    let mixedEraCatalog=[];
+    try{
+      mixedEraCatalog=await loadMixedEraConfigs();
+    }catch(error){
+      console.warn('[Historical Pack Loader] Could not load mixed-era configs', error);
+    }
+
+    const merged=baseCatalog.concat(mixedEraCatalog);
+    const deduped=[];
+    const seen=new Set();
+
+    merged.forEach(function(entry){
+      const packId=String(entry?.packId || '').trim();
+      if(!packId || seen.has(packId)) return;
+      seen.add(packId);
+      deduped.push(entry);
+    });
+
+    return deepClone(deduped);
+  }
+
+  function normalizeMixedEraIndex(index){
+    const entries=Array.isArray(index?.entries) ? index.entries : [];
+    return {
+      entries: entries
+        .map(function(entry){
+          const id=String(entry?.id || '').trim();
+          const file=String(entry?.file || '').trim();
+          if(!id || !file) return null;
+          return {id: id, file: file};
+        })
+        .filter(Boolean)
+    };
+  }
+
+  async function loadMixedEraIndex(){
+    const index=await fetchJson(resolveUrl(DEFAULT_MIXED_ERA_INDEX_PATH));
+    return normalizeMixedEraIndex(index);
+  }
+
+  async function loadMixedEraConfigFile(fileName){
+    return fetchJson(resolveUrl(DEFAULT_MIXED_ERA_ROOT+String(fileName || '').trim()));
+  }
+
+  async function loadMixedEraConfigById(id){
+    const normalizedId=String(id || '').trim();
+    if(!normalizedId) throw new Error('mixed_era_config_id_required');
+    const index=await loadMixedEraIndex();
+    const match=index.entries.find(function(entry){ return entry.id===normalizedId; });
+    if(!match) throw new Error('mixed_era_config_not_found:'+normalizedId);
+    const config=await loadMixedEraConfigFile(match.file);
+    return Object.assign({mixedEraConfigId: match.id}, deepClone(config));
+  }
+
+  async function loadMixedEraConfigs(){
+    const index=await loadMixedEraIndex();
+    return Promise.all(index.entries.map(async function(entry){
+      const config=await loadMixedEraConfigFile(entry.file);
+      return Object.assign({mixedEraConfigId: entry.id}, deepClone(config));
+    }));
   }
 
   const api={
     defaultPackId: DEFAULT_PACK_ID,
     packRoot: DEFAULT_PACK_ROOT,
     catalogPath: DEFAULT_CATALOG_PATH,
+    mixedEraRoot: DEFAULT_MIXED_ERA_ROOT,
+    mixedEraIndexPath: DEFAULT_MIXED_ERA_INDEX_PATH,
     loadCatalog: loadCatalog,
+    loadMixedEraIndex: loadMixedEraIndex,
+    loadMixedEraConfigById: loadMixedEraConfigById,
+    loadMixedEraConfigs: loadMixedEraConfigs,
     loadPackById: loadPackById,
     loadDefaultPack: loadDefaultPack,
     loadPackBundleFromRoot: loadPackBundleFromRoot,
