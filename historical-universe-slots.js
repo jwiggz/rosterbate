@@ -58,6 +58,9 @@
 
   function getModeLabel(entryMode){
     switch(String(entryMode || '').trim().toLowerCase()){
+      case 'simulation_season':
+      case 'historical_sim':
+        return 'Sim Season';
       case 'historical_draft':
         return 'Drafted Universe';
       case 'reimagined_season':
@@ -70,6 +73,9 @@
 
   function getModeTone(entryMode){
     switch(String(entryMode || '').trim().toLowerCase()){
+      case 'simulation_season':
+      case 'historical_sim':
+        return 'simulation';
       case 'historical_draft':
         return 'draft';
       case 'reimagined_season':

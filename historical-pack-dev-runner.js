@@ -732,7 +732,12 @@
       const id=getCurrentPackId(packId);
       const selectedTeamId=String(getPanelSelectedTeamId(id) || getPersistedSelectedTeamId(id) || '').trim();
       const mode=String(historicalMode || 'dev').trim() || 'dev';
-      await api.applyFixtureToLocalState(id, {selectedTeamId:selectedTeamId, entryMode: mode==='reimagined' ? 'reimagined_season' : 'real_season'});
+      await api.applyFixtureToLocalState(id, {
+        selectedTeamId:selectedTeamId,
+        entryMode: mode==='reimagined'
+          ? 'reimagined_season'
+          : (mode==='sim' || mode==='simulation' ? 'simulation_season' : 'real_season')
+      });
       const url=buildHistoricalSeasonUrl(id, mode);
       if(isBrowser && global.location){
         global.location.href=url;

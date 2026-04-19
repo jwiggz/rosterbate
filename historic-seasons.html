@@ -47,7 +47,7 @@
       radial-gradient(26% 18% at 86% 24%,rgba(255,255,255,.08),transparent 72%);
     pointer-events:none;
   }
-  .wrap{position:relative;z-index:1;max-width:1840px;margin:0 auto;padding:0 24px 56px}
+  .wrap{position:relative;z-index:1;max-width:1980px;margin:0 auto;padding:0 20px 56px}
   .nav{
     display:flex;align-items:center;justify-content:space-between;gap:20px;
     padding:14px 0 8px;border-bottom:1px solid rgba(255,255,255,.08);
@@ -123,13 +123,13 @@
   .snapshot-card.warn .snapshot-value{color:var(--accent-soft)}
   .snapshot-card.good .snapshot-value{color:var(--green)}
 
-  .grid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(340px,.58fr);gap:22px;margin-top:18px;align-items:start}
+  .grid{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(300px,.42fr);gap:20px;margin-top:18px;align-items:start}
   .browser-panel{padding:24px}
   .section-kicker{font:700 11px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#9ec8ff}
   .section-title{margin-top:10px;font:700 44px/.92 var(--teko);text-transform:uppercase}
   .section-copy{margin-top:10px;max-width:60ch;font-size:15px;line-height:1.68;color:#cbd8eb}
 
-  .archive-browser-shell{display:grid;grid-template-columns:332px minmax(0,1fr);gap:22px;margin-top:20px;align-items:start}
+  .archive-browser-shell{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;margin-top:20px;align-items:start}
   .archive-rail{display:grid;gap:12px;align-content:start}
   .archive-card{
     position:relative;padding:16px 16px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.08);
@@ -217,7 +217,7 @@
       linear-gradient(180deg,rgba(20,29,47,.94),rgba(10,16,28,.98));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 34px rgba(0,0,0,.18)
   }
-  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) 244px auto;gap:28px;align-items:start}
+  .pack-top{display:grid;grid-template-columns:minmax(0,1fr) 268px auto;gap:24px;align-items:start}
   .pack-label{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#a8bddc}
   .pack-title{margin-top:8px;font:700 58px/.88 var(--teko);text-transform:uppercase}
   .pack-tagline{margin-top:8px;font:700 18px/1.2 var(--teko);letter-spacing:.03em;color:var(--accent-soft)}
@@ -307,7 +307,7 @@
   }
   .selector:focus{border-color:rgba(255,193,133,.42);box-shadow:0 0 0 3px rgba(245,163,75,.12)}
   .selector:disabled{opacity:.6;cursor:not-allowed}
-  .mode-buttons{display:grid;grid-template-columns:repeat(3,minmax(172px,1fr));gap:12px;max-width:920px}
+  .mode-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;max-width:1080px}
   .mode-btn{
     display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 18px;border-radius:18px;
     border:1px solid rgba(255,255,255,.1);text-decoration:none;cursor:pointer;
@@ -316,6 +316,10 @@
     transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
   }
   .mode-btn:hover{transform:translateY(-1px);filter:brightness(1.04)}
+  .mode-btn.hero{
+    min-height:66px;font-size:18px;letter-spacing:.07em;grid-column:span 2;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 22px 34px rgba(0,0,0,.28),0 0 0 1px rgba(187,247,208,.16)
+  }
   .mode-btn.primary{
     background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);
     color:#082312;border-color:rgba(187,247,208,.34)
@@ -327,6 +331,14 @@
   .mode-btn.tertiary{
     background:linear-gradient(180deg,#f3d58a,#d2a84d 42%,#a56f1f 74%,#825413 100%);
     color:#221507;border-color:rgba(248,225,161,.42)
+  }
+  .mode-btn.quaternary{
+    background:linear-gradient(180deg,#98f3ff,#60d7ef 42%,#2ea7d7 74%,#1f6f9b 100%);
+    color:#071d29;border-color:rgba(186,230,253,.38)
+  }
+  .mode-btn.subtle{
+    background:linear-gradient(180deg,rgba(45,55,72,.96),rgba(23,29,42,.98));
+    color:#d9e8fb;border-color:rgba(255,255,255,.12)
   }
   .mode-btn.disabled{pointer-events:none;opacity:.58;filter:saturate(.66)}
   .mode-note{font-size:12px;line-height:1.55;color:#cad7e8}
@@ -369,6 +381,11 @@
   .saved-universe-card.tone-reimagined{
     background:
       radial-gradient(120% 120% at 100% 0%,rgba(245,181,85,.14),transparent 44%),
+      linear-gradient(180deg,rgba(13,20,33,.94),rgba(8,12,22,.98))
+  }
+  .saved-universe-card.tone-simulation{
+    background:
+      radial-gradient(120% 120% at 100% 0%,rgba(96,215,239,.16),transparent 44%),
       linear-gradient(180deg,rgba(13,20,33,.94),rgba(8,12,22,.98))
   }
   .saved-universe-top{display:grid;grid-template-columns:84px minmax(0,1fr);gap:14px;align-items:start}
@@ -414,6 +431,7 @@
   .saved-universe-mode.tone-real{background:rgba(9,35,22,.76);border-color:rgba(187,247,208,.2);color:#cbf7de}
   .saved-universe-mode.tone-draft{background:rgba(10,26,48,.8);border-color:rgba(191,219,254,.18);color:#d8e8ff}
   .saved-universe-mode.tone-reimagined{background:rgba(45,30,10,.8);border-color:rgba(248,225,161,.2);color:#ffe5b8}
+  .saved-universe-mode.tone-simulation{background:rgba(8,32,44,.82);border-color:rgba(125,211,252,.22);color:#d8f4ff}
   .saved-universe-subtitle{margin-top:8px;font-size:13px;line-height:1.52;color:#d2ddef}
   .saved-universe-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .saved-universe-pill{
@@ -444,11 +462,11 @@
   .page-status-inline{color:var(--accent-soft)}
 
   @media (max-width: 1320px){
-    .wrap{max-width:1520px;padding:0 18px 40px}
-    .grid{grid-template-columns:minmax(0,1.26fr) minmax(320px,.74fr)}
-    .archive-browser-shell{grid-template-columns:286px minmax(0,1fr)}
+    .wrap{max-width:1600px;padding:0 18px 40px}
+    .grid{grid-template-columns:minmax(0,1.38fr) minmax(300px,.56fr)}
+    .archive-browser-shell{grid-template-columns:304px minmax(0,1fr)}
     .pack-title{font-size:48px}
-    .pack-top{grid-template-columns:minmax(0,1fr) 208px auto}
+    .pack-top{grid-template-columns:minmax(0,1fr) 220px auto}
     .pack-poster-headline{font-size:46px}
   }
   @media (max-width: 1080px){
@@ -464,6 +482,7 @@
     .hero-title{font-size:54px}
     .section-title,.pack-title,.future-title{font-size:34px}
     .hero-foot,.snapshot-grid,.pack-health,.mode-buttons,.spotlight-list{grid-template-columns:1fr}
+    .mode-btn.hero{grid-column:auto}
     .pack-top{grid-template-columns:1fr}
     .saved-universe-top,.saved-universe-progress{grid-template-columns:1fr}
     .pack-poster-headline,.archive-art-headline{font-size:34px}
@@ -492,8 +511,8 @@
         </div>
         <div class="hero-chip-row">
           <div class="hero-chip">Full-League Player Pool</div>
-          <div class="hero-chip">Real Season Path</div>
           <div class="hero-chip">Draft The Era</div>
+          <div class="hero-chip">Sim Season</div>
           <div class="hero-chip">Daily Reveal Compatible</div>
         </div>
         <div class="hero-foot">
@@ -616,18 +635,19 @@
 
                 <div class="pack-box selector-shell">
                   <div>
-                    <div class="selector-label">Featured Team</div>
+                    <div class="selector-label">Starting Slot</div>
                     <select class="selector" id="featuredTeamSelect">
                       <option>Loading teams...</option>
                     </select>
                   </div>
                   <div class="mode-buttons">
-                    <a href="#" class="mode-btn primary" id="playRealSeasonBtn">Play The Real Season</a>
-                    <a href="#" class="mode-btn secondary" id="draftEraBtn">Draft The Era</a>
+                    <a href="#" class="mode-btn primary hero" id="draftEraBtn">Draft The Era</a>
+                    <a href="#" class="mode-btn secondary" id="simSeasonBtn">Sim Season</a>
                     <a href="#" class="mode-btn tertiary" id="reimaginedSeasonBtn">Reimagined Season</a>
+                    <a href="#" class="mode-btn subtle" id="playRealSeasonBtn">Replay Era Rosters</a>
                   </div>
                   <div class="mode-note" id="modeNote">
-                    On localhost, team selection is staged before launch so the historical universe opens from the featured path you choose here.
+                    On localhost, the selected slot becomes your controlled entry point before the drafted or simulated universe opens.
                   </div>
                 </div>
               </div>
@@ -646,16 +666,20 @@
           </div>
           <div class="future-list">
             <div class="future-item">
-              <strong>Play The Real Season</strong>
-              <span>Launch the era with historical rosters intact and let the daily reveal system make the season feel lived-in.</span>
+              <strong>Draft The Era</strong>
+              <span>Open the full player pool from that year, build a custom roster, and turn the pack into your own basketball universe.</span>
             </div>
             <div class="future-item">
-              <strong>Draft The Era</strong>
-              <span>Open the entire player pool from that year and build an alternate-history league around the best names of the season.</span>
+              <strong>Sim Season</strong>
+              <span>Run the same pack through the box-score simulation layer so every reveal is generated from ratings and lineup decisions instead of sourced stats.</span>
             </div>
             <div class="future-item">
               <strong>Reimagined Season</strong>
-              <span>Future direction: sim the season into a new branch before the user even drafts, so the same era can be replayed in a different reality.</span>
+              <span>Branch the era into a new alternate timeline before the season unfolds, then let the reveal loop tell the new story forward.</span>
+            </div>
+            <div class="future-item">
+              <strong>Replay Era Rosters</strong>
+              <span>Keep the real roster identities intact as an authenticity lane, but treat it as the supporting mode beside the custom-universe fantasy.</span>
             </div>
           </div>
         </div>
@@ -704,9 +728,9 @@
       significanceTone: 'dynasty',
       completenessLabel: 'Playable foundation',
       completenessPercent: 82,
-      tagline: 'Rewrite the greatest regular season ever.',
-      summary: 'Full-league historical universe with real season stats, real-season boot, and Draft The Era support.',
-      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.',
+      tagline: 'Draft the era and build a 72-win dream roster of your own.',
+      summary: 'Full-league historical universe with real season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox instead of only a preserved roster replay.',
       focusTeamName: 'Chicago Bulls',
       art: {
         theme: 'dynasty',
@@ -714,9 +738,10 @@
         headline: '72-Win Empire',
         subline: 'Jordan, Hakeem, Shaq, and the full season universe.'
       },
-      plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
+      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season', 'Replay Era Rosters'],
       previewStars: ['Michael Jordan', 'Hakeem Olajuwon', "Shaquille O'Neal"],
       seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1',
+      simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1',
       draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1'
     },
     {
@@ -731,7 +756,7 @@
       significanceTone: 'heritage',
       completenessLabel: 'Concept framing',
       completenessPercent: 18,
-      tagline: 'Bird, Magic, and a young Jordan in one league.',
+      tagline: 'Draft Bird, Magic, and Jordan into one custom universe.',
       summary: 'A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.',
       whyItMatters: 'This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.',
       focusTeamName: 'Los Angeles Lakers',
@@ -741,7 +766,7 @@
         headline: 'Bird. Magic. Jordan.',
         subline: 'Peak Celtics-Lakers tension with a young Jordan entering the frame.'
       },
-      plannedModes: ['Play The Real Season', 'Draft The Era'],
+      plannedModes: ['Draft The Era', 'Sim Season', 'Replay Era Rosters'],
       previewStars: ['Magic Johnson', 'Larry Bird', 'Michael Jordan']
     },
     {
@@ -756,7 +781,7 @@
       significanceTone: 'spotlight',
       completenessLabel: 'Research + roadmap',
       completenessPercent: 12,
-      tagline: "Shaq and Kobe, AI's run, Duncan in his prime.",
+      tagline: 'Draft a turn-of-the-century superteam from one loaded player pool.',
       summary: 'A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.',
       whyItMatters: 'This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.',
       focusTeamName: 'Los Angeles Lakers',
@@ -766,7 +791,7 @@
         headline: 'Shaq. Kobe. AI.',
         subline: 'An era built on dominant bigs, electric guards, and playoff gravity.'
       },
-      plannedModes: ['Play The Real Season', 'Draft The Era', 'Historic Challenges'],
+      plannedModes: ['Draft The Era', 'Sim Season', 'Historic Challenges', 'Replay Era Rosters'],
       previewStars: ["Shaquille O'Neal", 'Allen Iverson', 'Tim Duncan']
     },
     {
@@ -781,9 +806,9 @@
       significanceTone: 'modern',
       completenessLabel: 'Playable modern foundation',
       completenessPercent: 80,
-      tagline: 'Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.',
-      summary: 'A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.',
-      whyItMatters: 'This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.',
+      tagline: 'Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.',
+      summary: 'A modern historical universe with a loaded full-season player pool, real season stats, and a strong foundation for drafted or simulated alternate-history runs.',
+      whyItMatters: 'This season gives the archive lane a modern tentpole pack where the biggest fantasy is not replaying one roster intact, but drafting the entire era into custom universes.',
       focusTeamName: 'Golden State Warriors',
       art: {
         theme: 'modern',
@@ -791,9 +816,10 @@
         headline: '73 Wins. 3-1 Swing.',
         subline: 'Unanimous MVP energy and the most volatile Finals pivot of the era.'
       },
-      plannedModes: ['Play The Real Season', 'Draft The Era', 'Reimagined Season'],
+      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season', 'Replay Era Rosters'],
       previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard'],
       seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
+      simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1',
       draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
       reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2016_full_season_v1'
     }
@@ -909,6 +935,9 @@
     if(mode === 'draft'){
       return String(config.draftUrl || ('rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=' + packId));
     }
+    if(mode === 'simulation'){
+      return String(config.simUrl || ('rosterbate-season.html?sport=nba&historical=sim&historicalPackId=' + packId));
+    }
     if(mode === 'reimagined'){
       return String(config.reimaginedUrl || ('rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=' + packId));
     }
@@ -971,7 +1000,7 @@
         ? '<span class="archive-meta-pill completeness">' + config.completenessLabel + (config.completenessPercent != null ? ' - ' + config.completenessPercent + '%' : '') + '</span>'
         : '';
       const meta = [
-          config.focusTeamName ? '<span class="archive-meta-pill">' + config.focusTeamName + '</span>' : '',
+          '<span class="archive-meta-pill">Full-Era Player Pool</span>',
           config.availability === 'playable' ? '<span class="archive-meta-pill">Real Pack</span>' : '<span class="archive-meta-pill">Preview Only</span>',
           completeness
         ].filter(Boolean).join('');
@@ -1141,7 +1170,7 @@
 
     document.getElementById('packEraLabel').textContent = (manifest.era || config.era || 'Historic').toUpperCase() + ' Archive';
     document.getElementById('packTitle').textContent = packLabel;
-    document.getElementById('packTagline').textContent = manifest.tagline || config.tagline || 'Play the real season or draft the era.';
+    document.getElementById('packTagline').textContent = manifest.tagline || config.tagline || 'Draft the era, sim the season, rewrite the universe.';
     document.getElementById('packDesc').textContent = config.whyItMatters
       ? ((manifest.description || config.summary || packSummary) + ' Why this season matters: ' + config.whyItMatters)
       : (manifest.description || config.summary || packSummary);
@@ -1203,23 +1232,26 @@
       select.disabled = false;
       select.value = String(presentation.featuredTeamId || manifest.focusTeamId || (sortedTeams[0] && sortedTeams[0].teamId) || '');
     } else {
-      select.innerHTML = '<option value="">' + (config.focusTeamName || 'Archive preview team') + '</option>';
+      select.innerHTML = '<option value="">' + (config.focusTeamName || 'Archive preview slot') + '</option>';
       select.disabled = true;
     }
 
     const playBtn = document.getElementById('playRealSeasonBtn');
+    const simBtn = document.getElementById('simSeasonBtn');
     const draftBtn = document.getElementById('draftEraBtn');
     const reimaginedBtn = document.getElementById('reimaginedSeasonBtn');
     const playableHere = config.availability === 'playable' && isLocalHistorical;
     playBtn.classList.toggle('disabled', !playableHere);
+    simBtn.classList.toggle('disabled', !playableHere);
     draftBtn.classList.toggle('disabled', !playableHere);
     reimaginedBtn.classList.toggle('disabled', !playableHere);
     playBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'season') : '#');
+    simBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'simulation') : '#');
     draftBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'draft') : '#');
     reimaginedBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'reimagined') : '#');
 
     document.getElementById('modeNote').textContent = playableHere
-      ? 'On localhost, launching from here stages the selected team before opening the historical season or draft.'
+      ? 'On localhost, launching from here stages your selected slot before opening the drafted or simulated universe.'
       : (config.availability === 'playable'
         ? 'This pack is real, but direct launch stays localhost-first until the lane graduates from preview.'
         : 'Preview packs stay visible early on purpose. Planned modes: ' + (plannedModes.length ? plannedModes.join(', ') : 'Archive preview') + '.');
@@ -1236,12 +1268,38 @@
           : 'This archive slot is a preview. It is visible now so the shelf reads like a real archive, not a single-pack experiment.', 'warn');
         return;
       }
-      setStatus('Staging selected team and opening the real historical season...', 'good');
+      setStatus('Staging the selected slot and opening roster replay...', 'good');
       try{
         await stageSelectedTeam(config, String(select.value || '').trim());
         window.location.href = buildLaunchUrl(config, 'season');
       }catch(error){
-        setStatus('Could not stage historical season: ' + (error && error.message ? error.message : String(error)), 'warn');
+        setStatus('Could not stage roster replay: ' + (error && error.message ? error.message : String(error)), 'warn');
+      }
+    };
+
+    simBtn.onclick = async function(event){
+      event.preventDefault();
+      if(!playableHere){
+        setStatus(config.availability === 'playable'
+          ? 'This pack is playable, but Sim Season remains localhost-first for now.'
+          : 'This archive slot is a preview. Sim Season will light up once the pack is authored and imported.', 'warn');
+        return;
+      }
+      setStatus('Staging the selected slot and opening Sim Season...', 'good');
+      try{
+        if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
+          await window.rbHistoricalPackDev.ready();
+          await window.rbHistoricalPackDev.setSelectedTeam(String(select.value || '').trim(), config.packId);
+          await window.rbHistoricalPackDev.applyFixtureToLocalState(config.packId, {
+            selectedTeamId: String(select.value || '').trim(),
+            entryMode: 'simulation_season'
+          });
+          window.location.href = buildLaunchUrl(config, 'simulation');
+          return;
+        }
+        window.location.href = buildLaunchUrl(config, 'simulation');
+      }catch(error){
+        setStatus('Could not open Sim Season: ' + (error && error.message ? error.message : String(error)), 'warn');
       }
     };
 
@@ -1253,7 +1311,7 @@
           : 'This archive slot is a preview. Draft The Era will light up once the pack is authored and imported.', 'warn');
         return;
       }
-      setStatus('Staging selected team and opening Draft The Era...', 'good');
+      setStatus('Staging the selected slot and opening Draft The Era...', 'good');
       try{
         if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
           await window.rbHistoricalPackDev.ready();
@@ -1276,7 +1334,7 @@
           : 'This archive slot is a preview. Reimagined Season will light up once the pack is authored and imported.', 'warn');
         return;
       }
-      setStatus('Staging selected team and opening Reimagined Season...', 'good');
+      setStatus('Staging the selected slot and opening Reimagined Season...', 'good');
       try{
         if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
           await window.rbHistoricalPackDev.ready();
@@ -1297,7 +1355,7 @@
     setStatus(
       config.availability === 'playable'
         ? (isLocalHistorical
-          ? 'Historical browser loaded from a real on-disk pack. Select a team and launch directly.'
+          ? 'Historical browser loaded from a real on-disk pack. Pick a slot and launch directly into a drafted or simulated universe.'
           : 'Pack browser loaded from a real pack artifact. Direct launch stays localhost-first for now.')
         : 'Archive shelf loaded. Preview packs are intentionally visible before they become playable.',
       config.availability === 'playable' ? 'good' : 'warn'

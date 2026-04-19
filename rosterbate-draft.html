@@ -3924,7 +3924,9 @@ function buildHistoricalDraftContextFromSource(source, requestedSport){
       designation:'ACTIVE',
       draftEligible: player?.draftEligible!==false,
       statsThroughDate: latestStatsDate,
-      bio: player?.bio || ''
+      bio: player?.bio || '',
+      seasonStats: cloneDraftJsonSafe(player?.seasonStats || null),
+      simProfile: cloneDraftJsonSafe(player?.simProfile || null)
     };
   }));
 
@@ -8013,12 +8015,16 @@ async function endDraft(){
       ftp:p?.ftp,
       tpm:p?.tpm,
       fp:p?.fp,
+      gp:p?.gp,
+      totalFantasyPoints:p?.totalFantasyPoints,
       statValues:p?.statValues||null,
       statSummary:p?.statSummary||'',
       draftEligible:p?.draftEligible!==false,
       designation:p?.designation||'ACTIVE',
       statsThroughDate:p?.statsThroughDate||'',
-      bio:p?.bio||''
+      bio:p?.bio||'',
+      seasonStats:p?.seasonStats ? cloneDraftJsonSafe(p.seasonStats) : null,
+      simProfile:p?.simProfile ? cloneDraftJsonSafe(p.simProfile) : null
     });
 
     // Save draft data to localStorage for the season manager to pick up

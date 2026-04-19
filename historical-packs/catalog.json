@@ -11,9 +11,9 @@
     "significanceTone": "dynasty",
     "completenessLabel": "Playable foundation",
     "completenessPercent": 82,
-    "tagline": "Rewrite the greatest regular season ever.",
-    "summary": "Full-league historical universe with real season stats, real-season boot, and Draft The Era support.",
-    "whyItMatters": "This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.",
+    "tagline": "Draft the era and build a 72-win dream roster of your own.",
+    "summary": "Full-league historical universe with real season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.",
+    "whyItMatters": "This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox instead of only a preserved roster replay.",
     "focusTeamName": "Chicago Bulls",
     "art": {
       "theme": "dynasty",
@@ -22,9 +22,10 @@
       "subline": "Jordan, Hakeem, Shaq, and the full season universe."
     },
     "plannedModes": [
-      "Play The Real Season",
       "Draft The Era",
-      "Reimagined Season"
+      "Sim Season",
+      "Reimagined Season",
+      "Replay Era Rosters"
     ],
     "previewStars": [
       "Michael Jordan",
@@ -32,6 +33,7 @@
       "Shaquille O'Neal"
     ],
     "seasonUrl": "rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1",
+    "simUrl": "rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1",
     "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1"
   },
   {
@@ -46,7 +48,7 @@
     "significanceTone": "heritage",
     "completenessLabel": "Concept framing",
     "completenessPercent": 18,
-    "tagline": "Bird, Magic, and a young Jordan in one league.",
+    "tagline": "Draft Bird, Magic, and Jordan into one custom universe.",
     "summary": "A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.",
     "whyItMatters": "This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.",
     "focusTeamName": "Los Angeles Lakers",
@@ -57,8 +59,9 @@
       "subline": "Peak Celtics-Lakers tension with a young Jordan entering the frame."
     },
     "plannedModes": [
-      "Play The Real Season",
-      "Draft The Era"
+      "Draft The Era",
+      "Sim Season",
+      "Replay Era Rosters"
     ],
     "previewStars": [
       "Magic Johnson",
@@ -78,7 +81,7 @@
     "significanceTone": "spotlight",
     "completenessLabel": "Research + roadmap",
     "completenessPercent": 12,
-    "tagline": "Shaq and Kobe, AI's run, Duncan in his prime.",
+    "tagline": "Draft a turn-of-the-century superteam from one loaded player pool.",
     "summary": "A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.",
     "whyItMatters": "This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.",
     "focusTeamName": "Los Angeles Lakers",
@@ -89,9 +92,10 @@
       "subline": "An era built on dominant bigs, electric guards, and playoff gravity."
     },
     "plannedModes": [
-      "Play The Real Season",
       "Draft The Era",
-      "Historic Challenges"
+      "Sim Season",
+      "Historic Challenges",
+      "Replay Era Rosters"
     ],
     "previewStars": [
       "Shaquille O'Neal",
@@ -111,9 +115,9 @@
     "significanceTone": "modern",
     "completenessLabel": "Playable modern foundation",
     "completenessPercent": 80,
-    "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
-    "summary": "A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.",
-    "whyItMatters": "This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.",
+    "tagline": "Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.",
+    "summary": "A modern historical universe with a loaded full-season player pool, real season stats, and a strong foundation for drafted or simulated alternate-history runs.",
+    "whyItMatters": "This season gives the archive lane a modern tentpole pack where the biggest fantasy is not replaying one roster intact, but drafting the entire era into custom universes.",
     "focusTeamName": "Golden State Warriors",
     "art": {
       "theme": "modern",
@@ -122,9 +126,10 @@
       "subline": "Unanimous MVP energy and the most volatile Finals pivot of the era."
     },
     "plannedModes": [
-      "Play The Real Season",
       "Draft The Era",
-      "Reimagined Season"
+      "Sim Season",
+      "Reimagined Season",
+      "Replay Era Rosters"
     ],
     "previewStars": [
       "Stephen Curry",
@@ -132,6 +137,7 @@
       "Kawhi Leonard"
     ],
     "seasonUrl": "rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1",
+    "simUrl": "rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1",
     "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1",
     "reimaginedUrl": "rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2016_full_season_v1"
   }

@@ -142,8 +142,13 @@ body.mm-create-shimmer-ready .schedule-action::after{
   radial-gradient(90% 120% at 50% 0%,rgba(108,160,255,.08),transparent 46%),
   linear-gradient(180deg,rgba(77,116,178,.1),rgba(16,24,39,.12) 34%,rgba(12,18,29,.92) 100%),
   linear-gradient(135deg,#17243b,#0f1726);
-  border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 28px rgba(0,0,0,.18);}
+  border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 28px rgba(0,0,0,.18);position:relative;overflow:hidden;}
 .lobby-card:hover{border-color:rgba(247,164,87,.3);}
+.lobby-card::before{content:'';position:absolute;inset:0 0 auto 0;height:2px;background:rgba(255,255,255,.06);opacity:.9;}
+.lobby-card.fresh::before{background:linear-gradient(90deg,rgba(74,222,128,.9),rgba(74,222,128,.18),transparent 82%);}
+.lobby-card.warm::before{background:linear-gradient(90deg,rgba(249,115,22,.9),rgba(249,115,22,.18),transparent 82%);}
+.lobby-card.quiet::before{background:linear-gradient(90deg,rgba(96,165,250,.9),rgba(96,165,250,.18),transparent 82%);}
+.lobby-card.stale::before{background:linear-gradient(90deg,rgba(148,163,184,.8),rgba(148,163,184,.12),transparent 82%);}
 .mm-hero{padding:18px 18px 16px;}
 .mm-hero-shell{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(320px,.76fr);gap:14px;align-items:stretch;}
 .mm-hero-shell .mm-hero{height:100%;}
@@ -194,6 +199,11 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .mm-dashboard-stat{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 11px;background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
 .mm-dashboard-value{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1;color:#f8fafc;}
 .mm-dashboard-label{margin-top:6px;font-size:11px;color:#8fa0b8;text-transform:uppercase;letter-spacing:.65px;}
+.mm-dashboard-pulse{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.mm-dashboard-pulse-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(10,17,28,.58);font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#dbe6f5;}
+.mm-dashboard-pulse-pill.live{border-color:rgba(74,222,128,.3);color:#86efac;background:rgba(21,69,48,.28);}
+.mm-dashboard-pulse-pill.hot{border-color:rgba(249,115,22,.3);color:#fdba74;background:rgba(120,53,15,.25);}
+.mm-dashboard-pulse-pill.quiet{border-color:rgba(96,165,250,.3);color:#bfdbfe;background:rgba(24,49,104,.24);}
 .mm-dashboard-note{margin-top:10px;padding:9px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));font-size:11px;color:#aab7c9;line-height:1.5;}
 .mm-browse-chat-wide{grid-column:1 / -1;margin-top:-2px;}
 .mm-section-label{font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.85px;text-transform:uppercase;color:#97abc6;margin-bottom:10px;}
@@ -240,6 +250,7 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .wr-chat-card{min-height:340px;}
 .wr-chat-card #wrChat{min-height:170px;max-height:280px;}
 .lobby-card-top{display:flex;align-items:center;justify-content:space-between;}
+.lobby-meta-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .lobby-name{font-family:var(--fd);font-size:16px;font-weight:800;}
 .lobby-status{font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:20px;}
 .lobby-status.waiting{background:rgba(34,197,94,.15);color:var(--green);}
@@ -257,6 +268,20 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .lobby-av:first-child{margin-left:0;}
 .lobby-slots{font-size:11px;color:var(--text2);margin-left:8px;}
 .lobby-subline{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.55;}
+.lobby-freshness{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(8,13,21,.62);font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#d7e4f4;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.lobby-freshness::before{content:'';width:6px;height:6px;border-radius:999px;background:currentColor;opacity:.9;}
+.lobby-freshness.fresh{border-color:rgba(74,222,128,.3);background:rgba(21,69,48,.28);color:#86efac;}
+.lobby-freshness.warm{border-color:rgba(249,115,22,.3);background:rgba(120,53,15,.25);color:#fdba74;}
+.lobby-freshness.quiet{border-color:rgba(96,165,250,.3);background:rgba(24,49,104,.24);color:#bfdbfe;}
+.lobby-freshness.stale{border-color:rgba(148,163,184,.24);background:rgba(30,41,59,.32);color:#cbd5e1;}
+.lobby-energy-line{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:2px;}
+.lobby-energy-note{font-size:11px;color:#c7d3e4;line-height:1.5;min-width:0;}
+.lobby-energy-pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.lobby-energy-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(10,17,28,.58);font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#dbe6f5;}
+.lobby-energy-pill.live{border-color:rgba(74,222,128,.3);color:#86efac;background:rgba(21,69,48,.28);}
+.lobby-energy-pill.contested{border-color:rgba(249,115,22,.3);color:#fdba74;background:rgba(120,53,15,.25);}
+.lobby-energy-pill.quiet{border-color:rgba(96,165,250,.3);color:#bfdbfe;background:rgba(24,49,104,.24);}
+.lobby-energy-pill.stale{border-color:rgba(148,163,184,.24);color:#cbd5e1;background:rgba(30,41,59,.32);}
 .lobby-meta-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;}
 .lobby-availability{display:flex;align-items:center;min-width:0;}
 .lobby-state-note{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
@@ -295,6 +320,13 @@ body.mm-create-shimmer-ready .schedule-action::after{
 .global-chat-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;}
 .global-chat-sub{font-size:12px;color:var(--text2);line-height:1.55;max-width:520px;}
 .global-chat-room{font-size:11px;color:var(--green);font-family:var(--fd);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.global-chat-pulsebar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:linear-gradient(180deg,rgba(19,29,45,.78),rgba(10,16,26,.96));}
+.global-chat-pulse-title{font-family:var(--fd);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:#f8fafc;}
+.global-chat-pulse-copy{font-size:11px;color:#aab7c9;line-height:1.45;}
+.global-chat-pulse-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.global-chat-pulse-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(10,17,28,.58);font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:#dbe6f5;}
+.global-chat-pulse-pill.live{border-color:rgba(74,222,128,.3);color:#86efac;background:rgba(21,69,48,.28);}
+.global-chat-pulse-pill.quiet{border-color:rgba(96,165,250,.3);color:#bfdbfe;background:rgba(24,49,104,.24);}
 .global-chat-feed{flex:1;min-height:220px;max-height:420px;overflow-y:auto;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;}
 .global-chat-row{display:flex;gap:10px;align-items:flex-start;}
 .global-chat-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
@@ -702,6 +734,9 @@ function matchmakingDashboardShell(){
           <div class="mm-dashboard-label">In Matchmaking</div>
         </div>
       </div>
+      <div class="mm-dashboard-pulse" id="mmDashPulse">
+        <span class="mm-dashboard-pulse-pill quiet">Refreshing Floor</span>
+      </div>
       <div class="mm-dashboard-note" id="mmDashNote">Refreshing the live floor snapshot...</div>
     </div>
   `;
@@ -715,6 +750,15 @@ function globalChatShell(){
           <div class="global-chat-sub">Post league codes, call out open rooms, and keep the whole matchmaking floor alive.</div>
         </div>
         <div class="global-chat-room">${myIsAdmin ? 'Admin Online · Matchmaking Hub' : 'Matchmaking Hub'}</div>
+      </div>
+      <div class="global-chat-pulsebar">
+        <div>
+          <div class="global-chat-pulse-title" id="mmGlobalChatPulseTitle">Floor chatter</div>
+          <div class="global-chat-pulse-copy" id="mmGlobalChatPulseCopy">Waiting for the first room callout...</div>
+        </div>
+        <div class="global-chat-pulse-meta" id="mmGlobalChatPulseMeta">
+          <span class="global-chat-pulse-pill quiet">Quiet Floor</span>
+        </div>
       </div>
       <div id="mmGlobalChatFeed" class="global-chat-feed"><div class="empty"><div class="empty-icon">...</div><div class="empty-title">Loading chat...</div></div></div>
       <div class="global-chat-compose">
@@ -754,7 +798,28 @@ function isChatBanned(playerId){
 function renderGlobalChat(){
   if(!myId) return;
   const feed = document.getElementById('mmGlobalChatFeed');
+  const pulseTitle=document.getElementById('mmGlobalChatPulseTitle');
+  const pulseCopy=document.getElementById('mmGlobalChatPulseCopy');
+  const pulseMeta=document.getElementById('mmGlobalChatPulseMeta');
   if(!feed) return;
+  const latest=globalChatMessages.length ? globalChatMessages[globalChatMessages.length-1] : null;
+  const now=Date.now();
+  const recentCount=globalChatMessages.filter(m=>now-Number(m.ts||0) < 20*60*1000).length;
+  if(pulseTitle && pulseCopy && pulseMeta){
+    if(!latest){
+      pulseTitle.textContent='Floor chatter';
+      pulseCopy.textContent='Waiting for the first room callout...';
+      pulseMeta.innerHTML='<span class="global-chat-pulse-pill quiet">Quiet Floor</span>';
+    }else{
+      const previewText=String(latest.text || '').replace(/\s+/g,' ').trim();
+      const clipped=previewText ? previewText.slice(0,60) + (previewText.length>60?'…':'') : '';
+      pulseTitle.textContent=recentCount >= 6 ? 'Room is moving' : 'Latest callout';
+      pulseCopy.textContent=`${latest.name || 'Manager'} posted ${formatRelativeFloorTime(latest.ts)}${clipped ? ` · "${clipped}"` : ''}`;
+      pulseMeta.innerHTML=`
+        <span class="global-chat-pulse-pill ${recentCount >= 6 ? 'live' : 'quiet'}">${recentCount} recent post${recentCount!==1?'s':''}</span>
+        <span class="global-chat-pulse-pill quiet">Last ${formatRelativeFloorTime(latest.ts)}</span>`;
+    }
+  }
   if(!globalChatMessages.length){
     feed.innerHTML = '<div class="empty"><div class="empty-icon">??</div><div class="empty-title">Start the room</div><div class="empty-desc">Drop a code, ask for a league, or tell people what format you want.</div></div>';
     return;
@@ -828,6 +893,96 @@ function escapeHtml(value){
     .replace(/'/g,'&#39;');
 }
 
+function getLobbyLastActivityAt(lobby){
+  const target=lobby||{};
+  const chatValues=Object.values(target.chat||{});
+  const latestChat=chatValues.reduce((max,row)=>Math.max(max, Number(row?.ts||0)), 0);
+  return Math.max(
+    Number(target.lastActivityAt||0),
+    Number(target.lastChatAt||0),
+    Number(target.orderFinalizedAt||0),
+    Number(target.completedAt||0),
+    Number(target.createdAt||0),
+    latestChat
+  );
+}
+
+function formatRelativeFloorTime(ts){
+  const delta=Math.max(0, Date.now()-Number(ts||0));
+  if(!ts || !Number.isFinite(delta)) return 'just now';
+  const minutes=Math.floor(delta/60000);
+  if(minutes<=0) return 'just now';
+  if(minutes<60) return `${minutes}m ago`;
+  const hours=Math.floor(minutes/60);
+  if(hours<24) return `${hours}h ago`;
+  const days=Math.floor(hours/24);
+  return `${days}d ago`;
+}
+
+function getLobbyFreshnessMeta(lobby){
+  const target=lobby||{};
+  const lastActivityAt=getLobbyLastActivityAt(target);
+  const age=Math.max(0, Date.now()-Number(lastActivityAt||0));
+  const players=Object.keys(target.players||{}).length;
+  const readyCount=Object.values(target.players||{}).filter(player=>!!player?.ready).length;
+  const occupancy=Math.max(0, players)/Math.max(1, Number(target.teamSize||1));
+  const liveRoom=canOpenDraftRoom(target) || String(target.status||'')==='started';
+  if(liveRoom){
+    return { tone:'fresh', label:'Live Now', note:'Draft room is active right now.', activityAt:lastActivityAt, occupancy, readyCount };
+  }
+  if(age <= 5*60*1000){
+    return { tone:'fresh', label:'Just Active', note:`Touched ${formatRelativeFloorTime(lastActivityAt)}.`, activityAt:lastActivityAt, occupancy, readyCount };
+  }
+  if(age <= 20*60*1000){
+    return { tone:'warm', label:'Warm Room', note:`Last movement ${formatRelativeFloorTime(lastActivityAt)}.`, activityAt:lastActivityAt, occupancy, readyCount };
+  }
+  if(age <= 90*60*1000){
+    return { tone:'quiet', label:'Quiet Room', note:`Cooling off ${formatRelativeFloorTime(lastActivityAt)}.`, activityAt:lastActivityAt, occupancy, readyCount };
+  }
+  return { tone:'stale', label:'Stale Room', note:`No real movement since ${formatRelativeFloorTime(lastActivityAt)}.`, activityAt:lastActivityAt, occupancy, readyCount };
+}
+
+function getLobbyEnergyPills(lobby){
+  const freshness=getLobbyFreshnessMeta(lobby);
+  const players=Object.keys(lobby?.players||{}).length;
+  const readyCount=Object.values(lobby?.players||{}).filter(player=>!!player?.ready).length;
+  const pills=[];
+  if(canOpenDraftRoom(lobby) || String(lobby?.status||'')==='started'){
+    pills.push({tone:'live', text:'Live Room'});
+  }else if(players >= Math.max(2, Math.ceil(Number(lobby?.teamSize||0)*0.6))){
+    pills.push({tone:'contested', text:'Filling Fast'});
+  }else if(freshness.tone==='stale'){
+    pills.push({tone:'stale', text:'Needs Energy'});
+  }else{
+    pills.push({tone:freshness.tone==='warm'?'contested':freshness.tone, text:freshness.tone==='quiet'?'Quiet Floor':'Fresh Activity'});
+  }
+  if(readyCount>0) pills.push({tone:'live', text:`${readyCount} Ready`});
+  if(isScheduledLobby(lobby) && !isLobbyJoinLocked(lobby)) pills.push({tone:'quiet', text:'Scheduled'});
+  return pills;
+}
+
+function renderLobbyEnergyPills(lobby){
+  return getLobbyEnergyPills(lobby).map(pill=>`<span class="lobby-energy-pill ${pill.tone||''}">${pill.text}</span>`).join('');
+}
+
+function renderLobbyFreshnessCard(lobby, options){
+  const opts=options||{};
+  const freshness=getLobbyFreshnessMeta(lobby);
+  const urgencyTags=getLobbyUrgencyPills(lobby).map(tag=>`<span class="lobby-tag ${tag.tone||''}">${tag.text}</span>`).join('');
+  const energyPills=renderLobbyEnergyPills(lobby);
+  const extraTags=(opts.extraTags||[]).map(text=>`<span class="lobby-tag">${text}</span>`).join('');
+  return {
+    freshness,
+    urgencyTags,
+    energyPills,
+    open:`<div class="lobby-card ${freshness.tone}" style="margin-bottom:8px;">`,
+    topMeta:`<div class="lobby-meta-top"><div class="lobby-status ${opts.statusClass||''}">${opts.statusLabel||''}</div><div class="lobby-freshness ${freshness.tone}">${freshness.label}</div></div>`,
+    tags:`<div class="lobby-tags">${urgencyTags}${extraTags}</div>`,
+    energy:`<div class="lobby-energy-line"><div class="lobby-energy-note">${opts.energyNote || freshness.note}</div><div class="lobby-energy-pills">${energyPills}</div></div>`,
+    close:`</div>`
+  };
+}
+
 async function mmSendGlobalChat(){
   const input = document.getElementById('mmGlobalChatInput');
   const text = (input?.value || '').trim();
@@ -874,6 +1029,7 @@ async function mmSendGlobalChat(){
     
     console.log('📤 Sending message:', messageData);
     await globalChatRef.push(messageData);
+    await db.ref('matchmakingGlobalChat').update({lastActivityAt:messageData.ts,lastMessageAt:messageData.ts,lastMessageBy:messageData.name || 'Manager'});
     console.log('✅ Message sent successfully');
   }catch(e){
     console.error('❌ Failed to send message:', e);
@@ -1207,6 +1363,17 @@ function isCompletedOrStaleLobby(lobby){
   return false;
 }
 
+async function markLobbyActivity(lobbyId, extraUpdates){
+  if(!lobbyId) return;
+  const ts=Date.now();
+  const updates={lastActivityAt:ts, ...(extraUpdates||{})};
+  try{
+    await db.ref('lobbies/'+lobbyId).update(updates);
+  }catch(e){
+    console.warn('Could not mark lobby activity', lobbyId, e);
+  }
+}
+
 async function ensureScheduledLobbyState(lobbyId, lobby){
   const target=lobby||((await db.ref('lobbies/'+lobbyId).once('value')).val());
   if(!target || !isScheduledLobby(target)) return target;
@@ -1256,9 +1423,11 @@ function getCurrentDraftOrder(lobby){
 async function saveManualDraftOrder(lobbyId, orderedIds){
   const clean=(Array.isArray(orderedIds)?orderedIds:[]).filter(Boolean);
   if(!clean.length) return;
+  const ts=Date.now();
   await db.ref('lobbies/'+lobbyId).update({
     finalDraftOrder:clean,
-    orderFinalizedAt:Date.now()
+    orderFinalizedAt:ts,
+    lastActivityAt:ts
   });
 }
 
@@ -1852,7 +2021,8 @@ async function loadLiveDrafts(){
     const snap=await db.ref('lobbies').once('value');
     if(!snap.exists()){ list.innerHTML=emptyHtml('No live drafts','When one of your leagues starts, it will appear here.'); return; }
     const now=Date.now();
-    const TWO_HOURS=2*60*60*1000;
+    const FORTY_FIVE_MIN=45*60*1000;
+    const EIGHT_HOURS=8*60*60*1000;
     const live=[];
     const seenIds=new Set();
     const tasks=[];
@@ -1862,11 +2032,16 @@ async function loadLiveDrafts(){
       tasks.push(ensureScheduledLobbyState(c.key,lobby).then(next=>{
         const target={id:c.key,...(next||lobby)};
         const count=teamCount(target);
+        const lastActivityAt=getLobbyLastActivityAt(target);
         if(isCompletedOrStaleLobby(target)){
           db.ref('lobbies/'+c.key).remove().catch(()=>{});
           return;
         }
-        if(count===0 || (!isScheduledLobby(target) && Number(target.createdAt||0) && now-Number(target.createdAt||0)>TWO_HOURS)){
+        if(count===0 && !isScheduledLobby(target) && lastActivityAt && now-lastActivityAt>FORTY_FIVE_MIN){
+          db.ref('lobbies/'+c.key).remove().catch(()=>{});
+          return;
+        }
+        if(count>0 && !isScheduledLobby(target) && String(target.status||'')==='waiting' && lastActivityAt && now-lastActivityAt>EIGHT_HOURS){
           db.ref('lobbies/'+c.key).remove().catch(()=>{});
           return;
         }
@@ -1894,17 +2069,19 @@ async function loadLiveDrafts(){
         : (lobby.status==='draft_room_open' && Number(lobby.scheduledStartAt||0)>Date.now()
             ? `Draft starts ${formatDraftDateTime(lobby.scheduledStartAt)}`
             : (isJoined ? `You joined ${joined}` : `${teamCount(lobby)}/${lobby.teamSize} teams in room`));
-      const urgencyTags=getLobbyUrgencyPills(lobby).map(tag=>`<span class="lobby-tag ${tag.tone||''}">${tag.text}</span>`).join('');
-      return `<div class="lobby-card" style="margin-bottom:8px;">
+      const roomBits=renderLobbyFreshnessCard(lobby,{
+        statusClass,
+        statusLabel,
+        extraTags:[`${teamCount(lobby)}/${lobby.teamSize} teams`],
+        energyNote:subline
+      });
+      return `${roomBits.open}
         <div class="lobby-card-top">
           <div class="lobby-name">${lobby.name||'League'}</div>
-          <div class="lobby-status ${statusClass}">${statusLabel}</div>
+          ${roomBits.topMeta}
         </div>
-        <div class="lobby-tags">
-          ${urgencyTags}
-          <span class="lobby-tag">${teamCount(lobby)}/${lobby.teamSize} teams</span>
-        </div>
-        <div class="lobby-subline">${subline}</div>
+        ${roomBits.tags}
+        ${roomBits.energy}
         <div class="lobby-meta-row">
           <div class="lobby-state-note">${isJoined?(canOpenDraftRoom(lobby)?'Your room is open now':'You are staged in this room'):(canJoinLobbyNow(lobby)?'Room is taking managers now':'Room is visible, but entry is locked')}</div>
           <div class="lobby-action-row">
@@ -1912,7 +2089,7 @@ async function loadLiveDrafts(){
             ${isJoined?`<button class="btn-danger" onclick="leaveLeague('${lobby.id}', true)">Leave</button>`:''}
           </div>
         </div>
-      </div>`;
+      ${roomBits.close}`;
     }).join('');
   }catch(e){
     console.error(e);
@@ -2011,7 +2188,8 @@ async function loadBrowse(){
     if(!snap.exists()){ list.innerHTML=emptyHtml('No open leagues','Create one or browse back later when rooms open up.'); return; }
 
     const now=Date.now();
-    const TWO_HOURS=2*60*60*1000;
+    const FORTY_FIVE_MIN=45*60*1000;
+    const EIGHT_HOURS=8*60*60*1000;
     const results=[];
 
     const tasks=[];
@@ -2020,14 +2198,18 @@ async function loadBrowse(){
       tasks.push(ensureScheduledLobbyState(c.key,l).then(next=>{
       const lobby={id:c.key,...(next||l)};
       const count=Object.keys(lobby.players||{}).length;
+      const lastActivityAt=getLobbyLastActivityAt(lobby);
       if(isCompletedOrStaleLobby(lobby)){
         if(lobby.status==='completed' || Number(lobby.completedAt||0)>0 || String(lobby.completedSeasonId||'').trim()){
           db.ref('lobbies/'+c.key).remove().catch(()=>{});
         }
         return;
       }
-      // Remove stale: no players or older than 2 hours
-      if(count===0||(!isScheduledLobby(lobby) && lobby.createdAt&&now-lobby.createdAt>TWO_HOURS)){
+      if(count===0 && !isScheduledLobby(lobby) && lastActivityAt && now-lastActivityAt>FORTY_FIVE_MIN){
+        db.ref('lobbies/'+c.key).remove().catch(()=>{});
+        return;
+      }
+      if(count>0 && !isScheduledLobby(lobby) && String(lobby.status||'')==='waiting' && lastActivityAt && now-lastActivityAt>EIGHT_HOURS){
         db.ref('lobbies/'+c.key).remove().catch(()=>{});
         return;
       }
@@ -2069,16 +2251,19 @@ async function loadBrowse(){
       const metaLine=scheduled
         ? `Starts ${formatDraftDateTime(l.scheduledStartAt)} · Draft room opens ${formatDraftDateTime(l.draftAccessAt)}`
         : `${count}/${l.teamSize} joined`;
-      const urgencyTags=getLobbyUrgencyPills(l).map(tag=>`<span class="lobby-tag ${tag.tone||''}">${tag.text}</span>`).join('');
-      return `<div class="lobby-card" style="margin-bottom:8px;">
+      const roomBits=renderLobbyFreshnessCard(l,{
+        statusClass,
+        statusLabel,
+        extraTags:[`${l.teamSize} teams`, fmtLabel, scrLabel],
+        energyNote:metaLine
+      });
+      return `${roomBits.open}
         <div class="lobby-card-top">
           <div class="lobby-name">${l.name||'League'}</div>
-          <div class="lobby-status ${statusClass}">${statusLabel}</div>
+          ${roomBits.topMeta}
         </div>
-        <div class="lobby-tags">
-          ${urgencyTags}
-          <span class="lobby-tag">${l.teamSize} teams</span>
-        </div>
+        ${roomBits.tags}
+        ${roomBits.energy}
         <div class="lobby-meta-row">
           <div class="lobby-availability">
             <div style="display:flex;">${avs}</div>
@@ -2088,7 +2273,7 @@ async function loadBrowse(){
             ${canJoinLobbyNow(l)?`<button class="btn-p" onclick="joinLobby('${l.id}')">Join Room</button>`:`<span class="lobby-state-note">${full?'Room Full':(locked?'Join Locked':'Unavailable')}</span>`}
           </div>
         </div>
-      </div>`;
+      ${roomBits.close}`;
     }).join('');
   }catch(e){ console.error(e); list.innerHTML=emptyHtml('Error loading','Check your Firebase config'); }
 }
@@ -2101,6 +2286,7 @@ async function loadMatchmakingDashboard(){
   const draftingEl=document.getElementById('mmDashDrafting');
   const floorEl=document.getElementById('mmDashFloor');
   const noteEl=document.getElementById('mmDashNote');
+  const pulseEl=document.getElementById('mmDashPulse');
   if(!onlineEl || !draftingEl || !floorEl || !noteEl) return;
   const token=++mmDashboardRequestToken;
   try{
@@ -2119,15 +2305,28 @@ async function loadMatchmakingDashboard(){
     }
     const draftingPlayerIds=new Set();
     let liveRoomCount=0;
+    let openRoomCount=0;
+    let joinableRoomCount=0;
+    let freshestRoom=null;
+    let freshestAt=0;
     if(lobbySnap.exists()){
       lobbySnap.forEach(c=>{
         const lobby={id:c.key,...(c.val()||{})};
         if((lobby.sport||MM_SPORT)!==MM_SPORT) return;
         if(isCompletedOrStaleLobby(lobby)) return;
         const status=String(lobby.status||'');
+        const lastActivityAt=getLobbyLastActivityAt(lobby);
         if(['started','draft_room_open'].includes(status)){
           liveRoomCount++;
           Object.keys(lobby.players||{}).forEach(id=>draftingPlayerIds.add(String(id)));
+        }
+        if(!lobby.isPrivate && !['started','draft_room_open','completed'].includes(status)){
+          openRoomCount++;
+          if(canJoinLobbyNow(lobby)) joinableRoomCount++;
+          if(lastActivityAt > freshestAt){
+            freshestAt=lastActivityAt;
+            freshestRoom=lobby;
+          }
         }
       });
     }
@@ -2135,15 +2334,22 @@ async function loadMatchmakingDashboard(){
     onlineEl.textContent=String(activePresenceIds.size);
     draftingEl.textContent=String(draftingPlayerIds.size);
     floorEl.textContent=String(matchmakingOnlyCount);
+    if(pulseEl){
+      pulseEl.innerHTML=`
+        <span class="mm-dashboard-pulse-pill live">${openRoomCount} open room${openRoomCount!==1?'s':''}</span>
+        <span class="mm-dashboard-pulse-pill hot">${joinableRoomCount} joinable now</span>
+        <span class="mm-dashboard-pulse-pill quiet">${freshestRoom ? `${freshestRoom.name||'Fresh room'} ${formatRelativeFloorTime(freshestAt)}` : 'No room pulse yet'}</span>`;
+    }
     noteEl.textContent=liveRoomCount
-      ? `${liveRoomCount} live room${liveRoomCount!==1?'s':''} open right now. Matchmaking counts reflect active users on this page who are not already in a draft room.`
-      : 'No live draft rooms are open right now. The floor count reflects active users still browsing and forming rooms here.';
+      ? `${liveRoomCount} live room${liveRoomCount!==1?'s':''} open right now. ${joinableRoomCount} public room${joinableRoomCount!==1?'s':''} can be joined immediately${freshestRoom ? `, with ${freshestRoom.name||'the freshest room'} active ${formatRelativeFloorTime(freshestAt)}.` : '.'}`
+      : `No live draft rooms are open right now. ${joinableRoomCount} room${joinableRoomCount!==1?'s':''} are still joinable on the floor${freshestRoom ? `, and ${freshestRoom.name||'the freshest room'} moved ${formatRelativeFloorTime(freshestAt)}.` : '.'}`;
   }catch(e){
     if(token!==mmDashboardRequestToken) return;
     console.error('Failed to load matchmaking dashboard', e);
     onlineEl.textContent='--';
     draftingEl.textContent='--';
     floorEl.textContent='--';
+    if(pulseEl) pulseEl.innerHTML='<span class="mm-dashboard-pulse-pill quiet">Refresh failed</span>';
     noteEl.textContent='Could not refresh the live floor snapshot right now.';
   }
 }
@@ -2439,6 +2645,7 @@ async function createAndJoinLobby(opts){
   const code=Math.random().toString(36).slice(2,8).toUpperCase();
   const scheduledStartAt=Number(opts.scheduledStartAt||0);
   const draftAccessAt=scheduledStartAt ? Math.max(0, scheduledStartAt - DRAFT_ROOM_UNLOCK_MS) : 0;
+  const createdAt=Date.now();
   const lobby={
     name:opts.name||'New League',
     sport:opts.sport||MM_SPORT,
@@ -2456,7 +2663,8 @@ async function createAndJoinLobby(opts){
     orderFinalizedAt:null,
     draftRoomId:null,
     code, status:scheduledStartAt?'scheduled':'waiting',
-    createdBy:myId, createdAt:Date.now(),
+    createdBy:myId, createdAt,
+    lastActivityAt:createdAt,
     players:{}, chat:{}
   };
   const newRef=db.ref('lobbies').push();
@@ -2501,6 +2709,7 @@ async function leaveLeague(lobbyId, refreshLive){
       if(lobby.createdBy===myId){
         updates.createdBy=remainingIds[0];
       }
+      updates.lastActivityAt=Date.now();
       await db.ref('lobbies/'+lobbyId).update(updates);
     }
 
@@ -2533,13 +2742,17 @@ async function joinLobby(lobbyId){
     toast(isLobbyJoinLocked(lobby)?'This league is locked for order finalization and draft-room access':'That league is not accepting joins right now','var(--red)');
     return;
   }
-  await db.ref('lobbies/'+lobbyId+'/players/'+myId).set({
-    id:myId,
-    uid:currentRbUser?.uid || null,
-    userNumber:myUserNumber || 0,
-    name:myName,
-    joinedAt:Date.now(),
-    ready:false
+  const joinedAt=Date.now();
+  await db.ref().update({
+    [`lobbies/${lobbyId}/players/${myId}`]:{
+      id:myId,
+      uid:currentRbUser?.uid || null,
+      userNumber:myUserNumber || 0,
+      name:myName,
+      joinedAt,
+      ready:false
+    },
+    [`lobbies/${lobbyId}/lastActivityAt`]:joinedAt
   });
   if (currentRbUser?.uid) {
     ensureLobbyPlayerIndex(lobbyId, currentRbUser.uid).catch(()=>{});
@@ -2776,7 +2989,10 @@ function mmToggleReady(){
   if(!currentLobbyId) return;
   if(currentLobby) syncLocalPlayerIdToLobby(currentLobby);
   myReady=!myReady;
-  db.ref('lobbies/'+currentLobbyId+'/players/'+myId+'/ready').set(myReady);
+  db.ref().update({
+    [`lobbies/${currentLobbyId}/players/${myId}/ready`]:myReady,
+    [`lobbies/${currentLobbyId}/lastActivityAt`]:Date.now()
+  });
 }
 
 async function mmStartSoloTest(){
@@ -2808,7 +3024,8 @@ async function mmStartSoloTest(){
       status:'started',
       teamSize:1,
       soloTest:true,
-      ['players/'+myId+'/ready']:true
+      ['players/'+myId+'/ready']:true,
+      lastActivityAt:Date.now()
     });
     window.location.href='rosterbate-draft.html?lobby='+currentLobbyId;
   }catch(e){
@@ -2855,6 +3072,7 @@ async function mmSendLobbyChat(){
       ts:Date.now()
     };
     await db.ref('lobbies/'+lobbyId+'/chat').push(payload);
+    await markLobbyActivity(lobbyId,{lastChatAt:payload.ts});
   }catch(e){
     console.error('Failed to send lobby chat message', e);
     input.value=text;
@@ -2959,7 +3177,7 @@ function startScheduledCountdown(lobby){
 function launchDraft(){
   if(!currentLobby) return;
   saveMultiplayerLobbyState(currentLobby);
-  db.ref('lobbies/'+currentLobbyId+'/status').set('started');
+  db.ref('lobbies/'+currentLobbyId).update({status:'started', lastActivityAt:Date.now()});
   window.location.href='rosterbate-draft.html?lobby='+currentLobbyId;
 }
 

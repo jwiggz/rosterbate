@@ -14,6 +14,7 @@
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <script src="historical-universe-slots.js"></script>
+<script src="simulation-league-engine.js"></script>
 <script src="global-nav.js" defer></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <script>
@@ -27,7 +28,7 @@ try{
     const host=String(window.location.hostname||'').trim().toLowerCase();
     historicalPending=(host==='localhost' || host==='127.0.0.1') && !!window.localStorage.getItem('rbHistoricalPackDevPendingSeasonBoot');
   }catch(e){}
-  if(requestedHistoricalUniverse || requestedHistorical==='dev' || requestedHistorical==='reimagined' || historicalPending){
+  if(requestedHistoricalUniverse || requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='sim' || requestedHistorical==='simulation' || historicalPending){
     document.documentElement.dataset.seasonRoute='historical';
   }else if(requestedLeague && requestedLeague!=='demo'){
     document.documentElement.dataset.seasonRoute='league';
@@ -377,6 +378,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 #hub #advBtn:disabled::before{opacity:.4;animation:none;}
 #hub #advBtn.is-done::after{background:linear-gradient(135deg,rgba(30,41,59,.92),rgba(51,65,85,.92));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 12px 28px rgba(2,6,23,.28);}
 #hub #advBtn.is-done::before{background:radial-gradient(circle at 50% 50%,rgba(148,163,184,.34),rgba(15,23,42,0) 75%);}
+#hub #advBtn.is-sim::before{background:radial-gradient(circle at 18% 20%,rgba(125,211,252,.82),transparent 34%),radial-gradient(circle at 76% 24%,rgba(34,197,94,.38),transparent 24%),radial-gradient(circle at 50% 92%,rgba(6,95,70,.72),transparent 68%);}
+#hub #advBtn.is-sim::after{background:linear-gradient(135deg,rgba(8,47,73,.94),rgba(13,61,76,.92) 40%,rgba(15,118,110,.88) 100%);box-shadow:inset 0 0 0 1px rgba(186,230,253,.16),0 16px 30px rgba(8,47,73,.34);}
 .hub-column > .hub-card,.hub-side-left > .hub-card,.hub-side-aux > .hub-card{background:linear-gradient(180deg,rgba(18,26,39,.7),rgba(10,16,27,.82));border:1px solid rgba(214,232,255,.16);box-shadow:0 18px 34px rgba(2,6,23,.28),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
 .hub-card.compact{background:linear-gradient(180deg,rgba(18,26,39,.72),rgba(10,16,27,.84));}
 .hub-card-head{margin-bottom:12px;}
@@ -414,6 +417,31 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .hub-reveal-stat-copy{font-size:11px;color:#c6d3e4;line-height:1.45;margin-top:5px;}
 .hub-reveal-action{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,#3e8458,#205636);font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#effcf3;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 22px rgba(0,0,0,.18);}
 .hub-reveal-empty{padding:20px 6px;text-align:center;color:#9fb1c8;font-size:12px;line-height:1.6;}
+.hub-sim-runner-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(13,34,44,.82),rgba(9,16,27,.92) 36%,rgba(10,16,27,.96) 100%);border:1px solid rgba(96,165,250,.2);}
+.hub-sim-runner-card::before{content:'';position:absolute;inset:auto -12% -42% auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.18),transparent 64%);pointer-events:none;}
+.hub-sim-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(250px,.85fr);gap:12px;position:relative;z-index:1;}
+.hub-sim-copy{min-width:0;}
+.hub-sim-kicker{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7dd3fc;}
+.hub-sim-title{font-family:var(--fd);font-size:28px;font-weight:700;line-height:.92;color:#f8fafc;text-transform:uppercase;margin-top:4px;}
+.hub-sim-sub{font-size:12px;color:#d7e4f6;line-height:1.55;margin-top:8px;max-width:700px;}
+.hub-sim-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.hub-sim-pill{display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(9,13,20,.46);font-family:var(--fd);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#eef4fc;}
+.hub-sim-pill.blue{border-color:rgba(96,165,250,.3);color:#bfdbfe;background:rgba(30,64,175,.18);}
+.hub-sim-pill.green{border-color:rgba(74,222,128,.3);color:#86efac;background:rgba(20,83,45,.2);}
+.hub-sim-pill.orange{border-color:rgba(251,146,60,.3);color:#fdba74;background:rgba(124,45,18,.18);}
+.hub-sim-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.hub-sim-action{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(14,25,43,.94),rgba(10,16,27,.98));font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:#eef4fc;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.hub-sim-action.primary{background:linear-gradient(180deg,#0f766e,#115e59);border-color:rgba(94,234,212,.35);color:#ecfeff;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 22px rgba(2,132,199,.18);}
+.hub-sim-side{display:grid;gap:8px;}
+.hub-sim-stat{border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));padding:10px 11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.hub-sim-stat-label{font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9fb1c8;}
+.hub-sim-stat-value{font-family:var(--fd);font-size:22px;font-weight:700;line-height:.94;color:#f8fafc;margin-top:5px;text-transform:uppercase;}
+.hub-sim-stat-copy{font-size:11px;color:#c6d3e4;line-height:1.45;margin-top:5px;}
+.hub-sim-mini-list{display:grid;gap:8px;margin-top:4px;}
+.hub-sim-mini-item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);}
+.hub-sim-mini-item strong{display:block;font-size:11px;color:#f8fafc;line-height:1.35;}
+.hub-sim-mini-item span{display:block;font-size:10px;color:#9fb1c8;line-height:1.4;margin-top:3px;}
+.hub-sim-mini-score{font-family:var(--fd);font-size:16px;font-weight:700;line-height:1;color:#67e8f9;white-space:nowrap;}
 .reveal-modal-card{max-width:980px !important;width:min(94vw,980px) !important;border-radius:24px !important;padding:20px 20px 26px !important;background:
   radial-gradient(90% 120% at 50% 0%,rgba(74,222,128,.12),transparent 44%),
   linear-gradient(180deg,rgba(18,26,39,.96),rgba(9,14,22,.98)) !important;
@@ -648,7 +676,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       .hub-summary-meta{padding:12px 0 0 0;border-left:none;border-top:1px solid #e5e7eb;}
       .hub-summary-stats,.hub-actions,.hub-now-band{grid-template-columns:1fr;}
       .hub-powerup-grid{grid-template-columns:1fr;}
-      .hub-reveal-grid,.reveal-modal-grid,.reveal-summary-grid{grid-template-columns:1fr;}
+      .hub-reveal-grid,.reveal-modal-grid,.reveal-summary-grid,.hub-sim-grid{grid-template-columns:1fr;}
       .activity-item{grid-template-columns:28px minmax(0,1fr);}
     }
 
@@ -802,6 +830,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
           </div>
         </div>
         <button id="advBtn" onclick="advanceWeek()" class="bg">? Advance to Next Week</button>
+        <div class="hub-card compact hub-sim-runner-card" id="hubSimRunnerCard" style="display:none;"></div>
         <div class="hub-lower">
           <div class="hub-card compact hub-reveal-card" id="hubRevealReportCard"></div>
           <div class="hub-card compact" style="display:flex;flex-direction:column;min-height:0;">
@@ -1452,6 +1481,17 @@ function getDailyRevealReport(day){
   const key=String(Number(day)||0);
   return G?.dailyRevealReports?.[key] || null;
 }
+function getSimulationDayLog(day){
+  const key=String(Number(day)||0);
+  return G?.simulationLogsByDay?.[key] || null;
+}
+function getSimulationTopGame(log){
+  const games=Array.isArray(log?.gameLogs) ? log.gameLogs.filter(Boolean) : [];
+  return games.sort((a,b)=>
+    (Number(b.homeTotal||0)+Number(b.awayTotal||0)) - (Number(a.homeTotal||0)+Number(a.awayTotal||0)) ||
+    Math.abs(Number(a.homeTotal||0)-Number(a.awayTotal||0)) - Math.abs(Number(b.homeTotal||0)-Number(b.awayTotal||0))
+  )[0] || null;
+}
 function getRevealWindowActivities(day, generatedAt){
   const currentDay=Number(day)||0;
   const previousDay=Math.max(0,...Object.keys(G?.dailyRevealReports||{}).map(value=>Number(value)||0).filter(value=>value<currentDay));
@@ -1588,6 +1628,7 @@ function buildDailyRevealReport(day, generatedAt){
   const currentDay=Number(day)||0;
   const week=weekForDay(currentDay);
   const results=G?.dayResults?.[currentDay] || {};
+  const simulationLog=getSimulationDayLog(currentDay);
   const teams=Object.keys(results).map(teamIdx=>{
     const numericTeam=Number(teamIdx);
     const detail=results[teamIdx] || { total:0, entries:[] };
@@ -1618,12 +1659,19 @@ function buildDailyRevealReport(day, generatedAt){
   const leaderMargin=(teams.length>1 && leader) ? (Number(leader.total||0) - Number(teams[1]?.total||0)) : 0;
   const movement=buildRevealWeekMovement(week, currentDay);
   const matchups=buildRevealMatchupStories(week, currentDay);
+  const simulationTopGame=getSimulationTopGame(simulationLog);
   const story=buildRevealNarrative(currentDay, leader ? {
     teamIdx:leader.teamIdx,
     teamName:leader.teamName,
     total:leader.total,
     margin:leaderMargin
   } : null, movement, matchups, totalTransactions);
+  if(simulationLog && story){
+    story.headline=String(story.headline||`Day ${currentDay} Reveal Is Live`).replace(/\bReveal\b/i,'Sim');
+    if(!/simulated box scores/i.test(String(story.subheadline||''))){
+      story.subheadline=`${String(story.subheadline||'Daily results are now official.')} Simulated box scores are now official for this universe.`;
+    }
+  }
   return {
     day:currentDay,
     generatedAt:Number(generatedAt||Date.now()),
@@ -1645,6 +1693,12 @@ function buildDailyRevealReport(day, generatedAt){
     movement,
     matchups,
     topPerformers:playerLeaders,
+    isSimulation:Boolean(simulationLog) || isHistoricalSimulationUniverse(D),
+    simulationMeta:simulationLog ? {
+      gameCount:Array.isArray(simulationLog.gameLogs) ? simulationLog.gameLogs.length : 0,
+      engineVersion:simulationLog.engineVersion || null,
+      topGame:simulationTopGame
+    } : null,
     transactions,
     totalTransactions,
     activitySample:activities.slice(0,6).map(item=>({
@@ -1658,8 +1712,104 @@ function buildDailyRevealReport(day, generatedAt){
     }))
   };
 }
+function buildSimulationDayRunnerSnapshot(day){
+  if(!isHistoricalSimulationUniverse(D)) return null;
+  const currentDay=Number(day||G?.day||1) || 1;
+  const week=weekForDay(currentDay);
+  const teamCount=Array.isArray(D?.teams) ? D.teams.length : (Array.isArray(G?.rosters) ? G.rosters.length : 0);
+  const requiredSlots=Math.max(0, Array.isArray(SLOT_LABELS) ? SLOT_LABELS.length : Number(STARTERS||0));
+  const lineupReadyCount=Array.from({length:teamCount}, (_, teamIdx)=>{
+    return getSimulationStarterIdsForTeamDay(teamIdx, currentDay).filter(Boolean).length >= requiredSlots ? 1 : 0;
+  }).reduce((sum, value)=>sum + value, 0);
+  const myFilled=getSimulationStarterIdsForTeamDay(D?.myPos||0, currentDay).filter(Boolean).length;
+  const scheduledGames=weekGames(week).length;
+  const matchup=getMatchupForTeamDay(D?.myPos||0, currentDay);
+  const opponentName=matchup ? teamName(matchup.home===D?.myPos ? matchup.away : matchup.home) : 'Bye';
+  const latestReportDay=getLatestRevealReportDay();
+  const latestReport=latestReportDay ? getDailyRevealReport(latestReportDay) : null;
+  const latestLog=latestReportDay ? getSimulationDayLog(latestReportDay) : null;
+  const latestTopGame=getSimulationTopGame(latestLog);
+  const latestTopPerformer=(latestReport?.topPerformers||[])[0] || null;
+  const packLabel=String(D?.historicalPackName || D?.leagueName || 'Historical Universe')
+    .replace(/\s+Sim Season$/i,'')
+    .replace(/\s+Historic Season$/i,' Historic Season')
+    .trim() || 'Historical Universe';
+  return {
+    day:currentDay,
+    week,
+    teamCount,
+    requiredSlots,
+    lineupReadyCount,
+    myFilled,
+    scheduledGames,
+    opponentName,
+    latestReportDay,
+    latestReport,
+    latestTopGame,
+    latestTopPerformer,
+    packLabel
+  };
+}
+function renderSimulationRunnerCard(snapshot){
+  if(!snapshot) return '';
+  const readinessTone=snapshot.lineupReadyCount>=snapshot.teamCount ? 'green' : (snapshot.lineupReadyCount>=Math.max(1,Math.floor(snapshot.teamCount*0.7)) ? 'blue' : 'orange');
+  const myLineupReady=snapshot.myFilled>=snapshot.requiredSlots;
+  const primaryLabel=`Run Sim Day ${snapshot.day}`;
+  const topGameLine=snapshot.latestTopGame
+    ? `${snapshot.latestTopGame.homeName} ${Number(snapshot.latestTopGame.homeTotal||0).toFixed(1)} - ${Number(snapshot.latestTopGame.awayTotal||0).toFixed(1)} ${snapshot.latestTopGame.awayName}`
+    : 'No simulated reveal has landed yet.';
+  const topPerformerLine=snapshot.latestTopPerformer
+    ? `${snapshot.latestTopPerformer.name} led the last reveal with ${Number(snapshot.latestTopPerformer.score||0).toFixed(1)} fantasy points.`
+    : 'Your next sim day will generate a fresh top-performer board.';
+  return `
+    <div class="hub-sim-grid">
+      <div class="hub-sim-copy">
+        <div class="hub-sim-kicker">Simulation Day Runner</div>
+        <div class="hub-sim-title">${snapshot.packLabel}</div>
+        <div class="hub-sim-sub">Run one day at a time from real season stats plus light authored tuning. Each click generates box-score outcomes for the full fantasy slate, writes a reveal report, and saves the universe state immediately.</div>
+        <div class="hub-sim-pills">
+          <span class="hub-sim-pill blue">Day ${snapshot.day}</span>
+          <span class="hub-sim-pill ${readinessTone}">${snapshot.lineupReadyCount}/${snapshot.teamCount} lineups ready</span>
+          <span class="hub-sim-pill orange">${snapshot.scheduledGames} matchup${snapshot.scheduledGames===1?'':'s'} queued</span>
+          <span class="hub-sim-pill blue">vs ${snapshot.opponentName}</span>
+        </div>
+        <div class="hub-sim-actions">
+          <button type="button" class="hub-sim-action primary" onclick="advanceWeek()">${primaryLabel}</button>
+          <button type="button" class="hub-sim-action" onclick="goPage('roster')">${myLineupReady?'Review Lineup':'Set Lineup'}</button>
+          <button type="button" class="hub-sim-action" onclick="goPage('matchup')">Open Matchup</button>
+          ${snapshot.latestReportDay ? `<button type="button" class="hub-sim-action" onclick="openRevealReport(${snapshot.latestReportDay})">Last Sim Report</button>` : ''}
+        </div>
+      </div>
+      <div class="hub-sim-side">
+        <div class="hub-sim-stat">
+          <div class="hub-sim-stat-label">Today</div>
+          <div class="hub-sim-stat-value">${snapshot.myFilled}/${snapshot.requiredSlots}</div>
+          <div class="hub-sim-stat-copy">${myLineupReady?'Your board is locked in for the next simulation run.':'Your lineup still has open starter pressure before the next run.'}</div>
+        </div>
+        <div class="hub-sim-mini-list">
+          <div class="hub-sim-mini-item">
+            <div>
+              <strong>Latest sim board</strong>
+              <span>${topGameLine}</span>
+            </div>
+            <div class="hub-sim-mini-score">${snapshot.latestReportDay?`D${snapshot.latestReportDay}`:'--'}</div>
+          </div>
+          <div class="hub-sim-mini-item">
+            <div>
+              <strong>Top performer</strong>
+              <span>${topPerformerLine}</span>
+            </div>
+            <div class="hub-sim-mini-score">${snapshot.latestTopPerformer?Number(snapshot.latestTopPerformer.score||0).toFixed(1):'--'}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 function renderRevealSummaryStats(report){
   if(!report) return '';
+  const pointsLabel=report.isSimulation ? 'League Points Simulated' : 'League Points Revealed';
+  const dayLabel=report.isSimulation ? 'Your Sim Score' : 'Your Day Score';
   const leaderCopy=report.leader
     ? `${report.leader.teamName} led the day${report.leader.margin>0.1?` by ${report.leader.margin.toFixed(1)} points`:'.'}`
     : 'No leader data is available for this reveal yet.';
@@ -1675,12 +1825,12 @@ function renderRevealSummaryStats(report){
     <div class="reveal-summary-grid">
       <div class="reveal-summary-stat">
         <div class="value">${report.totalLeaguePoints.toFixed(1)}</div>
-        <div class="label">League Points Revealed</div>
+        <div class="label">${pointsLabel}</div>
         <div class="copy">${leaderCopy}</div>
       </div>
       <div class="reveal-summary-stat">
         <div class="value">${report.myTeam?report.myTeam.total.toFixed(1):'--'}</div>
-        <div class="label">Your Day Score</div>
+        <div class="label">${dayLabel}</div>
         <div class="copy">${myCopy}</div>
       </div>
       <div class="reveal-summary-stat">
@@ -1768,12 +1918,13 @@ function openRevealReport(day){
   mount.innerHTML=`
     <div class="reveal-modal-head">
       <div>
-        <div class="hub-reveal-kicker">Day ${report.day} Reveal Report</div>
+        <div class="hub-reveal-kicker">Day ${report.day} ${report.isSimulation ? 'Sim Report' : 'Reveal Report'}</div>
         <div class="reveal-modal-title">${report.story?.headline || ('Day '+report.day+' Reveal Report')}</div>
-        <div class="reveal-modal-sub">${report.story?.subheadline || 'Daily results are live. This recap packages the revealed scoring, top player lines, and the waiver / trade movement that shaped the day before it locked.'}</div>
+        <div class="reveal-modal-sub">${report.story?.subheadline || (report.isSimulation ? 'Simulated box scores are now official. This recap packages the generated scoring, top player lines, and the matchup movement created by today’s simulation run.' : 'Daily results are live. This recap packages the revealed scoring, top player lines, and the waiver / trade movement that shaped the day before it locked.')}</div>
         <div class="reveal-modal-badges">
           <span class="hub-reveal-pill green">Week ${report.week}</span>
           <span class="hub-reveal-pill blue">${report.totalLeaguePoints.toFixed(1)} points revealed</span>
+          ${report.simulationMeta?.gameCount ? `<span class="hub-reveal-pill blue">${report.simulationMeta.gameCount} sim matchup${report.simulationMeta.gameCount===1?'':'s'}</span>` : ''}
           <span class="hub-reveal-pill orange">${report.totalTransactions} move${report.totalTransactions===1?'':'s'} logged</span>
           ${report.movement?.biggestRiser ? `<span class="hub-reveal-pill blue">${report.movement.biggestRiser.teamName} +${Math.abs(report.movement.biggestRiser.delta)}</span>` : ''}
         </div>
@@ -1798,7 +1949,7 @@ function openRevealReport(day){
       </div>
       <div class="reveal-panel">
         <div class="reveal-panel-title">Top Performers</div>
-        <div class="reveal-panel-copy">The best fantasy lines from the day that just hit the public board.</div>
+        <div class="reveal-panel-copy">${report.isSimulation ? 'The best fantasy lines generated by the simulation engine for this day.' : 'The best fantasy lines from the day that just hit the public board.'}</div>
         ${renderRevealTopPerformers(report)}
       </div>
       <div class="reveal-panel">
@@ -1816,7 +1967,7 @@ function openRevealReport(day){
 }
 
 let D=null;
-let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{},dailyRevealReports:{}};
+let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{},dailyRevealReports:{},simulationLogsByDay:{}};
 let selectedStandingsTeamIdx=null;
 let moveCtx=null;
 let rosterTab='stats';
@@ -2115,7 +2266,7 @@ function shouldBootHistoricalDevSeason(leagueId, requestedSport, params){
   if(!isHistoricalDevHost()) return false;
   const requestedLeague=String(leagueId||'').trim();
   const requestedHistorical=String(params?.get('historical')||'').trim().toLowerCase();
-  if(requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='1' || requestedHistorical==='true') return true;
+  if(requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='sim' || requestedHistorical==='simulation' || requestedHistorical==='1' || requestedHistorical==='true') return true;
   const pending=getHistoricalPackDevPendingBoot();
   const pendingState=getHistoricalPackDevState();
   if(!pendingState) return false;
@@ -2144,7 +2295,7 @@ async function resolveHistoricalDevBootState(requestedSport, params){
     return stagedState;
     }
   }
-  if(requestedHistorical!=='dev' && requestedHistorical!=='reimagined' && requestedHistorical!=='1' && requestedHistorical!=='true'){
+  if(requestedHistorical!=='dev' && requestedHistorical!=='reimagined' && requestedHistorical!=='sim' && requestedHistorical!=='simulation' && requestedHistorical!=='1' && requestedHistorical!=='true'){
     return null;
   }
   if(window.RosterBateHistoricalPackLoader && typeof window.RosterBateHistoricalPackLoader.loadPackById==='function'){
@@ -2489,7 +2640,8 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
       designation: 'ACTIVE',
       draftEligible: player?.draftEligible!==false,
       statsThroughDate: latestStatsDate,
-      bio: player?.bio || ''
+      bio: player?.bio || '',
+      seasonStats: cloneJsonSafe(player?.seasonStats || null)
     };
   });
 
@@ -2517,9 +2669,14 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
   const selectedTeamIndex=teams.findIndex(team=>String(team?.teamId||'').trim()===selectedTeamId);
   const myPos=Math.max(0, selectedTeamIndex);
   const historicalMode=String(entryMode || devState?.pendingBoot?.entryMode || 'real_season').trim().toLowerCase();
+  const isSimulationSeason=historicalMode==='simulation_season' || historicalMode==='simulation' || historicalMode==='sim';
   const isReimaginedSeason=historicalMode==='reimagined_season' || historicalMode==='reimagined';
   const leagueNameBase=season.label || authored?.presentation?.heroTitle || 'Historical NBA Season';
-  const leagueName=isReimaginedSeason ? (leagueNameBase + ' Reimagined Season') : leagueNameBase;
+  const leagueName=isSimulationSeason
+    ? (leagueNameBase + ' Sim Season')
+    : isReimaginedSeason
+    ? (leagueNameBase + ' Reimagined Season')
+    : leagueNameBase;
   const teamNames=teams.map(team=>team.displayName || [team.city, team.name].filter(Boolean).join(' ') || 'Historical Team');
   const activeTeam=teams[myPos] || teams[0] || null;
   const effectiveRosters=isReimaginedSeason
@@ -2530,7 +2687,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     .filter(player=>!rosteredIds.has(Number(player.id)))
     .map(player=>({...player}));
 
-  return {
+  const launchData={
     sport: seasonSport,
     seasonId: season.seasonId || importPlan?.metadata?.seasonId || 'historical_dev_season',
     leagueId: season.seasonId || importPlan?.metadata?.seasonId || 'historical_dev_season',
@@ -2542,7 +2699,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     myPos: myPos,
     commissionerTeamIdx: myPos,
     multiplayer: false,
-    draftFormat: isReimaginedSeason ? 'historical_reimagined' : 'historical_real_season',
+    draftFormat: isSimulationSeason ? 'historical_simulation' : (isReimaginedSeason ? 'historical_reimagined' : 'historical_real_season'),
     scoringFormat: 'h2h_pts',
     currentWeek: 1,
     currentDay: 1,
@@ -2552,7 +2709,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     playerPoolSource: 'historical_pack',
     historicalPackId: importPlan?.metadata?.packId || null,
     historicalSeasonId: season.seasonId || null,
-    historicalEntryMode: isReimaginedSeason ? 'reimagined_season' : 'real_season',
+    historicalEntryMode: isSimulationSeason ? 'simulation_season' : (isReimaginedSeason ? 'reimagined_season' : 'real_season'),
     historicalSelectedTeamId: activeTeam?.teamId || null,
     historicalPlayerPool: historicalPlayerPool.map(player=>({...player})),
     freeAgents: freeAgents,
@@ -2565,8 +2722,154 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     historicalChallenges: cloneJsonSafe(authored?.packChallenges || null),
     historicalSummaries: cloneJsonSafe(authored?.summaries || null),
     historicalPackSummary: String(authored?.summaries?.packSummary || '').trim(),
+    simulationMode: isSimulationSeason ? 'historical_box_score' : null,
+    simulationProfile: isSimulationSeason ? {
+      engineVersion: String(window.RosterBateSimulationEngine?.ENGINE_VERSION || '').trim() || null,
+      ratingsSource: 'real season stats + light authored tuning',
+      cadence: 'daily_reveal',
+      output: 'box_score'
+    } : null,
+    simulationLogsByDay: {},
     isFreshDraftLaunch: false
   };
+  if(isSimulationSeason && window.RosterBateSimulationEngine && typeof window.RosterBateSimulationEngine.enrichLeagueState==='function'){
+    try{
+      window.RosterBateSimulationEngine.enrichLeagueState(launchData, {
+        packId: launchData.historicalPackId,
+        universeType: 'historical_pack'
+      });
+    }catch(simErr){
+      console.warn('Historical simulation ratings enrichment failed:', simErr);
+    }
+  }
+  return launchData;
+}
+
+function isHistoricalSimulationUniverse(state){
+  const mode=String(state?.historicalEntryMode || state?.simulationMode || '').trim().toLowerCase();
+  return mode==='simulation_season' || mode==='simulation' || mode==='sim' || String(state?.simulationMode || '').trim().toLowerCase()==='historical_box_score';
+}
+
+function getSimulationStarterIdsForTeamDay(teamIdx, day){
+  try{
+    if(typeof getStarterIdsForTeamDay==='function'){
+      const resolved=getStarterIdsForTeamDay(teamIdx, day);
+      if(Array.isArray(resolved)) return resolved.filter(Boolean);
+    }
+  }catch(e){}
+  const roster=G?.rosters?.[teamIdx] || [];
+  const fallback=Array.isArray(G?.starters?.[teamIdx]) ? G.starters[teamIdx] : buildBestLineupIdsForRoster(roster, day);
+  return Array.isArray(fallback) ? fallback.filter(Boolean) : [];
+}
+
+function applySimulationSeasonPowerups(teamIdx, day, result){
+  const baseResult=result && typeof result==='object' ? result : { total:0, entries:[] };
+  const roster=G?.rosters?.[teamIdx] || [];
+  const starterIds=getSimulationStarterIdsForTeamDay(teamIdx, day);
+  const benchIds=roster.map(player=>player.id).filter(id=>!starterIds.includes(id));
+  const week=weekForDay(day);
+  const powerups=teamIdx===D.myPos ? getWeekPowerups(week) : null;
+  const entries=Array.isArray(baseResult.entries) ? baseResult.entries.map(entry=>({
+    ...entry,
+    baseScore:Number(entry?.baseScore || 0),
+    finalScore:Number(entry?.finalScore || entry?.baseScore || 0)
+  })) : [];
+
+  if(powerups?.white_gloves?.active){
+    const fallbackPool=entries.filter(entry=>Number(entry.baseScore || 0) > 0);
+    const fallbackScore=fallbackPool.length ? Math.min(...fallbackPool.map(entry=>Number(entry.baseScore || 0))) : 0;
+    if(fallbackScore>0){
+      entries.forEach(entry=>{
+        if(entry.unavailable) entry.finalScore=fallbackScore;
+      });
+    }
+  }
+
+  if(powerups?.captain_mode?.active && powerups.captain_mode.targetId){
+    entries.forEach(entry=>{
+      if(Number(entry?.player?.id)===Number(powerups.captain_mode.targetId)){
+        entry.finalScore=Number(entry.finalScore || 0) * 2;
+      }
+    });
+  }
+
+  if(powerups?.sunday_surge?.active && dayOfWeek(day)===7){
+    entries.forEach(entry=>{
+      if(Number(entry.finalScore || 0)>0){
+        entry.finalScore=Number(entry.finalScore || 0) * 1.25;
+      }
+    });
+  }
+
+  const benchEntries=[];
+  if(powerups?.bench_boost?.active){
+    benchIds.forEach(id=>{
+      const player=roster.find(candidate=>candidate.id===id);
+      if(!player) return;
+      const baseScore=Number(window.RosterBateSimulationEngine?.computeFantasyPoints?.(player?.simProfile?.baseline || player) || 0) * 0.25;
+      if(baseScore>0){
+        benchEntries.push({
+          player:player,
+          baseScore:baseScore,
+          finalScore:baseScore,
+          game:{opp:'Bench', time:'Sim', isHome:false, simulated:true},
+          injury:null,
+          unavailable:false,
+          source:'bench_sim',
+          simulatedStats:player?.simProfile?.baseline || null
+        });
+      }
+    });
+  }
+
+  const allEntries=[...entries, ...benchEntries];
+  return {
+    total:roundHistoricalStat(allEntries.reduce((sum, entry)=>sum + Number(entry.finalScore || 0), 0)),
+    entries:allEntries,
+    powerups:powerups || null,
+    simMeta:baseResult.simMeta || null
+  };
+}
+
+function runHistoricalSimulationDay(day){
+  if(!isHistoricalSimulationUniverse(D)) return null;
+  if(!window.RosterBateSimulationEngine || typeof window.RosterBateSimulationEngine.simulateLeagueDay!=='function'){
+    throw new Error('simulation_engine_unavailable');
+  }
+  const week=weekForDay(day);
+  const lineupIdsByTeam=Array.from({length:G.rosters.length},(_,teamIdx)=>getSimulationStarterIdsForTeamDay(teamIdx, day));
+  const simulationState=Object.assign({}, D || {}, {
+    allRosters:Array.isArray(G?.rosters) ? G.rosters : (D?.allRosters || []),
+    teams:Array.isArray(D?.teams) ? D.teams : []
+  });
+  const simulation=window.RosterBateSimulationEngine.simulateLeagueDay({
+    state:simulationState,
+    day:day,
+    week:week,
+    matchups:weekGames(week),
+    lineupIdsByTeam:lineupIdsByTeam,
+    teamNames:D?.teams || []
+  });
+  if(!G.dayResults || typeof G.dayResults!=='object') G.dayResults={};
+  if(!G.revealedDays || typeof G.revealedDays!=='object') G.revealedDays={};
+  if(!G.dailyRevealReports || typeof G.dailyRevealReports!=='object') G.dailyRevealReports={};
+  if(!G.simulationLogsByDay || typeof G.simulationLogsByDay!=='object') G.simulationLogsByDay={};
+  G.dayResults[day]={};
+  for(let teamIdx=0; teamIdx<G.rosters.length; teamIdx+=1){
+    G.dayResults[day][teamIdx]=applySimulationSeasonPowerups(teamIdx, day, simulation.resultsByTeam?.[teamIdx] || { total:0, entries:[] });
+  }
+  G.revealedDays[day]=true;
+  G.simulationLogsByDay[String(day)]={
+    engineVersion:simulation.engineVersion || window.RosterBateSimulationEngine.ENGINE_VERSION,
+    generatedAt:simulation.generatedAt || Date.now(),
+    gameLogs:Array.isArray(simulation.gameLogs) ? simulation.gameLogs : []
+  };
+  const generatedAt=simulation.generatedAt || Date.now();
+  G.dailyRevealReports[String(day)] = buildDailyRevealReport(day, generatedAt);
+  D.lastRevealedDay=Math.max(Number(D.lastRevealedDay||0), Number(day||0));
+  logActivity('reveal','Day '+day+' simulated','Simulated box scores for Day '+day+' are now live league-wide.',D.myPos,'🎮');
+  queueSharedSeasonSave('simulate_day');
+  return simulation;
 }
 
 function getPendingSeasonLaunch(requestedLeagueId){
@@ -3171,6 +3474,7 @@ function syncGameStateToD() {
   if (G.tradeOffers) D.tradeOffers = G.tradeOffers;
   if (G.activityLog) D.activityLog = G.activityLog;
   if (G.dailyRevealReports) D.dailyRevealReports = G.dailyRevealReports;
+  if (G.simulationLogsByDay) D.simulationLogsByDay = G.simulationLogsByDay;
   if (G.recentDrops) D.recentDrops = G.recentDrops;
   if (G.powerupInventory) D.powerupInventory = G.powerupInventory;
   if (G.powerupsByWeek) D.powerupsByWeek = G.powerupsByWeek;
@@ -4719,8 +5023,8 @@ function getSeasonPlayerTotalFantasyPoints(player){
 }
 function formatSeasonTotalFantasyPoints(player){
   const total=getSeasonPlayerTotalFantasyPoints(player);
-  if(!(total>=0)) return '--';
-  return total.toFixed(1);
+  if(!Number.isFinite(total)) return '--';
+  return Number(total).toFixed(1);
 }
 
 function getTeamDayScoreDetails(teamIdx,day){
@@ -4834,6 +5138,10 @@ function syncCalendarFromDay(){G.week=Math.min(G.totalWeeks,Math.max(1,weekForDa
 function revealDay(day){
   if(day!==G.day) return;
   if(isDayRevealed(day)) return;
+  if(isHistoricalSimulationUniverse(D)){
+    runHistoricalSimulationDay(day);
+    return;
+  }
   if(!G.dayResults || typeof G.dayResults!=='object') G.dayResults={};
   if(!G.revealedDays || typeof G.revealedDays!=='object') G.revealedDays={};
   if(!G.dailyRevealReports || typeof G.dailyRevealReports!=='object') G.dailyRevealReports={};
@@ -6125,6 +6433,7 @@ function initSeason(){
     G.settledWeeks = D.settledWeeks || {};
     G.activityLog = D.activityLog || [];
     G.dailyRevealReports = D.dailyRevealReports || {};
+    G.simulationLogsByDay = D.simulationLogsByDay || {};
     G.recentDrops = D.recentDrops || [];
     G.moneyBallLocks = D.moneyBallLocks || {};
     G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
@@ -6176,11 +6485,12 @@ function initSeason(){
     D.settledWeeks={};
     D.activityLog=[];
     D.dailyRevealReports={};
+    D.simulationLogsByDay={};
     D.recentDrops=[];
     D.moneyBallLocks={};
     D.waiverPriority={};
     G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
-    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.dailyRevealReports={};G.recentDrops=[];G.moneyBallLocks={};
+    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.dailyRevealReports={};G.simulationLogsByDay={};G.recentDrops=[];G.moneyBallLocks={};
   }
   
   console.log('? All G properties initialized');
@@ -6287,6 +6597,7 @@ function goPage(id){
 
 function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=true; setTimeout(()=>advanceWeek.disabled=false,1000);
   if(G.isSeasonComplete){toast('Season complete!');return;}
+  const isSimulationSeason=isHistoricalSimulationUniverse(D);
   const revealDayNo=G.day;
   revealDay(revealDayNo);
   const finishedWeek=weekForDay(revealDayNo);
@@ -6295,7 +6606,7 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     G.isSeasonComplete=true;
     recordLifetimeSeasonStats().catch(error=>console.error('Could not record lifetime stats', error));
     queueSharedSeasonSave('season_complete');
-    toast('Final day revealed. Season complete!');
+    toast(isSimulationSeason?'Final sim day revealed. Season complete!':'Final day revealed. Season complete!');
     renderHub();
     setTimeout(()=>openRevealReport(revealDayNo),120);
     if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
@@ -6308,11 +6619,11 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
   if(G.week!==previousWeek){
     const drop=rollWeeklyPowerupDrops(G.week);
     const dropNames=drop.drops.map(id=>POWERUP_LIBRARY[id].name).join(', ');
-    toast('Day '+revealDayNo+' revealed. New drop: '+dropNames);
+    toast((isSimulationSeason?'Sim Day ':'Day ')+revealDayNo+' revealed. New drop: '+dropNames);
   }else if(settled){
-    toast('Week '+finishedWeek+' is final. Day '+revealDayNo+' revealed.');
+    toast((isSimulationSeason?'Week '+finishedWeek+' sim slate is final. Day ':'Week '+finishedWeek+' is final. Day ')+revealDayNo+' revealed.');
   }else{
-    toast('Day '+revealDayNo+' results revealed.');
+    toast((isSimulationSeason?'Sim Day ':'Day ')+revealDayNo+' results revealed.');
   }
   queueSharedSeasonSave('advance_day'); advanceWeek.disabled=false; renderHub();
   setTimeout(()=>openRevealReport(revealDayNo),120);
@@ -6468,6 +6779,8 @@ const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 function renderHub(){
   applySeasonShellEnhancements();
   repairSeasonUiIcons();
+  const isSimulationSeason=isHistoricalSimulationUniverse(D);
+  const simSnapshot=isSimulationSeason ? buildSimulationDayRunnerSnapshot(G.day) : null;
   const liveStandings=getLiveStandingsSnapshot();
   const mp=D.myPos,myS=liveStandings.find(st=>st.teamIdx===mp)||(G.standings||[])[mp];
   const watchIds=getWatchListIds();
@@ -6532,21 +6845,27 @@ function renderHub(){
   }
   const games=weekGames(G.week);
   const latestRevealReport=getDailyRevealReport(getLatestRevealReportDay());
+  const simRunnerMount=document.getElementById('hubSimRunnerCard');
+  if(simRunnerMount){
+    simRunnerMount.style.display=isSimulationSeason ? '' : 'none';
+    simRunnerMount.innerHTML=isSimulationSeason ? renderSimulationRunnerCard(simSnapshot) : '';
+  }
   const revealMount=document.getElementById('hubRevealReportCard');
   if(revealMount){
     revealMount.innerHTML=latestRevealReport ? `
       <div class="hub-reveal-grid">
         <div class="hub-reveal-copy">
-          <div class="hub-reveal-kicker">Daily Reveal Report</div>
+          <div class="hub-reveal-kicker">${latestRevealReport.isSimulation ? 'Sim Day Report' : 'Daily Reveal Report'}</div>
           <div class="hub-reveal-title">${latestRevealReport.story?.headline || ('Day '+latestRevealReport.day+' Is Official')}</div>
           <div class="hub-reveal-sub">${latestRevealReport.story?.subheadline || (latestRevealReport.leader ? `${latestRevealReport.leader.teamName} led the board with ${latestRevealReport.leader.total.toFixed(1)} points.` : 'Scores are now live league-wide.')}</div>
           <div class="hub-reveal-pills">
             <span class="hub-reveal-pill green">Week ${latestRevealReport.week}</span>
             <span class="hub-reveal-pill blue">${latestRevealReport.totalLeaguePoints.toFixed(1)} league points</span>
             <span class="hub-reveal-pill orange">${latestRevealReport.matchups?.[0]?.leaderName || latestRevealReport.topPerformers?.[0]?.name || 'No top line yet'}</span>
+            ${latestRevealReport.simulationMeta?.gameCount ? `<span class="hub-reveal-pill blue">${latestRevealReport.simulationMeta.gameCount} sim matchup${latestRevealReport.simulationMeta.gameCount===1?'':'s'}</span>` : ''}
             ${latestRevealReport.movement?.biggestRiser ? `<span class="hub-reveal-pill blue">${latestRevealReport.movement.biggestRiser.teamName} +${Math.abs(latestRevealReport.movement.biggestRiser.delta)}</span>` : ''}
           </div>
-          <button type="button" onclick="openRevealReport(${latestRevealReport.day})" class="hub-reveal-action">Open Full Reveal Report</button>
+          <button type="button" onclick="openRevealReport(${latestRevealReport.day})" class="hub-reveal-action">Open Full ${latestRevealReport.isSimulation ? 'Sim ' : ''}Reveal Report</button>
         </div>
         <div class="hub-reveal-stats">
           <div class="hub-reveal-stat">
@@ -6568,7 +6887,9 @@ function renderHub(){
       </div>
     ` : `
       <div class="hub-reveal-empty">
-        Reveal reports will appear here once the first day is unlocked. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the new scores, top performers, and waiver/trade movement from that window.
+        ${isSimulationSeason
+          ? 'Sim day reports will appear here once the first run lands. When you hit <b style="color:#f8fafc;">Run Sim Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.'
+          : 'Reveal reports will appear here once the first day is unlocked. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the new scores, top performers, and waiver/trade movement from that window.'}
       </div>
     `;
   }
@@ -6705,15 +7026,19 @@ function renderHub(){
     });
     nowCards.push({
       tone:G.isSeasonComplete?'':'live',
-      label:'Next Action',
-      value:G.isSeasonComplete ? 'Season wrapped' : ('Reveal Day '+G.day),
+      label:isSimulationSeason?'Sim Runner':'Next Action',
+      value:G.isSeasonComplete
+        ? (isSimulationSeason ? 'Sim wrapped' : 'Season wrapped')
+        : (isSimulationSeason ? ('Run Day '+G.day) : ('Reveal Day '+G.day)),
       copy:G.isSeasonComplete
         ? 'Everything is locked in. Review standings and league history from the hub.'
         : (revealedToday
             ? 'Today is already revealed. Set tomorrow’s lineup or hunt the wire before the next results drop.'
-            : 'Results for today are still pending. Reveal them when you are ready, then make your next move.'),
+            : (isSimulationSeason
+                ? 'Generate the next daily box-score slate, publish the reveal report, and save the universe in one step.'
+                : 'Results for today are still pending. Reveal them when you are ready, then make your next move.')),
       action:G.isSeasonComplete?"goPage('standings')":(revealedToday?"goPage('roster')":"advanceWeek()"),
-      link:G.isSeasonComplete?'Review standings':(revealedToday?'Set lineup':'Reveal results')
+      link:G.isSeasonComplete?'Review standings':(revealedToday?'Set lineup':(isSimulationSeason?'Run sim day':'Reveal results'))
     });
     hubNowBand.innerHTML=nowCards.map(card=>`<div class="hub-now-card ${card.tone||''}">
       <div class="hub-now-label">${card.label}</div>
@@ -6725,11 +7050,18 @@ function renderHub(){
   const ab=document.getElementById('advBtn');
   if(G.isSeasonComplete){
     ab.classList.add('is-done');
-    ab.innerHTML='<span class="season-reveal-btn-label">Season Complete</span><span class="season-reveal-btn-sub">League history locked in</span>';
+    ab.classList.remove('is-sim');
+    ab.innerHTML=`<span class="season-reveal-btn-label">${isSimulationSeason?'Sim Season Complete':'Season Complete'}</span><span class="season-reveal-btn-sub">League history locked in</span>`;
     ab.disabled=true;
   }else{
     ab.classList.remove('is-done');
-    ab.innerHTML=`<span class="season-reveal-btn-label">Reveal Day ${G.day} Results</span><span class="season-reveal-btn-sub">Update scores and league activity</span>`;
+    if(isSimulationSeason){
+      ab.classList.add('is-sim');
+      ab.innerHTML=`<span class="season-reveal-btn-label">Run Sim Day ${G.day}</span><span class="season-reveal-btn-sub">Generate box scores and publish the reveal</span>`;
+    } else {
+      ab.classList.remove('is-sim');
+      ab.innerHTML=`<span class="season-reveal-btn-label">Reveal Day ${G.day} Results</span><span class="season-reveal-btn-sub">Update scores and league activity</span>`;
+    }
     ab.disabled=false;
   }
   const hubActions=document.querySelector('#hub .hub-actions');
