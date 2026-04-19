@@ -421,6 +421,58 @@
     };
   }
 
+  function buildSourceComposition(players, limit){
+    var counts={};
+    var normalizedPlayers=Array.isArray(players) ? players : [];
+    normalizedPlayers.slice(0, limit > 0 ? limit : normalizedPlayers.length).forEach(function(player){
+      var packId=String(player && player.historicalPackId || '').trim() || 'unknown_source_era';
+      counts[packId]=(counts[packId] || 0) + 1;
+    });
+    return counts;
+  }
+
+  function getCompositionSpread(composition){
+    var counts=Object.keys(composition || {}).map(function(key){
+      return Number(composition[key] || 0);
+    }).filter(function(value){
+      return Number.isFinite(value);
+    });
+    if(!counts.length) return 0;
+    return Math.max.apply(Math, counts) - Math.min.apply(Math, counts);
+  }
+
+  function buildMixedEraAuditViewModel(options){
+    var input=options && typeof options==='object' ? options : {};
+    var config=input.config && typeof input.config==='object' ? input.config : {};
+    var playerPool=(Array.isArray(input.playerPool) ? input.playerPool : []).slice().sort(comparePlayers);
+    var top10Composition=buildSourceComposition(playerPool, 10);
+    var top25Composition=buildSourceComposition(playerPool, 25);
+    var fullPoolComposition=buildSourceComposition(playerPool, 0);
+    var warning=getCompositionSpread(top10Composition) >= 4
+      ? 'Top-10 board heavily favors one source era.'
+      : '';
+
+    return {
+      seasonLabel: String(config.seasonLabel || 'Mixed Era Draft').trim() || 'Mixed Era Draft',
+      topPlayersPerPack: Math.max(1, Math.round(Number(config.topPlayersPerPack || 0))) || null,
+      top10Composition: top10Composition,
+      top25Composition: top25Composition,
+      fullPoolComposition: fullPoolComposition,
+      warning: warning,
+      rows: playerPool.map(function(player, index){
+        return {
+          rank: index + 1,
+          player: String(player && player.name || '').trim(),
+          sourceEra: String(player && player.historicalPackId || '').trim(),
+          mixedEraOverall: roundStat(player && player.mixedEraOverall || 0),
+          projectedFp: roundStat(player && (player.mixedEraProjection || player.fp) || 0),
+          rawFp: roundStat(player && (player.totalFantasyPoints || player.statValues && player.statValues.TFP || player.fp) || 0),
+          gamesPlayed: Math.max(0, Number(player && player.gp || player && player.statValues && player.statValues.GP || 0))
+        };
+      })
+    };
+  }
+
   var api={
     clone: clone,
     roundStat: roundStat,
@@ -429,7 +481,8 @@
     buildProjection: buildProjection,
     buildMixedEraConfigSnapshot: buildMixedEraConfigSnapshot,
     buildMixedEraUniverseSummary: buildMixedEraUniverseSummary,
-    buildMixedEraDraftContextFromBundles: buildMixedEraDraftContextFromBundles
+    buildMixedEraDraftContextFromBundles: buildMixedEraDraftContextFromBundles,
+    buildMixedEraAuditViewModel: buildMixedEraAuditViewModel
   };
 
   root.RosterBateMixedEraRuntime=api;
