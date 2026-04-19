@@ -132,6 +132,18 @@ const mixedEraOverallByName = {
 
 const builderCalls = [];
 
+function expectedFantasyPointsFromTotals(totals) {
+  return Math.round((
+    Number(totals.pts || 0)
+    + (Number(totals.reb || 0) * 1.2)
+    + (Number(totals.ast || 0) * 1.5)
+    + (Number(totals.stl || 0) * 3)
+    + (Number(totals.blk || 0) * 3)
+    - Number(totals.to || 0)
+    + (Number(totals.threes || 0) * 0.5)
+  ) * 10) / 10;
+}
+
 const context = buildMixedEraDraftContextFromBundles({
   config,
   bundles,
@@ -158,6 +170,10 @@ assert.ok(context.playerPool[0].fp > 0);
 assert.ok(context.playerPool[0].statValues && context.playerPool[0].statValues.PTS > 0);
 assert.ok(typeof context.playerPool[0].statSummary === 'string' && context.playerPool[0].statSummary.includes('CHI'));
 assert.strictEqual(context.playerPool[1].name, 'Stephen Curry');
+const jordanTotals = bundles[0].players[0].seasonStats.totals;
+const expectedJordanTotalFantasyPoints = expectedFantasyPointsFromTotals(jordanTotals);
+assert.strictEqual(context.playerPool[0].totalFantasyPoints, expectedJordanTotalFantasyPoints);
+assert.strictEqual(context.playerPool[0].statValues.TFP, expectedJordanTotalFantasyPoints);
 assert.ok(context.playerPool.every(player => Array.isArray(player.historicalSourcePackIds)));
 assert.ok(context.playerPool.every(player => player.simProfile && player.simProfile.mixedEraRatings));
 

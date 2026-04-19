@@ -27,6 +27,7 @@
       + (Number(stats && stats.stl || 0) * 3)
       + (Number(stats && stats.blk || 0) * 3)
       - Number(stats && stats.to || 0)
+      + (Number(stats && stats.threes || 0) * 0.5)
     );
   }
 
