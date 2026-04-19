@@ -55,6 +55,36 @@ const loader = require('../historical-pack-loader.js');
   assert.equal(catalog.filter(entry => entry.packId === 'mixed_era_1996_2016_top100_v1').length, 1);
   assert.equal(catalog.find(entry => entry.packId === 'mixed_era_1996_2016_top100_v1').mixedEraConfigId, '1996-2016-top100');
 
+  const originalFetch = global.fetch;
+  const originalWarn = console.warn;
+  const warnings = [];
+
+  console.warn = function captureWarn() {
+    warnings.push(Array.from(arguments));
+  };
+  global.fetch = async function failingFetch(url) {
+    const normalized = String(url).replace(/^.*historical-packs/, 'historical-packs');
+    if (normalized === 'historical-packs/catalog.json') {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => JSON.parse(JSON.stringify(responses.get('historical-packs/catalog.json')))
+      };
+    }
+    return { ok: false, status: 404, json: async () => ({}) };
+  };
+
+  try {
+    await assert.rejects(
+      loader.loadCatalog(),
+      error => String(error && error.message || error).startsWith('fetch_failed:404:')
+    );
+    assert.equal(warnings.some(args => String(args[0]).includes('Could not load mixed-era configs')), true);
+  } finally {
+    console.warn = originalWarn;
+    global.fetch = originalFetch;
+  }
+
   console.log('mixed-era loader smoke test passed');
 })().catch(error => {
   console.error(error);
