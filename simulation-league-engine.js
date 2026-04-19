@@ -1,7 +1,7 @@
 (function(global){
   'use strict';
 
-  const ENGINE_VERSION='2026-04-19-sim-mvp-v2';
+  const ENGINE_VERSION='2026-04-19-sim-mvp-v3';
   const DEFAULT_PACK_TUNING={
     pace:1,
     variance:1,
@@ -43,26 +43,26 @@
   const PACK_ERA_CONTEXT={
     nba_1996_full_season_v1:{
       eraLabel:'1995-96',
-      fantasyBaseline:35.5,
-      fantasyInflation:0.9,
-      scoringInflation:0.91,
-      playmakingInflation:0.93,
-      spacingInflation:0.78,
-      reboundingInflation:1.04,
-      defenseEventInflation:1.06,
-      tempoInflation:0.95,
-      dominanceWeight:0.14
+      fantasyBaseline:38.6,
+      fantasyInflation:0.98,
+      scoringInflation:0.98,
+      playmakingInflation:0.99,
+      spacingInflation:0.9,
+      reboundingInflation:1.02,
+      defenseEventInflation:1.03,
+      tempoInflation:0.98,
+      dominanceWeight:0.08
     },
     nba_2016_full_season_v1:{
       eraLabel:'2015-16',
-      fantasyBaseline:39.5,
-      fantasyInflation:1.08,
-      scoringInflation:1.07,
-      playmakingInflation:1.05,
-      spacingInflation:1.18,
-      reboundingInflation:0.98,
-      defenseEventInflation:0.95,
-      tempoInflation:1.04,
+      fantasyBaseline:38.9,
+      fantasyInflation:1.03,
+      scoringInflation:1.03,
+      playmakingInflation:1.02,
+      spacingInflation:1.12,
+      reboundingInflation:0.99,
+      defenseEventInflation:0.97,
+      tempoInflation:1.02,
       dominanceWeight:0.11
     }
   };
@@ -269,7 +269,7 @@
 
   function buildPlayerSimulationProfile(player, options){
     const opts=options && typeof options==='object' ? options : {};
-    const packId=String(opts.packId || player?.historicalPackId || '').trim();
+    const packId=String(player?.historicalPackId || opts.packId || '').trim();
     const tuning=getPackTuning(packId);
     const baseline=deriveBaseline(player);
     const gp=getPlayerGamesPlayed(player);

@@ -3579,6 +3579,17 @@ function getHistoricalDraftRequestedPackIds(){
   }
 }
 
+function getRequestedMixedEraDraftSpot(){
+  try{
+    const params=new URLSearchParams(window.location.search||'');
+    const raw=Number(params.get('mixedStartSlot') || params.get('draftSpot') || 1);
+    if(!Number.isFinite(raw)) return 1;
+    return Math.max(1, Math.min(20, Math.round(raw)));
+  }catch(e){
+    return 1;
+  }
+}
+
 function shouldBootHistoricalDraft(){
   if(!isHistoricalDraftLocalhost()) return false;
   const mode=getHistoricalDraftQueryMode();
@@ -3877,6 +3888,7 @@ function buildMixedEraDraftContextFromBundles(bundles, requestedSport){
         return {
           ...cloneDraftJsonSafe(player),
           historicalPackId: context.packId,
+          historicalSourcePackIds:[context.packId],
           historicalPackLabel: context.seasonLabel,
           mixedEraOverall: mixedEraOverall,
           mixedEraProjection: mixedEraProjection,
@@ -3906,13 +3918,18 @@ function buildMixedEraDraftContextFromBundles(bundles, requestedSport){
       adp:index + 1
     }));
 
-  const mixedSeasonSlug=combinedSeasonLabels
-    .map(label=>String(label).replace(/[^0-9a-z]+/gi,'_').replace(/^_+|_+$/g,'').toLowerCase())
+  const mixedPackSlug=combinedPackIds
+    .map(id=>String(id||'')
+      .trim()
+      .toLowerCase()
+      .replace(/^nba_/,'')
+      .replace(/_full_season_v\d+$/,''))
     .filter(Boolean)
     .join('_');
   const mixedSeasonLabel=combinedSeasonLabels.join(' + ') || 'Mixed Era NBA Pool';
-  const syntheticId=('mixed_era_' + (mixedSeasonSlug || 'nba_pool') + '_top' + String(combinedPlayerPool.length || 0) + '_v1')
+  const syntheticId=('mixed_era_' + (mixedPackSlug || 'nba_pool') + '_top' + String(combinedPlayerPool.length || 0) + '_v1')
     .replace(/_+/g,'_');
+  const preferredDraftSpot=getRequestedMixedEraDraftSpot();
 
   return {
     sport: requestedSportKey,
@@ -3922,12 +3939,12 @@ function buildMixedEraDraftContextFromBundles(bundles, requestedSport){
     subtitle: 'Draft a curated top-player pool across both eras, ranked with era-normalized mixedEraRatings.',
     playerPool: combinedPlayerPool,
     historicalPlayerPool: combinedPlayerPool.map(player=>cloneDraftJsonSafe(player)),
-    teamCount: combinedPlayerPool.length,
+    teamCount: 10,
     featuredTeamId: null,
     featuredTeamLabel: null,
-    draftTitleKicker: 'Mixed Era Draft The Era',
-    lobbySubLabel: combinedSeasonLabels.join(' + ') + ' Curated Pool',
-    lobbyPillText: 'Mixed Era | ' + sourceContexts.length + ' Eras | ' + combinedPlayerPool.length + ' Players | Era-Normalized',
+    draftTitleKicker: 'Mixed Era Draft',
+    lobbySubLabel: combinedSeasonLabels.join(' + ') + ' Crossover Board',
+    lobbyPillText: 'Mixed Era Draft | ' + sourceContexts.length + ' Eras | ' + combinedPlayerPool.length + ' Players | Era-Normalized',
     entryButtonLabel: 'Enter Mixed Era Draft',
     leagueNamePlaceholder: 'e.g. 90s vs 2010s Dream Draft',
     teamNamePlaceholder: 'e.g. Timebreakers',
@@ -3939,6 +3956,8 @@ function buildMixedEraDraftContextFromBundles(bundles, requestedSport){
     sourceSeasonLabels: combinedSeasonLabels,
     mixedEraPackIds: combinedPackIds,
     mixedEraTopPlayersPerPack: MIXED_ERA_TOP_PLAYERS_PER_PACK,
+    preferredDraftSpot: preferredDraftSpot,
+    suggestedLeagueSize: 10,
     isHistoricalPack: true,
     isHistoricalPackDev: true,
     isMixedEraDraft: true,
@@ -4237,7 +4256,7 @@ function applyDraftRoomShellEnhancements(){
   );
 
   const countdownIcon=document.getElementById('sportCountdownIcon');
-  if(countdownIcon) countdownIcon.textContent=HISTORICAL_DRAFT_CONTEXT ? 'Era' : 'Live';
+  if(countdownIcon) countdownIcon.textContent=HISTORICAL_DRAFT_CONTEXT?.isMixedEraDraft ? 'Mixed' : (HISTORICAL_DRAFT_CONTEXT ? 'Era' : 'Live');
 
   const draftTitle=document.getElementById('sportDraftTitle');
   if(draftTitle){
@@ -4290,14 +4309,18 @@ function applyDraftRoomShellEnhancements(){
 
   const countdownCopy=document.querySelector('#pdcBar .pdc-text');
   if(countdownCopy && /Draft starts in/i.test(countdownCopy.textContent||'')){
-    countdownCopy.innerHTML='<strong>Draft starts in</strong> - browse players and set your queue.';
+    countdownCopy.innerHTML=HISTORICAL_DRAFT_CONTEXT?.isMixedEraDraft
+      ? '<strong>Mixed Era Draft starts in</strong> - compare eras, scan the crossover board, and set your queue.'
+      : '<strong>Draft starts in</strong> - browse players and set your queue.';
   }
 
   const startCopy=document.querySelector('#pdcBar .pdc-start');
   if(startCopy && /^scheduled$/i.test(startCopy.textContent||'')){
     const countdownCopyScheduled=document.querySelector('#pdcBar .pdc-text');
     if(countdownCopyScheduled){
-      countdownCopyScheduled.innerHTML='<strong>Room opens now</strong> - draft order is locked, so set your queue before launch.';
+      countdownCopyScheduled.innerHTML=HISTORICAL_DRAFT_CONTEXT?.isMixedEraDraft
+        ? '<strong>Mixed Era room opens now</strong> - the crossover board is locked, so set your queue before launch.'
+        : '<strong>Room opens now</strong> - draft order is locked, so set your queue before launch.';
     }
   }
   updatePickSignal();
@@ -4446,10 +4469,14 @@ function applySportToDraftUI(){
     mlb:'e.g. Dugout Dogs'
   };
   document.title = historicalContext
-    ? ('RosterBate ' + historicalContext.seasonLabel + ' Draft The Era')
+    ? (historicalContext.isMixedEraDraft
+        ? 'RosterBate Mixed Era Draft'
+        : ('RosterBate ' + historicalContext.seasonLabel + ' Draft The Era'))
     : ('RosterBate ' + SPORT_CFG.label + ' Draft');
   document.getElementById('sportLogoSub').textContent = historicalContext
-    ? historicalContext.lobbySubLabel
+    ? (historicalContext.isMixedEraDraft
+        ? ('Mixed Era Crossover | ' + historicalContext.lobbySubLabel)
+        : historicalContext.lobbySubLabel)
     : (SPORT_CFG.label + ' Draft Room');
   const liveUpdatedLabel=getLivePoolUpdatedTimestampLabel(SPORT);
   document.getElementById('sportLobbyPill').textContent = historicalContext
@@ -4461,7 +4488,9 @@ function applySportToDraftUI(){
         ? ('Live ' + SPORT_CFG.leagueLabel + ' Pool | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players' + (liveUpdatedLabel ? ' | Updated ' + liveUpdatedLabel : ''))
         : ('Imported ' + SPORT_CFG.leagueLabel + ' Pool | ' + SPORT_CFG.teamCodes.length + ' Teams | ' + PLAYERS.length + ' Players')
     );
-  document.getElementById('sportCountdownIcon').textContent = historicalContext ? 'Era' : 'Live';
+  document.getElementById('sportCountdownIcon').textContent = historicalContext
+    ? (historicalContext.isMixedEraDraft ? 'Mixed' : 'Era')
+    : 'Live';
   setDraftLobbyPill(buildDraftLobbyPillText(), getDraftLobbyTone());
   setDraftCountdownMode('countdown');
   document.getElementById('sportDraftTitle').innerHTML = '<img src="rosterbate-main-logo-final.png" alt="RosterBate" class="draft-brand-img"><div class="dtitle-copy"><div class="dtitle-main">Roster<span>Bate</span> Control Room</div><div class="dtitle-kicker">' + String(historicalContext?.draftTitleKicker || (SPORT_CFG.label + ' Draft')) + '</div></div>';
@@ -4470,10 +4499,14 @@ function applySportToDraftUI(){
   const leaguePlaceholders=getLeagueNamePlaceholders();
   document.getElementById('iLeagueName').placeholder = historicalContext?.leagueNamePlaceholder || leaguePlaceholders[SPORT] || leaguePlaceholders.nba;
   if(historicalContext && !document.getElementById('iLeagueName').value.trim()){
-    document.getElementById('iLeagueName').value=(historicalContext.seasonLabel || 'Historic Season') + ' Draft The Era';
+    document.getElementById('iLeagueName').value=historicalContext.isMixedEraDraft
+      ? ((historicalContext.seasonLabel || 'Mixed Era') + ' Mixed Era Draft')
+      : ((historicalContext.seasonLabel || 'Historic Season') + ' Draft The Era');
   }
-  document.getElementById('iSize').value = SPORT_CFG.defaultLeagueSize;
-  document.getElementById('iSpot').value = 1;
+  const suggestedLeagueSize=Number(historicalContext?.suggestedLeagueSize || SPORT_CFG.defaultLeagueSize || 10) || 10;
+  const preferredDraftSpot=Math.max(1, Math.min(suggestedLeagueSize, Number(historicalContext?.preferredDraftSpot || 1) || 1));
+  document.getElementById('iSize').value = suggestedLeagueSize;
+  document.getElementById('iSpot').value = preferredDraftSpot;
   document.getElementById('iRounds').value = SPORT_CFG.defaultRounds;
   document.getElementById('cScoring').querySelectorAll('.chip').forEach(chip => {
     chip.classList.toggle('on', chip.dataset.v === (SPORT === 'nba' ? 'h2h_pts' : SPORT_CFG.defaultScoring));
@@ -4483,8 +4516,8 @@ function applySportToDraftUI(){
   updatePosFilterBar();
   S.scr = SPORT === 'nba' ? 'h2h_pts' : SPORT_CFG.defaultScoring;
   S.rds = SPORT_CFG.defaultRounds;
-  S.ls = SPORT_CFG.defaultLeagueSize;
-  S.myPos = 0;
+  S.ls = suggestedLeagueSize;
+  S.myPos = preferredDraftSpot - 1;
   S.posF = 'ALL';
   syncDraftSpotBounds();
 }
@@ -8177,6 +8210,7 @@ async function endDraft(){
       historicalPackId:p?.historicalPackId||null,
       historicalTeamId:p?.historicalTeamId||null,
       historicalSeasonId:p?.historicalSeasonId||null,
+      historicalSourcePackIds:Array.isArray(p?.historicalSourcePackIds) ? cloneDraftJsonSafe(p.historicalSourcePackIds) : null,
       name:p?.name||'Unknown Player',
       team:p?.team||'FA',
       pos:p?.pos||'UTIL',
@@ -8277,6 +8311,9 @@ async function endDraft(){
       moneyBallLocks: {},
       waiverPriority: {},
       historicalPackId: isHistoricalDraft ? HISTORICAL_DRAFT_CONTEXT?.packId || null : null,
+      historicalSourcePackIds: isHistoricalDraft && Array.isArray(HISTORICAL_DRAFT_CONTEXT?.sourcePackIds)
+        ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT.sourcePackIds)
+        : null,
       historicalSeasonId: isHistoricalDraft ? HISTORICAL_DRAFT_CONTEXT?.seasonId || null : null,
       historicalEntryMode: isHistoricalDraft ? 'historical_draft' : null,
       historicalPresentation: isHistoricalDraft ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT?.presentation || null) : null,
@@ -8392,11 +8429,16 @@ async function endDraft(){
           +'</div>';
       }).join('') : '<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">No players were drafted to this roster.</div>';
     }
-    if(isMultiplayer){
+    if(isMultiplayer || isHistoricalDraft){
       const startBtn=document.getElementById('startSeasonBtn');
+      const pendingStartLabel = isHistoricalDraft ? 'Opening Your Season...' : 'Starting Your Season...';
+      const idleStartLabel = 'Start Your Season →';
+      const pendingToast = isHistoricalDraft
+        ? 'Season handoff is still staging. Try Start Your Season in a moment.'
+        : 'League link is still syncing. Try Start Your Season in a moment.';
       if(startBtn){
         startBtn.disabled=true;
-        startBtn.textContent='Starting Your Season...';
+        startBtn.textContent=pendingStartLabel;
         startBtn.style.opacity='.8';
       }
       clearTimeout(autoSeasonRedirectTimer);
@@ -8409,15 +8451,15 @@ async function endDraft(){
           }
           if(startBtn){
             startBtn.disabled=false;
-            startBtn.textContent='Start Your Season →';
+            startBtn.textContent=idleStartLabel;
             startBtn.style.opacity='1';
           }
-          showToast('League link is still syncing. Try Start Your Season in a moment.');
+          showToast(pendingToast);
         }catch(redirectErr){
           console.error('Auto season redirect failed:', redirectErr);
           if(startBtn){
             startBtn.disabled=false;
-            startBtn.textContent='Start Your Season →';
+            startBtn.textContent=idleStartLabel;
             startBtn.style.opacity='1';
           }
         }

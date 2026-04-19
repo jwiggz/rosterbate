@@ -717,6 +717,41 @@
 
   const FALLBACK_CATALOG = [
     {
+      packId: 'mixed_era_1996_2016_top100_v1',
+      sport: 'nba',
+      seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
+      shortLabel: '95-96 x 15-16',
+      era: 'Mixed Era',
+      availability: 'playable',
+      statusLabel: 'Localhost Lab',
+      significanceLabel: 'Time Collision',
+      significanceTone: 'spotlight',
+      completenessLabel: 'Curated crossover pool',
+      completenessPercent: 74,
+      tagline: 'Draft Jordan, Steph, LeBron, Hakeem, Shaq, KD, and Kawhi into one crossover board.',
+      summary: 'A curated mixed-era draft pool built from the top 50 players in 1995-96 and 2015-16, ranked with era-normalized mixedEraRatings and designed for custom-team universes first.',
+      whyItMatters: 'This is the clearest expression of RosterBate\'s fantasy promise: not replaying a real roster intact, but drafting across eras to build a universe nobody has seen before.',
+      focusTeamName: 'Draft Slot 1',
+      art: {
+        theme: 'spotlight',
+        eyebrow: 'Mixed Era Lab',
+        headline: '1995-96 x 2015-16',
+        subline: 'A curated time-collision board where two full fantasy eras meet.'
+      },
+      plannedModes: ['Draft The Era', 'Sim Season (After Draft)', 'Mixed-Era Universes'],
+      previewStars: ['Michael Jordan', 'Stephen Curry', 'LeBron James'],
+      draftUrl: 'rosterbate-draft.html?sport=nba&historical=mixed&historicalPackIds=nba_1996_full_season_v1,nba_2016_full_season_v1',
+      syntheticType: 'mixed_era',
+      sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1'],
+      startingSlotCount: 10,
+      playerCount: 100,
+      auditSummary: {
+        realStatCoverage: { playersWithRealSeasonStats: 100, playerCount: 100, label: 'Real season stats' },
+        zeroGamePlayers: { count: 0, label: 'Zero-game players' },
+        removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
+      }
+    },
+    {
       packId: 'nba_1996_full_season_v1',
       sport: 'nba',
       seasonLabel: '1995-96 NBA Historic Season',
@@ -868,6 +903,24 @@
 
   function getConfigById(packId){
     return activeCatalog.find(entry => String(entry.packId) === String(packId)) || null;
+  }
+
+  function isMixedEraConfig(config){
+    return String(config?.syntheticType || '').trim().toLowerCase() === 'mixed_era';
+  }
+
+  function buildMixedEraDraftLaunchUrl(config, selectedSlot){
+    const base=String(config?.draftUrl || '');
+    if(!base) return '#';
+    try{
+      const url=new URL(base, window.location.href);
+      const slot=Math.max(1, Math.min(20, Number(selectedSlot || 1) || 1));
+      url.searchParams.set('mixedStartSlot', String(slot));
+      return url.pathname.replace(/^\//, '') + url.search;
+    }catch(error){
+      const separator=base.includes('?') ? '&' : '?';
+      return base + separator + 'mixedStartSlot=' + encodeURIComponent(String(Math.max(1, Math.min(20, Number(selectedSlot || 1) || 1))));
+    }
   }
 
   function getPackArt(config){
@@ -1055,6 +1108,7 @@
       const eraClass = 'era-' + String(config.era || '').trim().toLowerCase();
       const significance = String(config.significanceLabel || 'Historical Run').trim();
       const shortLabel = String(config.shortLabel || slot.historicalSeasonId || 'Historic').trim();
+      const sourceEraCount=Array.isArray(slot.historicalSourcePackIds) ? slot.historicalSourcePackIds.length : 0;
       const rankText = Number.isFinite(Number(slot.teamRank)) ? ('#' + Number(slot.teamRank)) : '--';
       const recordText = Number.isFinite(Number(slot.wins)) && Number.isFinite(Number(slot.losses))
         ? (Number(slot.wins) + '-' + Number(slot.losses))
@@ -1076,9 +1130,10 @@
               '</div>',
               '<div class="saved-universe-subtitle">' + escapeHtml(slot.subtitle || 'Historical universe save') + '</div>',
               '<div class="saved-universe-meta">',
-                '<span class="saved-universe-pill">' + escapeHtml(slot.historicalPackId || 'historic_pack') + '</span>',
+                '<span class="saved-universe-pill">' + escapeHtml(shortLabel || slot.historicalPackId || 'historic_pack') + '</span>',
                 '<span class="saved-universe-pill">' + escapeHtml(progressText) + '</span>',
                 '<span class="saved-universe-pill">' + escapeHtml(config.significanceLabel || 'Archive Run') + '</span>',
+                (sourceEraCount > 1 ? '<span class="saved-universe-pill">' + escapeHtml(String(sourceEraCount)) + ' eras</span>' : ''),
               '</div>',
             '</div>',
           '</div>',
@@ -1125,6 +1180,9 @@
     if(!config || config.availability !== 'playable'){
       return null;
     }
+    if(isMixedEraConfig(config)){
+      return null;
+    }
     if(bundleCache.has(config.packId)){
       return bundleCache.get(config.packId);
     }
@@ -1154,8 +1212,10 @@
     const playerMap = buildPlayerMap(bundle);
     const teamMap = buildTeamMap(bundle);
     const audit = deriveAuditSummary(bundle, config);
+    const isMixedEra=isMixedEraConfig(config);
     const teams = Array.isArray(bundle && bundle.teams) ? bundle.teams : [];
     const players = Array.isArray(bundle && bundle.players) ? bundle.players : [];
+    const configuredPlayerCount=Number(config.playerCount || audit?.realStatCoverage?.playerCount || 0);
     const packLabel = manifest.seasonLabel || config.seasonLabel || 'Historic Pack';
     const packSummary = summaries.packSummary || manifest.description || config.summary || 'A historical season pack built for RosterBate.';
     const plannedModes = Array.isArray(config.plannedModes) ? config.plannedModes : [];
@@ -1166,7 +1226,9 @@
     document.getElementById('heroPackTitle').textContent = packLabel;
     document.getElementById('heroPackSummary').textContent = packSummary;
     document.getElementById('heroPackCount').textContent = String(activeCatalog.length || 0);
-    document.getElementById('heroPlayerCount').textContent = players.length ? String(players.length) : '--';
+    document.getElementById('heroPlayerCount').textContent = players.length
+      ? String(players.length)
+      : (configuredPlayerCount ? String(configuredPlayerCount) : '--');
 
     document.getElementById('packEraLabel').textContent = (manifest.era || config.era || 'Historic').toUpperCase() + ' Archive';
     document.getElementById('packTitle').textContent = packLabel;
@@ -1220,8 +1282,16 @@
           ].join('');
       document.getElementById('teamSpotlights').innerHTML = spotlightMarkup;
 
-    const select = document.getElementById('featuredTeamSelect');
-    if(teams.length){
+      const select = document.getElementById('featuredTeamSelect');
+    if(isMixedEra){
+      const slotCount=Math.max(2, Math.min(20, Number(config.startingSlotCount || 10) || 10));
+      select.innerHTML = Array.from({length:slotCount}, function(_, index){
+        const slot=index + 1;
+        return '<option value="' + slot + '">Draft Slot ' + slot + '</option>';
+      }).join('');
+      select.disabled = false;
+      select.value = String(Math.max(1, Math.min(slotCount, Number(select.value || 1) || 1)));
+    } else if(teams.length){
       const sortedTeams = teams.slice().sort(function(a, b){
         return teamDisplayName(a).localeCompare(teamDisplayName(b));
       });
@@ -1241,30 +1311,46 @@
     const draftBtn = document.getElementById('draftEraBtn');
     const reimaginedBtn = document.getElementById('reimaginedSeasonBtn');
     const playableHere = config.availability === 'playable' && isLocalHistorical;
-    playBtn.classList.toggle('disabled', !playableHere);
-    simBtn.classList.toggle('disabled', !playableHere);
-    draftBtn.classList.toggle('disabled', !playableHere);
-    reimaginedBtn.classList.toggle('disabled', !playableHere);
-    playBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'season') : '#');
-    simBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'simulation') : '#');
-    draftBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'draft') : '#');
-    reimaginedBtn.setAttribute('href', playableHere ? buildLaunchUrl(config, 'reimagined') : '#');
+    const canDraft=playableHere;
+    const canReplay=playableHere && !isMixedEra;
+    const canSim=playableHere && !isMixedEra;
+    const canReimagined=playableHere && !isMixedEra;
+    playBtn.textContent=isMixedEra ? 'Replay Locked' : 'Replay Era Rosters';
+    simBtn.textContent=isMixedEra ? 'Sim After Draft' : 'Sim Season';
+    draftBtn.textContent='Draft The Era';
+    reimaginedBtn.textContent=isMixedEra ? 'Reimagined Later' : 'Reimagined Season';
+    playBtn.classList.toggle('disabled', !canReplay);
+    simBtn.classList.toggle('disabled', !canSim);
+    draftBtn.classList.toggle('disabled', !canDraft);
+    reimaginedBtn.classList.toggle('disabled', !canReimagined);
+    playBtn.setAttribute('href', canReplay ? buildLaunchUrl(config, 'season') : '#');
+    simBtn.setAttribute('href', canSim ? buildLaunchUrl(config, 'simulation') : '#');
+    draftBtn.setAttribute('href', canDraft ? (isMixedEra ? buildMixedEraDraftLaunchUrl(config, String(select.value || '1').trim()) : buildLaunchUrl(config, 'draft')) : '#');
+    reimaginedBtn.setAttribute('href', canReimagined ? buildLaunchUrl(config, 'reimagined') : '#');
 
-    document.getElementById('modeNote').textContent = playableHere
-      ? 'On localhost, launching from here stages your selected slot before opening the drafted or simulated universe.'
-      : (config.availability === 'playable'
-        ? 'This pack is real, but direct launch stays localhost-first until the lane graduates from preview.'
-        : 'Preview packs stay visible early on purpose. Planned modes: ' + (plannedModes.length ? plannedModes.join(', ') : 'Archive preview') + '.');
+    document.getElementById('modeNote').textContent = isMixedEra
+      ? (playableHere
+          ? 'Choose a starting slot, launch Draft The Era, then turn that drafted universe into Sim Season with the same source-pack-aware players.'
+          : 'This crossover lane is visible now, but direct launch stays localhost-first until the mixed-era lane graduates.')
+      : playableHere
+        ? 'On localhost, launching from here stages your selected slot before opening the drafted or simulated universe.'
+        : (config.availability === 'playable'
+          ? 'This pack is real, but direct launch stays localhost-first until the lane graduates from preview.'
+          : 'Preview packs stay visible early on purpose. Planned modes: ' + (plannedModes.length ? plannedModes.join(', ') : 'Archive preview') + '.');
 
-    document.getElementById('detailNote').textContent = config.availability === 'playable'
-      ? 'This pack is being read from the real historical pack artifact. The shelf is ready for more eras whenever the next pack lands.'
-      : 'Preview packs are intentionally listed before they are playable. Completeness: ' + completenessText + '. Why this season matters: ' + (config.whyItMatters || 'This archive slot is here to make the roadmap feel tangible before the pack is authored.');
+    document.getElementById('detailNote').textContent = isMixedEra
+      ? 'This crossover slot is intentionally draft-first. Draft the curated mixed-era board now, then let Sim Season take over once the custom universe exists.'
+      : config.availability === 'playable'
+        ? 'This pack is being read from the real historical pack artifact. The shelf is ready for more eras whenever the next pack lands.'
+        : 'Preview packs are intentionally listed before they are playable. Completeness: ' + completenessText + '. Why this season matters: ' + (config.whyItMatters || 'This archive slot is here to make the roadmap feel tangible before the pack is authored.');
 
     playBtn.onclick = async function(event){
       event.preventDefault();
-      if(!playableHere){
+      if(!canReplay){
         setStatus(config.availability === 'playable'
-          ? 'This pack is playable, but direct launch remains localhost-first for now.'
+          ? (isMixedEra
+              ? 'This lane is draft-first. Replaying intact era rosters is intentionally not the main fantasy promise here.'
+              : 'This pack is playable, but direct launch remains localhost-first for now.')
           : 'This archive slot is a preview. It is visible now so the shelf reads like a real archive, not a single-pack experiment.', 'warn');
         return;
       }
@@ -1279,9 +1365,11 @@
 
     simBtn.onclick = async function(event){
       event.preventDefault();
-      if(!playableHere){
+      if(!canSim){
         setStatus(config.availability === 'playable'
-          ? 'This pack is playable, but Sim Season remains localhost-first for now.'
+          ? (isMixedEra
+              ? 'Mixed Era Sim Season starts after the draft. Draft the crossover board first, then convert that universe into Sim Season.'
+              : 'This pack is playable, but Sim Season remains localhost-first for now.')
           : 'This archive slot is a preview. Sim Season will light up once the pack is authored and imported.', 'warn');
         return;
       }
@@ -1305,14 +1393,18 @@
 
     draftBtn.onclick = async function(event){
       event.preventDefault();
-      if(!playableHere){
+      if(!canDraft){
         setStatus(config.availability === 'playable'
           ? 'This pack is playable, but Draft The Era remains localhost-first for now.'
           : 'This archive slot is a preview. Draft The Era will light up once the pack is authored and imported.', 'warn');
         return;
       }
-      setStatus('Staging the selected slot and opening Draft The Era...', 'good');
+      setStatus(isMixedEra ? 'Opening Mixed Era Draft...' : 'Staging the selected slot and opening Draft The Era...', 'good');
       try{
+        if(isMixedEra){
+          window.location.href = buildMixedEraDraftLaunchUrl(config, String(select.value || '1').trim());
+          return;
+        }
         if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
           await window.rbHistoricalPackDev.ready();
           await window.rbHistoricalPackDev.setSelectedTeam(String(select.value || '').trim(), config.packId);
@@ -1328,9 +1420,11 @@
 
     reimaginedBtn.onclick = async function(event){
       event.preventDefault();
-      if(!playableHere){
+      if(!canReimagined){
         setStatus(config.availability === 'playable'
-          ? 'This pack is playable, but Reimagined Season remains localhost-first for now.'
+          ? (isMixedEra
+              ? 'Reimagined play opens later from the drafted mixed-era universe, not from a fixed starting roster.'
+              : 'This pack is playable, but Reimagined Season remains localhost-first for now.')
           : 'This archive slot is a preview. Reimagined Season will light up once the pack is authored and imported.', 'warn');
         return;
       }
@@ -1353,12 +1447,16 @@
     };
 
     setStatus(
-      config.availability === 'playable'
+      isMixedEra
+        ? (playableHere
+          ? 'Mixed Era Draft loaded. Choose a starting slot and launch a curated crossover draft built from real on-disk packs.'
+          : 'Mixed Era Draft is cataloged, but direct launch stays localhost-first for now.')
+        : config.availability === 'playable'
         ? (isLocalHistorical
           ? 'Historical browser loaded from a real on-disk pack. Pick a slot and launch directly into a drafted or simulated universe.'
           : 'Pack browser loaded from a real pack artifact. Direct launch stays localhost-first for now.')
         : 'Archive shelf loaded. Preview packs are intentionally visible before they become playable.',
-      config.availability === 'playable' ? 'good' : 'warn'
+      (config.availability === 'playable' || isMixedEra) ? 'good' : 'warn'
     );
     renderSavedUniverses();
   }

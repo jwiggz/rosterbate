@@ -149,12 +149,16 @@
     const createdAt = Number(existingMeta?.createdAt || state?.historicalUniverseCreatedAt || state?.createdAt || state?.savedAt || Date.now());
     const updatedAt = Date.now();
     const standing = getUserStandingSummary(state);
+    const sourcePackIds=Array.isArray(state?.historicalSourcePackIds)
+      ? state.historicalSourcePackIds.map(function(id){ return String(id || '').trim(); }).filter(Boolean)
+      : [];
     return {
       slotId,
       title,
       subtitle: getSubtitle(state),
       sport: normalizeSport(state?.sport),
       historicalPackId: String(state?.historicalPackId || '').trim() || null,
+      historicalSourcePackIds: sourcePackIds.length ? sourcePackIds : null,
       historicalSeasonId: String(state?.historicalSeasonId || '').trim() || null,
       historicalEntryMode: String(state?.historicalEntryMode || 'real_season').trim().toLowerCase(),
       historicalSelectedTeamId: String(state?.historicalSelectedTeamId || '').trim() || null,
