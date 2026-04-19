@@ -89,6 +89,20 @@
     return String(sport || 'nba').trim().toLowerCase();
   }
 
+  function normalizeStringList(values){
+    return (Array.isArray(values) ? values : []).map(function(value){
+      return String(value || '').trim();
+    }).filter(Boolean);
+  }
+
+  function formatLabelList(labels){
+    var normalized=normalizeStringList(labels);
+    if(!normalized.length) return '';
+    if(normalized.length===1) return normalized[0];
+    if(normalized.length===2) return normalized[0] + ' and ' + normalized[1];
+    return normalized.slice(0, -1).join(', ') + ', and ' + normalized[normalized.length - 1];
+  }
+
   function buildTeamAbbrById(teams){
     var map={};
     (Array.isArray(teams) ? teams : []).forEach(function(team, index){
@@ -308,12 +322,105 @@
     };
   }
 
+  function buildMixedEraConfigSnapshot(context){
+    var mixedEraContext=context && typeof context==='object' ? context : {};
+    var mixedEraConfig=mixedEraContext.mixedEraConfig && typeof mixedEraContext.mixedEraConfig==='object'
+      ? mixedEraContext.mixedEraConfig
+      : null;
+    if(!mixedEraConfig) return null;
+
+    var sourcePackIds=normalizeStringList(
+      mixedEraContext.sourcePackIds || mixedEraConfig.sourcePackIds
+    );
+    var sourceSeasonLabels=normalizeStringList(
+      mixedEraContext.sourceSeasonLabels || mixedEraConfig.sourceSeasonLabels
+    );
+    var topPlayersValue=Number(
+      mixedEraContext.mixedEraTopPlayersPerPack ||
+      mixedEraConfig.topPlayersPerPack ||
+      0
+    );
+    var topPlayersPerPack=Number.isFinite(topPlayersValue) && topPlayersValue>0
+      ? (Math.max(1, Math.round(topPlayersValue)) || null)
+      : null;
+
+    return clone({
+      mixedEraConfigId: String(
+        mixedEraContext.mixedEraConfigId ||
+        mixedEraConfig.mixedEraConfigId ||
+        ''
+      ).trim() || null,
+      packId: String(
+        mixedEraContext.packId ||
+        mixedEraConfig.packId ||
+        ''
+      ).trim() || null,
+      seasonLabel: String(
+        mixedEraContext.seasonLabel ||
+        mixedEraConfig.seasonLabel ||
+        'Mixed Era Draft'
+      ).trim() || 'Mixed Era Draft',
+      shortLabel: String(
+        mixedEraConfig.shortLabel ||
+        mixedEraContext.shortLabel ||
+        ''
+      ).trim() || null,
+      sourcePackIds: sourcePackIds,
+      sourceSeasonLabels: sourceSeasonLabels,
+      topPlayersPerPack: topPlayersPerPack,
+      summary: String(
+        mixedEraConfig.summary ||
+        mixedEraContext.packSummary ||
+        mixedEraContext.subtitle ||
+        ''
+      ).trim() || '',
+      whyItMatters: String(
+        mixedEraConfig.whyItMatters ||
+        mixedEraContext.whyItMatters ||
+        ''
+      ).trim() || '',
+      syntheticType: String(
+        mixedEraConfig.syntheticType ||
+        mixedEraContext.syntheticType ||
+        'mixed_era'
+      ).trim() || 'mixed_era'
+    });
+  }
+
+  function buildMixedEraUniverseSummary(options){
+    var input=options && typeof options==='object' ? options : {};
+    var mixedEraConfig=input.mixedEraConfig && typeof input.mixedEraConfig==='object'
+      ? input.mixedEraConfig
+      : null;
+    if(!mixedEraConfig) return null;
+
+    var sourceEraLabels=normalizeStringList(
+      input.mixedEraSourceSeasonLabels || mixedEraConfig.sourceSeasonLabels
+    );
+    var topPlayersValue=Number(mixedEraConfig.topPlayersPerPack || 0);
+    var topPlayersPerPack=Number.isFinite(topPlayersValue) && topPlayersValue>0
+      ? (Math.max(1, Math.round(topPlayersValue)) || null)
+      : null;
+    var explainer=sourceEraLabels.length>=2
+      ? ('Curated crossover universe built from ' + formatLabelList(sourceEraLabels) + '.')
+      : 'Curated crossover universe built from real historical source packs.';
+
+    return {
+      sourceEraLabels: sourceEraLabels,
+      explainer: explainer,
+      poolRuleLabel: topPlayersPerPack ? ('Top ' + topPlayersPerPack + ' players from each era') : '',
+      trustNote: 'This save uses an era-normalized crossover board built from real historical source packs for draft and sim continuity.'
+    };
+  }
+
   var api={
     clone: clone,
     roundStat: roundStat,
     applyAvailabilityAdjustment: applyAvailabilityAdjustment,
     getMixedEraOverall: getMixedEraOverall,
     buildProjection: buildProjection,
+    buildMixedEraConfigSnapshot: buildMixedEraConfigSnapshot,
+    buildMixedEraUniverseSummary: buildMixedEraUniverseSummary,
     buildMixedEraDraftContextFromBundles: buildMixedEraDraftContextFromBundles
   };
 

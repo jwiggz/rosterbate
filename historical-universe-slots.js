@@ -152,6 +152,9 @@
     const sourcePackIds=Array.isArray(state?.historicalSourcePackIds)
       ? state.historicalSourcePackIds.map(function(id){ return String(id || '').trim(); }).filter(Boolean)
       : [];
+    const mixedEraSourceSeasonLabels=Array.isArray(state?.mixedEraSourceSeasonLabels)
+      ? state.mixedEraSourceSeasonLabels.map(function(label){ return String(label || '').trim(); }).filter(Boolean)
+      : [];
     return {
       slotId,
       title,
@@ -160,6 +163,11 @@
       historicalPackId: String(state?.historicalPackId || '').trim() || null,
       historicalSourcePackIds: sourcePackIds.length ? sourcePackIds : null,
       historicalSeasonId: String(state?.historicalSeasonId || '').trim() || null,
+      mixedEraConfigId: String(state?.mixedEraConfigId || '').trim() || null,
+      mixedEraTopPlayersPerPack: Number.isFinite(Number(state?.mixedEraTopPlayersPerPack))
+        ? Number(state.mixedEraTopPlayersPerPack)
+        : null,
+      mixedEraSourceSeasonLabels: mixedEraSourceSeasonLabels.length ? mixedEraSourceSeasonLabels : null,
       historicalEntryMode: String(state?.historicalEntryMode || 'real_season').trim().toLowerCase(),
       historicalSelectedTeamId: String(state?.historicalSelectedTeamId || '').trim() || null,
       seasonId: String(state?.seasonId || '').trim() || null,

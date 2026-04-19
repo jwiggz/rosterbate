@@ -8202,6 +8202,18 @@ async function endDraft(){
       historicalChallenges: isHistoricalDraft ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT?.packChallenges || null) : null,
       historicalSummaries: isHistoricalDraft ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT?.summaries || null) : null,
       historicalPackSummary: isHistoricalDraft ? String(HISTORICAL_DRAFT_CONTEXT?.packSummary || '').trim() : '',
+      mixedEraConfigId: isHistoricalDraft ? HISTORICAL_DRAFT_CONTEXT?.mixedEraConfigId || null : null,
+      mixedEraTopPlayersPerPack: isHistoricalDraft && Number.isFinite(Number(HISTORICAL_DRAFT_CONTEXT?.mixedEraTopPlayersPerPack))
+        ? Number(HISTORICAL_DRAFT_CONTEXT.mixedEraTopPlayersPerPack)
+        : null,
+      mixedEraSourceSeasonLabels: isHistoricalDraft && Array.isArray(HISTORICAL_DRAFT_CONTEXT?.sourceSeasonLabels)
+        ? cloneDraftJsonSafe(HISTORICAL_DRAFT_CONTEXT.sourceSeasonLabels)
+        : null,
+      mixedEraConfig: isHistoricalDraft
+        && window.RosterBateMixedEraRuntime
+        && typeof window.RosterBateMixedEraRuntime.buildMixedEraConfigSnapshot === 'function'
+        ? window.RosterBateMixedEraRuntime.buildMixedEraConfigSnapshot(HISTORICAL_DRAFT_CONTEXT)
+        : null,
       isHistoricalPack: isHistoricalDraft,
       isHistoricalPackDev: isHistoricalDraft,
       devLocalOnly: isHistoricalDraft,

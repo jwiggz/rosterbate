@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="sport-config.js"></script>
 <script src="historical-pack-loader.js"></script>
+<script src="mixed-era-runtime.js"></script>
 <script src="historical-universe-slots.js"></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <style>
@@ -511,6 +512,7 @@
 
   function renderUniverse(slot, state, config){
     const api = window.RosterBateHistoricalUniverseSlots;
+    const mixedEraRuntime = window.RosterBateMixedEraRuntime;
     const reveal = getLatestRevealReport(state);
     const standing = getStandingContext(state);
     const rosterCore = buildRosterCore(state);
@@ -527,6 +529,15 @@
     const weekDayText = 'W' + Number(slot.currentWeek || 1) + ' / D' + Number(slot.currentDay || 1);
     const title = String(slot.title || config?.seasonLabel || 'Historical Universe').trim();
     const heroTeam = String(slot.teamName || config?.focusTeamName || 'Featured Team').trim();
+    const mixedEraSummary = mixedEraRuntime && typeof mixedEraRuntime.buildMixedEraUniverseSummary === 'function'
+      ? mixedEraRuntime.buildMixedEraUniverseSummary({
+          mixedEraConfig: state?.mixedEraConfig || null,
+          mixedEraSourceSeasonLabels: state?.mixedEraSourceSeasonLabels || slot?.mixedEraSourceSeasonLabels || []
+        })
+      : null;
+    const isMixedEraUniverse = !!mixedEraSummary;
+    const packContextCopy = mixedEraSummary?.explainer || config?.summary || 'This saved universe is attached to a historical pack in your archive.';
+    const whyItMattersCopy = String(state?.mixedEraConfig?.whyItMatters || config?.whyItMatters || 'This universe keeps a historical season pack alive as a replayable archive branch.').trim();
     const heroCopy = config?.whyItMatters
       ? (config.summary + ' This saved run keeps that pack alive through your own branch: ' + config.whyItMatters)
       : (config?.summary || 'This saved universe captures a living historical branch you can revisit anytime.');
@@ -579,12 +590,23 @@
         }).join('')
       : '<div class="roster-item"><strong>No roster core available</strong><span>This universe has not published a visible starter or roster slice yet.</span></div>';
 
-    document.getElementById('packContextCopy').textContent = config?.summary || 'This saved universe is attached to a historical pack in your archive.';
-    document.getElementById('packContextList').innerHTML = [
-      '<div class="info-item"><strong>Why this season matters</strong><span>' + escapeHtml(config?.whyItMatters || 'This universe keeps a historical season pack alive as a replayable archive branch.') + '</span></div>',
-      '<div class="info-item"><strong>Current team focus</strong><span>' + escapeHtml(heroTeam) + '</span><div class="info-item-meta"><span class="pill">' + escapeHtml(config?.focusTeamName || heroTeam) + '</span><span class="pill">' + escapeHtml(config?.significanceLabel || 'Historic Run') + '</span></div></div>',
-      '<div class="info-item"><strong>Standing context</strong><span>' + escapeHtml(standing.rank ? ('Currently ' + standing.rank + ' in the league with ' + recordText + '.') : 'Standing summary is not available yet.') + '</span></div>'
-    ].join('');
+    document.getElementById('packContextCopy').textContent = packContextCopy;
+    document.getElementById('packContextList').innerHTML = isMixedEraUniverse
+      ? [
+          '<div class="info-item"><strong>Why this season matters</strong><span>' + escapeHtml(whyItMattersCopy) + '</span></div>',
+          '<div class="info-item"><strong>Source eras</strong><span>' + escapeHtml(mixedEraSummary.sourceEraLabels.length ? 'This universe draws from multiple real historical seasons.' : 'This universe draws from real historical source packs.') + '</span><div class="info-item-meta">' + [
+            mixedEraSummary.sourceEraLabels.map(function(label){
+              return '<span class="pill">' + escapeHtml(label) + '</span>';
+            }).join(''),
+            mixedEraSummary.poolRuleLabel ? '<span class="pill">' + escapeHtml(mixedEraSummary.poolRuleLabel) + '</span>' : ''
+          ].join('') + '</div></div>',
+          '<div class="info-item"><strong>Trust note</strong><span>' + escapeHtml(mixedEraSummary.trustNote) + '</span></div>'
+        ].join('')
+      : [
+          '<div class="info-item"><strong>Why this season matters</strong><span>' + escapeHtml(whyItMattersCopy) + '</span></div>',
+          '<div class="info-item"><strong>Current team focus</strong><span>' + escapeHtml(heroTeam) + '</span><div class="info-item-meta"><span class="pill">' + escapeHtml(config?.focusTeamName || heroTeam) + '</span><span class="pill">' + escapeHtml(config?.significanceLabel || 'Historic Run') + '</span></div></div>',
+          '<div class="info-item"><strong>Standing context</strong><span>' + escapeHtml(standing.rank ? ('Currently ' + standing.rank + ' in the league with ' + recordText + '.') : 'Standing summary is not available yet.') + '</span></div>'
+        ].join('');
 
     document.getElementById('timelineList').innerHTML = [
       '<div class="timeline-item"><strong>Universe Created</strong><span>' + escapeHtml(normalizeDate(slot.createdAt)) + '</span></div>',
