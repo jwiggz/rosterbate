@@ -602,13 +602,14 @@
     var input=options && typeof options==='object' ? options : {};
     var config=input.config && typeof input.config==='object' ? input.config : {};
     var playerPool=(Array.isArray(input.playerPool) ? input.playerPool : []).slice().sort(comparePlayers);
+    var authoredSourcePackIds=normalizeStringList(config.sourcePackIds);
     var sourcePackIds=collectAuditSourcePackIds(config, playerPool);
     var topPlayersValue=Number(config.topPlayersPerPack);
     var topPlayersPerPack=Number.isFinite(topPlayersValue) && topPlayersValue>0
       ? Math.max(1, Math.round(topPlayersValue))
       : null;
     var expectedPerSource={};
-    sourcePackIds.forEach(function(packId){
+    authoredSourcePackIds.forEach(function(packId){
       if(topPlayersPerPack!==null) expectedPerSource[packId]=topPlayersPerPack;
     });
     var compositionChecks=[
@@ -632,7 +633,7 @@
         tuneAt: 58,
         failAt: 62
       }),
-      buildCompositionCheck('fullPool', 'Full Pool', playerPool, 0, sourcePackIds, {
+      buildCompositionCheck('fullPool', 'Full Pool', playerPool, 0, authoredSourcePackIds, {
         mode: 'expected_equal',
         expectedPerSource: topPlayersPerPack!==null ? expectedPerSource : null
       })

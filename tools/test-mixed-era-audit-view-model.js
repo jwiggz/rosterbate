@@ -146,39 +146,68 @@ assert.strictEqual(unconfiguredViewModel.warning, '');
 
 const unexpectedSourceViewModel = runtime.buildMixedEraAuditViewModel({
   config: {
-    seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
-    sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1'],
+    seasonLabel: 'A + B Authored Mixed Era Draft',
+    sourcePackIds: ['A', 'B'],
     topPlayersPerPack: 2
   },
   playerPool: [
     {
-      name: 'Michael Jordan',
-      historicalPackId: 'nba_1996_full_season_v1',
+      name: 'Player A1',
+      historicalPackId: 'A',
       mixedEraOverall: 99.8,
       fp: 74.2,
       totalFantasyPoints: 6171.5,
       gp: 82
     },
     {
-      name: 'Stephen Curry',
-      historicalPackId: 'nba_2016_full_season_v1',
+      name: 'Player A2',
+      historicalPackId: 'A',
       mixedEraOverall: 98.7,
       fp: 72.4,
       totalFantasyPoints: 5742.1,
       gp: 79
     },
     {
-      name: 'Mystery Prospect',
-      historicalPackId: '',
+      name: 'Player B1',
+      historicalPackId: 'B',
       mixedEraOverall: 94.1,
       fp: 61.8,
       totalFantasyPoints: 5033.7,
       gp: 77
+    },
+    {
+      name: 'Player B2',
+      historicalPackId: 'B',
+      mixedEraOverall: 93.9,
+      fp: 61.4,
+      totalFantasyPoints: 4970.2,
+      gp: 76
+    },
+    {
+      name: 'Player C1',
+      historicalPackId: 'C',
+      mixedEraOverall: 91.2,
+      fp: 58.7,
+      totalFantasyPoints: 4696.0,
+      gp: 80
+    },
+    {
+      name: 'Player C2',
+      historicalPackId: 'C',
+      mixedEraOverall: 90.1,
+      fp: 57.3,
+      totalFantasyPoints: 4526.7,
+      gp: 79
     }
   ]
 });
 
 assert.strictEqual(getCheck(unexpectedSourceViewModel, 'top10').verdict, 'pass');
+assert.deepStrictEqual(unexpectedSourceViewModel.fullPoolComposition, {
+  A: 2,
+  B: 2,
+  C: 2
+});
 assert.strictEqual(getCheck(unexpectedSourceViewModel, 'fullPool').verdict, 'fail');
 assert.match(unexpectedSourceViewModel.warning, /Full Pool composition check failed/i);
 
