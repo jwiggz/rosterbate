@@ -29,7 +29,7 @@ expectMatch(/<tbody id="rows">[\s\S]*No audit board loaded yet\./i, 'table rows 
 expectMatch(/<th>2K OVR<\/th>[\s\S]*<th>Delta<\/th>[\s\S]*<th>Mismatch<\/th>/i, 'calibration table columns are missing');
 expectMatch(/function renderCompositionCheck\(target, check\)/i, 'renderCompositionCheck hook is missing');
 expectMatch(/function renderTierBands\(bands\)/i, 'renderTierBands hook is missing');
-expectMatch(/var calibration = await loadAuditCalibrationForConfig\(config\);/i, 'board-scoped calibration loading path is missing');
+expectMatch(/var calibration = await loadAuditCalibrationForConfig\(config, configId\);/i, 'board-scoped calibration loading path is missing');
 expectMatch(/config\.calibration = calibration;/i, 'calibration data is not passed explicitly into the audit config');
 expectMatch(/renderCalibrationSummary\(viewModel\.calibrationSummary\)/i, 'calibration summary rendering path is missing');
 expectMatch(/var checksById = \(Array\.isArray\(viewModel\.compositionChecks\)/i, 'compositionChecks rendering path is missing');

@@ -638,7 +638,7 @@
           throw new Error('required_runtime_missing');
         }
         var config = await loader.loadMixedEraConfigById(configId);
-        var calibration = await loadAuditCalibrationForConfig(config);
+        var calibration = await loadAuditCalibrationForConfig(config, configId);
         if(calibration){
           config = Object.assign({}, config);
           config.calibration = calibration;
@@ -675,12 +675,14 @@
         });
       }
 
-      function resolveAuditCalibrationId(config){
+      function resolveAuditCalibrationId(config, configId){
+        var explicitConfigId = String(configId || '').trim();
+        if(explicitConfigId) return explicitConfigId;
         return String(config && (config.mixedEraConfigId || config.auditCalibrationId || config.calibrationId || config.id || '') || '').trim();
       }
 
-      async function loadAuditCalibrationForConfig(config){
-        var calibrationId = resolveAuditCalibrationId(config);
+      async function loadAuditCalibrationForConfig(config, configId){
+        var calibrationId = resolveAuditCalibrationId(config, configId);
         if(!calibrationId) return null;
         try{
           var response = await fetch('historical-packs/mixed-era/audit-calibration/' + encodeURIComponent(calibrationId) + '.2k.json', { cache: 'no-store' });
