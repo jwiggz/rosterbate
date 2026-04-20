@@ -321,14 +321,13 @@
     const premiumTierGate = getPremiumTierGate(adjustedOverall, 60, 76);
     const middleTierGate = getPremiumTierGate(adjustedOverall, 58, 76);
     const olderEraInteriorCompression = packId === 'nba_1996_full_season_v1'
-      ? roundHundredth(1 - olderEraInteriorScore * premiumTierGate * 0.035)
+      ? 1 - olderEraInteriorScore * premiumTierGate * 0.035
       : 1;
     const modernSpacingHybridLift = packId === 'nba_2016_full_season_v1'
-      ? roundHundredth(1 + modernSpacingHybridScore * middleTierGate * 0.015)
+      ? 1 + modernSpacingHybridScore * middleTierGate * 0.015
       : 1;
-    const boardShapeMultiplier = roundHundredth(
+    const boardShapeMultiplier =
       olderEraInteriorCompression * modernSpacingHybridLift
-    );
 
     adjusted.overall=roundStat(adjustedOverall * boardShapeMultiplier * lowGamesConfidence);
     return {
@@ -341,10 +340,10 @@
         dominance:roundStat(dominance),
         lowGamesConfidence:lowGamesConfidence,
         olderEraInteriorScore:olderEraInteriorScore,
-        olderEraInteriorCompression:olderEraInteriorCompression,
+        olderEraInteriorCompression:roundHundredth(olderEraInteriorCompression),
         modernSpacingHybridScore:modernSpacingHybridScore,
-        modernSpacingHybridLift:modernSpacingHybridLift,
-        boardShapeMultiplier:boardShapeMultiplier,
+        modernSpacingHybridLift:roundHundredth(modernSpacingHybridLift),
+        boardShapeMultiplier:roundHundredth(boardShapeMultiplier),
         normalizationModel:'season_context_plus_board_shape_tuning_v1'
       }
     };
