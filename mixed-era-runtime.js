@@ -454,6 +454,123 @@
     return Math.max.apply(Math, counts) - Math.min.apply(Math, counts);
   }
 
+  function getDominantCompositionShare(composition){
+    var counts=Object.keys(composition || {}).map(function(key){
+      return Number(composition[key] || 0);
+    }).filter(function(value){
+      return Number.isFinite(value);
+    });
+    var total=counts.reduce(function(sum, value){
+      return sum + value;
+    }, 0);
+    if(!total) return 0;
+    return roundStat((Math.max.apply(Math, counts) / total) * 100);
+  }
+
+  function getCompositionDetail(id, label, players, limit, sourcePackIds, options, composition){
+    var mode=String(options && options.mode || '').trim();
+    var spread=getCompositionSpread(composition);
+    var dominantShare=getDominantCompositionShare(composition);
+    var expectedPerSource=options && options.expectedPerSource ? options.expectedPerSource : null;
+
+    if(mode==='spread'){
+      if(spread >= Number(options && options.failAt || 0)){
+        return {
+          verdict: 'fail',
+          detail: 'One era can lead by 4+ slots in the top 10 board.'
+        };
+      }
+      if(spread >= Number(options && options.tuneAt || 0)){
+        return {
+          verdict: 'tune',
+          detail: 'One era leads by 3 slots in the top 10 board.'
+        };
+      }
+      return {
+        verdict: 'pass',
+        detail: 'Top 10 composition stays balanced.'
+      };
+    }
+
+    if(mode==='dominant-share'){
+      if(dominantShare >= Number(options && options.failAt || 0)){
+        return {
+          verdict: 'fail',
+          detail: 'One era owns too much of the slice.'
+        };
+      }
+      if(dominantShare >= Number(options && options.tuneAt || 0)){
+        return {
+          verdict: 'tune',
+          detail: 'One era is starting to own too much of the slice.'
+        };
+      }
+      return {
+        verdict: 'pass',
+        detail: 'Slice stays within composition guardrails.'
+      };
+    }
+
+    if(mode==='expected_equal'){
+      var countsBySource=composition || {};
+      var expectedSourceIds=normalizeStringList(sourcePackIds);
+      if(!expectedPerSource || !expectedSourceIds.length){
+        return {
+          verdict: 'pass',
+          detail: 'Authored top-N-per-pack composition is not configured.'
+        };
+      }
+      var expectedLabel=Number.isFinite(Number(limit)) && Number(limit) > 0
+        ? ('Top ' + Number(limit) + ' players per pack')
+        : 'Authored top-N-per-pack composition';
+      var matches=expectedSourceIds.every(function(packId){
+        return Number(countsBySource[packId] || 0) === Number(expectedPerSource && expectedPerSource[packId] || 0);
+      });
+      return {
+        verdict: matches ? 'pass' : 'fail',
+        detail: matches
+          ? (expectedLabel + ' matches the authored top-N-per-pack composition.')
+          : (expectedLabel + ' does not match the authored top-N-per-pack composition.')
+      };
+    }
+
+    return {
+      verdict: 'pass',
+      detail: label + ' composition check passed.'
+    };
+  }
+
+  function buildCompositionCheck(id, label, players, limit, sourcePackIds, options){
+    var composition=buildSourceComposition(players, limit, sourcePackIds);
+    var detailResult=getCompositionDetail(id, label, players, limit, sourcePackIds, options, composition);
+    return {
+      id: id,
+      label: label,
+      limit: limit,
+      composition: composition,
+      dominantShare: getDominantCompositionShare(composition),
+      spread: getCompositionSpread(composition),
+      verdict: detailResult.verdict,
+      detail: detailResult.detail
+    };
+  }
+
+  function buildTierBand(label, players, startRank, endRank, sourcePackIds){
+    var bandPlayers=(Array.isArray(players) ? players : []).slice(Math.max(0, startRank - 1), Math.max(0, endRank));
+    var composition=buildSourceComposition(bandPlayers, 0, sourcePackIds);
+    return {
+      label: label,
+      startRank: startRank,
+      endRank: endRank,
+      playerCount: bandPlayers.length,
+      composition: composition,
+      dominantShare: getDominantCompositionShare(composition),
+      players: bandPlayers.map(function(player){
+        return String(player && player.name || '').trim();
+      })
+    };
+  }
+
   function getRawFantasyPointsPerGame(player){
     var gamesPlayed=Math.max(0, Number(player && player.gp || player && player.statValues && player.statValues.GP || 0));
     var totalFantasyPoints=Number(player && (player.totalFantasyPoints || player.statValues && player.statValues.TFP) || 0);
@@ -468,19 +585,68 @@
     var config=input.config && typeof input.config==='object' ? input.config : {};
     var playerPool=(Array.isArray(input.playerPool) ? input.playerPool : []).slice().sort(comparePlayers);
     var sourcePackIds=collectAuditSourcePackIds(config, playerPool);
-    var top10Composition=buildSourceComposition(playerPool, 10, sourcePackIds);
-    var top25Composition=buildSourceComposition(playerPool, 25, sourcePackIds);
-    var fullPoolComposition=buildSourceComposition(playerPool, 0, sourcePackIds);
-    var warning=getCompositionSpread(top10Composition) >= 4
-      ? 'Top-10 board heavily favors one source era.'
-      : '';
+    var topPlayersPerPack=Math.max(1, Math.round(Number(config.topPlayersPerPack || 0))) || null;
+    var expectedPerSource={};
+    sourcePackIds.forEach(function(packId){
+      expectedPerSource[packId]=topPlayersPerPack || 0;
+    });
+    var compositionChecks=[
+      buildCompositionCheck('top10', 'Top 10', playerPool, 10, sourcePackIds, {
+        mode: 'spread',
+        tuneAt: 3,
+        failAt: 4
+      }),
+      buildCompositionCheck('top25', 'Top 25', playerPool, 25, sourcePackIds, {
+        mode: 'dominant-share',
+        tuneAt: 64,
+        failAt: 70
+      }),
+      buildCompositionCheck('top50', 'Top 50', playerPool, 50, sourcePackIds, {
+        mode: 'dominant-share',
+        tuneAt: 60,
+        failAt: 66
+      }),
+      buildCompositionCheck('top100', 'Top 100', playerPool, 100, sourcePackIds, {
+        mode: 'dominant-share',
+        tuneAt: 58,
+        failAt: 62
+      }),
+      buildCompositionCheck('fullPool', 'Full Pool', playerPool, 0, sourcePackIds, {
+        mode: 'expected_equal',
+        expectedPerSource: expectedPerSource
+      })
+    ];
+    var checksById=compositionChecks.reduce(function(map, check){
+      map[check.id]=check;
+      return map;
+    }, {});
+    var firstFail=compositionChecks.find(function(check){
+      return check.verdict === 'fail';
+    });
+    var firstTune=compositionChecks.find(function(check){
+      return check.verdict === 'tune';
+    });
+    var warning=firstFail
+      ? (firstFail.label + ' composition check failed. ' + firstFail.detail)
+      : (firstTune ? (firstTune.label + ' composition check needs tuning. ' + firstTune.detail) : '');
 
     return {
       seasonLabel: String(config.seasonLabel || 'Mixed Era Draft').trim() || 'Mixed Era Draft',
-      topPlayersPerPack: Math.max(1, Math.round(Number(config.topPlayersPerPack || 0))) || null,
-      top10Composition: top10Composition,
-      top25Composition: top25Composition,
-      fullPoolComposition: fullPoolComposition,
+      topPlayersPerPack: topPlayersPerPack,
+      compositionChecks: compositionChecks,
+      checksById: checksById,
+      top10Composition: checksById.top10.composition,
+      top25Composition: checksById.top25.composition,
+      top50Composition: checksById.top50.composition,
+      top100Composition: checksById.top100.composition,
+      fullPoolComposition: checksById.fullPool.composition,
+      tierBands: [
+        buildTierBand('1-10', playerPool, 1, 10, sourcePackIds),
+        buildTierBand('11-25', playerPool, 11, 25, sourcePackIds),
+        buildTierBand('26-50', playerPool, 26, 50, sourcePackIds),
+        buildTierBand('51-100', playerPool, 51, 100, sourcePackIds),
+        buildTierBand('101-150', playerPool, 101, 150, sourcePackIds)
+      ],
       warning: warning,
       rows: playerPool.map(function(player, index){
         return {
