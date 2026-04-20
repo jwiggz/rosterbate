@@ -262,6 +262,8 @@ assert.ok(
     modernInteriorControlMixedEra.context.modernSpacingHybridScore
 );
 assert.ok(modernSpacingHybridMixedEra.context.modernSpacingHybridLift > 1);
+assert.ok(modernInteriorControlMixedEra.context.modernSpacingHybridLift > 1);
+assert.ok(modernInteriorControlMixedEra.context.boardShapeMultiplier > 1);
 assert.ok(
   modernSpacingHybridMixedEra.ratings.overall >
     modernInteriorControlMixedEra.ratings.overall

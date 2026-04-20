@@ -83,6 +83,11 @@
     return Number.isFinite(num) ? Math.round(num*100)/100 : 0;
   }
 
+  function roundThousandth(value){
+    const num=Number(value||0);
+    return Number.isFinite(num) ? Math.round(num*1000)/1000 : 0;
+  }
+
   function safeClone(value){
     try{
       return JSON.parse(JSON.stringify(value));
@@ -340,10 +345,10 @@
         dominance:roundStat(dominance),
         lowGamesConfidence:lowGamesConfidence,
         olderEraInteriorScore:olderEraInteriorScore,
-        olderEraInteriorCompression:roundHundredth(olderEraInteriorCompression),
+        olderEraInteriorCompression:roundThousandth(olderEraInteriorCompression),
         modernSpacingHybridScore:modernSpacingHybridScore,
-        modernSpacingHybridLift:roundHundredth(modernSpacingHybridLift),
-        boardShapeMultiplier:roundHundredth(boardShapeMultiplier),
+        modernSpacingHybridLift:roundThousandth(modernSpacingHybridLift),
+        boardShapeMultiplier:roundThousandth(boardShapeMultiplier),
         normalizationModel:'season_context_plus_board_shape_tuning_v1'
       }
     };
