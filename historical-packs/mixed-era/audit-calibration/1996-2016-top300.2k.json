@@ -1,0 +1,145 @@
+{
+  "boardId": "1996-2016-top300",
+  "packId": "mixed_era_1996_2016_top300_v1",
+  "seasonLabel": "1995-96 + 2015-16 Mixed Era Draft",
+  "sourcePackIds": [
+    "nba_1996_full_season_v1",
+    "nba_2016_full_season_v1"
+  ],
+  "capturedAt": "2026-04-20",
+  "notes": "Audit-only calibration prior for the flagship mixed-era board.",
+  "players": [
+    {
+      "name": "Michael Jordan",
+      "historicalPackId": "nba_1996_full_season_v1",
+      "2kOverall": 99.5,
+      "inside": 98,
+      "outside": 96,
+      "athleticism": 99,
+      "playmaking": 95,
+      "defense": 99,
+      "rebounding": 88,
+      "notes": "Anchor scorer and defensive standard."
+    },
+    {
+      "name": "Scottie Pippen",
+      "historicalPackId": "nba_1996_full_season_v1",
+      "2kOverall": 91.5,
+      "inside": 86,
+      "outside": 84,
+      "athleticism": 95,
+      "playmaking": 90,
+      "defense": 98,
+      "rebounding": 82,
+      "notes": "Elite connective wing with all-defense value."
+    },
+    {
+      "name": "Dennis Rodman",
+      "historicalPackId": "nba_1996_full_season_v1",
+      "2kOverall": 94.4,
+      "inside": 82,
+      "outside": 70,
+      "athleticism": 92,
+      "playmaking": 68,
+      "defense": 99,
+      "rebounding": 99,
+      "notes": "Defensive chaos engine and rebounding specialist."
+    },
+    {
+      "name": "Shawn Kemp",
+      "historicalPackId": "nba_1996_full_season_v1",
+      "2kOverall": 93.6,
+      "inside": 92,
+      "outside": 74,
+      "athleticism": 98,
+      "playmaking": 72,
+      "defense": 82,
+      "rebounding": 88,
+      "notes": "Explosive finisher with rim pressure."
+    },
+    {
+      "name": "Gary Payton",
+      "historicalPackId": "nba_1996_full_season_v1",
+      "2kOverall": 95.8,
+      "inside": 74,
+      "outside": 86,
+      "athleticism": 90,
+      "playmaking": 95,
+      "defense": 99,
+      "rebounding": 66,
+      "notes": "Primary perimeter stopper and pressure guard."
+    },
+    {
+      "name": "Hakeem Olajuwon",
+      "historicalPackId": "nba_1996_full_season_v1",
+      "2kOverall": 98.8,
+      "inside": 99,
+      "outside": 72,
+      "athleticism": 94,
+      "playmaking": 82,
+      "defense": 99,
+      "rebounding": 96,
+      "notes": "Franchise interior two-way centerpiece."
+    },
+    {
+      "name": "Stephen Curry",
+      "historicalPackId": "nba_2016_full_season_v1",
+      "2kOverall": 99.7,
+      "inside": 70,
+      "outside": 99,
+      "athleticism": 88,
+      "playmaking": 98,
+      "defense": 78,
+      "rebounding": 58,
+      "notes": "Off-ball gravity and shot creation."
+    },
+    {
+      "name": "Klay Thompson",
+      "historicalPackId": "nba_2016_full_season_v1",
+      "2kOverall": 95.2,
+      "inside": 68,
+      "outside": 98,
+      "athleticism": 82,
+      "playmaking": 72,
+      "defense": 88,
+      "rebounding": 56,
+      "notes": "Movement shooter with two-way wing utility."
+    },
+    {
+      "name": "Draymond Green",
+      "historicalPackId": "nba_2016_full_season_v1",
+      "2kOverall": 92.0,
+      "inside": 72,
+      "outside": 76,
+      "athleticism": 84,
+      "playmaking": 92,
+      "defense": 97,
+      "rebounding": 90,
+      "notes": "Defensive quarterback and transition organizer."
+    },
+    {
+      "name": "LeBron James",
+      "historicalPackId": "nba_2016_full_season_v1",
+      "2kOverall": 98.1,
+      "inside": 98,
+      "outside": 94,
+      "athleticism": 99,
+      "playmaking": 99,
+      "defense": 92,
+      "rebounding": 88,
+      "notes": "Primary engine with all-phase creation."
+    },
+    {
+      "name": "Kawhi Leonard",
+      "historicalPackId": "nba_2016_full_season_v1",
+      "2kOverall": 97.4,
+      "inside": 90,
+      "outside": 92,
+      "athleticism": 91,
+      "playmaking": 82,
+      "defense": 98,
+      "rebounding": 76,
+      "notes": "Two-way wing with playoff shot-making."
+    }
+  ]
+}

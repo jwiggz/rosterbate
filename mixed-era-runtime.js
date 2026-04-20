@@ -95,6 +95,218 @@
     }).filter(Boolean);
   }
 
+  function normalizeCalibrationText(value){
+    return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function buildCalibrationKey(name, packId){
+    var normalizedName=normalizeCalibrationText(name);
+    var normalizedPackId=normalizeCalibrationText(packId);
+    if(!normalizedName || !normalizedPackId) return '';
+    return normalizedName + '|' + normalizedPackId;
+  }
+
+  function normalizeCalibrationNumber(value){
+    var num=Number(value);
+    return Number.isFinite(num) ? roundStat(num) : null;
+  }
+
+  function normalizeCalibrationEntry(entry){
+    if(!(entry && typeof entry==='object')) return null;
+    var name=String(entry.name || entry.player || entry.displayName || '').trim();
+    var historicalPackId=String(entry.historicalPackId || entry.sourcePackId || entry.packId || '').trim();
+    var key=buildCalibrationKey(name, historicalPackId);
+    if(!key) return null;
+    return {
+      key: key,
+      name: name,
+      historicalPackId: historicalPackId || null,
+      boardId: String(entry.boardId || entry.mixedEraConfigId || entry.configId || '').trim() || null,
+      packId: String(entry.packId || '').trim() || null,
+      sourcePackId: String(entry.sourcePackId || '').trim() || null,
+      sourcePackIds: normalizeStringList(entry.sourcePackIds),
+      historicalTeamId: String(entry.historicalTeamId || '').trim() || null,
+      historicalSeasonId: String(entry.historicalSeasonId || '').trim() || null,
+      '2kOverall': normalizeCalibrationNumber(entry['2kOverall']),
+      inside: normalizeCalibrationNumber(entry.inside),
+      outside: normalizeCalibrationNumber(entry.outside),
+      athleticism: normalizeCalibrationNumber(entry.athleticism),
+      playmaking: normalizeCalibrationNumber(entry.playmaking),
+      defense: normalizeCalibrationNumber(entry.defense),
+      rebounding: normalizeCalibrationNumber(entry.rebounding),
+      notes: String(entry.notes || '').trim() || '',
+      capturedAt: String(entry.capturedAt || '').trim() || '',
+      sourceMetadata: clone(entry.sourceMetadata || entry.source || null)
+    };
+  }
+
+  function normalizeCalibration(input){
+    var source=input && typeof input==='object' ? input : null;
+    var rawEntries=Array.isArray(source)
+      ? source
+      : Array.isArray(source && source.entries)
+        ? source.entries
+        : Array.isArray(source && source.players)
+          ? source.players
+          : Array.isArray(source && source.calibration)
+            ? source.calibration
+            : [];
+    var entries=rawEntries.map(normalizeCalibrationEntry).filter(Boolean);
+    var normalizedEntries=entries.slice().sort(function(a, b){
+      var scoreA=Number(a && a['2kOverall'] || 0);
+      var scoreB=Number(b && b['2kOverall'] || 0);
+      if(scoreA !== scoreB) return scoreB - scoreA;
+      return String(a && a.name || '').localeCompare(String(b && b.name || ''));
+    });
+    var byKey={};
+    normalizedEntries.forEach(function(entry){
+      byKey[entry.key]=entry;
+    });
+    return {
+      boardId: source ? (String(source.boardId || source.mixedEraConfigId || source.configId || source.id || '').trim() || null) : null,
+      packId: source ? (String(source.packId || '').trim() || null) : null,
+      seasonLabel: source ? (String(source.seasonLabel || '').trim() || null) : null,
+      sourcePackIds: normalizeStringList(source && source.sourcePackIds),
+      capturedAt: source ? (String(source.capturedAt || '').trim() || null) : null,
+      notes: source ? (String(source.notes || '').trim() || null) : null,
+      entries: normalizedEntries,
+      byKey: byKey
+    };
+  }
+
+  function getCalibrationMismatchLabel(rankDelta){
+    var delta=Math.abs(Number(rankDelta));
+    if(!Number.isFinite(delta)) return null;
+    if(delta <= 2) return 'aligned';
+    if(delta <= 5) return 'review';
+    return 'strong_disagreement';
+  }
+
+  function getMixedEraAuditCalibrationId(config){
+    var explicit=String(
+      config && (
+        config.mixedEraConfigId ||
+        config.auditCalibrationId ||
+        ''
+      ) || ''
+    ).trim();
+    if(explicit) return explicit;
+
+    var draftUrl=String(config && config.draftUrl || '').trim();
+    if(draftUrl){
+      try{
+        var parsedUrl=new URL(draftUrl, 'http://localhost/');
+        var fromQuery=String(parsedUrl.searchParams.get('mixedEraConfigId') || '').trim();
+        if(fromQuery) return fromQuery;
+      }catch(error){
+        var queryMatch=draftUrl.match(/[?&]mixedEraConfigId=([^&#]+)/i);
+        if(queryMatch){
+          try{
+            return decodeURIComponent(queryMatch[1]).trim();
+          }catch(decodeError){
+            return String(queryMatch[1] || '').trim();
+          }
+        }
+      }
+    }
+
+    var packId=String(config && config.packId || '').trim();
+    if(packId.indexOf('mixed_era_')===0){
+      return packId
+        .replace(/^mixed_era_/, '')
+        .replace(/_v\d+$/i, '')
+        .replace(/_/g, '-');
+    }
+
+    return '';
+  }
+
+  function resolveMixedEraAuditCalibration(config){
+    if(config && config.calibration) return config.calibration;
+    if(config && config.auditCalibration) return config.auditCalibration;
+
+    var calibrationId=getMixedEraAuditCalibrationId(config);
+    if(!calibrationId) return null;
+
+    if(root && root.RosterBateMixedEraAuditCalibration){
+      var globalCalibration=root.RosterBateMixedEraAuditCalibration;
+      if(globalCalibration && typeof globalCalibration==='object'){
+        if(Array.isArray(globalCalibration.players) || Array.isArray(globalCalibration.entries) || Array.isArray(globalCalibration.calibration)){
+          return globalCalibration;
+        }
+        if(globalCalibration[calibrationId]) return globalCalibration[calibrationId];
+      }
+    }
+
+    if(typeof module!=='undefined' && module.exports && typeof require==='function'){
+      try{
+        return require('./historical-packs/mixed-era/audit-calibration/' + calibrationId + '.2k.json');
+      }catch(error){
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  function buildCalibrationSummary(rows){
+    var normalizedRows=Array.isArray(rows) ? rows : [];
+    var calibratedRows=normalizedRows.filter(function(row){
+      return row && row.calibration;
+    });
+    var counts={
+      total: normalizedRows.length,
+      calibrated: calibratedRows.length,
+      uncalibrated: normalizedRows.length - calibratedRows.length,
+      aligned: 0,
+      review: 0,
+      strong_disagreement: 0
+    };
+
+    calibratedRows.forEach(function(row){
+      var label=String(row && row.calibrationMismatch || '').trim();
+      if(!label) return;
+      if(!Object.prototype.hasOwnProperty.call(counts, label)){
+        counts[label]=0;
+      }
+      counts[label]+=1;
+    });
+
+    function buildDirectionalSlice(direction){
+      return calibratedRows.filter(function(row){
+        var delta=Number(row && row.calibrationRankDelta);
+        return Number.isFinite(delta) && (direction < 0 ? delta < 0 : delta > 0);
+      }).sort(function(a, b){
+        var deltaA=Number(a && a.calibrationRankDelta);
+        var deltaB=Number(b && b.calibrationRankDelta);
+        if(deltaA !== deltaB){
+          return direction < 0 ? (deltaA - deltaB) : (deltaB - deltaA);
+        }
+        var rankA=Number(a && a.rank || 0);
+        var rankB=Number(b && b.rank || 0);
+        if(rankA !== rankB) return rankA - rankB;
+        return String(a && a.player || '').localeCompare(String(b && b.player || ''));
+      }).slice(0, 5).map(function(row){
+        return {
+          rank: row.rank,
+          player: row.player,
+          sourceEra: row.sourceEra,
+          mixedEraOverall: row.mixedEraOverall,
+          calibrationRank: row.calibrationRank,
+          calibrationRankDelta: row.calibrationRankDelta,
+          calibrationMismatch: row.calibrationMismatch,
+          '2kOverall': row.calibration && row.calibration['2kOverall']
+        };
+      });
+    }
+
+    return {
+      counts: counts,
+      topOverRanked: buildDirectionalSlice(-1),
+      topUnderRanked: buildDirectionalSlice(1)
+    };
+  }
+
   function formatLabelList(labels){
     var normalized=normalizeStringList(labels);
     if(!normalized.length) return '';
@@ -602,6 +814,12 @@
     var input=options && typeof options==='object' ? options : {};
     var config=input.config && typeof input.config==='object' ? input.config : {};
     var playerPool=(Array.isArray(input.playerPool) ? input.playerPool : []).slice().sort(comparePlayers);
+    var auditCalibration=normalizeCalibration(resolveMixedEraAuditCalibration(config));
+    var calibrationByKey=auditCalibration && auditCalibration.byKey ? auditCalibration.byKey : {};
+    var calibrationRankByKey={};
+    (auditCalibration && Array.isArray(auditCalibration.entries) ? auditCalibration.entries : []).forEach(function(entry, index){
+      calibrationRankByKey[entry.key]=index + 1;
+    });
     var authoredSourcePackIds=normalizeStringList(config.sourcePackIds);
     var sourcePackIds=collectAuditSourcePackIds(config, playerPool);
     var topPlayersValue=Number(config.topPlayersPerPack);
@@ -651,6 +869,28 @@
     var warning=firstFail
       ? (firstFail.label + ' composition check failed. ' + firstFail.detail)
       : (firstTune ? (firstTune.label + ' composition check needs tuning. ' + firstTune.detail) : '');
+    var rows=playerPool.map(function(player, index){
+      var calibrationKey=buildCalibrationKey(player && player.name, player && player.historicalPackId);
+      var calibration=calibrationByKey[calibrationKey] || null;
+      var calibrationRank=calibration ? calibrationRankByKey[calibrationKey] : null;
+      var calibrationRankDelta=calibration && Number.isFinite(Number(calibrationRank))
+        ? (index + 1) - Number(calibrationRank)
+        : null;
+      return {
+        rank: index + 1,
+        player: String(player && player.name || '').trim(),
+        sourceEra: String(player && player.historicalPackId || '').trim(),
+        mixedEraOverall: roundStat(player && player.mixedEraOverall || 0),
+        projectedFp: roundStat(player && (player.mixedEraProjection || player.fp) || 0),
+        rawFp: getRawFantasyPointsPerGame(player),
+        gamesPlayed: Math.max(0, Number(player && player.gp || player && player.statValues && player.statValues.GP || 0)),
+        calibration: calibration ? clone(calibration) : null,
+        calibrationRank: calibrationRank,
+        calibrationRankDelta: calibrationRankDelta,
+        calibrationMismatch: calibrationRankDelta===null ? null : getCalibrationMismatchLabel(calibrationRankDelta)
+      };
+    });
+    var calibrationSummary=buildCalibrationSummary(rows);
 
     return {
       seasonLabel: String(config.seasonLabel || 'Mixed Era Draft').trim() || 'Mixed Era Draft',
@@ -669,18 +909,9 @@
         buildTierBand('51-100', playerPool, 51, 100, sourcePackIds),
         buildTierBand('101-150', playerPool, 101, 150, sourcePackIds)
       ],
+      calibrationSummary: calibrationSummary,
       warning: warning,
-      rows: playerPool.map(function(player, index){
-        return {
-          rank: index + 1,
-          player: String(player && player.name || '').trim(),
-          sourceEra: String(player && player.historicalPackId || '').trim(),
-          mixedEraOverall: roundStat(player && player.mixedEraOverall || 0),
-          projectedFp: roundStat(player && (player.mixedEraProjection || player.fp) || 0),
-          rawFp: getRawFantasyPointsPerGame(player),
-          gamesPlayed: Math.max(0, Number(player && player.gp || player && player.statValues && player.statValues.GP || 0))
-        };
-      })
+      rows: rows
     };
   }
 
@@ -692,6 +923,9 @@
     buildProjection: buildProjection,
     buildMixedEraConfigSnapshot: buildMixedEraConfigSnapshot,
     buildMixedEraUniverseSummary: buildMixedEraUniverseSummary,
+    buildCalibrationKey: buildCalibrationKey,
+    normalizeCalibration: normalizeCalibration,
+    getCalibrationMismatchLabel: getCalibrationMismatchLabel,
     buildMixedEraDraftContextFromBundles: buildMixedEraDraftContextFromBundles,
     buildMixedEraAuditViewModel: buildMixedEraAuditViewModel
   };

@@ -5,6 +5,8 @@ function getCheck(viewModel, id) {
   return (viewModel.compositionChecks || []).find((check) => check && check.id === id);
 }
 
+const calibrationFixture = require('../historical-packs/mixed-era/audit-calibration/1996-2016-top300.2k.json');
+
 const balancedViewModel = runtime.buildMixedEraAuditViewModel({
   config: {
     seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
@@ -210,5 +212,141 @@ assert.deepStrictEqual(unexpectedSourceViewModel.fullPoolComposition, {
 });
 assert.strictEqual(getCheck(unexpectedSourceViewModel, 'fullPool').verdict, 'fail');
 assert.match(unexpectedSourceViewModel.warning, /Full Pool composition check failed/i);
+
+const calibratedViewModel = runtime.buildMixedEraAuditViewModel({
+  config: {
+    packId: calibrationFixture.packId,
+    seasonLabel: calibrationFixture.seasonLabel,
+    sourcePackIds: calibrationFixture.sourcePackIds
+  },
+  playerPool: [
+    {
+      name: 'Michael Jordan',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 99.8,
+      fp: 74.2,
+      totalFantasyPoints: 6171.5,
+      gp: 82
+    },
+    {
+      name: 'LeBron James',
+      historicalPackId: 'nba_2016_full_season_v1',
+      mixedEraOverall: 99.3,
+      fp: 73.8,
+      totalFantasyPoints: 6062.3,
+      gp: 82
+    },
+    {
+      name: 'Stephen Curry',
+      historicalPackId: 'nba_2016_full_season_v1',
+      mixedEraOverall: 98.8,
+      fp: 72.4,
+      totalFantasyPoints: 5742.1,
+      gp: 79
+    },
+    {
+      name: 'Kawhi Leonard',
+      historicalPackId: 'nba_2016_full_season_v1',
+      mixedEraOverall: 97.9,
+      fp: 69.2,
+      totalFantasyPoints: 5608.8,
+      gp: 81
+    },
+    {
+      name: 'Scottie Pippen',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 96.7,
+      fp: 65.1,
+      totalFantasyPoints: 5302.0,
+      gp: 81
+    },
+    {
+      name: 'Hakeem Olajuwon',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 95.9,
+      fp: 64.4,
+      totalFantasyPoints: 5280.0,
+      gp: 82
+    },
+    {
+      name: 'Gary Payton',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 95.1,
+      fp: 62.7,
+      totalFantasyPoints: 5141.4,
+      gp: 82
+    },
+    {
+      name: 'Klay Thompson',
+      historicalPackId: 'nba_2016_full_season_v1',
+      mixedEraOverall: 94.8,
+      fp: 61.8,
+      totalFantasyPoints: 4838.4,
+      gp: 78
+    },
+    {
+      name: 'Dennis Rodman',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 93.7,
+      fp: 61.1,
+      totalFantasyPoints: 4990.2,
+      gp: 82
+    },
+    {
+      name: 'Shawn Kemp',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 92.4,
+      fp: 60.2,
+      totalFantasyPoints: 4936.4,
+      gp: 82
+    },
+    {
+      name: 'Draymond Green',
+      historicalPackId: 'nba_2016_full_season_v1',
+      mixedEraOverall: 91.8,
+      fp: 59.5,
+      totalFantasyPoints: 4425.0,
+      gp: 74
+    },
+    {
+      name: 'Charles Barkley',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 90.5,
+      fp: 58.8,
+      totalFantasyPoints: 4811.0,
+      gp: 82
+    }
+  ]
+});
+
+const mjRow = calibratedViewModel.rows.find((row) => row.player === 'Michael Jordan');
+const pippenRow = calibratedViewModel.rows.find((row) => row.player === 'Scottie Pippen');
+const hakeemRow = calibratedViewModel.rows.find((row) => row.player === 'Hakeem Olajuwon');
+const barkleyRow = calibratedViewModel.rows.find((row) => row.player === 'Charles Barkley');
+
+assert.ok(mjRow.calibration);
+assert.strictEqual(mjRow.calibration.name, 'Michael Jordan');
+assert.strictEqual(mjRow.calibration['2kOverall'], 99.5);
+assert.strictEqual(mjRow.calibrationRank, 2);
+assert.strictEqual(mjRow.calibrationRankDelta, -1);
+assert.strictEqual(mjRow.calibrationMismatch, 'aligned');
+assert.strictEqual(pippenRow.calibrationMismatch, 'strong_disagreement');
+assert.strictEqual(hakeemRow.calibrationMismatch, 'review');
+assert.strictEqual(barkleyRow.calibration, null);
+assert.strictEqual(barkleyRow.calibrationRank, null);
+assert.strictEqual(barkleyRow.calibrationRankDelta, null);
+assert.strictEqual(barkleyRow.calibrationMismatch, null);
+assert.deepStrictEqual(calibratedViewModel.calibrationSummary.counts, {
+  total: 12,
+  calibrated: 11,
+  uncalibrated: 1,
+  aligned: 9,
+  review: 1,
+  strong_disagreement: 1
+});
+assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].player, 'Scottie Pippen');
+assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].calibrationRankDelta, -6);
+assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].player, 'Hakeem Olajuwon');
+assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].calibrationRankDelta, 3);
 
 console.log('mixed-era audit view-model test passed');
