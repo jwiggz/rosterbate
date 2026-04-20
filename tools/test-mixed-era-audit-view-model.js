@@ -144,4 +144,42 @@ assert.strictEqual(unconfiguredViewModel.topPlayersPerPack, null);
 assert.strictEqual(getCheck(unconfiguredViewModel, 'fullPool').verdict, 'pass');
 assert.strictEqual(unconfiguredViewModel.warning, '');
 
+const unexpectedSourceViewModel = runtime.buildMixedEraAuditViewModel({
+  config: {
+    seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
+    sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1'],
+    topPlayersPerPack: 2
+  },
+  playerPool: [
+    {
+      name: 'Michael Jordan',
+      historicalPackId: 'nba_1996_full_season_v1',
+      mixedEraOverall: 99.8,
+      fp: 74.2,
+      totalFantasyPoints: 6171.5,
+      gp: 82
+    },
+    {
+      name: 'Stephen Curry',
+      historicalPackId: 'nba_2016_full_season_v1',
+      mixedEraOverall: 98.7,
+      fp: 72.4,
+      totalFantasyPoints: 5742.1,
+      gp: 79
+    },
+    {
+      name: 'Mystery Prospect',
+      historicalPackId: '',
+      mixedEraOverall: 94.1,
+      fp: 61.8,
+      totalFantasyPoints: 5033.7,
+      gp: 77
+    }
+  ]
+});
+
+assert.strictEqual(getCheck(unexpectedSourceViewModel, 'top10').verdict, 'pass');
+assert.strictEqual(getCheck(unexpectedSourceViewModel, 'fullPool').verdict, 'fail');
+assert.match(unexpectedSourceViewModel.warning, /Full Pool composition check failed/i);
+
 console.log('mixed-era audit view-model test passed');

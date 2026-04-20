@@ -523,14 +523,32 @@
       var expectedLabel=Number.isFinite(Number(limit)) && Number(limit) > 0
         ? ('Top ' + Number(limit) + ' players per pack')
         : 'Authored top-N-per-pack composition';
-      var matches=expectedSourceIds.every(function(packId){
-        return Number(countsBySource[packId] || 0) === Number(expectedPerSource && expectedPerSource[packId] || 0);
+      var compositionKeys=Object.keys(countsBySource).filter(function(packId){
+        return String(packId || '').trim();
       });
+      var unexpectedKeys=compositionKeys.filter(function(packId){
+        return expectedSourceIds.indexOf(packId)===-1;
+      });
+      var missingKeys=expectedSourceIds.filter(function(packId){
+        return !Object.prototype.hasOwnProperty.call(countsBySource, packId);
+      });
+      var countMismatch=expectedSourceIds.some(function(packId){
+        return Number(countsBySource[packId] || 0) !== Number(expectedPerSource && expectedPerSource[packId] || 0);
+      });
+      var matches=!unexpectedKeys.length && !missingKeys.length && !countMismatch;
       return {
         verdict: matches ? 'pass' : 'fail',
         detail: matches
           ? (expectedLabel + ' matches the authored top-N-per-pack composition.')
-          : (expectedLabel + ' does not match the authored top-N-per-pack composition.')
+          : (expectedLabel + ' does not match the authored top-N-per-pack composition.' + (
+            unexpectedKeys.length
+              ? ' Unexpected source keys: ' + unexpectedKeys.join(', ') + '.'
+              : ''
+          ) + (
+            missingKeys.length
+              ? ' Missing source keys: ' + missingKeys.join(', ') + '.'
+              : ''
+          ))
       };
     }
 
