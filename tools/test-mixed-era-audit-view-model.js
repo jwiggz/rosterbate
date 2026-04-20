@@ -125,4 +125,23 @@ const imbalancedViewModel = runtime.buildMixedEraAuditViewModel({
 assert.strictEqual(getCheck(imbalancedViewModel, 'top10').verdict, 'fail');
 assert.match(imbalancedViewModel.warning, /Top 10 composition check failed/i);
 
+const unconfiguredViewModel = runtime.buildMixedEraAuditViewModel({
+  config: {
+    seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
+    sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1']
+  },
+  playerPool: balancedViewModel.rows.map((row, index) => ({
+    name: index === 0 ? 'Michael Jordan' : index === 1 ? 'Stephen Curry' : index === 2 ? 'Scottie Pippen' : 'LeBron James',
+    historicalPackId: index % 2 === 0 ? 'nba_1996_full_season_v1' : 'nba_2016_full_season_v1',
+    mixedEraOverall: 99 - index,
+    fp: 70 - index,
+    totalFantasyPoints: 6000 - index * 100,
+    gp: 80 - index
+  }))
+});
+
+assert.strictEqual(unconfiguredViewModel.topPlayersPerPack, null);
+assert.strictEqual(getCheck(unconfiguredViewModel, 'fullPool').verdict, 'pass');
+assert.strictEqual(unconfiguredViewModel.warning, '');
+
 console.log('mixed-era audit view-model test passed');
