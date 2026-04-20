@@ -144,6 +144,52 @@
     return 'Week ' + week + ' - Day ' + day;
   }
 
+  function getPlayerIdentityKey(player){
+    const numericId = Number(player?.id);
+    if(Number.isFinite(numericId)) return 'id:' + numericId;
+    const historicalId = String(player?.historicalPlayerId || '').trim();
+    if(historicalId) return 'historical:' + historicalId;
+    const name = String(player?.name || '').trim();
+    return name ? ('name:' + name) : '';
+  }
+
+  function countUniquePlayers(players, seen){
+    const targetSeen = seen || new Set();
+    (Array.isArray(players) ? players : []).forEach(function(player){
+      const key = getPlayerIdentityKey(player);
+      if(key) targetSeen.add(key);
+    });
+    return targetSeen;
+  }
+
+  function getPlayerPoolCount(state){
+    const explicitPool = Array.isArray(state?.historicalPlayerPool) ? state.historicalPlayerPool : [];
+    if(explicitPool.length) return explicitPool.length;
+    const seen = new Set();
+    countUniquePlayers(state?.myRoster, seen);
+    countUniquePlayers((Array.isArray(state?.allRosters) ? state.allRosters : []).flat(), seen);
+    countUniquePlayers((Array.isArray(state?.ilByTeam) ? state.ilByTeam : []).flat(), seen);
+    countUniquePlayers((Array.isArray(state?.ilRosters) ? state.ilRosters : []).flat(), seen);
+    countUniquePlayers(state?.waiver, seen);
+    countUniquePlayers(state?.freeAgents, seen);
+    return seen.size;
+  }
+
+  function buildPersistedState(state, slotId, existingMeta){
+    const payload = safeClone(state);
+    if(!payload) return null;
+    payload.historicalUniverseSlotId = slotId;
+    if(!payload.historicalUniverseCreatedAt){
+      payload.historicalUniverseCreatedAt = Number(existingMeta?.createdAt || Date.now());
+    }
+    if((!Array.isArray(payload.waiver) || !payload.waiver.length) && Array.isArray(payload.freeAgents) && payload.freeAgents.length){
+      payload.waiver = safeClone(payload.freeAgents) || [];
+    }
+    delete payload.historicalPlayerPool;
+    delete payload.freeAgents;
+    return payload;
+  }
+
   function summarizeState(state, slotId, existingMeta){
     const title = getSeasonLabel(state) + ' - ' + getModeLabel(state?.historicalEntryMode);
     const createdAt = Number(existingMeta?.createdAt || state?.historicalUniverseCreatedAt || state?.createdAt || state?.savedAt || Date.now());
@@ -176,7 +222,7 @@
       currentWeek: Number(state?.currentWeek || state?.week || 1) || 1,
       currentDay: Number(state?.currentDay || state?.day || 1) || 1,
       leagueSize: Number(state?.leagueSize || (Array.isArray(state?.teams) ? state.teams.length : 0) || 0),
-      playerPoolCount: Array.isArray(state?.historicalPlayerPool) ? state.historicalPlayerPool.length : 0,
+      playerPoolCount: getPlayerPoolCount(state),
       modeTone: getModeTone(state?.historicalEntryMode),
       progressLabel: getProgressLabel(state),
       wins: standing?.wins ?? null,
@@ -202,10 +248,8 @@
     const index = readIndex();
     const slotId = String(opts.slotId || state.historicalUniverseSlotId || '').trim() || createSlotId(state);
     const existingMeta = index.find(function(entry){ return entry && entry.slotId === slotId; }) || null;
-    const payload = safeClone(state);
+    const payload = buildPersistedState(state, slotId, existingMeta);
     if(!payload) return null;
-    payload.historicalUniverseSlotId = slotId;
-    if(!payload.historicalUniverseCreatedAt) payload.historicalUniverseCreatedAt = Number(existingMeta?.createdAt || Date.now());
     const metadata = summarizeState(payload, slotId, existingMeta);
     global.localStorage.setItem(stateKey(slotId), JSON.stringify(payload));
     writeIndex(sortIndex([metadata].concat(index.filter(function(entry){ return entry && entry.slotId !== slotId; }))));
