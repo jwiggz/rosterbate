@@ -144,18 +144,20 @@ assert.ok(
   'expected low-games profile to have a lower mixedEraOverall'
 );
 
+const sharedClassicRawRatings = {
+  usage: 87,
+  scoring: 82,
+  rebounding: 86,
+  playmaking: 65,
+  defense: 86,
+  shooting: 60,
+  stamina: 85,
+  tempo: 73,
+  volatility: 58
+};
+
 const classicInteriorMixedEra = engine.buildMixedEraRatings(
-  {
-    usage: 87,
-    scoring: 82,
-    rebounding: 93,
-    playmaking: 56,
-    defense: 90,
-    shooting: 49,
-    stamina: 85,
-    tempo: 71,
-    volatility: 58
-  },
+  sharedClassicRawRatings,
   {
     pts: 22.1,
     reb: 12.0,
@@ -176,17 +178,7 @@ const classicInteriorMixedEra = engine.buildMixedEraRatings(
 );
 
 const classicWingMixedEra = engine.buildMixedEraRatings(
-  {
-    usage: 87,
-    scoring: 82,
-    rebounding: 71,
-    playmaking: 74,
-    defense: 83,
-    shooting: 73,
-    stamina: 85,
-    tempo: 75,
-    volatility: 58
-  },
+  sharedClassicRawRatings,
   {
     pts: 22.1,
     reb: 7.3,
@@ -206,18 +198,20 @@ const classicWingMixedEra = engine.buildMixedEraRatings(
   'nba_1996_full_season_v1'
 );
 
+const sharedModernRawRatings = {
+  usage: 82,
+  scoring: 79,
+  rebounding: 75,
+  playmaking: 77,
+  defense: 77,
+  shooting: 81,
+  stamina: 84,
+  tempo: 79,
+  volatility: 56
+};
+
 const modernSpacingHybridMixedEra = engine.buildMixedEraRatings(
-  {
-    usage: 82,
-    scoring: 79,
-    rebounding: 75,
-    playmaking: 77,
-    defense: 77,
-    shooting: 87,
-    stamina: 84,
-    tempo: 79,
-    volatility: 56
-  },
+  sharedModernRawRatings,
   {
     pts: 19.9,
     reb: 7.9,
@@ -238,17 +232,7 @@ const modernSpacingHybridMixedEra = engine.buildMixedEraRatings(
 );
 
 const modernInteriorControlMixedEra = engine.buildMixedEraRatings(
-  {
-    usage: 82,
-    scoring: 79,
-    rebounding: 75,
-    playmaking: 77,
-    defense: 77,
-    shooting: 75,
-    stamina: 84,
-    tempo: 79,
-    volatility: 56
-  },
+  sharedModernRawRatings,
   {
     pts: 19.9,
     reb: 7.9,
