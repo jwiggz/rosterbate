@@ -309,7 +309,7 @@ const calibratedViewModel = runtime.buildMixedEraAuditViewModel({
       gp: 74
     },
     {
-      name: 'Charles Barkley',
+      name: 'Larry Johnson',
       historicalPackId: 'nba_1996_full_season_v1',
       mixedEraOverall: 90.5,
       fp: 58.8,
@@ -319,35 +319,107 @@ const calibratedViewModel = runtime.buildMixedEraAuditViewModel({
   ]
 });
 
+const calibrationNames = calibrationFixture.players.map((player) => player.name);
+const calibrationNames1996 = calibrationFixture.players
+  .filter((player) => player.historicalPackId === 'nba_1996_full_season_v1')
+  .map((player) => player.name);
+const calibrationNames2016 = calibrationFixture.players
+  .filter((player) => player.historicalPackId === 'nba_2016_full_season_v1')
+  .map((player) => player.name);
+
+assert.strictEqual(calibrationFixture.players.length, 44);
+assert.strictEqual(calibrationNames1996.length, 22);
+assert.strictEqual(calibrationNames2016.length, 22);
+
+[
+  'Michael Jordan',
+  'Scottie Pippen',
+  'Dennis Rodman',
+  'Shawn Kemp',
+  'Gary Payton',
+  'Hakeem Olajuwon',
+  'David Robinson',
+  "Shaquille O'Neal",
+  'Karl Malone',
+  'Alonzo Mourning',
+  'Larry Johnson',
+  'Patrick Ewing',
+  'Grant Hill',
+  'Jason Kidd',
+  'Anfernee Hardaway',
+  'Dikembe Mutombo',
+  'John Stockton',
+  'Mitch Richmond',
+  'Clifford Robinson',
+  'Glen Rice',
+  'Detlef Schrempf',
+  'Chris Webber'
+].forEach((name) => {
+  assert.ok(calibrationNames1996.includes(name), name + ' should be present in the 1996 calibration set');
+});
+
+[
+  'Stephen Curry',
+  'Klay Thompson',
+  'Draymond Green',
+  'LeBron James',
+  'Kawhi Leonard',
+  'Russell Westbrook',
+  'DeMarcus Cousins',
+  'James Harden',
+  'Kevin Durant',
+  'Anthony Davis',
+  'Chris Paul',
+  'Damian Lillard',
+  'Paul George',
+  'Kyle Lowry',
+  'Pau Gasol',
+  'Andre Drummond',
+  'Blake Griffin',
+  'Rajon Rondo',
+  'Karl-Anthony Towns',
+  'Jimmy Butler',
+  'Giannis Antetokounmpo',
+  'Al Horford'
+].forEach((name) => {
+  assert.ok(calibrationNames2016.includes(name), name + ' should be present in the 2016 calibration set');
+});
+
+assert.ok(!calibrationNames.includes('Gheorghe Muresan'));
+assert.ok(!calibrationNames.includes('Gheorghe Muresan Sr.'));
+
 const mjRow = calibratedViewModel.rows.find((row) => row.player === 'Michael Jordan');
 const pippenRow = calibratedViewModel.rows.find((row) => row.player === 'Scottie Pippen');
 const hakeemRow = calibratedViewModel.rows.find((row) => row.player === 'Hakeem Olajuwon');
-const barkleyRow = calibratedViewModel.rows.find((row) => row.player === 'Charles Barkley');
+const kawhiRow = calibratedViewModel.rows.find((row) => row.player === 'Kawhi Leonard');
+const johnsonRow = calibratedViewModel.rows.find((row) => row.player === 'Larry Johnson');
 
 assert.ok(mjRow.calibration);
 assert.strictEqual(mjRow.calibration.name, 'Michael Jordan');
-assert.strictEqual(mjRow.calibration['2kOverall'], 99.5);
+assert.strictEqual(mjRow.calibration['2kOverall'], 99);
 assert.strictEqual(mjRow.calibrationRank, 2);
 assert.strictEqual(mjRow.calibrationRankDelta, -1);
 assert.strictEqual(mjRow.calibrationMismatch, 'aligned');
-assert.strictEqual(pippenRow.calibrationMismatch, 'strong_disagreement');
-assert.strictEqual(hakeemRow.calibrationMismatch, 'review');
-assert.strictEqual(barkleyRow.calibration, null);
-assert.strictEqual(barkleyRow.calibrationRank, null);
-assert.strictEqual(barkleyRow.calibrationRankDelta, null);
-assert.strictEqual(barkleyRow.calibrationMismatch, null);
+assert.strictEqual(pippenRow.calibrationMismatch, 'review');
+assert.strictEqual(hakeemRow.calibrationMismatch, 'aligned');
+assert.strictEqual(kawhiRow.calibrationMismatch, 'strong_disagreement');
+assert.ok(johnsonRow.calibration);
+assert.strictEqual(johnsonRow.calibration.name, 'Larry Johnson');
+assert.strictEqual(johnsonRow.calibrationRank, 38);
+assert.strictEqual(johnsonRow.calibrationRankDelta, -26);
+assert.strictEqual(johnsonRow.calibrationMismatch, 'strong_disagreement');
 assert.deepStrictEqual(calibratedViewModel.calibrationSummary.counts, {
   total: 12,
-  calibrated: 11,
-  uncalibrated: 1,
-  aligned: 9,
-  review: 1,
-  strong_disagreement: 1
+  calibrated: 12,
+  uncalibrated: 0,
+  aligned: 3,
+  review: 2,
+  strong_disagreement: 7
 });
-assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].player, 'Scottie Pippen');
-assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].calibrationRankDelta, -6);
+assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].player, 'Dennis Rodman');
+assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].calibrationRankDelta, -31);
 assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].player, 'Hakeem Olajuwon');
-assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].calibrationRankDelta, 3);
+assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].calibrationRankDelta, 2);
 
 global.RosterBateMixedEraAuditCalibration = calibrationFixture;
 try {
