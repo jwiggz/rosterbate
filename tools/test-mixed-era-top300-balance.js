@@ -61,8 +61,8 @@ assert.throws(
 );
 
 assert.equal(mustGetCheck('top10').verdict, 'pass');
-assertNotFailWithMaxDominantShare('top25', 64);
-assertNotFailWithMaxDominantShare('top50', 60);
+assertNotFailWithMaxDominantShare('top25', 60);
+assertNotFailWithMaxDominantShare('top50', 58);
 assertNotFailWithMaxDominantShare('top100', 60);
 assert.equal(mustGetCheck('fullPool').verdict, 'pass');
 assert.deepStrictEqual(

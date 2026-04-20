@@ -144,4 +144,143 @@ assert.ok(
   'expected low-games profile to have a lower mixedEraOverall'
 );
 
+const classicInteriorMixedEra = engine.buildMixedEraRatings(
+  {
+    usage: 87,
+    scoring: 82,
+    rebounding: 93,
+    playmaking: 56,
+    defense: 90,
+    shooting: 49,
+    stamina: 85,
+    tempo: 71,
+    volatility: 58
+  },
+  {
+    pts: 22.1,
+    reb: 12.0,
+    ast: 2.9,
+    stl: 1.0,
+    blk: 2.8,
+    to: 2.7,
+    min: 37.6,
+    fgm: 8.5,
+    fga: 16.3,
+    ftm: 5.1,
+    fta: 6.8,
+    threes: 0.2
+  },
+  3936,
+  82,
+  'nba_1996_full_season_v1'
+);
+
+const classicWingMixedEra = engine.buildMixedEraRatings(
+  {
+    usage: 87,
+    scoring: 82,
+    rebounding: 71,
+    playmaking: 74,
+    defense: 83,
+    shooting: 73,
+    stamina: 85,
+    tempo: 75,
+    volatility: 58
+  },
+  {
+    pts: 22.1,
+    reb: 7.3,
+    ast: 5.1,
+    stl: 1.7,
+    blk: 0.8,
+    to: 2.7,
+    min: 37.6,
+    fgm: 8.5,
+    fga: 16.3,
+    ftm: 5.1,
+    fta: 6.8,
+    threes: 1.4
+  },
+  3936,
+  82,
+  'nba_1996_full_season_v1'
+);
+
+const modernSpacingHybridMixedEra = engine.buildMixedEraRatings(
+  {
+    usage: 82,
+    scoring: 79,
+    rebounding: 75,
+    playmaking: 77,
+    defense: 77,
+    shooting: 87,
+    stamina: 84,
+    tempo: 79,
+    volatility: 56
+  },
+  {
+    pts: 19.9,
+    reb: 7.9,
+    ast: 4.8,
+    stl: 1.2,
+    blk: 1.4,
+    to: 2.3,
+    min: 35.0,
+    fgm: 7.5,
+    fga: 15.2,
+    ftm: 3.3,
+    fta: 4.0,
+    threes: 2.3
+  },
+  3500,
+  82,
+  'nba_2016_full_season_v1'
+);
+
+const modernInteriorControlMixedEra = engine.buildMixedEraRatings(
+  {
+    usage: 82,
+    scoring: 79,
+    rebounding: 75,
+    playmaking: 77,
+    defense: 77,
+    shooting: 75,
+    stamina: 84,
+    tempo: 79,
+    volatility: 56
+  },
+  {
+    pts: 19.9,
+    reb: 7.9,
+    ast: 4.8,
+    stl: 1.2,
+    blk: 1.4,
+    to: 2.3,
+    min: 35.0,
+    fgm: 7.5,
+    fga: 15.2,
+    ftm: 3.3,
+    fta: 4.0,
+    threes: 0.4
+  },
+  3500,
+  82,
+  'nba_2016_full_season_v1'
+);
+
+assert.ok(classicInteriorMixedEra.context.olderEraInteriorScore > 0.6);
+assert.ok(classicInteriorMixedEra.context.olderEraInteriorCompression < 1);
+assert.ok(
+  classicWingMixedEra.context.olderEraInteriorCompression >= classicInteriorMixedEra.context.olderEraInteriorCompression
+);
+assert.ok(
+  modernSpacingHybridMixedEra.context.modernSpacingHybridScore >
+    modernInteriorControlMixedEra.context.modernSpacingHybridScore
+);
+assert.ok(modernSpacingHybridMixedEra.context.modernSpacingHybridLift > 1);
+assert.ok(
+  modernSpacingHybridMixedEra.ratings.overall >
+    modernInteriorControlMixedEra.ratings.overall
+);
+
 console.log('mixed-era normalization retune test passed');
