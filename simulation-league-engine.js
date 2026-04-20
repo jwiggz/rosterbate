@@ -120,6 +120,12 @@
     return Object.assign({}, DEFAULT_ERA_CONTEXT, PACK_ERA_CONTEXT[String(packId||'').trim()] || {});
   }
 
+  function getLowGamesMixedEraConfidence(gp){
+    const games=clamp(gp, 0, 82);
+    if(games >= 25) return 1;
+    return clamp(0.72 + (games / 25) * 0.28, 0.72, 1);
+  }
+
   function getNestedNumber(source, path){
     let current=source;
     for(let index=0; index<path.length; index+=1){
@@ -230,6 +236,7 @@
       : computeFantasyPoints(baseline);
     const dominance = clamp((fantasyPerGame / Math.max(1, eraContext.fantasyBaseline)) - 1, -0.28, 0.72);
     const dominanceLift = 1 + dominance * Number(eraContext.dominanceWeight || 0.12);
+    const lowGamesConfidence=getLowGamesMixedEraConfidence(gp);
     const inverse=function(key, floor, ceiling){
       return clamp(1 / Math.max(0.7, Number(eraContext[key] || 1)), floor, ceiling);
     };
@@ -245,7 +252,7 @@
       tempo:roundStat(clamp(rawRatings.tempo * inverse('tempoInflation', 0.94, 1.1), 20, 99)),
       volatility:roundStat(rawRatings.volatility)
     };
-    adjusted.overall=roundStat(
+    adjusted.overall=roundStat((
       adjusted.scoring * 0.28 +
       adjusted.rebounding * 0.16 +
       adjusted.playmaking * 0.18 +
@@ -253,7 +260,7 @@
       adjusted.shooting * 0.11 +
       adjusted.stamina * 0.07 +
       adjusted.usage * 0.05
-    );
+    ) * lowGamesConfidence);
     return {
       ratings:adjusted,
       context:{
@@ -262,6 +269,7 @@
         fantasyPerGame:roundStat(fantasyPerGame),
         fantasyInflation:roundStat(eraContext.fantasyInflation),
         dominance:roundStat(dominance),
+        lowGamesConfidence:Number(lowGamesConfidence.toFixed(2)),
         normalizationModel:'season_context_plus_light_authored_tuning'
       }
     };
