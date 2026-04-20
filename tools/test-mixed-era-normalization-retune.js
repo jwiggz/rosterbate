@@ -5,6 +5,10 @@ require('../simulation-league-engine.js');
 
 const engine = globalThis.RosterBateSimulationEngine;
 
+function roundStat(value) {
+  return Math.round(Number(value) * 10) / 10;
+}
+
 function makeTotals(perGame, games) {
   return {
     pts: Math.round(perGame.pts * games * 10) / 10,
@@ -52,18 +56,64 @@ const shortSeasonPlayer = {
   }
 };
 
+const zeroGamesPlayer = {
+  name: 'Zero Sample Prototype',
+  historicalPackId: 'nba_1996_full_season_v1',
+  seasonStats: {
+    games: 0,
+    perGame,
+    totals: makeTotals(perGame, 0)
+  }
+};
+
+const cutoffPlayer = {
+  name: 'Cutoff Prototype',
+  historicalPackId: 'nba_1996_full_season_v1',
+  seasonStats: {
+    games: 25,
+    perGame,
+    totals: makeTotals(perGame, 25)
+  }
+};
+
 const durableProfile = engine.buildPlayerSimulationProfile(fullSeasonPlayer, {
   packId: 'nba_1996_full_season_v1'
 });
 const shortProfile = engine.buildPlayerSimulationProfile(shortSeasonPlayer, {
   packId: 'nba_1996_full_season_v1'
 });
+const zeroProfile = engine.buildPlayerSimulationProfile(zeroGamesPlayer, {
+  packId: 'nba_1996_full_season_v1'
+});
+const cutoffProfile = engine.buildPlayerSimulationProfile(cutoffPlayer, {
+  packId: 'nba_1996_full_season_v1'
+});
+const durableFantasyPerGame = durableProfile.totalFantasyPoints / durableProfile.gamesPlayed;
+function buildConfidenceAdjustedMixedEra(gp) {
+  return engine.buildMixedEraRatings(
+    durableProfile.ratings,
+    durableProfile.baseline,
+    durableFantasyPerGame * gp,
+    gp,
+    'nba_1996_full_season_v1'
+  );
+}
+const durableMixedEra = buildConfidenceAdjustedMixedEra(82);
+const shortMixedEra = buildConfidenceAdjustedMixedEra(15);
+const zeroMixedEra = buildConfidenceAdjustedMixedEra(0);
+const cutoffMixedEra = buildConfidenceAdjustedMixedEra(25);
 
 assert.equal(durableProfile.mixedEraContext.lowGamesConfidence, 1);
 assert.equal(shortProfile.mixedEraContext.lowGamesConfidence, 0.9);
-assert.ok(
-  shortProfile.mixedEraRatings.overall <= durableProfile.mixedEraRatings.overall - 8,
-  `expected low-games profile to trail durable profile by at least 8 points, got durable=${durableProfile.mixedEraRatings.overall} short=${shortProfile.mixedEraRatings.overall}`
+assert.equal(zeroProfile.mixedEraContext.lowGamesConfidence, 0.7);
+assert.equal(cutoffProfile.mixedEraContext.lowGamesConfidence, 1);
+assert.equal(durableMixedEra.context.lowGamesConfidence, 1);
+assert.equal(shortMixedEra.context.lowGamesConfidence, 0.9);
+assert.equal(zeroMixedEra.context.lowGamesConfidence, 0.7);
+assert.equal(cutoffMixedEra.context.lowGamesConfidence, 1);
+assert.equal(
+  shortMixedEra.ratings.overall,
+  roundStat(durableMixedEra.ratings.overall * shortMixedEra.context.lowGamesConfidence)
 );
 assert.ok(
   shortProfile.mixedEraRatings.overall < durableProfile.mixedEraRatings.overall,
