@@ -60,7 +60,7 @@ const shortProfile = engine.buildPlayerSimulationProfile(shortSeasonPlayer, {
 });
 
 assert.equal(durableProfile.mixedEraContext.lowGamesConfidence, 1);
-assert.equal(shortProfile.mixedEraContext.lowGamesConfidence, 0.89);
+assert.equal(shortProfile.mixedEraContext.lowGamesConfidence, 0.9);
 assert.ok(
   shortProfile.mixedEraRatings.overall <= durableProfile.mixedEraRatings.overall - 8,
   `expected low-games profile to trail durable profile by at least 8 points, got durable=${durableProfile.mixedEraRatings.overall} short=${shortProfile.mixedEraRatings.overall}`

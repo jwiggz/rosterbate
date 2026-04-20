@@ -123,7 +123,7 @@
   function getLowGamesMixedEraConfidence(gp){
     const games=clamp(gp, 0, 82);
     if(games >= 25) return 1;
-    return clamp(0.72 + (games / 25) * 0.28, 0.72, 1);
+    return roundStat(clamp(0.72 + (games / 25) * 0.28, 0.72, 1));
   }
 
   function getNestedNumber(source, path){
@@ -269,7 +269,7 @@
         fantasyPerGame:roundStat(fantasyPerGame),
         fantasyInflation:roundStat(eraContext.fantasyInflation),
         dominance:roundStat(dominance),
-        lowGamesConfidence:Number(lowGamesConfidence.toFixed(2)),
+        lowGamesConfidence:roundStat(lowGamesConfidence),
         normalizationModel:'season_context_plus_light_authored_tuning'
       }
     };
