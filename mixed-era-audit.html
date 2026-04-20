@@ -196,7 +196,7 @@
   table{
     width:100%;
     border-collapse:collapse;
-    min-width:760px;
+    min-width:1020px;
   }
   th, td{
     padding:10px 12px;
@@ -304,6 +304,14 @@
     <section class="audit-grid">
       <article class="panel">
         <div class="metric-header">
+          <h2>Calibration Summary</h2>
+          <span class="badge badge-review">Review</span>
+        </div>
+        <div id="calibrationSummary" class="metric-list"></div>
+        <p id="calibrationSummaryDetail" class="metric-detail"></p>
+      </article>
+      <article class="panel">
+        <div class="metric-header">
           <h2>Tier Integrity Bands</h2>
           <span class="badge badge-review">Review</span>
         </div>
@@ -356,10 +364,13 @@
             <th>Proj FP</th>
             <th>Raw FP</th>
             <th>GP</th>
+            <th>2K OVR</th>
+            <th>Delta</th>
+            <th>Mismatch</th>
           </tr>
         </thead>
         <tbody id="rows">
-          <tr><td colspan="7" class="empty">No audit board loaded yet.</td></tr>
+          <tr><td colspan="10" class="empty">No audit board loaded yet.</td></tr>
         </tbody>
       </table>
     </section>
@@ -378,6 +389,8 @@
       var warningNode = document.getElementById('warning');
       var configLabelNode = document.getElementById('configLabel');
       var rowsNode = document.getElementById('rows');
+      var calibrationSummaryNode = document.getElementById('calibrationSummary');
+      var calibrationSummaryDetailNode = document.getElementById('calibrationSummaryDetail');
 
       var compositionTargets = {
         top10: {
@@ -438,6 +451,28 @@
         return num.toFixed(1);
       }
 
+      function formatSignedNumber(value){
+        var num = Number(value);
+        if(!Number.isFinite(num)) return '—';
+        return (num > 0 ? '+' : '') + formatNumber(num);
+      }
+
+      function formatCalibrationMismatchLabel(label){
+        var normalized = String(label || '').trim().toLowerCase();
+        if(normalized === 'aligned') return 'Aligned';
+        if(normalized === 'review') return 'Review';
+        if(normalized === 'strong_disagreement') return 'Strong disagreement';
+        return 'Review';
+      }
+
+      function getCalibrationBadgeClass(label){
+        var normalized = String(label || '').trim().toLowerCase();
+        if(normalized === 'aligned') return 'badge badge-pass';
+        if(normalized === 'review') return 'badge badge-tune';
+        if(normalized === 'strong_disagreement') return 'badge badge-fail';
+        return 'badge badge-review';
+      }
+
       function setVerdictBadge(node, verdict){
         if(!node) return;
         var normalized = String(verdict || '').trim().toLowerCase();
@@ -483,6 +518,42 @@
         target.detail.textContent = check && check.detail ? check.detail : 'No composition detail available.';
       }
 
+      function renderCalibrationSummary(summary){
+        if(!calibrationSummaryNode) return;
+        var counts = summary && summary.counts ? summary.counts : {};
+        var topOverRanked = Array.isArray(summary && summary.topOverRanked) ? summary.topOverRanked : [];
+        var topUnderRanked = Array.isArray(summary && summary.topUnderRanked) ? summary.topUnderRanked : [];
+        var rows = [
+          '<div class="metric-row"><span>Total rows</span><strong>' + escapeHtml(String(counts.total || 0)) + '</strong></div>',
+          '<div class="metric-row"><span>Calibrated</span><strong>' + escapeHtml(String(counts.calibrated || 0)) + '</strong></div>',
+          '<div class="metric-row"><span>Uncalibrated</span><strong>' + escapeHtml(String(counts.uncalibrated || 0)) + '</strong></div>',
+          '<div class="metric-row"><span>Aligned</span><strong>' + escapeHtml(String(counts.aligned || 0)) + '</strong></div>',
+          '<div class="metric-row"><span>Review</span><strong>' + escapeHtml(String(counts.review || 0)) + '</strong></div>',
+          '<div class="metric-row"><span>Strong disagreement</span><strong>' + escapeHtml(String(counts.strong_disagreement || 0)) + '</strong></div>'
+        ];
+
+        if(topOverRanked.length){
+          rows.push('<div class="metric-detail"><strong>Most over-ranked</strong></div>');
+          rows = rows.concat(topOverRanked.map(function(row){
+            return '<div class="metric-row"><span>#' + escapeHtml(String(row.rank)) + ' ' + escapeHtml(row.player) + '</span><strong>' + escapeHtml(formatSignedNumber(row.calibrationRankDelta)) + ' vs #' + escapeHtml(String(row.calibrationRank || '—')) + '</strong></div>';
+          }));
+        }
+
+        if(topUnderRanked.length){
+          rows.push('<div class="metric-detail"><strong>Most under-ranked</strong></div>');
+          rows = rows.concat(topUnderRanked.map(function(row){
+            return '<div class="metric-row"><span>#' + escapeHtml(String(row.rank)) + ' ' + escapeHtml(row.player) + '</span><strong>' + escapeHtml(formatSignedNumber(row.calibrationRankDelta)) + ' vs #' + escapeHtml(String(row.calibrationRank || '—')) + '</strong></div>';
+          }));
+        }
+
+        calibrationSummaryNode.innerHTML = rows.join('');
+        if(calibrationSummaryDetailNode){
+          calibrationSummaryDetailNode.textContent = counts.total
+            ? 'Calibration summary shows how many rows have an external 2K prior, plus the biggest rank gaps in each direction.'
+            : 'No calibration data is attached to the selected board yet.';
+        }
+      }
+
       function renderTierBands(bands){
         if(!tierBandsNode) return;
         if(!Array.isArray(bands) || !bands.length){
@@ -506,10 +577,16 @@
 
       function renderRows(rows){
         if(!Array.isArray(rows) || !rows.length){
-          rowsNode.innerHTML = '<tr><td colspan="7" class="empty">The selected config did not produce any audit rows.</td></tr>';
+          rowsNode.innerHTML = '<tr><td colspan="10" class="empty">The selected config did not produce any audit rows.</td></tr>';
           return;
         }
         rowsNode.innerHTML = rows.map(function(row){
+          var calibration = row && row.calibration ? row.calibration : null;
+          var calibrationOvr = calibration ? calibration['2kOverall'] : null;
+          var calibrationRankDelta = row && row.calibrationRankDelta;
+          var mismatchBadge = row && row.calibrationMismatch
+            ? '<span class="' + getCalibrationBadgeClass(row.calibrationMismatch) + '">' + escapeHtml(formatCalibrationMismatchLabel(row.calibrationMismatch)) + '</span>'
+            : '&mdash;';
           return '<tr>'
             + '<td>' + escapeHtml(String(row.rank)) + '</td>'
             + '<td>' + escapeHtml(row.player) + '</td>'
@@ -518,6 +595,9 @@
             + '<td>' + escapeHtml(formatNumber(row.projectedFp)) + '</td>'
             + '<td>' + escapeHtml(formatNumber(row.rawFp)) + '</td>'
             + '<td>' + escapeHtml(String(row.gamesPlayed)) + '</td>'
+            + '<td>' + (calibration ? escapeHtml(formatNumber(calibrationOvr)) : '&mdash;') + '</td>'
+            + '<td>' + (calibration ? escapeHtml(formatSignedNumber(calibrationRankDelta)) : '&mdash;') + '</td>'
+            + '<td>' + mismatchBadge + '</td>'
             + '</tr>';
         }).join('');
       }
@@ -558,6 +638,11 @@
           throw new Error('required_runtime_missing');
         }
         var config = await loader.loadMixedEraConfigById(configId);
+        var calibration = await loadAuditCalibrationForConfig(config);
+        if(calibration){
+          config = Object.assign({}, config);
+          config.calibration = calibration;
+        }
         var sourcePackIds = Array.isArray(config && config.sourcePackIds) ? config.sourcePackIds : [];
         if(!sourcePackIds.length){
           throw new Error('mixed_era_source_packs_missing');
@@ -590,6 +675,23 @@
         });
       }
 
+      function resolveAuditCalibrationId(config){
+        return String(config && (config.mixedEraConfigId || config.auditCalibrationId || config.calibrationId || config.id || '') || '').trim();
+      }
+
+      async function loadAuditCalibrationForConfig(config){
+        var calibrationId = resolveAuditCalibrationId(config);
+        if(!calibrationId) return null;
+        try{
+          var response = await fetch('historical-packs/mixed-era/audit-calibration/' + encodeURIComponent(calibrationId) + '.2k.json', { cache: 'no-store' });
+          if(!response.ok) return null;
+          return await response.json();
+        }catch(error){
+          console.warn('[Mixed Era Audit] Calibration load failed for', calibrationId, error);
+          return null;
+        }
+      }
+
       async function refresh(){
         var configId = String(boardSelector.value || '').trim();
         if(!configId){
@@ -602,6 +704,7 @@
           renderCompositionCheck(compositionTargets.top50, null);
           renderCompositionCheck(compositionTargets.top100, null);
           renderCompositionCheck(compositionTargets.fullPool, null);
+          renderCalibrationSummary(null);
           renderTierBands([]);
           return;
         }
@@ -622,6 +725,7 @@
           renderCompositionCheck(compositionTargets.top50, checksById.top50);
           renderCompositionCheck(compositionTargets.top100, checksById.top100);
           renderCompositionCheck(compositionTargets.fullPool, checksById.fullPool);
+          renderCalibrationSummary(viewModel.calibrationSummary);
           renderTierBands(viewModel.tierBands);
           renderRows(viewModel.rows);
           setWarning(viewModel.warning);
@@ -633,6 +737,7 @@
           renderCompositionCheck(compositionTargets.top50, null);
           renderCompositionCheck(compositionTargets.top100, null);
           renderCompositionCheck(compositionTargets.fullPool, null);
+          renderCalibrationSummary(null);
           renderTierBands([]);
           renderRows([]);
           setWarning('');
