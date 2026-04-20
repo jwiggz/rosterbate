@@ -1,40 +1,31 @@
+const fs = require('node:fs');
+const path = require('node:path');
 const assert = require('node:assert/strict');
+
+function readJson(relativePath) {
+  const absolutePath = path.join(__dirname, '..', relativePath);
+  return JSON.parse(fs.readFileSync(absolutePath, 'utf8'));
+}
+
+const mixedEraIndex = readJson('historical-packs/mixed-era/index.json');
+const mixedEraTop300 = readJson('historical-packs/mixed-era/1996-2016-top300.json');
+const mixedEraTop100 = readJson('historical-packs/mixed-era/1996-2016-top100.json');
 
 const responses = new Map([
   ['historical-packs/catalog.json', [
     { packId: 'nba_1996_full_season_v1', sport: 'nba', seasonLabel: '1995-96 NBA Historic Season' }
   ]],
-  ['historical-packs/mixed-era/index.json', {
-    entries: [
-      { id: '1996-2016-top300', file: '1996-2016-top300.json' },
-      { id: '1996-2016-top100', file: '1996-2016-top100.json' }
-    ]
-  }],
-  ['historical-packs/mixed-era/1996-2016-top300.json', {
-    packId: 'mixed_era_1996_2016_top300_v1',
-    sport: 'nba',
-    seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
-    shortLabel: '95-96 x 15-16',
-    era: 'Mixed Era',
-    syntheticType: 'mixed_era',
-    sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1'],
-    topPlayersPerPack: 150,
-    playerCount: 300,
-    draftUrl: 'rosterbate-draft.html?sport=nba&historical=mixed&mixedEraConfigId=1996-2016-top300'
-  }],
-  ['historical-packs/mixed-era/1996-2016-top100.json', {
-    packId: 'mixed_era_1996_2016_top100_v1',
-    sport: 'nba',
-    seasonLabel: '1995-96 + 2015-16 Mixed Era Draft',
-    shortLabel: '95-96 x 15-16',
-    era: 'Mixed Era',
-    syntheticType: 'mixed_era',
-    sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1'],
-    topPlayersPerPack: 50,
-    playerCount: 100,
-    draftUrl: 'rosterbate-draft.html?sport=nba&historical=mixed&mixedEraConfigId=1996-2016-top100'
-  }]
 ]);
+
+responses.set('historical-packs/mixed-era/index.json', mixedEraIndex);
+responses.set('historical-packs/mixed-era/1996-2016-top300.json', {
+  ...mixedEraTop300,
+  mixedEraConfigId: 'override-me-top300'
+});
+responses.set('historical-packs/mixed-era/1996-2016-top100.json', {
+  ...mixedEraTop100,
+  mixedEraConfigId: 'override-me-top100'
+});
 
 global.fetch = async function fakeFetch(url) {
   const normalized = String(url).replace(/^.*historical-packs/, 'historical-packs');
