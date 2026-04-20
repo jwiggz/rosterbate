@@ -388,6 +388,95 @@ assert.strictEqual(calibrationNames2016.length, 22);
 assert.ok(!calibrationNames.includes('Gheorghe Muresan'));
 assert.ok(!calibrationNames.includes('Gheorghe Muresan Sr.'));
 
+const curryCalibration = calibrationFixture.players.find((player) => player.name === 'Stephen Curry');
+const shaqCalibration = calibrationFixture.players.find((player) => player.name === "Shaquille O'Neal");
+const dikembeCalibration = calibrationFixture.players.find((player) => player.name === 'Dikembe Mutombo');
+const horfordCalibration = calibrationFixture.players.find((player) => player.name === 'Al Horford');
+
+assert.deepStrictEqual(
+  {
+    overall: curryCalibration['2kOverall'],
+    outside: curryCalibration.outside,
+    athleticism: curryCalibration.athleticism,
+    inside: curryCalibration.inside,
+    playmaking: curryCalibration.playmaking,
+    defense: curryCalibration.defense,
+    rebounding: curryCalibration.rebounding
+  },
+  {
+    overall: 97,
+    outside: 95,
+    athleticism: 83,
+    inside: 58,
+    playmaking: 92,
+    defense: 69,
+    rebounding: 46
+  }
+);
+
+assert.deepStrictEqual(
+  {
+    overall: shaqCalibration['2kOverall'],
+    outside: shaqCalibration.outside,
+    athleticism: shaqCalibration.athleticism,
+    inside: shaqCalibration.inside,
+    playmaking: shaqCalibration.playmaking,
+    defense: shaqCalibration.defense,
+    rebounding: shaqCalibration.rebounding
+  },
+  {
+    overall: 92,
+    outside: 66,
+    athleticism: 81,
+    inside: 83,
+    playmaking: 53,
+    defense: 82,
+    rebounding: 87
+  }
+);
+
+assert.deepStrictEqual(
+  {
+    overall: dikembeCalibration['2kOverall'],
+    outside: dikembeCalibration.outside,
+    athleticism: dikembeCalibration.athleticism,
+    inside: dikembeCalibration.inside,
+    playmaking: dikembeCalibration.playmaking,
+    defense: dikembeCalibration.defense,
+    rebounding: dikembeCalibration.rebounding
+  },
+  {
+    overall: 90,
+    outside: 60,
+    athleticism: 80,
+    inside: 68,
+    playmaking: 35,
+    defense: 81,
+    rebounding: 95
+  }
+);
+
+assert.deepStrictEqual(
+  {
+    overall: horfordCalibration['2kOverall'],
+    outside: horfordCalibration.outside,
+    athleticism: horfordCalibration.athleticism,
+    inside: horfordCalibration.inside,
+    playmaking: horfordCalibration.playmaking,
+    defense: horfordCalibration.defense,
+    rebounding: horfordCalibration.rebounding
+  },
+  {
+    overall: 85,
+    outside: 89,
+    athleticism: 76,
+    inside: 77,
+    playmaking: 63,
+    defense: 75,
+    rebounding: 64
+  }
+);
+
 const mjRow = calibratedViewModel.rows.find((row) => row.player === 'Michael Jordan');
 const pippenRow = calibratedViewModel.rows.find((row) => row.player === 'Scottie Pippen');
 const hakeemRow = calibratedViewModel.rows.find((row) => row.player === 'Hakeem Olajuwon');
