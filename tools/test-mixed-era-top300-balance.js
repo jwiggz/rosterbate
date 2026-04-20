@@ -40,9 +40,14 @@ function getCheck(id) {
   return audit.compositionChecks.find((check) => check.id === id);
 }
 
-function assertNotFailWithMaxDominantShare(id, maxDominantShare) {
+function mustGetCheck(id) {
   const check = getCheck(id);
   assert.ok(check, `expected composition check ${id} to exist`);
+  return check;
+}
+
+function assertNotFailWithMaxDominantShare(id, maxDominantShare) {
+  const check = mustGetCheck(id);
   assert.notEqual(check.verdict, 'fail', `expected ${id} composition to stay out of fail range`);
   assert.ok(
     check.dominantShare <= maxDominantShare,
@@ -50,18 +55,23 @@ function assertNotFailWithMaxDominantShare(id, maxDominantShare) {
   );
 }
 
-assert.equal(getCheck('top10').verdict, 'pass');
+assert.throws(
+  () => mustGetCheck('missing-check'),
+  /expected composition check missing-check to exist/
+);
+
+assert.equal(mustGetCheck('top10').verdict, 'pass');
 assertNotFailWithMaxDominantShare('top25', 64);
 assertNotFailWithMaxDominantShare('top50', 60);
 assertNotFailWithMaxDominantShare('top100', 60);
-assert.equal(getCheck('fullPool').verdict, 'pass');
+assert.equal(mustGetCheck('fullPool').verdict, 'pass');
 assert.deepStrictEqual(
   audit.rows.filter((row) => row.rank <= 25 && row.gamesPlayed < 25),
   []
 );
-
-const webber = audit.rows.find((row) => row.player === 'Chris Webber');
-assert.ok(webber, 'expected Chris Webber to be present in the mixed-era board');
-assert.ok(webber.rank >= 40, `expected Chris Webber to fall out of premium tiers, got rank ${webber.rank}`);
+assert.deepStrictEqual(
+  audit.rows.filter((row) => row.rank <= 50 && row.gamesPlayed < 25),
+  []
+);
 
 console.log('mixed-era top300 balance test passed');
