@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mixed Era Audit</title>
+<style>
+  :root{
+    --bg:#f3efe6;
+    --panel:#fffdf8;
+    --line:#d8cfc0;
+    --ink:#241f17;
+    --muted:#6c6257;
+    --accent:#b3561c;
+    --accent-soft:#f3d9c4;
+    --warn:#8b2c20;
+    --warn-bg:#fde3de;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"IBM Plex Sans","Segoe UI",sans-serif;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.92)),
+      repeating-linear-gradient(135deg,rgba(179,86,28,.04) 0,rgba(179,86,28,.04) 12px,transparent 12px,transparent 24px),
+      var(--bg);
+    color:var(--ink);
+  }
+  .shell{
+    max-width:1200px;
+    margin:0 auto;
+    padding:24px 16px 40px;
+  }
+  .hero, .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:0 12px 30px rgba(36,31,23,.08);
+  }
+  .hero{
+    padding:20px;
+    margin-bottom:16px;
+  }
+  h1{
+    margin:0 0 8px;
+    font-size:clamp(2rem,4vw,3rem);
+    line-height:1;
+    letter-spacing:.02em;
+  }
+  .hero p, .status, .empty, .warning{
+    margin:0;
+    color:var(--muted);
+    line-height:1.55;
+  }
+  .controls{
+    display:grid;
+    grid-template-columns:minmax(0,320px) 1fr;
+    gap:12px;
+    align-items:end;
+    margin-top:16px;
+  }
+  label{
+    display:block;
+    margin-bottom:6px;
+    font-size:.85rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+  }
+  select, button{
+    width:100%;
+    min-height:44px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    padding:0 12px;
+    font:inherit;
+    background:#fff;
+    color:var(--ink);
+  }
+  button{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff8f0;
+    font-weight:700;
+    cursor:pointer;
+  }
+  button:disabled{
+    opacity:.65;
+    cursor:progress;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:16px;
+    margin-bottom:16px;
+  }
+  .panel{
+    padding:16px;
+  }
+  .panel h2{
+    margin:0 0 10px;
+    font-size:1rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .metric-list{
+    display:grid;
+    gap:8px;
+  }
+  .metric-row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:8px;
+    border-bottom:1px dashed var(--line);
+  }
+  .metric-row:last-child{
+    padding-bottom:0;
+    border-bottom:0;
+  }
+  .warning{
+    padding:14px 16px;
+    border:1px solid #efb4ab;
+    border-radius:14px;
+    background:var(--warn-bg);
+    color:var(--warn);
+    font-weight:700;
+    margin-bottom:16px;
+  }
+  .table-wrap{
+    overflow:auto;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:760px;
+  }
+  th, td{
+    padding:10px 12px;
+    text-align:left;
+    border-bottom:1px solid var(--line);
+    font-size:.95rem;
+  }
+  th{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    background:rgba(243,217,196,.35);
+    position:sticky;
+    top:0;
+  }
+  .status, .empty{
+    padding:14px 16px;
+    border:1px dashed var(--line);
+    border-radius:14px;
+    background:rgba(255,255,255,.55);
+    margin-bottom:16px;
+  }
+  .config-label{
+    margin:0 0 16px;
+    font-size:1.2rem;
+    font-weight:700;
+  }
+  @media (max-width:900px){
+    .controls, .grid{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+<script src="simulation-league-engine.js"></script>
+<script src="historical-pack-loader.js"></script>
+<script src="mixed-era-runtime.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <h1>Mixed-Era Audit</h1>
+      <p>Localhost-first board inspection for crossover configs. This page uses the same mixed-era draft context builder as the draft flow so board balance and era composition stay comparable.</p>
+      <div class="controls">
+        <div>
+          <label for="boardSelector">Board</label>
+          <select id="boardSelector">
+            <option value="">Loading mixed-era configs...</option>
+          </select>
+        </div>
+        <div>
+          <label for="reloadButton">Refresh</label>
+          <button id="reloadButton" type="button">Load Audit Board</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="status" class="status">Loading mixed-era index...</div>
+    <div id="warning" class="warning" hidden></div>
+    <p id="configLabel" class="config-label"></p>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>Top 10 Composition</h2>
+        <div id="top10Composition" class="metric-list"></div>
+      </article>
+      <article class="panel">
+        <h2>Top 25 Composition</h2>
+        <div id="top25Composition" class="metric-list"></div>
+      </article>
+      <article class="panel">
+        <h2>Full Pool Composition</h2>
+        <div id="fullPoolComposition" class="metric-list"></div>
+      </article>
+    </section>
+
+    <section class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Source Era</th>
+            <th>Mixed-Era Overall</th>
+            <th>Proj FP</th>
+            <th>Raw FP</th>
+            <th>GP</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="7" class="empty">No audit board loaded yet.</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      'use strict';
+
+      var loader = window.RosterBateHistoricalPackLoader;
+      var runtime = window.RosterBateMixedEraRuntime;
+      var simEngine = window.RosterBateSimulationEngine;
+      var boardSelector = document.getElementById('boardSelector');
+      var reloadButton = document.getElementById('reloadButton');
+      var statusNode = document.getElementById('status');
+      var warningNode = document.getElementById('warning');
+      var configLabelNode = document.getElementById('configLabel');
+      var rowsNode = document.getElementById('rows');
+
+      var compositionTargets = {
+        top10Composition: document.getElementById('top10Composition'),
+        top25Composition: document.getElementById('top25Composition'),
+        fullPoolComposition: document.getElementById('fullPoolComposition')
+      };
+
+      function setStatus(message){
+        statusNode.hidden = false;
+        statusNode.textContent = message;
+      }
+
+      function clearStatus(){
+        statusNode.hidden = true;
+        statusNode.textContent = '';
+      }
+
+      function setWarning(message){
+        warningNode.hidden = !message;
+        warningNode.textContent = message || '';
+      }
+
+      function readRequestedConfigId(){
+        try{
+          var params = new URLSearchParams(window.location.search || '');
+          return String(params.get('configId') || '').trim();
+        }catch(error){
+          return '';
+        }
+      }
+
+      function formatNumber(value){
+        var num = Number(value || 0);
+        if(!Number.isFinite(num)) return '0.0';
+        return num.toFixed(1);
+      }
+
+      function renderComposition(target, composition){
+        var entries = Object.keys(composition || {}).map(function(key){
+          return [key, composition[key]];
+        }).sort(function(a, b){
+          return Number(b[1] || 0) - Number(a[1] || 0) || String(a[0]).localeCompare(String(b[0]));
+        });
+        if(!entries.length){
+          target.innerHTML = '<div class="empty">No source-era counts available.</div>';
+          return;
+        }
+        target.innerHTML = entries.map(function(entry){
+          return '<div class="metric-row"><span>' + escapeHtml(entry[0]) + '</span><strong>' + escapeHtml(String(entry[1])) + '</strong></div>';
+        }).join('');
+      }
+
+      function renderRows(rows){
+        if(!Array.isArray(rows) || !rows.length){
+          rowsNode.innerHTML = '<tr><td colspan="7" class="empty">The selected config did not produce any audit rows.</td></tr>';
+          return;
+        }
+        rowsNode.innerHTML = rows.map(function(row){
+          return '<tr>'
+            + '<td>' + escapeHtml(String(row.rank)) + '</td>'
+            + '<td>' + escapeHtml(row.player) + '</td>'
+            + '<td>' + escapeHtml(row.sourceEra) + '</td>'
+            + '<td>' + escapeHtml(formatNumber(row.mixedEraOverall)) + '</td>'
+            + '<td>' + escapeHtml(formatNumber(row.projectedFp)) + '</td>'
+            + '<td>' + escapeHtml(formatNumber(row.rawFp)) + '</td>'
+            + '<td>' + escapeHtml(String(row.gamesPlayed)) + '</td>'
+            + '</tr>';
+        }).join('');
+      }
+
+      function escapeHtml(value){
+        return String(value || '').replace(/[&<>\"']/g, function(char){
+          return {
+            '&':'&amp;',
+            '<':'&lt;',
+            '>':'&gt;',
+            '"':'&quot;',
+            '\'':'&#39;'
+          }[char] || char;
+        });
+      }
+
+      function populateSelector(entries){
+        if(!Array.isArray(entries) || !entries.length){
+          boardSelector.innerHTML = '<option value="">No mixed-era configs found</option>';
+          boardSelector.disabled = true;
+          reloadButton.disabled = true;
+          return;
+        }
+        var requestedConfigId = readRequestedConfigId();
+        boardSelector.innerHTML = entries.map(function(entry){
+          var selected = requestedConfigId && entry.id === requestedConfigId;
+          return '<option value="' + escapeHtml(entry.id) + '"' + (selected ? ' selected' : '') + '>' + escapeHtml(entry.id) + '</option>';
+        }).join('');
+        if(!boardSelector.value){
+          boardSelector.value = entries[0].id;
+        }
+        boardSelector.disabled = false;
+        reloadButton.disabled = false;
+      }
+
+      async function loadAuditForConfig(configId){
+        if(!(loader && runtime)){
+          throw new Error('required_runtime_missing');
+        }
+        var config = await loader.loadMixedEraConfigById(configId);
+        var sourcePackIds = Array.isArray(config && config.sourcePackIds) ? config.sourcePackIds : [];
+        if(!sourcePackIds.length){
+          throw new Error('mixed_era_source_packs_missing');
+        }
+        var bundles = (await Promise.all(sourcePackIds.map(async function(packId){
+          try{
+            return await loader.loadPackById(packId);
+          }catch(error){
+            console.warn('[Mixed Era Audit] Failed to load source pack', packId, error);
+            return null;
+          }
+        }))).filter(Boolean);
+        if(!bundles.length){
+          throw new Error('mixed_era_bundles_missing');
+        }
+        var draftContext = runtime.buildMixedEraDraftContextFromBundles({
+          config: config,
+          bundles: bundles,
+          requestedSport: config.sport || 'nba',
+          buildPlayerSimulationProfile: simEngine && typeof simEngine.buildPlayerSimulationProfile === 'function'
+            ? simEngine.buildPlayerSimulationProfile
+            : null
+        });
+        if(!(draftContext && Array.isArray(draftContext.playerPool))){
+          throw new Error('mixed_era_draft_context_missing');
+        }
+        return runtime.buildMixedEraAuditViewModel({
+          config: config,
+          playerPool: draftContext.playerPool
+        });
+      }
+
+      async function refresh(){
+        var configId = String(boardSelector.value || '').trim();
+        if(!configId){
+          setStatus('Choose a mixed-era config to audit.');
+          setWarning('');
+          configLabelNode.textContent = '';
+          renderRows([]);
+          renderComposition(compositionTargets.top10Composition, {});
+          renderComposition(compositionTargets.top25Composition, {});
+          renderComposition(compositionTargets.fullPoolComposition, {});
+          return;
+        }
+
+        reloadButton.disabled = true;
+        setStatus('Loading audit board for ' + configId + '...');
+        setWarning('');
+
+        try{
+          var viewModel = await loadAuditForConfig(configId);
+          configLabelNode.textContent = viewModel.seasonLabel || configId;
+          renderComposition(compositionTargets.top10Composition, viewModel.top10Composition);
+          renderComposition(compositionTargets.top25Composition, viewModel.top25Composition);
+          renderComposition(compositionTargets.fullPoolComposition, viewModel.fullPoolComposition);
+          renderRows(viewModel.rows);
+          setWarning(viewModel.warning);
+          clearStatus();
+        }catch(error){
+          configLabelNode.textContent = '';
+          renderComposition(compositionTargets.top10Composition, {});
+          renderComposition(compositionTargets.top25Composition, {});
+          renderComposition(compositionTargets.fullPoolComposition, {});
+          renderRows([]);
+          setWarning('');
+          setStatus('Could not load audit board: ' + (error && error.message ? error.message : error));
+        }finally{
+          reloadButton.disabled = boardSelector.disabled;
+        }
+      }
+
+      async function init(){
+        if(!(loader
+          && typeof loader.loadMixedEraIndex === 'function'
+          && typeof loader.loadMixedEraConfigById === 'function'
+          && typeof loader.loadPackById === 'function'
+          && runtime
+          && typeof runtime.buildMixedEraDraftContextFromBundles === 'function'
+          && typeof runtime.buildMixedEraAuditViewModel === 'function')){
+          setStatus('Missing localhost mixed-era dependencies. Confirm historical-pack-loader.js and mixed-era-runtime.js are available.');
+          boardSelector.innerHTML = '<option value="">Dependencies missing</option>';
+          boardSelector.disabled = true;
+          reloadButton.disabled = true;
+          return;
+        }
+
+        try{
+          var index = await loader.loadMixedEraIndex();
+          var entries = Array.isArray(index && index.entries) ? index.entries : [];
+          populateSelector(entries);
+          if(!entries.length){
+            setStatus('Mixed-era index is empty.');
+            return;
+          }
+          await refresh();
+        }catch(error){
+          boardSelector.innerHTML = '<option value="">Index unavailable</option>';
+          boardSelector.disabled = true;
+          reloadButton.disabled = true;
+          setStatus('Could not load mixed-era index: ' + (error && error.message ? error.message : error));
+        }
+      }
+
+      reloadButton.addEventListener('click', refresh);
+      boardSelector.addEventListener('change', refresh);
+      init();
+    })();
+  </script>
+</body>
+</html>

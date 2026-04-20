@@ -2781,6 +2781,7 @@ function formatHistoricalPackShortLabel(packId){
   const known={
     nba_1996_full_season_v1:'1995-96',
     nba_2016_full_season_v1:'2015-16',
+    mixed_era_1996_2016_top300_v1:'95-96 x 15-16',
     mixed_era_1996_2016_top100_v1:'95-96 x 15-16'
   };
   if(known[raw]) return known[raw];
@@ -2791,10 +2792,44 @@ function formatHistoricalPackShortLabel(packId){
     .trim();
 }
 
+function getHistoricalUniversePlayerIdentityKey(player){
+  const historicalPlayerId=String(player?.historicalPlayerId || '').trim();
+  if(historicalPlayerId) return 'historical:' + historicalPlayerId;
+  const playerId=String(player?.playerId || '').trim();
+  if(playerId) return 'player:' + playerId;
+  const id=String(player?.id || '').trim();
+  if(id) return 'id:' + id;
+  const name=String(player?.name || '').trim();
+  return name ? ('name:' + name) : '';
+}
+
+function buildHistoricalUniversePlayerPoolFromState(state){
+  const explicitPool=Array.isArray(state?.historicalPlayerPool) ? state.historicalPlayerPool : [];
+  if(explicitPool.length) return explicitPool.slice();
+  const pool=[];
+  const seen=new Set();
+  [
+    Array.isArray(state?.myRoster) ? state.myRoster : [],
+    Array.isArray(state?.allRosters) ? state.allRosters.flat() : [],
+    Array.isArray(state?.ilByTeam) ? state.ilByTeam.flat() : [],
+    Array.isArray(state?.ilRosters) ? state.ilRosters.flat() : [],
+    Array.isArray(state?.waiver) ? state.waiver : [],
+    Array.isArray(state?.freeAgents) ? state.freeAgents : []
+  ].forEach(players=>{
+    players.forEach(player=>{
+      const key=getHistoricalUniversePlayerIdentityKey(player);
+      if(!player || !key || seen.has(key)) return;
+      seen.add(key);
+      pool.push(player);
+    });
+  });
+  return pool;
+}
+
 function buildDraftedUniverseSimulationBootSnapshot(){
   if(!isHistoricalDraftUniverse(D)) return null;
   const sourcePackIds=getHistoricalUniverseSourcePackIds(D);
-  const playerPool=Array.isArray(D?.historicalPlayerPool) ? D.historicalPlayerPool.slice() : [];
+  const playerPool=buildHistoricalUniversePlayerPoolFromState(D);
   const topTargets=playerPool
     .slice()
     .sort((a,b)=>{
