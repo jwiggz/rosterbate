@@ -91,7 +91,13 @@
   }
   .grid{
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+    margin-bottom:16px;
+  }
+  .audit-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:16px;
     margin-bottom:16px;
   }
@@ -108,6 +114,42 @@
     display:grid;
     gap:8px;
   }
+  .metric-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:28px;
+    padding:0 10px;
+    border-radius:999px;
+    border:1px solid transparent;
+    font-size:.72rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    white-space:nowrap;
+  }
+  .badge-pass{
+    background:#e5f2e8;
+    border-color:#93c29d;
+    color:#256037;
+  }
+  .badge-tune{
+    background:#fbefda;
+    border-color:#d9b56b;
+    color:#8a5a00;
+  }
+  .badge-fail{
+    background:#fde3de;
+    border-color:#efb4ab;
+    color:#8b2c20;
+  }
   .metric-row{
     display:flex;
     justify-content:space-between;
@@ -118,6 +160,21 @@
   .metric-row:last-child{
     padding-bottom:0;
     border-bottom:0;
+  }
+  .metric-detail{
+    margin:10px 0 0;
+    color:var(--muted);
+    line-height:1.5;
+    font-size:.93rem;
+  }
+  .prompt-list{
+    margin:10px 0 0;
+    padding-left:18px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+  .prompt-list li + li{
+    margin-top:6px;
   }
   .warning{
     padding:14px 16px;
@@ -198,16 +255,88 @@
 
     <section class="grid">
       <article class="panel">
-        <h2>Top 10 Composition</h2>
+        <div class="metric-header">
+          <h2>Top 10 Composition</h2>
+          <span id="top10Verdict" class="badge" aria-live="polite">-</span>
+        </div>
         <div id="top10Composition" class="metric-list"></div>
+        <p id="top10Detail" class="metric-detail"></p>
       </article>
       <article class="panel">
-        <h2>Top 25 Composition</h2>
+        <div class="metric-header">
+          <h2>Top 25 Composition</h2>
+          <span id="top25Verdict" class="badge" aria-live="polite">-</span>
+        </div>
         <div id="top25Composition" class="metric-list"></div>
+        <p id="top25Detail" class="metric-detail"></p>
       </article>
       <article class="panel">
-        <h2>Full Pool Composition</h2>
+        <div class="metric-header">
+          <h2>Top 50 Composition</h2>
+          <span id="top50Verdict" class="badge" aria-live="polite">-</span>
+        </div>
+        <div id="top50Composition" class="metric-list"></div>
+        <p id="top50Detail" class="metric-detail"></p>
+      </article>
+      <article class="panel">
+        <div class="metric-header">
+          <h2>Top 100 Composition</h2>
+          <span id="top100Verdict" class="badge" aria-live="polite">-</span>
+        </div>
+        <div id="top100Composition" class="metric-list"></div>
+        <p id="top100Detail" class="metric-detail"></p>
+      </article>
+      <article class="panel">
+        <div class="metric-header">
+          <h2>Full Pool Composition</h2>
+          <span id="fullPoolVerdict" class="badge" aria-live="polite">-</span>
+        </div>
         <div id="fullPoolComposition" class="metric-list"></div>
+        <p id="fullPoolDetail" class="metric-detail"></p>
+      </article>
+    </section>
+
+    <section class="audit-grid">
+      <article class="panel">
+        <div class="metric-header">
+          <h2>Tier Integrity Bands</h2>
+          <span class="badge badge-pass">Review</span>
+        </div>
+        <div id="tierBands" class="metric-list"></div>
+        <p class="metric-detail">Tier Integrity: pass if bands show believable cross-era representation, tune if one era is over-centred in a band, and fail if a single era appears to capture a tier outright.</p>
+      </article>
+      <article class="panel">
+        <div class="metric-header">
+          <h2>Star Fairness Check</h2>
+          <span class="badge badge-pass">Review</span>
+        </div>
+        <p class="metric-detail">Star Fairness: pass if the top-star conversation feels believable overall, tune if one or two comparisons are arguable, and fail if multiple headline stars are clearly misplaced by tier.</p>
+        <ul class="prompt-list">
+          <li>Does the top tier still read like the league's obvious alpha group?</li>
+          <li>Do the borderline legends land in the right neighborhood?</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <div class="metric-header">
+          <h2>Raw vs Normalized Sanity Check</h2>
+          <span class="badge badge-pass">Review</span>
+        </div>
+        <p class="metric-detail">Raw vs Normalized: pass if the shifts feel directional rather than absurd, tune if there are a handful of suspicious corrections, and fail if normalized order repeatedly contradicts production context in impossible ways.</p>
+        <ul class="prompt-list">
+          <li>Does normalization improve the board without flipping obvious production reality?</li>
+          <li>Are the biggest corrections explainable to a human reviewer?</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <div class="metric-header">
+          <h2>Draft-Feel Check</h2>
+          <span class="badge badge-pass">Review</span>
+        </div>
+        <p class="metric-detail">Draft-Feel: pass if the board feels exciting and credible, tune if it is fun but has a few obvious "why is he here?" names, and fail if a human reviewer would hesitate to draft from it.</p>
+        <ul class="prompt-list">
+          <li>Would you be comfortable drafting from this board without a disclaimer?</li>
+          <li>Do the surprise names feel fun, or do they break the board's trust?</li>
+        </ul>
       </article>
     </section>
 
@@ -246,10 +375,33 @@
       var rowsNode = document.getElementById('rows');
 
       var compositionTargets = {
-        top10Composition: document.getElementById('top10Composition'),
-        top25Composition: document.getElementById('top25Composition'),
-        fullPoolComposition: document.getElementById('fullPoolComposition')
+        top10: {
+          list: document.getElementById('top10Composition'),
+          verdict: document.getElementById('top10Verdict'),
+          detail: document.getElementById('top10Detail')
+        },
+        top25: {
+          list: document.getElementById('top25Composition'),
+          verdict: document.getElementById('top25Verdict'),
+          detail: document.getElementById('top25Detail')
+        },
+        top50: {
+          list: document.getElementById('top50Composition'),
+          verdict: document.getElementById('top50Verdict'),
+          detail: document.getElementById('top50Detail')
+        },
+        top100: {
+          list: document.getElementById('top100Composition'),
+          verdict: document.getElementById('top100Verdict'),
+          detail: document.getElementById('top100Detail')
+        },
+        fullPool: {
+          list: document.getElementById('fullPoolComposition'),
+          verdict: document.getElementById('fullPoolVerdict'),
+          detail: document.getElementById('fullPoolDetail')
+        }
       };
+      var tierBandsNode = document.getElementById('tierBands');
 
       function setStatus(message){
         statusNode.hidden = false;
@@ -281,6 +433,28 @@
         return num.toFixed(1);
       }
 
+      function setVerdictBadge(node, verdict){
+        if(!node) return;
+        var normalized = String(verdict || '').trim().toLowerCase();
+        node.className = 'badge';
+        if(normalized === 'pass'){
+          node.className = 'badge badge-pass';
+          node.textContent = 'Pass';
+          return;
+        }
+        if(normalized === 'tune'){
+          node.className = 'badge badge-tune';
+          node.textContent = 'Tune';
+          return;
+        }
+        if(normalized === 'fail'){
+          node.className = 'badge badge-fail';
+          node.textContent = 'Fail';
+          return;
+        }
+        node.textContent = '-';
+      }
+
       function renderComposition(target, composition){
         var entries = Object.keys(composition || {}).map(function(key){
           return [key, composition[key]];
@@ -293,6 +467,35 @@
         }
         target.innerHTML = entries.map(function(entry){
           return '<div class="metric-row"><span>' + escapeHtml(entry[0]) + '</span><strong>' + escapeHtml(String(entry[1])) + '</strong></div>';
+        }).join('');
+      }
+
+      function renderCompositionCheck(target, check){
+        if(!target) return;
+        var composition = check && check.composition ? check.composition : {};
+        renderComposition(target.list, composition);
+        setVerdictBadge(target.verdict, check && check.verdict);
+        target.detail.textContent = check && check.detail ? check.detail : 'No composition detail available.';
+      }
+
+      function renderTierBands(bands){
+        if(!tierBandsNode) return;
+        if(!Array.isArray(bands) || !bands.length){
+          tierBandsNode.innerHTML = '<div class="empty">No tier band data available.</div>';
+          return;
+        }
+        tierBandsNode.innerHTML = bands.map(function(band){
+          var composition = band && band.composition ? band.composition : {};
+          var entries = Object.keys(composition).map(function(key){
+            return [key, composition[key]];
+          }).sort(function(a, b){
+            return Number(b[1] || 0) - Number(a[1] || 0) || String(a[0]).localeCompare(String(b[0]));
+          });
+          var compositionText = entries.length ? entries.map(function(entry){
+            return escapeHtml(entry[0]) + ': ' + escapeHtml(String(entry[1]));
+          }).join(' | ') : 'No source-era counts available.';
+          return '<div class="metric-row"><span>' + escapeHtml(String(band.label || 'Tier')) + ' (' + escapeHtml(String(band.playerCount || 0)) + ')</span><strong>' + escapeHtml(String(band.dominantShare || 0)) + '%</strong></div>'
+            + '<div class="metric-detail">' + compositionText + '</div>';
         }).join('');
       }
 
@@ -389,9 +592,12 @@
           setWarning('');
           configLabelNode.textContent = '';
           renderRows([]);
-          renderComposition(compositionTargets.top10Composition, {});
-          renderComposition(compositionTargets.top25Composition, {});
-          renderComposition(compositionTargets.fullPoolComposition, {});
+          renderCompositionCheck(compositionTargets.top10, null);
+          renderCompositionCheck(compositionTargets.top25, null);
+          renderCompositionCheck(compositionTargets.top50, null);
+          renderCompositionCheck(compositionTargets.top100, null);
+          renderCompositionCheck(compositionTargets.fullPool, null);
+          renderTierBands([]);
           return;
         }
 
@@ -401,18 +607,28 @@
 
         try{
           var viewModel = await loadAuditForConfig(configId);
+          var checksById = (Array.isArray(viewModel.compositionChecks) ? viewModel.compositionChecks : []).reduce(function(map, check){
+            if(check && check.id) map[check.id] = check;
+            return map;
+          }, {});
           configLabelNode.textContent = viewModel.seasonLabel || configId;
-          renderComposition(compositionTargets.top10Composition, viewModel.top10Composition);
-          renderComposition(compositionTargets.top25Composition, viewModel.top25Composition);
-          renderComposition(compositionTargets.fullPoolComposition, viewModel.fullPoolComposition);
+          renderCompositionCheck(compositionTargets.top10, checksById.top10);
+          renderCompositionCheck(compositionTargets.top25, checksById.top25);
+          renderCompositionCheck(compositionTargets.top50, checksById.top50);
+          renderCompositionCheck(compositionTargets.top100, checksById.top100);
+          renderCompositionCheck(compositionTargets.fullPool, checksById.fullPool);
+          renderTierBands(viewModel.tierBands);
           renderRows(viewModel.rows);
           setWarning(viewModel.warning);
           clearStatus();
         }catch(error){
           configLabelNode.textContent = '';
-          renderComposition(compositionTargets.top10Composition, {});
-          renderComposition(compositionTargets.top25Composition, {});
-          renderComposition(compositionTargets.fullPoolComposition, {});
+          renderCompositionCheck(compositionTargets.top10, null);
+          renderCompositionCheck(compositionTargets.top25, null);
+          renderCompositionCheck(compositionTargets.top50, null);
+          renderCompositionCheck(compositionTargets.top100, null);
+          renderCompositionCheck(compositionTargets.fullPool, null);
+          renderTierBands([]);
           renderRows([]);
           setWarning('');
           setStatus('Could not load audit board: ' + (error && error.message ? error.message : error));
