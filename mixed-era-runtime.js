@@ -221,6 +221,20 @@
     return '';
   }
 
+  function calibrationMatchesId(calibration, calibrationId){
+    var normalizedId=normalizeCalibrationText(calibrationId);
+    if(!normalizedId || !(calibration && typeof calibration==='object')) return false;
+    var candidates=[
+      calibration.boardId,
+      calibration.mixedEraConfigId,
+      calibration.configId,
+      calibration.id
+    ];
+    return candidates.some(function(candidate){
+      return normalizeCalibrationText(candidate) === normalizedId;
+    });
+  }
+
   function resolveMixedEraAuditCalibration(config){
     if(config && config.calibration) return config.calibration;
     if(config && config.auditCalibration) return config.auditCalibration;
@@ -231,7 +245,8 @@
     if(root && root.RosterBateMixedEraAuditCalibration){
       var globalCalibration=root.RosterBateMixedEraAuditCalibration;
       if(globalCalibration && typeof globalCalibration==='object'){
-        if(Array.isArray(globalCalibration.players) || Array.isArray(globalCalibration.entries) || Array.isArray(globalCalibration.calibration)){
+        if((Array.isArray(globalCalibration.players) || Array.isArray(globalCalibration.entries) || Array.isArray(globalCalibration.calibration))
+          && calibrationMatchesId(globalCalibration, calibrationId)){
           return globalCalibration;
         }
         if(globalCalibration[calibrationId]) return globalCalibration[calibrationId];

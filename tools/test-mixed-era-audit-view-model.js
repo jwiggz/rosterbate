@@ -349,4 +349,30 @@ assert.strictEqual(calibratedViewModel.calibrationSummary.topOverRanked[0].calib
 assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].player, 'Hakeem Olajuwon');
 assert.strictEqual(calibratedViewModel.calibrationSummary.topUnderRanked[0].calibrationRankDelta, 3);
 
+global.RosterBateMixedEraAuditCalibration = calibrationFixture;
+try {
+  const mismatchedGlobalCalibrationViewModel = runtime.buildMixedEraAuditViewModel({
+    config: {
+      packId: 'mixed_era_other_board_top300_v1',
+      seasonLabel: 'Other Mixed Era Draft',
+      sourcePackIds: ['nba_1996_full_season_v1', 'nba_2016_full_season_v1']
+    },
+    playerPool: [
+      {
+        name: 'Michael Jordan',
+        historicalPackId: 'nba_1996_full_season_v1',
+        mixedEraOverall: 99.8,
+        fp: 74.2,
+        totalFantasyPoints: 6171.5,
+        gp: 82
+      }
+    ]
+  });
+
+  assert.strictEqual(mismatchedGlobalCalibrationViewModel.rows[0].calibration, null);
+  assert.strictEqual(mismatchedGlobalCalibrationViewModel.calibrationSummary.counts.calibrated, 0);
+} finally {
+  delete global.RosterBateMixedEraAuditCalibration;
+}
+
 console.log('mixed-era audit view-model test passed');
