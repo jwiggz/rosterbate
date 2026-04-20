@@ -140,6 +140,11 @@
     border-color:#93c29d;
     color:#256037;
   }
+  .badge-review{
+    background:#eef0f3;
+    border-color:#c5cad3;
+    color:#4f5867;
+  }
   .badge-tune{
     background:#fbefda;
     border-color:#d9b56b;
@@ -300,7 +305,7 @@
       <article class="panel">
         <div class="metric-header">
           <h2>Tier Integrity Bands</h2>
-          <span class="badge badge-pass">Review</span>
+          <span class="badge badge-review">Review</span>
         </div>
         <div id="tierBands" class="metric-list"></div>
         <p class="metric-detail">Tier Integrity: pass if bands show believable cross-era representation, tune if one era is over-centred in a band, and fail if a single era appears to capture a tier outright.</p>
@@ -308,7 +313,7 @@
       <article class="panel">
         <div class="metric-header">
           <h2>Star Fairness Check</h2>
-          <span class="badge badge-pass">Review</span>
+          <span class="badge badge-review">Review</span>
         </div>
         <p class="metric-detail">Star Fairness: pass if the top-star conversation feels believable overall, tune if one or two comparisons are arguable, and fail if multiple headline stars are clearly misplaced by tier.</p>
         <ul class="prompt-list">
@@ -319,7 +324,7 @@
       <article class="panel">
         <div class="metric-header">
           <h2>Raw vs Normalized Sanity Check</h2>
-          <span class="badge badge-pass">Review</span>
+          <span class="badge badge-review">Review</span>
         </div>
         <p class="metric-detail">Raw vs Normalized: pass if the shifts feel directional rather than absurd, tune if there are a handful of suspicious corrections, and fail if normalized order repeatedly contradicts production context in impossible ways.</p>
         <ul class="prompt-list">
@@ -330,7 +335,7 @@
       <article class="panel">
         <div class="metric-header">
           <h2>Draft-Feel Check</h2>
-          <span class="badge badge-pass">Review</span>
+          <span class="badge badge-review">Review</span>
         </div>
         <p class="metric-detail">Draft-Feel: pass if the board feels exciting and credible, tune if it is fun but has a few obvious "why is he here?" names, and fail if a human reviewer would hesitate to draft from it.</p>
         <ul class="prompt-list">
