@@ -43,15 +43,15 @@
   const PACK_ERA_CONTEXT={
     nba_1996_full_season_v1:{
       eraLabel:'1995-96',
-      fantasyBaseline:38.6,
-      fantasyInflation:0.98,
-      scoringInflation:0.98,
-      playmakingInflation:0.99,
-      spacingInflation:0.9,
-      reboundingInflation:1.02,
-      defenseEventInflation:1.03,
-      tempoInflation:0.98,
-      dominanceWeight:0.08
+      fantasyBaseline:39.2,
+      fantasyInflation:1,
+      scoringInflation:1,
+      playmakingInflation:1,
+      spacingInflation:0.96,
+      reboundingInflation:1.01,
+      defenseEventInflation:1.02,
+      tempoInflation:0.99,
+      dominanceWeight:0.07
     },
     nba_2016_full_season_v1:{
       eraLabel:'2015-16',
@@ -252,7 +252,7 @@
       tempo:roundStat(clamp(rawRatings.tempo * inverse('tempoInflation', 0.94, 1.1), 20, 99)),
       volatility:roundStat(rawRatings.volatility)
     };
-    adjusted.overall=roundStat((
+    const adjustedOverall=roundStat(
       adjusted.scoring * 0.28 +
       adjusted.rebounding * 0.16 +
       adjusted.playmaking * 0.18 +
@@ -260,7 +260,8 @@
       adjusted.shooting * 0.11 +
       adjusted.stamina * 0.07 +
       adjusted.usage * 0.05
-    ) * lowGamesConfidence);
+    );
+    adjusted.overall=roundStat(adjustedOverall * lowGamesConfidence);
     return {
       ratings:adjusted,
       context:{
