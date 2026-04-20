@@ -78,6 +78,11 @@
     return Number.isFinite(num) ? Math.round(num*10)/10 : 0;
   }
 
+  function roundHundredth(value){
+    const num=Number(value||0);
+    return Number.isFinite(num) ? Math.round(num*100)/100 : 0;
+  }
+
   function safeClone(value){
     try{
       return JSON.parse(JSON.stringify(value));
@@ -123,7 +128,7 @@
   function getLowGamesMixedEraConfidence(gp){
     const games=clamp(gp, 0, 82);
     if(games >= 25) return 1;
-    return roundStat(clamp(0.72 + (games / 25) * 0.28, 0.72, 1));
+    return roundHundredth(clamp(0.72 + (games / 25) * 0.28, 0.72, 1));
   }
 
   function getNestedNumber(source, path){
@@ -270,7 +275,7 @@
         fantasyPerGame:roundStat(fantasyPerGame),
         fantasyInflation:roundStat(eraContext.fantasyInflation),
         dominance:roundStat(dominance),
-        lowGamesConfidence:roundStat(lowGamesConfidence),
+        lowGamesConfidence:lowGamesConfidence,
         normalizationModel:'season_context_plus_light_authored_tuning'
       }
     };

@@ -76,6 +76,16 @@ const cutoffPlayer = {
   }
 };
 
+const nearCutoffPlayer = {
+  name: 'Near Cutoff Prototype',
+  historicalPackId: 'nba_1996_full_season_v1',
+  seasonStats: {
+    games: 24,
+    perGame,
+    totals: makeTotals(perGame, 24)
+  }
+};
+
 const durableProfile = engine.buildPlayerSimulationProfile(fullSeasonPlayer, {
   packId: 'nba_1996_full_season_v1'
 });
@@ -83,6 +93,9 @@ const shortProfile = engine.buildPlayerSimulationProfile(shortSeasonPlayer, {
   packId: 'nba_1996_full_season_v1'
 });
 const zeroProfile = engine.buildPlayerSimulationProfile(zeroGamesPlayer, {
+  packId: 'nba_1996_full_season_v1'
+});
+const nearCutoffProfile = engine.buildPlayerSimulationProfile(nearCutoffPlayer, {
   packId: 'nba_1996_full_season_v1'
 });
 const cutoffProfile = engine.buildPlayerSimulationProfile(cutoffPlayer, {
@@ -101,16 +114,27 @@ function buildConfidenceAdjustedMixedEra(gp) {
 const durableMixedEra = buildConfidenceAdjustedMixedEra(82);
 const shortMixedEra = buildConfidenceAdjustedMixedEra(15);
 const zeroMixedEra = buildConfidenceAdjustedMixedEra(0);
+const nearCutoffMixedEra = buildConfidenceAdjustedMixedEra(24);
 const cutoffMixedEra = buildConfidenceAdjustedMixedEra(25);
 
 assert.equal(durableProfile.mixedEraContext.lowGamesConfidence, 1);
-assert.equal(shortProfile.mixedEraContext.lowGamesConfidence, 0.9);
-assert.equal(zeroProfile.mixedEraContext.lowGamesConfidence, 0.7);
+assert.equal(shortProfile.mixedEraContext.lowGamesConfidence, 0.89);
+assert.equal(zeroProfile.mixedEraContext.lowGamesConfidence, 0.72);
+assert.equal(nearCutoffProfile.mixedEraContext.lowGamesConfidence, 0.99);
 assert.equal(cutoffProfile.mixedEraContext.lowGamesConfidence, 1);
 assert.equal(durableMixedEra.context.lowGamesConfidence, 1);
-assert.equal(shortMixedEra.context.lowGamesConfidence, 0.9);
-assert.equal(zeroMixedEra.context.lowGamesConfidence, 0.7);
+assert.equal(shortMixedEra.context.lowGamesConfidence, 0.89);
+assert.equal(zeroMixedEra.context.lowGamesConfidence, 0.72);
+assert.equal(nearCutoffMixedEra.context.lowGamesConfidence, 0.99);
 assert.equal(cutoffMixedEra.context.lowGamesConfidence, 1);
+assert.ok(
+  nearCutoffMixedEra.context.lowGamesConfidence < 1,
+  'expected 24 GP to keep a low-games confidence penalty'
+);
+assert.equal(
+  nearCutoffMixedEra.ratings.overall,
+  roundStat(durableMixedEra.ratings.overall * nearCutoffMixedEra.context.lowGamesConfidence)
+);
 assert.equal(
   shortMixedEra.ratings.overall,
   roundStat(durableMixedEra.ratings.overall * shortMixedEra.context.lowGamesConfidence)
