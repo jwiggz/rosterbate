@@ -234,6 +234,52 @@
     return 'balanced_rotation';
   }
 
+  function getOlderEraInteriorScore(baseline){
+    var rebounding = clamp((baseline.reb - 8) / 5, 0, 1);
+    var rimProtection = clamp((baseline.blk - 1.1) / 1.6, 0, 1);
+    var defenseEvents = clamp(((baseline.stl + baseline.blk) - 2.6) / 1.8, 0, 1);
+    var interiorScoring = clamp((baseline.pts - baseline.threes * 2.5 - 14) / 12, 0, 1);
+    var spacingPenalty = clamp((1.4 - baseline.threes) / 1.4, 0, 1);
+    var playmakingOffset = clamp((baseline.ast - 4) / 4, 0, 1) * 0.18;
+    return roundHundredth(
+      clamp(
+        rebounding * 0.28 +
+        rimProtection * 0.22 +
+        defenseEvents * 0.16 +
+        interiorScoring * 0.16 +
+        spacingPenalty * 0.18 -
+        playmakingOffset,
+        0,
+        1
+      )
+    );
+  }
+
+  function getModernSpacingHybridScore(baseline){
+    var spacing = clamp((baseline.threes - 1.4) / 2.8, 0, 1);
+    var playmaking = clamp((baseline.ast - 3.2) / 4.8, 0, 1);
+    var scoring = clamp((baseline.pts - 16) / 12, 0, 1);
+    var hybridRebounding = clamp((baseline.reb - 5.5) / 4.5, 0, 1);
+    var hybridRimValue = clamp((baseline.blk - 0.7) / 1.4, 0, 1);
+    return roundHundredth(
+      clamp(
+        spacing * 0.38 +
+        playmaking * 0.22 +
+        scoring * 0.20 +
+        hybridRebounding * 0.12 +
+        hybridRimValue * 0.08,
+        0,
+        1
+      )
+    );
+  }
+
+  function getPremiumTierGate(overall, floor, ceiling){
+    return roundHundredth(
+      clamp((overall - floor) / Math.max(1, ceiling - floor), 0, 1)
+    );
+  }
+
   function buildMixedEraRatings(rawRatings, baseline, totalFantasyPoints, gp, packId){
     const eraContext=getPackEraContext(packId);
     const fantasyPerGame = gp > 0 && totalFantasyPoints > 0
@@ -266,7 +312,25 @@
       adjusted.stamina * 0.07 +
       adjusted.usage * 0.05
     );
-    adjusted.overall=roundStat(adjustedOverall * lowGamesConfidence);
+    const olderEraInteriorScore = packId === 'nba_1996_full_season_v1'
+      ? getOlderEraInteriorScore(baseline)
+      : 0;
+    const modernSpacingHybridScore = packId === 'nba_2016_full_season_v1'
+      ? getModernSpacingHybridScore(baseline)
+      : 0;
+    const premiumTierGate = getPremiumTierGate(adjustedOverall, 60, 76);
+    const middleTierGate = getPremiumTierGate(adjustedOverall, 58, 76);
+    const olderEraInteriorCompression = packId === 'nba_1996_full_season_v1'
+      ? roundHundredth(1 - olderEraInteriorScore * premiumTierGate * 0.035)
+      : 1;
+    const modernSpacingHybridLift = packId === 'nba_2016_full_season_v1'
+      ? roundHundredth(1 + modernSpacingHybridScore * middleTierGate * 0.015)
+      : 1;
+    const boardShapeMultiplier = roundHundredth(
+      olderEraInteriorCompression * modernSpacingHybridLift
+    );
+
+    adjusted.overall=roundStat(adjustedOverall * boardShapeMultiplier * lowGamesConfidence);
     return {
       ratings:adjusted,
       context:{
@@ -276,7 +340,12 @@
         fantasyInflation:roundStat(eraContext.fantasyInflation),
         dominance:roundStat(dominance),
         lowGamesConfidence:lowGamesConfidence,
-        normalizationModel:'season_context_plus_light_authored_tuning'
+        olderEraInteriorScore:olderEraInteriorScore,
+        olderEraInteriorCompression:olderEraInteriorCompression,
+        modernSpacingHybridScore:modernSpacingHybridScore,
+        modernSpacingHybridLift:modernSpacingHybridLift,
+        boardShapeMultiplier:boardShapeMultiplier,
+        normalizationModel:'season_context_plus_board_shape_tuning_v1'
       }
     };
   }
