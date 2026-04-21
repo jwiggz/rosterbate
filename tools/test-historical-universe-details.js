@@ -364,6 +364,7 @@ assert.match(viewModel.recentSimDays[1].teamActivity[0].title, /Audit Agents add
 assert.match(viewModel.recentSimDays[1].leagueNote.title, /CPU Team 3 activated Kevin Johnson/i);
 assert.match(viewModel.recentSimDays[1].leagueNote.body, /Healthy guard returned from IL\./i);
 assert.equal(viewModel.recentSimDays[2].teamActivity.length, 0);
+assert.match(viewModel.recentSimDays[2].teamResult.headline, /Audit Agents beat CPU Team 3/i);
 assert.match(viewModel.recentSimDays[2].leagueNote.title, /CPU Team 2 added Danny Manning/i);
 assert.match(viewModel.recentSimDays[2].leagueNote.body, /Added another forward before Day 8\./i);
 
@@ -397,6 +398,7 @@ assert.deepStrictEqual(oneDayOnly.recentSimDays[0].story, {
   body: 'Only one reveal has been saved.'
 });
 assert.equal(oneDayOnly.recentSimDays[0].teamResult, null);
+assert.deepStrictEqual(oneDayOnly.recentSimDays[0].teamActivity, []);
 assert.equal(oneDayOnly.recentSimDays[0].leagueNote, null);
 assert.notEqual(oneDayOnly.recentSimDays[0].story.headline, 'Simulation day completed.');
 assert.notEqual(oneDayOnly.recentSimDays[0].story.body, 'Simulation day completed.');
