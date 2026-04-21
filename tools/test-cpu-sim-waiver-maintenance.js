@@ -97,6 +97,7 @@ function tryExtractFunctionSource(name) {
 }
 
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
+const canPlayerFillSlotSource = extractFunctionSource('canPlayerFillSlot');
 const getCpuWaiverPlayerSlotsSource = tryExtractFunctionSource('getCpuWaiverPlayerSlots');
 const getCpuWaiverRoleShapeSource = tryExtractFunctionSource('getCpuWaiverRoleShape');
 const buildCpuWaiverRosterNeedSummarySource = tryExtractFunctionSource('buildCpuWaiverRosterNeedSummary');
@@ -132,13 +133,6 @@ function buildContext(options = {}) {
   const injuries = new Map(options.injuries || []);
   const gamesToday = new Set(options.gamesToday || []);
   const starterIds = options.starterIds || [];
-  function splitPositions(value) {
-    return String(value || '')
-      .toUpperCase()
-      .split('/')
-      .map(part => part.trim())
-      .filter(Boolean);
-  }
   const context = {
     STARTERS: 5,
     SLOT_LABELS: ['PG', 'SG', 'SF', 'PF', 'C'],
@@ -216,15 +210,6 @@ function buildContext(options = {}) {
     getGameInfo(player) {
       return gamesToday.has(Number(player?.id)) ? { opponent: 'SIM' } : null;
     },
-    canPlayerFillSlot(player, slot) {
-      const positions = splitPositions(player?.pos);
-      const target = String(slot || '').toUpperCase();
-      if (positions.includes(target)) return true;
-      if (target === 'G') return positions.some(pos => pos === 'PG' || pos === 'SG');
-      if (target === 'F') return positions.some(pos => pos === 'SF' || pos === 'PF');
-      if (target === 'UTIL') return positions.some(pos => ['PG', 'SG', 'SF', 'PF', 'C'].includes(pos));
-      return false;
-    },
     slotPriority(slot) {
       return ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL'].indexOf(String(slot || '').toUpperCase());
     },
@@ -236,6 +221,7 @@ function buildContext(options = {}) {
   vm.runInNewContext(
     [
       getMissingStarterSlotsForTeamSource,
+      canPlayerFillSlotSource,
       getCpuWaiverPlayerSlotsSource,
       getCpuWaiverRoleShapeSource,
       buildCpuWaiverRosterNeedSummarySource,
@@ -267,6 +253,15 @@ function buildSeamContext(options = {}) {
   assert.ok(getCpuWaiverPositionNeedBonusSource, 'missing getCpuWaiverPositionNeedBonus');
   assert.ok(getCpuWaiverDropProtectionBonusSource, 'missing getCpuWaiverDropProtectionBonus');
   return buildContext(options);
+}
+
+{
+  const { context } = buildSeamContext();
+  const versatileBig = makePlayer(999, 'Versatile Big', 'PF/C', 24);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'PF'), true);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'C'), true);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'F'), true);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'UTIL'), true);
 }
 
 {
