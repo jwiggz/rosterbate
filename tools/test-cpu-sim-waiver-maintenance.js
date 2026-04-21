@@ -73,10 +73,13 @@ function findMatchingBrace(source, openBraceIndex) {
   throw new Error(`missing closing brace near index ${openBraceIndex}`);
 }
 
-function extractFunctionSource(name) {
+function extractFunctionSource(name, { optional = false } = {}) {
   const startPattern = new RegExp(`function\\s+${name}\\b`);
   const startMatch = startPattern.exec(html);
-  assert.ok(startMatch, `missing ${name}`);
+  if (!startMatch) {
+    if (optional) return null;
+    assert.fail(`missing ${name}`);
+  }
   const start = startMatch.index;
   const openBrace = html.indexOf('{', start);
   assert.ok(openBrace >= 0, `missing body for ${name}`);
@@ -88,7 +91,10 @@ const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingSta
 const getBestCpuWaiverCandidateForSlotSource = extractFunctionSource('getBestCpuWaiverCandidateForSlot');
 const getCpuWaiverDropCandidateSource = extractFunctionSource('getCpuWaiverDropCandidate');
 const fillCpuTeamStarterNeedsFromWaiversSource = extractFunctionSource('fillCpuTeamStarterNeedsFromWaivers');
-const maintainCpuTeamRosterSource = extractFunctionSource('maintainCpuTeamRoster');
+const cleanupCpuDeadRosterSpotsFromWaiversSource = extractFunctionSource(
+  'cleanupCpuDeadRosterSpotsFromWaivers',
+  { optional: true }
+);
 
 function makePlayer(id, name, pos, fp, extra = {}) {
   return {
@@ -139,12 +145,6 @@ function buildContext(options = {}) {
     },
     weekForDay() {
       return 1;
-    },
-    isIlEligiblePlayer() {
-      return false;
-    },
-    getHealthyCpuIlActivationCandidates() {
-      return [];
     },
     getIlSlotCount() {
       return 1;
@@ -212,8 +212,8 @@ function buildContext(options = {}) {
       getBestCpuWaiverCandidateForSlotSource,
       getCpuWaiverDropCandidateSource,
       fillCpuTeamStarterNeedsFromWaiversSource,
-      maintainCpuTeamRosterSource
-    ].join('\n'),
+      cleanupCpuDeadRosterSpotsFromWaiversSource
+    ].filter(Boolean).join('\n'),
     context
   );
 
@@ -258,10 +258,9 @@ function buildContext(options = {}) {
     totalRosterLimit: 6,
     starterIds: [101, 102, 103, 104, 105]
   });
-  const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.equal(result.waiverAdds, 1);
-  assert.equal(result.waiverDrops, 1);
-  assert.equal(result.changed, true);
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 1);
+  assert.equal(result.drops, 1);
   assert.deepStrictEqual(claimCalls[0], { teamIdx: 1, addId: 210, dropId: 106 });
 }
 
@@ -281,9 +280,8 @@ function buildContext(options = {}) {
     totalRosterLimit: 6,
     starterIds: [201, 202, 203, 204, 205]
   });
-  const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.equal(result.waiverAdds, 0);
-  assert.equal(result.changed, false);
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 0);
   assert.equal(claimCalls.length, 0);
 }
 
@@ -302,9 +300,8 @@ function buildContext(options = {}) {
     totalRosterLimit: 6,
     starterIds: [301, 302, 303, 304, 305]
   });
-  const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.equal(result.waiverAdds, 0);
-  assert.equal(result.changed, false);
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 0);
   assert.equal(claimCalls.length, 0);
 }
 
@@ -325,8 +322,8 @@ function buildContext(options = {}) {
     totalRosterLimit: 6,
     starterIds: [401, 402, 403, 404, 405]
   });
-  const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.equal(result.waiverAdds, 0);
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 0);
   assert.equal(claimCalls.length, 0);
 }
 
@@ -347,8 +344,8 @@ function buildContext(options = {}) {
     totalRosterLimit: 6,
     starterIds: [501, 502, 503, 504, 505]
   });
-  const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.equal(result.changed, false);
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 0);
   assert.equal(claimCalls.length, 0);
 }
 
