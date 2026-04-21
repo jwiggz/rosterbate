@@ -138,8 +138,7 @@
       Math.round(summary.bigLean / 10)
     ].join('|');
     const bucket = hashSeed(seed) % NON_STAR_PERSONALITIES.length;
-    const personality = NON_STAR_PERSONALITIES[bucket];
-    return personality === 'guards_bias' ? 'balanced' : personality;
+    return NON_STAR_PERSONALITIES[bucket];
   }
 
   function buildCpuSimPersonalitiesByTeam(options) {
