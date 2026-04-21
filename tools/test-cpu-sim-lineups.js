@@ -1,5 +1,9 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
 const cpuSimLineups = require('../cpu-sim-lineups.js');
+const cpuSimPersonalities = require('../cpu-sim-personalities.js');
 
 function makePlayer(id, name, pos, ratings, options = {}) {
   return {
@@ -208,6 +212,56 @@ function scorePersonalityCandidate(player, personality, slot) {
   });
 }
 
+function loadIsolatedLineupsWithMissingHelper() {
+  const warnings = [];
+  const context = {
+    console: {
+      warn(message) {
+        warnings.push(String(message));
+      }
+    },
+    require(request) {
+      if (request === './cpu-sim-personalities.js') {
+        throw new Error('missing helper');
+      }
+      return require(request);
+    },
+    module: { exports: {} },
+    exports: {},
+    Math,
+    Number,
+    Array,
+    Set,
+    Object,
+    String,
+    Boolean,
+    JSON,
+    Date,
+    RegExp,
+    parseInt,
+    parseFloat,
+    isNaN,
+    isFinite,
+    Promise,
+    Map,
+    WeakMap,
+    WeakSet,
+    Symbol,
+    Reflect,
+    Error,
+    TypeError,
+    globalThis: null
+  };
+  context.globalThis = context;
+  const source = fs.readFileSync(path.join(__dirname, '..', 'cpu-sim-lineups.js'), 'utf8');
+  vm.runInNewContext(source, context, { filename: 'cpu-sim-lineups.js' });
+  return {
+    api: context.module.exports,
+    context: context,
+    warnings: warnings
+  };
+}
+
 const coreIds = cpuSimLineups.selectCpuSimCoreStarterIds({
   roster,
   starterCount: 5
@@ -279,6 +333,95 @@ assert.ok(
 assert.ok(
   guardBiasScore > scorePersonalityCandidate(personalityBig, 'guards_bias', 'UTIL'),
   'expected guards_bias to break a close call toward the guard'
+);
+
+const missingHelperContext = loadIsolatedLineupsWithMissingHelper();
+const missingHelperDefaultLineup = missingHelperContext.api.buildCpuSimLineupIds({
+  roster,
+  slots,
+  starterCount: 5,
+  day: 1,
+  stableThreshold,
+  canPlayerFillSlot,
+  getGameInfo(player, requestedDay) {
+    const set = requestedDay === 1 ? day1Games : requestedDay === 2 ? day2Games : day3Games;
+    return set.has(player.id) ? { opponent: 'SIM' } : null;
+  },
+  getInjuryStatus(player) {
+    return null;
+  },
+  weekForDay() {
+    return healthyWeek;
+  }
+});
+const missingHelperBalancedLineup = missingHelperContext.api.buildCpuSimLineupIds({
+  roster,
+  slots,
+  starterCount: 5,
+  day: 1,
+  stableThreshold,
+  personality: 'balanced',
+  canPlayerFillSlot,
+  getGameInfo(player, requestedDay) {
+    const set = requestedDay === 1 ? day1Games : requestedDay === 2 ? day2Games : day3Games;
+    return set.has(player.id) ? { opponent: 'SIM' } : null;
+  },
+  getInjuryStatus(player) {
+    return null;
+  },
+  weekForDay() {
+    return healthyWeek;
+  }
+});
+assert.deepStrictEqual(
+  missingHelperDefaultLineup,
+  missingHelperBalancedLineup,
+  'expected missing helper fallback to preserve balanced/default lineup behavior'
+);
+assert.equal(
+  missingHelperContext.warnings.length,
+  1,
+  'expected the missing helper fallback to warn once'
+);
+missingHelperContext.context.RosterBateCpuSimPersonalities = cpuSimPersonalities;
+const recoveredStarScore = missingHelperContext.api.scoreCpuSimLineupCandidate(personalityStarGuard, {
+  day: 1,
+  slot: 'SG',
+  personality: 'star_loyalist',
+  canPlayerFillSlot,
+  getGameInfo(player, requestedDay) {
+    return day1Games.has(player.id) ? { opponent: 'SIM' } : null;
+  },
+  getInjuryStatus() {
+    return null;
+  },
+  weekForDay() {
+    return healthyWeek;
+  }
+});
+const recoveredRivalScore = missingHelperContext.api.scoreCpuSimLineupCandidate(personalityRivalGuard, {
+  day: 1,
+  slot: 'SG',
+  personality: 'star_loyalist',
+  canPlayerFillSlot,
+  getGameInfo(player, requestedDay) {
+    return day1Games.has(player.id) ? { opponent: 'SIM' } : null;
+  },
+  getInjuryStatus() {
+    return null;
+  },
+  weekForDay() {
+    return healthyWeek;
+  }
+});
+assert.ok(
+  recoveredStarScore > recoveredRivalScore,
+  'expected a late-attached helper to recover personality behavior'
+);
+assert.equal(
+  missingHelperContext.warnings.length,
+  1,
+  'expected recovery to stay within the original bounded warning'
 );
 
 console.log('cpu sim lineups policy test passed');

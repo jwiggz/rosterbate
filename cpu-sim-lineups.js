@@ -17,7 +17,6 @@
   }
 
   let cpuSimPersonalitiesApi = null;
-  let cpuSimPersonalitiesApiResolved = false;
   let warnedAboutMissingCpuSimPersonalities = false;
 
   function warnAboutMissingCpuSimPersonalities(){
@@ -29,26 +28,25 @@
   }
 
   function getCpuSimPersonalitiesApi(){
-    if(cpuSimPersonalitiesApiResolved) return cpuSimPersonalitiesApi;
     if(global.RosterBateCpuSimPersonalities){
       cpuSimPersonalitiesApi = global.RosterBateCpuSimPersonalities;
-      cpuSimPersonalitiesApiResolved = true;
       return cpuSimPersonalitiesApi;
     }
+    if(cpuSimPersonalitiesApi) return cpuSimPersonalitiesApi;
     if(typeof require === 'function'){
       try{
-        cpuSimPersonalitiesApi = require('./cpu-sim-personalities.js');
-        cpuSimPersonalitiesApiResolved = true;
-        return cpuSimPersonalitiesApi;
+        const api = require('./cpu-sim-personalities.js');
+        if(api){
+          cpuSimPersonalitiesApi = api;
+          return cpuSimPersonalitiesApi;
+        }
+        warnAboutMissingCpuSimPersonalities();
+        return null;
       }catch(_err){
-        cpuSimPersonalitiesApi = null;
-        cpuSimPersonalitiesApiResolved = true;
         warnAboutMissingCpuSimPersonalities();
         return null;
       }
     }
-    cpuSimPersonalitiesApi = null;
-    cpuSimPersonalitiesApiResolved = true;
     warnAboutMissingCpuSimPersonalities();
     return null;
   }
