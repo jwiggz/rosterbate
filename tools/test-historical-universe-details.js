@@ -193,11 +193,22 @@ function extractFunctionSpan(startSignature, endSignature) {
 }
 
 const script = [
+  [
+    'function escapeHtml(value){',
+    "  return String(value == null ? '' : value)",
+    "    .replace(/&/g,'&amp;')",
+    "    .replace(/</g,'&lt;')",
+    "    .replace(/>/g,'&gt;')",
+    "    .replace(/\"/g,'&quot;')",
+    "    .replace(/'/g,'&#39;');",
+    '}'
+  ].join('\n'),
   extractFunctionSource('getLatestRevealReport(state)'),
   extractFunctionSource('getRecentRevealReports(state, limit)'),
   extractFunctionSource('getTeamRoster(state)'),
   extractFunctionSource('buildRosterCore(state)'),
   extractFunctionSource('buildRecentSimulationSummary(slot, state)'),
+  extractFunctionSource('renderRecentSimulationCards(items)'),
   extractFunctionSpan('sortStandingsEntries(standings)', 'buildUniverseDetailsViewModel(slot, state, config)')
 ].join('\n\n');
 const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, config)');
@@ -367,6 +378,60 @@ assert.equal(viewModel.recentSimDays[2].teamActivity.length, 0);
 assert.match(viewModel.recentSimDays[2].teamResult.headline, /Audit Agents beat CPU Team 3/i);
 assert.match(viewModel.recentSimDays[2].leagueNote.title, /CPU Team 2 added Danny Manning/i);
 assert.match(viewModel.recentSimDays[2].leagueNote.body, /Added another forward before Day 8\./i);
+
+const renderedRecentSimCard = context.renderRecentSimulationCards([viewModel.recentSimDays[0]]);
+assert.match(renderedRecentSimCard, /Audit Agents beat CPU Team 2/);
+assert.match(renderedRecentSimCard, /Jordan led the latest sim-day swing and kept the team in second\./);
+assert.match(renderedRecentSimCard, /Team activity: Audit Agents added Brent Barry/);
+assert.match(renderedRecentSimCard, /League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock\./);
+assert.ok(
+  renderedRecentSimCard.indexOf('Audit Agents beat CPU Team 2') <
+  renderedRecentSimCard.indexOf('Jordan led the latest sim-day swing and kept the team in second.'),
+  'recent simulation cards should render the story after the team result'
+);
+assert.ok(
+  renderedRecentSimCard.indexOf('Jordan led the latest sim-day swing and kept the team in second.') <
+  renderedRecentSimCard.indexOf('Team activity: Audit Agents added Brent Barry'),
+  'recent simulation cards should render team activity after the story'
+);
+assert.ok(
+  renderedRecentSimCard.indexOf('Team activity: Audit Agents added Brent Barry') <
+  renderedRecentSimCard.indexOf('League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock.'),
+  'recent simulation cards should render the league note after team activity'
+);
+
+const transactionOnlyViewModel = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '10': {
+          day: 10,
+          week: 3,
+          generatedAt: 10000,
+          story: {
+            headline: 'Transaction window',
+            subheadline: 'Detailed activity feed was unavailable.'
+          },
+          matchups: [],
+          totalTransactions: 2
+        }
+      },
+      activityLog: []
+    },
+    {}
+  )
+));
+assert.deepStrictEqual(transactionOnlyViewModel.recentSimDays[0].leagueNote, {
+  title: 'League activity recorded during the reveal window',
+  body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
+});
+const transactionOnlyRendered = context.renderRecentSimulationCards(transactionOnlyViewModel.recentSimDays);
+assert.match(transactionOnlyRendered, /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but no detailed activity entry was available to summarize\./);
 
 const oneDayOnly = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(

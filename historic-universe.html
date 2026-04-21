@@ -742,7 +742,8 @@
   function buildRecentSimulationLeagueNote(slot, state, reveal){
     const myPos = Number(state?.myPos);
     const teamName = String(slot?.teamName || '').trim().toLowerCase();
-    const nonTeamEntry = getRevealWindowActivitiesForState(state, reveal).find(function(entry){
+    const revealWindowEntries = getRevealWindowActivitiesForState(state, reveal);
+    const nonTeamEntry = revealWindowEntries.find(function(entry){
       if(Number(entry?.teamIdx) === myPos) return false;
       const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
       return !(teamName && haystack.includes(teamName));
@@ -751,6 +752,12 @@
       return {
         title: String(nonTeamEntry?.title || 'League note').trim(),
         body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
+      };
+    }
+    if(Number(reveal?.totalTransactions) > 0){
+      return {
+        title: 'League activity recorded during the reveal window',
+        body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
       };
     }
     return null;
@@ -855,8 +862,16 @@
     }
     return list.map(function(item){
       const label = 'Week ' + String(item?.week || '--') + ' Day ' + String(item?.day || '--');
-      const resultHeadline = item?.teamResult?.headline || item?.story?.headline || 'Simulation day completed.';
-      const resultSubline = item?.teamResult?.subline || item?.story?.body || '';
+      const resultHeadline = String(item?.teamResult?.headline || 'Simulation day completed.').trim();
+      const resultSubline = String(item?.teamResult?.subline || '').trim();
+      const storyHeadline = String(item?.story?.headline || '').trim();
+      const storyBody = String(item?.story?.body || '').trim();
+      const storyHtml = storyHeadline || storyBody
+        ? [
+            storyHeadline ? '<strong>' + escapeHtml(storyHeadline) + '</strong>' : '',
+            storyBody ? '<span>' + escapeHtml(storyBody) + '</span>' : ''
+          ].join('')
+        : '';
       const activityHtml = Array.isArray(item?.teamActivity) && item.teamActivity.length
         ? item.teamActivity.map(function(entry){
             return '<span class="sim-day-subline">Team activity: ' + escapeHtml(String(entry?.title || '').trim()) + '</span>';
@@ -870,6 +885,7 @@
         '<div class="sim-day-label">' + escapeHtml(label) + '</div>',
         '<strong>' + escapeHtml(resultHeadline) + '</strong>',
         resultSubline ? '<span>' + escapeHtml(resultSubline) + '</span>' : '',
+        storyHtml,
         activityHtml,
         leagueNoteHtml,
         '</div>'
