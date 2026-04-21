@@ -36,7 +36,7 @@
     const third = Number(sortedPlayers[2]?.coreScore || 0);
     const fourth = Number(sortedPlayers[3]?.coreScore || 0);
     if(third > 0 && second > 0 && third < second * 0.88) return Math.min(2, limit);
-    if(limit >= 4 && fourth > 0 && third > 0 && fourth >= third * 0.99) return 4;
+    if(limit >= 4 && fourth > 0 && third > 0 && fourth >= third * 0.96) return 4;
     return Math.min(3, limit);
   }
 
@@ -78,17 +78,8 @@
       .sort(function(a, b){
         return b.coreScore - a.coreScore;
       });
-    const uniqueByPos = [];
-    const seenPositions = new Set();
-    sorted.forEach(function(entry){
-      const pos = String(entry.player?.pos || '').trim().toUpperCase();
-      const key = pos || String(entry.player?.id || '');
-      if(seenPositions.has(key)) return;
-      seenPositions.add(key);
-      uniqueByPos.push(entry);
-    });
-    const size = resolveCpuSimCoreSize(uniqueByPos, Number(opts.starterCount || 5));
-    return uniqueByPos.slice(0, size).map(function(entry){
+    const size = resolveCpuSimCoreSize(sorted, Number(opts.starterCount || 5));
+    return sorted.slice(0, size).map(function(entry){
       return Number(entry.player?.id);
     }).filter(Number.isFinite);
   }

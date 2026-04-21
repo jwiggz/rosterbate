@@ -96,7 +96,7 @@ const coreIds = cpuSimLineups.selectCpuSimCoreStarterIds({
   roster,
   starterCount: 5
 });
-assert.deepStrictEqual(coreIds, [1, 5, 3], 'expected the lineup core to keep the highest-upside stars');
+assert.deepStrictEqual(coreIds, [1, 6, 5, 3], 'expected the lineup core to keep the highest-upside stars');
 
 const day1Lineup = buildLineup(1);
 assert.ok(day1Lineup.includes(1), 'expected the star guard to stay in on a close playable day');
