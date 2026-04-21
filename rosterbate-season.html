@@ -4155,7 +4155,8 @@ function isCpuDeadRosterSpotCandidate(player, day){
   if(!injury) return false;
   if(String(injury?.label||'').toUpperCase()==='GTD') return false;
   if(!isUnavailableInjury(injury)) return false;
-  return !getGameInfo(player, day);
+  if(getGameInfo(player, day)) return false;
+  return Number(player?.fp||0) <= 15;
 }
 
 function getBestCpuWaiverCandidateForSlot(slot, day){
