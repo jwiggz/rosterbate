@@ -2920,7 +2920,6 @@ function startHistoricalDraftSimSeason(){
     }
     D.historicalEntryMode='simulation_season';
     D.simulationMode='historical_box_score';
-    ensureCpuTeamPersonalitiesByTeam(D, {preferDeterministic:true});
     D.simulationLogsByDay=(D.simulationLogsByDay && typeof D.simulationLogsByDay==='object') ? D.simulationLogsByDay : {};
     D.simulationProfile=Object.assign({}, D.simulationProfile || {}, {
       engineVersion:String(window.RosterBateSimulationEngine?.ENGINE_VERSION || '').trim() || null,
@@ -2936,6 +2935,7 @@ function startHistoricalDraftSimSeason(){
         universeType:sourcePackIds.length > 1 ? 'mixed_era_draft' : 'historical_draft'
       });
     }
+    ensureCpuTeamPersonalitiesByTeam(D, {preferDeterministic:true});
     D.updatedAt=Date.now();
     D.savedAt=Date.now();
     persistHistoricalUniverseSlotSnapshot('drafted_universe_sim_start');
@@ -4053,13 +4053,14 @@ function ensureCpuTeamPersonalitiesByTeam(state, options){
   const teamCount=getCpuSimTeamCount(state);
   const existing=Array.isArray(state.cpuTeamPersonalitiesByTeam) ? state.cpuTeamPersonalitiesByTeam : [];
   const preferDeterministic=!!(options && options.preferDeterministic);
-  const deterministic=preferDeterministic ? buildDeterministicCpuTeamPersonalitiesByTeam(state) : [];
+  const shouldUseDeterministicFallback=preferDeterministic || isHistoricalSimulationUniverse(state);
+  const deterministic=shouldUseDeterministicFallback ? buildDeterministicCpuTeamPersonalitiesByTeam(state) : [];
   const next=Array.from({length:teamCount},(_,teamIdx)=>{
     const value=existing[teamIdx];
     if(typeof value!=='undefined' && value!==null && String(value).trim()){
       return normalizeCpuSimPersonalityValue(value);
     }
-    return preferDeterministic
+    return shouldUseDeterministicFallback
       ? normalizeCpuSimPersonalityValue(deterministic[teamIdx])
       : 'balanced';
   });
