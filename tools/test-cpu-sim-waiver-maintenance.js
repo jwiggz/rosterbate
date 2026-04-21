@@ -147,6 +147,12 @@ function buildContext(options = {}) {
     weekForDay() {
       return 1;
     },
+    isIlEligiblePlayer() {
+      return false;
+    },
+    getHealthyCpuIlActivationCandidates() {
+      return [];
+    },
     getIlSlotCount() {
       return 1;
     },
@@ -241,11 +247,6 @@ function buildContext(options = {}) {
   assert.equal(claimCalls[0].addId, 200);
 }
 
-assert.ok(
-  cleanupCpuDeadRosterSpotsFromWaiversSource,
-  'missing cleanupCpuDeadRosterSpotsFromWaivers'
-);
-
 {
   const { context, claimCalls } = buildContext({
     roster: [
@@ -262,9 +263,10 @@ assert.ok(
     totalRosterLimit: 3,
     starterIds: [10, 12, null, null, null]
   });
-  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
-  assert.equal(result.adds, 1);
-  assert.equal(result.drops, 1);
+  const result = context.maintainCpuTeamRoster(1, { day: 3 });
+  assert.equal(result.waiverAdds, 1);
+  assert.equal(result.waiverDrops, 1);
+  assert.equal(result.changed, true);
   assert.deepStrictEqual(claimCalls[0], { teamIdx: 1, addId: 210, dropId: 11 });
 }
 
@@ -280,8 +282,9 @@ assert.ok(
     totalRosterLimit: 2,
     starterIds: [20, null, null, null, null]
   });
-  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
-  assert.equal(result.adds, 0);
+  const result = context.maintainCpuTeamRoster(1, { day: 3 });
+  assert.equal(result.waiverAdds, 0);
+  assert.equal(result.changed, false);
   assert.equal(claimCalls.length, 0);
 }
 
@@ -296,8 +299,9 @@ assert.ok(
     totalRosterLimit: 2,
     starterIds: [30, null, null, null, null]
   });
-  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
-  assert.equal(result.adds, 0);
+  const result = context.maintainCpuTeamRoster(1, { day: 3 });
+  assert.equal(result.waiverAdds, 0);
+  assert.equal(result.changed, false);
   assert.equal(claimCalls.length, 0);
 }
 
