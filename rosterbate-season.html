@@ -4146,32 +4146,38 @@ function getCpuWaiverRoleShape(player){
     }
     return 0;
   };
+  const normalizeRating=(value, maxValue)=>{
+    const num=Number(value);
+    if(!Number.isFinite(num) || num <= 0) return 0;
+    const scaleMax=Math.max(1, Number(maxValue)||1);
+    return (num / 100) * scaleMax;
+  };
   return {
     scoring:pickNumber(
       baseline?.pts,
       baseline?.points,
-      ratings?.scoring,
-      ratings?.shotCreation,
-      ratings?.shooting,
-      ratings?.offense
+      normalizeRating(ratings?.scoring, 26),
+      normalizeRating(ratings?.shotCreation, 24),
+      normalizeRating(ratings?.shooting, 22),
+      normalizeRating(ratings?.offense, 24)
     ),
     playmaking:pickNumber(
       baseline?.ast,
       baseline?.assists,
-      ratings?.playmaking,
-      ratings?.passing,
-      ratings?.ballHandling
+      normalizeRating(ratings?.playmaking, 9),
+      normalizeRating(ratings?.passing, 8),
+      normalizeRating(ratings?.ballHandling, 7)
     ),
     rebounding:pickNumber(
       baseline?.reb,
       baseline?.rebounds,
-      ratings?.rebounding
+      normalizeRating(ratings?.rebounding, 12)
     ),
     defense:pickNumber(
       (Number(baseline?.stl||baseline?.steals||0) + Number(baseline?.blk||baseline?.blocks||0)),
-      ratings?.defense,
-      ratings?.perimeterDefense,
-      ratings?.interiorDefense
+      normalizeRating(ratings?.defense, 3.2),
+      normalizeRating(ratings?.perimeterDefense, 2.4),
+      normalizeRating(ratings?.interiorDefense, 2.8)
     )
   };
 }
@@ -4325,8 +4331,7 @@ function getCpuWaiverDropCandidate(teamIdx, day, targetSlot, rosterNeed){
   const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean));
   const scoreCandidate=player=>{
     const game=getGameInfo(player, day);
-    const slots=getCpuWaiverPlayerSlots(player);
-    const canCoverTarget=targetSlot ? slots.includes(String(targetSlot||'').toUpperCase()) : false;
+    const canCoverTarget=targetSlot ? canPlayerFillSlot(player, targetSlot) : false;
     return getCpuWaiverCleanupDropScore(player, day, rosterNeed)
       + (game ? 10 : 0)
       + (canCoverTarget ? 120 : 0);
@@ -4348,7 +4353,6 @@ function fillCpuTeamStarterNeedsFromWaivers(teamIdx, options){
   if(!isCpuManagedTeam(teamIdx)) return {changed:false,adds:0,drops:0};
   const opts=options||{};
   const day=Number(opts.day || G.day || 1);
-  const rosterNeed=buildCpuWaiverRosterNeedSummary(teamIdx, day);
   let adds=0;
   let drops=0;
   let changed=false;
@@ -4358,6 +4362,7 @@ function fillCpuTeamStarterNeedsFromWaivers(teamIdx, options){
     normalizeCpuTeamLineups(teamIdx);
     const needs=getMissingStarterSlotsForTeam(teamIdx, day);
     if(!needs.length) break;
+    const rosterNeed=buildCpuWaiverRosterNeedSummary(teamIdx, day);
     let filled=false;
     for(const need of needs){
       const addCandidate=getBestCpuWaiverCandidateForSlot(need.slot, day, rosterNeed);
