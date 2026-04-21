@@ -129,6 +129,7 @@ function buildTop300State() {
     teamName: 'Audit Agents',
     leagueSize,
     teams: ['Audit Agents'].concat(Array.from({ length: leagueSize - 1 }, (_, index) => `CPU Team ${index + 1}`)),
+    cpuTeamPersonalitiesByTeam: ['balanced', 'guards_bias', 'bigs_bias', 'steady_floor', 'star_loyalist', 'balanced', 'guards_bias', 'bigs_bias', 'steady_floor', 'star_loyalist'],
     myPos: 0,
     currentWeek: 1,
     currentDay: 1,
@@ -236,5 +237,10 @@ assert.equal(Array.isArray(savedState.waiver), true);
 assert.equal(savedState.waiver.length, 140);
 assert.equal(Array.isArray(savedState.allRosters), true);
 assert.equal(savedState.allRosters.flat().length, 160);
+assert.equal(
+  JSON.stringify(savedState.cpuTeamPersonalitiesByTeam),
+  JSON.stringify(top300State.cpuTeamPersonalitiesByTeam),
+  'compact slot persistence should retain cpu team personalities'
+);
 
 console.log('historical universe slot storage test passed');
