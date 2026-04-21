@@ -4448,8 +4448,7 @@ function rebuildLineupsAfterRosterChange(teamIdx){
   const teamDailyLineups=getDailyLineupStore(teamIdx);
   Object.keys(teamDailyLineups||{}).forEach(dayKey=>{
     const day=Number(dayKey);
-    const current=(teamDailyLineups[day]||[]).map(id=>roster.find(p=>p.id===id)).filter(Boolean);
-    teamDailyLineups[day]=buildCpuManagedStarterIdsForDay(teamIdx, current, day);
+    teamDailyLineups[day]=buildCpuManagedStarterIdsForDay(teamIdx, roster, day);
   });
   G.starters[teamIdx]=buildCpuManagedStarterIdsForDay(teamIdx, roster, G.day||1);
 }
