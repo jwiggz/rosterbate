@@ -73,13 +73,10 @@ function findMatchingBrace(source, openBraceIndex) {
   throw new Error(`missing closing brace near index ${openBraceIndex}`);
 }
 
-function extractFunctionSource(name, { optional = false } = {}) {
+function extractFunctionSource(name) {
   const startPattern = new RegExp(`function\\s+${name}\\b`);
   const startMatch = startPattern.exec(html);
-  if (!startMatch) {
-    if (optional) return null;
-    assert.fail(`missing ${name}`);
-  }
+  assert.ok(startMatch, `missing ${name}`);
   const start = startMatch.index;
   const openBrace = html.indexOf('{', start);
   assert.ok(openBrace >= 0, `missing body for ${name}`);
@@ -91,10 +88,6 @@ const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingSta
 const getBestCpuWaiverCandidateForSlotSource = extractFunctionSource('getBestCpuWaiverCandidateForSlot');
 const getCpuWaiverDropCandidateSource = extractFunctionSource('getCpuWaiverDropCandidate');
 const fillCpuTeamStarterNeedsFromWaiversSource = extractFunctionSource('fillCpuTeamStarterNeedsFromWaivers');
-const cleanupCpuDeadRosterSpotsFromWaiversSource = extractFunctionSource(
-  'cleanupCpuDeadRosterSpotsFromWaivers',
-  { optional: true }
-);
 const maintainCpuTeamRosterSource = extractFunctionSource('maintainCpuTeamRoster');
 
 function makePlayer(id, name, pos, fp, extra = {}) {
@@ -219,7 +212,6 @@ function buildContext(options = {}) {
       getBestCpuWaiverCandidateForSlotSource,
       getCpuWaiverDropCandidateSource,
       fillCpuTeamStarterNeedsFromWaiversSource,
-      cleanupCpuDeadRosterSpotsFromWaiversSource,
       maintainCpuTeamRosterSource
     ].join('\n'),
     context
@@ -250,37 +242,44 @@ function buildContext(options = {}) {
 {
   const { context, claimCalls } = buildContext({
     roster: [
-      makePlayer(10, 'Locked Starter', 'PG', 52),
-      makePlayer(11, 'Dead Bench OUT', 'SG', 8),
-      makePlayer(12, 'Usable Bench', 'SF', 26)
+      makePlayer(101, 'Starter PG', 'PG', 52),
+      makePlayer(102, 'Starter SG', 'SG', 50),
+      makePlayer(103, 'Starter SF', 'SF', 48),
+      makePlayer(104, 'Starter PF', 'PF', 47),
+      makePlayer(105, 'Starter C', 'C', 51),
+      makePlayer(106, 'Dead Bench OUT', 'SG', 8)
     ],
     waiver: [
       makePlayer(210, 'Live Upgrade', 'SG', 28),
       makePlayer(211, 'Low Waiver', 'SG', 9)
     ],
-    injuries: [[11, { label: 'OUT' }]],
+    injuries: [[106, { label: 'OUT' }]],
     gamesToday: [210],
-    totalRosterLimit: 3,
-    starterIds: [10, 12, null, null, null]
+    totalRosterLimit: 6,
+    starterIds: [101, 102, 103, 104, 105]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
   assert.equal(result.waiverAdds, 1);
   assert.equal(result.waiverDrops, 1);
   assert.equal(result.changed, true);
-  assert.deepStrictEqual(claimCalls[0], { teamIdx: 1, addId: 210, dropId: 11 });
+  assert.deepStrictEqual(claimCalls[0], { teamIdx: 1, addId: 210, dropId: 106 });
 }
 
 {
   const { context, claimCalls } = buildContext({
     roster: [
-      makePlayer(20, 'Starter', 'PG', 50),
-      makePlayer(21, 'GTD Bench', 'SG', 12)
+      makePlayer(201, 'Starter PG', 'PG', 50),
+      makePlayer(202, 'Starter SG', 'SG', 49),
+      makePlayer(203, 'Starter SF', 'SF', 48),
+      makePlayer(204, 'Starter PF', 'PF', 47),
+      makePlayer(205, 'Starter C', 'C', 51),
+      makePlayer(206, 'GTD Bench', 'SG', 12)
     ],
     waiver: [makePlayer(220, 'Healthy SG', 'SG', 24)],
-    injuries: [[21, { label: 'GTD' }]],
+    injuries: [[206, { label: 'GTD' }]],
     gamesToday: [220],
-    totalRosterLimit: 2,
-    starterIds: [20, null, null, null, null]
+    totalRosterLimit: 6,
+    starterIds: [201, 202, 203, 204, 205]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
   assert.equal(result.waiverAdds, 0);
@@ -291,13 +290,17 @@ function buildContext(options = {}) {
 {
   const { context, claimCalls } = buildContext({
     roster: [
-      makePlayer(30, 'Starter', 'PG', 50),
-      makePlayer(31, 'Healthy Bench', 'SG', 18)
+      makePlayer(301, 'Starter PG', 'PG', 50),
+      makePlayer(302, 'Starter SG', 'SG', 49),
+      makePlayer(303, 'Starter SF', 'SF', 48),
+      makePlayer(304, 'Starter PF', 'PF', 47),
+      makePlayer(305, 'Starter C', 'C', 51),
+      makePlayer(306, 'Healthy Bench', 'SG', 18)
     ],
     waiver: [makePlayer(230, 'Tiny Upgrade', 'SG', 19)],
     gamesToday: [230],
-    totalRosterLimit: 2,
-    starterIds: [30, null, null, null, null]
+    totalRosterLimit: 6,
+    starterIds: [301, 302, 303, 304, 305]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
   assert.equal(result.waiverAdds, 0);
@@ -309,14 +312,18 @@ function buildContext(options = {}) {
   const { context, claimCalls } = buildContext({
     entryMode: 'historical_reimagined',
     roster: [
-      makePlayer(40, 'Starter', 'PG', 50),
-      makePlayer(41, 'Dead Bench OUT', 'SG', 8)
+      makePlayer(401, 'Starter PG', 'PG', 50),
+      makePlayer(402, 'Starter SG', 'SG', 49),
+      makePlayer(403, 'Starter SF', 'SF', 48),
+      makePlayer(404, 'Starter PF', 'PF', 47),
+      makePlayer(405, 'Starter C', 'C', 51),
+      makePlayer(406, 'Dead Bench OUT', 'SG', 8)
     ],
     waiver: [makePlayer(240, 'Live Upgrade', 'SG', 28)],
-    injuries: [[41, { label: 'OUT' }]],
+    injuries: [[406, { label: 'OUT' }]],
     gamesToday: [240],
-    totalRosterLimit: 2,
-    starterIds: [40, null, null, null, null]
+    totalRosterLimit: 6,
+    starterIds: [401, 402, 403, 404, 405]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
   assert.equal(result.waiverAdds, 0);
@@ -327,14 +334,18 @@ function buildContext(options = {}) {
   const { context, claimCalls } = buildContext({
     cpuManagedTeam: 99,
     roster: [
-      makePlayer(50, 'Starter', 'PG', 50),
-      makePlayer(51, 'Dead Bench OUT', 'SG', 8)
+      makePlayer(501, 'Starter PG', 'PG', 50),
+      makePlayer(502, 'Starter SG', 'SG', 49),
+      makePlayer(503, 'Starter SF', 'SF', 48),
+      makePlayer(504, 'Starter PF', 'PF', 47),
+      makePlayer(505, 'Starter C', 'C', 51),
+      makePlayer(506, 'Dead Bench OUT', 'SG', 8)
     ],
     waiver: [makePlayer(250, 'Live Upgrade', 'SG', 28)],
-    injuries: [[51, { label: 'OUT' }]],
+    injuries: [[506, { label: 'OUT' }]],
     gamesToday: [250],
-    totalRosterLimit: 2,
-    starterIds: [50, null, null, null, null]
+    totalRosterLimit: 6,
+    starterIds: [501, 502, 503, 504, 505]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
   assert.equal(result.changed, false);
