@@ -726,12 +726,6 @@
         body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
       };
     }
-    if(Number(reveal?.totalTransactions) > 0){
-      return {
-        title: Number(reveal.totalTransactions) + ' league move(s) logged',
-        body: 'This reveal window also included league activity outside your own roster.'
-      };
-    }
     return null;
   }
 
