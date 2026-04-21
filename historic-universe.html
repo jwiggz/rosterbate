@@ -160,13 +160,13 @@
   .mini-card.good .mini-value{color:var(--green)}
   .mini-card.blue .mini-value{color:var(--blue)}
   .mini-card.gold .mini-value{color:var(--gold)}
-  .timeline-list,.roster-list,.info-list{display:grid;gap:10px;margin-top:16px}
-  .timeline-item,.roster-item,.info-item{
+  .detail-list,.timeline-list,.roster-list,.info-list{display:grid;gap:10px;margin-top:16px}
+  .detail-item,.timeline-item,.roster-item,.info-item{
     padding:13px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
   }
-  .timeline-item strong,.roster-item strong,.info-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
-  .timeline-item span,.roster-item span,.info-item span{display:block;margin-top:6px;font-size:13px;line-height:1.56;color:#cdd9ea}
-  .roster-item-meta,.info-item-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .detail-item strong,.timeline-item strong,.roster-item strong,.info-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
+  .detail-item span,.timeline-item span,.roster-item span,.info-item span{display:block;margin-top:6px;font-size:13px;line-height:1.56;color:#cdd9ea}
+  .detail-item-meta,.roster-item-meta,.info-item-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
   .pill{
     display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
     background:rgba(7,14,25,.66);font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb
@@ -174,6 +174,7 @@
   .reveal-story{margin-top:16px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(14,21,34,.94),rgba(8,12,22,.98))}
   .reveal-headline{font:700 24px/.95 var(--teko);text-transform:uppercase}
   .reveal-copy{margin-top:8px;font-size:14px;line-height:1.62;color:#d3dfef}
+  .reveal-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
   .empty-state{
     padding:44px 28px;border-radius:24px;border:1px solid rgba(255,182,109,.14);
     background:linear-gradient(180deg,rgba(17,27,44,.92),rgba(9,14,24,.98));text-align:center
@@ -264,36 +265,23 @@
       <section class="grid">
         <div class="stack">
           <article class="panel card-pad">
-            <div class="section-kicker">Universe Snapshot</div>
-            <div class="section-title">Where This Run Stands</div>
-            <div class="section-copy" id="snapshotCopy">Loading current universe status...</div>
-            <div class="mini-grid">
-              <div class="mini-card gold">
-                <div class="mini-value" id="miniLeagueSize">--</div>
-                <div class="mini-label">League Size</div>
-              </div>
-              <div class="mini-card blue">
-                <div class="mini-value" id="miniPlayerPool">--</div>
-                <div class="mini-label">Player Pool</div>
-              </div>
-              <div class="mini-card good">
-                <div class="mini-value" id="miniWeekDay">--</div>
-                <div class="mini-label">Current Week/Day</div>
-              </div>
-            </div>
+            <div class="section-kicker">Latest Sim Day</div>
+            <div class="section-title">Latest Archive Beat</div>
+            <div class="section-copy" id="latestSimDayCopy">Loading current universe status...</div>
             <div class="reveal-story" id="revealStory">
-              <div class="reveal-headline" id="revealHeadline">No reveal story yet</div>
-              <div class="reveal-copy" id="revealCopy">As daily reveals land, this view will surface the latest headline so each universe feels like a living archive run.</div>
+              <div class="reveal-headline" id="latestSimDayHeadline">No reveal story yet</div>
+              <div class="reveal-copy" id="latestSimDayNarrative">As daily reveals land, this view will surface the latest headline so each universe feels like a living archive run.</div>
+              <div class="reveal-pills" id="latestSimDayPills"></div>
             </div>
           </article>
 
           <article class="panel card-pad">
-            <div class="section-kicker">Core Rotation</div>
-            <div class="section-title">Who Defines This Universe</div>
-            <div class="section-copy">A quick read on the roster spine that will shape how this saved run feels when you jump back in.</div>
-            <div class="roster-list" id="rosterCoreList">
-              <div class="roster-item">
-                <strong>Loading roster core</strong>
+            <div class="section-kicker">Current Team State</div>
+            <div class="section-title">Your Active Archive Clubhouse</div>
+            <div class="section-copy">A team-first read on where your universe stands before you jump back into the sim.</div>
+            <div class="detail-list" id="currentTeamStateList">
+              <div class="detail-item">
+                <strong>Loading team state</strong>
                 <span>Preparing saved-team context.</span>
               </div>
             </div>
@@ -302,24 +290,24 @@
 
         <div class="stack">
           <article class="panel card-pad">
-            <div class="section-kicker">Archive Context</div>
-            <div class="section-title">Pack Identity</div>
-            <div class="section-copy" id="packContextCopy">Loading pack framing...</div>
-            <div class="info-list" id="packContextList">
-              <div class="info-item">
-                <strong>Loading pack metadata</strong>
-                <span>Preparing season context and authored framing.</span>
+            <div class="section-kicker">League Snapshot</div>
+            <div class="section-title">Pressure Around The Table</div>
+            <div class="section-copy">Closest standings pressure points around your team, preserved as part of this archive branch.</div>
+            <div class="detail-list" id="leagueSnapshotList">
+              <div class="detail-item">
+                <strong>Loading league snapshot</strong>
+                <span>Preparing saved league context.</span>
               </div>
             </div>
           </article>
 
           <article class="panel card-pad">
-            <div class="section-kicker">Timeline</div>
-            <div class="section-title">Archive Trail</div>
-            <div class="section-copy">Saved universes should feel collectible. This panel gives each one a traceable place in your archive.</div>
-            <div class="timeline-list" id="timelineList">
-              <div class="timeline-item">
-                <strong>Loading timeline</strong>
+            <div class="section-kicker">Recent Universe Activity</div>
+            <div class="section-title">Archive Chatter</div>
+            <div class="section-copy">Waiver movement, activations, and sim-side maintenance that recently shaped this saved universe.</div>
+            <div class="detail-list" id="recentActivityList">
+              <div class="detail-item">
+                <strong>Loading recent activity</strong>
                 <span>Preparing save history.</span>
               </div>
             </div>
@@ -460,10 +448,19 @@
     return latestDay ? reports[String(latestDay)] : null;
   }
 
+  function getTeamRoster(state){
+    const myPos = Number(state?.myPos);
+    const rosters = Array.isArray(state?.rosters) ? state.rosters : null;
+    const allRosters = Array.isArray(state?.allRosters) ? state.allRosters : null;
+    if(Array.isArray(rosters?.[myPos])) return rosters[myPos];
+    if(Array.isArray(allRosters?.[myPos])) return allRosters[myPos];
+    return [];
+  }
+
   function buildRosterCore(state){
     const myPos = Number(state?.myPos);
     const starters = Array.isArray(state?.starters) ? state.starters[myPos] : null;
-    const roster = Array.isArray(state?.rosters) ? state.rosters[myPos] : null;
+    const roster = getTeamRoster(state);
     const source = Array.isArray(starters) && starters.length ? starters : (Array.isArray(roster) ? roster : []);
     const seen = new Set();
     return source
@@ -486,21 +483,241 @@
       });
   }
 
-  function getStandingContext(state){
-    const standings = Array.isArray(state?.standings) ? state.standings.slice() : [];
-    const myPos = Number(state?.myPos);
-    standings.sort(function(a, b){
+  function sortStandingsEntries(standings){
+    return (Array.isArray(standings) ? standings.slice() : []).sort(function(a, b){
       const winDiff = Number(b?.w || 0) - Number(a?.w || 0);
       if(winDiff) return winDiff;
       const pfDiff = Number(b?.pf || 0) - Number(a?.pf || 0);
       if(pfDiff) return pfDiff;
       return Number(a?.l || 0) - Number(b?.l || 0);
     });
+  }
+
+  function getStandingContext(state){
+    const standings = sortStandingsEntries(state?.standings);
+    const myPos = Number(state?.myPos);
     const mine = standings.find(function(entry){ return Number(entry?.teamIdx) === myPos; }) || null;
     const rank = mine ? standings.findIndex(function(entry){ return Number(entry?.teamIdx) === myPos; }) + 1 : null;
     return {
       mine: mine,
       rank: rank > 0 ? rank : null
+    };
+  }
+
+  function buildLatestSimDaySummary(slot, state, reveal, standing){
+    const teamName = String(slot?.teamName || state?.teams?.[Number(state?.myPos)] || 'Your team').trim() || 'Your team';
+    const week = Number(slot?.currentWeek || 1);
+    const day = Number(slot?.currentDay || 1);
+    const fallback = {
+      copy: 'Week ' + week + ', Day ' + day + ' is the current archive checkpoint for ' + teamName + '.',
+      headline: 'No completed sim day yet',
+      narrative: 'This saved universe has not published a latest sim-day recap yet.',
+      pills: ['Waiting for reveal data']
+    };
+    if(!reveal) return fallback;
+
+    const matchup = Array.isArray(reveal.matchups)
+      ? reveal.matchups.find(function(entry){
+          const myPos = Number(state?.myPos);
+          return Number(entry?.teamIdx) === myPos || Number(entry?.opponentIdx) === myPos;
+        })
+      : null;
+    const myTeamIsPrimary = matchup ? Number(matchup?.teamIdx) === Number(state?.myPos) : false;
+    const userTeamName = matchup
+      ? String(myTeamIsPrimary ? matchup?.teamName : matchup?.opponentName || '').trim()
+      : '';
+    const opponentTeamName = matchup
+      ? String(myTeamIsPrimary ? matchup?.opponentName : matchup?.teamName || '').trim()
+      : '';
+    const userScore = matchup
+      ? Number(myTeamIsPrimary ? matchup?.teamScore : matchup?.opponentScore)
+      : NaN;
+    const opponentScore = matchup
+      ? Number(myTeamIsPrimary ? matchup?.opponentScore : matchup?.teamScore)
+      : NaN;
+    const storyHeadline = String(reveal?.story?.headline || '').trim();
+    const storySubheadline = String(reveal?.story?.subheadline || '').trim();
+    const hasStoryCopy = !!(storyHeadline || storySubheadline);
+    const hasUsableMatchup = !!(userTeamName && opponentTeamName);
+    if(!hasStoryCopy && !hasUsableMatchup){
+      return fallback;
+    }
+    const resultVerb = Number.isFinite(userScore) && Number.isFinite(opponentScore)
+      ? (userScore >= opponentScore ? 'beat' : 'fell to')
+      : 'faced';
+    const resultHeadline = userTeamName && opponentTeamName
+      ? userTeamName + ' ' + resultVerb + ' ' + opponentTeamName
+      : storyHeadline || fallback.headline;
+    const copy = storySubheadline || storyHeadline || fallback.narrative;
+    const pills = [];
+    if(Number.isFinite(Number(reveal?.week)) && Number.isFinite(Number(reveal?.day))){
+      pills.push('Week ' + Number(reveal.week) + ' Day ' + Number(reveal.day));
+    }
+    if(Number.isFinite(userScore) && Number.isFinite(opponentScore)){
+      pills.push(userScore.toFixed(1) + ' - ' + opponentScore.toFixed(1));
+    }
+    if(standing?.rank){
+      pills.push('Rank #' + standing.rank);
+    }
+    return {
+      copy: 'Week ' + Number(reveal?.week || week) + ', Day ' + Number(reveal?.day || day) + ' is the latest completed archive beat for ' + teamName + '.',
+      headline: resultHeadline || fallback.headline,
+      narrative: copy,
+      pills: pills.length ? pills : fallback.pills.slice()
+    };
+  }
+
+  function buildLeagueSnapshotSummary(slot, state, standing){
+    const standings = sortStandingsEntries(state?.standings);
+    const teams = Array.isArray(state?.teams) ? state.teams : [];
+    if(!standings.length){
+      return {
+        currentStanding: null,
+        items: [{
+          title: 'Standings not available yet',
+          body: 'This universe has not saved a league table yet.',
+          meta: ['Record pending']
+        }]
+      };
+    }
+    const myStandingIndex = standings.findIndex(function(entry){
+      return Number(entry?.teamIdx) === Number(state?.myPos);
+    });
+    const fallbackIndex = standing?.rank ? Math.max(0, Number(standing.rank) - 1) : 0;
+    const centerIndex = myStandingIndex >= 0 ? myStandingIndex : fallbackIndex;
+    const visibleCount = Math.min(3, standings.length);
+    const maxStart = Math.max(0, standings.length - visibleCount);
+    const startIndex = Math.min(maxStart, Math.max(0, centerIndex - 1));
+    const items = standings.slice(startIndex, startIndex + visibleCount).map(function(entry, index){
+      const displayRank = startIndex + index + 1;
+      const teamName = String(teams[Number(entry?.teamIdx)] || ('Team ' + (Number(entry?.teamIdx) + 1))).trim();
+      const isMine = Number(entry?.teamIdx) === Number(state?.myPos);
+      return {
+        title: '#' + displayRank + ' ' + teamName,
+        body: isMine ? 'Your current standing window.' : 'Closest league pressure point.',
+        meta: [
+          Number(entry?.w || 0) + '-' + Number(entry?.l || 0),
+          'PF ' + Number(entry?.pf || 0).toFixed(1)
+        ],
+        isCurrentTeam: isMine
+      };
+    });
+    return {
+      currentStanding: items.find(function(item){
+        return item.isCurrentTeam;
+      }) || null,
+      items: items
+    };
+  }
+
+  function buildRecentUniverseActivitySummary(state, reveal){
+    const activityLog = Array.isArray(state?.activityLog) ? state.activityLog : [];
+    if(!activityLog.length){
+      if(Number(reveal?.totalTransactions) > 0){
+        return {
+          items: [{
+            title: Number(reveal.totalTransactions) + ' league transactions in the latest sim',
+            body: 'The latest completed sim day logged league activity, even though the detailed activity feed is still unavailable.',
+            meta: ['REVEAL SUMMARY']
+          }]
+        };
+      }
+      return {
+        items: [{
+          title: 'No recent universe activity',
+          body: 'This saved universe has not recorded recent waiver, IL, or sim maintenance activity yet.',
+          meta: ['Quiet now']
+        }]
+      };
+    }
+    return {
+      items: activityLog.slice(0, 3).map(function(entry){
+        return {
+          title: String(entry?.title || 'Universe activity').trim(),
+          body: String(entry?.text || reveal?.story?.subheadline || 'Recent universe activity was recorded here.').trim(),
+          meta: [String(entry?.type || 'activity').trim().toUpperCase() || 'ACTIVITY']
+        };
+      })
+    };
+  }
+
+  function buildCurrentTeamStateSummary(slot, state, rosterCore){
+    const fullRoster = getTeamRoster(state);
+    const rosterItems = Array.isArray(rosterCore) ? rosterCore : [];
+    const unavailableCount = Array.isArray(fullRoster)
+      ? fullRoster.filter(function(player){
+          if(!player) return false;
+          const injuryLabel = String(
+            player.injuryStatus ||
+            player.status ||
+            player.availability ||
+            ''
+          ).trim().toUpperCase();
+          return player.unavailable === true || injuryLabel === 'OUT' || injuryLabel === 'IR' || injuryLabel === 'IL' || injuryLabel === 'SUSP';
+        }).length
+      : 0;
+    const availableCount = Array.isArray(fullRoster)
+      ? Math.max(0, fullRoster.length - unavailableCount)
+      : rosterItems.length;
+    const summary = {
+      title: 'Roster availability',
+      body: availableCount + ' available, ' + unavailableCount + ' unavailable',
+      meta: ['Week ' + Number(slot?.currentWeek || 1), 'Day ' + Number(slot?.currentDay || 1)]
+    };
+    const players = rosterItems.slice(0, 3).map(function(player){
+      return {
+        title: String(player?.name || 'Unknown Player').trim(),
+        body: [player?.team, player?.pos].filter(Boolean).join(' - ') || 'Historical roster piece',
+        meta: ['FP ' + String(player?.fp || '--'), 'TFP ' + String(player?.tfp || '--')]
+      };
+    });
+    return {
+      summary: summary,
+      players: players,
+      items: [summary].concat(players)
+    };
+  }
+
+  function renderDetailList(items, className, emptyState){
+    const list = Array.isArray(items) ? items : [];
+    if(!list.length){
+      return [
+        '<div class="' + className + '">',
+        '<strong>' + escapeHtml(emptyState.title) + '</strong>',
+        '<span>' + escapeHtml(emptyState.body) + '</span>',
+        '</div>'
+      ].join('');
+    }
+    return list.map(function(item){
+        return {
+        title: String(item?.title || emptyState.title).trim(),
+        body: String(item?.body || emptyState.body).trim(),
+        meta: Array.isArray(item?.meta) ? item.meta : []
+      };
+    }).map(function(item){
+      return [
+        '<div class="' + className + '">',
+        '<strong>' + escapeHtml(item.title) + '</strong>',
+        '<span>' + escapeHtml(item.body) + '</span>',
+        '<div class="detail-item-meta">',
+        item.meta.map(function(metaItem){
+          return '<span class="pill">' + escapeHtml(String(metaItem || '').trim()) + '</span>';
+        }).join(''),
+        '</div>',
+        '</div>'
+      ].join('');
+    }).join('');
+  }
+
+  function buildUniverseDetailsViewModel(slot, state, config){
+    const reveal = getLatestRevealReport(state);
+    const standing = getStandingContext(state);
+    const rosterCore = buildRosterCore(state);
+    return {
+      latestSimDay: buildLatestSimDaySummary(slot, state, reveal, standing),
+      leagueSnapshot: buildLeagueSnapshotSummary(slot, state, standing),
+      recentActivity: buildRecentUniverseActivitySummary(state, reveal),
+      currentTeamState: buildCurrentTeamStateSummary(slot, state, rosterCore)
     };
   }
 
@@ -512,11 +729,17 @@
 
   function renderUniverse(slot, state, config){
     const api = window.RosterBateHistoricalUniverseSlots;
-    const mixedEraRuntime = window.RosterBateMixedEraRuntime;
-    const reveal = getLatestRevealReport(state);
-    const standing = getStandingContext(state);
-    const rosterCore = buildRosterCore(state);
-    const detailsUrl = api.buildDetailsUrl(slot, getSport());
+    const detailsViewModel = buildUniverseDetailsViewModel(slot, state, config);
+    const latestSimDay = detailsViewModel.latestSimDay || null;
+    const leagueSnapshot = detailsViewModel.leagueSnapshot && typeof detailsViewModel.leagueSnapshot === 'object'
+      ? detailsViewModel.leagueSnapshot
+      : { currentStanding:null, items:[] };
+    const currentTeamState = detailsViewModel.currentTeamState && typeof detailsViewModel.currentTeamState === 'object'
+      ? detailsViewModel.currentTeamState
+      : { summary:null, players:[], items:[] };
+    const recentActivity = detailsViewModel.recentActivity && typeof detailsViewModel.recentActivity === 'object'
+      ? detailsViewModel.recentActivity
+      : { items:[] };
     const seasonUrl = api.buildSeasonUrl(slot, getSport());
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
     const modeLabel = api.getModeLabel(slot.historicalEntryMode);
@@ -526,20 +749,8 @@
       ? (Number(slot.wins) + '-' + Number(slot.losses))
       : '--';
     const pfText = Number.isFinite(Number(slot.pf)) ? Number(slot.pf).toFixed(1) : '--';
-    const weekDayText = 'W' + Number(slot.currentWeek || 1) + ' / D' + Number(slot.currentDay || 1);
     const title = String(slot.title || config?.seasonLabel || 'Historical Universe').trim();
     const heroTeam = String(slot.teamName || config?.focusTeamName || 'Featured Team').trim();
-    const mixedEraSummary = mixedEraRuntime && typeof mixedEraRuntime.buildMixedEraUniverseSummary === 'function'
-      ? mixedEraRuntime.buildMixedEraUniverseSummary({
-          mixedEraConfig: state?.mixedEraConfig || null,
-          mixedEraConfigId: state?.mixedEraConfigId || slot?.mixedEraConfigId || '',
-          mixedEraTopPlayersPerPack: state?.mixedEraTopPlayersPerPack || slot?.mixedEraTopPlayersPerPack || null,
-          mixedEraSourceSeasonLabels: state?.mixedEraSourceSeasonLabels || slot?.mixedEraSourceSeasonLabels || []
-        })
-      : null;
-    const isMixedEraUniverse = !!mixedEraSummary;
-    const packContextCopy = mixedEraSummary?.explainer || config?.summary || 'This saved universe is attached to a historical pack in your archive.';
-    const whyItMattersCopy = String(state?.mixedEraConfig?.whyItMatters || config?.whyItMatters || 'This universe keeps a historical season pack alive as a replayable archive branch.').trim();
     const heroCopy = config?.whyItMatters
       ? (config.summary + ' This saved run keeps that pack alive through your own branch: ' + config.whyItMatters)
       : (config?.summary || 'This saved universe captures a living historical branch you can revisit anytime.');
@@ -566,56 +777,45 @@
     document.getElementById('continueBtn').href = seasonUrl;
     document.getElementById('openSeasonBtn').href = seasonUrl;
     document.getElementById('backArchiveBtn').href = archiveUrl;
-    document.getElementById('statusNote').textContent = modeLabel + ' is saved locally. Use this page as your archive stop before diving back into the season.';
+    document.getElementById('statusNote').textContent = [
+      modeLabel + ' is saved locally.',
+      'Pack: ' + (config?.seasonLabel || slot.historicalSeasonId || 'historic archive') + '.',
+      'Updated ' + normalizeDate(slot.updatedAt) + '.'
+    ].join(' ');
 
-    document.getElementById('miniLeagueSize').textContent = String(slot.leagueSize || 0);
-    document.getElementById('miniPlayerPool').textContent = String(slot.playerPoolCount || 0);
-    document.getElementById('miniWeekDay').textContent = weekDayText;
-    document.getElementById('snapshotCopy').textContent = 'You are currently running ' + modeLabel + ' from the ' + (config?.seasonLabel || slot.historicalSeasonId || 'historic archive') + '.';
+    document.getElementById('latestSimDayCopy').textContent = latestSimDay?.copy || 'This archive branch is waiting for its next sim-day headline.';
+    document.getElementById('latestSimDayHeadline').textContent = latestSimDay?.headline || 'No reveal story yet';
+    document.getElementById('latestSimDayNarrative').textContent = latestSimDay?.narrative || 'As daily reveals land, this page will surface the latest story beat so each universe reads like a living timeline instead of a raw save file.';
+    document.getElementById('latestSimDayPills').innerHTML = (Array.isArray(latestSimDay?.pills) ? latestSimDay.pills : []).map(function(pill){
+      return '<span class="pill">' + escapeHtml(String(pill || '').trim()) + '</span>';
+    }).join('');
 
-    document.getElementById('revealHeadline').textContent = reveal?.story?.headline || 'No reveal story yet';
-    document.getElementById('revealCopy').textContent = reveal?.story?.subheadline || 'As daily reveals land, this page will surface the latest story beat so each universe reads like a living timeline instead of a raw save file.';
+    document.getElementById('currentTeamStateList').innerHTML = renderDetailList(
+      currentTeamState.items,
+      'detail-item',
+      {
+        title: 'No team state available',
+        body: 'This universe has not published a visible starter, roster, or availability snapshot yet.'
+      }
+    );
 
-    document.getElementById('rosterCoreList').innerHTML = rosterCore.length
-      ? rosterCore.map(function(player){
-          const meta = [player.team, player.pos].filter(Boolean).join(' - ') || 'Historical roster piece';
-          return [
-            '<div class="roster-item">',
-            '<strong>' + escapeHtml(player.name) + '</strong>',
-            '<span>' + escapeHtml(meta) + '</span>',
-            '<div class="roster-item-meta">',
-            '<span class="pill">FP ' + escapeHtml(player.fp) + '</span>',
-            '<span class="pill">TFP ' + escapeHtml(player.tfp) + '</span>',
-            '</div>',
-            '</div>'
-          ].join('');
-        }).join('')
-      : '<div class="roster-item"><strong>No roster core available</strong><span>This universe has not published a visible starter or roster slice yet.</span></div>';
+    document.getElementById('leagueSnapshotList').innerHTML = renderDetailList(
+      leagueSnapshot.items,
+      'detail-item',
+      {
+        title: 'League snapshot unavailable',
+        body: 'No saved standings window is available for this universe yet.'
+      }
+    );
 
-    document.getElementById('packContextCopy').textContent = packContextCopy;
-    document.getElementById('packContextList').innerHTML = isMixedEraUniverse
-      ? [
-          '<div class="info-item"><strong>Why this season matters</strong><span>' + escapeHtml(whyItMattersCopy) + '</span></div>',
-          '<div class="info-item"><strong>Source eras</strong><span>' + escapeHtml(mixedEraSummary.sourceEraLabels.length ? 'This universe draws from multiple real historical seasons.' : 'This universe draws from real historical source packs.') + '</span><div class="info-item-meta">' + [
-            mixedEraSummary.sourceEraLabels.map(function(label){
-              return '<span class="pill">' + escapeHtml(label) + '</span>';
-            }).join(''),
-            mixedEraSummary.poolRuleLabel ? '<span class="pill">' + escapeHtml(mixedEraSummary.poolRuleLabel) + '</span>' : ''
-          ].join('') + '</div></div>',
-          '<div class="info-item"><strong>Trust note</strong><span>' + escapeHtml(mixedEraSummary.trustNote) + '</span></div>'
-        ].join('')
-      : [
-          '<div class="info-item"><strong>Why this season matters</strong><span>' + escapeHtml(whyItMattersCopy) + '</span></div>',
-          '<div class="info-item"><strong>Current team focus</strong><span>' + escapeHtml(heroTeam) + '</span><div class="info-item-meta"><span class="pill">' + escapeHtml(config?.focusTeamName || heroTeam) + '</span><span class="pill">' + escapeHtml(config?.significanceLabel || 'Historic Run') + '</span></div></div>',
-          '<div class="info-item"><strong>Standing context</strong><span>' + escapeHtml(standing.rank ? ('Currently ' + standing.rank + ' in the league with ' + recordText + '.') : 'Standing summary is not available yet.') + '</span></div>'
-        ].join('');
-
-    document.getElementById('timelineList').innerHTML = [
-      '<div class="timeline-item"><strong>Universe Created</strong><span>' + escapeHtml(normalizeDate(slot.createdAt)) + '</span></div>',
-      '<div class="timeline-item"><strong>Last Updated</strong><span>' + escapeHtml(normalizeDate(slot.updatedAt)) + '</span></div>',
-      '<div class="timeline-item"><strong>Archive Routing</strong><span>Pack ID: ' + escapeHtml(slot.historicalPackId || 'unknown') + ' - Season ID: ' + escapeHtml(slot.historicalSeasonId || 'unknown') + '</span></div>',
-      '<div class="timeline-item"><strong>Universe Link</strong><span>' + escapeHtml(detailsUrl) + '</span></div>'
-    ].join('');
+    document.getElementById('recentActivityList').innerHTML = renderDetailList(
+      recentActivity.items,
+      'detail-item',
+      {
+        title: 'No recent universe activity',
+        body: 'This universe has not logged recent archive activity yet.'
+      }
+    );
 
     document.getElementById('deleteUniverseBtn').onclick = function(){
       if(!window.confirm('Delete ' + (slot.title || 'this saved universe') + '?')) return;
