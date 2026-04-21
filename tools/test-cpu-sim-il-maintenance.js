@@ -8,49 +8,109 @@ const html = fs.readFileSync(
   'utf8'
 );
 
-function extractFunctionSource(name, nextName) {
-  const start = html.indexOf(`function ${name}`);
-  assert.ok(start >= 0, `missing ${name}`);
-  const end = html.indexOf(`\nfunction ${nextName}`, start);
-  assert.ok(end >= 0, `missing ${nextName}`);
-  return html.slice(start, end);
+function findMatchingBrace(source, openBraceIndex) {
+  let depth = 0;
+  let stringQuote = '';
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  for (let index = openBraceIndex; index < source.length; index++) {
+    const char = source[index];
+    const nextChar = source[index + 1];
+
+    if (inLineComment) {
+      if (char === '\n') inLineComment = false;
+      continue;
+    }
+
+    if (inBlockComment) {
+      if (char === '*' && nextChar === '/') {
+        inBlockComment = false;
+        index++;
+      }
+      continue;
+    }
+
+    if (stringQuote) {
+      if (char === '\\') {
+        index++;
+        continue;
+      }
+      if (char === stringQuote) {
+        stringQuote = '';
+      }
+      continue;
+    }
+
+    if (char === '/' && nextChar === '/') {
+      inLineComment = true;
+      index++;
+      continue;
+    }
+
+    if (char === '/' && nextChar === '*') {
+      inBlockComment = true;
+      index++;
+      continue;
+    }
+
+    if (char === '\'' || char === '"' || char === '`') {
+      stringQuote = char;
+      continue;
+    }
+
+    if (char === '{') {
+      depth++;
+      continue;
+    }
+
+    if (char === '}') {
+      depth--;
+      if (depth === 0) return index;
+    }
+  }
+
+  throw new Error(`missing closing brace near index ${openBraceIndex}`);
 }
 
-function extractOptionalFunctionSource(name, nextName) {
+function extractFunctionSource(name) {
+  const start = html.indexOf(`function ${name}`);
+  assert.ok(start >= 0, `missing ${name}`);
+  const openBrace = html.indexOf('{', start);
+  assert.ok(openBrace >= 0, `missing body for ${name}`);
+  const end = findMatchingBrace(html, openBrace);
+  return html.slice(start, end + 1);
+}
+
+function extractOptionalFunctionSource(name) {
   const start = html.indexOf(`function ${name}`);
   if (start < 0) return '';
-  const end = html.indexOf(`\nfunction ${nextName}`, start);
-  assert.ok(end >= 0, `missing ${nextName}`);
-  return html.slice(start, end);
+  const openBrace = html.indexOf('{', start);
+  assert.ok(openBrace >= 0, `missing body for ${name}`);
+  const end = findMatchingBrace(html, openBrace);
+  return html.slice(start, end + 1);
 }
 
 const getIlRosterSource = extractFunctionSource(
-  'getIlRoster(teamIdx)',
-  'isIlEligiblePlayer(player, injury)'
+  'getIlRoster(teamIdx)'
 );
 const isIlEligiblePlayerSource = extractFunctionSource(
-  'isIlEligiblePlayer(player, injury)',
-  'rebuildLineupsAfterRosterChange(teamIdx)'
+  'isIlEligiblePlayer(player, injury)'
 );
 const getCpuIlMaintenanceValueSource = extractOptionalFunctionSource(
-  'getCpuIlMaintenanceValue(player)',
-  'isHealthyCpuIlActivationCandidate(player, week)'
+  'getCpuIlMaintenanceValue(player)'
 );
 const isHealthyCpuIlActivationCandidateSource = extractOptionalFunctionSource(
-  'isHealthyCpuIlActivationCandidate(player, week)',
-  'getHealthyCpuIlActivationCandidates(ilRoster, week)'
+  'isHealthyCpuIlActivationCandidate(player, week)'
 );
 const getHealthyCpuIlActivationCandidatesSource = extractOptionalFunctionSource(
-  'getHealthyCpuIlActivationCandidates(ilRoster, week)',
-  'getActiveCpuIlSwapCandidates(roster, week)'
+  'getHealthyCpuIlActivationCandidates(ilRoster, week)'
 );
 const getActiveCpuIlSwapCandidatesSource = extractOptionalFunctionSource(
-  'getActiveCpuIlSwapCandidates(roster, week)',
-  'maintainCpuTeamRoster(teamIdx, options)'
+  'getActiveCpuIlSwapCandidates(roster, week)'
 );
 const maintainCpuTeamRosterSource = extractFunctionSource(
-  'maintainCpuTeamRoster(teamIdx, options)',
-  'maintainCpuLeagueRosters(options)'
+  'maintainCpuTeamRoster(teamIdx, options)'
 );
 
 function makePlayer(id, name, fp) {
