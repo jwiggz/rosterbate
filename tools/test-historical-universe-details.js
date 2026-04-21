@@ -539,6 +539,60 @@ assert.match(
   /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but the compact card only shows a partial activity sample\./
 );
 
+const activationHeavyOverflowWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '13': {
+          day: 13,
+          week: 3,
+          generatedAt: 13000,
+          story: {
+            headline: 'Activation-heavy overflow',
+            subheadline: 'The visible card only shows roster returns.'
+          },
+          matchups: [],
+          totalTransactions: 1
+        }
+      },
+      activityLog: [
+        { id: 'ah1', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 12900 },
+        { id: 'ah2', type: 'activation', title: 'Audit Agents activated Joe Smith', text: 'Another healthy body came back.', teamIdx: 0, ts: 12800 },
+        { id: 'ah3', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'The hidden move was the actual reveal transaction.', teamIdx: 0, ts: 12700 }
+      ]
+    },
+    {}
+  )
+));
+assert.equal(activationHeavyOverflowWindow.recentSimDays[0].teamActivity.length, 2);
+assert.deepStrictEqual(activationHeavyOverflowWindow.recentSimDays[0].teamActivity, [
+  {
+    title: 'Audit Agents activated Kevin Johnson',
+    body: 'Healthy guard returned from IL.'
+  },
+  {
+    title: 'Audit Agents activated Joe Smith',
+    body: 'Another healthy body came back.'
+  }
+]);
+assert.deepStrictEqual(activationHeavyOverflowWindow.recentSimDays[0].leagueNote, {
+  title: 'League activity recorded during the reveal window',
+  body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
+});
+const activationHeavyOverflowRendered = context.renderRecentSimulationCards(activationHeavyOverflowWindow.recentSimDays);
+assert.match(activationHeavyOverflowRendered, /Team activity: Audit Agents activated Kevin Johnson/);
+assert.match(activationHeavyOverflowRendered, /Team activity: Audit Agents activated Joe Smith/);
+assert.doesNotMatch(activationHeavyOverflowRendered, /Audit Agents added Brent Barry/);
+assert.match(
+  activationHeavyOverflowRendered,
+  /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but the compact card only shows a partial activity sample\./
+);
+
 const mixedOverflowTransactionWindow = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
     slot,

@@ -745,10 +745,10 @@
     return (Array.isArray(entries) ? entries : []).reduce(function(count, entry){
       const type = String(entry?.type || '').toLowerCase();
       const title = String(entry?.title || '').toLowerCase();
-      if(type === 'waiver' || type === 'trade' || type === 'activation' || type === 'drop' || type === 'restore' || type === 'transaction'){
+      if(type === 'waiver' || type === 'trade' || type === 'drop' || type === 'restore' || type === 'add'){
         return count + 1;
       }
-      if(title.includes('added') || title.includes('dropped') || title.includes('restored') || title.includes('activated') || title.includes('traded')){
+      if(!type && (title.includes('added') || title.includes('dropped') || title.includes('restored') || title.includes('traded'))){
         return count + 1;
       }
       return count;
