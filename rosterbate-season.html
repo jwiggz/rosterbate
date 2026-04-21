@@ -4230,7 +4230,7 @@ function getActiveCpuIlSwapCandidates(roster, week){
 }
 
 function maintainCpuTeamRoster(teamIdx, options){
-  if(!isCpuManagedTeam(teamIdx) || !isHistoricalSimulationUniverse(D)) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
+  if(!isCpuManagedTeam(teamIdx)) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
   const opts=options||{};
   const day=Number(opts.day || G.day || 1);
   const week=weekForDay(day);
@@ -4240,7 +4240,7 @@ function maintainCpuTeamRoster(teamIdx, options){
   let movedToIl=0;
   let activated=0;
 
-  if(ilSlots>0){
+  if(isHistoricalSimulationUniverse(D) && ilSlots>0){
     const ilCandidates=[...roster]
       .filter(player=>isIlEligiblePlayer(player,getInjuryStatus(player,week)))
       .sort((a,b)=>getCpuIlMaintenanceValue(b)-getCpuIlMaintenanceValue(a));
