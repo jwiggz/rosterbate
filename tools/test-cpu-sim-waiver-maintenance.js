@@ -266,21 +266,42 @@ function buildSeamContext(options = {}) {
 
 {
   const { context, claimCalls } = buildContext({
+    entryMode: 'historical_reimagined',
     starterIds: [1, null, 3, 4, 5],
     roster: [
-      makePlayer(1, 'Starter PG', 'PG', 50),
-      makePlayer(3, 'Starter SF', 'SF', 48),
-      makePlayer(4, 'Starter PF', 'PF', 47),
-      makePlayer(5, 'Starter C', 'C', 52)
+      makePlayer(1, 'Starter PG', 'PG', 50, { ast: 2 }),
+      makePlayer(3, 'Starter SF', 'SF', 48, { pts: 16 }),
+      makePlayer(4, 'Starter PF', 'PF', 47, { reb: 8 }),
+      makePlayer(5, 'Starter C', 'C', 52, { reb: 10 })
     ],
     waiver: [
-      makePlayer(200, 'Playable SG', 'SG', 35),
-      makePlayer(201, 'No-Game SG', 'SG', 44)
+      makePlayer(200, 'Scoring SG', 'SG', 26, { pts: 24 }),
+      makePlayer(201, 'Playmaking SG', 'SG', 20, { ast: 7 })
     ],
-    gamesToday: [200]
+    gamesToday: [200, 201]
   });
   context.fillCpuTeamStarterNeedsFromWaivers(1, { day: 3 });
   assert.equal(claimCalls[0].addId, 200);
+}
+
+{
+  const { context, claimCalls } = buildContext({
+    entryMode: 'simulation_season',
+    starterIds: [1, null, 3, 4, 5],
+    roster: [
+      makePlayer(1, 'Starter PG', 'PG', 50, { ast: 2 }),
+      makePlayer(3, 'Starter SF', 'SF', 48, { pts: 16 }),
+      makePlayer(4, 'Starter PF', 'PF', 47, { reb: 8 }),
+      makePlayer(5, 'Starter C', 'C', 52, { reb: 10 })
+    ],
+    waiver: [
+      makePlayer(200, 'Scoring SG', 'SG', 26, { pts: 24 }),
+      makePlayer(201, 'Playmaking SG', 'SG', 20, { ast: 7 })
+    ],
+    gamesToday: [200, 201]
+  });
+  context.fillCpuTeamStarterNeedsFromWaivers(1, { day: 3 });
+  assert.equal(claimCalls[0].addId, 201);
 }
 
 {
@@ -512,7 +533,24 @@ function buildSeamContext(options = {}) {
   assert.equal(context.getCpuWaiverPositionNeedBonus(catcher, rosterNeed, 'C'), 0);
   assert.equal(context.getCpuWaiverRoleNeedBonus(catcher, rosterNeed), 0);
   assert.equal(context.getCpuWaiverVersatilityBonus(catcher), 0);
-  assert.equal(context.getCpuWaiverDropProtectionBonus(catcher, rosterNeed), Number(catcher.fp) * 0.9);
+  assert.equal(context.getCpuWaiverDropProtectionBonus(catcher, rosterNeed), 0);
+  assert.equal(context.getCpuWaiverCleanupDropScore(catcher, 3, rosterNeed), Number(catcher.fp || 0) - 40);
+}
+
+{
+  const { context } = buildSeamContext({
+    roster: [
+      makePlayer(901, 'Starter PF/C', 'PF/C', 24),
+      makePlayer(902, 'Bench SG', 'SG', 20)
+    ],
+    starterIds: [901, null, null, null, null]
+  });
+  const pfc = context.G.rosters[1].find(player => Number(player.id) === 901);
+  const pfScore = context.getCpuWaiverStarterFillScore(pfc, 'PF', 3, null);
+  const fScore = context.getCpuWaiverStarterFillScore(pfc, 'F', 3, null);
+  const cScore = context.getCpuWaiverStarterFillScore(pfc, 'C', 3, null);
+  assert.equal(pfScore - fScore, 24);
+  assert.equal(cScore - fScore, 24);
 }
 
 {

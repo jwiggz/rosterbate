@@ -4274,6 +4274,7 @@ function getCpuWaiverRoleNeedBonus(player, rosterNeed){
 }
 
 function getCpuWaiverDropProtectionBonus(player, rosterNeed){
+  if(CURRENT_SPORT!=='nba') return 0;
   const positionProtection=getCpuWaiverPositionNeedBonus(player, rosterNeed, null) * 2;
   const roleProtection=getCpuWaiverRoleNeedBonus(player, rosterNeed) * 1.5;
   const valueProtection=Number(player?.fp||0) * 0.9;
@@ -4284,7 +4285,12 @@ function getCpuWaiverStarterFillScore(player, slot, day, rosterNeed){
   const injury=getInjuryStatus(player, weekForDay(day));
   const unavailable=isUnavailableInjury(injury);
   const game=getGameInfo(player, day);
-  const exactPos=String(player?.pos||'').toUpperCase()===String(slot||'').toUpperCase();
+  const exactPos=String(player?.pos||'')
+    .toUpperCase()
+    .split('/')
+    .map(part=>part.trim())
+    .filter(Boolean)
+    .includes(String(slot||'').toUpperCase());
   return Number(player?.fp||0)
     + (game ? 500 : 0)
     + (exactPos ? 24 : 0)
@@ -4373,7 +4379,9 @@ function fillCpuTeamStarterNeedsFromWaivers(teamIdx, options){
     normalizeCpuTeamLineups(teamIdx);
     const needs=getMissingStarterSlotsForTeam(teamIdx, day);
     if(!needs.length) break;
-    const rosterNeed=buildCpuWaiverRosterNeedSummary(teamIdx, day);
+    const rosterNeed=(CURRENT_SPORT==='nba' && isHistoricalSimulationUniverse(D))
+      ? buildCpuWaiverRosterNeedSummary(teamIdx, day)
+      : null;
     let filled=false;
     for(const need of needs){
       const addCandidate=getBestCpuWaiverCandidateForSlot(need.slot, day, rosterNeed);
@@ -4409,7 +4417,7 @@ function cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, options){
   const opts=options||{};
   const day=Number(opts.day || G.day || 1);
   const week=weekForDay(day);
-  const rosterNeed=buildCpuWaiverRosterNeedSummary(teamIdx, day);
+  const rosterNeed=CURRENT_SPORT==='nba' ? buildCpuWaiverRosterNeedSummary(teamIdx, day) : null;
   const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean).map(Number));
   const dropCandidate=(G.rosters[teamIdx]||[])
     .filter(player=>!starterSet.has(Number(player?.id)))
