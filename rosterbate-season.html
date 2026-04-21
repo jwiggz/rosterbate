@@ -4136,6 +4136,10 @@ function getCpuWaiverPlayerSlots(player){
   return [...slots];
 }
 
+function isCpuWaiverSimulationUniverse(){
+  return CURRENT_SPORT==='nba' && isHistoricalSimulationUniverse(D);
+}
+
 function getCpuWaiverRoleShape(player){
   const baseline=player?.simProfile?.baseline || player || {};
   const ratings=player?.simProfile?.ratings || {};
@@ -4183,13 +4187,13 @@ function getCpuWaiverRoleShape(player){
 }
 
 function getCpuWaiverVersatilityBonus(player){
-  if(CURRENT_SPORT!=='nba') return 0;
+  if(!isCpuWaiverSimulationUniverse()) return 0;
   const slotCount=getCpuWaiverPlayerSlots(player).length;
   return Math.max(0, slotCount - 1) * 4;
 }
 
 function buildCpuWaiverRosterNeedSummary(teamIdx, day){
-  if(CURRENT_SPORT!=='nba'){
+  if(!isCpuWaiverSimulationUniverse()){
     return {
       slotCounts:{G:0,F:0,C:0},
       roleCounts:{scoring:0,playmaking:0,rebounding:0,defense:0},
@@ -4243,7 +4247,7 @@ function buildCpuWaiverRosterNeedSummary(teamIdx, day){
 }
 
 function getCpuWaiverPositionNeedBonus(player, rosterNeed, targetSlot){
-  if(CURRENT_SPORT!=='nba') return 0;
+  if(!isCpuWaiverSimulationUniverse()) return 0;
   const slots=getCpuWaiverPlayerSlots(player);
   const target=String(targetSlot||'').toUpperCase();
   const positionNeed=rosterNeed?.positionNeed || {};
@@ -4262,7 +4266,7 @@ function getCpuWaiverPositionNeedBonus(player, rosterNeed, targetSlot){
 }
 
 function getCpuWaiverRoleNeedBonus(player, rosterNeed){
-  if(CURRENT_SPORT!=='nba') return 0;
+  if(!isCpuWaiverSimulationUniverse()) return 0;
   const roleNeed=rosterNeed?.roleNeed || {};
   const shape=getCpuWaiverRoleShape(player);
   let bonus=0;
@@ -4274,7 +4278,7 @@ function getCpuWaiverRoleNeedBonus(player, rosterNeed){
 }
 
 function getCpuWaiverDropProtectionBonus(player, rosterNeed){
-  if(CURRENT_SPORT!=='nba') return 0;
+  if(!isCpuWaiverSimulationUniverse()) return 0;
   const positionProtection=getCpuWaiverPositionNeedBonus(player, rosterNeed, null) * 2;
   const roleProtection=getCpuWaiverRoleNeedBonus(player, rosterNeed) * 1.5;
   const valueProtection=Number(player?.fp||0) * 0.9;
@@ -4285,12 +4289,15 @@ function getCpuWaiverStarterFillScore(player, slot, day, rosterNeed){
   const injury=getInjuryStatus(player, weekForDay(day));
   const unavailable=isUnavailableInjury(injury);
   const game=getGameInfo(player, day);
-  const exactPos=String(player?.pos||'')
-    .toUpperCase()
-    .split('/')
-    .map(part=>part.trim())
-    .filter(Boolean)
-    .includes(String(slot||'').toUpperCase());
+  const target=String(slot||'').toUpperCase();
+  const exactPos=isCpuWaiverSimulationUniverse()
+    ? String(player?.pos||'')
+        .toUpperCase()
+        .split('/')
+        .map(part=>part.trim())
+        .filter(Boolean)
+        .includes(target)
+    : String(player?.pos||'').toUpperCase()===target;
   return Number(player?.fp||0)
     + (game ? 500 : 0)
     + (exactPos ? 24 : 0)

@@ -99,6 +99,7 @@ function tryExtractFunctionSource(name) {
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
 const canPlayerFillSlotSource = extractFunctionSource('canPlayerFillSlot');
 const getCpuWaiverPlayerSlotsSource = tryExtractFunctionSource('getCpuWaiverPlayerSlots');
+const isCpuWaiverSimulationUniverseSource = tryExtractFunctionSource('isCpuWaiverSimulationUniverse');
 const getCpuWaiverRoleShapeSource = tryExtractFunctionSource('getCpuWaiverRoleShape');
 const buildCpuWaiverRosterNeedSummarySource = tryExtractFunctionSource('buildCpuWaiverRosterNeedSummary');
 const getCpuWaiverVersatilityBonusSource = tryExtractFunctionSource('getCpuWaiverVersatilityBonus');
@@ -223,6 +224,7 @@ function buildContext(options = {}) {
       getMissingStarterSlotsForTeamSource,
       canPlayerFillSlotSource,
       getCpuWaiverPlayerSlotsSource,
+      isCpuWaiverSimulationUniverseSource,
       getCpuWaiverRoleShapeSource,
       buildCpuWaiverRosterNeedSummarySource,
       getCpuWaiverVersatilityBonusSource,
@@ -551,6 +553,24 @@ function buildSeamContext(options = {}) {
   const cScore = context.getCpuWaiverStarterFillScore(pfc, 'C', 3, null);
   assert.equal(pfScore - fScore, 24);
   assert.equal(cScore - fScore, 24);
+}
+
+{
+  const { context } = buildSeamContext({
+    entryMode: 'historical_reimagined',
+    roster: [
+      makePlayer(911, 'Starter PF/C', 'PF/C', 24),
+      makePlayer(912, 'Bench SG', 'SG', 20)
+    ],
+    starterIds: [911, null, null, null, null]
+  });
+  const pfc = context.G.rosters[1].find(player => Number(player.id) === 911);
+  const pfScore = context.getCpuWaiverStarterFillScore(pfc, 'PF', 3, null);
+  const fScore = context.getCpuWaiverStarterFillScore(pfc, 'F', 3, null);
+  const cScore = context.getCpuWaiverStarterFillScore(pfc, 'C', 3, null);
+  assert.equal(pfScore, fScore);
+  assert.equal(cScore, fScore);
+  assert.equal(context.getCpuWaiverVersatilityBonus(pfc), 0);
 }
 
 {

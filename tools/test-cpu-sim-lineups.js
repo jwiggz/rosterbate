@@ -30,16 +30,12 @@ const stableThreshold = 160;
 const healthyWeek = 3;
 
 function canPlayerFillSlot(player, slot) {
-  const positions = String(player?.pos || '')
-    .toUpperCase()
-    .split('/')
-    .map(part => part.trim())
-    .filter(Boolean);
+  const pos = String(player?.pos || '').toUpperCase();
   const target = String(slot || '').toUpperCase();
-  if (positions.includes(target)) return true;
-  if (target === 'G') return positions.some(pos => pos === 'PG' || pos === 'SG');
-  if (target === 'F') return positions.some(pos => pos === 'SF' || pos === 'PF');
-  if (target === 'UTIL') return positions.some(pos => ['PG', 'SG', 'SF', 'PF', 'C'].includes(pos));
+  if (pos === target) return true;
+  if (target === 'G') return pos === 'PG' || pos === 'SG';
+  if (target === 'F') return pos === 'SF' || pos === 'PF';
+  if (target === 'UTIL') return ['PG', 'SG', 'SF', 'PF', 'C'].includes(pos);
   return false;
 }
 
