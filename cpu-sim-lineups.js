@@ -17,25 +17,43 @@
   }
 
   let cpuSimPersonalitiesApi = null;
+  let cpuSimPersonalitiesApiResolved = false;
+  let warnedAboutMissingCpuSimPersonalities = false;
+
+  function warnAboutMissingCpuSimPersonalities(){
+    if(warnedAboutMissingCpuSimPersonalities) return;
+    warnedAboutMissingCpuSimPersonalities = true;
+    if(typeof console !== 'undefined' && typeof console.warn === 'function'){
+      console.warn('[RosterBate] CPU sim personalities helper unavailable; using balanced fallback.');
+    }
+  }
 
   function getCpuSimPersonalitiesApi(){
-    if(cpuSimPersonalitiesApi) return cpuSimPersonalitiesApi;
+    if(cpuSimPersonalitiesApiResolved) return cpuSimPersonalitiesApi;
     if(global.RosterBateCpuSimPersonalities){
       cpuSimPersonalitiesApi = global.RosterBateCpuSimPersonalities;
+      cpuSimPersonalitiesApiResolved = true;
       return cpuSimPersonalitiesApi;
     }
     if(typeof require === 'function'){
       try{
         cpuSimPersonalitiesApi = require('./cpu-sim-personalities.js');
+        cpuSimPersonalitiesApiResolved = true;
         return cpuSimPersonalitiesApi;
       }catch(_err){
+        cpuSimPersonalitiesApi = null;
+        cpuSimPersonalitiesApiResolved = true;
+        warnAboutMissingCpuSimPersonalities();
         return null;
       }
     }
+    cpuSimPersonalitiesApi = null;
+    cpuSimPersonalitiesApiResolved = true;
+    warnAboutMissingCpuSimPersonalities();
     return null;
   }
 
-  function getCpuSimPersonalityBias(player, personality){
+  function getCpuSimPersonalityRawBias(player, personality){
     const api = getCpuSimPersonalitiesApi();
     if(api && typeof api.getCpuSimPersonalityBias === 'function'){
       return Number(api.getCpuSimPersonalityBias(player, personality) || 0);
@@ -43,10 +61,33 @@
     return 0;
   }
 
+  function getCpuSimPersonalityLineupBonus(player, personality){
+    const resolved = String(personality || 'balanced').trim().toLowerCase();
+    const rawBias = getCpuSimPersonalityRawBias(player, resolved);
+    if(resolved === 'star_loyalist'){
+      return clamp(Math.round((rawBias - 3500) / 8) + 8, 0, 16);
+    }
+    if(resolved === 'steady_floor'){
+      return clamp(Math.round((rawBias - 1800) / 25) + 6, 0, 14);
+    }
+    if(resolved === 'bigs_bias' || resolved === 'guards_bias'){
+      return clamp(Math.round((rawBias - 1800) / 20) + 6, 0, 14);
+    }
+    return 0;
+  }
+
   function getCpuSimStableThresholdDelta(player, personality){
+    const resolved = String(personality || 'balanced').trim().toLowerCase();
     const api = getCpuSimPersonalitiesApi();
     if(api && typeof api.getCpuSimStableThresholdDelta === 'function'){
-      return Number(api.getCpuSimStableThresholdDelta(player, personality) || 0);
+      const rawDelta = Number(api.getCpuSimStableThresholdDelta(player, resolved) || 0);
+      if(resolved === 'star_loyalist'){
+        return clamp(Math.round(rawDelta / 2), 0, 24);
+      }
+      if(resolved === 'steady_floor'){
+        return clamp(Math.round(rawDelta / 2), 0, 18);
+      }
+      return clamp(Math.round(rawDelta / 3), 0, 12);
     }
     return 0;
   }
@@ -95,7 +136,7 @@
     if(!canFill) return -999999;
     return roundScore(
       getCpuSimCoreScore(player) +
-      getCpuSimPersonalityBias(player, personality) +
+      getCpuSimPersonalityLineupBonus(player, personality) +
       (game ? 9000 : -9000) +
       (exactPos ? 180 : 60) +
       (isUnavailable(injury) ? -22000 : injury ? -600 : 0)

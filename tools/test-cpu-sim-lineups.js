@@ -56,11 +56,11 @@ const benchGuard = makePlayer(6, 'Bench Guard', 'PG', {
 const benchForward = makePlayer(7, 'Bench Forward', 'SF', {
   overall: 76, usage: 69, scoring: 75, playmaking: 61
 });
-const personalityStarGuard = makePlayer(8, 'Personality Star Guard', 'SG', {
-  overall: 85, usage: 98, scoring: 97, playmaking: 95, defense: 66, rebounding: 52
-});
 const personalityRivalGuard = makePlayer(9, 'Personality Rival Guard', 'SG', {
-  overall: 93, usage: 82, scoring: 82, playmaking: 82, defense: 70, rebounding: 45
+  overall: 90, usage: 92, scoring: 93, playmaking: 92, defense: 66, rebounding: 52
+});
+const personalityStarGuard = makePlayer(8, 'Personality Star Guard', 'SG', {
+  overall: 89, usage: 96, scoring: 94, playmaking: 93, defense: 66, rebounding: 52
 });
 const personalityPointGuard = makePlayer(10, 'Personality Point Guard', 'PG', {
   overall: 94, usage: 79, scoring: 80, playmaking: 82, defense: 70, rebounding: 60
@@ -78,7 +78,13 @@ const personalityBig = makePlayer(14, 'Personality Big', 'PF', {
   overall: 81, usage: 70, scoring: 74, playmaking: 45, defense: 84, rebounding: 90
 });
 const personalityGuard = makePlayer(15, 'Personality Guard', 'PG', {
-  overall: 81, usage: 73, scoring: 79, playmaking: 85, defense: 61, rebounding: 41
+  overall: 81, usage: 70, scoring: 74, playmaking: 45, defense: 84, rebounding: 90
+});
+const obviousGapStar = makePlayer(16, 'Obvious Gap Star', 'PG', {
+  overall: 95, usage: 92, scoring: 94, playmaking: 93, defense: 82, rebounding: 58
+});
+const obviousGapBackfill = makePlayer(17, 'Obvious Gap Backfill', 'PG', {
+  overall: 71, usage: 64, scoring: 65, playmaking: 60, defense: 60, rebounding: 50
 });
 
 const roster = [
@@ -92,12 +98,26 @@ const roster = [
 ];
 
 const personalityRoster = [
-  personalityPointGuard,
-  personalityStarGuard,
   personalityRivalGuard,
+  personalityStarGuard,
+  personalityPointGuard,
   personalityWing,
   personalityForward,
   personalityCenter
+];
+
+const obviousGapRoster = [
+  obviousGapStar,
+  obviousGapBackfill,
+  makePlayer(18, 'Obvious Gap Wing', 'SF', {
+    overall: 84, usage: 74, scoring: 82, playmaking: 70, defense: 78, rebounding: 60
+  }),
+  makePlayer(19, 'Obvious Gap Forward', 'PF', {
+    overall: 83, usage: 72, scoring: 79, playmaking: 68, defense: 80, rebounding: 76
+  }),
+  makePlayer(20, 'Obvious Gap Center', 'C', {
+    overall: 86, usage: 70, scoring: 76, playmaking: 60, defense: 84, rebounding: 88
+  })
 ];
 
 const day1Games = new Set([1, 2, 3, 4, 5, 6]);
@@ -125,17 +145,41 @@ function buildLineup(day, injuries = new Map()) {
   });
 }
 
-function buildPersonalityLineup(personality) {
+function buildBalancedBaseLineup(day, injuries = new Map()) {
   return cpuSimLineups.buildCpuSimLineupIds({
-    roster: personalityRoster,
+    roster,
+    slots,
+    starterCount: 5,
+    day,
+    stableThreshold,
+    personality: 'balanced',
+    canPlayerFillSlot,
+    getGameInfo(player, requestedDay) {
+      const set = requestedDay === 1 ? day1Games : requestedDay === 2 ? day2Games : day3Games;
+      return set.has(player.id) ? { opponent: 'SIM' } : null;
+    },
+    getInjuryStatus(player) {
+      return injuries.get(player.id) || null;
+    },
+    weekForDay() {
+      return healthyWeek;
+    }
+  });
+}
+
+function buildPersonalityLineupForRoster(rosterInput, personality) {
+  return cpuSimLineups.buildCpuSimLineupIds({
+    roster: rosterInput,
     slots,
     starterCount: 5,
     day: 1,
-    stableThreshold: 0,
+    stableThreshold,
     personality,
     canPlayerFillSlot,
     getGameInfo(player, requestedDay) {
-      return day1Games.has(player.id) ? { opponent: 'SIM' } : null;
+      return rosterInput.some(function(entry){ return Number(entry.id) === Number(player?.id); })
+        ? { opponent: 'SIM' }
+        : null;
     },
     getInjuryStatus() {
       return null;
@@ -186,14 +230,36 @@ const day3Lineup = buildLineup(3, new Map([[3, { label: 'OUT' }]]));
 assert.ok(!day3Lineup.includes(3), 'expected an unavailable core player to sit');
 assert.ok(day3Lineup.includes(7), 'expected a healthy replacement to enter for the unavailable forward');
 
-const balancedPersonalityLineup = buildPersonalityLineup('balanced');
-const starLoyalistPersonalityLineup = buildPersonalityLineup('star_loyalist');
-assert.ok(
-  !balancedPersonalityLineup.includes(8),
-  'expected the balanced lineup to keep the higher-ranked rival guard over the star'
+const defaultPersonalityLineup = buildLineup(1);
+const balancedBaseLineup = buildBalancedBaseLineup(1);
+assert.deepStrictEqual(
+  defaultPersonalityLineup,
+  balancedBaseLineup,
+  'expected balanced personality to match the default lineup behavior'
+);
+
+const obviousGapBalancedLineup = buildPersonalityLineupForRoster(obviousGapRoster, 'balanced');
+const obviousGapStarLoyalistLineup = buildPersonalityLineupForRoster(obviousGapRoster, 'star_loyalist');
+assert.deepStrictEqual(
+  obviousGapStarLoyalistLineup,
+  obviousGapBalancedLineup,
+  'expected personality to leave an obvious gap decision unchanged'
 );
 assert.ok(
-  starLoyalistPersonalityLineup.includes(8),
+  obviousGapBalancedLineup.includes(16),
+  'expected the obvious star to remain in the lineup'
+);
+
+const starBalancedScore = scorePersonalityCandidate(personalityStarGuard, 'balanced', 'SG');
+const rivalBalancedScore = scorePersonalityCandidate(personalityRivalGuard, 'balanced', 'SG');
+const starLoyalistStarScore = scorePersonalityCandidate(personalityStarGuard, 'star_loyalist', 'SG');
+const starLoyalistRivalScore = scorePersonalityCandidate(personalityRivalGuard, 'star_loyalist', 'SG');
+assert.ok(
+  rivalBalancedScore >= starBalancedScore,
+  'expected balanced scoring to stay effectively baseline in the close star/rival call'
+);
+assert.ok(
+  starLoyalistStarScore > starLoyalistRivalScore,
   'expected star_loyalist to preserve a star in a close playable decision'
 );
 
