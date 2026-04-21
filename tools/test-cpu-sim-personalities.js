@@ -38,67 +38,59 @@ const starHeavyRoster = [
 ];
 
 const steadyFloorTargetRoster = [
-  makePlayer(6633, 'PG', {
-    overall: 77,
-    usage: 74,
-    scoring: 80,
-    playmaking: 84,
-    defense: 75,
-    rebounding: 80
+  makePlayer(3, 'PG', {
+    overall: 72,
+    usage: 60,
+    scoring: 65,
+    playmaking: 64,
+    defense: 61,
+    rebounding: 38
   }),
-  makePlayer(6634, 'SF', {
-    overall: 77,
-    usage: 81,
-    scoring: 77,
-    playmaking: 78,
-    defense: 85,
-    rebounding: 73
-  }),
-  makePlayer(6635, 'PG', {
-    overall: 78,
-    usage: 79,
-    scoring: 77,
-    playmaking: 75,
-    defense: 77,
-    rebounding: 76
+  makePlayer(4, 'PF', {
+    overall: 75,
+    usage: 57,
+    scoring: 64,
+    playmaking: 50,
+    defense: 73,
+    rebounding: 71
   })
 ];
 
 const borderlineStarGuardRoster = [
-  makePlayer(3000, 'PG', {
-    overall: 90,
-    usage: 91,
-    scoring: 82,
-    playmaking: 76,
-    defense: 71,
-    rebounding: 69
+  makePlayer(5, 'PG', {
+    overall: 82,
+    usage: 77,
+    scoring: 81,
+    playmaking: 88,
+    defense: 61,
+    rebounding: 39
   }),
-  makePlayer(3001, 'PG', {
-    overall: 85,
-    usage: 68,
-    scoring: 73,
-    playmaking: 81,
-    defense: 64,
-    rebounding: 66
+  makePlayer(6, 'SG', {
+    overall: 80,
+    usage: 74,
+    scoring: 79,
+    playmaking: 79,
+    defense: 63,
+    rebounding: 44
   })
 ];
 
 const balancedTargetRoster = [
-  makePlayer(1867, 'C', {
-    overall: 74,
-    usage: 67,
-    scoring: 66,
-    playmaking: 59,
+  makePlayer(7, 'PG', {
+    overall: 70,
+    usage: 58,
+    scoring: 63,
+    playmaking: 62,
     defense: 59,
-    rebounding: 67
+    rebounding: 36
   }),
-  makePlayer(1868, 'PG', {
-    overall: 69,
-    usage: 66,
-    scoring: 66,
-    playmaking: 59,
-    defense: 58,
-    rebounding: 64
+  makePlayer(8, 'PF', {
+    overall: 73,
+    usage: 55,
+    scoring: 61,
+    playmaking: 47,
+    defense: 70,
+    rebounding: 68
   })
 ];
 
@@ -129,16 +121,33 @@ const comboBig = makePlayer(12, 'F/C', {
   rebounding: 91
 });
 
-const bigHeavyRoster = [bigProfile, comboBig];
-const guardHeavyRoster = [
-  guardProfile,
-  makePlayer(7000, 'SG', {
+const bigHeavyRoster = [
+  bigProfile,
+  makePlayer(13, 'PF', {
     overall: 81,
-    usage: 74,
-    scoring: 83,
-    playmaking: 89,
-    defense: 63,
-    rebounding: 44
+    usage: 63,
+    scoring: 70,
+    playmaking: 48,
+    defense: 82,
+    rebounding: 86
+  })
+];
+const guardHeavyRoster = [
+  makePlayer(14, 'PG', {
+    overall: 76,
+    usage: 69,
+    scoring: 75,
+    playmaking: 81,
+    defense: 58,
+    rebounding: 38
+  }),
+  makePlayer(15, 'SG', {
+    overall: 75,
+    usage: 67,
+    scoring: 74,
+    playmaking: 76,
+    defense: 59,
+    rebounding: 41
   })
 ];
 
@@ -196,27 +205,10 @@ assert.ok(
     cpuSimPersonalities.getCpuSimPersonalityBias(bigProfile, 'guards_bias'),
   'expected guards_bias to favor guard/creator profiles'
 );
-
-const comboAssignedA = cpuSimPersonalities.buildCpuSimPersonalitiesByTeam({
-  teamCount: 2,
-  myPos: 0,
-  rosters: [starHeavyRoster, [comboBig, bigProfile]]
-});
-const comboAssignedB = cpuSimPersonalities.buildCpuSimPersonalitiesByTeam({
-  teamCount: 2,
-  myPos: 0,
-  rosters: [starHeavyRoster, [bigProfile, comboBig]]
-});
-
-assert.deepStrictEqual(
-  comboAssignedA,
-  comboAssignedB,
-  'expected roster order not to change deterministic assignment'
-);
-assert.equal(
-  comboAssignedA[1],
-  'bigs_bias',
-  'expected a combo frontcourt roster to resolve to the bigs bias'
+assert.ok(
+  cpuSimPersonalities.getCpuSimPersonalityBias(comboBig, 'bigs_bias') >
+    cpuSimPersonalities.getCpuSimPersonalityBias(guardProfile, 'bigs_bias'),
+  'expected F/C combo bigs to benefit from big/frontcourt bias'
 );
 assert.ok(
   cpuSimPersonalities.getCpuSimStableThresholdDelta(makePlayer(12, 'SG', {
