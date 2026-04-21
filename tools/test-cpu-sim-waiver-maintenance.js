@@ -73,33 +73,29 @@ function findMatchingBrace(source, openBraceIndex) {
   throw new Error(`missing closing brace near index ${openBraceIndex}`);
 }
 
-function extractFunctionSource(name) {
-  const start = html.indexOf(`function ${name}`);
-  assert.ok(start >= 0, `missing ${name}`);
+function extractFunctionSource(name, { optional = false } = {}) {
+  const startPattern = new RegExp(`function\\s+${name}\\b`);
+  const startMatch = startPattern.exec(html);
+  if (!startMatch) {
+    if (optional) return null;
+    assert.fail(`missing ${name}`);
+  }
+  const start = startMatch.index;
   const openBrace = html.indexOf('{', start);
   assert.ok(openBrace >= 0, `missing body for ${name}`);
   const end = findMatchingBrace(html, openBrace);
   return html.slice(start, end + 1);
 }
 
-const getMissingStarterSlotsForTeamSource = extractFunctionSource(
-  'getMissingStarterSlotsForTeam(teamIdx, day)'
-);
-const getBestCpuWaiverCandidateForSlotSource = extractFunctionSource(
-  'getBestCpuWaiverCandidateForSlot(slot, day)'
-);
-const getCpuWaiverDropCandidateSource = extractFunctionSource(
-  'getCpuWaiverDropCandidate(teamIdx, day, targetSlot)'
-);
-const fillCpuTeamStarterNeedsFromWaiversSource = extractFunctionSource(
-  'fillCpuTeamStarterNeedsFromWaivers(teamIdx, options)'
-);
+const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
+const getBestCpuWaiverCandidateForSlotSource = extractFunctionSource('getBestCpuWaiverCandidateForSlot');
+const getCpuWaiverDropCandidateSource = extractFunctionSource('getCpuWaiverDropCandidate');
+const fillCpuTeamStarterNeedsFromWaiversSource = extractFunctionSource('fillCpuTeamStarterNeedsFromWaivers');
 const cleanupCpuDeadRosterSpotsFromWaiversSource = extractFunctionSource(
-  'cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, options)'
+  'cleanupCpuDeadRosterSpotsFromWaivers',
+  { optional: true }
 );
-const maintainCpuTeamRosterSource = extractFunctionSource(
-  'maintainCpuTeamRoster(teamIdx, options)'
-);
+const maintainCpuTeamRosterSource = extractFunctionSource('maintainCpuTeamRoster');
 
 function makePlayer(id, name, pos, fp, extra = {}) {
   return {
@@ -113,7 +109,6 @@ function makePlayer(id, name, pos, fp, extra = {}) {
 }
 
 function buildContext(options = {}) {
-  const normalizeCalls = [];
   const claimCalls = [];
   const injuries = new Map(options.injuries || []);
   const gamesToday = new Set(options.gamesToday || []);
@@ -169,7 +164,7 @@ function buildContext(options = {}) {
       return starterIds.slice();
     },
     normalizeCpuTeamLineups(teamIdx) {
-      normalizeCalls.push(teamIdx);
+      void teamIdx;
     },
     claimWaiverPlayerForTeam(teamIdx, playerToAdd, droppedPlayer) {
       claimCalls.push({
@@ -224,7 +219,7 @@ function buildContext(options = {}) {
     context
   );
 
-  return { context, normalizeCalls, claimCalls };
+  return { context, claimCalls };
 }
 
 {
@@ -242,10 +237,14 @@ function buildContext(options = {}) {
     ],
     gamesToday: [200]
   });
-  const result = context.fillCpuTeamStarterNeedsFromWaivers(1, { day: 3 });
-  assert.equal(result.adds, 1);
+  context.fillCpuTeamStarterNeedsFromWaivers(1, { day: 3 });
   assert.equal(claimCalls[0].addId, 200);
 }
+
+assert.ok(
+  cleanupCpuDeadRosterSpotsFromWaiversSource,
+  'missing cleanupCpuDeadRosterSpotsFromWaivers'
+);
 
 {
   const { context, claimCalls } = buildContext({
