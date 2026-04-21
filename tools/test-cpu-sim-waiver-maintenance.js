@@ -87,7 +87,23 @@ function extractFunctionSource(name, { optional = false } = {}) {
   return html.slice(start, end + 1);
 }
 
+function tryExtractFunctionSource(name) {
+  try {
+    return extractFunctionSource(name);
+  } catch (error) {
+    if (String(error?.message || '').includes(`missing ${name}`)) return null;
+    throw error;
+  }
+}
+
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
+const getCpuWaiverPlayerSlotsSource = tryExtractFunctionSource('getCpuWaiverPlayerSlots');
+const getCpuWaiverRoleShapeSource = tryExtractFunctionSource('getCpuWaiverRoleShape');
+const buildCpuWaiverRosterNeedSummarySource = tryExtractFunctionSource('buildCpuWaiverRosterNeedSummary');
+const getCpuWaiverVersatilityBonusSource = tryExtractFunctionSource('getCpuWaiverVersatilityBonus');
+const getCpuWaiverRoleNeedBonusSource = tryExtractFunctionSource('getCpuWaiverRoleNeedBonus');
+const getCpuWaiverPositionNeedBonusSource = tryExtractFunctionSource('getCpuWaiverPositionNeedBonus');
+const getCpuWaiverDropProtectionBonusSource = tryExtractFunctionSource('getCpuWaiverDropProtectionBonus');
 const getCpuWaiverStarterFillScoreSource = extractFunctionSource('getCpuWaiverStarterFillScore');
 const getCpuWaiverCleanupAddScoreSource = extractFunctionSource('getCpuWaiverCleanupAddScore');
 const getCpuWaiverCleanupDropScoreSource = extractFunctionSource('getCpuWaiverCleanupDropScore');
@@ -99,18 +115,6 @@ const cleanupCpuDeadRosterSpotsFromWaiversSource = extractFunctionSource(
   'cleanupCpuDeadRosterSpotsFromWaivers',
   { optional: true }
 );
-
-function getRosterNeedSeamSources() {
-  return [
-    extractFunctionSource('getCpuWaiverPlayerSlots'),
-    extractFunctionSource('getCpuWaiverRoleShape'),
-    extractFunctionSource('buildCpuWaiverRosterNeedSummary'),
-    extractFunctionSource('getCpuWaiverVersatilityBonus'),
-    extractFunctionSource('getCpuWaiverRoleNeedBonus'),
-    extractFunctionSource('getCpuWaiverPositionNeedBonus'),
-    extractFunctionSource('getCpuWaiverDropProtectionBonus')
-  ];
-}
 
 function makePlayer(id, name, pos, fp, extra = {}) {
   return {
@@ -232,6 +236,13 @@ function buildContext(options = {}) {
   vm.runInNewContext(
     [
       getMissingStarterSlotsForTeamSource,
+      getCpuWaiverPlayerSlotsSource,
+      getCpuWaiverRoleShapeSource,
+      buildCpuWaiverRosterNeedSummarySource,
+      getCpuWaiverVersatilityBonusSource,
+      getCpuWaiverRoleNeedBonusSource,
+      getCpuWaiverPositionNeedBonusSource,
+      getCpuWaiverDropProtectionBonusSource,
       getCpuWaiverStarterFillScoreSource,
       getCpuWaiverCleanupAddScoreSource,
       getCpuWaiverCleanupDropScoreSource,
@@ -249,7 +260,25 @@ function buildContext(options = {}) {
 
 function buildSeamContext(options = {}) {
   const built = buildContext(options);
-  vm.runInNewContext(getRosterNeedSeamSources().join('\n'), built.context);
+  assert.ok(getCpuWaiverPlayerSlotsSource, 'missing getCpuWaiverPlayerSlots');
+  assert.ok(getCpuWaiverRoleShapeSource, 'missing getCpuWaiverRoleShape');
+  assert.ok(buildCpuWaiverRosterNeedSummarySource, 'missing buildCpuWaiverRosterNeedSummary');
+  assert.ok(getCpuWaiverVersatilityBonusSource, 'missing getCpuWaiverVersatilityBonus');
+  assert.ok(getCpuWaiverRoleNeedBonusSource, 'missing getCpuWaiverRoleNeedBonus');
+  assert.ok(getCpuWaiverPositionNeedBonusSource, 'missing getCpuWaiverPositionNeedBonus');
+  assert.ok(getCpuWaiverDropProtectionBonusSource, 'missing getCpuWaiverDropProtectionBonus');
+  vm.runInNewContext(
+    [
+      getCpuWaiverPlayerSlotsSource,
+      getCpuWaiverRoleShapeSource,
+      buildCpuWaiverRosterNeedSummarySource,
+      getCpuWaiverVersatilityBonusSource,
+      getCpuWaiverRoleNeedBonusSource,
+      getCpuWaiverPositionNeedBonusSource,
+      getCpuWaiverDropProtectionBonusSource
+    ].join('\n'),
+    built.context
+  );
   return built;
 }
 
