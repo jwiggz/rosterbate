@@ -4449,9 +4449,9 @@ function rebuildLineupsAfterRosterChange(teamIdx){
   Object.keys(teamDailyLineups||{}).forEach(dayKey=>{
     const day=Number(dayKey);
     const current=(teamDailyLineups[day]||[]).map(id=>roster.find(p=>p.id===id)).filter(Boolean);
-    teamDailyLineups[day]=buildBestLineupIdsForRoster(current,day);
+    teamDailyLineups[day]=buildCpuManagedStarterIdsForDay(teamIdx, current, day);
   });
-  G.starters[teamIdx]=buildBestLineupIdsForRoster(roster,G.day||1);
+  G.starters[teamIdx]=buildCpuManagedStarterIdsForDay(teamIdx, roster, G.day||1);
 }
 
 function getCurrentRosterSlot(pid,day){
@@ -6605,7 +6605,7 @@ function initSeason(){
   
   G.ilByTeam=Array.isArray(D.ilRosters) ? D.ilRosters.map(r=>(r||[]).map(p=>({...p}))) : Array.from({length:n},()=>[]);
   
-  G.starters=G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
+  G.starters=G.rosters.map((roster, teamIdx)=>buildCpuManagedStarterIdsForDay(teamIdx, roster, G.day||1));
   console.log('? G.starters populated:', G.starters);
   
   const initialRosterIds=new Set(G.rosters.flat().map(p=>p.id));
@@ -6654,7 +6654,7 @@ function initSeason(){
     G.simulationLogsByDay = D.simulationLogsByDay || {};
     G.recentDrops = D.recentDrops || [];
     G.moneyBallLocks = D.moneyBallLocks || {};
-    G.starters = D.starters || G.rosters.map(r=>buildBestLineupIdsForRoster(r,G.day||1));
+    G.starters = D.starters || G.rosters.map((roster, teamIdx)=>buildCpuManagedStarterIdsForDay(teamIdx, roster, G.day||1));
     const savedFreeAgents=Array.isArray(D.freeAgents) ? D.freeAgents : null;
     const savedWaiver=Array.isArray(D.waiver) ? D.waiver : null;
     const rebuiltWaiver=rebuildSeasonWaiverPool();
