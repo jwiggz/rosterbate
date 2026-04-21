@@ -721,6 +721,8 @@
     };
   }
 
+  const RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT = 2;
+
   function buildRecentSimulationTeamActivity(slot, state, reveal){
     const myPos = Number(state?.myPos);
     const teamName = String(slot?.teamName || '').trim().toLowerCase();
@@ -730,7 +732,7 @@
         const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
         return !!teamName && haystack.includes(teamName);
       })
-      .slice(0, 2)
+      .slice(0, RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT)
       .map(function(entry){
         return {
           title: String(entry?.title || 'Team activity').trim(),
@@ -773,11 +775,13 @@
         body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
       };
     }
-    const representedTransactionCount = countRepresentedRevealTransactions(teamActivityEntries);
+    const representedTransactionCount = countRepresentedRevealTransactions(
+      teamActivityEntries.slice(0, RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT)
+    );
     if(Number(reveal?.totalTransactions) > representedTransactionCount){
       return {
         title: 'League activity recorded during the reveal window',
-        body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
+        body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
       };
     }
     return null;

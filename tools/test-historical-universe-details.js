@@ -477,11 +477,66 @@ assert.deepStrictEqual(partialCoverageTransactionWindow.recentSimDays[0].teamAct
 ]);
 assert.deepStrictEqual(partialCoverageTransactionWindow.recentSimDays[0].leagueNote, {
   title: 'League activity recorded during the reveal window',
-  body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
+  body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
 });
 assert.match(
   context.renderRecentSimulationCards(partialCoverageTransactionWindow.recentSimDays),
-  /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but no detailed activity entry was available to summarize\./
+  /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but the compact card only shows a partial activity sample\./
+);
+
+const overflowTransactionWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '11': {
+          day: 11,
+          week: 3,
+          generatedAt: 11000,
+          story: {
+            headline: 'Transaction overflow',
+            subheadline: 'Only the latest two team moves fit on the card.'
+          },
+          matchups: [],
+          totalTransactions: 3
+        }
+      },
+      activityLog: [
+        { id: 'o1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 10900 },
+        { id: 'o2', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 10800 },
+        { id: 'o3', type: 'trade', title: 'Audit Agents traded for Cliff Robinson', text: 'Added a frontcourt rotation piece.', teamIdx: 0, ts: 10700 }
+      ]
+    },
+    {}
+  )
+));
+assert.equal(overflowTransactionWindow.recentSimDays[0].teamActivity.length, 2);
+assert.deepStrictEqual(overflowTransactionWindow.recentSimDays[0].teamActivity, [
+  {
+    title: 'Audit Agents added Brent Barry',
+    body: 'Dropped an inactive bench wing for a live scorer.'
+  },
+  {
+    title: 'Audit Agents activated Kevin Johnson',
+    body: 'Healthy guard returned from IL.'
+  }
+]);
+assert.deepStrictEqual(overflowTransactionWindow.recentSimDays[0].leagueNote, {
+  title: 'League activity recorded during the reveal window',
+  body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
+});
+const overflowTransactionRendered = context.renderRecentSimulationCards(overflowTransactionWindow.recentSimDays);
+assert.equal((overflowTransactionRendered.match(/Team activity:/g) || []).length, 2);
+assert.match(overflowTransactionRendered, /Team activity: Audit Agents added Brent Barry/);
+assert.match(overflowTransactionRendered, /Team activity: Audit Agents activated Kevin Johnson/);
+assert.doesNotMatch(overflowTransactionRendered, /Audit Agents traded for Cliff Robinson/);
+assert.match(
+  overflowTransactionRendered,
+  /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but the compact card only shows a partial activity sample\./
 );
 
 const transactionOnlyViewModel = JSON.parse(JSON.stringify(
@@ -512,10 +567,10 @@ const transactionOnlyViewModel = JSON.parse(JSON.stringify(
 ));
 assert.deepStrictEqual(transactionOnlyViewModel.recentSimDays[0].leagueNote, {
   title: 'League activity recorded during the reveal window',
-  body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
+  body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
 });
 const transactionOnlyRendered = context.renderRecentSimulationCards(transactionOnlyViewModel.recentSimDays);
-assert.match(transactionOnlyRendered, /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but no detailed activity entry was available to summarize\./);
+assert.match(transactionOnlyRendered, /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but the compact card only shows a partial activity sample\./);
 
 const oneDayOnly = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
