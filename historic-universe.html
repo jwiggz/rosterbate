@@ -739,6 +739,20 @@
       });
   }
 
+  function countRepresentedRevealTransactions(entries){
+    return (Array.isArray(entries) ? entries : []).reduce(function(count, entry){
+      const type = String(entry?.type || '').toLowerCase();
+      const title = String(entry?.title || '').toLowerCase();
+      if(type === 'waiver' || type === 'trade' || type === 'activation' || type === 'drop' || type === 'restore' || type === 'transaction'){
+        return count + 1;
+      }
+      if(title.includes('added') || title.includes('dropped') || title.includes('restored') || title.includes('activated') || title.includes('traded')){
+        return count + 1;
+      }
+      return count;
+    }, 0);
+  }
+
   function buildRecentSimulationLeagueNote(slot, state, reveal){
     const myPos = Number(state?.myPos);
     const teamName = String(slot?.teamName || '').trim().toLowerCase();
@@ -759,7 +773,8 @@
         body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
       };
     }
-    if(Number(reveal?.totalTransactions) > 0 && !teamActivityEntries.length){
+    const representedTransactionCount = countRepresentedRevealTransactions(teamActivityEntries);
+    if(Number(reveal?.totalTransactions) > representedTransactionCount){
       return {
         title: 'League activity recorded during the reveal window',
         body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'

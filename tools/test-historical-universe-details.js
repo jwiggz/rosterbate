@@ -418,7 +418,7 @@ const teamOnlyTransactionWindow = JSON.parse(JSON.stringify(
             subheadline: 'Detailed activity feed was unavailable.'
           },
           matchups: [],
-          totalTransactions: 2
+          totalTransactions: 1
         }
       },
       activityLog: [
@@ -439,6 +439,49 @@ assert.doesNotMatch(
   context.renderRecentSimulationCards(teamOnlyTransactionWindow.recentSimDays),
   /League note:/,
   'team-only transaction windows should not render a generic league note'
+);
+
+const partialCoverageTransactionWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '10': {
+          day: 10,
+          week: 3,
+          generatedAt: 10000,
+          story: {
+            headline: 'Transaction window',
+            subheadline: 'Detailed activity feed was unavailable.'
+          },
+          matchups: [],
+          totalTransactions: 2
+        }
+      },
+      activityLog: [
+        { id: 't1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 9900 }
+      ]
+    },
+    {}
+  )
+));
+assert.deepStrictEqual(partialCoverageTransactionWindow.recentSimDays[0].teamActivity, [
+  {
+    title: 'Audit Agents added Brent Barry',
+    body: 'Dropped an inactive bench wing for a live scorer.'
+  }
+]);
+assert.deepStrictEqual(partialCoverageTransactionWindow.recentSimDays[0].leagueNote, {
+  title: 'League activity recorded during the reveal window',
+  body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
+});
+assert.match(
+  context.renderRecentSimulationCards(partialCoverageTransactionWindow.recentSimDays),
+  /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but no detailed activity entry was available to summarize\./
 );
 
 const transactionOnlyViewModel = JSON.parse(JSON.stringify(
