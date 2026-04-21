@@ -4209,8 +4209,28 @@ function fillCpuTeamStarterNeedsFromWaivers(teamIdx, options){
   return {changed,adds,drops};
 }
 
+function getCpuIlMaintenanceValue(player){
+  return Number(player?.fp || 0);
+}
+
+function isHealthyCpuIlActivationCandidate(player, week){
+  return getInjuryStatus(player, week) === null;
+}
+
+function getHealthyCpuIlActivationCandidates(ilRoster, week){
+  return [...(ilRoster||[])]
+    .filter(player=>isHealthyCpuIlActivationCandidate(player, week))
+    .sort((a,b)=>getCpuIlMaintenanceValue(b)-getCpuIlMaintenanceValue(a));
+}
+
+function getActiveCpuIlSwapCandidates(roster, week){
+  return [...(roster||[])]
+    .filter(player=>isIlEligiblePlayer(player, getInjuryStatus(player, week)))
+    .sort((a,b)=>getCpuIlMaintenanceValue(a)-getCpuIlMaintenanceValue(b));
+}
+
 function maintainCpuTeamRoster(teamIdx, options){
-  if(!isCpuManagedTeam(teamIdx)) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
+  if(!isCpuManagedTeam(teamIdx) || !isHistoricalSimulationUniverse(D)) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
   const opts=options||{};
   const day=Number(opts.day || G.day || 1);
   const week=weekForDay(day);
@@ -4223,7 +4243,7 @@ function maintainCpuTeamRoster(teamIdx, options){
   if(ilSlots>0){
     const ilCandidates=[...roster]
       .filter(player=>isIlEligiblePlayer(player,getInjuryStatus(player,week)))
-      .sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0));
+      .sort((a,b)=>getCpuIlMaintenanceValue(b)-getCpuIlMaintenanceValue(a));
     ilCandidates.forEach(player=>{
       if(ilRoster.length>=ilSlots) return;
       const rosterIndex=roster.findIndex(entry=>Number(entry?.id)===Number(player?.id));
@@ -4234,15 +4254,28 @@ function maintainCpuTeamRoster(teamIdx, options){
     });
 
     const activeCapacity=getActiveRosterCapacity();
-    const activationCandidates=[...ilRoster]
-      .filter(player=>!isIlEligiblePlayer(player,getInjuryStatus(player,week)))
-      .sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0));
+    const activationCandidates=getHealthyCpuIlActivationCandidates(ilRoster, week);
     activationCandidates.forEach(player=>{
-      if(roster.length>=activeCapacity) return;
       const ilIndex=ilRoster.findIndex(entry=>Number(entry?.id)===Number(player?.id));
       if(ilIndex<0) return;
-      const [moved]=ilRoster.splice(ilIndex,1);
-      roster.push(moved);
+
+      if(roster.length<activeCapacity){
+        const [moved]=ilRoster.splice(ilIndex,1);
+        roster.push(moved);
+        activated++;
+        return;
+      }
+
+      const swapCandidate=getActiveCpuIlSwapCandidates(roster, week)[0];
+      if(!swapCandidate) return;
+      const rosterIndex=roster.findIndex(entry=>Number(entry?.id)===Number(swapCandidate?.id));
+      if(rosterIndex<0) return;
+
+      const [activatedPlayer]=ilRoster.splice(ilIndex,1);
+      const [swappedPlayer]=roster.splice(rosterIndex,1);
+      roster.push(activatedPlayer);
+      ilRoster.push(swappedPlayer);
+      movedToIl++;
       activated++;
     });
   }

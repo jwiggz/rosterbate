@@ -283,11 +283,11 @@ function buildContext(options = {}) {
     ilRoster: [makePlayer(2, 'Healthy Return', 88)]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.deepStrictEqual(
-    result,
-    { changed: false, movedToIl: 0, activated: 0, waiverAdds: 0, waiverDrops: 0 },
-    'expected non-simulation universes to bypass the upgraded CPU IL logic'
-  );
+  assert.equal(result.changed, false, 'expected non-simulation universes to bypass the upgraded CPU IL logic');
+  assert.equal(result.movedToIl, 0);
+  assert.equal(result.activated, 0);
+  assert.equal(result.waiverAdds, 0);
+  assert.equal(result.waiverDrops, 0);
   assert.deepStrictEqual(context.G.rosters[1].map(player => Number(player.id)), [1]);
   assert.deepStrictEqual(context.G.ilByTeam[1].map(player => Number(player.id)), [2]);
   assert.deepStrictEqual(normalizeCalls, []);
@@ -301,11 +301,11 @@ function buildContext(options = {}) {
     ilRoster: [makePlayer(2, 'Healthy Return', 88)]
   });
   const result = context.maintainCpuTeamRoster(1, { day: 3 });
-  assert.deepStrictEqual(
-    result,
-    { changed: false, movedToIl: 0, activated: 0, waiverAdds: 0, waiverDrops: 0 },
-    'expected human teams to bypass CPU IL maintenance'
-  );
+  assert.equal(result.changed, false, 'expected human teams to bypass CPU IL maintenance');
+  assert.equal(result.movedToIl, 0);
+  assert.equal(result.activated, 0);
+  assert.equal(result.waiverAdds, 0);
+  assert.equal(result.waiverDrops, 0);
   assert.deepStrictEqual(normalizeCalls, []);
   assert.deepStrictEqual(waiverCalls, []);
 }
