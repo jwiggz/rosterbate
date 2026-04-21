@@ -400,6 +400,47 @@ assert.ok(
   'recent simulation cards should render the league note after team activity'
 );
 
+const teamOnlyTransactionWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '10': {
+          day: 10,
+          week: 3,
+          generatedAt: 10000,
+          story: {
+            headline: 'Transaction window',
+            subheadline: 'Detailed activity feed was unavailable.'
+          },
+          matchups: [],
+          totalTransactions: 2
+        }
+      },
+      activityLog: [
+        { id: 't1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 9900 }
+      ]
+    },
+    {}
+  )
+));
+assert.deepStrictEqual(teamOnlyTransactionWindow.recentSimDays[0].teamActivity, [
+  {
+    title: 'Audit Agents added Brent Barry',
+    body: 'Dropped an inactive bench wing for a live scorer.'
+  }
+]);
+assert.equal(teamOnlyTransactionWindow.recentSimDays[0].leagueNote, null);
+assert.doesNotMatch(
+  context.renderRecentSimulationCards(teamOnlyTransactionWindow.recentSimDays),
+  /League note:/,
+  'team-only transaction windows should not render a generic league note'
+);
+
 const transactionOnlyViewModel = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
     slot,

@@ -743,6 +743,11 @@
     const myPos = Number(state?.myPos);
     const teamName = String(slot?.teamName || '').trim().toLowerCase();
     const revealWindowEntries = getRevealWindowActivitiesForState(state, reveal);
+    const teamActivityEntries = revealWindowEntries.filter(function(entry){
+      if(Number(entry?.teamIdx) === myPos) return true;
+      const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
+      return !!teamName && haystack.includes(teamName);
+    });
     const nonTeamEntry = revealWindowEntries.find(function(entry){
       if(Number(entry?.teamIdx) === myPos) return false;
       const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
@@ -754,7 +759,7 @@
         body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
       };
     }
-    if(Number(reveal?.totalTransactions) > 0){
+    if(Number(reveal?.totalTransactions) > 0 && !teamActivityEntries.length){
       return {
         title: 'League activity recorded during the reveal window',
         body: 'Transactions were logged during this reveal window, but no detailed activity entry was available to summarize.'
