@@ -261,17 +261,17 @@
   }
 
   function getModernSpacingHybridScore(baseline){
-    var spacing = clamp((baseline.threes - 1.4) / 2.8, 0, 1);
-    var playmaking = clamp((baseline.ast - 3.2) / 4.8, 0, 1);
-    var scoring = clamp((baseline.pts - 16) / 12, 0, 1);
-    var hybridRebounding = clamp((baseline.reb - 5.5) / 4.5, 0, 1);
+    var spacing = clamp((baseline.threes - 1.1) / 2.8, 0, 1);
+    var playmaking = clamp((baseline.ast - 2.8) / 4.8, 0, 1);
+    var scoring = clamp((baseline.pts - 15) / 12, 0, 1);
+    var hybridRebounding = clamp((baseline.reb - 5.0) / 4.5, 0, 1);
     var hybridRimValue = clamp((baseline.blk - 0.7) / 1.4, 0, 1);
     return roundHundredth(
       clamp(
-        spacing * 0.38 +
-        playmaking * 0.22 +
-        scoring * 0.20 +
-        hybridRebounding * 0.12 +
+        spacing * 0.33 +
+        playmaking * 0.25 +
+        scoring * 0.18 +
+        hybridRebounding * 0.16 +
         hybridRimValue * 0.08,
         0,
         1
@@ -323,16 +323,94 @@
     const modernSpacingHybridScore = packId === 'nba_2016_full_season_v1'
       ? getModernSpacingHybridScore(baseline)
       : 0;
-    const premiumTierGate = getPremiumTierGate(adjustedOverall, 60, 76);
-    const middleTierGate = getPremiumTierGate(adjustedOverall, 58, 76);
+    const premiumTierGate = getPremiumTierGate(adjustedOverall, 57, 76);
+    const middleTierGate = getPremiumTierGate(adjustedOverall, 54, 76);
+    const lowerBandEntryGate = packId === 'nba_2016_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 54, 58)
+      : 0;
+    const lowerBandFadeGate = packId === 'nba_2016_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 61, 70)
+      : 0;
+    const lowerBandModernLiftGate = packId === 'nba_2016_full_season_v1'
+      ? roundHundredth(
+          clamp(lowerBandEntryGate * (1 - lowerBandFadeGate), 0, 1)
+        )
+      : 0;
+    const midPremiumEntryGate = packId === 'nba_2016_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 58, 62)
+      : 0;
+    const midPremiumFadeGate = packId === 'nba_2016_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 64, 70)
+      : 0;
+    const midPremiumModernLiftGate = packId === 'nba_2016_full_season_v1'
+      ? roundHundredth(
+          clamp(midPremiumEntryGate * (1 - midPremiumFadeGate), 0, 1)
+        )
+      : 0;
+    const olderEraMidPremiumEntryGate = packId === 'nba_1996_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 58, 62)
+      : 0;
+    const olderEraMidPremiumFadeGate = packId === 'nba_1996_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 66, 72)
+      : 0;
+    const olderEraMidPremiumGate = packId === 'nba_1996_full_season_v1'
+      ? roundHundredth(
+          clamp(olderEraMidPremiumEntryGate * (1 - olderEraMidPremiumFadeGate), 0, 1)
+        )
+      : 0;
+    const olderEraLowerPremiumEntryGate = packId === 'nba_1996_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 55, 58)
+      : 0;
+    const olderEraLowerPremiumFadeGate = packId === 'nba_1996_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 60, 64)
+      : 0;
+    const olderEraLowerPremiumGate = packId === 'nba_1996_full_season_v1'
+      ? roundHundredth(
+          clamp(olderEraLowerPremiumEntryGate * (1 - olderEraLowerPremiumFadeGate), 0, 1)
+        )
+      : 0;
+    const olderEraSharedBandEntryGate = packId === 'nba_1996_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 60, 63)
+      : 0;
+    const olderEraSharedBandFadeGate = packId === 'nba_1996_full_season_v1'
+      ? getPremiumTierGate(adjustedOverall, 64, 67)
+      : 0;
+    const olderEraSharedBandGate = packId === 'nba_1996_full_season_v1'
+      ? roundHundredth(
+          clamp(olderEraSharedBandEntryGate * (1 - olderEraSharedBandFadeGate), 0, 1)
+        )
+      : 0;
     const olderEraInteriorCompression = packId === 'nba_1996_full_season_v1'
       ? 1 - olderEraInteriorScore * premiumTierGate * 0.035
       : 1;
+    const olderEraMidPremiumCompression = packId === 'nba_1996_full_season_v1'
+      ? 1 - olderEraInteriorScore * olderEraMidPremiumGate * 0.012
+      : 1;
+    const olderEraLowerPremiumCompression = packId === 'nba_1996_full_season_v1'
+      ? 1 - olderEraInteriorScore * olderEraLowerPremiumGate * 0.008
+      : 1;
+    const olderEraSharedBandCompression = packId === 'nba_1996_full_season_v1'
+      ? 1 - olderEraInteriorScore * olderEraSharedBandGate * 0.006
+      : 1;
+    const modernSpacingHybridLowerBandLift = packId === 'nba_2016_full_season_v1'
+      ? lowerBandModernLiftGate * 0.01
+      : 0;
+    const modernSpacingHybridMidPremiumLift = packId === 'nba_2016_full_season_v1'
+      ? midPremiumModernLiftGate * 0.009
+      : 0;
     const modernSpacingHybridLift = packId === 'nba_2016_full_season_v1'
-      ? 1 + modernSpacingHybridScore * middleTierGate * 0.015
+      ? 1 + modernSpacingHybridScore * (
+          middleTierGate * 0.015 +
+          modernSpacingHybridLowerBandLift +
+          modernSpacingHybridMidPremiumLift
+        )
       : 1;
     const boardShapeMultiplier =
-      olderEraInteriorCompression * modernSpacingHybridLift
+      olderEraInteriorCompression *
+      olderEraMidPremiumCompression *
+      olderEraLowerPremiumCompression *
+      olderEraSharedBandCompression *
+      modernSpacingHybridLift
 
     adjusted.overall=roundStat(adjustedOverall * boardShapeMultiplier * lowGamesConfidence);
     return {
@@ -346,8 +424,18 @@
         lowGamesConfidence:lowGamesConfidence,
         olderEraInteriorScore:olderEraInteriorScore,
         olderEraInteriorCompression:roundThousandth(olderEraInteriorCompression),
+        olderEraMidPremiumGate:olderEraMidPremiumGate,
+        olderEraMidPremiumCompression:roundThousandth(olderEraMidPremiumCompression),
+        olderEraLowerPremiumGate:olderEraLowerPremiumGate,
+        olderEraLowerPremiumCompression:roundThousandth(olderEraLowerPremiumCompression),
+        olderEraSharedBandGate:olderEraSharedBandGate,
+        olderEraSharedBandCompression:roundThousandth(olderEraSharedBandCompression),
         modernSpacingHybridScore:modernSpacingHybridScore,
         modernSpacingHybridLift:roundThousandth(modernSpacingHybridLift),
+        lowerBandModernLiftGate:lowerBandModernLiftGate,
+        lowerBandModernLift:roundThousandth(modernSpacingHybridLowerBandLift),
+        midPremiumModernLiftGate:midPremiumModernLiftGate,
+        midPremiumModernLift:roundThousandth(modernSpacingHybridMidPremiumLift),
         boardShapeMultiplier:roundThousandth(boardShapeMultiplier),
         normalizationModel:'season_context_plus_board_shape_tuning_v1'
       }
