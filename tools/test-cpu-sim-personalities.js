@@ -38,7 +38,7 @@ const starHeavyRoster = [
 ];
 
 const steadyFloorTargetRoster = [
-  makePlayer(3, 'PG', {
+  makePlayer(11, 'PG', {
     overall: 72,
     usage: 60,
     scoring: 65,
@@ -46,7 +46,7 @@ const steadyFloorTargetRoster = [
     defense: 61,
     rebounding: 38
   }),
-  makePlayer(4, 'PF', {
+  makePlayer(12, 'PF', {
     overall: 75,
     usage: 57,
     scoring: 64,
@@ -57,7 +57,7 @@ const steadyFloorTargetRoster = [
 ];
 
 const borderlineStarGuardRoster = [
-  makePlayer(5, 'PG', {
+  makePlayer(21, 'PG', {
     overall: 82,
     usage: 77,
     scoring: 81,
@@ -65,7 +65,7 @@ const borderlineStarGuardRoster = [
     defense: 61,
     rebounding: 39
   }),
-  makePlayer(6, 'SG', {
+  makePlayer(22, 'SG', {
     overall: 80,
     usage: 74,
     scoring: 79,
@@ -76,7 +76,7 @@ const borderlineStarGuardRoster = [
 ];
 
 const balancedTargetRoster = [
-  makePlayer(7, 'PG', {
+  makePlayer(31, 'PG', {
     overall: 70,
     usage: 58,
     scoring: 63,
@@ -84,7 +84,7 @@ const balancedTargetRoster = [
     defense: 59,
     rebounding: 36
   }),
-  makePlayer(8, 'PF', {
+  makePlayer(32, 'PF', {
     overall: 73,
     usage: 55,
     scoring: 61,
@@ -94,7 +94,7 @@ const balancedTargetRoster = [
   })
 ];
 
-const bigProfile = makePlayer(10, 'C', {
+const bigProfile = makePlayer(61, 'C', {
   overall: 81,
   usage: 70,
   scoring: 74,
@@ -103,7 +103,7 @@ const bigProfile = makePlayer(10, 'C', {
   rebounding: 90
 });
 
-const guardProfile = makePlayer(11, 'PG', {
+const guardProfile = makePlayer(62, 'PG', {
   overall: 81,
   usage: 73,
   scoring: 79,
@@ -112,7 +112,7 @@ const guardProfile = makePlayer(11, 'PG', {
   rebounding: 41
 });
 
-const comboBig = makePlayer(12, 'F/C', {
+const comboBig = makePlayer(63, 'F/C', {
   overall: 82,
   usage: 68,
   scoring: 74,
@@ -123,7 +123,7 @@ const comboBig = makePlayer(12, 'F/C', {
 
 const bigHeavyRoster = [
   bigProfile,
-  makePlayer(13, 'PF', {
+  makePlayer(41, 'PF', {
     overall: 81,
     usage: 63,
     scoring: 70,
@@ -133,7 +133,7 @@ const bigHeavyRoster = [
   })
 ];
 const guardHeavyRoster = [
-  makePlayer(14, 'PG', {
+  makePlayer(51, 'PG', {
     overall: 76,
     usage: 69,
     scoring: 75,
@@ -141,7 +141,7 @@ const guardHeavyRoster = [
     defense: 58,
     rebounding: 38
   }),
-  makePlayer(15, 'SG', {
+  makePlayer(52, 'SG', {
     overall: 75,
     usage: 67,
     scoring: 74,
