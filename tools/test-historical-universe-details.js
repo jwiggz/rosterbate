@@ -337,12 +337,35 @@ assert.deepStrictEqual(
   viewModel.recentSimDays.map(item => item.week),
   [3, 3, 3]
 );
+assert.deepStrictEqual(
+  viewModel.recentSimDays.map(item => item.story),
+  [
+    {
+      headline: 'Audit Agents close strong on Day 10',
+      body: 'Jordan led the latest sim-day swing and kept the team in second.'
+    },
+    {
+      headline: 'CPU Team 1 clipped Audit Agents on Day 9',
+      body: 'The offense cooled off late.'
+    },
+    {
+      headline: 'Audit Agents survived a grinder on Day 8',
+      body: 'The defense carried a close finish.'
+    }
+  ]
+);
 assert.match(viewModel.recentSimDays[0].teamResult.headline, /Audit Agents beat CPU Team 2/i);
 assert.equal(viewModel.recentSimDays[0].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[0].teamActivity[0].title, /Audit Agents/i);
 assert.match(viewModel.recentSimDays[0].leagueNote.title, /CPU Team 1/i);
 assert.match(viewModel.recentSimDays[1].teamResult.headline, /Audit Agents fell to CPU Team 1/i);
+assert.equal(viewModel.recentSimDays[1].teamActivity.length, 1);
+assert.match(viewModel.recentSimDays[1].teamActivity[0].title, /Audit Agents added Buck Williams/i);
+assert.match(viewModel.recentSimDays[1].leagueNote.title, /CPU Team 3 activated Kevin Johnson/i);
+assert.match(viewModel.recentSimDays[1].leagueNote.body, /Healthy guard returned from IL\./i);
 assert.equal(viewModel.recentSimDays[2].teamActivity.length, 0);
+assert.match(viewModel.recentSimDays[2].leagueNote.title, /CPU Team 2 added Danny Manning/i);
+assert.match(viewModel.recentSimDays[2].leagueNote.body, /Added another forward before Day 8\./i);
 
 const oneDayOnly = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
@@ -369,6 +392,14 @@ const oneDayOnly = JSON.parse(JSON.stringify(
 ));
 assert.equal(oneDayOnly.recentSimDays.length, 1);
 assert.equal(oneDayOnly.recentSimDays[0].day, 10);
+assert.deepStrictEqual(oneDayOnly.recentSimDays[0].story, {
+  headline: 'Single day available',
+  body: 'Only one reveal has been saved.'
+});
+assert.equal(oneDayOnly.recentSimDays[0].teamResult, null);
+assert.equal(oneDayOnly.recentSimDays[0].leagueNote, null);
+assert.notEqual(oneDayOnly.recentSimDays[0].story.headline, 'Simulation day completed.');
+assert.notEqual(oneDayOnly.recentSimDays[0].story.body, 'Simulation day completed.');
 
 assert.deepStrictEqual(viewModel.leagueSnapshot.currentStanding, {
   title: '#2 Audit Agents',
