@@ -539,6 +539,47 @@ assert.match(
   /League note: League activity recorded during the reveal window - Transactions were logged during this reveal window, but the compact card only shows a partial activity sample\./
 );
 
+const mixedOverflowTransactionWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '12': {
+          day: 12,
+          week: 3,
+          generatedAt: 12000,
+          story: {
+            headline: 'Mixed overflow',
+            subheadline: 'The note slot should keep the concrete league entry visible.'
+          },
+          matchups: [],
+          totalTransactions: 4
+        }
+      },
+      activityLog: [
+        { id: 'm1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 11900 },
+        { id: 'm2', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 11800 },
+        { id: 'm3', type: 'trade', title: 'CPU Team 1 traded for Marcus Camby', text: 'A separate roster move landed in the same window.', teamIdx: 1, ts: 11700 }
+      ]
+    },
+    {}
+  )
+));
+assert.equal(mixedOverflowTransactionWindow.recentSimDays[0].teamActivity.length, 2);
+assert.deepStrictEqual(mixedOverflowTransactionWindow.recentSimDays[0].leagueNote, {
+  title: 'CPU Team 1 traded for Marcus Camby',
+  body: 'A separate roster move landed in the same window. Additional transactions were also logged during this reveal window.'
+});
+const mixedOverflowTransactionRendered = context.renderRecentSimulationCards(mixedOverflowTransactionWindow.recentSimDays);
+assert.match(mixedOverflowTransactionRendered, /Team activity: Audit Agents added Brent Barry/);
+assert.match(mixedOverflowTransactionRendered, /Team activity: Audit Agents activated Kevin Johnson/);
+assert.match(mixedOverflowTransactionRendered, /League note: CPU Team 1 traded for Marcus Camby - A separate roster move landed in the same window\. Additional transactions were also logged during this reveal window\./);
+assert.doesNotMatch(mixedOverflowTransactionRendered, /League activity recorded during the reveal window/);
+
 const transactionOnlyViewModel = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
     slot,

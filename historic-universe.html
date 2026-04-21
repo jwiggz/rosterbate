@@ -769,16 +769,23 @@
       const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
       return !(teamName && haystack.includes(teamName));
     });
-    if(nonTeamEntry){
-      return {
-        title: String(nonTeamEntry?.title || 'League note').trim(),
-        body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
-      };
-    }
-    const representedTransactionCount = countRepresentedRevealTransactions(
+    const representedTeamTransactions = countRepresentedRevealTransactions(
       teamActivityEntries.slice(0, RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT)
     );
-    if(Number(reveal?.totalTransactions) > representedTransactionCount){
+    const representedNonTeamTransactions = nonTeamEntry && countRepresentedRevealTransactions([nonTeamEntry]) > 0 ? 1 : 0;
+    const representedTransactions = representedTeamTransactions + representedNonTeamTransactions;
+    const hasOverflow = Number(reveal?.totalTransactions) > representedTransactions;
+    if(nonTeamEntry){
+      const title = String(nonTeamEntry?.title || 'League note').trim();
+      const body = String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim();
+      return {
+        title: title,
+        body: hasOverflow
+          ? (body ? body + ' Additional transactions were also logged during this reveal window.' : 'Additional transactions were also logged during this reveal window.')
+          : body
+      };
+    }
+    if(hasOverflow){
       return {
         title: 'League activity recorded during the reveal window',
         body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
