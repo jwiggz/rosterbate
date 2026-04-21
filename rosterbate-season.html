@@ -4183,11 +4183,20 @@ function getCpuWaiverRoleShape(player){
 }
 
 function getCpuWaiverVersatilityBonus(player){
+  if(CURRENT_SPORT!=='nba') return 0;
   const slotCount=getCpuWaiverPlayerSlots(player).length;
   return Math.max(0, slotCount - 1) * 4;
 }
 
 function buildCpuWaiverRosterNeedSummary(teamIdx, day){
+  if(CURRENT_SPORT!=='nba'){
+    return {
+      slotCounts:{G:0,F:0,C:0},
+      roleCounts:{scoring:0,playmaking:0,rebounding:0,defense:0},
+      positionNeed:{G:0,F:0,C:0},
+      roleNeed:{scoring:0,playmaking:0,rebounding:0,defense:0}
+    };
+  }
   const week=weekForDay(day);
   const availableRoster=(G.rosters[teamIdx]||[])
     .filter(Boolean)
@@ -4234,6 +4243,7 @@ function buildCpuWaiverRosterNeedSummary(teamIdx, day){
 }
 
 function getCpuWaiverPositionNeedBonus(player, rosterNeed, targetSlot){
+  if(CURRENT_SPORT!=='nba') return 0;
   const slots=getCpuWaiverPlayerSlots(player);
   const target=String(targetSlot||'').toUpperCase();
   const positionNeed=rosterNeed?.positionNeed || {};
@@ -4252,6 +4262,7 @@ function getCpuWaiverPositionNeedBonus(player, rosterNeed, targetSlot){
 }
 
 function getCpuWaiverRoleNeedBonus(player, rosterNeed){
+  if(CURRENT_SPORT!=='nba') return 0;
   const roleNeed=rosterNeed?.roleNeed || {};
   const shape=getCpuWaiverRoleShape(player);
   let bonus=0;

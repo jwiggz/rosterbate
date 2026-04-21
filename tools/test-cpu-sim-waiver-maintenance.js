@@ -136,7 +136,7 @@ function buildContext(options = {}) {
   const context = {
     STARTERS: 5,
     SLOT_LABELS: ['PG', 'SG', 'SF', 'PF', 'C'],
-    CURRENT_SPORT: 'nba',
+    CURRENT_SPORT: options.currentSport || 'nba',
     D: {
       myPos: 0,
       multiplayer: false,
@@ -491,6 +491,28 @@ function buildSeamContext(options = {}) {
     rosterNeed
   );
   assert.ok(protectedScore > deadScore);
+}
+
+{
+  const { context } = buildSeamContext({
+    currentSport: 'mlb',
+    roster: [
+      makePlayer(801, 'Starter Catcher', 'C', 20, { reb: 11, blk: 2 }),
+      makePlayer(802, 'Bench Catcher', 'C', 12, { reb: 8, blk: 1 })
+    ],
+    starterIds: [801]
+  });
+  const rosterNeed = context.buildCpuWaiverRosterNeedSummary(1, 3);
+  const catcher = context.G.rosters[1].find(player => Number(player.id) === 802);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(rosterNeed.positionNeed)), { G: 0, F: 0, C: 0 });
+  assert.deepStrictEqual(
+    JSON.parse(JSON.stringify(rosterNeed.roleNeed)),
+    { scoring: 0, playmaking: 0, rebounding: 0, defense: 0 }
+  );
+  assert.equal(context.getCpuWaiverPositionNeedBonus(catcher, rosterNeed, 'C'), 0);
+  assert.equal(context.getCpuWaiverRoleNeedBonus(catcher, rosterNeed), 0);
+  assert.equal(context.getCpuWaiverVersatilityBonus(catcher), 0);
+  assert.equal(context.getCpuWaiverDropProtectionBonus(catcher, rosterNeed), Number(catcher.fp) * 0.9);
 }
 
 {
