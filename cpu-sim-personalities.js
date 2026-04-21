@@ -3,6 +3,12 @@
 
   const PERSONALITIES = ['balanced', 'star_loyalist', 'steady_floor', 'bigs_bias', 'guards_bias'];
   const NON_STAR_PERSONALITIES = ['balanced', 'steady_floor', 'bigs_bias', 'guards_bias'];
+  const STAR_LOYALIST_SIGNAL_THRESHOLD = 14600;
+  const STAR_LOYALIST_OVERALL_THRESHOLD = 91;
+  const STAR_LOYALIST_USAGE_THRESHOLD = 89;
+  const POSITION_LEAN_GAP_THRESHOLD = 75;
+  const STEADY_FLOOR_AVERAGE_SHAPE_THRESHOLD = 238;
+  const STEADY_FLOOR_LEAN_GAP_THRESHOLD = 85;
 
   function toNumber(value) {
     const num = Number(value);
@@ -132,7 +138,8 @@
       Math.round(summary.bigLean / 10)
     ].join('|');
     const bucket = hashSeed(seed) % NON_STAR_PERSONALITIES.length;
-    return NON_STAR_PERSONALITIES[bucket];
+    const personality = NON_STAR_PERSONALITIES[bucket];
+    return personality === 'guards_bias' ? 'balanced' : personality;
   }
 
   function buildCpuSimPersonalitiesByTeam(options) {
@@ -148,22 +155,28 @@
 
       const summary = getRosterSummary(rosters[teamIdx]);
       if (
-        summary.topStarSignal >= 14200 ||
-        (summary.topOverall >= 90 && summary.topUsage >= 88)
+        summary.topStarSignal >= STAR_LOYALIST_SIGNAL_THRESHOLD ||
+        (
+          summary.topOverall >= STAR_LOYALIST_OVERALL_THRESHOLD &&
+          summary.topUsage >= STAR_LOYALIST_USAGE_THRESHOLD
+        )
       ) {
         return 'star_loyalist';
       }
 
-      if (summary.bigLean >= summary.guardLean + 55) {
+      if (summary.bigLean >= summary.guardLean + POSITION_LEAN_GAP_THRESHOLD) {
         return 'bigs_bias';
       }
 
-      if (summary.guardLean >= summary.bigLean + 55) {
+      if (summary.guardLean >= summary.bigLean + POSITION_LEAN_GAP_THRESHOLD) {
         return 'guards_bias';
       }
 
       const averageShape = summary.playerCount > 0 ? summary.shapeScore / summary.playerCount : 0;
-      if (averageShape >= 250 && Math.abs(summary.bigLean - summary.guardLean) <= 80) {
+      if (
+        averageShape >= STEADY_FLOOR_AVERAGE_SHAPE_THRESHOLD &&
+        Math.abs(summary.bigLean - summary.guardLean) <= STEADY_FLOOR_LEAN_GAP_THRESHOLD
+      ) {
         return 'steady_floor';
       }
 
