@@ -88,13 +88,6 @@ function extractFunctionSource(name, { optional = false } = {}) {
 }
 
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
-const getCpuWaiverPlayerSlotsSource = extractFunctionSource('getCpuWaiverPlayerSlots', { optional: true });
-const getCpuWaiverRoleShapeSource = extractFunctionSource('getCpuWaiverRoleShape', { optional: true });
-const buildCpuWaiverRosterNeedSummarySource = extractFunctionSource('buildCpuWaiverRosterNeedSummary', { optional: true });
-const getCpuWaiverVersatilityBonusSource = extractFunctionSource('getCpuWaiverVersatilityBonus', { optional: true });
-const getCpuWaiverRoleNeedBonusSource = extractFunctionSource('getCpuWaiverRoleNeedBonus', { optional: true });
-const getCpuWaiverPositionNeedBonusSource = extractFunctionSource('getCpuWaiverPositionNeedBonus', { optional: true });
-const getCpuWaiverDropProtectionBonusSource = extractFunctionSource('getCpuWaiverDropProtectionBonus', { optional: true });
 const getCpuWaiverStarterFillScoreSource = extractFunctionSource('getCpuWaiverStarterFillScore');
 const getCpuWaiverCleanupAddScoreSource = extractFunctionSource('getCpuWaiverCleanupAddScore');
 const getCpuWaiverCleanupDropScoreSource = extractFunctionSource('getCpuWaiverCleanupDropScore');
@@ -106,6 +99,18 @@ const cleanupCpuDeadRosterSpotsFromWaiversSource = extractFunctionSource(
   'cleanupCpuDeadRosterSpotsFromWaivers',
   { optional: true }
 );
+
+function getRosterNeedSeamSources() {
+  return [
+    extractFunctionSource('getCpuWaiverPlayerSlots'),
+    extractFunctionSource('getCpuWaiverRoleShape'),
+    extractFunctionSource('buildCpuWaiverRosterNeedSummary'),
+    extractFunctionSource('getCpuWaiverVersatilityBonus'),
+    extractFunctionSource('getCpuWaiverRoleNeedBonus'),
+    extractFunctionSource('getCpuWaiverPositionNeedBonus'),
+    extractFunctionSource('getCpuWaiverDropProtectionBonus')
+  ];
+}
 
 function makePlayer(id, name, pos, fp, extra = {}) {
   return {
@@ -227,13 +232,6 @@ function buildContext(options = {}) {
   vm.runInNewContext(
     [
       getMissingStarterSlotsForTeamSource,
-      getCpuWaiverPlayerSlotsSource,
-      getCpuWaiverRoleShapeSource,
-      buildCpuWaiverRosterNeedSummarySource,
-      getCpuWaiverVersatilityBonusSource,
-      getCpuWaiverRoleNeedBonusSource,
-      getCpuWaiverPositionNeedBonusSource,
-      getCpuWaiverDropProtectionBonusSource,
       getCpuWaiverStarterFillScoreSource,
       getCpuWaiverCleanupAddScoreSource,
       getCpuWaiverCleanupDropScoreSource,
@@ -247,6 +245,12 @@ function buildContext(options = {}) {
   );
 
   return { context, claimCalls };
+}
+
+function buildSeamContext(options = {}) {
+  const built = buildContext(options);
+  vm.runInNewContext(getRosterNeedSeamSources().join('\n'), built.context);
+  return built;
 }
 
 {
@@ -424,7 +428,7 @@ function buildContext(options = {}) {
 }
 
 {
-  const { context, claimCalls } = buildContext({
+  const { context, claimCalls } = buildSeamContext({
     roster: [
       makePlayer(601, 'Starter PG', 'PG', 52, { ast: 8, pts: 15 }),
       makePlayer(602, 'Starter SG', 'SG', 50, { ast: 5, pts: 18 }),
@@ -440,13 +444,15 @@ function buildContext(options = {}) {
     totalRosterLimit: 7,
     starterIds: [601, 602, 603, 604, 605]
   });
+  const dropCandidate = context.getCpuWaiverDropCandidate(1, 3, 'SF');
+  assert.equal(Number(dropCandidate.id), 607);
   const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
   assert.equal(result.drops, 1);
   assert.equal(claimCalls[0].dropId, 607);
 }
 
 {
-  const { context, claimCalls } = buildContext({
+  const { context } = buildSeamContext({
     roster: [
       makePlayer(701, 'Starter PG', 'PG', 51, { ast: 9, pts: 14 }),
       makePlayer(702, 'Starter SG', 'SG', 49, { ast: 3, pts: 18 }),
@@ -462,10 +468,18 @@ function buildContext(options = {}) {
     totalRosterLimit: 7,
     starterIds: [701, 702, 703, 704, 705]
   });
-  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
-  assert.equal(result.adds, 1);
-  assert.equal(result.drops, 1);
-  assert.equal(claimCalls[0].dropId, 707);
+  const rosterNeed = context.buildCpuWaiverRosterNeedSummary(1, 3);
+  const protectedScore = context.getCpuWaiverCleanupDropScore(
+    context.G.rosters[1].find(player => Number(player.id) === 706),
+    3,
+    rosterNeed
+  );
+  const deadScore = context.getCpuWaiverCleanupDropScore(
+    context.G.rosters[1].find(player => Number(player.id) === 707),
+    3,
+    rosterNeed
+  );
+  assert.ok(protectedScore > deadScore);
 }
 
 {
