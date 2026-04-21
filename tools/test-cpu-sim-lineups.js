@@ -56,6 +56,30 @@ const benchGuard = makePlayer(6, 'Bench Guard', 'PG', {
 const benchForward = makePlayer(7, 'Bench Forward', 'SF', {
   overall: 76, usage: 69, scoring: 75, playmaking: 61
 });
+const personalityStarGuard = makePlayer(8, 'Personality Star Guard', 'SG', {
+  overall: 85, usage: 98, scoring: 97, playmaking: 95, defense: 66, rebounding: 52
+});
+const personalityRivalGuard = makePlayer(9, 'Personality Rival Guard', 'SG', {
+  overall: 93, usage: 82, scoring: 82, playmaking: 82, defense: 70, rebounding: 45
+});
+const personalityPointGuard = makePlayer(10, 'Personality Point Guard', 'PG', {
+  overall: 94, usage: 79, scoring: 80, playmaking: 82, defense: 70, rebounding: 60
+});
+const personalityWing = makePlayer(11, 'Personality Wing', 'SF', {
+  overall: 95, usage: 77, scoring: 79, playmaking: 81, defense: 72, rebounding: 60
+});
+const personalityForward = makePlayer(12, 'Personality Forward', 'PF', {
+  overall: 96, usage: 76, scoring: 78, playmaking: 80, defense: 74, rebounding: 66
+});
+const personalityCenter = makePlayer(13, 'Personality Center', 'C', {
+  overall: 96, usage: 75, scoring: 77, playmaking: 78, defense: 80, rebounding: 88
+});
+const personalityBig = makePlayer(14, 'Personality Big', 'PF', {
+  overall: 81, usage: 70, scoring: 74, playmaking: 45, defense: 84, rebounding: 90
+});
+const personalityGuard = makePlayer(15, 'Personality Guard', 'PG', {
+  overall: 81, usage: 73, scoring: 79, playmaking: 85, defense: 61, rebounding: 41
+});
 
 const roster = [
   starGuard,
@@ -65,6 +89,15 @@ const roster = [
   anchorCenter,
   benchGuard,
   benchForward
+];
+
+const personalityRoster = [
+  personalityPointGuard,
+  personalityStarGuard,
+  personalityRivalGuard,
+  personalityWing,
+  personalityForward,
+  personalityCenter
 ];
 
 const day1Games = new Set([1, 2, 3, 4, 5, 6]);
@@ -85,6 +118,45 @@ function buildLineup(day, injuries = new Map()) {
     },
     getInjuryStatus(player) {
       return injuries.get(player.id) || null;
+    },
+    weekForDay() {
+      return healthyWeek;
+    }
+  });
+}
+
+function buildPersonalityLineup(personality) {
+  return cpuSimLineups.buildCpuSimLineupIds({
+    roster: personalityRoster,
+    slots,
+    starterCount: 5,
+    day: 1,
+    stableThreshold: 0,
+    personality,
+    canPlayerFillSlot,
+    getGameInfo(player, requestedDay) {
+      return day1Games.has(player.id) ? { opponent: 'SIM' } : null;
+    },
+    getInjuryStatus() {
+      return null;
+    },
+    weekForDay() {
+      return healthyWeek;
+    }
+  });
+}
+
+function scorePersonalityCandidate(player, personality, slot) {
+  return cpuSimLineups.scoreCpuSimLineupCandidate(player, {
+    day: 1,
+    slot,
+    personality,
+    canPlayerFillSlot,
+    getGameInfo(candidatePlayer, requestedDay) {
+      return day1Games.has(candidatePlayer.id) ? { opponent: 'SIM' } : null;
+    },
+    getInjuryStatus() {
+      return null;
     },
     weekForDay() {
       return healthyWeek;
@@ -114,37 +186,33 @@ const day3Lineup = buildLineup(3, new Map([[3, { label: 'OUT' }]]));
 assert.ok(!day3Lineup.includes(3), 'expected an unavailable core player to sit');
 assert.ok(day3Lineup.includes(7), 'expected a healthy replacement to enter for the unavailable forward');
 
-const clearUpgradeScore = cpuSimLineups.scoreCpuSimLineupCandidate(benchGuard, {
-  day: 1,
-  slot: 'PG',
-  canPlayerFillSlot,
-  getGameInfo(player) {
-    return day1Games.has(player.id) ? { opponent: 'SIM' } : null;
-  },
-  getInjuryStatus() {
-    return null;
-  },
-  weekForDay() {
-    return healthyWeek;
-  }
-});
-const starScore = cpuSimLineups.scoreCpuSimLineupCandidate(starGuard, {
-  day: 1,
-  slot: 'PG',
-  canPlayerFillSlot,
-  getGameInfo(player) {
-    return day1Games.has(player.id) ? { opponent: 'SIM' } : null;
-  },
-  getInjuryStatus() {
-    return null;
-  },
-  weekForDay() {
-    return healthyWeek;
-  }
-});
+const balancedPersonalityLineup = buildPersonalityLineup('balanced');
+const starLoyalistPersonalityLineup = buildPersonalityLineup('star_loyalist');
 assert.ok(
-  starScore + stableThreshold >= clearUpgradeScore,
-  'expected the higher-upside star to survive a close playable tie'
+  !balancedPersonalityLineup.includes(8),
+  'expected the balanced lineup to keep the higher-ranked rival guard over the star'
+);
+assert.ok(
+  starLoyalistPersonalityLineup.includes(8),
+  'expected star_loyalist to preserve a star in a close playable decision'
+);
+
+const balancedBigScore = scorePersonalityCandidate(personalityBig, 'balanced', 'UTIL');
+const balancedGuardScore = scorePersonalityCandidate(personalityGuard, 'balanced', 'UTIL');
+const bigBiasScore = scorePersonalityCandidate(personalityBig, 'bigs_bias', 'UTIL');
+const guardBiasScore = scorePersonalityCandidate(personalityGuard, 'guards_bias', 'UTIL');
+
+assert.ok(
+  Math.abs(balancedBigScore - balancedGuardScore) < 200,
+  'expected the big/guard matchup to be a close baseline call'
+);
+assert.ok(
+  bigBiasScore > scorePersonalityCandidate(personalityGuard, 'bigs_bias', 'UTIL'),
+  'expected bigs_bias to break a close call toward the big'
+);
+assert.ok(
+  guardBiasScore > scorePersonalityCandidate(personalityBig, 'guards_bias', 'UTIL'),
+  'expected guards_bias to break a close call toward the guard'
 );
 
 console.log('cpu sim lineups policy test passed');
