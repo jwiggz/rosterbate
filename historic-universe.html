@@ -167,6 +167,20 @@
   .detail-item strong,.timeline-item strong,.roster-item strong,.info-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
   .detail-item span,.timeline-item span,.roster-item span,.info-item span{display:block;margin-top:6px;font-size:13px;line-height:1.56;color:#cdd9ea}
   .detail-item-meta,.roster-item-meta,.info-item-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .sim-day-card{display:grid;gap:8px}
+  .sim-day-label{
+    font:700 10px/1 var(--plex);
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#9ec8ff;
+  }
+  .sim-day-subline,
+  .sim-day-note{
+    display:block;
+    font-size:12px;
+    line-height:1.55;
+    color:#b8cae3;
+  }
   .pill{
     display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
     background:rgba(7,14,25,.66);font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb
@@ -272,6 +286,19 @@
               <div class="reveal-headline" id="latestSimDayHeadline">No reveal story yet</div>
               <div class="reveal-copy" id="latestSimDayNarrative">As daily reveals land, this view will surface the latest headline so each universe feels like a living archive run.</div>
               <div class="reveal-pills" id="latestSimDayPills"></div>
+            </div>
+          </article>
+
+          <article class="panel card-pad">
+            <div class="section-kicker">Recent Simulation</div>
+            <div class="section-title">How The Last Three Days Landed</div>
+            <div class="section-copy">A team-first read on the last three sim days, with your result first and one light league note when it matters.</div>
+            <div class="detail-list" id="recentSimulationList">
+              <div class="detail-item sim-day-card">
+                <div class="sim-day-label">Recent Simulation</div>
+                <strong>Loading recent sim days</strong>
+                <span>Preparing the latest stretch of universe momentum.</span>
+              </div>
             </div>
           </article>
 
@@ -882,6 +909,9 @@
     const recentActivity = detailsViewModel.recentActivity && typeof detailsViewModel.recentActivity === 'object'
       ? detailsViewModel.recentActivity
       : { items:[] };
+    const recentSimDays = Array.isArray(detailsViewModel.recentSimDays)
+      ? detailsViewModel.recentSimDays
+      : [];
     const seasonUrl = api.buildSeasonUrl(slot, getSport());
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
     const modeLabel = api.getModeLabel(slot.historicalEntryMode);
@@ -931,6 +961,8 @@
     document.getElementById('latestSimDayPills').innerHTML = (Array.isArray(latestSimDay?.pills) ? latestSimDay.pills : []).map(function(pill){
       return '<span class="pill">' + escapeHtml(String(pill || '').trim()) + '</span>';
     }).join('');
+
+    document.getElementById('recentSimulationList').innerHTML = renderRecentSimulationCards(recentSimDays);
 
     document.getElementById('currentTeamStateList').innerHTML = renderDetailList(
       currentTeamState.items,
