@@ -263,26 +263,35 @@ function buildSeamContext(options = {}) {
 {
   const { context } = buildSeamContext();
   const versatileBig = makePlayer(999, 'Versatile Big', 'PF/C', 24);
+  assert.equal(JSON.stringify(context.getCpuWaiverPlayerSlots(versatileBig)), JSON.stringify(['PF/C']));
   assert.equal(context.canPlayerFillSlot(versatileBig, 'PF'), false);
   assert.equal(context.canPlayerFillSlot(versatileBig, 'C'), false);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'G'), false);
   assert.equal(context.canPlayerFillSlot(versatileBig, 'F'), false);
   assert.equal(context.canPlayerFillSlot(versatileBig, 'UTIL'), false);
-  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'PF'), true);
-  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'C'), true);
-  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'F'), true);
-  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'UTIL'), true);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'PF'), false);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'C'), false);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'G'), false);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'F'), false);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'UTIL'), false);
+  const pfScore = context.getCpuWaiverStarterFillScore(versatileBig, 'PF', 3, null);
+  const fScore = context.getCpuWaiverStarterFillScore(versatileBig, 'F', 3, null);
+  const cScore = context.getCpuWaiverStarterFillScore(versatileBig, 'C', 3, null);
+  assert.equal(pfScore, fScore);
+  assert.equal(cScore, fScore);
 }
 
 {
   const { context } = buildSeamContext({
     waiver: [
       makePlayer(300, 'Versatile Big', 'PF/C', 24, { reb: 9, blk: 1 }),
-      makePlayer(301, 'Narrow Wing', 'SF', 25, { pts: 18, reb: 3 })
+      makePlayer(301, 'Real PF', 'PF', 23, { reb: 8, blk: 1 }),
+      makePlayer(302, 'Narrow Wing', 'SF', 25, { pts: 18, reb: 3 })
     ],
-    gamesToday: [300, 301]
+    gamesToday: [300, 301, 302]
   });
   const candidate = context.getBestCpuWaiverCandidateForSlot('PF', 3, null);
-  assert.equal(Number(candidate.id), 300);
+  assert.equal(Number(candidate.id), 301);
 }
 
 {
@@ -477,7 +486,7 @@ function buildSeamContext(options = {}) {
   });
   const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
   assert.equal(result.adds, 1);
-  assert.equal(claimCalls[0].addId, 250);
+  assert.equal(claimCalls[0].addId, 251);
 }
 
 {
@@ -570,8 +579,8 @@ function buildSeamContext(options = {}) {
   const pfScore = context.getCpuWaiverStarterFillScore(pfc, 'PF', 3, null);
   const fScore = context.getCpuWaiverStarterFillScore(pfc, 'F', 3, null);
   const cScore = context.getCpuWaiverStarterFillScore(pfc, 'C', 3, null);
-  assert.equal(pfScore - fScore, 24);
-  assert.equal(cScore - fScore, 24);
+  assert.equal(pfScore, fScore);
+  assert.equal(cScore, fScore);
 }
 
 {
