@@ -315,6 +315,30 @@ function buildContext(options = {}) {
 
 {
   const { context, claimCalls } = buildContext({
+    roster: [
+      makePlayer(351, 'Starter PG', 'PG', 50),
+      makePlayer(352, 'Starter SG', 'SG', 49),
+      makePlayer(353, 'Starter SF', 'SF', 48),
+      makePlayer(354, 'Starter PF', 'PF', 47),
+      makePlayer(355, 'Starter C', 'C', 51),
+      makePlayer(356, 'Dead Bench OUT', 'SG', 8)
+    ],
+    waiver: [makePlayer(235, 'Speculative GTD Waiver', 'SG', 35)],
+    injuries: [
+      [235, { label: 'GTD' }],
+      [356, { label: 'OUT' }]
+    ],
+    gamesToday: [235],
+    totalRosterLimit: 6,
+    starterIds: [351, 352, 353, 354, 355]
+  });
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 0);
+  assert.equal(claimCalls.length, 0);
+}
+
+{
+  const { context, claimCalls } = buildContext({
     entryMode: 'historical_reimagined',
     roster: [
       makePlayer(401, 'Starter PG', 'PG', 50),

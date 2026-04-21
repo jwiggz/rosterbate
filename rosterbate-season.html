@@ -4243,6 +4243,7 @@ function cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, options){
   if(!isHistoricalSimulationUniverse(D)) return {changed:false,adds:0,drops:0};
   const opts=options||{};
   const day=Number(opts.day || G.day || 1);
+  const week=weekForDay(day);
   const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean).map(Number));
   const dropCandidate=(G.rosters[teamIdx]||[])
     .filter(player=>!starterSet.has(Number(player?.id)))
@@ -4253,6 +4254,7 @@ function cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, options){
 
   const addEntry=(G.waiver||[])
     .filter(Boolean)
+    .filter(player=>getInjuryStatus(player, week) === null)
     .map(player=>({player,score:getCpuWaiverCleanupAddScore(player, day)}))
     .sort((a,b)=>b.score-a.score)[0] || null;
   if(!addEntry?.player) return {changed:false,adds:0,drops:0};

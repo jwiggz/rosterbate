@@ -125,6 +125,7 @@ function makePlayer(id, name, fp) {
 function buildContext(options = {}) {
   const normalizeCalls = [];
   const waiverCalls = [];
+  const cleanupCalls = [];
   const injuries = new Map(options.injuries || []);
   const context = {
     CURRENT_SPORT: 'nba',
@@ -190,16 +191,17 @@ function buildContext(options = {}) {
   };
   context.fillCpuTeamStarterNeedsFromWaivers = function fillCpuTeamStarterNeedsFromWaivers(teamIdx, requestOptions) {
     waiverCalls.push({ teamIdx, requestOptions });
-    return { changed: false, adds: 0, drops: 0 };
+    return options.waiverResult || { changed: false, adds: 0, drops: 0 };
   };
   context.getMissingStarterSlotsForTeam = function getMissingStarterSlotsForTeam() {
-    return [];
+    return (options.missingStarterSlots || []).map(entry => ({ ...entry }));
   };
-  context.cleanupCpuDeadRosterSpotsFromWaivers = function cleanupCpuDeadRosterSpotsFromWaivers() {
-    return { changed: false, adds: 0, drops: 0 };
+  context.cleanupCpuDeadRosterSpotsFromWaivers = function cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, requestOptions) {
+    cleanupCalls.push({ teamIdx, requestOptions });
+    return options.cleanupResult || { changed: false, adds: 0, drops: 0 };
   };
 
-  return { context, normalizeCalls, waiverCalls };
+  return { context, normalizeCalls, waiverCalls, cleanupCalls };
 }
 
 {
@@ -216,6 +218,36 @@ function buildContext(options = {}) {
   assert.deepStrictEqual(context.G.ilByTeam[1], []);
   assert.deepStrictEqual(normalizeCalls, [1, 1]);
   assert.equal(waiverCalls.length, 1, 'expected existing waiver maintenance to still run after IL moves');
+}
+
+{
+  const { context, waiverCalls, cleanupCalls } = buildContext({
+    roster: [makePlayer(11, 'Starter', 42)],
+    waiverResult: { changed: true, adds: 1, drops: 1 },
+    missingStarterSlots: [],
+    cleanupResult: { changed: true, adds: 1, drops: 1 }
+  });
+  const result = context.maintainCpuTeamRoster(1, { day: 3 });
+  assert.equal(waiverCalls.length, 1, 'expected starter-fill waiver maintenance to run first');
+  assert.equal(cleanupCalls.length, 1, 'expected cleanup to run after starter legality is restored');
+  assert.equal(cleanupCalls[0].teamIdx, 1);
+  assert.equal(cleanupCalls[0].requestOptions.day, 3);
+  assert.equal(result.waiverAdds, 2, 'expected cleanup adds to be aggregated into returned waiverAdds');
+  assert.equal(result.waiverDrops, 2, 'expected cleanup drops to be aggregated into returned waiverDrops');
+}
+
+{
+  const { context, waiverCalls, cleanupCalls } = buildContext({
+    roster: [makePlayer(12, 'Starter', 42)],
+    waiverResult: { changed: true, adds: 1, drops: 0 },
+    missingStarterSlots: [{ slot: 'SG', index: 1, playerId: null }],
+    cleanupResult: { changed: true, adds: 1, drops: 1 }
+  });
+  const result = context.maintainCpuTeamRoster(1, { day: 3 });
+  assert.equal(waiverCalls.length, 1, 'expected starter-fill maintenance to still run');
+  assert.equal(cleanupCalls.length, 0, 'expected cleanup to stay off while starter legality is still unresolved');
+  assert.equal(result.waiverAdds, 1);
+  assert.equal(result.waiverDrops, 0);
 }
 
 {
@@ -283,7 +315,7 @@ function buildContext(options = {}) {
 }
 
 {
-  const { context, normalizeCalls, waiverCalls } = buildContext({
+  const { context, normalizeCalls, waiverCalls, cleanupCalls } = buildContext({
     entryMode: 'historical_reimagined',
     roster: [makePlayer(1, 'Starter', 42)],
     ilRoster: [makePlayer(2, 'Healthy Return', 88)]
@@ -298,6 +330,7 @@ function buildContext(options = {}) {
   assert.deepStrictEqual(context.G.ilByTeam[1].map(player => Number(player.id)), [2]);
   assert.deepStrictEqual(normalizeCalls, [1, 1]);
   assert.equal(waiverCalls.length, 1);
+  assert.equal(cleanupCalls.length, 1);
 }
 
 {
