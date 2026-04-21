@@ -194,8 +194,10 @@ function extractFunctionSpan(startSignature, endSignature) {
 
 const script = [
   extractFunctionSource('getLatestRevealReport(state)'),
+  extractFunctionSource('getRecentRevealReports(state, limit)'),
   extractFunctionSource('getTeamRoster(state)'),
   extractFunctionSource('buildRosterCore(state)'),
+  extractFunctionSource('buildRecentSimulationSummary(slot, state)'),
   extractFunctionSpan('sortStandingsEntries(standings)', 'buildUniverseDetailsViewModel(slot, state, config)')
 ].join('\n\n');
 const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, config)');
@@ -232,9 +234,36 @@ const state = {
     { teamIdx: 3, w: 4, l: 3, pf: 904.3 }
   ],
   dailyRevealReports: {
+    '8': {
+      day: 8,
+      week: 3,
+      generatedAt: 8000,
+      story: {
+        headline: 'Audit Agents survived a grinder on Day 8',
+        subheadline: 'The defense carried a close finish.'
+      },
+      matchups: [
+        { teamIdx: 0, opponentIdx: 3, teamName: 'Audit Agents', opponentName: 'CPU Team 3', teamScore: 151.2, opponentScore: 149.1 }
+      ],
+      totalTransactions: 1
+    },
+    '9': {
+      day: 9,
+      week: 3,
+      generatedAt: 9000,
+      story: {
+        headline: 'CPU Team 1 clipped Audit Agents on Day 9',
+        subheadline: 'The offense cooled off late.'
+      },
+      matchups: [
+        { teamIdx: 1, opponentIdx: 0, teamName: 'CPU Team 1', opponentName: 'Audit Agents', teamScore: 154.6, opponentScore: 148.3 }
+      ],
+      totalTransactions: 2
+    },
     '10': {
       day: 10,
       week: 3,
+      generatedAt: 10000,
       story: {
         headline: 'Audit Agents close strong on Day 10',
         subheadline: 'Jordan led the latest sim-day swing and kept the team in second.'
@@ -246,8 +275,12 @@ const state = {
     }
   },
   activityLog: [
-    { id: 'a1', type: 'waiver', title: 'CPU Team 1 added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', ts: 10 },
-    { id: 'a2', type: 'activation', title: 'CPU Team 3 activated Kevin Johnson', text: 'Healthy guard returned from IL.', ts: 9 }
+    { id: 'a1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 9900 },
+    { id: 'a2', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 9800 },
+    { id: 'a3', type: 'waiver', title: 'CPU Team 1 added Dell Curry', text: 'Found a hot hand before the next lock.', teamIdx: 1, ts: 9950 },
+    { id: 'a4', type: 'waiver', title: 'Audit Agents added Buck Williams', text: 'Needed another rebounder before Day 9.', teamIdx: 0, ts: 8900 },
+    { id: 'a5', type: 'activation', title: 'CPU Team 3 activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 3, ts: 8800 },
+    { id: 'a6', type: 'waiver', title: 'CPU Team 2 added Danny Manning', text: 'Added another forward before Day 8.', teamIdx: 2, ts: 7900 }
   ]
 };
 
@@ -294,6 +327,48 @@ assert.deepStrictEqual(reverseMatchupViewModel.latestSimDay, {
   narrative: 'The comeback ran out late.',
   pills: ['Week 3 Day 11', '146.8 - 151.3', 'Rank #2']
 });
+
+assert.equal(viewModel.recentSimDays.length, 3);
+assert.deepStrictEqual(
+  viewModel.recentSimDays.map(item => item.day),
+  [10, 9, 8]
+);
+assert.deepStrictEqual(
+  viewModel.recentSimDays.map(item => item.week),
+  [3, 3, 3]
+);
+assert.match(viewModel.recentSimDays[0].teamResult.headline, /Audit Agents beat CPU Team 2/i);
+assert.equal(viewModel.recentSimDays[0].teamActivity.length, 2);
+assert.match(viewModel.recentSimDays[0].teamActivity[0].title, /Audit Agents/i);
+assert.match(viewModel.recentSimDays[0].leagueNote.title, /CPU Team 1/i);
+assert.match(viewModel.recentSimDays[1].teamResult.headline, /Audit Agents fell to CPU Team 1/i);
+assert.equal(viewModel.recentSimDays[2].teamActivity.length, 0);
+
+const oneDayOnly = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '10': {
+          day: 10,
+          week: 3,
+          generatedAt: 10000,
+          story: { headline: 'Single day available', subheadline: 'Only one reveal has been saved.' },
+          matchups: [],
+          totalTransactions: 0
+        }
+      },
+      activityLog: []
+    },
+    {}
+  )
+));
+assert.equal(oneDayOnly.recentSimDays.length, 1);
+assert.equal(oneDayOnly.recentSimDays[0].day, 10);
 
 assert.deepStrictEqual(viewModel.leagueSnapshot.currentStanding, {
   title: '#2 Audit Agents',
@@ -522,6 +597,7 @@ assert.deepStrictEqual(degraded.recentActivity, {
     }
   ]
 });
+assert.deepStrictEqual(degraded.recentSimDays, []);
 assert.deepStrictEqual(degraded.currentTeamState, {
   summary: {
     title: 'Roster availability',
@@ -541,6 +617,7 @@ assert.deepStrictEqual(degraded.currentTeamState, {
 assert.match(renderUniverseSource, /currentTeamState\.items/, 'renderUniverse should render current team state from explicit view-model items');
 assert.match(renderUniverseSource, /leagueSnapshot\.items/, 'renderUniverse should render league snapshot from explicit view-model items');
 assert.match(renderUniverseSource, /recentActivity\.items/, 'renderUniverse should render recent activity from explicit view-model items');
+assert.match(renderUniverseSource, /recentSimulationList/, 'renderUniverse should render the recent simulation section');
 assert.doesNotMatch(renderUniverseSource, /\.slice\(1\)/, 'renderUniverse should not infer team-state semantics from item ordering');
 assert.doesNotMatch(renderUniverseSource, /Your current standing window\./, 'renderUniverse should not infer league semantics from presentation copy');
 
@@ -550,7 +627,10 @@ expectMatch(/id="latestSimDayNarrative"/, 'latest sim-day narrative node is miss
 expectMatch(/id="latestSimDayPills"/, 'latest sim-day pills node is missing');
 expectMatch(/id="leagueSnapshotList"/, 'league snapshot list node is missing');
 expectMatch(/id="recentActivityList"/, 'recent activity list node is missing');
+expectMatch(/id="recentSimulationList"/, 'recent simulation list node is missing');
 expectMatch(/id="currentTeamStateList"/, 'current team state list node is missing');
+expectMatch(/function getRecentRevealReports\(state, limit\)/, 'recent reveal helper is missing');
+expectMatch(/function buildRecentSimulationSummary\(slot, state\)/, 'recent simulation summary helper is missing');
 expectMatch(/function buildUniverseDetailsViewModel\(slot, state, config\)/, 'view-model builder is missing');
 expectMatch(/function renderUniverse\(slot, state, config\)/, 'renderUniverse is missing');
 expectNoMatch(/id="rosterCoreList"/, 'legacy roster core list should be removed');
