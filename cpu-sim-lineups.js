@@ -86,10 +86,9 @@
 
   function normalizeStarterIds(lineupIds, starterCount){
     const count = Math.max(0, Number(starterCount || 5));
-    const normalized = Array.from({ length: count }, function(_, index){
+    return Array.from({ length: count }, function(_, index){
       return Number(lineupIds?.[index] || 0) || null;
     });
-    return normalized.filter(Boolean);
   }
 
   function buildBaseDailyLineup(options){
@@ -128,9 +127,12 @@
   }
 
   function getEligibleStarterSlotIndex(lineupIds, slots, player, canPlayerFillSlot){
+    const canFillSlot = typeof canPlayerFillSlot === 'function'
+      ? canPlayerFillSlot
+      : function(){ return true; };
     for(let index = 0; index < lineupIds.length; index += 1){
       if(lineupIds[index]) continue;
-      if(canPlayerFillSlot(player, slots[index])) return index;
+      if(canFillSlot(player, slots[index])) return index;
     }
     return -1;
   }
