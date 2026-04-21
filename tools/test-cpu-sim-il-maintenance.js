@@ -192,6 +192,12 @@ function buildContext(options = {}) {
     waiverCalls.push({ teamIdx, requestOptions });
     return { changed: false, adds: 0, drops: 0 };
   };
+  context.getMissingStarterSlotsForTeam = function getMissingStarterSlotsForTeam() {
+    return [];
+  };
+  context.cleanupCpuDeadRosterSpotsFromWaivers = function cleanupCpuDeadRosterSpotsFromWaivers() {
+    return { changed: false, adds: 0, drops: 0 };
+  };
 
   return { context, normalizeCalls, waiverCalls };
 }
@@ -208,7 +214,7 @@ function buildContext(options = {}) {
     [1, 2]
   );
   assert.deepStrictEqual(context.G.ilByTeam[1], []);
-  assert.deepStrictEqual(normalizeCalls, [1]);
+  assert.deepStrictEqual(normalizeCalls, [1, 1]);
   assert.equal(waiverCalls.length, 1, 'expected existing waiver maintenance to still run after IL moves');
 }
 
@@ -290,7 +296,7 @@ function buildContext(options = {}) {
   assert.equal(result.waiverDrops, 0);
   assert.deepStrictEqual(context.G.rosters[1].map(player => Number(player.id)), [1]);
   assert.deepStrictEqual(context.G.ilByTeam[1].map(player => Number(player.id)), [2]);
-  assert.deepStrictEqual(normalizeCalls, [1]);
+  assert.deepStrictEqual(normalizeCalls, [1, 1]);
   assert.equal(waiverCalls.length, 1);
 }
 

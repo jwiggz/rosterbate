@@ -4121,20 +4121,49 @@ function getMissingStarterSlotsForTeam(teamIdx, day){
     });
 }
 
+function getCpuWaiverStarterFillScore(player, slot, day){
+  const injury=getInjuryStatus(player, weekForDay(day));
+  const unavailable=isUnavailableInjury(injury);
+  const game=getGameInfo(player, day);
+  const exactPos=String(player?.pos||'').toUpperCase()===String(slot||'').toUpperCase();
+  return Number(player?.fp||0)
+    + (game ? 500 : 0)
+    + (exactPos ? 24 : 0)
+    + (unavailable ? -1000 : injury ? -200 : 0);
+}
+
+function getCpuWaiverCleanupAddScore(player, day){
+  const injury=getInjuryStatus(player, weekForDay(day));
+  const unavailable=isUnavailableInjury(injury);
+  const game=getGameInfo(player, day);
+  return Number(player?.fp||0)
+    + (game ? 140 : -80)
+    + (unavailable ? -1000 : injury ? -120 : 0);
+}
+
+function getCpuWaiverCleanupDropScore(player, day){
+  const injury=getInjuryStatus(player, weekForDay(day));
+  const unavailable=isUnavailableInjury(injury);
+  const game=getGameInfo(player, day);
+  return Number(player?.fp||0)
+    + (game ? 30 : -40)
+    + (unavailable ? -240 : injury ? -20 : 0);
+}
+
+function isCpuDeadRosterSpotCandidate(player, day){
+  const injury=getInjuryStatus(player, weekForDay(day));
+  if(!injury) return false;
+  if(String(injury?.label||'').toUpperCase()==='GTD') return false;
+  if(!isUnavailableInjury(injury)) return false;
+  return !getGameInfo(player, day);
+}
+
 function getBestCpuWaiverCandidateForSlot(slot, day){
-  const week=weekForDay(day);
   const candidates=(G.waiver||[])
     .filter(Boolean)
     .filter(player=>canPlayerFillSlot(player, slot))
     .map(player=>{
-      const injury=getInjuryStatus(player, week);
-      const unavailable=isUnavailableInjury(injury);
-      const game=getGameInfo(player, day);
-      const exactPos=String(player?.pos||'').toUpperCase()===String(slot||'').toUpperCase();
-      const score=Number(player?.fp||0)
-        + (game ? 500 : 0)
-        + (exactPos ? 24 : 0)
-        + (unavailable ? -1000 : injury ? -200 : 0);
+      const score=getCpuWaiverStarterFillScore(player, slot, day);
       return {player,score};
     })
     .sort((a,b)=>b.score-a.score);
@@ -4207,6 +4236,41 @@ function fillCpuTeamStarterNeedsFromWaivers(teamIdx, options){
   }
   normalizeCpuTeamLineups(teamIdx);
   return {changed,adds,drops};
+}
+
+function cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, options){
+  if(!isCpuManagedTeam(teamIdx)) return {changed:false,adds:0,drops:0};
+  if(!isHistoricalSimulationUniverse(D)) return {changed:false,adds:0,drops:0};
+  const opts=options||{};
+  const day=Number(opts.day || G.day || 1);
+  const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean).map(Number));
+  const dropCandidate=(G.rosters[teamIdx]||[])
+    .filter(player=>!starterSet.has(Number(player?.id)))
+    .filter(player=>isCpuDeadRosterSpotCandidate(player, day))
+    .map(player=>({player,score:getCpuWaiverCleanupDropScore(player, day)}))
+    .sort((a,b)=>a.score-b.score)[0]?.player || null;
+  if(!dropCandidate) return {changed:false,adds:0,drops:0};
+
+  const addEntry=(G.waiver||[])
+    .filter(Boolean)
+    .map(player=>({player,score:getCpuWaiverCleanupAddScore(player, day)}))
+    .sort((a,b)=>b.score-a.score)[0] || null;
+  if(!addEntry?.player) return {changed:false,adds:0,drops:0};
+
+  const addScore=Number(addEntry.score||0);
+  const dropScore=Number(getCpuWaiverCleanupDropScore(dropCandidate, day)||0);
+  if(addScore < (dropScore + 12)) return {changed:false,adds:0,drops:0};
+
+  const claimed=claimWaiverPlayerForTeam(teamIdx, {...addEntry.player}, {...dropCandidate}, {
+    toast:false,
+    save:false,
+    activityTitle:'CPU waiver cleanup',
+    activityIcon:'🤖'
+  });
+  if(!claimed) return {changed:false,adds:0,drops:0};
+
+  normalizeCpuTeamLineups(teamIdx);
+  return {changed:true,adds:1,drops:1};
 }
 
 function getCpuIlMaintenanceValue(player){
@@ -4282,8 +4346,14 @@ function maintainCpuTeamRoster(teamIdx, options){
 
   normalizeCpuTeamLineups(teamIdx);
   const waiverResult=fillCpuTeamStarterNeedsFromWaivers(teamIdx, { day });
-  const changed=!!(movedToIl || activated || waiverResult.changed);
-  return {changed,movedToIl,activated,waiverAdds:Number(waiverResult.adds||0),waiverDrops:Number(waiverResult.drops||0)};
+  normalizeCpuTeamLineups(teamIdx);
+  const cleanupResult=getMissingStarterSlotsForTeam(teamIdx, day).length
+    ? {changed:false,adds:0,drops:0}
+    : cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, { day });
+  const waiverAdds=Number(waiverResult.adds||0) + Number(cleanupResult.adds||0);
+  const waiverDrops=Number(waiverResult.drops||0) + Number(cleanupResult.drops||0);
+  const changed=!!(movedToIl || activated || waiverResult.changed || cleanupResult.changed);
+  return {changed,movedToIl,activated,waiverAdds,waiverDrops};
 }
 
 function maintainCpuLeagueRosters(options){

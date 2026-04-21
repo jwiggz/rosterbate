@@ -88,6 +88,10 @@ function extractFunctionSource(name, { optional = false } = {}) {
 }
 
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
+const getCpuWaiverStarterFillScoreSource = extractFunctionSource('getCpuWaiverStarterFillScore');
+const getCpuWaiverCleanupAddScoreSource = extractFunctionSource('getCpuWaiverCleanupAddScore');
+const getCpuWaiverCleanupDropScoreSource = extractFunctionSource('getCpuWaiverCleanupDropScore');
+const isCpuDeadRosterSpotCandidateSource = extractFunctionSource('isCpuDeadRosterSpotCandidate');
 const getBestCpuWaiverCandidateForSlotSource = extractFunctionSource('getBestCpuWaiverCandidateForSlot');
 const getCpuWaiverDropCandidateSource = extractFunctionSource('getCpuWaiverDropCandidate');
 const fillCpuTeamStarterNeedsFromWaiversSource = extractFunctionSource('fillCpuTeamStarterNeedsFromWaivers');
@@ -209,6 +213,10 @@ function buildContext(options = {}) {
   vm.runInNewContext(
     [
       getMissingStarterSlotsForTeamSource,
+      getCpuWaiverStarterFillScoreSource,
+      getCpuWaiverCleanupAddScoreSource,
+      getCpuWaiverCleanupDropScoreSource,
+      isCpuDeadRosterSpotCandidateSource,
       getBestCpuWaiverCandidateForSlotSource,
       getCpuWaiverDropCandidateSource,
       fillCpuTeamStarterNeedsFromWaiversSource,
