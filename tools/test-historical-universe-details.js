@@ -433,14 +433,19 @@ assert.deepStrictEqual(viewModel.leagueSnapshot.items, [
 assert.deepStrictEqual(viewModel.recentActivity, {
   items: [
     {
-      title: 'CPU Team 1 added Brent Barry',
+      title: 'Audit Agents added Brent Barry',
       body: 'Dropped an inactive bench wing for a live scorer.',
       meta: ['WAIVER']
     },
     {
-      title: 'CPU Team 3 activated Kevin Johnson',
+      title: 'Audit Agents activated Kevin Johnson',
       body: 'Healthy guard returned from IL.',
       meta: ['ACTIVATION']
+    },
+    {
+      title: 'CPU Team 1 added Dell Curry',
+      body: 'Found a hot hand before the next lock.',
+      meta: ['WAIVER']
     }
   ]
 });

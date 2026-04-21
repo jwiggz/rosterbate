@@ -641,6 +641,118 @@
     };
   }
 
+  function getRecentRevealReports(state, limit){
+    const reports = state && state.dailyRevealReports && typeof state.dailyRevealReports === 'object'
+      ? state.dailyRevealReports
+      : {};
+    return Object.keys(reports)
+      .map(function(key){ return reports[key]; })
+      .filter(function(report){ return Number(report?.day || 0) > 0; })
+      .sort(function(a, b){ return Number(b?.day || 0) - Number(a?.day || 0); })
+      .slice(0, Math.max(0, Number(limit || 0)));
+  }
+
+  function getRevealWindowActivitiesForState(state, reveal){
+    const currentDay = Number(reveal?.day || 0);
+    const maxTs = Number(reveal?.generatedAt || 0);
+    if(!currentDay || !maxTs) return [];
+    const previousReveal = getRecentRevealReports(state, 20)
+      .filter(function(item){ return Number(item?.day || 0) < currentDay; })
+      .sort(function(a, b){ return Number(b?.day || 0) - Number(a?.day || 0); })[0] || null;
+    const minTs = Number(previousReveal?.generatedAt || 0);
+    return (Array.isArray(state?.activityLog) ? state.activityLog : []).filter(function(entry){
+      const ts = Number(entry?.ts || 0);
+      return ts > minTs && ts <= maxTs;
+    });
+  }
+
+  function buildRecentSimulationTeamResult(slot, state, reveal){
+    const myPos = Number(state?.myPos);
+    const teams = Array.isArray(state?.teams) ? state.teams : [];
+    const fallbackTeamName = String(slot?.teamName || teams[myPos] || 'Your Team').trim();
+    const matchup = Array.isArray(reveal?.matchups)
+      ? reveal.matchups.find(function(entry){
+          return Number(entry?.teamIdx) === myPos || Number(entry?.opponentIdx) === myPos;
+        })
+      : null;
+    if(!matchup){
+      return null;
+    }
+    const myTeamIsPrimary = Number(matchup?.teamIdx) === myPos;
+    const opponentName = String(myTeamIsPrimary ? matchup?.opponentName : matchup?.teamName || 'Unknown Opponent').trim();
+    const teamName = String(myTeamIsPrimary ? matchup?.teamName : matchup?.opponentName || fallbackTeamName).trim() || fallbackTeamName;
+    const myScore = Number(myTeamIsPrimary ? matchup?.teamScore : matchup?.opponentScore);
+    const opponentScore = Number(myTeamIsPrimary ? matchup?.opponentScore : matchup?.teamScore);
+    const verb = Number.isFinite(myScore) && Number.isFinite(opponentScore)
+      ? (myScore >= opponentScore ? 'beat' : 'fell to')
+      : 'faced';
+    return {
+      headline: teamName + ' ' + verb + ' ' + opponentName,
+      subline: Number.isFinite(myScore) && Number.isFinite(opponentScore)
+        ? myScore.toFixed(1) + ' - ' + opponentScore.toFixed(1)
+        : 'Result still loading'
+    };
+  }
+
+  function buildRecentSimulationTeamActivity(slot, state, reveal){
+    const myPos = Number(state?.myPos);
+    const teamName = String(slot?.teamName || '').trim().toLowerCase();
+    return getRevealWindowActivitiesForState(state, reveal)
+      .filter(function(entry){
+        if(Number(entry?.teamIdx) === myPos) return true;
+        const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
+        return !!teamName && haystack.includes(teamName);
+      })
+      .slice(0, 2)
+      .map(function(entry){
+        return {
+          title: String(entry?.title || 'Team activity').trim(),
+          body: String(entry?.text || 'Recent roster activity was logged.').trim()
+        };
+      });
+  }
+
+  function buildRecentSimulationLeagueNote(slot, state, reveal){
+    const myPos = Number(state?.myPos);
+    const teamName = String(slot?.teamName || '').trim().toLowerCase();
+    const nonTeamEntry = getRevealWindowActivitiesForState(state, reveal).find(function(entry){
+      if(Number(entry?.teamIdx) === myPos) return false;
+      const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
+      return !(teamName && haystack.includes(teamName));
+    });
+    if(nonTeamEntry){
+      return {
+        title: String(nonTeamEntry?.title || 'League note').trim(),
+        body: String(nonTeamEntry?.text || 'Another league event landed during this reveal window.').trim()
+      };
+    }
+    if(Number(reveal?.totalTransactions) > 0){
+      return {
+        title: Number(reveal.totalTransactions) + ' league move(s) logged',
+        body: 'This reveal window also included league activity outside your own roster.'
+      };
+    }
+    return null;
+  }
+
+  function buildRecentSimulationSummary(slot, state){
+    return getRecentRevealReports(state, 3).map(function(reveal){
+      const storyHeadline = String(reveal?.story?.headline || '').trim();
+      const storySubheadline = String(reveal?.story?.subheadline || '').trim();
+      return {
+        day: Number(reveal?.day || 0),
+        week: Number(reveal?.week || 0),
+        teamResult: buildRecentSimulationTeamResult(slot, state, reveal),
+        story: {
+          headline: storyHeadline || 'Simulation day completed.',
+          body: storySubheadline || storyHeadline || 'Simulation day completed.'
+        },
+        teamActivity: buildRecentSimulationTeamActivity(slot, state, reveal),
+        leagueNote: buildRecentSimulationLeagueNote(slot, state, reveal)
+      };
+    });
+  }
+
   function buildCurrentTeamStateSummary(slot, state, rosterCore){
     const fullRoster = getTeamRoster(state);
     const rosterItems = Array.isArray(rosterCore) ? rosterCore : [];
@@ -709,6 +821,41 @@
     }).join('');
   }
 
+  function renderRecentSimulationCards(items){
+    const list = Array.isArray(items) ? items : [];
+    if(!list.length){
+      return [
+        '<div class="detail-item sim-day-card">',
+        '<div class="sim-day-label">Recent Simulation</div>',
+        '<strong>No recent sim days saved yet</strong>',
+        '<span>This universe needs at least one completed sim day before recent momentum can be shown here.</span>',
+        '</div>'
+      ].join('');
+    }
+    return list.map(function(item){
+      const label = 'Week ' + String(item?.week || '--') + ' Day ' + String(item?.day || '--');
+      const resultHeadline = item?.teamResult?.headline || item?.story?.headline || 'Simulation day completed.';
+      const resultSubline = item?.teamResult?.subline || item?.story?.body || '';
+      const activityHtml = Array.isArray(item?.teamActivity) && item.teamActivity.length
+        ? item.teamActivity.map(function(entry){
+            return '<span class="sim-day-subline">Team activity: ' + escapeHtml(String(entry?.title || '').trim()) + '</span>';
+          }).join('')
+        : '';
+      const leagueNoteHtml = item?.leagueNote
+        ? '<span class="sim-day-note">League note: ' + escapeHtml(String(item.leagueNote.title || '').trim()) + ' - ' + escapeHtml(String(item.leagueNote.body || '').trim()) + '</span>'
+        : '';
+      return [
+        '<div class="detail-item sim-day-card">',
+        '<div class="sim-day-label">' + escapeHtml(label) + '</div>',
+        '<strong>' + escapeHtml(resultHeadline) + '</strong>',
+        resultSubline ? '<span>' + escapeHtml(resultSubline) + '</span>' : '',
+        activityHtml,
+        leagueNoteHtml,
+        '</div>'
+      ].join('');
+    }).join('');
+  }
+
   function buildUniverseDetailsViewModel(slot, state, config){
     const reveal = getLatestRevealReport(state);
     const standing = getStandingContext(state);
@@ -717,6 +864,7 @@
       latestSimDay: buildLatestSimDaySummary(slot, state, reveal, standing),
       leagueSnapshot: buildLeagueSnapshotSummary(slot, state, standing),
       recentActivity: buildRecentUniverseActivitySummary(state, reveal),
+      recentSimDays: buildRecentSimulationSummary(slot, state),
       currentTeamState: buildCurrentTeamStateSummary(slot, state, rosterCore)
     };
   }
