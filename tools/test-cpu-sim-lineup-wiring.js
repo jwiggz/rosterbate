@@ -8,7 +8,11 @@ const html = fs.readFileSync(
   'utf8'
 );
 
-assert.match(html, /<script src="cpu-sim-lineups\.js"><\/script>/);
+assert.match(
+  html,
+  /<script src="cpu-sim-personalities\.js"><\/script>\s*<script src="cpu-sim-lineups\.js"><\/script>/,
+  'expected cpu-sim-personalities.js to load before cpu-sim-lineups.js'
+);
 
 function extractFunctionSource(name, nextName) {
   const start = html.indexOf(`function ${name}`);
@@ -18,6 +22,34 @@ function extractFunctionSource(name, nextName) {
   return html.slice(start, end);
 }
 
+const normalizeCpuSimPersonalityValueSource = extractFunctionSource(
+  'normalizeCpuSimPersonalityValue(value)',
+  'getCpuSimPersonalityApi()'
+);
+const getCpuSimPersonalityApiSource = extractFunctionSource(
+  'getCpuSimPersonalityApi()',
+  'getCpuSimTeamCount(state)'
+);
+const getCpuSimTeamCountSource = extractFunctionSource(
+  'getCpuSimTeamCount(state)',
+  'buildDeterministicCpuTeamPersonalitiesByTeam(state)'
+);
+const buildDeterministicCpuTeamPersonalitiesByTeamSource = extractFunctionSource(
+  'buildDeterministicCpuTeamPersonalitiesByTeam(state)',
+  'ensureCpuTeamPersonalitiesByTeam(state, options)'
+);
+const ensureCpuTeamPersonalitiesByTeamSource = extractFunctionSource(
+  'ensureCpuTeamPersonalitiesByTeam(state, options)',
+  'getCpuTeamSimPersonality(teamIdx, state)'
+);
+const getCpuTeamSimPersonalitySource = extractFunctionSource(
+  'getCpuTeamSimPersonality(teamIdx, state)',
+  'buildCpuManagedStarterIdsForDay(teamIdx, roster, day)'
+);
+const startHistoricalDraftSimSeasonSource = extractFunctionSource(
+  'startHistoricalDraftSimSeason()',
+  'runHistoricalSimulationDay(day)'
+);
 const buildCpuManagedStarterIdsForDaySource = extractFunctionSource(
   'buildCpuManagedStarterIdsForDay(teamIdx, roster, day)',
   'normalizeCpuTeamLineups(teamIdx)'
@@ -29,8 +61,19 @@ const rebuildLineupsAfterRosterChangeSource = extractFunctionSource(
 
 const calls = [];
 const fallbackCalls = [];
+const personalityBuilds = [];
 const context = {
   window: {
+    RosterBateCpuSimPersonalities: {
+      buildCpuSimPersonalitiesByTeam(options) {
+        personalityBuilds.push(options.rosters);
+        return Array.from({ length: options.teamCount }, (_, teamIdx) => {
+          if (teamIdx === 0) return 'balanced';
+          if (teamIdx === 1) return 'guards_bias';
+          return 'bigs_bias';
+        });
+      }
+    },
     RosterBateCpuSimLineups: {
       buildCpuSimLineupIds(options) {
         calls.push(options);
@@ -79,15 +122,125 @@ const context = {
   },
   getDailyLineupStore(teamIdx) {
     return context.G.dailyLineupsByTeam[teamIdx];
-  }
+  },
+  getHistoricalUniverseSourcePackIds() {
+    return ['source-pack'];
+  },
+  persistHistoricalUniverseSlotSnapshot() {},
+  localStorage: {
+    setItem() {}
+  },
+  toast() {},
+  renderHub() {},
+  scheduleRosterRender() {},
+  document: {
+    getElementById() {
+      return { classList: { contains() { return false; } } };
+    }
+  },
+  console
 };
 
-vm.runInNewContext(`${buildCpuManagedStarterIdsForDaySource}\n${rebuildLineupsAfterRosterChangeSource}`, context);
+vm.runInNewContext(
+  [
+    normalizeCpuSimPersonalityValueSource,
+    getCpuSimPersonalityApiSource,
+    getCpuSimTeamCountSource,
+    buildDeterministicCpuTeamPersonalitiesByTeamSource,
+    ensureCpuTeamPersonalitiesByTeamSource,
+    getCpuTeamSimPersonalitySource,
+    startHistoricalDraftSimSeasonSource,
+    buildCpuManagedStarterIdsForDaySource,
+    rebuildLineupsAfterRosterChangeSource
+  ].join('\n'),
+  context
+);
+
+const creationState = {
+  historicalEntryMode: 'simulation_season',
+  leagueSize: 3,
+  myPos: 0,
+  teams: ['User', 'CPU 1', 'CPU 2'],
+  allRosters: [[], [], []]
+};
+assert.deepStrictEqual(
+  context.buildDeterministicCpuTeamPersonalitiesByTeam(creationState),
+  ['balanced', 'guards_bias', 'bigs_bias']
+);
+
+const legacyState = {
+  historicalEntryMode: 'simulation_season',
+  leagueSize: 3,
+  myPos: 0,
+  teams: ['User', 'CPU 1', 'CPU 2'],
+  allRosters: [[], [], []]
+};
+assert.equal(
+  JSON.stringify(context.ensureCpuTeamPersonalitiesByTeam(legacyState)),
+  JSON.stringify(['balanced', 'guards_bias', 'bigs_bias']),
+  'missing saved personalities should regenerate deterministic diversity for simulation saves'
+);
+assert.equal(
+  JSON.stringify(legacyState.cpuTeamPersonalitiesByTeam),
+  JSON.stringify(['balanced', 'guards_bias', 'bigs_bias'])
+);
+
+const savedState = {
+  historicalEntryMode: 'simulation_season',
+  leagueSize: 3,
+  myPos: 0,
+  teams: ['User', 'CPU 1', 'CPU 2'],
+  allRosters: [[], [], []],
+  cpuTeamPersonalitiesByTeam: ['balanced', 'guards_bias', 'bigs_bias']
+};
+assert.equal(context.getCpuTeamSimPersonality(1, savedState), 'guards_bias');
 
 const cpuManagedResult = context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);
 assert.deepStrictEqual(cpuManagedResult, ['cpu']);
 assert.equal(calls.length, 1);
 assert.strictEqual(calls[0].roster, context.G.rosters[0]);
+assert.equal(calls[0].personality, 'balanced');
+
+context.D.cpuTeamPersonalitiesByTeam = ['balanced'];
+calls.length = 0;
+context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);
+assert.equal(calls[0].personality, 'balanced');
+
+context.D.cpuTeamPersonalitiesByTeam = ['balanced', 'star_loyalist'];
+calls.length = 0;
+context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);
+assert.equal(calls[0].personality, 'balanced');
+
+personalityBuilds.length = 0;
+context.D = {
+  historicalEntryMode: 'historical_draft',
+  historicalPackId: 'pack-1',
+  allRosters: [[{ id: 'pre' }], [{ id: 'pre-cpu' }]],
+  leagueSize: 2,
+  myPos: 0,
+  teams: ['User', 'CPU 1'],
+  simulationProfile: null
+};
+context.isHistoricalDraftUniverse = state =>
+  String(state?.historicalEntryMode || '').trim().toLowerCase() === 'historical_draft';
+context.window.RosterBateSimulationEngine = {
+  ENGINE_VERSION: 'test-engine',
+  enrichLeagueState(state) {
+    state.allRosters = [[{ id: 'post' }], [{ id: 'post-cpu' }]];
+  }
+};
+assert.equal(context.startHistoricalDraftSimSeason(), true);
+assert.equal(context.D.historicalEntryMode, 'simulation_season');
+assert.equal(personalityBuilds.length, 1);
+assert.equal(
+  JSON.stringify(personalityBuilds[0]),
+  JSON.stringify([[{ id: 'post' }], [{ id: 'post-cpu' }]]),
+  'expected draft-to-sim conversion to assign personalities from enriched rosters'
+);
+assert.equal(
+  JSON.stringify(context.D.cpuTeamPersonalitiesByTeam),
+  JSON.stringify(['balanced', 'guards_bias'])
+);
 
 context.isHistoricalSimulationUniverse = () => false;
 const fallbackResult = context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);

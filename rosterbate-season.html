@@ -15,6 +15,7 @@
 <script src="sport-config-live.js"></script>
 <script src="historical-universe-slots.js"></script>
 <script src="simulation-league-engine.js"></script>
+<script src="cpu-sim-personalities.js"></script>
 <script src="cpu-sim-lineups.js"></script>
 <script src="global-nav.js" defer></script>
 <script src="historical-pack-dev-runner.js" defer></script>
@@ -2743,6 +2744,9 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
       console.warn('Historical simulation ratings enrichment failed:', simErr);
     }
   }
+  if(isSimulationSeason){
+    ensureCpuTeamPersonalitiesByTeam(launchData, {preferDeterministic:true});
+  }
   return launchData;
 }
 
@@ -2931,6 +2935,7 @@ function startHistoricalDraftSimSeason(){
         universeType:sourcePackIds.length > 1 ? 'mixed_era_draft' : 'historical_draft'
       });
     }
+    ensureCpuTeamPersonalitiesByTeam(D, {preferDeterministic:true});
     D.updatedAt=Date.now();
     D.savedAt=Date.now();
     persistHistoricalUniverseSlotSnapshot('drafted_universe_sim_start');
@@ -4008,6 +4013,66 @@ function isCpuManagedTeam(teamIdx){
   return !D?.multiplayer && Number.isInteger(teamIdx) && teamIdx!==Number(D?.myPos??0);
 }
 
+function normalizeCpuSimPersonalityValue(value){
+  const normalized=String(value||'').trim().toLowerCase();
+  return ['balanced','star_loyalist','steady_floor','bigs_bias','guards_bias'].includes(normalized)
+    ? normalized
+    : 'balanced';
+}
+
+function getCpuSimPersonalityApi(){
+  return window.RosterBateCpuSimPersonalities || null;
+}
+
+function getCpuSimTeamCount(state){
+  return Math.max(
+    Number(state?.leagueSize)||0,
+    Array.isArray(state?.teams) ? state.teams.length : 0,
+    Array.isArray(state?.allRosters) ? state.allRosters.length : 0
+  );
+}
+
+function buildDeterministicCpuTeamPersonalitiesByTeam(state){
+  const teamCount=getCpuSimTeamCount(state);
+  const api=getCpuSimPersonalityApi();
+  if(api && typeof api.buildCpuSimPersonalitiesByTeam==='function'){
+    const built=api.buildCpuSimPersonalitiesByTeam({
+      teamCount: teamCount,
+      myPos: Number(state?.myPos)||0,
+      rosters: Array.isArray(state?.allRosters) ? state.allRosters : []
+    });
+    if(Array.isArray(built) && built.length===teamCount){
+      return built.map(normalizeCpuSimPersonalityValue);
+    }
+  }
+  return Array.from({length:teamCount},()=> 'balanced');
+}
+
+function ensureCpuTeamPersonalitiesByTeam(state, options){
+  if(!state || typeof state!=='object') return [];
+  const teamCount=getCpuSimTeamCount(state);
+  const existing=Array.isArray(state.cpuTeamPersonalitiesByTeam) ? state.cpuTeamPersonalitiesByTeam : [];
+  const preferDeterministic=!!(options && options.preferDeterministic);
+  const shouldUseDeterministicFallback=preferDeterministic || isHistoricalSimulationUniverse(state);
+  const deterministic=shouldUseDeterministicFallback ? buildDeterministicCpuTeamPersonalitiesByTeam(state) : [];
+  const next=Array.from({length:teamCount},(_,teamIdx)=>{
+    const value=existing[teamIdx];
+    if(typeof value!=='undefined' && value!==null && String(value).trim()){
+      return normalizeCpuSimPersonalityValue(value);
+    }
+    return shouldUseDeterministicFallback
+      ? normalizeCpuSimPersonalityValue(deterministic[teamIdx])
+      : 'balanced';
+  });
+  state.cpuTeamPersonalitiesByTeam=next;
+  return next;
+}
+
+function getCpuTeamSimPersonality(teamIdx, state){
+  const personalities=ensureCpuTeamPersonalitiesByTeam(state||D);
+  return normalizeCpuSimPersonalityValue(personalities?.[teamIdx]);
+}
+
 function buildCpuManagedStarterIdsForDay(teamIdx, roster, day){
   if(
     isCpuManagedTeam(teamIdx) &&
@@ -4019,6 +4084,7 @@ function buildCpuManagedStarterIdsForDay(teamIdx, roster, day){
       roster: roster,
       slots: SLOT_LABELS,
       starterCount: STARTERS,
+      personality: getCpuTeamSimPersonality(teamIdx, D),
       day: day,
       stableThreshold: 160,
       canPlayerFillSlot: canPlayerFillSlot,
@@ -5919,6 +5985,9 @@ window.onload=async function(){
       hideSeasonEmptyState();
       D = slotState;
       D.historicalUniverseSlotId = requestedHistoricalUniverse;
+      if (isHistoricalSimulationUniverse(D)) {
+        ensureCpuTeamPersonalitiesByTeam(D);
+      }
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();
       refreshCommissionerAccess();
@@ -6594,6 +6663,9 @@ function initSeason(){
   );
   D.leagueSize=n;
   console.log('?? League size:', n);
+  if(isHistoricalSimulationUniverse(D)){
+    ensureCpuTeamPersonalitiesByTeam(D);
+  }
   
   if(!D.seasonId) D.seasonId=getRequestedLeagueId() || D.leagueId || null;
   console.log('?? Season ID:', D.seasonId);
