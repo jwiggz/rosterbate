@@ -88,6 +88,13 @@ function extractFunctionSource(name, { optional = false } = {}) {
 }
 
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
+const getCpuWaiverPlayerSlotsSource = extractFunctionSource('getCpuWaiverPlayerSlots');
+const getCpuWaiverRoleShapeSource = extractFunctionSource('getCpuWaiverRoleShape');
+const buildCpuWaiverRosterNeedSummarySource = extractFunctionSource('buildCpuWaiverRosterNeedSummary');
+const getCpuWaiverVersatilityBonusSource = extractFunctionSource('getCpuWaiverVersatilityBonus');
+const getCpuWaiverRoleNeedBonusSource = extractFunctionSource('getCpuWaiverRoleNeedBonus');
+const getCpuWaiverPositionNeedBonusSource = extractFunctionSource('getCpuWaiverPositionNeedBonus');
+const getCpuWaiverDropProtectionBonusSource = extractFunctionSource('getCpuWaiverDropProtectionBonus');
 const getCpuWaiverStarterFillScoreSource = extractFunctionSource('getCpuWaiverStarterFillScore');
 const getCpuWaiverCleanupAddScoreSource = extractFunctionSource('getCpuWaiverCleanupAddScore');
 const getCpuWaiverCleanupDropScoreSource = extractFunctionSource('getCpuWaiverCleanupDropScore');
@@ -213,6 +220,13 @@ function buildContext(options = {}) {
   vm.runInNewContext(
     [
       getMissingStarterSlotsForTeamSource,
+      getCpuWaiverPlayerSlotsSource,
+      getCpuWaiverRoleShapeSource,
+      buildCpuWaiverRosterNeedSummarySource,
+      getCpuWaiverVersatilityBonusSource,
+      getCpuWaiverRoleNeedBonusSource,
+      getCpuWaiverPositionNeedBonusSource,
+      getCpuWaiverDropProtectionBonusSource,
       getCpuWaiverStarterFillScoreSource,
       getCpuWaiverCleanupAddScoreSource,
       getCpuWaiverCleanupDropScoreSource,
@@ -356,6 +370,105 @@ function buildContext(options = {}) {
   const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
   assert.equal(result.adds, 0);
   assert.equal(claimCalls.length, 0);
+}
+
+{
+  const { context, claimCalls } = buildContext({
+    starterIds: [401, null, 403, 404, 405],
+    roster: [
+      makePlayer(401, 'Starter PG', 'PG', 52, { ast: 8, pts: 16 }),
+      makePlayer(403, 'Starter SF', 'SF', 49, { pts: 17, reb: 5 }),
+      makePlayer(404, 'Starter PF', 'PF', 48, { reb: 8, blk: 1 }),
+      makePlayer(405, 'Starter C', 'C', 50, { reb: 10, blk: 2 }),
+      makePlayer(406, 'Bench Wing', 'SF', 18, { pts: 11, reb: 4 })
+    ],
+    waiver: [
+      makePlayer(240, 'Scoring SG', 'SG', 30, { pts: 22, ast: 2 }),
+      makePlayer(241, 'Playmaking Combo Guard', 'SG', 28, { pts: 15, ast: 7 })
+    ],
+    gamesToday: [240, 241]
+  });
+  context.fillCpuTeamStarterNeedsFromWaivers(1, { day: 3 });
+  assert.equal(claimCalls[0].addId, 241);
+}
+
+{
+  const { context, claimCalls } = buildContext({
+    roster: [
+      makePlayer(501, 'Starter PG', 'PG', 52, { ast: 8, pts: 15 }),
+      makePlayer(502, 'Starter SG', 'SG', 50, { ast: 5, pts: 18 }),
+      makePlayer(503, 'Starter SF', 'SF', 47, { pts: 17, reb: 4 }),
+      makePlayer(504, 'Starter PF', 'PF', 45, { reb: 6, blk: 1 }),
+      makePlayer(505, 'Starter C', 'C', 42, { reb: 8, blk: 1 }),
+      makePlayer(506, 'Dead Bench OUT', 'PF', 9, { reb: 4 })
+    ],
+    waiver: [
+      makePlayer(250, 'Versatile Big', 'PF/C', 24, { reb: 9, blk: 1 }),
+      makePlayer(251, 'Narrow Wing', 'SF', 25, { pts: 18, reb: 3 })
+    ],
+    injuries: [[506, { label: 'OUT' }]],
+    gamesToday: [250, 251],
+    totalRosterLimit: 6,
+    starterIds: [501, 502, 503, 504, 505]
+  });
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.adds, 1);
+  assert.equal(claimCalls[0].addId, 250);
+}
+
+{
+  const { context, claimCalls } = buildContext({
+    roster: [
+      makePlayer(601, 'Starter PG', 'PG', 52, { ast: 8, pts: 15 }),
+      makePlayer(602, 'Starter SG', 'SG', 50, { ast: 5, pts: 18 }),
+      makePlayer(603, 'Starter SF', 'SF', 48, { pts: 17, reb: 5 }),
+      makePlayer(604, 'Starter PF', 'PF', 47, { reb: 7, blk: 1 }),
+      makePlayer(605, 'Starter C', 'C', 51, { reb: 9, blk: 2 }),
+      makePlayer(606, 'Bench Center Cover', 'C', 18, { reb: 8, blk: 1 }),
+      makePlayer(607, 'Dead Bench OUT', 'SG', 8, { pts: 7 })
+    ],
+    waiver: [makePlayer(260, 'Decent Wing Add', 'SF', 24, { pts: 16, reb: 4 })],
+    injuries: [[607, { label: 'OUT' }]],
+    gamesToday: [260],
+    totalRosterLimit: 7,
+    starterIds: [601, 602, 603, 604, 605]
+  });
+  const dropCandidate = context.getCpuWaiverDropCandidate(1, 3, 'SF');
+  assert.equal(Number(dropCandidate.id), 607);
+  const result = context.cleanupCpuDeadRosterSpotsFromWaivers(1, { day: 3 });
+  assert.equal(result.drops, 1);
+  assert.equal(claimCalls[0].dropId, 607);
+}
+
+{
+  const { context } = buildContext({
+    roster: [
+      makePlayer(701, 'Starter PG', 'PG', 51, { ast: 9, pts: 14 }),
+      makePlayer(702, 'Starter SG', 'SG', 49, { ast: 3, pts: 18 }),
+      makePlayer(703, 'Starter SF', 'SF', 48, { pts: 17, reb: 5 }),
+      makePlayer(704, 'Starter PF', 'PF', 47, { reb: 8, blk: 1 }),
+      makePlayer(705, 'Starter C', 'C', 52, { reb: 10, blk: 2 }),
+      makePlayer(706, 'Bench Playmaker', 'PG', 20, { ast: 7, pts: 10 }),
+      makePlayer(707, 'Dead Bench OUT', 'SF', 7, { pts: 6 })
+    ],
+    waiver: [makePlayer(270, 'Okay Forward', 'SF', 22, { pts: 15, reb: 4 })],
+    injuries: [[707, { label: 'OUT' }]],
+    gamesToday: [270],
+    totalRosterLimit: 7,
+    starterIds: [701, 702, 703, 704, 705]
+  });
+  const rosterNeed = context.buildCpuWaiverRosterNeedSummary(1, 3);
+  const protectedScore = context.getCpuWaiverCleanupDropScore(
+    context.G.rosters[1].find(player => Number(player.id) === 706),
+    3,
+    rosterNeed
+  );
+  const deadScore = context.getCpuWaiverCleanupDropScore(
+    context.G.rosters[1].find(player => Number(player.id) === 707),
+    3,
+    rosterNeed
+  );
+  assert.ok(protectedScore > deadScore);
 }
 
 {
