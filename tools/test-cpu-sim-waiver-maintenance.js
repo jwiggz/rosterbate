@@ -98,6 +98,7 @@ function tryExtractFunctionSource(name) {
 
 const getMissingStarterSlotsForTeamSource = extractFunctionSource('getMissingStarterSlotsForTeam');
 const canPlayerFillSlotSource = extractFunctionSource('canPlayerFillSlot');
+const canCpuWaiverFillSlotSource = tryExtractFunctionSource('canCpuWaiverFillSlot');
 const getCpuWaiverPlayerSlotsSource = tryExtractFunctionSource('getCpuWaiverPlayerSlots');
 const isCpuWaiverSimulationUniverseSource = tryExtractFunctionSource('isCpuWaiverSimulationUniverse');
 const getCpuWaiverRoleShapeSource = tryExtractFunctionSource('getCpuWaiverRoleShape');
@@ -223,6 +224,7 @@ function buildContext(options = {}) {
     [
       getMissingStarterSlotsForTeamSource,
       canPlayerFillSlotSource,
+      canCpuWaiverFillSlotSource,
       getCpuWaiverPlayerSlotsSource,
       isCpuWaiverSimulationUniverseSource,
       getCpuWaiverRoleShapeSource,
@@ -248,6 +250,7 @@ function buildContext(options = {}) {
 
 function buildSeamContext(options = {}) {
   assert.ok(getCpuWaiverPlayerSlotsSource, 'missing getCpuWaiverPlayerSlots');
+  assert.ok(canCpuWaiverFillSlotSource, 'missing canCpuWaiverFillSlot');
   assert.ok(getCpuWaiverRoleShapeSource, 'missing getCpuWaiverRoleShape');
   assert.ok(buildCpuWaiverRosterNeedSummarySource, 'missing buildCpuWaiverRosterNeedSummary');
   assert.ok(getCpuWaiverVersatilityBonusSource, 'missing getCpuWaiverVersatilityBonus');
@@ -260,10 +263,26 @@ function buildSeamContext(options = {}) {
 {
   const { context } = buildSeamContext();
   const versatileBig = makePlayer(999, 'Versatile Big', 'PF/C', 24);
-  assert.equal(context.canPlayerFillSlot(versatileBig, 'PF'), true);
-  assert.equal(context.canPlayerFillSlot(versatileBig, 'C'), true);
-  assert.equal(context.canPlayerFillSlot(versatileBig, 'F'), true);
-  assert.equal(context.canPlayerFillSlot(versatileBig, 'UTIL'), true);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'PF'), false);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'C'), false);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'F'), false);
+  assert.equal(context.canPlayerFillSlot(versatileBig, 'UTIL'), false);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'PF'), true);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'C'), true);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'F'), true);
+  assert.equal(context.canCpuWaiverFillSlot(versatileBig, 'UTIL'), true);
+}
+
+{
+  const { context } = buildSeamContext({
+    waiver: [
+      makePlayer(300, 'Versatile Big', 'PF/C', 24, { reb: 9, blk: 1 }),
+      makePlayer(301, 'Narrow Wing', 'SF', 25, { pts: 18, reb: 3 })
+    ],
+    gamesToday: [300, 301]
+  });
+  const candidate = context.getBestCpuWaiverCandidateForSlot('PF', 3, null);
+  assert.equal(Number(candidate.id), 300);
 }
 
 {

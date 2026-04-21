@@ -4136,6 +4136,13 @@ function getCpuWaiverPlayerSlots(player){
   return [...slots];
 }
 
+function canCpuWaiverFillSlot(player, slot){
+  const target=String(slot||'').toUpperCase();
+  if(!target) return false;
+  if(CURRENT_SPORT!=='nba') return canPlayerFillSlot(player, slot);
+  return getCpuWaiverPlayerSlots(player).includes(target);
+}
+
 function isCpuWaiverSimulationUniverse(){
   return CURRENT_SPORT==='nba' && isHistoricalSimulationUniverse(D);
 }
@@ -4341,7 +4348,7 @@ function isCpuDeadRosterSpotCandidate(player, day){
 function getBestCpuWaiverCandidateForSlot(slot, day, rosterNeed){
   const candidates=(G.waiver||[])
     .filter(Boolean)
-    .filter(player=>canPlayerFillSlot(player, slot))
+    .filter(player=>canCpuWaiverFillSlot(player, slot))
     .map(player=>{
       const score=getCpuWaiverStarterFillScore(player, slot, day, rosterNeed);
       return {player,score};
@@ -4355,7 +4362,7 @@ function getCpuWaiverDropCandidate(teamIdx, day, targetSlot, rosterNeed){
   const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean));
   const scoreCandidate=player=>{
     const game=getGameInfo(player, day);
-    const canCoverTarget=targetSlot ? canPlayerFillSlot(player, targetSlot) : false;
+    const canCoverTarget=targetSlot ? canCpuWaiverFillSlot(player, targetSlot) : false;
     return getCpuWaiverCleanupDropScore(player, day, rosterNeed)
       + (game ? 10 : 0)
       + (canCoverTarget ? 120 : 0);
@@ -5219,28 +5226,24 @@ function getStarterIdsForTeamDay(teamIdx,day){
 }
 
 function canPlayerFillSlot(player, slot){
-  const positions=String(player?.pos||'')
-    .toUpperCase()
-    .split('/')
-    .map(part=>part.trim())
-    .filter(Boolean);
+  const pos=String(player?.pos||'').toUpperCase();
   const target=String(slot||'').toUpperCase();
-  if(!positions.length||!target) return false;
-  if(positions.includes(target)) return true;
+  if(!pos||!target) return false;
+  if(pos===target) return true;
   if(CURRENT_SPORT==='nba'){
-    if(target==='G') return positions.some(pos=>pos==='PG'||pos==='SG');
-    if(target==='F') return positions.some(pos=>pos==='SF'||pos==='PF');
-    if(target==='UTIL') return positions.some(pos=>['PG','SG','SF','PF','C'].includes(pos));
+    if(target==='G') return pos==='PG'||pos==='SG';
+    if(target==='F') return pos==='SF'||pos==='PF';
+    if(target==='UTIL') return ['PG','SG','SF','PF','C'].includes(pos);
     return false;
   }
   if(CURRENT_SPORT==='nfl'){
-    if(target==='FLEX') return positions.some(pos=>['RB','WR','TE'].includes(pos));
-    if(target==='DST') return positions.includes('DST');
+    if(target==='FLEX') return ['RB','WR','TE'].includes(pos);
+    if(target==='DST') return pos==='DST';
     return false;
   }
   if(CURRENT_SPORT==='mlb'){
-    if(target==='UTIL') return positions.some(pos=>['C','1B','2B','3B','SS','OF'].includes(pos));
-    if(target==='P') return positions.some(pos=>pos==='SP'||pos==='RP');
+    if(target==='UTIL') return ['C','1B','2B','3B','SS','OF'].includes(pos);
+    if(target==='P') return pos==='SP'||pos==='RP';
     return false;
   }
   return false;
