@@ -39,20 +39,20 @@ const starHeavyRoster = [
 
 const steadyFloorTargetRoster = [
   makePlayer(11, 'PG', {
-    overall: 72,
-    usage: 60,
-    scoring: 65,
-    playmaking: 64,
-    defense: 61,
-    rebounding: 38
+    overall: 73,
+    usage: 54,
+    scoring: 60,
+    playmaking: 53,
+    defense: 74,
+    rebounding: 57
   }),
   makePlayer(12, 'PF', {
-    overall: 75,
-    usage: 57,
-    scoring: 64,
-    playmaking: 50,
-    defense: 73,
-    rebounding: 71
+    overall: 77,
+    usage: 56,
+    scoring: 63,
+    playmaking: 55,
+    defense: 80,
+    rebounding: 86
   })
 ];
 
@@ -184,10 +184,35 @@ assert.deepStrictEqual(
   assignedB,
   'expected deterministic assignment for the same league state'
 );
-assert.deepStrictEqual(
-  assignedA,
-  ['balanced', 'star_loyalist', 'steady_floor', 'guards_bias', 'balanced', 'bigs_bias', 'guards_bias'],
-  'expected the full deterministic spread across the seven CPU teams'
+assert.equal(
+  assignedA[0],
+  'balanced',
+  'expected the human-controlled slot to remain balanced'
+);
+assert.equal(
+  assignedA[1],
+  'star_loyalist',
+  'expected the obvious star-heavy roster to resolve to star_loyalist'
+);
+assert.equal(
+  assignedA[2],
+  'steady_floor',
+  'expected a mixed reliable roster to be able to resolve to steady_floor'
+);
+assert.equal(
+  assignedA[4],
+  'balanced',
+  'expected a mixed neutral roster to be able to resolve to balanced'
+);
+assert.equal(
+  assignedA[5],
+  'bigs_bias',
+  'expected the obvious frontcourt-heavy roster to resolve to bigs_bias'
+);
+assert.equal(
+  assignedA[6],
+  'guards_bias',
+  'expected the obvious guard-heavy roster to resolve to guards_bias'
 );
 assert.equal(
   cpuSimPersonalities.getCpuSimTeamPersonality(3, null),

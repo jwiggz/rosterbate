@@ -6,9 +6,10 @@
   const STAR_LOYALIST_SIGNAL_THRESHOLD = 14600;
   const STAR_LOYALIST_OVERALL_THRESHOLD = 91;
   const STAR_LOYALIST_USAGE_THRESHOLD = 89;
-  const POSITION_LEAN_GAP_THRESHOLD = 75;
-  const STEADY_FLOOR_AVERAGE_SHAPE_THRESHOLD = 238;
-  const STEADY_FLOOR_LEAN_GAP_THRESHOLD = 85;
+  const BIGS_BIAS_LEAN_GAP_THRESHOLD = 175;
+  const GUARDS_BIAS_LEAN_GAP_THRESHOLD = 350;
+  const STEADY_FLOOR_AVERAGE_SHAPE_THRESHOLD = 170;
+  const STEADY_FLOOR_LEAN_GAP_THRESHOLD = 150;
 
   function toNumber(value) {
     const num = Number(value);
@@ -95,7 +96,7 @@
       if (posGroup === 'guard') {
         summary.guardLean += usage * 2 + scoring * 3 + playmaking * 4;
       } else if (posGroup === 'frontcourt') {
-        summary.bigLean += defense * 3 + rebounding * 4 + overall;
+        summary.bigLean += defense * 1.75 + rebounding * 2.75 + overall;
       }
 
       summary.signature = (summary.signature + hashSeed(getPlayerSummaryKey(player))) % 2147483647;
@@ -163,11 +164,11 @@
         return 'star_loyalist';
       }
 
-      if (summary.bigLean >= summary.guardLean + POSITION_LEAN_GAP_THRESHOLD) {
+      if (summary.bigLean >= summary.guardLean + BIGS_BIAS_LEAN_GAP_THRESHOLD) {
         return 'bigs_bias';
       }
 
-      if (summary.guardLean >= summary.bigLean + POSITION_LEAN_GAP_THRESHOLD) {
+      if (summary.guardLean >= summary.bigLean + GUARDS_BIAS_LEAN_GAP_THRESHOLD) {
         return 'guards_bias';
       }
 
