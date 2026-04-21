@@ -74,6 +74,24 @@ const guard = makePlayer(11, 'PG', {
   rebounding: 41
 });
 
+const comboBig = makePlayer(12, 'F/C', {
+  overall: 82,
+  usage: 68,
+  scoring: 74,
+  playmaking: 48,
+  defense: 86,
+  rebounding: 91
+});
+
+const neutralWing = makePlayer(13, 'SF', {
+  overall: 77,
+  usage: 64,
+  scoring: 76,
+  playmaking: 63,
+  defense: 74,
+  rebounding: 58
+});
+
 const assignedA = cpuSimPersonalities.buildCpuSimPersonalitiesByTeam({
   teamCount: 6,
   myPos: 0,
@@ -110,6 +128,33 @@ assert.ok(
   cpuSimPersonalities.getCpuSimPersonalityBias(guard, 'guards_bias') >
     cpuSimPersonalities.getCpuSimPersonalityBias(big, 'guards_bias'),
   'expected guards_bias to favor guard/creator profiles'
+);
+assert.ok(
+  cpuSimPersonalities.getCpuSimPersonalityBias(comboBig, 'bigs_bias') >
+    cpuSimPersonalities.getCpuSimPersonalityBias(guard, 'bigs_bias'),
+  'expected F/C combo bigs to benefit from big/frontcourt bias'
+);
+
+const comboAssignedA = cpuSimPersonalities.buildCpuSimPersonalitiesByTeam({
+  teamCount: 2,
+  myPos: 0,
+  rosters: [starHeavyRoster, [comboBig, neutralWing]]
+});
+const comboAssignedB = cpuSimPersonalities.buildCpuSimPersonalitiesByTeam({
+  teamCount: 2,
+  myPos: 0,
+  rosters: [starHeavyRoster, [neutralWing, comboBig]]
+});
+
+assert.deepStrictEqual(
+  comboAssignedA,
+  comboAssignedB,
+  'expected roster order not to change deterministic assignment'
+);
+assert.equal(
+  comboAssignedA[1],
+  'bigs_bias',
+  'expected a combo frontcourt roster to resolve to the bigs bias'
 );
 assert.ok(
   cpuSimPersonalities.getCpuSimStableThresholdDelta(makePlayer(12, 'SG', {

@@ -20,10 +20,24 @@
 
   function getPosGroup(player) {
     const pos = String(player?.pos || '').trim().toUpperCase();
-    if (pos === 'PG' || pos === 'SG' || pos === 'G') return 'guard';
-    if (pos === 'SF' || pos === 'PF' || pos === 'F') return 'frontcourt';
-    if (pos === 'C') return 'center';
+    if (!pos) return 'other';
+    if (pos.includes('F') || pos.includes('C')) return 'frontcourt';
+    if (pos.includes('G')) return 'guard';
     return 'other';
+  }
+
+  function getPlayerSummaryKey(player) {
+    const ratings = getRatings(player);
+    return [
+      player?.id ?? '',
+      String(player?.pos || '').trim().toUpperCase(),
+      toNumber(ratings.overall),
+      toNumber(ratings.usage),
+      toNumber(ratings.scoring),
+      toNumber(ratings.playmaking),
+      toNumber(ratings.defense),
+      toNumber(ratings.rebounding)
+    ].join('|');
   }
 
   function getStarSignal(player) {
@@ -40,7 +54,16 @@
 
   function getRosterSummary(roster) {
     const players = Array.isArray(roster) ? roster.filter(Boolean) : [];
-    return players.reduce(function (summary, player, index) {
+    return players
+      .slice()
+      .sort(function (a, b) {
+        const keyA = getPlayerSummaryKey(a);
+        const keyB = getPlayerSummaryKey(b);
+        if (keyA < keyB) return -1;
+        if (keyA > keyB) return 1;
+        return 0;
+      })
+      .reduce(function (summary, player) {
       const ratings = getRatings(player);
       const overall = toNumber(ratings.overall);
       const usage = toNumber(ratings.usage);
@@ -62,13 +85,14 @@
       summary.totalRebounding += rebounding;
       summary.shapeScore += scoring + playmaking + defense + rebounding;
 
-      if (getPosGroup(player) === 'guard') {
+      const posGroup = getPosGroup(player);
+      if (posGroup === 'guard') {
         summary.guardLean += usage * 2 + scoring * 3 + playmaking * 4;
-      } else if (getPosGroup(player) === 'frontcourt' || getPosGroup(player) === 'center') {
+      } else if (posGroup === 'frontcourt') {
         summary.bigLean += defense * 3 + rebounding * 4 + overall;
       }
 
-      summary.signature = (summary.signature + Math.round(starSignal) + index * 17) % 2147483647;
+      summary.signature = (summary.signature + hashSeed(getPlayerSummaryKey(player))) % 2147483647;
       return summary;
     }, {
       playerCount: 0,
