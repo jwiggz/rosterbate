@@ -259,7 +259,6 @@ function buildContext(options = {}) {
 }
 
 function buildSeamContext(options = {}) {
-  const built = buildContext(options);
   assert.ok(getCpuWaiverPlayerSlotsSource, 'missing getCpuWaiverPlayerSlots');
   assert.ok(getCpuWaiverRoleShapeSource, 'missing getCpuWaiverRoleShape');
   assert.ok(buildCpuWaiverRosterNeedSummarySource, 'missing buildCpuWaiverRosterNeedSummary');
@@ -267,19 +266,7 @@ function buildSeamContext(options = {}) {
   assert.ok(getCpuWaiverRoleNeedBonusSource, 'missing getCpuWaiverRoleNeedBonus');
   assert.ok(getCpuWaiverPositionNeedBonusSource, 'missing getCpuWaiverPositionNeedBonus');
   assert.ok(getCpuWaiverDropProtectionBonusSource, 'missing getCpuWaiverDropProtectionBonus');
-  vm.runInNewContext(
-    [
-      getCpuWaiverPlayerSlotsSource,
-      getCpuWaiverRoleShapeSource,
-      buildCpuWaiverRosterNeedSummarySource,
-      getCpuWaiverVersatilityBonusSource,
-      getCpuWaiverRoleNeedBonusSource,
-      getCpuWaiverPositionNeedBonusSource,
-      getCpuWaiverDropProtectionBonusSource
-    ].join('\n'),
-    built.context
-  );
-  return built;
+  return buildContext(options);
 }
 
 {
