@@ -99,6 +99,23 @@
     return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
+  function normalizeMixedEraIdentityText(value){
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ');
+  }
+
+  function buildMixedEraIdentityKey(player){
+    var normalizedName=normalizeMixedEraIdentityText(player && player.name);
+    var sourcePackId=String(player && player.historicalPackId || '').trim().toLowerCase();
+    if(!normalizedName || !sourcePackId) return '';
+    return sourcePackId + '|' + normalizedName;
+  }
+
   function buildCalibrationKey(name, packId){
     var normalizedName=normalizeCalibrationText(name);
     var normalizedPackId=normalizeCalibrationText(packId);
@@ -172,6 +189,35 @@
       entries: normalizedEntries,
       byKey: byKey
     };
+  }
+
+  function dedupeMixedEraPlayers(players){
+    var survivors=[];
+    var survivorIndexes={};
+    (Array.isArray(players) ? players : []).forEach(function(player){
+      var key=buildMixedEraIdentityKey(player);
+      if(!key){
+        survivors.push(player);
+        return;
+      }
+      if(!Object.prototype.hasOwnProperty.call(survivorIndexes, key)){
+        survivorIndexes[key]=survivors.length;
+        survivors.push(player);
+        return;
+      }
+      var survivorIndex=survivorIndexes[key];
+      var survivor=survivors[survivorIndex];
+      if(Number(player && player.mixedEraOverall || 0) > Number(survivor && survivor.mixedEraOverall || 0)){
+        var mergedPlayer=Object.assign({}, survivor);
+        Object.keys(player || {}).forEach(function(field){
+          if(player[field] !== undefined){
+            mergedPlayer[field]=player[field];
+          }
+        });
+        survivors[survivorIndex]=mergedPlayer;
+      }
+    });
+    return survivors;
   }
 
   function getCalibrationMismatchLabel(rankDelta){
@@ -456,7 +502,7 @@
   }
 
   function curatePlayersForSource(sourceContext, topPlayersPerPack, buildPlayerSimulationProfile){
-    return sourceContext.players.map(function(player){
+    var curatedPlayers=sourceContext.players.map(function(player){
       var basePlayer=clone(player);
       var simProfile=basePlayer && basePlayer.simProfile && typeof basePlayer.simProfile==='object' ? clone(basePlayer.simProfile) : null;
       if((!simProfile || !simProfile.mixedEraRatings || !Number.isFinite(Number(simProfile.mixedEraRatings.overall))) && buildPlayerSimulationProfile){
@@ -484,7 +530,8 @@
         statSummary: String(basePlayer && basePlayer.statSummary || (String(basePlayer && basePlayer.team || 'ERA') + ' ' + String(basePlayer && basePlayer.pos || 'UTIL') + ' - ' + Number(basePlayer && basePlayer.pts || 0).toFixed(1) + ' pts')),
         simProfile: simProfile
       });
-    }).sort(comparePlayers).slice(0, topPlayersPerPack);
+    });
+    return dedupeMixedEraPlayers(curatedPlayers).sort(comparePlayers).slice(0, topPlayersPerPack);
   }
 
   function buildMixedEraDraftContextFromBundles(options){
@@ -500,7 +547,7 @@
     var curatedPlayers=sourceContexts.reduce(function(allPlayers, sourceContext){
       return allPlayers.concat(curatePlayersForSource(sourceContext, topPlayersPerPack, buildPlayerSimulationProfile));
     }, []);
-    var playerPool=curatedPlayers.sort(comparePlayers).map(function(player, index){
+    var playerPool=dedupeMixedEraPlayers(curatedPlayers).sort(comparePlayers).map(function(player, index){
       return Object.assign({}, player, {
         id: 970001 + index,
         adp: index + 1
@@ -938,6 +985,9 @@
     buildProjection: buildProjection,
     buildMixedEraConfigSnapshot: buildMixedEraConfigSnapshot,
     buildMixedEraUniverseSummary: buildMixedEraUniverseSummary,
+    normalizeMixedEraIdentityText: normalizeMixedEraIdentityText,
+    buildMixedEraIdentityKey: buildMixedEraIdentityKey,
+    dedupeMixedEraPlayers: dedupeMixedEraPlayers,
     buildCalibrationKey: buildCalibrationKey,
     normalizeCalibration: normalizeCalibration,
     getCalibrationMismatchLabel: getCalibrationMismatchLabel,

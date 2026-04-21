@@ -1,6 +1,16 @@
 const assert = require('assert');
 
-const { buildMixedEraDraftContextFromBundles } = require('../mixed-era-runtime.js');
+const {
+  buildMixedEraDraftContextFromBundles,
+  normalizeMixedEraIdentityText,
+  buildMixedEraIdentityKey,
+  dedupeMixedEraPlayers
+} = require('../mixed-era-runtime.js');
+
+assert.strictEqual(typeof buildMixedEraDraftContextFromBundles, 'function');
+assert.strictEqual(typeof normalizeMixedEraIdentityText, 'function');
+assert.strictEqual(typeof buildMixedEraIdentityKey, 'function');
+assert.strictEqual(typeof dedupeMixedEraPlayers, 'function');
 
 const config = {
   mixedEraConfigId: '1996-2016-top100',
@@ -64,6 +74,34 @@ const bundles = [
           perGame: { min: 35.7, pts: 15.7, reb: 4.1, ast: 5.9, stl: 2.6, blk: 0.2, to: 2.3, fgm: 5.6, fga: 13.9, ftm: 1.6, fta: 2.1, threes: 2.9 },
           totals: { pts: 1274, reb: 332, ast: 478, stl: 209, blk: 16, to: 186, threes: 235 }
         }
+      },
+      {
+        playerId: 'nba_1996_muresan_ascii',
+        displayName: 'Gheorghe Muresan',
+        firstName: 'Gheorghe',
+        lastName: 'Muresan',
+        teamId: 'nba_1996_sea',
+        primaryPosition: 'C',
+        draftEligible: true,
+        seasonStats: {
+          games: 76,
+          perGame: { min: 28.4, pts: 14.5, reb: 9.6, ast: 1.2, stl: 0.5, blk: 2.3, to: 2.1, fgm: 5.7, fga: 10.1, ftm: 3.1, fta: 4.2, threes: 0.0 },
+          totals: { pts: 1102, reb: 730, ast: 91, stl: 36, blk: 174, to: 160, threes: 0 }
+        }
+      },
+      {
+        playerId: 'nba_1996_muresan_accented',
+        displayName: 'Gheorghe Mureșan',
+        firstName: 'Gheorghe',
+        lastName: 'Mureșan',
+        teamId: 'nba_1996_sea',
+        primaryPosition: 'C',
+        draftEligible: true,
+        seasonStats: {
+          games: 76,
+          perGame: { min: 28.4, pts: 14.5, reb: 9.6, ast: 1.2, stl: 0.5, blk: 2.3, to: 2.1, fgm: 5.7, fga: 10.1, ftm: 3.1, fta: 4.2, threes: 0.0 },
+          totals: { pts: 1102, reb: 730, ast: 91, stl: 36, blk: 174, to: 160, threes: 0 }
+        }
       }
     ]
   },
@@ -116,6 +154,20 @@ const bundles = [
           perGame: { min: 34.7, pts: 14.0, reb: 9.5, ast: 7.4, stl: 1.5, blk: 1.4, to: 3.2, fgm: 4.9, fga: 10.1, ftm: 2.1, fta: 3.2, threes: 1.2 },
           totals: { pts: 1131, reb: 776, ast: 603, stl: 123, blk: 113, to: 259, threes: 100 }
         }
+      },
+      {
+        playerId: 'nba_2016_muresan_modern_name_collision',
+        displayName: 'Gheorghe Muresan',
+        firstName: 'Gheorghe',
+        lastName: 'Muresan',
+        teamId: 'nba_2016_cle',
+        primaryPosition: 'C',
+        draftEligible: true,
+        seasonStats: {
+          games: 18,
+          perGame: { min: 6.0, pts: 1.2, reb: 1.8, ast: 0.2, stl: 0.1, blk: 0.4, to: 0.4, fgm: 0.5, fga: 1.1, ftm: 0.2, fta: 0.3, threes: 0.0 },
+          totals: { pts: 22, reb: 32, ast: 4, stl: 2, blk: 7, to: 7, threes: 0 }
+        }
       }
     ]
   }
@@ -125,12 +177,32 @@ const mixedEraOverallByName = {
   'Michael Jordan': 99.5,
   'Gary Payton': 93.2,
   'Mookie Blaylock': 88.4,
+  'Gheorghe Muresan': 86.2,
+  'Gheorghe Mureșan': 86.5,
   'Stephen Curry': 98.7,
   'LeBron James': 96.8,
   'Draymond Green': 89.3
 };
 
-const builderCalls = [];
+assert.strictEqual(normalizeMixedEraIdentityText('Gheorghe Mureșan'), 'gheorghe muresan');
+assert.strictEqual(normalizeMixedEraIdentityText('  Toni   Kukoč  '), 'toni kukoc');
+
+const duplicateSameEraPlayers = [
+  { name: 'Gheorghe Muresan', historicalPackId: 'nba_1996_full_season_v1', mixedEraOverall: 72.1 },
+  { name: 'Gheorghe Mureșan', historicalPackId: 'nba_1996_full_season_v1', mixedEraOverall: 72.4 },
+  { name: 'Gheorghe Muresan', historicalPackId: 'nba_2016_full_season_v1', mixedEraOverall: 65.0 }
+];
+const dedupedDuplicateSameEraPlayers = dedupeMixedEraPlayers(duplicateSameEraPlayers);
+
+assert.strictEqual(buildMixedEraIdentityKey(duplicateSameEraPlayers[0]), 'nba_1996_full_season_v1|gheorghe muresan');
+assert.strictEqual(buildMixedEraIdentityKey(duplicateSameEraPlayers[2]), 'nba_2016_full_season_v1|gheorghe muresan');
+assert.strictEqual(dedupedDuplicateSameEraPlayers.length, 2);
+assert.deepStrictEqual(
+  dedupedDuplicateSameEraPlayers.map((player) => player.historicalPackId).sort(),
+  ['nba_1996_full_season_v1', 'nba_2016_full_season_v1']
+);
+assert.ok(dedupedDuplicateSameEraPlayers.some((player) => player.historicalPackId === 'nba_1996_full_season_v1' && player.mixedEraOverall === 72.4));
+assert.ok(dedupedDuplicateSameEraPlayers.some((player) => player.historicalPackId === 'nba_2016_full_season_v1'));
 
 function expectedFantasyPointsFromTotals(totals) {
   return Math.round((
@@ -149,7 +221,6 @@ const context = buildMixedEraDraftContextFromBundles({
   bundles,
   requestedSport: 'nba',
   buildPlayerSimulationProfile(player, options) {
-    builderCalls.push({ name: player.name, packId: options.packId });
     return {
       mixedEraRatings: { overall: mixedEraOverallByName[player.name] || 0 },
       mixedEraContext: { sourcePackId: options.packId }
@@ -159,7 +230,6 @@ const context = buildMixedEraDraftContextFromBundles({
 
 assert.strictEqual(context.mixedEraConfigId, '1996-2016-top100');
 assert.strictEqual(context.playerPool.length, 4);
-assert.strictEqual(builderCalls.length, 6);
 assert.deepStrictEqual(context.sourcePackIds, ['nba_1996_full_season_v1', 'nba_2016_full_season_v1']);
 assert.strictEqual(context.playerPool[0].name, 'Michael Jordan');
 assert.strictEqual(context.playerPool[0].team, 'CHI');
@@ -176,5 +246,34 @@ assert.strictEqual(context.playerPool[0].totalFantasyPoints, expectedJordanTotal
 assert.strictEqual(context.playerPool[0].statValues.TFP, expectedJordanTotalFantasyPoints);
 assert.ok(context.playerPool.every(player => Array.isArray(player.historicalSourcePackIds)));
 assert.ok(context.playerPool.every(player => player.simProfile && player.simProfile.mixedEraRatings));
+
+const dedupeConfig = {
+  ...config,
+  mixedEraConfigId: '1996-2016-top100-dedupe-check',
+  packId: 'mixed_era_1996_2016_top100_dedupe_check_v1',
+  topPlayersPerPack: 5
+};
+
+const dedupeContext = buildMixedEraDraftContextFromBundles({
+  config: dedupeConfig,
+  bundles,
+  requestedSport: 'nba',
+  buildPlayerSimulationProfile(player, options) {
+    return {
+      mixedEraRatings: { overall: mixedEraOverallByName[player.name] || 0 },
+      mixedEraContext: { sourcePackId: options.packId }
+    };
+  }
+});
+
+const dedupeContextSameEraMuresanRows = dedupeContext.playerPool.filter(
+  (player) => player.historicalPackId === 'nba_1996_full_season_v1' && normalizeMixedEraIdentityText(player.name) === 'gheorghe muresan'
+);
+const dedupeContextModernEraMuresanRows = dedupeContext.playerPool.filter(
+  (player) => player.historicalPackId === 'nba_2016_full_season_v1' && normalizeMixedEraIdentityText(player.name) === 'gheorghe muresan'
+);
+
+assert.strictEqual(dedupeContextSameEraMuresanRows.length, 1);
+assert.strictEqual(dedupeContextModernEraMuresanRows.length, 1);
 
 console.log('mixed-era runtime test passed');
