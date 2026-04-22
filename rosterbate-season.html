@@ -9391,6 +9391,14 @@ function getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid){
   const configuredStarterCount=typeof STARTERS!=='undefined' && Number.isFinite(Number(STARTERS))
     ? Number(STARTERS)
     : 0;
+  if(!starterContextAvailable && configuredStarterCount>0 && rosterPlayers.length){
+    starterIds=[...rosterPlayers]
+      .sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a))
+      .slice(0, Math.min(configuredStarterCount, rosterPlayers.length))
+      .map(player=>Number(player?.id))
+      .filter(Number.isFinite);
+    starterContextAvailable=starterIds.length>0;
+  }
   const simulatedStarterCount=starterContextAvailable
     ? Math.max(1, Math.min(configuredStarterCount || starterIds.length, simulatedRoster.length || 1))
     : 0;

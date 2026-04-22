@@ -379,6 +379,7 @@ const rosters = {
 
 const context = {
   console,
+  STARTERS: 2,
   G: { rosters },
   P(id) {
     return players[id];
@@ -400,10 +401,10 @@ const fair = context.evaluateOneForOneTradeFairness({
 });
 assert.equal(fair.rating, 'fair');
 
-const fallbackProfile = context.getTradeFairnessRosterProfile(0, 11, 12);
-assert.equal(fallbackProfile.starterContextAvailable, false);
-assert.equal(fallbackProfile.outgoingWasStarter, false);
-assert.equal(fallbackProfile.incomingProjectsStarter, false);
+const fallbackProfile = context.getTradeFairnessRosterProfile(0, 12, 31);
+assert.equal(fallbackProfile.starterContextAvailable, true);
+assert.equal(fallbackProfile.outgoingWasStarter, true);
+assert.equal(fallbackProfile.incomingProjectsStarter, true);
 
 assert.deepEqual(plain(context.getTradeFairnessBadgeMeta('fair')), {
   label: 'Fair',
@@ -439,22 +440,25 @@ const contextSoftened = context.evaluateOneForOneTradeFairness({
 assert.ok(['fair', 'slight_lean'].includes(contextSoftened.rating));
 
 const originalRosterProfile = context.getTradeFairnessRosterProfile;
-context.getTradeFairnessRosterProfile = teamIdx => ({
-  teamIdx,
-  incomingValue: teamIdx === 0 ? 30 : 10,
-  outgoingValue: teamIdx === 0 ? 22 : 18,
-  contextBoost: teamIdx === 0 ? -3 : 4
-});
-const penaltyAware = context.evaluateOneForOneTradeFairness({
-  fromTeam: 0,
-  toTeam: 1,
-  give: [11],
-  get: [12]
-});
-assert.equal(penaltyAware.contextOffset, 1);
-assert.equal(penaltyAware.adjustedGap, 7);
-assert.equal(penaltyAware.rating, 'slight_lean');
-context.getTradeFairnessRosterProfile = originalRosterProfile;
+try {
+  context.getTradeFairnessRosterProfile = teamIdx => ({
+    teamIdx,
+    incomingValue: teamIdx === 0 ? 30 : 10,
+    outgoingValue: teamIdx === 0 ? 22 : 18,
+    contextBoost: teamIdx === 0 ? -3 : 4
+  });
+  const penaltyAware = context.evaluateOneForOneTradeFairness({
+    fromTeam: 0,
+    toTeam: 1,
+    give: [11],
+    get: [12]
+  });
+  assert.equal(penaltyAware.contextOffset, 1);
+  assert.equal(penaltyAware.adjustedGap, 7);
+  assert.equal(penaltyAware.rating, 'slight_lean');
+} finally {
+  context.getTradeFairnessRosterProfile = originalRosterProfile;
+}
 
 const vmResult = context.getTradeFairnessViewModel({
   fromTeam: 0,
