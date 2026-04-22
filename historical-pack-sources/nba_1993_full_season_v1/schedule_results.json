@@ -1,0 +1,19 @@
+{
+  "season": "1992-93",
+  "packId": "nba_1993_full_season_v1",
+  "sourceMode": "foundation_snapshot",
+  "notes": [
+    "Real 1992-93 regular-season schedule and final scores captured for the playable foundation build.",
+    "Player-game box score rows remain inferred from season totals because the live 1992 archive feeds are absent."
+  ],
+  "games": [
+    {
+      "sourceGameId": "19921106_chi_cle",
+      "gameDate": "1992-11-06",
+      "homeTeamAbbr": "CLE",
+      "awayTeamAbbr": "CHI",
+      "homeScore": 96,
+      "awayScore": 101
+    }
+  ]
+}
