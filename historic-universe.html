@@ -570,7 +570,7 @@
       return fallback;
     }
     const resultVerb = Number.isFinite(userScore) && Number.isFinite(opponentScore)
-      ? (userScore >= opponentScore ? 'beat' : 'fell to')
+      ? (userScore === opponentScore ? 'tied' : (userScore > opponentScore ? 'beat' : 'fell to'))
       : 'faced';
     const resultHeadline = userTeamName && opponentTeamName
       ? userTeamName + ' ' + resultVerb + ' ' + opponentTeamName
@@ -713,7 +713,7 @@
     const myScore = Number(myTeamIsPrimary ? matchup?.teamScore : matchup?.opponentScore);
     const opponentScore = Number(myTeamIsPrimary ? matchup?.opponentScore : matchup?.teamScore);
     const verb = Number.isFinite(myScore) && Number.isFinite(opponentScore)
-      ? (myScore >= opponentScore ? 'beat' : 'fell to')
+      ? (myScore === opponentScore ? 'tied' : (myScore > opponentScore ? 'beat' : 'fell to'))
       : 'faced';
     return {
       headline: teamName + ' ' + verb + ' ' + opponentName,
@@ -725,14 +725,24 @@
 
   const RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT = 2;
 
+  function getRecentSimulationTeamNameCandidates(slot, state){
+    const myPos = Number(state?.myPos);
+    return [
+      String(slot?.teamName || '').trim().toLowerCase(),
+      String(state?.teams?.[myPos] || '').trim().toLowerCase()
+    ].filter(Boolean);
+  }
+
   function buildRecentSimulationTeamActivity(slot, state, reveal){
     const myPos = Number(state?.myPos);
-    const teamName = String(slot?.teamName || '').trim().toLowerCase();
+    const teamNames = getRecentSimulationTeamNameCandidates(slot, state);
     return getRevealWindowActivitiesForState(state, reveal)
       .filter(function(entry){
         if(Number(entry?.teamIdx) === myPos) return true;
         const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
-        return !!teamName && haystack.includes(teamName);
+        return teamNames.some(function(teamName){
+          return haystack.includes(teamName);
+        });
       })
       .slice(0, RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT)
       .map(function(entry){
@@ -759,17 +769,21 @@
 
   function buildRecentSimulationLeagueNote(slot, state, reveal){
     const myPos = Number(state?.myPos);
-    const teamName = String(slot?.teamName || '').trim().toLowerCase();
+    const teamNames = getRecentSimulationTeamNameCandidates(slot, state);
     const revealWindowEntries = getRevealWindowActivitiesForState(state, reveal);
     const teamActivityEntries = revealWindowEntries.filter(function(entry){
       if(Number(entry?.teamIdx) === myPos) return true;
       const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
-      return !!teamName && haystack.includes(teamName);
+      return teamNames.some(function(teamName){
+        return haystack.includes(teamName);
+      });
     });
     const nonTeamEntry = revealWindowEntries.find(function(entry){
       if(Number(entry?.teamIdx) === myPos) return false;
       const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
-      return !(teamName && haystack.includes(teamName));
+      return !teamNames.some(function(teamName){
+        return haystack.includes(teamName);
+      });
     });
     const representedTeamTransactions = countRepresentedRevealTransactions(
       teamActivityEntries.slice(0, RECENT_SIMULATION_TEAM_ACTIVITY_LIMIT)

@@ -339,6 +339,40 @@ assert.deepStrictEqual(reverseMatchupViewModel.latestSimDay, {
   pills: ['Week 3 Day 11', '146.8 - 151.3', 'Rank #2']
 });
 
+const tiedMatchupViewModel = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    Object.assign({}, state, {
+      dailyRevealReports: {
+        '11': {
+          day: 11,
+          week: 3,
+          story: {
+            headline: 'Audit Agents and CPU Team 2 traded blows on Day 11',
+            subheadline: 'Both sides finished level after the final sim-day swing.'
+          },
+          matchups: [
+            { teamIdx: 0, opponentIdx: 2, teamName: 'Audit Agents', opponentName: 'CPU Team 2', teamScore: 150.0, opponentScore: 150.0 }
+          ]
+        }
+      }
+    }),
+    {}
+  )
+));
+
+assert.deepStrictEqual(tiedMatchupViewModel.latestSimDay, {
+  copy: 'Week 3, Day 11 is the latest completed archive beat for Audit Agents.',
+  headline: 'Audit Agents tied CPU Team 2',
+  narrative: 'Both sides finished level after the final sim-day swing.',
+  pills: ['Week 3 Day 11', '150.0 - 150.0', 'Rank #2']
+});
+assert.match(tiedMatchupViewModel.recentSimDays[0].teamResult.headline, /Audit Agents tied CPU Team 2/i);
+assert.match(
+  context.renderRecentSimulationCards(tiedMatchupViewModel.recentSimDays),
+  /Audit Agents tied CPU Team 2/i
+);
+
 assert.equal(viewModel.recentSimDays.length, 3);
 assert.deepStrictEqual(
   viewModel.recentSimDays.map(item => item.day),
@@ -485,6 +519,51 @@ assert.doesNotMatch(
   context.renderRecentSimulationCards(teamOnlyTransactionWindow.recentSimDays),
   /League note:/,
   'team-only transaction windows should not render a generic league note'
+);
+
+const staleSlotActivityWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    Object.assign({}, slot, { teamName: 'Stale Slot Name' }),
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '10': {
+          day: 10,
+          week: 3,
+          generatedAt: 10000,
+          story: {
+            headline: 'Transaction window',
+            subheadline: 'Saved slot metadata was stale, but the live state still knows the team.'
+          },
+          matchups: [],
+          totalTransactions: 1
+        }
+      },
+      activityLog: [
+        { id: 's1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', ts: 9900 }
+      ]
+    },
+    {}
+  )
+));
+assert.deepStrictEqual(staleSlotActivityWindow.recentSimDays[0].teamActivity, [
+  {
+    title: 'Audit Agents added Brent Barry',
+    body: 'Dropped an inactive bench wing for a live scorer.'
+  }
+]);
+assert.equal(staleSlotActivityWindow.recentSimDays[0].leagueNote, null);
+assert.match(
+  context.renderRecentSimulationCards(staleSlotActivityWindow.recentSimDays),
+  /Team activity: Audit Agents added Brent Barry/
+);
+assert.doesNotMatch(
+  context.renderRecentSimulationCards(staleSlotActivityWindow.recentSimDays),
+  /League note:/,
+  'live team names from state should keep user activity out of the league-note bucket'
 );
 
 const partialCoverageTransactionWindow = JSON.parse(JSON.stringify(
