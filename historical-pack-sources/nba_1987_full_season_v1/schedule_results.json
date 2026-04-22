@@ -26,13 +26,15 @@
       "nbastats_1986",
       "pbpstats_1986"
     ],
-    "primaryScheduleSource": "wikipedia_team_season_pages",
-    "fallbackScheduleSource": "five_thirty_eight_nbaallelo"
+    "primaryScheduleSource": "five_thirty_eight_nbaallelo",
+    "fallbackScheduleSource": "five_thirty_eight_nbaallelo",
+    "supplementalScheduleSource": "wikipedia_team_season_pages",
+    "scheduleSourceBlend": "checked_in_mixed_source_snapshot"
   },
   "teamCoverage": [
     {
       "teamAbbr": "ATL",
-      "pageTitle": "1986\u201387 Atlanta Hawks season",
+      "pageTitle": "1986–87 Atlanta Hawks season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": true,
@@ -40,7 +42,7 @@
     },
     {
       "teamAbbr": "BOS",
-      "pageTitle": "1986\u201387 Boston Celtics season",
+      "pageTitle": "1986–87 Boston Celtics season",
       "wikipediaRegularSeasonGames": 82,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": false,
@@ -48,7 +50,7 @@
     },
     {
       "teamAbbr": "CHI",
-      "pageTitle": "1986\u201387 Chicago Bulls season",
+      "pageTitle": "1986–87 Chicago Bulls season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -56,7 +58,7 @@
     },
     {
       "teamAbbr": "CLE",
-      "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+      "pageTitle": "1986–87 Cleveland Cavaliers season",
       "wikipediaRegularSeasonGames": 6,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": true,
@@ -64,7 +66,7 @@
     },
     {
       "teamAbbr": "DAL",
-      "pageTitle": "1986\u201387 Dallas Mavericks season",
+      "pageTitle": "1986–87 Dallas Mavericks season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": true,
@@ -72,7 +74,7 @@
     },
     {
       "teamAbbr": "DEN",
-      "pageTitle": "1986\u201387 Denver Nuggets season",
+      "pageTitle": "1986–87 Denver Nuggets season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -80,7 +82,7 @@
     },
     {
       "teamAbbr": "DET",
-      "pageTitle": "1986\u201387 Detroit Pistons season",
+      "pageTitle": "1986–87 Detroit Pistons season",
       "wikipediaRegularSeasonGames": 9,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": false,
@@ -88,7 +90,7 @@
     },
     {
       "teamAbbr": "GOS",
-      "pageTitle": "1986\u201387 Golden State Warriors season",
+      "pageTitle": "1986–87 Golden State Warriors season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -96,7 +98,7 @@
     },
     {
       "teamAbbr": "HOU",
-      "pageTitle": "1986\u201387 Houston Rockets season",
+      "pageTitle": "1986–87 Houston Rockets season",
       "wikipediaRegularSeasonGames": 23,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": false,
@@ -104,7 +106,7 @@
     },
     {
       "teamAbbr": "IND",
-      "pageTitle": "1986\u201387 Indiana Pacers season",
+      "pageTitle": "1986–87 Indiana Pacers season",
       "wikipediaRegularSeasonGames": 82,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": true,
@@ -112,7 +114,7 @@
     },
     {
       "teamAbbr": "MIL",
-      "pageTitle": "1986\u201387 Milwaukee Bucks season",
+      "pageTitle": "1986–87 Milwaukee Bucks season",
       "wikipediaRegularSeasonGames": 2,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": true,
@@ -120,7 +122,7 @@
     },
     {
       "teamAbbr": "NJN",
-      "pageTitle": "1986\u201387 New Jersey Nets season",
+      "pageTitle": "1986–87 New Jersey Nets season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -128,7 +130,7 @@
     },
     {
       "teamAbbr": "NYK",
-      "pageTitle": "1986\u201387 New York Knicks season",
+      "pageTitle": "1986–87 New York Knicks season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -136,7 +138,7 @@
     },
     {
       "teamAbbr": "LAC",
-      "pageTitle": "1986\u201387 LA Clippers season",
+      "pageTitle": "1986–87 LA Clippers season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -144,7 +146,7 @@
     },
     {
       "teamAbbr": "LAL",
-      "pageTitle": "1986\u201387 Los Angeles Lakers season",
+      "pageTitle": "1986–87 Los Angeles Lakers season",
       "wikipediaRegularSeasonGames": 82,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": true,
@@ -152,7 +154,7 @@
     },
     {
       "teamAbbr": "PHX",
-      "pageTitle": "1986\u201387 Phoenix Suns season",
+      "pageTitle": "1986–87 Phoenix Suns season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": true,
@@ -160,7 +162,7 @@
     },
     {
       "teamAbbr": "PHL",
-      "pageTitle": "1986\u201387 Philadelphia 76ers season",
+      "pageTitle": "1986–87 Philadelphia 76ers season",
       "wikipediaRegularSeasonGames": 8,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": false,
@@ -168,7 +170,7 @@
     },
     {
       "teamAbbr": "POR",
-      "pageTitle": "1986\u201387 Portland Trail Blazers season",
+      "pageTitle": "1986–87 Portland Trail Blazers season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -176,7 +178,7 @@
     },
     {
       "teamAbbr": "SAC",
-      "pageTitle": "1986\u201387 Sacramento Kings season",
+      "pageTitle": "1986–87 Sacramento Kings season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": false,
@@ -184,7 +186,7 @@
     },
     {
       "teamAbbr": "SAN",
-      "pageTitle": "1986\u201387 San Antonio Spurs season",
+      "pageTitle": "1986–87 San Antonio Spurs season",
       "wikipediaRegularSeasonGames": 0,
       "hasWikipediaGameLog": false,
       "hasWikipediaPlayerStats": true,
@@ -192,7 +194,7 @@
     },
     {
       "teamAbbr": "SEA",
-      "pageTitle": "1986\u201387 Seattle SuperSonics season",
+      "pageTitle": "1986–87 Seattle SuperSonics season",
       "wikipediaRegularSeasonGames": 82,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": true,
@@ -200,7 +202,7 @@
     },
     {
       "teamAbbr": "UTH",
-      "pageTitle": "1986\u201387 Utah Jazz season",
+      "pageTitle": "1986–87 Utah Jazz season",
       "wikipediaRegularSeasonGames": 19,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": false,
@@ -208,7 +210,7 @@
     },
     {
       "teamAbbr": "WAS",
-      "pageTitle": "1986\u201387 Washington Bullets season",
+      "pageTitle": "1986–87 Washington Bullets season",
       "wikipediaRegularSeasonGames": 82,
       "hasWikipediaGameLog": true,
       "hasWikipediaPlayerStats": false,
@@ -217,9 +219,9 @@
   ],
   "notes": [
     "Live nbastats_1986 / pbpstats_1986 feeds are absent, so the pack cannot use the same play-by-play ingestion lane as later seasons.",
-    "Accessible Wikipedia team-season game logs are parsed wherever they expose real regular-season rows.",
-    "A FiveThirtyEight historical results backfill completes the schedule grid for teams whose Wikipedia season pages are empty or partial.",
-    "Player-game stat rows remain inferred from season totals and are not marketed as real event box scores."
+    "This checked-in snapshot is the authoritative normal-build input for 1986-87 schedule and results.",
+    "Accessible Wikipedia team-season game logs were used as cross-checks where available, but more than half the regular-season grid is completed by the FiveThirtyEight historical backfill.",
+    "Player-game box score rows remain inferred from season totals and are not marketed as real event box scores."
   ],
   "games": [
     {
@@ -261,7 +263,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198610310PHI.html"
         }
@@ -308,7 +310,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Milwaukee Bucks season",
+          "pageTitle": "1986–87 Milwaukee Bucks season",
           "pageTeamAbbr": "MIL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198110300DET.html"
         }
@@ -375,7 +377,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -402,7 +404,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198610310DAL.html"
         }
@@ -429,13 +431,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198610310BOS.html"
         }
@@ -462,13 +464,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Milwaukee Bucks season",
+          "pageTitle": "1986–87 Milwaukee Bucks season",
           "pageTeamAbbr": "MIL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611010MIL.html"
         }
@@ -555,7 +557,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611010IND.html"
         }
@@ -582,13 +584,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611010HOU.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611010HOU.html"
         }
@@ -655,7 +657,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611010UTA.html"
         }
@@ -682,7 +684,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -709,7 +711,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611010CLE.html"
         }
@@ -836,13 +838,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611040SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -889,7 +891,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611040WSB.html"
         }
@@ -936,7 +938,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611040IND.html"
         }
@@ -1003,7 +1005,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611050UTA.html"
         }
@@ -1030,13 +1032,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611050BOS.html"
         }
@@ -1123,7 +1125,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611050DET.html"
         }
@@ -1150,7 +1152,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -1217,7 +1219,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611060DEN.html"
         }
@@ -1244,13 +1246,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611070WSB.html"
         }
@@ -1337,7 +1339,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611070LAL.html"
         }
@@ -1464,7 +1466,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -1531,7 +1533,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611080IND.html"
         }
@@ -1558,7 +1560,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611080ATL.html"
         }
@@ -1585,7 +1587,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611090LAL.html"
         }
@@ -1652,7 +1654,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -1699,7 +1701,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611110UTA.html"
         }
@@ -1766,7 +1768,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611110MIL.html"
         }
@@ -1793,7 +1795,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -1860,7 +1862,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611120WSB.html"
         }
@@ -1907,7 +1909,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -1974,13 +1976,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611120LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -2027,7 +2029,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611130NJN.html"
         }
@@ -2114,7 +2116,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -2241,13 +2243,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611150DET.html"
         }
@@ -2294,7 +2296,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611150UTA.html"
         }
@@ -2321,7 +2323,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611150IND.html"
         }
@@ -2368,7 +2370,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -2395,7 +2397,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611150NYK.html"
         }
@@ -2442,13 +2444,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611160WSB.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611160WSB.html"
         }
@@ -2495,7 +2497,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611160LAL.html"
         }
@@ -2522,7 +2524,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611160POR.html"
         }
@@ -2569,7 +2571,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611180LAC.html"
         }
@@ -2596,7 +2598,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611180DAL.html"
         }
@@ -2663,7 +2665,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -2690,7 +2692,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -2717,7 +2719,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611190WSB.html"
         }
@@ -2764,7 +2766,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611190SAS.html"
         }
@@ -2831,7 +2833,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+          "pageTitle": "1986–87 Cleveland Cavaliers season",
           "pageTeamAbbr": "CLE",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611200ATL.html"
         }
@@ -2878,7 +2880,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611200SAC.html"
         }
@@ -2905,7 +2907,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -3012,7 +3014,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -3039,7 +3041,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611210WSB.html"
         }
@@ -3066,7 +3068,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611210LAL.html"
         }
@@ -3133,7 +3135,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -3200,13 +3202,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611220SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -3313,7 +3315,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611220CHI.html"
         }
@@ -3360,7 +3362,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611230POR.html"
         }
@@ -3387,7 +3389,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611230LAL.html"
         }
@@ -3414,7 +3416,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611250LAL.html"
         }
@@ -3441,13 +3443,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -3494,7 +3496,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -3561,7 +3563,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611250WSB.html"
         }
@@ -3648,7 +3650,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611260IND.html"
         }
@@ -3675,7 +3677,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611260LAC.html"
         }
@@ -3702,7 +3704,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -3769,7 +3771,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -3796,7 +3798,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611260MIL.html"
         }
@@ -3843,7 +3845,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611280LAL.html"
         }
@@ -3870,7 +3872,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611280IND.html"
         }
@@ -3977,7 +3979,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -4004,7 +4006,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -4111,7 +4113,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611290WSB.html"
         }
@@ -4138,7 +4140,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611290DAL.html"
         }
@@ -4185,7 +4187,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611300LAL.html"
         }
@@ -4212,7 +4214,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198611300IND.html"
         }
@@ -4239,7 +4241,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -4306,7 +4308,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612020GSW.html"
         }
@@ -4333,7 +4335,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612020MIL.html"
         }
@@ -4420,13 +4422,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612020BOS.html"
         }
@@ -4473,7 +4475,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -4540,13 +4542,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612030IND.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612030IND.html"
         }
@@ -4573,7 +4575,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612040HOU.html"
         }
@@ -4620,7 +4622,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612040GSW.html"
         }
@@ -4687,7 +4689,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -4714,7 +4716,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612050IND.html"
         }
@@ -4761,7 +4763,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612050LAL.html"
         }
@@ -4808,7 +4810,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612050WSB.html"
         }
@@ -4855,13 +4857,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -4888,7 +4890,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -5015,13 +5017,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612060HOU.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -5068,7 +5070,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612070LAL.html"
         }
@@ -5115,7 +5117,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+          "pageTitle": "1986–87 Cleveland Cavaliers season",
           "pageTeamAbbr": "CLE",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612090CLE.html"
         }
@@ -5162,7 +5164,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612090NYK.html"
         }
@@ -5289,7 +5291,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612100PHI.html"
         }
@@ -5316,7 +5318,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612100MIL.html"
         }
@@ -5343,7 +5345,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -5370,7 +5372,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612100WSB.html"
         }
@@ -5437,7 +5439,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -5464,7 +5466,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612100DEN.html"
         }
@@ -5491,7 +5493,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612110IND.html"
         }
@@ -5518,7 +5520,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612110UTA.html"
         }
@@ -5545,7 +5547,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612110HOU.html"
         }
@@ -5572,7 +5574,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -5619,13 +5621,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612120BOS.html"
         }
@@ -5732,7 +5734,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612120DET.html"
         }
@@ -5779,13 +5781,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612130WSB.html"
         }
@@ -5812,7 +5814,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -5899,13 +5901,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612130DET.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612130DET.html"
         }
@@ -5952,7 +5954,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612130IND.html"
         }
@@ -6039,7 +6041,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -6126,7 +6128,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612160CLE.html"
         }
@@ -6233,7 +6235,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -6260,7 +6262,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612160WSB.html"
         }
@@ -6307,13 +6309,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612170BOS.html"
         }
@@ -6400,7 +6402,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612180IND.html"
         }
@@ -6427,13 +6429,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612180SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -6480,7 +6482,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612180LAL.html"
         }
@@ -6527,7 +6529,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612180GSW.html"
         }
@@ -6554,13 +6556,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -6647,7 +6649,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -6674,7 +6676,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612190CLE.html"
         }
@@ -6701,7 +6703,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -6768,7 +6770,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612200NYK.html"
         }
@@ -6795,7 +6797,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612200DAL.html"
         }
@@ -6882,7 +6884,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612200LAC.html"
         }
@@ -6909,7 +6911,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -6936,7 +6938,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612210CLE.html"
         }
@@ -6963,13 +6965,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612210HOU.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612210HOU.html"
         }
@@ -6996,7 +6998,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612210POR.html"
         }
@@ -7103,7 +7105,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -7130,7 +7132,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612230IND.html"
         }
@@ -7177,7 +7179,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612230SAC.html"
         }
@@ -7284,7 +7286,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612250PHI.html"
         }
@@ -7311,7 +7313,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -7378,13 +7380,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612260LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612260LAL.html"
         }
@@ -7411,7 +7413,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -7458,7 +7460,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -7525,7 +7527,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612270WSB.html"
         }
@@ -7592,7 +7594,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612270CHI.html"
         }
@@ -7679,13 +7681,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612280LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -7712,7 +7714,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -7739,7 +7741,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+          "pageTitle": "1986–87 Cleveland Cavaliers season",
           "pageTeamAbbr": "CLE",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612290CLE.html"
         }
@@ -7766,7 +7768,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -7793,7 +7795,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612290WSB.html"
         }
@@ -7860,13 +7862,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -7893,7 +7895,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612300IND.html"
         }
@@ -8040,7 +8042,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198612300NYK.html"
         }
@@ -8067,7 +8069,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701010POR.html"
         }
@@ -8094,7 +8096,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701020WSB.html"
         }
@@ -8121,7 +8123,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -8168,7 +8170,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701020IND.html"
         }
@@ -8255,7 +8257,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701020LAL.html"
         }
@@ -8302,7 +8304,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -8449,13 +8451,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701030HOU.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -8522,7 +8524,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701040LAL.html"
         }
@@ -8549,7 +8551,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701050DAL.html"
         }
@@ -8656,7 +8658,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701060GSW.html"
         }
@@ -8683,7 +8685,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701060SAS.html"
         }
@@ -8710,7 +8712,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701060WSB.html"
         }
@@ -8757,7 +8759,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -8784,7 +8786,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701070LAL.html"
         }
@@ -8811,7 +8813,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -8898,7 +8900,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701070NJN.html"
         }
@@ -8925,7 +8927,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701080HOU.html"
         }
@@ -8972,7 +8974,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701080UTA.html"
         }
@@ -9019,7 +9021,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -9126,7 +9128,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -9173,7 +9175,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701090MIL.html"
         }
@@ -9200,13 +9202,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701100DET.html"
         }
@@ -9233,7 +9235,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+          "pageTitle": "1986–87 Cleveland Cavaliers season",
           "pageTeamAbbr": "CLE",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701100ATL.html"
         }
@@ -9280,7 +9282,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701100UTA.html"
         }
@@ -9307,7 +9309,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701100GSW.html"
         }
@@ -9354,7 +9356,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701100WSB.html"
         }
@@ -9441,7 +9443,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701110LAL.html"
         }
@@ -9468,7 +9470,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -9515,7 +9517,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701120WSB.html"
         }
@@ -9542,7 +9544,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -9609,7 +9611,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701130IND.html"
         }
@@ -9696,7 +9698,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -9723,7 +9725,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701130POR.html"
         }
@@ -9790,7 +9792,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -9837,7 +9839,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701140WSB.html"
         }
@@ -9864,7 +9866,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -9891,7 +9893,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701150LAL.html"
         }
@@ -9998,13 +10000,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701150IND.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701150IND.html"
         }
@@ -10031,7 +10033,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -10078,7 +10080,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -10105,7 +10107,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701160DET.html"
         }
@@ -10152,7 +10154,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701170IND.html"
         }
@@ -10259,7 +10261,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -10346,13 +10348,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701180BOS.html"
         }
@@ -10379,13 +10381,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701180WSB.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701180WSB.html"
         }
@@ -10432,7 +10434,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -10459,7 +10461,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701190IND.html"
         }
@@ -10526,7 +10528,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701190NJN.html"
         }
@@ -10693,13 +10695,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701210BOS.html"
         }
@@ -10726,7 +10728,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701210ATL.html"
         }
@@ -10813,7 +10815,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -10840,13 +10842,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701220IND.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701220IND.html"
         }
@@ -10873,7 +10875,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -10980,7 +10982,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701230WSB.html"
         }
@@ -11027,7 +11029,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -11094,7 +11096,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701240DAL.html"
         }
@@ -11161,7 +11163,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701240IND.html"
         }
@@ -11188,7 +11190,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -11215,7 +11217,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701240HOU.html"
         }
@@ -11242,13 +11244,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -11335,7 +11337,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -11362,7 +11364,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -11409,7 +11411,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701270ATL.html"
         }
@@ -11496,7 +11498,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701270LAL.html"
         }
@@ -11543,7 +11545,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701270DAL.html"
         }
@@ -11570,7 +11572,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -11637,13 +11639,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701280SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -11690,7 +11692,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+          "pageTitle": "1986–87 Cleveland Cavaliers season",
           "pageTeamAbbr": "CLE",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701290CLE.html"
         }
@@ -11737,7 +11739,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701290HOU.html"
         }
@@ -11764,7 +11766,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701290UTA.html"
         }
@@ -11811,7 +11813,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701290DET.html"
         }
@@ -11838,13 +11840,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701300IND.html"
         }
@@ -11891,7 +11893,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701300PHO.html"
         }
@@ -11998,7 +12000,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -12045,7 +12047,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701310CLE.html"
         }
@@ -12092,7 +12094,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198701310WSB.html"
         }
@@ -12119,7 +12121,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -12206,7 +12208,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702010ATL.html"
         }
@@ -12293,7 +12295,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702020LAL.html"
         }
@@ -12340,7 +12342,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -12367,7 +12369,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702020WSB.html"
         }
@@ -12394,7 +12396,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -12481,7 +12483,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702030IND.html"
         }
@@ -12548,7 +12550,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702030CHI.html"
         }
@@ -12575,7 +12577,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -12622,7 +12624,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702040LAL.html"
         }
@@ -12649,7 +12651,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -12696,7 +12698,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702050WSB.html"
         }
@@ -12743,7 +12745,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702050HOU.html"
         }
@@ -12770,7 +12772,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702050DET.html"
         }
@@ -12797,7 +12799,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702050POR.html"
         }
@@ -12844,7 +12846,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -12891,7 +12893,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -12918,7 +12920,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -12945,7 +12947,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702100GSW.html"
         }
@@ -12972,7 +12974,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702100SAC.html"
         }
@@ -13139,7 +13141,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702110PHO.html"
         }
@@ -13186,7 +13188,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702110SAS.html"
         }
@@ -13213,7 +13215,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -13300,7 +13302,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -13327,7 +13329,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702120DEN.html"
         }
@@ -13354,7 +13356,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -13381,13 +13383,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702130LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702130LAL.html"
         }
@@ -13434,7 +13436,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -13521,7 +13523,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702140MIL.html"
         }
@@ -13548,7 +13550,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702140DEN.html"
         }
@@ -13635,7 +13637,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702140SAC.html"
         }
@@ -13682,13 +13684,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702150LAL.html"
         }
@@ -13735,7 +13737,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -13782,7 +13784,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702160IND.html"
         }
@@ -13889,7 +13891,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -13916,7 +13918,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702160PHO.html"
         }
@@ -13983,13 +13985,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702170LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702170LAL.html"
         }
@@ -14016,7 +14018,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -14063,7 +14065,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702180DEN.html"
         }
@@ -14130,13 +14132,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702180IND.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -14163,13 +14165,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702190HOU.html"
         }
@@ -14256,13 +14258,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702190DET.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -14309,7 +14311,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702200ATL.html"
         }
@@ -14336,7 +14338,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702200CHI.html"
         }
@@ -14403,7 +14405,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702200UTA.html"
         }
@@ -14450,7 +14452,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -14557,13 +14559,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702210SEA.html"
         }
@@ -14610,13 +14612,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702220PHI.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -14683,7 +14685,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702220IND.html"
         }
@@ -14750,7 +14752,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -14777,7 +14779,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -14824,7 +14826,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702230CLE.html"
         }
@@ -14911,7 +14913,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702240MIL.html"
         }
@@ -14938,7 +14940,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702240PHO.html"
         }
@@ -15005,7 +15007,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -15052,7 +15054,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702250LAL.html"
         }
@@ -15079,7 +15081,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -15126,7 +15128,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -15173,13 +15175,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702260WSB.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702260WSB.html"
         }
@@ -15266,7 +15268,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -15293,7 +15295,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702270LAL.html"
         }
@@ -15320,7 +15322,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702270NJN.html"
         }
@@ -15427,7 +15429,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702280UTA.html"
         }
@@ -15474,7 +15476,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198702280WSB.html"
         }
@@ -15541,7 +15543,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -15588,13 +15590,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703010BOS.html"
         }
@@ -15621,7 +15623,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703010IND.html"
         }
@@ -15668,7 +15670,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -15755,7 +15757,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703020ATL.html"
         }
@@ -15782,7 +15784,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703030IND.html"
         }
@@ -15849,7 +15851,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703030GSW.html"
         }
@@ -15976,7 +15978,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703040WSB.html"
         }
@@ -16023,13 +16025,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703040LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -16056,7 +16058,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -16103,7 +16105,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703050GSW.html"
         }
@@ -16130,7 +16132,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -16217,7 +16219,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -16304,7 +16306,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703060PHI.html"
         }
@@ -16331,7 +16333,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703070LAL.html"
         }
@@ -16358,13 +16360,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703070SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -16411,7 +16413,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703070IND.html"
         }
@@ -16498,13 +16500,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703080DET.html"
         }
@@ -16611,7 +16613,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703090LAC.html"
         }
@@ -16658,7 +16660,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703090IND.html"
         }
@@ -16705,7 +16707,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703100LAL.html"
         }
@@ -16792,13 +16794,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703100HOU.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -16825,7 +16827,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703100NJN.html"
         }
@@ -16872,7 +16874,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703110IND.html"
         }
@@ -16919,7 +16921,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703110WSB.html"
         }
@@ -16946,7 +16948,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -16973,7 +16975,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -17000,7 +17002,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703110DEN.html"
         }
@@ -17067,7 +17069,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703120LAL.html"
         }
@@ -17154,13 +17156,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703130IND.html"
         }
@@ -17227,7 +17229,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -17254,7 +17256,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703140WSB.html"
         }
@@ -17401,7 +17403,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703150WSB.html"
         }
@@ -17448,7 +17450,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703150LAL.html"
         }
@@ -17475,7 +17477,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703150IND.html"
         }
@@ -17502,7 +17504,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -17529,7 +17531,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -17576,7 +17578,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703160DET.html"
         }
@@ -17603,7 +17605,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -17630,7 +17632,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -17777,7 +17779,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703170ATL.html"
         }
@@ -17864,7 +17866,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -17911,7 +17913,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703180LAL.html"
         }
@@ -17978,7 +17980,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198903190NYK.html"
         }
@@ -18025,13 +18027,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703190WSB.html"
         }
@@ -18158,7 +18160,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703200LAL.html"
         }
@@ -18185,13 +18187,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -18258,7 +18260,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703210IND.html"
         }
@@ -18285,7 +18287,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703210WSB.html"
         }
@@ -18412,7 +18414,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -18439,7 +18441,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703220LAL.html"
         }
@@ -18506,7 +18508,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703230UTA.html"
         }
@@ -18533,7 +18535,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703230HOU.html"
         }
@@ -18560,7 +18562,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -18587,13 +18589,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703230IND.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703230IND.html"
         }
@@ -18620,7 +18622,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703240WSB.html"
         }
@@ -18647,7 +18649,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -18734,7 +18736,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703240PHO.html"
         }
@@ -18841,7 +18843,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703250IND.html"
         }
@@ -18888,13 +18890,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703260WSB.html"
         }
@@ -18961,13 +18963,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703260LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703260LAL.html"
         }
@@ -19034,7 +19036,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -19061,7 +19063,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -19088,7 +19090,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -19175,7 +19177,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703270IND.html"
         }
@@ -19222,7 +19224,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703280WSB.html"
         }
@@ -19269,7 +19271,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703280ATL.html"
         }
@@ -19316,13 +19318,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703280HOU.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703280HOU.html"
         }
@@ -19389,13 +19391,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703290SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -19442,13 +19444,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -19495,7 +19497,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -19542,13 +19544,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Houston Rockets season",
+          "pageTitle": "1986–87 Houston Rockets season",
           "pageTeamAbbr": "HOU",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703310LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703310LAL.html"
         }
@@ -19635,7 +19637,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -19682,7 +19684,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198703310CHI.html"
         }
@@ -19729,7 +19731,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704010IND.html"
         }
@@ -19836,13 +19838,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704010BOS.html"
         }
@@ -19889,7 +19891,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704020DET.html"
         }
@@ -19916,13 +19918,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704020SEA.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -19969,7 +19971,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704030WSB.html"
         }
@@ -20016,13 +20018,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Detroit Pistons season",
+          "pageTitle": "1986–87 Detroit Pistons season",
           "pageTeamAbbr": "DET",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704030BOS.html"
         }
@@ -20069,7 +20071,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704030POR.html"
         }
@@ -20196,7 +20198,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704040NYK.html"
         }
@@ -20263,7 +20265,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -20290,7 +20292,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704040DAL.html"
         }
@@ -20317,7 +20319,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704040CLE.html"
         }
@@ -20344,13 +20346,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Philadelphia 76ers season",
+          "pageTitle": "1986–87 Philadelphia 76ers season",
           "pageTeamAbbr": "PHL",
           "boxscoreUrl": ""
         }
@@ -20397,7 +20399,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704050DEN.html"
         }
@@ -20444,7 +20446,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Cleveland Cavaliers season",
+          "pageTitle": "1986–87 Cleveland Cavaliers season",
           "pageTeamAbbr": "CLE",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704060ATL.html"
         }
@@ -20511,7 +20513,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704060LAL.html"
         }
@@ -20578,7 +20580,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -20665,7 +20667,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704070WSB.html"
         }
@@ -20692,7 +20694,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704070IND.html"
         }
@@ -20719,7 +20721,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -20746,7 +20748,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704080UTA.html"
         }
@@ -20813,7 +20815,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704080NJN.html"
         }
@@ -20860,7 +20862,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704090CLE.html"
         }
@@ -20887,7 +20889,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704090LAC.html"
         }
@@ -20954,7 +20956,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -21001,7 +21003,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704100UTA.html"
         }
@@ -21048,13 +21050,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704100WSB.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704100WSB.html"
         }
@@ -21101,7 +21103,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704100LAL.html"
         }
@@ -21128,7 +21130,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -21275,7 +21277,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704120WSB.html"
         }
@@ -21302,7 +21304,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704120CHI.html"
         }
@@ -21349,7 +21351,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -21376,7 +21378,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704120LAL.html"
         }
@@ -21423,7 +21425,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704130IND.html"
         }
@@ -21510,7 +21512,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704130PHI.html"
         }
@@ -21617,7 +21619,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -21644,13 +21646,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704150IND.html"
         }
@@ -21677,7 +21679,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704150WSB.html"
         }
@@ -21864,7 +21866,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704160UTA.html"
         }
@@ -21891,7 +21893,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -21918,7 +21920,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -21965,7 +21967,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704170PHI.html"
         }
@@ -21992,7 +21994,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704170SAS.html"
         }
@@ -22039,7 +22041,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Utah Jazz season",
+          "pageTitle": "1986–87 Utah Jazz season",
           "pageTeamAbbr": "UTH",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704170POR.html"
         }
@@ -22066,7 +22068,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704170NYK.html"
         }
@@ -22113,7 +22115,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -22160,7 +22162,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Indiana Pacers season",
+          "pageTitle": "1986–87 Indiana Pacers season",
           "pageTeamAbbr": "IND",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704180NJN.html"
         }
@@ -22247,7 +22249,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Boston Celtics season",
+          "pageTitle": "1986–87 Boston Celtics season",
           "pageTeamAbbr": "BOS",
           "boxscoreUrl": ""
         }
@@ -22294,7 +22296,7 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Washington Bullets season",
+          "pageTitle": "1986–87 Washington Bullets season",
           "pageTeamAbbr": "WAS",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704190WSB.html"
         }
@@ -22341,13 +22343,13 @@
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Los Angeles Lakers season",
+          "pageTitle": "1986–87 Los Angeles Lakers season",
           "pageTeamAbbr": "LAL",
           "boxscoreUrl": "https://www.basketball-reference.com/boxscores/198704190LAL.html"
         },
         {
           "type": "wikipedia_team_season_page",
-          "pageTitle": "1986\u201387 Seattle SuperSonics season",
+          "pageTitle": "1986–87 Seattle SuperSonics season",
           "pageTeamAbbr": "SEA",
           "boxscoreUrl": ""
         }
@@ -22366,7 +22368,7 @@
           "awayTeamAbbr": "BOS",
           "homeScore": 105,
           "awayScore": 124,
-          "pageTitle": "1986\u201387 Boston Celtics season"
+          "pageTitle": "1986–87 Boston Celtics season"
         },
         "backfill": {
           "homeTeamAbbr": "CHI",
@@ -22382,7 +22384,7 @@
           "awayTeamAbbr": "BOS",
           "homeScore": 102,
           "awayScore": 1,
-          "pageTitle": "1986\u201387 Philadelphia 76ers season"
+          "pageTitle": "1986–87 Philadelphia 76ers season"
         },
         "backfill": {
           "homeTeamAbbr": "PHL",
@@ -22398,7 +22400,7 @@
           "awayTeamAbbr": "DEN",
           "homeScore": 100,
           "awayScore": 134,
-          "pageTitle": "1986\u201387 Seattle SuperSonics season"
+          "pageTitle": "1986–87 Seattle SuperSonics season"
         },
         "backfill": {
           "homeTeamAbbr": "SEA",
@@ -22414,7 +22416,7 @@
           "awayTeamAbbr": "SEA",
           "homeScore": 136,
           "awayScore": 127,
-          "pageTitle": "1986\u201387 Seattle SuperSonics season"
+          "pageTitle": "1986–87 Seattle SuperSonics season"
         },
         "backfill": {
           "homeTeamAbbr": "HOU",
@@ -22430,7 +22432,7 @@
           "awayTeamAbbr": "WAS",
           "homeScore": 97,
           "awayScore": 96,
-          "pageTitle": "1986\u201387 Washington Bullets season"
+          "pageTitle": "1986–87 Washington Bullets season"
         },
         "backfill": {
           "homeTeamAbbr": "DET",
@@ -22446,7 +22448,7 @@
           "awayTeamAbbr": "NYK",
           "homeScore": 106,
           "awayScore": 105,
-          "pageTitle": "1986\u201387 Washington Bullets season"
+          "pageTitle": "1986–87 Washington Bullets season"
         },
         "backfill": {
           "homeTeamAbbr": "WAS",

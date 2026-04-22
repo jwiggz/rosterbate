@@ -63,7 +63,8 @@
   ],
   "auditNotes": [
     "Live nbastats_1986 / pbpstats_1986 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
-    "Schedule and results cover the complete regular season, with accessible Wikipedia team pages used where available and a historical backfill completing missing coverage.",
-    "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate so the inferred coverage is machine-readable and user-visible."
+    "Normal builds are reproducible from checked-in source artifacts and do not need live Wikipedia, TheBasketballDatabase, or list-data fetches.",
+    "Schedule and results cover the complete regular season from a mixed-source checked-in snapshot where the FiveThirtyEight backfill supplies more than half the games.",
+    "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate and is emitted only for the player's canonical teamId."
   ]
 }

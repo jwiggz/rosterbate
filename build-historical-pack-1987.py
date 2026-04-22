@@ -1416,10 +1416,56 @@ def featured_star_ids(players):
     ]
 
 
+def source_audit_from_snapshot(schedule_results_snapshot):
+    provenance = dict(schedule_results_snapshot.get("provenance") or {})
+    missing_feeds = list(provenance.get("missingFeeds") or ["nbastats_1986", "pbpstats_1986"])
+    return {
+        "mode": schedule_results_snapshot.get("sourceMode") or SOURCE_MODE,
+        "liveArchivesPresent": bool(provenance.get("liveArchivesPresent", False)),
+        "missingFeeds": missing_feeds,
+    }
+
+
+def sanitize_player_source_record(player):
+    cleaned = json.loads(json.dumps(player))
+    season_stats = dict(cleaned.get("seasonStats") or {})
+    totals = dict(season_stats.get("totals") or {})
+    games = max(0, min(82, to_int(season_stats.get("games"))))
+    games_started = max(0, min(games, to_int(season_stats.get("gamesStarted"))))
+    season_stats["games"] = games
+    season_stats["gamesStarted"] = games_started
+    season_stats["totals"] = totals
+    cleaned["seasonStats"] = season_stats
+    return cleaned
+
+
+def build_primary_team_inferred_stint(player):
+    season_stats = dict(player.get("seasonStats") or {})
+    totals = dict(season_stats.get("totals") or {})
+    return {
+        "teamId": player["teamId"],
+        "minutesTotal": to_int(totals.get("min")),
+        "games": max(0, min(82, to_int(season_stats.get("games")))),
+        "gamesStarted": max(0, min(82, to_int(season_stats.get("gamesStarted")))),
+        "totals": {
+            "points": to_int(totals.get("pts")),
+            "rebounds": to_int(totals.get("reb")),
+            "assists": to_int(totals.get("ast")),
+            "steals": to_int(totals.get("stl")),
+            "blocks": to_int(totals.get("blk")),
+            "turnovers": to_int(totals.get("to")),
+            "threePointersMade": to_int(totals.get("threes")),
+            "fgm": to_int(totals.get("fgm")),
+            "fga": to_int(totals.get("fga")),
+            "ftm": to_int(totals.get("ftm")),
+            "fta": to_int(totals.get("fta")),
+        },
+    }
+
+
 def main():
     ensure_dir(PACK_ROOT)
     generated_at = datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
-    source_audit = audit_source_mode()
 
     team_defs = []
     team_by_abbr = {}
@@ -1431,6 +1477,8 @@ def main():
         team_by_abbr[team_copy["abbr"]] = team_copy
 
     schedule_results_snapshot = read_source_json("schedule_results.json")
+    player_source_snapshot = read_source_json("normalized_players.json")
+    source_audit = source_audit_from_snapshot(schedule_results_snapshot)
 
     if schedule_results_snapshot.get("sourceMode") != SOURCE_MODE:
         raise RuntimeError(
@@ -1440,11 +1488,9 @@ def main():
     source_games = list(schedule_results_snapshot.get("games") or [])
     if len(source_games) != 943:
         raise RuntimeError(f"Expected 943 regular-season games in schedule_results.json, found {len(source_games)}.")
-
-    wiki_player_stats_by_abbr = {}
-    for team in team_defs:
-        html = fetch_wikipedia_render_html(team["wikiPageTitle"], f"wiki_render_{team['abbr'].lower()}")
-        wiki_player_stats_by_abbr[team["abbr"]] = parse_wikipedia_player_stats(html)
+    source_players = list(player_source_snapshot.get("players") or [])
+    if not source_players:
+        raise RuntimeError("Expected normalized_players.json to contain a non-empty `players` array.")
 
     source_games.sort(key=lambda item: (item["gameDate"], item["sourceGameId"]))
 
@@ -1500,145 +1546,7 @@ def main():
             }
         )
 
-    team_page_players = defaultdict(dict)
-    team_page_totals = defaultdict(dict)
-    player_stints_by_numeric = defaultdict(list)
-
-    for team in team_defs:
-        team_html = fetch_text(
-            TEAM_PAGE_URL.format(season=SOURCE_SEASON, abbr=quote(team["abbr"])),
-            f"team_page_{team['abbr'].lower()}",
-        )
-        dropdown_players = parse_dropdown_players(team_html)
-        if not dropdown_players:
-            raise RuntimeError(f"Team page for `{team['abbr']}` did not expose any player links.")
-        aligned_totals = align_team_page_totals(dropdown_players, parse_team_boxscore_totals(team_html), team["abbr"])
-        wiki_team_stats = wiki_player_stats_by_abbr.get(team["abbr"], {})
-        team_schedule_count = len(team_schedule_by_id[team["teamId"]])
-
-        for player_entry in dropdown_players:
-            player_numeric_id = player_entry["playerNumericId"]
-            display_name = player_entry["displayName"]
-            totals_row = aligned_totals[player_numeric_id]
-            wiki_stats = wiki_team_stats.get(normalize_name(display_name), {})
-            games_played = to_int(wiki_stats.get("games"))
-            if games_played <= 0:
-                games_played = estimate_games_played(totals_row["minutes"], team_schedule_count)
-            games_started = to_int(wiki_stats.get("gamesStarted"))
-            if games_started <= 0:
-                games_started = estimate_games_started(totals_row["minutes"], games_played)
-            games_started = min(games_started, games_played)
-
-            team_page_players[team["teamId"]][player_numeric_id] = display_name
-            team_page_totals[team["teamId"]][player_numeric_id] = totals_row
-            player_stints_by_numeric[player_numeric_id].append(
-                {
-                    "playerNumericId": player_numeric_id,
-                    "displayName": display_name,
-                    "teamId": team["teamId"],
-                    "teamAbbr": team["abbr"],
-                    "position": totals_row["position"],
-                    "minutesTotal": totals_row["minutes"],
-                    "games": games_played,
-                    "gamesStarted": games_started,
-                    "totals": dict(totals_row["totals"]),
-                    "gamesSource": "wikipedia_team_player_stats_table" if wiki_stats else "minutes_based_game_estimate",
-                }
-            )
-
-    if not player_stints_by_numeric:
-        raise RuntimeError("No 1986-87 player rows were discovered while building the pack.")
-
-    players = []
-    player_stints_by_canonical = {}
-    for player_numeric_id in sorted(player_stints_by_numeric.keys(), key=lambda value: (to_int(value), value)):
-        stints = player_stints_by_numeric[player_numeric_id]
-        display_name = next((stint["displayName"] for stint in stints if stint["displayName"]), f"Player {player_numeric_id}")
-        first_name, last_name = split_name(display_name)
-        primary_stint = max(stints, key=lambda stint: (stint["minutesTotal"], stint["games"], stint["teamId"]))
-        primary_position = next((stint["position"] for stint in stints if stint["position"]), "SF")
-
-        aggregate_totals = defaultdict(int)
-        total_minutes = 0
-        total_games = 0
-        total_games_started = 0
-        games_source = "wikipedia_team_player_stats_table"
-        for stint in stints:
-            total_minutes += to_int(stint["minutesTotal"])
-            total_games += to_int(stint["games"])
-            total_games_started += to_int(stint["gamesStarted"])
-            if stint["gamesSource"] != "wikipedia_team_player_stats_table":
-                games_source = "minutes_based_game_estimate"
-            for stat_key, value in stint["totals"].items():
-                aggregate_totals[stat_key] += to_int(value)
-
-        if total_games <= 0 and total_minutes > 0:
-            total_games = estimate_games_played(total_minutes, 82)
-        total_games = max(total_games, total_games_started)
-        divisor = total_games if total_games > 0 else 1
-        canonical_player_id = f"{ENTITY_PREFIX}_{slugify(display_name)}_{player_numeric_id}"
-        player_stints_by_canonical[canonical_player_id] = stints
-
-        players.append(
-            {
-                "playerId": canonical_player_id,
-                "seasonId": SEASON_ID,
-                "displayName": display_name,
-                "firstName": first_name,
-                "lastName": last_name or first_name,
-                "teamId": primary_stint["teamId"],
-                "primaryPosition": primary_position,
-                "secondaryPositions": secondary_positions(primary_position),
-                "status": "active" if total_minutes > 0 else "inactive",
-                "draftEligible": True,
-                "bio": (
-                    f"{display_name} belongs to the 1986-87 player pool with real season totals and inferred "
-                    f"game-by-game coverage anchored to the {primary_stint['teamAbbr']} lane."
-                ),
-                "externalRefs": {
-                    "sourcePlayerId": player_numeric_id,
-                    "theBasketballDatabasePage": f"{player_numeric_id}RegularSeasonBoxScore.html",
-                    "sourceTeamCodes": sorted({stint['teamAbbr'] for stint in stints}),
-                },
-                "seasonStats": {
-                    "source": "the_basketball_database_team_box_scores",
-                    "sourceSeason": SOURCE_SEASON,
-                    "sourceTeamCode": primary_stint["teamAbbr"],
-                    "games": total_games,
-                    "gamesStarted": total_games_started,
-                    "gamesSource": games_source,
-                    "perGame": {
-                        "min": round_stat(total_minutes / divisor if divisor else 0, 1),
-                        "pts": round_stat(aggregate_totals["points"] / divisor if divisor else 0, 1),
-                        "reb": round_stat(aggregate_totals["rebounds"] / divisor if divisor else 0, 1),
-                        "ast": round_stat(aggregate_totals["assists"] / divisor if divisor else 0, 1),
-                        "stl": round_stat(aggregate_totals["steals"] / divisor if divisor else 0, 1),
-                        "blk": round_stat(aggregate_totals["blocks"] / divisor if divisor else 0, 1),
-                        "to": round_stat(aggregate_totals["turnovers"] / divisor if divisor else 0, 1),
-                        "fgm": round_stat(aggregate_totals["fgm"] / divisor if divisor else 0, 1),
-                        "fga": round_stat(aggregate_totals["fga"] / divisor if divisor else 0, 1),
-                        "ftm": round_stat(aggregate_totals["ftm"] / divisor if divisor else 0, 1),
-                        "fta": round_stat(aggregate_totals["fta"] / divisor if divisor else 0, 1),
-                        "threes": round_stat(aggregate_totals["threePointersMade"] / divisor if divisor else 0, 1),
-                    },
-                    "totals": {
-                        "min": total_minutes,
-                        "pts": aggregate_totals["points"],
-                        "reb": aggregate_totals["rebounds"],
-                        "ast": aggregate_totals["assists"],
-                        "stl": aggregate_totals["steals"],
-                        "blk": aggregate_totals["blocks"],
-                        "to": aggregate_totals["turnovers"],
-                        "fgm": aggregate_totals["fgm"],
-                        "fga": aggregate_totals["fga"],
-                        "ftm": aggregate_totals["ftm"],
-                        "fta": aggregate_totals["fta"],
-                        "threes": aggregate_totals["threePointersMade"],
-                    },
-                },
-            }
-        )
-
+    players = [sanitize_player_source_record(player) for player in source_players]
     players.sort(key=lambda item: (item["teamId"], item["displayName"], item["playerId"]))
 
     team_player_buckets = defaultdict(list)
@@ -1683,11 +1591,11 @@ def main():
 
     player_game_stats = []
     for player in players:
-        for stint in player_stints_by_canonical[player["playerId"]]:
-            team_schedule = team_schedule_by_id[stint["teamId"]]
-            games_to_cover = min(len(team_schedule), max(0, to_int(stint["games"])))
-            selected_games = select_inferred_games(team_schedule, games_to_cover, f"{player['playerId']}:{stint['teamId']}")
-            player_game_stats.extend(build_inferred_player_game_rows(player["playerId"], SEASON_ID, stint, selected_games))
+        primary_stint = build_primary_team_inferred_stint(player)
+        team_schedule = team_schedule_by_id[player["teamId"]]
+        games_to_cover = min(len(team_schedule), max(0, to_int(primary_stint["games"])))
+        selected_games = select_inferred_games(team_schedule, games_to_cover, f"{player['playerId']}:{player['teamId']}")
+        player_game_stats.extend(build_inferred_player_game_rows(player["playerId"], SEASON_ID, primary_stint, selected_games))
 
     teams = []
     for team in team_defs:
@@ -1726,7 +1634,8 @@ def main():
         "eraTags": ERA_TAGS,
         "notes": [
             "This pack uses the real 1986-87 regular-season schedule and final scores.",
-            "Player season totals come from TheBasketballDatabase team pages.",
+            "Normal builds consume checked-in schedule and normalized player source snapshots rather than live network fetches.",
+            "Player season totals originate from curated checked-in historical source artifacts.",
             "Player-game rows are deterministic season-average weighted estimates because live 1986 play-by-play feeds are absent.",
         ],
     }
@@ -1775,9 +1684,9 @@ def main():
             "curationOwner": "RosterBate",
             "reviewStatus": "draft",
             "importNotes": (
-                "1986-87 live nbastats_1986 / pbpstats_1986 feeds are absent. The builder refreshes schedule/results from "
-                "accessible Wikipedia team-season pages where available, completes uncovered games with FiveThirtyEight's historical nbaallelo results, "
-                "pulls player season totals from TheBasketballDatabase, and emits deterministic inferred player-game rows."
+                "1986-87 live nbastats_1986 / pbpstats_1986 feeds are absent. Normal builds consume the checked-in mixed-source "
+                "schedule snapshot plus the checked-in normalized player source snapshot, then emit deterministic inferred player-game rows "
+                "against each player's canonical primary-team schedule lane."
             ),
         },
         "auditSummary": {
@@ -1797,8 +1706,8 @@ def main():
         },
         "notes": [
             "The 23-team league map uses era-appropriate 1986-87 abbreviations, including GOS, SAN, UTH, and WAS.",
-            "Schedule/results span the full 943-game regular season with explicit source provenance.",
-            "Player-game rows are season-average weighted estimates and are disclosed as inferred coverage throughout the pack.",
+            "Schedule/results span the full 943-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
+            "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
             "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable and replayable.",
         ],
         "createdAt": generated_at,
@@ -1846,8 +1755,9 @@ def main():
         "missingSourceFeeds": source_audit["missingFeeds"],
         "auditNotes": [
             "Live nbastats_1986 / pbpstats_1986 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
-            "Schedule and results cover the complete regular season, with accessible Wikipedia team pages used where available and a historical backfill completing missing coverage.",
-            "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate so the inferred coverage is machine-readable and user-visible.",
+            "Normal builds are reproducible from checked-in source artifacts and do not need live Wikipedia, TheBasketballDatabase, or list-data fetches.",
+            "Schedule and results cover the complete regular season from a mixed-source checked-in snapshot where the FiveThirtyEight backfill supplies more than half the games.",
+            "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate and is emitted only for the player's canonical teamId.",
         ],
     }
 

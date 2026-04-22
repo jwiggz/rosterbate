@@ -62,7 +62,7 @@
     "sourceProfile": "historical_curated",
     "curationOwner": "RosterBate",
     "reviewStatus": "draft",
-    "importNotes": "1986-87 live nbastats_1986 / pbpstats_1986 feeds are absent. The builder refreshes schedule/results from accessible Wikipedia team-season pages where available, completes uncovered games with FiveThirtyEight's historical nbaallelo results, pulls player season totals from TheBasketballDatabase, and emits deterministic inferred player-game rows."
+    "importNotes": "1986-87 live nbastats_1986 / pbpstats_1986 feeds are absent. Normal builds consume the checked-in mixed-source schedule snapshot plus the checked-in normalized player source snapshot, then emit deterministic inferred player-game rows against each player's canonical primary-team schedule lane."
   },
   "auditSummary": {
     "realStatCoverage": {
@@ -81,10 +81,10 @@
   },
   "notes": [
     "The 23-team league map uses era-appropriate 1986-87 abbreviations, including GOS, SAN, UTH, and WAS.",
-    "Schedule/results span the full 943-game regular season with explicit source provenance.",
-    "Player-game rows are season-average weighted estimates and are disclosed as inferred coverage throughout the pack.",
+    "Schedule/results span the full 943-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
+    "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
     "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable and replayable."
   ],
-  "createdAt": "2026-04-22T16:18:46.606Z",
-  "updatedAt": "2026-04-22T16:18:46.606Z"
+  "createdAt": "2026-04-22T16:32:04.262Z",
+  "updatedAt": "2026-04-22T16:32:04.262Z"
 }

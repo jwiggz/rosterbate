@@ -14,7 +14,8 @@
   ],
   "notes": [
     "This pack uses the real 1986-87 regular-season schedule and final scores.",
-    "Player season totals come from TheBasketballDatabase team pages.",
+    "Normal builds consume checked-in schedule and normalized player source snapshots rather than live network fetches.",
+    "Player season totals originate from curated checked-in historical source artifacts.",
     "Player-game rows are deterministic season-average weighted estimates because live 1986 play-by-play feeds are absent."
   ]
 }
