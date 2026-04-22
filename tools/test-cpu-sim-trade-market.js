@@ -381,6 +381,51 @@ function buildContext(options = {}) {
 }
 
 {
+  const { context } = buildContext({
+    day: 3,
+    rosters: [
+      [],
+      [
+        makePlayer(211, 'Healthy Center', 'C', 18, {
+          simProfile: makeShape({ rebounding: 8, defense: 2 })
+        }),
+        makePlayer(212, 'Injured Center', 'C', 52, {
+          simProfile: makeShape({ rebounding: 11, defense: 2 })
+        }),
+        makePlayer(213, 'Lead Guard', 'PG', 60, {
+          simProfile: makeShape({ scoring: 22, playmaking: 9, defense: 2 })
+        }),
+        makePlayer(214, 'Wing Stopper', 'SF', 39, {
+          simProfile: makeShape({ scoring: 14, defense: 2 })
+        })
+      ],
+      [],
+      []
+    ],
+    starters: [
+      [],
+      [211, 213],
+      [],
+      []
+    ],
+    injuries: [
+      [212, { label: 'OUT' }]
+    ]
+  });
+
+  const rosterNeed = context.buildCpuTradeRosterNeedSummary(1, 3, context.G.rosters[1]);
+  const protectedIds = context.getCpuTradeProtectedPlayerIds(1, 3, rosterNeed);
+
+  assert.equal(protectedIds.has(211), true);
+  assert.equal(protectedIds.has(212), false);
+  assert.equal(
+    context.getCpuTradeOutgoingCandidates(1, 3, rosterNeed, protectedIds)
+      .some(entry => Number(entry.player.id) === 211),
+    false
+  );
+}
+
+{
   const { context, activityCalls, lineupCalls } = buildContext({
     day: 3,
     rosters: [

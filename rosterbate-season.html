@@ -4587,7 +4587,7 @@ function getCpuTradeProtectedPlayerIds(teamIdx, day, rosterNeed){
       return !isUnavailableHelper(injury);
     });
 
-  if(roster.length > 4){
+  if(roster.length >= 4){
     const slotCounts={G:0,F:0,C:0};
     availableRoster.forEach(player=>{
       const slots=getCpuWaiverPlayerSlots(player);
