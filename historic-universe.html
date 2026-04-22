@@ -303,6 +303,18 @@
           </article>
 
           <article class="panel card-pad">
+            <div class="section-kicker">Recent Roster Moves</div>
+            <div class="section-title">How Your Roster Changed</div>
+            <div class="section-copy">The latest team-first roster moves, grouped into compact archive notes instead of full transaction history.</div>
+            <div class="detail-list" id="recentRosterMovesList">
+              <div class="detail-item">
+                <strong>Loading recent roster moves</strong>
+                <span>Preparing the latest roster changes.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel card-pad">
             <div class="section-kicker">Current Team State</div>
             <div class="section-title">Your Active Archive Clubhouse</div>
             <div class="section-copy">A team-first read on where your universe stands before you jump back into the sim.</div>
@@ -1145,6 +1157,9 @@
     const recentSimDays = Array.isArray(detailsViewModel.recentSimDays)
       ? detailsViewModel.recentSimDays
       : [];
+    const recentRosterMoves = Array.isArray(detailsViewModel.recentRosterMoves)
+      ? detailsViewModel.recentRosterMoves
+      : [];
     const seasonUrl = api.buildSeasonUrl(slot, getSport());
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
     const modeLabel = api.getModeLabel(slot.historicalEntryMode);
@@ -1196,6 +1211,14 @@
     }).join('');
 
     document.getElementById('recentSimulationList').innerHTML = renderRecentSimulationCards(recentSimDays);
+    document.getElementById('recentRosterMovesList').innerHTML = renderDetailList(
+      recentRosterMoves,
+      'detail-item',
+      {
+        title: 'No recent roster moves',
+        body: 'This universe has not logged recent team roster changes yet.'
+      }
+    );
 
     document.getElementById('currentTeamStateList').innerHTML = renderDetailList(
       currentTeamState.items,

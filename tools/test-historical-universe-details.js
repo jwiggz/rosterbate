@@ -209,6 +209,7 @@ const script = [
   extractFunctionSource('buildRosterCore(state)'),
   extractFunctionSource('buildRecentSimulationSummary(slot, state)'),
   extractFunctionSource('renderRecentSimulationCards(items)'),
+  extractFunctionSource('renderDetailList(items, className, emptyState)'),
   extractFunctionSpan('sortStandingsEntries(standings)', 'buildUniverseDetailsViewModel(slot, state, config)')
 ].join('\n\n');
 const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, config)');
@@ -416,14 +417,18 @@ assert.equal(viewModel.recentSimDays[0].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[0].teamActivity[0].title, /Audit Agents/i);
 assert.match(viewModel.recentSimDays[0].leagueNote.title, /CPU Team 1/i);
 assert.match(viewModel.recentSimDays[1].teamResult.headline, /Audit Agents fell to CPU Team 1/i);
-assert.equal(viewModel.recentSimDays[1].teamActivity.length, 1);
+assert.equal(viewModel.recentSimDays[1].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[1].teamActivity[0].title, /Audit Agents added Buck Williams/i);
-assert.match(viewModel.recentSimDays[1].leagueNote.title, /CPU Team 3 activated Kevin Johnson/i);
-assert.match(viewModel.recentSimDays[1].leagueNote.body, /Healthy guard returned from IL\./i);
-assert.equal(viewModel.recentSimDays[2].teamActivity.length, 0);
+assert.match(viewModel.recentSimDays[1].teamActivity[1].title, /Commissioner restored Alonzo Mourning/i);
+assert.deepStrictEqual(viewModel.recentSimDays[1].leagueNote, {
+  title: 'League activity recorded during the reveal window',
+  body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
+});
+assert.equal(viewModel.recentSimDays[2].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[2].teamResult.headline, /Audit Agents beat CPU Team 3/i);
-assert.match(viewModel.recentSimDays[2].leagueNote.title, /CPU Team 2 added Danny Manning/i);
-assert.match(viewModel.recentSimDays[2].leagueNote.body, /Added another forward before Day 8\./i);
+assert.match(viewModel.recentSimDays[2].teamActivity[0].title, /Audit Agents added Rick Fox/i);
+assert.match(viewModel.recentSimDays[2].teamActivity[1].title, /Audit Agents dropped Tony Delk/i);
+assert.equal(viewModel.recentSimDays[2].leagueNote, null);
 
 assert.equal(viewModel.recentRosterMoves.length, 5);
 assert.deepStrictEqual(
@@ -480,11 +485,41 @@ const noRosterMoveHistory = JSON.parse(JSON.stringify(
 ));
 assert.deepStrictEqual(noRosterMoveHistory.recentRosterMoves, []);
 
+const renderedRosterMoves = context.renderDetailList(
+  viewModel.recentRosterMoves,
+  'detail-item',
+  {
+    title: 'No recent roster moves',
+    body: 'This universe has not logged recent team roster changes yet.'
+  }
+);
+assert.match(renderedRosterMoves, /Added Brent Barry, dropped Dell Curry/);
+assert.match(renderedRosterMoves, /Activated Kevin Johnson, moved Mookie Blaylock to IL/);
+assert.ok(
+  renderedRosterMoves.indexOf('Added Brent Barry, dropped Dell Curry') <
+  renderedRosterMoves.indexOf('Activated Kevin Johnson, moved Mookie Blaylock to IL'),
+  'recent roster moves should render newest grouped entries first'
+);
+assert.doesNotMatch(renderedRosterMoves, /CPU Team 1 added Dell Curry/);
+assert.doesNotMatch(renderedRosterMoves, /started Ron Harper/i);
+
+const emptyRosterMoves = context.renderDetailList(
+  noRosterMoveHistory.recentRosterMoves,
+  'detail-item',
+  {
+    title: 'No recent roster moves',
+    body: 'This universe has not logged recent team roster changes yet.'
+  }
+);
+assert.match(emptyRosterMoves, /No recent roster moves/);
+assert.match(emptyRosterMoves, /This universe has not logged recent team roster changes yet\./);
+
 const renderedRecentSimCard = context.renderRecentSimulationCards([viewModel.recentSimDays[0]]);
 assert.match(renderedRecentSimCard, /Audit Agents beat CPU Team 2/);
 assert.match(renderedRecentSimCard, /Jordan led the latest sim-day swing and kept the team in second\./);
-assert.match(renderedRecentSimCard, /Team activity: Audit Agents added Brent Barry/);
-assert.match(renderedRecentSimCard, /League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock\./);
+assert.match(renderedRecentSimCard, /Team activity: Audit Agents activated Kevin Johnson/);
+assert.match(renderedRecentSimCard, /Team activity: Audit Agents moved Mookie Blaylock to IL/);
+assert.match(renderedRecentSimCard, /League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock\. Additional transactions were also logged during this reveal window\./);
 assert.ok(
   renderedRecentSimCard.indexOf('Audit Agents beat CPU Team 2') <
   renderedRecentSimCard.indexOf('Jordan led the latest sim-day swing and kept the team in second.'),
@@ -492,12 +527,12 @@ assert.ok(
 );
 assert.ok(
   renderedRecentSimCard.indexOf('Jordan led the latest sim-day swing and kept the team in second.') <
-  renderedRecentSimCard.indexOf('Team activity: Audit Agents added Brent Barry'),
+  renderedRecentSimCard.indexOf('Team activity: Audit Agents activated Kevin Johnson'),
   'recent simulation cards should render team activity after the story'
 );
 assert.ok(
-  renderedRecentSimCard.indexOf('Team activity: Audit Agents added Brent Barry') <
-  renderedRecentSimCard.indexOf('League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock.'),
+  renderedRecentSimCard.indexOf('Team activity: Audit Agents moved Mookie Blaylock to IL') <
+  renderedRecentSimCard.indexOf('League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock. Additional transactions were also logged during this reveal window.'),
   'recent simulation cards should render the league note after team activity'
 );
 
@@ -946,18 +981,18 @@ assert.deepStrictEqual(viewModel.recentActivity, {
   items: [
     {
       title: 'Audit Agents added Brent Barry',
-      body: 'Dropped an inactive bench wing for a live scorer.',
+      body: 'Added wing depth before the next lock.',
+      meta: ['WAIVER']
+    },
+    {
+      title: 'Audit Agents dropped Dell Curry',
+      body: 'Opened the bench spot for the new claim.',
       meta: ['WAIVER']
     },
     {
       title: 'Audit Agents activated Kevin Johnson',
       body: 'Healthy guard returned from IL.',
       meta: ['ACTIVATION']
-    },
-    {
-      title: 'CPU Team 1 added Dell Curry',
-      body: 'Found a hot hand before the next lock.',
-      meta: ['WAIVER']
     }
   ]
 });
