@@ -1033,9 +1033,11 @@
         const meta = [];
         if(Number.isFinite(Number(entry?.week))) meta.push('Week ' + Number(entry.week));
         if(Number.isFinite(Number(entry?.day))) meta.push('Day ' + Number(entry.day));
+        const title = String(entry?.text || '').trim();
+        const body = String(entry?.title || '').trim();
         return {
-          title: String(entry?.title || 'League trade').trim(),
-          body: String(entry?.text || 'Completed league trade.').trim(),
+          title: title || body || 'League trade',
+          body: body || 'Completed league trade.',
           meta: meta
         };
       });

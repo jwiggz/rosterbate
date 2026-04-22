@@ -552,6 +552,16 @@ assert.deepStrictEqual(
     'CPU Team 8 traded Bench Creator to CPU Team 9 for Two-Way Forward'
   ]
 );
+assert.deepStrictEqual(
+  tradeHistoryViewModel.recentLeagueTrades.map(item => item.body),
+  [
+    'CPU trade completed',
+    'Trade completed',
+    'CPU trade completed',
+    'Trade completed',
+    'CPU trade completed'
+  ]
+);
 assert.ok(
   tradeHistoryViewModel.recentLeagueTrades.every(item => !/offer|rejected|veto|pending|declin|expired/i.test(item.title + ' ' + item.body)),
   'only completed trade activity should appear in recent league trades'
