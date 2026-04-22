@@ -1,0 +1,69 @@
+{
+  "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
+  "featuredStorylines": [
+    "The Lakers headline the pack as the featured prestige lane, with Magic's MVP season and championship gravity defining the front door.",
+    "Boston and Los Angeles keep the Bird-Magic rivalry alive, while Chicago adds the Michael Jordan scoring-explosion path to the same board.",
+    "Every included game result is real, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth."
+  ],
+  "teamSpotlights": [
+    {
+      "teamId": "nba_1987_lal",
+      "summary": "The Lakers are the flagship prestige route, built around Magic, Kareem, Worthy, and the title-winning West power lane."
+    },
+    {
+      "teamId": "nba_1987_bos",
+      "summary": "Boston preserves the Bird side of the rivalry and keeps the East's marquee late-80s heavyweight intact."
+    },
+    {
+      "teamId": "nba_1987_chi",
+      "summary": "Chicago offers the Jordan explosion route and a different challenge path from the finished-title contenders."
+    },
+    {
+      "teamId": "nba_1987_hou",
+      "summary": "Houston keeps the Twin Towers-era West in play for anyone chasing a non-Lakers contender timeline."
+    },
+    {
+      "teamId": "nba_1987_det",
+      "summary": "Detroit brings the rising Bad Boys lane into a season that still sits just before their title breakthrough."
+    }
+  ],
+  "modeSummaries": [
+    {
+      "mode": "real_season",
+      "summary": "Replay the real 1986-87 campaign from opening night through the final regular-season standings."
+    },
+    {
+      "mode": "historical_draft",
+      "summary": "Reshuffle the full Bird-Magic-Jordan player pool and discover how the era changes under a custom draft."
+    },
+    {
+      "mode": "reimagined_season",
+      "summary": "Branch into an alternate-history 1986-87 universe while keeping the same real team and player foundation."
+    }
+  ],
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 335,
+      "playerCount": 335,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 0,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "buildSourceMode": "foundation_snapshot",
+  "missingSourceFeeds": [
+    "nbastats_1986",
+    "pbpstats_1986"
+  ],
+  "auditNotes": [
+    "Live nbastats_1986 / pbpstats_1986 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
+    "Schedule and results cover the complete regular season, with accessible Wikipedia team pages used where available and a historical backfill completing missing coverage.",
+    "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate so the inferred coverage is machine-readable and user-visible."
+  ]
+}

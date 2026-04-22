@@ -1,0 +1,37 @@
+{
+  "heroTitle": "1986-87 NBA Historic Season",
+  "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a full-season 1986-87 foundation built with honest provenance.",
+  "featuredTeamId": "nba_1987_lal",
+  "featuredStars": [
+    "nba_1987_magic_johnson_77142",
+    "nba_1987_larry_bird_1449",
+    "nba_1987_michael_jordan_893",
+    "nba_1987_james_worthy_1460"
+  ],
+  "artDirection": {
+    "heroTone": "prestige_rivalry",
+    "primaryPalette": [
+      "#552583",
+      "#007A33",
+      "#CE1141"
+    ],
+    "backgroundStyle": "historic_arena_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "real_season",
+      "label": "Play The Real Season",
+      "description": "Replay 1986-87 with the real full schedule and final scores."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the Bird-Magic-Jordan season from the full-league player pool."
+    },
+    {
+      "mode": "reimagined_season",
+      "label": "Reimagined Season",
+      "description": "Launch an alternate-history 1986-87 branch from the same foundation pack."
+    }
+  ]
+}

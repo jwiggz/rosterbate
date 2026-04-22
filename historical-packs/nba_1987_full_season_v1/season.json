@@ -1,0 +1,20 @@
+{
+  "seasonId": "nba_1987_historic",
+  "sport": "nba",
+  "league": "nba",
+  "label": "1986-87 NBA Historic Season",
+  "startDate": "1986-10-31",
+  "endDate": "1987-04-19",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "eraTags": [
+    "1980s",
+    "Bird-Magic Era",
+    "Historic Season"
+  ],
+  "notes": [
+    "This pack uses the real 1986-87 regular-season schedule and final scores.",
+    "Player season totals come from TheBasketballDatabase team pages.",
+    "Player-game rows are deterministic season-average weighted estimates because live 1986 play-by-play feeds are absent."
+  ]
+}

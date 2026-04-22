@@ -1,0 +1,439 @@
+[
+  {
+    "teamId": "nba_1987_atl",
+    "seasonId": "nba_1987_historic",
+    "city": "Atlanta",
+    "name": "Hawks",
+    "displayName": "Atlanta Hawks",
+    "abbreviation": "ATL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#9D2235",
+      "secondary": "#FDB927"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ATL",
+      "theBasketballDatabasePage": "1986-87ATLRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Atlanta Hawks season"
+    }
+  },
+  {
+    "teamId": "nba_1987_bos",
+    "seasonId": "nba_1987_historic",
+    "city": "Boston",
+    "name": "Celtics",
+    "displayName": "Boston Celtics",
+    "abbreviation": "BOS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#007A33",
+      "secondary": "#BA9653"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "BOS",
+      "theBasketballDatabasePage": "1986-87BOSRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Boston Celtics season"
+    }
+  },
+  {
+    "teamId": "nba_1987_chi",
+    "seasonId": "nba_1987_historic",
+    "city": "Chicago",
+    "name": "Bulls",
+    "displayName": "Chicago Bulls",
+    "abbreviation": "CHI",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#CE1141",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHI",
+      "theBasketballDatabasePage": "1986-87CHIRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Chicago Bulls season"
+    }
+  },
+  {
+    "teamId": "nba_1987_cle",
+    "seasonId": "nba_1987_historic",
+    "city": "Cleveland",
+    "name": "Cavaliers",
+    "displayName": "Cleveland Cavaliers",
+    "abbreviation": "CLE",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#860038",
+      "secondary": "#FDBB30"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CLE",
+      "theBasketballDatabasePage": "1986-87CLERegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Cleveland Cavaliers season"
+    }
+  },
+  {
+    "teamId": "nba_1987_dal",
+    "seasonId": "nba_1987_historic",
+    "city": "Dallas",
+    "name": "Mavericks",
+    "displayName": "Dallas Mavericks",
+    "abbreviation": "DAL",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#00538C",
+      "secondary": "#B8C4CA"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DAL",
+      "theBasketballDatabasePage": "1986-87DALRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Dallas Mavericks season"
+    }
+  },
+  {
+    "teamId": "nba_1987_den",
+    "seasonId": "nba_1987_historic",
+    "city": "Denver",
+    "name": "Nuggets",
+    "displayName": "Denver Nuggets",
+    "abbreviation": "DEN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#0E2240",
+      "secondary": "#FEC524"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DEN",
+      "theBasketballDatabasePage": "1986-87DENRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Denver Nuggets season"
+    }
+  },
+  {
+    "teamId": "nba_1987_det",
+    "seasonId": "nba_1987_historic",
+    "city": "Detroit",
+    "name": "Pistons",
+    "displayName": "Detroit Pistons",
+    "abbreviation": "DET",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#C8102E",
+      "secondary": "#1D42BA"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DET",
+      "theBasketballDatabasePage": "1986-87DETRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Detroit Pistons season"
+    }
+  },
+  {
+    "teamId": "nba_1987_gos",
+    "seasonId": "nba_1987_historic",
+    "city": "Golden State",
+    "name": "Warriors",
+    "displayName": "Golden State Warriors",
+    "abbreviation": "GOS",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1D428A",
+      "secondary": "#FFC72C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "GOS",
+      "theBasketballDatabasePage": "1986-87GOSRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Golden State Warriors season"
+    }
+  },
+  {
+    "teamId": "nba_1987_hou",
+    "seasonId": "nba_1987_historic",
+    "city": "Houston",
+    "name": "Rockets",
+    "displayName": "Houston Rockets",
+    "abbreviation": "HOU",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#CE1141",
+      "secondary": "#C4CED4"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "HOU",
+      "theBasketballDatabasePage": "1986-87HOURegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Houston Rockets season"
+    }
+  },
+  {
+    "teamId": "nba_1987_ind",
+    "seasonId": "nba_1987_historic",
+    "city": "Indiana",
+    "name": "Pacers",
+    "displayName": "Indiana Pacers",
+    "abbreviation": "IND",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#002D62",
+      "secondary": "#FDBB30"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "IND",
+      "theBasketballDatabasePage": "1986-87INDRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Indiana Pacers season"
+    }
+  },
+  {
+    "teamId": "nba_1987_mil",
+    "seasonId": "nba_1987_historic",
+    "city": "Milwaukee",
+    "name": "Bucks",
+    "displayName": "Milwaukee Bucks",
+    "abbreviation": "MIL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#00471B",
+      "secondary": "#EEE1C6"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIL",
+      "theBasketballDatabasePage": "1986-87MILRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Milwaukee Bucks season"
+    }
+  },
+  {
+    "teamId": "nba_1987_njn",
+    "seasonId": "nba_1987_historic",
+    "city": "New Jersey",
+    "name": "Nets",
+    "displayName": "New Jersey Nets",
+    "abbreviation": "NJN",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#000000",
+      "secondary": "#FFFFFF"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NJN",
+      "theBasketballDatabasePage": "1986-87NJNRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 New Jersey Nets season"
+    }
+  },
+  {
+    "teamId": "nba_1987_nyk",
+    "seasonId": "nba_1987_historic",
+    "city": "New York",
+    "name": "Knicks",
+    "displayName": "New York Knicks",
+    "abbreviation": "NYK",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#006BB6",
+      "secondary": "#F58426"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NYK",
+      "theBasketballDatabasePage": "1986-87NYKRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 New York Knicks season"
+    }
+  },
+  {
+    "teamId": "nba_1987_lac",
+    "seasonId": "nba_1987_historic",
+    "city": "Los Angeles",
+    "name": "Clippers",
+    "displayName": "LA Clippers",
+    "abbreviation": "LAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#ED174C",
+      "secondary": "#1D428A"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAC",
+      "theBasketballDatabasePage": "1986-87LACRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 LA Clippers season"
+    }
+  },
+  {
+    "teamId": "nba_1987_lal",
+    "seasonId": "nba_1987_historic",
+    "city": "Los Angeles",
+    "name": "Lakers",
+    "displayName": "Los Angeles Lakers",
+    "abbreviation": "LAL",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#552583",
+      "secondary": "#FDB927"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAL",
+      "theBasketballDatabasePage": "1986-87LALRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Los Angeles Lakers season"
+    }
+  },
+  {
+    "teamId": "nba_1987_phx",
+    "seasonId": "nba_1987_historic",
+    "city": "Phoenix",
+    "name": "Suns",
+    "displayName": "Phoenix Suns",
+    "abbreviation": "PHX",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1D1160",
+      "secondary": "#E56020"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHX",
+      "theBasketballDatabasePage": "1986-87PHXRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Phoenix Suns season"
+    }
+  },
+  {
+    "teamId": "nba_1987_phl",
+    "seasonId": "nba_1987_historic",
+    "city": "Philadelphia",
+    "name": "76ers",
+    "displayName": "Philadelphia 76ers",
+    "abbreviation": "PHL",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#006BB6",
+      "secondary": "#ED174C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHL",
+      "theBasketballDatabasePage": "1986-87PHLRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Philadelphia 76ers season"
+    }
+  },
+  {
+    "teamId": "nba_1987_por",
+    "seasonId": "nba_1987_historic",
+    "city": "Portland",
+    "name": "Trail Blazers",
+    "displayName": "Portland Trail Blazers",
+    "abbreviation": "POR",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#E03A3E",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "POR",
+      "theBasketballDatabasePage": "1986-87PORRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Portland Trail Blazers season"
+    }
+  },
+  {
+    "teamId": "nba_1987_sac",
+    "seasonId": "nba_1987_historic",
+    "city": "Sacramento",
+    "name": "Kings",
+    "displayName": "Sacramento Kings",
+    "abbreviation": "SAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5A2D81",
+      "secondary": "#63727A"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAC",
+      "theBasketballDatabasePage": "1986-87SACRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Sacramento Kings season"
+    }
+  },
+  {
+    "teamId": "nba_1987_san",
+    "seasonId": "nba_1987_historic",
+    "city": "San Antonio",
+    "name": "Spurs",
+    "displayName": "San Antonio Spurs",
+    "abbreviation": "SAN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#C4CED4",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAN",
+      "theBasketballDatabasePage": "1986-87SANRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 San Antonio Spurs season"
+    }
+  },
+  {
+    "teamId": "nba_1987_sea",
+    "seasonId": "nba_1987_historic",
+    "city": "Seattle",
+    "name": "SuperSonics",
+    "displayName": "Seattle SuperSonics",
+    "abbreviation": "SEA",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#00653A",
+      "secondary": "#FFC200"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SEA",
+      "theBasketballDatabasePage": "1986-87SEARegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Seattle SuperSonics season"
+    }
+  },
+  {
+    "teamId": "nba_1987_uth",
+    "seasonId": "nba_1987_historic",
+    "city": "Utah",
+    "name": "Jazz",
+    "displayName": "Utah Jazz",
+    "abbreviation": "UTH",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#002B5C",
+      "secondary": "#00471B"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "UTH",
+      "theBasketballDatabasePage": "1986-87UTHRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Utah Jazz season"
+    }
+  },
+  {
+    "teamId": "nba_1987_was",
+    "seasonId": "nba_1987_historic",
+    "city": "Washington",
+    "name": "Bullets",
+    "displayName": "Washington Bullets",
+    "abbreviation": "WAS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#C8102E",
+      "secondary": "#002B5C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "WAS",
+      "theBasketballDatabasePage": "1986-87WASRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1986\u201387 Washington Bullets season"
+    }
+  }
+]

@@ -7,9 +7,11 @@ import math
 import re
 import sys
 import tarfile
+import time
 from collections import defaultdict
 from datetime import UTC, datetime
 from html import unescape
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import quote
 
@@ -30,11 +32,17 @@ REGULAR_SEASON_END = "1987-04-19"
 SOURCE_MODE = "foundation_snapshot"
 ENTITY_PREFIX = "nba_1987"
 ERA_KEY = "1980s"
-ERA_TAGS = ["1980s", "Late 80s", "Historic Season"]
-SOURCE_PROFILE = "historical_foundation_snapshot"
+ERA_TAGS = ["1980s", "Bird-Magic Era", "Historic Season"]
+SOURCE_PROFILE = "historical_curated"
 FEATURED_TEAM_ID = f"{ENTITY_PREFIX}_lal"
 SOURCE_NBASTATS_KEY = "nbastats_1986"
 SOURCE_PBPSTATS_KEY = "pbpstats_1986"
+HTTP_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+)
+WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php"
+NBAALLELO_URL = "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-elo/nbaallelo.csv"
 
 LIST_DATA_URL = "https://raw.githubusercontent.com/shufinskiy/nba_data/main/list_data.txt"
 TEAM_PAGE_URL = "https://thebasketballdatabase.com/{season}{abbr}RegularSeasonBoxScore.html"
@@ -97,6 +105,12 @@ def write_json(relative_path, value):
     target.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
 
 
+def write_source_json(relative_path, value):
+    target = SOURCE_ROOT / relative_path
+    ensure_dir(target.parent)
+    target.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+
+
 def cache_text_path(label):
     return CACHE_ROOT / f"{label}.txt"
 
@@ -110,11 +124,28 @@ def fetch_text(url, label):
     cache_path = cache_text_path(label)
     if cache_path.exists():
         return cache_path.read_text(encoding="utf-8")
-    response = requests.get(url, timeout=180)
-    response.raise_for_status()
-    text = response.text
-    cache_path.write_text(text, encoding="utf-8")
-    return text
+    headers = {
+        "User-Agent": HTTP_USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://thebasketballdatabase.com/seasonindex.html" if "thebasketballdatabase.com" in url else "https://en.wikipedia.org/",
+    }
+    last_error = None
+    for attempt in range(5):
+        response = requests.get(url, timeout=180, headers=headers)
+        if response.status_code == 429:
+            last_error = RuntimeError(f"429 rate limit while fetching `{url}`.")
+            time.sleep(2 + attempt * 2)
+            continue
+        response.raise_for_status()
+        text = response.text
+        cache_path.write_text(text, encoding="utf-8")
+        if "thebasketballdatabase.com" in url:
+            time.sleep(0.5)
+        return text
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError(f"Unable to fetch `{url}`.")
 
 
 def fetch_tar_csv_rows(url, label):
@@ -625,74 +656,858 @@ def derive_game_boxscore(game_rows, game_id):
     }
 
 
+class TableHtmlParser(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.tables = []
+        self.table_stack = []
+        self.row_stack = []
+        self.current_cell = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs_dict = dict(attrs)
+        if tag == "table":
+            self.table_stack.append({"attrs": attrs_dict, "rows": []})
+            return
+        if not self.table_stack:
+            return
+        if tag == "tr":
+            self.row_stack.append({"attrs": attrs_dict, "cells": []})
+        elif tag in ("td", "th") and self.row_stack:
+            self.current_cell = {"tag": tag, "attrs": attrs_dict, "text": "", "links": []}
+        elif tag == "br" and self.current_cell is not None:
+            self.current_cell["text"] += "\n"
+        elif tag == "a" and self.current_cell is not None and attrs_dict.get("href"):
+            self.current_cell["links"].append(attrs_dict["href"])
+
+    def handle_endtag(self, tag):
+        if tag in ("td", "th") and self.current_cell is not None and self.row_stack:
+            self.current_cell["text"] = normalize_whitespace(self.current_cell["text"])
+            self.row_stack[-1]["cells"].append(self.current_cell)
+            self.current_cell = None
+            return
+        if tag == "tr" and self.row_stack and self.table_stack:
+            self.table_stack[-1]["rows"].append(self.row_stack.pop())
+            return
+        if tag == "table" and self.table_stack:
+            table = self.table_stack.pop()
+            self.tables.append(table)
+
+    def handle_data(self, data):
+        if self.current_cell is not None:
+            self.current_cell["text"] += data
+
+
+def normalize_whitespace(value):
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def parse_html_tables(html_text):
+    parser = TableHtmlParser()
+    parser.feed(str(html_text or ""))
+    parser.close()
+    return parser.tables
+
+
+def fetch_wikipedia_render_html(page_title, label):
+    encoded_title = quote(page_title, safe="")
+    url = (
+        f"{WIKIPEDIA_API_URL}?action=parse&page={encoded_title}"
+        "&prop=text&format=json&formatversion=2"
+    )
+    payload = fetch_text(url, label)
+    data = json.loads(payload)
+    if "parse" not in data or "text" not in data["parse"]:
+        raise RuntimeError(f"Wikipedia render API did not return HTML for `{page_title}`.")
+    return data["parse"]["text"]
+
+
+def extract_section_html(page_html, start_markers, end_markers):
+    html_text = str(page_html or "")
+    start_index = -1
+    for marker in start_markers:
+        candidate = html_text.find(marker)
+        if candidate >= 0 and (start_index < 0 or candidate < start_index):
+            start_index = candidate
+    if start_index < 0:
+        return ""
+    end_index = len(html_text)
+    for marker in end_markers:
+        candidate = html_text.find(marker, start_index + 1)
+        if candidate >= 0:
+            end_index = min(end_index, candidate)
+    return html_text[start_index:end_index]
+
+
+def normalize_header(value):
+    header = normalize_whitespace(value).lower()
+    header = re.sub(r"[^a-z0-9]+", "_", header).strip("_")
+    return header
+
+
+def parse_wikipedia_date(date_text):
+    cleaned = normalize_whitespace(date_text)
+    cleaned = re.sub(r"^(mon|tue|wed|thu|thur|thurs|fri|sat|sun)\.?,?\s*", "", cleaned, flags=re.I)
+    cleaned = cleaned.replace(",", "")
+    month_lookup = {
+        "oct": 10,
+        "october": 10,
+        "nov": 11,
+        "november": 11,
+        "dec": 12,
+        "december": 12,
+        "jan": 1,
+        "january": 1,
+        "feb": 2,
+        "february": 2,
+        "mar": 3,
+        "march": 3,
+        "apr": 4,
+        "april": 4,
+    }
+    match = re.search(r"(Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?)\.?\s+(\d{1,2})", cleaned, flags=re.I)
+    if not match:
+        raise RuntimeError(f"Unable to parse Wikipedia date `{date_text}`.")
+    month_name = match.group(1).lower().rstrip(".")
+    day = int(match.group(2))
+    month_number = month_lookup[month_name]
+    year = 1986 if month_number >= 10 else 1987
+    return f"{year:04d}-{month_number:02d}-{day:02d}"
+
+
+def parse_record_tuple(record_text):
+    match = re.search(r"(\d+)\s*[–-]\s*(\d+)", str(record_text or ""))
+    if not match:
+        return None
+    return int(match.group(1)), int(match.group(2))
+
+
+def result_from_row_attrs(row_attrs):
+    attr_values = " ".join(str(value or "") for value in row_attrs.values()).lower()
+    if any(token in attr_values for token in ("#ccffcc", "#cfc", "#bbffbb", "bbffbb", "cfc")):
+        return "W"
+    if any(token in attr_values for token in ("#ffcccc", "#fcc", "#ffbbbb", "ffbbbb", "fcc", "edbebf")):
+        return "L"
+    return ""
+
+
+def build_team_alias_map(team_defs):
+    alias_map = {}
+    manual_aliases = {
+        "washington bullets": "WAS",
+        "washington": "WAS",
+        "bullets": "WAS",
+        "golden state": "GOS",
+        "golden state warriors": "GOS",
+        "warriors": "GOS",
+        "la clippers": "LAC",
+        "l.a. clippers": "LAC",
+        "los angeles clippers": "LAC",
+        "clippers": "LAC",
+        "la lakers": "LAL",
+        "l.a. lakers": "LAL",
+        "los angeles lakers": "LAL",
+        "lakers": "LAL",
+        "philadelphia": "PHL",
+        "philadelphia 76ers": "PHL",
+        "76ers": "PHL",
+        "sixers": "PHL",
+        "phoenix": "PHX",
+        "phoenix suns": "PHX",
+        "suns": "PHX",
+        "san antonio": "SAN",
+        "san antonio spurs": "SAN",
+        "spurs": "SAN",
+        "utah": "UTH",
+        "utah jazz": "UTH",
+        "jazz": "UTH",
+        "indiana": "IND",
+        "indiana pacers": "IND",
+        "pacers": "IND",
+        "new jersey": "NJN",
+        "new jersey nets": "NJN",
+        "nets": "NJN",
+        "new york": "NYK",
+        "new york knicks": "NYK",
+        "knicks": "NYK",
+        "seattle": "SEA",
+        "seattle supersonics": "SEA",
+        "supersonics": "SEA",
+        "sonics": "SEA",
+        "portland": "POR",
+        "portland trail blazers": "POR",
+        "trail blazers": "POR",
+        "blazers": "POR",
+        "sacramento": "SAC",
+        "sacramento kings": "SAC",
+        "kings": "SAC",
+        "atlanta": "ATL",
+        "atlanta hawks": "ATL",
+        "hawks": "ATL",
+        "boston": "BOS",
+        "boston celtics": "BOS",
+        "celtics": "BOS",
+        "chicago": "CHI",
+        "chicago bulls": "CHI",
+        "bulls": "CHI",
+        "cleveland": "CLE",
+        "cleveland cavaliers": "CLE",
+        "cavaliers": "CLE",
+        "cavs": "CLE",
+        "dallas": "DAL",
+        "dallas mavericks": "DAL",
+        "mavericks": "DAL",
+        "denver": "DEN",
+        "denver nuggets": "DEN",
+        "nuggets": "DEN",
+        "detroit": "DET",
+        "detroit pistons": "DET",
+        "pistons": "DET",
+        "houston": "HOU",
+        "houston rockets": "HOU",
+        "rockets": "HOU",
+        "milwaukee": "MIL",
+        "milwaukee bucks": "MIL",
+        "bucks": "MIL",
+    }
+    for alias, abbr in manual_aliases.items():
+        alias_map[normalize_name(alias)] = abbr
+    for team in team_defs:
+        alias_map[normalize_name(team["displayName"])] = team["abbr"]
+        alias_map[normalize_name(team["city"])] = team["abbr"]
+        alias_map[normalize_name(team["name"])] = team["abbr"]
+        alias_map[normalize_name(team["abbr"])] = team["abbr"]
+    return alias_map
+
+
+def parse_wikipedia_schedule_entries(team, page_title, page_html, alias_map):
+    section_html = extract_section_html(
+        page_html,
+        ["Game log", "Game Log"],
+        ["Player statistics", "Transactions", "References", "Awards and records", "Awards", "References and notes"],
+    )
+    if not section_html:
+        return []
+
+    entries = []
+    for table in parse_html_tables(section_html):
+        rows = table.get("rows", [])
+        if len(rows) < 2:
+            continue
+        headers = [normalize_header(cell["text"]) for cell in rows[0]["cells"]]
+        if "date" not in headers or "score" not in headers:
+            continue
+        opponent_key = "team" if "team" in headers else "opponent" if "opponent" in headers else ""
+        if not opponent_key:
+            continue
+        if "series" in headers:
+            continue
+
+        date_index = headers.index("date")
+        opponent_index = headers.index(opponent_key)
+        score_index = headers.index("score")
+        record_index = headers.index("record") if "record" in headers else -1
+        previous_record = (0, 0)
+
+        for row in rows[1:]:
+            cells = row.get("cells", [])
+            if max(date_index, opponent_index, score_index) >= len(cells):
+                continue
+
+            score_text = normalize_whitespace(cells[score_index]["text"])
+            score_numbers = re.findall(r"\d+", score_text)
+            if len(score_numbers) < 2:
+                continue
+
+            result_match = re.match(r"^([WL])\s*(\d+)\s*[-–]\s*(\d+)", score_text, re.I)
+            result = result_match.group(1).upper() if result_match else result_from_row_attrs(row.get("attrs", {}))
+
+            record_tuple = None
+            if record_index >= 0 and record_index < len(cells):
+                record_tuple = parse_record_tuple(cells[record_index]["text"])
+                if not result and record_tuple is not None:
+                    if record_tuple[0] > previous_record[0]:
+                        result = "W"
+                    elif record_tuple[1] > previous_record[1]:
+                        result = "L"
+            if not result and len(score_numbers) >= 2:
+                result = "W" if int(score_numbers[1]) > int(score_numbers[0]) else "L"
+            if record_tuple is not None:
+                previous_record = record_tuple
+
+            game_date = parse_wikipedia_date(cells[date_index]["text"])
+            opponent_raw = normalize_whitespace(cells[opponent_index]["text"])
+            is_away = bool(re.match(r"^(?:@\s*|at\s+|vs\.?\s+)", opponent_raw, re.I))
+            opponent_clean = re.sub(r"^(?:@\s*|at\s+|vs\.?\s+)", "", opponent_raw, flags=re.I).strip()
+            opponent_abbr = alias_map.get(normalize_name(opponent_clean))
+            if not opponent_abbr:
+                raise RuntimeError(f"Unable to map Wikipedia opponent label `{opponent_clean}` on `{page_title}`.")
+
+            team_score_first = int(score_numbers[0])
+            team_score_second = int(score_numbers[1])
+            team_score = max(team_score_first, team_score_second) if result == "W" else min(team_score_first, team_score_second)
+            opponent_score = min(team_score_first, team_score_second) if result == "W" else max(team_score_first, team_score_second)
+
+            home_team_abbr = opponent_abbr if is_away else team["abbr"]
+            away_team_abbr = team["abbr"] if is_away else opponent_abbr
+            home_score = opponent_score if is_away else team_score
+            away_score = team_score if is_away else opponent_score
+            source_game_id = f"{game_date.replace('-', '')}_{away_team_abbr.lower()}_{home_team_abbr.lower()}"
+            boxscore_url = ""
+            for link in cells[score_index].get("links", []):
+                if "basketball-reference.com/boxscores/" in link:
+                    boxscore_url = link
+                    break
+
+            entries.append(
+                {
+                    "sourceGameId": source_game_id,
+                    "gameDate": game_date,
+                    "homeTeamAbbr": home_team_abbr,
+                    "awayTeamAbbr": away_team_abbr,
+                    "homeScore": home_score,
+                    "awayScore": away_score,
+                    "boxscoreUrl": boxscore_url,
+                    "pageTitle": page_title,
+                    "pageTeamAbbr": team["abbr"],
+                }
+            )
+
+    deduped = {}
+    for entry in entries:
+        deduped.setdefault(entry["sourceGameId"], entry)
+    return list(deduped.values())
+
+
+def parse_wikipedia_player_stats(page_html):
+    section_html = extract_section_html(
+        page_html,
+        ["Player statistics", "Player Statistics"],
+        ["Transactions", "References", "Award winners", "Awards and records", "Awards"],
+    )
+    if not section_html:
+        return {}
+
+    parsed = {}
+    for table in parse_html_tables(section_html):
+        rows = table.get("rows", [])
+        if len(rows) < 2:
+            continue
+        headers = [normalize_header(cell["text"]) for cell in rows[0]["cells"]]
+        if "player" not in headers or "gp" not in headers:
+            continue
+        player_index = headers.index("player")
+        gp_index = headers.index("gp")
+        gs_index = headers.index("gs") if "gs" in headers else -1
+        mpg_index = headers.index("mpg") if "mpg" in headers else -1
+
+        row_count = 0
+        for row in rows[1:]:
+            cells = row.get("cells", [])
+            if max(player_index, gp_index) >= len(cells):
+                continue
+            player_name = normalize_whitespace(cells[player_index]["text"])
+            games_played = to_int(cells[gp_index]["text"])
+            if not player_name or games_played <= 0:
+                continue
+            row_count += 1
+            parsed[normalize_name(player_name)] = {
+                "games": games_played,
+                "gamesStarted": to_int(cells[gs_index]["text"]) if gs_index >= 0 and gs_index < len(cells) else 0,
+                "minutesPerGame": float(str(cells[mpg_index]["text"]).strip() or "0") if mpg_index >= 0 and mpg_index < len(cells) else 0.0,
+            }
+        if row_count >= 5:
+            return parsed
+    return parsed
+
+
+def parse_nbaallelo_schedule():
+    abbr_map = {
+        "ATL": "ATL",
+        "BOS": "BOS",
+        "CHI": "CHI",
+        "CLE": "CLE",
+        "DAL": "DAL",
+        "DEN": "DEN",
+        "DET": "DET",
+        "GSW": "GOS",
+        "HOU": "HOU",
+        "IND": "IND",
+        "LAC": "LAC",
+        "LAL": "LAL",
+        "MIL": "MIL",
+        "NJN": "NJN",
+        "NYK": "NYK",
+        "PHI": "PHL",
+        "PHO": "PHX",
+        "POR": "POR",
+        "SAC": "SAC",
+        "SAS": "SAN",
+        "SEA": "SEA",
+        "UTA": "UTH",
+        "WSB": "WAS",
+    }
+    games = {}
+    csv_text = fetch_text(NBAALLELO_URL, "nbaallelo")
+    for row in csv.DictReader(io.StringIO(csv_text)):
+        if str(row.get("year_id") or "").strip() != "1987":
+            continue
+        if str(row.get("is_playoffs") or "").strip() != "0":
+            continue
+        if str(row.get("game_location") or "").strip() != "H":
+            continue
+
+        home_team_abbr = abbr_map.get(str(row.get("team_id") or "").strip())
+        away_team_abbr = abbr_map.get(str(row.get("opp_id") or "").strip())
+        if not home_team_abbr or not away_team_abbr:
+            continue
+
+        game_date = datetime.strptime(str(row.get("date_game") or "").strip(), "%m/%d/%Y").strftime("%Y-%m-%d")
+        source_game_id = f"{game_date.replace('-', '')}_{away_team_abbr.lower()}_{home_team_abbr.lower()}"
+        games[source_game_id] = {
+            "sourceGameId": source_game_id,
+            "gameDate": game_date,
+            "homeTeamAbbr": home_team_abbr,
+            "awayTeamAbbr": away_team_abbr,
+            "homeScore": to_int(row.get("pts")),
+            "awayScore": to_int(row.get("opp_pts")),
+            "sourceTypes": ["five_thirty_eight_nbaallelo"],
+            "sourceRefs": [
+                {
+                    "type": "five_thirty_eight_nbaallelo",
+                    "gameId": str(row.get("game_id") or "").strip(),
+                    "teamId": str(row.get("team_id") or "").strip(),
+                }
+            ],
+            "boxscoreUrl": "",
+        }
+    return games
+
+
+def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_abbr, source_audit):
+    elo_games = parse_nbaallelo_schedule()
+    if len(elo_games) != 943:
+        raise RuntimeError(f"Expected 943 regular-season games from nbaallelo, found {len(elo_games)}.")
+
+    alias_map = build_team_alias_map(team_defs)
+    wiki_matched_games = set()
+    wikipedia_only_refs = 0
+    unmatched_wiki_rows = []
+    mismatched_wiki_rows = []
+    team_coverage = []
+
+    for team in team_defs:
+        page_title = wiki_pages[team["abbr"]]["pageTitle"]
+        page_html = wiki_pages[team["abbr"]]["html"]
+        wiki_entries = parse_wikipedia_schedule_entries(team, page_title, page_html, alias_map)
+        matched_for_team = set()
+        for entry in wiki_entries:
+            source_key = entry["sourceGameId"]
+            reverse_key = f"{entry['gameDate'].replace('-', '')}_{entry['homeTeamAbbr'].lower()}_{entry['awayTeamAbbr'].lower()}"
+            resolved_key = source_key if source_key in elo_games else reverse_key if reverse_key in elo_games else ""
+            if not resolved_key:
+                unmatched_wiki_rows.append(entry)
+                continue
+
+            target = elo_games[resolved_key]
+            matched_for_team.add(resolved_key)
+            wiki_matched_games.add(resolved_key)
+            wikipedia_only_refs += 1
+            reference = {
+                "type": "wikipedia_team_season_page",
+                "pageTitle": entry["pageTitle"],
+                "pageTeamAbbr": entry["pageTeamAbbr"],
+                "boxscoreUrl": entry["boxscoreUrl"],
+            }
+            if reference not in target["sourceRefs"]:
+                target["sourceRefs"].append(reference)
+            if "wikipedia_team_season_page" not in target["sourceTypes"]:
+                target["sourceTypes"].append("wikipedia_team_season_page")
+            if (
+                target["homeTeamAbbr"] != entry["homeTeamAbbr"]
+                or target["awayTeamAbbr"] != entry["awayTeamAbbr"]
+                or target["homeScore"] != entry["homeScore"]
+                or target["awayScore"] != entry["awayScore"]
+            ):
+                mismatched_wiki_rows.append(
+                    {
+                        "sourceGameId": resolved_key,
+                        "wikipedia": {
+                            "homeTeamAbbr": entry["homeTeamAbbr"],
+                            "awayTeamAbbr": entry["awayTeamAbbr"],
+                            "homeScore": entry["homeScore"],
+                            "awayScore": entry["awayScore"],
+                            "pageTitle": entry["pageTitle"],
+                        },
+                        "backfill": {
+                            "homeTeamAbbr": target["homeTeamAbbr"],
+                            "awayTeamAbbr": target["awayTeamAbbr"],
+                            "homeScore": target["homeScore"],
+                            "awayScore": target["awayScore"],
+                        },
+                    }
+                )
+
+        team_coverage.append(
+            {
+                "teamAbbr": team["abbr"],
+                "pageTitle": page_title,
+                "wikipediaRegularSeasonGames": len(matched_for_team),
+                "hasWikipediaGameLog": len(wiki_entries) > 0,
+                "hasWikipediaPlayerStats": bool(wiki_player_stats_by_abbr.get(team["abbr"])),
+                "wikipediaPlayerStatRows": len(wiki_player_stats_by_abbr.get(team["abbr"], {})),
+            }
+        )
+
+    ordered_games = sorted(elo_games.values(), key=lambda item: (item["gameDate"], item["sourceGameId"]))
+    for game in ordered_games:
+        game["wasBackfilled"] = "wikipedia_team_season_page" not in game["sourceTypes"]
+
+    return {
+        "season": SOURCE_SEASON,
+        "packId": PACK_ID,
+        "sourceMode": SOURCE_MODE,
+        "status": "complete_real_regular_season_foundation",
+        "isPartial": False,
+        "coverage": {
+            "scope": "full_regular_season",
+            "gamesCaptured": len(ordered_games),
+            "expectedRegularSeasonGames": 943,
+            "isCompleteSeason": len(ordered_games) == 943,
+            "sampledDateRange": {
+                "start": REGULAR_SEASON_START,
+                "end": REGULAR_SEASON_END,
+            },
+            "wikipediaGamesMatched": len(wiki_matched_games),
+            "backfilledGames": sum(1 for game in ordered_games if game["wasBackfilled"]),
+            "wikipediaSourceRowsProcessed": wikipedia_only_refs,
+            "unmatchedWikipediaRows": len(unmatched_wiki_rows),
+            "mismatchedWikipediaRows": len(mismatched_wiki_rows),
+            "missingData": [],
+        },
+        "provenance": {
+            "liveArchivesPresent": False,
+            "missingFeeds": source_audit["missingFeeds"],
+            "primaryScheduleSource": "wikipedia_team_season_pages",
+            "fallbackScheduleSource": "five_thirty_eight_nbaallelo",
+        },
+        "teamCoverage": team_coverage,
+        "notes": [
+            "Live nbastats_1986 / pbpstats_1986 feeds are absent, so the pack cannot use the same play-by-play ingestion lane as later seasons.",
+            "Accessible Wikipedia team-season game logs are parsed wherever they expose real regular-season rows.",
+            "A FiveThirtyEight historical results backfill completes the schedule grid for teams whose Wikipedia season pages are empty or partial.",
+            "Player-game stat rows remain inferred from season totals and are not marketed as real event box scores.",
+        ],
+        "games": ordered_games,
+        "audit": {
+            "unmatchedWikipediaRows": unmatched_wiki_rows[:25],
+            "mismatchedWikipediaRows": mismatched_wiki_rows[:25],
+        },
+    }
+
+
+def estimate_games_played(total_minutes, team_game_count):
+    total_minutes = max(0, int(total_minutes or 0))
+    if total_minutes <= 0 or team_game_count <= 0:
+        return 0
+    estimate = int(round(total_minutes / 24))
+    if total_minutes >= team_game_count * 28:
+        estimate = team_game_count
+    return max(1, min(team_game_count, estimate))
+
+
+def estimate_games_started(total_minutes, games_played):
+    if games_played <= 0:
+        return 0
+    average_minutes = float(total_minutes or 0) / games_played
+    if average_minutes >= 32:
+        return max(1, min(games_played, int(round(games_played * 0.82))))
+    if average_minutes >= 26:
+        return max(0, min(games_played, int(round(games_played * 0.55))))
+    if average_minutes >= 20:
+        return max(0, min(games_played, int(round(games_played * 0.25))))
+    return 0
+
+
+def build_weight_vector(length, seed):
+    if length <= 0:
+        return []
+    weights = []
+    for index in range(length):
+        weights.append(1.0 + stable_fraction(f"{seed}:{index}") + ((index + 1) / max(1, length)) * 0.35)
+    return weights
+
+
+def allocate_weighted_integers(total, weights, capacities=None):
+    count = len(weights)
+    allocations = [0] * count
+    total = max(0, int(total or 0))
+    if total <= 0 or count == 0:
+        return allocations
+
+    if capacities is None:
+        capacities = [sys.maxsize] * count
+    else:
+        capacities = [max(0, int(value)) for value in capacities]
+
+    active = {index for index in range(count) if capacities[index] > 0}
+    remaining = total
+
+    while remaining > 0 and active:
+        weight_total = sum(weights[index] for index in active)
+        if weight_total <= 0:
+            for index in active:
+                weights[index] = 1.0
+            weight_total = float(len(active))
+
+        raw_allocations = {index: remaining * weights[index] / weight_total for index in active}
+        progress = False
+        for index in active:
+            base = int(math.floor(raw_allocations[index]))
+            if base <= 0:
+                continue
+            available = capacities[index] - allocations[index]
+            if available <= 0:
+                continue
+            applied = min(base, available)
+            allocations[index] += applied
+            remaining -= applied
+            progress = progress or applied > 0
+
+        if remaining <= 0:
+            break
+
+        ranked = sorted(active, key=lambda index: (raw_allocations[index] - math.floor(raw_allocations[index]), weights[index]), reverse=True)
+        for index in ranked:
+            if remaining <= 0:
+                break
+            if allocations[index] >= capacities[index]:
+                continue
+            allocations[index] += 1
+            remaining -= 1
+            progress = True
+
+        if not progress:
+            break
+
+        active = {index for index in active if allocations[index] < capacities[index]}
+
+    return allocations
+
+
+def select_inferred_games(team_schedule, desired_count, seed):
+    if desired_count <= 0 or not team_schedule:
+        return []
+    if desired_count >= len(team_schedule):
+        return list(team_schedule)
+
+    desired_count = max(1, int(desired_count))
+    used_indexes = set()
+    selected = []
+    offset = stable_fraction(seed)
+    schedule_length = len(team_schedule)
+
+    for pick_index in range(desired_count):
+        raw_position = int(math.floor(((pick_index + offset) * schedule_length) / desired_count))
+        candidate = max(0, min(schedule_length - 1, raw_position))
+        while candidate in used_indexes:
+            candidate = (candidate + 1) % schedule_length
+        used_indexes.add(candidate)
+        selected.append(team_schedule[candidate])
+
+    return sorted(selected, key=lambda game: (game["gameDate"], game["gameId"]))
+
+
+def build_inferred_player_game_rows(player_id, season_id, stint, selected_games):
+    if not selected_games:
+        return []
+
+    rows = []
+    for game in selected_games:
+        opponent_team_id = game["awayTeamId"] if game["homeTeamId"] == stint["teamId"] else game["homeTeamId"]
+        rows.append(
+            {
+                "playerId": player_id,
+                "gameId": game["gameId"],
+                "seasonId": season_id,
+                "teamId": stint["teamId"],
+                "opponentTeamId": opponent_team_id,
+                "minutes": 0,
+                "points": 0,
+                "rebounds": 0,
+                "assists": 0,
+                "steals": 0,
+                "blocks": 0,
+                "turnovers": 0,
+                "threePointersMade": 0,
+                "fgm": 0,
+                "fga": 0,
+                "ftm": 0,
+                "fta": 0,
+                "statSource": "season_average_weighted_estimate",
+                "minutesSource": "season_average_weighted_estimate",
+            }
+        )
+
+    field_totals = {
+        "minutes": stint["minutesTotal"],
+        "rebounds": stint["totals"].get("rebounds", 0),
+        "assists": stint["totals"].get("assists", 0),
+        "steals": stint["totals"].get("steals", 0),
+        "blocks": stint["totals"].get("blocks", 0),
+        "turnovers": stint["totals"].get("turnovers", 0),
+        "fga": stint["totals"].get("fga", 0),
+        "fta": stint["totals"].get("fta", 0),
+        "fgm": min(stint["totals"].get("fgm", 0), stint["totals"].get("fga", 0)),
+        "ftm": min(stint["totals"].get("ftm", 0), stint["totals"].get("fta", 0)),
+        "threePointersMade": min(stint["totals"].get("threePointersMade", 0), stint["totals"].get("fgm", 0)),
+    }
+
+    assignments = {}
+    for field in ("minutes", "rebounds", "assists", "steals", "blocks", "turnovers", "fga", "fta"):
+        assignments[field] = allocate_weighted_integers(
+            field_totals[field],
+            build_weight_vector(len(rows), f"{player_id}:{stint['teamId']}:{field}"),
+        )
+    assignments["fgm"] = allocate_weighted_integers(
+        field_totals["fgm"],
+        build_weight_vector(len(rows), f"{player_id}:{stint['teamId']}:fgm"),
+        capacities=assignments["fga"],
+    )
+    assignments["ftm"] = allocate_weighted_integers(
+        field_totals["ftm"],
+        build_weight_vector(len(rows), f"{player_id}:{stint['teamId']}:ftm"),
+        capacities=assignments["fta"],
+    )
+    assignments["threePointersMade"] = allocate_weighted_integers(
+        field_totals["threePointersMade"],
+        build_weight_vector(len(rows), f"{player_id}:{stint['teamId']}:threes"),
+        capacities=assignments["fgm"],
+    )
+
+    for index, row in enumerate(rows):
+        row["minutes"] = assignments["minutes"][index]
+        row["rebounds"] = assignments["rebounds"][index]
+        row["assists"] = assignments["assists"][index]
+        row["steals"] = assignments["steals"][index]
+        row["blocks"] = assignments["blocks"][index]
+        row["turnovers"] = assignments["turnovers"][index]
+        row["fga"] = assignments["fga"][index]
+        row["fta"] = assignments["fta"][index]
+        row["fgm"] = assignments["fgm"][index]
+        row["ftm"] = assignments["ftm"][index]
+        row["threePointersMade"] = assignments["threePointersMade"][index]
+        row["points"] = (2 * (row["fgm"] - row["threePointersMade"])) + (3 * row["threePointersMade"]) + row["ftm"]
+
+    return rows
+
+
+def featured_star_ids(players):
+    by_name = {normalize_name(player["displayName"]): player["playerId"] for player in players}
+    return [
+        player_id
+        for player_id in (
+            by_name.get(normalize_name("Magic Johnson")),
+            by_name.get(normalize_name("Larry Bird")),
+            by_name.get(normalize_name("Michael Jordan")),
+            by_name.get(normalize_name("James Worthy")),
+        )
+        if player_id
+    ]
+
+
 def main():
     ensure_dir(PACK_ROOT)
+    ensure_dir(SOURCE_ROOT)
     generated_at = datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     source_audit = audit_source_mode()
-    schedule_results_snapshot = read_source_json("schedule_results.json")
-    if schedule_results_snapshot.get("sourceMode") != SOURCE_MODE:
-        raise RuntimeError(
-            f"Expected schedule_results.json sourceMode to be `{SOURCE_MODE}`, found `{schedule_results_snapshot.get('sourceMode')}`."
-        )
-    raise RuntimeError(
-        "1986-87 foundation snapshot scaffold is in place, but translating snapshot schedule/results into pack outputs is not implemented yet."
-    )
 
     team_defs = []
     team_by_abbr = {}
     for team in TEAM_DEFS:
         team_copy = dict(team)
         team_copy["teamId"] = f"{ENTITY_PREFIX}_{team['slug']}"
+        team_copy["wikiPageTitle"] = f"1986\u201387 {team['displayName']} season"
         team_defs.append(team_copy)
         team_by_abbr[team_copy["abbr"]] = team_copy
 
-    list_data_urls = parse_list_data_urls()
-    if SOURCE_NBASTATS_KEY not in list_data_urls or SOURCE_PBPSTATS_KEY not in list_data_urls:
-        raise RuntimeError("Required 1986-87 season archives were not found in the source dataset index.")
+    wiki_pages = {}
+    wiki_player_stats_by_abbr = {}
+    for team in team_defs:
+        html = fetch_wikipedia_render_html(team["wikiPageTitle"], f"wiki_render_{team['abbr'].lower()}")
+        wiki_pages[team["abbr"]] = {"pageTitle": team["wikiPageTitle"], "html": html}
+        wiki_player_stats_by_abbr[team["abbr"]] = parse_wikipedia_player_stats(html)
 
-    pbp_rows = fetch_tar_csv_rows(list_data_urls[SOURCE_NBASTATS_KEY], SOURCE_NBASTATS_KEY)
-    possession_rows = fetch_tar_csv_rows(list_data_urls[SOURCE_PBPSTATS_KEY], SOURCE_PBPSTATS_KEY)
+    schedule_results_snapshot = build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_abbr, source_audit)
+    write_source_json("schedule_results.json", schedule_results_snapshot)
 
-    game_dates = {}
-    for row in possession_rows:
-        game_id = str(row.get("GAMEID") or "").strip()
-        game_date = str(row.get("GAMEDATE") or "").strip()
-        if not game_id or not game_date:
-            continue
-        if REGULAR_SEASON_START <= game_date <= REGULAR_SEASON_END:
-            game_dates[game_id] = game_date
-
-    regular_games_by_id = defaultdict(list)
-    team_numeric_to_abbr = {}
-    for row in pbp_rows:
-        game_id = str(row.get("GAME_ID") or "").strip()
-        if not game_id or game_id not in game_dates:
-            continue
-        regular_games_by_id[game_id].append(row)
-        for index in (1, 2, 3):
-            team_numeric_id = str(row.get(f"PLAYER{index}_TEAM_ID") or "").strip()
-            abbr = str(row.get(f"PLAYER{index}_TEAM_ABBREVIATION") or "").strip().upper()
-            if team_numeric_id and team_numeric_id != "0" and abbr:
-                team_numeric_to_abbr[team_numeric_id] = abbr
-
-    if not regular_games_by_id:
-        raise RuntimeError("No 1986-87 regular-season game rows were found in the source dataset.")
-
-    team_by_numeric = {}
-    for team_numeric_id, abbr in sorted(team_numeric_to_abbr.items()):
-        if abbr not in team_by_abbr:
-            raise RuntimeError(f"Source team abbreviation `{abbr}` is not defined in the 1986-87 team map.")
-        team_by_numeric[team_numeric_id] = team_by_abbr[abbr]
-
-    if len({team["teamId"] for team in team_by_numeric.values()}) != 23:
+    if schedule_results_snapshot.get("sourceMode") != SOURCE_MODE:
         raise RuntimeError(
-            f"Expected 23 teams from the 1986-87 source rows, found {len({team['teamId'] for team in team_by_numeric.values()})}."
+            f"Expected schedule_results.json sourceMode to be `{SOURCE_MODE}`, found `{schedule_results_snapshot.get('sourceMode')}`."
+        )
+
+    source_games = list(schedule_results_snapshot.get("games") or [])
+    if len(source_games) != 943:
+        raise RuntimeError(f"Expected 943 regular-season games in schedule_results.json, found {len(source_games)}.")
+
+    source_games.sort(key=lambda item: (item["gameDate"], item["sourceGameId"]))
+
+    unique_dates = []
+    date_to_index = {}
+    schedule = []
+    games = []
+    team_schedule_by_id = defaultdict(list)
+    source_game_to_canonical = {}
+
+    for game_number, source_game in enumerate(source_games, start=1):
+        game_date = source_game["gameDate"]
+        if game_date not in date_to_index:
+            date_to_index[game_date] = len(unique_dates)
+            unique_dates.append(game_date)
+
+        home_team = team_by_abbr[source_game["homeTeamAbbr"]]
+        away_team = team_by_abbr[source_game["awayTeamAbbr"]]
+        canonical_game_id = f"{ENTITY_PREFIX}_game_{game_number:04d}"
+        source_game_to_canonical[source_game["sourceGameId"]] = canonical_game_id
+
+        schedule_row = {
+            "gameId": canonical_game_id,
+            "seasonId": SEASON_ID,
+            "gameDate": game_date,
+            "homeTeamId": home_team["teamId"],
+            "awayTeamId": away_team["teamId"],
+            "isRegularSeason": True,
+            "gameNumber": game_number,
+            "weekLabel": f"Week {date_to_index[game_date] // 7 + 1}",
+            "dayLabel": f"Day {date_to_index[game_date] % 7 + 1}",
+            "externalRefs": {
+                "sourceGameId": source_game["sourceGameId"],
+                "sourceTypes": list(source_game.get("sourceTypes") or []),
+                "sourceRefs": list(source_game.get("sourceRefs") or []),
+            },
+        }
+        schedule.append(schedule_row)
+        team_schedule_by_id[home_team["teamId"]].append(schedule_row)
+        team_schedule_by_id[away_team["teamId"]].append(schedule_row)
+
+        winner_team_id = home_team["teamId"] if source_game["homeScore"] > source_game["awayScore"] else away_team["teamId"]
+        loser_team_id = away_team["teamId"] if winner_team_id == home_team["teamId"] else home_team["teamId"]
+        games.append(
+            {
+                "gameId": canonical_game_id,
+                "seasonId": SEASON_ID,
+                "status": "final",
+                "homeScore": source_game["homeScore"],
+                "awayScore": source_game["awayScore"],
+                "winnerTeamId": winner_team_id,
+                "loserTeamId": loser_team_id,
+            }
         )
 
     team_page_players = defaultdict(dict)
     team_page_totals = defaultdict(dict)
-    player_team_candidates = defaultdict(set)
-    team_numeric_by_team_id = {team["teamId"]: team_numeric_id for team_numeric_id, team in team_by_numeric.items()}
+    player_stints_by_numeric = defaultdict(list)
+
     for team in team_defs:
         team_html = fetch_text(
             TEAM_PAGE_URL.format(season=SOURCE_SEASON, abbr=quote(team["abbr"])),
@@ -702,222 +1517,71 @@ def main():
         if not dropdown_players:
             raise RuntimeError(f"Team page for `{team['abbr']}` did not expose any player links.")
         aligned_totals = align_team_page_totals(dropdown_players, parse_team_boxscore_totals(team_html), team["abbr"])
+        wiki_team_stats = wiki_player_stats_by_abbr.get(team["abbr"], {})
+        team_schedule_count = len(team_schedule_by_id[team["teamId"]])
+
         for player_entry in dropdown_players:
             player_numeric_id = player_entry["playerNumericId"]
-            team_page_players[team["teamId"]][player_numeric_id] = player_entry["displayName"]
-            team_page_totals[team["teamId"]][player_numeric_id] = aligned_totals[player_numeric_id]
-            player_team_candidates[player_numeric_id].add(team["teamId"])
+            display_name = player_entry["displayName"]
+            totals_row = aligned_totals[player_numeric_id]
+            wiki_stats = wiki_team_stats.get(normalize_name(display_name), {})
+            games_played = to_int(wiki_stats.get("games"))
+            if games_played <= 0:
+                games_played = estimate_games_played(totals_row["minutes"], team_schedule_count)
+            games_started = to_int(wiki_stats.get("gamesStarted"))
+            if games_started <= 0:
+                games_started = estimate_games_started(totals_row["minutes"], games_played)
+            games_started = min(games_started, games_played)
 
-    game_ids = sorted(regular_games_by_id.keys(), key=lambda value: (game_dates[value], value))
-
-    player_season = defaultdict(
-        lambda: {
-            "displayName": "",
-            "games": set(),
-            "teamRefs": defaultdict(int),
-            "gamesStarted": 0,
-            "startPos": defaultdict(int),
-        }
-    )
-
-    schedule = []
-    games = []
-    player_game_stats = []
-    source_game_to_canonical = {}
-
-    unique_dates = []
-    date_to_index = {}
-
-    for game_number, source_game_id in enumerate(game_ids, start=1):
-        derived = derive_game_boxscore(regular_games_by_id[source_game_id], source_game_id)
-        game_date = game_dates[source_game_id]
-        if game_date not in date_to_index:
-            date_to_index[game_date] = len(unique_dates)
-            unique_dates.append(game_date)
-
-        home_team = team_by_numeric[derived["homeTeamNumericId"]]
-        away_team = team_by_numeric[derived["awayTeamNumericId"]]
-        canonical_game_id = f"{ENTITY_PREFIX}_game_{game_number:04d}"
-        source_game_to_canonical[source_game_id] = canonical_game_id
-
-        schedule.append(
-            {
-                "gameId": canonical_game_id,
-                "seasonId": SEASON_ID,
-                "gameDate": game_date,
-                "homeTeamId": home_team["teamId"],
-                "awayTeamId": away_team["teamId"],
-                "isRegularSeason": True,
-                "gameNumber": game_number,
-                "weekLabel": f"Week {date_to_index[game_date] // 7 + 1}",
-                "dayLabel": f"Day {date_to_index[game_date] % 7 + 1}",
-                "externalRefs": {
-                    "sourceGameId": source_game_id,
-                    "sourceGameDate": game_date,
-                },
-            }
-        )
-
-        winner_team_id = home_team["teamId"] if derived["homeScore"] >= derived["awayScore"] else away_team["teamId"]
-        loser_team_id = away_team["teamId"] if winner_team_id == home_team["teamId"] else home_team["teamId"]
-        games.append(
-            {
-                "gameId": canonical_game_id,
-                "seasonId": SEASON_ID,
-                "status": "final",
-                "homeScore": derived["homeScore"],
-                "awayScore": derived["awayScore"],
-                "winnerTeamId": winner_team_id,
-                "loserTeamId": loser_team_id,
-            }
-        )
-
-        matchup_team_ids = {
-            "home": home_team["teamId"],
-            "away": away_team["teamId"],
-        }
-
-        for player_numeric_id, games_seen in derived["playerGames"].items():
-            player_season[player_numeric_id]["games"].update(games_seen)
-        for player_numeric_id, team_refs in derived["playerTeamRefs"].items():
-            for numeric_team_id, ref_count in team_refs.items():
-                player_season[player_numeric_id]["teamRefs"][numeric_team_id] += ref_count
-
-        for player_numeric_id, stat_line in derived["playerGameStats"].items():
-            canonical_team = team_by_numeric.get(stat_line["teamNumericId"])
-            if not canonical_team:
-                raise RuntimeError(
-                    f"Game `{source_game_id}` produced player `{player_numeric_id}` on unknown team `{stat_line['teamNumericId']}`."
-                )
-
-            opponent_team_id = matchup_team_ids["away"] if canonical_team["teamId"] == matchup_team_ids["home"] else matchup_team_ids["home"]
-            canonical_player_id = f"{ENTITY_PREFIX}_{slugify(player_numeric_id)}"
-            display_name = ""
-            for team_id in player_team_candidates.get(player_numeric_id, set()):
-                display_name = team_page_players[team_id].get(player_numeric_id, "")
-                if display_name:
-                    break
-            if not display_name:
-                display_name = str(player_numeric_id)
-
-            player_season[player_numeric_id]["displayName"] = display_name
-
-            player_game_stats.append(
+            team_page_players[team["teamId"]][player_numeric_id] = display_name
+            team_page_totals[team["teamId"]][player_numeric_id] = totals_row
+            player_stints_by_numeric[player_numeric_id].append(
                 {
-                    "playerId": f"{ENTITY_PREFIX}_{slugify(display_name)}_{player_numeric_id}",
-                    "gameId": canonical_game_id,
-                    "seasonId": SEASON_ID,
-                    "teamId": canonical_team["teamId"],
-                    "opponentTeamId": opponent_team_id,
-                    "minutes": 0,
-                    "points": stat_line["points"],
-                    "rebounds": stat_line["rebounds"],
-                    "assists": stat_line["assists"],
-                    "steals": stat_line["steals"],
-                    "blocks": stat_line["blocks"],
-                    "turnovers": stat_line["turnovers"],
-                    "threePointersMade": stat_line["threePointersMade"],
-                    "fgm": stat_line["fgm"],
-                    "fga": stat_line["fga"],
-                    "ftm": stat_line["ftm"],
-                    "fta": stat_line["fta"],
-                    "statSource": "stats_nba_com_event_boxscore",
+                    "playerNumericId": player_numeric_id,
+                    "displayName": display_name,
+                    "teamId": team["teamId"],
+                    "teamAbbr": team["abbr"],
+                    "position": totals_row["position"],
+                    "minutesTotal": totals_row["minutes"],
+                    "games": games_played,
+                    "gamesStarted": games_started,
+                    "totals": dict(totals_row["totals"]),
+                    "gamesSource": "wikipedia_team_player_stats_table" if wiki_stats else "minutes_based_game_estimate",
                 }
             )
 
-        for player_numeric_id, start_count in derived["playerStartCounts"].items():
-            player_season[player_numeric_id]["gamesStarted"] += start_count
-        for player_numeric_id, start_positions in derived["playerStartPos"].items():
-            for position, count in start_positions.items():
-                player_season[player_numeric_id]["startPos"][position] += count
-
-    union_player_ids = sorted(set(player_team_candidates.keys()) | set(player_season.keys()), key=lambda value: (to_int(value), value))
-    if not union_player_ids:
+    if not player_stints_by_numeric:
         raise RuntimeError("No 1986-87 player rows were discovered while building the pack.")
 
     players = []
-    player_numeric_to_canonical = {}
-
-    for player_numeric_id in union_player_ids:
-        display_name = player_season[player_numeric_id]["displayName"]
-        if not display_name:
-            roster_names = []
-            for team_id in sorted(player_team_candidates.get(player_numeric_id, set())):
-                roster_name = team_page_players[team_id].get(player_numeric_id, "")
-                if roster_name:
-                    roster_names.append(roster_name)
-            display_name = roster_names[0] if roster_names else f"Player {player_numeric_id}"
+    player_stints_by_canonical = {}
+    for player_numeric_id in sorted(player_stints_by_numeric.keys(), key=lambda value: (to_int(value), value)):
+        stints = player_stints_by_numeric[player_numeric_id]
+        display_name = next((stint["displayName"] for stint in stints if stint["displayName"]), f"Player {player_numeric_id}")
         first_name, last_name = split_name(display_name)
+        primary_stint = max(stints, key=lambda stint: (stint["minutesTotal"], stint["games"], stint["teamId"]))
+        primary_position = next((stint["position"] for stint in stints if stint["position"]), "SF")
 
         aggregate_totals = defaultdict(int)
-        team_minutes = defaultdict(int)
-        primary_position = ""
-        for team_id in sorted(player_team_candidates.get(player_numeric_id, set())):
-            team_totals = team_page_totals.get(team_id, {}).get(player_numeric_id)
-            if not team_totals:
-                continue
-            team_minutes[team_id] += team_totals["minutes"]
-            if not primary_position and team_totals["position"]:
-                primary_position = team_totals["position"]
-            for stat_key in (
-                "points",
-                "rebounds",
-                "assists",
-                "steals",
-                "blocks",
-                "turnovers",
-                "threePointersMade",
-                "fgm",
-                "fga",
-                "ftm",
-                "fta",
-            ):
-                aggregate_totals[stat_key] += team_totals["totals"].get(stat_key, 0)
+        total_minutes = 0
+        total_games = 0
+        total_games_started = 0
+        games_source = "wikipedia_team_player_stats_table"
+        for stint in stints:
+            total_minutes += to_int(stint["minutesTotal"])
+            total_games += to_int(stint["games"])
+            total_games_started += to_int(stint["gamesStarted"])
+            if stint["gamesSource"] != "wikipedia_team_player_stats_table":
+                games_source = "minutes_based_game_estimate"
+            for stat_key, value in stint["totals"].items():
+                aggregate_totals[stat_key] += to_int(value)
 
-        if team_minutes:
-            primary_team_id = max(team_minutes.items(), key=lambda item: (item[1], item[0]))[0]
-            primary_team = next(team for team in team_defs if team["teamId"] == primary_team_id)
-            primary_team_numeric_id = team_numeric_by_team_id.get(primary_team_id, "")
-        elif player_season[player_numeric_id]["teamRefs"]:
-            primary_team_numeric_id = max(player_season[player_numeric_id]["teamRefs"].items(), key=lambda item: (item[1], item[0]))[0]
-            primary_team = team_by_numeric[primary_team_numeric_id]
-            primary_team_id = primary_team["teamId"]
-        else:
-            candidate_team_ids = sorted(player_team_candidates.get(player_numeric_id, set()))
-            if not candidate_team_ids:
-                raise RuntimeError(f"Player `{player_numeric_id}` had no team candidates.")
-            primary_team_id = candidate_team_ids[0]
-            primary_team = next(team for team in team_defs if team["teamId"] == primary_team_id)
-            primary_team_numeric_id = team_numeric_by_team_id.get(primary_team_id, "")
-
-        if not primary_position:
-            primary_position = "SF"
-
-        games_played = len(player_season[player_numeric_id]["games"])
-        if games_played <= 0 and (sum(aggregate_totals.values()) > 0 or sum(team_minutes.values()) > 0):
-            games_played = 1
-        games_played = max(games_played, player_season[player_numeric_id]["gamesStarted"])
-        divisor = games_played if games_played > 0 else 1
-        per_game = {
-            "min": round_stat(sum(team_minutes.values()) / divisor if team_minutes else 0, 1),
-            "pts": round_stat(aggregate_totals["points"] / divisor, 1),
-            "reb": round_stat(aggregate_totals["rebounds"] / divisor, 1),
-            "ast": round_stat(aggregate_totals["assists"] / divisor, 1),
-            "stl": round_stat(aggregate_totals["steals"] / divisor, 1),
-            "blk": round_stat(aggregate_totals["blocks"] / divisor, 1),
-            "to": round_stat(aggregate_totals["turnovers"] / divisor, 1),
-            "fgm": round_stat(aggregate_totals["fgm"] / divisor, 1),
-            "fga": round_stat(aggregate_totals["fga"] / divisor, 1),
-            "ftm": round_stat(aggregate_totals["ftm"] / divisor, 1),
-            "fta": round_stat(aggregate_totals["fta"] / divisor, 1),
-            "threes": round_stat(aggregate_totals["threePointersMade"] / divisor, 1),
-        }
-
+        if total_games <= 0 and total_minutes > 0:
+            total_games = estimate_games_played(total_minutes, 82)
+        total_games = max(total_games, total_games_started)
+        divisor = total_games if total_games > 0 else 1
         canonical_player_id = f"{ENTITY_PREFIX}_{slugify(display_name)}_{player_numeric_id}"
-        player_numeric_to_canonical[player_numeric_id] = {
-            "playerId": canonical_player_id,
-            "teamId": primary_team["teamId"],
-        }
+        player_stints_by_canonical[canonical_player_id] = stints
 
         players.append(
             {
@@ -926,26 +1590,43 @@ def main():
                 "displayName": display_name,
                 "firstName": first_name,
                 "lastName": last_name or first_name,
-                "teamId": primary_team["teamId"],
+                "teamId": primary_stint["teamId"],
                 "primaryPosition": primary_position,
                 "secondaryPositions": secondary_positions(primary_position),
-                "status": "active",
+                "status": "active" if total_minutes > 0 else "inactive",
                 "draftEligible": True,
-                "bio": f"{display_name} is part of the {SOURCE_SEASON} {primary_team['displayName']} historical player pool.",
+                "bio": (
+                    f"{display_name} belongs to the 1986-87 player pool with real season totals and inferred "
+                    f"game-by-game coverage anchored to the {primary_stint['teamAbbr']} lane."
+                ),
                 "externalRefs": {
                     "sourcePlayerId": player_numeric_id,
                     "theBasketballDatabasePage": f"{player_numeric_id}RegularSeasonBoxScore.html",
-                    "sourceTeamId": primary_team_numeric_id,
+                    "sourceTeamCodes": sorted({stint['teamAbbr'] for stint in stints}),
                 },
                 "seasonStats": {
                     "source": "the_basketball_database_team_box_scores",
                     "sourceSeason": SOURCE_SEASON,
-                    "sourceTeamCode": primary_team["abbr"],
-                    "games": games_played,
-                    "gamesStarted": player_season[player_numeric_id]["gamesStarted"],
-                    "perGame": per_game,
+                    "sourceTeamCode": primary_stint["teamAbbr"],
+                    "games": total_games,
+                    "gamesStarted": total_games_started,
+                    "gamesSource": games_source,
+                    "perGame": {
+                        "min": round_stat(total_minutes / divisor if divisor else 0, 1),
+                        "pts": round_stat(aggregate_totals["points"] / divisor if divisor else 0, 1),
+                        "reb": round_stat(aggregate_totals["rebounds"] / divisor if divisor else 0, 1),
+                        "ast": round_stat(aggregate_totals["assists"] / divisor if divisor else 0, 1),
+                        "stl": round_stat(aggregate_totals["steals"] / divisor if divisor else 0, 1),
+                        "blk": round_stat(aggregate_totals["blocks"] / divisor if divisor else 0, 1),
+                        "to": round_stat(aggregate_totals["turnovers"] / divisor if divisor else 0, 1),
+                        "fgm": round_stat(aggregate_totals["fgm"] / divisor if divisor else 0, 1),
+                        "fga": round_stat(aggregate_totals["fga"] / divisor if divisor else 0, 1),
+                        "ftm": round_stat(aggregate_totals["ftm"] / divisor if divisor else 0, 1),
+                        "fta": round_stat(aggregate_totals["fta"] / divisor if divisor else 0, 1),
+                        "threes": round_stat(aggregate_totals["threePointersMade"] / divisor if divisor else 0, 1),
+                    },
                     "totals": {
-                        "min": int(round(sum(team_minutes.values()))) if team_minutes else 0,
+                        "min": total_minutes,
                         "pts": aggregate_totals["points"],
                         "reb": aggregate_totals["rebounds"],
                         "ast": aggregate_totals["assists"],
@@ -962,21 +1643,7 @@ def main():
             }
         )
 
-    players.sort(key=lambda item: (item["teamId"], item["displayName"]))
-
-    canonical_id_remap = {player["playerId"]: player["playerId"] for player in players}
-    players_by_id = {player["playerId"]: player for player in players}
-    player_game_stats_by_player = defaultdict(list)
-    for stat_row in player_game_stats:
-        player_match = players_by_id.get(stat_row["playerId"])
-        if player_match is None:
-            # Player rows are built from the same ids; if one is missing, hard fail rather than silently dropping it.
-            raise RuntimeError(f"Generated player game stat row for `{stat_row['playerId']}` without a matching player record.")
-        player_game_stats_by_player[stat_row["playerId"]].append(stat_row)
-
-    for player_id, stat_rows in player_game_stats_by_player.items():
-        player_match = players_by_id[player_id]
-        assign_inferred_player_game_minutes(stat_rows, player_match["seasonStats"]["perGame"]["min"])
+    players.sort(key=lambda item: (item["teamId"], item["displayName"], item["playerId"]))
 
     team_player_buckets = defaultdict(list)
     for player in players:
@@ -984,7 +1651,7 @@ def main():
 
     roster_snapshots = []
     for team_id, team_players in team_player_buckets.items():
-        sorted_team_players = sorted(
+        ordered_players = sorted(
             team_players,
             key=lambda player: (
                 -to_int(player["seasonStats"]["gamesStarted"]),
@@ -993,10 +1660,10 @@ def main():
             ),
         )
         position_counts = defaultdict(int)
-        for player in sorted_team_players:
+        for player in ordered_players:
             games_started = to_int(player["seasonStats"]["gamesStarted"])
-            per_game_min = round_stat(player["seasonStats"]["perGame"]["min"], 1)
             games_played = to_int(player["seasonStats"]["games"])
+            per_game_min = round_stat(player["seasonStats"]["perGame"]["min"], 1)
             if games_started >= max(20, int(games_played * 0.45)):
                 role = "starter"
             elif per_game_min >= 20:
@@ -1018,6 +1685,14 @@ def main():
                 }
             )
 
+    player_game_stats = []
+    for player in players:
+        for stint in player_stints_by_canonical[player["playerId"]]:
+            team_schedule = team_schedule_by_id[stint["teamId"]]
+            games_to_cover = min(len(team_schedule), max(0, to_int(stint["games"])))
+            selected_games = select_inferred_games(team_schedule, games_to_cover, f"{player['playerId']}:{stint['teamId']}")
+            player_game_stats.extend(build_inferred_player_game_rows(player["playerId"], SEASON_ID, stint, selected_games))
+
     teams = []
     for team in team_defs:
         teams.append(
@@ -1034,9 +1709,14 @@ def main():
                 "externalRefs": {
                     "sourceTeamCode": team["abbr"],
                     "theBasketballDatabasePage": f"{SOURCE_SEASON}{team['abbr']}RegularSeasonBoxScore.html",
+                    "wikipediaSeasonPage": team["wikiPageTitle"],
                 },
             }
         )
+
+    real_stat_players = sum(1 for player in players if to_int(player["seasonStats"]["totals"]["min"]) > 0)
+    zero_game_players = sum(1 for player in players if to_int(player["seasonStats"]["games"]) <= 0)
+    featured_stars = featured_star_ids(players)
 
     season = {
         "seasonId": SEASON_ID,
@@ -1049,13 +1729,11 @@ def main():
         "isHistorical": True,
         "eraTags": ERA_TAGS,
         "notes": [
-            "Source-aware scaffold for a full-league 1986-87 historical foundation pack.",
-            "Pack generation remains blocked until snapshot schedule translation and roster assembly are implemented.",
+            "This pack uses the real 1986-87 regular-season schedule and final scores.",
+            "Player season totals come from TheBasketballDatabase team pages.",
+            "Player-game rows are deterministic season-average weighted estimates because live 1986 play-by-play feeds are absent.",
         ],
     }
-
-    real_stat_players = sum(1 for player in players if to_int(player["seasonStats"]["games"]) > 0)
-    zero_game_players = sum(1 for player in players if to_int(player["seasonStats"]["games"]) <= 0)
 
     manifest = {
         "packId": PACK_ID,
@@ -1069,16 +1747,16 @@ def main():
         "isHistorical": True,
         "era": ERA_KEY,
         "version": 1,
-        "status": "scaffold",
+        "status": "ready",
         "sourceProfile": SOURCE_PROFILE,
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
         "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
         "defaultEntryMode": "real_season",
         "focusTeamId": FEATURED_TEAM_ID,
-        "subtitle": "Source-aware scaffold for the 1986-87 NBA season with audited archive gaps and checked-in schedule seeds.",
-        "description": "A scaffolded 1986-87 NBA historical season builder that audits missing live archives and anchors future work to checked-in source snapshots.",
-        "tagline": "Late-80s league foundation with honest source disclosure.",
+        "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 replay foundation with Lakers prestige at the center.",
+        "description": "A playable 1986-87 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
+        "tagline": "Replay the Bird-Magic-Jordan season with real scores and disclosed inferred box lines.",
         "eraTags": ERA_TAGS,
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
         "playerPoolType": "full_season_player_pool",
@@ -1100,7 +1778,11 @@ def main():
             "sourceProfile": SOURCE_PROFILE,
             "curationOwner": "RosterBate",
             "reviewStatus": "draft",
-            "importNotes": "1986-87 scaffold currently audits the missing live archive feeds, loads a checked-in schedule/results seed snapshot, and stops before pack generation so later tasks can implement translation deliberately.",
+            "importNotes": (
+                "1986-87 live nbastats_1986 / pbpstats_1986 feeds are absent. The builder refreshes schedule/results from "
+                "accessible Wikipedia team-season pages where available, completes uncovered games with FiveThirtyEight's historical nbaallelo results, "
+                "pulls player season totals from TheBasketballDatabase, and emits deterministic inferred player-game rows."
+            ),
         },
         "auditSummary": {
             "realStatCoverage": {
@@ -1118,10 +1800,10 @@ def main():
             },
         },
         "notes": [
-            "The builder audits that 1986 live archive feeds are absent before doing any pack work.",
-            "Schedule/results currently come from a checked-in partial foundation snapshot rather than live archive imports.",
-            "Team universe definitions are aligned to the 23-team 1986-87 league and TheBasketballDatabase abbreviations.",
-            "Full schedule translation, roster generation, and player-game buildout remain future tasks.",
+            "The 23-team league map uses era-appropriate 1986-87 abbreviations, including GOS, SAN, UTH, and WAS.",
+            "Schedule/results span the full 943-game regular season with explicit source provenance.",
+            "Player-game rows are season-average weighted estimates and are disclosed as inferred coverage throughout the pack.",
+            "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable and replayable.",
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
@@ -1129,47 +1811,47 @@ def main():
 
     presentation = {
         "heroTitle": SEASON_LABEL,
-        "heroSubtitle": "Scaffolded 1986-87 league foundation with source-audit guardrails before the full build arrives.",
+        "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a full-season 1986-87 foundation built with honest provenance.",
         "featuredTeamId": FEATURED_TEAM_ID,
-        "featuredStars": [],
+        "featuredStars": featured_stars,
         "artDirection": {
-            "heroTone": "historic_rivalry",
-            "primaryPalette": ["#552583", "#007A33", "#C8102E"],
+            "heroTone": "prestige_rivalry",
+            "primaryPalette": ["#552583", "#007A33", "#CE1141"],
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "real_season", "label": "Play The Real Season", "description": "Reserved for the eventual full 1986-87 historical season build."},
-            {"mode": "historical_draft", "label": "Draft The Era", "description": "Reserved for a future late-80s full-league draftable player pool."},
-            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Reserved for the alternate-history 1986-87 branch once the core pack exists."},
+            {"mode": "real_season", "label": "Play The Real Season", "description": "Replay 1986-87 with the real full schedule and final scores."},
+            {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Bird-Magic-Jordan season from the full-league player pool."},
+            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1986-87 branch from the same foundation pack."},
         ],
     }
 
     summaries = {
-        "packSummary": "The 1986-87 builder is currently a source-aware scaffold: it locks the league to the correct 23-team universe, records missing live archive feeds, and anchors future work to a checked-in schedule/results snapshot.",
+        "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
         "featuredStorylines": [
-            "The scaffold preserves a late-80s league footprint instead of leaking later expansion-era franchises into future implementation work.",
-            "Missing 1986 live archive feeds are disclosed up front so downstream tasks cannot silently switch data lanes.",
-            "The checked-in schedule snapshot is explicitly partial, giving later tasks a safe seed without implying full regular-season coverage.",
+            "The Lakers headline the pack as the featured prestige lane, with Magic's MVP season and championship gravity defining the front door.",
+            "Boston and Los Angeles keep the Bird-Magic rivalry alive, while Chicago adds the Michael Jordan scoring-explosion path to the same board.",
+            "Every included game result is real, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth.",
         ],
         "teamSpotlights": [
-            {"teamId": f"{ENTITY_PREFIX}_lal", "summary": "Los Angeles remains a natural featured-team lane for later full-pack work once roster and schedule translation are implemented."},
-            {"teamId": f"{ENTITY_PREFIX}_bos", "summary": "Boston is preserved as a core late-80s East power in the corrected team universe scaffold."},
-            {"teamId": f"{ENTITY_PREFIX}_chi", "summary": "Chicago stays in the league foundation for later era-building without pulling in unrelated modern-season assumptions."},
-            {"teamId": f"{ENTITY_PREFIX}_hou", "summary": "Houston anchors part of the West structure in the corrected 23-team 1986-87 map."},
-            {"teamId": f"{ENTITY_PREFIX}_sea", "summary": "Seattle remains available for future pack storytelling inside the proper pre-expansion team set."},
+            {"teamId": f"{ENTITY_PREFIX}_lal", "summary": "The Lakers are the flagship prestige route, built around Magic, Kareem, Worthy, and the title-winning West power lane."},
+            {"teamId": f"{ENTITY_PREFIX}_bos", "summary": "Boston preserves the Bird side of the rivalry and keeps the East's marquee late-80s heavyweight intact."},
+            {"teamId": f"{ENTITY_PREFIX}_chi", "summary": "Chicago offers the Jordan explosion route and a different challenge path from the finished-title contenders."},
+            {"teamId": f"{ENTITY_PREFIX}_hou", "summary": "Houston keeps the Twin Towers-era West in play for anyone chasing a non-Lakers contender timeline."},
+            {"teamId": f"{ENTITY_PREFIX}_det", "summary": "Detroit brings the rising Bad Boys lane into a season that still sits just before their title breakthrough."},
         ],
         "modeSummaries": [
-            {"mode": "real_season", "summary": "Planned mode for replaying the eventual full 1986-87 season once source translation is implemented."},
-            {"mode": "historical_draft", "summary": "Planned mode for redrafting the completed late-80s player universe after the scaffold grows into a full pack."},
-            {"mode": "reimagined_season", "summary": "Planned mode for alternate-history play once the underlying 1986-87 pack data is complete."},
+            {"mode": "real_season", "summary": "Replay the real 1986-87 campaign from opening night through the final regular-season standings."},
+            {"mode": "historical_draft", "summary": "Reshuffle the full Bird-Magic-Jordan player pool and discover how the era changes under a custom draft."},
+            {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1986-87 universe while keeping the same real team and player foundation."},
         ],
         "auditSummary": manifest["auditSummary"],
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
         "auditNotes": [
-            "The builder intentionally stops after source audit and snapshot load because full 1986-87 schedule translation is not implemented yet.",
-            "The checked-in schedule/results source file is explicitly partial and should not be treated as full-season coverage.",
-            "Player-game coverage remains a future task and will require inferred or curated handling because live 1986 archive feeds are absent.",
+            "Live nbastats_1986 / pbpstats_1986 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
+            "Schedule and results cover the complete regular season, with accessible Wikipedia team pages used where available and a historical backfill completing missing coverage.",
+            "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate so the inferred coverage is machine-readable and user-visible.",
         ],
     }
 
@@ -1183,37 +1865,37 @@ def main():
         ],
         "challenges": [
             {
-                "challengeId": "featured_team_50_wins",
+                "challengeId": "lakers_repeat_pace",
                 "mode": "real_season",
                 "path": "featured_team_path",
-                "title": "Featured Team Benchmark",
-                "description": "Placeholder challenge for the eventual featured-team real-season path.",
+                "title": "Keep Showtime On Top",
+                "description": "Take the featured Lakers lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
                 "type": "season_wins_min",
-                "target": 50,
+                "target": 60,
                 "evaluation": "season_end",
-                "reward": "Historic Standard",
+                "reward": "Showtime Standard",
                 "required": False,
                 "featured": True,
             },
             {
-                "challengeId": "open_team_48_wins",
+                "challengeId": "east_challenger_55",
                 "mode": "real_season",
                 "path": "open_team_path",
-                "title": "Open Team Run",
-                "description": "Placeholder challenge for any-team real-season play once the 1986-87 pack is buildable.",
+                "title": "Break The Rivalry",
+                "description": "Choose any team and reach 55 wins while trying to interrupt the Bird-Magic prestige track.",
                 "type": "season_wins_min",
-                "target": 48,
+                "target": 55,
                 "evaluation": "season_end",
-                "reward": "Late-80s Contender",
+                "reward": "Era Disruptor",
                 "required": False,
                 "featured": False,
             },
             {
-                "challengeId": "draft_era_58_wins",
+                "challengeId": "draft_jordan_magic_bird",
                 "mode": "historical_draft",
                 "path": "alternate_history_success",
-                "title": "Build A 58-Win Team",
-                "description": "Placeholder draft challenge for the eventual 1986-87 full-league player pool.",
+                "title": "Draft The Superteam",
+                "description": "Redraft 1986-87 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
                 "type": "season_wins_min",
                 "target": 58,
                 "evaluation": "season_end",
@@ -1225,8 +1907,8 @@ def main():
                 "challengeId": "reimagined_title",
                 "mode": "reimagined_season",
                 "path": "reshuffled_league",
-                "title": "Win The Reimagined League",
-                "description": "Placeholder title challenge for the eventual reshuffled 1986-87 universe.",
+                "title": "Rewrite 1986-87",
+                "description": "Spin the league into an alternate-history branch and win the title with the same trust-forward data disclosures intact.",
                 "type": "win_championship",
                 "target": True,
                 "evaluation": "season_end",
@@ -1260,6 +1942,8 @@ def main():
                 "playerGameStats": len(player_game_stats),
                 "realSeasonStats": real_stat_players,
                 "zeroGamePlayers": zero_game_players,
+                "wikipediaScheduleGames": schedule_results_snapshot["coverage"]["wikipediaGamesMatched"],
+                "backfilledScheduleGames": schedule_results_snapshot["coverage"]["backfilledGames"],
             },
             indent=2,
         )

@@ -1,0 +1,3017 @@
+[
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_doc_rivers_470",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_kevin_willis_788",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_dominique_wilkins_1122",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_randy_wittman_1456",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_tree_rollins_78014",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_jon_koncak_402",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_cliff_levingston_77377",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_john_battle_174",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_mike_mcgee_77530",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_antoine_carr_156",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_spud_webb_892",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_gus_williams_78549",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_scott_hastings_76968",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_atl",
+    "playerId": "nba_1987_cedric_henderson_76990",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_kevin_mchale_1450",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_larry_bird_1449",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_robert_parish_305",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_dennis_johnson_77141",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_danny_ainge_76017",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_jerry_sichting_78146",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_fred_roberts_122",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_greg_kite_1123",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_darren_daye_76543",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_sam_vincent_78417",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_rick_carlisle_76342",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_conner_henry_77002",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_scott_wedman_78482",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_bill_walton_78450",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_david_thirdkill_78314",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_bos",
+    "playerId": "nba_1987_andre_turner_78377",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_michael_jordan_893",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_charles_oakley_891",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_john_paxson_77820",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_dave_corzine_76453",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_earl_cureton_940",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_gene_banks_76093",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_brad_sellers_78110",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_sedale_threatt_9",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_elston_turner_78378",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_mike_brown_1479",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_granville_waiters_78430",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_pete_myers_939",
+    "rosterRole": "rotation",
+    "depthTag": "SG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_chi",
+    "playerId": "nba_1987_fred_cofield_76411",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_ron_harper_166",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_hot_rod_williams_73",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_brad_daugherty_921",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_phil_hubbard_77071",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_john_bagley_76082",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_craig_ehlo_378",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_mark_west_770",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_mel_turpin_78386",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_ben_poquette_77873",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_scooter_mccray_77518",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_keith_lee_77361",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_mark_price_899",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_cle",
+    "playerId": "nba_1987_johnny_newman_271",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_james_donaldson_76583",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_rolando_blackman_76176",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_sam_perkins_64",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_mark_aguirre_76016",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_derek_harper_157",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_brad_davis_76516",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_detlef_schrempf_96",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_roy_tarpley_78293",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_al_wood_78610",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_bill_wennington_82",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_uwe_blab_76172",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_dennis_nutt_77738",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_dal",
+    "playerId": "nba_1987_myron_jackson_77105",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_alex_english_76673",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_lafayette_lever_77376",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_darrell_walker_78437",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_bill_hanzlik_76944",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_t_r_dunn_76618",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_mike_evans_76686",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_wayne_cooper_76441",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_dan_schayes_7",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_blair_rasmussen_78656",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_mark_alarie_76019",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_mo_martin_77476",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_otis_smith_78198",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_calvin_natt_77691",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_den",
+    "playerId": "nba_1987_pete_williams_78566",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_isiah_thomas_78318",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_bill_laimbeer_100263",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_adrian_dantley_76504",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_joe_dumars_247",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_vinnie_johnson_77167",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_sidney_green_76876",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_john_salley_927",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_rick_mahorn_328",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_dennis_rodman_23",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_tony_campbell_76338",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_chuck_nevitt_77707",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_jeff_taylor_78299",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_cozell_mcqueen_77565",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_det",
+    "playerId": "nba_1987_john_schweitz_78093",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_sleepy_floyd_76726",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_joe_barry_carroll_76353",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_chris_mullin_904",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_larry_smith_78195",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_terry_teagle_78304",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_rod_higgins_77019",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_greg_ballard_76091",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_ben_mcdonald_77524",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_jerome_whitehead_78516",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_purvis_short_78139",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_perry_moss_77654",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_clinton_smith_78181",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_chris_washburn_78463",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_gos",
+    "playerId": "nba_1987_kevin_henderson_76994",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_rodney_mccray_1622",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_hakeem_olajuwon_165",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_robert_reid_77936",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_jim_petersen_77839",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_dirk_minniefield_77609",
+    "rosterRole": "rotation",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_ralph_sampson_78055",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_allen_leavell_77353",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_steve_harris_76960",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_mitchell_wiggins_78523",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_lewis_lloyd_77395",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_buck_johnson_77130",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_dave_feitl_76703",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_hou",
+    "playerId": "nba_1987_richard_anderson_76045",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_vern_fleming_313",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_steve_stipanovich_78257",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_chuck_person_456",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_john_long_1381",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_herb_williams_1006",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_wayman_tisdale_47",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_clint_richardson_77950",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_clark_kellogg_77236",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_stuart_gray_76861",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_kyle_macy_77438",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_michael_brooks_76266",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_ron_anderson_76046",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_walker_russell_78048",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_peter_verhoeven_78414",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_ind",
+    "playerId": "nba_1987_greg_dreiling_1068",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_michael_cage_262",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_benoit_benjamin_104",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_cedric_maxwell_77487",
+    "rosterRole": "rotation",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_mike_woodson_78614",
+    "rosterRole": "rotation",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_darnell_valentine_78395",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_larry_drew_76599",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_rory_white_78512",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_lancaster_gordon_76834",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_kurt_nimphius_77719",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_quintin_dailey_76497",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_tim_kempton_1118",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_kenny_fields_76713",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_geoff_huston_77087",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_marques_johnson_77160",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_steffond_johnson_77166",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lac",
+    "playerId": "nba_1987_dwayne_polee_77866",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_james_worthy_1460",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_byron_scott_2",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_magic_johnson_77142",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_michael_cooper_76444",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_kareem_abdul_jabbar_76003",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_a_c_green_920",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_kurt_rambis_77905",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_billy_thompson_1631",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_frank_brickowski_783",
+    "rosterRole": "bench",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_wes_matthews_77484",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_adrian_branch_76237",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_lal",
+    "playerId": "nba_1987_mike_smrek_1091",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_jack_sikma_78149",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_terry_cummings_187",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_paul_pressey_77879",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_craig_hodges_77034",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_john_lucas_77419",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_ricky_pierce_894",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_sidney_moncrief_77626",
+    "rosterRole": "starter",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_jerry_reynolds_77946",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_randy_breuer_76247",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_junior_bridgeman_76252",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_keith_smith_78192",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_paul_mokeski_77623",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_dudley_bradley_76231",
+    "rosterRole": "bench",
+    "depthTag": "PG8",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_scott_skiles_101",
+    "rosterRole": "bench",
+    "depthTag": "PG9",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_hank_mcdowell_77527",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_don_collins_76418",
+    "rosterRole": "bench",
+    "depthTag": "PG10",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_mike_glenn_76822",
+    "rosterRole": "bench",
+    "depthTag": "PG11",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_marvin_webster_78481",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_mil",
+    "playerId": "nba_1987_jerome_henderson_76992",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_buck_williams_433",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_orlando_woolridge_78615",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_tony_brown_76268",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_mike_gminski_76826",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_leon_wood_78611",
+    "rosterRole": "rotation",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_dwayne_washington_78465",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_albert_king_77263",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_ben_coleman_76412",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_kevin_mckenna_77541",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_jeff_turner_78381",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_ray_williams_78571",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_james_bailey_76085",
+    "rosterRole": "rotation",
+    "depthTag": "SF8",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_pace_mannion_77456",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_darryl_dawkins_76539",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_chris_engler_76670",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_otis_birdsong_76170",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_njn",
+    "playerId": "nba_1987_mike_wilson_78581",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_gerald_wilkins_786",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_patrick_ewing_121",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_gerald_henderson_76993",
+    "rosterRole": "rotation",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_bill_cartwright_76362",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_rory_sparrow_600009",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_trent_tucker_78375",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_kenny_walker_78440",
+    "rosterRole": "rotation",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_louis_orr_77770",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_pat_cummings_76483",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_chris_mcnealy_77560",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_jawann_oldham_77757",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_eddielee_wilkins_78534",
+    "rosterRole": "rotation",
+    "depthTag": "C5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_bob_thornton_738",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_bernard_king_77264",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_stewart_granger_76847",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_brad_wright_78620",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_bill_martin_77481",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_nyk",
+    "playerId": "nba_1987_mckinley_singleton_78162",
+    "rosterRole": "bench",
+    "depthTag": "SF8",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_tim_mccormick_77516",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_charles_barkley_787",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_maurice_cheeks_76385",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_roy_hinson_77030",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_julius_erving_76681",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_david_wingate_766",
+    "rosterRole": "rotation",
+    "depthTag": "SG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_cliff_t_robinson_77986",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_steve_colter_306",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_andrew_toney_78351",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_danny_vranes_78423",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_world_free_76753",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_kenny_green_76869",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_jeff_ruland_78041",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_mark_mcnamara_77558",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phl",
+    "playerId": "nba_1987_jim_lampley_77333",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_jay_humphries_77081",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_walter_davis_1453",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_larry_nance_77685",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_ed_pinckney_291",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_alvan_adams_76011",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_william_bedford_76138",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_kenny_gattison_930",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_nick_vanos_78407",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_rafael_addison_912",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_james_edwards_229",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_mike_sanders_78059",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_jeff_hornacek_204",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_bernard_thompson_78323",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_phx",
+    "playerId": "nba_1987_grant_gondrezick_76831",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_clyde_drexler_17",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_kiki_vandeweghe_78404",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_terry_porter_345",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_steve_johnson_77134",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_jerome_kersey_760",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_jim_paxson_77819",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_caldwell_jones_77175",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_kenny_carr_76350",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_kevin_duckworth_404",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_michael_holton_77047",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_fernando_martin_77472",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_sam_bowie_76217",
+    "rosterRole": "rotation",
+    "depthTag": "C5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_perry_young_78635",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_joe_binion_76167",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_por",
+    "playerId": "nba_1987_ron_rowan_78027",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_otis_thorpe_901",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_reggie_theus_78310",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_eddie_johnson_698",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_lasalle_thompson_78",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_terry_tyler_78390",
+    "rosterRole": "rotation",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_derek_smith_78183",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_joe_kleine_170",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_harold_pressley_77881",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_mark_olberding_77756",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_othell_wilson_78578",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_brook_steppe_78250",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_johnny_rogers_78007",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_jerry_eaves_76632",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_bruce_douglas_76588",
+    "rosterRole": "rotation",
+    "depthTag": "PG7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sac",
+    "playerId": "nba_1987_franklin_edwards_76641",
+    "rosterRole": "rotation",
+    "depthTag": "PG8",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_alvin_robertson_926",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_david_greenwood_76881",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_artis_gilmore_600014",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_walter_berry_76158",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_jon_sundvold_78279",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_johnny_moore_77633",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_mike_mitchell_77615",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_tyrone_corbin_895",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_mychal_thompson_78331",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_johnny_dawkins_1008",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_ed_nealy_77697",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_anthony_jones_77173",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_larry_krystkowiak_1474",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_forrest_mckenzie_77542",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_san",
+    "playerId": "nba_1987_mike_brittain_76260",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_xavier_mcdaniel_1365",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_tom_chambers_1472",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_dale_ellis_107",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_alton_lister_175",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_nate_mcmillan_203",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_danny_young_78633",
+    "rosterRole": "rotation",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_clemon_johnson_77136",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_eddie_johnson_77144",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_mike_phelps_77852",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_maurice_lucas_77420",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_kevin_williams_78556",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_russ_schoene_78087",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_terence_stansbury_78241",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_sea",
+    "playerId": "nba_1987_curtis_kitchen_77280",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_karl_malone_252",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_mark_eaton_76631",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_thurl_bailey_1847",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_rickey_green_76874",
+    "rosterRole": "rotation",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_kelly_tripucka_78369",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_john_stockton_304",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_darrell_griffith_76890",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_bob_hansen_76942",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_kent_benson_76154",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_marc_iavaroni_77092",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_carey_scurry_78102",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_uth",
+    "playerId": "nba_1987_dell_curry_209",
+    "rosterRole": "rotation",
+    "depthTag": "SG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_jeff_malone_117",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_moses_malone_77449",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_terry_catledge_767",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_ennis_whatley_941",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_john_williams_78554",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_charles_jones_279",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_manute_bol_76195",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_darwin_cook_76435",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_michael_adams_149",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_jay_vincent_78418",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_dan_roundfield_78025",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_frank_johnson_77146",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_jay_murphy_77670",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  },
+  {
+    "seasonId": "nba_1987_historic",
+    "teamId": "nba_1987_was",
+    "playerId": "nba_1987_mike_o_koren_77754",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1986-10-31",
+    "endDate": "1987-04-19"
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "packId": "nba_1987_full_season_v1",
+  "version": 1,
+  "challengeGroups": [
+    {
+      "groupId": "real_season_paths",
+      "label": "Play The Real Season",
+      "mode": "real_season"
+    },
+    {
+      "groupId": "draft_the_era_paths",
+      "label": "Draft The Era",
+      "mode": "historical_draft"
+    },
+    {
+      "groupId": "reimagined_paths",
+      "label": "Reimagined Season",
+      "mode": "reimagined_season"
+    }
+  ],
+  "challenges": [
+    {
+      "challengeId": "lakers_repeat_pace",
+      "mode": "real_season",
+      "path": "featured_team_path",
+      "title": "Keep Showtime On Top",
+      "description": "Take the featured Lakers lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
+      "type": "season_wins_min",
+      "target": 60,
+      "evaluation": "season_end",
+      "reward": "Showtime Standard",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "east_challenger_55",
+      "mode": "real_season",
+      "path": "open_team_path",
+      "title": "Break The Rivalry",
+      "description": "Choose any team and reach 55 wins while trying to interrupt the Bird-Magic prestige track.",
+      "type": "season_wins_min",
+      "target": 55,
+      "evaluation": "season_end",
+      "reward": "Era Disruptor",
+      "required": false,
+      "featured": false
+    },
+    {
+      "challengeId": "draft_jordan_magic_bird",
+      "mode": "historical_draft",
+      "path": "alternate_history_success",
+      "title": "Draft The Superteam",
+      "description": "Redraft 1986-87 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
+      "type": "season_wins_min",
+      "target": 58,
+      "evaluation": "season_end",
+      "reward": "Era Architect",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "reimagined_title",
+      "mode": "reimagined_season",
+      "path": "reshuffled_league",
+      "title": "Rewrite 1986-87",
+      "description": "Spin the league into an alternate-history branch and win the title with the same trust-forward data disclosures intact.",
+      "type": "win_championship",
+      "target": true,
+      "evaluation": "season_end",
+      "reward": "Alternate History Champion",
+      "required": false,
+      "featured": true
+    }
+  ]
+}
