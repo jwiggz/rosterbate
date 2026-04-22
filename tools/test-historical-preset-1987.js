@@ -23,13 +23,11 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function extractObjectLiteralBlock(source, targetPackId, label) {
-  const marker = new RegExp(`\\{\\s*packId:\\s*'${escapeRegExp(targetPackId)}'`);
-  const start = source.search(marker);
-  assert.ok(start >= 0, `${label} is missing the ${targetPackId} fallback entry`);
-
+function extractObjectLiteralFromIndex(source, start, label) {
   let index = source.indexOf('{', start);
-  assert.ok(index >= 0, `${label} fallback entry is malformed`);
+  assert.ok(index >= 0, `${label} is malformed`);
+
+  const objectStart = index;
 
   let depth = 0;
   let inString = false;
@@ -64,12 +62,30 @@ function extractObjectLiteralBlock(source, targetPackId, label) {
     if (char === '}') {
       depth -= 1;
       if (depth === 0) {
-        return source.slice(source.indexOf('{', start), index + 1);
+        return source.slice(objectStart, index + 1);
       }
     }
   }
 
-  throw new Error(`${label} fallback entry could not be fully extracted`);
+  throw new Error(`${label} could not be fully extracted`);
+}
+
+function extractObjectLiteralBlock(source, targetPackId, label) {
+  const marker = new RegExp(`\\bpackId\\s*:\\s*['"]${escapeRegExp(targetPackId)}['"]`);
+  for (let start = source.indexOf('{'); start >= 0; start = source.indexOf('{', start + 1)) {
+    const candidate = extractObjectLiteralFromIndex(source, start, `${label} candidate`);
+    if (marker.test(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new Error(`${label} is missing the ${targetPackId} fallback entry`);
+}
+
+function extractObjectLiteralFromMarker(source, marker, label) {
+  const match = marker.exec(source);
+  assert.ok(match, `${label} is missing`);
+  return extractObjectLiteralFromIndex(source, match.index, label);
 }
 
 const catalog = readJson('historical-packs/catalog.json');
@@ -151,9 +167,14 @@ assert.match(historicUniverseFallbackEntry, /shortLabel:\s*'1986-87'/, 'historic
 assert.match(historicUniverseFallbackEntry, /focusTeamName:\s*'Los Angeles Lakers'/, 'historic-universe fallback catalog should preserve the Lakers spotlight');
 
 const rosterbateSeasonSource = readText('rosterbate-season.html');
-assert.match(
+const shortLabelMapBlock = extractObjectLiteralFromMarker(
   rosterbateSeasonSource,
-  /nba_1987_full_season_v1:'1986-87'/,
+  /const\s+known\s*=\s*\{/,
+  'season page short-label map'
+);
+assert.match(
+  shortLabelMapBlock,
+  /nba_1987_full_season_v1\s*:\s*['"]1986-87['"]/,
   'season page short-label mapping should include 1986-87'
 );
 
