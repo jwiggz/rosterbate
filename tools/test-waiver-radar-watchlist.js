@@ -194,8 +194,8 @@ assert.equal(watchedSignals.radarReason.split(/\r?\n/).length, 1);
 assert.equal(watchedSignals.fitReason.split(/\r?\n/).length, 1);
 assert.ok(watchedSignals.radarReason.trim().length > 0);
 assert.ok(watchedSignals.fitReason.trim().length > 0);
-assert.ok(watchedSignals.radarReason.trim().length <= 60);
-assert.ok(watchedSignals.fitReason.trim().length <= 60);
+assert.ok(watchedSignals.radarReason.trim().split(/\s+/).length <= 8);
+assert.ok(watchedSignals.fitReason.trim().split(/\s+/).length <= 8);
 
 const recentSignals = context.getWaiverRowSignals(radar[2].player);
 assert.equal(recentSignals.recentDrop, true);
