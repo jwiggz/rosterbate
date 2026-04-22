@@ -33,6 +33,8 @@ ERA_KEY = "1980s"
 ERA_TAGS = ["1980s", "Late 80s", "Historic Season"]
 SOURCE_PROFILE = "historical_foundation_snapshot"
 FEATURED_TEAM_ID = f"{ENTITY_PREFIX}_lal"
+SOURCE_NBASTATS_KEY = "nbastats_1986"
+SOURCE_PBPSTATS_KEY = "pbpstats_1986"
 
 LIST_DATA_URL = "https://raw.githubusercontent.com/shufinskiy/nba_data/main/list_data.txt"
 TEAM_PAGE_URL = "https://thebasketballdatabase.com/{season}{abbr}RegularSeasonBoxScore.html"
@@ -645,11 +647,11 @@ def main():
         team_by_abbr[team_copy["abbr"]] = team_copy
 
     list_data_urls = parse_list_data_urls()
-    if "nbastats_2000" not in list_data_urls or "pbpstats_2000" not in list_data_urls:
+    if SOURCE_NBASTATS_KEY not in list_data_urls or SOURCE_PBPSTATS_KEY not in list_data_urls:
         raise RuntimeError("Required 1986-87 season archives were not found in the source dataset index.")
 
-    pbp_rows = fetch_tar_csv_rows(list_data_urls["nbastats_2000"], "nbastats_2000")
-    possession_rows = fetch_tar_csv_rows(list_data_urls["pbpstats_2000"], "pbpstats_2000")
+    pbp_rows = fetch_tar_csv_rows(list_data_urls[SOURCE_NBASTATS_KEY], SOURCE_NBASTATS_KEY)
+    possession_rows = fetch_tar_csv_rows(list_data_urls[SOURCE_PBPSTATS_KEY], SOURCE_PBPSTATS_KEY)
 
     game_dates = {}
     for row in possession_rows:
@@ -682,7 +684,7 @@ def main():
             raise RuntimeError(f"Source team abbreviation `{abbr}` is not defined in the 1986-87 team map.")
         team_by_numeric[team_numeric_id] = team_by_abbr[abbr]
 
-    if len({team["teamId"] for team in team_by_numeric.values()}) != 29:
+    if len({team["teamId"] for team in team_by_numeric.values()}) != 23:
         raise RuntimeError(
             f"Expected 23 teams from the 1986-87 source rows, found {len({team['teamId'] for team in team_by_numeric.values()})}."
         )
