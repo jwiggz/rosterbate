@@ -74,6 +74,27 @@
     "reimaginedUrl": "rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1987_full_season_v1"
   },
   {
+    "packId": "nba_1993_full_season_v1",
+    "sport": "nba",
+    "seasonLabel": "1992-93 NBA Historic Season",
+    "shortLabel": "1992-93",
+    "era": "1990s",
+    "availability": "playable",
+    "statusLabel": "Playable Now",
+    "significanceLabel": "First Three-Peat Prestige",
+    "significanceTone": "dynasty",
+    "completenessLabel": "Playable foundation",
+    "completenessPercent": 18,
+    "tagline": "Jordan. Barkley. Pippen. One first-three-peat universe.",
+    "summary": "A playable 1992-93 historical foundation built around the Bulls' first three-peat push and the Suns' Finals-era challenge.",
+    "whyItMatters": "This is the archive's premium early-1990s tentpole: Jordan's title-era gravity, Barkley's challenger Suns, and a player pool that bridges 1980s prestige to 1995-96 dynasty apex.",
+    "focusTeamName": "Chicago Bulls",
+    "seasonUrl": "rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1",
+    "simUrl": "rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1",
+    "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1",
+    "reimaginedUrl": "rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1"
+  },
+  {
     "packId": "nba_2001_full_season_v1",
     "sport": "nba",
     "seasonLabel": "2000-01 NBA Historic Season",

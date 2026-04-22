@@ -310,6 +310,11 @@ def split_name(display_name):
     return tokens[0], " ".join(tokens[1:])
 
 
+def canonical_team_code_from_team_id(team_id):
+    suffix = str(team_id or "").strip().split("_")[-1]
+    return suffix.upper() if suffix else ""
+
+
 def map_position_code(raw_position):
     mapping = {
         "1": "PG",
@@ -1475,10 +1480,52 @@ def recompute_per_game_from_totals(totals, games):
 
 def sanitize_player_source_record(player):
     cleaned = json.loads(json.dumps(player))
+    cleaned["playerId"] = str(cleaned.get("playerId") or "").strip()
+    cleaned["seasonId"] = str(cleaned.get("seasonId") or SEASON_ID).strip() or SEASON_ID
+    cleaned["displayName"] = str(cleaned.get("displayName") or "").strip()
+    cleaned["teamId"] = str(cleaned.get("teamId") or "").strip()
+    cleaned["primaryPosition"] = map_position_code(cleaned.get("primaryPosition"))
+
+    first_name = str(cleaned.get("firstName") or "").strip()
+    last_name = str(cleaned.get("lastName") or "").strip()
+    if not first_name or not last_name:
+        inferred_first_name, inferred_last_name = split_name(cleaned["displayName"])
+        first_name = first_name or inferred_first_name
+        last_name = last_name or inferred_last_name
+    cleaned["firstName"] = first_name
+    cleaned["lastName"] = last_name
+
+    secondary = list(cleaned.get("secondaryPositions") or [])
+    cleaned["secondaryPositions"] = secondary or secondary_positions(cleaned["primaryPosition"])
+    cleaned["status"] = str(cleaned.get("status") or "active").strip() or "active"
+    cleaned["draftEligible"] = bool(cleaned.get("draftEligible", True))
+
+    team_code = canonical_team_code_from_team_id(cleaned["teamId"])
+    if not cleaned.get("bio"):
+        cleaned["bio"] = (
+            f"{cleaned['displayName']} belongs to the {SOURCE_SEASON} player pool with real season totals "
+            f"and inferred game-by-game coverage anchored to the {team_code or 'primary-team'} lane."
+        )
+
+    external_refs = dict(cleaned.get("externalRefs") or {})
+    if cleaned["playerId"] and not external_refs.get("sourcePlayerId"):
+        external_refs["sourcePlayerId"] = cleaned["playerId"]
+    if cleaned["playerId"] and not external_refs.get("theBasketballDatabasePage"):
+        external_refs["theBasketballDatabasePage"] = f"{cleaned['playerId']}RegularSeasonBoxScore.html"
+    if team_code and not external_refs.get("sourceTeamCode") and not external_refs.get("sourceTeamCodes"):
+        external_refs["sourceTeamCodes"] = [team_code]
+    cleaned["externalRefs"] = external_refs
+
     season_stats = dict(cleaned.get("seasonStats") or {})
     totals = dict(season_stats.get("totals") or {})
     games = max(0, min(82, to_int(season_stats.get("games"))))
     games_started = max(0, min(games, to_int(season_stats.get("gamesStarted"))))
+    if not season_stats.get("source"):
+        season_stats["source"] = "historical_curated_foundation_snapshot"
+    if not season_stats.get("sourceSeason"):
+        season_stats["sourceSeason"] = SOURCE_SEASON
+    if team_code and not season_stats.get("sourceTeamCode"):
+        season_stats["sourceTeamCode"] = team_code
     season_stats["games"] = games
     season_stats["gamesStarted"] = games_started
     season_stats["totals"] = totals
