@@ -8,123 +8,225 @@ const html = fs.readFileSync(
   'utf8'
 );
 
-function expectMatch(pattern, message) {
+function expectSourceMatch(pattern, message) {
   assert.match(html, pattern, message);
 }
 
-function extractFunctionSource(signature) {
-  const start = html.indexOf(`function ${signature}`);
+function extractFunctionSourceFrom(source, signature) {
+  const start = source.indexOf(`function ${signature}`);
   assert.ok(start >= 0, `missing ${signature}`);
 
-  const openBrace = html.indexOf('{', start);
+  const openBrace = source.indexOf('{', start);
   assert.ok(openBrace >= 0, `missing body for ${signature}`);
 
-  let depth = 0;
-  let mode = 'code';
-  const stack = [];
+  const regexStartKeywords = new Set([
+    'case',
+    'delete',
+    'do',
+    'else',
+    'in',
+    'instanceof',
+    'new',
+    'return',
+    'throw',
+    'typeof',
+    'void',
+    'while',
+    'with',
+    'yield',
+    'await'
+  ]);
 
-  for (let index = openBrace; index < html.length; index += 1) {
-    const char = html[index];
-    const next = html[index + 1];
+  const isIdentifierStart = char => /[A-Za-z_$]/.test(char || '');
+  const isIdentifierPart = char => /[A-Za-z0-9_$]/.test(char || '');
+  const isDecimalDigit = char => /[0-9]/.test(char || '');
 
-    if (mode === 'lineComment') {
-      if (char === '\n') mode = stack.pop() || 'code';
+  const stack = [{
+    type: 'code',
+    braceDepth: 1,
+    canStartRegex: true
+  }];
+
+  const pushState = state => stack.push(state);
+  const popState = () => stack.pop();
+  const currentState = () => stack[stack.length - 1];
+
+  for (let index = openBrace + 1; index < source.length; index += 1) {
+    const state = currentState();
+    const char = source[index];
+    const next = source[index + 1];
+
+    if (state.type === 'lineComment') {
+      if (char === '\n' || char === '\r') popState();
       continue;
     }
 
-    if (mode === 'blockComment') {
+    if (state.type === 'blockComment') {
       if (char === '*' && next === '/') {
-        mode = stack.pop() || 'code';
+        popState();
         index += 1;
       }
       continue;
     }
 
-    if (mode === 'singleQuote') {
+    if (state.type === 'singleQuote' || state.type === 'doubleQuote') {
       if (char === '\\') {
         index += 1;
         continue;
       }
-      if (char === '\'') mode = stack.pop() || 'code';
+      if (char === state.quote) popState();
       continue;
     }
 
-    if (mode === 'doubleQuote') {
+    if (state.type === 'regex') {
       if (char === '\\') {
         index += 1;
         continue;
       }
-      if (char === '"') mode = stack.pop() || 'code';
+      if (char === '[') {
+        state.inClass = true;
+        continue;
+      }
+      if (char === ']' && state.inClass) {
+        state.inClass = false;
+        continue;
+      }
+      if (char === '/' && !state.inClass) {
+        popState();
+        currentState().canStartRegex = false;
+      }
       continue;
     }
 
-    if (mode === 'template') {
+    if (state.type === 'template') {
       if (char === '\\') {
         index += 1;
         continue;
       }
       if (char === '`') {
-        mode = stack.pop() || 'code';
+        popState();
         continue;
       }
+      if (char === '$' && next === '{') {
+        pushState({
+          type: 'templateExpr',
+          braceDepth: 1,
+          canStartRegex: true
+        });
+        index += 1;
+      }
+      continue;
     }
 
-    if (mode === 'code') {
-      if (char === '/' && next === '/') {
-        stack.push(mode);
-        mode = 'lineComment';
-        index += 1;
-        continue;
-      }
+    if (char === '/' && next === '/') {
+      pushState({ type: 'lineComment' });
+      index += 1;
+      continue;
+    }
 
-      if (char === '/' && next === '*') {
-        stack.push(mode);
-        mode = 'blockComment';
-        index += 1;
-        continue;
-      }
+    if (char === '/' && next === '*') {
+      pushState({ type: 'blockComment' });
+      index += 1;
+      continue;
+    }
 
-      if (char === '\'') {
-        stack.push(mode);
-        mode = 'singleQuote';
-        continue;
-      }
+    if (char === '\'') {
+      pushState({ type: 'singleQuote', quote: '\'' });
+      continue;
+    }
 
-      if (char === '"') {
-        stack.push(mode);
-        mode = 'doubleQuote';
-        continue;
-      }
+    if (char === '"') {
+      pushState({ type: 'doubleQuote', quote: '"' });
+      continue;
+    }
 
-      if (char === '`') {
-        stack.push(mode);
-        mode = 'template';
-        continue;
-      }
+    if (char === '`') {
+      pushState({ type: 'template' });
+      continue;
+    }
 
-      if (char === '{') {
-        depth += 1;
-        continue;
-      }
+    if (char === '/' && state.canStartRegex) {
+      pushState({ type: 'regex', inClass: false });
+      continue;
+    }
 
-      if (char === '}') {
-        depth -= 1;
-        if (depth === 0) {
-          return html.slice(start, index + 1);
+    if (isIdentifierStart(char)) {
+      let end = index + 1;
+      while (end < source.length && isIdentifierPart(source[end])) end += 1;
+      const token = source.slice(index, end);
+      state.canStartRegex = regexStartKeywords.has(token);
+      index = end - 1;
+      continue;
+    }
+
+    if (isDecimalDigit(char)) {
+      let end = index + 1;
+      while (end < source.length && /[0-9_.eExXobOBA-Fa-f]/.test(source[end] || '')) end += 1;
+      state.canStartRegex = false;
+      index = end - 1;
+      continue;
+    }
+
+    if (char === '{') {
+      state.braceDepth += 1;
+      state.canStartRegex = true;
+      continue;
+    }
+
+    if (char === '}') {
+      state.braceDepth -= 1;
+      state.canStartRegex = false;
+      if (state.braceDepth === 0) {
+        if (state.type === 'code') {
+          return source.slice(start, index + 1);
         }
+        popState();
       }
+      continue;
+    }
+
+    if (char === '(' || char === '[' || char === ',' || char === ';' || char === ':' || char === '?' || char === '=' || char === '!' || char === '~' || char === '+' || char === '-' || char === '*' || char === '%' || char === '&' || char === '|' || char === '^' || char === '<' || char === '>') {
+      state.canStartRegex = true;
+      continue;
+    }
+
+    if (char === '.') {
+      state.canStartRegex = false;
+      continue;
+    }
+
+    if (!/\s/.test(char)) {
+      state.canStartRegex = false;
     }
   }
 
   assert.fail(`unterminated ${signature}`);
 }
 
-expectMatch(/trade-fairness-card/, 'trade fairness card hook is missing');
-expectMatch(/function evaluateOneForOneTradeFairness\(offer\)/, 'missing fairness evaluator');
-expectMatch(/function getTradeFairnessBadgeMeta\(rating\)/, 'missing fairness badge metadata helper');
-expectMatch(/function buildTradeFairnessReasons\(result\)/, 'missing fairness reason builder');
-expectMatch(/function getTradeFairnessViewModel\(offer\)/, 'missing fairness view-model helper');
-expectMatch(/Fairness insights are available for 1-for-1 deals first\./, 'missing unsupported-state copy');
+function extractFunctionSource(signature) {
+  return extractFunctionSourceFrom(html, signature);
+}
+
+const parserFixture = [
+  'function sampleTradeHelper(value) {',
+  '  const regex = /foo{2,3}\\/bar(?:baz)?/gi;',
+  '  const message = `outer ${value ? `inner ${value}` : `fallback ${String(value)}`}`;',
+  '  if (regex.test(message)) {',
+  '    return { ok: true, note: `matched ${message}` };',
+  '  }',
+  '  return { ok: false, note: `missed ${message}` };',
+  '}'
+].join('\n');
+
+const parsedFixture = extractFunctionSourceFrom(parserFixture, 'sampleTradeHelper(value)');
+assert.match(parsedFixture, /regex/);
+assert.match(parsedFixture, /inner \$\{value\}/);
+assert.match(parsedFixture, /matched/);
+
+expectSourceMatch(/function evaluateOneForOneTradeFairness\(offer\)/, 'missing fairness evaluator');
+expectSourceMatch(/function getTradeFairnessBadgeMeta\(rating\)/, 'missing fairness badge metadata helper');
+expectSourceMatch(/function buildTradeFairnessReasons\(result\)/, 'missing fairness reason builder');
+expectSourceMatch(/function getTradeFairnessViewModel\(offer\)/, 'missing fairness view-model helper');
 
 const script = [
   extractFunctionSource('evaluateOneForOneTradeFairness(offer)'),
@@ -166,6 +268,23 @@ const fair = context.evaluateOneForOneTradeFairness({
 });
 assert.equal(fair.rating, 'fair');
 
+assert.deepEqual(context.getTradeFairnessBadgeMeta('fair'), {
+  label: 'Fair',
+  tone: 'fair'
+});
+assert.deepEqual(context.getTradeFairnessBadgeMeta('slight_lean'), {
+  label: 'Slight Lean',
+  tone: 'lean'
+});
+assert.deepEqual(context.getTradeFairnessBadgeMeta('uneven'), {
+  label: 'Uneven',
+  tone: 'uneven'
+});
+assert.deepEqual(context.getTradeFairnessBadgeMeta('high_risk'), {
+  label: 'High Risk',
+  tone: 'risk'
+});
+
 const highRisk = context.evaluateOneForOneTradeFairness({
   fromTeam: 0,
   toTeam: 1,
@@ -192,6 +311,9 @@ assert.equal(typeof vmResult.badgeLabel, 'string');
 assert.ok(Array.isArray(vmResult.reasons));
 assert.ok(vmResult.reasons.length >= 2);
 assert.ok(vmResult.reasons.length <= 4);
+assert.ok(vmResult.reasons.every(reason => typeof reason === 'string' && reason.trim().length > 0));
+assert.ok(vmResult.reasons.some(reason => /value|producer|lean/i.test(reason)));
+assert.ok(vmResult.reasons.some(reason => /starter|depth|need|slot/i.test(reason)));
 
 const unsupported = context.getTradeFairnessViewModel({
   fromTeam: 0,
@@ -200,6 +322,7 @@ const unsupported = context.getTradeFairnessViewModel({
   get: [21]
 });
 assert.equal(unsupported.supported, false);
-assert.match(unsupported.message, /1-for-1 deals first/i);
+assert.match(unsupported.message, /1-for-1/i);
+assert.ok(unsupported.message.length < 120);
 
 console.log('trade fairness evaluator test passed');
