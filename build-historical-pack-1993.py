@@ -31,10 +31,10 @@ REGULAR_SEASON_START = "1992-11-06"
 REGULAR_SEASON_END = "1993-04-25"
 SOURCE_MODE = "foundation_snapshot"
 ENTITY_PREFIX = "nba_1993"
-ERA_KEY = "1980s"
-ERA_TAGS = ["1980s", "Bird-Magic Era", "Historic Season"]
+ERA_KEY = "1990s"
+ERA_TAGS = ["1990s", "First Three-Peat Prestige", "Historic Season"]
 SOURCE_PROFILE = "historical_curated"
-FEATURED_TEAM_ID = f"{ENTITY_PREFIX}_lal"
+FEATURED_TEAM_ID = f"{ENTITY_PREFIX}_chi"
 SOURCE_NBASTATS_KEY = "nbastats_1992"
 SOURCE_PBPSTATS_KEY = "pbpstats_1992"
 HTTP_USER_AGENT = (
@@ -71,27 +71,31 @@ TEAM_PAGE_TOTAL_FIELDS = [
 TEAM_DEFS = [
     {"slug": "atl", "abbr": "ATL", "city": "Atlanta", "name": "Hawks", "displayName": "Atlanta Hawks", "conference": "East", "division": "Central", "palette": {"primary": "#9D2235", "secondary": "#FDB927"}},
     {"slug": "bos", "abbr": "BOS", "city": "Boston", "name": "Celtics", "displayName": "Boston Celtics", "conference": "East", "division": "Atlantic", "palette": {"primary": "#007A33", "secondary": "#BA9653"}},
+    {"slug": "chh", "abbr": "CHH", "city": "Charlotte", "name": "Hornets", "displayName": "Charlotte Hornets", "conference": "East", "division": "Central", "palette": {"primary": "#00788C", "secondary": "#5A2D81"}},
     {"slug": "chi", "abbr": "CHI", "city": "Chicago", "name": "Bulls", "displayName": "Chicago Bulls", "conference": "East", "division": "Central", "palette": {"primary": "#CE1141", "secondary": "#000000"}},
     {"slug": "cle", "abbr": "CLE", "city": "Cleveland", "name": "Cavaliers", "displayName": "Cleveland Cavaliers", "conference": "East", "division": "Central", "palette": {"primary": "#860038", "secondary": "#FDBB30"}},
-    {"slug": "dal", "abbr": "DAL", "city": "Dallas", "name": "Mavericks", "displayName": "Dallas Mavericks", "conference": "West", "division": "Midwest", "palette": {"primary": "#00538C", "secondary": "#B8C4CA"}},
-    {"slug": "den", "abbr": "DEN", "city": "Denver", "name": "Nuggets", "displayName": "Denver Nuggets", "conference": "West", "division": "Midwest", "palette": {"primary": "#0E2240", "secondary": "#FEC524"}},
     {"slug": "det", "abbr": "DET", "city": "Detroit", "name": "Pistons", "displayName": "Detroit Pistons", "conference": "East", "division": "Central", "palette": {"primary": "#C8102E", "secondary": "#1D42BA"}},
-    {"slug": "gos", "abbr": "GOS", "city": "Golden State", "name": "Warriors", "displayName": "Golden State Warriors", "conference": "West", "division": "Pacific", "palette": {"primary": "#1D428A", "secondary": "#FFC72C"}},
-    {"slug": "hou", "abbr": "HOU", "city": "Houston", "name": "Rockets", "displayName": "Houston Rockets", "conference": "West", "division": "Midwest", "palette": {"primary": "#CE1141", "secondary": "#C4CED4"}},
     {"slug": "ind", "abbr": "IND", "city": "Indiana", "name": "Pacers", "displayName": "Indiana Pacers", "conference": "East", "division": "Central", "palette": {"primary": "#002D62", "secondary": "#FDBB30"}},
+    {"slug": "mia", "abbr": "MIA", "city": "Miami", "name": "Heat", "displayName": "Miami Heat", "conference": "East", "division": "Atlantic", "palette": {"primary": "#98002E", "secondary": "#F9A01B"}},
     {"slug": "mil", "abbr": "MIL", "city": "Milwaukee", "name": "Bucks", "displayName": "Milwaukee Bucks", "conference": "East", "division": "Central", "palette": {"primary": "#00471B", "secondary": "#EEE1C6"}},
     {"slug": "njn", "abbr": "NJN", "city": "New Jersey", "name": "Nets", "displayName": "New Jersey Nets", "conference": "East", "division": "Atlantic", "palette": {"primary": "#000000", "secondary": "#FFFFFF"}},
     {"slug": "nyk", "abbr": "NYK", "city": "New York", "name": "Knicks", "displayName": "New York Knicks", "conference": "East", "division": "Atlantic", "palette": {"primary": "#006BB6", "secondary": "#F58426"}},
+    {"slug": "orl", "abbr": "ORL", "city": "Orlando", "name": "Magic", "displayName": "Orlando Magic", "conference": "East", "division": "Atlantic", "palette": {"primary": "#0077C0", "secondary": "#C4CED4"}},
+    {"slug": "phl", "abbr": "PHL", "city": "Philadelphia", "name": "76ers", "displayName": "Philadelphia 76ers", "conference": "East", "division": "Atlantic", "palette": {"primary": "#006BB6", "secondary": "#ED174C"}},
+    {"slug": "was", "abbr": "WAS", "city": "Washington", "name": "Bullets", "displayName": "Washington Bullets", "conference": "East", "division": "Atlantic", "palette": {"primary": "#C8102E", "secondary": "#002B5C"}},
+    {"slug": "dal", "abbr": "DAL", "city": "Dallas", "name": "Mavericks", "displayName": "Dallas Mavericks", "conference": "West", "division": "Midwest", "palette": {"primary": "#00538C", "secondary": "#B8C4CA"}},
+    {"slug": "den", "abbr": "DEN", "city": "Denver", "name": "Nuggets", "displayName": "Denver Nuggets", "conference": "West", "division": "Midwest", "palette": {"primary": "#0E2240", "secondary": "#FEC524"}},
+    {"slug": "gos", "abbr": "GOS", "city": "Golden State", "name": "Warriors", "displayName": "Golden State Warriors", "conference": "West", "division": "Pacific", "palette": {"primary": "#1D428A", "secondary": "#FFC72C"}},
+    {"slug": "hou", "abbr": "HOU", "city": "Houston", "name": "Rockets", "displayName": "Houston Rockets", "conference": "West", "division": "Midwest", "palette": {"primary": "#CE1141", "secondary": "#C4CED4"}},
     {"slug": "lac", "abbr": "LAC", "city": "Los Angeles", "name": "Clippers", "displayName": "LA Clippers", "conference": "West", "division": "Pacific", "palette": {"primary": "#ED174C", "secondary": "#1D428A"}},
     {"slug": "lal", "abbr": "LAL", "city": "Los Angeles", "name": "Lakers", "displayName": "Los Angeles Lakers", "conference": "West", "division": "Pacific", "palette": {"primary": "#552583", "secondary": "#FDB927"}},
+    {"slug": "min", "abbr": "MIN", "city": "Minnesota", "name": "Timberwolves", "displayName": "Minnesota Timberwolves", "conference": "West", "division": "Midwest", "palette": {"primary": "#0C2340", "secondary": "#236192"}},
     {"slug": "phx", "abbr": "PHX", "city": "Phoenix", "name": "Suns", "displayName": "Phoenix Suns", "conference": "West", "division": "Pacific", "palette": {"primary": "#1D1160", "secondary": "#E56020"}},
-    {"slug": "phl", "abbr": "PHL", "city": "Philadelphia", "name": "76ers", "displayName": "Philadelphia 76ers", "conference": "East", "division": "Atlantic", "palette": {"primary": "#006BB6", "secondary": "#ED174C"}},
     {"slug": "por", "abbr": "POR", "city": "Portland", "name": "Trail Blazers", "displayName": "Portland Trail Blazers", "conference": "West", "division": "Pacific", "palette": {"primary": "#E03A3E", "secondary": "#000000"}},
     {"slug": "sac", "abbr": "SAC", "city": "Sacramento", "name": "Kings", "displayName": "Sacramento Kings", "conference": "West", "division": "Pacific", "palette": {"primary": "#5A2D81", "secondary": "#63727A"}},
     {"slug": "san", "abbr": "SAN", "city": "San Antonio", "name": "Spurs", "displayName": "San Antonio Spurs", "conference": "West", "division": "Midwest", "palette": {"primary": "#C4CED4", "secondary": "#000000"}},
     {"slug": "sea", "abbr": "SEA", "city": "Seattle", "name": "SuperSonics", "displayName": "Seattle SuperSonics", "conference": "West", "division": "Pacific", "palette": {"primary": "#00653A", "secondary": "#FFC200"}},
     {"slug": "uth", "abbr": "UTH", "city": "Utah", "name": "Jazz", "displayName": "Utah Jazz", "conference": "West", "division": "Midwest", "palette": {"primary": "#002B5C", "secondary": "#00471B"}},
-    {"slug": "was", "abbr": "WAS", "city": "Washington", "name": "Bullets", "displayName": "Washington Bullets", "conference": "East", "division": "Atlantic", "palette": {"primary": "#C8102E", "secondary": "#002B5C"}},
 ]
 
 
@@ -771,7 +775,7 @@ def parse_wikipedia_date(date_text):
     month_name = match.group(1).lower().rstrip(".")
     day = int(match.group(2))
     month_number = month_lookup[month_name]
-    year = 1986 if month_number >= 10 else 1987
+    year = 1992 if month_number >= 11 else 1993
     return f"{year:04d}-{month_number:02d}-{day:02d}"
 
 
@@ -1050,7 +1054,7 @@ def parse_nbaallelo_schedule():
     games = {}
     csv_text = fetch_text(NBAALLELO_URL, "nbaallelo")
     for row in csv.DictReader(io.StringIO(csv_text)):
-        if str(row.get("year_id") or "").strip() != "1987":
+        if str(row.get("year_id") or "").strip() != "1993":
             continue
         if str(row.get("is_playoffs") or "").strip() != "0":
             continue
@@ -1193,7 +1197,7 @@ def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_
         },
         "teamCoverage": team_coverage,
         "notes": [
-            "Live nbastats_1986 / pbpstats_1986 feeds are absent, so the pack cannot use the same play-by-play ingestion lane as later seasons.",
+            "Live nbastats_1992 / pbpstats_1992 feeds are absent, so the pack cannot use the same play-by-play ingestion lane as later seasons.",
             "Accessible Wikipedia team-season game logs are parsed wherever they expose real regular-season rows.",
             "A FiveThirtyEight historical results backfill completes the schedule grid for teams whose Wikipedia season pages are empty or partial.",
             "Player-game stat rows remain inferred from season totals and are not marketed as real event box scores.",
@@ -1407,10 +1411,10 @@ def featured_star_ids(players):
     return [
         player_id
         for player_id in (
-            by_name.get(normalize_name("Magic Johnson")),
-            by_name.get(normalize_name("Larry Bird")),
             by_name.get(normalize_name("Michael Jordan")),
-            by_name.get(normalize_name("James Worthy")),
+            by_name.get(normalize_name("Charles Barkley")),
+            by_name.get(normalize_name("Scottie Pippen")),
+            by_name.get(normalize_name("Kevin Johnson")),
         )
         if player_id
     ]
@@ -1418,7 +1422,7 @@ def featured_star_ids(players):
 
 def source_audit_from_snapshot(schedule_results_snapshot):
     provenance = dict(schedule_results_snapshot.get("provenance") or {})
-    missing_feeds = list(provenance.get("missingFeeds") or ["nbastats_1986", "pbpstats_1986"])
+    missing_feeds = list(provenance.get("missingFeeds") or ["nbastats_1992", "pbpstats_1992"])
     return {
         "mode": schedule_results_snapshot.get("sourceMode") or SOURCE_MODE,
         "liveArchivesPresent": bool(provenance.get("liveArchivesPresent", False)),
@@ -1516,7 +1520,7 @@ def main():
     for team in TEAM_DEFS:
         team_copy = dict(team)
         team_copy["teamId"] = f"{ENTITY_PREFIX}_{team['slug']}"
-        team_copy["wikiPageTitle"] = f"1986\u201387 {team['displayName']} season"
+        team_copy["wikiPageTitle"] = f"1992\u201393 {team['displayName']} season"
         team_defs.append(team_copy)
         team_by_abbr[team_copy["abbr"]] = team_copy
 
@@ -1675,10 +1679,10 @@ def main():
         "isHistorical": True,
         "eraTags": ERA_TAGS,
         "notes": [
-            "This pack uses the real 1986-87 regular-season schedule and final scores.",
+            "This pack uses the real 1992-93 regular-season schedule and final scores.",
             "Normal builds consume checked-in schedule and normalized player source snapshots rather than live network fetches.",
             "Player season totals originate from curated checked-in historical source artifacts.",
-            "Player-game rows are deterministic season-average weighted estimates because live 1986 play-by-play feeds are absent.",
+            "Player-game rows are deterministic season-average weighted estimates because live 1992 play-by-play feeds are absent.",
         ],
     }
 
@@ -1701,9 +1705,9 @@ def main():
         "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
         "defaultEntryMode": "real_season",
         "focusTeamId": FEATURED_TEAM_ID,
-        "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 replay foundation with Lakers prestige at the center.",
-        "description": "A playable 1986-87 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
-        "tagline": "Replay the Bird-Magic-Jordan season with real scores and disclosed inferred box lines.",
+        "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 replay foundation centered on the Bulls.",
+        "description": "A playable 1992-93 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
+        "tagline": "Replay the Jordan-Barkley-Pippen season with real scores and disclosed inferred box lines.",
         "eraTags": ERA_TAGS,
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
         "playerPoolType": "full_season_player_pool",
@@ -1726,7 +1730,7 @@ def main():
             "curationOwner": "RosterBate",
             "reviewStatus": "draft",
             "importNotes": (
-                "1986-87 live nbastats_1986 / pbpstats_1986 feeds are absent. Normal builds consume the checked-in mixed-source "
+                "1992-93 live nbastats_1992 / pbpstats_1992 feeds are absent. Normal builds consume the checked-in mixed-source "
                 "schedule snapshot plus the checked-in normalized player source snapshot, then emit deterministic inferred player-game rows "
                 "against each player's canonical primary-team schedule lane."
             ),
@@ -1747,10 +1751,10 @@ def main():
             },
         },
         "notes": [
-            "The 23-team league map uses era-appropriate 1986-87 abbreviations, including GOS, SAN, UTH, and WAS.",
+            "The 27-team league map uses era-appropriate 1992-93 abbreviations, including CHH, GOS, SAN, UTH, and WAS.",
             "Schedule/results span the full 943-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
             "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
-            "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable and replayable.",
+            "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable and replayable.",
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
@@ -1758,7 +1762,7 @@ def main():
 
     presentation = {
         "heroTitle": SEASON_LABEL,
-        "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a full-season 1986-87 foundation built with honest provenance.",
+        "heroSubtitle": "Jordan's Bulls, Barkley's Suns, and a full-season 1992-93 foundation built with honest provenance.",
         "featuredTeamId": FEATURED_TEAM_ID,
         "featuredStars": featured_stars,
         "artDirection": {
@@ -1767,36 +1771,36 @@ def main():
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "real_season", "label": "Play The Real Season", "description": "Replay 1986-87 with the real full schedule and final scores."},
-            {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Bird-Magic-Jordan season from the full-league player pool."},
-            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1986-87 branch from the same foundation pack."},
+            {"mode": "real_season", "label": "Play The Real Season", "description": "Replay 1992-93 with the real full schedule and final scores."},
+            {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Jordan-Barkley-Pippen season from the full-league player pool."},
+            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1992-93 branch from the same foundation pack."},
         ],
     }
 
     summaries = {
-        "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
+        "packSummary": "The 1992-93 foundation pack brings the full 27-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
         "featuredStorylines": [
-            "The Lakers headline the pack as the featured prestige lane, with Magic's MVP season and championship gravity defining the front door.",
-            "Boston and Los Angeles keep the Bird-Magic rivalry alive, while Chicago adds the Michael Jordan scoring-explosion path to the same board.",
+            "The Bulls headline the pack as the featured prestige lane, with Jordan's title chase defining the front door.",
+            "Phoenix and Chicago keep the Barkley-Jordan Finals collision alive, while New York and the rest of the East keep the season from collapsing into a one-team nostalgia pack.",
             "Every included game result is real, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth.",
         ],
         "teamSpotlights": [
-            {"teamId": f"{ENTITY_PREFIX}_lal", "summary": "The Lakers are the flagship prestige route, built around Magic, Kareem, Worthy, and the title-winning West power lane."},
-            {"teamId": f"{ENTITY_PREFIX}_bos", "summary": "Boston preserves the Bird side of the rivalry and keeps the East's marquee late-80s heavyweight intact."},
-            {"teamId": f"{ENTITY_PREFIX}_chi", "summary": "Chicago offers the Jordan explosion route and a different challenge path from the finished-title contenders."},
-            {"teamId": f"{ENTITY_PREFIX}_hou", "summary": "Houston keeps the Twin Towers-era West in play for anyone chasing a non-Lakers contender timeline."},
-            {"teamId": f"{ENTITY_PREFIX}_det", "summary": "Detroit brings the rising Bad Boys lane into a season that still sits just before their title breakthrough."},
+            {"teamId": f"{ENTITY_PREFIX}_chi", "summary": "Chicago is the flagship prestige route, built around Jordan, Pippen, and the first three-peat front door."},
+            {"teamId": f"{ENTITY_PREFIX}_phx", "summary": "Phoenix keeps Barkley's challenger Suns at full strength as the Finals counterweight."},
+            {"teamId": f"{ENTITY_PREFIX}_nyk", "summary": "New York anchors the East contention lane and keeps the playoff chase from narrowing to just Chicago and Phoenix."},
+            {"teamId": f"{ENTITY_PREFIX}_sea", "summary": "Seattle carries the West's top-seed pressure track and the best non-Finals challenger lane."},
+            {"teamId": f"{ENTITY_PREFIX}_orl", "summary": "Orlando gives the expansion-era growth story a real 1992-93 home inside the playable league."},
         ],
         "modeSummaries": [
-            {"mode": "real_season", "summary": "Replay the real 1986-87 campaign from opening night through the final regular-season standings."},
-            {"mode": "historical_draft", "summary": "Reshuffle the full Bird-Magic-Jordan player pool and discover how the era changes under a custom draft."},
-            {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1986-87 universe while keeping the same real team and player foundation."},
+            {"mode": "real_season", "summary": "Replay the real 1992-93 campaign from opening night through the final regular-season standings."},
+            {"mode": "historical_draft", "summary": "Reshuffle the full Jordan-Barkley-Pippen player pool and discover how the era changes under a custom draft."},
+            {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1992-93 universe while keeping the same real team and player foundation."},
         ],
         "auditSummary": manifest["auditSummary"],
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
         "auditNotes": [
-            "Live nbastats_1986 / pbpstats_1986 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
+            "Live nbastats_1992 / pbpstats_1992 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
             "Normal builds are reproducible from checked-in source artifacts and do not need live Wikipedia, TheBasketballDatabase, or list-data fetches.",
             "Schedule and results cover the complete regular season from a mixed-source checked-in snapshot where the FiveThirtyEight backfill supplies more than half the games.",
             "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate and is emitted only for the player's canonical teamId.",
@@ -1813,15 +1817,15 @@ def main():
         ],
         "challenges": [
             {
-                "challengeId": "lakers_repeat_pace",
+                "challengeId": "bulls_threepeat_push",
                 "mode": "real_season",
                 "path": "featured_team_path",
-                "title": "Keep Showtime On Top",
-                "description": "Take the featured Lakers lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
+                "title": "Complete The First Three-Peat",
+                "description": "Take the featured Bulls lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
                 "type": "season_wins_min",
                 "target": 60,
                 "evaluation": "season_end",
-                "reward": "Showtime Standard",
+                "reward": "Three-Peat Standard",
                 "required": False,
                 "featured": True,
             },
@@ -1829,8 +1833,8 @@ def main():
                 "challengeId": "east_challenger_55",
                 "mode": "real_season",
                 "path": "open_team_path",
-                "title": "Break The Rivalry",
-                "description": "Choose any team and reach 55 wins while trying to interrupt the Bird-Magic prestige track.",
+                "title": "Break The Finals Track",
+                "description": "Choose any team and reach 55 wins while trying to interrupt the Jordan-Barkley prestige track.",
                 "type": "season_wins_min",
                 "target": 55,
                 "evaluation": "season_end",
@@ -1839,11 +1843,11 @@ def main():
                 "featured": False,
             },
             {
-                "challengeId": "draft_jordan_magic_bird",
+                "challengeId": "draft_jordan_barkley_pippen",
                 "mode": "historical_draft",
                 "path": "alternate_history_success",
                 "title": "Draft The Superteam",
-                "description": "Redraft 1986-87 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
+                "description": "Redraft 1992-93 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
                 "type": "season_wins_min",
                 "target": 58,
                 "evaluation": "season_end",
@@ -1852,10 +1856,10 @@ def main():
                 "featured": True,
             },
             {
-                "challengeId": "reimagined_title",
+                "challengeId": "rewrite_1992_93",
                 "mode": "reimagined_season",
                 "path": "reshuffled_league",
-                "title": "Rewrite 1986-87",
+                "title": "Rewrite 1992-93",
                 "description": "Spin the league into an alternate-history branch and win the title with the same trust-forward data disclosures intact.",
                 "type": "win_championship",
                 "target": True,
