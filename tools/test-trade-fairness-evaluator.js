@@ -349,9 +349,15 @@ expectSourceMatch(/function evaluateOneForOneTradeFairness\(offer\)/, 'missing f
 expectSourceMatch(/function getTradeFairnessBadgeMeta\(rating\)/, 'missing fairness badge metadata helper');
 expectSourceMatch(/function buildTradeFairnessReasons\(result\)/, 'missing fairness reason builder');
 expectSourceMatch(/function getTradeFairnessViewModel\(offer\)/, 'missing fairness view-model helper');
+expectSourceMatch(/function renderTradeFairnessCard\(offer,\s*options=\{\}\)/, 'missing fairness card renderer');
 expectSourceMatch(/function getTradeFairnessPlayerValue\(player\)/, 'missing fairness player value helper');
 expectSourceMatch(/function getTradeFairnessPositionKey\(player\)/, 'missing fairness position key helper');
 expectSourceMatch(/function getTradeFairnessRosterProfile\(teamIdx, outgoingPid, incomingPid\)/, 'missing fairness roster profile helper');
+expectSourceMatch(/renderTradeFairnessCard\(\{\s*fromTeam:D\.myPos,\s*toTeam:trP\.ti,\s*give:trP\.give,\s*get:trP\.get\s*\}/, 'inline trade builder should render fairness card');
+expectSourceMatch(/renderTradeFairnessCard\(o,\s*\{\s*variant:'incoming'/, 'incoming offers should render fairness card');
+expectSourceMatch(/renderTradeFairnessCard\(o,\s*\{\s*variant:'sent'/, 'sent offers should render fairness card');
+expectSourceMatch(/renderTradeFairnessCard\(o,\s*\{\s*variant:'commissioner'/, 'commissioner review should render fairness card');
+expectSourceMatch(/Fairness insights are available for 1-for-1 deals first/i, 'unsupported fairness copy should remain wired');
 
 const script = [
   extractFunctionSource('getTradeFairnessPlayerValue(player)'),
@@ -360,7 +366,8 @@ const script = [
   extractFunctionSource('evaluateOneForOneTradeFairness(offer)'),
   extractFunctionSource('getTradeFairnessBadgeMeta(rating)'),
   extractFunctionSource('buildTradeFairnessReasons(result)'),
-  extractFunctionSource('getTradeFairnessViewModel(offer)')
+  extractFunctionSource('getTradeFairnessViewModel(offer)'),
+  extractFunctionSource('renderTradeFairnessCard(offer, options={})')
 ].join('\n\n');
 
 const players = {
@@ -484,5 +491,22 @@ assert.equal(unsupported.supported, false);
 assert.match(unsupported.message, /1-for-1/i);
 assert.ok(Array.isArray(unsupported.reasons));
 assert.equal(unsupported.reasons.length, 0);
+
+const supportedCard = context.renderTradeFairnessCard({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [11],
+  get: [12]
+});
+assert.match(supportedCard, /Fair/i);
+assert.match(supportedCard, /Advisory only/i);
+
+const unsupportedCard = context.renderTradeFairnessCard({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [11, 12],
+  get: [21]
+});
+assert.match(unsupportedCard, /1-for-1/i);
 
 console.log('trade fairness evaluator test passed');
