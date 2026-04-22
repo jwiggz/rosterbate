@@ -712,6 +712,34 @@
   </div>
 
 <script>
+const HISTORIC_1987_FALLBACK = {
+  packId: 'nba_1987_full_season_v1',
+  sport: 'nba',
+  seasonLabel: '1986-87 NBA Historic Season',
+  shortLabel: '1986-87',
+  era: '1980s',
+  availability: 'playable',
+  statusLabel: 'Playable Now',
+  significanceLabel: 'Finals Prestige',
+  significanceTone: 'heritage',
+  completenessLabel: 'Playable foundation',
+  completenessPercent: 18,
+  tagline: 'Magic. Bird. Jordan. One prestige-rivalry universe.',
+  summary: 'A playable 1986-87 historical foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.',
+  whyItMatters: 'This is the archive\'s premium 1980s tentpole: Finals rivalry gravity, Lakers focus-team energy, and a young Jordan expanding the draft sandbox.',
+  focusTeamName: 'Los Angeles Lakers',
+  art: {
+    theme: 'heritage',
+    eyebrow: '1980s Rivalry',
+    headline: 'Bird. Magic. Jordan.',
+    subline: 'Peak Celtics-Lakers tension with a young Jordan entering the frame.'
+  },
+  previewStars: ['Magic Johnson', 'Larry Bird', 'Michael Jordan'],
+  seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1987_full_season_v1',
+  simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1987_full_season_v1',
+  draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1987_full_season_v1',
+  reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1987_full_season_v1'
+};
 (function(){
   'use strict';
 
@@ -779,31 +807,7 @@
       simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1',
       draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1'
     },
-    {
-      packId: 'nba_1987_full_season_v1',
-      sport: 'nba',
-      seasonLabel: '1986-87 NBA Historic Season',
-      shortLabel: '1986-87',
-      era: '1980s',
-      availability: 'preview',
-      statusLabel: 'Archive Preview',
-      significanceLabel: 'Rivalry Apex',
-      significanceTone: 'heritage',
-      completenessLabel: 'Concept framing',
-      completenessPercent: 18,
-      tagline: 'Draft Bird, Magic, and Jordan into one custom universe.',
-      summary: 'A future full-season universe centered on the peak of the Celtics-Lakers era and the rise of Jordan.',
-      whyItMatters: 'This is the cleanest bridge between the Showtime-Lakers era, peak Celtics rivalry, and the earliest true Jordan sandbox.',
-      focusTeamName: 'Los Angeles Lakers',
-      art: {
-        theme: 'heritage',
-        eyebrow: '1980s Rivalry',
-        headline: 'Bird. Magic. Jordan.',
-        subline: 'Peak Celtics-Lakers tension with a young Jordan entering the frame.'
-      },
-      plannedModes: ['Draft The Era', 'Sim Season', 'Replay Era Rosters'],
-      previewStars: ['Magic Johnson', 'Larry Bird', 'Michael Jordan']
-    },
+    HISTORIC_1987_FALLBACK,
     {
       packId: 'nba_2001_full_season_v1',
       sport: 'nba',

@@ -369,6 +369,21 @@
   </div>
 
 <script>
+const HISTORIC_UNIVERSE_1987_FALLBACK = {
+  packId: 'nba_1987_full_season_v1',
+  seasonLabel: '1986-87 NBA Historic Season',
+  shortLabel: '1986-87',
+  era: '1980s',
+  availability: 'playable',
+  statusLabel: 'Playable Now',
+  significanceLabel: 'Finals Prestige',
+  significanceTone: 'heritage',
+  focusTeamName: 'Los Angeles Lakers',
+  tagline: 'Magic. Bird. Jordan. One prestige-rivalry universe.',
+  summary: 'A playable 1986-87 historical foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.',
+  whyItMatters: 'This is the archive\'s premium 1980s tentpole: Finals rivalry gravity, Lakers focus-team energy, and a young Jordan expanding the draft sandbox.',
+  art: { theme:'heritage', eyebrow:'1980s Rivalry', headline:'Bird. Magic. Jordan.', subline:'Peak Celtics-Lakers tension with a young Jordan entering the frame.' }
+};
 (function(){
   'use strict';
 
@@ -400,6 +415,7 @@
       whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into both a truthful archive run and an alternate-history fantasy sandbox.',
       art: { theme:'dynasty', eyebrow:'1990s Archive', headline:'72-Win Empire', subline:'Jordan, Hakeem, Shaq, and the full season universe.' }
     },
+    HISTORIC_UNIVERSE_1987_FALLBACK,
     {
       packId: 'nba_2001_full_season_v1',
       seasonLabel: '2000-01 NBA Historic Season',
