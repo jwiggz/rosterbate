@@ -4221,14 +4221,6 @@ function buildCpuWaiverRosterNeedSummary(teamIdx, day){
     if(shape.rebounding >= 7) roleCounts.rebounding++;
     if(shape.defense >= 1.8) roleCounts.defense++;
   });
-  const starterIds=typeof getStarterIdsForTeamDay==='function'
-    ? getStarterIdsForTeamDay(teamIdx, day)
-    : [];
-  const availableIds=new Set(
-    availableRoster
-      .map(player=>Number(player?.id))
-      .filter(id=>Number.isFinite(id))
-  );
   const positionNeed={
     G:Math.max(0, 2 - slotCounts.G),
     F:Math.max(0, 2 - slotCounts.F),
@@ -4504,26 +4496,39 @@ function buildCpuTradeRosterNeedSummary(teamIdx, day, rosterOverride){
     rebounding:Math.max(0, 2 - roleCounts.rebounding),
     defense:Math.max(0, 2 - roleCounts.defense)
   };
-  const missingStarterCount=(starterIds||[])
-    .filter(Boolean)
-    .reduce((count, starterId)=>count + (availableIds.has(Number(starterId)) ? 0 : 1), 0);
-  for(let index=0; index<missingStarterCount; index++){
-    let priority=null;
-    ['G','F','C'].forEach(slot=>{
-      if(priority===null){
-        priority=slot;
-        return;
-      }
-      const currentNeed=Number(positionNeed[priority]||0);
-      const nextNeed=Number(positionNeed[slot]||0);
-      if(nextNeed > currentNeed || (nextNeed===currentNeed && slot.localeCompare(priority) < 0)){
-        priority=slot;
-      }
+  const starterSlots=
+    typeof SLOT_LABELS !== 'undefined' &&
+    Array.isArray(SLOT_LABELS) &&
+    SLOT_LABELS.length
+      ? SLOT_LABELS.slice(0, Math.max(0, Number(STARTERS||SLOT_LABELS.length)))
+      : (CURRENT_SPORT==='nba' ? ['PG','SG','SF','PF','C'] : []);
+  const starterCandidates=availableRoster
+    .map(player=>({
+      player,
+      slots:getCpuWaiverPlayerSlots(player),
+      flexibility:getCpuWaiverPlayerSlots(player).length,
+      fp:Number(player?.fp || 0)
+    }))
+    .sort((left,right)=>{
+      if(left.flexibility!==right.flexibility) return left.flexibility-right.flexibility;
+      if(right.fp!==left.fp) return right.fp-left.fp;
+      return Number(left.player?.id||0)-Number(right.player?.id||0);
     });
-    if(!priority) break;
-    positionNeed[priority] += 1;
-    slotCounts[priority] += 1;
-  }
+  const usedStarterIds=new Set();
+  starterSlots.forEach(slot=>{
+    const normalizedSlot=String(slot||'').toUpperCase();
+    const match=starterCandidates.find(entry=>{
+      const playerId=Number(entry.player?.id);
+      return !usedStarterIds.has(playerId) && entry.slots.includes(normalizedSlot);
+    });
+    if(match){
+      usedStarterIds.add(Number(match.player?.id));
+      return;
+    }
+    if(normalizedSlot==='PG'||normalizedSlot==='SG'||normalizedSlot==='G') positionNeed.G += 1;
+    else if(normalizedSlot==='SF'||normalizedSlot==='PF'||normalizedSlot==='F') positionNeed.F += 1;
+    else if(normalizedSlot==='C') positionNeed.C += 1;
+  });
   return {
     slotCounts,
     roleCounts,
@@ -4618,8 +4623,10 @@ function getCpuTradeIncomingFitScore(teamIdx, player, day, rosterNeed){
 function buildCpuTradeProposalForPair(fromTeamIdx, toTeamIdx, day){
   if(!isCpuTradeSimulationUniverse()) return null;
   if(!isCpuManagedTeam(fromTeamIdx) || !isCpuManagedTeam(toTeamIdx) || fromTeamIdx===toTeamIdx) return null;
-  const fromNeed=buildCpuWaiverRosterNeedSummary(fromTeamIdx, day);
-  const toNeed=buildCpuWaiverRosterNeedSummary(toTeamIdx, day);
+  const fromRoster=G.rosters[fromTeamIdx]||[];
+  const toRoster=G.rosters[toTeamIdx]||[];
+  const fromNeed=buildCpuTradeRosterNeedSummary(fromTeamIdx, day, fromRoster);
+  const toNeed=buildCpuTradeRosterNeedSummary(toTeamIdx, day, toRoster);
   const fromProtected=getCpuTradeProtectedPlayerIds(fromTeamIdx, day, fromNeed);
   const toProtected=getCpuTradeProtectedPlayerIds(toTeamIdx, day, toNeed);
   const fromOutgoing=getCpuTradeOutgoingCandidates(fromTeamIdx, day, fromNeed, fromProtected);
@@ -4640,8 +4647,6 @@ function buildCpuTradeProposalForPair(fromTeamIdx, toTeamIdx, day){
     );
   };
 
-  const fromRoster=G.rosters[fromTeamIdx]||[];
-  const toRoster=G.rosters[toTeamIdx]||[];
   const fromCurrentNeedScore=scoreNeed(fromNeed);
   const toCurrentNeedScore=scoreNeed(toNeed);
 
