@@ -831,14 +831,21 @@ assert.doesNotMatch(
   /Simulation day completed\./,
   'null-result days should not render a fabricated completion line'
 );
-assert.doesNotMatch(
-  context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
-  /<strong>Simulation day completed\.<\/strong>/,
-  'null-result days should not render a result block'
-);
+const oneDayOnlyRendered = context.renderRecentSimulationCards(oneDayOnly.recentSimDays);
 assert.match(
-  context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
-  /Single day available/
+  oneDayOnlyRendered,
+  /<div class="sim-day-label">Week 3 Day 10<\/div>[\s\S]*<strong>Single day available<\/strong>/,
+  'null-result days should render the day label directly before the story headline'
+);
+assert.equal(
+  (oneDayOnlyRendered.match(/<strong>/g) || []).length,
+  1,
+  'null-result days should not render an extra result <strong> ahead of the story'
+);
+assert.doesNotMatch(
+  oneDayOnlyRendered,
+  /<strong>Simulation day completed\.<\/strong>/,
+  'null-result days should not render a fabricated completion line'
 );
 
 assert.deepStrictEqual(viewModel.leagueSnapshot.currentStanding, {
