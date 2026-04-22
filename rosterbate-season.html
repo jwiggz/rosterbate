@@ -4449,6 +4449,246 @@ function cleanupCpuDeadRosterSpotsFromWaivers(teamIdx, options){
   return {changed:true,adds:1,drops:1};
 }
 
+function isCpuTradeSimulationUniverse(){
+  return CURRENT_SPORT==='nba' && isHistoricalSimulationUniverse(D);
+}
+
+function shouldRunCpuTradeMarketForDay(day){
+  const numericDay=Number(day || 0);
+  return isCpuTradeSimulationUniverse() && numericDay > 1 && numericDay % 3 === 0;
+}
+
+function getCpuTradeProtectedPlayerIds(teamIdx, day, rosterNeed){
+  const roster=G.rosters[teamIdx]||[];
+  const protectedIds=new Set();
+  const topByValue=[...roster]
+    .filter(Boolean)
+    .sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0))
+    .slice(0,2);
+  topByValue.forEach(player=>protectedIds.add(Number(player?.id)));
+
+  const slotCounts={G:0,F:0,C:0};
+  roster.forEach(player=>{
+    const slots=getCpuWaiverPlayerSlots(player);
+    if(slots.includes('G')) slotCounts.G++;
+    if(slots.includes('F')) slotCounts.F++;
+    if(slots.includes('C')) slotCounts.C++;
+  });
+  roster.forEach(player=>{
+    const slots=getCpuWaiverPlayerSlots(player);
+    const thinAnchor=
+      (slots.includes('G') && slotCounts.G <= 1) ||
+      (slots.includes('F') && slotCounts.F <= 1) ||
+      (slots.includes('C') && slotCounts.C <= 1);
+    if(thinAnchor) protectedIds.add(Number(player?.id));
+  });
+
+  roster.forEach(player=>{
+    const protection=getCpuWaiverDropProtectionBonus(player, rosterNeed);
+    if(protection >= 170) protectedIds.add(Number(player?.id));
+  });
+
+  return protectedIds;
+}
+
+function getCpuTradeOutgoingCandidates(teamIdx, day, rosterNeed, protectedIds){
+  const roster=G.rosters[teamIdx]||[];
+  const starterSet=new Set(getStarterIdsForTeamDay(teamIdx, day).filter(Boolean).map(Number));
+  return roster
+    .filter(Boolean)
+    .filter(player=>!protectedIds.has(Number(player?.id)))
+    .map(player=>{
+      const slots=getCpuWaiverPlayerSlots(player);
+      const shape=getCpuWaiverRoleShape(player);
+      const benchBonus=starterSet.has(Number(player?.id)) ? 0 : 24;
+      const surplusBonus=
+        (slots.includes('G') ? Math.max(0, 2 - Number(rosterNeed?.positionNeed?.G || 0)) * 8 : 0) +
+        (slots.includes('F') ? Math.max(0, 2 - Number(rosterNeed?.positionNeed?.F || 0)) * 8 : 0) +
+        (slots.includes('C') ? Math.max(0, 2 - Number(rosterNeed?.positionNeed?.C || 0)) * 10 : 0) +
+        (shape.playmaking >= 5 ? Math.max(0, 2 - Number(rosterNeed?.roleNeed?.playmaking || 0)) * 6 : 0) +
+        (shape.rebounding >= 7 ? Math.max(0, 2 - Number(rosterNeed?.roleNeed?.rebounding || 0)) * 6 : 0);
+      return {
+        player,
+        score:benchBonus + surplusBonus - getCpuWaiverDropProtectionBonus(player, rosterNeed)
+      };
+    })
+    .sort((a,b)=>b.score-a.score);
+}
+
+function getCpuTradeIncomingFitScore(teamIdx, player, day, rosterNeed){
+  const slots=getCpuWaiverPlayerSlots(player);
+  const shape=getCpuWaiverRoleShape(player);
+  return Number(player?.fp||0)
+    + (slots.includes('G') ? Number(rosterNeed?.positionNeed?.G || 0) * 12 : 0)
+    + (slots.includes('F') ? Number(rosterNeed?.positionNeed?.F || 0) * 10 : 0)
+    + (slots.includes('C') ? Number(rosterNeed?.positionNeed?.C || 0) * 14 : 0)
+    + (shape.scoring >= 16 ? Number(rosterNeed?.roleNeed?.scoring || 0) * 4 : 0)
+    + (shape.playmaking >= 5 ? Number(rosterNeed?.roleNeed?.playmaking || 0) * 8 : 0)
+    + (shape.rebounding >= 7 ? Number(rosterNeed?.roleNeed?.rebounding || 0) * 6 : 0)
+    + (shape.defense >= 1.8 ? Number(rosterNeed?.roleNeed?.defense || 0) * 4 : 0)
+    + getCpuWaiverVersatilityBonus(player);
+}
+
+function buildCpuTradeProposalForPair(fromTeamIdx, toTeamIdx, day){
+  if(!isCpuTradeSimulationUniverse()) return null;
+  if(!isCpuManagedTeam(fromTeamIdx) || !isCpuManagedTeam(toTeamIdx) || fromTeamIdx===toTeamIdx) return null;
+
+  const fromNeed=buildCpuWaiverRosterNeedSummary(fromTeamIdx, day);
+  const toNeed=buildCpuWaiverRosterNeedSummary(toTeamIdx, day);
+  const fromProtected=getCpuTradeProtectedPlayerIds(fromTeamIdx, day, fromNeed);
+  const toProtected=getCpuTradeProtectedPlayerIds(toTeamIdx, day, toNeed);
+  const fromOutgoing=getCpuTradeOutgoingCandidates(fromTeamIdx, day, fromNeed, fromProtected);
+  const toOutgoing=getCpuTradeOutgoingCandidates(toTeamIdx, day, toNeed, toProtected);
+  if(!fromOutgoing.length || !toOutgoing.length) return null;
+
+  const scoreNeed=summary=>{
+    const positionNeed=summary?.positionNeed||{};
+    const roleNeed=summary?.roleNeed||{};
+    return (
+      Number(positionNeed.G||0) * 4 +
+      Number(positionNeed.F||0) * 4 +
+      Number(positionNeed.C||0) * 4 +
+      Number(roleNeed.scoring||0) * 2 +
+      Number(roleNeed.playmaking||0) * 2 +
+      Number(roleNeed.rebounding||0) * 2 +
+      Number(roleNeed.defense||0) * 2
+    );
+  };
+
+  const summarizeRosterNeed=roster=>{
+    const slotCounts={G:0,F:0,C:0};
+    const roleCounts={scoring:0,playmaking:0,rebounding:0,defense:0};
+    (roster||[]).filter(Boolean).forEach(player=>{
+      const slots=getCpuWaiverPlayerSlots(player);
+      if(slots.includes('G')) slotCounts.G++;
+      if(slots.includes('F')) slotCounts.F++;
+      if(slots.includes('C')) slotCounts.C++;
+      const shape=getCpuWaiverRoleShape(player);
+      if(shape.scoring >= 16) roleCounts.scoring++;
+      if(shape.playmaking >= 5) roleCounts.playmaking++;
+      if(shape.rebounding >= 7) roleCounts.rebounding++;
+      if(shape.defense >= 1.8) roleCounts.defense++;
+    });
+    return {
+      positionNeed:{
+        G:Math.max(0, 2 - slotCounts.G),
+        F:Math.max(0, 2 - slotCounts.F),
+        C:Math.max(0, 2 - slotCounts.C)
+      },
+      roleNeed:{
+        scoring:Math.max(0, 2 - roleCounts.scoring),
+        playmaking:Math.max(0, 2 - roleCounts.playmaking),
+        rebounding:Math.max(0, 2 - roleCounts.rebounding),
+        defense:Math.max(0, 2 - roleCounts.defense)
+      }
+    };
+  };
+
+  const fromRoster=G.rosters[fromTeamIdx]||[];
+  const toRoster=G.rosters[toTeamIdx]||[];
+  const fromCurrentNeedScore=scoreNeed(summarizeRosterNeed(fromRoster));
+  const toCurrentNeedScore=scoreNeed(summarizeRosterNeed(toRoster));
+
+  let best=null;
+  fromOutgoing.forEach(outgoingEntry=>{
+    toOutgoing.forEach(incomingEntry=>{
+      const outgoingPlayer=outgoingEntry.player;
+      const incomingPlayer=incomingEntry.player;
+      const fairnessGap=Math.abs(Number(outgoingPlayer?.fp||0)-Number(incomingPlayer?.fp||0));
+      if(fairnessGap > 18) return;
+
+      const fromIncomingFit=getCpuTradeIncomingFitScore(fromTeamIdx, incomingPlayer, day, fromNeed);
+      const toIncomingFit=getCpuTradeIncomingFitScore(toTeamIdx, outgoingPlayer, day, toNeed);
+      const fromLoss=getCpuWaiverDropProtectionBonus(outgoingPlayer, fromNeed);
+      const toLoss=getCpuWaiverDropProtectionBonus(incomingPlayer, toNeed);
+      if(fromIncomingFit <= fromLoss || toIncomingFit <= toLoss) return;
+
+      const fromSimulatedRoster=fromRoster.map(player=>player);
+      const toSimulatedRoster=toRoster.map(player=>player);
+      const fromIndex=fromSimulatedRoster.findIndex(player=>Number(player?.id)===Number(outgoingPlayer?.id));
+      const toIndex=toSimulatedRoster.findIndex(player=>Number(player?.id)===Number(incomingPlayer?.id));
+      if(fromIndex < 0 || toIndex < 0) return;
+      fromSimulatedRoster[fromIndex]=incomingPlayer;
+      toSimulatedRoster[toIndex]=outgoingPlayer;
+
+      const fromPostNeedScore=scoreNeed(summarizeRosterNeed(fromSimulatedRoster));
+      const toPostNeedScore=scoreNeed(summarizeRosterNeed(toSimulatedRoster));
+      if(fromPostNeedScore >= fromCurrentNeedScore) return;
+      if(toPostNeedScore >= toCurrentNeedScore) return;
+
+      const score=
+        (fromCurrentNeedScore - fromPostNeedScore) * 8 +
+        (toCurrentNeedScore - toPostNeedScore) * 8 +
+        (fromIncomingFit - fromLoss) +
+        (toIncomingFit - toLoss) -
+        fairnessGap;
+      if(!best || score > best.score){
+        best={
+          score,
+          fromTeamIdx,
+          toTeamIdx,
+          outgoingPlayer,
+          incomingPlayer
+        };
+      }
+    });
+  });
+  return best;
+}
+
+function executeCpuTradeProposal(proposal, options){
+  if(!proposal) return false;
+  const opts=options||{};
+  const fromRoster=G.rosters[proposal.fromTeamIdx]||[];
+  const toRoster=G.rosters[proposal.toTeamIdx]||[];
+  const fromIndex=fromRoster.findIndex(player=>Number(player?.id)===Number(proposal.outgoingPlayer?.id));
+  const toIndex=toRoster.findIndex(player=>Number(player?.id)===Number(proposal.incomingPlayer?.id));
+  if(fromIndex < 0 || toIndex < 0) return false;
+
+  const [sentPlayer]=fromRoster.splice(fromIndex,1);
+  const [receivedPlayer]=toRoster.splice(toIndex,1);
+  if(!sentPlayer || !receivedPlayer) return false;
+  fromRoster.push(receivedPlayer);
+  toRoster.push(sentPlayer);
+  normalizeCpuTeamLineups(proposal.fromTeamIdx);
+  normalizeCpuTeamLineups(proposal.toTeamIdx);
+  logActivity(
+    'trade',
+    opts.activityTitle || 'CPU trade completed',
+    `${teamName(proposal.fromTeamIdx)} traded ${sentPlayer.name} to ${teamName(proposal.toTeamIdx)} for ${receivedPlayer.name}.`,
+    D.myPos,
+    '🤝'
+  );
+  return true;
+}
+
+function runCpuTradeMarketForDay(day, options){
+  const numericDay=Number(day || G.day || 1);
+  if(!shouldRunCpuTradeMarketForDay(numericDay)) return {changed:false,tradesCompleted:0};
+
+  const cpuTeams=Array.from({length:G.rosters.length},(_,teamIdx)=>teamIdx)
+    .filter(teamIdx=>isCpuManagedTeam(teamIdx));
+  const proposals=[];
+  cpuTeams.forEach((fromTeamIdx, index)=>{
+    for(let inner=index+1; inner<cpuTeams.length; inner++){
+      const toTeamIdx=cpuTeams[inner];
+      const proposal=buildCpuTradeProposalForPair(fromTeamIdx, toTeamIdx, numericDay);
+      if(proposal) proposals.push(proposal);
+    }
+  });
+  proposals.sort((a,b)=>Number(b.score||0)-Number(a.score||0));
+
+  let tradesCompleted=0;
+  for(const proposal of proposals){
+    if(executeCpuTradeProposal(proposal, options)){
+      tradesCompleted=1;
+      break;
+    }
+  }
+
+  return {changed:tradesCompleted>0,tradesCompleted};
+}
+
 function getCpuIlMaintenanceValue(player){
   return Number(player?.fp || 0);
 }
