@@ -20,9 +20,36 @@ const entry = catalog.find(item => item.packId === packId);
 assert.ok(entry, 'catalog is missing the 1992-93 pack entry');
 assert.equal(entry.availability, 'playable', '1992-93 catalog entry should be playable');
 assert.equal(entry.statusLabel, 'Playable Now');
-['seasonUrl', 'simUrl', 'draftUrl', 'reimaginedUrl'].forEach(key => {
-  assert.match(String(entry[key] || ''), /historicalPackId=nba_1993_full_season_v1/, `${key} should target the 1992-93 pack`);
-});
+const expectedCatalogUrls = {
+  seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1',
+  simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1',
+  draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1',
+  reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'
+};
+for (const [key, expectedUrl] of Object.entries(expectedCatalogUrls)) {
+  assert.equal(entry[key], expectedUrl, `${key} should target the exact 1992-93 playable route`);
+}
+
+const expectedPlayableUrls = Object.values(expectedCatalogUrls);
+const historicSeasonsSource = readText('historic-seasons.html');
+for (const expectedUrl of expectedPlayableUrls) {
+  assert.ok(
+    historicSeasonsSource.includes(expectedUrl),
+    `historic-seasons fallback should include ${expectedUrl}`
+  );
+}
+
+const historicUniverseSource = readText('historic-universe.html');
+assert.ok(historicUniverseSource.includes("packId: 'nba_1993_full_season_v1'"), 'historic-universe fallback catalog should know about 1992-93');
+assert.ok(historicUniverseSource.includes("availability: 'playable'"), 'historic-universe fallback catalog should mark 1992-93 playable');
+assert.ok(historicUniverseSource.includes("shortLabel: '1992-93'"), 'historic-universe fallback catalog should label 1992-93 correctly');
+
+const rosterbateSeasonSource = readText('rosterbate-season.html');
+assert.match(
+  rosterbateSeasonSource,
+  /nba_1993_full_season_v1\s*:\s*'1992-93'/,
+  'season page short-label mapping should include 1992-93'
+);
 
 [
   'manifest.json',
@@ -71,29 +98,8 @@ assert.ok(validation.summary.playerCount > 300, '1992-93 should ship a full-leag
 const summaries = readJson(`historical-packs/${packId}/optional/summaries.json`);
 assert.match(
   JSON.stringify(summaries),
-  /inferred|estimated|foundation/i,
+  /(?:inferred[\s\S]{0,40}player-game coverage|player-game coverage[\s\S]{0,40}inferred)/i,
   '1992-93 summaries should disclose inferred player-game coverage'
-);
-
-const historicSeasonsSource = readText('historic-seasons.html');
-assert.match(
-  historicSeasonsSource,
-  /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?seasonUrl:\s*'rosterbate-season\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'/,
-  'historic-seasons fallback catalog should include 1992-93 as playable'
-);
-
-const historicUniverseSource = readText('historic-universe.html');
-assert.match(
-  historicUniverseSource,
-  /packId:\s*'nba_1993_full_season_v1'/,
-  'historic-universe fallback catalog should know about 1992-93'
-);
-
-const rosterbateSeasonSource = readText('rosterbate-season.html');
-assert.match(
-  rosterbateSeasonSource,
-  /nba_1993_full_season_v1:'1992-93'/,
-  'season page short-label mapping should include 1992-93'
 );
 
 console.log('historical 1992-93 preset test passed');
