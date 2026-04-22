@@ -522,6 +522,7 @@ assert.match(emptyRosterMoves, /This universe has not logged recent team roster 
 const tradeHistoryState = JSON.parse(JSON.stringify({
   ...state,
   activityLog: [
+    { id: 'th0', type: 'trade', title: 'Audit Agents completed a trade', text: 'Audit Agents traded Brent Barry to CPU Team 1 for Cliff Robinson.', teamIdx: 0, ts: 10750 },
     { id: 'th1', type: 'trade', title: 'Trade offer sent', text: 'Audit Agents offered Brent Barry to CPU Team 1 for Cliff Robinson.', teamIdx: 0, ts: 9900 },
     { id: 'th2', type: 'trade', title: 'Trade rejected', text: 'CPU Team 1 turned down a trade offer from Audit Agents.', teamIdx: 1, ts: 10050 },
     { id: 'th3', type: 'trade', title: 'Commissioner rejected trade', text: 'Commissioner vetoed a trade between CPU Team 4 and CPU Team 5.', teamIdx: 0, ts: 10100 },
@@ -552,6 +553,18 @@ assert.deepStrictEqual(
     'CPU Team 6 traded Scoring Wing to CPU Team 7 for Rebounder.',
     'CPU Team 8 traded Bench Creator to CPU Team 9 for Two-Way Forward.'
   ]
+);
+assert.doesNotMatch(
+  context.renderDetailList(
+    tradeHistoryViewModel.recentLeagueTrades,
+    'detail-item',
+    {
+      title: 'No recent league trades',
+      body: 'This universe has not logged completed league trades yet.'
+    }
+  ),
+  /Audit Agents traded Brent Barry to CPU Team 1 for Cliff Robinson/,
+  'completed user trades should not appear in recent league trades'
 );
 assert.deepStrictEqual(
   tradeHistoryViewModel.recentLeagueTrades.map(item => item.body),

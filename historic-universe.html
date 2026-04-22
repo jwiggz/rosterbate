@@ -1034,7 +1034,7 @@
   function buildRecentLeagueTradesSummary(slot, state){
     return (Array.isArray(state?.activityLog) ? state.activityLog : [])
       .filter(function(entry){
-        return isCompletedTradeActivityEntry(entry);
+        return isCompletedTradeActivityEntry(entry) && !isControlledTeamActivity(slot, state, entry);
       })
       .slice()
       .sort(function(a, b){
