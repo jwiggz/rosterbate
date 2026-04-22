@@ -833,7 +833,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
-  /Result:/,
+  /<strong>Simulation day completed\.<\/strong>/,
   'null-result days should not render a result block'
 );
 assert.match(
