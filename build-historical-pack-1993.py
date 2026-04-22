@@ -435,17 +435,18 @@ def parse_list_data_urls():
 
 def audit_source_mode():
     urls = parse_list_data_urls()
-    has_live_archives = (
-        "nbastats_1992" in urls and "pbpstats_1992" in urls
-    )
-    if has_live_archives:
+    feed_keys = ["nbastats_1992", "pbpstats_1992"]
+    present_feeds = [feed_key for feed_key in feed_keys if feed_key in urls]
+    missing_feeds = [feed_key for feed_key in feed_keys if feed_key not in urls]
+    if present_feeds:
         raise RuntimeError(
-            "1992-93 live archive feeds unexpectedly exist. Revisit the builder plan before silently switching source lanes."
+            "1992-93 live archive feeds unexpectedly exist: "
+            f"{', '.join(present_feeds)}. Revisit the builder plan before silently switching source lanes."
         )
     return {
         "mode": SOURCE_MODE,
-        "liveArchivesPresent": False,
-        "missingFeeds": ["nbastats_1992", "pbpstats_1992"],
+        "liveArchivesPresent": bool(present_feeds),
+        "missingFeeds": missing_feeds,
     }
 
 
@@ -1526,6 +1527,7 @@ def main():
 
     schedule_results_snapshot = read_source_json("schedule_results.json")
     player_source_snapshot = read_source_json("normalized_players.json")
+    source_audit = audit_source_mode()
 
     if schedule_results_snapshot.get("sourceMode") != SOURCE_MODE:
         raise RuntimeError(
