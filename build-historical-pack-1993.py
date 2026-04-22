@@ -1514,7 +1514,6 @@ def build_primary_team_inferred_stint(player):
 def main():
     ensure_dir(PACK_ROOT)
     generated_at = datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
-    source_audit = audit_source_mode()
 
     team_defs = []
     team_by_abbr = {}
