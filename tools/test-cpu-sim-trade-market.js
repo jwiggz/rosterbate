@@ -89,6 +89,7 @@ function extractFunctionSource(name, { optional = false } = {}) {
 
 const isCpuTradeSimulationUniverseSource = extractFunctionSource('isCpuTradeSimulationUniverse');
 const shouldRunCpuTradeMarketForDaySource = extractFunctionSource('shouldRunCpuTradeMarketForDay');
+const buildCpuTradeRosterNeedSummarySource = extractFunctionSource('buildCpuTradeRosterNeedSummary');
 const getCpuTradeProtectedPlayerIdsSource = extractFunctionSource('getCpuTradeProtectedPlayerIds');
 const getCpuTradeOutgoingCandidatesSource = extractFunctionSource('getCpuTradeOutgoingCandidates');
 const getCpuTradeIncomingFitScoreSource = extractFunctionSource('getCpuTradeIncomingFitScore');
@@ -299,6 +300,7 @@ function buildContext(options = {}) {
     [
       isCpuTradeSimulationUniverseSource,
       shouldRunCpuTradeMarketForDaySource,
+      buildCpuTradeRosterNeedSummarySource,
       getCpuTradeProtectedPlayerIdsSource,
       getCpuTradeOutgoingCandidatesSource,
       getCpuTradeIncomingFitScoreSource,
