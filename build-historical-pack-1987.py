@@ -28,6 +28,11 @@ SOURCE_SEASON_KEY = "1986"
 REGULAR_SEASON_START = "1986-10-31"
 REGULAR_SEASON_END = "1987-04-19"
 SOURCE_MODE = "foundation_snapshot"
+ENTITY_PREFIX = "nba_1987"
+ERA_KEY = "1980s"
+ERA_TAGS = ["1980s", "Late 80s", "Historic Season"]
+SOURCE_PROFILE = "historical_foundation_snapshot"
+FEATURED_TEAM_ID = f"{ENTITY_PREFIX}_lal"
 
 LIST_DATA_URL = "https://raw.githubusercontent.com/shufinskiy/nba_data/main/list_data.txt"
 TEAM_PAGE_URL = "https://thebasketballdatabase.com/{season}{abbr}RegularSeasonBoxScore.html"
@@ -56,33 +61,27 @@ TEAM_PAGE_TOTAL_FIELDS = [
 TEAM_DEFS = [
     {"slug": "atl", "abbr": "ATL", "city": "Atlanta", "name": "Hawks", "displayName": "Atlanta Hawks", "conference": "East", "division": "Central", "palette": {"primary": "#9D2235", "secondary": "#FDB927"}},
     {"slug": "bos", "abbr": "BOS", "city": "Boston", "name": "Celtics", "displayName": "Boston Celtics", "conference": "East", "division": "Atlantic", "palette": {"primary": "#007A33", "secondary": "#BA9653"}},
-    {"slug": "chh", "abbr": "CHH", "city": "Charlotte", "name": "Hornets", "displayName": "Charlotte Hornets", "conference": "East", "division": "Central", "palette": {"primary": "#00788C", "secondary": "#5A2D81"}},
     {"slug": "chi", "abbr": "CHI", "city": "Chicago", "name": "Bulls", "displayName": "Chicago Bulls", "conference": "East", "division": "Central", "palette": {"primary": "#CE1141", "secondary": "#000000"}},
     {"slug": "cle", "abbr": "CLE", "city": "Cleveland", "name": "Cavaliers", "displayName": "Cleveland Cavaliers", "conference": "East", "division": "Central", "palette": {"primary": "#860038", "secondary": "#FDBB30"}},
+    {"slug": "dal", "abbr": "DAL", "city": "Dallas", "name": "Mavericks", "displayName": "Dallas Mavericks", "conference": "West", "division": "Midwest", "palette": {"primary": "#00538C", "secondary": "#B8C4CA"}},
+    {"slug": "den", "abbr": "DEN", "city": "Denver", "name": "Nuggets", "displayName": "Denver Nuggets", "conference": "West", "division": "Midwest", "palette": {"primary": "#0E2240", "secondary": "#FEC524"}},
     {"slug": "det", "abbr": "DET", "city": "Detroit", "name": "Pistons", "displayName": "Detroit Pistons", "conference": "East", "division": "Central", "palette": {"primary": "#C8102E", "secondary": "#1D42BA"}},
+    {"slug": "gos", "abbr": "GOS", "city": "Golden State", "name": "Warriors", "displayName": "Golden State Warriors", "conference": "West", "division": "Pacific", "palette": {"primary": "#1D428A", "secondary": "#FFC72C"}},
+    {"slug": "hou", "abbr": "HOU", "city": "Houston", "name": "Rockets", "displayName": "Houston Rockets", "conference": "West", "division": "Midwest", "palette": {"primary": "#CE1141", "secondary": "#C4CED4"}},
     {"slug": "ind", "abbr": "IND", "city": "Indiana", "name": "Pacers", "displayName": "Indiana Pacers", "conference": "East", "division": "Central", "palette": {"primary": "#002D62", "secondary": "#FDBB30"}},
-    {"slug": "mia", "abbr": "MIA", "city": "Miami", "name": "Heat", "displayName": "Miami Heat", "conference": "East", "division": "Atlantic", "palette": {"primary": "#98002E", "secondary": "#F9A01B"}},
     {"slug": "mil", "abbr": "MIL", "city": "Milwaukee", "name": "Bucks", "displayName": "Milwaukee Bucks", "conference": "East", "division": "Central", "palette": {"primary": "#00471B", "secondary": "#EEE1C6"}},
     {"slug": "njn", "abbr": "NJN", "city": "New Jersey", "name": "Nets", "displayName": "New Jersey Nets", "conference": "East", "division": "Atlantic", "palette": {"primary": "#000000", "secondary": "#FFFFFF"}},
     {"slug": "nyk", "abbr": "NYK", "city": "New York", "name": "Knicks", "displayName": "New York Knicks", "conference": "East", "division": "Atlantic", "palette": {"primary": "#006BB6", "secondary": "#F58426"}},
-    {"slug": "orl", "abbr": "ORL", "city": "Orlando", "name": "Magic", "displayName": "Orlando Magic", "conference": "East", "division": "Atlantic", "palette": {"primary": "#0077C0", "secondary": "#C4CED4"}},
-    {"slug": "phi", "abbr": "PHI", "city": "Philadelphia", "name": "76ers", "displayName": "Philadelphia 76ers", "conference": "East", "division": "Atlantic", "palette": {"primary": "#006BB6", "secondary": "#ED174C"}},
-    {"slug": "tor", "abbr": "TOR", "city": "Toronto", "name": "Raptors", "displayName": "Toronto Raptors", "conference": "East", "division": "Central", "palette": {"primary": "#753BBD", "secondary": "#BA0C2F"}},
-    {"slug": "was", "abbr": "WAS", "city": "Washington", "name": "Wizards", "displayName": "Washington Wizards", "conference": "East", "division": "Atlantic", "palette": {"primary": "#002B5C", "secondary": "#E31837"}},
-    {"slug": "dal", "abbr": "DAL", "city": "Dallas", "name": "Mavericks", "displayName": "Dallas Mavericks", "conference": "West", "division": "Midwest", "palette": {"primary": "#00538C", "secondary": "#B8C4CA"}},
-    {"slug": "den", "abbr": "DEN", "city": "Denver", "name": "Nuggets", "displayName": "Denver Nuggets", "conference": "West", "division": "Midwest", "palette": {"primary": "#0E2240", "secondary": "#FEC524"}},
-    {"slug": "gsw", "abbr": "GSW", "city": "Golden State", "name": "Warriors", "displayName": "Golden State Warriors", "conference": "West", "division": "Pacific", "palette": {"primary": "#1D428A", "secondary": "#FFC72C"}},
-    {"slug": "hou", "abbr": "HOU", "city": "Houston", "name": "Rockets", "displayName": "Houston Rockets", "conference": "West", "division": "Midwest", "palette": {"primary": "#CE1141", "secondary": "#C4CED4"}},
     {"slug": "lac", "abbr": "LAC", "city": "Los Angeles", "name": "Clippers", "displayName": "LA Clippers", "conference": "West", "division": "Pacific", "palette": {"primary": "#ED174C", "secondary": "#1D428A"}},
     {"slug": "lal", "abbr": "LAL", "city": "Los Angeles", "name": "Lakers", "displayName": "Los Angeles Lakers", "conference": "West", "division": "Pacific", "palette": {"primary": "#552583", "secondary": "#FDB927"}},
-    {"slug": "min", "abbr": "MIN", "city": "Minnesota", "name": "Timberwolves", "displayName": "Minnesota Timberwolves", "conference": "West", "division": "Midwest", "palette": {"primary": "#0C2340", "secondary": "#236192"}},
     {"slug": "phx", "abbr": "PHX", "city": "Phoenix", "name": "Suns", "displayName": "Phoenix Suns", "conference": "West", "division": "Pacific", "palette": {"primary": "#1D1160", "secondary": "#E56020"}},
+    {"slug": "phl", "abbr": "PHL", "city": "Philadelphia", "name": "76ers", "displayName": "Philadelphia 76ers", "conference": "East", "division": "Atlantic", "palette": {"primary": "#006BB6", "secondary": "#ED174C"}},
     {"slug": "por", "abbr": "POR", "city": "Portland", "name": "Trail Blazers", "displayName": "Portland Trail Blazers", "conference": "West", "division": "Pacific", "palette": {"primary": "#E03A3E", "secondary": "#000000"}},
     {"slug": "sac", "abbr": "SAC", "city": "Sacramento", "name": "Kings", "displayName": "Sacramento Kings", "conference": "West", "division": "Pacific", "palette": {"primary": "#5A2D81", "secondary": "#63727A"}},
-    {"slug": "sas", "abbr": "SAS", "city": "San Antonio", "name": "Spurs", "displayName": "San Antonio Spurs", "conference": "West", "division": "Midwest", "palette": {"primary": "#C4CED4", "secondary": "#000000"}},
+    {"slug": "san", "abbr": "SAN", "city": "San Antonio", "name": "Spurs", "displayName": "San Antonio Spurs", "conference": "West", "division": "Midwest", "palette": {"primary": "#C4CED4", "secondary": "#000000"}},
     {"slug": "sea", "abbr": "SEA", "city": "Seattle", "name": "SuperSonics", "displayName": "Seattle SuperSonics", "conference": "West", "division": "Pacific", "palette": {"primary": "#00653A", "secondary": "#FFC200"}},
-    {"slug": "uta", "abbr": "UTA", "city": "Utah", "name": "Jazz", "displayName": "Utah Jazz", "conference": "West", "division": "Midwest", "palette": {"primary": "#002B5C", "secondary": "#00471B"}},
-    {"slug": "van", "abbr": "VAN", "city": "Vancouver", "name": "Grizzlies", "displayName": "Vancouver Grizzlies", "conference": "West", "division": "Midwest", "palette": {"primary": "#041E42", "secondary": "#00B2A9"}},
+    {"slug": "uth", "abbr": "UTH", "city": "Utah", "name": "Jazz", "displayName": "Utah Jazz", "conference": "West", "division": "Midwest", "palette": {"primary": "#002B5C", "secondary": "#00471B"}},
+    {"slug": "was", "abbr": "WAS", "city": "Washington", "name": "Bullets", "displayName": "Washington Bullets", "conference": "East", "division": "Atlantic", "palette": {"primary": "#C8102E", "secondary": "#002B5C"}},
 ]
 
 
@@ -641,13 +640,13 @@ def main():
     team_by_abbr = {}
     for team in TEAM_DEFS:
         team_copy = dict(team)
-        team_copy["teamId"] = f"nba_2001_{team['slug']}"
+        team_copy["teamId"] = f"{ENTITY_PREFIX}_{team['slug']}"
         team_defs.append(team_copy)
         team_by_abbr[team_copy["abbr"]] = team_copy
 
     list_data_urls = parse_list_data_urls()
     if "nbastats_2000" not in list_data_urls or "pbpstats_2000" not in list_data_urls:
-        raise RuntimeError("Required 2000-01 season archives were not found in the source dataset index.")
+        raise RuntimeError("Required 1986-87 season archives were not found in the source dataset index.")
 
     pbp_rows = fetch_tar_csv_rows(list_data_urls["nbastats_2000"], "nbastats_2000")
     possession_rows = fetch_tar_csv_rows(list_data_urls["pbpstats_2000"], "pbpstats_2000")
@@ -675,17 +674,17 @@ def main():
                 team_numeric_to_abbr[team_numeric_id] = abbr
 
     if not regular_games_by_id:
-        raise RuntimeError("No 2000-01 regular-season game rows were found in the source dataset.")
+        raise RuntimeError("No 1986-87 regular-season game rows were found in the source dataset.")
 
     team_by_numeric = {}
     for team_numeric_id, abbr in sorted(team_numeric_to_abbr.items()):
         if abbr not in team_by_abbr:
-            raise RuntimeError(f"Source team abbreviation `{abbr}` is not defined in the 2000-01 team map.")
+            raise RuntimeError(f"Source team abbreviation `{abbr}` is not defined in the 1986-87 team map.")
         team_by_numeric[team_numeric_id] = team_by_abbr[abbr]
 
     if len({team["teamId"] for team in team_by_numeric.values()}) != 29:
         raise RuntimeError(
-            f"Expected 29 teams from the 2000-01 source rows, found {len({team['teamId'] for team in team_by_numeric.values()})}."
+            f"Expected 23 teams from the 1986-87 source rows, found {len({team['teamId'] for team in team_by_numeric.values()})}."
         )
 
     team_page_players = defaultdict(dict)
@@ -736,7 +735,7 @@ def main():
 
         home_team = team_by_numeric[derived["homeTeamNumericId"]]
         away_team = team_by_numeric[derived["awayTeamNumericId"]]
-        canonical_game_id = f"nba_2001_game_{game_number:04d}"
+        canonical_game_id = f"{ENTITY_PREFIX}_game_{game_number:04d}"
         source_game_to_canonical[source_game_id] = canonical_game_id
 
         schedule.append(
@@ -790,7 +789,7 @@ def main():
                 )
 
             opponent_team_id = matchup_team_ids["away"] if canonical_team["teamId"] == matchup_team_ids["home"] else matchup_team_ids["home"]
-            canonical_player_id = f"nba_2001_{slugify(player_numeric_id)}"
+            canonical_player_id = f"{ENTITY_PREFIX}_{slugify(player_numeric_id)}"
             display_name = ""
             for team_id in player_team_candidates.get(player_numeric_id, set()):
                 display_name = team_page_players[team_id].get(player_numeric_id, "")
@@ -803,7 +802,7 @@ def main():
 
             player_game_stats.append(
                 {
-                    "playerId": f"nba_2001_{slugify(display_name)}_{player_numeric_id}",
+                    "playerId": f"{ENTITY_PREFIX}_{slugify(display_name)}_{player_numeric_id}",
                     "gameId": canonical_game_id,
                     "seasonId": SEASON_ID,
                     "teamId": canonical_team["teamId"],
@@ -832,7 +831,7 @@ def main():
 
     union_player_ids = sorted(set(player_team_candidates.keys()) | set(player_season.keys()), key=lambda value: (to_int(value), value))
     if not union_player_ids:
-        raise RuntimeError("No 2000-01 player rows were discovered while building the pack.")
+        raise RuntimeError("No 1986-87 player rows were discovered while building the pack.")
 
     players = []
     player_numeric_to_canonical = {}
@@ -912,7 +911,7 @@ def main():
             "threes": round_stat(aggregate_totals["threePointersMade"] / divisor, 1),
         }
 
-        canonical_player_id = f"nba_2001_{slugify(display_name)}_{player_numeric_id}"
+        canonical_player_id = f"{ENTITY_PREFIX}_{slugify(display_name)}_{player_numeric_id}"
         player_numeric_to_canonical[player_numeric_id] = {
             "playerId": canonical_player_id,
             "teamId": primary_team["teamId"],
@@ -930,7 +929,7 @@ def main():
                 "secondaryPositions": secondary_positions(primary_position),
                 "status": "active",
                 "draftEligible": True,
-                "bio": f"{display_name} is part of the 2000-01 {primary_team['displayName']} historical player pool.",
+                "bio": f"{display_name} is part of the {SOURCE_SEASON} {primary_team['displayName']} historical player pool.",
                 "externalRefs": {
                     "sourcePlayerId": player_numeric_id,
                     "theBasketballDatabasePage": f"{player_numeric_id}RegularSeasonBoxScore.html",
@@ -1046,10 +1045,10 @@ def main():
         "endDate": REGULAR_SEASON_END,
         "seasonType": "historical_pack",
         "isHistorical": True,
-        "eraTags": ["2000s", "Dynasty Transition", "Historic Season"],
+        "eraTags": ERA_TAGS,
         "notes": [
-            "Full-league historical foundation pack for 2000-01.",
-            "Supports real-season boots, Draft The Era, and Reimagined Season.",
+            "Source-aware scaffold for a full-league 1986-87 historical foundation pack.",
+            "Pack generation remains blocked until snapshot schedule translation and roster assembly are implemented.",
         ],
     }
 
@@ -1066,19 +1065,19 @@ def main():
         "seasonLabel": SEASON_LABEL,
         "seasonType": "historical_pack",
         "isHistorical": True,
-        "era": "2000s",
+        "era": ERA_KEY,
         "version": 1,
-        "status": "ready",
-        "sourceProfile": "historical_curated",
+        "status": "scaffold",
+        "sourceProfile": SOURCE_PROFILE,
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
         "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
         "defaultEntryMode": "real_season",
-        "focusTeamId": "nba_2001_lal",
-        "subtitle": "Play the real season, redraft the era, or branch into a turn-of-the-century alternate universe.",
-        "description": "A 2000-01 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
-        "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
-        "eraTags": ["2000s", "Dynasty Era", "Historic Season"],
+        "focusTeamId": FEATURED_TEAM_ID,
+        "subtitle": "Source-aware scaffold for the 1986-87 NBA season with audited archive gaps and checked-in schedule seeds.",
+        "description": "A scaffolded 1986-87 NBA historical season builder that audits missing live archives and anchors future work to checked-in source snapshots.",
+        "tagline": "Late-80s league foundation with honest source disclosure.",
+        "eraTags": ERA_TAGS,
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
         "playerPoolType": "full_season_player_pool",
         "draftModes": ["snake", "auction"],
@@ -1096,10 +1095,10 @@ def main():
             "summaries": "optional/summaries.json",
         },
         "provenance": {
-            "sourceProfile": "historical_curated",
+            "sourceProfile": SOURCE_PROFILE,
             "curationOwner": "RosterBate",
             "reviewStatus": "draft",
-            "importNotes": "2000-01 pack built from official stats.nba.com play-by-play archives published by shufinskiy/nba_data for schedule, results, and game-event stats, with team-page season totals and roster metadata sourced from TheBasketballDatabase.",
+            "importNotes": "1986-87 scaffold currently audits the missing live archive feeds, loads a checked-in schedule/results seed snapshot, and stops before pack generation so later tasks can implement translation deliberately.",
         },
         "auditSummary": {
             "realStatCoverage": {
@@ -1117,10 +1116,10 @@ def main():
             },
         },
         "notes": [
-            "Schedule and final scores come from official 2000-01 regular-season play-by-play archives.",
-            "Season totals, minutes, and roster metadata come from TheBasketballDatabase team box-score pages.",
-            "Per-game player stat rows carry official event totals with weighted minute estimates normalized to season-average workloads.",
-            "The pack spotlights the Lakers dynasty lane while preserving the full-league player pool.",
+            "The builder audits that 1986 live archive feeds are absent before doing any pack work.",
+            "Schedule/results currently come from a checked-in partial foundation snapshot rather than live archive imports.",
+            "Team universe definitions are aligned to the 23-team 1986-87 league and TheBasketballDatabase abbreviations.",
+            "Full schedule translation, roster generation, and player-game buildout remain future tasks.",
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
@@ -1128,54 +1127,47 @@ def main():
 
     presentation = {
         "heroTitle": SEASON_LABEL,
-        "heroSubtitle": "Step into the Shaq-and-Kobe title-defense season or redraft the full turn-of-the-century league.",
-        "featuredTeamId": "nba_2001_lal",
-        "featuredStars": [
-            "nba_2001_shaquille_o_neal_406",
-            "nba_2001_kobe_bryant_977",
-            "nba_2001_allen_iverson_947",
-            "nba_2001_tim_duncan_1495",
-            "nba_2001_kevin_garnett_708",
-            "nba_2001_chris_webber_185",
-        ],
+        "heroSubtitle": "Scaffolded 1986-87 league foundation with source-audit guardrails before the full build arrives.",
+        "featuredTeamId": FEATURED_TEAM_ID,
+        "featuredStars": [],
         "artDirection": {
-            "heroTone": "dynasty",
-            "primaryPalette": ["#5f3293", "#f0c461", "#111111"],
+            "heroTone": "historic_rivalry",
+            "primaryPalette": ["#552583", "#007A33", "#C8102E"],
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "real_season", "label": "Play The Real Season", "description": "Step into 2000-01 with the historical league intact."},
-            {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the full 2000-01 player pool into a new fantasy universe."},
-            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch a reshuffled 2000-01 and play the alternate branch from opening night."},
+            {"mode": "real_season", "label": "Play The Real Season", "description": "Reserved for the eventual full 1986-87 historical season build."},
+            {"mode": "historical_draft", "label": "Draft The Era", "description": "Reserved for a future late-80s full-league draftable player pool."},
+            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Reserved for the alternate-history 1986-87 branch once the core pack exists."},
         ],
     }
 
     summaries = {
-        "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for real-season play, Draft The Era, and Reimagined Season.",
+        "packSummary": "The 1986-87 builder is currently a source-aware scaffold: it locks the league to the correct 23-team universe, records missing live archive feeds, and anchors future work to a checked-in schedule/results snapshot.",
         "featuredStorylines": [
-            "The Lakers title-defense season anchors the pack with Shaq-and-Kobe dynasty energy from opening night forward.",
-            "Iverson's MVP season, Duncan's Spurs, Garnett's rise, and Webber's Kings keep the full-league fantasy board loaded well beyond Los Angeles.",
-            "The archive gains a true early-2000s lane with different pacing, spacing, and roster texture from both the 1990s and modern packs.",
+            "The scaffold preserves a late-80s league footprint instead of leaking later expansion-era franchises into future implementation work.",
+            "Missing 1986 live archive feeds are disclosed up front so downstream tasks cannot silently switch data lanes.",
+            "The checked-in schedule snapshot is explicitly partial, giving later tasks a safe seed without implying full regular-season coverage.",
         ],
         "teamSpotlights": [
-            {"teamId": "nba_2001_lal", "summary": "The Lakers are the flagship dynasty path, built around Shaq's force, Kobe's ascent, and a title-defense season with championship gravity."},
-            {"teamId": "nba_2001_phi", "summary": "Philadelphia offers the Allen Iverson MVP route and one of the era's clearest one-star-versus-the-league challenges."},
-            {"teamId": "nba_2001_sas", "summary": "San Antonio provides the Duncan path with elite interior play and a disciplined contender profile."},
-            {"teamId": "nba_2001_sac", "summary": "Sacramento delivers the Webber-era Kings lane and one of the era's most creative offensive cores."},
-            {"teamId": "nba_2001_por", "summary": "Portland brings a deep veteran roster and a different West contender route from the dynasty spotlight teams."},
+            {"teamId": f"{ENTITY_PREFIX}_lal", "summary": "Los Angeles remains a natural featured-team lane for later full-pack work once roster and schedule translation are implemented."},
+            {"teamId": f"{ENTITY_PREFIX}_bos", "summary": "Boston is preserved as a core late-80s East power in the corrected team universe scaffold."},
+            {"teamId": f"{ENTITY_PREFIX}_chi", "summary": "Chicago stays in the league foundation for later era-building without pulling in unrelated modern-season assumptions."},
+            {"teamId": f"{ENTITY_PREFIX}_hou", "summary": "Houston anchors part of the West structure in the corrected 23-team 1986-87 map."},
+            {"teamId": f"{ENTITY_PREFIX}_sea", "summary": "Seattle remains available for future pack storytelling inside the proper pre-expansion team set."},
         ],
         "modeSummaries": [
-            {"mode": "real_season", "summary": "Keep the 2000-01 season intact and see whether you can outpace the Lakers dynasty branch or rewrite it."},
-            {"mode": "historical_draft", "summary": "Remix the full-league 2000-01 player universe and discover what the era becomes with custom rosters."},
-            {"mode": "reimagined_season", "summary": "Launch a reshuffled version of 2000-01 and treat the season like an alternate-history branch from day one."},
+            {"mode": "real_season", "summary": "Planned mode for replaying the eventual full 1986-87 season once source translation is implemented."},
+            {"mode": "historical_draft", "summary": "Planned mode for redrafting the completed late-80s player universe after the scaffold grows into a full pack."},
+            {"mode": "reimagined_season", "summary": "Planned mode for alternate-history play once the underlying 1986-87 pack data is complete."},
         ],
         "auditSummary": manifest["auditSummary"],
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
         "auditNotes": [
-            "Real season stats cover every included player who logged official 2000-01 regular-season minutes.",
-            "Schedule and results span the full regular season using real historical game records.",
-            "Per-game stat lines use official event totals with inferred minute estimates normalized to season-average workloads.",
+            "The builder intentionally stops after source audit and snapshot load because full 1986-87 schedule translation is not implemented yet.",
+            "The checked-in schedule/results source file is explicitly partial and should not be treated as full-season coverage.",
+            "Player-game coverage remains a future task and will require inferred or curated handling because live 1986 archive feeds are absent.",
         ],
     }
 
@@ -1189,41 +1181,41 @@ def main():
         ],
         "challenges": [
             {
-                "challengeId": "lakers_repeat",
+                "challengeId": "featured_team_50_wins",
                 "mode": "real_season",
-                "path": "lakers_dynasty_path",
-                "title": "Repeat The Title Run",
-                "description": "Choose the Lakers and finish the season with the league's best record.",
+                "path": "featured_team_path",
+                "title": "Featured Team Benchmark",
+                "description": "Placeholder challenge for the eventual featured-team real-season path.",
                 "type": "season_wins_min",
-                "target": 56,
+                "target": 50,
                 "evaluation": "season_end",
-                "reward": "Dynasty Standard",
+                "reward": "Historic Standard",
                 "required": False,
                 "featured": True,
             },
             {
-                "challengeId": "iverson_50_wins",
+                "challengeId": "open_team_48_wins",
                 "mode": "real_season",
                 "path": "open_team_path",
-                "title": "MVP Support Run",
-                "description": "Choose any included team and finish with at least 50 wins.",
+                "title": "Open Team Run",
+                "description": "Placeholder challenge for any-team real-season play once the 1986-87 pack is buildable.",
                 "type": "season_wins_min",
-                "target": 50,
+                "target": 48,
                 "evaluation": "season_end",
-                "reward": "Turn-of-the-Century Contender",
+                "reward": "Late-80s Contender",
                 "required": False,
                 "featured": False,
             },
             {
-                "challengeId": "draft_era_60_wins",
+                "challengeId": "draft_era_58_wins",
                 "mode": "historical_draft",
                 "path": "alternate_history_success",
-                "title": "Build A 60-Win Team",
-                "description": "Complete a historical fantasy draft and finish with at least 60 wins.",
+                "title": "Build A 58-Win Team",
+                "description": "Placeholder draft challenge for the eventual 1986-87 full-league player pool.",
                 "type": "season_wins_min",
-                "target": 60,
+                "target": 58,
                 "evaluation": "season_end",
-                "reward": "Loaded Era Architect",
+                "reward": "Era Architect",
                 "required": False,
                 "featured": True,
             },
@@ -1232,11 +1224,11 @@ def main():
                 "mode": "reimagined_season",
                 "path": "reshuffled_league",
                 "title": "Win The Reimagined League",
-                "description": "Take your selected franchise through the reshuffled 2000-01 universe and win the title.",
+                "description": "Placeholder title challenge for the eventual reshuffled 1986-87 universe.",
                 "type": "win_championship",
                 "target": True,
                 "evaluation": "season_end",
-                "reward": "Alternate Millennium Champion",
+                "reward": "Alternate History Champion",
                 "required": False,
                 "featured": True,
             },
