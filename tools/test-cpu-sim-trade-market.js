@@ -492,6 +492,7 @@ function buildContext(options = {}) {
 
   const maintenanceResult = context.maintainCpuLeagueRosters({ day: 3 });
   assert.equal(maintenanceResult.tradesCompleted, 1);
+  assert.equal(activityCalls.length, 1);
   assert.match(activityCalls[0].title, /CPU trade completed/i);
 }
 

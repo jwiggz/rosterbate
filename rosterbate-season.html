@@ -4838,6 +4838,7 @@ function maintainCpuTeamRoster(teamIdx, options){
 function maintainCpuLeagueRosters(options){
   if(D?.multiplayer || !Array.isArray(G?.rosters) || G.rosters.length<2) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0,tradesCompleted:0};
   let changed=false;
+  let rosterMaintenanceChanged=false;
   let movedToIl=0;
   let activated=0;
   let waiverAdds=0;
@@ -4847,6 +4848,7 @@ function maintainCpuLeagueRosters(options){
     const result=maintainCpuTeamRoster(teamIdx, options);
     if(!result) continue;
     changed = changed || !!result.changed;
+    rosterMaintenanceChanged = rosterMaintenanceChanged || !!result.changed;
     movedToIl += Number(result.movedToIl||0);
     activated += Number(result.activated||0);
     waiverAdds += Number(result.waiverAdds||0);
@@ -4857,20 +4859,14 @@ function maintainCpuLeagueRosters(options){
     changed = changed || !!tradeResult.changed;
     tradesCompleted += Number(tradeResult.tradesCompleted||0);
   }
-  if(changed){
+  if(rosterMaintenanceChanged){
     const rosterMaintenanceCopy=movedToIl || activated || waiverAdds || waiverDrops
       ? `AI teams auto-managed ${movedToIl} ${getIlSlotKey()} move${movedToIl===1?'':'s'}, ${activated} activation${activated===1?'':'s'}, and ${waiverAdds} waiver add${waiverAdds===1?'':'s'} to keep solo rosters legal.`
       : '';
-    const tradeMaintenanceCopy=tradesCompleted
-      ? `AI teams completed ${tradesCompleted} trade${tradesCompleted===1?'':'s'} to rebalance the league.`
-      : '';
-    const maintenanceCopy=rosterMaintenanceCopy && tradeMaintenanceCopy
-      ? `${rosterMaintenanceCopy} ${tradeMaintenanceCopy}`
-      : (rosterMaintenanceCopy || tradeMaintenanceCopy);
     logActivity(
       'league',
-      'CPU lineup maintenance',
-      maintenanceCopy,
+      'CPU roster maintenance',
+      rosterMaintenanceCopy,
       D.myPos,
       '🤖'
     );
