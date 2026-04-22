@@ -1010,7 +1010,13 @@
     const type = String(entry?.type || '').trim().toLowerCase();
     const title = String(entry?.title || '').trim();
     const body = String(entry?.text || '').trim();
-    return type === 'trade' && (title.length > 0 || body.length > 0);
+    const haystack = (title + ' ' + body).trim().toLowerCase();
+    if(type !== 'trade') return false;
+    if(!haystack) return false;
+    if(!haystack.includes('completed')) return false;
+    if(/(?:offer|rejected|reject|veto|vetoed|pending|declin|expired)/i.test(haystack)) return false;
+    if(!/\btrade\b/i.test(haystack) && !/\btraded\b/i.test(body)) return false;
+    return true;
   }
 
   function buildRecentLeagueTradesSummary(slot, state){

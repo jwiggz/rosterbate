@@ -518,9 +518,32 @@ const emptyRosterMoves = context.renderDetailList(
 assert.match(emptyRosterMoves, /No recent roster moves/);
 assert.match(emptyRosterMoves, /This universe has not logged recent team roster changes yet\./);
 
-assert.equal(viewModel.recentLeagueTrades.length, 5);
+const tradeHistoryState = JSON.parse(JSON.stringify({
+  ...state,
+  activityLog: [
+    { id: 'th1', type: 'trade', title: 'Trade offer sent', text: 'Audit Agents offered Brent Barry to CPU Team 1 for Cliff Robinson.', teamIdx: 0, ts: 9900 },
+    { id: 'th2', type: 'trade', title: 'Trade rejected', text: 'CPU Team 1 turned down a trade offer from Audit Agents.', teamIdx: 1, ts: 10050 },
+    { id: 'th3', type: 'trade', title: 'Commissioner rejected trade', text: 'Commissioner vetoed a trade between CPU Team 4 and CPU Team 5.', teamIdx: 0, ts: 10100 },
+    { id: 'th4', type: 'trade', title: 'CPU trade completed', text: 'CPU Team 3 traded Wing Stopper to CPU Team 1 for Stretch Four.', teamIdx: -1, ts: 10600 },
+    { id: 'th5', type: 'trade', title: 'Trade completed', text: 'CPU Team 1 traded Bench Big to CPU Team 2 for Bench Creator.', teamIdx: -1, ts: 10400 },
+    { id: 'th6', type: 'trade', title: 'CPU trade completed', text: 'CPU Team 4 traded Rim Protector to CPU Team 5 for Lead Guard.', teamIdx: -1, ts: 10200 },
+    { id: 'th7', type: 'trade', title: 'Trade completed', text: 'CPU Team 6 traded Scoring Wing to CPU Team 7 for Rebounder.', teamIdx: -1, ts: 10100 },
+    { id: 'th8', type: 'trade', title: 'CPU trade completed', text: 'CPU Team 8 traded Bench Creator to CPU Team 9 for Two-Way Forward.', teamIdx: -1, ts: 10000 },
+    { id: 'th9', type: 'trade', title: 'Trade completed', text: 'CPU Team 10 traded Stretch Big to CPU Team 11 for Guard Depth.', teamIdx: -1, ts: 9900 },
+    { id: 'th10', type: 'trade', title: 'Trade offer sent', text: 'Manager proposed a swap that never completed.', teamIdx: 0, ts: 9800 }
+  ]
+}));
+const tradeHistoryViewModel = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    tradeHistoryState,
+    {}
+  )
+));
+
+assert.equal(tradeHistoryViewModel.recentLeagueTrades.length, 5);
 assert.deepStrictEqual(
-  viewModel.recentLeagueTrades.map(item => item.title),
+  tradeHistoryViewModel.recentLeagueTrades.map(item => item.title),
   [
     'CPU Team 3 traded Wing Stopper to CPU Team 1 for Stretch Four',
     'CPU Team 1 traded Bench Big to CPU Team 2 for Bench Creator',
@@ -530,14 +553,14 @@ assert.deepStrictEqual(
   ]
 );
 assert.ok(
-  viewModel.recentLeagueTrades.every(item => !/Waiver|IL|lineup|Commissioner/i.test(item.title + ' ' + item.body)),
+  tradeHistoryViewModel.recentLeagueTrades.every(item => !/offer|rejected|veto|pending|declin|expired/i.test(item.title + ' ' + item.body)),
   'only completed trade activity should appear in recent league trades'
 );
 
 const noTradeHistory = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
     slot,
-    { ...state, activityLog: [] },
+    { ...tradeHistoryState, activityLog: [] },
     {}
   )
 ));
