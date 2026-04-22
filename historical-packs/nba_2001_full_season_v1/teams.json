@@ -1,0 +1,524 @@
+[
+  {
+    "teamId": "nba_2001_atl",
+    "seasonId": "nba_2001_historic",
+    "city": "Atlanta",
+    "name": "Hawks",
+    "displayName": "Atlanta Hawks",
+    "abbreviation": "ATL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#9D2235",
+      "secondary": "#FDB927"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ATL",
+      "theBasketballDatabasePage": "2000-01ATLRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_bos",
+    "seasonId": "nba_2001_historic",
+    "city": "Boston",
+    "name": "Celtics",
+    "displayName": "Boston Celtics",
+    "abbreviation": "BOS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#007A33",
+      "secondary": "#BA9653"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "BOS",
+      "theBasketballDatabasePage": "2000-01BOSRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_chh",
+    "seasonId": "nba_2001_historic",
+    "city": "Charlotte",
+    "name": "Hornets",
+    "displayName": "Charlotte Hornets",
+    "abbreviation": "CHH",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#00788C",
+      "secondary": "#5A2D81"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHH",
+      "theBasketballDatabasePage": "2000-01CHHRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_chi",
+    "seasonId": "nba_2001_historic",
+    "city": "Chicago",
+    "name": "Bulls",
+    "displayName": "Chicago Bulls",
+    "abbreviation": "CHI",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#CE1141",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHI",
+      "theBasketballDatabasePage": "2000-01CHIRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_cle",
+    "seasonId": "nba_2001_historic",
+    "city": "Cleveland",
+    "name": "Cavaliers",
+    "displayName": "Cleveland Cavaliers",
+    "abbreviation": "CLE",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#860038",
+      "secondary": "#FDBB30"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CLE",
+      "theBasketballDatabasePage": "2000-01CLERegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_det",
+    "seasonId": "nba_2001_historic",
+    "city": "Detroit",
+    "name": "Pistons",
+    "displayName": "Detroit Pistons",
+    "abbreviation": "DET",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#C8102E",
+      "secondary": "#1D42BA"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DET",
+      "theBasketballDatabasePage": "2000-01DETRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_ind",
+    "seasonId": "nba_2001_historic",
+    "city": "Indiana",
+    "name": "Pacers",
+    "displayName": "Indiana Pacers",
+    "abbreviation": "IND",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#002D62",
+      "secondary": "#FDBB30"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "IND",
+      "theBasketballDatabasePage": "2000-01INDRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_mia",
+    "seasonId": "nba_2001_historic",
+    "city": "Miami",
+    "name": "Heat",
+    "displayName": "Miami Heat",
+    "abbreviation": "MIA",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#98002E",
+      "secondary": "#F9A01B"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIA",
+      "theBasketballDatabasePage": "2000-01MIARegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_mil",
+    "seasonId": "nba_2001_historic",
+    "city": "Milwaukee",
+    "name": "Bucks",
+    "displayName": "Milwaukee Bucks",
+    "abbreviation": "MIL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#00471B",
+      "secondary": "#EEE1C6"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIL",
+      "theBasketballDatabasePage": "2000-01MILRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_njn",
+    "seasonId": "nba_2001_historic",
+    "city": "New Jersey",
+    "name": "Nets",
+    "displayName": "New Jersey Nets",
+    "abbreviation": "NJN",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#000000",
+      "secondary": "#FFFFFF"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NJN",
+      "theBasketballDatabasePage": "2000-01NJNRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_nyk",
+    "seasonId": "nba_2001_historic",
+    "city": "New York",
+    "name": "Knicks",
+    "displayName": "New York Knicks",
+    "abbreviation": "NYK",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#006BB6",
+      "secondary": "#F58426"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NYK",
+      "theBasketballDatabasePage": "2000-01NYKRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_orl",
+    "seasonId": "nba_2001_historic",
+    "city": "Orlando",
+    "name": "Magic",
+    "displayName": "Orlando Magic",
+    "abbreviation": "ORL",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#0077C0",
+      "secondary": "#C4CED4"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ORL",
+      "theBasketballDatabasePage": "2000-01ORLRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_phi",
+    "seasonId": "nba_2001_historic",
+    "city": "Philadelphia",
+    "name": "76ers",
+    "displayName": "Philadelphia 76ers",
+    "abbreviation": "PHI",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#006BB6",
+      "secondary": "#ED174C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHI",
+      "theBasketballDatabasePage": "2000-01PHIRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_tor",
+    "seasonId": "nba_2001_historic",
+    "city": "Toronto",
+    "name": "Raptors",
+    "displayName": "Toronto Raptors",
+    "abbreviation": "TOR",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#753BBD",
+      "secondary": "#BA0C2F"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "TOR",
+      "theBasketballDatabasePage": "2000-01TORRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_was",
+    "seasonId": "nba_2001_historic",
+    "city": "Washington",
+    "name": "Wizards",
+    "displayName": "Washington Wizards",
+    "abbreviation": "WAS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#002B5C",
+      "secondary": "#E31837"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "WAS",
+      "theBasketballDatabasePage": "2000-01WASRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_dal",
+    "seasonId": "nba_2001_historic",
+    "city": "Dallas",
+    "name": "Mavericks",
+    "displayName": "Dallas Mavericks",
+    "abbreviation": "DAL",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#00538C",
+      "secondary": "#B8C4CA"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DAL",
+      "theBasketballDatabasePage": "2000-01DALRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_den",
+    "seasonId": "nba_2001_historic",
+    "city": "Denver",
+    "name": "Nuggets",
+    "displayName": "Denver Nuggets",
+    "abbreviation": "DEN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#0E2240",
+      "secondary": "#FEC524"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DEN",
+      "theBasketballDatabasePage": "2000-01DENRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_gsw",
+    "seasonId": "nba_2001_historic",
+    "city": "Golden State",
+    "name": "Warriors",
+    "displayName": "Golden State Warriors",
+    "abbreviation": "GSW",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1D428A",
+      "secondary": "#FFC72C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "GSW",
+      "theBasketballDatabasePage": "2000-01GSWRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_hou",
+    "seasonId": "nba_2001_historic",
+    "city": "Houston",
+    "name": "Rockets",
+    "displayName": "Houston Rockets",
+    "abbreviation": "HOU",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#CE1141",
+      "secondary": "#C4CED4"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "HOU",
+      "theBasketballDatabasePage": "2000-01HOURegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_lac",
+    "seasonId": "nba_2001_historic",
+    "city": "Los Angeles",
+    "name": "Clippers",
+    "displayName": "LA Clippers",
+    "abbreviation": "LAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#ED174C",
+      "secondary": "#1D428A"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAC",
+      "theBasketballDatabasePage": "2000-01LACRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_lal",
+    "seasonId": "nba_2001_historic",
+    "city": "Los Angeles",
+    "name": "Lakers",
+    "displayName": "Los Angeles Lakers",
+    "abbreviation": "LAL",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#552583",
+      "secondary": "#FDB927"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAL",
+      "theBasketballDatabasePage": "2000-01LALRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_min",
+    "seasonId": "nba_2001_historic",
+    "city": "Minnesota",
+    "name": "Timberwolves",
+    "displayName": "Minnesota Timberwolves",
+    "abbreviation": "MIN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#0C2340",
+      "secondary": "#236192"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIN",
+      "theBasketballDatabasePage": "2000-01MINRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_phx",
+    "seasonId": "nba_2001_historic",
+    "city": "Phoenix",
+    "name": "Suns",
+    "displayName": "Phoenix Suns",
+    "abbreviation": "PHX",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1D1160",
+      "secondary": "#E56020"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHX",
+      "theBasketballDatabasePage": "2000-01PHXRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_por",
+    "seasonId": "nba_2001_historic",
+    "city": "Portland",
+    "name": "Trail Blazers",
+    "displayName": "Portland Trail Blazers",
+    "abbreviation": "POR",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#E03A3E",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "POR",
+      "theBasketballDatabasePage": "2000-01PORRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_sac",
+    "seasonId": "nba_2001_historic",
+    "city": "Sacramento",
+    "name": "Kings",
+    "displayName": "Sacramento Kings",
+    "abbreviation": "SAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5A2D81",
+      "secondary": "#63727A"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAC",
+      "theBasketballDatabasePage": "2000-01SACRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_sas",
+    "seasonId": "nba_2001_historic",
+    "city": "San Antonio",
+    "name": "Spurs",
+    "displayName": "San Antonio Spurs",
+    "abbreviation": "SAS",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#C4CED4",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAS",
+      "theBasketballDatabasePage": "2000-01SASRegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_sea",
+    "seasonId": "nba_2001_historic",
+    "city": "Seattle",
+    "name": "SuperSonics",
+    "displayName": "Seattle SuperSonics",
+    "abbreviation": "SEA",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#00653A",
+      "secondary": "#FFC200"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SEA",
+      "theBasketballDatabasePage": "2000-01SEARegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_uta",
+    "seasonId": "nba_2001_historic",
+    "city": "Utah",
+    "name": "Jazz",
+    "displayName": "Utah Jazz",
+    "abbreviation": "UTA",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#002B5C",
+      "secondary": "#00471B"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "UTA",
+      "theBasketballDatabasePage": "2000-01UTARegularSeasonBoxScore.html"
+    }
+  },
+  {
+    "teamId": "nba_2001_van",
+    "seasonId": "nba_2001_historic",
+    "city": "Vancouver",
+    "name": "Grizzlies",
+    "displayName": "Vancouver Grizzlies",
+    "abbreviation": "VAN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#041E42",
+      "secondary": "#00B2A9"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "VAN",
+      "theBasketballDatabasePage": "2000-01VANRegularSeasonBoxScore.html"
+    }
+  }
+]

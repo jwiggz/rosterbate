@@ -1,0 +1,39 @@
+{
+  "heroTitle": "2000-01 NBA Historic Season",
+  "heroSubtitle": "Step into the Shaq-and-Kobe title-defense season or redraft the full turn-of-the-century league.",
+  "featuredTeamId": "nba_2001_lal",
+  "featuredStars": [
+    "nba_2001_shaquille_o_neal_406",
+    "nba_2001_kobe_bryant_977",
+    "nba_2001_allen_iverson_947",
+    "nba_2001_tim_duncan_1495",
+    "nba_2001_kevin_garnett_708",
+    "nba_2001_chris_webber_185"
+  ],
+  "artDirection": {
+    "heroTone": "dynasty",
+    "primaryPalette": [
+      "#5f3293",
+      "#f0c461",
+      "#111111"
+    ],
+    "backgroundStyle": "historic_arena_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "real_season",
+      "label": "Play The Real Season",
+      "description": "Step into 2000-01 with the historical league intact."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the full 2000-01 player pool into a new fantasy universe."
+    },
+    {
+      "mode": "reimagined_season",
+      "label": "Reimagined Season",
+      "description": "Launch a reshuffled 2000-01 and play the alternate branch from opening night."
+    }
+  ]
+}

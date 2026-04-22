@@ -1,0 +1,3971 @@
+[
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_jason_terry_1891",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_dikembe_mutombo_87",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_lorenzen_wright_953",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_brevin_knight_1510",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_alan_henderson_673",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_matt_maloney_1074",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_roshown_mcleod_1728",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_chris_crawford_1544",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_nazr_mohammed_1737",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_dermarr_johnson_2035",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_dion_glover_1901",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_hanno_mottola_2069",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_larry_robinson_1683",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_tony_smith_380",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_anthony_johnson_1533",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_cal_bowdler_1898",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_ira_bowman_1085",
+    "rosterRole": "bench",
+    "depthTag": "PG8",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_anthony_miller_292",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_atl",
+    "playerId": "nba_2001_andy_panko_1950",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_paul_pierce_1718",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_antoine_walker_952",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_bryant_stith_179",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_mark_blount_1548",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_randy_brown_753",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_kenny_anderson_72",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_tony_battie_1499",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_eric_williams_677",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_vitaly_potapenko_958",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_chris_herren_1914",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_milt_palacio_1960",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_walter_mccarty_962",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_rick_brunson_1594",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_chris_carr_713",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_adrian_griffin_1559",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_bos",
+    "playerId": "nba_2001_jerome_moiso_2040",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_baron_davis_1884",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_david_wesley_133",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_p_j_brown_136",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_elden_campbell_922",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_jamal_mashburn_469",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_eddie_robinson_1944",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_otis_thorpe_901",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_derrick_coleman_934",
+    "rosterRole": "rotation",
+    "depthTag": "PF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_jamaal_magloire_2048",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_hersey_hawkins_765",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_lee_nailon_1924",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_scott_burrell_197",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_eldridge_recasner_695",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_tim_james_1906",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chh",
+    "playerId": "nba_2001_terrance_roberson_2121",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_elton_brand_1882",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_metta_world_peace_1897",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_ron_mercer_1500",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_brad_miller_1802",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_bryce_drew_1724",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_fred_hoiberg_697",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_michael_ruffin_1913",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_khalid_el_amin_2064",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_marcus_fizer_2033",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_dragan_tarlac_1434",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_a_j_guyton_2062",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_jamal_crawford_2037",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_corey_benjamin_1736",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_jake_voskuhl_2063",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_steve_goodrich_1864",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_chi",
+    "playerId": "nba_2001_dalibor_bagaric_2053",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_andre_miller_1889",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_clar_weatherspoon_221",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_matt_harpring_1723",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_lamond_murray_441",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_chris_mihm_2036",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_jim_jackson_754",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_zydrunas_ilgauskas_980",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_wesley_person_445",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_cedric_henderson_1538",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_robert_traylor_1714",
+    "rosterRole": "bench",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_chris_gatling_423",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_trajan_langdon_1892",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_chucky_brown_359",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_bimbo_coles_902",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_michael_hawkins_1138",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_j_r_reid_462",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_cle",
+    "playerId": "nba_2001_etdrick_bohannon_1564",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_michael_finley_714",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_dirk_nowitzki_1717",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_steve_nash_959",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_christian_laettner_363",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_howard_eisley_458",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_shawn_bradley_762",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_hubert_davis_93",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_greg_buckner_1761",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_eduardo_najera_2059",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_gary_trent_718",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_loy_vaught_919",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_mark_bryant_95",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_wang_zhi_zhi_1917",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_dal",
+    "playerId": "nba_2001_donnell_harvey_2051",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_james_posey_1899",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_raef_lafrentz_1711",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_nick_van_exel_89",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_antonio_mcdyess_686",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_voshon_lenard_702",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_kevin_willis_788",
+    "rosterRole": "rotation",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_tariq_abdul_wahad_1505",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_robert_pack_123",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_george_mccloud_45",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_calbert_cheaney_384",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_mark_strickland_1110",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_terry_davis_426",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_dan_mcclintock_2082",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_ryan_bowen_1763",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_anthony_goldwire_924",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_den",
+    "playerId": "nba_2001_garth_joseph_2123",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_jerry_stackhouse_711",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_ben_wallace_1112",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_chucky_atkins_1088",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_joe_smith_693",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_michael_curry_688",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_eric_montross_376",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_billy_owens_182",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_mateen_cleaves_2043",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_jud_buechler_146",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_jerome_williams_966",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_mikki_moore_1630",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_dana_barros_344",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_john_wallace_961",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_det",
+    "playerId": "nba_2001_brian_cardinal_2073",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_antawn_jamison_1712",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_mookie_blaylock_302",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_larry_hughes_1716",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_bob_sura_682",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_adonal_foyle_1502",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_marc_jackson_1531",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_chris_porter_2084",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_erick_dampier_956",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_adam_keefe_228",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_vonteego_cummings_1907",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_chris_mills_168",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_chris_mullin_904",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_danny_fortson_1504",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_corie_blount_916",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_bill_curley_223",
+    "rosterRole": "bench",
+    "depthTag": "SF7",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_chris_garner_1612",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_john_coker_715",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_gsw",
+    "playerId": "nba_2001_randy_livingston_988",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_shandon_anderson_1000",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_steve_francis_1883",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_maurice_taylor_1508",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_hakeem_olajuwon_165",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_cuttino_mobley_1749",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_walt_williams_1005",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_kenny_thomas_1903",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_kelvin_cato_1509",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_moochie_norris_983",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_matt_bullard_672",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_carlos_rogers_435",
+    "rosterRole": "bench",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_jason_collier_2044",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_dan_langhi_2061",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_hou",
+    "playerId": "nba_2001_sean_colson_2173",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_reggie_miller_397",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_jermaine_o_neal_979",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_jalen_rose_147",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_sam_perkins_64",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_al_harrington_1733",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_austin_croshere_1506",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_travis_best_696",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_derrick_mckey_365",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_zan_tabak_440",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_jeff_foster_1902",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_jonathan_bender_1886",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_bruno_sundov_1743",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_tyus_edney_721",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_terry_mills_371",
+    "rosterRole": "bench",
+    "depthTag": "PF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_ind",
+    "playerId": "nba_2001_lari_ketner_1930",
+    "rosterRole": "bench",
+    "depthTag": "PF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_michael_olowokandi_1709",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_jeff_mcinnis_976",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_lamar_odom_1885",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_eric_piatkowski_15",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_cherokee_parks_685",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_quentin_richardson_2047",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_brian_skinner_1730",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_darius_miles_2032",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_corey_maggette_1894",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_derek_strong_400",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_keyon_dooling_2039",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_sean_rooks_399",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_earl_boykins_1863",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lac",
+    "playerId": "nba_2001_zendon_hamilton_1985",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_horace_grant_270",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_rick_fox_296",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_shaquille_o_neal_406",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_kobe_bryant_977",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_ron_harper_166",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_brian_shaw_216",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_derek_fisher_965",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_greg_foster_323",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_isaiah_rider_375",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_mark_madsen_2058",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_robert_horry_109",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_tyronn_lue_1731",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_devean_george_1904",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_mike_penberthy_2130",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_lal",
+    "playerId": "nba_2001_slava_medvedenko_2098",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_anthony_mason_193",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_brian_grant_258",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_tim_hardaway_896",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_bruce_bowen_1477",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_eddie_jones_224",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_dan_majerle_105",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_duane_causwell_190",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_anthony_carter_1853",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_alonzo_mourning_297",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_a_c_green_920",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_don_maclean_931",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_cedric_ceballos_76",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_jamal_robinson_1554",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_eddie_house_2067",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_ricky_davis_1729",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mia",
+    "playerId": "nba_2001_todd_fuller_957",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_ray_allen_951",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_sam_cassell_208",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_glenn_robinson_299",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_mark_pope_998",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_jason_caffey_679",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_scott_williams_281",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_ervin_johnson_911",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_tim_thomas_1501",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_darvin_ham_1032",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_joel_przybilla_2038",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_lindsey_hunter_283",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_jerome_kersey_760",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_rafer_alston_1747",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_jason_hart_2078",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_mil",
+    "playerId": "nba_2001_michael_redd_2072",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_wally_szczerbiak_1887",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_kevin_garnett_708",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_terrell_brandon_210",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_anthony_peeler_324",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_rasho_nesterovic_1725",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_chauncey_billups_1497",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_dean_garrett_1051",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_reggie_slater_1073",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_laphonso_ellis_111",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_sam_mitchell_417",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_todd_day_103",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_william_avery_1895",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_tom_hammonds_67",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_min",
+    "playerId": "nba_2001_sam_jacobson_1734",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_kenyon_martin_2030",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_stephon_marbury_950",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_evan_eschmeyer_1915",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_lucious_harris_446",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_keith_van_horn_1496",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_stephen_jackson_1536",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_kendall_gill_383",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_aaron_williams_1425",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_johnny_newman_271",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_doug_overton_77",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_sherman_douglas_428",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_jim_mcilvaine_29",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_jamie_feick_994",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_eddie_gill_2109",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_jamel_thomas_1975",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_vladimir_stepania_1735",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_njn",
+    "playerId": "nba_2001_soumaila_samake_2066",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_allan_houston_275",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_latrell_sprewell_84",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_larry_johnson_913",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_marcus_camby_948",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_charlie_ward_369",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_kurt_thomas_703",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_glen_rice_779",
+    "rosterRole": "rotation",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_chris_childs_164",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_luc_longley_26",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_erick_strickland_1065",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_lavor_postell_2068",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_felton_spencer_280",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_nyk",
+    "playerId": "nba_2001_travis_knight_969",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_tracy_mcgrady_1503",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_darrell_armstrong_353",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_bo_outlaw_448",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_mike_miller_2034",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_andrew_declercq_692",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_john_amaechi_680",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_michael_doleac_1720",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_troy_hudson_1607",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_don_reid_690",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_grant_hill_255",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_pat_garrity_1727",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_dee_brown_244",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_monty_williams_42",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_cory_alexander_724",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_orl",
+    "playerId": "nba_2001_james_robinson_381",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_george_lynch_248",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_tyrone_hill_238",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_allen_iverson_947",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_theo_ratliff_689",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_eric_snow_727",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_aaron_mckie_243",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_toni_kukoc_389",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_vernon_maxwell_137",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_matt_geiger_761",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_kevin_ollie_1563",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_todd_macculloch_1928",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_jumaine_jones_1908",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_rodney_buford_1934",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_raja_bell_1952",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phi",
+    "playerId": "nba_2001_pepe_sanchez_2143",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_clifford_robinson_361",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_shawn_marion_1890",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_jason_kidd_467",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_mario_elie_53",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_jake_tsakalidis_2054",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_chris_dudley_201",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_tony_delk_960",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_elliot_perry_386",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_anfernee_hardaway_358",
+    "rosterRole": "rotation",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_rodney_rogers_915",
+    "rosterRole": "rotation",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_tom_gugliotta_339",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_daniel_santiago_2091",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_vinny_del_negro_219",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_paul_mcpherson_2101",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_phx",
+    "playerId": "nba_2001_ruben_garces_2092",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_damon_stoudamire_757",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_rasheed_wallace_739",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_scottie_pippen_937",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_bonzi_wells_1719",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_dale_davis_905",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_arvydas_sabonis_717",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_steven_smith_120",
+    "rosterRole": "starter",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_stacey_augmon_278",
+    "rosterRole": "bench",
+    "depthTag": "SG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_shawn_kemp_431",
+    "rosterRole": "bench",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_detlef_schrempf_96",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_greg_anthony_21",
+    "rosterRole": "bench",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_antonio_harvey_176",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_erick_barkley_2057",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_will_perdue_781",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_por",
+    "playerId": "nba_2001_gary_grant_202",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_doug_christie_57",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_vlade_divac_124",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_jason_williams_1715",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_peja_stojakovic_978",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_chris_webber_185",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_scot_pollard_1513",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_bobby_jackson_1517",
+    "rosterRole": "rotation",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_hedo_turkoglu_2045",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_jon_barry_468",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_lawrence_funderburke_1444",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_nick_anderson_98",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_jabari_smith_2074",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_darrick_martin_239",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sac",
+    "playerId": "nba_2001_art_long_1609",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_tim_duncan_1495",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_derek_anderson_1507",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_david_robinson_764",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_terry_porter_345",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_sean_elliott_251",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_danny_ferry_198",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_antonio_daniels_1498",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_avery_johnson_422",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_malik_rose_990",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_ira_newble_1956",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_samaki_walker_955",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_steve_kerr_70",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_shawnelle_scott_1035",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_jaren_jackson_1114",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sas",
+    "playerId": "nba_2001_derrick_dial_1760",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_gary_payton_56",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_patrick_ewing_121",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_rashard_lewis_1740",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_jelani_mccoy_1741",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_emanual_davis_1023",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_vin_baker_452",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_ruben_patterson_1739",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_brent_barry_699",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_desmond_mason_2046",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_shammond_williams_1742",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_ruben_wolkowyski_2106",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_olumide_oyedeji_2071",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_david_wingate_766",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_sea",
+    "playerId": "nba_2001_pervis_ellison_442",
+    "rosterRole": "bench",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_mark_jackson_349",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_charles_oakley_891",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_antonio_davis_213",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_vince_carter_1713",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_morris_peterson_2050",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_corliss_williamson_722",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_alvin_williams_1541",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_keon_clark_1721",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_dell_curry_209",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_tracy_murray_145",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_tyrone_corbin_895",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_muggsy_bogues_177",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_kornel_david_1600",
+    "rosterRole": "bench",
+    "depthTag": "SF5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_michael_stewart_1565",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_tor",
+    "playerId": "nba_2001_mamadou_n_diaye_2055",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_john_stockton_304",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_karl_malone_252",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_olden_polynice_178",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_john_starks_317",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_donyell_marshall_923",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_bryon_russell_935",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_greg_ostertag_731",
+    "rosterRole": "bench",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_quincy_lewis_1900",
+    "rosterRole": "bench",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_david_benoit_128",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_deshawn_stevenson_2052",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_jacque_vaughn_1521",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_danny_manning_330",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_john_crotty_180",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_uta",
+    "playerId": "nba_2001_scott_padgett_1909",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_mike_bibby_1710",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_shareef_abdur_rahim_949",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_michael_dickerson_1722",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_bryant_reeves_735",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_othella_harrington_970",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_grant_long_3",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_tony_massenburg_763",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_ike_austin_1134",
+    "rosterRole": "bench",
+    "depthTag": "C2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_damon_jones_1800",
+    "rosterRole": "bench",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_stromile_swift_2031",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_doug_west_28",
+    "rosterRole": "bench",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_kevin_edwards_236",
+    "rosterRole": "bench",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_mahmoud_abdul_rauf_51",
+    "rosterRole": "bench",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_van",
+    "playerId": "nba_2001_brent_price_85",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_juwan_howard_436",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_jahidi_white_1751",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_felipe_lopez_1732",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_richard_hamilton_1888",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_tyrone_nesby_1838",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_chris_whitney_43",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_mitch_richmond_782",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_michael_smith_63",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_calvin_booth_1916",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_rod_strickland_393",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_courtney_alexander_2042",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_laron_profit_1919",
+    "rosterRole": "bench",
+    "depthTag": "SG3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_gerard_king_1562",
+    "rosterRole": "bench",
+    "depthTag": "PF2",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_popeye_jones_461",
+    "rosterRole": "bench",
+    "depthTag": "SF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_david_vanterpool_2128",
+    "rosterRole": "bench",
+    "depthTag": "PG6",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_mike_smith_2065",
+    "rosterRole": "bench",
+    "depthTag": "SF4",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  },
+  {
+    "seasonId": "nba_2001_historic",
+    "teamId": "nba_2001_was",
+    "playerId": "nba_2001_obinna_ekezie_1918",
+    "rosterRole": "bench",
+    "depthTag": "PF3",
+    "startDate": "2000-10-31",
+    "endDate": "2001-04-18"
+  }
+]

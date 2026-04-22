@@ -1,0 +1,85 @@
+{
+  "packId": "nba_2001_full_season_v1",
+  "schemaVersion": 1,
+  "canonicalModelVersion": 1,
+  "sport": "nba",
+  "league": "nba",
+  "seasonId": "nba_2001_historic",
+  "seasonLabel": "2000-01 NBA Historic Season",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "era": "2000s",
+  "version": 1,
+  "status": "ready",
+  "sourceProfile": "historical_curated",
+  "supportedModes": [
+    "real_season",
+    "historical_draft",
+    "single_player_season",
+    "reimagined_season"
+  ],
+  "defaultEntryMode": "real_season",
+  "focusTeamId": "nba_2001_lal",
+  "subtitle": "Play the real season, redraft the era, or branch into a turn-of-the-century alternate universe.",
+  "description": "A 2000-01 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
+  "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
+  "eraTags": [
+    "2000s",
+    "Dynasty Era",
+    "Historic Season"
+  ],
+  "packTags": [
+    "historical-full-league-foundation",
+    "single-player",
+    "historical-draft",
+    "reimagined-season",
+    "featured-pack"
+  ],
+  "playerPoolType": "full_season_player_pool",
+  "draftModes": [
+    "snake",
+    "auction"
+  ],
+  "challengeProfile": "featured_team_plus_open_draft",
+  "contentFiles": {
+    "season": "season.json",
+    "teams": "teams.json",
+    "players": "players.json",
+    "rosterSnapshots": "roster_snapshots.json",
+    "schedule": "schedule.json",
+    "games": "games.json",
+    "playerGameStats": "player_game_stats.json",
+    "packChallenges": "optional/pack_challenges.json",
+    "presentation": "optional/presentation.json",
+    "summaries": "optional/summaries.json"
+  },
+  "provenance": {
+    "sourceProfile": "historical_curated",
+    "curationOwner": "RosterBate",
+    "reviewStatus": "draft",
+    "importNotes": "2000-01 pack built from official stats.nba.com play-by-play archives published by shufinskiy/nba_data for schedule, results, and game-event stats, with team-page season totals and roster metadata sourced from TheBasketballDatabase."
+  },
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 441,
+      "playerCount": 441,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 0,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "notes": [
+    "Schedule and final scores come from official 2000-01 regular-season play-by-play archives.",
+    "Season totals, minutes, and roster metadata come from TheBasketballDatabase team box-score pages.",
+    "Per-game player stat rows carry official event totals with weighted minute estimates normalized to season-average workloads.",
+    "The pack spotlights the Lakers dynasty lane while preserving the full-league player pool."
+  ],
+  "createdAt": "2026-04-22T14:26:47.541Z",
+  "updatedAt": "2026-04-22T14:26:47.541Z"
+}

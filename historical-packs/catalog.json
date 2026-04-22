@@ -75,33 +75,37 @@
     "seasonLabel": "2000-01 NBA Historic Season",
     "shortLabel": "2000-01",
     "era": "2000s",
-    "availability": "preview",
-    "statusLabel": "Authoring Next",
-    "significanceLabel": "Superstar Pivot",
-    "significanceTone": "spotlight",
-    "completenessLabel": "Research + roadmap",
-    "completenessPercent": 12,
-    "tagline": "Draft a turn-of-the-century superteam from one loaded player pool.",
-    "summary": "A modern-classic historical universe with dominant bigs, elite guards, and a very different draft board from the 1990s packs.",
-    "whyItMatters": "This era creates a very different fantasy board from the 1990s packs, with elite bigs, heliocentric guards, and a more modern roster mix.",
-    "focusTeamName": "Los Angeles Lakers",
-    "art": {
-      "theme": "spotlight",
-      "eyebrow": "Turn-of-Century",
-      "headline": "Shaq.\nKobe.\nAI.",
-      "subline": "An era built on dominant bigs, electric guards, and playoff gravity."
-    },
+    "availability": "playable",
+    "statusLabel": "Playable Now",
+      "significanceLabel": "Dynasty Spotlight",
+      "significanceTone": "dynasty",
+      "completenessLabel": "Playable iconic season",
+      "completenessPercent": 80,
+      "tagline": "Draft a turn-of-the-century superteam from one loaded player pool.",
+      "summary": "A first-class 2000-01 historical universe with real season data, a full league player pool, and marquee early-2000s star power.",
+      "whyItMatters": "This is the archive lane's turn-of-the-century flagship: a recognizable Shaq-and-Kobe title-defense universe that plays differently from both the 1990s and 2010s packs.",
+      "focusTeamName": "Los Angeles Lakers",
+      "art": {
+        "theme": "dynasty",
+        "eyebrow": "Turn-of-Century Dynasty",
+        "headline": "Shaq.\nKobe.\nAI.",
+        "subline": "An early-2000s spotlight season built on dominant bigs, electric guards, and playoff gravity."
+      },
     "plannedModes": [
       "Draft The Era",
       "Sim Season",
-      "Historic Challenges",
-      "Replay Era Rosters"
-    ],
-    "previewStars": [
-      "Shaquille O'Neal",
-      "Allen Iverson",
-      "Tim Duncan"
-    ]
+        "Reimagined Season",
+        "Replay Era Rosters"
+      ],
+      "previewStars": [
+        "Shaquille O'Neal",
+        "Kobe Bryant",
+        "Allen Iverson"
+      ],
+    "seasonUrl": "rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2001_full_season_v1",
+    "simUrl": "rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1",
+    "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2001_full_season_v1",
+    "reimaginedUrl": "rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2001_full_season_v1"
   },
   {
     "packId": "nba_2016_full_season_v1",

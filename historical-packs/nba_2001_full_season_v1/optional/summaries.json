@@ -1,0 +1,64 @@
+{
+  "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for real-season play, Draft The Era, and Reimagined Season.",
+  "featuredStorylines": [
+    "The Lakers title-defense season anchors the pack with Shaq-and-Kobe dynasty energy from opening night forward.",
+    "Iverson's MVP season, Duncan's Spurs, Garnett's rise, and Webber's Kings keep the full-league fantasy board loaded well beyond Los Angeles.",
+    "The archive gains a true early-2000s lane with different pacing, spacing, and roster texture from both the 1990s and modern packs."
+  ],
+  "teamSpotlights": [
+    {
+      "teamId": "nba_2001_lal",
+      "summary": "The Lakers are the flagship dynasty path, built around Shaq's force, Kobe's ascent, and a title-defense season with championship gravity."
+    },
+    {
+      "teamId": "nba_2001_phi",
+      "summary": "Philadelphia offers the Allen Iverson MVP route and one of the era's clearest one-star-versus-the-league challenges."
+    },
+    {
+      "teamId": "nba_2001_sas",
+      "summary": "San Antonio provides the Duncan path with elite interior play and a disciplined contender profile."
+    },
+    {
+      "teamId": "nba_2001_sac",
+      "summary": "Sacramento delivers the Webber-era Kings lane and one of the era's most creative offensive cores."
+    },
+    {
+      "teamId": "nba_2001_por",
+      "summary": "Portland brings a deep veteran roster and a different West contender route from the dynasty spotlight teams."
+    }
+  ],
+  "modeSummaries": [
+    {
+      "mode": "real_season",
+      "summary": "Keep the 2000-01 season intact and see whether you can outpace the Lakers dynasty branch or rewrite it."
+    },
+    {
+      "mode": "historical_draft",
+      "summary": "Remix the full-league 2000-01 player universe and discover what the era becomes with custom rosters."
+    },
+    {
+      "mode": "reimagined_season",
+      "summary": "Launch a reshuffled version of 2000-01 and treat the season like an alternate-history branch from day one."
+    }
+  ],
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 441,
+      "playerCount": 441,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 0,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "auditNotes": [
+    "Real season stats cover every included player who logged official 2000-01 regular-season minutes.",
+    "Schedule and results span the full regular season using real historical game records.",
+    "Per-game stat lines use official event totals with inferred minute estimates normalized to season-average workloads."
+  ]
+}

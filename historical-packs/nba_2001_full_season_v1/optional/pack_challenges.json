@@ -1,0 +1,75 @@
+{
+  "packId": "nba_2001_full_season_v1",
+  "version": 1,
+  "challengeGroups": [
+    {
+      "groupId": "real_season_paths",
+      "label": "Play The Real Season",
+      "mode": "real_season"
+    },
+    {
+      "groupId": "draft_the_era_paths",
+      "label": "Draft The Era",
+      "mode": "historical_draft"
+    },
+    {
+      "groupId": "reimagined_paths",
+      "label": "Reimagined Season",
+      "mode": "reimagined_season"
+    }
+  ],
+  "challenges": [
+    {
+      "challengeId": "lakers_repeat",
+      "mode": "real_season",
+      "path": "lakers_dynasty_path",
+      "title": "Repeat The Title Run",
+      "description": "Choose the Lakers and finish the season with the league's best record.",
+      "type": "season_wins_min",
+      "target": 56,
+      "evaluation": "season_end",
+      "reward": "Dynasty Standard",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "iverson_50_wins",
+      "mode": "real_season",
+      "path": "open_team_path",
+      "title": "MVP Support Run",
+      "description": "Choose any included team and finish with at least 50 wins.",
+      "type": "season_wins_min",
+      "target": 50,
+      "evaluation": "season_end",
+      "reward": "Turn-of-the-Century Contender",
+      "required": false,
+      "featured": false
+    },
+    {
+      "challengeId": "draft_era_60_wins",
+      "mode": "historical_draft",
+      "path": "alternate_history_success",
+      "title": "Build A 60-Win Team",
+      "description": "Complete a historical fantasy draft and finish with at least 60 wins.",
+      "type": "season_wins_min",
+      "target": 60,
+      "evaluation": "season_end",
+      "reward": "Loaded Era Architect",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "reimagined_title",
+      "mode": "reimagined_season",
+      "path": "reshuffled_league",
+      "title": "Win The Reimagined League",
+      "description": "Take your selected franchise through the reshuffled 2000-01 universe and win the title.",
+      "type": "win_championship",
+      "target": true,
+      "evaluation": "season_end",
+      "reward": "Alternate Millennium Champion",
+      "required": false,
+      "featured": true
+    }
+  ]
+}

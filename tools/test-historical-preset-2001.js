@@ -128,6 +128,27 @@ assert.equal(validation.summary.seasonId, 'nba_2001_historic');
 assert.equal(validation.summary.teamCount, 29);
 assert.ok(validation.summary.playerCount > 300, '2000-01 should ship a full-league player pool');
 
+const playerGameStatsByPlayer = new Map();
+bundle.playerGameStats.forEach(row => {
+  const list = playerGameStatsByPlayer.get(row.playerId) || [];
+  list.push(row);
+  playerGameStatsByPlayer.set(row.playerId, list);
+});
+
+[
+  'nba_2001_shaquille_o_neal_406',
+  'nba_2001_kobe_bryant_977',
+  'nba_2001_allen_iverson_947'
+].forEach(playerId => {
+  const rows = playerGameStatsByPlayer.get(playerId) || [];
+  assert.ok(rows.length >= 20, `${playerId} should have a meaningful game-log sample`);
+  const distinctMinutes = new Set(rows.map(row => Number(row.minutes || 0)));
+  assert.ok(
+    distinctMinutes.size > 1,
+    `${playerId} should not repeat the exact same inferred minutes across every logged game`
+  );
+});
+
 const historicSeasonsSource = readText('historic-seasons.html');
 const historicSeasonsFallbackEntry = extractObjectLiteralBlock(historicSeasonsSource, packId, 'historic-seasons fallback catalog');
 assert.match(historicSeasonsFallbackEntry, /availability:\s*'playable'/, 'historic-seasons fallback catalog should promote 2000-01 to playable');
