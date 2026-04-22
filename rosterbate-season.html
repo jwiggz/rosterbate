@@ -7403,6 +7403,9 @@ function initSeason(){
   console.log('?? Final G state:', G);
   
   const cpuMaintenanceSummary=maintainCpuLeagueRosters({ day:G.day||1 });
+  if(hasCompatibleSavedState){
+    queueSharedSeasonSave('resume_cpu_maintenance');
+  }
 
   ensurePowerupState();
   

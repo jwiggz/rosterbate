@@ -100,6 +100,8 @@ const buildCpuTradeProposalForPairSource = extractFunctionSource('buildCpuTradeP
 const executeCpuTradeProposalSource = extractFunctionSource('executeCpuTradeProposal');
 const runCpuTradeMarketForDaySource = extractFunctionSource('runCpuTradeMarketForDay');
 const maintainCpuLeagueRostersSource = extractFunctionSource('maintainCpuLeagueRosters');
+const syncGameStateToDSource = extractFunctionSource('syncGameStateToD');
+const initSeasonSource = extractFunctionSource('initSeason');
 
 function makePlayer(id, name, pos, fp, extra = {}) {
   return {
@@ -314,7 +316,9 @@ function buildContext(options = {}) {
       buildCpuTradeProposalForPairSource,
       executeCpuTradeProposalSource,
       runCpuTradeMarketForDaySource,
-      maintainCpuLeagueRostersSource
+      maintainCpuLeagueRostersSource,
+      syncGameStateToDSource,
+      initSeasonSource
     ].join('\n'),
     context
   );
@@ -526,6 +530,140 @@ function buildContext(options = {}) {
   assert.equal(maintenanceResult.tradesCompleted, 1);
   assert.equal(activityCalls.length, 1);
   assert.match(activityCalls[0].title, /CPU trade completed/i);
+}
+
+{
+  const { context } = buildContext({
+    day: 3,
+    rosters: [
+      [],
+      [
+        makePlayer(201, 'Star Big', 'C', 45, {
+          protectionScore: 240,
+          simProfile: makeShape({ scoring: 22, rebounding: 12, defense: 3 })
+        }),
+        makePlayer(202, 'Bench Big', 'C', 27, {
+          protectionScore: 60,
+          simProfile: makeShape({ scoring: 12, rebounding: 10, defense: 2 })
+        }),
+        makePlayer(203, 'Wing Stopper', 'SF', 24, {
+          protectionScore: 120,
+          simProfile: makeShape({ scoring: 10, defense: 3 })
+        })
+      ],
+      [
+        makePlayer(301, 'Star Guard', 'PG', 44, {
+          protectionScore: 235,
+          simProfile: makeShape({ scoring: 23, playmaking: 9, defense: 2 })
+        }),
+        makePlayer(302, 'Bench Creator', 'PG', 28, {
+          protectionScore: 70,
+          simProfile: makeShape({ scoring: 14, playmaking: 8, defense: 1 })
+        }),
+        makePlayer(303, 'Stretch Four', 'PF', 24, {
+          protectionScore: 110,
+          simProfile: makeShape({ scoring: 12, rebounding: 6 })
+        })
+      ],
+      [
+        makePlayer(401, 'Quiet Wing', 'SF', 18, {
+          simProfile: makeShape({ scoring: 11, defense: 1 })
+        })
+      ]
+    ],
+    starters: [
+      [],
+      [201, 203],
+      [301, 303],
+      [401]
+    ],
+    tradeNeedByTeam: {
+      1: {
+        positionNeed: { G: 2, F: 0, C: 0 },
+        roleNeed: { scoring: 0, playmaking: 2, rebounding: 0, defense: 0 }
+      },
+      2: {
+        positionNeed: { G: 0, F: 0, C: 2 },
+        roleNeed: { scoring: 0, playmaking: 0, rebounding: 2, defense: 0 }
+      },
+      3: {
+        positionNeed: { G: 0, F: 0, C: 0 },
+        roleNeed: { scoring: 0, playmaking: 0, rebounding: 0, defense: 0 }
+      }
+    }
+  });
+
+  const resolvedThenable = () => {
+    const thenable = {
+      then(onFulfilled) {
+        if (typeof onFulfilled === 'function') onFulfilled();
+        return thenable;
+      },
+      catch() {
+        return thenable;
+      }
+    };
+    return thenable;
+  };
+
+  const storageWrites = [];
+  const queueReasons = [];
+  context.D.isFreshDraftLaunch = false;
+  context.D.currentWeek = 3;
+  context.D.currentDay = 3;
+  context.D.standings = Array.from({ length: 4 }, (_, teamIdx) => ({
+    teamIdx,
+    w: 0,
+    l: 0,
+    pf: 0,
+    pa: 0,
+    streak: 0,
+    streakW: true
+  }));
+  context.D.allRosters = context.G.rosters.map(team => team.map(player => ({ ...player })));
+  context.D.ilRosters = [[], [], [], []];
+  context.D.cpuTradeMarketDaysProcessed = {};
+  context.G.totalWeeks = 17;
+  context.applySportContext = () => {};
+  context.repairDraftLeagueShapeFromPicks = () => false;
+  context.ensureCpuTeamPersonalitiesByTeam = () => {};
+  context.getRequestedLeagueId = () => null;
+  context.buildCpuManagedStarterIdsForDay = (teamIdx, roster) => (roster || []).filter(Boolean).slice(0, 2).map(player => player.id);
+  context.rebuildSeasonWaiverPool = () => [];
+  context.getSeasonPlayerPool = () => [];
+  context.buildSched = (n, weeks) => Array.from({ length: Number(weeks) || 0 }, () => []);
+  context.TOTAL_DAYS = () => 17;
+  context.syncCalendarFromDay = () => {};
+  context.ensurePowerupState = () => {};
+  context.rollWeeklyPowerupDrops = () => {};
+  context.awardRosterbateScore = () => resolvedThenable();
+  context.ensureRosterbatePools = () => resolvedThenable();
+  context.refreshSeasonPlayerUniverse = () => {};
+  context.ensureSeasonNbaReferenceContext = () => resolvedThenable();
+  context.renderHub = () => {};
+  context.renderRoster = () => {};
+  context.renderMatchup = () => {};
+  context.renderTeams = () => {};
+  context.toast = () => {};
+  context.document = { getElementById: () => null };
+  context.window = {};
+  context.persistHistoricalUniverseSlotSnapshot = () => {};
+  context.queueSharedSeasonSave = reason => {
+    queueReasons.push(reason);
+    context.syncGameStateToD();
+    storageWrites.push({ key: 'rosterbateDraft', value: JSON.stringify(context.D) });
+    return true;
+  };
+
+  context.initSeason();
+
+  assert.equal(queueReasons[0], 'resume_cpu_maintenance');
+  const savedDraftWrite = storageWrites.filter(entry => entry.key === 'rosterbateDraft').pop();
+  assert.ok(savedDraftWrite, 'expected resumed initSeason to persist the saved draft');
+  const savedDraft = JSON.parse(savedDraftWrite.value);
+  assert.equal(savedDraft.currentWeek, 3);
+  assert.equal(savedDraft.currentDay, 3);
+  assert.equal(savedDraft.cpuTradeMarketDaysProcessed?.[3], true);
 }
 
 console.log('cpu sim trade market test passed');
