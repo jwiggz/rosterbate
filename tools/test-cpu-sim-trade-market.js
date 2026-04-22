@@ -137,6 +137,7 @@ function makeShape({ scoring = 0, playmaking = 0, rebounding = 0, defense = 0 })
 function buildContext(options = {}) {
   const activityCalls = [];
   const lineupCalls = [];
+  const injuries = new Map(options.injuries || []);
   const rosters = options.rosters || [[], [], [], []];
   const starters = options.starters || [[], [], [], []];
   const tradeNeedByTeam = options.tradeNeedByTeam || {};
@@ -178,6 +179,12 @@ function buildContext(options = {}) {
     },
     getStarterIdsForTeamDay(teamIdx) {
       return (context.G.starters[teamIdx] || []).slice();
+    },
+    getInjuryStatus(player) {
+      return injuries.get(Number(player?.id)) || null;
+    },
+    isUnavailableInjury(injury) {
+      return ['OUT', 'IR', 'IL', 'SUSP'].includes(String(injury?.label || '').toUpperCase());
     },
     normalizeCpuTeamLineups(teamIdx) {
       lineupCalls.push(teamIdx);
@@ -324,6 +331,53 @@ function buildContext(options = {}) {
   );
 
   return { context, activityCalls, lineupCalls };
+}
+
+{
+  const { context } = buildContext({
+    day: 3,
+    rosters: [
+      [],
+      [
+        makePlayer(201, 'Healthy Center', 'C', 22, {
+          simProfile: makeShape({ rebounding: 8, defense: 2 })
+        }),
+        makePlayer(202, 'Injured Center', 'C', 48, {
+          simProfile: makeShape({ rebounding: 11, defense: 2 })
+        }),
+        makePlayer(203, 'Lead Guard', 'PG', 50, {
+          simProfile: makeShape({ scoring: 22, playmaking: 9, defense: 2 })
+        }),
+        makePlayer(204, 'Wing Stopper', 'SF', 40, {
+          simProfile: makeShape({ scoring: 14, defense: 2 })
+        }),
+        makePlayer(205, 'Bench Guard', 'SG', 35, {
+          simProfile: makeShape({ scoring: 13, playmaking: 7, defense: 1 })
+        })
+      ],
+      [],
+      []
+    ],
+    starters: [
+      [],
+      [201, 203, 204],
+      [],
+      []
+    ],
+    injuries: [
+      [202, { label: 'OUT' }]
+    ]
+  });
+
+  const rosterNeed = context.buildCpuTradeRosterNeedSummary(1, 3, context.G.rosters[1]);
+  assert.equal(rosterNeed.positionNeed.C, 1);
+
+  const protectedIds = context.getCpuTradeProtectedPlayerIds(1, 3, rosterNeed);
+  assert.equal(protectedIds.has(201), true);
+  assert.equal(protectedIds.has(202), false);
+
+  const outgoingCandidates = context.getCpuTradeOutgoingCandidates(1, 3, rosterNeed, protectedIds);
+  assert.equal(outgoingCandidates.some(entry => Number(entry.player.id) === 201), false);
 }
 
 {
