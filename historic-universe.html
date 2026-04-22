@@ -303,6 +303,18 @@
           </article>
 
           <article class="panel card-pad">
+            <div class="section-kicker">Recent Roster Moves</div>
+            <div class="section-title">How Your Roster Changed</div>
+            <div class="section-copy">The latest team-first roster moves, grouped into compact archive notes instead of full transaction history.</div>
+            <div class="detail-list" id="recentRosterMovesList">
+              <div class="detail-item">
+                <strong>Loading recent roster moves</strong>
+                <span>Preparing the latest roster changes.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel card-pad">
             <div class="section-kicker">Current Team State</div>
             <div class="section-title">Your Active Archive Clubhouse</div>
             <div class="section-copy">A team-first read on where your universe stands before you jump back into the sim.</div>
@@ -828,6 +840,172 @@
     });
   }
 
+  const RECENT_ROSTER_MOVES_LIMIT = 5;
+
+  function getControlledTeamName(slot, state){
+    const myPos = Number(state?.myPos);
+    const teams = Array.isArray(state?.teams) ? state.teams : [];
+    return String(slot?.teamName || teams[myPos] || 'Your Team').trim();
+  }
+
+  function isRosterChangingActivityEntry(entry){
+    const type = String(entry?.type || '').trim().toLowerCase();
+    const title = String(entry?.title || '').trim().toLowerCase();
+    if(type === 'waiver' || type === 'activation' || type === 'il') return true;
+    if(type === 'commissioner' && (title.includes('restored') || title.includes('reversed'))) return true;
+    return false;
+  }
+
+  function isControlledTeamActivity(slot, state, entry){
+    const myPos = Number(state?.myPos);
+    if(Number(entry?.teamIdx) === myPos) return true;
+    const teamName = getControlledTeamName(slot, state).toLowerCase();
+    const haystack = (String(entry?.title || '') + ' ' + String(entry?.text || '')).toLowerCase();
+    return !!teamName && haystack.includes(teamName);
+  }
+
+  function getRosterMoveVerb(entry){
+    const title = String(entry?.title || '').trim();
+    const lower = title.toLowerCase();
+    if(lower.includes('added ')) return 'add';
+    if(lower.includes('dropped ')) return 'drop';
+    if(lower.includes('activated ')) return 'activate';
+    if(lower.includes('moved ') && lower.includes(' to il')) return 'il';
+    if(lower.includes('restored ')) return 'restore';
+    return 'other';
+  }
+
+  function getRosterMovePlayerName(entry){
+    const title = String(entry?.title || '').trim();
+    const patterns = [
+      /^.*added\s+(.+)$/i,
+      /^.*dropped\s+(.+)$/i,
+      /^.*activated\s+(.+)$/i,
+      /^.*moved\s+(.+?)\s+to il$/i,
+      /^.*restored\s+(.+)$/i
+    ];
+    for(const pattern of patterns){
+      const match = title.match(pattern);
+      if(match && match[1]) return String(match[1]).trim();
+    }
+    return title;
+  }
+
+  function getRosterMoveActorKey(entry){
+    const title = String(entry?.title || '').trim();
+    const match = title.match(/^(.*?)(?:\s+added|\s+dropped|\s+activated|\s+moved|\s+restored)\b/i);
+    return match && match[1]
+      ? String(match[1]).trim().toLowerCase()
+      : '';
+  }
+
+  function canGroupRosterMoveEntries(current, next){
+    if(!current || !next) return false;
+    const pair = [getRosterMoveVerb(current), getRosterMoveVerb(next)].join(':');
+    if(pair !== 'add:drop' && pair !== 'activate:il') return false;
+    const currentTeamIdx = Number(current?.teamIdx);
+    const nextTeamIdx = Number(next?.teamIdx);
+    if(Number.isFinite(currentTeamIdx) && Number.isFinite(nextTeamIdx) && currentTeamIdx !== nextTeamIdx) return false;
+    const currentTs = Number(current?.ts || 0);
+    const nextTs = Number(next?.ts || 0);
+    if(!currentTs || !nextTs || Math.abs(currentTs - nextTs) > 15) return false;
+    const currentActorKey = getRosterMoveActorKey(current);
+    const nextActorKey = getRosterMoveActorKey(next);
+    if(!currentActorKey || !nextActorKey || currentActorKey !== nextActorKey) return false;
+    return true;
+  }
+
+  function buildGroupedRosterMoveEntry(entries){
+    const items = Array.isArray(entries) ? entries : [];
+    const primary = items[0] || null;
+    if(!primary){
+      return null;
+    }
+    if(items.length === 2){
+      const firstVerb = getRosterMoveVerb(items[0]);
+      const secondVerb = getRosterMoveVerb(items[1]);
+      if(firstVerb === 'add' && secondVerb === 'drop'){
+        return {
+          title: 'Added ' + getRosterMovePlayerName(items[0]) + ', dropped ' + getRosterMovePlayerName(items[1]),
+          body: String(items[0]?.text || items[1]?.text || 'Roster move recorded.').trim(),
+          meta: ['WAIVER']
+        };
+      }
+      if(firstVerb === 'activate' && secondVerb === 'il'){
+        return {
+          title: 'Activated ' + getRosterMovePlayerName(items[0]) + ', moved ' + getRosterMovePlayerName(items[1]) + ' to IL',
+          body: String(items[0]?.text || items[1]?.text || 'Roster move recorded.').trim(),
+          meta: ['ROSTER']
+        };
+      }
+    }
+    const verb = getRosterMoveVerb(primary);
+    if(verb === 'add'){
+      return {
+        title: 'Added ' + getRosterMovePlayerName(primary),
+        body: String(primary?.text || 'Roster move recorded.').trim(),
+        meta: ['WAIVER']
+      };
+    }
+    if(verb === 'drop'){
+      return {
+        title: 'Dropped ' + getRosterMovePlayerName(primary),
+        body: String(primary?.text || 'Roster move recorded.').trim(),
+        meta: ['WAIVER']
+      };
+    }
+    if(verb === 'activate'){
+      return {
+        title: 'Activated ' + getRosterMovePlayerName(primary),
+        body: String(primary?.text || 'Roster move recorded.').trim(),
+        meta: ['ROSTER']
+      };
+    }
+    if(verb === 'il'){
+      return {
+        title: 'Moved ' + getRosterMovePlayerName(primary) + ' to IL',
+        body: String(primary?.text || 'Roster move recorded.').trim(),
+        meta: ['ROSTER']
+      };
+    }
+    if(verb === 'restore'){
+      return {
+        title: 'Commissioner restored ' + getRosterMovePlayerName(primary),
+        body: String(primary?.text || 'Roster move recorded.').trim(),
+        meta: ['COMMISSIONER']
+      };
+    }
+    return {
+      title: String(primary?.title || 'Roster move').trim(),
+      body: String(primary?.text || 'Roster move recorded.').trim(),
+      meta: [String(primary?.type || 'activity').trim().toUpperCase()]
+    };
+  }
+
+  function buildRecentRosterMovesSummary(slot, state){
+    const entries = (Array.isArray(state?.activityLog) ? state.activityLog : [])
+      .filter(function(entry){
+        return isControlledTeamActivity(slot, state, entry) && isRosterChangingActivityEntry(entry);
+      })
+      .slice()
+      .sort(function(a, b){
+        return Number(b?.ts || 0) - Number(a?.ts || 0);
+      });
+
+    const grouped = [];
+    for(let index = 0; index < entries.length && grouped.length < RECENT_ROSTER_MOVES_LIMIT; index += 1){
+      const current = entries[index];
+      const next = entries[index + 1];
+      if(canGroupRosterMoveEntries(current, next)){
+        grouped.push(buildGroupedRosterMoveEntry([current, next]));
+        index += 1;
+        continue;
+      }
+      grouped.push(buildGroupedRosterMoveEntry([current]));
+    }
+    return grouped.filter(Boolean);
+  }
+
   function buildCurrentTeamStateSummary(slot, state, rosterCore){
     const fullRoster = getTeamRoster(state);
     const rosterItems = Array.isArray(rosterCore) ? rosterCore : [];
@@ -952,6 +1130,7 @@
       leagueSnapshot: buildLeagueSnapshotSummary(slot, state, standing),
       recentActivity: buildRecentUniverseActivitySummary(state, reveal),
       recentSimDays: buildRecentSimulationSummary(slot, state),
+      recentRosterMoves: buildRecentRosterMovesSummary(slot, state),
       currentTeamState: buildCurrentTeamStateSummary(slot, state, rosterCore)
     };
   }
@@ -977,6 +1156,9 @@
       : { items:[] };
     const recentSimDays = Array.isArray(detailsViewModel.recentSimDays)
       ? detailsViewModel.recentSimDays
+      : [];
+    const recentRosterMoves = Array.isArray(detailsViewModel.recentRosterMoves)
+      ? detailsViewModel.recentRosterMoves
       : [];
     const seasonUrl = api.buildSeasonUrl(slot, getSport());
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
@@ -1029,6 +1211,14 @@
     }).join('');
 
     document.getElementById('recentSimulationList').innerHTML = renderRecentSimulationCards(recentSimDays);
+    document.getElementById('recentRosterMovesList').innerHTML = renderDetailList(
+      recentRosterMoves,
+      'detail-item',
+      {
+        title: 'No recent roster moves',
+        body: 'This universe has not logged recent team roster changes yet.'
+      }
+    );
 
     document.getElementById('currentTeamStateList').innerHTML = renderDetailList(
       currentTeamState.items,

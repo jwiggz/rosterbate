@@ -209,9 +209,15 @@ const script = [
   extractFunctionSource('buildRosterCore(state)'),
   extractFunctionSource('buildRecentSimulationSummary(slot, state)'),
   extractFunctionSource('renderRecentSimulationCards(items)'),
+  extractFunctionSource('renderDetailList(items, className, emptyState)'),
   extractFunctionSpan('sortStandingsEntries(standings)', 'buildUniverseDetailsViewModel(slot, state, config)')
 ].join('\n\n');
 const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, config)');
+
+expectMatch(/id="recentRosterMovesList"/, 'recent roster moves list node is missing');
+expectMatch(/function isRosterChangingActivityEntry\(entry\)/, 'roster-changing activity helper is missing');
+expectMatch(/function buildRecentRosterMovesSummary\(slot, state\)/, 'recent roster moves summary helper is missing');
+assert.match(renderUniverseSource, /recentRosterMovesList/, 'renderUniverse should render the recent roster moves section');
 
 const slot = {
   title: 'Top300 Regression League',
@@ -286,12 +292,19 @@ const state = {
     }
   },
   activityLog: [
-    { id: 'a1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 9900 },
-    { id: 'a2', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 9800 },
-    { id: 'a3', type: 'waiver', title: 'CPU Team 1 added Dell Curry', text: 'Found a hot hand before the next lock.', teamIdx: 1, ts: 9950 },
-    { id: 'a4', type: 'waiver', title: 'Audit Agents added Buck Williams', text: 'Needed another rebounder before Day 9.', teamIdx: 0, ts: 8900 },
-    { id: 'a5', type: 'activation', title: 'CPU Team 3 activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 3, ts: 8800 },
-    { id: 'a6', type: 'waiver', title: 'CPU Team 2 added Danny Manning', text: 'Added another forward before Day 8.', teamIdx: 2, ts: 7900 }
+    { id: 'rm1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Added wing depth before the next lock.', teamIdx: 0, ts: 10040 },
+    { id: 'rm2', type: 'waiver', title: 'Audit Agents dropped Dell Curry', text: 'Opened the bench spot for the new claim.', teamIdx: 0, ts: 10035 },
+    { id: 'rm3', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 9995 },
+    { id: 'rm4', type: 'il', title: 'Audit Agents moved Mookie Blaylock to IL', text: 'Cleared active space after the injury update.', teamIdx: 0, ts: 9990 },
+    { id: 'rm5', type: 'waiver', title: 'Audit Agents added Buck Williams', text: 'Needed another rebounder before Day 9.', teamIdx: 0, ts: 8920 },
+    { id: 'rm6', type: 'commissioner', title: 'Commissioner restored Alonzo Mourning', text: 'Restored to Audit Agents after a mistaken drop.', teamIdx: 0, ts: 8910 },
+    { id: 'rm7', type: 'lineup', title: 'Audit Agents started Ron Harper', text: 'Lineup shuffle only.', teamIdx: 0, ts: 8905 },
+    { id: 'rm8', type: 'waiver', title: 'CPU Team 1 added Dell Curry', text: 'Found a hot hand before the next lock.', teamIdx: 1, ts: 9950 },
+    { id: 'rm9', type: 'waiver', title: 'Audit Agents added Rick Fox', text: 'Needed another wing before Day 8.', teamIdx: 0, ts: 7920 },
+    { id: 'rm10', type: 'waiver', title: 'Audit Agents dropped Tony Delk', text: 'Made room at the back of the bench.', teamIdx: 0, ts: 7915 },
+    { id: 'rm11', type: 'activation', title: 'Audit Agents activated Muggsy Bogues', text: 'Healthy guard returned to the bench mix.', teamIdx: 0, ts: 7905 },
+    { id: 'rm12', type: 'waiver', title: 'Audit Agents added Horace Grant', text: 'Extra frontcourt depth after the roster shuffle.', teamIdx: 0, ts: 7000 },
+    { id: 'rm13', type: 'waiver', title: 'Audit Agents dropped Bill Wennington', text: 'Freed the bench slot for the new big.', teamIdx: 0, ts: 6995 }
   ]
 };
 
@@ -404,20 +417,109 @@ assert.equal(viewModel.recentSimDays[0].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[0].teamActivity[0].title, /Audit Agents/i);
 assert.match(viewModel.recentSimDays[0].leagueNote.title, /CPU Team 1/i);
 assert.match(viewModel.recentSimDays[1].teamResult.headline, /Audit Agents fell to CPU Team 1/i);
-assert.equal(viewModel.recentSimDays[1].teamActivity.length, 1);
+assert.equal(viewModel.recentSimDays[1].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[1].teamActivity[0].title, /Audit Agents added Buck Williams/i);
-assert.match(viewModel.recentSimDays[1].leagueNote.title, /CPU Team 3 activated Kevin Johnson/i);
-assert.match(viewModel.recentSimDays[1].leagueNote.body, /Healthy guard returned from IL\./i);
-assert.equal(viewModel.recentSimDays[2].teamActivity.length, 0);
+assert.match(viewModel.recentSimDays[1].teamActivity[1].title, /Commissioner restored Alonzo Mourning/i);
+assert.deepStrictEqual(viewModel.recentSimDays[1].leagueNote, {
+  title: 'League activity recorded during the reveal window',
+  body: 'Transactions were logged during this reveal window, but the compact card only shows a partial activity sample.'
+});
+assert.equal(viewModel.recentSimDays[2].teamActivity.length, 2);
 assert.match(viewModel.recentSimDays[2].teamResult.headline, /Audit Agents beat CPU Team 3/i);
-assert.match(viewModel.recentSimDays[2].leagueNote.title, /CPU Team 2 added Danny Manning/i);
-assert.match(viewModel.recentSimDays[2].leagueNote.body, /Added another forward before Day 8\./i);
+assert.match(viewModel.recentSimDays[2].teamActivity[0].title, /Audit Agents added Rick Fox/i);
+assert.match(viewModel.recentSimDays[2].teamActivity[1].title, /Audit Agents dropped Tony Delk/i);
+assert.equal(viewModel.recentSimDays[2].leagueNote, null);
+
+assert.equal(viewModel.recentRosterMoves.length, 5);
+assert.deepStrictEqual(
+  viewModel.recentRosterMoves.map(item => item.title),
+  [
+    'Added Brent Barry, dropped Dell Curry',
+    'Activated Kevin Johnson, moved Mookie Blaylock to IL',
+    'Added Buck Williams',
+    'Commissioner restored Alonzo Mourning',
+    'Added Rick Fox, dropped Tony Delk'
+  ]
+);
+assert.ok(
+  viewModel.recentRosterMoves.every(item => !/Muggsy Bogues/i.test(item.title + ' ' + item.body)),
+  'older valid single-move entries should be trimmed once the latest five roster moves are kept'
+);
+assert.ok(
+  viewModel.recentRosterMoves.every(item => !/Horace Grant|Bill Wennington/i.test(item.title + ' ' + item.body)),
+  'older valid grouped add-drop pairs should be trimmed once the latest five roster moves are kept'
+);
+assert.ok(
+  viewModel.recentRosterMoves.every(item => !/lineup/i.test(item.title + ' ' + item.body)),
+  'lineup-only activity should not appear in recent roster moves'
+);
+assert.ok(
+  viewModel.recentRosterMoves.every(item => !/CPU Team 1/i.test(item.title + ' ' + item.body)),
+  'other-team roster activity should not appear in recent roster moves'
+);
+
+const blankSlotNameMoves = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    { ...slot, teamName: '' },
+    state,
+    {}
+  )
+));
+assert.match(blankSlotNameMoves.recentRosterMoves[0].title, /Brent Barry/i);
+
+const noRosterMoveHistory = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {},
+      activityLog: [
+        { id: 'quiet1', type: 'lineup', title: 'Audit Agents started Ron Harper', text: 'Lineup shuffle only.', teamIdx: 0, ts: 1000 }
+      ]
+    },
+    {}
+  )
+));
+assert.deepStrictEqual(noRosterMoveHistory.recentRosterMoves, []);
+
+const renderedRosterMoves = context.renderDetailList(
+  viewModel.recentRosterMoves,
+  'detail-item',
+  {
+    title: 'No recent roster moves',
+    body: 'This universe has not logged recent team roster changes yet.'
+  }
+);
+assert.match(renderedRosterMoves, /Added Brent Barry, dropped Dell Curry/);
+assert.match(renderedRosterMoves, /Activated Kevin Johnson, moved Mookie Blaylock to IL/);
+assert.ok(
+  renderedRosterMoves.indexOf('Added Brent Barry, dropped Dell Curry') <
+  renderedRosterMoves.indexOf('Activated Kevin Johnson, moved Mookie Blaylock to IL'),
+  'recent roster moves should render newest grouped entries first'
+);
+assert.doesNotMatch(renderedRosterMoves, /CPU Team 1 added Dell Curry/);
+assert.doesNotMatch(renderedRosterMoves, /started Ron Harper/i);
+
+const emptyRosterMoves = context.renderDetailList(
+  noRosterMoveHistory.recentRosterMoves,
+  'detail-item',
+  {
+    title: 'No recent roster moves',
+    body: 'This universe has not logged recent team roster changes yet.'
+  }
+);
+assert.match(emptyRosterMoves, /No recent roster moves/);
+assert.match(emptyRosterMoves, /This universe has not logged recent team roster changes yet\./);
 
 const renderedRecentSimCard = context.renderRecentSimulationCards([viewModel.recentSimDays[0]]);
 assert.match(renderedRecentSimCard, /Audit Agents beat CPU Team 2/);
 assert.match(renderedRecentSimCard, /Jordan led the latest sim-day swing and kept the team in second\./);
-assert.match(renderedRecentSimCard, /Team activity: Audit Agents added Brent Barry/);
-assert.match(renderedRecentSimCard, /League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock\./);
+assert.match(renderedRecentSimCard, /Team activity: Audit Agents activated Kevin Johnson/);
+assert.match(renderedRecentSimCard, /Team activity: Audit Agents moved Mookie Blaylock to IL/);
+assert.match(renderedRecentSimCard, /League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock\. Additional transactions were also logged during this reveal window\./);
 assert.ok(
   renderedRecentSimCard.indexOf('Audit Agents beat CPU Team 2') <
   renderedRecentSimCard.indexOf('Jordan led the latest sim-day swing and kept the team in second.'),
@@ -425,12 +527,12 @@ assert.ok(
 );
 assert.ok(
   renderedRecentSimCard.indexOf('Jordan led the latest sim-day swing and kept the team in second.') <
-  renderedRecentSimCard.indexOf('Team activity: Audit Agents added Brent Barry'),
+  renderedRecentSimCard.indexOf('Team activity: Audit Agents activated Kevin Johnson'),
   'recent simulation cards should render team activity after the story'
 );
 assert.ok(
-  renderedRecentSimCard.indexOf('Team activity: Audit Agents added Brent Barry') <
-  renderedRecentSimCard.indexOf('League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock.'),
+  renderedRecentSimCard.indexOf('Team activity: Audit Agents moved Mookie Blaylock to IL') <
+  renderedRecentSimCard.indexOf('League note: CPU Team 1 added Dell Curry - Found a hot hand before the next lock. Additional transactions were also logged during this reveal window.'),
   'recent simulation cards should render the league note after team activity'
 );
 
@@ -879,18 +981,18 @@ assert.deepStrictEqual(viewModel.recentActivity, {
   items: [
     {
       title: 'Audit Agents added Brent Barry',
-      body: 'Dropped an inactive bench wing for a live scorer.',
+      body: 'Added wing depth before the next lock.',
+      meta: ['WAIVER']
+    },
+    {
+      title: 'Audit Agents dropped Dell Curry',
+      body: 'Opened the bench spot for the new claim.',
       meta: ['WAIVER']
     },
     {
       title: 'Audit Agents activated Kevin Johnson',
       body: 'Healthy guard returned from IL.',
       meta: ['ACTIVATION']
-    },
-    {
-      title: 'CPU Team 1 added Dell Curry',
-      body: 'Found a hot hand before the next lock.',
-      meta: ['WAIVER']
     }
   ]
 });
