@@ -201,10 +201,16 @@ const newestPlayable = context.applyArchiveBrowseSort(sampleCatalog, {
   sort: 'newest_playable'
 });
 assert.deepStrictEqual(
-  newestPlayable.slice(0, 3).map(item => item.packId),
-  ['nba_2016_full_season_v1', 'nba_2001_full_season_v1', 'nba_1996_full_season_v1']
+  newestPlayable.map(item => item.packId),
+  [
+    'nba_2016_full_season_v1',
+    'nba_2001_full_season_v1',
+    'nba_1996_full_season_v1',
+    'nba_1993_full_season_v1',
+    'nba_1987_full_season_v1',
+    'nba_preview_future'
+  ]
 );
-assert.equal(newestPlayable[newestPlayable.length - 1].packId, 'nba_preview_future');
 
 assert.equal(
   context.resolveVisibleActivePackId(filtered, 'nba_2001_full_season_v1'),
