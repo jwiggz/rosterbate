@@ -207,6 +207,43 @@
     font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb
   }
   .archive-meta-pill.completeness{border-color:rgba(255,182,109,.18);background:rgba(42,24,10,.62);color:#ffe0bc}
+  .archive-filter-bar{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+    margin-top:18px;padding:14px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg,rgba(12,19,31,.88),rgba(8,13,23,.96));
+  }
+  .archive-filter-groups{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+  .archive-filter-group{display:flex;flex-wrap:wrap;gap:8px}
+  .archive-filter-chip{
+    display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.1);background:rgba(8,14,25,.68);color:#dce8fb;
+    font:700 10px/1 var(--plex);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+    transition:border-color .18s ease,transform .18s ease,background .18s ease,color .18s ease;
+  }
+  .archive-filter-chip:hover{transform:translateY(-1px);border-color:rgba(255,182,109,.22)}
+  .archive-filter-chip.active{
+    border-color:rgba(255,182,109,.36);
+    background:rgba(48,29,12,.72);
+    color:#ffe2bb;
+    box-shadow:0 0 0 1px rgba(255,182,109,.12);
+  }
+  .archive-sort-wrap{display:grid;gap:6px;justify-items:end}
+  .archive-sort-label{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#a9bdd8}
+  .archive-sort-control{
+    min-height:38px;padding:0 12px;border-radius:14px;border:1px solid rgba(255,255,255,.1);
+    background:rgba(8,14,25,.78);color:#edf5ff;font:700 12px/1 var(--plex);
+  }
+  .archive-empty-state{
+    margin-top:18px;padding:24px 20px;border-radius:22px;border:1px solid rgba(255,182,109,.16);
+    background:linear-gradient(180deg,rgba(15,22,35,.92),rgba(8,13,23,.98));text-align:center;
+  }
+  .archive-empty-title{font:700 30px/.9 var(--teko);text-transform:uppercase}
+  .archive-empty-copy{margin-top:8px;font-size:13px;line-height:1.6;color:#cfdced}
+  .archive-empty-clear{
+    margin-top:14px;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,#3f4d64,#202b3f);color:#edf4ff;
+    font:700 12px/1 var(--teko);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  }
   .archive-detail{display:grid;gap:0}
   .detail-note{margin-top:14px;font-size:12px;line-height:1.55;color:#cad7e8}
 
@@ -470,6 +507,8 @@
     .pack-poster-headline{font-size:46px}
   }
   @media (max-width: 1080px){
+    .archive-filter-bar{flex-direction:column;align-items:stretch}
+    .archive-sort-wrap{justify-items:start}
     .hero,.grid,.pack-lower,.archive-browser-shell{grid-template-columns:1fr}
     .snapshot-grid,.pack-health{grid-template-columns:repeat(3,minmax(0,1fr))}
     .pack-top{grid-template-columns:minmax(0,1fr) 200px}
@@ -561,6 +600,28 @@
         <div class="section-title">Browse The Era</div>
         <div class="section-copy">
           Historic mode is no longer a hidden tool. This browser is the front door to full-season universes, classic franchise runs, and alternate-history drafts built from real packs instead of one-off demos.
+        </div>
+
+        <div class="archive-filter-bar" id="archiveFilterBar">
+          <div class="archive-filter-groups">
+            <div class="archive-filter-group" id="archiveEraFilterGroup" aria-label="Filter by era"></div>
+            <div class="archive-filter-group" id="archiveAvailabilityFilterGroup" aria-label="Filter by playability"></div>
+            <div class="archive-filter-group" id="archiveSignificanceFilterGroup" aria-label="Filter by significance"></div>
+          </div>
+          <div class="archive-sort-wrap">
+            <label class="archive-sort-label" for="archiveSortControl">Sort</label>
+            <select id="archiveSortControl" class="archive-sort-control" aria-label="Sort archive shelf">
+              <option value="featured">Featured</option>
+              <option value="newest_playable">Newest Playable</option>
+              <option value="era">Era</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="archive-empty-state" id="archiveEmptyState" hidden>
+          <div class="archive-empty-title">No Packs Match These Filters</div>
+          <div class="archive-empty-copy">Try a different era, significance, or playability mix to reopen the shelf.</div>
+          <button type="button" class="archive-empty-clear" id="archiveClearFiltersBtn">Clear Filters</button>
         </div>
 
         <div class="archive-browser-shell">
@@ -900,7 +961,9 @@ const HISTORIC_1993_FALLBACK = {
   const host = String(window.location.hostname || '').toLowerCase();
   const isLocalHistorical = host === 'localhost' || host === '127.0.0.1';
   const bundleCache = new Map();
-  let activeCatalog = [];
+  let fullCatalog = [];
+  let visibleCatalog = [];
+  let activeBrowseState = null;
   let activePackId = '';
 
   function clone(value){
@@ -939,7 +1002,150 @@ const HISTORIC_1993_FALLBACK = {
   }
 
   function getConfigById(packId){
-    return activeCatalog.find(entry => String(entry.packId) === String(packId)) || null;
+    return (Array.isArray(fullCatalog) ? fullCatalog : []).find(function(entry){
+      return String(entry.packId || '') === String(packId || '');
+    }) || null;
+  }
+
+  function getDefaultArchiveBrowseState(){
+    return {
+      era: 'all',
+      availability: 'all',
+      significance: 'all',
+      sort: 'featured'
+    };
+  }
+
+  function normalizeArchiveBrowseState(input){
+    const defaults = getDefaultArchiveBrowseState();
+    const normalized = Object.assign({}, defaults, input || {});
+    const allowedEras = ['all', '1980s', '1990s', '2000s', '2010s'];
+    const allowedAvailability = ['all', 'playable', 'preview'];
+    const allowedSignificance = ['all', 'dynasty', 'prestige', 'spotlight', 'modern'];
+    const allowedSort = ['featured', 'newest_playable', 'era'];
+
+    normalized.era = allowedEras.includes(String(normalized.era || '').trim().toLowerCase())
+      ? String(normalized.era).trim().toLowerCase()
+      : defaults.era;
+    normalized.availability = allowedAvailability.includes(String(normalized.availability || '').trim().toLowerCase())
+      ? String(normalized.availability).trim().toLowerCase()
+      : defaults.availability;
+    normalized.significance = allowedSignificance.includes(String(normalized.significance || '').trim().toLowerCase())
+      ? String(normalized.significance).trim().toLowerCase()
+      : defaults.significance;
+    normalized.sort = allowedSort.includes(String(normalized.sort || '').trim().toLowerCase())
+      ? String(normalized.sort).trim().toLowerCase()
+      : defaults.sort;
+    return normalized;
+  }
+
+  function readArchiveBrowseStateFromUrl(){
+    try{
+      const params = new URLSearchParams(window.location.search);
+      return normalizeArchiveBrowseState({
+        era: params.get('era') || 'all',
+        availability: params.get('availability') || 'all',
+        significance: params.get('significance') || 'all',
+        sort: params.get('sort') || 'featured'
+      });
+    }catch(error){
+      return getDefaultArchiveBrowseState();
+    }
+  }
+
+  function writeArchiveBrowseStateToUrl(state){
+    const next = normalizeArchiveBrowseState(state);
+    const defaults = getDefaultArchiveBrowseState();
+    const params = new URLSearchParams(window.location.search);
+    const sport = typeof getBrowserSport === 'function'
+      ? getBrowserSport()
+      : String(params.get('sport') || 'nba').trim().toLowerCase();
+    params.set('sport', sport);
+    if(next.era !== defaults.era){ params.set('era', next.era); } else { params.delete('era'); }
+    if(next.availability !== defaults.availability){ params.set('availability', next.availability); } else { params.delete('availability'); }
+    if(next.significance !== defaults.significance){ params.set('significance', next.significance); } else { params.delete('significance'); }
+    if(next.sort !== defaults.sort){ params.set('sort', next.sort); } else { params.delete('sort'); }
+    const query = params.toString();
+    window.history.replaceState({}, '', query ? ('?' + query) : window.location.pathname);
+  }
+
+  function getArchiveSignificanceKey(config){
+    const tone = String(config?.significanceTone || '').trim().toLowerCase();
+    if(tone === 'heritage'){ return 'prestige'; }
+    if(tone === 'dynasty' || tone === 'spotlight' || tone === 'modern'){ return tone; }
+    return 'all';
+  }
+
+  function matchesArchiveBrowseFilters(config, state){
+    const normalized = normalizeArchiveBrowseState(state);
+    const significanceKey = typeof getArchiveSignificanceKey === 'function'
+      ? getArchiveSignificanceKey(config)
+      : (function(){
+          const tone = String(config?.significanceTone || '').trim().toLowerCase();
+          if(tone === 'heritage'){ return 'prestige'; }
+          if(tone === 'dynasty' || tone === 'spotlight' || tone === 'modern'){ return tone; }
+          return 'all';
+        })();
+    if(normalized.era !== 'all' && String(config?.era || '').trim().toLowerCase() !== normalized.era){
+      return false;
+    }
+    if(normalized.availability !== 'all' && String(config?.availability || '').trim().toLowerCase() !== normalized.availability){
+      return false;
+    }
+    if(normalized.significance !== 'all' && significanceKey !== normalized.significance){
+      return false;
+    }
+    return true;
+  }
+
+  function applyArchiveBrowseFilters(catalog, state){
+    return (Array.isArray(catalog) ? catalog : []).filter(function(config){
+      return matchesArchiveBrowseFilters(config, state);
+    });
+  }
+
+  function compareArchiveCatalogOrder(a, b){
+    return Number(a?.__catalogIndex || 0) - Number(b?.__catalogIndex || 0);
+  }
+
+  function applyArchiveBrowseSort(catalog, state){
+    const normalized = normalizeArchiveBrowseState(state);
+    const items = Array.isArray(catalog) ? catalog.slice() : [];
+    if(normalized.sort === 'era'){
+      const eraOrder = { '1980s': 0, '1990s': 1, '2000s': 2, '2010s': 3 };
+      return items.sort(function(a, b){
+        const eraDelta = (eraOrder[String(a?.era || '')] ?? 99) - (eraOrder[String(b?.era || '')] ?? 99);
+        return eraDelta || compareArchiveCatalogOrder(a, b);
+      });
+    }
+    if(normalized.sort === 'newest_playable'){
+      return items.sort(function(a, b){
+        const aPlayable = String(a?.availability || '').trim().toLowerCase() === 'playable' ? 1 : 0;
+        const bPlayable = String(b?.availability || '').trim().toLowerCase() === 'playable' ? 1 : 0;
+        const aIndex = Number.isFinite(Number(a?.__catalogIndex)) ? Number(a.__catalogIndex) : NaN;
+        const bIndex = Number.isFinite(Number(b?.__catalogIndex)) ? Number(b.__catalogIndex) : NaN;
+        const aYearMatch = String(a?.packId || '').match(/_(\d{4})_/);
+        const bYearMatch = String(b?.packId || '').match(/_(\d{4})_/);
+        const aOrder = Number.isFinite(aIndex) ? aIndex : Number(aYearMatch && aYearMatch[1] ? aYearMatch[1] : 0);
+        const bOrder = Number.isFinite(bIndex) ? bIndex : Number(bYearMatch && bYearMatch[1] ? bYearMatch[1] : 0);
+        return (bPlayable - aPlayable) || (bOrder - aOrder);
+      });
+    }
+    return items.sort(function(a, b){
+      const aPlayable = String(a?.availability || '').trim().toLowerCase() === 'playable' ? 1 : 0;
+      const bPlayable = String(b?.availability || '').trim().toLowerCase() === 'playable' ? 1 : 0;
+      return (bPlayable - aPlayable) || compareArchiveCatalogOrder(a, b);
+    });
+  }
+
+  function resolveVisibleActivePackId(catalog, preferredPackId){
+    const items = Array.isArray(catalog) ? catalog : [];
+    if(!items.length) return '';
+    const preferred = String(preferredPackId || '').trim();
+    if(preferred && items.some(function(entry){ return String(entry?.packId || '').trim() === preferred; })){
+      return preferred;
+    }
+    return String(items[0]?.packId || '').trim();
   }
 
   function isMixedEraConfig(config){
@@ -1074,9 +1280,110 @@ const HISTORIC_1993_FALLBACK = {
     document.getElementById('heroRemovedCount').textContent = removedCount == null ? '--' : String(removedCount);
   }
 
+  function renderArchiveFilterGroup(targetId, label, options, activeValue, onSelect){
+    const group = document.getElementById(targetId);
+    if(!group) return;
+    group.innerHTML = [
+      '<span class="archive-sort-label">' + escapeHtml(label) + '</span>',
+      options.map(function(option){
+        const value = String(option.value);
+        const activeClass = value === activeValue ? ' active' : '';
+        return '<button type="button" class="archive-filter-chip' + activeClass + '" data-filter-value="' + escapeHtml(value) + '">' + escapeHtml(option.label) + '</button>';
+      }).join('')
+    ].join('');
+    group.querySelectorAll('[data-filter-value]').forEach(function(button){
+      button.addEventListener('click', function(){
+        onSelect(String(button.getAttribute('data-filter-value') || '').trim());
+      });
+    });
+  }
+
+  function renderArchiveControls(){
+    const state = activeBrowseState || getDefaultArchiveBrowseState();
+    renderArchiveFilterGroup('archiveEraFilterGroup', 'Era', [
+      { value: 'all', label: 'All' },
+      { value: '1980s', label: '1980s' },
+      { value: '1990s', label: '1990s' },
+      { value: '2000s', label: '2000s' },
+      { value: '2010s', label: '2010s' }
+    ], state.era, function(value){
+      updateArchiveBrowseState({ era: value });
+    });
+    renderArchiveFilterGroup('archiveAvailabilityFilterGroup', 'Playability', [
+      { value: 'all', label: 'All' },
+      { value: 'playable', label: 'Playable Now' },
+      { value: 'preview', label: 'Preview' }
+    ], state.availability, function(value){
+      updateArchiveBrowseState({ availability: value });
+    });
+    renderArchiveFilterGroup('archiveSignificanceFilterGroup', 'Significance', [
+      { value: 'all', label: 'All' },
+      { value: 'dynasty', label: 'Dynasty' },
+      { value: 'prestige', label: 'Prestige' },
+      { value: 'spotlight', label: 'Spotlight' },
+      { value: 'modern', label: 'Modern' }
+    ], state.significance, function(value){
+      updateArchiveBrowseState({ significance: value });
+    });
+
+    const sortControl = document.getElementById('archiveSortControl');
+    if(sortControl){
+      sortControl.value = state.sort;
+      sortControl.onchange = function(){
+        updateArchiveBrowseState({ sort: String(sortControl.value || 'featured').trim() });
+      };
+    }
+
+    const clearButton = document.getElementById('archiveClearFiltersBtn');
+    if(clearButton){
+      clearButton.onclick = function(){
+        updateArchiveBrowseState(getDefaultArchiveBrowseState());
+      };
+    }
+  }
+
+  function computeVisibleCatalog(catalog, state){
+    return applyArchiveBrowseSort(applyArchiveBrowseFilters(catalog, state), state);
+  }
+
+  function syncArchiveEmptyState(){
+    const emptyState = document.getElementById('archiveEmptyState');
+    const browserShell = document.querySelector('.archive-browser-shell');
+    if(!emptyState || !browserShell) return;
+    const hasItems = Array.isArray(visibleCatalog) && visibleCatalog.length > 0;
+    emptyState.hidden = hasItems;
+    browserShell.hidden = !hasItems;
+  }
+
+  async function updateArchiveBrowseState(patch){
+    activeBrowseState = normalizeArchiveBrowseState(Object.assign({}, activeBrowseState || getDefaultArchiveBrowseState(), patch || {}));
+    writeArchiveBrowseStateToUrl(activeBrowseState);
+    visibleCatalog = computeVisibleCatalog(fullCatalog, activeBrowseState);
+    renderArchiveControls();
+    syncArchiveEmptyState();
+    if(!visibleCatalog.length){
+      activePackId = '';
+      document.getElementById('heroPackCount').textContent = '0';
+      setStatus('No historical packs match the current archive filters.', 'warn');
+      return;
+    }
+    const nextPackId = resolveVisibleActivePackId(visibleCatalog, activePackId);
+    if(nextPackId === activePackId){
+      renderShelf();
+      const config = getConfigById(activePackId);
+      if(config){
+        const bundle = await loadBundleForConfig(config).catch(function(){ return null; });
+        renderPack(config, bundle);
+      }
+      return;
+    }
+    await setActivePack(nextPackId);
+  }
+
   function renderShelf(){
     const shelf = document.getElementById('archiveShelf');
-    shelf.innerHTML = activeCatalog.map(function(config){
+    const items = Array.isArray(visibleCatalog) ? visibleCatalog : [];
+    shelf.innerHTML = items.map(function(config){
       const isActive = String(config.packId) === String(activePackId);
       const previewClass = config.availability === 'playable' ? '' : ' preview';
       const activeClass = isActive ? ' active' : '';
@@ -1262,7 +1569,7 @@ const HISTORIC_1993_FALLBACK = {
 
     document.getElementById('heroPackTitle').textContent = packLabel;
     document.getElementById('heroPackSummary').textContent = packSummary;
-    document.getElementById('heroPackCount').textContent = String(activeCatalog.length || 0);
+    document.getElementById('heroPackCount').textContent = String((visibleCatalog && visibleCatalog.length) || 0);
     document.getElementById('heroPlayerCount').textContent = players.length
       ? String(players.length)
       : (configuredPlayerCount ? String(configuredPlayerCount) : '--');
@@ -1503,6 +1810,7 @@ const HISTORIC_1993_FALLBACK = {
     if(!config) return;
     activePackId = config.packId;
     renderShelf();
+    syncArchiveEmptyState();
     try{
       const bundle = await loadBundleForConfig(config);
       renderPack(config, bundle);
@@ -1526,21 +1834,41 @@ const HISTORIC_1993_FALLBACK = {
     if(!Array.isArray(catalog) || !catalog.length){
       catalog = buildFallbackCatalog();
     }
-    activeCatalog = catalog.filter(function(entry){
-      return String(entry.sport || browserSport).toLowerCase() === browserSport;
-    });
-    if(!activeCatalog.length){
-      activeCatalog = buildFallbackCatalog().filter(function(entry){
-        return String(entry.sport || 'nba').toLowerCase() === browserSport;
+    fullCatalog = catalog
+      .filter(function(entry){
+        return String(entry.sport || browserSport).toLowerCase() === browserSport;
+      })
+      .map(function(entry, index){
+        return Object.assign({ __catalogIndex: index }, entry);
       });
+    if(!fullCatalog.length){
+      fullCatalog = buildFallbackCatalog()
+        .filter(function(entry){
+          return String(entry.sport || 'nba').toLowerCase() === browserSport;
+        })
+        .map(function(entry, index){
+          return Object.assign({ __catalogIndex: index }, entry);
+        });
     }
-    if(!activeCatalog.length){
+    if(!fullCatalog.length){
       setStatus('No historical packs are cataloged for this sport yet.', 'warn');
       renderSavedUniverses();
       return;
     }
-    const firstPlayable = activeCatalog.find(function(entry){ return entry.availability === 'playable'; });
-    await setActivePack(firstPlayable ? firstPlayable.packId : activeCatalog[0].packId);
+    activeBrowseState = readArchiveBrowseStateFromUrl();
+    visibleCatalog = computeVisibleCatalog(fullCatalog, activeBrowseState);
+    renderArchiveControls();
+    syncArchiveEmptyState();
+    if(!visibleCatalog.length){
+      setStatus('No historical packs match the current archive filters.', 'warn');
+      renderSavedUniverses();
+      return;
+    }
+    const firstVisible = resolveVisibleActivePackId(
+      visibleCatalog,
+      (visibleCatalog.find(function(entry){ return entry.availability === 'playable'; }) || visibleCatalog[0]).packId
+    );
+    await setActivePack(firstVisible);
   }
 
   if(document.readyState === 'loading'){
