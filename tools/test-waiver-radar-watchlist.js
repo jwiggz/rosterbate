@@ -97,7 +97,10 @@ expectMatch(/function getWaiverRowSignals\(player\)/, 'missing row signal helper
 expectMatch(/Watch List Snapshot/, 'missing watch list snapshot section');
 expectMatch(/Recent Drops/, 'missing recent drops section');
 expectMatch(/waiver-radar-reason/, 'missing radar reason hook');
-expectMatch(/All Players\s*\/\s*Watch List/, 'missing combined All Players / Watch List browse hook');
+expectMatch(
+  /onclick="setWaiverListMode\('all'\)"[\s\S]*?>All Players<\/button>[\s\S]*?onclick="setWaiverListMode\('watch'\)"[\s\S]*?>Watch List[\s\S]*?<\/button>/,
+  'missing combined All Players / Watch List browse hook'
+);
 
 const script = [
   extractFunctionSource('getWatchListIds()'),
