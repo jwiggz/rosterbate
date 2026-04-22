@@ -394,9 +394,6 @@ function buildContext(options = {}) {
         }),
         makePlayer(213, 'Lead Guard', 'PG', 60, {
           simProfile: makeShape({ scoring: 22, playmaking: 9, defense: 2 })
-        }),
-        makePlayer(214, 'Wing Stopper', 'SF', 39, {
-          simProfile: makeShape({ scoring: 14, defense: 2 })
         })
       ],
       [],

@@ -4587,23 +4587,21 @@ function getCpuTradeProtectedPlayerIds(teamIdx, day, rosterNeed){
       return !isUnavailableHelper(injury);
     });
 
-  if(roster.length >= 4){
-    const slotCounts={G:0,F:0,C:0};
-    availableRoster.forEach(player=>{
-      const slots=getCpuWaiverPlayerSlots(player);
-      if(slots.includes('G')) slotCounts.G++;
-      if(slots.includes('F')) slotCounts.F++;
-      if(slots.includes('C')) slotCounts.C++;
-    });
-    availableRoster.forEach(player=>{
-      const slots=getCpuWaiverPlayerSlots(player);
-      const thinAnchor=
-        (slots.includes('G') && slotCounts.G <= 1) ||
-        (slots.includes('F') && slotCounts.F <= 1) ||
-        (slots.includes('C') && slotCounts.C <= 1);
-      if(thinAnchor) protectedIds.add(Number(player?.id));
-    });
-  }
+  const slotCounts={G:0,F:0,C:0};
+  availableRoster.forEach(player=>{
+    const slots=getCpuWaiverPlayerSlots(player);
+    if(slots.includes('G')) slotCounts.G++;
+    if(slots.includes('F')) slotCounts.F++;
+    if(slots.includes('C')) slotCounts.C++;
+  });
+  availableRoster.forEach(player=>{
+    const slots=getCpuWaiverPlayerSlots(player);
+    const thinAnchor=
+      (slots.includes('G') && slotCounts.G <= 1) ||
+      (slots.includes('F') && slotCounts.F <= 1) ||
+      (slots.includes('C') && slotCounts.C <= 1);
+    if(thinAnchor) protectedIds.add(Number(player?.id));
+  });
 
   roster.forEach(player=>{
     const protection=getCpuWaiverDropProtectionBonus(player, rosterNeed);
