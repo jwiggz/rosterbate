@@ -1108,6 +1108,33 @@ const HISTORIC_1993_FALLBACK = {
     return Number(a?.__catalogIndex || 0) - Number(b?.__catalogIndex || 0);
   }
 
+  function getArchiveSeasonRecencyValue(config){
+    const numericCandidates = [
+      config?.seasonStartYear,
+      config?.seasonYear,
+      config?.year,
+      config?.startYear
+    ];
+    for(let index = 0; index < numericCandidates.length; index += 1){
+      const value = Number(numericCandidates[index]);
+      if(Number.isFinite(value) && value > 0){
+        return value;
+      }
+    }
+    const textCandidates = [
+      config?.seasonLabel,
+      config?.shortLabel,
+      config?.packId
+    ];
+    for(let index = 0; index < textCandidates.length; index += 1){
+      const match = String(textCandidates[index] || '').match(/(?:^|[^0-9])((?:19|20)\d{2})(?:[^0-9]|$)/);
+      if(match){
+        return Number(match[1]);
+      }
+    }
+    return -1;
+  }
+
   function applyArchiveBrowseSort(catalog, state){
     const normalized = normalizeArchiveBrowseState(state);
     const items = Array.isArray(catalog) ? catalog.slice() : [];
@@ -1122,13 +1149,9 @@ const HISTORIC_1993_FALLBACK = {
       return items.sort(function(a, b){
         const aPlayable = String(a?.availability || '').trim().toLowerCase() === 'playable' ? 1 : 0;
         const bPlayable = String(b?.availability || '').trim().toLowerCase() === 'playable' ? 1 : 0;
-        const aIndex = Number.isFinite(Number(a?.__catalogIndex)) ? Number(a.__catalogIndex) : NaN;
-        const bIndex = Number.isFinite(Number(b?.__catalogIndex)) ? Number(b.__catalogIndex) : NaN;
-        const aYearMatch = String(a?.packId || '').match(/_(\d{4})_/);
-        const bYearMatch = String(b?.packId || '').match(/_(\d{4})_/);
-        const aOrder = Number.isFinite(aIndex) ? aIndex : Number(aYearMatch && aYearMatch[1] ? aYearMatch[1] : 0);
-        const bOrder = Number.isFinite(bIndex) ? bIndex : Number(bYearMatch && bYearMatch[1] ? bYearMatch[1] : 0);
-        return (bPlayable - aPlayable) || (bOrder - aOrder);
+        const aRecency = getArchiveSeasonRecencyValue(a);
+        const bRecency = getArchiveSeasonRecencyValue(b);
+        return (bPlayable - aPlayable) || (bRecency - aRecency) || compareArchiveCatalogOrder(a, b);
       });
     }
     return items.sort(function(a, b){
@@ -1355,6 +1378,92 @@ const HISTORIC_1993_FALLBACK = {
     browserShell.hidden = !hasItems;
   }
 
+  function resetArchiveDetailToEmptyState(){
+    document.getElementById('heroPackTitle').textContent = 'Adjust The Archive Filters';
+    document.getElementById('heroPackSummary').textContent = 'No seasons match the current archive filters. Clear or widen the filters to load a playable or preview pack back into the browser.';
+    document.getElementById('heroPackCount').textContent = '0';
+    document.getElementById('heroPlayerCount').textContent = '--';
+    document.getElementById('heroAuditCoverage').textContent = '--';
+    document.getElementById('heroCoverageValue').textContent = '--';
+    document.getElementById('heroZeroGames').textContent = '--';
+    document.getElementById('heroRemovedCount').textContent = '--';
+
+    document.getElementById('packEraLabel').textContent = 'Archive Filters Active';
+    document.getElementById('packTitle').textContent = 'No Visible Seasons';
+    document.getElementById('packTagline').textContent = 'Clear filters to reopen the archive shelf.';
+    document.getElementById('packDesc').textContent = 'The previous pack selection has been cleared so the browser does not imply that a hidden season is still active.';
+    document.getElementById('packPosterSlot').innerHTML = renderCatalogArt({
+      art: {
+        theme: 'spotlight',
+        eyebrow: 'Archive Filters',
+        headline: 'No Packs',
+        subline: 'Clear filters to reopen the shelf.'
+      }
+    }, 'poster');
+
+    const statusPill = document.getElementById('packStatusPill');
+    statusPill.textContent = 'No Visible Pack';
+    statusPill.classList.add('preview');
+
+    document.getElementById('packHealth').innerHTML = [
+      {
+        value: '--',
+        label: 'Real Stat Coverage',
+        sub: 'Load a visible season to inspect audit data.'
+      },
+      {
+        value: '--',
+        label: 'Zero-Game Players',
+        sub: 'Audit snapshots return when a pack is active.'
+      },
+      {
+        value: '--',
+        label: 'Removed Invalid',
+        sub: 'No hidden pack remains selected.'
+      }
+    ].map(function(item){
+      return [
+        '<div class="health-card">',
+        '<div class="health-value">' + item.value + '</div>',
+        '<div class="health-label">' + item.label + '</div>',
+        '<div class="health-sub">' + item.sub + '</div>',
+        '</div>'
+      ].join('');
+    }).join('');
+
+    document.getElementById('featuredStars').innerHTML = '<span class="star-pill">No active pack selected</span>';
+    document.getElementById('teamSpotlights').innerHTML = [
+      '<div class="spotlight">',
+      '<div class="spotlight-title">Archive Shelf Cleared</div>',
+      '<div class="spotlight-copy">This zero-results state intentionally clears the previous active pack so the detail pane matches the filtered shelf.</div>',
+      '</div>'
+    ].join('');
+
+    const select = document.getElementById('featuredTeamSelect');
+    select.innerHTML = '<option value="">No visible seasons</option>';
+    select.disabled = true;
+
+    const buttonResets = [
+      { id: 'draftEraBtn', label: 'Draft The Era' },
+      { id: 'simSeasonBtn', label: 'Sim Season' },
+      { id: 'reimaginedSeasonBtn', label: 'Reimagined Season' },
+      { id: 'playRealSeasonBtn', label: 'Replay Era Rosters' }
+    ];
+    buttonResets.forEach(function(buttonConfig){
+      const button = document.getElementById(buttonConfig.id);
+      button.textContent = buttonConfig.label;
+      button.classList.add('disabled');
+      button.setAttribute('href', '#');
+      button.onclick = function(event){
+        event.preventDefault();
+        setStatus('No historical packs match the current archive filters.', 'warn');
+      };
+    });
+
+    document.getElementById('modeNote').textContent = 'Clear filters to load a season before launching Draft The Era, Sim Season, or Replay Era Rosters.';
+    document.getElementById('detailNote').textContent = 'The archive browser resets its hero and detail state when filters produce zero matches so no hidden pack appears active.';
+  }
+
   async function updateArchiveBrowseState(patch){
     activeBrowseState = normalizeArchiveBrowseState(Object.assign({}, activeBrowseState || getDefaultArchiveBrowseState(), patch || {}));
     writeArchiveBrowseStateToUrl(activeBrowseState);
@@ -1363,7 +1472,8 @@ const HISTORIC_1993_FALLBACK = {
     syncArchiveEmptyState();
     if(!visibleCatalog.length){
       activePackId = '';
-      document.getElementById('heroPackCount').textContent = '0';
+      renderShelf();
+      resetArchiveDetailToEmptyState();
       setStatus('No historical packs match the current archive filters.', 'warn');
       return;
     }
@@ -1860,6 +1970,9 @@ const HISTORIC_1993_FALLBACK = {
     renderArchiveControls();
     syncArchiveEmptyState();
     if(!visibleCatalog.length){
+      activePackId = '';
+      renderShelf();
+      resetArchiveDetailToEmptyState();
       setStatus('No historical packs match the current archive filters.', 'warn');
       renderSavedUniverses();
       return;

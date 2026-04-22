@@ -118,6 +118,7 @@ expectMatch(/function writeArchiveBrowseStateToUrl\(state\)/, 'missing URL-write
 expectMatch(/function applyArchiveBrowseFilters\(catalog, state\)/, 'missing filter helper');
 expectMatch(/function applyArchiveBrowseSort\(catalog, state\)/, 'missing sort helper');
 expectMatch(/function resolveVisibleActivePackId\(catalog, preferredPackId\)/, 'missing active-pack resolver');
+expectMatch(/function getArchiveSeasonRecencyValue\(config\)/, 'missing season recency helper');
 
 const script = [
   extractFunctionSource('getDefaultArchiveBrowseState()'),
@@ -127,17 +128,18 @@ const script = [
   extractFunctionSource('matchesArchiveBrowseFilters(config, state)'),
   extractFunctionSource('applyArchiveBrowseFilters(catalog, state)'),
   extractFunctionSource('compareArchiveCatalogOrder(a, b)'),
+  extractFunctionSource('getArchiveSeasonRecencyValue(config)'),
   extractFunctionSource('applyArchiveBrowseSort(catalog, state)'),
   extractFunctionSource('resolveVisibleActivePackId(catalog, preferredPackId)')
 ].join('\n\n');
 
 const sampleCatalog = [
-  { packId: 'nba_1987_full_season_v1', era: '1980s', availability: 'playable', significanceTone: 'heritage' },
-  { packId: 'nba_1993_full_season_v1', era: '1990s', availability: 'playable', significanceTone: 'dynasty' },
-  { packId: 'nba_1996_full_season_v1', era: '1990s', availability: 'playable', significanceTone: 'dynasty' },
-  { packId: 'nba_2001_full_season_v1', era: '2000s', availability: 'playable', significanceTone: 'dynasty' },
-  { packId: 'nba_2016_full_season_v1', era: '2010s', availability: 'playable', significanceTone: 'modern' },
-  { packId: 'nba_preview_future', era: '2000s', availability: 'preview', significanceTone: 'spotlight' }
+  { packId: 'nba_2016_full_season_v1', era: '2010s', availability: 'playable', significanceTone: 'modern', __catalogIndex: 0 },
+  { packId: 'nba_1987_full_season_v1', era: '1980s', availability: 'playable', significanceTone: 'heritage', __catalogIndex: 1 },
+  { packId: 'nba_preview_future', era: '2000s', availability: 'preview', significanceTone: 'spotlight', __catalogIndex: 2 },
+  { packId: 'nba_2001_full_season_v1', era: '2000s', availability: 'playable', significanceTone: 'dynasty', __catalogIndex: 3 },
+  { packId: 'nba_1993_full_season_v1', era: '1990s', availability: 'playable', significanceTone: 'dynasty', __catalogIndex: 4 },
+  { packId: 'nba_1996_full_season_v1', era: '1990s', availability: 'playable', significanceTone: 'dynasty', __catalogIndex: 5 }
 ];
 
 const historyCalls = [];
@@ -188,8 +190,8 @@ assert.deepStrictEqual(
     'nba_1987_full_season_v1',
     'nba_1993_full_season_v1',
     'nba_1996_full_season_v1',
-    'nba_2001_full_season_v1',
     'nba_preview_future',
+    'nba_2001_full_season_v1',
     'nba_2016_full_season_v1'
   ]
 );
