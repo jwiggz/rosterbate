@@ -215,9 +215,13 @@ const script = [
 const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, config)');
 
 expectMatch(/id="recentRosterMovesList"/, 'recent roster moves list node is missing');
+expectMatch(/id="recentLeagueTradesList"/, 'recent league trades list node is missing');
 expectMatch(/function isRosterChangingActivityEntry\(entry\)/, 'roster-changing activity helper is missing');
 expectMatch(/function buildRecentRosterMovesSummary\(slot, state\)/, 'recent roster moves summary helper is missing');
+expectMatch(/function isCompletedTradeActivityEntry\(entry\)/, 'completed trade activity helper is missing');
+expectMatch(/function buildRecentLeagueTradesSummary\(slot, state\)/, 'recent league trades summary helper is missing');
 assert.match(renderUniverseSource, /recentRosterMovesList/, 'renderUniverse should render the recent roster moves section');
+assert.match(renderUniverseSource, /recentLeagueTradesList/, 'renderUniverse should render the recent league trades section');
 
 const slot = {
   title: 'Top300 Regression League',
@@ -513,6 +517,31 @@ const emptyRosterMoves = context.renderDetailList(
 );
 assert.match(emptyRosterMoves, /No recent roster moves/);
 assert.match(emptyRosterMoves, /This universe has not logged recent team roster changes yet\./);
+
+assert.equal(viewModel.recentLeagueTrades.length, 5);
+assert.deepStrictEqual(
+  viewModel.recentLeagueTrades.map(item => item.title),
+  [
+    'CPU Team 3 traded Wing Stopper to CPU Team 1 for Stretch Four',
+    'CPU Team 1 traded Bench Big to CPU Team 2 for Bench Creator',
+    'CPU Team 4 traded Rim Protector to CPU Team 5 for Lead Guard',
+    'CPU Team 6 traded Scoring Wing to CPU Team 7 for Rebounder',
+    'CPU Team 8 traded Bench Creator to CPU Team 9 for Two-Way Forward'
+  ]
+);
+assert.ok(
+  viewModel.recentLeagueTrades.every(item => !/Waiver|IL|lineup|Commissioner/i.test(item.title + ' ' + item.body)),
+  'only completed trade activity should appear in recent league trades'
+);
+
+const noTradeHistory = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    { ...state, activityLog: [] },
+    {}
+  )
+));
+assert.deepStrictEqual(noTradeHistory.recentLeagueTrades, []);
 
 const renderedRecentSimCard = context.renderRecentSimulationCards([viewModel.recentSimDays[0]]);
 assert.match(renderedRecentSimCard, /Audit Agents beat CPU Team 2/);
@@ -1203,6 +1232,7 @@ assert.match(renderUniverseSource, /currentTeamState\.items/, 'renderUniverse sh
 assert.match(renderUniverseSource, /leagueSnapshot\.items/, 'renderUniverse should render league snapshot from explicit view-model items');
 assert.match(renderUniverseSource, /recentActivity\.items/, 'renderUniverse should render recent activity from explicit view-model items');
 assert.match(renderUniverseSource, /recentSimulationList/, 'renderUniverse should render the recent simulation section');
+assert.match(renderUniverseSource, /recentLeagueTradesList/, 'renderUniverse should render the recent league trades section');
 assert.doesNotMatch(renderUniverseSource, /\.slice\(1\)/, 'renderUniverse should not infer team-state semantics from item ordering');
 assert.doesNotMatch(renderUniverseSource, /Your current standing window\./, 'renderUniverse should not infer league semantics from presentation copy');
 
@@ -1216,6 +1246,7 @@ expectMatch(/id="recentSimulationList"/, 'recent simulation list node is missing
 expectMatch(/id="currentTeamStateList"/, 'current team state list node is missing');
 expectMatch(/function getRecentRevealReports\(state, limit\)/, 'recent reveal helper is missing');
 expectMatch(/function buildRecentSimulationSummary\(slot, state\)/, 'recent simulation summary helper is missing');
+expectMatch(/function buildRecentLeagueTradesSummary\(slot, state\)/, 'recent league trades summary helper is missing');
 expectMatch(/function buildUniverseDetailsViewModel\(slot, state, config\)/, 'view-model builder is missing');
 expectMatch(/function renderUniverse\(slot, state, config\)/, 'renderUniverse is missing');
 expectNoMatch(/id="rosterCoreList"/, 'legacy roster core list should be removed');

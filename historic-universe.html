@@ -1006,6 +1006,35 @@
     return grouped.filter(Boolean);
   }
 
+  function isCompletedTradeActivityEntry(entry){
+    const type = String(entry?.type || '').trim().toLowerCase();
+    const title = String(entry?.title || '').trim();
+    const body = String(entry?.text || '').trim();
+    return type === 'trade' && (title.length > 0 || body.length > 0);
+  }
+
+  function buildRecentLeagueTradesSummary(slot, state){
+    return (Array.isArray(state?.activityLog) ? state.activityLog : [])
+      .filter(function(entry){
+        return isCompletedTradeActivityEntry(entry);
+      })
+      .slice()
+      .sort(function(a, b){
+        return Number(b?.ts || 0) - Number(a?.ts || 0);
+      })
+      .slice(0, 5)
+      .map(function(entry){
+        const meta = [];
+        if(Number.isFinite(Number(entry?.week))) meta.push('Week ' + Number(entry.week));
+        if(Number.isFinite(Number(entry?.day))) meta.push('Day ' + Number(entry.day));
+        return {
+          title: String(entry?.title || 'League trade').trim(),
+          body: String(entry?.text || 'Completed league trade.').trim(),
+          meta: meta
+        };
+      });
+  }
+
   function buildCurrentTeamStateSummary(slot, state, rosterCore){
     const fullRoster = getTeamRoster(state);
     const rosterItems = Array.isArray(rosterCore) ? rosterCore : [];
@@ -1131,6 +1160,7 @@
       recentActivity: buildRecentUniverseActivitySummary(state, reveal),
       recentSimDays: buildRecentSimulationSummary(slot, state),
       recentRosterMoves: buildRecentRosterMovesSummary(slot, state),
+      recentLeagueTrades: buildRecentLeagueTradesSummary(slot, state),
       currentTeamState: buildCurrentTeamStateSummary(slot, state, rosterCore)
     };
   }
