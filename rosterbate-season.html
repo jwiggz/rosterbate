@@ -9381,33 +9381,30 @@ function getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid){
     afterCounts[key]=(afterCounts[key]||0)+1;
   });
   let starterIds=[];
+  let starterContextAvailable=false;
   try{
-    if(typeof getStarterIdsForTeamDay==='function') starterIds=getStarterIdsForTeamDay(teamIdx, G?.day||1)||[];
+    if(typeof getStarterIdsForTeamDay==='function'){
+      starterIds=(getStarterIdsForTeamDay(teamIdx, G?.day||1)||[]).filter(Boolean);
+      starterContextAvailable=starterIds.length>0;
+    }
   }catch(e){}
-  if(!Array.isArray(starterIds) || !starterIds.length){
-    const configuredStarterCount=typeof STARTERS!=='undefined' && Number.isFinite(Number(STARTERS))
-      ? Number(STARTERS)
-      : Math.max(1, rosterPlayers.length-1);
-    const starterCount=Math.max(1, Math.min(
-      rosterPlayers.length,
-      configuredStarterCount
-    ));
-    starterIds=[...rosterPlayers]
+  const configuredStarterCount=typeof STARTERS!=='undefined' && Number.isFinite(Number(STARTERS))
+    ? Number(STARTERS)
+    : 0;
+  const simulatedStarterCount=starterContextAvailable
+    ? Math.max(1, Math.min(configuredStarterCount || starterIds.length, simulatedRoster.length || 1))
+    : 0;
+  const projectedStarterIds=starterContextAvailable
+    ? [...simulatedRoster]
       .sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a))
-      .slice(0, starterCount)
+      .slice(0, simulatedStarterCount)
       .map(player=>Number(player?.id))
-      .filter(Number.isFinite);
-  }
-  const simulatedStarterCount=Math.max(1, Math.min(starterIds.length || simulatedRoster.length || 1, simulatedRoster.length || 1));
-  const projectedStarterIds=[...simulatedRoster]
-    .sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a))
-    .slice(0, simulatedStarterCount)
-    .map(player=>Number(player?.id))
-    .filter(Number.isFinite);
+      .filter(Number.isFinite)
+    : [];
   const outgoingKey=getTradeFairnessPositionKey(outgoingPlayer);
   const incomingKey=getTradeFairnessPositionKey(incomingPlayer);
-  const outgoingWasStarter=starterIds.includes(outgoingId);
-  const incomingProjectsStarter=projectedStarterIds.includes(incomingId);
+  const outgoingWasStarter=starterContextAvailable ? starterIds.includes(outgoingId) : false;
+  const incomingProjectsStarter=starterContextAvailable ? projectedStarterIds.includes(incomingId) : false;
   const outgoingCount=beforeCounts[outgoingKey]||0;
   const incomingCountBefore=beforeCounts[incomingKey]||0;
   const incomingCountAfter=afterCounts[incomingKey]||0;
@@ -9430,6 +9427,7 @@ function getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid){
     incomingValue:getTradeFairnessPlayerValue(incomingPlayer),
     outgoingKey,
     incomingKey,
+    starterContextAvailable,
     beforeCounts,
     afterCounts,
     outgoingWasStarter,
@@ -9455,7 +9453,7 @@ function evaluateOneForOneTradeFairness(offer){
   const fromProfile=getTradeFairnessRosterProfile(Number(offer?.fromTeam), give[0], get[0]);
   const toProfile=getTradeFairnessRosterProfile(Number(offer?.toTeam), get[0], give[0]);
   const rawDelta=+(fromProfile.incomingValue-fromProfile.outgoingValue).toFixed(1);
-  const contextOffset=+(Math.max(0, fromProfile.contextBoost)+Math.max(0, toProfile.contextBoost)).toFixed(1);
+  const contextOffset=+(Number(fromProfile.contextBoost||0)+Number(toProfile.contextBoost||0)).toFixed(1);
   const adjustedGap=Math.max(0, +(Math.abs(rawDelta)-contextOffset).toFixed(1));
   let rating='high_risk';
   if(adjustedGap<=4) rating='fair';

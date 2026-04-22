@@ -400,6 +400,11 @@ const fair = context.evaluateOneForOneTradeFairness({
 });
 assert.equal(fair.rating, 'fair');
 
+const fallbackProfile = context.getTradeFairnessRosterProfile(0, 11, 12);
+assert.equal(fallbackProfile.starterContextAvailable, false);
+assert.equal(fallbackProfile.outgoingWasStarter, false);
+assert.equal(fallbackProfile.incomingProjectsStarter, false);
+
 assert.deepEqual(plain(context.getTradeFairnessBadgeMeta('fair')), {
   label: 'Fair',
   tone: 'fair'
@@ -433,6 +438,24 @@ const contextSoftened = context.evaluateOneForOneTradeFairness({
 });
 assert.ok(['fair', 'slight_lean'].includes(contextSoftened.rating));
 
+const originalRosterProfile = context.getTradeFairnessRosterProfile;
+context.getTradeFairnessRosterProfile = teamIdx => ({
+  teamIdx,
+  incomingValue: teamIdx === 0 ? 30 : 10,
+  outgoingValue: teamIdx === 0 ? 22 : 18,
+  contextBoost: teamIdx === 0 ? -3 : 4
+});
+const penaltyAware = context.evaluateOneForOneTradeFairness({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [11],
+  get: [12]
+});
+assert.equal(penaltyAware.contextOffset, 1);
+assert.equal(penaltyAware.adjustedGap, 7);
+assert.equal(penaltyAware.rating, 'slight_lean');
+context.getTradeFairnessRosterProfile = originalRosterProfile;
+
 const vmResult = context.getTradeFairnessViewModel({
   fromTeam: 0,
   toTeam: 1,
@@ -445,7 +468,7 @@ assert.ok(vmResult.reasons.length >= 2);
 assert.ok(vmResult.reasons.length <= 4);
 assert.ok(vmResult.reasons.every(reason => typeof reason === 'string' && reason.trim().length > 0));
 assert.ok(vmResult.reasons.some(reason => /value|producer|lean/i.test(reason)));
-assert.ok(vmResult.reasons.some(reason => /starter|depth|need|slot/i.test(reason)));
+assert.ok(vmResult.reasons.some(reason => /starter|depth|need|slot|context/i.test(reason)));
 
 const unsupported = context.getTradeFairnessViewModel({
   fromTeam: 0,
