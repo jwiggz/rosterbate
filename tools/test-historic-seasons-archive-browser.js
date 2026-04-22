@@ -119,6 +119,11 @@ expectMatch(/function applyArchiveBrowseFilters\(catalog, state\)/, 'missing fil
 expectMatch(/function applyArchiveBrowseSort\(catalog, state\)/, 'missing sort helper');
 expectMatch(/function resolveVisibleActivePackId\(catalog, preferredPackId\)/, 'missing active-pack resolver');
 expectMatch(/function getArchiveSeasonRecencyValue\(config\)/, 'missing season recency helper');
+expectMatch(/activePackRenderToken/, 'missing active-pack render token guard');
+expectMatch(/Historic Archive/, 'missing zero-results hero title copy');
+expectMatch(/Adjust the filters to bring historical packs back onto the shelf\./, 'missing zero-results hero summary copy');
+expectMatch(/Historical browser loaded with archive filters active\. Pick a slot and launch directly into a drafted or simulated universe\./, 'missing playable shelf-aware status copy');
+expectMatch(/Archive shelf loaded with preview packs filtered into view\./, 'missing preview shelf-aware status copy');
 
 const script = [
   extractFunctionSource('getDefaultArchiveBrowseState()'),
@@ -217,6 +222,14 @@ assert.deepStrictEqual(
 assert.equal(
   context.resolveVisibleActivePackId(filtered, 'nba_2001_full_season_v1'),
   'nba_1993_full_season_v1'
+);
+assert.equal(
+  context.resolveVisibleActivePackId([
+    { packId: 'nba_preview_filtered_in', availability: 'preview' },
+    { packId: 'nba_2001_full_season_v1', availability: 'playable' },
+    { packId: 'nba_1996_full_season_v1', availability: 'playable' }
+  ], 'nba_2016_full_season_v1'),
+  'nba_2001_full_season_v1'
 );
 assert.equal(context.resolveVisibleActivePackId([], 'nba_1993_full_season_v1'), '');
 

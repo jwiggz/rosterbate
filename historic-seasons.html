@@ -965,6 +965,7 @@ const HISTORIC_1993_FALLBACK = {
   let visibleCatalog = [];
   let activeBrowseState = null;
   let activePackId = '';
+  let activePackRenderToken = 0;
 
   function clone(value){
     return JSON.parse(JSON.stringify(value));
@@ -1168,7 +1169,23 @@ const HISTORIC_1993_FALLBACK = {
     if(preferred && items.some(function(entry){ return String(entry?.packId || '').trim() === preferred; })){
       return preferred;
     }
-    return String(items[0]?.packId || '').trim();
+    const firstPlayable = items.find(function(entry){
+      return String(entry?.availability || '').trim().toLowerCase() === 'playable';
+    });
+    return String((firstPlayable || items[0])?.packId || '').trim();
+  }
+
+  function createActivePackRenderToken(packId){
+    activePackRenderToken += 1;
+    return {
+      id: activePackRenderToken,
+      packId: String(packId || '').trim()
+    };
+  }
+
+  function isCurrentActivePackRenderToken(token){
+    if(!token || !token.id) return false;
+    return token.id === activePackRenderToken && token.packId === String(activePackId || '').trim();
   }
 
   function isMixedEraConfig(config){
@@ -1379,8 +1396,8 @@ const HISTORIC_1993_FALLBACK = {
   }
 
   function resetArchiveDetailToEmptyState(){
-    document.getElementById('heroPackTitle').textContent = 'Adjust The Archive Filters';
-    document.getElementById('heroPackSummary').textContent = 'No seasons match the current archive filters. Clear or widen the filters to load a playable or preview pack back into the browser.';
+    document.getElementById('heroPackTitle').textContent = 'Historic Archive';
+    document.getElementById('heroPackSummary').textContent = 'Adjust the filters to bring historical packs back onto the shelf.';
     document.getElementById('heroPackCount').textContent = '0';
     document.getElementById('heroPlayerCount').textContent = '--';
     document.getElementById('heroAuditCoverage').textContent = '--';
@@ -1472,6 +1489,7 @@ const HISTORIC_1993_FALLBACK = {
     syncArchiveEmptyState();
     if(!visibleCatalog.length){
       activePackId = '';
+      createActivePackRenderToken('');
       renderShelf();
       resetArchiveDetailToEmptyState();
       setStatus('No historical packs match the current archive filters.', 'warn');
@@ -1482,7 +1500,9 @@ const HISTORIC_1993_FALLBACK = {
       renderShelf();
       const config = getConfigById(activePackId);
       if(config){
+        const renderToken = createActivePackRenderToken(config.packId);
         const bundle = await loadBundleForConfig(config).catch(function(){ return null; });
+        if(!isCurrentActivePackRenderToken(renderToken)) return;
         renderPack(config, bundle);
       }
       return;
@@ -1901,16 +1921,10 @@ const HISTORIC_1993_FALLBACK = {
     };
 
     setStatus(
-      isMixedEra
-        ? (playableHere
-          ? 'Mixed Era Draft loaded. Choose a starting slot and launch a curated crossover draft built from real on-disk packs.'
-          : 'Mixed Era Draft is cataloged, but direct launch stays localhost-first for now.')
-        : config.availability === 'playable'
-        ? (isLocalHistorical
-          ? 'Historical browser loaded from a real on-disk pack. Pick a slot and launch directly into a drafted or simulated universe.'
-          : 'Pack browser loaded from a real pack artifact. Direct launch stays localhost-first for now.')
-        : 'Archive shelf loaded. Preview packs are intentionally visible before they become playable.',
-      (config.availability === 'playable' || isMixedEra) ? 'good' : 'warn'
+      config.availability === 'playable'
+        ? 'Historical browser loaded with archive filters active. Pick a slot and launch directly into a drafted or simulated universe.'
+        : 'Archive shelf loaded with preview packs filtered into view.',
+      config.availability === 'playable' ? 'good' : 'warn'
     );
     renderSavedUniverses();
   }
@@ -1919,12 +1933,15 @@ const HISTORIC_1993_FALLBACK = {
     const config = getConfigById(packId);
     if(!config) return;
     activePackId = config.packId;
+    const renderToken = createActivePackRenderToken(config.packId);
     renderShelf();
     syncArchiveEmptyState();
     try{
       const bundle = await loadBundleForConfig(config);
+      if(!isCurrentActivePackRenderToken(renderToken)) return;
       renderPack(config, bundle);
     }catch(error){
+      if(!isCurrentActivePackRenderToken(renderToken)) return;
       console.error('[Historic Seasons] Failed to load active pack', error);
       renderPack(config, null);
       setStatus('Could not load pack "' + config.packId + '": ' + (error && error.message ? error.message : String(error)), 'warn');
@@ -1971,6 +1988,7 @@ const HISTORIC_1993_FALLBACK = {
     syncArchiveEmptyState();
     if(!visibleCatalog.length){
       activePackId = '';
+      createActivePackRenderToken('');
       renderShelf();
       resetArchiveDetailToEmptyState();
       setStatus('No historical packs match the current archive filters.', 'warn');
