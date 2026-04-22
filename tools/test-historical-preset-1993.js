@@ -32,17 +32,18 @@ for (const [key, expectedUrl] of Object.entries(expectedCatalogUrls)) {
 
 const expectedPlayableUrls = Object.values(expectedCatalogUrls);
 const historicSeasonsSource = readText('historic-seasons.html');
-for (const expectedUrl of expectedPlayableUrls) {
-  assert.ok(
-    historicSeasonsSource.includes(expectedUrl),
-    `historic-seasons fallback should include ${expectedUrl}`
-  );
-}
+assert.match(
+  historicSeasonsSource,
+  /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?statusLabel:\s*'Playable Now'[\s\S]*?seasonUrl:\s*'rosterbate-season\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?simUrl:\s*'rosterbate-season\.html\?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1'[\s\S]*?draftUrl:\s*'rosterbate-draft\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?reimaginedUrl:\s*'rosterbate-season\.html\?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'/,
+  'historic-seasons fallback should include a single coherent playable 1992-93 entry'
+);
 
 const historicUniverseSource = readText('historic-universe.html');
-assert.ok(historicUniverseSource.includes("packId: 'nba_1993_full_season_v1'"), 'historic-universe fallback catalog should know about 1992-93');
-assert.ok(historicUniverseSource.includes("availability: 'playable'"), 'historic-universe fallback catalog should mark 1992-93 playable');
-assert.ok(historicUniverseSource.includes("shortLabel: '1992-93'"), 'historic-universe fallback catalog should label 1992-93 correctly');
+assert.match(
+  historicUniverseSource,
+  /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?shortLabel:\s*'1992-93'/,
+  'historic-universe fallback catalog should include a single coherent playable 1992-93 entry'
+);
 
 const rosterbateSeasonSource = readText('rosterbate-season.html');
 assert.match(
@@ -98,7 +99,7 @@ assert.ok(validation.summary.playerCount > 300, '1992-93 should ship a full-leag
 const summaries = readJson(`historical-packs/${packId}/optional/summaries.json`);
 assert.match(
   JSON.stringify(summaries),
-  /(?:inferred[\s\S]{0,40}player-game coverage|player-game coverage[\s\S]{0,40}inferred)/i,
+  /inferred[\s\S]{0,40}player-game coverage/i,
   '1992-93 summaries should disclose inferred player-game coverage'
 );
 
