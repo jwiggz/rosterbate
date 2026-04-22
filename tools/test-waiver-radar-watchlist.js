@@ -96,9 +96,8 @@ expectMatch(/function getRecentDroppedWaiverTargets\(limit=4\)/, 'missing recent
 expectMatch(/function getWaiverRowSignals\(player\)/, 'missing row signal helper');
 expectMatch(/Watch List Snapshot/, 'missing watch list snapshot section');
 expectMatch(/Recent Drops/, 'missing recent drops section');
-expectMatch(/All Players/, 'missing all players browse hook');
-expectMatch(/Watch List/, 'missing watch list browse hook');
 expectMatch(/waiver-radar-reason/, 'missing radar reason hook');
+expectMatch(/All Players\s*\/\s*Watch List/, 'missing combined All Players / Watch List browse hook');
 
 const script = [
   extractFunctionSource('getWatchListIds()'),
@@ -191,6 +190,12 @@ assert.equal(watchedSignals.watched, true);
 assert.equal(watchedSignals.recentDrop, false);
 assert.equal(typeof watchedSignals.radarReason, 'string');
 assert.equal(typeof watchedSignals.fitReason, 'string');
+assert.equal(watchedSignals.radarReason.split(/\r?\n/).length, 1);
+assert.equal(watchedSignals.fitReason.split(/\r?\n/).length, 1);
+assert.ok(watchedSignals.radarReason.trim().length > 0);
+assert.ok(watchedSignals.fitReason.trim().length > 0);
+assert.ok(watchedSignals.radarReason.trim().length <= 60);
+assert.ok(watchedSignals.fitReason.trim().length <= 60);
 
 const recentSignals = context.getWaiverRowSignals(radar[2].player);
 assert.equal(recentSignals.recentDrop, true);
