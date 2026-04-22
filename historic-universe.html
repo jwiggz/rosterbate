@@ -690,6 +690,8 @@
     return (Array.isArray(state?.activityLog) ? state.activityLog : []).filter(function(entry){
       const ts = Number(entry?.ts || 0);
       return ts > minTs && ts <= maxTs;
+    }).sort(function(a, b){
+      return Number(b?.ts || 0) - Number(a?.ts || 0);
     });
   }
 
@@ -893,14 +895,18 @@
     }
     return list.map(function(item){
       const label = 'Week ' + String(item?.week || '--') + ' Day ' + String(item?.day || '--');
-      const resultHeadline = String(item?.teamResult?.headline || 'Simulation day completed.').trim();
-      const resultSubline = String(item?.teamResult?.subline || '').trim();
       const storyHeadline = String(item?.story?.headline || '').trim();
       const storyBody = String(item?.story?.body || '').trim();
       const storyHtml = storyHeadline || storyBody
         ? [
             storyHeadline ? '<strong>' + escapeHtml(storyHeadline) + '</strong>' : '',
             storyBody ? '<span>' + escapeHtml(storyBody) + '</span>' : ''
+          ].join('')
+        : '';
+      const resultHtml = item?.teamResult
+        ? [
+            '<strong>' + escapeHtml(String(item.teamResult.headline || 'Simulation day completed.').trim()) + '</strong>',
+            String(item.teamResult.subline || '').trim() ? '<span>' + escapeHtml(String(item.teamResult.subline || '').trim()) + '</span>' : ''
           ].join('')
         : '';
       const activityHtml = Array.isArray(item?.teamActivity) && item.teamActivity.length
@@ -914,8 +920,7 @@
       return [
         '<div class="detail-item sim-day-card">',
         '<div class="sim-day-label">' + escapeHtml(label) + '</div>',
-        '<strong>' + escapeHtml(resultHeadline) + '</strong>',
-        resultSubline ? '<span>' + escapeHtml(resultSubline) + '</span>' : '',
+        resultHtml,
         storyHtml,
         activityHtml,
         leagueNoteHtml,

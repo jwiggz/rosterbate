@@ -400,6 +400,52 @@ assert.ok(
   'recent simulation cards should render the league note after team activity'
 );
 
+const ascendingActivityWindow = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    slot,
+    {
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1'],
+      rosters: [[]],
+      standings: [],
+      dailyRevealReports: {
+        '10': {
+          day: 10,
+          week: 3,
+          generatedAt: 10000,
+          story: {
+            headline: 'Transaction window',
+            subheadline: 'Newest activity should win even when the feed arrives oldest-first.'
+          },
+          matchups: [],
+          totalTransactions: 3
+        }
+      },
+      activityLog: [
+        { id: 'a1', type: 'waiver', title: 'Audit Agents added Brent Barry', text: 'Dropped an inactive bench wing for a live scorer.', teamIdx: 0, ts: 9800 },
+        { id: 'a2', type: 'activation', title: 'Audit Agents activated Kevin Johnson', text: 'Healthy guard returned from IL.', teamIdx: 0, ts: 9900 },
+        { id: 'a3', type: 'trade', title: 'Audit Agents traded for Cliff Robinson', text: 'Added a frontcourt rotation piece.', teamIdx: 0, ts: 10000 }
+      ]
+    },
+    {}
+  )
+));
+assert.deepStrictEqual(ascendingActivityWindow.recentSimDays[0].teamActivity, [
+  {
+    title: 'Audit Agents traded for Cliff Robinson',
+    body: 'Added a frontcourt rotation piece.'
+  },
+  {
+    title: 'Audit Agents activated Kevin Johnson',
+    body: 'Healthy guard returned from IL.'
+  }
+]);
+assert.doesNotMatch(
+  context.renderRecentSimulationCards(ascendingActivityWindow.recentSimDays),
+  /Audit Agents added Brent Barry/,
+  'oldest-first activity logs should not surface the oldest team activity on the compact card'
+);
+
 const teamOnlyTransactionWindow = JSON.parse(JSON.stringify(
   context.buildUniverseDetailsViewModel(
     slot,
@@ -701,6 +747,15 @@ assert.deepStrictEqual(oneDayOnly.recentSimDays[0].teamActivity, []);
 assert.equal(oneDayOnly.recentSimDays[0].leagueNote, null);
 assert.notEqual(oneDayOnly.recentSimDays[0].story.headline, 'Simulation day completed.');
 assert.notEqual(oneDayOnly.recentSimDays[0].story.body, 'Simulation day completed.');
+assert.doesNotMatch(
+  context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
+  /Simulation day completed\./,
+  'null-result days should not render a fabricated completion line'
+);
+assert.match(
+  context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
+  /Single day available/
+);
 
 assert.deepStrictEqual(viewModel.leagueSnapshot.currentStanding, {
   title: '#2 Audit Agents',
