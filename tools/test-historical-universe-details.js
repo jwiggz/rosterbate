@@ -301,7 +301,9 @@ const state = {
     { id: 'rm8', type: 'waiver', title: 'CPU Team 1 added Dell Curry', text: 'Found a hot hand before the next lock.', teamIdx: 1, ts: 9950 },
     { id: 'rm9', type: 'waiver', title: 'Audit Agents added Rick Fox', text: 'Needed another wing before Day 8.', teamIdx: 0, ts: 7920 },
     { id: 'rm10', type: 'waiver', title: 'Audit Agents dropped Tony Delk', text: 'Made room at the back of the bench.', teamIdx: 0, ts: 7915 },
-    { id: 'rm11', type: 'activation', title: 'Audit Agents activated Muggsy Bogues', text: 'Healthy guard returned to the bench mix.', teamIdx: 0, ts: 7905 }
+    { id: 'rm11', type: 'activation', title: 'Audit Agents activated Muggsy Bogues', text: 'Healthy guard returned to the bench mix.', teamIdx: 0, ts: 7905 },
+    { id: 'rm12', type: 'waiver', title: 'Audit Agents added Horace Grant', text: 'Extra frontcourt depth after the roster shuffle.', teamIdx: 0, ts: 7000 },
+    { id: 'rm13', type: 'waiver', title: 'Audit Agents dropped Bill Wennington', text: 'Freed the bench slot for the new big.', teamIdx: 0, ts: 6995 }
   ]
 };
 
