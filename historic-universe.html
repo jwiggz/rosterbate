@@ -879,13 +879,28 @@
     return title;
   }
 
+  function getRosterMoveActorKey(entry){
+    const title = String(entry?.title || '').trim();
+    const match = title.match(/^(.*?)(?:\s+added|\s+dropped|\s+activated|\s+moved|\s+restored)\b/i);
+    return match && match[1]
+      ? String(match[1]).trim().toLowerCase()
+      : '';
+  }
+
   function canGroupRosterMoveEntries(current, next){
     if(!current || !next) return false;
+    const pair = [getRosterMoveVerb(current), getRosterMoveVerb(next)].join(':');
+    if(pair !== 'add:drop' && pair !== 'activate:il') return false;
+    const currentTeamIdx = Number(current?.teamIdx);
+    const nextTeamIdx = Number(next?.teamIdx);
+    if(Number.isFinite(currentTeamIdx) && Number.isFinite(nextTeamIdx) && currentTeamIdx !== nextTeamIdx) return false;
     const currentTs = Number(current?.ts || 0);
     const nextTs = Number(next?.ts || 0);
-    if(Math.abs(currentTs - nextTs) > 120) return false;
-    const pair = [getRosterMoveVerb(current), getRosterMoveVerb(next)].join(':');
-    return pair === 'add:drop' || pair === 'activate:il';
+    if(!currentTs || !nextTs || Math.abs(currentTs - nextTs) > 15) return false;
+    const currentActorKey = getRosterMoveActorKey(current);
+    const nextActorKey = getRosterMoveActorKey(next);
+    if(!currentActorKey || !nextActorKey || currentActorKey !== nextActorKey) return false;
+    return true;
   }
 
   function buildGroupedRosterMoveEntry(entries){
