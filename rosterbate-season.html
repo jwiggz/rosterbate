@@ -4836,12 +4836,13 @@ function maintainCpuTeamRoster(teamIdx, options){
 }
 
 function maintainCpuLeagueRosters(options){
-  if(D?.multiplayer || !Array.isArray(G?.rosters) || G.rosters.length<2) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0};
+  if(D?.multiplayer || !Array.isArray(G?.rosters) || G.rosters.length<2) return {changed:false,movedToIl:0,activated:0,waiverAdds:0,waiverDrops:0,tradesCompleted:0};
   let changed=false;
   let movedToIl=0;
   let activated=0;
   let waiverAdds=0;
   let waiverDrops=0;
+  let tradesCompleted=0;
   for(let teamIdx=0; teamIdx<G.rosters.length; teamIdx++){
     const result=maintainCpuTeamRoster(teamIdx, options);
     if(!result) continue;
@@ -4851,16 +4852,30 @@ function maintainCpuLeagueRosters(options){
     waiverAdds += Number(result.waiverAdds||0);
     waiverDrops += Number(result.waiverDrops||0);
   }
+  const tradeResult=runCpuTradeMarketForDay(options?.day || G.day || 1, options);
+  if(tradeResult){
+    changed = changed || !!tradeResult.changed;
+    tradesCompleted += Number(tradeResult.tradesCompleted||0);
+  }
   if(changed){
+    const rosterMaintenanceCopy=movedToIl || activated || waiverAdds || waiverDrops
+      ? `AI teams auto-managed ${movedToIl} ${getIlSlotKey()} move${movedToIl===1?'':'s'}, ${activated} activation${activated===1?'':'s'}, and ${waiverAdds} waiver add${waiverAdds===1?'':'s'} to keep solo rosters legal.`
+      : '';
+    const tradeMaintenanceCopy=tradesCompleted
+      ? `AI teams completed ${tradesCompleted} trade${tradesCompleted===1?'':'s'} to rebalance the league.`
+      : '';
+    const maintenanceCopy=rosterMaintenanceCopy && tradeMaintenanceCopy
+      ? `${rosterMaintenanceCopy} ${tradeMaintenanceCopy}`
+      : (rosterMaintenanceCopy || tradeMaintenanceCopy);
     logActivity(
       'league',
       'CPU lineup maintenance',
-      `AI teams auto-managed ${movedToIl} ${getIlSlotKey()} move${movedToIl===1?'':'s'}, ${activated} activation${activated===1?'':'s'}, and ${waiverAdds} waiver add${waiverAdds===1?'':'s'} to keep solo rosters legal.`,
+      maintenanceCopy,
       D.myPos,
       '🤖'
     );
   }
-  return {changed,movedToIl,activated,waiverAdds,waiverDrops};
+  return {changed,movedToIl,activated,waiverAdds,waiverDrops,tradesCompleted};
 }
 
 function closeDropModal(){
