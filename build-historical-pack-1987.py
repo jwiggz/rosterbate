@@ -1418,7 +1418,6 @@ def featured_star_ids(players):
 
 def main():
     ensure_dir(PACK_ROOT)
-    ensure_dir(SOURCE_ROOT)
     generated_at = datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     source_audit = audit_source_mode()
 
@@ -1431,15 +1430,7 @@ def main():
         team_defs.append(team_copy)
         team_by_abbr[team_copy["abbr"]] = team_copy
 
-    wiki_pages = {}
-    wiki_player_stats_by_abbr = {}
-    for team in team_defs:
-        html = fetch_wikipedia_render_html(team["wikiPageTitle"], f"wiki_render_{team['abbr'].lower()}")
-        wiki_pages[team["abbr"]] = {"pageTitle": team["wikiPageTitle"], "html": html}
-        wiki_player_stats_by_abbr[team["abbr"]] = parse_wikipedia_player_stats(html)
-
-    schedule_results_snapshot = build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_abbr, source_audit)
-    write_source_json("schedule_results.json", schedule_results_snapshot)
+    schedule_results_snapshot = read_source_json("schedule_results.json")
 
     if schedule_results_snapshot.get("sourceMode") != SOURCE_MODE:
         raise RuntimeError(
@@ -1449,6 +1440,11 @@ def main():
     source_games = list(schedule_results_snapshot.get("games") or [])
     if len(source_games) != 943:
         raise RuntimeError(f"Expected 943 regular-season games in schedule_results.json, found {len(source_games)}.")
+
+    wiki_player_stats_by_abbr = {}
+    for team in team_defs:
+        html = fetch_wikipedia_render_html(team["wikiPageTitle"], f"wiki_render_{team['abbr'].lower()}")
+        wiki_player_stats_by_abbr[team["abbr"]] = parse_wikipedia_player_stats(html)
 
     source_games.sort(key=lambda item: (item["gameDate"], item["sourceGameId"]))
 
