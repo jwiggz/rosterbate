@@ -1513,7 +1513,7 @@ def build_primary_team_inferred_stint(player):
 def main():
     ensure_dir(PACK_ROOT)
     generated_at = datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
-    audit_source_mode()
+    source_audit = audit_source_mode()
 
     team_defs = []
     team_by_abbr = {}
@@ -1526,7 +1526,6 @@ def main():
 
     schedule_results_snapshot = read_source_json("schedule_results.json")
     player_source_snapshot = read_source_json("normalized_players.json")
-    source_audit = source_audit_from_snapshot(schedule_results_snapshot)
 
     if schedule_results_snapshot.get("sourceMode") != SOURCE_MODE:
         raise RuntimeError(
