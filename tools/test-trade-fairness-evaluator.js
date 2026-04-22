@@ -12,12 +12,9 @@ function expectSourceMatch(pattern, message) {
   assert.match(html, pattern, message);
 }
 
-function extractFunctionSourceFrom(source, signature) {
+function findFunctionBodyOpenBrace(source, signature) {
   const start = source.indexOf(`function ${signature}`);
   assert.ok(start >= 0, `missing ${signature}`);
-
-  const openBrace = source.indexOf('{', start);
-  assert.ok(openBrace >= 0, `missing body for ${signature}`);
 
   const regexStartKeywords = new Set([
     'case',
@@ -43,15 +40,18 @@ function extractFunctionSourceFrom(source, signature) {
 
   const stack = [{
     type: 'code',
-    braceDepth: 1,
     canStartRegex: true
   }];
 
   const pushState = state => stack.push(state);
   const popState = () => stack.pop();
   const currentState = () => stack[stack.length - 1];
+  let parenDepth = 0;
+  let sawParamsStart = false;
+  let inParams = false;
+  let openBrace = -1;
 
-  for (let index = openBrace + 1; index < source.length; index += 1) {
+  for (let index = start; index < source.length; index += 1) {
     const state = currentState();
     const char = source[index];
     const next = source[index + 1];
@@ -118,6 +118,17 @@ function extractFunctionSourceFrom(source, signature) {
       continue;
     }
 
+    if (!inParams) {
+      if (char === '(') {
+        sawParamsStart = true;
+        inParams = true;
+        parenDepth = 1;
+        continue;
+      }
+
+      if (!sawParamsStart) continue;
+    }
+
     if (char === '/' && next === '/') {
       pushState({ type: 'lineComment' });
       index += 1;
@@ -145,6 +156,23 @@ function extractFunctionSourceFrom(source, signature) {
       continue;
     }
 
+    if (inParams && char === '(') {
+      parenDepth += 1;
+      continue;
+    }
+
+    if (inParams && char === ')') {
+      parenDepth -= 1;
+      if (parenDepth === 0) {
+        inParams = false;
+      }
+      continue;
+    }
+
+    if (inParams) {
+      continue;
+    }
+
     if (char === '/' && state.canStartRegex) {
       pushState({ type: 'regex', inClass: false });
       continue;
@@ -167,24 +195,6 @@ function extractFunctionSourceFrom(source, signature) {
       continue;
     }
 
-    if (char === '{') {
-      state.braceDepth += 1;
-      state.canStartRegex = true;
-      continue;
-    }
-
-    if (char === '}') {
-      state.braceDepth -= 1;
-      state.canStartRegex = false;
-      if (state.braceDepth === 0) {
-        if (state.type === 'code') {
-          return source.slice(start, index + 1);
-        }
-        popState();
-      }
-      continue;
-    }
-
     if (char === '(' || char === '[' || char === ',' || char === ';' || char === ':' || char === '?' || char === '=' || char === '!' || char === '~' || char === '+' || char === '-' || char === '*' || char === '%' || char === '&' || char === '|' || char === '^' || char === '<' || char === '>') {
       state.canStartRegex = true;
       continue;
@@ -197,6 +207,118 @@ function extractFunctionSourceFrom(source, signature) {
 
     if (!/\s/.test(char)) {
       state.canStartRegex = false;
+    }
+
+    if (char === '{') {
+      openBrace = index;
+      break;
+    }
+  }
+
+  assert.ok(openBrace >= 0, `missing body for ${signature}`);
+  return openBrace;
+}
+
+function extractFunctionSourceFrom(source, signature) {
+  const start = source.indexOf(`function ${signature}`);
+  assert.ok(start >= 0, `missing ${signature}`);
+
+  const openBrace = findFunctionBodyOpenBrace(source, signature);
+
+  let depth = 0;
+  let mode = 'code';
+  const stack = [];
+
+  for (let index = openBrace; index < source.length; index += 1) {
+    const char = source[index];
+    const next = source[index + 1];
+
+    if (mode === 'lineComment') {
+      if (char === '\n' || char === '\r') mode = stack.pop() || 'code';
+      continue;
+    }
+
+    if (mode === 'blockComment') {
+      if (char === '*' && next === '/') {
+        mode = stack.pop() || 'code';
+        index += 1;
+      }
+      continue;
+    }
+
+    if (mode === 'singleQuote') {
+      if (char === '\\') {
+        index += 1;
+        continue;
+      }
+      if (char === '\'') mode = stack.pop() || 'code';
+      continue;
+    }
+
+    if (mode === 'doubleQuote') {
+      if (char === '\\') {
+        index += 1;
+        continue;
+      }
+      if (char === '"') mode = stack.pop() || 'code';
+      continue;
+    }
+
+    if (mode === 'template') {
+      if (char === '\\') {
+        index += 1;
+        continue;
+      }
+      if (char === '`') {
+        mode = stack.pop() || 'code';
+        continue;
+      }
+    }
+
+    if (mode === 'code') {
+      if (char === '/' && next === '/') {
+        stack.push(mode);
+        mode = 'lineComment';
+        index += 1;
+        continue;
+      }
+
+      if (char === '/' && next === '*') {
+        stack.push(mode);
+        mode = 'blockComment';
+        index += 1;
+        continue;
+      }
+
+      if (char === '\'') {
+        stack.push(mode);
+        mode = 'singleQuote';
+        continue;
+      }
+
+      if (char === '"') {
+        stack.push(mode);
+        mode = 'doubleQuote';
+        continue;
+      }
+
+      if (char === '`') {
+        stack.push(mode);
+        mode = 'template';
+        continue;
+      }
+
+      if (char === '{') {
+        depth += 1;
+        continue;
+      }
+
+      if (char === '}') {
+        depth -= 1;
+        if (depth === 0) {
+          return source.slice(start, index + 1);
+        }
+      }
     }
   }
 
@@ -323,6 +445,7 @@ const unsupported = context.getTradeFairnessViewModel({
 });
 assert.equal(unsupported.supported, false);
 assert.match(unsupported.message, /1-for-1/i);
-assert.ok(unsupported.message.length < 120);
+assert.ok(Array.isArray(unsupported.reasons));
+assert.equal(unsupported.reasons.length, 0);
 
 console.log('trade fairness evaluator test passed');
