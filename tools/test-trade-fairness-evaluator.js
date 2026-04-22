@@ -349,8 +349,14 @@ expectSourceMatch(/function evaluateOneForOneTradeFairness\(offer\)/, 'missing f
 expectSourceMatch(/function getTradeFairnessBadgeMeta\(rating\)/, 'missing fairness badge metadata helper');
 expectSourceMatch(/function buildTradeFairnessReasons\(result\)/, 'missing fairness reason builder');
 expectSourceMatch(/function getTradeFairnessViewModel\(offer\)/, 'missing fairness view-model helper');
+expectSourceMatch(/function getTradeFairnessPlayerValue\(player\)/, 'missing fairness player value helper');
+expectSourceMatch(/function getTradeFairnessPositionKey\(player\)/, 'missing fairness position key helper');
+expectSourceMatch(/function getTradeFairnessRosterProfile\(teamIdx, outgoingPid, incomingPid\)/, 'missing fairness roster profile helper');
 
 const script = [
+  extractFunctionSource('getTradeFairnessPlayerValue(player)'),
+  extractFunctionSource('getTradeFairnessPositionKey(player)'),
+  extractFunctionSource('getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid)'),
   extractFunctionSource('evaluateOneForOneTradeFairness(offer)'),
   extractFunctionSource('getTradeFairnessBadgeMeta(rating)'),
   extractFunctionSource('buildTradeFairnessReasons(result)'),
@@ -382,6 +388,10 @@ const context = {
 vm.createContext(context);
 vm.runInContext(script, context);
 
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
 const fair = context.evaluateOneForOneTradeFairness({
   fromTeam: 0,
   toTeam: 1,
@@ -390,19 +400,19 @@ const fair = context.evaluateOneForOneTradeFairness({
 });
 assert.equal(fair.rating, 'fair');
 
-assert.deepEqual(context.getTradeFairnessBadgeMeta('fair'), {
+assert.deepEqual(plain(context.getTradeFairnessBadgeMeta('fair')), {
   label: 'Fair',
   tone: 'fair'
 });
-assert.deepEqual(context.getTradeFairnessBadgeMeta('slight_lean'), {
+assert.deepEqual(plain(context.getTradeFairnessBadgeMeta('slight_lean')), {
   label: 'Slight Lean',
   tone: 'lean'
 });
-assert.deepEqual(context.getTradeFairnessBadgeMeta('uneven'), {
+assert.deepEqual(plain(context.getTradeFairnessBadgeMeta('uneven')), {
   label: 'Uneven',
   tone: 'uneven'
 });
-assert.deepEqual(context.getTradeFairnessBadgeMeta('high_risk'), {
+assert.deepEqual(plain(context.getTradeFairnessBadgeMeta('high_risk')), {
   label: 'High Risk',
   tone: 'risk'
 });

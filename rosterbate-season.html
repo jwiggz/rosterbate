@@ -9337,6 +9337,211 @@ function confirmWaiver(){
   wAdd=null;wDrop=null;renderWaiver();renderHub();
 }
 
+function getTradeFairnessPlayerValue(player){
+  return +Number(player?.fp||0).toFixed(1);
+}
+
+function getTradeFairnessPositionKey(player){
+  const pos=String(player?.pos||'').trim().toUpperCase();
+  if(!pos) return 'util';
+  if(['PG','SG','G'].includes(pos)) return 'guard';
+  if(['SF','PF','F'].includes(pos)) return 'forward';
+  if(pos==='C') return 'center';
+  if(['SP','RP','P'].includes(pos)) return 'pitcher';
+  if(['RB','WR','TE','FLEX'].includes(pos)) return 'flex';
+  return pos.toLowerCase();
+}
+
+function getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid){
+  const rosterSource=Array.isArray(G?.rosters?.[teamIdx]) ? G.rosters[teamIdx] : [];
+  const resolvePlayer=entry=>{
+    if(entry && typeof entry==='object' && Number.isFinite(Number(entry.id))) return entry;
+    if(typeof P==='function') return P(entry)||null;
+    return null;
+  };
+  const outgoingPlayer=resolvePlayer(outgoingPid);
+  const incomingPlayer=resolvePlayer(incomingPid);
+  const rosterPlayers=rosterSource.map(resolvePlayer).filter(Boolean);
+  const outgoingId=Number(outgoingPlayer?.id ?? outgoingPid);
+  const incomingId=Number(incomingPlayer?.id ?? incomingPid);
+  const beforeCounts={};
+  rosterPlayers.forEach(player=>{
+    const key=getTradeFairnessPositionKey(player);
+    beforeCounts[key]=(beforeCounts[key]||0)+1;
+  });
+  const simulatedRoster=rosterPlayers
+    .filter(player=>Number(player?.id)!==outgoingId)
+    .slice();
+  if(incomingPlayer && !simulatedRoster.some(player=>Number(player?.id)===incomingId)){
+    simulatedRoster.push(incomingPlayer);
+  }
+  const afterCounts={};
+  simulatedRoster.forEach(player=>{
+    const key=getTradeFairnessPositionKey(player);
+    afterCounts[key]=(afterCounts[key]||0)+1;
+  });
+  let starterIds=[];
+  try{
+    if(typeof getStarterIdsForTeamDay==='function') starterIds=getStarterIdsForTeamDay(teamIdx, G?.day||1)||[];
+  }catch(e){}
+  if(!Array.isArray(starterIds) || !starterIds.length){
+    const configuredStarterCount=typeof STARTERS!=='undefined' && Number.isFinite(Number(STARTERS))
+      ? Number(STARTERS)
+      : Math.max(1, rosterPlayers.length-1);
+    const starterCount=Math.max(1, Math.min(
+      rosterPlayers.length,
+      configuredStarterCount
+    ));
+    starterIds=[...rosterPlayers]
+      .sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a))
+      .slice(0, starterCount)
+      .map(player=>Number(player?.id))
+      .filter(Number.isFinite);
+  }
+  const simulatedStarterCount=Math.max(1, Math.min(starterIds.length || simulatedRoster.length || 1, simulatedRoster.length || 1));
+  const projectedStarterIds=[...simulatedRoster]
+    .sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a))
+    .slice(0, simulatedStarterCount)
+    .map(player=>Number(player?.id))
+    .filter(Number.isFinite);
+  const outgoingKey=getTradeFairnessPositionKey(outgoingPlayer);
+  const incomingKey=getTradeFairnessPositionKey(incomingPlayer);
+  const outgoingWasStarter=starterIds.includes(outgoingId);
+  const incomingProjectsStarter=projectedStarterIds.includes(incomingId);
+  const outgoingCount=beforeCounts[outgoingKey]||0;
+  const incomingCountBefore=beforeCounts[incomingKey]||0;
+  const incomingCountAfter=afterCounts[incomingKey]||0;
+  const losesScarceSlot=outgoingCount<=1;
+  const addsNeededSlot=incomingCountBefore===0 && incomingCountAfter>0;
+  const addsDepth=incomingCountAfter>incomingCountBefore;
+  const movesFromSurplus=outgoingCount>=2;
+  let contextBoost=0;
+  if(addsNeededSlot) contextBoost+=3;
+  else if(addsDepth) contextBoost+=2;
+  if(movesFromSurplus) contextBoost+=1.5;
+  if(incomingProjectsStarter && !outgoingWasStarter) contextBoost+=1.5;
+  if(outgoingWasStarter && !incomingProjectsStarter) contextBoost-=1;
+  if(losesScarceSlot && !addsNeededSlot) contextBoost-=0.5;
+  return {
+    teamIdx:Number(teamIdx),
+    outgoingPlayer,
+    incomingPlayer,
+    outgoingValue:getTradeFairnessPlayerValue(outgoingPlayer),
+    incomingValue:getTradeFairnessPlayerValue(incomingPlayer),
+    outgoingKey,
+    incomingKey,
+    beforeCounts,
+    afterCounts,
+    outgoingWasStarter,
+    incomingProjectsStarter,
+    losesScarceSlot,
+    addsNeededSlot,
+    addsDepth,
+    movesFromSurplus,
+    contextBoost:+contextBoost.toFixed(1)
+  };
+}
+
+function evaluateOneForOneTradeFairness(offer){
+  const give=Array.isArray(offer?.give) ? offer.give.filter(value=>value!=null) : [];
+  const get=Array.isArray(offer?.get) ? offer.get.filter(value=>value!=null) : [];
+  if(give.length!==1 || get.length!==1){
+    return {
+      supported:false,
+      rating:'unsupported',
+      message:'Fairness insights are available for 1-for-1 deals first.'
+    };
+  }
+  const fromProfile=getTradeFairnessRosterProfile(Number(offer?.fromTeam), give[0], get[0]);
+  const toProfile=getTradeFairnessRosterProfile(Number(offer?.toTeam), get[0], give[0]);
+  const rawDelta=+(fromProfile.incomingValue-fromProfile.outgoingValue).toFixed(1);
+  const contextOffset=+(Math.max(0, fromProfile.contextBoost)+Math.max(0, toProfile.contextBoost)).toFixed(1);
+  const adjustedGap=Math.max(0, +(Math.abs(rawDelta)-contextOffset).toFixed(1));
+  let rating='high_risk';
+  if(adjustedGap<=4) rating='fair';
+  else if(adjustedGap<=9) rating='slight_lean';
+  else if(adjustedGap<=16) rating='uneven';
+  return {
+    supported:true,
+    rating,
+    rawDelta,
+    adjustedGap,
+    contextOffset,
+    favoredTeam:rawDelta>0 ? Number(offer?.fromTeam) : rawDelta<0 ? Number(offer?.toTeam) : null,
+    fromProfile,
+    toProfile
+  };
+}
+
+function getTradeFairnessBadgeMeta(rating){
+  return {
+    fair:{ label:'Fair', tone:'fair' },
+    slight_lean:{ label:'Slight Lean', tone:'lean' },
+    uneven:{ label:'Uneven', tone:'uneven' },
+    high_risk:{ label:'High Risk', tone:'risk' }
+  }[rating] || { label:'Fairness Pending', tone:'neutral' };
+}
+
+function buildTradeFairnessReasons(result){
+  if(!result?.supported) return [];
+  const reasons=[];
+  const delta=Math.abs(Number(result.rawDelta||0));
+  if(delta<=4){
+    reasons.push(`Raw value is close with only ${delta.toFixed(1)} FP between the players.`);
+  }else{
+    const favoredLabel=result.favoredTeam==null ? 'Neither side' : `Team ${Number(result.favoredTeam)+1}`;
+    reasons.push(`${favoredLabel} gets the stronger current producer on raw value by ${delta.toFixed(1)} FP.`);
+  }
+  if(Number(result.contextOffset||0)>0){
+    reasons.push(`Roster context softens the lean by ${Number(result.contextOffset||0).toFixed(1)} points.`);
+  }
+  const profiles=[result.fromProfile, result.toProfile].filter(Boolean);
+  profiles.forEach(profile=>{
+    const teamLabel=`Team ${Number(profile.teamIdx)+1}`;
+    if(profile.addsNeededSlot){
+      reasons.push(`${teamLabel} fills a needed ${profile.incomingKey} slot.`);
+      return;
+    }
+    if(profile.movesFromSurplus && profile.addsDepth){
+      reasons.push(`${teamLabel} shifts from depth into a cleaner ${profile.incomingKey} need.`);
+      return;
+    }
+    if(profile.outgoingWasStarter && !profile.incomingProjectsStarter){
+      reasons.push(`${teamLabel} gives up a starter-level piece in this swap.`);
+      return;
+    }
+    if(profile.incomingProjectsStarter){
+      reasons.push(`${teamLabel} gets a player who projects into the starter mix.`);
+    }
+  });
+  return reasons.filter(Boolean).slice(0,4);
+}
+
+function getTradeFairnessViewModel(offer){
+  const result=evaluateOneForOneTradeFairness(offer);
+  if(!result.supported){
+    return {
+      supported:false,
+      rating:result.rating,
+      badgeLabel:'',
+      badgeTone:'neutral',
+      message:result.message||'Fairness insights are available for 1-for-1 deals first.',
+      reasons:[]
+    };
+  }
+  const badge=getTradeFairnessBadgeMeta(result.rating);
+  const reasons=buildTradeFairnessReasons(result);
+  return {
+    supported:true,
+    rating:result.rating,
+    badgeLabel:badge.label,
+    badgeTone:badge.tone,
+    message:'',
+    reasons,
+    result
+  };
+}
+
 function getTradeOfferImpact(offer, viewerTeam=D?.myPos){
   if(!offer) return null;
   const targetTeam=Number(viewerTeam ?? 0);
