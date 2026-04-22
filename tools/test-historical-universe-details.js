@@ -831,6 +831,11 @@ assert.doesNotMatch(
   /Simulation day completed\./,
   'null-result days should not render a fabricated completion line'
 );
+assert.doesNotMatch(
+  context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
+  /Result:/,
+  'null-result days should not render a result block'
+);
 assert.match(
   context.renderRecentSimulationCards(oneDayOnly.recentSimDays),
   /Single day available/
