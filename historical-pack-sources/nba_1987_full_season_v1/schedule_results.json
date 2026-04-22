@@ -1,0 +1,19 @@
+{
+  "season": "1986-87",
+  "packId": "nba_1987_full_season_v1",
+  "sourceMode": "foundation_snapshot",
+  "notes": [
+    "Real 1986-87 regular-season schedule and final scores captured for the playable foundation build.",
+    "Player-game box score rows remain inferred from season totals because the live 1986 archive feeds are absent."
+  ],
+  "games": [
+    {
+      "sourceGameId": "19861031_bos_atl",
+      "gameDate": "1986-10-31",
+      "homeTeamAbbr": "ATL",
+      "awayTeamAbbr": "BOS",
+      "homeScore": 95,
+      "awayScore": 103
+    }
+  ]
+}
