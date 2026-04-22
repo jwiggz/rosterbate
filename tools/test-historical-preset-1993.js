@@ -15,6 +15,14 @@ function readText(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
 
+function extractEntryRegion(source, marker) {
+  const start = source.indexOf(marker);
+  assert.ok(start >= 0, `missing entry marker: ${marker}`);
+  const end = source.indexOf('\n    },', start);
+  assert.ok(end >= 0, `missing entry terminator for: ${marker}`);
+  return source.slice(start, end);
+}
+
 const catalog = readJson('historical-packs/catalog.json');
 const entry = catalog.find(item => item.packId === packId);
 assert.ok(entry, 'catalog is missing the 1992-93 pack entry');
@@ -32,15 +40,17 @@ for (const [key, expectedUrl] of Object.entries(expectedCatalogUrls)) {
 
 const expectedPlayableUrls = Object.values(expectedCatalogUrls);
 const historicSeasonsSource = readText('historic-seasons.html');
+const historicSeasonsEntry = extractEntryRegion(historicSeasonsSource, "packId: 'nba_1993_full_season_v1'");
 assert.match(
-  historicSeasonsSource,
+  historicSeasonsEntry,
   /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?statusLabel:\s*'Playable Now'[\s\S]*?seasonUrl:\s*'rosterbate-season\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?simUrl:\s*'rosterbate-season\.html\?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1'[\s\S]*?draftUrl:\s*'rosterbate-draft\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?reimaginedUrl:\s*'rosterbate-season\.html\?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'/,
   'historic-seasons fallback should include a single coherent playable 1992-93 entry'
 );
 
 const historicUniverseSource = readText('historic-universe.html');
+const historicUniverseEntry = extractEntryRegion(historicUniverseSource, "packId: 'nba_1993_full_season_v1'");
 assert.match(
-  historicUniverseSource,
+  historicUniverseEntry,
   /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?shortLabel:\s*'1992-93'/,
   'historic-universe fallback catalog should include a single coherent playable 1992-93 entry'
 );
@@ -91,14 +101,14 @@ for (const [fileKey, bundleKey] of Object.entries(contentKeyMap)) {
 }
 
 const validation = validator.validateHistoricalPackBundle(bundle);
-assert.notEqual(validation.status, 'validation_failed', '1992-93 bundle should pass historical-pack validation');
+assert.equal(validation.status, 'validation_passed_clean', '1992-93 bundle should validate cleanly');
 assert.equal(validation.summary.seasonId, 'nba_1993_historic');
 assert.equal(validation.summary.teamCount, 27);
 assert.ok(validation.summary.playerCount > 300, '1992-93 should ship a full-league player pool');
 
-const summaries = readJson(`historical-packs/${packId}/optional/summaries.json`);
+assert.ok(bundle.summaries, 'bundle should include summaries loaded through manifest contentFiles');
 assert.match(
-  JSON.stringify(summaries),
+  JSON.stringify(bundle.summaries),
   /inferred[\s\S]{0,40}player-game coverage/i,
   '1992-93 summaries should disclose inferred player-game coverage'
 );
