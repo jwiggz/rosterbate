@@ -437,6 +437,14 @@ assert.deepStrictEqual(
   ]
 );
 assert.ok(
+  viewModel.recentRosterMoves.every(item => !/Muggsy Bogues/i.test(item.title + ' ' + item.body)),
+  'older valid single-move entries should be trimmed once the latest five roster moves are kept'
+);
+assert.ok(
+  viewModel.recentRosterMoves.every(item => !/Horace Grant|Bill Wennington/i.test(item.title + ' ' + item.body)),
+  'older valid grouped add-drop pairs should be trimmed once the latest five roster moves are kept'
+);
+assert.ok(
   viewModel.recentRosterMoves.every(item => !/lineup/i.test(item.title + ' ' + item.body)),
   'lineup-only activity should not appear in recent roster moves'
 );
