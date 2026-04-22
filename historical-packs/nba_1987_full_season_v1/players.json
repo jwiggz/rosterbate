@@ -40,7 +40,7 @@
         "fga": 4.1,
         "ftm": 1.1,
         "fta": 1.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 695,
@@ -92,15 +92,15 @@
         "min": 2.5,
         "pts": 1.1,
         "reb": 0.6,
-        "ast": 0,
-        "stl": 0,
-        "blk": 0,
+        "ast": 0.0,
+        "stl": 0.0,
+        "blk": 0.0,
         "to": 0.2,
         "fgm": 0.4,
         "fga": 0.9,
         "ftm": 0.4,
         "fta": 0.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 20,
@@ -149,17 +149,17 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 22.5,
-        "pts": 8,
+        "pts": 8.0,
         "reb": 6.5,
         "ast": 0.5,
         "stl": 0.6,
         "blk": 0.8,
         "to": 0.9,
         "fgm": 3.1,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 1.9,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1848,
@@ -209,7 +209,7 @@
         "min": 31.6,
         "pts": 12.8,
         "reb": 3.6,
-        "ast": 10,
+        "ast": 10.0,
         "stl": 2.1,
         "blk": 0.4,
         "to": 2.6,
@@ -217,7 +217,7 @@
         "fga": 9.2,
         "ftm": 4.5,
         "fta": 5.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2590,
@@ -266,7 +266,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 37.6,
-        "pts": 29,
+        "pts": 29.0,
         "reb": 6.3,
         "ast": 3.3,
         "stl": 1.5,
@@ -382,7 +382,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 12.6,
-        "pts": 6,
+        "pts": 6.0,
         "reb": 0.9,
         "ast": 1.9,
         "stl": 0.5,
@@ -391,8 +391,8 @@
         "fgm": 2.2,
         "fga": 4.9,
         "ftm": 1.5,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 804,
@@ -441,7 +441,7 @@
       "perGame": {
         "min": 20.5,
         "pts": 5.6,
-        "reb": 6,
+        "reb": 6.0,
         "ast": 0.4,
         "stl": 0.6,
         "blk": 0.9,
@@ -450,7 +450,7 @@
         "fga": 4.3,
         "ftm": 1.5,
         "fta": 2.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1684,
@@ -508,8 +508,8 @@
         "fgm": 6.6,
         "fga": 12.4,
         "ftm": 2.8,
-        "fta": 4,
-        "threes": 0
+        "fta": 4.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 2626,
@@ -560,9 +560,9 @@
         "min": 18.7,
         "pts": 10.4,
         "reb": 2.1,
-        "ast": 2,
+        "ast": 2.0,
         "stl": 0.8,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.4,
         "fgm": 4.1,
         "fga": 8.9,
@@ -618,7 +618,7 @@
         "min": 28.9,
         "pts": 12.7,
         "reb": 1.7,
-        "ast": 3,
+        "ast": 3.0,
         "stl": 0.5,
         "blk": 0.2,
         "to": 1.2,
@@ -736,14 +736,14 @@
         "pts": 6.8,
         "reb": 1.8,
         "ast": 5.1,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.1,
         "to": 2.1,
         "fgm": 2.2,
         "fga": 4.9,
         "ftm": 2.4,
         "fta": 3.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 532,
@@ -801,7 +801,7 @@
         "fga": 4.2,
         "ftm": 0.8,
         "fta": 1.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1764,
@@ -848,18 +848,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 18,
-        "pts": 4,
-        "reb": 2,
-        "ast": 1,
-        "stl": 0,
-        "blk": 0,
-        "to": 5,
-        "fgm": 2,
-        "fga": 5,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 18.0,
+        "pts": 4.0,
+        "reb": 2.0,
+        "ast": 1.0,
+        "stl": 0.0,
+        "blk": 0.0,
+        "to": 5.0,
+        "fgm": 2.0,
+        "fga": 5.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 18,
@@ -911,13 +911,13 @@
         "reb": 6.2,
         "ast": 1.8,
         "stl": 0.2,
-        "blk": 2,
-        "to": 3,
-        "fgm": 2,
+        "blk": 2.0,
+        "to": 3.0,
+        "fgm": 2.0,
         "fga": 5.2,
         "ftm": 1.6,
-        "fta": 3,
-        "threes": 0
+        "fta": 3.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 112,
@@ -1025,16 +1025,16 @@
       "perGame": {
         "min": 30.5,
         "pts": 12.8,
-        "reb": 3,
+        "reb": 3.0,
         "ast": 4.9,
         "stl": 1.2,
         "blk": 0.2,
         "to": 1.7,
-        "fgm": 5,
+        "fgm": 5.0,
         "fga": 10.3,
         "ftm": 1.8,
-        "fta": 2,
-        "threes": 1
+        "fta": 2.0,
+        "threes": 1.0
       },
       "totals": {
         "min": 2499,
@@ -1093,8 +1093,8 @@
         "fgm": 3.2,
         "fga": 6.3,
         "ftm": 1.1,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 743,
@@ -1147,13 +1147,13 @@
         "reb": 4.8,
         "ast": 0.5,
         "stl": 0.5,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.2,
         "fgm": 2.5,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 1.2,
-        "fta": 4,
-        "threes": 0
+        "fta": 4.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 89,
@@ -1201,7 +1201,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 35.8,
-        "pts": 13,
+        "pts": 13.0,
         "reb": 3.2,
         "ast": 7.2,
         "stl": 1.1,
@@ -1259,18 +1259,18 @@
       "gamesStarted": 11,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 8.9,
         "reb": 4.2,
         "ast": 1.4,
         "stl": 0.5,
         "blk": 0.4,
-        "to": 2,
+        "to": 2.0,
         "fgm": 3.1,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 2.8,
         "fta": 3.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1079,
@@ -1317,8 +1317,8 @@
       "gamesStarted": 8,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
-        "pts": 4,
+        "min": 24.0,
+        "pts": 4.0,
         "reb": 5.5,
         "ast": 0.9,
         "stl": 0.5,
@@ -1328,7 +1328,7 @@
         "fga": 3.5,
         "ftm": 0.9,
         "fta": 2.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 745,
@@ -1380,7 +1380,7 @@
         "reb": 1.4,
         "ast": 2.9,
         "stl": 0.6,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.9,
         "fgm": 3.1,
         "fga": 6.1,
@@ -1445,7 +1445,7 @@
         "fga": 15.9,
         "ftm": 5.2,
         "fta": 6.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 3060,
@@ -1502,7 +1502,7 @@
         "to": 2.9,
         "fgm": 9.6,
         "fga": 18.3,
-        "ftm": 5,
+        "ftm": 5.0,
         "fta": 5.5,
         "threes": 1.1
       },
@@ -1556,7 +1556,7 @@
         "reb": 2.5,
         "ast": 2.9,
         "stl": 0.7,
-        "blk": 0,
+        "blk": 0.0,
         "to": 2.1,
         "fgm": 2.5,
         "fga": 7.7,
@@ -1620,7 +1620,7 @@
         "fga": 12.9,
         "ftm": 2.8,
         "fta": 3.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2995,
@@ -1678,7 +1678,7 @@
         "fga": 8.5,
         "ftm": 3.2,
         "fta": 3.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 374,
@@ -1726,15 +1726,15 @@
       "gamesStarted": 2,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 26,
+        "min": 26.0,
         "pts": 6.7,
-        "reb": 3,
-        "ast": 2,
+        "reb": 3.0,
+        "ast": 2.0,
         "stl": 0.7,
         "blk": 0.7,
-        "to": 1,
-        "fgm": 3,
-        "fga": 9,
+        "to": 1.0,
+        "fgm": 3.0,
+        "fga": 9.0,
         "ftm": 0.3,
         "fta": 0.7,
         "threes": 0.3
@@ -1785,7 +1785,7 @@
       "gamesStarted": 18,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 9.3,
         "reb": 5.1,
         "ast": 1.4,
@@ -1796,7 +1796,7 @@
         "fga": 8.3,
         "ftm": 1.7,
         "fta": 2.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1751,
@@ -1848,12 +1848,12 @@
         "pts": 14.5,
         "reb": 13.1,
         "ast": 3.6,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.4,
         "to": 3.6,
         "fgm": 5.7,
         "fga": 12.8,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 4.4,
         "threes": 0.1
       },
@@ -1913,7 +1913,7 @@
         "fga": 7.5,
         "ftm": 1.2,
         "fta": 1.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2287,
@@ -1962,18 +1962,18 @@
       "gamesStarted": 21,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 23.9,
-        "pts": 6.8,
-        "reb": 5.4,
+        "min": 24.5,
+        "pts": 6.9,
+        "reb": 5.5,
         "ast": 1.5,
         "stl": 0.4,
         "blk": 0.7,
-        "to": 1,
-        "fgm": 2.9,
-        "fga": 6.1,
-        "ftm": 1,
-        "fta": 1.8,
-        "threes": 0
+        "to": 1.0,
+        "fgm": 3.0,
+        "fga": 6.2,
+        "ftm": 1.0,
+        "fta": 1.9,
+        "threes": 0.0
       },
       "totals": {
         "min": 2005,
@@ -2020,7 +2020,7 @@
       "gamesStarted": 10,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 6.4,
         "reb": 2.9,
         "ast": 2.6,
@@ -2031,7 +2031,7 @@
         "fga": 6.5,
         "ftm": 0.6,
         "fta": 0.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 936,
@@ -2078,18 +2078,18 @@
       "gamesStarted": 1,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 27,
-        "pts": 4,
-        "reb": 5,
-        "ast": 4,
-        "stl": 2,
-        "blk": 0,
-        "to": 1,
-        "fgm": 2,
-        "fga": 11,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 27.0,
+        "pts": 4.0,
+        "reb": 5.0,
+        "ast": 4.0,
+        "stl": 2.0,
+        "blk": 0.0,
+        "to": 1.0,
+        "fgm": 2.0,
+        "fga": 11.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 27,
@@ -2137,8 +2137,8 @@
       "gamesStarted": 19,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
-        "pts": 8,
+        "min": 24.0,
+        "pts": 8.0,
         "reb": 4.1,
         "ast": 2.2,
         "stl": 0.7,
@@ -2148,7 +2148,7 @@
         "fga": 6.1,
         "ftm": 1.5,
         "fta": 1.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1822,
@@ -2197,8 +2197,8 @@
       "perGame": {
         "min": 24.3,
         "pts": 3.9,
-        "reb": 4,
-        "ast": 1,
+        "reb": 4.0,
+        "ast": 1.0,
         "stl": 0.5,
         "blk": 1.4,
         "to": 0.7,
@@ -2206,7 +2206,7 @@
         "fga": 4.2,
         "ftm": 0.2,
         "fta": 0.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 534,
@@ -2311,7 +2311,7 @@
       "gamesStarted": 67,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 40,
+        "min": 40.0,
         "pts": 37.1,
         "reb": 5.2,
         "ast": 4.6,
@@ -2381,7 +2381,7 @@
         "fga": 5.9,
         "ftm": 1.4,
         "fta": 2.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 818,
@@ -2430,7 +2430,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 25.8,
-        "pts": 11,
+        "pts": 11.0,
         "reb": 2.8,
         "ast": 3.5,
         "stl": 2.3,
@@ -2440,7 +2440,7 @@
         "fga": 8.7,
         "ftm": 4.7,
         "fta": 7.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 155,
@@ -2498,7 +2498,7 @@
         "fgm": 3.9,
         "fga": 8.8,
         "ftm": 1.6,
-        "fta": 2,
+        "fta": 2.0,
         "threes": 0.1
       },
       "totals": {
@@ -2548,7 +2548,7 @@
       "gamesStarted": 3,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 14,
+        "min": 14.0,
         "pts": 3.7,
         "reb": 2.3,
         "ast": 0.8,
@@ -2559,7 +2559,7 @@
         "fga": 2.8,
         "ftm": 0.9,
         "fta": 1.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 614,
@@ -2616,8 +2616,8 @@
         "fgm": 6.1,
         "fga": 11.3,
         "ftm": 3.5,
-        "fta": 5,
-        "threes": 0
+        "fta": 5.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 2695,
@@ -2732,8 +2732,8 @@
         "fgm": 5.4,
         "fga": 11.2,
         "ftm": 3.7,
-        "fta": 5,
-        "threes": 0
+        "fta": 5.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 2714,
@@ -2840,7 +2840,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 10.7,
-        "pts": 5,
+        "pts": 5.0,
         "reb": 1.2,
         "ast": 0.5,
         "stl": 0.3,
@@ -2850,7 +2850,7 @@
         "fga": 4.7,
         "ftm": 1.1,
         "fta": 1.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 630,
@@ -2898,10 +2898,10 @@
       "gamesStarted": 1,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 13,
+        "min": 13.0,
         "pts": 6.1,
         "reb": 3.7,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.4,
         "blk": 0.6,
         "to": 1.3,
@@ -2909,7 +2909,7 @@
         "fga": 5.6,
         "ftm": 1.1,
         "fta": 1.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 870,
@@ -2959,7 +2959,7 @@
         "min": 18.2,
         "pts": 6.9,
         "reb": 1.7,
-        "ast": 3,
+        "ast": 3.0,
         "stl": 0.6,
         "blk": 0.1,
         "to": 1.6,
@@ -3019,13 +3019,13 @@
         "reb": 4.3,
         "ast": 0.5,
         "stl": 0.3,
-        "blk": 1,
+        "blk": 1.0,
         "to": 1.4,
         "fgm": 2.7,
         "fga": 4.9,
         "ftm": 1.1,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1333,
@@ -3075,7 +3075,7 @@
         "min": 24.3,
         "pts": 11.9,
         "reb": 5.8,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.3,
         "blk": 1.2,
         "to": 1.9,
@@ -3083,7 +3083,7 @@
         "fga": 11.1,
         "ftm": 1.7,
         "fta": 2.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 801,
@@ -3134,15 +3134,15 @@
         "min": 30.6,
         "pts": 11.8,
         "reb": 5.7,
-        "ast": 2,
-        "stl": 1,
+        "ast": 2.0,
+        "stl": 1.0,
         "blk": 0.1,
         "to": 2.3,
         "fgm": 4.7,
         "fga": 8.9,
         "ftm": 2.4,
-        "fta": 4,
-        "threes": 0
+        "fta": 4.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 2083,
@@ -3194,9 +3194,9 @@
         "reb": 4.8,
         "ast": 4.8,
         "stl": 2.5,
-        "blk": 1,
+        "blk": 1.0,
         "to": 4.2,
-        "fgm": 9,
+        "fgm": 9.0,
         "fga": 19.7,
         "ftm": 4.7,
         "fta": 6.9,
@@ -3251,15 +3251,15 @@
         "min": 11.6,
         "pts": 3.3,
         "reb": 2.4,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.4,
         "blk": 0.2,
-        "to": 1,
+        "to": 1.0,
         "fgm": 1.2,
         "fga": 2.7,
         "ftm": 0.8,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 279,
@@ -3315,7 +3315,7 @@
         "to": 0.6,
         "fgm": 2.2,
         "fga": 5.7,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.6,
         "threes": 0.1
       },
@@ -3371,11 +3371,11 @@
         "stl": 0.2,
         "blk": 0.2,
         "to": 0.7,
-        "fgm": 1,
+        "fgm": 1.0,
         "fga": 2.3,
         "ftm": 0.8,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 560,
@@ -3423,7 +3423,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 19.3,
-        "pts": 7,
+        "pts": 7.0,
         "reb": 1.4,
         "ast": 4.5,
         "stl": 0.8,
@@ -3485,7 +3485,7 @@
         "reb": 0.3,
         "ast": 0.6,
         "stl": 0.3,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.4,
         "fgm": 0.6,
         "fga": 1.6,
@@ -3539,7 +3539,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 33.2,
-        "pts": 16,
+        "pts": 16.0,
         "reb": 2.6,
         "ast": 7.9,
         "stl": 2.2,
@@ -3548,8 +3548,8 @@
         "fgm": 6.5,
         "fga": 12.9,
         "ftm": 2.1,
-        "fta": 3,
-        "threes": 1
+        "fta": 3.0,
+        "threes": 1.0
       },
       "totals": {
         "min": 2556,
@@ -3600,7 +3600,7 @@
         "min": 21.1,
         "pts": 9.3,
         "reb": 3.7,
-        "ast": 2,
+        "ast": 2.0,
         "stl": 0.6,
         "blk": 0.2,
         "to": 1.4,
@@ -3665,8 +3665,8 @@
         "fgm": 3.8,
         "fga": 6.5,
         "ftm": 3.3,
-        "fta": 4,
-        "threes": 0
+        "fta": 4.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 3028,
@@ -3724,7 +3724,7 @@
         "fgm": 9.8,
         "fga": 19.9,
         "ftm": 5.4,
-        "fta": 7,
+        "fta": 7.0,
         "threes": 0.7
       },
       "totals": {
@@ -3777,13 +3777,13 @@
         "reb": 0.4,
         "ast": 0.8,
         "stl": 0.1,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.6,
         "fgm": 0.2,
         "fga": 1.1,
         "ftm": 0.9,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 22,
@@ -3900,7 +3900,7 @@
         "fga": 6.7,
         "ftm": 1.3,
         "fta": 1.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1405,
@@ -3953,10 +3953,10 @@
         "reb": 7.7,
         "ast": 1.8,
         "stl": 1.4,
-        "blk": 1,
+        "blk": 1.0,
         "to": 1.6,
         "fgm": 5.8,
-        "fga": 12,
+        "fga": 12.0,
         "ftm": 3.1,
         "fta": 3.7,
         "threes": 0.2
@@ -4017,7 +4017,7 @@
         "fga": 1.7,
         "ftm": 0.4,
         "fta": 0.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 160,
@@ -4074,9 +4074,9 @@
         "to": 2.6,
         "fgm": 11.8,
         "fga": 23.4,
-        "ftm": 5,
+        "ftm": 5.0,
         "fta": 5.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 3085,
@@ -4186,15 +4186,15 @@
         "min": 24.1,
         "pts": 11.9,
         "reb": 7.9,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.4,
-        "blk": 1,
+        "blk": 1.0,
         "to": 1.3,
         "fgm": 4.5,
         "fga": 9.7,
         "ftm": 2.9,
         "fta": 3.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1421,
@@ -4242,18 +4242,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 20,
-        "pts": 10,
-        "reb": 5,
-        "ast": 2,
-        "stl": 1,
-        "blk": 0,
-        "to": 1,
-        "fgm": 4,
-        "fga": 10,
-        "ftm": 2,
-        "fta": 2,
-        "threes": 0
+        "min": 20.0,
+        "pts": 10.0,
+        "reb": 5.0,
+        "ast": 2.0,
+        "stl": 1.0,
+        "blk": 0.0,
+        "to": 1.0,
+        "fgm": 4.0,
+        "fga": 10.0,
+        "ftm": 2.0,
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 20,
@@ -4301,7 +4301,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 23.9,
-        "pts": 10,
+        "pts": 10.0,
         "reb": 5.8,
         "ast": 1.3,
         "stl": 0.3,
@@ -4311,7 +4311,7 @@
         "fga": 6.2,
         "ftm": 3.5,
         "fta": 4.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1556,
@@ -4359,17 +4359,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 24.6,
-        "pts": 12,
-        "reb": 4,
+        "pts": 12.0,
+        "reb": 4.0,
         "ast": 3.4,
         "stl": 1.5,
         "blk": 0.5,
         "to": 2.3,
         "fgm": 4.4,
-        "fga": 9,
+        "fga": 9.0,
         "ftm": 3.3,
         "fta": 4.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2020,
@@ -4419,13 +4419,13 @@
         "min": 37.2,
         "pts": 18.9,
         "reb": 8.9,
-        "ast": 8,
+        "ast": 8.0,
         "stl": 2.5,
         "blk": 0.4,
-        "to": 2,
+        "to": 2.0,
         "fgm": 7.8,
         "fga": 16.7,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 3.8,
         "threes": 0.3
       },
@@ -4486,7 +4486,7 @@
         "fga": 9.6,
         "ftm": 1.5,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1110,
@@ -4535,7 +4535,7 @@
       "perGame": {
         "min": 24.1,
         "pts": 12.6,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 2.8,
         "stl": 1.2,
         "blk": 0.2,
@@ -4650,7 +4650,7 @@
       "gamesStarted": 2,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 11.1,
         "reb": 4.9,
         "ast": 3.1,
@@ -4660,8 +4660,8 @@
         "fgm": 4.7,
         "fga": 11.3,
         "ftm": 1.7,
-        "fta": 3,
-        "threes": 0
+        "fta": 3.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 168,
@@ -4709,18 +4709,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 10,
-        "pts": 2,
-        "reb": 1,
-        "ast": 1,
-        "stl": 0,
-        "blk": 0,
-        "to": 1,
-        "fgm": 1,
-        "fga": 2,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 10.0,
+        "pts": 2.0,
+        "reb": 1.0,
+        "ast": 1.0,
+        "stl": 0.0,
+        "blk": 0.0,
+        "to": 1.0,
+        "fgm": 1.0,
+        "fga": 2.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 10,
@@ -4778,7 +4778,7 @@
         "fga": 3.5,
         "ftm": 0.5,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1932,
@@ -4825,10 +4825,10 @@
       "gamesStarted": 16,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 8.4,
         "reb": 7.3,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.2,
         "blk": 1.6,
         "to": 1.2,
@@ -4836,7 +4836,7 @@
         "fga": 8.1,
         "ftm": 1.2,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1561,
@@ -4886,8 +4886,8 @@
       "perGame": {
         "min": 33.4,
         "pts": 21.2,
-        "reb": 4,
-        "ast": 2,
+        "reb": 4.0,
+        "ast": 2.0,
         "stl": 0.8,
         "blk": 0.1,
         "to": 2.2,
@@ -4895,7 +4895,7 @@
         "fga": 13.7,
         "ftm": 6.6,
         "fta": 8.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2736,
@@ -4951,7 +4951,7 @@
         "to": 1.5,
         "fgm": 6.2,
         "fga": 12.3,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 3.3,
         "threes": 0.1
       },
@@ -5011,7 +5011,7 @@
         "fga": 5.7,
         "ftm": 1.3,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 267,
@@ -5059,18 +5059,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 7,
-        "pts": 6,
-        "reb": 8,
-        "ast": 0,
-        "stl": 0,
-        "blk": 1,
-        "to": 0,
-        "fgm": 3,
-        "fga": 3,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 7.0,
+        "pts": 6.0,
+        "reb": 8.0,
+        "ast": 0.0,
+        "stl": 0.0,
+        "blk": 1.0,
+        "to": 0.0,
+        "fgm": 3.0,
+        "fga": 3.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 7,
@@ -5123,13 +5123,13 @@
         "reb": 6.9,
         "ast": 1.2,
         "stl": 0.8,
-        "blk": 1,
+        "blk": 1.0,
         "to": 1.9,
         "fgm": 4.4,
         "fga": 8.1,
         "ftm": 1.5,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1155,
@@ -5234,18 +5234,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 22,
+        "min": 22.0,
         "pts": 10.5,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 1.5,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.5,
-        "to": 4,
-        "fgm": 3,
-        "fga": 5,
+        "to": 4.0,
+        "fgm": 3.0,
+        "fga": 5.0,
         "ftm": 4.5,
-        "fta": 5,
-        "threes": 0
+        "fta": 5.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 44,
@@ -5294,15 +5294,15 @@
       "perGame": {
         "min": 29.7,
         "pts": 11.4,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 4.3,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.1,
         "to": 2.1,
         "fgm": 4.5,
         "fga": 9.1,
         "ftm": 2.2,
-        "fta": 3,
+        "fta": 3.0,
         "threes": 0.1
       },
       "totals": {
@@ -5351,18 +5351,18 @@
       "gamesStarted": 15,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 7.1,
         "reb": 4.9,
         "ast": 0.9,
         "stl": 0.7,
-        "blk": 2,
+        "blk": 2.0,
         "to": 1.2,
         "fgm": 2.7,
         "fga": 4.8,
         "ftm": 1.7,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1463,
@@ -5409,18 +5409,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 7,
-        "pts": 0,
-        "reb": 1,
-        "ast": 0,
-        "stl": 0,
-        "blk": 0,
-        "to": 2,
-        "fgm": 0,
-        "fga": 1,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 7.0,
+        "pts": 0.0,
+        "reb": 1.0,
+        "ast": 0.0,
+        "stl": 0.0,
+        "blk": 0.0,
+        "to": 2.0,
+        "fgm": 0.0,
+        "fga": 1.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 7,
@@ -5479,7 +5479,7 @@
         "fga": 6.1,
         "ftm": 1.8,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1278,
@@ -5538,7 +5538,7 @@
         "fga": 7.2,
         "ftm": 1.6,
         "fta": 2.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1792,
@@ -5597,7 +5597,7 @@
         "fga": 10.4,
         "ftm": 1.7,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 332,
@@ -5645,7 +5645,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 26.4,
-        "pts": 15,
+        "pts": 15.0,
         "reb": 3.1,
         "ast": 3.7,
         "stl": 1.1,
@@ -5655,7 +5655,7 @@
         "fga": 14.1,
         "ftm": 1.9,
         "fta": 2.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2166,
@@ -5710,11 +5710,11 @@
         "stl": 0.5,
         "blk": 0.1,
         "to": 0.8,
-        "fgm": 3,
+        "fgm": 3.0,
         "fga": 6.7,
         "ftm": 0.4,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1284,
@@ -5762,7 +5762,7 @@
       "gamesStarted": 45,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 29,
+        "min": 29.0,
         "pts": 15.1,
         "reb": 2.2,
         "ast": 3.2,
@@ -5772,7 +5772,7 @@
         "fgm": 5.8,
         "fga": 11.3,
         "ftm": 3.3,
-        "fta": 4,
+        "fta": 4.0,
         "threes": 0.2
       },
       "totals": {
@@ -5823,7 +5823,7 @@
         "min": 24.1,
         "pts": 8.2,
         "reb": 6.3,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.4,
         "blk": 0.5,
         "to": 2.4,
@@ -5831,7 +5831,7 @@
         "fga": 9.1,
         "ftm": 1.1,
         "fta": 3.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 385,
@@ -5881,7 +5881,7 @@
       "perGame": {
         "min": 24.4,
         "pts": 9.1,
-        "reb": 4,
+        "reb": 4.0,
         "ast": 3.2,
         "stl": 0.9,
         "blk": 0.1,
@@ -5890,7 +5890,7 @@
         "fga": 8.4,
         "ftm": 1.9,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 341,
@@ -5947,7 +5947,7 @@
         "to": 1.1,
         "fgm": 3.8,
         "fga": 8.5,
-        "ftm": 1,
+        "ftm": 1.0,
         "fta": 1.4,
         "threes": 0.2
       },
@@ -5996,7 +5996,7 @@
       "gamesStarted": 10,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 9.6,
         "reb": 6.7,
         "ast": 0.6,
@@ -6005,9 +6005,9 @@
         "to": 1.3,
         "fgm": 3.8,
         "fga": 8.4,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 937,
@@ -6055,7 +6055,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 33.2,
-        "pts": 21,
+        "pts": 21.0,
         "reb": 7.2,
         "ast": 2.6,
         "stl": 1.1,
@@ -6065,7 +6065,7 @@
         "fga": 17.8,
         "ftm": 4.1,
         "fta": 5.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2724,
@@ -6113,17 +6113,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 22.5,
-        "pts": 4,
+        "pts": 4.0,
         "reb": 1.5,
         "ast": 5.5,
         "stl": 0.5,
-        "blk": 0,
-        "to": 2,
+        "blk": 0.0,
+        "to": 2.0,
         "fgm": 1.5,
-        "fga": 4,
-        "ftm": 1,
-        "fta": 1,
-        "threes": 0
+        "fga": 4.0,
+        "ftm": 1.0,
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 45,
@@ -6171,7 +6171,7 @@
       "gamesStarted": 45,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 29,
+        "min": 29.0,
         "pts": 8.6,
         "reb": 11.2,
         "ast": 1.2,
@@ -6182,7 +6182,7 @@
         "fga": 6.6,
         "ftm": 1.4,
         "fta": 2.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2374,
@@ -6230,17 +6230,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 24.1,
-        "pts": 8,
+        "pts": 8.0,
         "reb": 3.3,
         "ast": 3.1,
         "stl": 1.4,
         "blk": 0.1,
-        "to": 2,
+        "to": 2.0,
         "fgm": 3.1,
         "fga": 7.1,
         "ftm": 1.7,
         "fta": 2.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 698,
@@ -6295,10 +6295,10 @@
         "stl": 1.1,
         "blk": 0.2,
         "to": 1.7,
-        "fgm": 6,
+        "fgm": 6.0,
         "fga": 12.5,
         "ftm": 3.4,
-        "fta": 4,
+        "fta": 4.0,
         "threes": 0.1
       },
       "totals": {
@@ -6358,7 +6358,7 @@
         "fga": 6.6,
         "ftm": 3.2,
         "fta": 3.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1497,
@@ -6467,14 +6467,14 @@
         "pts": 13.4,
         "reb": 2.5,
         "ast": 1.5,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.2,
         "to": 1.7,
         "fgm": 5.4,
         "fga": 11.7,
         "ftm": 2.6,
         "fta": 3.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1650,
@@ -6521,16 +6521,16 @@
       "gamesStarted": 12,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 8.4,
         "reb": 1.2,
         "ast": 4.6,
         "stl": 1.1,
         "blk": 0.2,
         "to": 1.3,
-        "fgm": 3,
+        "fgm": 3.0,
         "fga": 7.3,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.4,
         "threes": 0.4
       },
@@ -6582,7 +6582,7 @@
       "perGame": {
         "min": 23.6,
         "pts": 10.4,
-        "reb": 4,
+        "reb": 4.0,
         "ast": 1.8,
         "stl": 0.8,
         "blk": 0.7,
@@ -6591,7 +6591,7 @@
         "fga": 9.1,
         "ftm": 1.8,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 520,
@@ -6641,7 +6641,7 @@
         "min": 23.7,
         "pts": 10.9,
         "reb": 5.6,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.4,
         "blk": 0.2,
         "to": 1.8,
@@ -6649,7 +6649,7 @@
         "fga": 9.6,
         "ftm": 2.5,
         "fta": 3.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 498,
@@ -6697,11 +6697,11 @@
       "gamesStarted": 16,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 22,
+        "min": 22.0,
         "pts": 6.9,
         "reb": 1.9,
         "ast": 4.7,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.1,
         "to": 2.1,
         "fgm": 2.9,
@@ -6765,8 +6765,8 @@
         "fgm": 8.3,
         "fga": 16.2,
         "ftm": 4.9,
-        "fta": 7,
-        "threes": 0
+        "fta": 7.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 2760,
@@ -6825,7 +6825,7 @@
         "fga": 9.2,
         "ftm": 1.9,
         "fta": 2.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2403,
@@ -6882,8 +6882,8 @@
         "fgm": 5.7,
         "fga": 10.7,
         "ftm": 2.2,
-        "fta": 3,
-        "threes": 0
+        "fta": 3.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 688,
@@ -6932,7 +6932,7 @@
       "perGame": {
         "min": 23.9,
         "pts": 10.8,
-        "reb": 4,
+        "reb": 4.0,
         "ast": 2.3,
         "stl": 1.3,
         "blk": 0.1,
@@ -6940,8 +6940,8 @@
         "fgm": 4.6,
         "fga": 10.6,
         "ftm": 1.5,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 788,
@@ -6995,11 +6995,11 @@
         "stl": 0.7,
         "blk": 1.1,
         "to": 2.3,
-        "fgm": 5,
+        "fgm": 5.0,
         "fga": 10.3,
         "ftm": 2.1,
         "fta": 3.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1326,
@@ -7047,7 +7047,7 @@
       "gamesStarted": 3,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 11.1,
         "reb": 6.1,
         "ast": 2.5,
@@ -7167,7 +7167,7 @@
       "perGame": {
         "min": 38.2,
         "pts": 14.3,
-        "reb": 7,
+        "reb": 7.0,
         "ast": 5.3,
         "stl": 1.1,
         "blk": 0.6,
@@ -7176,7 +7176,7 @@
         "fga": 9.5,
         "ftm": 3.7,
         "fta": 4.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 3136,
@@ -7223,10 +7223,10 @@
       "gamesStarted": 12,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 12.5,
         "reb": 3.5,
-        "ast": 2,
+        "ast": 2.0,
         "stl": 0.8,
         "blk": 0.3,
         "to": 1.5,
@@ -7234,7 +7234,7 @@
         "fga": 12.2,
         "ftm": 2.3,
         "fta": 2.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1174,
@@ -7282,7 +7282,7 @@
       "gamesStarted": 78,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 36,
+        "min": 36.0,
         "pts": 18.8,
         "reb": 8.3,
         "ast": 3.6,
@@ -7341,17 +7341,17 @@
       "gamesStarted": 4,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 15,
-        "pts": 5,
+        "min": 15.0,
+        "pts": 5.0,
         "reb": 2.8,
         "ast": 1.5,
         "stl": 1.2,
-        "blk": 0,
-        "to": 1,
-        "fgm": 2,
+        "blk": 0.0,
+        "to": 1.0,
+        "fgm": 2.0,
         "fga": 5.5,
         "ftm": 0.8,
-        "fta": 1,
+        "fta": 1.0,
         "threes": 0.2
       },
       "totals": {
@@ -7407,7 +7407,7 @@
         "blk": 0.1,
         "to": 1.1,
         "fgm": 2.8,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 0.8,
         "fta": 0.9,
         "threes": 0.1
@@ -7468,7 +7468,7 @@
         "fga": 1.5,
         "ftm": 0.4,
         "fta": 0.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 128,
@@ -7521,12 +7521,12 @@
         "ast": 2.4,
         "stl": 0.8,
         "blk": 1.3,
-        "to": 2,
+        "to": 2.0,
         "fgm": 6.1,
         "fga": 12.7,
         "ftm": 2.7,
         "fta": 3.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2526,
@@ -7695,13 +7695,13 @@
         "reb": 2.8,
         "ast": 1.1,
         "stl": 0.9,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.1,
         "fgm": 1.3,
         "fga": 3.7,
         "ftm": 0.7,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 148,
@@ -7750,17 +7750,17 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 8.8,
-        "pts": 2,
+        "pts": 2.0,
         "reb": 1.4,
         "ast": 0.4,
         "stl": 0.4,
         "blk": 0.2,
-        "to": 0,
-        "fgm": 1,
+        "to": 0.0,
+        "fgm": 1.0,
         "fga": 2.8,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 44,
@@ -7813,13 +7813,13 @@
         "reb": 2.4,
         "ast": 0.9,
         "stl": 0.5,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.9,
         "fgm": 2.2,
         "fga": 4.7,
         "ftm": 1.3,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 721,
@@ -7877,7 +7877,7 @@
         "fga": 9.4,
         "ftm": 3.8,
         "fta": 4.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2761,
@@ -7925,7 +7925,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 8.3,
-        "pts": 2,
+        "pts": 2.0,
         "reb": 2.3,
         "ast": 0.5,
         "stl": 0.2,
@@ -7935,7 +7935,7 @@
         "fga": 1.8,
         "ftm": 0.5,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 456,
@@ -7983,17 +7983,17 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 31.1,
-        "pts": 12,
+        "pts": 12.0,
         "reb": 4.1,
         "ast": 5.8,
         "stl": 1.3,
         "blk": 0.2,
-        "to": 2,
+        "to": 2.0,
         "fgm": 4.5,
         "fga": 8.9,
         "ftm": 2.9,
         "fta": 3.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2549,
@@ -8051,7 +8051,7 @@
         "fga": 3.4,
         "ftm": 0.6,
         "fta": 0.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 511,
@@ -8107,10 +8107,10 @@
         "blk": 0.3,
         "to": 1.7,
         "fgm": 5.7,
-        "fga": 11,
+        "fga": 11.0,
         "ftm": 3.2,
         "fta": 4.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2159,
@@ -8168,7 +8168,7 @@
         "fga": 8.7,
         "ftm": 2.3,
         "fta": 3.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2230,
@@ -8217,18 +8217,18 @@
       "gamesStarted": 21,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24.1,
-        "pts": 9.7,
-        "reb": 5.2,
+        "min": 24.4,
+        "pts": 9.9,
+        "reb": 5.3,
         "ast": 2.4,
         "stl": 0.5,
         "blk": 0.2,
-        "to": 1.6,
-        "fgm": 3,
-        "fga": 5.7,
+        "to": 1.7,
+        "fgm": 3.1,
+        "fga": 5.8,
         "ftm": 3.7,
-        "fta": 4.7,
-        "threes": 0
+        "fta": 4.8,
+        "threes": 0.0
       },
       "totals": {
         "min": 2001,
@@ -8334,18 +8334,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 6,
-        "pts": 2,
-        "reb": 0,
-        "ast": 0,
-        "stl": 1,
-        "blk": 0,
-        "to": 1,
-        "fgm": 1,
-        "fga": 4,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 6.0,
+        "pts": 2.0,
+        "reb": 0.0,
+        "ast": 0.0,
+        "stl": 1.0,
+        "blk": 0.0,
+        "to": 1.0,
+        "fgm": 1.0,
+        "fga": 4.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 6,
@@ -8397,11 +8397,11 @@
         "reb": 0.9,
         "ast": 5.6,
         "stl": 0.8,
-        "blk": 0,
+        "blk": 0.0,
         "to": 2.5,
         "fgm": 3.1,
         "fga": 6.7,
-        "ftm": 1,
+        "ftm": 1.0,
         "fta": 1.9,
         "threes": 0.1
       },
@@ -8459,7 +8459,7 @@
         "stl": 0.8,
         "blk": 0.3,
         "to": 1.3,
-        "fgm": 4,
+        "fgm": 4.0,
         "fga": 8.8,
         "ftm": 1.8,
         "fta": 2.4,
@@ -8522,7 +8522,7 @@
         "fga": 7.2,
         "ftm": 1.8,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1107,
@@ -8569,17 +8569,17 @@
       "gamesStarted": 12,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 11.2,
         "reb": 2.7,
-        "ast": 3,
+        "ast": 3.0,
         "stl": 1.3,
         "blk": 0.3,
         "to": 2.2,
         "fgm": 4.7,
         "fga": 11.6,
         "ftm": 1.5,
-        "fta": 2,
+        "fta": 2.0,
         "threes": 0.3
       },
       "totals": {
@@ -8630,9 +8630,9 @@
         "min": 24.1,
         "pts": 11.4,
         "reb": 1.6,
-        "ast": 5,
+        "ast": 5.0,
         "stl": 0.9,
-        "blk": 0,
+        "blk": 0.0,
         "to": 2.3,
         "fgm": 4.5,
         "fga": 10.5,
@@ -8697,7 +8697,7 @@
         "fga": 11.9,
         "ftm": 2.3,
         "fta": 3.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 302,
@@ -8756,7 +8756,7 @@
         "fga": 10.7,
         "ftm": 4.2,
         "fta": 5.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2922,
@@ -8805,12 +8805,12 @@
       "perGame": {
         "min": 25.9,
         "pts": 15.4,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 2.4,
         "stl": 1.2,
         "blk": 0.2,
-        "to": 2,
-        "fgm": 6,
+        "to": 2.0,
+        "fgm": 6.0,
         "fga": 13.8,
         "ftm": 2.9,
         "fta": 3.5,
@@ -8872,7 +8872,7 @@
         "fga": 12.9,
         "ftm": 3.1,
         "fta": 4.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 924,
@@ -8922,7 +8922,7 @@
       "perGame": {
         "min": 24.1,
         "pts": 9.8,
-        "reb": 3,
+        "reb": 3.0,
         "ast": 1.2,
         "stl": 0.7,
         "blk": 0.3,
@@ -8931,7 +8931,7 @@
         "fga": 8.6,
         "ftm": 1.5,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1545,
@@ -8988,9 +8988,9 @@
         "to": 1.8,
         "fgm": 2.7,
         "fga": 6.4,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 3.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 234,
@@ -9037,18 +9037,18 @@
       "gamesStarted": 10,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 7.4,
-        "reb": 5,
+        "reb": 5.0,
         "ast": 1.4,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.3,
         "to": 1.3,
         "fgm": 2.5,
         "fga": 5.3,
         "ftm": 2.4,
         "fta": 3.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 936,
@@ -9101,13 +9101,13 @@
         "reb": 7.8,
         "ast": 1.1,
         "stl": 0.9,
-        "blk": 1,
+        "blk": 1.0,
         "to": 1.3,
-        "fgm": 4,
+        "fgm": 4.0,
         "fga": 7.4,
         "ftm": 2.8,
         "fta": 3.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2240,
@@ -9163,10 +9163,10 @@
         "blk": 0.1,
         "to": 0.8,
         "fgm": 1.5,
-        "fga": 3,
+        "fga": 3.0,
         "ftm": 1.3,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 219,
@@ -9217,15 +9217,15 @@
         "min": 12.9,
         "pts": 5.6,
         "reb": 2.9,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.3,
         "blk": 0.5,
-        "to": 1,
+        "to": 1.0,
         "fgm": 2.4,
         "fga": 4.4,
         "ftm": 0.8,
         "fta": 1.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 762,
@@ -9273,7 +9273,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 33.3,
-        "pts": 17,
+        "pts": 17.0,
         "reb": 3.5,
         "ast": 3.4,
         "stl": 1.5,
@@ -9333,7 +9333,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 11.2,
-        "pts": 4,
+        "pts": 4.0,
         "reb": 2.6,
         "ast": 0.4,
         "stl": 0.5,
@@ -9343,7 +9343,7 @@
         "fga": 2.8,
         "ftm": 1.1,
         "fta": 1.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 495,
@@ -9396,13 +9396,13 @@
         "reb": 5.7,
         "ast": 2.8,
         "stl": 1.3,
-        "blk": 1,
-        "to": 2,
+        "blk": 1.0,
+        "to": 2.0,
         "fgm": 7.9,
         "fga": 14.7,
         "ftm": 3.6,
         "fta": 4.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2819,
@@ -9460,7 +9460,7 @@
         "fga": 12.7,
         "ftm": 3.1,
         "fta": 4.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2441,
@@ -9516,10 +9516,10 @@
         "blk": 0.5,
         "to": 1.3,
         "fgm": 2.1,
-        "fga": 4,
+        "fga": 4.0,
         "ftm": 1.5,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 1514,
@@ -9629,11 +9629,11 @@
         "pts": 10.5,
         "reb": 3.1,
         "ast": 4.5,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.5,
         "to": 1.2,
         "fgm": 3.9,
-        "fga": 9,
+        "fga": 9.0,
         "ftm": 1.5,
         "fta": 1.8,
         "threes": 1.1
@@ -9694,7 +9694,7 @@
         "fga": 1.7,
         "ftm": 0.5,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 233,
@@ -9744,15 +9744,15 @@
         "min": 10.6,
         "pts": 4.2,
         "reb": 0.9,
-        "ast": 2,
+        "ast": 2.0,
         "stl": 0.5,
         "blk": 0.1,
-        "to": 1,
+        "to": 1.0,
         "fgm": 1.8,
         "fga": 3.7,
         "ftm": 0.6,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 532,
@@ -9803,10 +9803,10 @@
         "pts": 10.8,
         "reb": 1.8,
         "ast": 3.1,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.1,
         "to": 1.6,
-        "fgm": 4,
+        "fgm": 4.0,
         "fga": 8.7,
         "ftm": 1.7,
         "fta": 1.9,
@@ -9868,7 +9868,7 @@
         "fga": 4.7,
         "ftm": 0.8,
         "fta": 1.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 57,
@@ -9918,7 +9918,7 @@
         "min": 13.2,
         "pts": 3.1,
         "reb": 1.5,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 1.5,
         "blk": 0.1,
         "to": 0.5,
@@ -9974,18 +9974,18 @@
       "gamesStarted": 0,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 10,
+        "min": 10.0,
         "pts": 3.1,
         "reb": 2.7,
         "ast": 0.3,
         "stl": 0.3,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.4,
         "fgm": 1.1,
         "fga": 2.4,
         "ftm": 0.9,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 70,
@@ -10034,16 +10034,16 @@
       "perGame": {
         "min": 30.9,
         "pts": 12.7,
-        "reb": 10,
+        "reb": 10.0,
         "ast": 2.5,
         "stl": 1.1,
         "blk": 1.1,
-        "to": 2,
+        "to": 2.0,
         "fgm": 4.8,
         "fga": 10.3,
         "ftm": 3.2,
         "fta": 3.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2536,
@@ -10091,18 +10091,18 @@
       "gamesStarted": 0,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 6,
-        "pts": 2,
+        "min": 6.0,
+        "pts": 2.0,
         "reb": 1.2,
-        "ast": 0,
+        "ast": 0.0,
         "stl": 0.2,
         "blk": 0.2,
-        "to": 1,
+        "to": 1.0,
         "fgm": 0.7,
         "fga": 2.2,
         "ftm": 0.7,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 36,
@@ -10150,15 +10150,15 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 16.6,
-        "pts": 7,
-        "reb": 3,
+        "pts": 7.0,
+        "reb": 3.0,
         "ast": 1.8,
         "stl": 0.9,
         "blk": 0.5,
         "to": 1.4,
         "fgm": 2.4,
         "fga": 6.1,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 3.2,
         "threes": 0.1
       },
@@ -10217,7 +10217,7 @@
         "fgm": 6.6,
         "fga": 14.5,
         "ftm": 3.2,
-        "fta": 4,
+        "fta": 4.0,
         "threes": 1.1
       },
       "totals": {
@@ -10269,15 +10269,15 @@
         "min": 12.3,
         "pts": 5.1,
         "reb": 1.5,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.3,
         "blk": 0.1,
         "to": 0.4,
         "fgm": 2.3,
-        "fga": 5,
+        "fga": 5.0,
         "ftm": 0.5,
         "fta": 0.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 418,
@@ -10324,10 +10324,10 @@
       "gamesStarted": 4,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 11,
+        "min": 11.0,
         "pts": 3.3,
         "reb": 0.8,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.6,
         "blk": 0.1,
         "to": 0.7,
@@ -10445,13 +10445,13 @@
         "reb": 0.5,
         "ast": 0.2,
         "stl": 0.2,
-        "blk": 0,
-        "to": 0,
+        "blk": 0.0,
+        "to": 0.0,
         "fgm": 1.2,
         "fga": 3.2,
         "ftm": 1.2,
         "fta": 1.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 34,
@@ -10508,8 +10508,8 @@
         "fgm": 0.8,
         "fga": 2.1,
         "ftm": 0.7,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 626,
@@ -10562,10 +10562,10 @@
         "ast": 7.2,
         "stl": 1.8,
         "blk": 0.8,
-        "to": 3,
+        "to": 3.0,
         "fgm": 4.8,
         "fga": 10.1,
-        "ftm": 4,
+        "ftm": 4.0,
         "fta": 5.4,
         "threes": 0.3
       },
@@ -10625,7 +10625,7 @@
         "fga": 6.5,
         "ftm": 1.6,
         "fta": 2.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1467,
@@ -10683,7 +10683,7 @@
         "fga": 13.6,
         "ftm": 4.9,
         "fta": 5.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2505,
@@ -10732,7 +10732,7 @@
       "perGame": {
         "min": 15.8,
         "pts": 3.8,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 3.5,
         "stl": 0.4,
         "blk": 0.1,
@@ -10852,13 +10852,13 @@
         "reb": 8.5,
         "ast": 2.8,
         "stl": 1.6,
-        "blk": 1,
+        "blk": 1.0,
         "to": 2.1,
         "fgm": 8.9,
         "fga": 17.4,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 4.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2770,
@@ -10908,7 +10908,7 @@
       "perGame": {
         "min": 23.9,
         "pts": 10.8,
-        "reb": 4,
+        "reb": 4.0,
         "ast": 1.9,
         "stl": 0.6,
         "blk": 0.5,
@@ -10974,9 +10974,9 @@
         "to": 2.2,
         "fgm": 4.2,
         "fga": 7.3,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1029,
@@ -11025,17 +11025,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 36.3,
-        "pts": 18,
+        "pts": 18.0,
         "reb": 12.5,
         "ast": 1.6,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 1.1,
         "to": 3.4,
         "fgm": 6.4,
         "fga": 11.4,
         "ftm": 5.2,
         "fta": 7.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2976,
@@ -11090,12 +11090,12 @@
         "ast": 0.7,
         "stl": 0.4,
         "blk": 0.9,
-        "to": 1,
+        "to": 1.0,
         "fgm": 1.9,
         "fga": 4.2,
-        "ftm": 1,
+        "ftm": 1.0,
         "fta": 1.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 198,
@@ -11149,11 +11149,11 @@
         "stl": 0.5,
         "blk": 0.8,
         "to": 3.8,
-        "fgm": 5,
-        "fga": 8,
+        "fgm": 5.0,
+        "fga": 8.0,
         "ftm": 4.2,
-        "fta": 6,
-        "threes": 0
+        "fta": 6.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 106,
@@ -11208,7 +11208,7 @@
         "blk": 0.1,
         "to": 2.6,
         "fgm": 3.8,
-        "fga": 8,
+        "fga": 8.0,
         "ftm": 1.5,
         "fta": 1.9,
         "threes": 0.1
@@ -11261,16 +11261,16 @@
       "perGame": {
         "min": 23.6,
         "pts": 12.3,
-        "reb": 6,
+        "reb": 6.0,
         "ast": 0.9,
         "stl": 0.5,
-        "blk": 1,
+        "blk": 1.0,
         "to": 2.3,
         "fgm": 4.9,
         "fga": 10.4,
         "ftm": 2.5,
         "fta": 3.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 542,
@@ -11319,7 +11319,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 23.9,
-        "pts": 9,
+        "pts": 9.0,
         "reb": 4.7,
         "ast": 1.4,
         "stl": 0.8,
@@ -11329,7 +11329,7 @@
         "fga": 7.7,
         "ftm": 1.8,
         "fta": 2.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1003,
@@ -11379,7 +11379,7 @@
       "perGame": {
         "min": 24.2,
         "pts": 10.3,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 2.4,
         "stl": 1.4,
         "blk": 0.2,
@@ -11440,10 +11440,10 @@
         "reb": 1.7,
         "ast": 5.1,
         "stl": 0.7,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.5,
         "fgm": 2.6,
-        "fga": 7,
+        "fga": 7.0,
         "ftm": 1.7,
         "fta": 2.1,
         "threes": 0.8
@@ -11504,7 +11504,7 @@
         "fga": 11.5,
         "ftm": 3.8,
         "fta": 4.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2272,
@@ -11557,13 +11557,13 @@
         "reb": 1.3,
         "ast": 2.3,
         "stl": 0.3,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.7,
-        "fgm": 1,
+        "fgm": 1.0,
         "fga": 3.3,
         "ftm": 0.7,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 46,
@@ -11616,13 +11616,13 @@
         "reb": 4.5,
         "ast": 3.2,
         "stl": 0.7,
-        "blk": 1,
+        "blk": 1.0,
         "to": 2.6,
         "fgm": 6.8,
-        "fga": 13,
+        "fga": 13.0,
         "ftm": 5.3,
         "fta": 6.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2638,
@@ -11674,13 +11674,13 @@
         "reb": 1.4,
         "ast": 3.4,
         "stl": 0.6,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.8,
         "fgm": 3.8,
         "fga": 8.4,
         "ftm": 1.2,
         "fta": 1.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 127,
@@ -11792,7 +11792,7 @@
         "stl": 1.2,
         "blk": 0.3,
         "to": 2.8,
-        "fgm": 4,
+        "fgm": 4.0,
         "fga": 8.8,
         "ftm": 1.5,
         "fta": 1.8,
@@ -11908,13 +11908,13 @@
         "reb": 3.6,
         "ast": 2.1,
         "stl": 0.2,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.7,
         "fgm": 5.8,
         "fga": 11.7,
         "ftm": 3.6,
         "fta": 4.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 214,
@@ -11972,7 +11972,7 @@
         "fga": 7.7,
         "ftm": 4.2,
         "fta": 5.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1989,
@@ -12023,15 +12023,15 @@
         "min": 22.7,
         "pts": 8.3,
         "reb": 2.3,
-        "ast": 0,
+        "ast": 0.0,
         "stl": 1.3,
         "blk": 0.7,
         "to": 2.3,
-        "fgm": 3,
+        "fgm": 3.0,
         "fga": 8.3,
         "ftm": 2.3,
         "fta": 2.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 68,
@@ -12085,12 +12085,12 @@
         "ast": 0.7,
         "stl": 0.3,
         "blk": 0.2,
-        "to": 2,
+        "to": 2.0,
         "fgm": 2.4,
         "fga": 5.6,
         "ftm": 1.1,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 282,
@@ -12138,18 +12138,18 @@
       "gamesStarted": 2,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 23,
+        "min": 23.0,
         "pts": 8.7,
         "reb": 8.8,
         "ast": 0.2,
         "stl": 0.5,
-        "blk": 1,
+        "blk": 1.0,
         "to": 2.2,
         "fgm": 3.3,
         "fga": 7.7,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 4.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 138,
@@ -12207,8 +12207,8 @@
         "fgm": 2.2,
         "fga": 4.5,
         "ftm": 1.3,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 972,
@@ -12266,7 +12266,7 @@
         "fga": 6.7,
         "ftm": 1.4,
         "fta": 3.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 454,
@@ -12314,17 +12314,17 @@
       "gamesStarted": 22,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 23.9,
-        "pts": 9.3,
-        "reb": 2,
-        "ast": 5.4,
+        "min": 25.4,
+        "pts": 9.8,
+        "reb": 2.1,
+        "ast": 5.7,
         "stl": 1.2,
         "blk": 0.1,
-        "to": 2,
-        "fgm": 3.4,
-        "fga": 7.7,
-        "ftm": 2.2,
-        "fta": 2.6,
+        "to": 2.1,
+        "fgm": 3.6,
+        "fga": 8.2,
+        "ftm": 2.3,
+        "fta": 2.8,
         "threes": 0.2
       },
       "totals": {
@@ -12440,9 +12440,9 @@
         "to": 1.5,
         "fgm": 2.2,
         "fga": 5.4,
-        "ftm": 1,
+        "ftm": 1.0,
         "fta": 1.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 776,
@@ -12493,15 +12493,15 @@
         "min": 23.9,
         "pts": 9.9,
         "reb": 4.7,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.7,
         "blk": 0.7,
-        "to": 1,
-        "fgm": 4,
+        "to": 1.0,
+        "fgm": 4.0,
         "fga": 8.1,
         "ftm": 1.9,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1719,
@@ -12549,7 +12549,7 @@
       "gamesStarted": 15,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 7.6,
         "reb": 3.9,
         "ast": 1.8,
@@ -12560,7 +12560,7 @@
         "fga": 6.5,
         "ftm": 2.1,
         "fta": 2.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1440,
@@ -12608,18 +12608,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 10,
-        "pts": 4,
-        "reb": 0,
-        "ast": 1,
-        "stl": 0,
-        "blk": 0,
-        "to": 0,
-        "fgm": 2,
-        "fga": 3,
-        "ftm": 0,
-        "fta": 0,
-        "threes": 0
+        "min": 10.0,
+        "pts": 4.0,
+        "reb": 0.0,
+        "ast": 1.0,
+        "stl": 0.0,
+        "blk": 0.0,
+        "to": 0.0,
+        "fgm": 2.0,
+        "fga": 3.0,
+        "ftm": 0.0,
+        "fta": 0.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 10,
@@ -12666,7 +12666,7 @@
       "gamesStarted": 11,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 9.6,
         "reb": 7.1,
         "ast": 0.9,
@@ -12677,7 +12677,7 @@
         "fga": 8.7,
         "ftm": 1.8,
         "fta": 2.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1056,
@@ -12735,7 +12735,7 @@
         "fga": 12.8,
         "ftm": 3.6,
         "fta": 5.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2206,
@@ -12841,17 +12841,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 23.7,
-        "pts": 7,
+        "pts": 7.0,
         "reb": 2.4,
         "ast": 3.9,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.1,
         "to": 3.1,
         "fgm": 2.9,
         "fga": 7.7,
         "ftm": 1.3,
         "fta": 1.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 166,
@@ -12909,7 +12909,7 @@
         "fga": 9.9,
         "ftm": 1.1,
         "fta": 1.4,
-        "threes": 1
+        "threes": 1.0
       },
       "totals": {
         "min": 1691,
@@ -12956,7 +12956,7 @@
       "gamesStarted": 11,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 12.5,
         "reb": 1.9,
         "ast": 4.3,
@@ -12965,7 +12965,7 @@
         "to": 2.5,
         "fgm": 4.5,
         "fga": 9.9,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 3.8,
         "threes": 0.5
       },
@@ -13018,7 +13018,7 @@
         "min": 33.4,
         "pts": 19.1,
         "reb": 12.1,
-        "ast": 4,
+        "ast": 4.0,
         "stl": 1.5,
         "blk": 1.3,
         "to": 3.9,
@@ -13074,7 +13074,7 @@
       "gamesStarted": 16,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 12.3,
         "reb": 4.7,
         "ast": 1.3,
@@ -13082,10 +13082,10 @@
         "blk": 0.5,
         "to": 1.9,
         "fgm": 5.1,
-        "fga": 11,
+        "fga": 11.0,
         "ftm": 2.1,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1586,
@@ -13133,18 +13133,18 @@
       "gamesStarted": 8,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 4.1,
         "reb": 4.3,
         "ast": 0.9,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.7,
         "to": 0.8,
         "fgm": 1.7,
         "fga": 4.1,
         "ftm": 0.6,
         "fta": 1.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 817,
@@ -13200,9 +13200,9 @@
         "blk": 0.3,
         "to": 1.9,
         "fgm": 3.9,
-        "fga": 9,
+        "fga": 9.0,
         "ftm": 2.2,
-        "fta": 3,
+        "fta": 3.0,
         "threes": 0.2
       },
       "totals": {
@@ -13253,15 +13253,15 @@
         "min": 23.2,
         "pts": 9.4,
         "reb": 5.6,
-        "ast": 2,
-        "stl": 0,
+        "ast": 2.0,
+        "stl": 0.0,
         "blk": 0.8,
-        "to": 2,
+        "to": 2.0,
         "fgm": 3.8,
         "fga": 5.6,
         "ftm": 1.8,
         "fta": 2.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 116,
@@ -13309,18 +13309,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 16,
-        "pts": 3,
-        "reb": 5,
-        "ast": 0,
-        "stl": 1,
-        "blk": 0,
-        "to": 1,
-        "fgm": 1,
-        "fga": 3,
-        "ftm": 1,
-        "fta": 2,
-        "threes": 0
+        "min": 16.0,
+        "pts": 3.0,
+        "reb": 5.0,
+        "ast": 0.0,
+        "stl": 1.0,
+        "blk": 0.0,
+        "to": 1.0,
+        "fgm": 1.0,
+        "fga": 3.0,
+        "ftm": 1.0,
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 16,
@@ -13368,14 +13368,14 @@
       "gamesStarted": 20,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 12.6,
         "reb": 3.3,
         "ast": 2.4,
         "stl": 0.9,
         "blk": 1.2,
-        "to": 2,
-        "fgm": 5,
+        "to": 2.0,
+        "fgm": 5.0,
         "fga": 10.6,
         "ftm": 2.4,
         "fta": 2.9,
@@ -13428,16 +13428,16 @@
       "perGame": {
         "min": 24.6,
         "pts": 9.1,
-        "reb": 4,
-        "ast": 1,
+        "reb": 4.0,
+        "ast": 1.0,
         "stl": 0.6,
         "blk": 0.3,
         "to": 2.1,
         "fgm": 3.6,
-        "fga": 10,
-        "ftm": 2,
+        "fga": 10.0,
+        "ftm": 2.0,
         "fta": 2.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 172,
@@ -13485,17 +13485,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 22.6,
-        "pts": 7,
+        "pts": 7.0,
         "reb": 7.2,
         "ast": 0.4,
         "stl": 0.2,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.6,
         "fgm": 2.8,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 1.4,
         "fta": 3.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 113,
@@ -13542,7 +13542,7 @@
       "gamesStarted": 67,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 32,
+        "min": 32.0,
         "pts": 12.9,
         "reb": 2.6,
         "ast": 6.6,
@@ -13553,7 +13553,7 @@
         "fga": 9.6,
         "ftm": 2.8,
         "fta": 3.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2624,
@@ -13602,16 +13602,16 @@
       "perGame": {
         "min": 30.4,
         "pts": 12.9,
-        "reb": 6,
+        "reb": 6.0,
         "ast": 0.7,
         "stl": 0.5,
-        "blk": 2,
+        "blk": 2.0,
         "to": 1.8,
         "fgm": 4.8,
-        "fga": 10,
+        "fga": 10.0,
         "ftm": 3.3,
         "fta": 4.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2489,
@@ -13659,14 +13659,14 @@
       "gamesStarted": 14,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 7.6,
         "reb": 1.9,
         "ast": 3.8,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.2,
         "to": 1.2,
-        "fgm": 3,
+        "fgm": 3.0,
         "fga": 7.1,
         "ftm": 1.5,
         "fta": 1.9,
@@ -13728,7 +13728,7 @@
         "fga": 8.8,
         "ftm": 3.1,
         "fta": 4.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2817,
@@ -13784,7 +13784,7 @@
         "to": 1.5,
         "fgm": 3.2,
         "fga": 10.2,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 3.9,
         "threes": 0.2
       },
@@ -13835,16 +13835,16 @@
       "perGame": {
         "min": 24.9,
         "pts": 11.1,
-        "reb": 5,
+        "reb": 5.0,
         "ast": 3.3,
         "stl": 0.9,
         "blk": 0.5,
-        "to": 2,
+        "to": 2.0,
         "fgm": 4.6,
         "fga": 9.1,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1690,
@@ -13902,7 +13902,7 @@
         "fga": 4.4,
         "ftm": 1.1,
         "fta": 1.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 331,
@@ -13961,7 +13961,7 @@
         "fga": 6.2,
         "ftm": 3.2,
         "fta": 4.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2250,
@@ -14067,7 +14067,7 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 21.7,
-        "pts": 12,
+        "pts": 12.0,
         "reb": 4.3,
         "ast": 1.4,
         "stl": 0.4,
@@ -14076,8 +14076,8 @@
         "fgm": 4.1,
         "fga": 7.9,
         "ftm": 3.9,
-        "fta": 5,
-        "threes": 0
+        "fta": 5.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 304,
@@ -14189,7 +14189,7 @@
         "stl": 0.9,
         "blk": 0.1,
         "to": 1.9,
-        "fgm": 2,
+        "fgm": 2.0,
         "fga": 4.4,
         "ftm": 1.2,
         "fta": 1.5,
@@ -14249,10 +14249,10 @@
         "blk": 0.4,
         "to": 1.1,
         "fgm": 1.9,
-        "fga": 4,
+        "fga": 4.0,
         "ftm": 1.4,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1104,
@@ -14311,7 +14311,7 @@
         "fga": 15.4,
         "ftm": 5.5,
         "fta": 7.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2569,
@@ -14370,7 +14370,7 @@
         "fga": 8.8,
         "ftm": 1.7,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1655,
@@ -14427,8 +14427,8 @@
         "fgm": 1.1,
         "fga": 2.8,
         "ftm": 0.7,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 640,
@@ -14486,7 +14486,7 @@
         "fgm": 2.4,
         "fga": 5.3,
         "ftm": 0.8,
-        "fta": 1,
+        "fta": 1.0,
         "threes": 0.3
       },
       "totals": {
@@ -14601,9 +14601,9 @@
         "to": 1.7,
         "fgm": 2.8,
         "fga": 7.2,
-        "ftm": 1,
+        "ftm": 1.0,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 979,
@@ -14653,7 +14653,7 @@
         "min": 23.9,
         "pts": 4.8,
         "reb": 6.9,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.3,
         "blk": 1.2,
         "to": 1.3,
@@ -14661,7 +14661,7 @@
         "fga": 3.4,
         "ftm": 1.5,
         "fta": 1.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1578,
@@ -14708,7 +14708,7 @@
       "gamesStarted": 67,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 38,
+        "min": 38.0,
         "pts": 21.7,
         "reb": 6.3,
         "ast": 6.9,
@@ -14777,7 +14777,7 @@
         "fga": 5.2,
         "ftm": 0.7,
         "fta": 1.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 146,
@@ -14827,7 +14827,7 @@
       "perGame": {
         "min": 25.5,
         "pts": 12.3,
-        "reb": 6,
+        "reb": 6.0,
         "ast": 2.4,
         "stl": 1.5,
         "blk": 0.9,
@@ -14836,7 +14836,7 @@
         "fga": 8.9,
         "ftm": 3.2,
         "fta": 4.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2088,
@@ -14883,11 +14883,11 @@
       "gamesStarted": 19,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 11.7,
         "reb": 1.9,
         "ast": 3.2,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.2,
         "to": 1.4,
         "fgm": 4.5,
@@ -14943,17 +14943,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 25.5,
-        "pts": 7,
-        "reb": 9,
+        "pts": 7.0,
+        "reb": 9.0,
         "ast": 0.5,
-        "stl": 1,
-        "blk": 1,
+        "stl": 1.0,
+        "blk": 1.0,
         "to": 1.5,
-        "fgm": 2,
-        "fga": 5,
-        "ftm": 3,
-        "fta": 5,
-        "threes": 0
+        "fgm": 2.0,
+        "fga": 5.0,
+        "ftm": 3.0,
+        "fta": 5.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 51,
@@ -15012,7 +15012,7 @@
         "fga": 6.7,
         "ftm": 2.1,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1443,
@@ -15069,9 +15069,9 @@
         "to": 1.7,
         "fgm": 2.8,
         "fga": 5.9,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 890,
@@ -15183,7 +15183,7 @@
         "ast": 3.6,
         "stl": 0.8,
         "blk": 0.1,
-        "to": 2,
+        "to": 2.0,
         "fgm": 3.5,
         "fga": 8.6,
         "ftm": 2.2,
@@ -15243,11 +15243,11 @@
         "stl": 1.7,
         "blk": 0.3,
         "to": 1.3,
-        "fgm": 2,
-        "fga": 7,
+        "fgm": 2.0,
+        "fga": 7.0,
         "ftm": 0.3,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 73,
@@ -15295,18 +15295,18 @@
       "gamesStarted": 0,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 16,
-        "pts": 12,
-        "reb": 1,
-        "ast": 1,
-        "stl": 4,
-        "blk": 0,
-        "to": 3,
-        "fgm": 4,
-        "fga": 9,
-        "ftm": 3,
-        "fta": 4,
-        "threes": 1
+        "min": 16.0,
+        "pts": 12.0,
+        "reb": 1.0,
+        "ast": 1.0,
+        "stl": 4.0,
+        "blk": 0.0,
+        "to": 3.0,
+        "fgm": 4.0,
+        "fga": 9.0,
+        "ftm": 3.0,
+        "fta": 4.0,
+        "threes": 1.0
       },
       "totals": {
         "min": 16,
@@ -15364,7 +15364,7 @@
         "fga": 9.4,
         "ftm": 2.9,
         "fta": 4.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 163,
@@ -15418,11 +15418,11 @@
         "stl": 0.6,
         "blk": 0.9,
         "to": 3.4,
-        "fgm": 6,
+        "fgm": 6.0,
         "fga": 10.8,
         "ftm": 4.2,
-        "fta": 6,
-        "threes": 0
+        "fta": 6.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 2345,
@@ -15590,13 +15590,13 @@
         "reb": 3.5,
         "ast": 4.2,
         "stl": 2.2,
-        "blk": 0,
+        "blk": 0.0,
         "to": 2.2,
         "fgm": 1.8,
-        "fga": 6,
-        "ftm": 0,
-        "fta": 1,
-        "threes": 0
+        "fga": 6.0,
+        "ftm": 0.0,
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 98,
@@ -15643,15 +15643,15 @@
       "gamesStarted": 17,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 12.5,
         "reb": 2.6,
-        "ast": 3,
+        "ast": 3.0,
         "stl": 0.7,
         "blk": 0.3,
         "to": 1.8,
         "fgm": 4.9,
-        "fga": 11,
+        "fga": 11.0,
         "ftm": 2.6,
         "fta": 3.3,
         "threes": 0.1
@@ -15701,15 +15701,15 @@
       "gamesStarted": 45,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 30,
+        "min": 30.0,
         "pts": 18.5,
         "reb": 4.3,
         "ast": 3.1,
         "stl": 0.5,
         "blk": 0.2,
-        "to": 2,
+        "to": 2.0,
         "fgm": 7.4,
-        "fga": 16,
+        "fga": 16.0,
         "ftm": 3.3,
         "fta": 3.9,
         "threes": 0.5
@@ -15761,16 +15761,16 @@
       "perGame": {
         "min": 24.4,
         "pts": 5.6,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 5.8,
-        "stl": 1,
-        "blk": 0,
+        "stl": 1.0,
+        "blk": 0.0,
         "to": 3.4,
         "fgm": 1.8,
         "fga": 6.4,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 122,
@@ -15818,7 +15818,7 @@
       "gamesStarted": 10,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 8.2,
         "reb": 4.6,
         "ast": 3.2,
@@ -15876,18 +15876,18 @@
       "gamesStarted": 1,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 26,
-        "pts": 4,
-        "reb": 1,
-        "ast": 0,
-        "stl": 1,
-        "blk": 0,
-        "to": 2,
-        "fgm": 1,
-        "fga": 8,
-        "ftm": 2,
-        "fta": 2,
-        "threes": 0
+        "min": 26.0,
+        "pts": 4.0,
+        "reb": 1.0,
+        "ast": 0.0,
+        "stl": 1.0,
+        "blk": 0.0,
+        "to": 2.0,
+        "fgm": 1.0,
+        "fga": 8.0,
+        "ftm": 2.0,
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 26,
@@ -15934,18 +15934,18 @@
       "gamesStarted": 17,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
-        "pts": 9,
-        "reb": 7,
-        "ast": 1,
+        "min": 24.0,
+        "pts": 9.0,
+        "reb": 7.0,
+        "ast": 1.0,
         "stl": 0.5,
         "blk": 0.4,
         "to": 1.3,
         "fgm": 3.7,
         "fga": 7.9,
         "ftm": 1.6,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 1658,
@@ -15999,12 +15999,12 @@
         "ast": 1.3,
         "stl": 0.5,
         "blk": 0.4,
-        "to": 1,
+        "to": 1.0,
         "fgm": 4.5,
         "fga": 9.2,
         "ftm": 0.5,
         "fta": 0.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 468,
@@ -16063,7 +16063,7 @@
         "fga": 9.2,
         "ftm": 2.3,
         "fta": 3.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2166,
@@ -16112,7 +16112,7 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 23.9,
-        "pts": 6,
+        "pts": 6.0,
         "reb": 4.4,
         "ast": 2.2,
         "stl": 0.4,
@@ -16122,7 +16122,7 @@
         "fga": 3.9,
         "ftm": 2.8,
         "fta": 3.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1002,
@@ -16228,18 +16228,18 @@
       "gamesStarted": 67,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 36,
+        "min": 36.0,
         "pts": 18.9,
-        "reb": 10,
+        "reb": 10.0,
         "ast": 2.5,
         "stl": 0.6,
         "blk": 0.7,
         "to": 2.3,
         "fgm": 6.9,
         "fga": 12.8,
-        "ftm": 5,
+        "ftm": 5.0,
         "fta": 6.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2956,
@@ -16286,17 +16286,17 @@
       "gamesStarted": 67,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 35,
+        "min": 35.0,
         "pts": 19.5,
         "reb": 3.2,
         "ast": 8.4,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.2,
         "to": 3.5,
-        "fgm": 7,
+        "fgm": 7.0,
         "fga": 14.9,
         "ftm": 5.2,
-        "fta": 6,
+        "fta": 6.0,
         "threes": 0.2
       },
       "totals": {
@@ -16350,13 +16350,13 @@
         "reb": 4.1,
         "ast": 0.9,
         "stl": 0.7,
-        "blk": 1,
-        "to": 1,
+        "blk": 1.0,
+        "to": 1.0,
         "fgm": 4.1,
         "fga": 8.3,
         "ftm": 1.3,
         "fta": 1.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1930,
@@ -16409,11 +16409,11 @@
         "ast": 5.2,
         "stl": 3.2,
         "blk": 0.4,
-        "to": 3,
+        "to": 3.0,
         "fgm": 7.3,
         "fga": 15.6,
-        "ftm": 3,
-        "fta": 4,
+        "ftm": 3.0,
+        "fta": 4.0,
         "threes": 0.2
       },
       "totals": {
@@ -16463,14 +16463,14 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 16.1,
-        "pts": 6,
+        "pts": 6.0,
         "reb": 1.9,
         "ast": 1.4,
         "stl": 0.8,
         "blk": 0.4,
         "to": 0.9,
         "fgm": 2.5,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 0.9,
         "fta": 1.2,
         "threes": 0.1
@@ -16529,9 +16529,9 @@
         "to": 2.2,
         "fgm": 4.2,
         "fga": 7.1,
-        "ftm": 3,
+        "ftm": 3.0,
         "fta": 4.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2405,
@@ -16582,15 +16582,15 @@
         "min": 32.7,
         "pts": 11.6,
         "reb": 9.9,
-        "ast": 3,
+        "ast": 3.0,
         "stl": 0.9,
         "blk": 0.6,
-        "to": 2,
+        "to": 2.0,
         "fgm": 4.3,
         "fga": 8.3,
         "ftm": 3.1,
         "fta": 3.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2587,
@@ -16697,12 +16697,12 @@
       "gamesStarted": 0,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 7,
+        "min": 7.0,
         "pts": 2.8,
         "reb": 1.2,
         "ast": 0.2,
         "stl": 0.2,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.5,
         "fgm": 1.2,
         "fga": 4.7,
@@ -16760,7 +16760,7 @@
         "reb": 2.1,
         "ast": 3.6,
         "stl": 0.8,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.5,
         "fgm": 4.1,
         "fga": 9.4,
@@ -16822,7 +16822,7 @@
         "to": 1.9,
         "fgm": 3.6,
         "fga": 8.1,
-        "ftm": 1,
+        "ftm": 1.0,
         "fta": 1.3,
         "threes": 0.4
       },
@@ -16876,7 +16876,7 @@
         "reb": 1.3,
         "ast": 4.1,
         "stl": 0.5,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.3,
         "fgm": 4.8,
         "fga": 9.9,
@@ -16936,12 +16936,12 @@
         "ast": 1.2,
         "stl": 0.3,
         "blk": 0.2,
-        "to": 1,
+        "to": 1.0,
         "fgm": 2.5,
         "fga": 5.5,
         "ftm": 1.6,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1004,
@@ -16993,13 +16993,13 @@
         "reb": 0.7,
         "ast": 0.3,
         "stl": 0.2,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.3,
         "fgm": 0.7,
         "fga": 1.5,
         "ftm": 0.2,
         "fta": 0.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 29,
@@ -17058,7 +17058,7 @@
         "fga": 11.9,
         "ftm": 2.3,
         "fta": 2.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 922,
@@ -17108,7 +17108,7 @@
       "perGame": {
         "min": 23.4,
         "pts": 11.4,
-        "reb": 5,
+        "reb": 5.0,
         "ast": 1.4,
         "stl": 0.5,
         "blk": 0.8,
@@ -17117,7 +17117,7 @@
         "fga": 9.7,
         "ftm": 2.7,
         "fta": 3.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1921,
@@ -17174,10 +17174,10 @@
         "blk": 0.1,
         "to": 1.1,
         "fgm": 2.5,
-        "fga": 6,
+        "fga": 6.0,
         "ftm": 1.4,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 1189,
@@ -17237,7 +17237,7 @@
         "fga": 13.4,
         "ftm": 3.3,
         "fta": 5.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1612,
@@ -17296,7 +17296,7 @@
         "fga": 9.2,
         "ftm": 2.4,
         "fta": 3.5,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2288,
@@ -17354,7 +17354,7 @@
         "fga": 2.3,
         "ftm": 0.9,
         "fta": 1.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1051,
@@ -17408,12 +17408,12 @@
         "ast": 0.2,
         "stl": 0.3,
         "blk": 0.5,
-        "to": 0,
+        "to": 0.0,
         "fgm": 0.5,
-        "fga": 1,
+        "fga": 1.0,
         "ftm": 0.5,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 31,
@@ -17471,8 +17471,8 @@
         "fgm": 9.6,
         "fga": 18.5,
         "ftm": 4.7,
-        "fta": 6,
-        "threes": 1
+        "fta": 6.0,
+        "threes": 1.0
       },
       "totals": {
         "min": 3073,
@@ -17523,13 +17523,13 @@
         "pts": 4.8,
         "reb": 1.5,
         "ast": 4.8,
-        "stl": 1,
-        "blk": 0,
+        "stl": 1.0,
+        "blk": 0.0,
         "to": 1.2,
         "fgm": 1.8,
         "fga": 3.9,
         "ftm": 0.8,
-        "fta": 1,
+        "fta": 1.0,
         "threes": 0.4
       },
       "totals": {
@@ -17578,11 +17578,11 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 21.2,
-        "pts": 9,
+        "pts": 9.0,
         "reb": 1.9,
         "ast": 4.8,
         "stl": 0.5,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.7,
         "fgm": 3.5,
         "fga": 7.8,
@@ -17638,15 +17638,15 @@
         "min": 10.8,
         "pts": 4.9,
         "reb": 1.3,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.7,
         "blk": 0.1,
-        "to": 1,
-        "fgm": 2,
+        "to": 1.0,
+        "fgm": 2.0,
         "fga": 4.6,
         "ftm": 0.8,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 703,
@@ -17697,15 +17697,15 @@
         "min": 17.8,
         "pts": 7.9,
         "reb": 4.9,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.5,
         "blk": 0.3,
         "to": 1.2,
         "fgm": 2.8,
         "fga": 6.2,
         "ftm": 2.4,
-        "fta": 3,
-        "threes": 0
+        "fta": 3.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 1120,
@@ -17753,17 +17753,17 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 7.8,
-        "pts": 3,
+        "pts": 3.0,
         "reb": 0.8,
         "ast": 1.1,
         "stl": 0.3,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.5,
         "fgm": 1.2,
         "fga": 2.9,
         "ftm": 0.5,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 469,
@@ -17818,11 +17818,11 @@
         "stl": 1.8,
         "blk": 0.6,
         "to": 2.2,
-        "fgm": 2,
+        "fgm": 2.0,
         "fga": 4.2,
         "ftm": 1.2,
-        "fta": 2,
-        "threes": 0
+        "fta": 2.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 1972,
@@ -17878,10 +17878,10 @@
         "blk": 0.2,
         "to": 0.7,
         "fgm": 1.1,
-        "fga": 3,
+        "fga": 3.0,
         "ftm": 0.5,
         "fta": 0.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 579,
@@ -17929,11 +17929,11 @@
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
         "min": 8.5,
-        "pts": 4,
+        "pts": 4.0,
         "reb": 0.5,
         "ast": 1.3,
         "stl": 0.3,
-        "blk": 0,
+        "blk": 0.0,
         "to": 0.7,
         "fgm": 1.5,
         "fga": 3.5,
@@ -17990,11 +17990,11 @@
         "min": 36.8,
         "pts": 23.3,
         "reb": 6.6,
-        "ast": 3,
-        "stl": 1,
+        "ast": 3.0,
+        "stl": 1.0,
         "blk": 0.6,
         "to": 3.3,
-        "fgm": 8,
+        "fgm": 8.0,
         "fga": 17.6,
         "ftm": 6.5,
         "fta": 7.7,
@@ -18046,8 +18046,8 @@
       "gamesStarted": 82,
       "gamesSource": "wikipedia_team_player_stats_table",
       "perGame": {
-        "min": 37,
-        "pts": 23,
+        "min": 37.0,
+        "pts": 23.0,
         "reb": 8.6,
         "ast": 2.5,
         "stl": 1.4,
@@ -18057,7 +18057,7 @@
         "fga": 19.3,
         "ftm": 3.4,
         "fta": 4.8,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 3031,
@@ -18170,9 +18170,9 @@
         "stl": 1.8,
         "blk": 1.7,
         "to": 1.8,
-        "fgm": 4,
-        "fga": 8,
-        "ftm": 3,
+        "fgm": 4.0,
+        "fga": 8.0,
+        "ftm": 3.0,
         "fta": 4.3,
         "threes": 0.1
       },
@@ -18228,7 +18228,7 @@
         "stl": 1.3,
         "blk": 0.4,
         "to": 1.8,
-        "fgm": 6,
+        "fgm": 6.0,
         "fga": 13.5,
         "ftm": 1.9,
         "fta": 2.8,
@@ -18282,9 +18282,9 @@
       "perGame": {
         "min": 24.5,
         "pts": 12.5,
-        "reb": 3,
+        "reb": 3.0,
         "ast": 2.2,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 0.2,
         "to": 1.7,
         "fgm": 5.3,
@@ -18340,15 +18340,15 @@
       "perGame": {
         "min": 24.1,
         "pts": 8.4,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 8.7,
         "stl": 2.3,
         "blk": 0.2,
         "to": 2.1,
-        "fgm": 3,
-        "fga": 6,
+        "fgm": 3.0,
+        "fga": 6.0,
         "ftm": 2.3,
-        "fta": 3,
+        "fta": 3.0,
         "threes": 0.1
       },
       "totals": {
@@ -18408,7 +18408,7 @@
         "fga": 17.3,
         "ftm": 3.9,
         "fta": 6.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2857,
@@ -18464,7 +18464,7 @@
         "blk": 0.1,
         "to": 2.1,
         "fgm": 3.7,
-        "fga": 8,
+        "fga": 8.0,
         "ftm": 2.5,
         "fta": 2.9,
         "threes": 0.2
@@ -18576,7 +18576,7 @@
         "min": 24.1,
         "pts": 7.9,
         "reb": 4.9,
-        "ast": 1,
+        "ast": 1.0,
         "stl": 0.5,
         "blk": 0.3,
         "to": 1.6,
@@ -18584,7 +18584,7 @@
         "fga": 6.1,
         "ftm": 2.2,
         "fta": 3.3,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 845,
@@ -18642,7 +18642,7 @@
         "fga": 7.1,
         "ftm": 1.7,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2505,
@@ -18691,10 +18691,10 @@
       "perGame": {
         "min": 25.5,
         "pts": 9.5,
-        "reb": 2,
+        "reb": 2.0,
         "ast": 6.6,
         "stl": 1.3,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.6,
         "fgm": 3.7,
         "fga": 7.9,
@@ -18759,7 +18759,7 @@
         "fga": 12.6,
         "ftm": 2.3,
         "fta": 2.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2155,
@@ -18807,18 +18807,18 @@
       "gamesStarted": 17,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 4.2,
         "reb": 5.3,
         "ast": 1.2,
-        "stl": 1,
+        "stl": 1.0,
         "blk": 2.5,
         "to": 1.1,
         "fgm": 1.8,
         "fga": 3.7,
         "ftm": 0.7,
         "fta": 1.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1609,
@@ -18875,9 +18875,9 @@
         "to": 1.8,
         "fgm": 3.2,
         "fga": 7.9,
-        "ftm": 2,
+        "ftm": 2.0,
         "fta": 2.6,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 669,
@@ -18935,7 +18935,7 @@
         "fga": 10.5,
         "ftm": 1.4,
         "fta": 1.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1420,
@@ -18993,7 +18993,7 @@
         "fga": 6.8,
         "ftm": 1.7,
         "fta": 2.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1816,
@@ -19041,17 +19041,17 @@
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
         "min": 23.5,
-        "pts": 9,
+        "pts": 9.0,
         "reb": 1.8,
         "ast": 3.4,
         "stl": 1.2,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.8,
         "fgm": 3.5,
         "fga": 7.5,
         "ftm": 2.1,
         "fta": 2.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 399,
@@ -19105,12 +19105,12 @@
         "ast": 0.8,
         "stl": 0.5,
         "blk": 0.3,
-        "to": 1,
+        "to": 1.0,
         "fgm": 5.2,
-        "fga": 12,
+        "fga": 12.0,
         "ftm": 1.5,
         "fta": 2.7,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 141,
@@ -19169,7 +19169,7 @@
         "fga": 10.6,
         "ftm": 2.2,
         "fta": 2.9,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 1386,
@@ -19227,7 +19227,7 @@
         "fga": 18.4,
         "ftm": 4.6,
         "fta": 5.2,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2763,
@@ -19275,7 +19275,7 @@
       "gamesStarted": 18,
       "gamesSource": "minutes_based_game_estimate",
       "perGame": {
-        "min": 24,
+        "min": 24.0,
         "pts": 9.7,
         "reb": 4.9,
         "ast": 2.6,
@@ -19285,7 +19285,7 @@
         "fgm": 3.8,
         "fga": 8.4,
         "ftm": 1.9,
-        "fta": 3,
+        "fta": 3.0,
         "threes": 0.1
       },
       "totals": {
@@ -19343,8 +19343,8 @@
         "fgm": 1.6,
         "fga": 3.6,
         "ftm": 0.7,
-        "fta": 1,
-        "threes": 0
+        "fta": 1.0,
+        "threes": 0.0
       },
       "totals": {
         "min": 1552,
@@ -19398,7 +19398,7 @@
         "stl": 1.6,
         "blk": 0.1,
         "to": 1.5,
-        "fgm": 3,
+        "fgm": 3.0,
         "fga": 7.3,
         "ftm": 1.9,
         "fta": 2.3,
@@ -19455,13 +19455,13 @@
         "reb": 2.8,
         "ast": 2.6,
         "stl": 0.4,
-        "blk": 0,
+        "blk": 0.0,
         "to": 1.2,
         "fgm": 3.2,
         "fga": 8.4,
-        "ftm": 0,
+        "ftm": 0.0,
         "fta": 0.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 123,
@@ -19510,16 +19510,16 @@
       "perGame": {
         "min": 30.3,
         "pts": 21.5,
-        "reb": 10,
+        "reb": 10.0,
         "ast": 1.5,
         "stl": 0.7,
         "blk": 1.1,
         "to": 2.5,
         "fgm": 7.3,
-        "fga": 16,
-        "ftm": 7,
+        "fga": 16.0,
+        "ftm": 7.0,
         "fta": 8.4,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2488,
@@ -19574,11 +19574,11 @@
         "stl": 0.5,
         "blk": 0.2,
         "to": 1.8,
-        "fgm": 5,
+        "fgm": 5.0,
         "fga": 10.2,
         "ftm": 2.4,
         "fta": 4.1,
-        "threes": 0
+        "threes": 0.0
       },
       "totals": {
         "min": 2149,

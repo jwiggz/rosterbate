@@ -1426,6 +1426,29 @@ def source_audit_from_snapshot(schedule_results_snapshot):
     }
 
 
+def recompute_per_game_from_totals(totals, games):
+    stat_key_pairs = (
+        ("min", "min"),
+        ("pts", "pts"),
+        ("reb", "reb"),
+        ("ast", "ast"),
+        ("stl", "stl"),
+        ("blk", "blk"),
+        ("to", "to"),
+        ("fgm", "fgm"),
+        ("fga", "fga"),
+        ("ftm", "ftm"),
+        ("fta", "fta"),
+        ("threes", "threes"),
+    )
+    divisor = games if games > 0 else 0
+    per_game = {}
+    for total_key, per_game_key in stat_key_pairs:
+        total_value = to_int(totals.get(total_key))
+        per_game[per_game_key] = round_stat((total_value / divisor) if divisor else 0, 1)
+    return per_game
+
+
 def sanitize_player_source_record(player):
     cleaned = json.loads(json.dumps(player))
     season_stats = dict(cleaned.get("seasonStats") or {})
@@ -1435,8 +1458,28 @@ def sanitize_player_source_record(player):
     season_stats["games"] = games
     season_stats["gamesStarted"] = games_started
     season_stats["totals"] = totals
+    season_stats["perGame"] = recompute_per_game_from_totals(totals, games)
     cleaned["seasonStats"] = season_stats
     return cleaned
+
+
+def validate_player_source_snapshot(player_source_snapshot):
+    metadata_expectations = {
+        "packId": PACK_ID,
+        "season": SOURCE_SEASON,
+        "sourceMode": SOURCE_MODE,
+    }
+    for key, expected_value in metadata_expectations.items():
+        actual_value = player_source_snapshot.get(key)
+        if actual_value != expected_value:
+            raise RuntimeError(
+                f"Expected normalized_players.json {key} to be `{expected_value}`, found `{actual_value}`."
+            )
+
+    source_players = list(player_source_snapshot.get("players") or [])
+    if not source_players:
+        raise RuntimeError("Expected normalized_players.json to contain a non-empty `players` array.")
+    return source_players
 
 
 def build_primary_team_inferred_stint(player):
@@ -1488,9 +1531,7 @@ def main():
     source_games = list(schedule_results_snapshot.get("games") or [])
     if len(source_games) != 943:
         raise RuntimeError(f"Expected 943 regular-season games in schedule_results.json, found {len(source_games)}.")
-    source_players = list(player_source_snapshot.get("players") or [])
-    if not source_players:
-        raise RuntimeError("Expected normalized_players.json to contain a non-empty `players` array.")
+    source_players = validate_player_source_snapshot(player_source_snapshot)
 
     source_games.sort(key=lambda item: (item["gameDate"], item["sourceGameId"]))
 
