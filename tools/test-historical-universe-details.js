@@ -216,6 +216,7 @@ const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, 
 
 expectMatch(/id="recentRosterMovesList"/, 'recent roster moves list node is missing');
 expectMatch(/id="recentLeagueTradesList"/, 'recent league trades list node is missing');
+expectMatch(/Recent League Trades/, 'recent league trades heading is missing');
 expectMatch(/function isRosterChangingActivityEntry\(entry\)/, 'roster-changing activity helper is missing');
 expectMatch(/function buildRecentRosterMovesSummary\(slot, state\)/, 'recent roster moves summary helper is missing');
 expectMatch(/function isCompletedTradeActivityEntry\(entry\)/, 'completed trade activity helper is missing');
@@ -545,11 +546,11 @@ assert.equal(tradeHistoryViewModel.recentLeagueTrades.length, 5);
 assert.deepStrictEqual(
   tradeHistoryViewModel.recentLeagueTrades.map(item => item.title),
   [
-    'CPU Team 3 traded Wing Stopper to CPU Team 1 for Stretch Four',
-    'CPU Team 1 traded Bench Big to CPU Team 2 for Bench Creator',
-    'CPU Team 4 traded Rim Protector to CPU Team 5 for Lead Guard',
-    'CPU Team 6 traded Scoring Wing to CPU Team 7 for Rebounder',
-    'CPU Team 8 traded Bench Creator to CPU Team 9 for Two-Way Forward'
+    'CPU Team 3 traded Wing Stopper to CPU Team 1 for Stretch Four.',
+    'CPU Team 1 traded Bench Big to CPU Team 2 for Bench Creator.',
+    'CPU Team 4 traded Rim Protector to CPU Team 5 for Lead Guard.',
+    'CPU Team 6 traded Scoring Wing to CPU Team 7 for Rebounder.',
+    'CPU Team 8 traded Bench Creator to CPU Team 9 for Two-Way Forward.'
   ]
 );
 assert.deepStrictEqual(
@@ -575,6 +576,28 @@ const noTradeHistory = JSON.parse(JSON.stringify(
   )
 ));
 assert.deepStrictEqual(noTradeHistory.recentLeagueTrades, []);
+
+const renderedLeagueTrades = context.renderDetailList(
+  tradeHistoryViewModel.recentLeagueTrades,
+  'detail-item',
+  {
+    title: 'No recent league trades',
+    body: 'This universe has not logged completed league trades yet.'
+  }
+);
+assert.match(renderedLeagueTrades, /CPU Team 3 traded Wing Stopper to CPU Team 1 for Stretch Four/);
+assert.doesNotMatch(renderedLeagueTrades, /CPU Team 2 added Buck Williams/);
+
+const emptyLeagueTrades = context.renderDetailList(
+  noTradeHistory.recentLeagueTrades,
+  'detail-item',
+  {
+    title: 'No recent league trades',
+    body: 'This universe has not logged completed league trades yet.'
+  }
+);
+assert.match(emptyLeagueTrades, /No recent league trades/);
+assert.match(emptyLeagueTrades, /This universe has not logged completed league trades yet\./);
 
 const renderedRecentSimCard = context.renderRecentSimulationCards([viewModel.recentSimDays[0]]);
 assert.match(renderedRecentSimCard, /Audit Agents beat CPU Team 2/);

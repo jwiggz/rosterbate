@@ -351,6 +351,18 @@
               </div>
             </div>
           </article>
+
+          <article class="panel card-pad">
+            <div class="section-kicker">Recent League Trades</div>
+            <div class="section-title">Market Movement</div>
+            <div class="section-copy">The latest completed CPU trades across the league, kept compact so the archive still reads team-first.</div>
+            <div class="detail-list" id="recentLeagueTradesList">
+              <div class="detail-item">
+                <strong>Loading recent league trades</strong>
+                <span>Preparing the latest league market activity.</span>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
     </div>
@@ -1198,6 +1210,9 @@
     const recentRosterMoves = Array.isArray(detailsViewModel.recentRosterMoves)
       ? detailsViewModel.recentRosterMoves
       : [];
+    const recentLeagueTrades = Array.isArray(detailsViewModel.recentLeagueTrades)
+      ? detailsViewModel.recentLeagueTrades
+      : [];
     const seasonUrl = api.buildSeasonUrl(slot, getSport());
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
     const modeLabel = api.getModeLabel(slot.historicalEntryMode);
@@ -1255,6 +1270,15 @@
       {
         title: 'No recent roster moves',
         body: 'This universe has not logged recent team roster changes yet.'
+      }
+    );
+
+    document.getElementById('recentLeagueTradesList').innerHTML = renderDetailList(
+      recentLeagueTrades,
+      'detail-item',
+      {
+        title: 'No recent league trades',
+        body: 'This universe has not logged completed league trades yet.'
       }
     );
 
