@@ -1969,7 +1969,7 @@ function openRevealReport(day){
 }
 
 let D=null;
-let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{},dailyRevealReports:{},simulationLogsByDay:{}};
+let G={week:1,totalWeeks:17,day:1,rosters:[],ilByTeam:[],starters:[],dailyLineups:{},waiver:[],schedule:[],standings:[],tradeOffers:[],processed:new Set(),powerupsByWeek:{},dayResults:{},revealedDays:{},settledWeeks:{},isSeasonComplete:false,activityLog:[],recentDrops:[],moneyBallLocks:{},dailyRevealReports:{},simulationLogsByDay:{},cpuTradeMarketDaysProcessed:{}};
 let selectedStandingsTeamIdx=null;
 let moveCtx=null;
 let rosterTab='stats';
@@ -3397,6 +3397,7 @@ function normalizeSharedGameState(){
   if(!G.powerupsByWeek || typeof G.powerupsByWeek!=='object') G.powerupsByWeek={};
   if(!G.powerupDropsByWeek || typeof G.powerupDropsByWeek!=='object') G.powerupDropsByWeek={};
   if(!G.dailyRevealReports || typeof G.dailyRevealReports!=='object') G.dailyRevealReports={};
+  if(!G.cpuTradeMarketDaysProcessed || typeof G.cpuTradeMarketDaysProcessed!=='object') G.cpuTradeMarketDaysProcessed={};
   if(!G.waiverPriority || typeof G.waiverPriority!=='object') G.waiverPriority={};
   G.processed=new Set(Array.isArray(G.processed) ? G.processed : Array.from(G.processed||[]));
 }
@@ -3677,6 +3678,7 @@ function syncGameStateToD() {
   if (G.dailyRevealReports) D.dailyRevealReports = G.dailyRevealReports;
   if (G.simulationLogsByDay) D.simulationLogsByDay = G.simulationLogsByDay;
   if (G.recentDrops) D.recentDrops = G.recentDrops;
+  if (G.cpuTradeMarketDaysProcessed) D.cpuTradeMarketDaysProcessed = G.cpuTradeMarketDaysProcessed;
   if (G.powerupInventory) D.powerupInventory = G.powerupInventory;
   if (G.powerupsByWeek) D.powerupsByWeek = G.powerupsByWeek;
   if (G.powerupDropsByWeek) D.powerupDropsByWeek = G.powerupDropsByWeek;
@@ -4546,6 +4548,24 @@ function shouldRunCpuTradeMarketForDay(day){
   return isCpuTradeSimulationUniverse() && numericDay > 1 && numericDay % 3 === 0;
 }
 
+function getCpuTradeMarketProcessedDays(){
+  if(!G.cpuTradeMarketDaysProcessed || typeof G.cpuTradeMarketDaysProcessed!=='object') G.cpuTradeMarketDaysProcessed={};
+  return G.cpuTradeMarketDaysProcessed;
+}
+
+function hasCpuTradeMarketRunForDay(day){
+  const numericDay=Number(day || 0);
+  if(!Number.isFinite(numericDay) || numericDay<=0) return false;
+  return !!getCpuTradeMarketProcessedDays()[String(numericDay)];
+}
+
+function markCpuTradeMarketRunForDay(day){
+  const numericDay=Number(day || 0);
+  if(!Number.isFinite(numericDay) || numericDay<=0) return false;
+  getCpuTradeMarketProcessedDays()[String(numericDay)] = true;
+  return true;
+}
+
 function getCpuTradeProtectedPlayerIds(teamIdx, day, rosterNeed){
   const roster=G.rosters[teamIdx]||[];
   const protectedIds=new Set();
@@ -4728,6 +4748,8 @@ function executeCpuTradeProposal(proposal, options){
 function runCpuTradeMarketForDay(day, options){
   const numericDay=Number(day || G.day || 1);
   if(!shouldRunCpuTradeMarketForDay(numericDay)) return {changed:false,tradesCompleted:0};
+  if(hasCpuTradeMarketRunForDay(numericDay)) return {changed:false,tradesCompleted:0};
+  markCpuTradeMarketRunForDay(numericDay);
 
   const cpuTeams=Array.from({length:G.rosters.length},(_,teamIdx)=>teamIdx)
     .filter(teamIdx=>isCpuManagedTeam(teamIdx));
@@ -7312,6 +7334,7 @@ function initSeason(){
     G.powerupDropsByWeek = D.powerupDropsByWeek || {};
     G.dayResults = D.dayResults || {};
     G.revealedDays = D.revealedDays || {};
+    G.cpuTradeMarketDaysProcessed = D.cpuTradeMarketDaysProcessed || G.cpuTradeMarketDaysProcessed || {};
     G.settledWeeks = D.settledWeeks || {};
     G.activityLog = D.activityLog || [];
     G.dailyRevealReports = D.dailyRevealReports || {};
@@ -7370,9 +7393,10 @@ function initSeason(){
     D.simulationLogsByDay={};
     D.recentDrops=[];
     D.moneyBallLocks={};
+    D.cpuTradeMarketDaysProcessed={};
     D.waiverPriority={};
     G.standings=Array.from({length:n},(_,i)=>({teamIdx:i,w:0,l:0,pf:0,pa:0,streak:0,streakW:true}));
-    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.dailyRevealReports={};G.simulationLogsByDay={};G.recentDrops=[];G.moneyBallLocks={};
+    G.week=1;G.day=1;G.processed=new Set();G.tradeOffers=[];G.dailyLineups={};G.powerupsByWeek={};G.powerupInventory=null;G.powerupDropsByWeek={};G.dayResults={};G.revealedDays={};G.settledWeeks={};G.isSeasonComplete=false;G.activityLog=[];G.dailyRevealReports={};G.simulationLogsByDay={};G.recentDrops=[];G.moneyBallLocks={};G.cpuTradeMarketDaysProcessed={};
   }
   
   console.log('? All G properties initialized');

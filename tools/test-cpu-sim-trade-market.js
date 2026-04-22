@@ -93,6 +93,9 @@ const buildCpuTradeRosterNeedSummarySource = extractFunctionSource('buildCpuTrad
 const getCpuTradeProtectedPlayerIdsSource = extractFunctionSource('getCpuTradeProtectedPlayerIds');
 const getCpuTradeOutgoingCandidatesSource = extractFunctionSource('getCpuTradeOutgoingCandidates');
 const getCpuTradeIncomingFitScoreSource = extractFunctionSource('getCpuTradeIncomingFitScore');
+const getCpuTradeMarketProcessedDaysSource = extractFunctionSource('getCpuTradeMarketProcessedDays');
+const hasCpuTradeMarketRunForDaySource = extractFunctionSource('hasCpuTradeMarketRunForDay');
+const markCpuTradeMarketRunForDaySource = extractFunctionSource('markCpuTradeMarketRunForDay');
 const buildCpuTradeProposalForPairSource = extractFunctionSource('buildCpuTradeProposalForPair');
 const executeCpuTradeProposalSource = extractFunctionSource('executeCpuTradeProposal');
 const runCpuTradeMarketForDaySource = extractFunctionSource('runCpuTradeMarketForDay');
@@ -148,7 +151,8 @@ function buildContext(options = {}) {
       rosters: rosters.map(team => team.map(player => ({ ...player }))),
       starters: starters.map(team => team.slice()),
       activityLog: [],
-      tradeOffers: []
+      tradeOffers: [],
+      cpuTradeMarketDaysProcessed: { ...(options.cpuTradeMarketDaysProcessed || {}) }
     },
     Number,
     Math,
@@ -304,6 +308,9 @@ function buildContext(options = {}) {
       getCpuTradeProtectedPlayerIdsSource,
       getCpuTradeOutgoingCandidatesSource,
       getCpuTradeIncomingFitScoreSource,
+      getCpuTradeMarketProcessedDaysSource,
+      hasCpuTradeMarketRunForDaySource,
+      markCpuTradeMarketRunForDaySource,
       buildCpuTradeProposalForPairSource,
       executeCpuTradeProposalSource,
       runCpuTradeMarketForDaySource,
@@ -391,6 +398,31 @@ function buildContext(options = {}) {
   assert.ok(context.G.rosters[2].some(player => Number(player.id) === 301));
   assert.equal(activityCalls.filter(entry => entry.type === 'trade').length, 1);
   assert.ok(lineupCalls.includes(1) && lineupCalls.includes(2));
+
+  const replayContext = buildContext({
+    day: 3,
+    rosters: context.G.rosters.map(team => team.map(player => ({ ...player }))),
+    starters: context.G.starters.map(team => team.slice()),
+    tradeNeedByTeam: {
+      1: {
+        positionNeed: { G: 2, F: 0, C: 0 },
+        roleNeed: { scoring: 0, playmaking: 2, rebounding: 0, defense: 0 }
+      },
+      2: {
+        positionNeed: { G: 0, F: 0, C: 2 },
+        roleNeed: { scoring: 0, playmaking: 0, rebounding: 2, defense: 0 }
+      },
+      3: {
+        positionNeed: { G: 0, F: 0, C: 0 },
+        roleNeed: { scoring: 0, playmaking: 0, rebounding: 0, defense: 0 }
+      }
+    },
+    cpuTradeMarketDaysProcessed: { 3: true }
+  });
+  const replayResult = replayContext.context.maintainCpuLeagueRosters({ day: 3 });
+  assert.equal(replayResult.tradesCompleted, 0);
+  assert.equal(replayContext.activityCalls.length, 0);
+  assert.equal(replayContext.lineupCalls.length, 0);
 }
 
 {
