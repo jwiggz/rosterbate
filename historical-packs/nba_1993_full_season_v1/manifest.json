@@ -1,0 +1,90 @@
+{
+  "packId": "nba_1993_full_season_v1",
+  "schemaVersion": 1,
+  "canonicalModelVersion": 1,
+  "sport": "nba",
+  "league": "nba",
+  "seasonId": "nba_1993_historic",
+  "seasonLabel": "1992-93 NBA Historic Season",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "era": "1990s",
+  "version": 1,
+  "status": "ready",
+  "sourceProfile": "historical_curated",
+  "buildSourceMode": "foundation_snapshot",
+  "missingSourceFeeds": [
+    "nbastats_1992",
+    "pbpstats_1992"
+  ],
+  "supportedModes": [
+    "real_season",
+    "historical_draft",
+    "single_player_season",
+    "reimagined_season"
+  ],
+  "defaultEntryMode": "real_season",
+  "focusTeamId": "nba_1993_chi",
+  "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 replay foundation centered on the Bulls.",
+  "description": "A playable 1992-93 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
+  "tagline": "Replay the Jordan-Barkley-Pippen season with real scores and disclosed inferred box lines.",
+  "eraTags": [
+    "1990s",
+    "First Three-Peat Prestige",
+    "Historic Season"
+  ],
+  "packTags": [
+    "historical-full-league-foundation",
+    "single-player",
+    "historical-draft",
+    "reimagined-season",
+    "featured-pack"
+  ],
+  "playerPoolType": "full_season_player_pool",
+  "draftModes": [
+    "snake",
+    "auction"
+  ],
+  "challengeProfile": "featured_team_plus_open_draft",
+  "contentFiles": {
+    "season": "season.json",
+    "teams": "teams.json",
+    "players": "players.json",
+    "rosterSnapshots": "roster_snapshots.json",
+    "schedule": "schedule.json",
+    "games": "games.json",
+    "playerGameStats": "player_game_stats.json",
+    "packChallenges": "optional/pack_challenges.json",
+    "presentation": "optional/presentation.json",
+    "summaries": "optional/summaries.json"
+  },
+  "provenance": {
+    "sourceProfile": "historical_curated",
+    "curationOwner": "RosterBate",
+    "reviewStatus": "draft",
+    "importNotes": "1992-93 live nbastats_1992 / pbpstats_1992 feeds are absent. Normal builds consume the checked-in mixed-source schedule snapshot plus the checked-in normalized player source snapshot, then emit deterministic inferred player-game rows against each player's canonical primary-team schedule lane."
+  },
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 392,
+      "playerCount": 392,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 0,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "notes": [
+    "The 27-team league map uses era-appropriate 1992-93 abbreviations, including CHH, GOS, SAN, UTH, and WAS.",
+    "Schedule/results span the full 1107-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
+    "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
+    "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable and replayable."
+  ],
+  "createdAt": "2026-04-22T19:45:57.617Z",
+  "updatedAt": "2026-04-22T19:45:57.617Z"
+}

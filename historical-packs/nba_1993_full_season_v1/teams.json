@@ -1,0 +1,515 @@
+[
+  {
+    "teamId": "nba_1993_atl",
+    "seasonId": "nba_1993_historic",
+    "city": "Atlanta",
+    "name": "Hawks",
+    "displayName": "Atlanta Hawks",
+    "abbreviation": "ATL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#9D2235",
+      "secondary": "#FDB927"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ATL",
+      "theBasketballDatabasePage": "1992-93ATLRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Atlanta Hawks season"
+    }
+  },
+  {
+    "teamId": "nba_1993_bos",
+    "seasonId": "nba_1993_historic",
+    "city": "Boston",
+    "name": "Celtics",
+    "displayName": "Boston Celtics",
+    "abbreviation": "BOS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#007A33",
+      "secondary": "#BA9653"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "BOS",
+      "theBasketballDatabasePage": "1992-93BOSRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Boston Celtics season"
+    }
+  },
+  {
+    "teamId": "nba_1993_chh",
+    "seasonId": "nba_1993_historic",
+    "city": "Charlotte",
+    "name": "Hornets",
+    "displayName": "Charlotte Hornets",
+    "abbreviation": "CHH",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#00788C",
+      "secondary": "#5A2D81"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHH",
+      "theBasketballDatabasePage": "1992-93CHHRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Charlotte Hornets season"
+    }
+  },
+  {
+    "teamId": "nba_1993_chi",
+    "seasonId": "nba_1993_historic",
+    "city": "Chicago",
+    "name": "Bulls",
+    "displayName": "Chicago Bulls",
+    "abbreviation": "CHI",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#CE1141",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CHI",
+      "theBasketballDatabasePage": "1992-93CHIRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Chicago Bulls season"
+    }
+  },
+  {
+    "teamId": "nba_1993_cle",
+    "seasonId": "nba_1993_historic",
+    "city": "Cleveland",
+    "name": "Cavaliers",
+    "displayName": "Cleveland Cavaliers",
+    "abbreviation": "CLE",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#860038",
+      "secondary": "#FDBB30"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "CLE",
+      "theBasketballDatabasePage": "1992-93CLERegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Cleveland Cavaliers season"
+    }
+  },
+  {
+    "teamId": "nba_1993_det",
+    "seasonId": "nba_1993_historic",
+    "city": "Detroit",
+    "name": "Pistons",
+    "displayName": "Detroit Pistons",
+    "abbreviation": "DET",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#C8102E",
+      "secondary": "#1D42BA"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DET",
+      "theBasketballDatabasePage": "1992-93DETRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Detroit Pistons season"
+    }
+  },
+  {
+    "teamId": "nba_1993_ind",
+    "seasonId": "nba_1993_historic",
+    "city": "Indiana",
+    "name": "Pacers",
+    "displayName": "Indiana Pacers",
+    "abbreviation": "IND",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#002D62",
+      "secondary": "#FDBB30"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "IND",
+      "theBasketballDatabasePage": "1992-93INDRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Indiana Pacers season"
+    }
+  },
+  {
+    "teamId": "nba_1993_mia",
+    "seasonId": "nba_1993_historic",
+    "city": "Miami",
+    "name": "Heat",
+    "displayName": "Miami Heat",
+    "abbreviation": "MIA",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#98002E",
+      "secondary": "#F9A01B"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIA",
+      "theBasketballDatabasePage": "1992-93MIARegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Miami Heat season"
+    }
+  },
+  {
+    "teamId": "nba_1993_mil",
+    "seasonId": "nba_1993_historic",
+    "city": "Milwaukee",
+    "name": "Bucks",
+    "displayName": "Milwaukee Bucks",
+    "abbreviation": "MIL",
+    "conference": "East",
+    "division": "Central",
+    "palette": {
+      "primary": "#00471B",
+      "secondary": "#EEE1C6"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIL",
+      "theBasketballDatabasePage": "1992-93MILRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Milwaukee Bucks season"
+    }
+  },
+  {
+    "teamId": "nba_1993_njn",
+    "seasonId": "nba_1993_historic",
+    "city": "New Jersey",
+    "name": "Nets",
+    "displayName": "New Jersey Nets",
+    "abbreviation": "NJN",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#000000",
+      "secondary": "#FFFFFF"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NJN",
+      "theBasketballDatabasePage": "1992-93NJNRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 New Jersey Nets season"
+    }
+  },
+  {
+    "teamId": "nba_1993_nyk",
+    "seasonId": "nba_1993_historic",
+    "city": "New York",
+    "name": "Knicks",
+    "displayName": "New York Knicks",
+    "abbreviation": "NYK",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#006BB6",
+      "secondary": "#F58426"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "NYK",
+      "theBasketballDatabasePage": "1992-93NYKRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 New York Knicks season"
+    }
+  },
+  {
+    "teamId": "nba_1993_orl",
+    "seasonId": "nba_1993_historic",
+    "city": "Orlando",
+    "name": "Magic",
+    "displayName": "Orlando Magic",
+    "abbreviation": "ORL",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#0077C0",
+      "secondary": "#C4CED4"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "ORL",
+      "theBasketballDatabasePage": "1992-93ORLRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Orlando Magic season"
+    }
+  },
+  {
+    "teamId": "nba_1993_phl",
+    "seasonId": "nba_1993_historic",
+    "city": "Philadelphia",
+    "name": "76ers",
+    "displayName": "Philadelphia 76ers",
+    "abbreviation": "PHL",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#006BB6",
+      "secondary": "#ED174C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHL",
+      "theBasketballDatabasePage": "1992-93PHLRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Philadelphia 76ers season"
+    }
+  },
+  {
+    "teamId": "nba_1993_was",
+    "seasonId": "nba_1993_historic",
+    "city": "Washington",
+    "name": "Bullets",
+    "displayName": "Washington Bullets",
+    "abbreviation": "WAS",
+    "conference": "East",
+    "division": "Atlantic",
+    "palette": {
+      "primary": "#C8102E",
+      "secondary": "#002B5C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "WAS",
+      "theBasketballDatabasePage": "1992-93WASRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Washington Bullets season"
+    }
+  },
+  {
+    "teamId": "nba_1993_dal",
+    "seasonId": "nba_1993_historic",
+    "city": "Dallas",
+    "name": "Mavericks",
+    "displayName": "Dallas Mavericks",
+    "abbreviation": "DAL",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#00538C",
+      "secondary": "#B8C4CA"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DAL",
+      "theBasketballDatabasePage": "1992-93DALRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Dallas Mavericks season"
+    }
+  },
+  {
+    "teamId": "nba_1993_den",
+    "seasonId": "nba_1993_historic",
+    "city": "Denver",
+    "name": "Nuggets",
+    "displayName": "Denver Nuggets",
+    "abbreviation": "DEN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#0E2240",
+      "secondary": "#FEC524"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "DEN",
+      "theBasketballDatabasePage": "1992-93DENRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Denver Nuggets season"
+    }
+  },
+  {
+    "teamId": "nba_1993_gos",
+    "seasonId": "nba_1993_historic",
+    "city": "Golden State",
+    "name": "Warriors",
+    "displayName": "Golden State Warriors",
+    "abbreviation": "GOS",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1D428A",
+      "secondary": "#FFC72C"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "GOS",
+      "theBasketballDatabasePage": "1992-93GOSRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Golden State Warriors season"
+    }
+  },
+  {
+    "teamId": "nba_1993_hou",
+    "seasonId": "nba_1993_historic",
+    "city": "Houston",
+    "name": "Rockets",
+    "displayName": "Houston Rockets",
+    "abbreviation": "HOU",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#CE1141",
+      "secondary": "#C4CED4"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "HOU",
+      "theBasketballDatabasePage": "1992-93HOURegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Houston Rockets season"
+    }
+  },
+  {
+    "teamId": "nba_1993_lac",
+    "seasonId": "nba_1993_historic",
+    "city": "Los Angeles",
+    "name": "Clippers",
+    "displayName": "LA Clippers",
+    "abbreviation": "LAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#ED174C",
+      "secondary": "#1D428A"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAC",
+      "theBasketballDatabasePage": "1992-93LACRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 LA Clippers season"
+    }
+  },
+  {
+    "teamId": "nba_1993_lal",
+    "seasonId": "nba_1993_historic",
+    "city": "Los Angeles",
+    "name": "Lakers",
+    "displayName": "Los Angeles Lakers",
+    "abbreviation": "LAL",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#552583",
+      "secondary": "#FDB927"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "LAL",
+      "theBasketballDatabasePage": "1992-93LALRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Los Angeles Lakers season"
+    }
+  },
+  {
+    "teamId": "nba_1993_min",
+    "seasonId": "nba_1993_historic",
+    "city": "Minnesota",
+    "name": "Timberwolves",
+    "displayName": "Minnesota Timberwolves",
+    "abbreviation": "MIN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#0C2340",
+      "secondary": "#236192"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "MIN",
+      "theBasketballDatabasePage": "1992-93MINRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Minnesota Timberwolves season"
+    }
+  },
+  {
+    "teamId": "nba_1993_phx",
+    "seasonId": "nba_1993_historic",
+    "city": "Phoenix",
+    "name": "Suns",
+    "displayName": "Phoenix Suns",
+    "abbreviation": "PHX",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#1D1160",
+      "secondary": "#E56020"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "PHX",
+      "theBasketballDatabasePage": "1992-93PHXRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Phoenix Suns season"
+    }
+  },
+  {
+    "teamId": "nba_1993_por",
+    "seasonId": "nba_1993_historic",
+    "city": "Portland",
+    "name": "Trail Blazers",
+    "displayName": "Portland Trail Blazers",
+    "abbreviation": "POR",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#E03A3E",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "POR",
+      "theBasketballDatabasePage": "1992-93PORRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Portland Trail Blazers season"
+    }
+  },
+  {
+    "teamId": "nba_1993_sac",
+    "seasonId": "nba_1993_historic",
+    "city": "Sacramento",
+    "name": "Kings",
+    "displayName": "Sacramento Kings",
+    "abbreviation": "SAC",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#5A2D81",
+      "secondary": "#63727A"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAC",
+      "theBasketballDatabasePage": "1992-93SACRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Sacramento Kings season"
+    }
+  },
+  {
+    "teamId": "nba_1993_san",
+    "seasonId": "nba_1993_historic",
+    "city": "San Antonio",
+    "name": "Spurs",
+    "displayName": "San Antonio Spurs",
+    "abbreviation": "SAN",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#C4CED4",
+      "secondary": "#000000"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SAN",
+      "theBasketballDatabasePage": "1992-93SANRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 San Antonio Spurs season"
+    }
+  },
+  {
+    "teamId": "nba_1993_sea",
+    "seasonId": "nba_1993_historic",
+    "city": "Seattle",
+    "name": "SuperSonics",
+    "displayName": "Seattle SuperSonics",
+    "abbreviation": "SEA",
+    "conference": "West",
+    "division": "Pacific",
+    "palette": {
+      "primary": "#00653A",
+      "secondary": "#FFC200"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "SEA",
+      "theBasketballDatabasePage": "1992-93SEARegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Seattle SuperSonics season"
+    }
+  },
+  {
+    "teamId": "nba_1993_uth",
+    "seasonId": "nba_1993_historic",
+    "city": "Utah",
+    "name": "Jazz",
+    "displayName": "Utah Jazz",
+    "abbreviation": "UTH",
+    "conference": "West",
+    "division": "Midwest",
+    "palette": {
+      "primary": "#002B5C",
+      "secondary": "#00471B"
+    },
+    "externalRefs": {
+      "sourceTeamCode": "UTH",
+      "theBasketballDatabasePage": "1992-93UTHRegularSeasonBoxScore.html",
+      "wikipediaSeasonPage": "1992\u201393 Utah Jazz season"
+    }
+  }
+]

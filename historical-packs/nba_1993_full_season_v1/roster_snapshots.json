@@ -1,0 +1,3530 @@
+[
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "788",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "302",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "1122",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "278",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "273",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "402",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "76842",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "228",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "1667",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "77496",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "78656",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "323",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "1874",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_atl",
+    "playerId": "76247",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "77384",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "333",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "244",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "1365",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "428",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "305",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "1450",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "170",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "76001",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "296",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "31",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "291",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "76082",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "77294",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "76123",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_bos",
+    "playerId": "78478",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "913",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "177",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "297",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "383",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "209",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "930",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "271",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "766",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "76148",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "77426",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chh",
+    "playerId": "76826",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "937",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "893",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "270",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "769",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "281",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "351",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "77820",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "1622",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "76362",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "78375",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "781",
+    "rosterRole": "starter",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "78437",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "101258",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "76676",
+    "rosterRole": "rotation",
+    "depthTag": "PG7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_chi",
+    "playerId": "76184",
+    "rosterRole": "bench",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "77685",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "921",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "899",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "378",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "73",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "786",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "210",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "198",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "78059",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "174",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "76904",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "184",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_cle",
+    "playerId": "77335",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "426",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "157",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "77098",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "399",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "1603",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "475",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "1839",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "77065",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "1106",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "754",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "76337",
+    "rosterRole": "starter",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "78528",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "100",
+    "rosterRole": "starter",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "929",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "76097",
+    "rosterRole": "rotation",
+    "depthTag": "PG7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "78273",
+    "rosterRole": "rotation",
+    "depthTag": "PG8",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "77794",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_dal",
+    "playerId": "76488",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "87",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "111",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "199",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "51",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "123",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "77386",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "1855",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "179",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "77387",
+    "rosterRole": "starter",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "77865",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "76968",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "67",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "76265",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "78493",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_den",
+    "playerId": "438",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "247",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "78318",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "23",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "371",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "100263",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "78615",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "178",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "76016",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "78633",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "76821",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "1116",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "1821",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "77647",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_det",
+    "playerId": "78041",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "84",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "896",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "238",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "904",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "2349",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "423",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "146",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "780",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "182",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "81",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "36",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "925",
+    "rosterRole": "rotation",
+    "depthTag": "SG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "78227",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "77879",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "77697",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "175",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "24",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "1432",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "1090",
+    "rosterRole": "rotation",
+    "depthTag": "SF8",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_gos",
+    "playerId": "78251",
+    "rosterRole": "bench",
+    "depthTag": "PG7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "165",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "901",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "109",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "137",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "181",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "61",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "418",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "672",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "76782",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "76726",
+    "rosterRole": "starter",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "78589",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "78014",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_hou",
+    "playerId": "78304",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "96",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "397",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "905",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "71",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "22",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "45",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "313",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "417",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "78555",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "78",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "907",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "1068",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_ind",
+    "playerId": "76875",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "349",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "166",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "330",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "80",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "919",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "78412",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "78554",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "202",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "914",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "78404",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "76431",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "1114",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "771",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "1010",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lac",
+    "playerId": "78464",
+    "rosterRole": "rotation",
+    "depthTag": "PG7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "9",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "920",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "124",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "1460",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "2",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "64",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "922",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "324",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "380",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "1030",
+    "rosterRole": "starter",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "229",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "57",
+    "rosterRole": "rotation",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_lal",
+    "playerId": "76180",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "779",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "3",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "938",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "902",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "216",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "120",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "927",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "114",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "236",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "173",
+    "rosterRole": "starter",
+    "depthTag": "SG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "416",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "761",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mia",
+    "playerId": "77251",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "898",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "785",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "783",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "138",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "103",
+    "rosterRole": "starter",
+    "depthTag": "SG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "38",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "122",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "195",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "7",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "926",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "468",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "400",
+    "rosterRole": "rotation",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "77449",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "77890",
+    "rosterRole": "rotation",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_mil",
+    "playerId": "1628",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "28",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "456",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "363",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "52",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "737",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "280",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "1847",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "1814",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "26",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "76183",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "78110",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "77486",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_min",
+    "playerId": "78415",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "934",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "77845",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "356",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "72",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "76217",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "716",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "359",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "912",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "201",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "328",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "76385",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "77264",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "76801",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "420",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "368",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "77358",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "77776",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_njn",
+    "playerId": "77053",
+    "rosterRole": "bench",
+    "depthTag": "C4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "121",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "317",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "193",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "891",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "293",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "21",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "470",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "76176",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "76338",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "93",
+    "rosterRole": "starter",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "1006",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "944",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_nyk",
+    "playerId": "77260",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "101",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "406",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "98",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "194",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "78347",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "192",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "140",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "78381",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "1036",
+    "rosterRole": "rotation",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "1123",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "70",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "767",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "183",
+    "rosterRole": "rotation",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "76450",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_orl",
+    "playerId": "78621",
+    "rosterRole": "bench",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "765",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "204",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "221",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "897",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "457",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "288",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "1008",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "76046",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "285",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "76195",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "1593",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "78534",
+    "rosterRole": "rotation",
+    "depthTag": "C4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "77822",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phl",
+    "playerId": "77208",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "105",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "787",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "76017",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "134",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "1472",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "76",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "30",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "770",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "77146",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "932",
+    "rosterRole": "starter",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "1861",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "1054",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "1118",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_phx",
+    "playerId": "78261",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "345",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "393",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "361",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "433",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "17",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "53",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "760",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "404",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "95",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "145",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "77138",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "341",
+    "rosterRole": "rotation",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "78035",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_por",
+    "playerId": "78201",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "1489",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "47",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "892",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "782",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "41",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "753",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "1005",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "77019",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "190",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "77372",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "432",
+    "rosterRole": "starter",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "77905",
+    "rosterRole": "starter",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "55",
+    "rosterRole": "rotation",
+    "depthTag": "SF7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "1080",
+    "rosterRole": "rotation",
+    "depthTag": "SF8",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sac",
+    "playerId": "77261",
+    "rosterRole": "bench",
+    "depthTag": "SF9",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "764",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "107",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "251",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "422",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "156",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "462",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "1380",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "219",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "78195",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "116",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "335",
+    "rosterRole": "rotation",
+    "depthTag": "SG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "694",
+    "rosterRole": "rotation",
+    "depthTag": "SG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "76876",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "76138",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "187",
+    "rosterRole": "rotation",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_san",
+    "playerId": "77777",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "431",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "365",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "56",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "894",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "262",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "698",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "203",
+    "rosterRole": "starter",
+    "depthTag": "SG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "344",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "355",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "104",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "77789",
+    "rosterRole": "rotation",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "88",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_sea",
+    "playerId": "1101",
+    "rosterRole": "bench",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "252",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "304",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "895",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "117",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "77081",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "128",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "1479",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "1474",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "76631",
+    "rosterRole": "starter",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "1128",
+    "rosterRole": "rotation",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "1134",
+    "rosterRole": "rotation",
+    "depthTag": "C2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "180",
+    "rosterRole": "rotation",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_uth",
+    "playerId": "76583",
+    "rosterRole": "rotation",
+    "depthTag": "C3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "339",
+    "rosterRole": "starter",
+    "depthTag": "SF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "265",
+    "rosterRole": "starter",
+    "depthTag": "SF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "149",
+    "rosterRole": "starter",
+    "depthTag": "PG1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "1125",
+    "rosterRole": "starter",
+    "depthTag": "SF3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "442",
+    "rosterRole": "starter",
+    "depthTag": "PF1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "78194",
+    "rosterRole": "starter",
+    "depthTag": "SF4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "77130",
+    "rosterRole": "starter",
+    "depthTag": "SF5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "279",
+    "rosterRole": "starter",
+    "depthTag": "PF2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "364",
+    "rosterRole": "starter",
+    "depthTag": "PG2",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "77",
+    "rosterRole": "starter",
+    "depthTag": "PG3",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "85",
+    "rosterRole": "starter",
+    "depthTag": "PG4",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "931",
+    "rosterRole": "starter",
+    "depthTag": "SF6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "76009",
+    "rosterRole": "rotation",
+    "depthTag": "C1",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "77096",
+    "rosterRole": "rotation",
+    "depthTag": "PG5",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "76316",
+    "rosterRole": "rotation",
+    "depthTag": "PG6",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  },
+  {
+    "seasonId": "nba_1993_historic",
+    "teamId": "nba_1993_was",
+    "playerId": "1683",
+    "rosterRole": "rotation",
+    "depthTag": "PG7",
+    "startDate": "1992-11-06",
+    "endDate": "1993-04-25"
+  }
+]

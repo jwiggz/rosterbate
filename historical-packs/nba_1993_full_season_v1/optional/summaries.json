@@ -1,0 +1,70 @@
+{
+  "packSummary": "The 1992-93 foundation pack brings the full 27-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
+  "featuredStorylines": [
+    "The Bulls headline the pack as the featured prestige lane, with Jordan's title chase defining the front door.",
+    "Phoenix and Chicago keep the Barkley-Jordan Finals collision alive, while New York and the rest of the East keep the season from collapsing into a one-team nostalgia pack.",
+    "Every included game result is real, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth."
+  ],
+  "teamSpotlights": [
+    {
+      "teamId": "nba_1993_chi",
+      "summary": "Chicago is the flagship prestige route, built around Jordan, Pippen, and the first three-peat front door."
+    },
+    {
+      "teamId": "nba_1993_phx",
+      "summary": "Phoenix keeps Barkley's challenger Suns at full strength as the Finals counterweight."
+    },
+    {
+      "teamId": "nba_1993_nyk",
+      "summary": "New York anchors the East contention lane and keeps the playoff chase from narrowing to just Chicago and Phoenix."
+    },
+    {
+      "teamId": "nba_1993_sea",
+      "summary": "Seattle carries the West's top-seed pressure track and the best non-Finals challenger lane."
+    },
+    {
+      "teamId": "nba_1993_orl",
+      "summary": "Orlando gives the expansion-era growth story a real 1992-93 home inside the playable league."
+    }
+  ],
+  "modeSummaries": [
+    {
+      "mode": "real_season",
+      "summary": "Replay the real 1992-93 campaign from opening night through the final regular-season standings."
+    },
+    {
+      "mode": "historical_draft",
+      "summary": "Reshuffle the full Jordan-Barkley-Pippen player pool and discover how the era changes under a custom draft."
+    },
+    {
+      "mode": "reimagined_season",
+      "summary": "Branch into an alternate-history 1992-93 universe while keeping the same real team and player foundation."
+    }
+  ],
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 392,
+      "playerCount": 392,
+      "label": "Real season stats"
+    },
+    "zeroGamePlayers": {
+      "count": 0,
+      "label": "Zero-game players"
+    },
+    "removedInvalidPlayers": {
+      "count": 0,
+      "label": "Removed invalid players"
+    }
+  },
+  "buildSourceMode": "foundation_snapshot",
+  "missingSourceFeeds": [
+    "nbastats_1992",
+    "pbpstats_1992"
+  ],
+  "auditNotes": [
+    "Live nbastats_1992 / pbpstats_1992 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
+    "Normal builds are reproducible from checked-in source artifacts and do not need live Wikipedia, TheBasketballDatabase, or list-data fetches.",
+    "Schedule and results cover the complete regular season from a mixed-source checked-in snapshot where the FiveThirtyEight backfill supplies more than half the games.",
+    "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate and is emitted only for the player's canonical teamId."
+  ]
+}

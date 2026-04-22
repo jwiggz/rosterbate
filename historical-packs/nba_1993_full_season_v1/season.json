@@ -1,0 +1,21 @@
+{
+  "seasonId": "nba_1993_historic",
+  "sport": "nba",
+  "league": "nba",
+  "label": "1992-93 NBA Historic Season",
+  "startDate": "1992-11-06",
+  "endDate": "1993-04-25",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "eraTags": [
+    "1990s",
+    "First Three-Peat Prestige",
+    "Historic Season"
+  ],
+  "notes": [
+    "This pack uses the real 1992-93 regular-season schedule and final scores.",
+    "Normal builds consume checked-in schedule and normalized player source snapshots rather than live network fetches.",
+    "Player season totals originate from curated checked-in historical source artifacts.",
+    "Player-game rows are deterministic season-average weighted estimates because live 1992 play-by-play feeds are absent."
+  ]
+}

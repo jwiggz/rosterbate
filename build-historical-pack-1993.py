@@ -29,6 +29,7 @@ SOURCE_SEASON = "1992-93"
 SOURCE_SEASON_KEY = "1992"
 REGULAR_SEASON_START = "1992-11-06"
 REGULAR_SEASON_END = "1993-04-25"
+EXPECTED_REGULAR_SEASON_GAMES = 1107
 SOURCE_MODE = "foundation_snapshot"
 ENTITY_PREFIX = "nba_1993"
 ERA_KEY = "1990s"
@@ -940,10 +941,16 @@ def parse_wikipedia_schedule_entries(team, page_title, page_html, alias_map):
             if record_tuple is not None:
                 previous_record = record_tuple
 
-            game_date = parse_wikipedia_date(cells[date_index]["text"])
+            try:
+                game_date = parse_wikipedia_date(cells[date_index]["text"])
+            except RuntimeError:
+                continue
+            if game_date < REGULAR_SEASON_START or game_date > REGULAR_SEASON_END:
+                continue
             opponent_raw = normalize_whitespace(cells[opponent_index]["text"])
             is_away = bool(re.match(r"^(?:@\s*|at\s+|vs\.?\s+)", opponent_raw, re.I))
             opponent_clean = re.sub(r"^(?:@\s*|at\s+|vs\.?\s+)", "", opponent_raw, flags=re.I).strip()
+            opponent_clean = re.sub(r"\s*\(.*?\)\s*$", "", opponent_clean).strip()
             opponent_abbr = alias_map.get(normalize_name(opponent_clean))
             if not opponent_abbr:
                 raise RuntimeError(f"Unable to map Wikipedia opponent label `{opponent_clean}` on `{page_title}`.")
@@ -1031,6 +1038,7 @@ def parse_nbaallelo_schedule():
         "ATL": "ATL",
         "BOS": "BOS",
         "CHI": "CHI",
+        "CHH": "CHH",
         "CLE": "CLE",
         "DAL": "DAL",
         "DEN": "DEN",
@@ -1040,9 +1048,12 @@ def parse_nbaallelo_schedule():
         "IND": "IND",
         "LAC": "LAC",
         "LAL": "LAL",
+        "MIA": "MIA",
         "MIL": "MIL",
+        "MIN": "MIN",
         "NJN": "NJN",
         "NYK": "NYK",
+        "ORL": "ORL",
         "PHI": "PHL",
         "PHO": "PHX",
         "POR": "POR",
@@ -1091,8 +1102,6 @@ def parse_nbaallelo_schedule():
 
 def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_abbr, source_audit):
     elo_games = parse_nbaallelo_schedule()
-    if len(elo_games) != 943:
-        raise RuntimeError(f"Expected 943 regular-season games from nbaallelo, found {len(elo_games)}.")
 
     alias_map = build_team_alias_map(team_defs)
     wiki_matched_games = set()
@@ -1109,12 +1118,22 @@ def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_
         for entry in wiki_entries:
             source_key = entry["sourceGameId"]
             reverse_key = f"{entry['gameDate'].replace('-', '')}_{entry['homeTeamAbbr'].lower()}_{entry['awayTeamAbbr'].lower()}"
-            resolved_key = source_key if source_key in elo_games else reverse_key if reverse_key in elo_games else ""
-            if not resolved_key:
-                unmatched_wiki_rows.append(entry)
-                continue
+            resolved_key = source_key if source_key in elo_games else reverse_key if reverse_key in elo_games else source_key
 
-            target = elo_games[resolved_key]
+            target = elo_games.get(resolved_key)
+            if target is None:
+                target = {
+                    "sourceGameId": resolved_key,
+                    "gameDate": entry["gameDate"],
+                    "homeTeamAbbr": entry["homeTeamAbbr"],
+                    "awayTeamAbbr": entry["awayTeamAbbr"],
+                    "homeScore": entry["homeScore"],
+                    "awayScore": entry["awayScore"],
+                    "sourceTypes": [],
+                    "sourceRefs": [],
+                    "boxscoreUrl": entry["boxscoreUrl"],
+                }
+                elo_games[resolved_key] = target
             matched_for_team.add(resolved_key)
             wiki_matched_games.add(resolved_key)
             wikipedia_only_refs += 1
@@ -1177,8 +1196,8 @@ def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_
         "coverage": {
             "scope": "full_regular_season",
             "gamesCaptured": len(ordered_games),
-            "expectedRegularSeasonGames": 943,
-            "isCompleteSeason": len(ordered_games) == 943,
+            "expectedRegularSeasonGames": EXPECTED_REGULAR_SEASON_GAMES,
+            "isCompleteSeason": len(ordered_games) == EXPECTED_REGULAR_SEASON_GAMES,
             "sampledDateRange": {
                 "start": REGULAR_SEASON_START,
                 "end": REGULAR_SEASON_END,
@@ -1534,8 +1553,10 @@ def main():
         )
 
     source_games = list(schedule_results_snapshot.get("games") or [])
-    if len(source_games) != 943:
-        raise RuntimeError(f"Expected 943 regular-season games in schedule_results.json, found {len(source_games)}.")
+    if len(source_games) != EXPECTED_REGULAR_SEASON_GAMES:
+        raise RuntimeError(
+            f"Expected {EXPECTED_REGULAR_SEASON_GAMES} regular-season games in schedule_results.json, found {len(source_games)}."
+        )
     source_players = validate_player_source_snapshot(player_source_snapshot)
 
     source_games.sort(key=lambda item: (item["gameDate"], item["sourceGameId"]))
@@ -1752,7 +1773,7 @@ def main():
         },
         "notes": [
             "The 27-team league map uses era-appropriate 1992-93 abbreviations, including CHH, GOS, SAN, UTH, and WAS.",
-            "Schedule/results span the full 943-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
+            "Schedule/results span the full 1107-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
             "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
             "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable and replayable.",
         ],

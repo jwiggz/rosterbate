@@ -1,0 +1,37 @@
+{
+  "heroTitle": "1992-93 NBA Historic Season",
+  "heroSubtitle": "Jordan's Bulls, Barkley's Suns, and a full-season 1992-93 foundation built with honest provenance.",
+  "featuredTeamId": "nba_1993_chi",
+  "featuredStars": [
+    "893",
+    "787",
+    "937",
+    "134"
+  ],
+  "artDirection": {
+    "heroTone": "prestige_rivalry",
+    "primaryPalette": [
+      "#552583",
+      "#007A33",
+      "#CE1141"
+    ],
+    "backgroundStyle": "historic_arena_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "real_season",
+      "label": "Play The Real Season",
+      "description": "Replay 1992-93 with the real full schedule and final scores."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the Jordan-Barkley-Pippen season from the full-league player pool."
+    },
+    {
+      "mode": "reimagined_season",
+      "label": "Reimagined Season",
+      "description": "Launch an alternate-history 1992-93 branch from the same foundation pack."
+    }
+  ]
+}

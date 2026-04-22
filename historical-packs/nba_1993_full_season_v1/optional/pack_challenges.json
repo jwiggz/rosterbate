@@ -1,0 +1,75 @@
+{
+  "packId": "nba_1993_full_season_v1",
+  "version": 1,
+  "challengeGroups": [
+    {
+      "groupId": "real_season_paths",
+      "label": "Play The Real Season",
+      "mode": "real_season"
+    },
+    {
+      "groupId": "draft_the_era_paths",
+      "label": "Draft The Era",
+      "mode": "historical_draft"
+    },
+    {
+      "groupId": "reimagined_paths",
+      "label": "Reimagined Season",
+      "mode": "reimagined_season"
+    }
+  ],
+  "challenges": [
+    {
+      "challengeId": "bulls_threepeat_push",
+      "mode": "real_season",
+      "path": "featured_team_path",
+      "title": "Complete The First Three-Peat",
+      "description": "Take the featured Bulls lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
+      "type": "season_wins_min",
+      "target": 60,
+      "evaluation": "season_end",
+      "reward": "Three-Peat Standard",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "east_challenger_55",
+      "mode": "real_season",
+      "path": "open_team_path",
+      "title": "Break The Finals Track",
+      "description": "Choose any team and reach 55 wins while trying to interrupt the Jordan-Barkley prestige track.",
+      "type": "season_wins_min",
+      "target": 55,
+      "evaluation": "season_end",
+      "reward": "Era Disruptor",
+      "required": false,
+      "featured": false
+    },
+    {
+      "challengeId": "draft_jordan_barkley_pippen",
+      "mode": "historical_draft",
+      "path": "alternate_history_success",
+      "title": "Draft The Superteam",
+      "description": "Redraft 1992-93 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
+      "type": "season_wins_min",
+      "target": 58,
+      "evaluation": "season_end",
+      "reward": "Era Architect",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "rewrite_1992_93",
+      "mode": "reimagined_season",
+      "path": "reshuffled_league",
+      "title": "Rewrite 1992-93",
+      "description": "Spin the league into an alternate-history branch and win the title with the same trust-forward data disclosures intact.",
+      "type": "win_championship",
+      "target": true,
+      "evaluation": "season_end",
+      "reward": "Alternate History Champion",
+      "required": false,
+      "featured": true
+    }
+  ]
+}
