@@ -129,6 +129,71 @@
     };
   }
 
+  function getSimulationPlayerPosition(player){
+    return String(player?.pos || player?.primaryPosition || 'UTIL').trim().toUpperCase();
+  }
+
+  function getSimulationAutoDraftScore(player, roster){
+    const nextRoster = Array.isArray(roster) ? roster : [];
+    const position = getSimulationPlayerPosition(player);
+    const samePositionCount = nextRoster.reduce((count, entry) => (
+      getSimulationPlayerPosition(entry) === position ? count + 1 : count
+    ), 0);
+    const baseScore = (Number(player?.mixedEraOverall || 0) * 100) + Number(player?.fp || 0);
+    const coverageBonus = samePositionCount === 0 ? 6 : 0;
+    const duplicatePenalty = samePositionCount * 3;
+    return baseScore + coverageBonus - duplicatePenalty;
+  }
+
+  function buildCompletedSimulationAutoDraftState({
+    shell,
+    mixedEraContext,
+    controlledTeamAbbr
+  }){
+    const bootstrap = buildSimulationUniverseBootstrap({
+      shell,
+      mixedEraContext,
+      controlledTeamAbbr,
+      draftSlot: 1
+    });
+    const next = clone(bootstrap);
+    const draftState = next.draftState || {};
+    const rosterSize = Number(draftState.rosterSize || 0);
+    const teams = Array.isArray(next.leagueShell?.teams) ? next.leagueShell.teams : [];
+    const availablePlayers = []
+      .concat(Array.isArray(draftState.draftPool) ? draftState.draftPool : [])
+      .concat(Array.isArray(draftState.freeAgents) ? draftState.freeAgents : []);
+
+    for (let round = 0; round < rosterSize; round += 1) {
+      const roundTeams = round % 2 === 0 ? teams : teams.slice().reverse();
+      roundTeams.forEach((team) => {
+        const teamAbbr = normalizeTeamAbbr(team?.abbr);
+        const roster = Array.isArray(draftState.rostersByTeam?.[teamAbbr]) ? draftState.rostersByTeam[teamAbbr] : [];
+        if (roster.length >= rosterSize || !availablePlayers.length) {
+          return;
+        }
+        let bestIndex = 0;
+        let bestScore = -Infinity;
+        for (let index = 0; index < availablePlayers.length; index += 1) {
+          const score = getSimulationAutoDraftScore(availablePlayers[index], roster);
+          if (score > bestScore) {
+            bestScore = score;
+            bestIndex = index;
+          }
+        }
+        const [selectedPlayer] = availablePlayers.splice(bestIndex, 1);
+        draftState.rostersByTeam[teamAbbr] = roster.concat(selectedPlayer);
+      });
+    }
+
+    draftState.completedAt = Date.now();
+    draftState.completedPicks = [];
+    draftState.draftPool = [];
+    draftState.freeAgents = availablePlayers;
+    next.draftState = draftState;
+    return next;
+  }
+
   function setSimulationLineup(state, teamAbbr, lineupIds){
     const next = clone(state);
     const key = normalizeTeamAbbr(teamAbbr);
@@ -256,6 +321,7 @@
     writeCompletedSimulationState,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,
+    buildCompletedSimulationAutoDraftState,
     setSimulationLineup,
     claimSimulationFreeAgent,
     applySimulationTrade,
