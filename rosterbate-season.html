@@ -6258,8 +6258,8 @@ function getWaiverRadarCandidates(limit=4){
     .filter(player=>player.id!=null && !unavailableIds.has(Number(player.id)))
     .map(player=>getWaiverRadarCandidateScore(player, needProfile))
     .sort((a,b)=>{
-      if(b.score!==a.score) return b.score-a.score;
       if(b.fitScore!==a.fitScore) return b.fitScore-a.fitScore;
+      if(b.score!==a.score) return b.score-a.score;
       if(b.watchBoost!==a.watchBoost) return b.watchBoost-a.watchBoost;
       return b.baseScore-a.baseScore;
     })
