@@ -14,7 +14,9 @@
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <script src="historical-universe-slots.js"></script>
+<script src="simulation-mode-runtime.js"></script>
 <script src="simulation-league-engine.js"></script>
+<script src="simulation-season-adapter.js"></script>
 <script src="cpu-sim-personalities.js"></script>
 <script src="cpu-sim-lineups.js"></script>
 <script src="global-nav.js" defer></script>
@@ -24,13 +26,14 @@ try{
   const params=new URLSearchParams(window.location.search || '');
   const requestedLeague=(params.get('league')||'').trim();
   const requestedHistorical=(params.get('historical')||'').trim().toLowerCase();
+  const requestedSimulation=(params.get('simulation')||'').trim().toLowerCase();
   const requestedHistoricalUniverse=(params.get('historicalUniverse')||'').trim();
   let historicalPending=false;
   try{
     const host=String(window.location.hostname||'').trim().toLowerCase();
     historicalPending=(host==='localhost' || host==='127.0.0.1') && !!window.localStorage.getItem('rbHistoricalPackDevPendingSeasonBoot');
   }catch(e){}
-  if(requestedHistoricalUniverse || requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='sim' || requestedHistorical==='simulation' || historicalPending){
+  if(requestedHistoricalUniverse || requestedSimulation==='nba_mixed_era' || requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='sim' || requestedHistorical==='simulation' || historicalPending){
     document.documentElement.dataset.seasonRoute='historical';
   }else if(requestedLeague && requestedLeague!=='demo'){
     document.documentElement.dataset.seasonRoute='league';
@@ -1237,9 +1240,12 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 
 <script>
 const TCOLORS=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#6366f1','#f97316','#06b6d4','#84cc16','#a855f7'];
-const PAGES=['hub','roster','matchup','waiver','trades','standings','commissioner'];
-const PLABELS={hub:'Hub',roster:'Roster',matchup:'Matchup',waiver:'Wire',trades:'Trade',standings:'Stand.',commissioner:'Comm.'};
+const DEFAULT_PAGES=['hub','roster','matchup','waiver','trades','standings','commissioner'];
+const DEFAULT_LABELS={hub:'Hub',roster:'Roster',matchup:'Matchup',waiver:'Wire',trades:'Trade',standings:'Stand.',commissioner:'Comm.'};
 const NAVIDS={hub:'hn',roster:'rn',matchup:'mn',waiver:'wn',trades:'tn',standings:'stn',commissioner:'commNav'};
+const SHARED_SIMULATION_QUERY='simulation=nba_mixed_era';
+let ACTIVE_SEASON_MODE='fantasy';
+let SEASON_MODE_ADAPTER=null;
 let CURRENT_SPORT = getSelectedRosterbateSport();
 let SPORT_CFG = getRosterbateSportConfig(CURRENT_SPORT);
 let STARTERS = SPORT_CFG.starterSlots.length;
@@ -2033,6 +2039,7 @@ const authReady=new Promise(resolve=>{
 function getRequestedLeagueId(){
   try{
     const params=new URLSearchParams(window.location.search || '');
+    if(getRequestedSimulationMode(params)==='nba_mixed_era') return null;
     const leagueId=(params.get('league')||'').trim();
     return leagueId && leagueId!=='demo' ? leagueId : null;
   }catch(e){
@@ -2248,8 +2255,15 @@ function getRequestedHistoricalPackId(params){
   return String(params?.get('historicalPackId')||'').trim();
 }
 
+function getRequestedSimulationMode(params){
+  return String(params?.get('simulation') || '').trim().toLowerCase();
+}
+
 function getRequestedHistoricalUniverseSlotId(params){
-  return String(params?.get('historicalUniverse')||'').trim();
+  const direct=String(params?.get('historicalUniverse') || '').trim();
+  if(direct) return direct;
+  const alias=String(params?.get('slot') || '').trim();
+  return alias || null;
 }
 
 function loadHistoricalUniverseSlotState(slotId, requestedSport){
@@ -2772,7 +2786,30 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
 
 function isHistoricalSimulationUniverse(state){
   const mode=String(state?.historicalEntryMode || state?.simulationMode || '').trim().toLowerCase();
-  return mode==='simulation_season' || mode==='simulation' || mode==='sim' || String(state?.simulationMode || '').trim().toLowerCase()==='historical_box_score';
+  return mode==='simulation_season'
+    || mode==='simulation'
+    || mode==='sim'
+    || mode==='historical_box_score'
+    || mode==='nba_mixed_era_single_player_v1';
+}
+
+function isSharedSimulationSeason(params, state){
+  if(getRequestedSimulationMode(params)==='nba_mixed_era') return true;
+  return !!(window.RosterBateSimulationSeasonAdapter?.isSupportedSimulationSeasonState?.(state));
+}
+
+function getActiveSeasonPages(){
+  if(ACTIVE_SEASON_MODE==='simulation'){
+    return ['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings'];
+  }
+  return DEFAULT_PAGES.slice();
+}
+
+function getActiveSeasonLabels(){
+  if(ACTIVE_SEASON_MODE==='simulation'){
+    return { hub: 'Hub', roster: 'Roster', matchup: 'Schedule', waiver: 'Waivers', trades: 'Trades', standings: 'Stand.' };
+  }
+  return { ...DEFAULT_LABELS };
 }
 
 function isHistoricalDraftUniverse(state){
@@ -6766,6 +6803,7 @@ function applyRequestedSeasonView(defaultPage='hub'){
     hub: 'hub',
     roster: 'roster',
     matchup: 'matchup',
+    schedule: 'matchup',
     waiver: 'waiver',
     wire: 'waiver',
     trade: 'trades',
@@ -6788,6 +6826,9 @@ window.onload=async function(){
   const leagueId = urlParams.get('league');
   const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
   const requestedHistoricalUniverse = getRequestedHistoricalUniverseSlotId(urlParams);
+  const sharedSimulationSeasonRequested = isSharedSimulationSeason(urlParams, null);
+  ACTIVE_SEASON_MODE = sharedSimulationSeasonRequested ? 'simulation' : 'fantasy';
+  SEASON_MODE_ADAPTER = null;
   if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
   else setSeasonEmptyState('idle');
 
@@ -6803,6 +6844,13 @@ window.onload=async function(){
       hideSeasonEmptyState();
       D = slotState;
       D.historicalUniverseSlotId = requestedHistoricalUniverse;
+      ACTIVE_SEASON_MODE = isSharedSimulationSeason(urlParams, D) ? 'simulation' : 'fantasy';
+      SEASON_MODE_ADAPTER = ACTIVE_SEASON_MODE === 'simulation'
+        ? window.RosterBateSimulationSeasonAdapter?.createSimulationSeasonAdapter?.({
+            slotId: requestedHistoricalUniverse,
+            state: D
+          }) || null
+        : null;
       if (isHistoricalSimulationUniverse(D)) {
         ensureCpuTeamPersonalitiesByTeam(D);
       }
@@ -7685,26 +7733,37 @@ function buildSched(n,weeks){
 function weekGames(w){return G.schedule.filter(g=>g.week===w);}
 function projScore(ti,week=G.week){return getTeamWeekRevealedScore(ti,week);}
 
+function renderActiveSeasonScreen(id){
+  ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[id]?.();
+}
+
 function goPage(id){
-  if(id==='commissioner' && D?.isCommissioner===false){
+  const pages=getActiveSeasonPages();
+  const labels=getActiveSeasonLabels();
+  const safeId=pages.includes(id) ? id : 'hub';
+  if(safeId==='commissioner' && D?.isCommissioner===false){
     toast('Only the commissioner can open league settings.');
     return;
   }
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  PAGES.forEach(p=>{
-    const el=document.getElementById(NAVIDS[p]);
-    if(el) el.innerHTML=PAGES.map(pg=>`<button class="nb${pg===id?' on':''}" onclick="goPage('${pg}')">${PLABELS[pg]}</button>`).join('');
+  document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
+  document.getElementById(safeId).classList.add('active');
+  pages.forEach((pageId) => {
+    const navId = NAVIDS[pageId];
+    const mount = document.getElementById(navId);
+    if (!mount) return;
+    mount.innerHTML = pages.map((candidate) => (
+      `<button class="nb${candidate === safeId ? ' on' : ''}" onclick="goPage('${candidate}')">${labels[candidate]}</button>`
+    )).join('');
   });
-  if(id==='roster') rosterViewDay=G.day;
-  if(id==='matchup') matchupViewDay=rosterViewDay||G.day;
-  if(id==='waiver'){
+  if(safeId==='roster') rosterViewDay=G.day;
+  if(safeId==='matchup') matchupViewDay=rosterViewDay||G.day;
+  if(safeId==='waiver'){
     const srch=document.getElementById('wSrch');
     const pos=document.getElementById('wPos');
     if(srch) srch.value='';
     if(pos) pos.value='ALL';
   }
-  ({hub:renderHub,roster:renderRoster,matchup:renderMatchup,waiver:renderWaiver,trades:renderTrades,standings:renderStandings,commissioner:renderCommissioner})[id]?.();
+  renderActiveSeasonScreen(safeId);
 }
 
 function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=true; setTimeout(()=>advanceWeek.disabled=false,1000);
@@ -11239,7 +11298,11 @@ function renderCommissioner(){
     }
   }
   const el=document.getElementById('commNav');
-  if(el) el.innerHTML=PAGES.map(pg=>`<button class="nb${pg==='commissioner'?' on':''}" onclick="goPage('${pg}')">${PLABELS[pg]}</button>`).join('');
+  if(el){
+    const pages=getActiveSeasonPages();
+    const labels=getActiveSeasonLabels();
+    el.innerHTML=pages.map(pg=>`<button class="nb${pg==='commissioner'?' on':''}" onclick="goPage('${pg}')">${labels[pg]}</button>`).join('');
+  }
   updateCommissionerTabState();
 }
 

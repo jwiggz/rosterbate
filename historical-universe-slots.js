@@ -440,7 +440,10 @@
     const targetSport = normalizeSport(sport || slot?.sport || 'nba');
     const id = String(slot?.slotId || '').trim();
     if(isSimulationModeUniverse(slot, state)){
-      return 'rosterbate-simulation-season.html?simulation=nba_mixed_era&historicalUniverse=' + encodeURIComponent(id);
+      return 'rosterbate-season.html?sport='
+        + encodeURIComponent(targetSport)
+        + '&simulation=nba_mixed_era&historicalUniverse='
+        + encodeURIComponent(id);
     }
     return 'rosterbate-season.html?sport=' + encodeURIComponent(targetSport) + '&historicalUniverse=' + encodeURIComponent(id);
   }
