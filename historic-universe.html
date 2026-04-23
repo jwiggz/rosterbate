@@ -706,6 +706,39 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     };
   }
 
+  function isSimulationModeUniverse(slot, state){
+    return String(slot?.simulationMode || state?.simulationMode || '').trim() === 'nba_mixed_era_single_player_v1';
+  }
+
+  function buildSimulationModeSummary(slot, state){
+    const standing = (state?.seasonState?.standings || []).find(function(row){
+      return String(row?.teamAbbr || '') === String(state?.draftState?.controlledTeamAbbr || '');
+    });
+    return {
+      title: 'Simulation champion chase',
+      body: String((state?.leagueShell?.anchorSeasonLabel || 'NBA')) + ' shell · ' + String((state?.sourceSeasons?.sourceSeasonLabels || []).join(' + ') || 'Mixed era') + ' player universe',
+      meta: [
+        standing ? 'Record ' + standing.w + '-' + standing.l : 'Record pending',
+        state?.postseasonState?.phase === 'regular_season' ? 'Play-In race active' : 'Phase: ' + String(state?.postseasonState?.phase || 'regular_season')
+      ]
+    };
+  }
+
+  function buildSimulationPlayoffSummary(slot, state){
+    if(state?.postseasonState?.champion){
+      return {
+        title: 'Simulation champion: ' + String(state.postseasonState.champion.championTeamAbbr || ''),
+        body: 'Defeated ' + String(state.postseasonState.champion.runnerUpTeamAbbr || '') + ' in ' + String(state.postseasonState.champion.finalsGames || '--') + ' games.',
+        meta: ['Trophy awarded']
+      };
+    }
+    return {
+      title: 'Play-In and playoff path pending',
+      body: 'The regular season is still shaping the final conference seeds.',
+      meta: ['Play-In race active']
+    };
+  }
+
   function buildRecentUniverseActivitySummary(state, reveal){
     const activityLog = Array.isArray(state?.activityLog) ? state.activityLog : [];
     if(!activityLog.length){
@@ -1219,9 +1252,10 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const reveal = getLatestRevealReport(state);
     const standing = getStandingContext(state);
     const rosterCore = buildRosterCore(state);
+    const simulationMode = isSimulationModeUniverse(slot, state);
     return {
-      latestSimDay: buildLatestSimDaySummary(slot, state, reveal, standing),
-      leagueSnapshot: buildLeagueSnapshotSummary(slot, state, standing),
+      latestSimDay: simulationMode ? buildSimulationModeSummary(slot, state) : buildLatestSimDaySummary(slot, state, reveal, standing),
+      leagueSnapshot: simulationMode ? buildSimulationPlayoffSummary(slot, state) : buildLeagueSnapshotSummary(slot, state, standing),
       recentActivity: buildRecentUniverseActivitySummary(state, reveal),
       recentSimDays: buildRecentSimulationSummary(slot, state),
       recentRosterMoves: buildRecentRosterMovesSummary(slot, state),
@@ -1258,9 +1292,10 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const recentLeagueTrades = Array.isArray(detailsViewModel.recentLeagueTrades)
       ? detailsViewModel.recentLeagueTrades
       : [];
-    const seasonUrl = api.buildSeasonUrl(slot, getSport());
+    const seasonUrl = api.buildSeasonUrl(slot, getSport(), state);
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
     const modeLabel = api.getModeLabel(slot.historicalEntryMode);
+    const simulationMode = isSimulationModeUniverse(slot, state);
     const progressLabel = String(slot.progressLabel || 'In progress').trim();
     const rankText = Number.isFinite(Number(slot.teamRank)) ? ('#' + Number(slot.teamRank)) : '--';
     const recordText = Number.isFinite(Number(slot.wins)) && Number.isFinite(Number(slot.losses))
@@ -1278,9 +1313,11 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     document.getElementById('archiveNavLink').href = archiveUrl;
     document.getElementById('continueNavLink').href = seasonUrl;
     document.getElementById('seasonNavLink').href = seasonUrl;
-    document.getElementById('heroEyebrow').textContent = modeLabel + ' - Saved Universe';
+    document.getElementById('heroEyebrow').textContent = simulationMode ? 'Simulation Universe - Saved Universe' : modeLabel + ' - Saved Universe';
     document.getElementById('heroTitle').innerHTML = escapeHtml(title) + '<span>' + escapeHtml(heroTeam) + '</span>';
-    document.getElementById('heroCopy').textContent = heroCopy;
+    document.getElementById('heroCopy').textContent = simulationMode
+      ? 'This simulation archive tracks the play-in race, the postseason bracket, and the current champion chase for ' + heroTeam + '.'
+      : heroCopy;
     document.getElementById('heroPills').innerHTML = [
       '<span class="meta-pill">' + escapeHtml(config?.shortLabel || slot.historicalSeasonId || 'Historic') + '</span>',
       '<span class="meta-pill">' + escapeHtml(config?.significanceLabel || 'Archive Run') + '</span>',

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RosterBate Simulation Setup</title>
+  <script src="historical-pack-loader.js"></script>
+  <script src="mixed-era-runtime.js"></script>
+  <script src="simulation-mode-config.js"></script>
+  <script src="simulation-mode-runtime.js"></script>
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#08101d;
+      --panel:#132036;
+      --panel-2:#1a2942;
+      --border:rgba(167,195,230,.18);
+      --text:#eef5ff;
+      --muted:#b7c9df;
+      --accent:#68f1a0;
+      --accent-2:#7dc5ff;
+      --shadow:0 24px 48px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,sans-serif;
+      background:
+        radial-gradient(circle at top,rgba(125,197,255,.18),transparent 34%),
+        linear-gradient(180deg,#0b1424 0%,var(--bg) 100%);
+      color:var(--text);
+    }
+    main{
+      width:min(980px,calc(100% - 32px));
+      margin:0 auto;
+      padding:48px 0 64px;
+    }
+    .setup-shell{
+      padding:28px;
+      border:1px solid var(--border);
+      border-radius:24px;
+      background:linear-gradient(180deg,rgba(19,32,54,.96),rgba(10,19,34,.94));
+      box-shadow:var(--shadow);
+    }
+    h1{
+      margin:0;
+      font-size:40px;
+      line-height:1;
+    }
+    .setup-copy{
+      margin:12px 0 0;
+      max-width:62ch;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    .setup-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);
+      gap:20px;
+      margin-top:24px;
+    }
+    .setup-card{
+      padding:20px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:linear-gradient(180deg,rgba(26,41,66,.9),rgba(16,26,43,.92));
+    }
+    .setup-card h2{
+      margin:0 0 8px;
+      font-size:18px;
+    }
+    .setup-card p{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+    #simulationSourceSeasonList{
+      display:grid;
+      gap:10px;
+      max-height:420px;
+      overflow:auto;
+      padding-right:8px;
+    }
+    .season-option{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:12px 14px;
+      border:1px solid rgba(167,195,230,.12);
+      border-radius:14px;
+      background:rgba(7,13,24,.34);
+    }
+    .season-option strong{
+      display:block;
+      font-size:15px;
+    }
+    .season-option span{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .field{
+      display:grid;
+      gap:8px;
+      margin-bottom:16px;
+    }
+    .field:last-child{
+      margin-bottom:0;
+    }
+    label{
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+    select, button{
+      width:100%;
+      border-radius:14px;
+      border:1px solid rgba(167,195,230,.18);
+      font:inherit;
+    }
+    select{
+      padding:12px 14px;
+      color:var(--text);
+      background:#0f192b;
+    }
+    button{
+      padding:14px 16px;
+      font-weight:700;
+      color:#06111c;
+      background:linear-gradient(180deg,var(--accent) 0%,#2ed376 100%);
+      cursor:pointer;
+    }
+    .helper-text{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .status{
+      margin-top:16px;
+      min-height:20px;
+      color:var(--accent-2);
+      font-size:13px;
+    }
+    @media (max-width: 760px){
+      main{
+        width:min(100%,calc(100% - 24px));
+        padding:24px 0 40px;
+      }
+      .setup-shell{
+        padding:20px;
+      }
+      h1{
+        font-size:32px;
+      }
+      .setup-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="setup-shell">
+      <h1>Start Simulation League</h1>
+      <p class="setup-copy">Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise and a draft slot before heading into the board.</p>
+      <div class="setup-grid">
+        <section class="setup-card">
+          <h2>Source Seasons</h2>
+          <p>Pick one or more NBA historical packs. These selections will define the crossover player pool for your simulation league.</p>
+          <div id="simulationSourceSeasonList"></div>
+        </section>
+        <section class="setup-card">
+          <div class="field">
+            <label for="simulationFranchiseSelect">Franchise</label>
+            <select id="simulationFranchiseSelect"></select>
+          </div>
+          <div class="field">
+            <label for="simulationDraftSlotSelect">Draft Slot</label>
+            <select id="simulationDraftSlotSelect"></select>
+          </div>
+          <button id="simulationContinueBtn" onclick="enterSimulationDraft()">Enter Draft</button>
+          <p class="helper-text">The setup payload is stored locally and handed off to the dedicated simulation draft flow.</p>
+          <div class="status" id="simulationSetupStatus" aria-live="polite"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const SIMULATION_SETUP_STORAGE_KEY = (
+      window.RosterBateSimulationModeRuntime &&
+      window.RosterBateSimulationModeRuntime.STORAGE_KEY
+    ) || 'rbSimulationModeLocalState';
+
+    function readSportFromQuery(){
+      try{
+        return String(new URLSearchParams(window.location.search).get('sport') || 'nba').trim().toLowerCase() || 'nba';
+      }catch(error){
+        return 'nba';
+      }
+    }
+
+    function getSimulationSetupStatusNode(){
+      return document.getElementById('simulationSetupStatus');
+    }
+
+    function setSimulationSetupStatus(message){
+      const node = getSimulationSetupStatusNode();
+      if (node) {
+        node.textContent = String(message || '');
+      }
+    }
+
+    function renderSeasonOptions(entries){
+      const container = document.getElementById('simulationSourceSeasonList');
+      container.innerHTML = entries.map((entry, index) => (
+        '<label class="season-option">' +
+          '<input type="checkbox" value="' + String(entry.packId || '') + '"' + (index === 0 ? ' checked' : '') + '>' +
+          '<span>' +
+            '<strong>' + String(entry.seasonLabel || entry.packId || 'Unknown Season') + '</strong>' +
+            '<span>' + String(entry.packId || '') + '</span>' +
+          '</span>' +
+        '</label>'
+      )).join('');
+    }
+
+    function renderFranchiseOptions(shell){
+      document.getElementById('simulationFranchiseSelect').innerHTML = shell.teams.map((team) => (
+        '<option value="' + team.abbr + '">' + team.name + '</option>'
+      )).join('');
+    }
+
+    function renderDraftSlotOptions(shell){
+      document.getElementById('simulationDraftSlotSelect').innerHTML = Array.from({ length: shell.teams.length }, function(_, index){
+        return '<option value="' + String(index + 1) + '">Pick ' + String(index + 1) + '</option>';
+      }).join('');
+    }
+
+    async function bootSimulationSetup(){
+      const shell = window.RosterBateSimulationModeConfig.getSimulationShell();
+      const requestedSport = readSportFromQuery();
+      renderFranchiseOptions(shell);
+      renderDraftSlotOptions(shell);
+      setSimulationSetupStatus('Loading available source seasons...');
+      try{
+        const catalog = await window.RosterBateHistoricalPackLoader.loadCatalog();
+        const nbaSeasons = catalog.filter(function(entry){
+          return String(entry && entry.sport || 'nba').trim().toLowerCase() === requestedSport
+            && String(entry && entry.syntheticType || '').trim().toLowerCase() !== 'mixed_era';
+        });
+        renderSeasonOptions(nbaSeasons);
+        setSimulationSetupStatus(nbaSeasons.length ? 'Choose your eras and enter the draft.' : 'No historical NBA packs were found.');
+      }catch(error){
+        console.error('[Simulation Setup] Failed to load historical catalog', error);
+        renderSeasonOptions([]);
+        setSimulationSetupStatus('Unable to load historical packs right now.');
+      }
+    }
+
+    function enterSimulationDraft(){
+      const selectedPackIds = Array.from(document.querySelectorAll('#simulationSourceSeasonList input:checked')).map(function(node){
+        return node.value;
+      }).filter(Boolean);
+      if (!selectedPackIds.length) {
+        setSimulationSetupStatus('Select at least one historical season before entering the draft.');
+        return;
+      }
+      const payload = {
+        mode: 'nba_mixed_era_single_player_v1',
+        sourcePackIds: selectedPackIds,
+        controlledTeamAbbr: document.getElementById('simulationFranchiseSelect').value,
+        draftSlot: Number(document.getElementById('simulationDraftSlotSelect').value || 1)
+      };
+      localStorage.setItem(SIMULATION_SETUP_STORAGE_KEY, JSON.stringify(payload));
+      window.location.href = 'rosterbate-draft.html?simulation=nba_mixed_era';
+    }
+
+    bootSimulationSetup();
+  </script>
+</body>
+</html>

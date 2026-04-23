@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RosterBate Simulation Season</title>
+  <script src="historical-universe-slots.js"></script>
+  <script src="simulation-mode-config.js"></script>
+  <script src="simulation-mode-runtime.js"></script>
+  <script src="simulation-league-engine.js"></script>
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#07111d;
+      --panel:#102036;
+      --panel-soft:#162942;
+      --line:rgba(180,206,235,.16);
+      --text:#f4f8ff;
+      --muted:#a9bfd8;
+      --accent:#7cf0b0;
+      --accent-strong:#2fd07a;
+      --accent-cool:#7cbcff;
+      --danger:#ff8f8f;
+      --shadow:0 28px 50px rgba(0,0,0,.32);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(124,188,255,.14), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(124,240,176,.08), transparent 24%),
+        linear-gradient(180deg, #0a1627 0%, var(--bg) 100%);
+    }
+    .season-shell{
+      width:min(1380px, calc(100% - 28px));
+      margin:0 auto;
+      padding:28px 0 36px;
+    }
+    .season-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      padding:24px;
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:linear-gradient(145deg, rgba(21,34,55,.96), rgba(10,19,33,.94));
+      box-shadow:var(--shadow);
+    }
+    .season-header-copy{
+      display:grid;
+      gap:10px;
+    }
+    .season-kicker{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--accent-cool);
+    }
+    h1{
+      margin:0;
+      font-size:clamp(32px, 5vw, 52px);
+      line-height:1;
+    }
+    #simulationSeasonDate{
+      color:var(--muted);
+      font-size:15px;
+      letter-spacing:.01em;
+    }
+    .season-header-actions{
+      display:grid;
+      gap:10px;
+      min-width:min(100%, 260px);
+    }
+    .action-button{
+      border:none;
+      border-radius:16px;
+      padding:15px 18px;
+      font:inherit;
+      font-weight:700;
+      color:#08141f;
+      background:linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
+      cursor:pointer;
+      box-shadow:0 18px 28px rgba(47,208,122,.18);
+    }
+    .action-button[disabled]{
+      cursor:not-allowed;
+      opacity:.6;
+      box-shadow:none;
+    }
+    #simulationChampionBanner{
+      min-height:48px;
+      padding:12px 16px;
+      border-radius:16px;
+      border:1px solid rgba(124,240,176,.2);
+      background:linear-gradient(180deg, rgba(124,240,176,.16), rgba(124,188,255,.08));
+      color:var(--text);
+    }
+    .champion-label{
+      display:block;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(244,248,255,.76);
+    }
+    .champion-team{
+      display:block;
+      margin-top:4px;
+      font-size:20px;
+      font-weight:800;
+    }
+    .season-grid{
+      display:grid;
+      grid-template-columns:minmax(0, 1.45fr) minmax(320px, .95fr);
+      gap:18px;
+      margin-top:18px;
+    }
+    .season-column{
+      display:grid;
+      gap:18px;
+    }
+    .panel{
+      padding:18px;
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(16,32,54,.92), rgba(10,19,33,.92));
+      box-shadow:var(--shadow);
+    }
+    .panel h2{
+      margin:0 0 6px;
+      font-size:18px;
+    }
+    .panel-copy{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    .table th,
+    .table td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(180,206,235,.1);
+      text-align:left;
+    }
+    .table th{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .table td:last-child,
+    .table th:last-child{
+      text-align:right;
+    }
+    .team-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+    }
+    .team-pill::before{
+      content:"";
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:linear-gradient(180deg, var(--accent-cool), var(--accent));
+      opacity:.9;
+    }
+    .list{
+      display:grid;
+      gap:10px;
+    }
+    .list-item{
+      padding:12px 14px;
+      border:1px solid rgba(180,206,235,.1);
+      border-radius:16px;
+      background:rgba(9,18,31,.44);
+    }
+    .list-item strong{
+      display:block;
+      font-size:14px;
+    }
+    .list-item span{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .two-up{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:14px;
+    }
+    .conference-block{
+      padding:14px;
+      border:1px solid rgba(180,206,235,.1);
+      border-radius:18px;
+      background:rgba(9,18,31,.4);
+    }
+    .conference-block h3{
+      margin:0 0 12px;
+      font-size:14px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--accent-cool);
+    }
+    .seed-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:8px 0;
+      border-bottom:1px solid rgba(180,206,235,.08);
+      font-size:13px;
+    }
+    .seed-row:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+    .seed-label{
+      color:var(--muted);
+      min-width:48px;
+    }
+    .empty-state{
+      padding:16px;
+      border:1px dashed rgba(180,206,235,.18);
+      border-radius:16px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      background:rgba(8,15,26,.32);
+    }
+    .status-note{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .positive{
+      color:var(--accent);
+    }
+    .negative{
+      color:var(--danger);
+    }
+    @media (max-width: 1080px){
+      .season-grid{
+        grid-template-columns:1fr;
+      }
+    }
+    @media (max-width: 760px){
+      .season-shell{
+        width:min(100%, calc(100% - 20px));
+        padding:16px 0 28px;
+      }
+      .season-header{
+        padding:18px;
+      }
+      .season-header,
+      .two-up{
+        grid-template-columns:1fr;
+      }
+      .season-header{
+        display:grid;
+      }
+      .action-button{
+        width:100%;
+      }
+      .two-up{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="season-shell">
+    <header class="season-header">
+      <div class="season-header-copy">
+        <div class="season-kicker">Dedicated Simulation Mode</div>
+        <h1 id="simulationLeagueTitle">Simulation League</h1>
+        <div id="simulationSeasonDate"></div>
+      </div>
+      <div class="season-header-actions">
+        <button class="action-button" id="simulationNextDayButton" onclick="simulateNextSimulationDay()">Sim Day</button>
+        <section id="simulationChampionBanner" aria-live="polite"></section>
+      </div>
+    </header>
+    <main class="season-grid">
+      <div class="season-column">
+        <section class="panel">
+          <h2>Standings</h2>
+          <p class="panel-copy">League table after each simulated day, sorted by wins and point differential.</p>
+          <section id="simulationStandingsTable"></section>
+        </section>
+        <section class="panel">
+          <h2>Daily Results</h2>
+          <p class="panel-copy">Latest game logs from the mixed-era regular season.</p>
+          <section id="simulationGameResults"></section>
+        </section>
+        <section class="panel">
+          <h2>Playoff Picture</h2>
+          <p class="panel-copy">Conference seeds update automatically, then lock into a bracket once the regular season finishes.</p>
+          <section id="simulationPlayoffBracket"></section>
+        </section>
+      </div>
+      <div class="season-column">
+        <section class="panel">
+          <h2>Controlled Roster</h2>
+          <p class="panel-copy">Your franchise core carried forward from the draft board.</p>
+          <section id="simulationRosterPanel"></section>
+        </section>
+        <section class="panel">
+          <h2>Waiver Wire</h2>
+          <p class="panel-copy">Top remaining free agents available for future roster management flows.</p>
+          <section id="simulationWaiverPanel"></section>
+        </section>
+        <section class="panel">
+          <h2>League Activity</h2>
+          <p class="panel-copy">Recent trade, waiver, and lineup updates from the simulation runtime state.</p>
+          <section id="simulationTradePanel"></section>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script>
+    let SIM_STATE = null;
+    let SIM_SCHEDULE = null;
+
+    function getSimulationRuntime(){
+      return window.RosterBateSimulationModeRuntime || {};
+    }
+
+    function getSimulationConfig(){
+      return window.RosterBateSimulationModeConfig || {};
+    }
+
+    function getSimulationEngine(){
+      return window.RosterBateSimulationEngine || {};
+    }
+
+    function getRequestedHistoricalUniverseSlotId(){
+      return String(new URLSearchParams(window.location.search || '').get('historicalUniverse') || '').trim();
+    }
+
+    function loadHistoricalUniverseSlotState(slotId){
+      const api = window.RosterBateHistoricalUniverseSlots;
+      const targetSlotId = String(slotId || '').trim();
+      if (!api || !targetSlotId || typeof api.getState !== 'function') {
+        return null;
+      }
+      const state = api.getState(targetSlotId);
+      if (!state || typeof state !== 'object') {
+        return null;
+      }
+      return String(state?.simulationMode || '').trim() === 'nba_mixed_era_single_player_v1'
+        ? state
+        : null;
+    }
+
+    function readCompletedSimulationDraft(){
+      const runtime = getSimulationRuntime();
+      if (typeof runtime.readCompletedSimulationState === 'function') {
+        return runtime.readCompletedSimulationState();
+      }
+      try{
+        return JSON.parse(localStorage.getItem(runtime.COMPLETED_DRAFT_KEY || 'rbSimulationModeCompletedDraft') || 'null');
+      }catch(error){
+        return null;
+      }
+    }
+
+    function writeCompletedSimulationDraft(state){
+      const runtime = getSimulationRuntime();
+      if (typeof runtime.writeCompletedSimulationState === 'function') {
+        return runtime.writeCompletedSimulationState(state);
+      }
+      localStorage.setItem(runtime.COMPLETED_DRAFT_KEY || 'rbSimulationModeCompletedDraft', JSON.stringify(state));
+      return state;
+    }
+
+    function persistSimulationUniverseSlotSnapshot(reason){
+      const api = window.RosterBateHistoricalUniverseSlots;
+      if (!api || !SIM_STATE || typeof api.upsertFromState !== 'function') {
+        return null;
+      }
+      try{
+        const persisted = api.upsertFromState(SIM_STATE, {
+          slotId: String(SIM_STATE?.historicalUniverseSlotId || '').trim() || null,
+          reason: String(reason || '').trim() || 'simulation_save'
+        });
+        if (persisted?.slotId) {
+          SIM_STATE.historicalUniverseSlotId = persisted.slotId;
+          writeCompletedSimulationDraft(SIM_STATE);
+        }
+        return persisted;
+      }catch(error){
+        console.warn('Simulation universe slot save skipped:', error);
+        return null;
+      }
+    }
+
+    function formatSimulationDate(shell, day){
+      const anchorDate = String(shell?.regularSeasonStartDate || '').trim();
+      if (!anchorDate) {
+        return 'Date TBD';
+      }
+      const base = new Date(anchorDate + 'T12:00:00');
+      if (Number.isNaN(base.getTime())) {
+        return anchorDate;
+      }
+      base.setDate(base.getDate() + Math.max(0, Number(day || 1) - 1));
+      return base.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function getScheduleDayCount(schedule){
+      return Object.keys(schedule?.byDay || {}).length;
+    }
+
+    function getTeamNameMap(shell){
+      return Object.fromEntries((shell?.teams || []).map(function(team){
+        return [team.abbr, team.name];
+      }));
+    }
+
+    function sortStandingsRows(rows){
+      return (Array.isArray(rows) ? rows.slice() : []).sort(function(a, b){
+        const winDiff = Number(b?.w || 0) - Number(a?.w || 0);
+        if (winDiff) return winDiff;
+        const lossDiff = Number(a?.l || 0) - Number(b?.l || 0);
+        if (lossDiff) return lossDiff;
+        const pdDiff = (Number(b?.pf || 0) - Number(b?.pa || 0)) - (Number(a?.pf || 0) - Number(a?.pa || 0));
+        if (pdDiff) return pdDiff;
+        return String(a?.teamAbbr || '').localeCompare(String(b?.teamAbbr || ''));
+      });
+    }
+
+    function formatPointDifferential(row){
+      const value = Number(row?.pf || 0) - Number(row?.pa || 0);
+      const cls = value >= 0 ? 'positive' : 'negative';
+      const prefix = value >= 0 ? '+' : '';
+      return '<span class="' + cls + '">' + prefix + String(value) + '</span>';
+    }
+
+    function renderStandingsTable(state){
+      const rows = sortStandingsRows(state?.seasonState?.standings || []);
+      if (!rows.length) {
+        return '<div class="empty-state">Standings will appear after the first simulated day.</div>';
+      }
+      return '' +
+        '<table class="table">' +
+          '<thead><tr><th>Team</th><th>Conf</th><th>Record</th><th>Diff</th></tr></thead>' +
+          '<tbody>' +
+            rows.map(function(row){
+              return '' +
+                '<tr>' +
+                  '<td><span class="team-pill">' + String(row.teamAbbr || '') + '</span></td>' +
+                  '<td>' + String(row.conference || '-') + '</td>' +
+                  '<td>' + String(Number(row.w || 0)) + '-' + String(Number(row.l || 0)) + '</td>' +
+                  '<td>' + formatPointDifferential(row) + '</td>' +
+                '</tr>';
+            }).join('') +
+          '</tbody>' +
+        '</table>';
+    }
+
+    function renderGameResults(state, shell){
+      const teamNames = getTeamNameMap(shell);
+      const results = (state?.seasonState?.completedGameLogs || []).slice(-12).reverse();
+      if (!results.length) {
+        return '<div class="empty-state">No games logged yet. Hit Sim Day to open the season.</div>';
+      }
+      return '<div class="list">' + results.map(function(game){
+        const winnerIsHome = Number(game.homeScore || 0) >= Number(game.awayScore || 0);
+        const awayName = String(game.awayName || teamNames[game.awayAbbr] || 'Away Team');
+        const homeName = String(game.homeName || teamNames[game.homeAbbr] || 'Home Team');
+        return '' +
+          '<div class="list-item">' +
+            '<strong>' + awayName + ' ' + String(game.awayScore || 0) + ' at ' + homeName + ' ' + String(game.homeScore || 0) + '</strong>' +
+            '<span>Day ' + String(game.day || state?.seasonState?.currentDay || 1) + ' | Winner: ' + (winnerIsHome ? homeName : awayName) + '</span>' +
+          '</div>';
+      }).join('') + '</div>';
+    }
+
+    function renderRosterPanel(state, shell){
+      const controlledTeamAbbr = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+      const controlledTeam = (shell?.teams || []).find(function(team){
+        return team.abbr === controlledTeamAbbr;
+      });
+      const roster = (state?.draftState?.rostersByTeam || {})[controlledTeamAbbr] || [];
+      if (!controlledTeamAbbr || !roster.length) {
+        return '<div class="empty-state">Complete a simulation draft to populate your controlled-team roster.</div>';
+      }
+      return '' +
+        '<div class="list">' +
+          '<div class="list-item">' +
+            '<strong>' + String(controlledTeam?.name || controlledTeamAbbr) + '</strong>' +
+            '<span>' + String(roster.length) + ' players | Draft slot ' + String(Number(state?.draftState?.draftSlot || 1)) + '</span>' +
+          '</div>' +
+          roster.slice(0, 10).map(function(player){
+            return '' +
+              '<div class="list-item">' +
+                '<strong>' + String(player?.name || 'Unknown Player') + '</strong>' +
+                '<span>' +
+                  String(player?.pos || 'POS') +
+                  ' | OVR ' + String(Math.round(Number(player?.mixedEraOverall || player?.simProfile?.mixedEraRatings?.overall || 0))) +
+                  ' | ' + String(player?.historicalSeasonLabel || player?.historicalPackId || 'Mixed Era') +
+                '</span>' +
+              '</div>';
+          }).join('') +
+        '</div>';
+    }
+
+    function renderWaiverPanel(state){
+      const freeAgents = (state?.draftState?.freeAgents || []).slice(0, 8);
+      if (!freeAgents.length) {
+        return '<div class="empty-state">No free agents are loaded into this simulation state yet.</div>';
+      }
+      return '<div class="list">' + freeAgents.map(function(player){
+        return '' +
+          '<div class="list-item">' +
+            '<strong>' + String(player?.name || 'Unknown Player') + '</strong>' +
+            '<span>' +
+              String(player?.pos || 'POS') +
+              ' | Tier ' + String(player?.simulationTier || 'reserve') +
+              ' | OVR ' + String(Math.round(Number(player?.mixedEraOverall || player?.simProfile?.mixedEraRatings?.overall || 0))) +
+            '</span>' +
+          '</div>';
+      }).join('') + '</div>';
+    }
+
+    function renderTradePanel(state){
+      const activity = (state?.seasonState?.activityLog || []).slice(0, 8);
+      if (!activity.length) {
+        return '<div class="empty-state">League activity will populate as lineup, trade, and waiver actions are recorded.</div>';
+      }
+      return '<div class="list">' + activity.map(function(entry){
+        return '' +
+          '<div class="list-item">' +
+            '<strong>' + String(entry?.title || 'League update') + '</strong>' +
+            '<span>' + String(entry?.type || 'activity').toUpperCase() + ' | ' + new Date(Number(entry?.ts || Date.now())).toLocaleString() + '</span>' +
+          '</div>';
+      }).join('') + '</div>';
+    }
+
+    function buildConferenceSnapshotRows(state, conference){
+      return sortStandingsRows((state?.seasonState?.standings || []).filter(function(row){
+        return String(row?.conference || '').toLowerCase() === String(conference || '').toLowerCase();
+      })).map(function(row, index){
+        return Object.assign({}, row, { seed: index + 1 });
+      });
+    }
+
+    function ensurePostseasonSnapshot(state){
+      const engine = getSimulationEngine();
+      const totalDays = getScheduleDayCount(SIM_SCHEDULE);
+      if (!state || !totalDays || Number(state?.seasonState?.currentDay || 1) <= totalDays) {
+        return;
+      }
+      state.postseasonState = state.postseasonState || {};
+      state.postseasonState.phase = state.postseasonState.phase || 'postseason_ready';
+      if (!state.postseasonState.playIn && typeof engine.buildSimulationPlayIn === 'function') {
+        state.postseasonState.playIn = {
+          east: engine.buildSimulationPlayIn(buildConferenceSnapshotRows(state, 'East')),
+          west: engine.buildSimulationPlayIn(buildConferenceSnapshotRows(state, 'West'))
+        };
+      }
+      if (!state.postseasonState.bracket && typeof engine.buildSimulationPlayoffBracket === 'function') {
+        state.postseasonState.bracket = engine.buildSimulationPlayoffBracket({
+          east: buildConferenceSnapshotRows(state, 'East').slice(0, 8),
+          west: buildConferenceSnapshotRows(state, 'West').slice(0, 8)
+        });
+      }
+    }
+
+    function renderConferenceSeeds(title, rows){
+      if (!rows.length) {
+        return '<div class="conference-block"><h3>' + title + '</h3><div class="empty-state">No seeds available yet.</div></div>';
+      }
+      return '' +
+        '<div class="conference-block">' +
+          '<h3>' + title + '</h3>' +
+          rows.slice(0, 8).map(function(row, index){
+            return '' +
+              '<div class="seed-row">' +
+                '<span class="seed-label">Seed ' + String(index + 1) + '</span>' +
+                '<span><strong>' + String(row.teamAbbr || '') + '</strong> | ' + String(Number(row.w || 0)) + '-' + String(Number(row.l || 0)) + '</span>' +
+              '</div>';
+          }).join('') +
+        '</div>';
+    }
+
+    function renderBracketPreview(state){
+      const east = buildConferenceSnapshotRows(state, 'East');
+      const west = buildConferenceSnapshotRows(state, 'West');
+      const bracket = state?.postseasonState?.bracket || null;
+      const totalDays = getScheduleDayCount(SIM_SCHEDULE);
+      const seasonComplete = totalDays > 0 && Number(state?.seasonState?.currentDay || 1) > totalDays;
+      if (!east.length && !west.length) {
+        return '<div class="empty-state">Conference seeds will appear once standings data is available.</div>';
+      }
+      let bracketSummary = '';
+      if (seasonComplete && bracket) {
+        const eastSeries = (bracket.east?.firstRound || []).filter(Boolean).map(function(series){
+          return '<div class="seed-row"><span class="seed-label">East</span><span>' +
+            String(series?.higherSeed?.teamAbbr || '?') + ' vs ' + String(series?.lowerSeed?.teamAbbr || '?') +
+          '</span></div>';
+        }).join('');
+        const westSeries = (bracket.west?.firstRound || []).filter(Boolean).map(function(series){
+          return '<div class="seed-row"><span class="seed-label">West</span><span>' +
+            String(series?.higherSeed?.teamAbbr || '?') + ' vs ' + String(series?.lowerSeed?.teamAbbr || '?') +
+          '</span></div>';
+        }).join('');
+        bracketSummary = '<div class="conference-block"><h3>First Round</h3>' + eastSeries + westSeries + '</div>';
+      }
+      return '' +
+        '<div class="two-up">' +
+          renderConferenceSeeds('East', east) +
+          renderConferenceSeeds('West', west) +
+        '</div>' +
+        (bracketSummary || '<p class="status-note">' + (seasonComplete ? 'Regular season is complete. First-round bracket has been seeded.' : 'Bracket locks in after game ' + String(totalDays || 82) + ' of the regular season.') + '</p>');
+    }
+
+    function renderChampionBanner(state, shell){
+      const champion = state?.postseasonState?.champion || null;
+      if (champion?.championTeamAbbr) {
+        const winner = (shell?.teams || []).find(function(team){
+          return team.abbr === champion.championTeamAbbr;
+        });
+        return '' +
+          '<span class="champion-label">Champion</span>' +
+          '<span class="champion-team">' + String(winner?.name || champion.championTeamAbbr) + '</span>' +
+          '<span class="status-note">Finals won in ' + String(Number(champion?.finalsGames || 0)) + ' games.</span>';
+      }
+      const totalDays = getScheduleDayCount(SIM_SCHEDULE);
+      const seasonComplete = totalDays > 0 && Number(state?.seasonState?.currentDay || 1) > totalDays;
+      return seasonComplete
+        ? '<span class="champion-label">Postseason Ready</span><span class="champion-team">Bracket seeded</span><span class="status-note">Champion will appear once the postseason simulation is resolved.</span>'
+        : '<span class="champion-label">Season In Progress</span><span class="champion-team">No champion yet</span><span class="status-note">Simulate each day to advance the mixed-era regular season.</span>';
+    }
+
+    function updateSimulationButton(state){
+      const button = document.getElementById('simulationNextDayButton');
+      const totalDays = getScheduleDayCount(SIM_SCHEDULE);
+      const seasonComplete = totalDays > 0 && Number(state?.seasonState?.currentDay || 1) > totalDays;
+      if (!button) {
+        return;
+      }
+      button.disabled = !state || seasonComplete;
+      button.textContent = seasonComplete ? 'Regular Season Complete' : 'Sim Day';
+    }
+
+    function renderSimulationDashboard(state){
+      const shell = state?.leagueShell || getSimulationConfig().getSimulationShell?.() || {};
+      if (!state || !shell || !Array.isArray(shell.teams) || !shell.teams.length) {
+        document.getElementById('simulationLeagueTitle').textContent = 'Simulation League';
+        document.getElementById('simulationSeasonDate').textContent = 'No completed simulation draft was found.';
+        document.getElementById('simulationStandingsTable').innerHTML = '<div class="empty-state">Return to the simulation setup and finish a draft to open this season surface.</div>';
+        document.getElementById('simulationGameResults').innerHTML = '<div class="empty-state">Game results will appear here after your first simulated day.</div>';
+        document.getElementById('simulationRosterPanel').innerHTML = '<div class="empty-state">The controlled roster panel activates after the draft handoff completes.</div>';
+        document.getElementById('simulationWaiverPanel').innerHTML = '<div class="empty-state">Free-agent data is tied to the completed simulation draft payload.</div>';
+        document.getElementById('simulationTradePanel').innerHTML = '<div class="empty-state">League activity is empty until the simulation runtime records events.</div>';
+        document.getElementById('simulationPlayoffBracket').innerHTML = '<div class="empty-state">Conference seeds and the playoff bracket will appear once a season state is loaded.</div>';
+        document.getElementById('simulationChampionBanner').innerHTML = '<span class="champion-label">Waiting On Draft</span><span class="champion-team">No season loaded</span>';
+        updateSimulationButton(null);
+        return;
+      }
+      ensurePostseasonSnapshot(state);
+      document.getElementById('simulationLeagueTitle').textContent = String(shell.anchorSeasonLabel || 'Simulation League') + ' Simulation';
+      document.getElementById('simulationSeasonDate').textContent = 'Day ' + String(Number(state?.seasonState?.currentDay || 1)) + ' | ' + formatSimulationDate(shell, state?.seasonState?.currentDay || 1);
+      document.getElementById('simulationStandingsTable').innerHTML = renderStandingsTable(state);
+      document.getElementById('simulationGameResults').innerHTML = renderGameResults(state, shell);
+      document.getElementById('simulationRosterPanel').innerHTML = renderRosterPanel(state, shell);
+      document.getElementById('simulationWaiverPanel').innerHTML = renderWaiverPanel(state);
+      document.getElementById('simulationTradePanel').innerHTML = renderTradePanel(state);
+      document.getElementById('simulationPlayoffBracket').innerHTML = renderBracketPreview(state);
+      document.getElementById('simulationChampionBanner').innerHTML = renderChampionBanner(state, shell);
+      updateSimulationButton(state);
+    }
+
+    function simulateNextSimulationDay(){
+      const engine = getSimulationEngine();
+      if (!SIM_STATE || typeof engine.simulateSimulationGameDay !== 'function' || typeof engine.applySimulationDayResults !== 'function') {
+        renderSimulationDashboard(SIM_STATE);
+        return;
+      }
+      const totalDays = getScheduleDayCount(SIM_SCHEDULE);
+      if (totalDays > 0 && Number(SIM_STATE?.seasonState?.currentDay || 1) > totalDays) {
+        ensurePostseasonSnapshot(SIM_STATE);
+        writeCompletedSimulationDraft(SIM_STATE);
+        renderSimulationDashboard(SIM_STATE);
+        return;
+      }
+      const teamMeta = Array.isArray(SIM_STATE?.leagueShell?.teams) ? SIM_STATE.leagueShell.teams : [];
+      const dayResult = engine.simulateSimulationGameDay({
+        state: {
+          ...SIM_STATE.seasonState,
+          teamMeta: teamMeta,
+          teams: teamMeta.map(function(team){ return team.name; }),
+          allRosters: teamMeta.map(function(team){
+            return SIM_STATE?.draftState?.rostersByTeam?.[team.abbr] || [];
+          })
+        },
+        schedule: SIM_SCHEDULE,
+        day: SIM_STATE?.seasonState?.currentDay,
+        lineupIdsByTeam: SIM_STATE?.seasonState?.lineupIdsByTeam || {}
+      });
+      SIM_STATE.seasonState = engine.applySimulationDayResults(SIM_STATE.seasonState, dayResult);
+      ensurePostseasonSnapshot(SIM_STATE);
+      writeCompletedSimulationDraft(SIM_STATE);
+      persistSimulationUniverseSlotSnapshot('simulation_day');
+      renderSimulationDashboard(SIM_STATE);
+    }
+
+    function bootSimulationSeason(){
+      const requestedSlotId = getRequestedHistoricalUniverseSlotId();
+      if (requestedSlotId) {
+        SIM_STATE = loadHistoricalUniverseSlotState(requestedSlotId);
+        if (SIM_STATE) {
+          SIM_STATE.historicalUniverseSlotId = requestedSlotId;
+          writeCompletedSimulationDraft(SIM_STATE);
+        } else {
+          console.warn('Requested simulation universe slot was not found. Falling back to completed-draft storage.', requestedSlotId);
+        }
+      }
+      if (!SIM_STATE) {
+        SIM_STATE = readCompletedSimulationDraft();
+      }
+      if (SIM_STATE && String(SIM_STATE?.simulationMode || '').trim() === 'nba_mixed_era_single_player_v1') {
+        persistSimulationUniverseSlotSnapshot('season_boot');
+      }
+      if (SIM_STATE?.leagueShell && typeof getSimulationEngine().buildSimulationSeasonSchedule === 'function') {
+        SIM_SCHEDULE = getSimulationEngine().buildSimulationSeasonSchedule(SIM_STATE.leagueShell);
+      } else {
+        SIM_SCHEDULE = { byDay: {} };
+      }
+      renderSimulationDashboard(SIM_STATE);
+    }
+
+    bootSimulationSeason();
+  </script>
+</body>
+</html>

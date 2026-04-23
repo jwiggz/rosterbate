@@ -566,10 +566,58 @@
       : null;
   }
 
+  function getPlayerDesignation(player){
+    return String(player?.designation || player?.injuryStatus || 'ACTIVE').trim().toUpperCase();
+  }
+
+  function isUnavailableForSimulation(player){
+    const designation=getPlayerDesignation(player);
+    return designation==='OUT' ||
+      designation==='INACTIVE' ||
+      designation==='DNP' ||
+      designation==='DOUBTFUL' ||
+      designation==='SUSPENDED' ||
+      designation==='IR';
+  }
+
+  function getStarterRankScore(player, packId){
+    if(!(player && typeof player==='object')) return 0;
+    const profile=player?.simProfile || buildPlayerSimulationProfile(player, { packId:player?.historicalPackId || packId || null });
+    return Number(
+      player?.mixedEraOverall ??
+      profile?.mixedEraRatings?.overall ??
+      profile?.ratings?.overall ??
+      player?.fp ??
+      0
+    ) || 0;
+  }
+
+  function selectSimulationStarters(roster, requestedStarters, packId){
+    const availableRequested=(Array.isArray(requestedStarters) ? requestedStarters : [])
+      .filter(function(player){ return player && !isUnavailableForSimulation(player); });
+    const requestedIds=new Set(availableRequested.map(function(player){ return Number(player?.id); }));
+    const availableBench=(Array.isArray(roster) ? roster : [])
+      .filter(function(player){
+        return player &&
+          !isUnavailableForSimulation(player) &&
+          !requestedIds.has(Number(player?.id));
+      })
+      .slice()
+      .sort(function(a, b){
+        const rankDiff=getStarterRankScore(b, packId) - getStarterRankScore(a, packId);
+        if(rankDiff) return rankDiff;
+        const fpDiff=Number(b?.fp || 0) - Number(a?.fp || 0);
+        if(fpDiff) return fpDiff;
+        return String(a?.name || '').localeCompare(String(b?.name || ''));
+      });
+    return availableRequested.concat(availableBench).slice(0, 5);
+  }
+
   function buildTeamProfile(roster, lineupIds, packId){
-    const starters=(Array.isArray(lineupIds) ? lineupIds : [])
+    const requestedStarters=(Array.isArray(lineupIds) ? lineupIds : [])
       .map(function(playerId){ return getPlayerById(roster, playerId); })
       .filter(Boolean);
+    const starters=selectSimulationStarters(roster, requestedStarters, packId);
     const tuning=getPackTuning(packId);
     const avg=function(selector, fallback){
       if(!starters.length) return fallback;
@@ -692,6 +740,189 @@
     });
   }
 
+  function buildRoundRobinDays(teams){
+    const rotation=Array.isArray(teams) ? teams.slice() : [];
+    if(rotation.length < 2) return [];
+    if(rotation.length % 2) rotation.push(null);
+    const rounds=[];
+    for(let round=0; round<rotation.length - 1; round+=1){
+      const day=[];
+      for(let index=0; index<rotation.length / 2; index+=1){
+        const left=rotation[index];
+        const right=rotation[rotation.length - 1 - index];
+        if(!(left && right)) continue;
+        day.push({
+          teamAAbbr:left.abbr,
+          teamBAbbr:right.abbr
+        });
+      }
+      rounds.push(day);
+      rotation.splice(1, 0, rotation.pop());
+    }
+    return rounds;
+  }
+
+  function buildSimulationSeasonSchedule(shell){
+    const teams=Array.isArray(shell?.teams) ? shell.teams : [];
+    const targetGames=Math.max(0, Number(shell?.regularSeasonGamesPerTeam || 82) || 82);
+    const byDay={};
+    const teamCounts=Object.fromEntries(teams.map(function(team){
+      return [team.abbr, {
+        total:0,
+        home:0,
+        away:0
+      }];
+    }));
+    const roundRobinDays=buildRoundRobinDays(teams);
+    const teamGameCounts=Object.fromEntries(teams.map(function(team){
+      return [team.abbr, 0];
+    }));
+    if(!roundRobinDays.length || !targetGames) return { byDay:byDay, teamGameCounts:teamGameCounts };
+
+    function addMatchup(day, homeAbbr, awayAbbr){
+      if(!byDay[day]) byDay[day]=[];
+      byDay[day].push({
+        homeAbbr:homeAbbr,
+        awayAbbr:awayAbbr
+      });
+      teamCounts[homeAbbr].total += 1;
+      teamCounts[homeAbbr].home += 1;
+      teamCounts[awayAbbr].total += 1;
+      teamCounts[awayAbbr].away += 1;
+      teamGameCounts[homeAbbr] += 1;
+      teamGameCounts[awayAbbr] += 1;
+    }
+
+    const fullCycleDays=Math.min(targetGames, roundRobinDays.length);
+    for(let day=1; day<=fullCycleDays; day+=1){
+      roundRobinDays[day - 1].forEach(function(matchup, index){
+        const homeFirst=(day + index) % 2 === 0;
+        addMatchup(
+          day,
+          homeFirst ? matchup.teamAAbbr : matchup.teamBAbbr,
+          homeFirst ? matchup.teamBAbbr : matchup.teamAAbbr
+        );
+      });
+    }
+
+    const reverseCycleDays=Math.min(Math.max(targetGames - fullCycleDays, 0), roundRobinDays.length);
+    for(let offset=0; offset<reverseCycleDays; offset+=1){
+      const day=fullCycleDays + offset + 1;
+      roundRobinDays[offset].forEach(function(matchup, index){
+        const homeFirst=(offset + 1 + index) % 2 === 0;
+        addMatchup(
+          day,
+          homeFirst ? matchup.teamBAbbr : matchup.teamAAbbr,
+          homeFirst ? matchup.teamAAbbr : matchup.teamBAbbr
+        );
+      });
+    }
+
+    for(let day=fullCycleDays + reverseCycleDays + 1; day<=targetGames; day+=1){
+      const templateDay=roundRobinDays[(day - fullCycleDays - reverseCycleDays - 1) % roundRobinDays.length];
+      templateDay.forEach(function(matchup, index){
+        const homeStats=teamCounts[matchup.teamAAbbr];
+        const awayStats=teamCounts[matchup.teamBAbbr];
+        let homeAbbr=matchup.teamAAbbr;
+        let awayAbbr=matchup.teamBAbbr;
+        if(homeStats.home > awayStats.home){
+          homeAbbr=matchup.teamBAbbr;
+          awayAbbr=matchup.teamAAbbr;
+        }else if(homeStats.home === awayStats.home && ((day + index) % 2 === 1)){
+          homeAbbr=matchup.teamBAbbr;
+          awayAbbr=matchup.teamAAbbr;
+        }
+        addMatchup(day, homeAbbr, awayAbbr);
+      });
+    }
+
+    return { byDay:byDay, teamGameCounts:teamGameCounts };
+  }
+
+  function buildSimulationPlayIn(conferenceStandings){
+    const ordered=(Array.isArray(conferenceStandings) ? conferenceStandings : [])
+      .slice()
+      .sort(function(a, b){
+        return Number(a?.seed || 99) - Number(b?.seed || 99);
+      });
+    return {
+      topSix:ordered.filter(function(entry){
+        const seed=Number(entry?.seed);
+        return seed >= 1 && seed <= 6;
+      }),
+      sevenEight:ordered.filter(function(entry){
+        const seed=Number(entry?.seed);
+        return seed === 7 || seed === 8;
+      }),
+      nineTen:ordered.filter(function(entry){
+        const seed=Number(entry?.seed);
+        return seed === 9 || seed === 10;
+      })
+    };
+  }
+
+  function resolveSimulationPlayIn(playIn, results){
+    const topSix=[].concat(playIn?.topSix || []).filter(Boolean);
+    const sevenEight=Array.isArray(playIn?.sevenEight) ? playIn.sevenEight : [];
+    const nineTen=Array.isArray(playIn?.nineTen) ? playIn.nineTen : [];
+    const sevenSeed=sevenEight.find(function(entry){
+      return entry?.teamAbbr === results?.sevenEightWinner;
+    });
+    const nineTenWinner=nineTen.find(function(entry){
+      return entry?.teamAbbr === results?.nineTenWinner;
+    });
+    const sevenEightLoser=sevenEight.find(function(entry){
+      return entry?.teamAbbr !== results?.sevenEightWinner;
+    });
+    const eightSeed=[sevenEightLoser, nineTenWinner].filter(Boolean).find(function(entry){
+      return entry?.teamAbbr === results?.finalWinner;
+    });
+    return topSix.concat([sevenSeed, eightSeed]).filter(Boolean);
+  }
+
+  function buildSimulationPlayoffBracket(conferences){
+    const east=Array.isArray(conferences?.east) ? conferences.east : [];
+    const west=Array.isArray(conferences?.west) ? conferences.west : [];
+
+    function buildConferenceRound(field){
+      return [
+        { higherSeed:field[0], lowerSeed:field[7] },
+        { higherSeed:field[1], lowerSeed:field[6] },
+        { higherSeed:field[2], lowerSeed:field[5] },
+        { higherSeed:field[3], lowerSeed:field[4] }
+      ];
+    }
+
+    return {
+      east:{ firstRound:buildConferenceRound(east) },
+      west:{ firstRound:buildConferenceRound(west) },
+      finals:null
+    };
+  }
+
+  function advanceSimulationSeries(series, outcome){
+    return Object.assign({}, series, {
+      winnerTeamAbbr:String(outcome?.winner || '').trim(),
+      games:Number(outcome?.games || 4)
+    });
+  }
+
+  function finalizeSimulationChampion(state){
+    const finals=state?.finals || null;
+    const winnerTeamAbbr=finals?.winnerTeamAbbr || null;
+    return {
+      championTeamAbbr:winnerTeamAbbr,
+      runnerUpTeamAbbr:finals?.higherSeed?.teamAbbr === winnerTeamAbbr
+        ? finals?.lowerSeed?.teamAbbr || null
+        : finals?.higherSeed?.teamAbbr || null,
+      finalsGames:Number(finals?.games || 0)
+    };
+  }
+
+  function convertFantasyTotalToNbaScore(total){
+    return Math.max(70, Math.round(82 + (Number(total || 0) * 0.72)));
+  }
+
   function simulateLeagueDay(options){
     const opts=options && typeof options==='object' ? options : {};
     const state=opts.state || {};
@@ -792,12 +1023,88 @@
     };
   }
 
-  global.RosterBateSimulationEngine={
+  function simulateSimulationGameDay(options){
+    const opts=options && typeof options==='object' ? options : {};
+    const state=opts.state || {};
+    const teamMeta=Array.isArray(state.teamMeta) ? state.teamMeta : [];
+    const lineupMap=opts.lineupIdsByTeam && !Array.isArray(opts.lineupIdsByTeam)
+      ? opts.lineupIdsByTeam
+      : {};
+    const matchups=(opts.schedule?.byDay?.[Number(opts.day)] || []).map(function(matchup){
+      return {
+        home:teamMeta.findIndex(function(team){ return team.abbr === matchup.homeAbbr; }),
+        away:teamMeta.findIndex(function(team){ return team.abbr === matchup.awayAbbr; })
+      };
+    }).filter(function(matchup){
+      return matchup.home >= 0 && matchup.away >= 0;
+    });
+    const lowLevel=simulateLeagueDay({
+      state:state,
+      matchups:matchups,
+      lineupIdsByTeam:teamMeta.map(function(team){
+        return Array.isArray(lineupMap[team.abbr]) ? lineupMap[team.abbr] : [];
+      }),
+      day:opts.day,
+      week:state.currentWeek
+    });
+
+    return Object.assign({}, lowLevel, {
+      gameLogs:lowLevel.gameLogs.map(function(game){
+        return Object.assign({}, game, {
+          homeScore:convertFantasyTotalToNbaScore(game.homeTotal),
+          awayScore:convertFantasyTotalToNbaScore(game.awayTotal),
+          winner:game.homeTotal >= game.awayTotal ? 'home' : 'away'
+        });
+      })
+    });
+  }
+
+  function applySimulationDayResults(state, dayResult){
+    const next=safeClone(state) || {};
+    next.completedGameLogs=(next.completedGameLogs || []).concat(dayResult?.gameLogs || []);
+    (dayResult?.gameLogs || []).forEach(function(game){
+      const home=Array.isArray(next.standings)
+        ? next.standings.find(function(row){ return Number(row.teamIdx) === Number(game.home); })
+        : null;
+      const away=Array.isArray(next.standings)
+        ? next.standings.find(function(row){ return Number(row.teamIdx) === Number(game.away); })
+        : null;
+      if(!(home && away)) return;
+      home.pf=Number(home.pf || 0) + Number(game.homeScore || 0);
+      home.pa=Number(home.pa || 0) + Number(game.awayScore || 0);
+      away.pf=Number(away.pf || 0) + Number(game.awayScore || 0);
+      away.pa=Number(away.pa || 0) + Number(game.homeScore || 0);
+      if(Number(game.homeScore || 0) >= Number(game.awayScore || 0)){
+        home.w=Number(home.w || 0) + 1;
+        away.l=Number(away.l || 0) + 1;
+      }else{
+        away.w=Number(away.w || 0) + 1;
+        home.l=Number(home.l || 0) + 1;
+      }
+    });
+    next.currentDay=Number(next.currentDay || 1) + 1;
+    next.currentWeek=Math.max(1, Math.ceil(next.currentDay / 7));
+    return next;
+  }
+
+  const api={
     ENGINE_VERSION:ENGINE_VERSION,
     buildPlayerSimulationProfile:buildPlayerSimulationProfile,
     buildMixedEraRatings:buildMixedEraRatings,
     enrichLeagueState:enrichLeagueState,
     simulateLeagueDay:simulateLeagueDay,
+    buildSimulationSeasonSchedule:buildSimulationSeasonSchedule,
+    buildSimulationPlayIn:buildSimulationPlayIn,
+    resolveSimulationPlayIn:resolveSimulationPlayIn,
+    buildSimulationPlayoffBracket:buildSimulationPlayoffBracket,
+    advanceSimulationSeries:advanceSimulationSeries,
+    finalizeSimulationChampion:finalizeSimulationChampion,
+    simulateSimulationGameDay:simulateSimulationGameDay,
+    applySimulationDayResults:applySimulationDayResults,
     computeFantasyPoints:computeFantasyPoints
   };
-})(window);
+  if(typeof module!=='undefined' && module.exports){
+    module.exports=api;
+  }
+  global.RosterBateSimulationEngine=api;
+})(typeof window!=='undefined' ? window : globalThis);
