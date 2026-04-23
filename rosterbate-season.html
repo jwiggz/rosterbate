@@ -6174,24 +6174,24 @@ function getWaiverRosterFitScore(player, needProfile){
   }
   if(positions.some(pos=>needProfile?.thinPositions?.has(pos))){
     return {
-      score:8 + Math.max(0, Math.min(2, baseValue-47)),
+      score:11 + Math.max(0, Math.min(2, baseValue-47)),
       reason:`Adds ${primaryPos} depth`
     };
   }
   if(positions.some(pos=>needProfile?.crowdedPositions?.has(pos))){
-    return { score:-6, reason:`Crowds ${primaryPos} depth` };
+    return { score:0, reason:`Crowds ${primaryPos} depth` };
   }
   if((needProfile?.trackedPositions||[]).length && positions.every(pos=>!needProfile.trackedPositions.includes(pos))){
-    return { score:-4, reason:`Lower ${primaryPos} fit` };
+    return { score:3, reason:`Stable ${primaryPos} depth` };
   }
-  return { score:0, reason:`Stable ${primaryPos} depth` };
+  return { score:3, reason:`Stable ${primaryPos} depth` };
 }
 
 function getWaiverRecentDropBoost(player){
   const recentDropIds=new Set((G?.recentDrops||[]).map(drop=>Number(drop?.player?.id)).filter(Number.isFinite));
   const recentDrop=recentDropIds.has(Number(player?.id));
   return {
-    score:recentDrop ? 1 : 0,
+    score:recentDrop ? 1.5 : 0,
     recentDrop
   };
 }
@@ -6199,7 +6199,7 @@ function getWaiverRecentDropBoost(player){
 function getWaiverWatchListBoost(player){
   const watchListed=isWatchListed(player?.id);
   return {
-    score:watchListed ? 12 : 0,
+    score:watchListed ? 9 : 0,
     watchListed
   };
 }
@@ -6259,8 +6259,8 @@ function getWaiverRadarCandidates(limit=4){
     .map(player=>getWaiverRadarCandidateScore(player, needProfile))
     .sort((a,b)=>{
       if(b.score!==a.score) return b.score-a.score;
-      if(b.watchBoost!==a.watchBoost) return b.watchBoost-a.watchBoost;
       if(b.fitScore!==a.fitScore) return b.fitScore-a.fitScore;
+      if(b.watchBoost!==a.watchBoost) return b.watchBoost-a.watchBoost;
       return b.baseScore-a.baseScore;
     })
     .slice(0, Math.max(1, limit));
