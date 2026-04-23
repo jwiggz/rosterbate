@@ -27,9 +27,13 @@ async function main(){
   ];
   const franchiseSelect = { value: 'LAL', innerHTML: '' };
   const draftSlotSelect = { value: '4', innerHTML: '' };
+  const continueButton = { disabled: false };
+  const autoDraftButton = { disabled: false };
   const sourceSeasonList = { innerHTML: '' };
   const statusNode = { textContent: '' };
   const elementMap = {
+    simulationContinueBtn: continueButton,
+    simulationAutoDraftBtn: autoDraftButton,
     simulationFranchiseSelect: franchiseSelect,
     simulationDraftSlotSelect: draftSlotSelect,
     simulationSourceSeasonList: sourceSeasonList,
@@ -204,6 +208,8 @@ async function main(){
     document: {
       getElementById(id){
         if (id === 'simulationSetupStatus') return autoDraftStatusNode;
+        if (id === 'simulationContinueBtn') return { disabled: false };
+        if (id === 'simulationAutoDraftBtn') return { disabled: false };
         if (id === 'simulationFranchiseSelect') return { value: 'LAL', innerHTML: '' };
         if (id === 'simulationDraftSlotSelect') return { value: '4', innerHTML: '' };
         if (id === 'simulationSourceSeasonList') return { innerHTML: '' };
