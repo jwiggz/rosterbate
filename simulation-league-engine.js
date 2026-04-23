@@ -692,6 +692,58 @@
     });
   }
 
+  function buildRoundRobinDays(teams){
+    const rotation=Array.isArray(teams) ? teams.slice() : [];
+    if(rotation.length < 2) return [];
+    if(rotation.length % 2) rotation.push(null);
+    const rounds=[];
+    for(let round=0; round<rotation.length - 1; round+=1){
+      const day=[];
+      for(let index=0; index<rotation.length / 2; index+=1){
+        const left=rotation[index];
+        const right=rotation[rotation.length - 1 - index];
+        if(!(left && right)) continue;
+        const homeFirst=(round + index) % 2 === 0;
+        day.push({
+          homeAbbr:homeFirst ? left.abbr : right.abbr,
+          awayAbbr:homeFirst ? right.abbr : left.abbr
+        });
+      }
+      rounds.push(day);
+      rotation.splice(1, 0, rotation.pop());
+    }
+    return rounds;
+  }
+
+  function buildSimulationSeasonSchedule(shell){
+    const teams=Array.isArray(shell?.teams) ? shell.teams : [];
+    const targetGames=Math.max(0, Number(shell?.regularSeasonGamesPerTeam || 82) || 82);
+    const byDay={};
+    const teamGameCounts=Object.fromEntries(teams.map(function(team){
+      return [team.abbr, 0];
+    }));
+    const roundRobinDays=buildRoundRobinDays(teams);
+    if(!roundRobinDays.length || !targetGames) return { byDay:byDay, teamGameCounts:teamGameCounts };
+
+    for(let day=1; day<=targetGames; day+=1){
+      const slate=roundRobinDays[(day - 1) % roundRobinDays.length].map(function(matchup){
+        teamGameCounts[matchup.homeAbbr] += 1;
+        teamGameCounts[matchup.awayAbbr] += 1;
+        return {
+          homeAbbr:matchup.homeAbbr,
+          awayAbbr:matchup.awayAbbr
+        };
+      });
+      byDay[day]=slate;
+    }
+
+    return { byDay:byDay, teamGameCounts:teamGameCounts };
+  }
+
+  function convertFantasyTotalToNbaScore(total){
+    return Math.max(70, Math.round(82 + (Number(total || 0) * 0.72)));
+  }
+
   function simulateLeagueDay(options){
     const opts=options && typeof options==='object' ? options : {};
     const state=opts.state || {};
@@ -792,12 +844,83 @@
     };
   }
 
-  global.RosterBateSimulationEngine={
+  function simulateSimulationGameDay(options){
+    const opts=options && typeof options==='object' ? options : {};
+    const state=opts.state || {};
+    const teamMeta=Array.isArray(state.teamMeta) ? state.teamMeta : [];
+    const lineupMap=opts.lineupIdsByTeam && !Array.isArray(opts.lineupIdsByTeam)
+      ? opts.lineupIdsByTeam
+      : {};
+    const matchups=(opts.schedule?.byDay?.[Number(opts.day)] || []).map(function(matchup){
+      return {
+        home:teamMeta.findIndex(function(team){ return team.abbr === matchup.homeAbbr; }),
+        away:teamMeta.findIndex(function(team){ return team.abbr === matchup.awayAbbr; })
+      };
+    }).filter(function(matchup){
+      return matchup.home >= 0 && matchup.away >= 0;
+    });
+    const lowLevel=simulateLeagueDay({
+      state:state,
+      matchups:matchups,
+      lineupIdsByTeam:teamMeta.map(function(team){
+        return Array.isArray(lineupMap[team.abbr]) ? lineupMap[team.abbr] : [];
+      }),
+      day:opts.day,
+      week:state.currentWeek
+    });
+
+    return Object.assign({}, lowLevel, {
+      gameLogs:lowLevel.gameLogs.map(function(game){
+        return Object.assign({}, game, {
+          homeScore:convertFantasyTotalToNbaScore(game.homeTotal),
+          awayScore:convertFantasyTotalToNbaScore(game.awayTotal),
+          winner:game.homeTotal >= game.awayTotal ? 'home' : 'away'
+        });
+      })
+    });
+  }
+
+  function applySimulationDayResults(state, dayResult){
+    const next=safeClone(state) || {};
+    next.completedGameLogs=(next.completedGameLogs || []).concat(dayResult?.gameLogs || []);
+    (dayResult?.gameLogs || []).forEach(function(game){
+      const home=Array.isArray(next.standings)
+        ? next.standings.find(function(row){ return Number(row.teamIdx) === Number(game.home); })
+        : null;
+      const away=Array.isArray(next.standings)
+        ? next.standings.find(function(row){ return Number(row.teamIdx) === Number(game.away); })
+        : null;
+      if(!(home && away)) return;
+      home.pf=Number(home.pf || 0) + Number(game.homeScore || 0);
+      home.pa=Number(home.pa || 0) + Number(game.awayScore || 0);
+      away.pf=Number(away.pf || 0) + Number(game.awayScore || 0);
+      away.pa=Number(away.pa || 0) + Number(game.homeScore || 0);
+      if(Number(game.homeScore || 0) >= Number(game.awayScore || 0)){
+        home.w=Number(home.w || 0) + 1;
+        away.l=Number(away.l || 0) + 1;
+      }else{
+        away.w=Number(away.w || 0) + 1;
+        home.l=Number(home.l || 0) + 1;
+      }
+    });
+    next.currentDay=Number(next.currentDay || 1) + 1;
+    next.currentWeek=Math.max(1, Math.ceil(next.currentDay / 7));
+    return next;
+  }
+
+  const api={
     ENGINE_VERSION:ENGINE_VERSION,
     buildPlayerSimulationProfile:buildPlayerSimulationProfile,
     buildMixedEraRatings:buildMixedEraRatings,
     enrichLeagueState:enrichLeagueState,
     simulateLeagueDay:simulateLeagueDay,
+    buildSimulationSeasonSchedule:buildSimulationSeasonSchedule,
+    simulateSimulationGameDay:simulateSimulationGameDay,
+    applySimulationDayResults:applySimulationDayResults,
     computeFantasyPoints:computeFantasyPoints
   };
-})(window);
+  if(typeof module!=='undefined' && module.exports){
+    module.exports=api;
+  }
+  global.RosterBateSimulationEngine=api;
+})(typeof window!=='undefined' ? window : globalThis);
