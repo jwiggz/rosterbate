@@ -373,6 +373,25 @@ assert.equal(
   'play_in',
   'adapter should expose a playoffs view model once postseason play begins'
 );
+assert.deepStrictEqual(
+  playInState.seasonState.standings.map((row) => ({ teamAbbr: row.teamAbbr, w: row.w, l: row.l })),
+  postseasonReadyState.seasonState.standings.map((row) => ({ teamAbbr: row.teamAbbr, w: row.w, l: row.l })),
+  'simulateNextDay should keep regular-season standings frozen once postseason play begins'
+);
+
+let roundOneState = playInState;
+for (let index = 0; index < 2; index += 1) {
+  roundOneState = postseasonTransitionAdapter.simulateNextDay();
+}
+assert.equal(
+  roundOneState.postseasonState.phase,
+  'playoffs_round_1',
+  'simulateNextDay should be able to advance from play-in results into the first playoff round'
+);
+assert.ok(
+  Object.values(roundOneState.postseasonState.seriesById || {}).some((series) => series.round === 'playoffs_round_1'),
+  'advancing out of the play-in should seed first-round playoff series'
+);
 
 const finalsCloseoutSeedState = JSON.parse(JSON.stringify(playInState));
 finalsCloseoutSeedState.seasonState.currentDay = 30;
@@ -468,8 +487,8 @@ assert.deepStrictEqual(
   'completed postseason state should keep runner-up details frozen on later simulateNextDay calls'
 );
 
-const postseasonDayCount = playInState.seasonState.currentDay;
-const postseasonLogCount = playInState.seasonState.completedGameLogs.length;
+const postseasonDayCount = roundOneState.seasonState.currentDay;
+const postseasonLogCount = roundOneState.seasonState.completedGameLogs.length;
 const postseasonAlreadyOverState = postseasonTransitionAdapter.simulateNextDay();
 assert.equal(
   postseasonAlreadyOverState.seasonState.currentDay,

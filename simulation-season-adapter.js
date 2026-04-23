@@ -137,6 +137,44 @@
       .filter(Boolean);
   }
 
+  function buildSimulationExecutionContext(state, shell){
+    const teamMeta = clone(shell?.teams || []);
+    const teamNames = teamMeta.map((team) => team.name);
+    const allRosters = teamMeta.map((team) => clone(state?.draftState?.rostersByTeam?.[team.abbr] || []));
+    const currentSeasonState = clone(state?.seasonState || {});
+    return {
+      teamMeta,
+      teamNames,
+      allRosters,
+      currentSeasonState,
+      engineSeasonState: {
+        ...currentSeasonState,
+        standings: normalizeSimulationStandingsRows(state, teamMeta)
+      }
+    };
+  }
+
+  function simulateEngineDay(state, shell, dayScheduleByDay, day){
+    const simulationContext = buildSimulationExecutionContext(state, shell);
+    return {
+      ...simulationContext,
+      dayResult: engineApi.simulateSimulationGameDay({
+        state: {
+          ...simulationContext.engineSeasonState,
+          seasonId: state?.seasonId || state?.historicalUniverseSlotId || null,
+          teamMeta: simulationContext.teamMeta,
+          teams: simulationContext.teamNames,
+          allRosters: simulationContext.allRosters
+        },
+        schedule: {
+          byDay: clone(dayScheduleByDay || {})
+        },
+        day: Number(day || simulationContext.currentSeasonState.currentDay || 1),
+        lineupIdsByTeam: clone(simulationContext.currentSeasonState.lineupIdsByTeam || {})
+      })
+    };
+  }
+
   function getSeriesTeam(series, teamAbbr){
     const targetAbbr = String(teamAbbr || '').trim().toUpperCase();
     if (String(series?.higherSeed?.teamAbbr || '').trim().toUpperCase() === targetAbbr) {
@@ -234,6 +272,65 @@
     };
   }
 
+  function buildPlayInResultsForConference(seriesById, conference){
+    return {
+      sevenEightWinner: seriesById?.[`${conference}-play-in-7-8`]?.winnerTeamAbbr || null,
+      nineTenWinner: seriesById?.[`${conference}-play-in-9-10`]?.winnerTeamAbbr || null,
+      finalWinner: seriesById?.[`${conference}-play-in-final`]?.winnerTeamAbbr || null
+    };
+  }
+
+  function resolvePlayoffFieldForConference(postseasonState, seriesById, conference){
+    if (typeof engineApi.resolveSimulationPlayIn !== 'function') {
+      return [];
+    }
+    return engineApi.resolveSimulationPlayIn(
+      postseasonState?.playIn?.[conference] || {},
+      buildPlayInResultsForConference(seriesById, conference)
+    );
+  }
+
+  function seedConferenceRoundSeries(seriesById, round, conference, teams){
+    buildPlayoffSeriesForRound(round, conference, teams).forEach((series) => {
+      seriesById[series.id] = series;
+    });
+  }
+
+  function seedPlayoffRoundFromFields(postseasonState, seriesById, round, eastField, westField){
+    const nextBracket = round === 'playoffs_round_1' && typeof engineApi.buildSimulationPlayoffBracket === 'function'
+      ? engineApi.buildSimulationPlayoffBracket({ east: eastField, west: westField })
+      : clone(postseasonState?.bracket || {});
+    seedConferenceRoundSeries(seriesById, round, 'east', eastField);
+    seedConferenceRoundSeries(seriesById, round, 'west', westField);
+    return nextBracket;
+  }
+
+  function buildFinalsSeriesFromConferenceWinners(seriesById, winners){
+    const finalists = (Array.isArray(winners) ? winners : [])
+      .filter(Boolean)
+      .sort((a, b) => {
+        const seedDiff = Number(a?.seed || 99) - Number(b?.seed || 99);
+        if (seedDiff) return seedDiff;
+        return String(a?.teamAbbr || '').localeCompare(String(b?.teamAbbr || ''));
+      });
+    return seriesById.finals || buildSeriesState(
+      'finals',
+      'finals',
+      'finals',
+      finalists[0] || null,
+      finalists[1] || null,
+      4
+    );
+  }
+
+  function getRoundWinnersForConference(roundSeries, conference){
+    return (Array.isArray(roundSeries) ? roundSeries : [])
+      .filter((series) => series.conference === conference)
+      .map((series) => getSeriesTeam(series, series.winnerTeamAbbr))
+      .filter(Boolean)
+      .sort((a, b) => Number(a?.seed || 99) - Number(b?.seed || 99));
+  }
+
   function buildCurrentDayPostseasonSchedule(nextState){
     const postseasonState = nextState?.postseasonState || {};
     const phase = String(postseasonState?.phase || '').trim();
@@ -297,29 +394,15 @@
       });
 
       if (seriesById['east-play-in-final']?.winnerTeamAbbr && seriesById['west-play-in-final']?.winnerTeamAbbr) {
-        const eastField = typeof engineApi.resolveSimulationPlayIn === 'function'
-          ? engineApi.resolveSimulationPlayIn(resolvedState.playIn?.east || {}, {
-            sevenEightWinner: seriesById['east-play-in-7-8']?.winnerTeamAbbr || null,
-            nineTenWinner: seriesById['east-play-in-9-10']?.winnerTeamAbbr || null,
-            finalWinner: seriesById['east-play-in-final']?.winnerTeamAbbr || null
-          })
-          : [];
-        const westField = typeof engineApi.resolveSimulationPlayIn === 'function'
-          ? engineApi.resolveSimulationPlayIn(resolvedState.playIn?.west || {}, {
-            sevenEightWinner: seriesById['west-play-in-7-8']?.winnerTeamAbbr || null,
-            nineTenWinner: seriesById['west-play-in-9-10']?.winnerTeamAbbr || null,
-            finalWinner: seriesById['west-play-in-final']?.winnerTeamAbbr || null
-          })
-          : [];
-        const bracket = typeof engineApi.buildSimulationPlayoffBracket === 'function'
-          ? engineApi.buildSimulationPlayoffBracket({ east: eastField, west: westField })
-          : { east: { firstRound: [] }, west: { firstRound: [] }, finals: null };
-        buildPlayoffSeriesForRound('playoffs_round_1', 'east', eastField).forEach((series) => {
-          seriesById[series.id] = series;
-        });
-        buildPlayoffSeriesForRound('playoffs_round_1', 'west', westField).forEach((series) => {
-          seriesById[series.id] = series;
-        });
+        const eastField = resolvePlayoffFieldForConference(resolvedState, seriesById, 'east');
+        const westField = resolvePlayoffFieldForConference(resolvedState, seriesById, 'west');
+        const bracket = seedPlayoffRoundFromFields(
+          resolvedState,
+          seriesById,
+          'playoffs_round_1',
+          eastField,
+          westField
+        );
         return {
           ...resolvedState,
           phase: 'playoffs_round_1',
@@ -380,29 +463,10 @@
     }
 
     if (currentRound === 'conference_finals') {
-      const eastChampion = getSeriesTeam(
-        currentRoundSeries.find((series) => series.conference === 'east'),
-        currentRoundSeries.find((series) => series.conference === 'east')?.winnerTeamAbbr
-      );
-      const westChampion = getSeriesTeam(
-        currentRoundSeries.find((series) => series.conference === 'west'),
-        currentRoundSeries.find((series) => series.conference === 'west')?.winnerTeamAbbr
-      );
-      const finalists = [eastChampion, westChampion]
-        .filter(Boolean)
-        .sort((a, b) => {
-          const seedDiff = Number(a?.seed || 99) - Number(b?.seed || 99);
-          if (seedDiff) return seedDiff;
-          return String(a?.teamAbbr || '').localeCompare(String(b?.teamAbbr || ''));
-        });
-      const finalsSeries = seriesById.finals || buildSeriesState(
-        'finals',
-        'finals',
-        'finals',
-        finalists[0] || null,
-        finalists[1] || null,
-        4
-      );
+      const finalsSeries = buildFinalsSeriesFromConferenceWinners(seriesById, [
+        ...getRoundWinnersForConference(currentRoundSeries, 'east'),
+        ...getRoundWinnersForConference(currentRoundSeries, 'west')
+      ]);
       seriesById.finals = finalsSeries;
       return {
         ...resolvedState,
@@ -432,14 +496,7 @@
     }
 
     ['east', 'west'].forEach((conference) => {
-      const conferenceWinners = currentRoundSeries
-        .filter((series) => series.conference === conference)
-        .map((series) => getSeriesTeam(series, series.winnerTeamAbbr))
-        .filter(Boolean)
-        .sort((a, b) => Number(a?.seed || 99) - Number(b?.seed || 99));
-      buildPlayoffSeriesForRound(nextRound, conference, conferenceWinners).forEach((series) => {
-        seriesById[series.id] = series;
-      });
+      seedConferenceRoundSeries(seriesById, nextRound, conference, getRoundWinnersForConference(currentRoundSeries, conference));
     });
 
     return {
@@ -524,6 +581,14 @@
     };
   }
 
+  function applyPostseasonDayResults(currentSeasonState, dayResult){
+    const nextSeasonState = clone(currentSeasonState || {});
+    nextSeasonState.completedGameLogs = (nextSeasonState.completedGameLogs || []).concat(dayResult?.gameLogs || []);
+    nextSeasonState.currentDay = Number(nextSeasonState.currentDay || 1) + 1;
+    nextSeasonState.currentWeek = Math.max(1, Math.ceil(Number(nextSeasonState.currentDay || 1) / 7));
+    return nextSeasonState;
+  }
+
   function simulatePostseasonDay(nextState, shell){
     const workingState = clone(nextState || {});
     const postseasonState = clone(workingState?.postseasonState || {});
@@ -542,31 +607,13 @@
     if (!todayGames.length) {
       return workingState;
     }
-    const teamMeta = clone(shell?.teams || []);
-    const teamNames = teamMeta.map((team) => team.name);
-    const allRosters = teamMeta.map((team) => clone(workingState?.draftState?.rostersByTeam?.[team.abbr] || []));
-    const currentSeasonState = clone(workingState?.seasonState || {});
-    const engineSeasonState = {
-      ...currentSeasonState,
-      standings: normalizeSimulationStandingsRows(workingState, teamMeta)
-    };
-    const dayResult = engineApi.simulateSimulationGameDay({
-      state: {
-        ...engineSeasonState,
-        seasonId: workingState?.seasonId || workingState?.historicalUniverseSlotId || null,
-        teamMeta,
-        teams: teamNames,
-        allRosters
-      },
-      schedule: {
-        byDay: {
-          [currentDay]: clone(todayGames)
-        }
-      },
-      day: currentDay,
-      lineupIdsByTeam: clone(currentSeasonState.lineupIdsByTeam || {})
-    });
-    const nextSeasonState = engineApi.applySimulationDayResults(engineSeasonState, dayResult);
+    const { currentSeasonState, dayResult } = simulateEngineDay(
+      workingState,
+      shell,
+      { [currentDay]: clone(todayGames) },
+      currentDay
+    );
+    const nextSeasonState = applyPostseasonDayResults(currentSeasonState, dayResult);
     const nextPostseasonState = advancePostseasonStateFromResults(workingState, nextSeasonState, todayGames, dayResult);
     return {
       ...clone(workingState),
@@ -774,27 +821,12 @@
           state = simulatePostseasonDay(ensurePostseasonSnapshot(state, totalDays), shell);
           return this.getState();
         }
-        const schedule = { byDay: clone(scheduleByDay) };
-        const teamMeta = clone(shell.teams || []);
-        const teamNames = teamMeta.map((team) => team.name);
-        const allRosters = teamMeta.map((team) => clone(state?.draftState?.rostersByTeam?.[team.abbr] || []));
-        const currentSeasonState = clone(state?.seasonState || {});
-        const engineSeasonState = {
-          ...currentSeasonState,
-          standings: normalizeSimulationStandingsRows(state, teamMeta)
-        };
-        const dayResult = engineApi.simulateSimulationGameDay({
-          state: {
-            ...engineSeasonState,
-            seasonId: state?.seasonId || state?.historicalUniverseSlotId || null,
-            teamMeta,
-            teams: teamNames,
-            allRosters
-          },
-          schedule,
-          day: Number(currentSeasonState.currentDay || 1),
-          lineupIdsByTeam: clone(currentSeasonState.lineupIdsByTeam || {})
-        });
+        const { currentSeasonState, engineSeasonState, dayResult } = simulateEngineDay(
+          state,
+          shell,
+          scheduleByDay,
+          Number(state?.seasonState?.currentDay || 1)
+        );
         const nextSeasonState = engineApi.applySimulationDayResults(engineSeasonState, dayResult);
         state = ensurePostseasonSnapshot({
           ...clone(state),
