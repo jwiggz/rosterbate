@@ -125,26 +125,42 @@
     return next;
   }
 
+  function pruneLineupIds(next, teamAbbr, removedPlayerIds){
+    const seasonState = next.seasonState || {};
+    const lineupIdsByTeam = seasonState.lineupIdsByTeam || {};
+    const currentLineup = Array.isArray(lineupIdsByTeam[teamAbbr]) ? lineupIdsByTeam[teamAbbr] : [];
+    const removedIds = new Set((Array.isArray(removedPlayerIds) ? removedPlayerIds : []).map(Number));
+    lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(Number(id)));
+    seasonState.lineupIdsByTeam = lineupIdsByTeam;
+    next.seasonState = seasonState;
+  }
+
   function claimSimulationFreeAgent(state, move){
-    const next = clone(state);
     const teamAbbr = normalizeTeamAbbr(move?.teamAbbr);
     const addId = Number(move?.addPlayerId);
     const dropId = Number(move?.dropPlayerId);
 
+    const draftState = state?.draftState || {};
+    const roster = Array.isArray(draftState.rostersByTeam?.[teamAbbr]) ? draftState.rostersByTeam[teamAbbr] : [];
+    const freeAgents = Array.isArray(draftState.freeAgents) ? draftState.freeAgents : [];
+    const addPlayer = freeAgents.find((player) => Number(player.id) === addId);
+    const droppedPlayer = roster.find((player) => Number(player.id) === dropId);
+
+    if (!addPlayer || !droppedPlayer) {
+      return clone(state);
+    }
+
+    const next = clone(state);
     next.draftState = next.draftState || {};
     next.draftState.rostersByTeam = next.draftState.rostersByTeam || {};
     next.draftState.freeAgents = Array.isArray(next.draftState.freeAgents) ? next.draftState.freeAgents : [];
     next.seasonState = next.seasonState || {};
     next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
 
-    const addPlayer = next.draftState.freeAgents.find((player) => Number(player.id) === addId);
-    const roster = Array.isArray(next.draftState.rostersByTeam[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
-    const droppedPlayer = roster.find((player) => Number(player.id) === dropId);
-
-    next.draftState.rostersByTeam[teamAbbr] = roster.filter((player) => Number(player.id) !== dropId);
-    if (addPlayer) next.draftState.rostersByTeam[teamAbbr].push(addPlayer);
-    if (droppedPlayer) next.draftState.freeAgents.push(droppedPlayer);
-    next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player.id) !== addId);
+    const nextRoster = Array.isArray(next.draftState.rostersByTeam[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
+    next.draftState.rostersByTeam[teamAbbr] = nextRoster.filter((player) => Number(player.id) !== dropId).concat(addPlayer);
+    next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player.id) !== addId).concat(droppedPlayer);
+    pruneLineupIds(next, teamAbbr, [dropId]);
     next.seasonState.activityLog.unshift({
       type: 'waiver',
       teamAbbr,
@@ -155,24 +171,34 @@
   }
 
   function applySimulationTrade(state, trade){
-    const next = clone(state);
     const fromTeamAbbr = normalizeTeamAbbr(trade?.fromTeamAbbr);
     const toTeamAbbr = normalizeTeamAbbr(trade?.toTeamAbbr);
     const outgoingIds = new Set((Array.isArray(trade?.outgoingPlayerIds) ? trade.outgoingPlayerIds : []).map(Number));
     const incomingIds = new Set((Array.isArray(trade?.incomingPlayerIds) ? trade.incomingPlayerIds : []).map(Number));
 
+    const draftState = state?.draftState || {};
+    const fromRoster = Array.isArray(draftState.rostersByTeam?.[fromTeamAbbr]) ? draftState.rostersByTeam[fromTeamAbbr] : [];
+    const toRoster = Array.isArray(draftState.rostersByTeam?.[toTeamAbbr]) ? draftState.rostersByTeam[toTeamAbbr] : [];
+    const outgoing = fromRoster.filter((player) => outgoingIds.has(Number(player.id)));
+    const incoming = toRoster.filter((player) => incomingIds.has(Number(player.id)));
+
+    if (outgoing.length !== outgoingIds.size || incoming.length !== incomingIds.size) {
+      return clone(state);
+    }
+
+    const next = clone(state);
     next.draftState = next.draftState || {};
     next.draftState.rostersByTeam = next.draftState.rostersByTeam || {};
     next.seasonState = next.seasonState || {};
     next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
 
-    const fromRoster = Array.isArray(next.draftState.rostersByTeam[fromTeamAbbr]) ? next.draftState.rostersByTeam[fromTeamAbbr] : [];
-    const toRoster = Array.isArray(next.draftState.rostersByTeam[toTeamAbbr]) ? next.draftState.rostersByTeam[toTeamAbbr] : [];
-    const outgoing = fromRoster.filter((player) => outgoingIds.has(Number(player.id)));
-    const incoming = toRoster.filter((player) => incomingIds.has(Number(player.id)));
+    const nextFromRoster = Array.isArray(next.draftState.rostersByTeam[fromTeamAbbr]) ? next.draftState.rostersByTeam[fromTeamAbbr] : [];
+    const nextToRoster = Array.isArray(next.draftState.rostersByTeam[toTeamAbbr]) ? next.draftState.rostersByTeam[toTeamAbbr] : [];
 
-    next.draftState.rostersByTeam[fromTeamAbbr] = fromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(incoming);
-    next.draftState.rostersByTeam[toTeamAbbr] = toRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(outgoing);
+    next.draftState.rostersByTeam[fromTeamAbbr] = nextFromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(incoming);
+    next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(outgoing);
+    pruneLineupIds(next, fromTeamAbbr, Array.from(outgoingIds));
+    pruneLineupIds(next, toTeamAbbr, Array.from(incomingIds));
     next.seasonState.activityLog.unshift({
       type: 'trade',
       title: `${fromTeamAbbr} traded with ${toTeamAbbr}`,
