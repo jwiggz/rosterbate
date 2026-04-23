@@ -2310,10 +2310,21 @@ function resolveCompletedSimulationDraftSeasonBoot(params, requestedSport){
   return {
     redirected:false,
     redirectUrl:'',
+    shouldConsumeAfterBoot:true,
     slotId:String(rawState?.historicalUniverseSlotId || rawState?.slotId || '').trim() || null,
     rawState,
     state:normalizeSharedSimulationSeasonBootState(rawState, rawState?.historicalUniverseSlotId || rawState?.slotId || null)
   };
+}
+
+function consumeCompletedSimulationDraftFallbackBoot(boot){
+  if(!boot || boot.redirected || !boot.shouldConsumeAfterBoot) return false;
+  try{
+    return !!window.RosterBateSimulationModeRuntime?.clearCompletedSimulationState?.();
+  }catch(e){
+    console.warn('Failed to clear consumed completed simulation draft handoff:', e);
+    return false;
+  }
 }
 
 function loadHistoricalUniverseSlotState(slotId, requestedSport){
@@ -7185,9 +7196,18 @@ window.onload=async function(){
     applySportContext(D.sport || requestedSport);
     hydrateDraftUserContextFromLobby();
     refreshCommissionerAccess();
-    try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+    let storedFallbackResumeState = false;
+    try{
+      localStorage.setItem('rosterbateDraft', JSON.stringify(D));
+      storedFallbackResumeState = true;
+    }catch(e){
+      console.warn('Failed to persist fallback simulation resume state before boot:', e);
+    }
     initSeason();
     applyRequestedSeasonView();
+    if (storedFallbackResumeState) {
+      consumeCompletedSimulationDraftFallbackBoot(completedSimulationDraftBoot);
+    }
     return;
   }
 

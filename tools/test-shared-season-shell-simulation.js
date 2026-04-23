@@ -40,6 +40,7 @@ module.exports = {
   getRequestedHistoricalUniverseSlotId,
   readCompletedSimulationDraftState,
   resolveCompletedSimulationDraftSeasonBoot,
+  consumeCompletedSimulationDraftFallbackBoot,
   isSharedSimulationSeason,
   shouldPersistSharedSimulationState,
   getActiveSeasonPages,
@@ -320,6 +321,7 @@ assert.equal(
 );
 assert.match(html, /function resolveCompletedSimulationDraftSeasonBoot\(/, 'season shell should expose a completed-draft handoff helper');
 assert.match(html, /const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot\(urlParams, requestedSport\);/, 'season shell should check runtime completed-draft handoffs during boot');
+assert.match(html, /function consumeCompletedSimulationDraftFallbackBoot\(/, 'season shell should expose a fallback-handoff consumption helper');
 
 const fixture = {
   simulationMode: 'nba_mixed_era_single_player_v1',
@@ -407,10 +409,22 @@ const completedDraftFallback = toPlain(
 
 assert.equal(completedDraftFallback.redirected, false, 'completed-draft handoff should fall back to direct boot when slot persistence fails');
 assert.equal(completedDraftFallback.redirectUrl, '', 'fallback handoff should skip redirecting when slot persistence fails');
+assert.equal(completedDraftFallback.shouldConsumeAfterBoot, true, 'fallback handoff should mark the completed draft payload for one-shot consumption after a successful boot');
 assert.equal(completedDraftFallback.slotId, null, 'fallback handoff should boot without a slot when no slot could be created');
 assert.equal(completedDraftFallback.state.seasonId, 'simulation:shared-season', 'fallback handoff should normalize the raw simulation state into the shared shell boot shape');
 assert.equal(completedDraftFallback.state.allRosters[0][0].name, 'Michael Jordan', 'fallback handoff should preserve completed-draft rosters');
 assert.equal(completedDraftClearCount, 0, 'fallback handoff should keep the runtime payload available when slot persistence fails');
+assert.equal(
+  api.consumeCompletedSimulationDraftFallbackBoot(completedDraftFallback),
+  true,
+  'fallback handoff should be clearable after the season shell establishes its own resume state'
+);
+assert.equal(completedDraftClearCount, 1, 'fallback handoff consumption should clear the one-shot runtime payload after a successful boot');
+assert.equal(
+  api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era'), 'nba'),
+  null,
+  'a consumed fallback handoff should not win on a second visit'
+);
 
 assert.equal(
   api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era&historicalUniverse=existing-slot'), 'nba'),
