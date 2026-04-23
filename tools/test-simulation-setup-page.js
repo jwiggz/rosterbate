@@ -17,7 +17,7 @@ async function main(){
   assert.match(inlineScript, /function enterSimulationDraft\(\)/, 'setup page needs a draft handoff function');
   assert.match(inlineScript, /buildMixedEraDraftContextFromBundles/, 'setup page should preflight the mixed-era pool before entering the draft');
   assert.match(setupHtml, /id="simulationAutoDraftBtn"/, 'setup page should expose an auto-draft CTA');
-  assert.match(inlineScript, /function simDraftAndStartSeason\(\)/, 'setup page needs an auto-draft handoff function');
+  assert.match(inlineScript, /simDraftAndStartSeason/, 'setup page needs an auto-draft handoff function');
   assert.match(inlineScript, /buildCompletedSimulationAutoDraftState/, 'setup page should build the completed auto-draft simulation state');
   assert.match(inlineScript, /writeCompletedSimulationState/, 'setup page should persist the completed simulation state');
 
@@ -187,6 +187,8 @@ async function main(){
     search: '?sport=nba'
   };
   const autoDraftWrites = [];
+  let autoDraftHelperInput = null;
+  let autoDraftHelperResult = null;
   const autoDraftContext = {
     console,
     URLSearchParams,
@@ -232,7 +234,8 @@ async function main(){
       return state;
     },
     buildCompletedSimulationAutoDraftState(input){
-      return {
+      autoDraftHelperInput = input;
+      autoDraftHelperResult = {
         simulationMode: 'nba_mixed_era_single_player_v1',
         leagueShell: input.shell,
         sourceSeasons: input.mixedEraContext,
@@ -252,6 +255,7 @@ async function main(){
           phase: 'regular_season'
         }
       };
+      return autoDraftHelperResult;
     }
   };
   autoDraftContext.window.RosterBateSimulationModeConfig = context.window.RosterBateSimulationModeConfig;
@@ -267,6 +271,15 @@ async function main(){
 
   const completedWrites = autoDraftWrites.filter((entry) => entry.kind === 'completed');
   assert.equal(completedWrites.length, 1, 'setup page should write one completed simulation state');
+  assert.equal(autoDraftHelperInput.controlledTeamAbbr, 'LAL', 'auto-draft path should forward the selected franchise');
+  assert.deepStrictEqual(
+    autoDraftHelperInput.mixedEraContext.sourcePackIds,
+    ['nba_1987_full_season_v1', 'nba_1993_full_season_v1', 'nba_1996_full_season_v1'],
+    'auto-draft path should forward the selected source seasons'
+  );
+  assert.equal(autoDraftHelperInput.shell.teams.length, 30, 'auto-draft path should forward the configured 30-team shell');
+  assert.equal(autoDraftHelperInput.shell.rosterSize, 10, 'auto-draft path should forward the configured roster size');
+  assert.strictEqual(completedWrites[0].state, autoDraftHelperResult, 'setup page should write the helper result unchanged');
   assert.equal(completedWrites[0].state.draftState.controlledTeamAbbr, 'LAL', 'auto-draft path should preserve the selected team');
   assert.equal(autoDraftLocationState.href, 'rosterbate-season.html?sport=nba&simulation=nba_mixed_era', 'auto-draft path should enter the season shell directly');
 
