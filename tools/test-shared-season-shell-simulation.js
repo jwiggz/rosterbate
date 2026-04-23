@@ -22,8 +22,16 @@ ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
 ${extractBetween('function isHistoricalSimulationUniverse(', 'function isHistoricalDraftUniverse(')}
 ${extractBetween('function setSeasonSidePanelVisible(', 'function buildPowerupCardsHtml(')}
-${extractBetween('function setHubSummaryStatLabels(', 'function renderSimulationHubInSharedShell(')}
-${extractBetween('function renderSimulationHubInSharedShell(', 'function renderActiveSeasonScreen(')}
+${extractBetween('function setHubSummaryStatLabels(', 'function persistSimulationSeasonState(')}
+${extractBetween('function persistSimulationSeasonState(', 'function buildPowerupCardsHtml(')}
+${extractBetween('function renderSimulationHubInSharedShell(', 'function renderSimulationWaiverInSharedShell(')}
+${extractBetween('function renderSimulationWaiverInSharedShell(', 'function claimSimulationFreeAgentFromShell(')}
+${extractBetween('function claimSimulationFreeAgentFromShell(', 'function renderSimulationTradesInSharedShell(')}
+${extractBetween('function renderSimulationTradesInSharedShell(', 'function applySimulationTradeFromShell(')}
+${extractBetween('function applySimulationTradeFromShell(', 'function renderSimulationStandingsInSharedShell(')}
+${extractBetween('function renderSimulationStandingsInSharedShell(', 'function renderSimulationRosterInSharedShell(')}
+${extractBetween('function renderSimulationRosterInSharedShell(', 'function renderSimulationScheduleInSharedShell(')}
+${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderActiveSeasonScreen(')}
 
 module.exports = {
   getRequestedSimulationMode,
@@ -34,12 +42,19 @@ module.exports = {
   getActiveSeasonLabels,
   normalizeSharedSimulationSeasonBootState,
   buildSharedSimulationPersistenceState,
+  persistSimulationSeasonState,
   renderSimulationHubInSharedShell,
   renderSimulationRosterInSharedShell,
   renderSimulationScheduleInSharedShell,
+  renderSimulationWaiverInSharedShell,
+  renderSimulationTradesInSharedShell,
+  renderSimulationStandingsInSharedShell,
+  claimSimulationFreeAgentFromShell,
+  applySimulationTradeFromShell,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
   setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; },
-  setData(value){ D = value; }
+  setData(value){ D = value; },
+  getData(){ return D; }
 };
 `;
 
@@ -97,14 +112,102 @@ const elements = Object.fromEntries([
   'rosterPowerups',
   'mWk',
   'matchupContent',
-  'matchupPowerups'
+  'matchupPowerups',
+  'waiverContent',
+  'waiverPowerups',
+  'tradesContent',
+  'tradesPowerups',
+  'standingsContent',
+  'standingsPowerups'
 ].map((id) => [id, createElement(id)]));
+
+let persistedReason = null;
+const simulationAdapterStub = {
+  getState() {
+    return {
+      leagueShell: { teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }] },
+      draftState: { controlledTeamAbbr: 'LAL' }
+    };
+  },
+  getHubViewModel() {
+    return {
+      leagueLabel: '2025-26 NBA Simulation',
+      shellLabel: '1995-96 + 2015-16 Mixed Era Shell',
+      controlledTeam: { abbr: 'LAL', name: 'Los Angeles Lakers' },
+      userRow: { w: 9, l: 3, streak: 'W3' },
+      recordLabel: '9-3',
+      primaryAction: { label: 'Sim Day' },
+      sourceSeasonLabels: ['1986-87', '1995-96', '2015-16']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      title: 'Schedule / Results',
+      cycleLabel: 'Day 12 - Week 2',
+      recentResults: [
+        { awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112 }
+      ]
+    };
+  },
+  getRosterViewModel() {
+    return {
+      roster: [
+        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' },
+        { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' }
+      ],
+      bench: [
+        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+      ]
+    };
+  },
+  getWaiverViewModel() {
+    return {
+      availablePlayers: [
+        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' }
+      ]
+    };
+  },
+  getTradeViewModel() {
+    return {
+      tradePartners: [
+        { abbr: 'BOS', name: 'Boston Celtics' }
+      ],
+      outgoingRoster: [
+        { id: 34, name: 'Hakeem Olajuwon' }
+      ],
+      incomingRostersByTeam: {
+        BOS: [
+          { id: 30, name: 'Stephen Curry' }
+        ]
+      }
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      rows: [
+        { teamAbbr: 'LAL', w: 9, l: 3 },
+        { teamAbbr: 'BOS', w: 7, l: 5 }
+      ]
+    };
+  },
+  claimFreeAgent(move) {
+    this.lastClaim = move;
+    return {};
+  },
+  applyTrade(trade) {
+    this.lastTrade = trade;
+    return {};
+  }
+};
 
 const sandbox = {
   module: { exports: {} },
   exports: {},
   console,
   URLSearchParams,
+  persistHistoricalUniverseSlotSnapshot(reason) {
+    persistedReason = reason;
+  },
   document: {
     getElementById(id) {
       return elements[id] || null;
@@ -128,10 +231,14 @@ assert.match(html, /simulation-season-adapter\.js/, 'season shell should load th
 assert.match(html, /function renderSimulationHubInSharedShell\(/, 'season shell should add a simulation hub renderer');
 assert.match(html, /function renderSimulationRosterInSharedShell\(/, 'season shell should add a simulation roster renderer');
 assert.match(html, /function renderSimulationScheduleInSharedShell\(/, 'season shell should add a simulation schedule renderer');
+assert.match(html, /function renderSimulationWaiverInSharedShell\(/, 'season shell should add a simulation waiver renderer');
+assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season shell should add a simulation trade renderer');
+assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season shell should add a simulation standings renderer');
 assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should centralize mode-aware screen rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationScheduleInSharedShell\(\);/, 'renderMatchup should branch into simulation rendering');
+assert.match(html, /SEASON_MODE_ADAPTER\.simulateNextDay\(\)/, 'Sim Day should flow through the adapter');
 assert.match(html, /id="hubOppLabel"/, 'hub markup should expose a label node for the first simulation stat');
 assert.match(html, /id="hubProjLabel"/, 'hub markup should expose a label node for the second simulation stat');
 assert.match(html, /id="hubOppProjLabel"/, 'hub markup should expose a label node for the third simulation stat');
@@ -188,38 +295,13 @@ assert.deepEqual(
   'season labels should be derived from adapter nav items when available'
 );
 
-api.setSeasonModeAdapter({
-  getHubViewModel() {
-    return {
-      leagueLabel: '2025-26 NBA Simulation',
-      shellLabel: '1995-96 + 2015-16 Mixed Era Shell',
-      controlledTeam: { abbr: 'LAL', name: 'Los Angeles Lakers' },
-      userRow: { w: 9, l: 3, streak: 'W3' },
-      recordLabel: '9-3',
-      primaryAction: { label: 'Sim Day' },
-      sourceSeasonLabels: ['1986-87', '1995-96', '2015-16']
-    };
-  },
-  getScheduleViewModel() {
-    return {
-      title: 'Schedule / Results',
-      cycleLabel: 'Day 12 - Week 2',
-      recentResults: [
-        { awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112 }
-      ]
-    };
-  },
-  getRosterViewModel() {
-    return {
-      roster: [
-        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
-      ]
-    };
-  }
-});
+api.setSeasonModeAdapter(simulationAdapterStub);
 api.setData({
   leagueShell: {
     teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
+  },
+  draftState: {
+    controlledTeamAbbr: 'LAL'
   }
 });
 
@@ -256,6 +338,41 @@ assert.equal(elements.matchupTitle.textContent, 'Schedule');
 assert.match(elements.matchupNote.textContent, /results/i);
 assert.match(elements.matchupContent.innerHTML, /Schedule \/ Results/);
 assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
+
+api.renderSimulationWaiverInSharedShell();
+assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
+assert.match(elements.waiverContent.innerHTML, /claimSimulationFreeAgentFromShell\(33\)/);
+
+api.claimSimulationFreeAgentFromShell(33);
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastClaim),
+  {
+    teamAbbr: 'LAL',
+    addPlayerId: 33,
+    dropPlayerId: 23
+  }
+);
+assert.equal(persistedReason, 'simulation_claim');
+
+api.renderSimulationTradesInSharedShell();
+assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
+assert.match(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/);
+
+api.applySimulationTradeFromShell('BOS');
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastTrade),
+  {
+    fromTeamAbbr: 'LAL',
+    toTeamAbbr: 'BOS',
+    outgoingPlayerIds: [34],
+    incomingPlayerIds: [30]
+  }
+);
+assert.equal(persistedReason, 'simulation_trade');
+
+api.renderSimulationStandingsInSharedShell();
+assert.match(elements.standingsContent.innerHTML, /LAL/);
+assert.match(elements.standingsContent.innerHTML, /9-3/);
 
 const fixture = {
   simulationMode: 'nba_mixed_era_single_player_v1',

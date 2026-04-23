@@ -126,6 +126,25 @@
         state = clone(nextState || {});
         return this.getState();
       },
+      setLineup(lineupIds){
+        const nextState = runtimeApi.setSimulationLineup(
+          clone(state),
+          state?.draftState?.controlledTeamAbbr,
+          lineupIds
+        );
+        state = clone(nextState || {});
+        return this.getState();
+      },
+      claimFreeAgent(move){
+        const nextState = runtimeApi.claimSimulationFreeAgent(clone(state), move);
+        state = clone(nextState || {});
+        return this.getState();
+      },
+      applyTrade(trade){
+        const nextState = runtimeApi.applySimulationTrade(clone(state), trade);
+        state = clone(nextState || {});
+        return this.getState();
+      },
       getHubViewModel(){
         const team = getControlledTeam(state);
         const standings = Array.isArray(state?.seasonState?.standings) ? state.seasonState.standings : [];
@@ -163,23 +182,28 @@
         };
       },
       getWaiverViewModel(){
+        const roster = getControlledRoster(state);
         return {
-          availablePlayers: clone(state?.draftState?.freeAgents || [])
+          roster,
+          availablePlayers: clone(state?.draftState?.freeAgents || []).slice(0, 40)
         };
       },
       getTradeViewModel(){
         const controlled = getControlledTeamAbbr(state);
         return {
+          userTeamAbbr: controlled,
           tradePartners: clone(state?.leagueShell?.teams || []).filter((team) => team.abbr !== controlled),
-          tradeHistory: clone(state?.seasonState?.activityLog || []).filter((entry) => entry.type === 'trade')
+          outgoingRoster: getControlledRoster(state),
+          incomingRostersByTeam: clone(state?.draftState?.rostersByTeam || {})
         };
       },
       getStandingsViewModel(){
-        const standings = clone(state?.seasonState?.standings || []);
+        const standings = clone(state?.seasonState?.standings || []).sort((a, b) => Number(b.w || 0) - Number(a.w || 0));
         const controlled = getControlledTeamAbbr(state);
         return {
           rows: standings,
-          userRow: standings.find((row) => row.teamAbbr === controlled) || null
+          userRow: standings.find((row) => String(row?.teamAbbr || '').trim().toUpperCase() === controlled) || null,
+          postseasonPhase: state?.postseasonState?.phase || 'regular_season'
         };
       },
       simulateNextDay(){

@@ -85,6 +85,10 @@ assert.deepStrictEqual(
   ['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings']
 );
 assert.equal(adapter.getNavItems().find((item) => item.id === 'matchup').label, 'Schedule');
+assert.equal(typeof adapter.setLineup, 'function');
+assert.equal(typeof adapter.claimFreeAgent, 'function');
+assert.equal(typeof adapter.applyTrade, 'function');
+assert.equal(typeof adapter.simulateNextDay, 'function');
 
 const hub = adapter.getHubViewModel();
 assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
@@ -114,12 +118,38 @@ assert.equal(adapter.getScheduleViewModel().nextGame.opponentName, 'Boston Celti
 
 const waivers = adapter.getWaiverViewModel();
 assert.equal(waivers.availablePlayers.length, 1);
+assert.equal(waivers.availablePlayers[0].name, 'Scottie Pippen');
 
 const trades = adapter.getTradeViewModel();
 assert.equal(trades.tradePartners.length, 1);
+assert.equal(trades.tradePartners[0].abbr, 'BOS');
+assert.equal(trades.outgoingRoster.length, 2);
+assert.equal(trades.incomingRostersByTeam.BOS.length, 1);
 
 const standings = adapter.getStandingsViewModel();
 assert.equal(standings.userRow.teamAbbr, 'LAL');
+assert.equal(standings.rows.length, 2);
+
+const lineupState = adapter.setLineup([34, 23]);
+assert.deepStrictEqual(lineupState.seasonState.lineupIdsByTeam.LAL, [34, 23]);
+assert.deepStrictEqual(adapter.getRosterViewModel().lineup.map((player) => player.id), [23, 34]);
+
+const claimState = adapter.claimFreeAgent({
+  teamAbbr: 'LAL',
+  addPlayerId: 50,
+  dropPlayerId: 23
+});
+assert.ok(claimState.draftState.rostersByTeam.LAL.some((player) => player.id === 50));
+assert.ok(claimState.draftState.freeAgents.some((player) => player.id === 23));
+
+const tradedState = adapter.applyTrade({
+  fromTeamAbbr: 'LAL',
+  toTeamAbbr: 'BOS',
+  outgoingPlayerIds: [34],
+  incomingPlayerIds: [30]
+});
+assert.ok(tradedState.draftState.rostersByTeam.LAL.some((player) => player.id === 30));
+assert.ok(tradedState.draftState.rostersByTeam.BOS.some((player) => player.id === 34));
 
 const postSimState = adapter.simulateNextDay();
 assert.equal(postSimState.currentDay, 13);

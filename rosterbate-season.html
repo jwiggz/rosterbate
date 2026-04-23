@@ -5761,6 +5761,12 @@ function setHubSummaryStatLabels(labels){
   document.getElementById('hubStreakLabel').textContent = labels?.streak || 'Streak';
 }
 
+function persistSimulationSeasonState(reason){
+  if (ACTIVE_SEASON_MODE !== 'simulation' || !SEASON_MODE_ADAPTER) return;
+  D = SEASON_MODE_ADAPTER.getState();
+  persistHistoricalUniverseSlotSnapshot(reason || 'simulation_shared_shell');
+}
+
 function buildPowerupCardsHtml(){
   const myRoster=G.rosters[D.myPos]||[];
   const weekPowerups=getWeekPowerups(G.week);
@@ -8016,6 +8022,67 @@ function renderSimulationHubInSharedShell(){
   )).join('') || '<div class="hub-card-sub">No completed games yet.</div>';
 }
 
+function renderSimulationWaiverInSharedShell(){
+  setSeasonSidePanelVisible('waiverPowerups', false);
+  const vm = SEASON_MODE_ADAPTER.getWaiverViewModel();
+  document.getElementById('waiverContent').innerHTML = vm.availablePlayers.map((player) => (
+    `<div class="card">
+      <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
+      <div style="color:var(--text2);font-size:12px;">${player.team} · ${player.pos}</div>
+      <button class="bp" style="margin-top:10px;" onclick="claimSimulationFreeAgentFromShell(${player.id})">Add</button>
+    </div>`
+  )).join('') || '<div class="card">No free agents available.</div>';
+}
+
+function claimSimulationFreeAgentFromShell(playerId){
+  const vm = SEASON_MODE_ADAPTER.getWaiverViewModel();
+  const addPlayer = vm.availablePlayers.find((player) => Number(player.id) === Number(playerId));
+  const dropPlayer = (SEASON_MODE_ADAPTER.getRosterViewModel().bench || [])[0] || null;
+  if (!(addPlayer && dropPlayer)) return;
+  SEASON_MODE_ADAPTER.claimFreeAgent({
+    teamAbbr: D?.draftState?.controlledTeamAbbr,
+    addPlayerId: addPlayer?.id,
+    dropPlayerId: dropPlayer?.id || null
+  });
+  persistSimulationSeasonState('simulation_claim');
+  renderSimulationWaiverInSharedShell();
+  renderSimulationRosterInSharedShell();
+  renderSimulationHubInSharedShell();
+}
+
+function renderSimulationTradesInSharedShell(){
+  setSeasonSidePanelVisible('tradesPowerups', false);
+  const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
+  document.getElementById('tradesContent').innerHTML = (vm.tradePartners || []).map((team) => (
+    `<button class="card" onclick="applySimulationTradeFromShell('${team.abbr}')">${team.name}</button>`
+  )).join('') || '<div class="card">No trade partners available.</div>';
+}
+
+function applySimulationTradeFromShell(partnerAbbr){
+  const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
+  const outgoing = (vm.outgoingRoster || [])[0] || null;
+  const incoming = (vm.incomingRostersByTeam?.[partnerAbbr] || [])[0] || null;
+  if (!(outgoing && incoming)) return;
+  SEASON_MODE_ADAPTER.applyTrade({
+    fromTeamAbbr: D?.draftState?.controlledTeamAbbr,
+    toTeamAbbr: partnerAbbr,
+    outgoingPlayerIds: [outgoing.id],
+    incomingPlayerIds: [incoming.id]
+  });
+  persistSimulationSeasonState('simulation_trade');
+  renderSimulationTradesInSharedShell();
+  renderSimulationRosterInSharedShell();
+  renderSimulationHubInSharedShell();
+}
+
+function renderSimulationStandingsInSharedShell(){
+  setSeasonSidePanelVisible('standingsPowerups', false);
+  const vm = SEASON_MODE_ADAPTER.getStandingsViewModel();
+  document.getElementById('standingsContent').innerHTML = (vm.rows || []).map((row) => (
+    `<div class="card">${row.teamAbbr} · ${row.w}-${row.l}</div>`
+  )).join('') || '<div class="card">No standings available.</div>';
+}
+
 function renderSimulationRosterInSharedShell(){
   setSeasonSidePanelVisible('rosterPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
@@ -8053,7 +8120,7 @@ function renderActiveSeasonScreen(id){
   if (ACTIVE_SEASON_MODE !== 'simulation') {
     return ({ hub: renderHub, roster: renderRoster, matchup: renderMatchup, waiver: renderWaiver, trades: renderTrades, standings: renderStandings, commissioner: renderCommissioner })[id]?.();
   }
-  return ({ hub: renderSimulationHubInSharedShell, roster: renderSimulationRosterInSharedShell, matchup: renderSimulationScheduleInSharedShell, waiver: renderWaiver, trades: renderTrades, standings: renderStandings })[id]?.();
+  return ({ hub: renderSimulationHubInSharedShell, roster: renderSimulationRosterInSharedShell, matchup: renderSimulationScheduleInSharedShell, waiver: renderSimulationWaiverInSharedShell, trades: renderSimulationTradesInSharedShell, standings: renderSimulationStandingsInSharedShell })[id]?.();
 }
 
 function goPage(id){
@@ -8086,6 +8153,16 @@ function goPage(id){
 }
 
 function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=true; setTimeout(()=>advanceWeek.disabled=false,1000);
+  if (ACTIVE_SEASON_MODE === 'simulation' && SEASON_MODE_ADAPTER) {
+    SEASON_MODE_ADAPTER.simulateNextDay();
+    persistSimulationSeasonState('simulation_day_advance');
+    renderSimulationHubInSharedShell();
+    if (document.getElementById('matchup').classList.contains('active')) renderSimulationScheduleInSharedShell();
+    if (document.getElementById('waiver').classList.contains('active')) renderSimulationWaiverInSharedShell();
+    if (document.getElementById('trades').classList.contains('active')) renderSimulationTradesInSharedShell();
+    if (document.getElementById('standings').classList.contains('active')) renderSimulationStandingsInSharedShell();
+    return;
+  }
   if(G.isSeasonComplete){toast('Season complete!');return;}
   if(isHistoricalDraftUniverse(D)){
     startHistoricalDraftSimSeason();
