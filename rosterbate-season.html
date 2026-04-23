@@ -815,7 +815,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
           <div id="hubStandingsMini" class="hub-standings-table"></div>
           <a href="javascript:void(0)" onclick="goPage('standings')" class="hub-mini-link" style="display:block;text-align:center;">View Full Standings</a>
         </div>
-        <div class="hub-card"><div class="hub-card-title">This Week's Matchups</div><div id="hubMatchups"></div></div>
+        <div class="hub-card"><div id="hubMatchupsTitle" class="hub-card-title">This Week's Matchups</div><div id="hubMatchups"></div></div>
       </div>
       <div class="hub-main">
         <div class="hub-summary">
@@ -826,8 +826,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
                 <div id="hubLeagueName" class="hub-summary-name"></div>
                 <div class="hub-summary-rec">
                   <a id="hubSettingsLink" href="javascript:void(0)" onclick="goPage('commissioner')" style="color:#2563eb;text-decoration:none;">Settings</a>
-                  &nbsp;|&nbsp;
-                  <button type="button" onclick="openLeagueTeams()" class="season-team-link-btn" style="padding:0;background:none;border:none;color:#2563eb;text-decoration:none;">League Teams</button>
+                  <span id="hubSettingsDivider">&nbsp;|&nbsp;</span>
+                  <button id="hubLeagueTeamsButton" type="button" onclick="openLeagueTeams()" class="season-team-link-btn" style="padding:0;background:none;border:none;color:#2563eb;text-decoration:none;">League Teams</button>
                   &nbsp;|&nbsp;
                   <a href="javascript:void(0)" onclick="goPage('roster')" style="color:#2563eb;text-decoration:none;">Rosters</a>
                 </div>
@@ -7992,10 +7992,17 @@ function renderSimulationHubInSharedShell(){
   document.getElementById('hubOppProj').textContent = vm.sourceSeasonLabels.join(' + ');
   document.getElementById('hubStreak').textContent = vm.userRow?.streak || 'EVEN';
   const settingsLink=document.getElementById('hubSettingsLink');
+  const settingsDivider=document.getElementById('hubSettingsDivider');
+  const leagueTeamsButton=document.getElementById('hubLeagueTeamsButton');
+  const matchupsTitle=document.getElementById('hubMatchupsTitle');
   if(settingsLink){
-    settingsLink.textContent='League Teams';
-    settingsLink.setAttribute('onclick','openLeagueTeams()');
+    settingsLink.textContent='Settings';
+    settingsLink.setAttribute('onclick',"goPage('commissioner')");
+    settingsLink.style.display='none';
   }
+  if(settingsDivider) settingsDivider.style.display='none';
+  if(leagueTeamsButton) leagueTeamsButton.style.display='';
+  if(matchupsTitle) matchupsTitle.textContent='Recent Results';
   const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
   const matchupActionSub=document.getElementById('hubMatchupActionSub');
   if(matchupActionTitle) matchupActionTitle.textContent='Schedule';
@@ -8267,10 +8274,17 @@ const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 function renderHub(){
   if (ACTIVE_SEASON_MODE === 'simulation') return renderSimulationHubInSharedShell();
   const settingsLink=document.getElementById('hubSettingsLink');
+  const settingsDivider=document.getElementById('hubSettingsDivider');
+  const leagueTeamsButton=document.getElementById('hubLeagueTeamsButton');
+  const matchupsTitle=document.getElementById('hubMatchupsTitle');
   if(settingsLink){
     settingsLink.textContent='Settings';
     settingsLink.setAttribute('onclick',"goPage('commissioner')");
+    settingsLink.style.display='';
   }
+  if(settingsDivider) settingsDivider.style.display='';
+  if(leagueTeamsButton) leagueTeamsButton.style.display='';
+  if(matchupsTitle) matchupsTitle.textContent="This Week's Matchups";
   const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
   const matchupActionSub=document.getElementById('hubMatchupActionSub');
   if(matchupActionTitle) matchupActionTitle.textContent='Matchup';

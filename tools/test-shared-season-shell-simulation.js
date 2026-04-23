@@ -82,6 +82,9 @@ const elements = Object.fromEntries([
   'hubOppProjLabel',
   'hubStreakLabel',
   'hubSettingsLink',
+  'hubSettingsDivider',
+  'hubLeagueTeamsButton',
+  'hubMatchupsTitle',
   'hubMatchupActionTitle',
   'hubMatchupActionSub',
   'rosterScheduleChip',
@@ -133,6 +136,8 @@ assert.match(html, /id="hubOppLabel"/, 'hub markup should expose a label node fo
 assert.match(html, /id="hubProjLabel"/, 'hub markup should expose a label node for the second simulation stat');
 assert.match(html, /id="hubOppProjLabel"/, 'hub markup should expose a label node for the third simulation stat');
 assert.match(html, /id="hubSettingsLink"/, 'hub markup should expose a settings link node for mode-specific behavior');
+assert.match(html, /id="hubLeagueTeamsButton"/, 'hub markup should expose the league teams button for mode-specific behavior');
+assert.match(html, /id="hubMatchupsTitle"/, 'hub markup should expose the matchup results card title');
 assert.match(html, /id="hubMatchupActionTitle"/, 'hub markup should expose the hub matchup action title');
 assert.match(html, /id="rosterScheduleChip"/, 'roster markup should expose the schedule chip for mode-specific copy');
 assert.match(html, /id="matchupTitle"/, 'schedule screen title should be targetable for simulation mode');
@@ -229,8 +234,11 @@ assert.equal(elements.hubProj.textContent, 'LAL');
 assert.equal(elements.hubProjLabel.textContent, 'Team');
 assert.equal(elements.hubOppProj.textContent, '1986-87 + 1995-96 + 2015-16');
 assert.equal(elements.hubOppProjLabel.textContent, 'Source Seasons');
-assert.equal(elements.hubSettingsLink.textContent, 'League Teams');
-assert.equal(elements.hubSettingsLink.getAttribute('onclick'), 'openLeagueTeams()');
+assert.equal(elements.hubSettingsLink.textContent, 'Settings');
+assert.equal(elements.hubSettingsLink.style.display, 'none');
+assert.equal(elements.hubSettingsDivider.style.display, 'none');
+assert.equal(elements.hubLeagueTeamsButton.style.display, '');
+assert.equal(elements.hubMatchupsTitle.textContent, 'Recent Results');
 assert.equal(elements.hubMatchupActionTitle.textContent, 'Schedule');
 assert.match(elements.hubMatchupActionSub.textContent, /recent results/i);
 assert.match(elements.hubMatchups.innerHTML, /BOS 108 at LAL 112/);
