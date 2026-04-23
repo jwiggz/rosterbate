@@ -2826,22 +2826,51 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
   const baseState=(rawState && typeof rawState==='object') ? cloneSharedSimulationBootValue(rawState) : {};
   const shell=(shellState && typeof shellState==='object') ? shellState : {};
   const game=(gameState && typeof gameState==='object') ? gameState : {};
+  const preferRawSimulationState=shouldPersistSharedSimulationState(baseState);
   const leagueShell=(baseState?.leagueShell && typeof baseState.leagueShell==='object') ? baseState.leagueShell : {};
   const rawTeams=Array.isArray(leagueShell?.teams) ? leagueShell.teams.filter(Boolean) : [];
   const teamMeta=Array.isArray(shell?.teamMeta) ? shell.teamMeta.filter(Boolean) : [];
   const teams=rawTeams.length ? rawTeams : teamMeta;
+  const rawRosterMap=(baseState?.draftState && typeof baseState.draftState==='object' && baseState.draftState.rostersByTeam && typeof baseState.draftState.rostersByTeam==='object')
+    ? baseState.draftState.rostersByTeam
+    : {};
   const rosterSource=Array.isArray(game?.rosters) ? game.rosters : (Array.isArray(shell?.allRosters) ? shell.allRosters : []);
-  const freeAgentSource=Array.isArray(game?.waiver)
+  const freeAgentSource=preferRawSimulationState && Array.isArray(baseState?.draftState?.freeAgents)
+    ? baseState.draftState.freeAgents
+    : Array.isArray(game?.waiver)
     ? game.waiver
     : Array.isArray(shell?.freeAgents)
     ? shell.freeAgents
     : Array.isArray(shell?.waiver)
     ? shell.waiver
     : [];
-  const standingsSource=Array.isArray(game?.standings) ? game.standings : (Array.isArray(shell?.standings) ? shell.standings : []);
+  const standingsSource=preferRawSimulationState && Array.isArray(baseState?.seasonState?.standings)
+    ? baseState.seasonState.standings
+    : Array.isArray(game?.standings)
+    ? game.standings
+    : Array.isArray(shell?.standings)
+    ? shell.standings
+    : [];
   const starterSource=Array.isArray(game?.starters) ? game.starters : (Array.isArray(shell?.starters) ? shell.starters : []);
-  const shellWeek=Number(game?.week || shell?.currentWeek || baseState?.seasonState?.currentWeek || baseState?.currentWeek || 1) || 1;
-  const shellDay=Number(game?.day || shell?.currentDay || baseState?.seasonState?.currentDay || baseState?.currentDay || 1) || 1;
+  const lineupSource=preferRawSimulationState && baseState?.seasonState?.lineupIdsByTeam && typeof baseState.seasonState.lineupIdsByTeam==='object'
+    ? baseState.seasonState.lineupIdsByTeam
+    : null;
+  const shellWeek=Number(
+    (preferRawSimulationState ? baseState?.seasonState?.currentWeek || baseState?.currentWeek : null)
+    || game?.week
+    || shell?.currentWeek
+    || baseState?.seasonState?.currentWeek
+    || baseState?.currentWeek
+    || 1
+  ) || 1;
+  const shellDay=Number(
+    (preferRawSimulationState ? baseState?.seasonState?.currentDay || baseState?.currentDay : null)
+    || game?.day
+    || shell?.currentDay
+    || baseState?.seasonState?.currentDay
+    || baseState?.currentDay
+    || 1
+  ) || 1;
   const rostersByTeam={};
   const lineupIdsByTeam={};
   const standingsByAbbr=new Map(
@@ -2850,9 +2879,17 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
 
   teams.forEach((team, teamIdx)=>{
     const abbr=String(team?.abbr || '').trim().toUpperCase() || ('TEAM_' + teamIdx);
-    const roster=Array.isArray(rosterSource[teamIdx]) ? rosterSource[teamIdx] : [];
+    const roster=preferRawSimulationState && Array.isArray(rawRosterMap?.[abbr])
+      ? rawRosterMap[abbr]
+      : Array.isArray(rosterSource[teamIdx])
+      ? rosterSource[teamIdx]
+      : [];
     rostersByTeam[abbr]=roster.map(player=>cloneSharedSimulationBootValue(player)).filter(Boolean);
-    const starters=Array.isArray(starterSource[teamIdx]) ? starterSource[teamIdx] : [];
+    const starters=lineupSource && Array.isArray(lineupSource?.[abbr])
+      ? lineupSource[abbr]
+      : Array.isArray(starterSource[teamIdx])
+      ? starterSource[teamIdx]
+      : [];
     lineupIdsByTeam[abbr]=starters
       .map(entry=>{
         const candidate=(entry && typeof entry==='object') ? entry.id : entry;
@@ -9681,6 +9718,7 @@ function autoSetDay(day){
 function autoSet(){autoSetDay(rosterViewDay||G.day);}
 
 function renderWaiver(){
+  if (ACTIVE_SEASON_MODE === 'simulation') return renderSimulationWaiverInSharedShell();
   applySeasonShellEnhancements();
   setSeasonSidePanelVisible('waiverPowerups', false);
   const waiverPowerups=document.getElementById('waiverPowerups');

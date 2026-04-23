@@ -254,6 +254,7 @@ assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should c
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationScheduleInSharedShell\(\);/, 'renderMatchup should branch into simulation rendering');
+assert.match(html, /function renderWaiver\(\)\{\s*if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationWaiverInSharedShell\(\);/, 'renderWaiver should branch into simulation rendering before fantasy waiver logic');
 assert.match(html, /SEASON_MODE_ADAPTER\.simulateNextDay\(\)/, 'Sim Day should flow through the adapter');
 assert.match(html, /id="hubOppLabel"/, 'hub markup should expose a label node for the first simulation stat');
 assert.match(html, /id="hubProjLabel"/, 'hub markup should expose a label node for the second simulation stat');
@@ -475,8 +476,20 @@ const progressedGame = {
   ]
 };
 
+const fallbackSimulationState = {
+  simulationMode: fixture.simulationMode,
+  historicalUniverseSlotId: 'sim-slot-1',
+  leagueShell: fixture.leagueShell,
+  draftState: {
+    controlledTeamAbbr: 'LAL'
+  },
+  seasonState: {
+    activityLog: [{ type: 'sim_day', summary: 'Fallback fixture log entry' }]
+  }
+};
+
 const persistedSimulationState = toPlain(
-  api.buildSharedSimulationPersistenceState(fixture, progressedShell, progressedGame)
+  api.buildSharedSimulationPersistenceState(fallbackSimulationState, progressedShell, progressedGame)
 );
 
 assert.equal(
@@ -511,6 +524,98 @@ assert.deepEqual(
     BOS: [30]
   },
   'simulation persistence should align starter ids back into seasonState.lineupIdsByTeam by team abbr'
+);
+
+const updatedAdapterState = {
+  ...fixture,
+  draftState: {
+    ...fixture.draftState,
+    rostersByTeam: {
+      LAL: [
+        { id: 33, name: 'Scottie Pippen', pos: 'SF' },
+        { id: 34, name: 'Hakeem Olajuwon', pos: 'C' }
+      ],
+      BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    },
+    freeAgents: [{ id: 23, name: 'Michael Jordan', pos: 'SG' }]
+  },
+  seasonState: {
+    ...fixture.seasonState,
+    currentDay: 21,
+    currentWeek: 4,
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 12, l: 4, pf: 1601, pa: 1450 },
+      { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 8, l: 8, pf: 1492, pa: 1510 }
+    ],
+    lineupIdsByTeam: {
+      LAL: [33, 34],
+      BOS: [30]
+    }
+  }
+};
+
+const staleLegacyShell = {
+  ...progressedShell,
+  currentDay: 18,
+  currentWeek: 3,
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 10, l: 4, pf: 1500, pa: 1410 },
+    { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 8, l: 6, pf: 1450, pa: 1480 }
+  ],
+  freeAgents: [{ id: 99, name: 'Tim Duncan', pos: 'PF' }]
+};
+
+const staleLegacyGame = {
+  week: 3,
+  day: 18,
+  rosters: [
+    [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+  ],
+  waiver: [{ id: 99, name: 'Tim Duncan', pos: 'PF' }],
+  standings: staleLegacyShell.standings,
+  starters: [
+    [23],
+    [30]
+  ]
+};
+
+const rawPreferredPersistenceState = toPlain(
+  api.buildSharedSimulationPersistenceState(updatedAdapterState, staleLegacyShell, staleLegacyGame)
+);
+
+assert.equal(
+  rawPreferredPersistenceState.seasonState.currentDay,
+  21,
+  'simulation persistence should prefer adapter current day over stale legacy game state'
+);
+assert.equal(
+  rawPreferredPersistenceState.seasonState.currentWeek,
+  4,
+  'simulation persistence should prefer adapter current week over stale legacy game state'
+);
+assert.equal(
+  rawPreferredPersistenceState.seasonState.standings[0].w,
+  12,
+  'simulation persistence should prefer adapter standings over stale legacy standings'
+);
+assert.equal(
+  rawPreferredPersistenceState.draftState.rostersByTeam.LAL[0].name,
+  'Scottie Pippen',
+  'simulation persistence should prefer adapter rosters over stale legacy rosters'
+);
+assert.equal(
+  rawPreferredPersistenceState.draftState.freeAgents[0].name,
+  'Michael Jordan',
+  'simulation persistence should prefer adapter free agents over stale legacy waiver state'
+);
+assert.deepEqual(
+  rawPreferredPersistenceState.seasonState.lineupIdsByTeam,
+  {
+    LAL: [33, 34],
+    BOS: [30]
+  },
+  'simulation persistence should prefer adapter lineup ids over stale legacy starters'
 );
 
 const legacyHistoricalSimulation = {
