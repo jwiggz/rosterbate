@@ -3,7 +3,8 @@ const assert = require('node:assert/strict');
 const { getSimulationShell } = require('../simulation-mode-config.js');
 const {
   buildSimulationPlayerPool,
-  buildSimulationUniverseBootstrap
+  buildSimulationUniverseBootstrap,
+  buildCompletedSimulationAutoDraftState
 } = require('../simulation-mode-runtime.js');
 
 const shell = getSimulationShell();
@@ -119,5 +120,26 @@ const partialShellBootstrap = buildSimulationUniverseBootstrap({
 assert.equal(partialShellBootstrap.leagueShell.teams.length, 0);
 assert.deepStrictEqual(partialShellBootstrap.draftState.rostersByTeam, {});
 assert.deepStrictEqual(partialShellBootstrap.seasonState.standings, []);
+
+const autoDraftState = buildCompletedSimulationAutoDraftState({
+  shell,
+  mixedEraContext,
+  controlledTeamAbbr: 'LAL'
+});
+
+assert.equal(autoDraftState.simulationMode, 'nba_mixed_era_single_player_v1');
+assert.equal(autoDraftState.draftState.controlledTeamAbbr, 'LAL');
+assert.equal(Object.keys(autoDraftState.draftState.rostersByTeam).length, 30);
+assert.ok(
+  Object.values(autoDraftState.draftState.rostersByTeam).every((roster) => Array.isArray(roster) && roster.length === 10),
+  'every team roster should contain 10 drafted players'
+);
+assert.equal(
+  new Set(Object.values(autoDraftState.draftState.rostersByTeam).flat().map((player) => player.id)).size,
+  300
+);
+assert.equal(autoDraftState.draftState.freeAgents.length, 60);
+assert.equal(autoDraftState.seasonState.currentDay, 1);
+assert.equal(autoDraftState.postseasonState.phase, 'regular_season');
 
 console.log('simulation mode runtime test passed');
