@@ -5063,6 +5063,7 @@ function startDraft(){
   applyDraftRoomShellEnhancements();
   updateSoloSimButton();
   subscribeRealtimeDraftState();
+  draftCountdownState={mode:'countdown',remaining:CD_DURATION,duration:CD_DURATION};
 
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
@@ -5078,12 +5079,12 @@ document.getElementById('statHeader').style.display='grid';
 
 let cdInt=null;
 const CD_DURATION=120;
+let draftCountdownState={mode:'countdown',remaining:CD_DURATION,duration:CD_DURATION};
 
 function startCountdown(){
   const scheduledStartAt=getScheduledDraftStartAt();
   if(scheduledStartAt && Date.now() < scheduledStartAt){
     const scheduledDuration=Math.max(1, Math.ceil((scheduledStartAt-Date.now())/1000));
-    let remaining=scheduledDuration;
     document.getElementById('pdcBar').classList.remove('hidden');
     document.getElementById('pdcStrip').style.display='block';
     setDraftCountdownMode('scheduled');
@@ -5097,6 +5098,11 @@ function startCountdown(){
       startBtn.style.cursor='not-allowed';
     }
     function scheduledTick(){
+      if(PS.isPaused){
+        clearInterval(cdInt);
+        return;
+      }
+      const remaining=Math.max(0, Math.ceil((scheduledStartAt-Date.now())/1000));
       const m=Math.floor(remaining/60);
       const s=remaining%60;
       const pct=(remaining/scheduledDuration)*100;
@@ -5116,14 +5122,19 @@ function startCountdown(){
         launchDraft();
         return;
       }
-      remaining--;
     }
     scheduledTick();
     clearInterval(cdInt);
     cdInt=setInterval(scheduledTick,1000);
     return;
   }
-  let remaining=CD_DURATION;
+  if(!draftCountdownState || draftCountdownState.mode!=='countdown'){
+    draftCountdownState={mode:'countdown',remaining:CD_DURATION,duration:CD_DURATION};
+  }
+  if(!Number.isFinite(Number(draftCountdownState.remaining)) || Number(draftCountdownState.remaining)<=0 || Number(draftCountdownState.remaining)>CD_DURATION){
+    draftCountdownState.remaining=CD_DURATION;
+  }
+  draftCountdownState.duration=CD_DURATION;
   document.getElementById('pdcBar').classList.remove('hidden');
   document.getElementById('pdcStrip').style.display='block';
   setDraftCountdownMode('countdown');
@@ -5136,7 +5147,8 @@ function startCountdown(){
     startBtn.style.cursor='';
   }
 
-  function tick(){
+  function renderCountdown(){
+    const remaining=Math.max(0, Number(draftCountdownState.remaining||0));
     const m=Math.floor(remaining/60);
     const s=remaining%60;
     const pct=(remaining/CD_DURATION)*100;
@@ -5145,11 +5157,18 @@ function startCountdown(){
     document.getElementById('pdcTime').className='pdc-time'+(urgent?' urgent':'');
     document.getElementById('pdcFill').style.width=pct+'%';
     document.getElementById('pdcFill').className='pdc-strip-fill'+(urgent?' urgent':'');
-    if(remaining<=0){ clearInterval(cdInt); launchDraft(); return; }
-    remaining--;
+  }
+  function tick(){
+    if(PS.isPaused){
+      clearInterval(cdInt);
+      return;
+    }
+    draftCountdownState.remaining=Math.max(0, Number(draftCountdownState.remaining||0)-1);
+    renderCountdown();
+    if(Number(draftCountdownState.remaining||0)<=0){ clearInterval(cdInt); launchDraft(); }
   }
 
-  tick();
+  renderCountdown();
   clearInterval(cdInt);
   cdInt=setInterval(tick,1000);
 }
@@ -5164,6 +5183,7 @@ function launchDraft(){
   clearAuctionCpuAction();
   S.started=true;
   clearInterval(cdInt);
+  draftCountdownState={mode:'live',remaining:0,duration:0};
   setDraftCountdownMode('live-ready');
   setDraftLobbyPill(buildDraftLobbyPillText({started:true}), getDraftLobbyTone({started:true}));
   document.getElementById('pdcBar').classList.add('hidden');
@@ -5632,6 +5652,7 @@ function simulateDraftToFinish(){
     return;
   }
   clearInterval(S.timerInt);
+  clearInterval(cdInt);
   clearCpuPickSequence();
   clearAuctionCpuAction();
   hideBanner();
@@ -7775,6 +7796,7 @@ function triggerPause(reason, isAdmin=false){
   document.getElementById('voteBar').classList.remove('show');
   // Stop pick timer
   clearInterval(S.timerInt);
+  clearInterval(cdInt);
   // Show pause overlay
   document.getElementById('pauseReason').textContent = reason;
   document.getElementById('pauseOverlay').classList.add('show');
@@ -7802,9 +7824,15 @@ function resumeDraft(){
   document.getElementById('pauseOverlay').classList.remove('show');
   refreshPauseBtn();
   showBanner('▶ Draft Resumed!');
+  if(!S.started){
+    startCountdown();
+    return;
+  }
   // Restart pick timer if it was running
   if(S.tmax > 0 && S.cur < S.total && S.order[S.cur] === S.myPos){
     resetTimer();
+  }else if(S.fmt!=='auction' && S.cur < S.total){
+    advance();
   }
 }
 
