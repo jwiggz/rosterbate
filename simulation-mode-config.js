@@ -1,7 +1,18 @@
 (function(root){
   'use strict';
 
-  const SIMULATION_SHELL = Object.freeze({
+  function deepFreeze(value){
+    if (!value || typeof value !== 'object' || Object.isFrozen(value)) {
+      return value;
+    }
+    Object.freeze(value);
+    Object.keys(value).forEach((key) => {
+      deepFreeze(value[key]);
+    });
+    return value;
+  }
+
+  const SIMULATION_SHELL = deepFreeze({
     anchorSeasonId: 'nba_2025_26',
     anchorSeasonLabel: '2025-26 NBA',
     regularSeasonStartDate: '2025-10-21',

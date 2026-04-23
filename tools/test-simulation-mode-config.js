@@ -29,4 +29,21 @@ assert.deepStrictEqual(
   { conference: 'East', division: 'Southeast' }
 );
 
+shell.teams[0].conference = 'Mutated';
+shell.playInSeeds.push(11);
+
+const freshShell = getSimulationShell();
+
+assert.deepStrictEqual(
+  {
+    conference: freshShell.teams[0].conference,
+    playInSeeds: freshShell.playInSeeds
+  },
+  {
+    conference: 'East',
+    playInSeeds: [7, 8, 9, 10]
+  }
+);
+assert.equal(findSimulationTeamByAbbr('ZZZ'), null);
+
 console.log('simulation mode config test passed');
