@@ -2280,7 +2280,7 @@ function loadHistoricalUniverseSlotState(slotId, requestedSport){
 
 function persistHistoricalUniverseSlotSnapshot(reason){
   const api=window.RosterBateHistoricalUniverseSlots;
-  const shouldPersistSimulationState=ACTIVE_SEASON_MODE==='simulation' || isHistoricalSimulationUniverse(D);
+  const shouldPersistSimulationState=shouldPersistSharedSimulationState(SEASON_MODE_ADAPTER?.getState?.() || D);
   if(!api || !D || typeof D!=='object' || (!D.historicalPackId && !shouldPersistSimulationState)) return null;
   try{
     const stateToPersist=shouldPersistSimulationState
@@ -2814,6 +2814,12 @@ function cloneSharedSimulationBootValue(value){
     if(value && typeof value==='object') return {...value};
     return value;
   }
+}
+
+function shouldPersistSharedSimulationState(state){
+  const mode=String(state?.simulationMode || '').trim().toLowerCase();
+  if(mode==='nba_mixed_era_single_player_v1') return true;
+  return !!(window.RosterBateSimulationSeasonAdapter?.isSupportedSimulationSeasonState?.(state));
 }
 
 function buildSharedSimulationPersistenceState(rawState, shellState, gameState){

@@ -26,6 +26,7 @@ module.exports = {
   getRequestedSimulationMode,
   getRequestedHistoricalUniverseSlotId,
   isSharedSimulationSeason,
+  shouldPersistSharedSimulationState,
   getActiveSeasonPages,
   getActiveSeasonLabels,
   normalizeSharedSimulationSeasonBootState,
@@ -216,6 +217,32 @@ assert.deepEqual(
     BOS: [30]
   },
   'simulation persistence should align starter ids back into seasonState.lineupIdsByTeam by team abbr'
+);
+
+const legacyHistoricalSimulation = {
+  historicalEntryMode: 'simulation_season',
+  simulationMode: 'historical_box_score',
+  historicalPackId: 'nba_1996_full_season_v1',
+  teams: ['Chicago Bulls', 'Seattle SuperSonics'],
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan' }],
+    [{ id: 20, name: 'Gary Payton' }]
+  ],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'CHI', w: 10, l: 2, pf: 1300, pa: 1180 },
+    { teamIdx: 1, teamAbbr: 'SEA', w: 8, l: 4, pf: 1210, pa: 1198 }
+  ]
+};
+
+assert.equal(
+  api.shouldPersistSharedSimulationState(fixture),
+  true,
+  'shared-shell mixed-era simulation should opt into the shared simulation persistence serializer'
+);
+assert.equal(
+  api.shouldPersistSharedSimulationState(legacyHistoricalSimulation),
+  false,
+  'legacy historical simulations should not be claimed by the shared simulation persistence serializer'
 );
 
 console.log('shared season shell simulation test passed');
