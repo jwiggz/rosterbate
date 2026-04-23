@@ -2798,18 +2798,143 @@ function isSharedSimulationSeason(params, state){
   return !!(window.RosterBateSimulationSeasonAdapter?.isSupportedSimulationSeasonState?.(state));
 }
 
-function getActiveSeasonPages(){
-  if(ACTIVE_SEASON_MODE==='simulation'){
-    return ['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings'];
+function cloneSharedSimulationBootValue(value){
+  try{
+    return JSON.parse(JSON.stringify(value));
+  }catch(e){
+    if(Array.isArray(value)) return value.slice();
+    if(value && typeof value==='object') return {...value};
+    return value;
   }
-  return DEFAULT_PAGES.slice();
+}
+
+function normalizeSharedSimulationSeasonBootState(state, slotId){
+  const rawState=(state && typeof state==='object') ? state : {};
+  const rawTeams=Array.isArray(rawState?.leagueShell?.teams) ? rawState.leagueShell.teams.filter(Boolean) : [];
+  const rosterMap=(rawState?.draftState && typeof rawState.draftState==='object' && rawState.draftState.rostersByTeam && typeof rawState.draftState.rostersByTeam==='object')
+    ? rawState.draftState.rostersByTeam
+    : {};
+  const freeAgents=Array.isArray(rawState?.draftState?.freeAgents)
+    ? rawState.draftState.freeAgents.map(player=>cloneSharedSimulationBootValue(player))
+    : [];
+  const leagueSize=Math.max(rawTeams.length, Number(rawState?.leagueSize)||0, 1);
+  const teams=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    return String(team?.name || team?.displayName || team?.abbr || ('Team ' + (teamIdx+1))).trim() || ('Team ' + (teamIdx+1));
+  });
+  const allRosters=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    const abbr=String(team?.abbr || '').trim();
+    const roster=abbr && Array.isArray(rosterMap[abbr]) ? rosterMap[abbr] : [];
+    return roster.map(player=>cloneSharedSimulationBootValue(player)).filter(Boolean);
+  });
+  const controlledTeamAbbr=String(rawState?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  let myPos=rawTeams.findIndex(team=>String(team?.abbr || '').trim().toUpperCase()===controlledTeamAbbr);
+  if(myPos<0) myPos=0;
+  const standingsSource=Array.isArray(rawState?.seasonState?.standings) ? rawState.seasonState.standings : [];
+  const standingsByAbbr=new Map(
+    standingsSource.map(row=>[String(row?.teamAbbr || '').trim().toUpperCase(), row]).filter(entry=>entry[0])
+  );
+  const standings=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    const abbr=String(team?.abbr || '').trim().toUpperCase();
+    const row=(abbr && standingsByAbbr.get(abbr)) || standingsSource[teamIdx] || {};
+    return {
+      teamIdx,
+      teamAbbr: abbr || String(row?.teamAbbr || '').trim().toUpperCase() || null,
+      conference: row?.conference || team?.conference || '',
+      division: row?.division || team?.division || '',
+      w: Number(row?.w || 0) || 0,
+      l: Number(row?.l || 0) || 0,
+      pf: Number(row?.pf || 0) || 0,
+      pa: Number(row?.pa || 0) || 0,
+      streak: Number(row?.streak || 0) || 0,
+      streakW: row?.streakW !== false
+    };
+  });
+  const stableSlotId=String(slotId || rawState?.historicalUniverseSlotId || rawState?.slotId || '').trim();
+  const sport=String(rawState?.sport || rawState?.leagueShell?.sport || 'nba').trim().toLowerCase() || 'nba';
+  const currentDay=Math.max(1, Number(rawState?.seasonState?.currentDay || rawState?.currentDay || 1) || 1);
+  const currentWeek=Math.max(1, Number(rawState?.seasonState?.currentWeek || rawState?.currentWeek || 1) || 1);
+  const seasonId=String(rawState?.seasonId || rawState?.leagueId || (stableSlotId ? ('simulation:' + stableSlotId) : 'simulation:shared-season')).trim();
+  return {
+    ...rawState,
+    sport,
+    simulationMode: String(rawState?.simulationMode || 'nba_mixed_era_single_player_v1').trim() || 'nba_mixed_era_single_player_v1',
+    historicalEntryMode: String(rawState?.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+    seasonId,
+    leagueId: seasonId,
+    historicalUniverseSlotId: stableSlotId || null,
+    sharedSimulationSlotId: stableSlotId || null,
+    leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || 'NBA Simulation').trim() || 'NBA Simulation',
+    teamName: teams[myPos] || 'My Team',
+    teams,
+    teamMeta: rawTeams.map(team=>cloneSharedSimulationBootValue(team)),
+    leagueSize,
+    myPos,
+    myTeamIndex: myPos,
+    currentDay,
+    currentWeek,
+    allRosters,
+    ilRosters: Array.from({length:leagueSize}, ()=>[]),
+    standings,
+    freeAgents,
+    waiver: freeAgents.map(player=>cloneSharedSimulationBootValue(player)),
+    starters: Array.from({length:leagueSize}, ()=>[]),
+    processed: Array.isArray(rawState?.processed) ? rawState.processed.slice() : [],
+    tradeOffers: Array.isArray(rawState?.tradeOffers) ? rawState.tradeOffers.map(entry=>cloneSharedSimulationBootValue(entry)) : [],
+    dailyLineups: rawState?.dailyLineups && typeof rawState.dailyLineups==='object' ? cloneSharedSimulationBootValue(rawState.dailyLineups) : {},
+    dailyLineupsByTeam: rawState?.dailyLineupsByTeam && typeof rawState.dailyLineupsByTeam==='object' ? cloneSharedSimulationBootValue(rawState.dailyLineupsByTeam) : {},
+    powerupsByWeek: rawState?.powerupsByWeek && typeof rawState.powerupsByWeek==='object' ? cloneSharedSimulationBootValue(rawState.powerupsByWeek) : {},
+    dayResults: rawState?.dayResults && typeof rawState.dayResults==='object' ? cloneSharedSimulationBootValue(rawState.dayResults) : {},
+    revealedDays: rawState?.revealedDays && typeof rawState.revealedDays==='object' ? cloneSharedSimulationBootValue(rawState.revealedDays) : {},
+    settledWeeks: rawState?.settledWeeks && typeof rawState.settledWeeks==='object' ? cloneSharedSimulationBootValue(rawState.settledWeeks) : {},
+    activityLog: Array.isArray(rawState?.seasonState?.activityLog)
+      ? rawState.seasonState.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+      : Array.isArray(rawState?.activityLog)
+      ? rawState.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+      : [],
+    dailyRevealReports: rawState?.dailyRevealReports && typeof rawState.dailyRevealReports==='object' ? cloneSharedSimulationBootValue(rawState.dailyRevealReports) : {},
+    recentDrops: Array.isArray(rawState?.recentDrops) ? rawState.recentDrops.map(entry=>cloneSharedSimulationBootValue(entry)) : [],
+    moneyBallLocks: rawState?.moneyBallLocks && typeof rawState.moneyBallLocks==='object' ? cloneSharedSimulationBootValue(rawState.moneyBallLocks) : {},
+    cpuTradeMarketDaysProcessed: rawState?.cpuTradeMarketDaysProcessed && typeof rawState.cpuTradeMarketDaysProcessed==='object' ? cloneSharedSimulationBootValue(rawState.cpuTradeMarketDaysProcessed) : {},
+    isFreshDraftLaunch: false,
+    multiplayer: false
+  };
+}
+
+function getActiveSeasonNavItems(){
+  const adapterNavItems=SEASON_MODE_ADAPTER?.getNavItems?.();
+  if(Array.isArray(adapterNavItems) && adapterNavItems.length){
+    return adapterNavItems
+      .map(item=>({
+        id: String(item?.id || '').trim(),
+        label: String(item?.label || item?.id || '').trim()
+      }))
+      .filter(item=>item.id && item.label);
+  }
+  if(ACTIVE_SEASON_MODE==='simulation'){
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' }
+    ];
+  }
+  return DEFAULT_PAGES.map(pageId=>({ id: pageId, label: DEFAULT_LABELS[pageId] }));
+}
+
+function getActiveSeasonPages(){
+  return getActiveSeasonNavItems().map(item=>item.id);
 }
 
 function getActiveSeasonLabels(){
-  if(ACTIVE_SEASON_MODE==='simulation'){
-    return { hub: 'Hub', roster: 'Roster', matchup: 'Schedule', waiver: 'Waivers', trades: 'Trades', standings: 'Stand.' };
-  }
-  return { ...DEFAULT_LABELS };
+  return getActiveSeasonNavItems().reduce((labels, item)=>{
+    labels[item.id]=item.label;
+    return labels;
+  }, {});
 }
 
 function isHistoricalDraftUniverse(state){
@@ -6835,6 +6960,7 @@ window.onload=async function(){
   if (requestedHistoricalUniverse) {
     const slotState = loadHistoricalUniverseSlotState(requestedHistoricalUniverse, requestedSport);
     if (slotState) {
+      const sharedSimulationSeason = isSharedSimulationSeason(urlParams, slotState);
       console.log('🗂️ Loading saved historical universe slot...', {
         slotId: requestedHistoricalUniverse,
         packId: slotState.historicalPackId || null,
@@ -6842,15 +6968,17 @@ window.onload=async function(){
         entryMode: slotState.historicalEntryMode || null
       });
       hideSeasonEmptyState();
-      D = slotState;
-      D.historicalUniverseSlotId = requestedHistoricalUniverse;
-      ACTIVE_SEASON_MODE = isSharedSimulationSeason(urlParams, D) ? 'simulation' : 'fantasy';
-      SEASON_MODE_ADAPTER = ACTIVE_SEASON_MODE === 'simulation'
+      ACTIVE_SEASON_MODE = sharedSimulationSeason ? 'simulation' : 'fantasy';
+      SEASON_MODE_ADAPTER = sharedSimulationSeason
         ? window.RosterBateSimulationSeasonAdapter?.createSimulationSeasonAdapter?.({
             slotId: requestedHistoricalUniverse,
-            state: D
+            state: slotState
           }) || null
         : null;
+      D = sharedSimulationSeason
+        ? normalizeSharedSimulationSeasonBootState(slotState, requestedHistoricalUniverse)
+        : slotState;
+      D.historicalUniverseSlotId = requestedHistoricalUniverse;
       if (isHistoricalSimulationUniverse(D)) {
         ensureCpuTeamPersonalitiesByTeam(D);
       }
