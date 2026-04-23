@@ -38,6 +38,8 @@ ${extractBetween('function renderSimulationScheduleInSharedShell(', 'function re
 module.exports = {
   getRequestedSimulationMode,
   getRequestedHistoricalUniverseSlotId,
+  readCompletedSimulationDraftState,
+  resolveCompletedSimulationDraftSeasonBoot,
   isSharedSimulationSeason,
   shouldPersistSharedSimulationState,
   getActiveSeasonPages,
@@ -124,7 +126,17 @@ const elements = Object.fromEntries([
   'standingsPowerups'
 ].map((id) => [id, createElement(id)]));
 
+const sandboxConsole = {
+  ...console,
+  warn() {}
+};
+
 let persistedReason = null;
+let completedDraftState = null;
+let completedDraftClearCount = 0;
+let completedDraftUpsertInput = null;
+let completedDraftUpsertOptions = null;
+let completedDraftUpsertError = null;
 const simulationAdapterStub = {
   getState() {
     return {
@@ -213,8 +225,12 @@ const simulationAdapterStub = {
 const sandbox = {
   module: { exports: {} },
   exports: {},
-  console,
+  console: sandboxConsole,
+  CURRENT_SPORT: 'nba',
   URLSearchParams,
+  normalizeRosterbateSport(value) {
+    return String(value || 'nba').trim().toLowerCase() || 'nba';
+  },
   persistHistoricalUniverseSlotSnapshot(reason) {
     persistedReason = reason;
   },
@@ -224,6 +240,35 @@ const sandbox = {
     }
   },
   window: {
+    RosterBateHistoricalUniverseSlots: {
+      upsertFromState(state, options) {
+        completedDraftUpsertInput = toPlain(state);
+        completedDraftUpsertOptions = toPlain(options);
+        if (completedDraftUpsertError) {
+          throw completedDraftUpsertError;
+        }
+        return {
+          slotId: 'sim-slot-from-completed-draft',
+          state: {
+            ...toPlain(state),
+            historicalUniverseSlotId: 'sim-slot-from-completed-draft'
+          }
+        };
+      },
+      buildSeasonUrl(slot, sport) {
+        return `rosterbate-season.html?sport=${encodeURIComponent(String(sport || 'nba'))}&simulation=nba_mixed_era&historicalUniverse=${encodeURIComponent(String(slot?.slotId || ''))}`;
+      }
+    },
+    RosterBateSimulationModeRuntime: {
+      readCompletedSimulationState() {
+        return completedDraftState ? toPlain(completedDraftState) : null;
+      },
+      clearCompletedSimulationState() {
+        completedDraftClearCount += 1;
+        completedDraftState = null;
+        return true;
+      }
+    },
     RosterBateSimulationSeasonAdapter: {
       isSupportedSimulationSeasonState(state) {
         return String(state?.simulationMode || '').trim().toLowerCase() === 'nba_mixed_era_single_player_v1';
@@ -272,6 +317,105 @@ assert.equal(
   api.getRequestedHistoricalUniverseSlotId(new URLSearchParams('?slot=legacy-slot')),
   'legacy-slot',
   'historical slot helper should support slot alias fallback'
+);
+assert.match(html, /function resolveCompletedSimulationDraftSeasonBoot\(/, 'season shell should expose a completed-draft handoff helper');
+assert.match(html, /const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot\(urlParams, requestedSport\);/, 'season shell should check runtime completed-draft handoffs during boot');
+
+const fixture = {
+  simulationMode: 'nba_mixed_era_single_player_v1',
+  leagueShell: {
+    sport: 'nba',
+    anchorSeasonLabel: '2025-26 NBA',
+    teams: [
+      { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
+      { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' }
+    ]
+  },
+  draftState: {
+    controlledTeamAbbr: 'LAL',
+    rostersByTeam: {
+      LAL: [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    },
+    freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }]
+  },
+  seasonState: {
+    currentDay: 12,
+    currentWeek: 2,
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ],
+    activityLog: [{ type: 'trade', summary: 'Fixture log entry' }]
+  }
+};
+completedDraftState = fixture;
+completedDraftClearCount = 0;
+completedDraftUpsertInput = null;
+completedDraftUpsertOptions = null;
+completedDraftUpsertError = null;
+
+const completedDraftRedirect = toPlain(
+  api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era'), 'nba')
+);
+
+assert.equal(completedDraftRedirect.redirected, true, 'completed-draft handoff should prefer a canonical slot-backed redirect');
+assert.equal(completedDraftRedirect.slotId, 'sim-slot-from-completed-draft', 'completed-draft handoff should capture the created slot id');
+assert.equal(
+  completedDraftRedirect.redirectUrl,
+  'rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=sim-slot-from-completed-draft',
+  'completed-draft handoff should produce the canonical season-shell URL'
+);
+assert.equal(completedDraftClearCount, 1, 'completed-draft handoff should clear the one-shot runtime payload after slot persistence succeeds');
+assert.equal(completedDraftUpsertOptions.reason, 'simulation_completed_draft_handoff', 'completed-draft handoff should label the slot write reason');
+assert.equal(completedDraftUpsertInput.draftState.controlledTeamAbbr, 'LAL', 'completed-draft handoff should persist the completed simulation state');
+
+completedDraftState = {
+  simulationMode: 'nba_mixed_era_single_player_v1',
+  leagueShell: {
+    sport: 'nba',
+    teams: [
+      { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
+      { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' }
+    ]
+  },
+  draftState: {
+    controlledTeamAbbr: 'LAL',
+    rostersByTeam: {
+      LAL: [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    },
+    freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }]
+  },
+  seasonState: {
+    currentDay: 12,
+    currentWeek: 2,
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ]
+  }
+};
+completedDraftClearCount = 0;
+completedDraftUpsertInput = null;
+completedDraftUpsertOptions = null;
+completedDraftUpsertError = new Error('quota exceeded');
+
+const completedDraftFallback = toPlain(
+  api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era'), 'nba')
+);
+
+assert.equal(completedDraftFallback.redirected, false, 'completed-draft handoff should fall back to direct boot when slot persistence fails');
+assert.equal(completedDraftFallback.redirectUrl, '', 'fallback handoff should skip redirecting when slot persistence fails');
+assert.equal(completedDraftFallback.slotId, null, 'fallback handoff should boot without a slot when no slot could be created');
+assert.equal(completedDraftFallback.state.seasonId, 'simulation:shared-season', 'fallback handoff should normalize the raw simulation state into the shared shell boot shape');
+assert.equal(completedDraftFallback.state.allRosters[0][0].name, 'Michael Jordan', 'fallback handoff should preserve completed-draft rosters');
+assert.equal(completedDraftClearCount, 0, 'fallback handoff should keep the runtime payload available when slot persistence fails');
+
+assert.equal(
+  api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era&historicalUniverse=existing-slot'), 'nba'),
+  null,
+  'completed-draft handoff should not override an explicit historical universe slot'
 );
 
 api.setActiveSeasonMode('fantasy');
@@ -397,35 +541,6 @@ assert.equal(persistedReason, 'simulation_trade');
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /LAL/);
 assert.match(elements.standingsContent.innerHTML, /9-3/);
-
-const fixture = {
-  simulationMode: 'nba_mixed_era_single_player_v1',
-  leagueShell: {
-    sport: 'nba',
-    anchorSeasonLabel: '2025-26 NBA',
-    teams: [
-      { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
-      { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' }
-    ]
-  },
-  draftState: {
-    controlledTeamAbbr: 'LAL',
-    rostersByTeam: {
-      LAL: [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
-      BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
-    },
-    freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }]
-  },
-  seasonState: {
-    currentDay: 12,
-    currentWeek: 2,
-    standings: [
-      { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
-      { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
-    ],
-    activityLog: [{ type: 'trade', summary: 'Fixture log entry' }]
-  }
-};
 
 const normalized = toPlain(api.normalizeSharedSimulationSeasonBootState(fixture, 'sim-slot-1'));
 

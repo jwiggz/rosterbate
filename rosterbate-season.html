@@ -2266,6 +2266,56 @@ function getRequestedHistoricalUniverseSlotId(params){
   return alias || null;
 }
 
+function readCompletedSimulationDraftState(){
+  try{
+    const state=window.RosterBateSimulationModeRuntime?.readCompletedSimulationState?.();
+    return shouldPersistSharedSimulationState(state) ? state : null;
+  }catch(e){
+    console.warn('Failed to read completed simulation draft handoff:', e);
+    return null;
+  }
+}
+
+function resolveCompletedSimulationDraftSeasonBoot(params, requestedSport){
+  if(getRequestedHistoricalUniverseSlotId(params)) return null;
+  if(getRequestedSimulationMode(params)!=='nba_mixed_era') return null;
+  const rawState=readCompletedSimulationDraftState();
+  if(!rawState) return null;
+  const targetSport=normalizeRosterbateSport(rawState?.sport || rawState?.leagueShell?.sport || requestedSport || CURRENT_SPORT);
+  const historicalSlotApi=window.RosterBateHistoricalUniverseSlots;
+  if(historicalSlotApi?.upsertFromState){
+    try{
+      const persisted=historicalSlotApi.upsertFromState(rawState,{
+        reason:'simulation_completed_draft_handoff'
+      });
+      if(persisted?.slotId){
+        window.RosterBateSimulationModeRuntime?.clearCompletedSimulationState?.();
+        return {
+          redirected:true,
+          redirectUrl:historicalSlotApi.buildSeasonUrl
+            ? historicalSlotApi.buildSeasonUrl({slotId:persisted.slotId, sport:targetSport}, targetSport, persisted.state || rawState)
+            : ('rosterbate-season.html?sport='
+              + encodeURIComponent(targetSport)
+              + '&simulation=nba_mixed_era&historicalUniverse='
+              + encodeURIComponent(persisted.slotId)),
+          slotId:persisted.slotId,
+          rawState:persisted.state || rawState,
+          state:normalizeSharedSimulationSeasonBootState(persisted.state || rawState, persisted.slotId)
+        };
+      }
+    }catch(e){
+      console.warn('Completed simulation draft handoff could not create a historical slot. Booting from runtime storage instead.', e);
+    }
+  }
+  return {
+    redirected:false,
+    redirectUrl:'',
+    slotId:String(rawState?.historicalUniverseSlotId || rawState?.slotId || '').trim() || null,
+    rawState,
+    state:normalizeSharedSimulationSeasonBootState(rawState, rawState?.historicalUniverseSlotId || rawState?.slotId || null)
+  };
+}
+
 function loadHistoricalUniverseSlotState(slotId, requestedSport){
   const api=window.RosterBateHistoricalUniverseSlots;
   const targetSlotId=String(slotId||'').trim();
@@ -7109,10 +7159,37 @@ window.onload=async function(){
   const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
   const requestedHistoricalUniverse = getRequestedHistoricalUniverseSlotId(urlParams);
   const sharedSimulationSeasonRequested = isSharedSimulationSeason(urlParams, null);
+  const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot(urlParams, requestedSport);
   ACTIVE_SEASON_MODE = sharedSimulationSeasonRequested ? 'simulation' : 'fantasy';
   SEASON_MODE_ADAPTER = null;
   if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
   else setSeasonEmptyState('idle');
+
+  if (completedSimulationDraftBoot?.redirected && completedSimulationDraftBoot.redirectUrl) {
+    window.location.href = completedSimulationDraftBoot.redirectUrl;
+    return;
+  }
+
+  if (completedSimulationDraftBoot?.state && completedSimulationDraftBoot.rawState) {
+    hideSeasonEmptyState();
+    ACTIVE_SEASON_MODE = 'simulation';
+    SEASON_MODE_ADAPTER = buildSimulationSeasonAdapterFromState(
+      completedSimulationDraftBoot.slotId,
+      completedSimulationDraftBoot.rawState
+    );
+    D = completedSimulationDraftBoot.state;
+    D.historicalUniverseSlotId = completedSimulationDraftBoot.slotId || null;
+    if (isHistoricalSimulationUniverse(D)) {
+      ensureCpuTeamPersonalitiesByTeam(D);
+    }
+    applySportContext(D.sport || requestedSport);
+    hydrateDraftUserContextFromLobby();
+    refreshCommissionerAccess();
+    try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+    initSeason();
+    applyRequestedSeasonView();
+    return;
+  }
 
   if (requestedHistoricalUniverse) {
     const slotState = loadHistoricalUniverseSlotState(requestedHistoricalUniverse, requestedSport);

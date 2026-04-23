@@ -369,6 +369,111 @@ async function main(){
   assert.equal(autoDraftStatusNode.textContent, 'Opening season manager...', 'auto path should announce the season handoff on success');
   assert.equal(autoDraftLocationState.href, 'rosterbate-season.html?sport=nba&simulation=nba_mixed_era', 'auto-draft path should enter the season shell directly');
 
+  const failedAutoDraftStatusNode = { textContent: '' };
+  const failedAutoDraftContinueButton = { disabled: false };
+  const failedAutoDraftButtonNode = { disabled: false };
+  const failedAutoDraftFranchiseSelect = { value: 'LAL', innerHTML: '', disabled: false };
+  const failedAutoDraftDraftSlotSelect = { value: '4', innerHTML: '', disabled: false };
+  const failedAutoDraftSeasonNodes = [
+    { value: 'nba_1987_full_season_v1', checked: true, disabled: false },
+    { value: 'nba_1993_full_season_v1', checked: true, disabled: false },
+    { value: 'nba_1996_full_season_v1', checked: true, disabled: false }
+  ];
+  const failedAutoDraftLocationState = {
+    href: 'rosterbate-simulation-setup.html?sport=nba',
+    search: '?sport=nba'
+  };
+  let failedAutoDraftHelperInput = null;
+  const failedAutoDraftContext = {
+    console,
+    URLSearchParams,
+    setTimeout,
+    clearTimeout,
+    Promise,
+    Array,
+    Number,
+    String,
+    Object,
+    JSON,
+    Math,
+    document: {
+      getElementById(id){
+        if (id === 'simulationSetupStatus') return failedAutoDraftStatusNode;
+        if (id === 'simulationContinueBtn') return failedAutoDraftContinueButton;
+        if (id === 'simulationAutoDraftBtn') return failedAutoDraftButtonNode;
+        if (id === 'simulationFranchiseSelect') return failedAutoDraftFranchiseSelect;
+        if (id === 'simulationDraftSlotSelect') return failedAutoDraftDraftSlotSelect;
+        if (id === 'simulationSourceSeasonList') return { innerHTML: '' };
+        throw new Error(`Unknown element requested: ${id}`);
+      },
+      querySelectorAll(selector){
+        if (selector === '#simulationSourceSeasonList input:checked') {
+          return failedAutoDraftSeasonNodes.filter((node) => node.checked);
+        }
+        if (selector === '#simulationSourceSeasonList input') {
+          return failedAutoDraftSeasonNodes;
+        }
+        throw new Error(`Unexpected selector requested: ${selector}`);
+      }
+    },
+    localStorage: {
+      setItem(){
+        throw new Error('should not write setup payload during completed-draft failure test');
+      }
+    }
+  };
+
+  failedAutoDraftContext.window = failedAutoDraftContext;
+  failedAutoDraftContext.window.location = failedAutoDraftLocationState;
+  failedAutoDraftContext.window.RosterBateSimulationModeRuntime = {
+    STORAGE_KEY: 'rbSimulationModeLocalState__fromRuntime',
+    writeCompletedSimulationState(){
+      throw new Error('quota exceeded');
+    },
+    buildCompletedSimulationAutoDraftState(input){
+      failedAutoDraftHelperInput = input;
+      return {
+        simulationMode: 'nba_mixed_era_single_player_v1',
+        leagueShell: input.shell,
+        sourceSeasons: input.mixedEraContext,
+        draftState: {
+          controlledTeamAbbr: input.controlledTeamAbbr,
+          rostersByTeam: {
+            LAL: Array.from({ length: 10 }, (_, index) => ({ id: index + 1 }))
+          },
+          freeAgents: [],
+          draftPool: [],
+          teamCount: 1,
+          rosterSize: 10
+        },
+        seasonState: {
+          currentDay: 1
+        },
+        postseasonState: {
+          phase: 'regular_season'
+        }
+      };
+    }
+  };
+  failedAutoDraftContext.window.RosterBateSimulationModeConfig = context.window.RosterBateSimulationModeConfig;
+  failedAutoDraftContext.window.RosterBateHistoricalPackLoader = context.window.RosterBateHistoricalPackLoader;
+  failedAutoDraftContext.window.RosterBateMixedEraRuntime = context.window.RosterBateMixedEraRuntime;
+
+  vm.runInNewContext(inlineScript, failedAutoDraftContext, { filename: 'rosterbate-simulation-setup.inline.js' });
+  await Promise.resolve();
+  await Promise.resolve();
+
+  await failedAutoDraftContext.simDraftAndStartSeason();
+
+  assert.equal(failedAutoDraftHelperInput.controlledTeamAbbr, 'LAL', 'auto-draft failure path should still build the completed simulation state before the write fails');
+  assert.equal(failedAutoDraftStatusNode.textContent, 'quota exceeded', 'auto-draft failure path should surface the storage write error');
+  assert.equal(failedAutoDraftLocationState.href, 'rosterbate-simulation-setup.html?sport=nba', 'auto-draft failure path should stay on setup when the completed state cannot be written');
+  assert.equal(failedAutoDraftContinueButton.disabled, false, 'auto-draft failure path should re-enable the manual CTA');
+  assert.equal(failedAutoDraftButtonNode.disabled, false, 'auto-draft failure path should re-enable the auto CTA');
+  assert.equal(failedAutoDraftFranchiseSelect.disabled, false, 'auto-draft failure path should re-enable franchise selection');
+  assert.equal(failedAutoDraftDraftSlotSelect.disabled, false, 'auto-draft failure path should re-enable draft slot selection');
+  assert.ok(failedAutoDraftSeasonNodes.every((node) => node.disabled === false), 'auto-draft failure path should re-enable all season inputs');
+
   console.log('simulation setup page test passed');
 }
 

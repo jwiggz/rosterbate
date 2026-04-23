@@ -24,12 +24,16 @@
     if (!(root && root.localStorage)) {
       return value;
     }
-    try{
-      root.localStorage.setItem(key, JSON.stringify(value));
-    }catch(error){
-      return value;
-    }
+    root.localStorage.setItem(key, JSON.stringify(value));
     return value;
+  }
+
+  function clearJsonStorage(key){
+    if (!(root && root.localStorage)) {
+      return false;
+    }
+    root.localStorage.removeItem(key);
+    return true;
   }
 
   function normalizeTeamAbbr(teamAbbr){
@@ -325,11 +329,16 @@
     return writeJsonStorage(COMPLETED_DRAFT_KEY, state);
   }
 
+  function clearCompletedSimulationState(){
+    return clearJsonStorage(COMPLETED_DRAFT_KEY);
+  }
+
   const api = {
     STORAGE_KEY,
     COMPLETED_DRAFT_KEY,
     readCompletedSimulationState,
     writeCompletedSimulationState,
+    clearCompletedSimulationState,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,
     buildCompletedSimulationAutoDraftState,
