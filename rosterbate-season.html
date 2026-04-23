@@ -6105,7 +6105,13 @@ let wAdd=null,wDrop=null,trP={ti:-1,give:[],get:[]};
 let waiverSortKey='fp',waiverSortDir='desc',waiverTab='stats',waiverListMode='all';
 
 function getWatchListIds(){
-  if(!D || !Array.isArray(D.watchList)) D.watchList=[];
+  if(!D || typeof D!=='object') return [];
+  const legacy=Array.isArray(D.watchlist) ? D.watchlist : [];
+  const modern=Array.isArray(D.watchList) ? D.watchList : [];
+  const source=legacy.length ? legacy : modern;
+  const normalized=Array.from(new Set(source.map(id=>Number(id)).filter(Number.isFinite)));
+  D.watchlist=normalized;
+  D.watchList=normalized;
   return D.watchList;
 }
 
@@ -6129,6 +6135,7 @@ function toggleWatchList(pid){
   const next=current.includes(targetId)
     ? current.filter(id=>id!==targetId)
     : [...current, targetId];
+  D.watchlist=next;
   D.watchList=next;
   queueSharedSeasonSave('watch_list', 150);
   renderWaiver();
@@ -11060,7 +11067,7 @@ function getCommissionerOverviewState(){
   initCS();
   const pendingTrades=(G.tradeOffers||[]).filter(t=>t.status==='pending');
   const recentDrops=(G.recentDrops||[]).filter(drop=>!drop.undone);
-  const watchHits=(D.watchlist||[]).filter(pid=>(G.waiver||[]).some(player=>Number(player?.id)===Number(pid))).length;
+  const watchHits=getWatchListIds().filter(pid=>(G.waiver||[]).some(player=>Number(player?.id)===Number(pid))).length;
   const commissionerIdx=Number.isFinite(Number(D?.commissionerTeamIdx))?Number(D.commissionerTeamIdx):Number(D?.myPos||0);
   const commissionerName=teamName(commissionerIdx);
   const actions=[
@@ -11427,7 +11434,7 @@ function commAcq(){
         <button class="season-outline-btn" style="padding:8px 14px;" onclick="undoRecentDrop('${drop.id}')">Undo Drop</button>
       </div>`).join('');
   const pendingRecentDrops=(G.recentDrops||[]).filter(d=>!d.undone).length;
-  const watchHits=(D.watchlist||[]).filter(pid=>(G.waiver||[]).some(player=>Number(player?.id)===Number(pid))).length;
+  const watchHits=getWatchListIds().filter(pid=>(G.waiver||[]).some(player=>Number(player?.id)===Number(pid))).length;
   document.getElementById('commContent').innerHTML=`
     <div class="comm-overview-card" style="margin-bottom:14px;">
       <div class="comm-overview-label">Wire Pressure</div>

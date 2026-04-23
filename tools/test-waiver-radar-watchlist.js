@@ -149,7 +149,7 @@ function buildContext() {
     Set,
     JSON,
     D: {
-      watchList: [202]
+      watchlist: [202]
     },
     G: {
       rosters: [
@@ -180,11 +180,23 @@ function buildContext() {
 const context = buildContext();
 
 assert.deepStrictEqual(Array.from(context.getWatchListIds()), [202]);
+assert.deepStrictEqual(Array.from(context.D.watchlist), [202]);
+assert.deepStrictEqual(Array.from(context.D.watchList), [202]);
 assert.equal(context.isWatchListed(202), true);
 assert.equal(context.isWatchListed(203), false);
 
+const originalWatchlistPayload = Array.from(context.D.watchlist);
+context.D.watchlist = [];
+context.D.watchList = [402];
+assert.deepStrictEqual(Array.from(context.getWatchListIds()), [402]);
+assert.deepStrictEqual(Array.from(context.D.watchlist), [402]);
+assert.deepStrictEqual(Array.from(context.D.watchList), [402]);
+context.D.watchlist = originalWatchlistPayload;
+context.D.watchList = originalWatchlistPayload;
+
 const fitFirstWatchList = Array.from(context.getWatchListIds());
 const originalWaiverPool = Array.from(context.G.waiver);
+context.D.watchlist = [];
 context.D.watchList = [402];
 context.G.waiver = [
   makePlayer(401, 'Fit Lead', 45, { pos: 'PG' }),
@@ -194,6 +206,7 @@ const fitFirstRadar = context.getWaiverRadarCandidates(2);
 assert.equal(Number(fitFirstRadar[0].player.id), 401);
 assert.ok(fitFirstRadar[0].fitScore > fitFirstRadar[1].fitScore);
 assert.ok(fitFirstRadar[1].score > fitFirstRadar[0].score, 'watch boost should still matter after fit');
+context.D.watchlist = fitFirstWatchList;
 context.D.watchList = fitFirstWatchList;
 context.G.waiver = originalWaiverPool;
 
@@ -228,6 +241,7 @@ const unwatchedWeak = context.getWaiverRadarCandidateScore(
 );
 assert.ok(strongerFit.score > watchedNeutral.score, 'fit should beat watch boost');
 const originalWatchList = Array.from(context.getWatchListIds());
+context.D.watchlist = [];
 context.D.watchList = [302];
 const watchedWeakerFitBoosted = context.getWaiverRadarCandidateScore(
   makePlayer(302, 'Watched Weak', 50, { pos: 'SF' }),
@@ -236,6 +250,7 @@ const watchedWeakerFitBoosted = context.getWaiverRadarCandidateScore(
 assert.ok(watchedWeakerFitBoosted.score > unwatchedWeak.score, 'watch should surface weaker-fit players');
 
 const originalRecentDrops = Array.from(context.G.recentDrops);
+context.D.watchlist = [];
 context.D.watchList = [];
 context.G.recentDrops = [];
 const plainNeutral = context.getWaiverRadarCandidateScore(
@@ -249,11 +264,14 @@ const recentBoosted = context.getWaiverRadarCandidateScore(
 );
 assert.ok(recentBoosted.score > plainNeutral.score, 'recent drops should lift players');
 assert.ok(strongerFit.score > recentBoosted.score, 'recent drop should not outrank stronger fit');
+context.D.watchlist = originalWatchList;
 context.D.watchList = originalWatchList;
 context.G.recentDrops = originalRecentDrops;
 
 context.toggleWatchList(203);
 assert.deepStrictEqual(Array.from(context.getWatchListIds()), [202, 203]);
+assert.deepStrictEqual(Array.from(context.D.watchlist), [202, 203]);
+assert.deepStrictEqual(Array.from(context.D.watchList), [202, 203]);
 
 const watchedTargets = context.getWatchedWaiverTargets(4);
 assert.deepStrictEqual(Array.from(watchedTargets, player => Number(player.id)), [202, 203]);
