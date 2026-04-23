@@ -711,25 +711,143 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function buildSimulationModeSummary(slot, state){
+    const postseason = state?.postseasonState && typeof state.postseasonState === 'object'
+      ? state.postseasonState
+      : {};
+    const phase = String(postseason.phase || 'regular_season').trim().toLowerCase();
+    const champion = postseason.champion && typeof postseason.champion === 'object'
+      ? postseason.champion
+      : {};
+    const runnerUp = postseason.runnerUp && typeof postseason.runnerUp === 'object'
+      ? postseason.runnerUp
+      : {};
+    const championAbbr = String(champion.teamAbbr || champion.championTeamAbbr || '').trim();
+    const runnerUpAbbr = String(runnerUp.teamAbbr || champion.runnerUpTeamAbbr || '').trim();
     const standing = (state?.seasonState?.standings || []).find(function(row){
       return String(row?.teamAbbr || '') === String(state?.draftState?.controlledTeamAbbr || '');
     });
+    const universeLabel = String((state?.leagueShell?.anchorSeasonLabel || 'NBA')) + ' shell · ' + String((state?.sourceSeasons?.sourceSeasonLabels || []).join(' + ') || 'Mixed era') + ' player universe';
+    const phaseSummary = {
+      regular_season: {
+        title: 'Simulation champion chase',
+        body: universeLabel + '. The regular season is still shaping the play-in and playoff picture.',
+        meta: 'Play-In race active'
+      },
+      postseason_ready: {
+        title: 'Simulation bracket set',
+        body: universeLabel + '. The field is locked and the title chase is ready to open.',
+        meta: 'Bracket locked'
+      },
+      play_in: {
+        title: 'Simulation play-in push',
+        body: universeLabel + '. The play-in tournament is deciding the final playoff field.',
+        meta: 'Play-In tournament live'
+      },
+      playoffs_round_1: {
+        title: 'Simulation Round 1 live',
+        body: universeLabel + '. The opening playoff round is underway and every bracket line matters now.',
+        meta: 'Round 1 underway'
+      },
+      conference_semifinals: {
+        title: 'Simulation semifinals live',
+        body: universeLabel + '. The bracket has tightened and the conference semifinal push is on.',
+        meta: 'Semifinals underway'
+      },
+      conference_finals: {
+        title: 'Simulation conference finals live',
+        body: universeLabel + '. The final conference spots are being decided before the title round.',
+        meta: 'Conference finals underway'
+      },
+      finals: {
+        title: 'Simulation Finals spotlight',
+        body: universeLabel + '. The last two teams are battling for the trophy.',
+        meta: 'Finals underway'
+      },
+      completed: {
+        title: 'Simulation title claimed',
+        body: universeLabel + '. ' + (
+          championAbbr
+            ? championAbbr + ' finished the run on top and closed out the title chase.'
+            : 'The postseason run is complete and the trophy has already been claimed.'
+        ),
+        meta: championAbbr ? 'Champion: ' + championAbbr : 'Champion crowned'
+      }
+    };
+    const summary = phaseSummary[phase] || phaseSummary.regular_season;
     return {
-      title: 'Simulation champion chase',
-      body: String((state?.leagueShell?.anchorSeasonLabel || 'NBA')) + ' shell · ' + String((state?.sourceSeasons?.sourceSeasonLabels || []).join(' + ') || 'Mixed era') + ' player universe',
+      title: summary.title,
+      body: summary.body,
       meta: [
         standing ? 'Record ' + standing.w + '-' + standing.l : 'Record pending',
-        state?.postseasonState?.phase === 'regular_season' ? 'Play-In race active' : 'Phase: ' + String(state?.postseasonState?.phase || 'regular_season')
+        summary.meta
       ]
     };
   }
 
   function buildSimulationPlayoffSummary(slot, state){
-    if(state?.postseasonState?.champion){
+    const postseason = state?.postseasonState && typeof state.postseasonState === 'object'
+      ? state.postseasonState
+      : {};
+    const phase = String(postseason.phase || 'regular_season').trim().toLowerCase();
+    const champion = postseason.champion && typeof postseason.champion === 'object'
+      ? postseason.champion
+      : {};
+    const runnerUp = postseason.runnerUp && typeof postseason.runnerUp === 'object'
+      ? postseason.runnerUp
+      : {};
+    const finals = {
+      ...(postseason?.bracket?.finals || {}),
+      ...(postseason?.seriesById?.finals || {})
+    };
+    const championAbbr = String(champion.teamAbbr || champion.championTeamAbbr || '').trim();
+    const runnerUpAbbr = String(runnerUp.teamAbbr || champion.runnerUpTeamAbbr || '').trim();
+    const finalsHigher = String(finals?.higherSeed?.teamAbbr || '').trim();
+    const finalsLower = String(finals?.lowerSeed?.teamAbbr || '').trim();
+    const higherSeedWins = Number(finals?.higherSeedWins || 0);
+    const lowerSeedWins = Number(finals?.lowerSeedWins || 0);
+    const seriesResult = String(
+      champion.seriesResult ||
+      postseason.seriesResult ||
+      (
+        higherSeedWins > 0 || lowerSeedWins > 0
+          ? (higherSeedWins + '-' + lowerSeedWins)
+          : ''
+      )
+    ).trim();
+    const finalsGames = Number(champion.finalsGames || finals.games || postseason.finalsGames || 0);
+    const completedAt = String(postseason.completedAt || champion.completedAt || '').trim();
+
+    if(championAbbr){
+      const finalsResultText = championAbbr + ' beat ' + (runnerUpAbbr || 'the runner-up') +
+        (seriesResult ? ' ' + seriesResult + ' in the Finals' : ' in the Finals') +
+        (finalsGames ? ', wrapped the series in ' + finalsGames + ' games' : '') +
+        ', and lifted the trophy';
       return {
-        title: 'Simulation champion: ' + String(state.postseasonState.champion.championTeamAbbr || ''),
-        body: 'Defeated ' + String(state.postseasonState.champion.runnerUpTeamAbbr || '') + ' in ' + String(state.postseasonState.champion.finalsGames || '--') + ' games.',
-        meta: ['Trophy awarded']
+        title: championAbbr + ' won the simulation title',
+        body: finalsResultText + '.',
+        meta: [
+          'Trophy awarded',
+          completedAt ? 'Completed ' + completedAt.slice(0, 10) : 'Postseason complete'
+        ]
+      };
+    }
+    if(phase === 'finals'){
+      return {
+        title: 'Simulation Finals underway',
+        body: finalsHigher && finalsLower
+          ? finalsHigher + ' and ' + finalsLower + ' are playing for the simulation trophy.'
+          : 'The last two teams are playing for the simulation trophy.',
+        meta: [
+          'Phase: Finals',
+          seriesResult ? 'Series ' + seriesResult : 'Trophy chase live'
+        ]
+      };
+    }
+    if(phase === 'play_in'){
+      return {
+        title: 'Play-In tournament live',
+        body: 'Win-and-in games are underway to lock the final East and West playoff seeds.',
+        meta: ['Phase: Play-In', 'Bracket race active']
       };
     }
     return {
