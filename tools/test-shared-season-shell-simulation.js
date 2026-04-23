@@ -1107,11 +1107,17 @@ assert.match(elements.playoffsContent.innerHTML, /BOS/);
 assert.match(elements.playoffsContent.innerHTML, /LAL/);
 assert.match(elements.playoffsContent.innerHTML, /3-2|2-1/);
 assert.match(elements.playoffsContent.innerHTML, /Finals|Round 1|Playoffs Round 1/i);
+const activePlayoffsContentBeforeAdvance = elements.playoffsContent.innerHTML;
 
 setSimulationStubPhase('completed');
-api.goPage('playoffs');
+assert.equal(api.getActiveSeasonPageId(), 'playoffs', 'playoffs should remain the active screen before the rerender advance');
+assert.equal(elements.playoffsContent.innerHTML, activePlayoffsContentBeforeAdvance, 'changing the adapter state alone should not refresh the active playoffs screen');
+api.advanceWeek();
+assert.equal(api.getActiveSeasonPageId(), 'playoffs', 'playoffs should stay active while advanceWeek rerenders it in place');
+assert.notEqual(elements.playoffsContent.innerHTML, activePlayoffsContentBeforeAdvance, 'advanceWeek should replace the active playoffs screen content when adapter postseason state changes');
 assert.match(elements.playoffsContent.innerHTML, /NBA Champions/i);
 assert.match(elements.playoffsContent.innerHTML, /Los Angeles Lakers/);
+assert.match(elements.playoffsContent.innerHTML, /Completed/i, 'active-screen rerender should surface the updated completed-phase playoffs state');
 
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
