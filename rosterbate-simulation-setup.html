@@ -165,7 +165,7 @@
   <main>
     <section class="setup-shell">
       <h1>Start Simulation League</h1>
-      <p class="setup-copy">Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise and a draft slot before heading into the board.</p>
+      <p class="setup-copy">Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. Draft slot only applies if you want to enter the board yourself.</p>
       <div class="setup-grid">
         <section class="setup-card">
           <h2>Source Seasons</h2>
@@ -181,8 +181,10 @@
             <label for="simulationDraftSlotSelect">Draft Slot</label>
             <select id="simulationDraftSlotSelect"></select>
           </div>
+          <p class="helper-text">Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.</p>
           <button id="simulationContinueBtn" onclick="enterSimulationDraft()">Enter Draft</button>
-          <p class="helper-text">The setup payload is stored locally and handed off to the dedicated simulation draft flow.</p>
+          <button id="simulationAutoDraftBtn" onclick="simDraftAndStartSeason()">Sim Draft and Start Season</button>
+          <p class="helper-text">The setup payload is stored locally and handed off to the dedicated simulation draft or season flow.</p>
           <div class="status" id="simulationSetupStatus" aria-live="polite"></div>
         </section>
       </div>
@@ -229,6 +231,33 @@
       return Array.from(document.querySelectorAll('#simulationSourceSeasonList input:checked')).map(function(node){
         return node.value;
       }).filter(Boolean);
+    }
+
+    function setSimulationSetupBusyState(isBusy){
+      [
+        document.getElementById('simulationContinueBtn'),
+        document.getElementById('simulationAutoDraftBtn'),
+        document.getElementById('simulationFranchiseSelect'),
+        document.getElementById('simulationDraftSlotSelect')
+      ].forEach(function(node){
+        if (node) {
+          node.disabled = !!isBusy;
+        }
+      });
+      Array.from(document.querySelectorAll('#simulationSourceSeasonList input:checked')).forEach(function(node){
+        if (node) {
+          node.disabled = !!isBusy;
+        }
+      });
+    }
+
+    function buildSimulationSetupPayload(selectedPackIds){
+      return {
+        mode: 'nba_mixed_era_single_player_v1',
+        sourcePackIds: Array.isArray(selectedPackIds) ? selectedPackIds.slice() : [],
+        controlledTeamAbbr: document.getElementById('simulationFranchiseSelect').value,
+        draftSlot: Number(document.getElementById('simulationDraftSlotSelect').value || 1)
+      };
     }
 
     function renderSeasonOptions(entries){
@@ -308,26 +337,63 @@
         return;
       }
       const shell = getSimulationShell();
+      const payload = buildSimulationSetupPayload(selectedPackIds);
+      let redirecting = false;
       setSimulationSetupStatus('Building mixed-era player pool...');
+      setSimulationSetupBusyState(true);
       try{
         const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
         if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
           setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the 2025-26 NBA shell needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
           return;
         }
+        localStorage.setItem(SIMULATION_SETUP_STORAGE_KEY, JSON.stringify(payload));
+        redirecting = true;
+        window.location.href = 'rosterbate-draft.html?simulation=nba_mixed_era';
       }catch(error){
         console.error('[Simulation Setup] Failed to build mixed-era preview', error);
         setSimulationSetupStatus('Unable to build the mixed-era player pool right now.');
+      }finally{
+        if (!redirecting) {
+          setSimulationSetupBusyState(false);
+        }
+      }
+    }
+
+    async function simDraftAndStartSeason(){
+      const selectedPackIds = getSelectedSimulationSourcePackIds();
+      if (!selectedPackIds.length) {
+        setSimulationSetupStatus('Select at least one historical season before starting the season.');
         return;
       }
-      const payload = {
-        mode: 'nba_mixed_era_single_player_v1',
-        sourcePackIds: selectedPackIds,
-        controlledTeamAbbr: document.getElementById('simulationFranchiseSelect').value,
-        draftSlot: Number(document.getElementById('simulationDraftSlotSelect').value || 1)
-      };
-      localStorage.setItem(SIMULATION_SETUP_STORAGE_KEY, JSON.stringify(payload));
-      window.location.href = 'rosterbate-draft.html?simulation=nba_mixed_era';
+      const shell = getSimulationShell();
+      const setupPayload = buildSimulationSetupPayload(selectedPackIds);
+      let redirecting = false;
+      setSimulationSetupStatus('Building mixed-era player pool...');
+      setSimulationSetupBusyState(true);
+      try{
+        const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
+        if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
+          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the 2025-26 NBA shell needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
+          return;
+        }
+        const finalState = window.RosterBateSimulationModeRuntime.buildCompletedSimulationAutoDraftState({
+          shell: shell,
+          mixedEraContext: preview.mixedEraContext,
+          controlledTeamAbbr: setupPayload.controlledTeamAbbr
+        });
+        window.RosterBateSimulationModeRuntime.writeCompletedSimulationState(finalState);
+        setSimulationSetupStatus('Opening season manager...');
+        redirecting = true;
+        window.location.href = 'rosterbate-season.html?sport=nba&simulation=nba_mixed_era';
+      }catch(error){
+        console.error('[Simulation Setup] Failed to auto-draft season', error);
+        setSimulationSetupStatus(error && error.message ? error.message : 'Unable to auto-draft the simulation season right now.');
+      }finally{
+        if (!redirecting) {
+          setSimulationSetupBusyState(false);
+        }
+      }
     }
 
     bootSimulationSetup();
