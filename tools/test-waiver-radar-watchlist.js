@@ -98,6 +98,7 @@ expectMatch(/class="waiver-radar-card"/, 'missing compact radar tile hook');
 expectMatch(/Watch List Snapshot/, 'missing watch list snapshot section');
 expectMatch(/Recent Drops/, 'missing recent drops section');
 expectMatch(/waiver-radar-reason/, 'missing radar reason hook');
+expectMatch(/No radar candidates available/, 'missing no-radar-candidates empty-state copy');
 expectMatch(/Star any free agent below and they will stay surfaced here every time you come back\./, 'missing watch list empty-state copy');
 expectMatch(
   /onclick="setWaiverListMode\('all'\)"[\s\S]*?>All Players<\/button>[\s\S]*?onclick="setWaiverListMode\('watch'\)"[\s\S]*?>Watch List[\s\S]*?<\/button>/,

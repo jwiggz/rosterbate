@@ -9341,7 +9341,8 @@ function renderWaiver(){
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
-          ${radar.map(entry=>{
+          ${radar.length
+            ? radar.map(entry=>{
             const p=entry.player||{};
             const radarStats=[
               ['PTS', Number(p.pts||0)],
@@ -9378,7 +9379,17 @@ function renderWaiver(){
               <div class="waiver-radar-summary">${escapeHtml(radarSummary||'Ready for a closer look on the full wire.')}</div>
               <div class="waiver-radar-reason">${escapeHtml(entry.radarReason||'Steady available value')}</div>
             </div>`;
-          }).join('')}
+          }).join('')
+            : `<div class="waiver-radar-card" style="grid-column:1/-1;align-items:flex-start;">
+                <div class="waiver-radar-head">
+                  <div>
+                    <div class="waiver-radar-name">No radar candidates</div>
+                    <div class="waiver-radar-meta">The wire is quiet right now.</div>
+                  </div>
+                </div>
+                <div class="waiver-radar-summary">Nothing is standing out in the current free-agent pool.</div>
+                <div class="waiver-radar-reason">No radar candidates available</div>
+              </div>`}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
