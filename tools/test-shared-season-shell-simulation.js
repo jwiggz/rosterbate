@@ -42,7 +42,9 @@ ${extractBetween('function applySimulationTradeFromShell(', 'function renderSimu
 ${extractBetween('function renderSimulationStandingsInSharedShell(', 'function renderSimulationRosterInSharedShell(')}
 ${extractBetween('function applySimulationSuggestedLineupFromShell(', 'function renderSimulationRosterInSharedShell(')}
 ${extractBetween('function renderSimulationRosterInSharedShell(', 'function renderSimulationScheduleInSharedShell(')}
-${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderActiveSeasonScreen(')}
+${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderSimulationPlayoffsInSharedShell(')}
+${extractBetween('function renderSimulationPlayoffsInSharedShell(', 'function renderActiveSeasonScreen(')}
+${extractBetween('function getActiveSeasonPageId(', 'function buildLifetimeSeasonPayload(')}
 ${extractBetween('async function loadDemo(', 'function isDemoSeasonData(')}
 ${extractFrom('window.onload=async function(){', 'function clearAllData(')}
 
@@ -64,12 +66,15 @@ module.exports = {
   renderSimulationHubInSharedShell,
   renderSimulationRosterInSharedShell,
   renderSimulationScheduleInSharedShell,
+  renderSimulationPlayoffsInSharedShell,
   renderSimulationWaiverInSharedShell,
   renderSimulationTradesInSharedShell,
   renderSimulationStandingsInSharedShell,
   claimSimulationFreeAgentFromShell,
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
+  goPage,
+  advanceWeek,
   resolveLocalSavedSeasonAutoLoad,
   loadDemo,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
@@ -85,6 +90,8 @@ module.exports = {
 
 function createElement(id) {
   const shell = { style: {} };
+  const classes = new Set();
+  if (SCREEN_IDS.has(id)) classes.add('screen');
   return {
     id,
     textContent: '',
@@ -92,6 +99,17 @@ function createElement(id) {
     style: {},
     value: '',
     attributes: {},
+    classList: {
+      add(...tokens) {
+        tokens.forEach((token) => classes.add(String(token)));
+      },
+      remove(...tokens) {
+        tokens.forEach((token) => classes.delete(String(token)));
+      },
+      contains(token) {
+        return classes.has(String(token));
+      }
+    },
     setAttribute(name, value) {
       this.attributes[name] = value;
       this[name] = value;
@@ -106,7 +124,23 @@ function createElement(id) {
   };
 }
 
+const SCREEN_IDS = new Set(['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings', 'playoffs', 'commissioner']);
 const elements = Object.fromEntries([
+  'hub',
+  'roster',
+  'matchup',
+  'waiver',
+  'trades',
+  'standings',
+  'playoffs',
+  'commissioner',
+  'hn',
+  'rn',
+  'mn',
+  'wn',
+  'tn',
+  'stn',
+  'pn',
   'hubLeagueName',
   'hubName',
   'hubRec',
@@ -139,6 +173,8 @@ const elements = Object.fromEntries([
   'mWk',
   'matchupContent',
   'matchupPowerups',
+  'playoffsContent',
+  'playoffsPowerups',
   'waiverContent',
   'waiverPowerups',
   'tradesContent',
@@ -165,43 +201,244 @@ let demoInitCalls = 0;
 let demoViewCalls = 0;
 let demoToasts = [];
 let lastEmptyState = null;
+let simulationStubState = null;
+
+function buildSimulationStubState(phase = 'regular_season') {
+  const postseasonState = phase === 'regular_season'
+    ? {
+      phase: 'regular_season',
+      currentRound: null,
+      currentDay: 12,
+      playIn: null,
+      bracket: null,
+      seriesById: {},
+      currentDaySchedule: [],
+      champion: null,
+      runnerUp: null,
+      completedAt: null
+    }
+    : phase === 'completed'
+    ? {
+      phase: 'completed',
+      currentRound: 'finals',
+      currentDay: 15,
+      playIn: {
+        east: {
+          topSix: [
+            { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+            { seed: 2, teamAbbr: 'MIL', teamName: 'Milwaukee Bucks' }
+          ],
+          sevenEight: [
+            { seed: 7, teamAbbr: 'IND', teamName: 'Indiana Pacers' },
+            { seed: 8, teamAbbr: 'MIA', teamName: 'Miami Heat' }
+          ],
+          nineTen: [
+            { seed: 9, teamAbbr: 'PHI', teamName: 'Philadelphia 76ers' },
+            { seed: 10, teamAbbr: 'ATL', teamName: 'Atlanta Hawks' }
+          ]
+        },
+        west: {
+          topSix: [
+            { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+            { seed: 2, teamAbbr: 'DEN', teamName: 'Denver Nuggets' }
+          ],
+          sevenEight: [
+            { seed: 7, teamAbbr: 'DAL', teamName: 'Dallas Mavericks' },
+            { seed: 8, teamAbbr: 'MIN', teamName: 'Minnesota Timberwolves' }
+          ],
+          nineTen: [
+            { seed: 9, teamAbbr: 'GSW', teamName: 'Golden State Warriors' },
+            { seed: 10, teamAbbr: 'SAC', teamName: 'Sacramento Kings' }
+          ]
+        }
+      },
+      bracket: {
+        finals: { higherSeed: { teamAbbr: 'LAL' }, lowerSeed: { teamAbbr: 'BOS' } }
+      },
+      seriesById: {
+        finals: {
+          id: 'finals',
+          conference: 'finals',
+          round: 'finals',
+          higherSeed: { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+          lowerSeed: { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+          higherSeedWins: 4,
+          lowerSeedWins: 2,
+          targetWins: 4,
+          winnerTeamAbbr: 'LAL',
+          games: 6
+        }
+      },
+      currentDaySchedule: [],
+      champion: {
+        teamAbbr: 'LAL',
+        teamName: 'Los Angeles Lakers',
+        seed: 1,
+        conference: 'West'
+      },
+      runnerUp: {
+        teamAbbr: 'BOS',
+        teamName: 'Boston Celtics',
+        seed: 1,
+        conference: 'East'
+      },
+      completedAt: 1713916800000
+    }
+    : {
+      phase,
+      currentRound: 'play_in',
+      currentDay: 13,
+      playIn: {
+        east: {
+          topSix: [
+            { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+            { seed: 2, teamAbbr: 'MIL', teamName: 'Milwaukee Bucks' },
+            { seed: 3, teamAbbr: 'CLE', teamName: 'Cleveland Cavaliers' },
+            { seed: 4, teamAbbr: 'NYK', teamName: 'New York Knicks' },
+            { seed: 5, teamAbbr: 'ORL', teamName: 'Orlando Magic' },
+            { seed: 6, teamAbbr: 'MIA', teamName: 'Miami Heat' }
+          ],
+          sevenEight: [
+            { seed: 7, teamAbbr: 'IND', teamName: 'Indiana Pacers' },
+            { seed: 8, teamAbbr: 'PHI', teamName: 'Philadelphia 76ers' }
+          ],
+          nineTen: [
+            { seed: 9, teamAbbr: 'ATL', teamName: 'Atlanta Hawks' },
+            { seed: 10, teamAbbr: 'CHI', teamName: 'Chicago Bulls' }
+          ]
+        },
+        west: {
+          topSix: [
+            { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+            { seed: 2, teamAbbr: 'DEN', teamName: 'Denver Nuggets' },
+            { seed: 3, teamAbbr: 'PHX', teamName: 'Phoenix Suns' },
+            { seed: 4, teamAbbr: 'OKC', teamName: 'Oklahoma City Thunder' },
+            { seed: 5, teamAbbr: 'NOP', teamName: 'New Orleans Pelicans' },
+            { seed: 6, teamAbbr: 'SAC', teamName: 'Sacramento Kings' }
+          ],
+          sevenEight: [
+            { seed: 7, teamAbbr: 'DAL', teamName: 'Dallas Mavericks' },
+            { seed: 8, teamAbbr: 'MIN', teamName: 'Minnesota Timberwolves' }
+          ],
+          nineTen: [
+            { seed: 9, teamAbbr: 'GSW', teamName: 'Golden State Warriors' },
+            { seed: 10, teamAbbr: 'HOU', teamName: 'Houston Rockets' }
+          ]
+        }
+      },
+      bracket: {
+        east: { firstRound: [] },
+        west: { firstRound: [] },
+        finals: null
+      },
+      seriesById: {
+        'east-play-in-7-8': {
+          id: 'east-play-in-7-8',
+          conference: 'east',
+          round: 'play_in',
+          higherSeed: { seed: 7, teamAbbr: 'IND', teamName: 'Indiana Pacers' },
+          lowerSeed: { seed: 8, teamAbbr: 'PHI', teamName: 'Philadelphia 76ers' },
+          targetWins: 1,
+          higherSeedWins: 0,
+          lowerSeedWins: 0,
+          winnerTeamAbbr: null,
+          games: 0
+        },
+        'west-play-in-7-8': {
+          id: 'west-play-in-7-8',
+          conference: 'west',
+          round: 'play_in',
+          higherSeed: { seed: 7, teamAbbr: 'DAL', teamName: 'Dallas Mavericks' },
+          lowerSeed: { seed: 8, teamAbbr: 'MIN', teamName: 'Minnesota Timberwolves' },
+          targetWins: 1,
+          higherSeedWins: 0,
+          lowerSeedWins: 0,
+          winnerTeamAbbr: null,
+          games: 0
+        },
+        finals: {
+          id: 'finals',
+          conference: 'finals',
+          round: 'finals',
+          higherSeed: { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+          lowerSeed: { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+          targetWins: 4,
+          higherSeedWins: 0,
+          lowerSeedWins: 0,
+          winnerTeamAbbr: null,
+          games: 0
+        }
+      },
+      currentDaySchedule: [
+        { day: 13, gameId: 'east-play-in-7-8-game-1', seriesId: 'east-play-in-7-8', conference: 'east', round: 'play_in', awayAbbr: 'PHI', homeAbbr: 'IND' },
+        { day: 13, gameId: 'west-play-in-7-8-game-1', seriesId: 'west-play-in-7-8', conference: 'west', round: 'play_in', awayAbbr: 'MIN', homeAbbr: 'DAL' }
+      ],
+      champion: null,
+      runnerUp: null,
+      completedAt: null
+    };
+
+  return {
+    simulationMode: 'nba_mixed_era_single_player_v1',
+    historicalUniverseSlotId: 'sim-slot-1',
+    leagueShell: { teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }] },
+    draftState: {
+      controlledTeamAbbr: 'LAL',
+      rostersByTeam: {
+        LAL: [
+          { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
+          { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+        ],
+        BOS: [
+          { id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }
+        ],
+        CHI: []
+      },
+      freeAgents: [
+        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' }
+      ]
+    },
+    seasonState: {
+      currentDay: phase === 'regular_season' ? 12 : 13,
+      currentWeek: phase === 'regular_season' ? 2 : 3,
+      standings: [
+        { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+        { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 },
+        { teamIdx: 2, teamAbbr: 'CHI', conference: 'East', division: 'Central', w: 5, l: 7, pf: 1180, pa: 1210 }
+      ],
+      lineupIdsByTeam: {
+        LAL: [23],
+        BOS: [30],
+        CHI: []
+      }
+    },
+    postseasonState
+  };
+}
+
+function setSimulationStubPhase(phase) {
+  simulationStubState = buildSimulationStubState(phase);
+}
+
+setSimulationStubPhase('regular_season');
 const simulationAdapterStub = {
   getState() {
-    return {
-      simulationMode: 'nba_mixed_era_single_player_v1',
-      historicalUniverseSlotId: 'sim-slot-1',
-      leagueShell: { teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }] },
-      draftState: {
-        controlledTeamAbbr: 'LAL',
-        rostersByTeam: {
-          LAL: [
-            { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
-            { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
-          ],
-          BOS: [
-            { id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }
-          ],
-          CHI: []
-        },
-        freeAgents: [
-          { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' }
-        ]
-      },
-      seasonState: {
-        currentDay: 12,
-        currentWeek: 2,
-        standings: [
-          { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
-          { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 },
-          { teamIdx: 2, teamAbbr: 'CHI', conference: 'East', division: 'Central', w: 5, l: 7, pf: 1180, pa: 1210 }
-        ],
-        lineupIdsByTeam: {
-          LAL: [23],
-          BOS: [30],
-          CHI: []
-        }
-      }
-    };
+    return toPlain(simulationStubState);
+  },
+  getNavItems() {
+    const statePhase = String(simulationStubState?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
+    const navItems = [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' }
+    ];
+    if (statePhase !== 'regular_season') {
+      navItems.push({ id: 'playoffs', label: 'Playoffs' });
+    }
+    return navItems;
   },
   getHubViewModel() {
     return {
@@ -267,6 +504,21 @@ const simulationAdapterStub = {
       ]
     };
   },
+  getPlayoffsViewModel() {
+    const postseasonState = simulationStubState?.postseasonState || {};
+    return {
+      phase: postseasonState.phase || 'regular_season',
+      currentRound: postseasonState.currentRound || null,
+      currentDay: Number(postseasonState.currentDay || simulationStubState?.seasonState?.currentDay || 1),
+      playIn: toPlain(postseasonState.playIn || null),
+      bracket: toPlain(postseasonState.bracket || null),
+      seriesById: toPlain(postseasonState.seriesById || {}),
+      currentDaySchedule: toPlain(postseasonState.currentDaySchedule || []),
+      champion: toPlain(postseasonState.champion || null),
+      runnerUp: toPlain(postseasonState.runnerUp || null),
+      completedAt: postseasonState.completedAt || null
+    };
+  },
   claimFreeAgent(move) {
     this.lastClaim = move;
     return {};
@@ -277,6 +529,13 @@ const simulationAdapterStub = {
   },
   setLineup(lineupIds) {
     this.lastLineupIds = lineupIds;
+    return this.getState();
+  },
+  simulateNextDay() {
+    const phase = String(simulationStubState?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
+    if (phase === 'regular_season') {
+      setSimulationStubPhase('postseason_ready');
+    }
     return this.getState();
   }
 };
@@ -345,12 +604,24 @@ const sandbox = {
   toast(message) {
     demoToasts.push(String(message || ''));
   },
+  setTimeout(callback) {
+    return typeof callback === 'function' ? callback() : 0;
+  },
   document: {
     getElementById(id) {
       if (!elements[id]) {
         elements[id] = createElement(id);
       }
       return elements[id];
+    },
+    querySelectorAll(selector) {
+      if (selector === '.screen') {
+        return Object.values(elements).filter((element) => element?.classList?.contains('screen'));
+      }
+      if (selector === '.screen.active') {
+        return Object.values(elements).filter((element) => element?.classList?.contains('screen') && element.classList.contains('active'));
+      }
+      return [];
     }
   },
   window: {
@@ -418,6 +689,7 @@ assert.match(html, /simulation-season-adapter\.js/, 'season shell should load th
 assert.match(html, /function renderSimulationHubInSharedShell\(/, 'season shell should add a simulation hub renderer');
 assert.match(html, /function renderSimulationRosterInSharedShell\(/, 'season shell should add a simulation roster renderer');
 assert.match(html, /function renderSimulationScheduleInSharedShell\(/, 'season shell should add a simulation schedule renderer');
+assert.match(html, /function renderSimulationPlayoffsInSharedShell\(/, 'season shell should add a simulation playoffs renderer');
 assert.match(html, /function renderSimulationWaiverInSharedShell\(/, 'season shell should add a simulation waiver renderer');
 assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season shell should add a simulation trade renderer');
 assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season shell should add a simulation standings renderer');
@@ -442,6 +714,8 @@ assert.match(html, /id="hubMatchupsTitle"/, 'hub markup should expose the matchu
 assert.match(html, /id="hubMatchupActionTitle"/, 'hub markup should expose the hub matchup action title');
 assert.match(html, /id="rosterScheduleChip"/, 'roster markup should expose the schedule chip for mode-specific copy');
 assert.match(html, /id="matchupTitle"/, 'schedule screen title should be targetable for simulation mode');
+assert.match(html, /id="playoffsContent"/, 'playoffs markup should expose a dedicated content mount');
+assert.match(html, /id="playoffsPowerups"/, 'playoffs markup should expose a dedicated powerups mount');
 
 const params = new URLSearchParams('?simulation=NBA_Mixed_Era&historicalUniverse=sim-slot-1');
 assert.equal(api.getRequestedSimulationMode(params), 'nba_mixed_era', 'simulation query param should normalize to lowercase');
@@ -641,6 +915,7 @@ assert.deepEqual(
 
 api.setSeasonModeAdapter(simulationAdapterStub);
 api.setActiveSeasonMode('simulation');
+setSimulationStubPhase('regular_season');
 api.setData({
   leagueShell: {
     teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
@@ -649,6 +924,9 @@ api.setData({
     controlledTeamAbbr: 'LAL'
   }
 });
+api.setGame({ day: 12, week: 2 });
+
+assert.ok(!api.getActiveSeasonPages().includes('playoffs'), 'regular-season nav should not show Playoffs');
 
 api.renderSimulationHubInSharedShell();
 assert.equal(elements.hubLeagueName.textContent, '2025-26 NBA Simulation');
@@ -731,6 +1009,23 @@ assert.equal(elements.matchupTitle.textContent, 'Schedule');
 assert.match(elements.matchupNote.textContent, /results/i);
 assert.match(elements.matchupContent.innerHTML, /Schedule \/ Results/);
 assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
+
+api.goPage('hub');
+api.advanceWeek();
+assert.ok(api.getActiveSeasonPages().includes('playoffs'), 'nav should expose Playoffs after the adapter enters postseason');
+assert.match(elements.hn.innerHTML, /Playoffs/, 'advanceWeek should rebuild hub nav when playoffs become available');
+
+api.renderSimulationPlayoffsInSharedShell();
+assert.equal(elements.playoffsPowerups.style.display, 'none');
+assert.equal(elements.playoffsPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
+assert.match(elements.playoffsContent.innerHTML, /Play-In/i);
+assert.match(elements.playoffsContent.innerHTML, /Indiana Pacers/);
+assert.match(elements.playoffsContent.innerHTML, /Dallas Mavericks/);
+
+setSimulationStubPhase('completed');
+api.renderSimulationPlayoffsInSharedShell();
+assert.match(elements.playoffsContent.innerHTML, /NBA Champions/i);
+assert.match(elements.playoffsContent.innerHTML, /Los Angeles Lakers/);
 
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
@@ -970,6 +1265,37 @@ assert.deepEqual(
     BOS: [30]
   },
   'simulation persistence should prefer adapter lineup ids over stale legacy starters'
+);
+
+const postseasonPersistenceState = toPlain(
+  api.buildSharedSimulationPersistenceState(
+    {
+      ...updatedAdapterState,
+      postseasonState: {
+        phase: 'completed',
+        seriesById: {
+          finals: {
+            id: 'finals',
+            higherSeedWins: 4,
+            lowerSeedWins: 2
+          }
+        }
+      }
+    },
+    staleLegacyShell,
+    staleLegacyGame
+  )
+);
+
+assert.equal(
+  postseasonPersistenceState.postseasonState.phase,
+  'completed',
+  'simulation persistence should preserve postseason phase'
+);
+assert.equal(
+  postseasonPersistenceState.postseasonState.seriesById.finals.higherSeedWins,
+  4,
+  'simulation persistence should preserve postseason series state'
 );
 
 const legacyHistoricalSimulation = {

@@ -972,6 +972,31 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   <div class="bn" id="mn"></div>
 </div>
 
+<!-- PLAYOFFS -->
+<div id="playoffs" class="screen">
+  <div class="season-subbar">
+    <div class="season-subbar-left">
+      <button class="season-back" onclick="goPage('hub')">‹</button>
+      <div>
+        <div class="season-subbar-title">Playoffs</div>
+        <div class="season-subbar-copy">Postseason bracket, play-in races, and the champion path</div>
+      </div>
+    </div>
+    <div class="season-topmeta">
+      <button type="button" class="season-chip action" onclick="goPage('standings')">Standings</button>
+      <a href="index.html" class="season-chip action" style="text-decoration:none;">Home</a>
+    </div>
+  </div>
+  <div class="season-page-note">Simulation mode only. This screen reflects adapter-driven postseason state as the season rolls into the play-in and playoffs.</div>
+  <div class="sbb season-light-body">
+    <div class="season-screen-shell">
+      <div class="season-screen-main" id="playoffsContent"></div>
+      <aside class="season-side-powerups" id="playoffsPowerups"></aside>
+    </div>
+  </div>
+  <div class="bn" id="pn"></div>
+</div>
+
 <!-- WAIVER -->
 <div id="waiver" class="screen">
   <div class="season-subbar">
@@ -1241,8 +1266,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <script>
 const TCOLORS=['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e','#ef4444','#6366f1','#f97316','#06b6d4','#84cc16','#a855f7'];
 const DEFAULT_PAGES=['hub','roster','matchup','waiver','trades','standings','commissioner'];
-const DEFAULT_LABELS={hub:'Hub',roster:'Roster',matchup:'Matchup',waiver:'Wire',trades:'Trade',standings:'Stand.',commissioner:'Comm.'};
-const NAVIDS={hub:'hn',roster:'rn',matchup:'mn',waiver:'wn',trades:'tn',standings:'stn',commissioner:'commNav'};
+const DEFAULT_LABELS={hub:'Hub',roster:'Roster',matchup:'Matchup',waiver:'Wire',trades:'Trade',standings:'Stand.',playoffs:'Playoffs',commissioner:'Comm.'};
+const NAVIDS={hub:'hn',roster:'rn',matchup:'mn',waiver:'wn',trades:'tn',standings:'stn',playoffs:'pn',commissioner:'commNav'};
 const SHARED_SIMULATION_QUERY='simulation=nba_mixed_era';
 let ACTIVE_SEASON_MODE='fantasy';
 let SEASON_MODE_ADAPTER=null;
@@ -8386,11 +8411,125 @@ function renderSimulationScheduleInSharedShell(){
   `;
 }
 
+function renderSimulationPlayoffsInSharedShell(){
+  setSeasonSidePanelVisible('playoffsPowerups', false);
+  const vm = SEASON_MODE_ADAPTER.getPlayoffsViewModel?.() || {};
+  const formatLabel = (value) => String(value || '')
+    .trim()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (match) => match.toUpperCase()) || 'Postseason';
+  const renderSeed = (team) => {
+    if (!team) return '<div class="muted">TBD</div>';
+    const seed = Number(team.seed || 0);
+    const seedLabel = seed > 0 ? ('Seed ' + seed + ' ') : '';
+    const teamLabel = String(team.teamName || team.name || team.teamAbbr || '').trim() || 'TBD';
+    const conference = String(team.conference || '').trim();
+    return `
+      <div style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);">
+        <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${seedLabel}${teamLabel}</div>
+        <div style="color:var(--text2);font-size:12px;">${String(team.teamAbbr || '').trim() || teamLabel}${conference ? ' - ' + conference : ''}</div>
+      </div>
+    `;
+  };
+  const renderPairingGroup = (title, teams) => {
+    const rows = Array.isArray(teams) ? teams.filter(Boolean) : [];
+    if (!rows.length) return '';
+    return `
+      <div style="margin-top:12px;">
+        <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${title}</div>
+        ${rows.map(renderSeed).join('')}
+      </div>
+    `;
+  };
+  const renderConferencePlayIn = (conferenceLabel, conferenceVm) => {
+    if (!conferenceVm || typeof conferenceVm !== 'object') return '';
+    const sections = [
+      renderPairingGroup('7 vs 8', conferenceVm.sevenEight),
+      renderPairingGroup('9 vs 10', conferenceVm.nineTen)
+    ].filter(Boolean).join('');
+    if (!sections) return '';
+    return `
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${conferenceLabel} Play-In</div>
+          <div style="color:var(--text2);font-size:12px;">Top six clinch automatically. Seeds 7-10 fight for the final two spots.</div>
+        </div>
+        ${sections}
+      </div>
+    `;
+  };
+  const todayGames = Array.isArray(vm.currentDaySchedule) ? vm.currentDaySchedule : [];
+  const champion = vm.champion && typeof vm.champion === 'object' ? vm.champion : null;
+  document.getElementById('playoffsContent').innerHTML = `
+    ${champion ? `
+      <div class="card" style="background:linear-gradient(135deg,rgba(74,44,13,.98),rgba(18,26,41,.98));border-color:rgba(247,199,106,.42);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);">NBA Champions</div>
+            <div style="font-family:var(--fd);font-size:30px;font-weight:900;text-transform:uppercase;line-height:.92;margin-top:6px;">&#127942; ${champion.teamName || champion.teamAbbr || 'Champion'}</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:8px;">${champion.teamAbbr || ''}${vm.runnerUp?.teamName || vm.runnerUp?.teamAbbr ? ' beat ' + (vm.runnerUp.teamName || vm.runnerUp.teamAbbr) : ''}</div>
+          </div>
+          <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);min-width:180px;">
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Final Phase</div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-top:6px;">${formatLabel(vm.phase)}</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:6px;">Completed through ${formatLabel(vm.currentRound || 'finals')}</div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Postseason Summary</div>
+          <div style="color:var(--text2);font-size:12px;margin-top:4px;">The shared shell reads directly from the adapter's postseason snapshot.</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="padding:10px 12px;border-radius:12px;background:#0f1724;border:1px solid #24324a;min-width:132px;">
+            <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Phase</div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-top:6px;">${formatLabel(vm.phase)}</div>
+          </div>
+          <div style="padding:10px 12px;border-radius:12px;background:#0f1724;border:1px solid #24324a;min-width:132px;">
+            <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Round</div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-top:6px;">${formatLabel(vm.currentRound || vm.phase || 'postseason')}</div>
+          </div>
+          <div style="padding:10px 12px;border-radius:12px;background:#0f1724;border:1px solid #24324a;min-width:132px;">
+            <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Day</div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-top:6px;">${Number(vm.currentDay || 0) || 1}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Today's Postseason Games</div>
+      <div style="color:var(--text2);font-size:12px;margin-top:4px;">Current adapter slate for the active postseason day.</div>
+      <div style="margin-top:14px;">
+        ${todayGames.map((game) => `
+          <div style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${game.awayAbbr || 'TBD'} at ${game.homeAbbr || 'TBD'}</div>
+              <div style="color:var(--text2);font-size:12px;">${formatLabel(game.round || vm.currentRound || 'postseason')} · ${formatLabel(game.conference || 'league')}</div>
+            </div>
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${game.seriesId || game.gameId || 'Next Up'}</div>
+          </div>
+        `).join('') || '<div class="muted" style="margin-top:12px;">No postseason games are scheduled for the current adapter day.</div>'}
+      </div>
+    </div>
+    ${renderConferencePlayIn('East', vm.playIn?.east)}
+    ${renderConferencePlayIn('West', vm.playIn?.west)}
+  `;
+}
+
+function getActiveSeasonPageId(){
+  const pages=getActiveSeasonPages();
+  const activePage=pages.find(pageId=>document.getElementById(pageId)?.classList?.contains('active'));
+  return activePage || (pages.includes('hub') ? 'hub' : (pages[0] || 'hub'));
+}
+
 function renderActiveSeasonScreen(id){
   if (ACTIVE_SEASON_MODE !== 'simulation') {
     return ({ hub: renderHub, roster: renderRoster, matchup: renderMatchup, waiver: renderWaiver, trades: renderTrades, standings: renderStandings, commissioner: renderCommissioner })[id]?.();
   }
-  return ({ hub: renderSimulationHubInSharedShell, roster: renderSimulationRosterInSharedShell, matchup: renderSimulationScheduleInSharedShell, waiver: renderSimulationWaiverInSharedShell, trades: renderSimulationTradesInSharedShell, standings: renderSimulationStandingsInSharedShell })[id]?.();
+  return ({ hub: renderSimulationHubInSharedShell, roster: renderSimulationRosterInSharedShell, matchup: renderSimulationScheduleInSharedShell, waiver: renderSimulationWaiverInSharedShell, trades: renderSimulationTradesInSharedShell, standings: renderSimulationStandingsInSharedShell, playoffs: renderSimulationPlayoffsInSharedShell })[id]?.();
 }
 
 function goPage(id){
@@ -8424,13 +8563,12 @@ function goPage(id){
 
 function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=true; setTimeout(()=>advanceWeek.disabled=false,1000);
   if (ACTIVE_SEASON_MODE === 'simulation' && SEASON_MODE_ADAPTER) {
+    const activePageId=getActiveSeasonPageId();
     SEASON_MODE_ADAPTER.simulateNextDay();
     persistSimulationSeasonState('simulation_day_advance');
-    renderSimulationHubInSharedShell();
-    if (document.getElementById('matchup').classList.contains('active')) renderSimulationScheduleInSharedShell();
-    if (document.getElementById('waiver').classList.contains('active')) renderSimulationWaiverInSharedShell();
-    if (document.getElementById('trades').classList.contains('active')) renderSimulationTradesInSharedShell();
-    if (document.getElementById('standings').classList.contains('active')) renderSimulationStandingsInSharedShell();
+    const pages=getActiveSeasonPages();
+    goPage(pages.includes(activePageId) ? activePageId : 'hub');
+    advanceWeek.disabled=false;
     return;
   }
   if(G.isSeasonComplete){toast('Season complete!');return;}
