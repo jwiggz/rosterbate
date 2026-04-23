@@ -3706,6 +3706,10 @@ function applySimulationModeDraftLobbySettings(context){
 
 async function buildSimulationDraftContextFromState(){
   const setupState = readSimulationModeLocalState();
+  if(!setupState || !Array.isArray(setupState.sourcePackIds) || !setupState.sourcePackIds.length || !String(setupState.controlledTeamAbbr || '').trim() || !Number.isFinite(Number(setupState.draftSlot))){
+    console.warn('Simulation mode setup payload missing or invalid. Falling back to the standard draft boot.');
+    return null;
+  }
   const shell = window.RosterBateSimulationModeConfig.getSimulationShell();
   const bundles = await Promise.all(
     (setupState?.sourcePackIds || []).map((packId) => window.RosterBateHistoricalPackLoader.loadPackById(packId))
@@ -5001,7 +5005,8 @@ function startDraft(){
   const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
-  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>(simulationContext ? simulationLeagueSize : 20)){e.textContent=simulationContext?'Simulation drafts require a locked 30-team league.':(allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.');e.classList.add('show');return;}
+  if(simulationContext && ls !== simulationLeagueSize){e.textContent='Simulation drafts require a locked 30-team league.';e.classList.add('show');return;}
+  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
   const need=ls*rd;
