@@ -2326,6 +2326,32 @@ function consumeCompletedSimulationDraftFallbackBoot(boot){
     return false;
   }
 }
+function resolveLocalSavedSeasonAutoLoad(parsed, requestedSport){
+  if(!parsed || typeof parsed!=='object') return null;
+  const savedSport=normalizeRosterbateSport(parsed?.sport || parsed?.leagueShell?.sport || 'nba');
+  const requestedSportNormalized=normalizeRosterbateSport(requestedSport || savedSport);
+  if(savedSport!==requestedSportNormalized) return null;
+  const sharedSimulationSeason=isSharedSimulationSeason(null, parsed);
+  const slotId=String(parsed?.historicalUniverseSlotId || parsed?.slotId || '').trim() || null;
+  if(sharedSimulationSeason){
+    return {
+      sport:savedSport,
+      activeSeasonMode:'simulation',
+      slotId,
+      rawState:cloneSharedSimulationBootValue(parsed),
+      adapter:buildSimulationSeasonAdapterFromState(slotId, parsed),
+      state:normalizeSharedSimulationSeasonBootState(parsed, slotId)
+    };
+  }
+  return {
+    sport:savedSport,
+    activeSeasonMode:'fantasy',
+    slotId,
+    rawState:null,
+    adapter:null,
+    state:parsed
+  };
+}
 function loadHistoricalUniverseSlotState(slotId, requestedSport){
   const api=window.RosterBateHistoricalUniverseSlots;
   const targetSlotId=String(slotId||'').trim();
@@ -7577,17 +7603,24 @@ window.onload=async function(){
     console.log('?? Found saved data in localStorage, auto-loading...');
     try{
       const parsed=JSON.parse(raw);
-      const savedSport=normalizeRosterbateSport(parsed.sport || 'nba');
-      if(savedSport===requestedSport){
+      const localAutoLoad=resolveLocalSavedSeasonAutoLoad(parsed, requestedSport);
+      if(localAutoLoad){
         if(isDemoSeasonData(parsed)){
           console.log('?? Loading demo season data...');
-          D=rebuildDemoSeasonData(savedSport);
+          ACTIVE_SEASON_MODE='fantasy';
+          SEASON_MODE_ADAPTER=null;
+          D=rebuildDemoSeasonData(localAutoLoad.sport);
           try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
         } else {
           console.log('?? Loading saved season data...');
-          D=parsed;
+          ACTIVE_SEASON_MODE=localAutoLoad.activeSeasonMode;
+          SEASON_MODE_ADAPTER=localAutoLoad.adapter;
+          D=localAutoLoad.state;
+          if(localAutoLoad.slotId && !D.historicalUniverseSlotId){
+            D.historicalUniverseSlotId=localAutoLoad.slotId;
+          }
         }
-        applySportContext(savedSport);
+        applySportContext(localAutoLoad.sport);
         hydrateDraftUserContextFromLobby();
         refreshCommissionerAccess();
         let seasonLoaded=false;
@@ -8158,10 +8191,21 @@ function renderSimulationHubInSharedShell(){
 function renderSimulationWaiverInSharedShell(){
   setSeasonSidePanelVisible('waiverPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getWaiverViewModel();
+  const rosterVm = SEASON_MODE_ADAPTER.getRosterViewModel();
+  const benchPlayers = Array.isArray(rosterVm?.bench) ? rosterVm.bench : [];
   document.getElementById('waiverContent').innerHTML = vm.availablePlayers.map((player) => (
     `<div class="card">
       <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
       <div style="color:var(--text2);font-size:12px;">${player.team} · ${player.pos}</div>
+      <div style="margin-top:10px;">
+        <label for="simulation-waiver-drop-select-${player.id}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Drop Player</label>
+        <select id="simulation-waiver-drop-select-${player.id}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+          <option value="">Choose drop player</option>
+          ${benchPlayers.map((benchPlayer) => (
+            `<option value="${benchPlayer.id}">${benchPlayer.name} · ${benchPlayer.team} · ${benchPlayer.pos}</option>`
+          )).join('')}
+        </select>
+      </div>
       <button class="bp" style="margin-top:10px;" onclick="claimSimulationFreeAgentFromShell(${player.id})">Add</button>
     </div>`
   )).join('') || '<div class="card">No free agents available.</div>';
@@ -8170,12 +8214,16 @@ function renderSimulationWaiverInSharedShell(){
 function claimSimulationFreeAgentFromShell(playerId){
   const vm = SEASON_MODE_ADAPTER.getWaiverViewModel();
   const addPlayer = vm.availablePlayers.find((player) => Number(player.id) === Number(playerId));
-  const dropPlayer = (SEASON_MODE_ADAPTER.getRosterViewModel().bench || [])[0] || null;
-  if (!(addPlayer && dropPlayer)) return;
+  const dropPlayerValue=String(document.getElementById(`simulation-waiver-drop-select-${playerId}`)?.value || '').trim();
+  const dropPlayerId=Number(dropPlayerValue);
+  if (!(addPlayer && dropPlayerValue && Number.isFinite(dropPlayerId))) {
+    if(typeof toast==='function') toast('Choose a drop player before claiming a free agent.');
+    return;
+  }
   SEASON_MODE_ADAPTER.claimFreeAgent({
     teamAbbr: D?.draftState?.controlledTeamAbbr,
     addPlayerId: addPlayer?.id,
-    dropPlayerId: dropPlayer?.id || null
+    dropPlayerId
   });
   persistSimulationSeasonState('simulation_claim');
   renderSimulationWaiverInSharedShell();
@@ -8187,20 +8235,48 @@ function renderSimulationTradesInSharedShell(){
   setSeasonSidePanelVisible('tradesPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
   document.getElementById('tradesContent').innerHTML = (vm.tradePartners || []).map((team) => (
-    `<button class="card" onclick="applySimulationTradeFromShell('${team.abbr}')">${team.name}</button>`
+    `<div class="card">
+      <div style="font-family:var(--fd);font-size:16px;font-weight:800;">${team.name}</div>
+      <div style="color:var(--text2);font-size:12px;margin-top:4px;">Pick one player to send and one to receive before the trade is applied.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;">
+        <div>
+          <label for="simulation-trade-outgoing-select-${team.abbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose outgoing player</label>
+          <select id="simulation-trade-outgoing-select-${team.abbr}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+            <option value="">Choose outgoing player</option>
+            ${(vm.outgoingRoster || []).map((player) => (
+              `<option value="${player.id}">${player.name}</option>`
+            )).join('')}
+          </select>
+        </div>
+        <div>
+          <label for="simulation-trade-incoming-select-${team.abbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose incoming player</label>
+          <select id="simulation-trade-incoming-select-${team.abbr}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+            <option value="">Choose incoming player</option>
+            ${(vm.incomingRostersByTeam?.[team.abbr] || []).map((player) => (
+              `<option value="${player.id}">${player.name}</option>`
+            )).join('')}
+          </select>
+        </div>
+      </div>
+      <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${team.abbr}')">Apply Trade</button>
+    </div>`
   )).join('') || '<div class="card">No trade partners available.</div>';
 }
 
 function applySimulationTradeFromShell(partnerAbbr){
-  const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
-  const outgoing = (vm.outgoingRoster || [])[0] || null;
-  const incoming = (vm.incomingRostersByTeam?.[partnerAbbr] || [])[0] || null;
-  if (!(outgoing && incoming)) return;
+  const outgoingPlayerValue=String(document.getElementById(`simulation-trade-outgoing-select-${partnerAbbr}`)?.value || '').trim();
+  const incomingPlayerValue=String(document.getElementById(`simulation-trade-incoming-select-${partnerAbbr}`)?.value || '').trim();
+  const outgoingPlayerId=Number(outgoingPlayerValue);
+  const incomingPlayerId=Number(incomingPlayerValue);
+  if (!(outgoingPlayerValue && incomingPlayerValue && Number.isFinite(outgoingPlayerId) && Number.isFinite(incomingPlayerId))) {
+    if(typeof toast==='function') toast('Choose both the outgoing and incoming players before applying a trade.');
+    return;
+  }
   SEASON_MODE_ADAPTER.applyTrade({
     fromTeamAbbr: D?.draftState?.controlledTeamAbbr,
     toTeamAbbr: partnerAbbr,
-    outgoingPlayerIds: [outgoing.id],
-    incomingPlayerIds: [incoming.id]
+    outgoingPlayerIds: [outgoingPlayerId],
+    incomingPlayerIds: [incomingPlayerId]
   });
   persistSimulationSeasonState('simulation_trade');
   renderSimulationTradesInSharedShell();
@@ -8218,9 +8294,13 @@ function renderSimulationStandingsInSharedShell(){
 
 function applySimulationSuggestedLineupFromShell(){
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
-  const currentLineupSize = Math.max(Number((vm.lineup || []).length || 0), 1);
+  const currentLineupSize = Number((vm.lineup || []).length || 0);
+  const targetLineupSize = Math.min(
+    currentLineupSize > 0 ? currentLineupSize : 5,
+    Number((vm.roster || []).length || 0)
+  );
   const suggestedLineupIds = (vm.roster || [])
-    .slice(0, currentLineupSize)
+    .slice(0, targetLineupSize)
     .map((player) => Number(player?.id))
     .filter((id) => Number.isFinite(id));
   if (!suggestedLineupIds.length) return;

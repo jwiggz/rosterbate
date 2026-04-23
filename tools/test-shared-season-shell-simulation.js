@@ -57,6 +57,7 @@ module.exports = {
   claimSimulationFreeAgentFromShell,
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
+  resolveLocalSavedSeasonAutoLoad,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
   setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; },
   setData(value){ D = value; },
@@ -71,6 +72,7 @@ function createElement(id) {
     textContent: '',
     innerHTML: '',
     style: {},
+    value: '',
     attributes: {},
     setAttribute(name, value) {
       this.attributes[name] = value;
@@ -138,6 +140,7 @@ let completedDraftClearCount = 0;
 let completedDraftUpsertInput = null;
 let completedDraftUpsertOptions = null;
 let completedDraftUpsertError = null;
+let createdSimulationAdapters = [];
 const simulationAdapterStub = {
   getState() {
     return {
@@ -237,7 +240,10 @@ const sandbox = {
   },
   document: {
     getElementById(id) {
-      return elements[id] || null;
+      if (!elements[id]) {
+        elements[id] = createElement(id);
+      }
+      return elements[id];
     }
   },
   window: {
@@ -273,6 +279,10 @@ const sandbox = {
     RosterBateSimulationSeasonAdapter: {
       isSupportedSimulationSeasonState(state) {
         return String(state?.simulationMode || '').trim().toLowerCase() === 'nba_mixed_era_single_player_v1';
+      },
+      createSimulationSeasonAdapter(options) {
+        createdSimulationAdapters.push(toPlain(options));
+        return simulationAdapterStub;
       }
     }
   }
@@ -508,10 +518,52 @@ assert.match(elements.rosterContent.innerHTML, /Use Suggested Starters/);
 assert.match(elements.rosterContent.innerHTML, /Starters/);
 assert.match(elements.rosterContent.innerHTML, /Bench/);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
+assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michael Jordan/);
 
 api.applySimulationSuggestedLineupFromShell();
 assert.deepStrictEqual(toPlain(simulationAdapterStub.lastLineupIds), [34]);
 assert.equal(persistedReason, 'simulation_lineup');
+
+const freshRosterAdapterStub = {
+  ...simulationAdapterStub,
+  lastLineupIds: null,
+  getRosterViewModel() {
+    return {
+      roster: [
+        { id: 1, name: 'Player 1', team: 'AAA', pos: 'PG' },
+        { id: 2, name: 'Player 2', team: 'AAA', pos: 'SG' },
+        { id: 3, name: 'Player 3', team: 'AAA', pos: 'SF' },
+        { id: 4, name: 'Player 4', team: 'AAA', pos: 'PF' },
+        { id: 5, name: 'Player 5', team: 'AAA', pos: 'C' },
+        { id: 6, name: 'Player 6', team: 'AAA', pos: 'G' }
+      ],
+      lineup: [],
+      bench: [
+        { id: 1, name: 'Player 1', team: 'AAA', pos: 'PG' },
+        { id: 2, name: 'Player 2', team: 'AAA', pos: 'SG' },
+        { id: 3, name: 'Player 3', team: 'AAA', pos: 'SF' },
+        { id: 4, name: 'Player 4', team: 'AAA', pos: 'PF' },
+        { id: 5, name: 'Player 5', team: 'AAA', pos: 'C' },
+        { id: 6, name: 'Player 6', team: 'AAA', pos: 'G' }
+      ]
+    };
+  },
+  setLineup(lineupIds) {
+    this.lastLineupIds = lineupIds;
+    return this.getState();
+  }
+};
+
+persistedReason = null;
+api.setSeasonModeAdapter(freshRosterAdapterStub);
+api.applySimulationSuggestedLineupFromShell();
+assert.deepStrictEqual(
+  toPlain(freshRosterAdapterStub.lastLineupIds),
+  [1, 2, 3, 4, 5],
+  'fresh shared-shell simulation teams should get a five-player suggested lineup'
+);
+assert.equal(persistedReason, 'simulation_lineup');
+api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationScheduleInSharedShell();
 assert.equal(elements.matchupPowerups.style.display, 'none');
@@ -524,7 +576,14 @@ assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
 assert.match(elements.waiverContent.innerHTML, /claimSimulationFreeAgentFromShell\(33\)/);
+assert.match(elements.waiverContent.innerHTML, /Drop Player/i);
 
+simulationAdapterStub.lastClaim = null;
+persistedReason = null;
+api.claimSimulationFreeAgentFromShell(33);
+assert.equal(simulationAdapterStub.lastClaim, null, 'waiver claim should require an explicit drop selection');
+assert.equal(persistedReason, null, 'waiver claim should not persist until a drop player is chosen');
+elements['simulation-waiver-drop-select-33'].value = '34';
 api.claimSimulationFreeAgentFromShell(33);
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastClaim),
@@ -539,7 +598,16 @@ assert.equal(persistedReason, 'simulation_claim');
 api.renderSimulationTradesInSharedShell();
 assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
 assert.match(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/);
+assert.match(elements.tradesContent.innerHTML, /Choose outgoing player/i);
+assert.match(elements.tradesContent.innerHTML, /Choose incoming player/i);
 
+simulationAdapterStub.lastTrade = null;
+persistedReason = null;
+api.applySimulationTradeFromShell('BOS');
+assert.equal(simulationAdapterStub.lastTrade, null, 'trade helper should require explicit outgoing and incoming selections');
+assert.equal(persistedReason, null, 'trade helper should not persist until both sides are chosen');
+elements['simulation-trade-outgoing-select-BOS'].value = '34';
+elements['simulation-trade-incoming-select-BOS'].value = '30';
 api.applySimulationTradeFromShell('BOS');
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastTrade),
@@ -771,6 +839,24 @@ assert.equal(
   api.shouldPersistSharedSimulationState(legacyHistoricalSimulation),
   false,
   'legacy historical simulations should not be claimed by the shared simulation persistence serializer'
+);
+
+createdSimulationAdapters = [];
+const localResume = toPlain(api.resolveLocalSavedSeasonAutoLoad({
+  ...fixture,
+  historicalUniverseSlotId: 'sim-slot-local'
+}, 'nba'));
+
+assert.equal(localResume.activeSeasonMode, 'simulation', 'local auto-load should detect shared simulation seasons from raw persisted state');
+assert.equal(localResume.sport, 'nba', 'local auto-load should derive sport from the raw simulation state');
+assert.equal(localResume.state.historicalUniverseSlotId, 'sim-slot-local', 'local auto-load should preserve the raw simulation slot id');
+assert.equal(localResume.state.seasonId, 'simulation:sim-slot-local', 'local auto-load should normalize raw simulation state before boot');
+assert.equal(createdSimulationAdapters.length, 1, 'local auto-load should rebuild the shared simulation adapter from raw state');
+assert.equal(createdSimulationAdapters[0].slotId, 'sim-slot-local', 'local auto-load should seed the adapter with the persisted slot id');
+assert.equal(
+  createdSimulationAdapters[0].state.draftState.controlledTeamAbbr,
+  'LAL',
+  'local auto-load should rebuild the adapter from the raw simulation payload'
 );
 
 console.log('shared season shell simulation test passed');
