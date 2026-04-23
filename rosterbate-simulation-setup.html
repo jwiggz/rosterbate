@@ -189,6 +189,7 @@
     </section>
   </main>
   <script>
+    const SIMULATION_TOP_PLAYERS_PER_PACK = 120;
     const SIMULATION_SETUP_STORAGE_KEY = (
       window.RosterBateSimulationModeRuntime &&
       window.RosterBateSimulationModeRuntime.STORAGE_KEY
@@ -213,11 +214,28 @@
       }
     }
 
+    function getSimulationShell(){
+      return window.RosterBateSimulationModeConfig.getSimulationShell();
+    }
+
+    function getSimulationRequiredDraftSlots(shell){
+      const leagueShell = shell || getSimulationShell();
+      const teamCount = Array.isArray(leagueShell?.teams) ? leagueShell.teams.length : 30;
+      const rosterSize = Math.max(1, Number(leagueShell?.rosterSize || 10));
+      return teamCount * rosterSize;
+    }
+
+    function getSelectedSimulationSourcePackIds(){
+      return Array.from(document.querySelectorAll('#simulationSourceSeasonList input:checked')).map(function(node){
+        return node.value;
+      }).filter(Boolean);
+    }
+
     function renderSeasonOptions(entries){
       const container = document.getElementById('simulationSourceSeasonList');
       container.innerHTML = entries.map((entry, index) => (
         '<label class="season-option">' +
-          '<input type="checkbox" value="' + String(entry.packId || '') + '"' + (index === 0 ? ' checked' : '') + '>' +
+          '<input type="checkbox" value="' + String(entry.packId || '') + '"' + (index < 3 ? ' checked' : '') + '>' +
           '<span>' +
             '<strong>' + String(entry.seasonLabel || entry.packId || 'Unknown Season') + '</strong>' +
             '<span>' + String(entry.packId || '') + '</span>' +
@@ -238,8 +256,32 @@
       }).join('');
     }
 
+    async function buildSimulationPoolPreview(selectedPackIds, shell){
+      const bundles = await Promise.all(
+        (Array.isArray(selectedPackIds) ? selectedPackIds : []).map(function(packId){
+          return window.RosterBateHistoricalPackLoader.loadPackById(packId);
+        })
+      );
+      const mixedEraContext = window.RosterBateMixedEraRuntime.buildMixedEraDraftContextFromBundles({
+        config: {
+          mixedEraConfigId: 'simulation_setup_preview',
+          sport: 'nba',
+          seasonLabel: 'Simulation Mode Mixed Era Draft',
+          sourcePackIds: selectedPackIds,
+          topPlayersPerPack: SIMULATION_TOP_PLAYERS_PER_PACK
+        },
+        bundles,
+        requestedSport: 'nba'
+      });
+      return {
+        mixedEraContext: mixedEraContext,
+        playerCount: Array.isArray(mixedEraContext?.playerPool) ? mixedEraContext.playerPool.length : 0,
+        requiredSlots: getSimulationRequiredDraftSlots(shell)
+      };
+    }
+
     async function bootSimulationSetup(){
-      const shell = window.RosterBateSimulationModeConfig.getSimulationShell();
+      const shell = getSimulationShell();
       const requestedSport = readSportFromQuery();
       renderFranchiseOptions(shell);
       renderDraftSlotOptions(shell);
@@ -259,12 +301,23 @@
       }
     }
 
-    function enterSimulationDraft(){
-      const selectedPackIds = Array.from(document.querySelectorAll('#simulationSourceSeasonList input:checked')).map(function(node){
-        return node.value;
-      }).filter(Boolean);
+    async function enterSimulationDraft(){
+      const selectedPackIds = getSelectedSimulationSourcePackIds();
       if (!selectedPackIds.length) {
         setSimulationSetupStatus('Select at least one historical season before entering the draft.');
+        return;
+      }
+      const shell = getSimulationShell();
+      setSimulationSetupStatus('Building mixed-era player pool...');
+      try{
+        const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
+        if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
+          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the 2025-26 NBA shell needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
+          return;
+        }
+      }catch(error){
+        console.error('[Simulation Setup] Failed to build mixed-era preview', error);
+        setSimulationSetupStatus('Unable to build the mixed-era player pool right now.');
         return;
       }
       const payload = {

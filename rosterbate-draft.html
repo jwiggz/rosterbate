@@ -5010,6 +5010,7 @@ function startDraft(){
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
   const need=ls*rd;
+  if(simulationContext && need>PLAYERS.length){e.textContent='This simulation league needs '+need+' draftable players, but the selected eras only produced '+PLAYERS.length+'. Go back and add more source seasons.';e.classList.add('show');return;}
   if(need>PLAYERS.length){e.textContent='Need '+need+' slots but only '+PLAYERS.length+' players. Reduce teams or rounds.';e.classList.add('show');return;}
   S.name=teamName;
   S.ls=ls;S.myPos=sp-1;S.rds=rd;
