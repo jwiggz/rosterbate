@@ -21,6 +21,7 @@ function extractBetween(startMarker, endMarker) {
 const harnessSource = `
 ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
+${extractBetween('function loadHistoricalUniverseSlotState(', 'function shouldBootHistoricalDevSeason(')}
 ${extractBetween('function isHistoricalSimulationUniverse(', 'function isHistoricalDraftUniverse(')}
 ${extractBetween('function setSeasonSidePanelVisible(', 'function buildPowerupCardsHtml(')}
 ${extractBetween('function setHubSummaryStatLabels(', 'function persistSimulationSeasonState(')}
@@ -34,6 +35,7 @@ ${extractBetween('function renderSimulationStandingsInSharedShell(', 'function r
 ${extractBetween('function applySimulationSuggestedLineupFromShell(', 'function renderSimulationRosterInSharedShell(')}
 ${extractBetween('function renderSimulationRosterInSharedShell(', 'function renderSimulationScheduleInSharedShell(')}
 ${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderActiveSeasonScreen(')}
+${extractBetween('async function loadDemo(', 'function isDemoSeasonData(')}
 
 module.exports = {
   getRequestedSimulationMode,
@@ -45,8 +47,10 @@ module.exports = {
   shouldPersistSharedSimulationState,
   getActiveSeasonPages,
   getActiveSeasonLabels,
+  loadHistoricalUniverseSlotState,
   normalizeSharedSimulationSeasonBootState,
   buildSharedSimulationPersistenceState,
+  persistHistoricalUniverseSlotSnapshot,
   persistSimulationSeasonState,
   renderSimulationHubInSharedShell,
   renderSimulationRosterInSharedShell,
@@ -58,10 +62,15 @@ module.exports = {
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
   resolveLocalSavedSeasonAutoLoad,
+  loadDemo,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
+  getActiveSeasonMode(){ return ACTIVE_SEASON_MODE; },
   setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; },
+  getSeasonModeAdapter(){ return SEASON_MODE_ADAPTER; },
   setData(value){ D = value; },
-  getData(){ return D; }
+  getData(){ return D; },
+  setGame(value){ G = value; },
+  getGame(){ return G; }
 };
 `;
 
@@ -141,11 +150,46 @@ let completedDraftUpsertInput = null;
 let completedDraftUpsertOptions = null;
 let completedDraftUpsertError = null;
 let createdSimulationAdapters = [];
+let historicalSlotUpsertCalls = [];
+let demoInitCalls = 0;
+let demoViewCalls = 0;
+let demoToasts = [];
 const simulationAdapterStub = {
   getState() {
     return {
+      simulationMode: 'nba_mixed_era_single_player_v1',
+      historicalUniverseSlotId: 'sim-slot-1',
       leagueShell: { teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }] },
-      draftState: { controlledTeamAbbr: 'LAL' }
+      draftState: {
+        controlledTeamAbbr: 'LAL',
+        rostersByTeam: {
+          LAL: [
+            { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
+            { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+          ],
+          BOS: [
+            { id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }
+          ],
+          CHI: []
+        },
+        freeAgents: [
+          { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' }
+        ]
+      },
+      seasonState: {
+        currentDay: 12,
+        currentWeek: 2,
+        standings: [
+          { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+          { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 },
+          { teamIdx: 2, teamAbbr: 'CHI', conference: 'East', division: 'Central', w: 5, l: 7, pf: 1180, pa: 1210 }
+        ],
+        lineupIdsByTeam: {
+          LAL: [23],
+          BOS: [30],
+          CHI: []
+        }
+      }
     };
   },
   getHubViewModel() {
@@ -238,6 +282,42 @@ const sandbox = {
   persistHistoricalUniverseSlotSnapshot(reason) {
     persistedReason = reason;
   },
+  localStorage: {
+    setItem() {},
+    getItem() { return null; }
+  },
+  getRosterbateDemoData() {
+    return {
+      sport: 'nba',
+      leagueName: 'Demo League',
+      leagueSize: 2,
+      myPos: 0,
+      teams: ['Demo A', 'Demo B'],
+      allRosters: [
+        [{ id: 1, name: 'Demo Player 1', team: 'AAA', pos: 'PG' }],
+        [{ id: 2, name: 'Demo Player 2', team: 'BBB', pos: 'SG' }]
+      ],
+      ilRosters: [[], []],
+      freeAgents: [],
+      waiver: [],
+      standings: [
+        { teamIdx: 0, teamAbbr: 'AAA', w: 0, l: 0, pf: 0, pa: 0 },
+        { teamIdx: 1, teamAbbr: 'BBB', w: 0, l: 0, pf: 0, pa: 0 }
+      ]
+    };
+  },
+  initSeason() {
+    demoInitCalls += 1;
+    if (sandbox.module.exports.getActiveSeasonMode() === 'simulation' && !sandbox.module.exports.getSeasonModeAdapter()) {
+      throw new Error('simulation adapter missing');
+    }
+  },
+  applyRequestedSeasonView() {
+    demoViewCalls += 1;
+  },
+  toast(message) {
+    demoToasts.push(String(message || ''));
+  },
   document: {
     getElementById(id) {
       if (!elements[id]) {
@@ -249,6 +329,10 @@ const sandbox = {
   window: {
     RosterBateHistoricalUniverseSlots: {
       upsertFromState(state, options) {
+        historicalSlotUpsertCalls.push({
+          state: toPlain(state),
+          options: toPlain(options)
+        });
         completedDraftUpsertInput = toPlain(state);
         completedDraftUpsertOptions = toPlain(options);
         if (completedDraftUpsertError) {
@@ -481,6 +565,7 @@ assert.deepEqual(
 );
 
 api.setSeasonModeAdapter(simulationAdapterStub);
+api.setActiveSeasonMode('simulation');
 api.setData({
   leagueShell: {
     teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
@@ -520,9 +605,9 @@ assert.match(elements.rosterContent.innerHTML, /Bench/);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
 assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michael Jordan/);
 
+historicalSlotUpsertCalls = [];
 api.applySimulationSuggestedLineupFromShell();
 assert.deepStrictEqual(toPlain(simulationAdapterStub.lastLineupIds), [34]);
-assert.equal(persistedReason, 'simulation_lineup');
 
 const freshRosterAdapterStub = {
   ...simulationAdapterStub,
@@ -554,7 +639,7 @@ const freshRosterAdapterStub = {
   }
 };
 
-persistedReason = null;
+historicalSlotUpsertCalls = [];
 api.setSeasonModeAdapter(freshRosterAdapterStub);
 api.applySimulationSuggestedLineupFromShell();
 assert.deepStrictEqual(
@@ -562,7 +647,6 @@ assert.deepStrictEqual(
   [1, 2, 3, 4, 5],
   'fresh shared-shell simulation teams should get a five-player suggested lineup'
 );
-assert.equal(persistedReason, 'simulation_lineup');
 api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationScheduleInSharedShell();
@@ -579,10 +663,10 @@ assert.match(elements.waiverContent.innerHTML, /claimSimulationFreeAgentFromShel
 assert.match(elements.waiverContent.innerHTML, /Drop Player/i);
 
 simulationAdapterStub.lastClaim = null;
-persistedReason = null;
+historicalSlotUpsertCalls = [];
 api.claimSimulationFreeAgentFromShell(33);
 assert.equal(simulationAdapterStub.lastClaim, null, 'waiver claim should require an explicit drop selection');
-assert.equal(persistedReason, null, 'waiver claim should not persist until a drop player is chosen');
+assert.equal(historicalSlotUpsertCalls.length, 0, 'waiver claim should not persist until a drop player is chosen');
 elements['simulation-waiver-drop-select-33'].value = '34';
 api.claimSimulationFreeAgentFromShell(33);
 assert.deepStrictEqual(
@@ -593,7 +677,6 @@ assert.deepStrictEqual(
     dropPlayerId: 34
   }
 );
-assert.equal(persistedReason, 'simulation_claim');
 
 api.renderSimulationTradesInSharedShell();
 assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
@@ -602,10 +685,10 @@ assert.match(elements.tradesContent.innerHTML, /Choose outgoing player/i);
 assert.match(elements.tradesContent.innerHTML, /Choose incoming player/i);
 
 simulationAdapterStub.lastTrade = null;
-persistedReason = null;
+historicalSlotUpsertCalls = [];
 api.applySimulationTradeFromShell('BOS');
 assert.equal(simulationAdapterStub.lastTrade, null, 'trade helper should require explicit outgoing and incoming selections');
-assert.equal(persistedReason, null, 'trade helper should not persist until both sides are chosen');
+assert.equal(historicalSlotUpsertCalls.length, 0, 'trade helper should not persist until both sides are chosen');
 elements['simulation-trade-outgoing-select-BOS'].value = '34';
 elements['simulation-trade-incoming-select-BOS'].value = '30';
 api.applySimulationTradeFromShell('BOS');
@@ -618,7 +701,6 @@ assert.deepStrictEqual(
     incomingPlayerIds: [30]
   }
 );
-assert.equal(persistedReason, 'simulation_trade');
 
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /LAL/);
@@ -859,4 +941,59 @@ assert.equal(
   'local auto-load should rebuild the adapter from the raw simulation payload'
 );
 
-console.log('shared season shell simulation test passed');
+historicalSlotUpsertCalls = [];
+completedDraftUpsertError = null;
+const fallbackBootState = toPlain(api.normalizeSharedSimulationSeasonBootState(fixture, null));
+const fallbackBootAdapter = {
+  currentState: toPlain(fixture),
+  getState() {
+    return toPlain(this.currentState);
+  },
+  replaceState(nextState) {
+    this.currentState = toPlain(nextState);
+    return this.getState();
+  }
+};
+api.setSeasonModeAdapter(fallbackBootAdapter);
+api.setData(fallbackBootState);
+api.setGame({
+  week: fallbackBootState.currentWeek,
+  day: fallbackBootState.currentDay,
+  rosters: toPlain(fallbackBootState.allRosters),
+  waiver: toPlain(fallbackBootState.waiver),
+  standings: toPlain(fallbackBootState.standings),
+  starters: [
+    [23],
+    [30]
+  ]
+});
+api.persistHistoricalUniverseSlotSnapshot('simulation_claim');
+api.persistSimulationSeasonState('simulation_lineup');
+assert.equal(
+  historicalSlotUpsertCalls[1]?.options?.slotId,
+  'sim-slot-from-completed-draft',
+  'fallback shared-shell saves should adopt the first assigned historical slot id for later adapter-backed saves'
+);
+assert.equal(
+  fallbackBootAdapter.getState().historicalUniverseSlotId,
+  'sim-slot-from-completed-draft',
+  'fallback shared-shell adapters should retain the assigned slot id after the first successful save'
+);
+
+api.setActiveSeasonMode('simulation');
+api.setSeasonModeAdapter(null);
+demoInitCalls = 0;
+demoViewCalls = 0;
+demoToasts = [];
+api.loadDemo().then(() => {
+  assert.equal(api.getActiveSeasonMode(), 'fantasy', 'demo boot should clear stale simulation mode when no recoverable simulation state exists');
+  assert.equal(api.getSeasonModeAdapter(), null, 'demo boot should not leave a missing simulation adapter behind');
+  assert.equal(demoInitCalls, 1, 'demo boot should still initialize the season once');
+  assert.equal(demoViewCalls, 1, 'demo boot should still apply the requested season view once');
+  assert.deepEqual(demoToasts, [], 'demo boot should not surface a simulation adapter error when falling back to fantasy mode');
+
+  console.log('shared season shell simulation test passed');
+}).catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

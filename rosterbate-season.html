@@ -2378,10 +2378,17 @@ function persistHistoricalUniverseSlotSnapshot(reason){
     });
     if(persisted?.slotId){
       D.historicalUniverseSlotId=persisted.slotId;
+      D.sharedSimulationSlotId=persisted.slotId;
       D.historicalUniverseCreatedAt=Number(persisted.metadata?.createdAt || D.historicalUniverseCreatedAt || Date.now());
       if(shouldPersistSimulationState){
-        D.historicalUniverseSlotId=persisted.slotId;
-        SEASON_MODE_ADAPTER?.replaceState?.(stateToPersist);
+        const adapterPersistedState=(persisted.state && typeof persisted.state==='object')
+          ? persisted.state
+          : {
+              ...stateToPersist,
+              historicalUniverseSlotId:persisted.slotId,
+              sharedSimulationSlotId:persisted.slotId
+            };
+        SEASON_MODE_ADAPTER?.replaceState?.(adapterPersistedState);
       }
       try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
     }
@@ -7194,9 +7201,8 @@ window.onload=async function(){
   const leagueId = urlParams.get('league');
   const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
   const requestedHistoricalUniverse = getRequestedHistoricalUniverseSlotId(urlParams);
-  const sharedSimulationSeasonRequested = isSharedSimulationSeason(urlParams, null);
   const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot(urlParams, requestedSport);
-  ACTIVE_SEASON_MODE = sharedSimulationSeasonRequested ? 'simulation' : 'fantasy';
+  ACTIVE_SEASON_MODE = 'fantasy';
   SEASON_MODE_ADAPTER = null;
   if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
   else setSeasonEmptyState('idle');
@@ -7716,6 +7722,9 @@ async function loadDemo(){
   
   console.log('? Demo data loaded:', demoData);
   
+  ACTIVE_SEASON_MODE='fantasy';
+  SEASON_MODE_ADAPTER=null;
+
   // Set global D to demo data
   D = {...demoData};
   
