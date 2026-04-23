@@ -8083,18 +8083,60 @@ function renderSimulationStandingsInSharedShell(){
   )).join('') || '<div class="card">No standings available.</div>';
 }
 
+function applySimulationSuggestedLineupFromShell(){
+  const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
+  const currentLineupSize = Math.max(Number((vm.lineup || []).length || 0), 1);
+  const suggestedLineupIds = (vm.roster || [])
+    .slice(0, currentLineupSize)
+    .map((player) => Number(player?.id))
+    .filter((id) => Number.isFinite(id));
+  if (!suggestedLineupIds.length) return;
+  SEASON_MODE_ADAPTER.setLineup(suggestedLineupIds);
+  persistSimulationSeasonState('simulation_lineup');
+  renderSimulationRosterInSharedShell();
+  renderSimulationHubInSharedShell();
+  renderSimulationScheduleInSharedShell();
+}
+
 function renderSimulationRosterInSharedShell(){
   setSeasonSidePanelVisible('rosterPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
   const scheduleChip=document.getElementById('rosterScheduleChip');
   if(scheduleChip) scheduleChip.textContent='Schedule';
   document.getElementById('rWk').textContent = 'Set starters, bench order, and injury availability';
-  document.getElementById('rosterContent').innerHTML = vm.roster.map((player) => (
-    `<div class="card" data-player-id="${player.id}">
-      <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
-      <div style="color:var(--text2);font-size:12px;">${player.team} - ${player.pos}</div>
-    </div>`
-  )).join('');
+  document.getElementById('rosterContent').innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Lineup Control</div>
+          <div style="color:var(--text2);font-size:12px;margin-top:4px;">Apply a runtime-backed starter set for the next simulation day.</div>
+        </div>
+        <button class="bp" onclick="applySimulationSuggestedLineupFromShell()">Use Suggested Starters</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">Starters</div>
+      <div style="margin-top:12px;">
+        ${(vm.lineup || []).map((player) => (
+          `<div data-player-id="${player.id}" style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);">
+            <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
+            <div style="color:var(--text2);font-size:12px;">${player.team} - ${player.pos}</div>
+          </div>`
+        )).join('') || '<div class="muted" style="margin-top:10px;">No starters locked in yet.</div>'}
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">Bench</div>
+      <div style="margin-top:12px;">
+        ${(vm.bench || []).map((player) => (
+          `<div data-player-id="${player.id}" style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);">
+            <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
+            <div style="color:var(--text2);font-size:12px;">${player.team} - ${player.pos}</div>
+          </div>`
+        )).join('') || '<div class="muted" style="margin-top:10px;">No bench players available.</div>'}
+      </div>
+    </div>
+  `;
 }
 
 function renderSimulationScheduleInSharedShell(){

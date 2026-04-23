@@ -1,10 +1,13 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const simulationSeasonAdapterApi = require('../simulation-season-adapter.js');
 const {
   createSimulationSeasonAdapter,
   isSupportedSimulationSeasonState
 } = simulationSeasonAdapterApi;
+const adapterSource = fs.readFileSync(path.join(__dirname, '..', 'simulation-season-adapter.js'), 'utf8');
 
 const slotState = {
   simulationMode: 'nba_mixed_era_single_player_v1',
@@ -89,6 +92,9 @@ assert.equal(typeof adapter.setLineup, 'function');
 assert.equal(typeof adapter.claimFreeAgent, 'function');
 assert.equal(typeof adapter.applyTrade, 'function');
 assert.equal(typeof adapter.simulateNextDay, 'function');
+assert.match(adapterSource, /runtimeApi\.setSimulationLineup\(/, 'adapter lineup mutation should stay runtime-backed');
+assert.match(adapterSource, /runtimeApi\.claimSimulationFreeAgent\(/, 'adapter waiver mutation should stay runtime-backed');
+assert.match(adapterSource, /runtimeApi\.applySimulationTrade\(/, 'adapter trade mutation should stay runtime-backed');
 
 const hub = adapter.getHubViewModel();
 assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');

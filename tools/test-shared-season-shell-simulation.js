@@ -30,6 +30,7 @@ ${extractBetween('function claimSimulationFreeAgentFromShell(', 'function render
 ${extractBetween('function renderSimulationTradesInSharedShell(', 'function applySimulationTradeFromShell(')}
 ${extractBetween('function applySimulationTradeFromShell(', 'function renderSimulationStandingsInSharedShell(')}
 ${extractBetween('function renderSimulationStandingsInSharedShell(', 'function renderSimulationRosterInSharedShell(')}
+${extractBetween('function applySimulationSuggestedLineupFromShell(', 'function renderSimulationRosterInSharedShell(')}
 ${extractBetween('function renderSimulationRosterInSharedShell(', 'function renderSimulationScheduleInSharedShell(')}
 ${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderActiveSeasonScreen(')}
 
@@ -51,6 +52,7 @@ module.exports = {
   renderSimulationStandingsInSharedShell,
   claimSimulationFreeAgentFromShell,
   applySimulationTradeFromShell,
+  applySimulationSuggestedLineupFromShell,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
   setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; },
   setData(value){ D = value; },
@@ -152,11 +154,14 @@ const simulationAdapterStub = {
   getRosterViewModel() {
     return {
       roster: [
-        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' },
-        { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' }
+        { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
+        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+      ],
+      lineup: [
+        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
       ],
       bench: [
-        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+        { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' }
       ]
     };
   },
@@ -197,6 +202,10 @@ const simulationAdapterStub = {
   applyTrade(trade) {
     this.lastTrade = trade;
     return {};
+  },
+  setLineup(lineupIds) {
+    this.lastLineupIds = lineupIds;
+    return this.getState();
   }
 };
 
@@ -234,6 +243,9 @@ assert.match(html, /function renderSimulationScheduleInSharedShell\(/, 'season s
 assert.match(html, /function renderSimulationWaiverInSharedShell\(/, 'season shell should add a simulation waiver renderer');
 assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season shell should add a simulation trade renderer');
 assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season shell should add a simulation standings renderer');
+assert.match(html, /function applySimulationSuggestedLineupFromShell\(/, 'season shell should expose a simulation lineup action helper');
+assert.match(html, /SEASON_MODE_ADAPTER\.setLineup\(/, 'simulation lineup action should flow through the adapter');
+assert.match(html, /persistSimulationSeasonState\('simulation_lineup'\)/, 'simulation lineup action should persist shared state');
 assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should centralize mode-aware screen rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');
@@ -329,7 +341,14 @@ api.renderSimulationRosterInSharedShell();
 assert.equal(elements.rosterPowerups.style.display, 'none');
 assert.equal(elements.rosterPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
 assert.equal(elements.rosterScheduleChip.textContent, 'Schedule');
+assert.match(elements.rosterContent.innerHTML, /Use Suggested Starters/);
+assert.match(elements.rosterContent.innerHTML, /Starters/);
+assert.match(elements.rosterContent.innerHTML, /Bench/);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
+
+api.applySimulationSuggestedLineupFromShell();
+assert.deepStrictEqual(toPlain(simulationAdapterStub.lastLineupIds), [34]);
+assert.equal(persistedReason, 'simulation_lineup');
 
 api.renderSimulationScheduleInSharedShell();
 assert.equal(elements.matchupPowerups.style.display, 'none');
@@ -349,7 +368,7 @@ assert.deepStrictEqual(
   {
     teamAbbr: 'LAL',
     addPlayerId: 33,
-    dropPlayerId: 23
+    dropPlayerId: 34
   }
 );
 assert.equal(persistedReason, 'simulation_claim');
