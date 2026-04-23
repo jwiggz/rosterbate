@@ -14,12 +14,13 @@
       target.searchParams.set('simulation', params.get('simulation') || 'nba_mixed_era');
       const slotId = params.get('historicalUniverse') || params.get('slot');
       if (slotId) target.searchParams.set('historicalUniverse', slotId);
-      const page = params.get('page');
+      const page = String(params.get('page') || '').trim().toLowerCase();
       if (page) target.searchParams.set('page', page);
       return target.toString();
     }
 
     function redirectToSharedSeasonShell(){
+      document.body.textContent = 'Redirecting to the season manager...';
       window.location.replace(resolveLegacySimulationTarget());
     }
 
