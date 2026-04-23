@@ -17,6 +17,11 @@ assert.match(
   /if\s*\(simulationContext\s*&&\s*ls\s*!==\s*simulationLeagueSize\)\s*\{/,
   'simulation drafts should enforce the exact shell team count before starting'
 );
+assert.match(
+  source,
+  /if\s*\(!simulationContext\s*&&\s*\(isNaN\(ls\)\|\|ls<\(allowSoloTest\?1:2\)\|\|ls>20\)\)\s*\{/,
+  'generic league-size validation should not block the locked 30-team simulation draft'
+);
 assert.match(source, /simulationMode===['"]nba_mixed_era_single_player_v1['"]/, 'draft page should stamp simulation mode onto the finished save');
 assert.match(source, /rosterbate-simulation-season\.html/, 'draft completion should route to the dedicated simulation season page');
 
