@@ -4,7 +4,8 @@ const { getSimulationShell } = require('../simulation-mode-config.js');
 const {
   buildSimulationPlayerPool,
   buildSimulationUniverseBootstrap,
-  buildCompletedSimulationAutoDraftState
+  buildCompletedSimulationAutoDraftState,
+  writeCompletedSimulationState
 } = require('../simulation-mode-runtime.js');
 
 const shell = getSimulationShell();
@@ -139,7 +140,29 @@ assert.equal(
   300
 );
 assert.equal(autoDraftState.draftState.freeAgents.length, 60);
+assert.deepStrictEqual(
+  autoDraftState.draftState.freeAgents.map((player) => player.name),
+  expectedRankedNames.slice(300, 360)
+);
 assert.equal(autoDraftState.seasonState.currentDay, 1);
 assert.equal(autoDraftState.postseasonState.phase, 'regular_season');
+
+assert.throws(() => buildCompletedSimulationAutoDraftState({
+  shell,
+  mixedEraContext: {
+    ...mixedEraContext,
+    playerPool: playerPool.slice(0, 299)
+  },
+  controlledTeamAbbr: 'LAL'
+}), /Unable to auto-draft simulation league/i);
+
+const originalLocalStorage = global.localStorage;
+global.localStorage = {
+  setItem(){
+    throw new Error('quota exceeded');
+  }
+};
+assert.doesNotThrow(() => writeCompletedSimulationState({ ok: true }));
+global.localStorage = originalLocalStorage;
 
 console.log('simulation mode runtime test passed');

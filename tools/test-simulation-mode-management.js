@@ -69,6 +69,14 @@ const invalidTradeState = applySimulationTrade(baseState, {
 });
 assert.deepStrictEqual(invalidTradeState, baseState);
 
+const sameTeamTradeState = applySimulationTrade(baseState, {
+  fromTeamAbbr: 'LAL',
+  toTeamAbbr: 'LAL',
+  outgoingPlayerIds: [1],
+  incomingPlayerIds: [2]
+});
+assert.deepStrictEqual(sameTeamTradeState, baseState);
+
 const injuryState = applySimulationInjuryDesignations(baseState, [
   { teamAbbr: 'LAL', playerId: 2, designation: 'OUT' }
 ]);
