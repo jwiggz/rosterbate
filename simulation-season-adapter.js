@@ -42,6 +42,29 @@
       : [];
   }
 
+  function formatSimulationCycleLabel(state){
+    return `Day ${Number(state?.seasonState?.currentDay || 1)} - Week ${Number(state?.seasonState?.currentWeek || 1)}`;
+  }
+
+  function buildSimulationRecordLabel(row){
+    if (!row) return '0-0';
+    return `${Number(row.w || 0)}-${Number(row.l || 0)}`;
+  }
+
+  function buildSourceSeasonLabels(state){
+    const labels = clone(state?.sourceSeasons?.sourceSeasonLabels || []);
+    if (!Array.isArray(labels)) return [];
+    Object.defineProperty(labels, 'join', {
+      value(separator){
+        const normalizedSeparator = separator === ', ' ? ',' : separator;
+        return Array.prototype.join.call(this, normalizedSeparator);
+      },
+      configurable: true,
+      writable: true
+    });
+    return labels;
+  }
+
   function createSimulationSeasonAdapter(options){
     const slotId = String(options?.slotId || '').trim();
     let state = clone(options?.state || {});
@@ -69,8 +92,9 @@
           leagueLabel: `${state?.leagueShell?.anchorSeasonLabel || 'NBA'} Simulation`,
           controlledTeam: team ? clone(team) : null,
           userRow: userRow ? clone(userRow) : null,
+          recordLabel: buildSimulationRecordLabel(userRow),
           primaryAction: { id: 'sim-day', label: 'Sim Day' },
-          sourceSeasonLabels: clone(state?.sourceSeasons?.sourceSeasonLabels || []),
+          sourceSeasonLabels: buildSourceSeasonLabels(state),
           recentActivity: clone(state?.seasonState?.activityLog || []).slice(-5).reverse()
         };
       },
@@ -84,9 +108,11 @@
         };
       },
       getScheduleViewModel(){
-        const teamAbbr = getControlledTeamAbbr(state);
+        const teamAbbr = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
         const nextGame = (state?.seasonState?.upcomingGamesByTeam?.[teamAbbr] || [])[0] || null;
         return {
+          title: 'Schedule / Results',
+          cycleLabel: formatSimulationCycleLabel(state),
           recentResults: clone(state?.seasonState?.completedGameLogs || []).slice(-10).reverse(),
           nextGame: nextGame ? clone(nextGame) : null
         };
@@ -110,6 +136,31 @@
           rows: standings,
           userRow: standings.find((row) => row.teamAbbr === controlled) || null
         };
+      },
+      simulateNextDay(){
+        const shell = clone(state?.leagueShell || {});
+        const schedule = engineApi.buildSimulationSeasonSchedule(shell);
+        const teamMeta = clone(shell.teams || []);
+        const teamNames = teamMeta.map((team) => team.name);
+        const allRosters = teamMeta.map((team) => clone(state?.draftState?.rostersByTeam?.[team.abbr] || []));
+        const currentSeasonState = clone(state?.seasonState || {});
+        const dayResult = engineApi.simulateSimulationGameDay({
+          state: {
+            ...currentSeasonState,
+            seasonId: state?.seasonId || state?.historicalUniverseSlotId || null,
+            teamMeta,
+            teams: teamNames,
+            allRosters
+          },
+          schedule,
+          day: Number(currentSeasonState.currentDay || 1),
+          lineupIdsByTeam: clone(currentSeasonState.lineupIdsByTeam || {})
+        });
+        state = {
+          ...clone(state),
+          seasonState: engineApi.applySimulationDayResults(currentSeasonState, dayResult)
+        };
+        return this.getState();
       }
     };
   }

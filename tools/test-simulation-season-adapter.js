@@ -90,6 +90,7 @@ const hub = adapter.getHubViewModel();
 assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
 assert.equal(hub.controlledTeam.abbr, 'LAL');
 assert.equal(hub.primaryAction.label, 'Sim Day');
+assert.equal(hub.sourceSeasonLabels.join(', '), '1986-87,1995-96,2015-16');
 hub.controlledTeam.name = 'Mutated Lakers';
 hub.userRow.w = 999;
 assert.equal(adapter.getState().leagueShell.teams[0].name, 'Los Angeles Lakers');
@@ -103,6 +104,7 @@ assert.equal(adapter.getState().draftState.rostersByTeam.LAL[0].name, 'Michael J
 
 const schedule = adapter.getScheduleViewModel();
 assert.equal(schedule.recentResults.length, 1);
+assert.equal(schedule.recentResults[0].homeAbbr, 'LAL');
 assert.equal(schedule.nextGame.opponentAbbr, 'BOS');
 schedule.nextGame.opponentName = 'Mutated Opponent';
 assert.equal(adapter.getState().seasonState.upcomingGamesByTeam.LAL[0].opponentName, 'Boston Celtics');
