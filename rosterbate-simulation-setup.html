@@ -189,7 +189,10 @@
     </section>
   </main>
   <script>
-    const SIMULATION_SETUP_STORAGE_KEY = 'rbSimulationModeLocalState';
+    const SIMULATION_SETUP_STORAGE_KEY = (
+      window.RosterBateSimulationModeRuntime &&
+      window.RosterBateSimulationModeRuntime.STORAGE_KEY
+    ) || 'rbSimulationModeLocalState';
 
     function readSportFromQuery(){
       try{
