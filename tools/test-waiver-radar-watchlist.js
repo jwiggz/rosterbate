@@ -114,6 +114,8 @@ const script = [
   extractFunctionSource('getWaiverRadarReason(player, context)'),
   extractFunctionSource('getWaiverRadarCandidateScore(player, needProfile)'),
   extractFunctionSource('getWaiverRadarCandidates(limit=4)'),
+  extractFunctionSource('primeWaiverRadarSignalsCache(limit=10)'),
+  extractFunctionSource('getWaiverRadarSignalsCache(limit=10)'),
   extractFunctionSource('getWatchedWaiverTargets(limit=4)'),
   extractFunctionSource('getRecentDroppedWaiverTargets(limit=4)'),
   extractFunctionSource('getWaiverRowSignals(player)')

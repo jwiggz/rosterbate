@@ -6266,6 +6266,27 @@ function getWaiverRadarCandidates(limit=4){
     .slice(0, Math.max(1, limit));
 }
 
+function primeWaiverRadarSignalsCache(limit=10){
+  const entries=getWaiverRadarCandidates(limit);
+  const byId=new Map();
+  entries.forEach((entry, index)=>{
+    byId.set(Number(entry?.player?.id), {
+      entry,
+      radarRank:index
+    });
+  });
+  globalThis.waiverRadarSignalsCache={ limit, entries, byId };
+  return globalThis.waiverRadarSignalsCache;
+}
+
+function getWaiverRadarSignalsCache(limit=10){
+  const cache=globalThis.waiverRadarSignalsCache||null;
+  if(!cache || cache.limit!==limit){
+    return primeWaiverRadarSignalsCache(limit);
+  }
+  return cache;
+}
+
 function getWatchedWaiverTargets(limit=4){
   const watchIds=new Set(getWatchListIds().map(Number));
   if(!watchIds.size) return [];
@@ -6292,9 +6313,10 @@ function getWaiverRowSignals(player){
   const fit=getWaiverRosterFitScore(player, buildWaiverRosterNeedProfile());
   const watch=getWaiverWatchListBoost(player);
   const recentDropBoost=getWaiverRecentDropBoost(player);
-  const radarCandidates=getWaiverRadarCandidates(10);
-  const radarEntry=radarCandidates.find(entry=>Number(entry?.player?.id)===playerId)||null;
-  const radarRank=radarCandidates.findIndex(entry=>Number(entry?.player?.id)===playerId);
+  const radarCache=getWaiverRadarSignalsCache(10);
+  const radarMatch=radarCache.byId.get(playerId)||null;
+  const radarEntry=radarMatch?.entry||null;
+  const radarRank=Number.isFinite(radarMatch?.radarRank) ? radarMatch.radarRank : -1;
   const radarReason=radarEntry?.radarReason || getWaiverRadarReason(player, {
     fitScore:fit.score,
     fitReason:fit.reason,
@@ -9114,6 +9136,7 @@ function renderWaiver(){
   const myRoster=G.rosters[D.myPos]||[];
   const ilRoster=getIlRoster(D.myPos);
   const watchIds=getWatchListIds();
+  primeWaiverRadarSignalsCache(10);
   const radar=getWaiverRadarCandidates(6);
   const watchedTargets=getWatchedWaiverTargets(4);
   const recentDrops=getRecentDroppedWaiverTargets(4);
