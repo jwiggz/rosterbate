@@ -7985,6 +7985,7 @@ function renderSimulationHubInSharedShell(){
 }
 
 function renderSimulationRosterInSharedShell(){
+  setSeasonSidePanelVisible('rosterPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
   document.getElementById('rWk').textContent = 'Set starters, bench order, and injury availability';
   document.getElementById('rosterContent').innerHTML = vm.roster.map((player) => (
@@ -7996,6 +7997,7 @@ function renderSimulationRosterInSharedShell(){
 }
 
 function renderSimulationScheduleInSharedShell(){
+  setSeasonSidePanelVisible('matchupPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getScheduleViewModel();
   document.getElementById('mWk').textContent = vm.cycleLabel;
   document.getElementById('matchupContent').innerHTML = `

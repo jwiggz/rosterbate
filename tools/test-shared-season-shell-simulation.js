@@ -63,6 +63,9 @@ assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should c
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationScheduleInSharedShell\(\);/, 'renderMatchup should branch into simulation rendering');
+assert.match(html, /function setSeasonSidePanelVisible\(targetId, visible\)\{/, 'season shell should expose a shared side panel visibility helper');
+assert.match(html, /function renderSimulationRosterInSharedShell\(\)\{[\s\S]*setSeasonSidePanelVisible\('rosterPowerups', false\);/, 'simulation roster should hide the fantasy side rail');
+assert.match(html, /function renderSimulationScheduleInSharedShell\(\)\{[\s\S]*setSeasonSidePanelVisible\('matchupPowerups', false\);/, 'simulation schedule should hide the fantasy side rail');
 
 const params = new URLSearchParams('?simulation=NBA_Mixed_Era&historicalUniverse=sim-slot-1');
 assert.equal(api.getRequestedSimulationMode(params), 'nba_mixed_era', 'simulation query param should normalize to lowercase');
