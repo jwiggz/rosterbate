@@ -18,6 +18,14 @@ function extractBetween(startMarker, endMarker) {
   return html.slice(start, end);
 }
 
+function extractFrom(startMarker, endMarker) {
+  const start = html.indexOf(startMarker);
+  assert.notEqual(start, -1, `expected to find start marker: ${startMarker}`);
+  const end = html.indexOf(endMarker, start);
+  assert.notEqual(end, -1, `expected to find end marker: ${endMarker}`);
+  return html.slice(start, end);
+}
+
 const harnessSource = `
 ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
@@ -36,79 +44,7 @@ ${extractBetween('function applySimulationSuggestedLineupFromShell(', 'function 
 ${extractBetween('function renderSimulationRosterInSharedShell(', 'function renderSimulationScheduleInSharedShell(')}
 ${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderActiveSeasonScreen(')}
 ${extractBetween('async function loadDemo(', 'function isDemoSeasonData(')}
-
-function bootSeasonShellForTest(search){
-  applySportContext(CURRENT_SPORT);
-  const urlParams = new URLSearchParams(search || '');
-  const leagueId = urlParams.get('league');
-  const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
-  const requestedHistoricalUniverse = getRequestedHistoricalUniverseSlotId(urlParams);
-  const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot(urlParams, requestedSport);
-  ACTIVE_SEASON_MODE = 'fantasy';
-  SEASON_MODE_ADAPTER = null;
-  if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
-  else setSeasonEmptyState('idle');
-
-  if (completedSimulationDraftBoot?.redirected && completedSimulationDraftBoot.redirectUrl) {
-    return {
-      redirected: true,
-      activeSeasonMode: ACTIVE_SEASON_MODE,
-      hasAdapter: !!SEASON_MODE_ADAPTER,
-      emptyState: getSeasonEmptyStateForTest()
-    };
-  }
-
-  if (completedSimulationDraftBoot?.state && completedSimulationDraftBoot.rawState) {
-    ACTIVE_SEASON_MODE = 'simulation';
-    SEASON_MODE_ADAPTER = buildSimulationSeasonAdapterFromState(
-      completedSimulationDraftBoot.slotId,
-      completedSimulationDraftBoot.rawState
-    );
-    return {
-      redirected: false,
-      activeSeasonMode: ACTIVE_SEASON_MODE,
-      hasAdapter: !!SEASON_MODE_ADAPTER,
-      emptyState: getSeasonEmptyStateForTest()
-    };
-  }
-
-  if (requestedHistoricalUniverse) {
-    const slotState = loadHistoricalUniverseSlotState(requestedHistoricalUniverse, requestedSport);
-    if (slotState) {
-      const sharedSimulationSeason = isSharedSimulationSeason(urlParams, slotState);
-      ACTIVE_SEASON_MODE = sharedSimulationSeason ? 'simulation' : 'fantasy';
-      SEASON_MODE_ADAPTER = sharedSimulationSeason
-        ? buildSimulationSeasonAdapterFromState(requestedHistoricalUniverse, slotState)
-        : null;
-      return {
-        redirected: false,
-        activeSeasonMode: ACTIVE_SEASON_MODE,
-        hasAdapter: !!SEASON_MODE_ADAPTER,
-        emptyState: getSeasonEmptyStateForTest()
-      };
-    }
-  }
-
-  let raw = null;
-  try{ raw = localStorage.getItem('rosterbateDraft'); }catch(e){}
-  if(raw){
-    try{
-      const parsed = JSON.parse(raw);
-      const localAutoLoad = resolveLocalSavedSeasonAutoLoad(parsed, requestedSport);
-      if(localAutoLoad){
-        ACTIVE_SEASON_MODE = localAutoLoad.activeSeasonMode;
-        SEASON_MODE_ADAPTER = localAutoLoad.adapter;
-      }
-    }catch(e){}
-  }
-
-  return {
-    redirected: false,
-    activeSeasonMode: ACTIVE_SEASON_MODE,
-    hasAdapter: !!SEASON_MODE_ADAPTER,
-    emptyState: getSeasonEmptyStateForTest()
-  };
-}
+${extractFrom('window.onload=async function(){', 'function clearAllData(')}
 
 module.exports = {
   getRequestedSimulationMode,
@@ -135,7 +71,6 @@ module.exports = {
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
   resolveLocalSavedSeasonAutoLoad,
-  bootSeasonShellForTest,
   loadDemo,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
   getActiveSeasonMode(){ return ACTIVE_SEASON_MODE; },
@@ -364,6 +299,12 @@ const sandbox = {
   getSeasonEmptyStateForTest() {
     return lastEmptyState;
   },
+  shouldBootHistoricalDevSeason() {
+    return false;
+  },
+  getSavedMultiplayerLobbyState() {
+    return null;
+  },
   persistHistoricalUniverseSlotSnapshot(reason) {
     persistedReason = reason;
   },
@@ -412,6 +353,10 @@ const sandbox = {
     }
   },
   window: {
+    location: {
+      search: '',
+      href: 'rosterbate-season.html'
+    },
     RosterBateHistoricalUniverseSlots: {
       upsertFromState(state, options) {
         historicalSlotUpsertCalls.push({
@@ -1070,11 +1015,13 @@ api.setSeasonModeAdapter(null);
 demoInitCalls = 0;
 demoViewCalls = 0;
 demoToasts = [];
-const staleSimulationBoot = api.bootSeasonShellForTest('?sport=nba&simulation=nba_mixed_era');
-assert.equal(staleSimulationBoot.activeSeasonMode, 'fantasy', 'stale simulation URLs with no recoverable state should boot in fantasy mode');
-assert.equal(staleSimulationBoot.hasAdapter, false, 'stale simulation URLs with no recoverable state should not leave a null simulation adapter behind');
-assert.equal(staleSimulationBoot.emptyState, 'idle', 'stale simulation URLs with no recoverable state should stay on the idle empty state');
-api.loadDemo().then(() => {
+sandbox.window.location = { search: '?sport=nba&simulation=nba_mixed_era', href: 'rosterbate-season.html?sport=nba&simulation=nba_mixed_era' };
+Promise.resolve(sandbox.window.onload()).then(() => {
+  assert.equal(api.getActiveSeasonMode(), 'fantasy', 'stale simulation URLs with no recoverable state should boot in fantasy mode');
+  assert.equal(api.getSeasonModeAdapter(), null, 'stale simulation URLs with no recoverable state should not leave a null simulation adapter behind');
+  assert.equal(sandbox.getSeasonEmptyStateForTest(), 'idle', 'stale simulation URLs with no recoverable state should stay on the idle empty state');
+  return api.loadDemo();
+}).then(() => {
   assert.equal(api.getActiveSeasonMode(), 'fantasy', 'demo boot should clear stale simulation mode when no recoverable simulation state exists');
   assert.equal(api.getSeasonModeAdapter(), null, 'demo boot should not leave a missing simulation adapter behind');
   assert.equal(demoInitCalls, 1, 'demo boot should still initialize the season once');
