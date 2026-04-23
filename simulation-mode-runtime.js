@@ -9,7 +9,13 @@
   }
 
   function normalizeShell(shell){
-    return shell && typeof shell === 'object' ? shell : { teams: [] };
+    if (!shell || typeof shell !== 'object') {
+      return { teams: [] };
+    }
+    return {
+      ...shell,
+      teams: Array.isArray(shell.teams) ? shell.teams : []
+    };
   }
 
   function sortPlayers(players){

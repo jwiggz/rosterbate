@@ -109,4 +109,15 @@ assert.equal(freshBootstrap.sourceSeasons.sourcePackIds.length, 4);
 assert.equal(freshBootstrap.seasonState.standings[0].w, 0);
 assert.equal(freshBootstrap.postseasonState.phase, 'regular_season');
 
+const partialShellBootstrap = buildSimulationUniverseBootstrap({
+  shell: { rosterSize: 10 },
+  mixedEraContext,
+  controlledTeamAbbr: 'LAL',
+  draftSlot: 4
+});
+
+assert.equal(partialShellBootstrap.leagueShell.teams.length, 0);
+assert.deepStrictEqual(partialShellBootstrap.draftState.rostersByTeam, {});
+assert.deepStrictEqual(partialShellBootstrap.seasonState.standings, []);
+
 console.log('simulation mode runtime test passed');
