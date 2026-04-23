@@ -25,8 +25,12 @@
     return String(state?.simulationMode || '').trim().toLowerCase() === MODE_ID;
   }
 
+  function getControlledTeamAbbr(state){
+    return String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  }
+
   function getControlledTeam(state){
-    const abbr = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+    const abbr = getControlledTeamAbbr(state);
     return (state?.leagueShell?.teams || []).find((team) => team.abbr === abbr) || null;
   }
 
@@ -34,7 +38,7 @@
     const team = getControlledTeam(state);
     if (!team) return [];
     return Array.isArray(state?.draftState?.rostersByTeam?.[team.abbr])
-      ? state.draftState.rostersByTeam[team.abbr].slice()
+      ? clone(state.draftState.rostersByTeam[team.abbr])
       : [];
   }
 
@@ -63,8 +67,8 @@
         return {
           slotId,
           leagueLabel: `${state?.leagueShell?.anchorSeasonLabel || 'NBA'} Simulation`,
-          controlledTeam: team,
-          userRow,
+          controlledTeam: team ? clone(team) : null,
+          userRow: userRow ? clone(userRow) : null,
           primaryAction: { id: 'sim-day', label: 'Sim Day' },
           sourceSeasonLabels: clone(state?.sourceSeasons?.sourceSeasonLabels || []),
           recentActivity: clone(state?.seasonState?.activityLog || []).slice(-5).reverse()
@@ -72,19 +76,19 @@
       },
       getRosterViewModel(){
         const roster = getControlledRoster(state);
-        const lineupIds = new Set(state?.seasonState?.lineupIdsByTeam?.[state?.draftState?.controlledTeamAbbr] || []);
+        const lineupIds = new Set(state?.seasonState?.lineupIdsByTeam?.[getControlledTeamAbbr(state)] || []);
         return {
           roster,
-          lineup: roster.filter((player) => lineupIds.has(player.id)),
-          bench: roster.filter((player) => !lineupIds.has(player.id))
+          lineup: roster.filter((player) => lineupIds.has(player.id)).map((player) => clone(player)),
+          bench: roster.filter((player) => !lineupIds.has(player.id)).map((player) => clone(player))
         };
       },
       getScheduleViewModel(){
-        const teamAbbr = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+        const teamAbbr = getControlledTeamAbbr(state);
         const nextGame = (state?.seasonState?.upcomingGamesByTeam?.[teamAbbr] || [])[0] || null;
         return {
           recentResults: clone(state?.seasonState?.completedGameLogs || []).slice(-10).reverse(),
-          nextGame
+          nextGame: nextGame ? clone(nextGame) : null
         };
       },
       getWaiverViewModel(){
@@ -93,7 +97,7 @@
         };
       },
       getTradeViewModel(){
-        const controlled = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+        const controlled = getControlledTeamAbbr(state);
         return {
           tradePartners: clone(state?.leagueShell?.teams || []).filter((team) => team.abbr !== controlled),
           tradeHistory: clone(state?.seasonState?.activityLog || []).filter((entry) => entry.type === 'trade')
@@ -101,9 +105,10 @@
       },
       getStandingsViewModel(){
         const standings = clone(state?.seasonState?.standings || []);
+        const controlled = getControlledTeamAbbr(state);
         return {
           rows: standings,
-          userRow: standings.find((row) => row.teamAbbr === state?.draftState?.controlledTeamAbbr) || null
+          userRow: standings.find((row) => row.teamAbbr === controlled) || null
         };
       }
     };
