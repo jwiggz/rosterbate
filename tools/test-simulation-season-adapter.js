@@ -331,24 +331,160 @@ assert.ok(postseasonReadyState.postseasonState.playIn?.east, 'simulateNextDay sh
 assert.ok(postseasonReadyState.postseasonState.playIn?.west, 'simulateNextDay should seed the West play-in snapshot when the regular season ends');
 assert.ok(postseasonReadyState.postseasonState.bracket?.east, 'simulateNextDay should seed the East playoff bracket when the regular season ends');
 assert.ok(postseasonReadyState.postseasonState.bracket?.west, 'simulateNextDay should seed the West playoff bracket when the regular season ends');
+assert.deepStrictEqual(
+  postseasonReadyState.postseasonState.playIn.east.sevenEight.map((entry) => entry.teamAbbr),
+  ['MIA', 'MIL'],
+  'postseason-ready state should preserve the East 7/8 play-in pairing'
+);
+assert.deepStrictEqual(
+  postseasonReadyState.postseasonState.playIn.west.nineTen.map((entry) => entry.teamAbbr),
+  ['OKC', 'PHX'],
+  'postseason-ready state should preserve the West 9/10 play-in pairing'
+);
+assert.deepStrictEqual(
+  postseasonTransitionAdapter.getNavItems().map((item) => item.id),
+  ['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings', 'playoffs'],
+  'postseason-ready state should expose a playoffs navigation tab'
+);
+assert.equal(
+  postseasonTransitionAdapter.getNavItems().find((item) => item.id === 'playoffs')?.label,
+  'Playoffs',
+  'postseason navigation should label the new postseason tab clearly'
+);
 
-const postseasonDayCount = postseasonReadyState.seasonState.currentDay;
-const postseasonLogCount = postseasonReadyState.seasonState.completedGameLogs.length;
+const playInState = postseasonTransitionAdapter.simulateNextDay();
+assert.equal(
+  playInState.postseasonState.phase,
+  'play_in',
+  'simulateNextDay should advance postseason-ready state into the play-in day-by-day flow'
+);
+assert.equal(
+  playInState.seasonState.currentDay,
+  4,
+  'simulateNextDay should advance the simulation day after resolving the first play-in slate'
+);
+assert.ok(
+  playInState.postseasonState.currentDaySchedule.length > 0,
+  'simulateNextDay should seed the next postseason game day after the opening play-in slate'
+);
+assert.equal(typeof postseasonTransitionAdapter.getPlayoffsViewModel, 'function');
+assert.equal(
+  postseasonTransitionAdapter.getPlayoffsViewModel().phase,
+  'play_in',
+  'adapter should expose a playoffs view model once postseason play begins'
+);
+
+const finalsCloseoutSeedState = JSON.parse(JSON.stringify(playInState));
+finalsCloseoutSeedState.seasonState.currentDay = 30;
+finalsCloseoutSeedState.seasonState.currentWeek = 5;
+finalsCloseoutSeedState.draftState.rostersByTeam.BOS = [
+  { id: 1, name: 'Player 1', pos: 'PG', team: 'BOS', fp: 50 },
+  { id: 2, name: 'Player 2', pos: 'SG', team: 'BOS', fp: 49 },
+  { id: 3, name: 'Player 3', pos: 'SF', team: 'BOS', fp: 48 },
+  { id: 4, name: 'Player 4', pos: 'PF', team: 'BOS', fp: 47 },
+  { id: 5, name: 'Player 5', pos: 'C', team: 'BOS', fp: 46 }
+];
+finalsCloseoutSeedState.seasonState.lineupIdsByTeam.BOS = [1, 2, 3, 4, 5];
+finalsCloseoutSeedState.postseasonState = {
+  ...finalsCloseoutSeedState.postseasonState,
+  phase: 'finals',
+  currentRound: 'finals',
+  currentDaySchedule: [
+    {
+      day: 30,
+      gameId: 'finals-game-4',
+      seriesId: 'finals',
+      homeAbbr: 'BOS',
+      awayAbbr: 'DAL'
+    }
+  ],
+  bracket: {
+    east: finalsCloseoutSeedState.postseasonState.bracket?.east || null,
+    west: finalsCloseoutSeedState.postseasonState.bracket?.west || null,
+    finals: {
+      higherSeed: { teamAbbr: 'BOS', seed: 1, conference: 'East' },
+      lowerSeed: { teamAbbr: 'DAL', seed: 1, conference: 'West' }
+    }
+  },
+  seriesById: {
+    ...(finalsCloseoutSeedState.postseasonState.seriesById || {}),
+    finals: {
+      id: 'finals',
+      conference: 'finals',
+      round: 'finals',
+      higherSeed: { teamAbbr: 'BOS', seed: 1, conference: 'East' },
+      lowerSeed: { teamAbbr: 'DAL', seed: 1, conference: 'West' },
+      targetWins: 4,
+      higherSeedWins: 3,
+      lowerSeedWins: 0
+    }
+  }
+};
+
+const finalsCloseoutAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-finals-closeout',
+  state: finalsCloseoutSeedState
+});
+
+const completedFinalsState = finalsCloseoutAdapter.simulateNextDay();
+assert.equal(
+  completedFinalsState.postseasonState.phase,
+  'completed',
+  'simulateNextDay should finalize the postseason once the Finals close out'
+);
+assert.equal(
+  completedFinalsState.postseasonState.champion?.teamAbbr,
+  'BOS',
+  'simulateNextDay should crown the winning Finals team as champion'
+);
+assert.equal(
+  completedFinalsState.postseasonState.runnerUp?.teamAbbr,
+  'DAL',
+  'simulateNextDay should preserve the Finals loser as runner-up'
+);
+assert.match(
+  String(completedFinalsState.postseasonState.completedAt || ''),
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+  'completed postseason state should include an ISO-like completion timestamp'
+);
+
+const completedFreezeDay = completedFinalsState.seasonState.currentDay;
+const completedFreezeChampion = JSON.parse(JSON.stringify(completedFinalsState.postseasonState.champion));
+const completedFreezeRunnerUp = JSON.parse(JSON.stringify(completedFinalsState.postseasonState.runnerUp));
+const completedFreezeState = finalsCloseoutAdapter.simulateNextDay();
+assert.equal(
+  completedFreezeState.seasonState.currentDay,
+  completedFreezeDay,
+  'completed postseason state should not advance the simulation day on later simulateNextDay calls'
+);
+assert.deepStrictEqual(
+  completedFreezeState.postseasonState.champion,
+  completedFreezeChampion,
+  'completed postseason state should keep champion details frozen on later simulateNextDay calls'
+);
+assert.deepStrictEqual(
+  completedFreezeState.postseasonState.runnerUp,
+  completedFreezeRunnerUp,
+  'completed postseason state should keep runner-up details frozen on later simulateNextDay calls'
+);
+
+const postseasonDayCount = playInState.seasonState.currentDay;
+const postseasonLogCount = playInState.seasonState.completedGameLogs.length;
 const postseasonAlreadyOverState = postseasonTransitionAdapter.simulateNextDay();
 assert.equal(
   postseasonAlreadyOverState.seasonState.currentDay,
-  postseasonDayCount,
-  'simulateNextDay should stop advancing empty days once the regular season schedule is exhausted'
+  postseasonDayCount + 1,
+  'simulateNextDay should keep advancing one postseason day at a time after play-in begins'
 );
 assert.equal(
-  postseasonAlreadyOverState.seasonState.completedGameLogs.length,
-  postseasonLogCount,
-  'simulateNextDay should not add empty regular-season logs once postseason seeding is ready'
+  postseasonAlreadyOverState.seasonState.completedGameLogs.length > postseasonLogCount,
+  true,
+  'simulateNextDay should append postseason game logs once the postseason schedule is active'
 );
-assert.equal(
+assert.notEqual(
   postseasonAlreadyOverState.postseasonState.phase,
   'postseason_ready',
-  'simulateNextDay should keep postseason-ready state when called after the regular season is already over'
+  'simulateNextDay should keep postseason progress moving after play-in starts'
 );
 
 console.log('simulation season adapter test passed');
