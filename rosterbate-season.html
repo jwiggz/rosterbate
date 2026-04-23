@@ -588,6 +588,26 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-stat-pill.btn{cursor:pointer;font-family:var(--fb);font-weight:700;transition:background .15s ease,border-color .15s ease,color .15s ease;}
 .season-stat-pill.btn:hover{background:#172234;border-color:#3b82f6;color:#f8fafc;}
 .season-stat-pill.btn.on{background:#22180d;border-color:#7c4a18;color:#fdba74;}
+.waiver-radar-card{border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;background:linear-gradient(180deg,rgba(19,30,48,.92),rgba(12,18,29,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column;gap:10px;}
+.waiver-radar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.waiver-radar-name{font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;}
+.waiver-radar-meta{font-size:12px;color:#94a3b8;}
+.waiver-radar-stats{display:flex;gap:8px;flex-wrap:wrap;}
+.waiver-radar-summary{font-size:12px;color:#94a3b8;}
+.waiver-radar-reason{padding:8px 10px;border-radius:10px;background:rgba(15,23,36,.72);border:1px solid rgba(59,130,246,.16);font-size:11px;line-height:1.45;color:#cbd5e1;}
+.waiver-radar-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.waiver-radar-action-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.waiver-radar-star{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid #24324a;background:#0f1724;color:#94a3b8;font-size:17px;font-weight:900;cursor:pointer;flex-shrink:0;}
+.waiver-radar-star.on{border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.14);color:#facc15;}
+.waiver-radar-cta{padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;white-space:nowrap;}
+.waiver-snapshot-row,.waiver-drop-row{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #24324a;background:#101826;border-radius:14px;padding:12px;color:#f8fafc;cursor:pointer;}
+.waiver-snapshot-row:hover,.waiver-drop-row:hover{background:#152033;border-color:#35507a;}
+.waiver-snapshot-copy,.waiver-drop-copy{font-family:var(--fb);font-size:15px;font-weight:800;}
+.waiver-snapshot-meta,.waiver-drop-meta{font-size:12px;color:#94a3b8;}
+.waiver-snapshot-value,.waiver-drop-value{text-align:right;}
+.waiver-snapshot-value-main,.waiver-drop-value-main{font-family:var(--fb);font-size:15px;}
+.waiver-snapshot-value-sub,.waiver-drop-value-sub{font-size:11px;}
+.waiver-snapshot-empty,.waiver-drop-empty{font-size:13px;max-width:420px;}
 .season-header-band{display:grid;grid-template-columns:90px 300px 150px 86px 92px 82px;gap:0;border-top:1px solid #24324a;border-bottom:1px solid #24324a;background:#121a29;}
 .season-header-cell{padding:10px 10px 8px;border-right:1px solid #1d283b;}
 .season-header-cell:last-child{border-right:none;}
@@ -9309,7 +9329,7 @@ function renderWaiver(){
       <div class="season-now-band">
         ${postureCards}
       </div>
-      <div class="season-table-card season-card-pad" id="waiverRadarSection">
+        <div class="season-table-card season-card-pad" id="waiverRadarSection">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
           <div>
             <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">Waiver Radar</div>
@@ -9334,29 +9354,29 @@ function renderWaiver(){
             const radarSummary=radarStats.length
               ? radarStats.slice(0,3).map(([label,value])=>`${label} ${value.toFixed(1)}`).join(' · ')
               : getRosterbatePlayerSummary(p,CURRENT_SPORT);
-            return `<div style="border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;background:linear-gradient(180deg,rgba(19,30,48,.92),rgba(12,18,29,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            return `<div class="waiver-radar-card">
+              <div class="waiver-radar-head">
                 <div>
-                  <div style="font-family:var(--fb);font-size:16px;font-weight:800;color:#f8fafc;">${escapeHtml(p.name||'Player')}</div>
-                  <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} · ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
+                  <div class="waiver-radar-name">${escapeHtml(p.name||'Player')}</div>
+                  <div class="waiver-radar-meta">${escapeHtml(String(p.team||'FA').toUpperCase())} · ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                <div class="waiver-radar-action-group">
                   <button
                     type="button"
+                    class="waiver-radar-star ${entry.watched?'on':''}"
                     onclick="toggleWatchList(${Number(p.id)})"
                     title="${entry.watched?'Remove from':'Add to'} watch list"
-                    style="width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid ${entry.watched?'rgba(250,204,21,.45)':'#24324a'};background:${entry.watched?'rgba(250,204,21,.14)':'#0f1724'};color:${entry.watched?'#facc15':'#94a3b8'};font-size:17px;font-weight:900;cursor:pointer;flex-shrink:0;"
                   >${entry.watched?'&#9733;':'&#9734;'}</button>
-                  <button class="season-outline-btn" onclick="openWaiver(${Number(p.id)})" style="padding:8px 14px;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.4);color:#86efac;white-space:nowrap;">Add Player</button>
+                  <button class="season-outline-btn waiver-radar-cta" onclick="openWaiver(${Number(p.id)})">Add Player</button>
                 </div>
               </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div class="waiver-radar-stats">
                 <span class="season-stat-pill">${Number(p.fp||0).toFixed(1)} fantasy</span>
                 ${entry.recentDrop?'<span class="season-stat-pill" style="border-color:rgba(249,115,22,.35);color:#fdba74;background:rgba(249,115,22,.12);">Recent Drop</span>':''}
                 ${entry.watched?'<span class="season-stat-pill" style="border-color:rgba(250,204,21,.35);color:#fde68a;background:rgba(250,204,21,.12);">Watching</span>':''}
               </div>
-              <div style="font-size:12px;color:#94a3b8;">${escapeHtml(radarSummary||'Ready for a closer look on the full wire.')}</div>
-              <div class="waiver-radar-reason" style="font-size:11px;line-height:1.45;color:#cbd5e1;">${escapeHtml(entry.radarReason||'Steady available value')}</div>
+              <div class="waiver-radar-summary">${escapeHtml(radarSummary||'Ready for a closer look on the full wire.')}</div>
+              <div class="waiver-radar-reason">${escapeHtml(entry.radarReason||'Steady available value')}</div>
             </div>`;
           }).join('')}
         </div>
@@ -9371,17 +9391,17 @@ function renderWaiver(){
             <span class="season-stat-pill">${watchIds.length} tracked</span>
           </div>
           ${watchedTargets.length
-            ? `<div style="display:flex;flex-direction:column;gap:10px;">${watchedTargets.map(p=>`<button type="button" onclick="openWaiver(${Number(p.id)})" style="display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #24324a;background:#101826;border-radius:14px;padding:12px;color:#f8fafc;cursor:pointer;">
+            ? `<div style="display:flex;flex-direction:column;gap:10px;">${watchedTargets.map(p=>`<button type="button" class="waiver-snapshot-row" onclick="openWaiver(${Number(p.id)})">
                 <div>
-                  <div style="font-family:var(--fb);font-size:15px;font-weight:800;">${escapeHtml(p.name||'Player')}</div>
-                  <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} | ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
+                  <div class="waiver-snapshot-copy">${escapeHtml(p.name||'Player')}</div>
+                  <div class="waiver-snapshot-meta">${escapeHtml(String(p.team||'FA').toUpperCase())} | ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
                 </div>
-                <div style="text-align:right;">
-                  <div style="font-family:var(--fb);font-size:15px;color:#38bdf8;">${Number(p.fp||0).toFixed(1)}</div>
-                  <div style="font-size:11px;color:#fde68a;">Watching</div>
+                <div class="waiver-snapshot-value">
+                  <div class="waiver-snapshot-value-main" style="color:#38bdf8;">${Number(p.fp||0).toFixed(1)}</div>
+                  <div class="waiver-snapshot-value-sub" style="color:#fde68a;">Watching</div>
                 </div>
               </button>`).join('')}</div>`
-            : `<div class="season-soft-muted" style="font-size:13px;">Star any free agent below and they will stay surfaced here every time you come back.</div>`}
+            : `<div class="season-soft-muted waiver-snapshot-empty">Star any free agent below and they will stay surfaced here every time you come back.</div>`}
         </div>
         <div class="season-table-card season-card-pad" id="waiverRecentDropsSection">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
@@ -9392,17 +9412,17 @@ function renderWaiver(){
             <span class="season-stat-pill">${recentDrops.length} live</span>
           </div>
           ${recentDrops.length
-            ? `<div style="display:flex;flex-direction:column;gap:10px;">${recentDrops.map(p=>`<button type="button" onclick="openWaiver(${Number(p.id)})" style="display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid rgba(249,115,22,.22);background:linear-gradient(180deg,rgba(33,22,16,.72),rgba(16,24,38,.95));border-radius:14px;padding:12px;color:#f8fafc;cursor:pointer;">
+            ? `<div style="display:flex;flex-direction:column;gap:10px;">${recentDrops.map(p=>`<button type="button" class="waiver-drop-row" onclick="openWaiver(${Number(p.id)})" style="border-color:rgba(249,115,22,.22);background:linear-gradient(180deg,rgba(33,22,16,.72),rgba(16,24,38,.95));">
                 <div>
-                  <div style="font-family:var(--fb);font-size:15px;font-weight:800;">${escapeHtml(p.name||'Player')}</div>
-                  <div style="font-size:12px;color:#94a3b8;">${escapeHtml(String(p.team||'FA').toUpperCase())} | ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
+                  <div class="waiver-drop-copy">${escapeHtml(p.name||'Player')}</div>
+                  <div class="waiver-drop-meta">${escapeHtml(String(p.team||'FA').toUpperCase())} | ${escapeHtml(String(p.pos||'').toUpperCase())}</div>
                 </div>
-                <div style="text-align:right;">
-                  <div style="font-family:var(--fb);font-size:15px;color:#fdba74;">${Number(p.fp||0).toFixed(1)}</div>
-                  <div style="font-size:11px;color:#fdba74;">Recently dropped</div>
+                <div class="waiver-drop-value">
+                  <div class="waiver-drop-value-main" style="color:#fdba74;">${Number(p.fp||0).toFixed(1)}</div>
+                  <div class="waiver-drop-value-sub" style="color:#fdba74;">Recently dropped</div>
                 </div>
               </button>`).join('')}</div>`
-            : `<div class="season-soft-muted" style="font-size:13px;">No recent drop candidates are floating in free agency right now.</div>`}
+            : `<div class="season-soft-muted waiver-drop-empty">No recent drop candidates are floating in free agency right now.</div>`}
         </div>
       </div>
       <div class="season-table-card">

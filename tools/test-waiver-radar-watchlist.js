@@ -94,9 +94,11 @@ expectMatch(/function getWaiverRadarCandidates\(limit=4\)/, 'missing radar helpe
 expectMatch(/function getWatchedWaiverTargets\(limit=4\)/, 'missing watched helper');
 expectMatch(/function getRecentDroppedWaiverTargets\(limit=4\)/, 'missing recent-drop helper');
 expectMatch(/function getWaiverRowSignals\(player\)/, 'missing row signal helper');
+expectMatch(/class="waiver-radar-card"/, 'missing compact radar tile hook');
 expectMatch(/Watch List Snapshot/, 'missing watch list snapshot section');
 expectMatch(/Recent Drops/, 'missing recent drops section');
 expectMatch(/waiver-radar-reason/, 'missing radar reason hook');
+expectMatch(/Star any free agent below and they will stay surfaced here every time you come back\./, 'missing watch list empty-state copy');
 expectMatch(
   /onclick="setWaiverListMode\('all'\)"[\s\S]*?>All Players<\/button>[\s\S]*?onclick="setWaiverListMode\('watch'\)"[\s\S]*?>Watch List[\s\S]*?<\/button>/,
   'missing combined All Players / Watch List browse hook'
