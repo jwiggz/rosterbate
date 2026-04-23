@@ -137,6 +137,40 @@
       .filter(Boolean);
   }
 
+  function buildBracketRoundEntries(round, conference, teams){
+    return buildPlayoffSeriesForRound(round, conference, teams).map((series) => ({
+      higherSeed: clone(series?.higherSeed || null),
+      lowerSeed: clone(series?.lowerSeed || null)
+    }));
+  }
+
+  function getLeagueTeamByAbbr(state, teamAbbr){
+    const targetAbbr = String(teamAbbr || '').trim().toUpperCase();
+    return (state?.leagueShell?.teams || []).find((team) => (
+      String(team?.abbr || '').trim().toUpperCase() === targetAbbr
+    )) || null;
+  }
+
+  function buildPostseasonTeamMetadata(state, teamEntry, extras){
+    const entry = teamEntry && typeof teamEntry === 'object'
+      ? teamEntry
+      : { teamAbbr: teamEntry };
+    const teamAbbr = String(entry?.teamAbbr || '').trim().toUpperCase() || null;
+    const shellTeam = getLeagueTeamByAbbr(state, teamAbbr);
+    const metadata = {
+      teamAbbr,
+      teamName: shellTeam?.name || shellTeam?.displayName || entry?.teamName || teamAbbr,
+      teamDisplayName: shellTeam?.displayName || shellTeam?.name || entry?.teamDisplayName || teamAbbr,
+      conference: entry?.conference || shellTeam?.conference || null,
+      division: entry?.division || shellTeam?.division || null,
+      seed: Number.isFinite(Number(entry?.seed)) ? Number(entry.seed) : null
+    };
+    return {
+      ...metadata,
+      ...(extras && typeof extras === 'object' ? clone(extras) : {})
+    };
+  }
+
   function buildSimulationExecutionContext(state, shell){
     const teamMeta = clone(shell?.teams || []);
     const teamNames = teamMeta.map((team) => team.name);
@@ -305,6 +339,35 @@
     return nextBracket;
   }
 
+  function updateBracketForConferenceRound(bracket, round, conference, teams){
+    const nextBracket = clone(bracket || {});
+    if (!nextBracket[conference]) {
+      nextBracket[conference] = {};
+    }
+    if (round === 'playoffs_round_2') {
+      nextBracket[conference].secondRound = buildBracketRoundEntries(round, conference, teams);
+    } else if (round === 'conference_finals') {
+      nextBracket[conference].conferenceFinals = buildBracketRoundEntries(round, conference, teams);
+    }
+    return nextBracket;
+  }
+
+  function finalizeResolvedPostseasonState(nextState){
+    const finalizedPostseasonState = finalizePostseasonRound(nextState, nextState?.postseasonState || {});
+    const resolvedState = {
+      ...clone(nextState),
+      postseasonState: finalizedPostseasonState
+    };
+    return {
+      ...resolvedState,
+      postseasonState: {
+        ...finalizedPostseasonState,
+        currentDay: Number(resolvedState?.seasonState?.currentDay || finalizedPostseasonState.currentDay || 1),
+        currentDaySchedule: buildCurrentDayPostseasonSchedule(resolvedState)
+      }
+    };
+  }
+
   function buildFinalsSeriesFromConferenceWinners(seriesById, winners){
     const finalists = (Array.isArray(winners) ? winners : [])
       .filter(Boolean)
@@ -440,16 +503,29 @@
         currentRound: 'completed',
         bracket: {
           ...(resolvedState.bracket || {}),
-          finals
+          finals: {
+            higherSeed: clone(finals?.higherSeed || null),
+            lowerSeed: clone(finals?.lowerSeed || null),
+            winnerTeamAbbr: finals?.winnerTeamAbbr || null,
+            games: Number(finals?.games || 0)
+          }
         },
         seriesById,
-        champion: {
-          teamAbbr: summary?.championTeamAbbr || null,
-          seriesResult: `${winnerWins}-${loserWins}`
-        },
-        runnerUp: {
-          teamAbbr: summary?.runnerUpTeamAbbr || null
-        },
+        champion: buildPostseasonTeamMetadata(
+          nextState,
+          getSeriesTeam(finals, summary?.championTeamAbbr || null) || summary?.championTeamAbbr || null,
+          {
+            seriesResult: `${winnerWins}-${loserWins}`,
+            finalsGames: Number(summary?.finalsGames || finals?.games || 0)
+          }
+        ),
+        runnerUp: buildPostseasonTeamMetadata(
+          nextState,
+          getSeriesTeam(finals, summary?.runnerUpTeamAbbr || null) || summary?.runnerUpTeamAbbr || null,
+          {
+            finalsGames: Number(summary?.finalsGames || finals?.games || 0)
+          }
+        ),
         completedAt: resolvedState.completedAt || new Date().toISOString()
       };
     }
@@ -496,13 +572,16 @@
     }
 
     ['east', 'west'].forEach((conference) => {
-      seedConferenceRoundSeries(seriesById, nextRound, conference, getRoundWinnersForConference(currentRoundSeries, conference));
+      const conferenceWinners = getRoundWinnersForConference(currentRoundSeries, conference);
+      seedConferenceRoundSeries(seriesById, nextRound, conference, conferenceWinners);
+      resolvedState.bracket = updateBracketForConferenceRound(resolvedState.bracket, nextRound, conference, conferenceWinners);
     });
 
     return {
       ...resolvedState,
       phase: nextRound,
       currentRound: nextRound,
+      bracket: clone(resolvedState.bracket || {}),
       seriesById
     };
   }
@@ -605,7 +684,7 @@
     workingState.postseasonState.currentDay = currentDay;
     workingState.postseasonState.currentDaySchedule = clone(todayGames);
     if (!todayGames.length) {
-      return workingState;
+      return finalizeResolvedPostseasonState(workingState);
     }
     const { currentSeasonState, dayResult } = simulateEngineDay(
       workingState,

@@ -393,6 +393,41 @@ assert.ok(
   'advancing out of the play-in should seed first-round playoff series'
 );
 
+const roundTwoSeedState = JSON.parse(JSON.stringify(roundOneState));
+roundTwoSeedState.seasonState.currentDay = 20;
+roundTwoSeedState.seasonState.currentWeek = 3;
+roundTwoSeedState.postseasonState.phase = 'playoffs_round_1';
+roundTwoSeedState.postseasonState.currentRound = 'playoffs_round_1';
+roundTwoSeedState.postseasonState.currentDaySchedule = [];
+const roundOneSeries = Object.values(roundTwoSeedState.postseasonState.seriesById)
+  .filter((series) => series.round === 'playoffs_round_1')
+  .sort((a, b) => String(a.id).localeCompare(String(b.id)));
+roundOneSeries.forEach((series) => {
+  series.winnerTeamAbbr = series.higherSeed.teamAbbr;
+  series.higherSeedWins = 4;
+  series.lowerSeedWins = 0;
+  series.games = 4;
+});
+
+const roundTwoAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-round-two-transition',
+  state: roundTwoSeedState
+});
+const roundTwoState = roundTwoAdapter.simulateNextDay();
+assert.equal(
+  roundTwoState.postseasonState.phase,
+  'playoffs_round_2',
+  'simulateNextDay should advance a completed first round into the second round'
+);
+assert.ok(
+  roundTwoState.postseasonState.bracket?.east?.secondRound?.length > 0,
+  'advancing into the second round should update the East bracket snapshot beyond Round 1'
+);
+assert.ok(
+  roundTwoState.postseasonState.bracket?.west?.secondRound?.length > 0,
+  'advancing into the second round should update the West bracket snapshot beyond Round 1'
+);
+
 const finalsCloseoutSeedState = JSON.parse(JSON.stringify(playInState));
 finalsCloseoutSeedState.seasonState.currentDay = 30;
 finalsCloseoutSeedState.seasonState.currentWeek = 5;
@@ -457,9 +492,24 @@ assert.equal(
   'simulateNextDay should crown the winning Finals team as champion'
 );
 assert.equal(
+  completedFinalsState.postseasonState.champion?.teamName,
+  'Boston Celtics',
+  'completed postseason state should include champion team naming metadata for renderers'
+);
+assert.equal(
+  completedFinalsState.postseasonState.champion?.finalsGames,
+  4,
+  'completed postseason state should include Finals length metadata for renderers'
+);
+assert.equal(
   completedFinalsState.postseasonState.runnerUp?.teamAbbr,
   'DAL',
   'simulateNextDay should preserve the Finals loser as runner-up'
+);
+assert.equal(
+  completedFinalsState.postseasonState.runnerUp?.teamName,
+  'Dallas Mavericks',
+  'completed postseason state should include runner-up team naming metadata for renderers'
 );
 assert.match(
   String(completedFinalsState.postseasonState.completedAt || ''),
