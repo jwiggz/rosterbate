@@ -729,62 +729,72 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const universeLabel = String((state?.leagueShell?.anchorSeasonLabel || 'NBA')) + ' shell · ' + String((state?.sourceSeasons?.sourceSeasonLabels || []).join(' + ') || 'Mixed era') + ' player universe';
     const phaseSummary = {
       regular_season: {
-        title: 'Simulation champion chase',
-        body: universeLabel + '. The regular season is still shaping the play-in and playoff picture.',
-        meta: 'Play-In race active'
+        headline: 'Simulation champion chase',
+        copy: universeLabel + '. The regular season is still shaping the play-in and playoff picture.',
+        narrative: 'This branch is still in the regular-season push, with the play-in line and the playoff field both in motion.',
+        pill: 'Play-In race active'
       },
       postseason_ready: {
-        title: 'Simulation bracket set',
-        body: universeLabel + '. The field is locked and the title chase is ready to open.',
-        meta: 'Bracket locked'
+        headline: 'Simulation bracket set',
+        copy: universeLabel + '. The field is locked and the title chase is ready to open.',
+        narrative: 'The regular season work is done and the playoff branch is ready to begin.',
+        pill: 'Bracket locked'
       },
       play_in: {
-        title: 'Simulation play-in push',
-        body: universeLabel + '. The play-in tournament is deciding the final playoff field.',
-        meta: 'Play-In tournament live'
+        headline: 'Simulation play-in push',
+        copy: universeLabel + '. The play-in tournament is deciding the final playoff field.',
+        narrative: 'The bracket is still sorting the final seeds before the full playoff field locks in.',
+        pill: 'Play-In tournament live'
       },
       playoffs_round_1: {
-        title: 'Simulation Round 1 live',
-        body: universeLabel + '. The opening playoff round is underway and every bracket line matters now.',
-        meta: 'Round 1 underway'
+        headline: 'Simulation Round 1 live',
+        copy: universeLabel + '. The opening playoff round is underway and every bracket line matters now.',
+        narrative: 'The postseason has started, and the first set of winners will define the next shape of the bracket.',
+        pill: 'Round 1 underway'
       },
       playoffs_round_2: {
-        title: 'Simulation Round 2 live',
-        body: universeLabel + '. The second round is underway and the conference finalists are coming into focus.',
-        meta: 'Round 2 underway'
+        headline: 'Simulation Round 2 live',
+        copy: universeLabel + '. The second round is underway and the conference finalists are coming into focus.',
+        narrative: 'The bracket has narrowed and the next winners will punch their conference finals tickets.',
+        pill: 'Round 2 underway'
       },
       conference_semifinals: {
-        title: 'Simulation semifinals live',
-        body: universeLabel + '. The bracket has tightened and the conference semifinal push is on.',
-        meta: 'Semifinals underway'
+        headline: 'Simulation semifinals live',
+        copy: universeLabel + '. The bracket has tightened and the conference semifinal push is on.',
+        narrative: 'The remaining series are thinning the field again before the conference finals arrive.',
+        pill: 'Semifinals underway'
       },
       conference_finals: {
-        title: 'Simulation conference finals live',
-        body: universeLabel + '. The final conference spots are being decided before the title round.',
-        meta: 'Conference finals underway'
+        headline: 'Simulation conference finals live',
+        copy: universeLabel + '. The final conference spots are being decided before the title round.',
+        narrative: 'Only a few wins separate the surviving teams from the Finals matchup.',
+        pill: 'Conference finals underway'
       },
       finals: {
-        title: 'Simulation Finals spotlight',
-        body: universeLabel + '. The last two teams are battling for the trophy.',
-        meta: 'Finals underway'
+        headline: 'Simulation Finals spotlight',
+        copy: universeLabel + '. The last two teams are battling for the trophy.',
+        narrative: 'The bracket is down to one series and the title is on the line.',
+        pill: 'Finals underway'
       },
       completed: {
-        title: 'Simulation title claimed',
-        body: universeLabel + '. ' + (
+        headline: 'Simulation title claimed',
+        copy: universeLabel + '. ' + (
           championAbbr
             ? championAbbr + ' finished the run on top and closed out the title chase.'
             : 'The postseason run is complete and the trophy has already been claimed.'
         ),
-        meta: championAbbr ? 'Champion: ' + championAbbr : 'Champion crowned'
+        narrative: 'The title chase is over and this branch now reads like a completed championship archive.',
+        pill: championAbbr ? 'Champion: ' + championAbbr : 'Champion crowned'
       }
     };
     const summary = phaseSummary[phase] || phaseSummary.regular_season;
     return {
-      title: summary.title,
-      body: summary.body,
-      meta: [
+      copy: summary.copy,
+      headline: summary.headline,
+      narrative: summary.narrative,
+      pills: [
         standing ? 'Record ' + standing.w + '-' + standing.l : 'Record pending',
-        summary.meta
+        summary.pill
       ]
     };
   }
@@ -848,23 +858,29 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         meta: ['Phase: Conference Finals', 'Finals berths at stake']
       }
     };
+    function wrapSummary(item){
+      return {
+        currentStanding: null,
+        items: [item]
+      };
+    }
 
     if(championAbbr){
       const finalsResultText = championAbbr + ' beat ' + (runnerUpAbbr || 'the runner-up') +
         (seriesResult ? ' ' + seriesResult + ' in the Finals' : ' in the Finals') +
         (finalsGames ? ', wrapped the series in ' + finalsGames + ' games' : '') +
         ', and lifted the trophy';
-      return {
+      return wrapSummary({
         title: championAbbr + ' won the simulation title',
         body: finalsResultText + '.',
         meta: [
           'Trophy awarded',
           completedAt ? 'Completed ' + completedAt.slice(0, 10) : 'Postseason complete'
         ]
-      };
+      });
     }
     if(phase === 'finals'){
-      return {
+      return wrapSummary({
         title: 'Simulation Finals underway',
         body: finalsHigher && finalsLower
           ? finalsHigher + ' and ' + finalsLower + ' are playing for the simulation trophy.'
@@ -873,16 +889,16 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
           'Phase: Finals',
           seriesResult ? 'Series ' + seriesResult : 'Trophy chase live'
         ]
-      };
+      });
     }
     if(phaseSummary[phase]){
-      return phaseSummary[phase];
+      return wrapSummary(phaseSummary[phase]);
     }
-    return {
+    return wrapSummary({
       title: 'Play-In and playoff path pending',
       body: 'The regular season is still shaping the final conference seeds.',
       meta: ['Play-In race active']
-    };
+    });
   }
 
   function buildRecentUniverseActivitySummary(state, reveal){

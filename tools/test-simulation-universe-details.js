@@ -154,21 +154,27 @@ const playInState = buildState({
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, playInState))),
   {
-    title: 'Simulation play-in push',
-    body: universeLabel + '. The play-in tournament is deciding the final playoff field.',
-    meta: ['Record 53-29', 'Play-In tournament live']
+    copy: universeLabel + '. The play-in tournament is deciding the final playoff field.',
+    headline: 'Simulation play-in push',
+    narrative: 'The bracket is still sorting the final seeds before the full playoff field locks in.',
+    pills: ['Record 53-29', 'Play-In tournament live']
   },
-  'play-in universes should get play-in aware archive copy while preserving shell context'
+  'play-in universes should return the latest-sim-day summary shape the page consumes'
 );
 
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, playInState))),
   {
-    title: 'Play-In tournament live',
-    body: 'Win-and-in games are underway to lock the final East and West playoff seeds.',
-    meta: ['Phase: Play-In', 'Bracket race active']
+    currentStanding: null,
+    items: [
+      {
+        title: 'Play-In tournament live',
+        body: 'Win-and-in games are underway to lock the final East and West playoff seeds.',
+        meta: ['Phase: Play-In', 'Bracket race active']
+      }
+    ]
   },
-  'play-in universes should describe the active play-in bracket'
+  'play-in universes should return league snapshot items the page can render'
 );
 
 const postseasonReadyState = buildState({
@@ -185,19 +191,25 @@ const postseasonReadyState = buildState({
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, postseasonReadyState))),
   {
-    title: 'Simulation bracket set',
-    body: universeLabel + '. The field is locked and the title chase is ready to open.',
-    meta: ['Record 53-29', 'Bracket locked']
+    copy: universeLabel + '. The field is locked and the title chase is ready to open.',
+    headline: 'Simulation bracket set',
+    narrative: 'The regular season work is done and the playoff branch is ready to begin.',
+    pills: ['Record 53-29', 'Bracket locked']
   },
-  'postseason-ready universes should get bracket-set archive copy before the games begin'
+  'postseason-ready universes should keep the latest-sim-day summary shape intact'
 );
 
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, postseasonReadyState))),
   {
-    title: 'Simulation playoff field locked',
-    body: 'The regular season is over, the bracket is set, and the postseason is ready to tip.',
-    meta: ['Phase: Postseason Ready', 'Bracket locked']
+    currentStanding: null,
+    items: [
+      {
+        title: 'Simulation playoff field locked',
+        body: 'The regular season is over, the bracket is set, and the postseason is ready to tip.',
+        meta: ['Phase: Postseason Ready', 'Bracket locked']
+      }
+    ]
   },
   'postseason-ready universes should describe the bridge between the regular season and the bracket opener'
 );
@@ -216,19 +228,25 @@ const roundTwoState = buildState({
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, roundTwoState))),
   {
-    title: 'Simulation Round 2 live',
-    body: universeLabel + '. The second round is underway and the conference finalists are coming into focus.',
-    meta: ['Record 53-29', 'Round 2 underway']
+    copy: universeLabel + '. The second round is underway and the conference finalists are coming into focus.',
+    headline: 'Simulation Round 2 live',
+    narrative: 'The bracket has narrowed and the next winners will punch their conference finals tickets.',
+    pills: ['Record 53-29', 'Round 2 underway']
   },
-  'second-round universes should get phase-specific archive copy instead of regular-season language'
+  'second-round universes should keep the latest-sim-day structure while changing the copy'
 );
 
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, roundTwoState))),
   {
-    title: 'Simulation Round 2 underway',
-    body: 'Second-round series are deciding which teams will reach the conference finals.',
-    meta: ['Phase: Round 2', 'Conference finals spots at stake']
+    currentStanding: null,
+    items: [
+      {
+        title: 'Simulation Round 2 underway',
+        body: 'Second-round series are deciding which teams will reach the conference finals.',
+        meta: ['Phase: Round 2', 'Conference finals spots at stake']
+      }
+    ]
   },
   'second-round universes should render phase-specific playoff summary copy'
 );
@@ -258,9 +276,14 @@ const finalsState = buildState({
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, finalsState))),
   {
-    title: 'Simulation Finals underway',
-    body: 'LAL and BOS are playing for the simulation trophy.',
-    meta: ['Phase: Finals', 'Series 2-1']
+    currentStanding: null,
+    items: [
+      {
+        title: 'Simulation Finals underway',
+        body: 'LAL and BOS are playing for the simulation trophy.',
+        meta: ['Phase: Finals', 'Series 2-1']
+      }
+    ]
   },
   'Finals universes should describe the championship matchup and live series score'
 );
@@ -293,9 +316,10 @@ const completedState = buildState({
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, completedState))),
   {
-    title: 'Simulation title claimed',
-    body: universeLabel + '. LAL finished the run on top and closed out the title chase.',
-    meta: ['Record 53-29', 'Champion: LAL']
+    copy: universeLabel + '. LAL finished the run on top and closed out the title chase.',
+    headline: 'Simulation title claimed',
+    narrative: 'The title chase is over and this branch now reads like a completed championship archive.',
+    pills: ['Record 53-29', 'Champion: LAL']
   },
   'completed universes should get title-complete framing without losing season context'
 );
@@ -303,9 +327,14 @@ assert.deepStrictEqual(
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, completedState))),
   {
-    title: 'LAL won the simulation title',
-    body: 'LAL beat BOS 4-2 in the Finals, wrapped the series in 6 games, and lifted the trophy.',
-    meta: ['Trophy awarded', 'Completed 2026-06-18']
+    currentStanding: null,
+    items: [
+      {
+        title: 'LAL won the simulation title',
+        body: 'LAL beat BOS 4-2 in the Finals, wrapped the series in 6 games, and lifted the trophy.',
+        meta: ['Trophy awarded', 'Completed 2026-06-18']
+      }
+    ]
   },
   'completed universes should surface champion, runner-up, Finals result, and completion timing'
 );
