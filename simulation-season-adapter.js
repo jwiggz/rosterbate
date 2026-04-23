@@ -111,6 +111,9 @@
 
   const api = {
     MODE_ID,
+    clone,
+    getControlledTeam,
+    getControlledRoster,
     isSupportedSimulationSeasonState,
     createSimulationSeasonAdapter
   };
