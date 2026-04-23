@@ -825,7 +825,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
                 <div class="hub-summary-kicker">League Home</div>
                 <div id="hubLeagueName" class="hub-summary-name"></div>
                 <div class="hub-summary-rec">
-                  <a href="javascript:void(0)" onclick="goPage('commissioner')" style="color:#2563eb;text-decoration:none;">Settings</a>
+                  <a id="hubSettingsLink" href="javascript:void(0)" onclick="goPage('commissioner')" style="color:#2563eb;text-decoration:none;">Settings</a>
                   &nbsp;|&nbsp;
                   <button type="button" onclick="openLeagueTeams()" class="season-team-link-btn" style="padding:0;background:none;border:none;color:#2563eb;text-decoration:none;">League Teams</button>
                   &nbsp;|&nbsp;
@@ -849,7 +849,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
           <div class="hub-now-band" id="hubNowBand"></div>
           <div class="hub-actions" style="margin-top:12px;">
             <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">&#128101;</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
-            <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div class="hub-action-title">Matchup</div><div class="hub-action-sub">Open the head-to-head box score</div></div></button>
+            <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div id="hubMatchupActionTitle" class="hub-action-title">Matchup</div><div id="hubMatchupActionSub" class="hub-action-sub">Open the head-to-head box score</div></div></button>
             <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">-- available</div></div></button>
             <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">&#127942;</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">--</div></div></button>
           </div>
@@ -933,7 +933,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       </div>
     </div>
     <div class="season-topmeta">
-      <button class="season-chip action" onclick="goPage('matchup')">Matchup</button>
+      <button id="rosterScheduleChip" class="season-chip action" onclick="goPage('matchup')">Matchup</button>
       <a href="index.html" class="season-chip action" id="rosterHomeLink" style="text-decoration:none;">Home</a>
     </div>
   </div>
@@ -953,7 +953,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     <div class="season-subbar-left">
       <button class="season-back" onclick="goPage('roster')">‹</button>
       <div>
-        <div class="season-subbar-title">Matchup</div>
+        <div id="matchupTitle" class="season-subbar-title">Matchup</div>
         <div class="season-subbar-copy" id="mWk"></div>
       </div>
     </div>
@@ -962,7 +962,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       <a href="index.html" class="season-chip action" id="matchupHomeLink" style="text-decoration:none;">Home</a>
     </div>
   </div>
-  <div class="season-page-note">Daily head-to-head view. Both lineups are shown side by side for the selected day.</div>
+  <div id="matchupNote" class="season-page-note">Daily head-to-head view. Both lineups are shown side by side for the selected day.</div>
   <div class="sbb season-light-body">
     <div class="season-screen-shell">
       <div class="season-screen-main" id="matchupContent"></div>
@@ -7991,6 +7991,15 @@ function renderSimulationHubInSharedShell(){
   document.getElementById('hubProj').textContent = vm.controlledTeam?.abbr || '---';
   document.getElementById('hubOppProj').textContent = vm.sourceSeasonLabels.join(' + ');
   document.getElementById('hubStreak').textContent = vm.userRow?.streak || 'EVEN';
+  const settingsLink=document.getElementById('hubSettingsLink');
+  if(settingsLink){
+    settingsLink.textContent='League Teams';
+    settingsLink.setAttribute('onclick','openLeagueTeams()');
+  }
+  const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
+  const matchupActionSub=document.getElementById('hubMatchupActionSub');
+  if(matchupActionTitle) matchupActionTitle.textContent='Schedule';
+  if(matchupActionSub) matchupActionSub.textContent='Open recent results and the upcoming sim slate';
   document.getElementById('hubProj').style.color = 'var(--accent)';
   document.getElementById('hubOppProj').style.color = 'var(--text2)';
   document.getElementById('hubStreak').style.color = '';
@@ -8003,6 +8012,8 @@ function renderSimulationHubInSharedShell(){
 function renderSimulationRosterInSharedShell(){
   setSeasonSidePanelVisible('rosterPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
+  const scheduleChip=document.getElementById('rosterScheduleChip');
+  if(scheduleChip) scheduleChip.textContent='Schedule';
   document.getElementById('rWk').textContent = 'Set starters, bench order, and injury availability';
   document.getElementById('rosterContent').innerHTML = vm.roster.map((player) => (
     `<div class="card" data-player-id="${player.id}">
@@ -8015,6 +8026,10 @@ function renderSimulationRosterInSharedShell(){
 function renderSimulationScheduleInSharedShell(){
   setSeasonSidePanelVisible('matchupPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getScheduleViewModel();
+  const title=document.getElementById('matchupTitle');
+  const note=document.getElementById('matchupNote');
+  if(title) title.textContent='Schedule';
+  if(note) note.textContent='Recent results and the upcoming simulation slate for your controlled team.';
   document.getElementById('mWk').textContent = vm.cycleLabel;
   document.getElementById('matchupContent').innerHTML = `
     <div class="card">
@@ -8251,6 +8266,15 @@ const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function renderHub(){
   if (ACTIVE_SEASON_MODE === 'simulation') return renderSimulationHubInSharedShell();
+  const settingsLink=document.getElementById('hubSettingsLink');
+  if(settingsLink){
+    settingsLink.textContent='Settings';
+    settingsLink.setAttribute('onclick',"goPage('commissioner')");
+  }
+  const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
+  const matchupActionSub=document.getElementById('hubMatchupActionSub');
+  if(matchupActionTitle) matchupActionTitle.textContent='Matchup';
+  if(matchupActionSub) matchupActionSub.textContent='Open the head-to-head box score';
   setHubSummaryStatLabels({
     opp: 'This Week',
     proj: 'Your Revealed',
@@ -8682,6 +8706,10 @@ function getMatchupUrgencyCards(day, matchup){
 
 function renderMatchup(){
   if (ACTIVE_SEASON_MODE === 'simulation') return renderSimulationScheduleInSharedShell();
+  const title=document.getElementById('matchupTitle');
+  const note=document.getElementById('matchupNote');
+  if(title) title.textContent='Matchup';
+  if(note) note.textContent='Daily head-to-head view. Both lineups are shown side by side for the selected day.';
   setSeasonSidePanelVisible('matchupPowerups', true);
   renderSidePowerups('matchupPowerups');
   if(matchupViewDay===null) matchupViewDay=G.day;
@@ -8855,6 +8883,8 @@ function buildSingleRowHtml(entry, day){
 
 function renderRoster(){
   if (ACTIVE_SEASON_MODE === 'simulation') return renderSimulationRosterInSharedShell();
+  const scheduleChip=document.getElementById('rosterScheduleChip');
+  if(scheduleChip) scheduleChip.textContent='Matchup';
   setSeasonSidePanelVisible('rosterPowerups', true);
   renderSidePowerups('rosterPowerups');
   const rosterNote=document.querySelector('#roster .season-page-note');

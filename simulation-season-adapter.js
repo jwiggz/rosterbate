@@ -209,6 +209,8 @@
         const nextSeasonState = engineApi.applySimulationDayResults(engineSeasonState, dayResult);
         state = {
           ...clone(state),
+          currentDay: Number(nextSeasonState.currentDay || currentSeasonState.currentDay || 1),
+          currentWeek: Number(nextSeasonState.currentWeek || currentSeasonState.currentWeek || 1),
           seasonState: {
             ...nextSeasonState,
             scheduleByDay: clone(scheduleByDay)

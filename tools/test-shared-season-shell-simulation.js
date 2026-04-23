@@ -50,6 +50,14 @@ function createElement(id) {
     textContent: '',
     innerHTML: '',
     style: {},
+    attributes: {},
+    setAttribute(name, value) {
+      this.attributes[name] = value;
+      this[name] = value;
+    },
+    getAttribute(name) {
+      return this.attributes[name];
+    },
     closest(selector) {
       return selector === '.season-screen-shell' ? shell : null;
     },
@@ -73,6 +81,12 @@ const elements = Object.fromEntries([
   'hubProjLabel',
   'hubOppProjLabel',
   'hubStreakLabel',
+  'hubSettingsLink',
+  'hubMatchupActionTitle',
+  'hubMatchupActionSub',
+  'rosterScheduleChip',
+  'matchupTitle',
+  'matchupNote',
   'advBtn',
   'hubMatchups',
   'rWk',
@@ -118,6 +132,10 @@ assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimu
 assert.match(html, /id="hubOppLabel"/, 'hub markup should expose a label node for the first simulation stat');
 assert.match(html, /id="hubProjLabel"/, 'hub markup should expose a label node for the second simulation stat');
 assert.match(html, /id="hubOppProjLabel"/, 'hub markup should expose a label node for the third simulation stat');
+assert.match(html, /id="hubSettingsLink"/, 'hub markup should expose a settings link node for mode-specific behavior');
+assert.match(html, /id="hubMatchupActionTitle"/, 'hub markup should expose the hub matchup action title');
+assert.match(html, /id="rosterScheduleChip"/, 'roster markup should expose the schedule chip for mode-specific copy');
+assert.match(html, /id="matchupTitle"/, 'schedule screen title should be targetable for simulation mode');
 
 const params = new URLSearchParams('?simulation=NBA_Mixed_Era&historicalUniverse=sim-slot-1');
 assert.equal(api.getRequestedSimulationMode(params), 'nba_mixed_era', 'simulation query param should normalize to lowercase');
@@ -211,16 +229,23 @@ assert.equal(elements.hubProj.textContent, 'LAL');
 assert.equal(elements.hubProjLabel.textContent, 'Team');
 assert.equal(elements.hubOppProj.textContent, '1986-87 + 1995-96 + 2015-16');
 assert.equal(elements.hubOppProjLabel.textContent, 'Source Seasons');
+assert.equal(elements.hubSettingsLink.textContent, 'League Teams');
+assert.equal(elements.hubSettingsLink.getAttribute('onclick'), 'openLeagueTeams()');
+assert.equal(elements.hubMatchupActionTitle.textContent, 'Schedule');
+assert.match(elements.hubMatchupActionSub.textContent, /recent results/i);
 assert.match(elements.hubMatchups.innerHTML, /BOS 108 at LAL 112/);
 
 api.renderSimulationRosterInSharedShell();
 assert.equal(elements.rosterPowerups.style.display, 'none');
 assert.equal(elements.rosterPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
+assert.equal(elements.rosterScheduleChip.textContent, 'Schedule');
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
 
 api.renderSimulationScheduleInSharedShell();
 assert.equal(elements.matchupPowerups.style.display, 'none');
 assert.equal(elements.matchupPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
+assert.equal(elements.matchupTitle.textContent, 'Schedule');
+assert.match(elements.matchupNote.textContent, /results/i);
 assert.match(elements.matchupContent.innerHTML, /Schedule \/ Results/);
 assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
 

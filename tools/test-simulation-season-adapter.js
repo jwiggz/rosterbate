@@ -122,6 +122,8 @@ const standings = adapter.getStandingsViewModel();
 assert.equal(standings.userRow.teamAbbr, 'LAL');
 
 const postSimState = adapter.simulateNextDay();
+assert.equal(postSimState.currentDay, 13);
+assert.equal(postSimState.currentWeek, 2);
 assert.equal(postSimState.seasonState.currentDay, 13);
 assert.equal(postSimState.seasonState.currentWeek, 2);
 assert.equal(postSimState.seasonState.completedGameLogs.length, 2);
