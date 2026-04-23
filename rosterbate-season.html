@@ -8233,7 +8233,19 @@ function renderSimulationWaiverInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getWaiverViewModel();
   const rosterVm = SEASON_MODE_ADAPTER.getRosterViewModel();
   const benchPlayers = Array.isArray(rosterVm?.bench) ? rosterVm.bench : [];
-  document.getElementById('waiverContent').innerHTML = vm.availablePlayers.map((player) => (
+  const searchValue=(document.getElementById('wSrch')?.value||'').toLowerCase();
+  const positionFilter=String(document.getElementById('wPos')?.value||'ALL').toUpperCase() || 'ALL';
+  const filteredPlayers=(Array.isArray(vm?.availablePlayers) ? vm.availablePlayers : []).filter((player) => {
+    const pos=String(player?.pos || '').toUpperCase();
+    const posMatch = positionFilter==='ALL'
+      || pos===positionFilter
+      || (CURRENT_SPORT==='mlb' && positionFilter==='P' && (pos==='SP' || pos==='RP'));
+    const searchMatch = !searchValue
+      || String(player?.name || '').toLowerCase().includes(searchValue)
+      || String(player?.team || '').toLowerCase().includes(searchValue);
+    return posMatch && searchMatch;
+  });
+  document.getElementById('waiverContent').innerHTML = filteredPlayers.map((player) => (
     `<div class="card">
       <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
       <div style="color:var(--text2);font-size:12px;">${player.team} · ${player.pos}</div>
@@ -8248,7 +8260,7 @@ function renderSimulationWaiverInSharedShell(){
       </div>
       <button class="bp" style="margin-top:10px;" onclick="claimSimulationFreeAgentFromShell(${player.id})">Add</button>
     </div>`
-  )).join('') || '<div class="card">No free agents available.</div>';
+  )).join('') || `<div class="card">${searchValue || positionFilter!=='ALL' ? 'No free agents found for the current filters.' : 'No free agents available.'}</div>`;
 }
 
 function claimSimulationFreeAgentFromShell(playerId){

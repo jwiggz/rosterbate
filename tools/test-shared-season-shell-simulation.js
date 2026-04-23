@@ -463,7 +463,8 @@ function buildSimulationStubState(phase = 'regular_season') {
         CHI: []
       },
       freeAgents: [
-        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' }
+        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' },
+        { id: 91, name: 'Dennis Rodman', team: 'CHI', pos: 'PF' }
       ]
     },
     seasonState: {
@@ -545,7 +546,8 @@ const simulationAdapterStub = {
   getWaiverViewModel() {
     return {
       availablePlayers: [
-        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' }
+        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' },
+        { id: 91, name: 'Dennis Rodman', team: 'CHI', pos: 'PF' }
       ]
     };
   },
@@ -1083,12 +1085,17 @@ const waiverSearchInput = sandbox.document.getElementById('wSrch');
 const waiverPosInput = sandbox.document.getElementById('wPos');
 waiverSearchInput.value = 'Scottie';
 waiverPosInput.value = 'SF';
+api.renderSimulationWaiverInSharedShell();
+assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/, 'simulation waiver renderer should show matching searched players');
+assert.doesNotMatch(elements.waiverContent.innerHTML, /Dennis Rodman/, 'simulation waiver renderer should exclude non-matching players before the advance');
 api.advanceWeek();
 assert.ok(api.getActiveSeasonPages().includes('playoffs'), 'nav should expose Playoffs after the adapter enters postseason');
 assert.match(elements.hn.innerHTML, /Playoffs/, 'advanceWeek should rebuild hub nav when playoffs become available');
 assert.equal(api.getActiveSeasonPageId(), 'waiver', 'simulation advance should preserve the active page when it remains valid');
 assert.equal(waiverSearchInput.value, 'Scottie', 'simulation advance should preserve the waiver search input');
 assert.equal(waiverPosInput.value, 'SF', 'simulation advance should preserve the waiver position filter');
+assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/, 'simulation advance should preserve the filtered waiver match');
+assert.doesNotMatch(elements.waiverContent.innerHTML, /Dennis Rodman/, 'simulation advance should preserve the filtered waiver exclusion');
 
 api.goPage('playoffs');
 assert.equal(elements.playoffsPowerups.style.display, 'none');
