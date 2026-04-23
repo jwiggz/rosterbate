@@ -8,6 +8,10 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function normalizeShell(shell){
+    return shell && typeof shell === 'object' ? shell : { teams: [] };
+  }
+
   function sortPlayers(players){
     return (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
       const overallDiff = Number(b?.mixedEraOverall || 0) - Number(a?.mixedEraOverall || 0);
@@ -26,8 +30,9 @@
   }
 
   function buildSimulationPlayerPool({ mixedEraContext, shell }){
-    const rosterSize = Number(shell?.rosterSize || 10);
-    const teamCount = Array.isArray(shell?.teams) ? shell.teams.length : 30;
+    const leagueShell = normalizeShell(shell);
+    const rosterSize = Number(leagueShell.rosterSize || 10);
+    const teamCount = Array.isArray(leagueShell.teams) ? leagueShell.teams.length : 30;
     const draftTarget = rosterSize * teamCount;
     const freeAgentTarget = 60;
     const ranked = decorateSimulationTier(sortPlayers(mixedEraContext?.playerPool || []));
@@ -49,10 +54,11 @@
     controlledTeamAbbr,
     draftSlot
   }){
+    const leagueShell = normalizeShell(shell);
     const pool = buildSimulationPlayerPool({ mixedEraContext, shell });
     return {
       simulationMode: 'nba_mixed_era_single_player_v1',
-      leagueShell: clone(shell),
+      leagueShell: clone(leagueShell),
       sourceSeasons: {
         mixedEraConfigId: String(mixedEraContext?.mixedEraConfigId || '').trim(),
         sourcePackIds: clone(mixedEraContext?.sourcePackIds || []),
@@ -65,14 +71,14 @@
         rosterSize: pool.poolMeta.rosterSize,
         draftPool: clone(pool.draftPool),
         freeAgents: clone(pool.freeAgents),
-        rostersByTeam: Object.fromEntries(shell.teams.map((team) => [team.abbr, []]))
+        rostersByTeam: Object.fromEntries(leagueShell.teams.map((team) => [team.abbr, []]))
       },
       seasonState: {
         currentDay: 1,
         currentWeek: 1,
         scheduleByDay: {},
         completedGameLogs: [],
-        standings: shell.teams.map((team, index) => ({
+        standings: leagueShell.teams.map((team, index) => ({
           teamIdx: index,
           teamAbbr: team.abbr,
           conference: team.conference,
