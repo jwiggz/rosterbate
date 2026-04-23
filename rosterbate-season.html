@@ -6640,9 +6640,9 @@ function waiverStatValue(player,key){
   return Number(player?.[key]||0);
 }
 
-function waiverCell(player,key){
+function waiverCell(player,key,signals){
   if(key==='name'){
-    const signals=getWaiverRowSignals(player);
+    signals=signals||getWaiverRowSignals(player);
     const watched=signals.watched;
     const tags=[];
     if(signals.bestPickup) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(96,165,250,.34);background:rgba(30,64,175,.18);color:#bfdbfe;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Best Pickup</span>');
@@ -9440,7 +9440,7 @@ function renderWaiver(){
                       ? 'background:linear-gradient(90deg,rgba(250,204,21,.1),rgba(15,23,36,0));'
                       : '';
                 return `<tr style="${rowStyle}">
-                ${cols.map(col=>`<td style="text-align:${col.align||'right'};${col.key==='fp'?'font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);':''}">${waiverCell(p,col.key)}</td>`).join('')}
+                ${cols.map(col=>`<td style="text-align:${col.align||'right'};${col.key==='fp'?'font-family:var(--fb);font-size:15px;font-weight:800;color:#38bdf8;text-shadow:0 0 18px rgba(56,189,248,.18);':''}">${waiverCell(p,col.key,signals)}</td>`).join('')}
               </tr>`;
               }).join('')}
             </tbody>
