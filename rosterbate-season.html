@@ -8431,6 +8431,50 @@ function renderSimulationPlayoffsInSharedShell(){
       </div>
     `;
   };
+  const renderSeriesRow = (series) => {
+    if (!series || typeof series !== 'object') return '';
+    const higherSeed=series.higherSeed || {};
+    const lowerSeed=series.lowerSeed || {};
+    const higherLabel=String(higherSeed.teamName || higherSeed.name || higherSeed.teamAbbr || 'TBD').trim() || 'TBD';
+    const lowerLabel=String(lowerSeed.teamName || lowerSeed.name || lowerSeed.teamAbbr || 'TBD').trim() || 'TBD';
+    const higherAbbr=String(higherSeed.teamAbbr || higherLabel).trim();
+    const lowerAbbr=String(lowerSeed.teamAbbr || lowerLabel).trim();
+    const scoreLabel=`${Number(series.higherSeedWins || 0)}-${Number(series.lowerSeedWins || 0)}`;
+    const winnerAbbr=String(series.winnerTeamAbbr || '').trim();
+    return `
+      <div style="padding:12px 0;border-top:1px solid rgba(255,255,255,.08);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${higherLabel} vs ${lowerLabel}</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:4px;">${formatLabel(series.round || 'series')} · ${formatLabel(series.conference || 'league')}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${higherAbbr} ${scoreLabel} ${lowerAbbr}</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:4px;">${winnerAbbr ? ('Winner: ' + winnerAbbr) : ('Race to ' + (Number(series.targetWins || 0) || 1))}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+  const collectBracketSections = (bracket) => {
+    const sections=[];
+    const pushSeriesSection = (title, value) => {
+      const seriesList=(Array.isArray(value) ? value : [value]).filter(series=>series && typeof series==='object' && (series.higherSeed || series.lowerSeed));
+      if (!seriesList.length) return;
+      sections.push({ title, seriesList });
+    };
+    Object.entries(bracket && typeof bracket==='object' ? bracket : {}).forEach(([conferenceKey, conferenceValue]) => {
+      if (!conferenceValue || typeof conferenceValue!=='object') return;
+      if (conferenceValue.higherSeed || conferenceValue.lowerSeed){
+        pushSeriesSection(formatLabel(conferenceKey), conferenceValue);
+        return;
+      }
+      Object.entries(conferenceValue).forEach(([roundKey, roundValue]) => {
+        pushSeriesSection(`${formatLabel(conferenceKey)} ${formatLabel(roundKey)}`, roundValue);
+      });
+    });
+    return sections;
+  };
   const renderPairingGroup = (title, teams) => {
     const rows = Array.isArray(teams) ? teams.filter(Boolean) : [];
     if (!rows.length) return '';
@@ -8460,6 +8504,15 @@ function renderSimulationPlayoffsInSharedShell(){
   };
   const todayGames = Array.isArray(vm.currentDaySchedule) ? vm.currentDaySchedule : [];
   const champion = vm.champion && typeof vm.champion === 'object' ? vm.champion : null;
+  const bracketSections=collectBracketSections(vm.bracket);
+  const seriesByRound=Object.values(vm.seriesById && typeof vm.seriesById==='object' ? vm.seriesById : {})
+    .filter(series=>series && typeof series==='object' && (series.higherSeed || series.lowerSeed))
+    .reduce((groups, series) => {
+      const roundKey=formatLabel(series.round || 'postseason');
+      if (!groups[roundKey]) groups[roundKey]=[];
+      groups[roundKey].push(series);
+      return groups;
+    }, {});
   document.getElementById('playoffsContent').innerHTML = `
     ${champion ? `
       <div class="card" style="background:linear-gradient(135deg,rgba(74,44,13,.98),rgba(18,26,41,.98));border-color:rgba(247,199,106,.42);">
@@ -8516,6 +8569,30 @@ function renderSimulationPlayoffsInSharedShell(){
     </div>
     ${renderConferencePlayIn('East', vm.playIn?.east)}
     ${renderConferencePlayIn('West', vm.playIn?.west)}
+    ${bracketSections.length ? `
+      <div class="card">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Bracket Snapshot</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Adapter bracket groupings for each conference and the Finals.</div>
+        ${bracketSections.map((section) => `
+          <div style="margin-top:14px;">
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${section.title}</div>
+            ${section.seriesList.map(renderSeriesRow).join('')}
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+    ${Object.keys(seriesByRound).length ? `
+      <div class="card">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Series Tracker</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Live postseason series state from the adapter snapshot.</div>
+        ${Object.entries(seriesByRound).map(([roundLabel, seriesList]) => `
+          <div style="margin-top:14px;">
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${roundLabel}</div>
+            ${seriesList.map(renderSeriesRow).join('')}
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
   `;
 }
 
@@ -8523,6 +8600,25 @@ function getActiveSeasonPageId(){
   const pages=getActiveSeasonPages();
   const activePage=pages.find(pageId=>document.getElementById(pageId)?.classList?.contains('active'));
   return activePage || (pages.includes('hub') ? 'hub' : (pages[0] || 'hub'));
+}
+
+function setActiveSeasonScreen(id){
+  document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
+  const mount=document.getElementById(id);
+  if(mount) mount.classList.add('active');
+}
+
+function rebuildActiveSeasonNav(activeId){
+  const pages=getActiveSeasonPages();
+  const labels=getActiveSeasonLabels();
+  pages.forEach((pageId) => {
+    const navId = NAVIDS[pageId];
+    const mount = document.getElementById(navId);
+    if (!mount) return;
+    mount.innerHTML = pages.map((candidate) => (
+      `<button class="nb${candidate === activeId ? ' on' : ''}" onclick="goPage('${candidate}')">${labels[candidate]}</button>`
+    )).join('');
+  });
 }
 
 function renderActiveSeasonScreen(id){
@@ -8534,22 +8630,13 @@ function renderActiveSeasonScreen(id){
 
 function goPage(id){
   const pages=getActiveSeasonPages();
-  const labels=getActiveSeasonLabels();
   const safeId=pages.includes(id) ? id : 'hub';
   if(safeId==='commissioner' && D?.isCommissioner===false){
     toast('Only the commissioner can open league settings.');
     return;
   }
-  document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
-  document.getElementById(safeId).classList.add('active');
-  pages.forEach((pageId) => {
-    const navId = NAVIDS[pageId];
-    const mount = document.getElementById(navId);
-    if (!mount) return;
-    mount.innerHTML = pages.map((candidate) => (
-      `<button class="nb${candidate === safeId ? ' on' : ''}" onclick="goPage('${candidate}')">${labels[candidate]}</button>`
-    )).join('');
-  });
+  setActiveSeasonScreen(safeId);
+  rebuildActiveSeasonNav(safeId);
   if(safeId==='roster') rosterViewDay=G.day;
   if(safeId==='matchup') matchupViewDay=rosterViewDay||G.day;
   if(safeId==='waiver'){
@@ -8567,7 +8654,14 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     SEASON_MODE_ADAPTER.simulateNextDay();
     persistSimulationSeasonState('simulation_day_advance');
     const pages=getActiveSeasonPages();
-    goPage(pages.includes(activePageId) ? activePageId : 'hub');
+    const nextPageId=pages.includes(activePageId) ? activePageId : 'hub';
+    if(nextPageId!==activePageId){
+      goPage(nextPageId);
+    }else{
+      setActiveSeasonScreen(nextPageId);
+      rebuildActiveSeasonNav(nextPageId);
+      renderActiveSeasonScreen(nextPageId);
+    }
     advanceWeek.disabled=false;
     return;
   }

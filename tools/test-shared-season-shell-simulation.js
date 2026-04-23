@@ -73,6 +73,7 @@ module.exports = {
   claimSimulationFreeAgentFromShell,
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
+  getActiveSeasonPageId,
   goPage,
   advanceWeek,
   resolveLocalSavedSeasonAutoLoad,
@@ -327,9 +328,52 @@ function buildSimulationStubState(phase = 'regular_season') {
         }
       },
       bracket: {
-        east: { firstRound: [] },
-        west: { firstRound: [] },
-        finals: null
+        east: {
+          firstRound: [
+            {
+              id: 'east-playoffs-round-1-1',
+              conference: 'east',
+              round: 'playoffs_round_1',
+              higherSeed: { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+              lowerSeed: { seed: 8, teamAbbr: 'IND', teamName: 'Indiana Pacers' },
+              targetWins: 4,
+              higherSeedWins: 2,
+              lowerSeedWins: 1,
+              winnerTeamAbbr: null,
+              games: 3
+            }
+          ],
+          conferenceFinals: []
+        },
+        west: {
+          firstRound: [
+            {
+              id: 'west-playoffs-round-1-1',
+              conference: 'west',
+              round: 'playoffs_round_1',
+              higherSeed: { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+              lowerSeed: { seed: 8, teamAbbr: 'DAL', teamName: 'Dallas Mavericks' },
+              targetWins: 4,
+              higherSeedWins: 3,
+              lowerSeedWins: 2,
+              winnerTeamAbbr: null,
+              games: 5
+            }
+          ],
+          conferenceFinals: []
+        },
+        finals: {
+          id: 'finals',
+          conference: 'finals',
+          round: 'finals',
+          higherSeed: { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+          lowerSeed: { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+          targetWins: 4,
+          higherSeedWins: 0,
+          lowerSeedWins: 0,
+          winnerTeamAbbr: null,
+          games: 0
+        }
       },
       seriesById: {
         'east-play-in-7-8': {
@@ -355,6 +399,30 @@ function buildSimulationStubState(phase = 'regular_season') {
           lowerSeedWins: 0,
           winnerTeamAbbr: null,
           games: 0
+        },
+        'east-playoffs-round-1-1': {
+          id: 'east-playoffs-round-1-1',
+          conference: 'east',
+          round: 'playoffs_round_1',
+          higherSeed: { seed: 1, teamAbbr: 'BOS', teamName: 'Boston Celtics' },
+          lowerSeed: { seed: 8, teamAbbr: 'IND', teamName: 'Indiana Pacers' },
+          targetWins: 4,
+          higherSeedWins: 2,
+          lowerSeedWins: 1,
+          winnerTeamAbbr: null,
+          games: 3
+        },
+        'west-playoffs-round-1-1': {
+          id: 'west-playoffs-round-1-1',
+          conference: 'west',
+          round: 'playoffs_round_1',
+          higherSeed: { seed: 1, teamAbbr: 'LAL', teamName: 'Los Angeles Lakers' },
+          lowerSeed: { seed: 8, teamAbbr: 'DAL', teamName: 'Dallas Mavericks' },
+          targetWins: 4,
+          higherSeedWins: 3,
+          lowerSeedWins: 2,
+          winnerTeamAbbr: null,
+          games: 5
         },
         finals: {
           id: 'finals',
@@ -1010,20 +1078,31 @@ assert.match(elements.matchupNote.textContent, /results/i);
 assert.match(elements.matchupContent.innerHTML, /Schedule \/ Results/);
 assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
 
-api.goPage('hub');
+api.goPage('waiver');
+const waiverSearchInput = sandbox.document.getElementById('wSrch');
+const waiverPosInput = sandbox.document.getElementById('wPos');
+waiverSearchInput.value = 'Scottie';
+waiverPosInput.value = 'SF';
 api.advanceWeek();
 assert.ok(api.getActiveSeasonPages().includes('playoffs'), 'nav should expose Playoffs after the adapter enters postseason');
 assert.match(elements.hn.innerHTML, /Playoffs/, 'advanceWeek should rebuild hub nav when playoffs become available');
+assert.equal(api.getActiveSeasonPageId(), 'waiver', 'simulation advance should preserve the active page when it remains valid');
+assert.equal(waiverSearchInput.value, 'Scottie', 'simulation advance should preserve the waiver search input');
+assert.equal(waiverPosInput.value, 'SF', 'simulation advance should preserve the waiver position filter');
 
-api.renderSimulationPlayoffsInSharedShell();
+api.goPage('playoffs');
 assert.equal(elements.playoffsPowerups.style.display, 'none');
 assert.equal(elements.playoffsPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
 assert.match(elements.playoffsContent.innerHTML, /Play-In/i);
 assert.match(elements.playoffsContent.innerHTML, /Indiana Pacers/);
 assert.match(elements.playoffsContent.innerHTML, /Dallas Mavericks/);
+assert.match(elements.playoffsContent.innerHTML, /BOS/);
+assert.match(elements.playoffsContent.innerHTML, /LAL/);
+assert.match(elements.playoffsContent.innerHTML, /3-2|2-1/);
+assert.match(elements.playoffsContent.innerHTML, /Finals|Round 1|Playoffs Round 1/i);
 
 setSimulationStubPhase('completed');
-api.renderSimulationPlayoffsInSharedShell();
+api.goPage('playoffs');
 assert.match(elements.playoffsContent.innerHTML, /NBA Champions/i);
 assert.match(elements.playoffsContent.innerHTML, /Los Angeles Lakers/);
 
