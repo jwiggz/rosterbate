@@ -703,10 +703,9 @@
         const left=rotation[index];
         const right=rotation[rotation.length - 1 - index];
         if(!(left && right)) continue;
-        const homeFirst=(round + index) % 2 === 0;
         day.push({
-          homeAbbr:homeFirst ? left.abbr : right.abbr,
-          awayAbbr:homeFirst ? right.abbr : left.abbr
+          teamAAbbr:left.abbr,
+          teamBAbbr:right.abbr
         });
       }
       rounds.push(day);
@@ -719,22 +718,74 @@
     const teams=Array.isArray(shell?.teams) ? shell.teams : [];
     const targetGames=Math.max(0, Number(shell?.regularSeasonGamesPerTeam || 82) || 82);
     const byDay={};
+    const teamCounts=Object.fromEntries(teams.map(function(team){
+      return [team.abbr, {
+        total:0,
+        home:0,
+        away:0
+      }];
+    }));
+    const roundRobinDays=buildRoundRobinDays(teams);
     const teamGameCounts=Object.fromEntries(teams.map(function(team){
       return [team.abbr, 0];
     }));
-    const roundRobinDays=buildRoundRobinDays(teams);
     if(!roundRobinDays.length || !targetGames) return { byDay:byDay, teamGameCounts:teamGameCounts };
 
-    for(let day=1; day<=targetGames; day+=1){
-      const slate=roundRobinDays[(day - 1) % roundRobinDays.length].map(function(matchup){
-        teamGameCounts[matchup.homeAbbr] += 1;
-        teamGameCounts[matchup.awayAbbr] += 1;
-        return {
-          homeAbbr:matchup.homeAbbr,
-          awayAbbr:matchup.awayAbbr
-        };
+    function addMatchup(day, homeAbbr, awayAbbr){
+      if(!byDay[day]) byDay[day]=[];
+      byDay[day].push({
+        homeAbbr:homeAbbr,
+        awayAbbr:awayAbbr
       });
-      byDay[day]=slate;
+      teamCounts[homeAbbr].total += 1;
+      teamCounts[homeAbbr].home += 1;
+      teamCounts[awayAbbr].total += 1;
+      teamCounts[awayAbbr].away += 1;
+      teamGameCounts[homeAbbr] += 1;
+      teamGameCounts[awayAbbr] += 1;
+    }
+
+    const fullCycleDays=Math.min(targetGames, roundRobinDays.length);
+    for(let day=1; day<=fullCycleDays; day+=1){
+      roundRobinDays[day - 1].forEach(function(matchup, index){
+        const homeFirst=(day + index) % 2 === 0;
+        addMatchup(
+          day,
+          homeFirst ? matchup.teamAAbbr : matchup.teamBAbbr,
+          homeFirst ? matchup.teamBAbbr : matchup.teamAAbbr
+        );
+      });
+    }
+
+    const reverseCycleDays=Math.min(Math.max(targetGames - fullCycleDays, 0), roundRobinDays.length);
+    for(let offset=0; offset<reverseCycleDays; offset+=1){
+      const day=fullCycleDays + offset + 1;
+      roundRobinDays[offset].forEach(function(matchup, index){
+        const homeFirst=(offset + 1 + index) % 2 === 0;
+        addMatchup(
+          day,
+          homeFirst ? matchup.teamBAbbr : matchup.teamAAbbr,
+          homeFirst ? matchup.teamAAbbr : matchup.teamBAbbr
+        );
+      });
+    }
+
+    for(let day=fullCycleDays + reverseCycleDays + 1; day<=targetGames; day+=1){
+      const templateDay=roundRobinDays[(day - fullCycleDays - reverseCycleDays - 1) % roundRobinDays.length];
+      templateDay.forEach(function(matchup, index){
+        const homeStats=teamCounts[matchup.teamAAbbr];
+        const awayStats=teamCounts[matchup.teamBAbbr];
+        let homeAbbr=matchup.teamAAbbr;
+        let awayAbbr=matchup.teamBAbbr;
+        if(homeStats.home > awayStats.home){
+          homeAbbr=matchup.teamBAbbr;
+          awayAbbr=matchup.teamAAbbr;
+        }else if(homeStats.home === awayStats.home && ((day + index) % 2 === 1)){
+          homeAbbr=matchup.teamBAbbr;
+          awayAbbr=matchup.teamAAbbr;
+        }
+        addMatchup(day, homeAbbr, awayAbbr);
+      });
     }
 
     return { byDay:byDay, teamGameCounts:teamGameCounts };
