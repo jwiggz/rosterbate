@@ -24,11 +24,7 @@
     if (!(root && root.localStorage)) {
       return value;
     }
-    try{
-      root.localStorage.setItem(key, JSON.stringify(value));
-    }catch(error){
-      return value;
-    }
+    root.localStorage.setItem(key, JSON.stringify(value));
     return value;
   }
 

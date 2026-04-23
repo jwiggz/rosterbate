@@ -14,6 +14,7 @@
 <script src="sport-demo-data.js"></script>
 <script src="sport-config-live.js"></script>
 <script src="historical-universe-slots.js"></script>
+<script src="simulation-mode-runtime.js"></script>
 <script src="simulation-league-engine.js"></script>
 <script src="cpu-sim-personalities.js"></script>
 <script src="cpu-sim-lineups.js"></script>
@@ -2204,6 +2205,7 @@ function getSavedMultiplayerLobbyState(){
 const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';
 const RB_HISTORICAL_DEV_LOCAL_STATE_KEY = 'rbHistoricalPackDevLocalState';
 const RB_HISTORICAL_DEV_PENDING_BOOT_KEY = 'rbHistoricalPackDevPendingSeasonBoot';
+const RB_SHARED_SIMULATION_MODE_ID = 'nba_mixed_era_single_player_v1';
 
 function isHistoricalDevHost(){
   const host=String(window.location?.hostname||'').trim().toLowerCase();
@@ -2248,8 +2250,339 @@ function getRequestedHistoricalPackId(params){
   return String(params?.get('historicalPackId')||'').trim();
 }
 
+function getRequestedSimulationMode(params){
+  return String(params?.get('simulation') || '').trim().toLowerCase();
+}
+
 function getRequestedHistoricalUniverseSlotId(params){
   return String(params?.get('historicalUniverse')||'').trim();
+}
+
+function cloneSharedSimulationBootValue(value){
+  try{
+    return JSON.parse(JSON.stringify(value));
+  }catch(e){
+    if(Array.isArray(value)) return value.slice();
+    if(value && typeof value==='object') return {...value};
+    return value;
+  }
+}
+
+function shouldPersistSharedSimulationState(state){
+  return String(state?.simulationMode || '').trim().toLowerCase() === RB_SHARED_SIMULATION_MODE_ID;
+}
+
+function getSharedSimulationPlayerIdentityKey(player){
+  const historicalPlayerId=String(player?.historicalPlayerId || '').trim();
+  if(historicalPlayerId) return 'historical:' + historicalPlayerId;
+  const numericId=Number(player?.id);
+  if(Number.isFinite(numericId)) return 'id:' + numericId;
+  const id=String(player?.id || '').trim();
+  if(id) return 'id:' + id;
+  const name=String(player?.name || '').trim();
+  return name ? ('name:' + name) : '';
+}
+
+function buildSharedSimulationPlayerPool(rawState){
+  const seen=new Set();
+  const pool=[];
+  const rosterMap=(rawState?.draftState && typeof rawState.draftState==='object' && rawState.draftState.rostersByTeam && typeof rawState.draftState.rostersByTeam==='object')
+    ? rawState.draftState.rostersByTeam
+    : {};
+  Object.keys(rosterMap).forEach(teamAbbr=>{
+    const roster=Array.isArray(rosterMap[teamAbbr]) ? rosterMap[teamAbbr] : [];
+    roster.forEach(player=>{
+      const key=getSharedSimulationPlayerIdentityKey(player);
+      if(!player || !key || seen.has(key)) return;
+      seen.add(key);
+      pool.push(cloneSharedSimulationBootValue(player));
+    });
+  });
+  (Array.isArray(rawState?.draftState?.draftPool) ? rawState.draftState.draftPool : []).forEach(player=>{
+    const key=getSharedSimulationPlayerIdentityKey(player);
+    if(!player || !key || seen.has(key)) return;
+    seen.add(key);
+    pool.push(cloneSharedSimulationBootValue(player));
+  });
+  (Array.isArray(rawState?.draftState?.freeAgents) ? rawState.draftState.freeAgents : []).forEach(player=>{
+    const key=getSharedSimulationPlayerIdentityKey(player);
+    if(!player || !key || seen.has(key)) return;
+    seen.add(key);
+    pool.push(cloneSharedSimulationBootValue(player));
+  });
+  return pool;
+}
+
+function normalizeSharedSimulationSeasonBootState(state, slotId){
+  const rawState=(state && typeof state==='object') ? state : {};
+  const rawTeams=Array.isArray(rawState?.leagueShell?.teams) ? rawState.leagueShell.teams.filter(Boolean) : [];
+  const rosterMap=(rawState?.draftState && typeof rawState.draftState==='object' && rawState.draftState.rostersByTeam && typeof rawState.draftState.rostersByTeam==='object')
+    ? rawState.draftState.rostersByTeam
+    : {};
+  const freeAgents=Array.isArray(rawState?.draftState?.freeAgents)
+    ? rawState.draftState.freeAgents.map(player=>cloneSharedSimulationBootValue(player)).filter(Boolean)
+    : [];
+  const leagueSize=Math.max(rawTeams.length, Number(rawState?.leagueSize)||0, 1);
+  const teams=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    return String(team?.name || team?.displayName || team?.abbr || ('Team ' + (teamIdx+1))).trim() || ('Team ' + (teamIdx+1));
+  });
+  const allRosters=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    const abbr=String(team?.abbr || '').trim();
+    const roster=abbr && Array.isArray(rosterMap[abbr]) ? rosterMap[abbr] : [];
+    return roster.map(player=>cloneSharedSimulationBootValue(player)).filter(Boolean);
+  });
+  const controlledTeamAbbr=String(rawState?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  let myPos=rawTeams.findIndex(team=>String(team?.abbr || '').trim().toUpperCase()===controlledTeamAbbr);
+  if(myPos<0) myPos=0;
+  const standingsSource=Array.isArray(rawState?.seasonState?.standings) ? rawState.seasonState.standings : [];
+  const standingsByAbbr=new Map(
+    standingsSource.map(row=>[String(row?.teamAbbr || '').trim().toUpperCase(), row]).filter(entry=>entry[0])
+  );
+  const standings=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    const abbr=String(team?.abbr || '').trim().toUpperCase();
+    const row=(abbr && standingsByAbbr.get(abbr)) || standingsSource[teamIdx] || {};
+    return {
+      teamIdx,
+      teamAbbr: abbr || String(row?.teamAbbr || '').trim().toUpperCase() || null,
+      conference: row?.conference || team?.conference || '',
+      division: row?.division || team?.division || '',
+      w: Number(row?.w || 0) || 0,
+      l: Number(row?.l || 0) || 0,
+      pf: Number(row?.pf || 0) || 0,
+      pa: Number(row?.pa || 0) || 0,
+      streak: Number(row?.streak || 0) || 0,
+      streakW: row?.streakW !== false
+    };
+  });
+  const starters=Array.from({length:leagueSize}, (_, teamIdx)=>{
+    const team=rawTeams[teamIdx] || null;
+    const abbr=String(team?.abbr || '').trim().toUpperCase();
+    const lineup=Array.isArray(rawState?.seasonState?.lineupIdsByTeam?.[abbr]) ? rawState.seasonState.lineupIdsByTeam[abbr] : [];
+    return lineup
+      .map(entry=>{
+        const candidate=(entry && typeof entry==='object') ? entry.id : entry;
+        const normalized=Number(candidate);
+        return Number.isFinite(normalized) ? normalized : candidate;
+      })
+      .filter(value=>value!=null && value!=='');
+  });
+  const stableSlotId=String(slotId || rawState?.historicalUniverseSlotId || rawState?.slotId || '').trim();
+  const sport=String(rawState?.sport || rawState?.leagueShell?.sport || 'nba').trim().toLowerCase() || 'nba';
+  const currentDay=Math.max(1, Number(rawState?.seasonState?.currentDay || rawState?.currentDay || 1) || 1);
+  const currentWeek=Math.max(1, Number(rawState?.seasonState?.currentWeek || rawState?.currentWeek || 1) || 1);
+  const seasonId=String(rawState?.seasonId || rawState?.leagueId || (stableSlotId ? ('simulation:' + stableSlotId) : 'simulation:shared-season')).trim();
+  const historicalPlayerPool=buildSharedSimulationPlayerPool(rawState);
+  return {
+    ...rawState,
+    sport,
+    simulationMode: String(rawState?.simulationMode || RB_SHARED_SIMULATION_MODE_ID).trim() || RB_SHARED_SIMULATION_MODE_ID,
+    historicalEntryMode: String(rawState?.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+    historicalUniverseSlotId: stableSlotId || null,
+    sharedSimulationSlotId: stableSlotId || null,
+    seasonId,
+    leagueId: seasonId,
+    leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || 'NBA Simulation').trim() || 'NBA Simulation',
+    teamName: teams[myPos] || 'My Team',
+    teams,
+    teamMeta: rawTeams.map(team=>cloneSharedSimulationBootValue(team)),
+    leagueSize,
+    myPos,
+    myTeamIndex: myPos,
+    currentDay,
+    currentWeek,
+    allRosters,
+    ilRosters: Array.from({length:leagueSize}, ()=>[]),
+    historicalSourcePackIds: Array.isArray(rawState?.sourceSeasons?.sourcePackIds)
+      ? rawState.sourceSeasons.sourcePackIds.map(id=>String(id || '').trim()).filter(Boolean)
+      : Array.isArray(rawState?.historicalSourcePackIds)
+      ? rawState.historicalSourcePackIds.map(id=>String(id || '').trim()).filter(Boolean)
+      : [],
+    mixedEraSourceSeasonLabels: Array.isArray(rawState?.sourceSeasons?.sourceSeasonLabels)
+      ? rawState.sourceSeasons.sourceSeasonLabels.map(label=>String(label || '').trim()).filter(Boolean)
+      : Array.isArray(rawState?.mixedEraSourceSeasonLabels)
+      ? rawState.mixedEraSourceSeasonLabels.map(label=>String(label || '').trim()).filter(Boolean)
+      : [],
+    historicalPlayerPool,
+    freeAgents,
+    waiver: freeAgents.map(player=>cloneSharedSimulationBootValue(player)),
+    standings,
+    starters,
+    processed: Array.isArray(rawState?.processed) ? rawState.processed.slice() : [],
+    tradeOffers: Array.isArray(rawState?.tradeOffers) ? rawState.tradeOffers.map(entry=>cloneSharedSimulationBootValue(entry)) : [],
+    dailyLineups: rawState?.dailyLineups && typeof rawState.dailyLineups==='object' ? cloneSharedSimulationBootValue(rawState.dailyLineups) : {},
+    dailyLineupsByTeam: rawState?.dailyLineupsByTeam && typeof rawState.dailyLineupsByTeam==='object' ? cloneSharedSimulationBootValue(rawState.dailyLineupsByTeam) : {},
+    powerupsByWeek: rawState?.powerupsByWeek && typeof rawState.powerupsByWeek==='object' ? cloneSharedSimulationBootValue(rawState.powerupsByWeek) : {},
+    dayResults: rawState?.dayResults && typeof rawState.dayResults==='object' ? cloneSharedSimulationBootValue(rawState.dayResults) : {},
+    revealedDays: rawState?.revealedDays && typeof rawState.revealedDays==='object' ? cloneSharedSimulationBootValue(rawState.revealedDays) : {},
+    settledWeeks: rawState?.settledWeeks && typeof rawState.settledWeeks==='object' ? cloneSharedSimulationBootValue(rawState.settledWeeks) : {},
+    activityLog: Array.isArray(rawState?.seasonState?.activityLog)
+      ? rawState.seasonState.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+      : Array.isArray(rawState?.activityLog)
+      ? rawState.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+      : [],
+    dailyRevealReports: rawState?.dailyRevealReports && typeof rawState.dailyRevealReports==='object' ? cloneSharedSimulationBootValue(rawState.dailyRevealReports) : {},
+    recentDrops: Array.isArray(rawState?.recentDrops) ? rawState.recentDrops.map(entry=>cloneSharedSimulationBootValue(entry)) : [],
+    moneyBallLocks: rawState?.moneyBallLocks && typeof rawState.moneyBallLocks==='object' ? cloneSharedSimulationBootValue(rawState.moneyBallLocks) : {},
+    cpuTradeMarketDaysProcessed: rawState?.cpuTradeMarketDaysProcessed && typeof rawState.cpuTradeMarketDaysProcessed==='object' ? cloneSharedSimulationBootValue(rawState.cpuTradeMarketDaysProcessed) : {},
+    isFreshDraftLaunch: false,
+    multiplayer: false
+  };
+}
+
+function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
+  const baseState=(rawState && typeof rawState==='object') ? cloneSharedSimulationBootValue(rawState) : {};
+  const shell=(shellState && typeof shellState==='object') ? shellState : {};
+  const game=(gameState && typeof gameState==='object') ? gameState : {};
+  const leagueShell=(baseState?.leagueShell && typeof baseState.leagueShell==='object') ? baseState.leagueShell : {};
+  const rawTeams=Array.isArray(leagueShell?.teams) ? leagueShell.teams.filter(Boolean) : [];
+  const teamMeta=Array.isArray(shell?.teamMeta) ? shell.teamMeta.filter(Boolean) : [];
+  const teams=rawTeams.length ? rawTeams : teamMeta;
+  const rosterSource=Array.isArray(game?.rosters) ? game.rosters : (Array.isArray(shell?.allRosters) ? shell.allRosters : []);
+  const freeAgentSource=Array.isArray(game?.waiver)
+    ? game.waiver
+    : Array.isArray(shell?.freeAgents)
+    ? shell.freeAgents
+    : Array.isArray(shell?.waiver)
+    ? shell.waiver
+    : Array.isArray(baseState?.draftState?.freeAgents)
+    ? baseState.draftState.freeAgents
+    : [];
+  const standingsSource=Array.isArray(game?.standings)
+    ? game.standings
+    : Array.isArray(shell?.standings)
+    ? shell.standings
+    : Array.isArray(baseState?.seasonState?.standings)
+    ? baseState.seasonState.standings
+    : [];
+  const starterSource=Array.isArray(game?.starters) ? game.starters : (Array.isArray(shell?.starters) ? shell.starters : []);
+  const shellWeek=Number(game?.week || shell?.currentWeek || baseState?.seasonState?.currentWeek || baseState?.currentWeek || 1) || 1;
+  const shellDay=Number(game?.day || shell?.currentDay || baseState?.seasonState?.currentDay || baseState?.currentDay || 1) || 1;
+  const rostersByTeam={};
+  const lineupIdsByTeam={};
+  const standingsByAbbr=new Map(
+    standingsSource.map(row=>[String(row?.teamAbbr || '').trim().toUpperCase(), row]).filter(entry=>entry[0])
+  );
+
+  teams.forEach((team, teamIdx)=>{
+    const abbr=String(team?.abbr || '').trim().toUpperCase() || ('TEAM_' + teamIdx);
+    const roster=Array.isArray(rosterSource[teamIdx]) ? rosterSource[teamIdx] : [];
+    rostersByTeam[abbr]=roster.map(player=>cloneSharedSimulationBootValue(player)).filter(Boolean);
+    const starters=Array.isArray(starterSource[teamIdx]) ? starterSource[teamIdx] : [];
+    lineupIdsByTeam[abbr]=starters
+      .map(entry=>{
+        const candidate=(entry && typeof entry==='object') ? entry.id : entry;
+        const normalized=Number(candidate);
+        return Number.isFinite(normalized) ? normalized : candidate;
+      })
+      .filter(value=>value!=null && value!=='');
+  });
+
+  const standings=teams.map((team, teamIdx)=>{
+    const abbr=String(team?.abbr || '').trim().toUpperCase();
+    const row=(abbr && standingsByAbbr.get(abbr)) || standingsSource[teamIdx] || {};
+    return {
+      ...cloneSharedSimulationBootValue(row || {}),
+      teamIdx,
+      teamAbbr: abbr || String(row?.teamAbbr || '').trim().toUpperCase() || null,
+      conference: row?.conference || team?.conference || '',
+      division: row?.division || team?.division || '',
+      w: Number(row?.w || 0) || 0,
+      l: Number(row?.l || 0) || 0,
+      pf: Number(row?.pf || 0) || 0,
+      pa: Number(row?.pa || 0) || 0,
+      streak: Number(row?.streak || 0) || 0,
+      streakW: row?.streakW !== false
+    };
+  });
+
+  return {
+    ...baseState,
+    draftState: {
+      ...(baseState?.draftState && typeof baseState.draftState==='object' ? baseState.draftState : {}),
+      rostersByTeam,
+      freeAgents: freeAgentSource.map(player=>cloneSharedSimulationBootValue(player)).filter(Boolean)
+    },
+    seasonState: {
+      ...(baseState?.seasonState && typeof baseState.seasonState==='object' ? baseState.seasonState : {}),
+      currentWeek: shellWeek,
+      currentDay: shellDay,
+      standings,
+      lineupIdsByTeam,
+      activityLog: Array.isArray(game?.activityLog)
+        ? game.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+        : Array.isArray(shell?.activityLog)
+        ? shell.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+        : Array.isArray(baseState?.seasonState?.activityLog)
+        ? baseState.seasonState.activityLog.map(entry=>cloneSharedSimulationBootValue(entry))
+        : []
+    },
+    currentWeek: shellWeek,
+    currentDay: shellDay,
+    historicalUniverseSlotId: String(shell?.historicalUniverseSlotId || baseState?.historicalUniverseSlotId || '').trim() || null
+  };
+}
+
+function readCompletedSimulationDraftState(){
+  const runtime=window.RosterBateSimulationModeRuntime;
+  if(runtime && typeof runtime.readCompletedSimulationState==='function'){
+    return runtime.readCompletedSimulationState();
+  }
+  try{
+    const key=String(runtime?.COMPLETED_DRAFT_KEY || 'rbSimulationModeCompletedDraft').trim();
+    const raw=localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function persistCompletedSimulationDraftSlot(rawState){
+  const api=window.RosterBateHistoricalUniverseSlots;
+  if(!api || typeof api.upsertFromState!=='function' || !shouldPersistSharedSimulationState(rawState)) return null;
+  try{
+    return api.upsertFromState(rawState, {
+      slotId: String(rawState?.historicalUniverseSlotId || '').trim() || null,
+      reason: 'completed_simulation_handoff'
+    });
+  }catch(error){
+    console.warn('Completed simulation draft slot bootstrap failed:', error);
+    return null;
+  }
+}
+
+function buildSharedSimulationSeasonUrl(slotId, requestedSport){
+  return 'rosterbate-season.html?sport='
+    + encodeURIComponent(normalizeRosterbateSport(requestedSport || 'nba'))
+    + '&simulation=nba_mixed_era&historicalUniverse='
+    + encodeURIComponent(String(slotId || '').trim());
+}
+
+function bootstrapCompletedSimulationDraftHandoff(params, requestedSport){
+  if(getRequestedSimulationMode(params)!=='nba_mixed_era') return null;
+  if(getRequestedHistoricalUniverseSlotId(params)) return null;
+  const rawState=readCompletedSimulationDraftState();
+  if(!shouldPersistSharedSimulationState(rawState)) return null;
+  const persisted=persistCompletedSimulationDraftSlot(rawState);
+  if(persisted?.slotId){
+    const canonicalUrl=buildSharedSimulationSeasonUrl(persisted.slotId, requestedSport);
+    if(window.location?.replace){
+      window.location.replace(canonicalUrl);
+    }else if(window.location){
+      window.location.href=canonicalUrl;
+    }
+    return {
+      redirected:true,
+      slotId:persisted.slotId,
+      url:canonicalUrl
+    };
+  }
+  return {
+    redirected:false,
+    state:normalizeSharedSimulationSeasonBootState(rawState, null)
+  };
 }
 
 function loadHistoricalUniverseSlotState(slotId, requestedSport){
@@ -2266,9 +2599,13 @@ function loadHistoricalUniverseSlotState(slotId, requestedSport){
 
 function persistHistoricalUniverseSlotSnapshot(reason){
   const api=window.RosterBateHistoricalUniverseSlots;
-  if(!api || !D || typeof D!=='object' || !D.historicalPackId) return null;
+  const shouldPersistSimulationState=shouldPersistSharedSimulationState(D);
+  if(!api || !D || typeof D!=='object' || (!D.historicalPackId && !shouldPersistSimulationState)) return null;
   try{
-    const persisted=api.upsertFromState(D,{
+    const stateToPersist=shouldPersistSimulationState
+      ? buildSharedSimulationPersistenceState(D, D, G)
+      : D;
+    const persisted=api.upsertFromState(stateToPersist,{
       slotId:String(D.historicalUniverseSlotId||'').trim() || null,
       reason:String(reason||'').trim() || 'historical_save'
     });
@@ -2772,7 +3109,11 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
 
 function isHistoricalSimulationUniverse(state){
   const mode=String(state?.historicalEntryMode || state?.simulationMode || '').trim().toLowerCase();
-  return mode==='simulation_season' || mode==='simulation' || mode==='sim' || String(state?.simulationMode || '').trim().toLowerCase()==='historical_box_score';
+  return mode==='simulation_season'
+    || mode==='simulation'
+    || mode==='sim'
+    || mode==='historical_box_score'
+    || mode===RB_SHARED_SIMULATION_MODE_ID;
 }
 
 function isHistoricalDraftUniverse(state){
@@ -6791,6 +7132,22 @@ window.onload=async function(){
   if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
   else setSeasonEmptyState('idle');
 
+  const completedSimulationHandoff = bootstrapCompletedSimulationDraftHandoff(urlParams, requestedSport);
+  if (completedSimulationHandoff?.redirected) {
+    return;
+  }
+  if (completedSimulationHandoff?.state) {
+    hideSeasonEmptyState();
+    D = completedSimulationHandoff.state;
+    applySportContext(D.sport || requestedSport);
+    hydrateDraftUserContextFromLobby();
+    refreshCommissionerAccess();
+    try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+    initSeason();
+    applyRequestedSeasonView();
+    return;
+  }
+
   if (requestedHistoricalUniverse) {
     const slotState = loadHistoricalUniverseSlotState(requestedHistoricalUniverse, requestedSport);
     if (slotState) {
@@ -6801,7 +7158,9 @@ window.onload=async function(){
         entryMode: slotState.historicalEntryMode || null
       });
       hideSeasonEmptyState();
-      D = slotState;
+      D = shouldPersistSharedSimulationState(slotState)
+        ? normalizeSharedSimulationSeasonBootState(slotState, requestedHistoricalUniverse)
+        : slotState;
       D.historicalUniverseSlotId = requestedHistoricalUniverse;
       if (isHistoricalSimulationUniverse(D)) {
         ensureCpuTeamPersonalitiesByTeam(D);
