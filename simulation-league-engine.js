@@ -566,10 +566,58 @@
       : null;
   }
 
+  function getPlayerDesignation(player){
+    return String(player?.designation || player?.injuryStatus || 'ACTIVE').trim().toUpperCase();
+  }
+
+  function isUnavailableForSimulation(player){
+    const designation=getPlayerDesignation(player);
+    return designation==='OUT' ||
+      designation==='INACTIVE' ||
+      designation==='DNP' ||
+      designation==='DOUBTFUL' ||
+      designation==='SUSPENDED' ||
+      designation==='IR';
+  }
+
+  function getStarterRankScore(player, packId){
+    if(!(player && typeof player==='object')) return 0;
+    const profile=player?.simProfile || buildPlayerSimulationProfile(player, { packId:player?.historicalPackId || packId || null });
+    return Number(
+      player?.mixedEraOverall ??
+      profile?.mixedEraRatings?.overall ??
+      profile?.ratings?.overall ??
+      player?.fp ??
+      0
+    ) || 0;
+  }
+
+  function selectSimulationStarters(roster, requestedStarters, packId){
+    const availableRequested=(Array.isArray(requestedStarters) ? requestedStarters : [])
+      .filter(function(player){ return player && !isUnavailableForSimulation(player); });
+    const requestedIds=new Set(availableRequested.map(function(player){ return Number(player?.id); }));
+    const availableBench=(Array.isArray(roster) ? roster : [])
+      .filter(function(player){
+        return player &&
+          !isUnavailableForSimulation(player) &&
+          !requestedIds.has(Number(player?.id));
+      })
+      .slice()
+      .sort(function(a, b){
+        const rankDiff=getStarterRankScore(b, packId) - getStarterRankScore(a, packId);
+        if(rankDiff) return rankDiff;
+        const fpDiff=Number(b?.fp || 0) - Number(a?.fp || 0);
+        if(fpDiff) return fpDiff;
+        return String(a?.name || '').localeCompare(String(b?.name || ''));
+      });
+    return availableRequested.concat(availableBench).slice(0, 5);
+  }
+
   function buildTeamProfile(roster, lineupIds, packId){
-    const starters=(Array.isArray(lineupIds) ? lineupIds : [])
+    const requestedStarters=(Array.isArray(lineupIds) ? lineupIds : [])
       .map(function(playerId){ return getPlayerById(roster, playerId); })
       .filter(Boolean);
+    const starters=selectSimulationStarters(roster, requestedStarters, packId);
     const tuning=getPackTuning(packId);
     const avg=function(selector, fallback){
       if(!starters.length) return fallback;

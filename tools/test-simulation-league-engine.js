@@ -42,8 +42,21 @@ const roster = Array.from({ length: 10 }, (_, index) => ({
   name: `Starter ${index + 1}`,
   team: 'SIM',
   pos: index < 2 ? 'G' : index < 4 ? 'F' : 'C',
+  designation: index === 0 ? 'OUT' : 'ACTIVE',
   fp: 55 - index,
-  mixedEraOverall: 95 - index
+  mixedEraOverall: 95 - index,
+  pts: 30 - index,
+  reb: 10 - Math.floor(index / 2),
+  ast: 8 - Math.floor(index / 3),
+  stl: index < 3 ? 2 : 1,
+  blk: index < 4 ? 1 : 0,
+  to: 3,
+  min: 36 - index,
+  fgm: 10 - Math.floor(index / 2),
+  fga: 18 - index,
+  ftm: 6 - Math.floor(index / 3),
+  fta: 7 - Math.floor(index / 3),
+  tpm: index < 4 ? 3 : 1
 }));
 
 const state = {
@@ -74,6 +87,20 @@ const dayResult = simulateSimulationGameDay({
 
 assert.equal(dayResult.gameLogs.length, 15);
 assert.ok(dayResult.gameLogs.every((game) => game.homeScore >= 70 && game.awayScore >= 70));
+assert.ok(
+  dayResult.gameLogs.some((game) => game.homeScore !== 82 || game.awayScore !== 82),
+  'fresh simulation leagues should not devolve into 82-82 ties when lineups are unset'
+);
+assert.ok(
+  Object.values(dayResult.resultsByTeam).every((teamResult) => teamResult.entries.length === 5),
+  'engine should auto-select five starters when no lineup state has been saved yet'
+);
+assert.ok(
+  Object.values(dayResult.resultsByTeam).every((teamResult) =>
+    teamResult.entries.every((entry) => String(entry?.player?.designation || 'ACTIVE').toUpperCase() !== 'OUT')
+  ),
+  'engine should not auto-start players marked OUT'
+);
 
 const updated = applySimulationDayResults(state, dayResult);
 assert.equal(updated.currentDay, 2);

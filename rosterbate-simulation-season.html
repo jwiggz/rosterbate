@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RosterBate Simulation Season</title>
+  <script src="historical-universe-slots.js"></script>
   <script src="simulation-mode-config.js"></script>
   <script src="simulation-mode-runtime.js"></script>
   <script src="simulation-league-engine.js"></script>
@@ -345,6 +346,25 @@
       return window.RosterBateSimulationEngine || {};
     }
 
+    function getRequestedHistoricalUniverseSlotId(){
+      return String(new URLSearchParams(window.location.search || '').get('historicalUniverse') || '').trim();
+    }
+
+    function loadHistoricalUniverseSlotState(slotId){
+      const api = window.RosterBateHistoricalUniverseSlots;
+      const targetSlotId = String(slotId || '').trim();
+      if (!api || !targetSlotId || typeof api.getState !== 'function') {
+        return null;
+      }
+      const state = api.getState(targetSlotId);
+      if (!state || typeof state !== 'object') {
+        return null;
+      }
+      return String(state?.simulationMode || '').trim() === 'nba_mixed_era_single_player_v1'
+        ? state
+        : null;
+    }
+
     function readCompletedSimulationDraft(){
       const runtime = getSimulationRuntime();
       if (typeof runtime.readCompletedSimulationState === 'function') {
@@ -364,6 +384,27 @@
       }
       localStorage.setItem(runtime.COMPLETED_DRAFT_KEY || 'rbSimulationModeCompletedDraft', JSON.stringify(state));
       return state;
+    }
+
+    function persistSimulationUniverseSlotSnapshot(reason){
+      const api = window.RosterBateHistoricalUniverseSlots;
+      if (!api || !SIM_STATE || typeof api.upsertFromState !== 'function') {
+        return null;
+      }
+      try{
+        const persisted = api.upsertFromState(SIM_STATE, {
+          slotId: String(SIM_STATE?.historicalUniverseSlotId || '').trim() || null,
+          reason: String(reason || '').trim() || 'simulation_save'
+        });
+        if (persisted?.slotId) {
+          SIM_STATE.historicalUniverseSlotId = persisted.slotId;
+          writeCompletedSimulationDraft(SIM_STATE);
+        }
+        return persisted;
+      }catch(error){
+        console.warn('Simulation universe slot save skipped:', error);
+        return null;
+      }
     }
 
     function formatSimulationDate(shell, day){
@@ -674,11 +715,27 @@
       SIM_STATE.seasonState = engine.applySimulationDayResults(SIM_STATE.seasonState, dayResult);
       ensurePostseasonSnapshot(SIM_STATE);
       writeCompletedSimulationDraft(SIM_STATE);
+      persistSimulationUniverseSlotSnapshot('simulation_day');
       renderSimulationDashboard(SIM_STATE);
     }
 
     function bootSimulationSeason(){
-      SIM_STATE = readCompletedSimulationDraft();
+      const requestedSlotId = getRequestedHistoricalUniverseSlotId();
+      if (requestedSlotId) {
+        SIM_STATE = loadHistoricalUniverseSlotState(requestedSlotId);
+        if (SIM_STATE) {
+          SIM_STATE.historicalUniverseSlotId = requestedSlotId;
+          writeCompletedSimulationDraft(SIM_STATE);
+        } else {
+          console.warn('Requested simulation universe slot was not found. Falling back to completed-draft storage.', requestedSlotId);
+        }
+      }
+      if (!SIM_STATE) {
+        SIM_STATE = readCompletedSimulationDraft();
+      }
+      if (SIM_STATE && String(SIM_STATE?.simulationMode || '').trim() === 'nba_mixed_era_single_player_v1') {
+        persistSimulationUniverseSlotSnapshot('season_boot');
+      }
       if (SIM_STATE?.leagueShell && typeof getSimulationEngine().buildSimulationSeasonSchedule === 'function') {
         SIM_SCHEDULE = getSimulationEngine().buildSimulationSeasonSchedule(SIM_STATE.leagueShell);
       } else {

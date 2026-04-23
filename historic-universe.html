@@ -1292,7 +1292,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const recentLeagueTrades = Array.isArray(detailsViewModel.recentLeagueTrades)
       ? detailsViewModel.recentLeagueTrades
       : [];
-    const seasonUrl = api.buildSeasonUrl(slot, getSport());
+    const seasonUrl = api.buildSeasonUrl(slot, getSport(), state);
     const archiveUrl = 'historic-seasons.html?sport=' + encodeURIComponent(getSport());
     const modeLabel = api.getModeLabel(slot.historicalEntryMode);
     const simulationMode = isSimulationModeUniverse(slot, state);
