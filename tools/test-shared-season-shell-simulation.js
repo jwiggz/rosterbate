@@ -29,6 +29,7 @@ module.exports = {
   getActiveSeasonPages,
   getActiveSeasonLabels,
   normalizeSharedSimulationSeasonBootState,
+  buildSharedSimulationPersistenceState,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
   setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; }
 };
@@ -152,5 +153,69 @@ assert.equal(normalized.freeAgents[0].name, 'Hakeem Olajuwon', 'boot normalizati
 assert.ok(Array.isArray(normalized.waiver), 'boot normalization should provide a legacy-safe waiver array');
 assert.ok(Array.isArray(normalized.standings), 'boot normalization should provide standings for initSeason');
 assert.equal(normalized.standings[0].teamIdx, 0, 'boot normalization should align standings rows to legacy team indexes');
+
+const progressedShell = {
+  ...normalized,
+  currentDay: 19,
+  currentWeek: 3,
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 11, l: 4, pf: 1540, pa: 1412 },
+    { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 8, l: 7, pf: 1460, pa: 1494 }
+  ],
+  freeAgents: [{ id: 99, name: 'Tim Duncan', pos: 'PF' }]
+};
+
+const progressedGame = {
+  week: 3,
+  day: 19,
+  rosters: [
+    [{ id: 23, name: 'Michael Jordan', pos: 'SG' }, { id: 33, name: 'Scottie Pippen', pos: 'SF' }],
+    [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+  ],
+  waiver: [{ id: 99, name: 'Tim Duncan', pos: 'PF' }],
+  standings: progressedShell.standings,
+  starters: [
+    [23, 33],
+    [30]
+  ]
+};
+
+const persistedSimulationState = toPlain(
+  api.buildSharedSimulationPersistenceState(fixture, progressedShell, progressedGame)
+);
+
+assert.equal(
+  persistedSimulationState.seasonState.currentDay,
+  19,
+  'simulation persistence should carry the updated current day into seasonState'
+);
+assert.equal(
+  persistedSimulationState.seasonState.currentWeek,
+  3,
+  'simulation persistence should carry the updated current week into seasonState'
+);
+assert.equal(
+  persistedSimulationState.seasonState.standings[0].w,
+  11,
+  'simulation persistence should carry updated standings into seasonState'
+);
+assert.equal(
+  persistedSimulationState.draftState.rostersByTeam.LAL[1].name,
+  'Scottie Pippen',
+  'simulation persistence should map legacy rosters back into draftState.rostersByTeam'
+);
+assert.equal(
+  persistedSimulationState.draftState.freeAgents[0].name,
+  'Tim Duncan',
+  'simulation persistence should map the current waiver pool back into draftState.freeAgents'
+);
+assert.deepEqual(
+  persistedSimulationState.seasonState.lineupIdsByTeam,
+  {
+    LAL: [23, 33],
+    BOS: [30]
+  },
+  'simulation persistence should align starter ids back into seasonState.lineupIdsByTeam by team abbr'
+);
 
 console.log('shared season shell simulation test passed');
