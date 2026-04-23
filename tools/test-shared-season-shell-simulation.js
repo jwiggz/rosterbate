@@ -37,6 +37,79 @@ ${extractBetween('function renderSimulationRosterInSharedShell(', 'function rend
 ${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderActiveSeasonScreen(')}
 ${extractBetween('async function loadDemo(', 'function isDemoSeasonData(')}
 
+function bootSeasonShellForTest(search){
+  applySportContext(CURRENT_SPORT);
+  const urlParams = new URLSearchParams(search || '');
+  const leagueId = urlParams.get('league');
+  const requestedSport = normalizeRosterbateSport(urlParams.get('sport') || CURRENT_SPORT);
+  const requestedHistoricalUniverse = getRequestedHistoricalUniverseSlotId(urlParams);
+  const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot(urlParams, requestedSport);
+  ACTIVE_SEASON_MODE = 'fantasy';
+  SEASON_MODE_ADAPTER = null;
+  if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
+  else setSeasonEmptyState('idle');
+
+  if (completedSimulationDraftBoot?.redirected && completedSimulationDraftBoot.redirectUrl) {
+    return {
+      redirected: true,
+      activeSeasonMode: ACTIVE_SEASON_MODE,
+      hasAdapter: !!SEASON_MODE_ADAPTER,
+      emptyState: getSeasonEmptyStateForTest()
+    };
+  }
+
+  if (completedSimulationDraftBoot?.state && completedSimulationDraftBoot.rawState) {
+    ACTIVE_SEASON_MODE = 'simulation';
+    SEASON_MODE_ADAPTER = buildSimulationSeasonAdapterFromState(
+      completedSimulationDraftBoot.slotId,
+      completedSimulationDraftBoot.rawState
+    );
+    return {
+      redirected: false,
+      activeSeasonMode: ACTIVE_SEASON_MODE,
+      hasAdapter: !!SEASON_MODE_ADAPTER,
+      emptyState: getSeasonEmptyStateForTest()
+    };
+  }
+
+  if (requestedHistoricalUniverse) {
+    const slotState = loadHistoricalUniverseSlotState(requestedHistoricalUniverse, requestedSport);
+    if (slotState) {
+      const sharedSimulationSeason = isSharedSimulationSeason(urlParams, slotState);
+      ACTIVE_SEASON_MODE = sharedSimulationSeason ? 'simulation' : 'fantasy';
+      SEASON_MODE_ADAPTER = sharedSimulationSeason
+        ? buildSimulationSeasonAdapterFromState(requestedHistoricalUniverse, slotState)
+        : null;
+      return {
+        redirected: false,
+        activeSeasonMode: ACTIVE_SEASON_MODE,
+        hasAdapter: !!SEASON_MODE_ADAPTER,
+        emptyState: getSeasonEmptyStateForTest()
+      };
+    }
+  }
+
+  let raw = null;
+  try{ raw = localStorage.getItem('rosterbateDraft'); }catch(e){}
+  if(raw){
+    try{
+      const parsed = JSON.parse(raw);
+      const localAutoLoad = resolveLocalSavedSeasonAutoLoad(parsed, requestedSport);
+      if(localAutoLoad){
+        ACTIVE_SEASON_MODE = localAutoLoad.activeSeasonMode;
+        SEASON_MODE_ADAPTER = localAutoLoad.adapter;
+      }
+    }catch(e){}
+  }
+
+  return {
+    redirected: false,
+    activeSeasonMode: ACTIVE_SEASON_MODE,
+    hasAdapter: !!SEASON_MODE_ADAPTER,
+    emptyState: getSeasonEmptyStateForTest()
+  };
+}
+
 module.exports = {
   getRequestedSimulationMode,
   getRequestedHistoricalUniverseSlotId,
@@ -62,6 +135,7 @@ module.exports = {
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
   resolveLocalSavedSeasonAutoLoad,
+  bootSeasonShellForTest,
   loadDemo,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
   getActiveSeasonMode(){ return ACTIVE_SEASON_MODE; },
@@ -154,6 +228,7 @@ let historicalSlotUpsertCalls = [];
 let demoInitCalls = 0;
 let demoViewCalls = 0;
 let demoToasts = [];
+let lastEmptyState = null;
 const simulationAdapterStub = {
   getState() {
     return {
@@ -278,6 +353,16 @@ const sandbox = {
   URLSearchParams,
   normalizeRosterbateSport(value) {
     return String(value || 'nba').trim().toLowerCase() || 'nba';
+  },
+  applySportContext() {},
+  hideSeasonEmptyState() {
+    lastEmptyState = 'hidden';
+  },
+  setSeasonEmptyState(value) {
+    lastEmptyState = String(value || '');
+  },
+  getSeasonEmptyStateForTest() {
+    return lastEmptyState;
   },
   persistHistoricalUniverseSlotSnapshot(reason) {
     persistedReason = reason;
@@ -985,6 +1070,10 @@ api.setSeasonModeAdapter(null);
 demoInitCalls = 0;
 demoViewCalls = 0;
 demoToasts = [];
+const staleSimulationBoot = api.bootSeasonShellForTest('?sport=nba&simulation=nba_mixed_era');
+assert.equal(staleSimulationBoot.activeSeasonMode, 'fantasy', 'stale simulation URLs with no recoverable state should boot in fantasy mode');
+assert.equal(staleSimulationBoot.hasAdapter, false, 'stale simulation URLs with no recoverable state should not leave a null simulation adapter behind');
+assert.equal(staleSimulationBoot.emptyState, 'idle', 'stale simulation URLs with no recoverable state should stay on the idle empty state');
 api.loadDemo().then(() => {
   assert.equal(api.getActiveSeasonMode(), 'fantasy', 'demo boot should clear stale simulation mode when no recoverable simulation state exists');
   assert.equal(api.getSeasonModeAdapter(), null, 'demo boot should not leave a missing simulation adapter behind');
