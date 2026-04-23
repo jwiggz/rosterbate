@@ -791,6 +791,86 @@
     return { byDay:byDay, teamGameCounts:teamGameCounts };
   }
 
+  function buildSimulationPlayIn(conferenceStandings){
+    const ordered=(Array.isArray(conferenceStandings) ? conferenceStandings : [])
+      .slice()
+      .sort(function(a, b){
+        return Number(a?.seed || 99) - Number(b?.seed || 99);
+      });
+    return {
+      topSix:ordered.filter(function(entry){
+        const seed=Number(entry?.seed);
+        return seed >= 1 && seed <= 6;
+      }),
+      sevenEight:ordered.filter(function(entry){
+        const seed=Number(entry?.seed);
+        return seed === 7 || seed === 8;
+      }),
+      nineTen:ordered.filter(function(entry){
+        const seed=Number(entry?.seed);
+        return seed === 9 || seed === 10;
+      })
+    };
+  }
+
+  function resolveSimulationPlayIn(playIn, results){
+    const topSix=[].concat(playIn?.topSix || []).filter(Boolean);
+    const sevenEight=Array.isArray(playIn?.sevenEight) ? playIn.sevenEight : [];
+    const nineTen=Array.isArray(playIn?.nineTen) ? playIn.nineTen : [];
+    const sevenSeed=sevenEight.find(function(entry){
+      return entry?.teamAbbr === results?.sevenEightWinner;
+    });
+    const nineTenWinner=nineTen.find(function(entry){
+      return entry?.teamAbbr === results?.nineTenWinner;
+    });
+    const sevenEightLoser=sevenEight.find(function(entry){
+      return entry?.teamAbbr !== results?.sevenEightWinner;
+    });
+    const eightSeed=[sevenEightLoser, nineTenWinner].filter(Boolean).find(function(entry){
+      return entry?.teamAbbr === results?.finalWinner;
+    });
+    return topSix.concat([sevenSeed, eightSeed]).filter(Boolean);
+  }
+
+  function buildSimulationPlayoffBracket(conferences){
+    const east=Array.isArray(conferences?.east) ? conferences.east : [];
+    const west=Array.isArray(conferences?.west) ? conferences.west : [];
+
+    function buildConferenceRound(field){
+      return [
+        { higherSeed:field[0], lowerSeed:field[7] },
+        { higherSeed:field[1], lowerSeed:field[6] },
+        { higherSeed:field[2], lowerSeed:field[5] },
+        { higherSeed:field[3], lowerSeed:field[4] }
+      ];
+    }
+
+    return {
+      east:{ firstRound:buildConferenceRound(east) },
+      west:{ firstRound:buildConferenceRound(west) },
+      finals:null
+    };
+  }
+
+  function advanceSimulationSeries(series, outcome){
+    return Object.assign({}, series, {
+      winnerTeamAbbr:String(outcome?.winner || '').trim(),
+      games:Number(outcome?.games || 4)
+    });
+  }
+
+  function finalizeSimulationChampion(state){
+    const finals=state?.finals || null;
+    const winnerTeamAbbr=finals?.winnerTeamAbbr || null;
+    return {
+      championTeamAbbr:winnerTeamAbbr,
+      runnerUpTeamAbbr:finals?.higherSeed?.teamAbbr === winnerTeamAbbr
+        ? finals?.lowerSeed?.teamAbbr || null
+        : finals?.higherSeed?.teamAbbr || null,
+      finalsGames:Number(finals?.games || 0)
+    };
+  }
+
   function convertFantasyTotalToNbaScore(total){
     return Math.max(70, Math.round(82 + (Number(total || 0) * 0.72)));
   }
@@ -966,6 +1046,11 @@
     enrichLeagueState:enrichLeagueState,
     simulateLeagueDay:simulateLeagueDay,
     buildSimulationSeasonSchedule:buildSimulationSeasonSchedule,
+    buildSimulationPlayIn:buildSimulationPlayIn,
+    resolveSimulationPlayIn:resolveSimulationPlayIn,
+    buildSimulationPlayoffBracket:buildSimulationPlayoffBracket,
+    advanceSimulationSeries:advanceSimulationSeries,
+    finalizeSimulationChampion:finalizeSimulationChampion,
     simulateSimulationGameDay:simulateSimulationGameDay,
     applySimulationDayResults:applySimulationDayResults,
     computeFantasyPoints:computeFantasyPoints
