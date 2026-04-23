@@ -8,6 +8,26 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function readJsonStorage(key){
+    if (!(root && root.localStorage)) {
+      return null;
+    }
+    try{
+      const raw = root.localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    }catch(error){
+      return null;
+    }
+  }
+
+  function writeJsonStorage(key, value){
+    if (!(root && root.localStorage)) {
+      return value;
+    }
+    root.localStorage.setItem(key, JSON.stringify(value));
+    return value;
+  }
+
   function normalizeTeamAbbr(teamAbbr){
     return String(teamAbbr || '').trim().toUpperCase();
   }
@@ -221,9 +241,19 @@
     return next;
   }
 
+  function readCompletedSimulationState(){
+    return readJsonStorage(COMPLETED_DRAFT_KEY);
+  }
+
+  function writeCompletedSimulationState(state){
+    return writeJsonStorage(COMPLETED_DRAFT_KEY, state);
+  }
+
   const api = {
     STORAGE_KEY,
     COMPLETED_DRAFT_KEY,
+    readCompletedSimulationState,
+    writeCompletedSimulationState,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,
     setSimulationLineup,
