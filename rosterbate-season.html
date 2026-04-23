@@ -2358,7 +2358,13 @@ function loadHistoricalUniverseSlotState(slotId, requestedSport){
   if(!api || !targetSlotId) return null;
   const state=api.getState(targetSlotId);
   if(!state || typeof state!=='object') return null;
-  const stateSport=normalizeRosterbateSport(state?.sport || CURRENT_SPORT);
+  const stateSport=normalizeRosterbateSport(
+    state?.sport
+    || state?.leagueShell?.sport
+    || state?.leagueShell?.settings?.sport
+    || requestedSport
+    || CURRENT_SPORT
+  );
   const requestedSportNormalized=normalizeRosterbateSport(requestedSport || stateSport);
   if(stateSport!==requestedSportNormalized) return null;
   return state;

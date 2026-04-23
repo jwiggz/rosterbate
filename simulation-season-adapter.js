@@ -62,6 +62,62 @@
     return `${Number(row.w || 0)}-${Number(row.l || 0)}`;
   }
 
+  function sortStandingsRows(rows){
+    return (Array.isArray(rows) ? rows.slice() : []).sort((a, b) => {
+      const winDiff = Number(b?.w || 0) - Number(a?.w || 0);
+      if (winDiff) return winDiff;
+      const lossDiff = Number(a?.l || 0) - Number(b?.l || 0);
+      if (lossDiff) return lossDiff;
+      const pdDiff = (Number(b?.pf || 0) - Number(b?.pa || 0)) - (Number(a?.pf || 0) - Number(a?.pa || 0));
+      if (pdDiff) return pdDiff;
+      return String(a?.teamAbbr || '').localeCompare(String(b?.teamAbbr || ''));
+    });
+  }
+
+  function buildConferenceSnapshotRows(state, conference){
+    return sortStandingsRows((state?.seasonState?.standings || []).filter((row) => (
+      String(row?.conference || '').toLowerCase() === String(conference || '').toLowerCase()
+    ))).map((row, index) => ({
+      ...clone(row),
+      seed: index + 1
+    }));
+  }
+
+  function getScheduleDayCount(scheduleByDay){
+    return Object.keys(scheduleByDay || {})
+      .map((day) => Number(day))
+      .filter((day) => Number.isFinite(day) && day > 0)
+      .reduce((maxDay, day) => Math.max(maxDay, day), 0);
+  }
+
+  function ensurePostseasonSnapshot(nextState, totalDays){
+    if (!nextState || !totalDays || Number(nextState?.seasonState?.currentDay || 1) <= totalDays) {
+      return nextState;
+    }
+    const postseasonState = {
+      ...(nextState?.postseasonState || {})
+    };
+    postseasonState.phase = postseasonState.phase && postseasonState.phase !== 'regular_season'
+      ? postseasonState.phase
+      : 'postseason_ready';
+    if (!postseasonState.playIn && typeof engineApi.buildSimulationPlayIn === 'function') {
+      postseasonState.playIn = {
+        east: engineApi.buildSimulationPlayIn(buildConferenceSnapshotRows(nextState, 'East')),
+        west: engineApi.buildSimulationPlayIn(buildConferenceSnapshotRows(nextState, 'West'))
+      };
+    }
+    if (!postseasonState.bracket && typeof engineApi.buildSimulationPlayoffBracket === 'function') {
+      postseasonState.bracket = engineApi.buildSimulationPlayoffBracket({
+        east: buildConferenceSnapshotRows(nextState, 'East').slice(0, 8),
+        west: buildConferenceSnapshotRows(nextState, 'West').slice(0, 8)
+      });
+    }
+    return {
+      ...clone(nextState),
+      postseasonState
+    };
+  }
+
   function getCanonicalScheduleByDay(state, shell){
     const persistedSchedule = state?.seasonState?.scheduleByDay;
     if (persistedSchedule && typeof persistedSchedule === 'object' && Object.keys(persistedSchedule).length) {
@@ -220,6 +276,11 @@
       simulateNextDay(){
         const shell = clone(state?.leagueShell || {});
         const scheduleByDay = getCanonicalScheduleByDay(state, shell);
+        const totalDays = getScheduleDayCount(scheduleByDay);
+        if (totalDays > 0 && Number(state?.seasonState?.currentDay || 1) > totalDays) {
+          state = ensurePostseasonSnapshot(state, totalDays);
+          return this.getState();
+        }
         const schedule = { byDay: clone(scheduleByDay) };
         const teamMeta = clone(shell.teams || []);
         const teamNames = teamMeta.map((team) => team.name);
@@ -242,7 +303,7 @@
           lineupIdsByTeam: clone(currentSeasonState.lineupIdsByTeam || {})
         });
         const nextSeasonState = engineApi.applySimulationDayResults(engineSeasonState, dayResult);
-        state = {
+        state = ensurePostseasonSnapshot({
           ...clone(state),
           currentDay: Number(nextSeasonState.currentDay || currentSeasonState.currentDay || 1),
           currentWeek: Number(nextSeasonState.currentWeek || currentSeasonState.currentWeek || 1),
@@ -250,7 +311,7 @@
             ...nextSeasonState,
             scheduleByDay: clone(scheduleByDay)
           }
-        };
+        }, totalDays);
         return this.getState();
       }
     };

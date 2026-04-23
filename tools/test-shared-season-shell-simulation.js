@@ -160,6 +160,7 @@ let completedDraftUpsertOptions = null;
 let completedDraftUpsertError = null;
 let createdSimulationAdapters = [];
 let historicalSlotUpsertCalls = [];
+let historicalSlotStateById = Object.create(null);
 let demoInitCalls = 0;
 let demoViewCalls = 0;
 let demoToasts = [];
@@ -358,6 +359,12 @@ const sandbox = {
       href: 'rosterbate-season.html'
     },
     RosterBateHistoricalUniverseSlots: {
+      getState(slotId) {
+        const targetSlotId = String(slotId || '').trim();
+        return targetSlotId && historicalSlotStateById[targetSlotId]
+          ? toPlain(historicalSlotStateById[targetSlotId])
+          : null;
+      },
       upsertFromState(state, options) {
         historicalSlotUpsertCalls.push({
           state: toPlain(state),
@@ -555,6 +562,44 @@ assert.equal(
   null,
   'completed-draft handoff should not override an explicit historical universe slot'
 );
+
+historicalSlotStateById = {
+  'sim-slot-mixed-era': {
+    simulationMode: 'nba_mixed_era_single_player_v1',
+    leagueShell: {
+      sport: 'nba',
+      teams: [
+        { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
+        { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' }
+      ]
+    },
+    draftState: {
+      controlledTeamAbbr: 'LAL',
+      rostersByTeam: {
+        LAL: [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+        BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+      },
+      freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }]
+    },
+    seasonState: {
+      currentDay: 12,
+      currentWeek: 2,
+      standings: [
+        { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+        { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
+      ]
+    }
+  }
+};
+sandbox.CURRENT_SPORT = 'mlb';
+const reopenedMixedEraSlot = toPlain(api.loadHistoricalUniverseSlotState('sim-slot-mixed-era', 'nba'));
+assert.equal(
+  reopenedMixedEraSlot?.leagueShell?.sport,
+  'nba',
+  'shared mixed-era slots should reopen from their persisted simulation sport even when the current global sport differs'
+);
+sandbox.CURRENT_SPORT = 'nba';
+historicalSlotStateById = Object.create(null);
 
 api.setActiveSeasonMode('fantasy');
 api.setSeasonModeAdapter(null);

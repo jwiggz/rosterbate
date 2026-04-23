@@ -222,4 +222,133 @@ assert.equal(adapter.getRosterViewModel().lineup.length, 1);
 assert.equal(adapter.getScheduleViewModel().nextGame.day, 13);
 assert.equal(adapter.getScheduleViewModel().nextGame.opponentAbbr, 'LAL');
 
+const postseasonTransitionAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-postseason-transition',
+  state: {
+    simulationMode: 'nba_mixed_era_single_player_v1',
+    leagueShell: {
+      anchorSeasonLabel: '2025-26 NBA',
+      teams: [
+        { abbr: 'ATL', name: 'Atlanta Hawks', conference: 'East', division: 'Southeast' },
+        { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' },
+        { abbr: 'CHI', name: 'Chicago Bulls', conference: 'East', division: 'Central' },
+        { abbr: 'CLE', name: 'Cleveland Cavaliers', conference: 'East', division: 'Central' },
+        { abbr: 'DET', name: 'Detroit Pistons', conference: 'East', division: 'Central' },
+        { abbr: 'IND', name: 'Indiana Pacers', conference: 'East', division: 'Central' },
+        { abbr: 'MIA', name: 'Miami Heat', conference: 'East', division: 'Southeast' },
+        { abbr: 'MIL', name: 'Milwaukee Bucks', conference: 'East', division: 'Central' },
+        { abbr: 'NYK', name: 'New York Knicks', conference: 'East', division: 'Atlantic' },
+        { abbr: 'ORL', name: 'Orlando Magic', conference: 'East', division: 'Southeast' },
+        { abbr: 'DAL', name: 'Dallas Mavericks', conference: 'West', division: 'Southwest' },
+        { abbr: 'DEN', name: 'Denver Nuggets', conference: 'West', division: 'Northwest' },
+        { abbr: 'GSW', name: 'Golden State Warriors', conference: 'West', division: 'Pacific' },
+        { abbr: 'HOU', name: 'Houston Rockets', conference: 'West', division: 'Southwest' },
+        { abbr: 'LAC', name: 'LA Clippers', conference: 'West', division: 'Pacific' },
+        { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
+        { abbr: 'MEM', name: 'Memphis Grizzlies', conference: 'West', division: 'Southwest' },
+        { abbr: 'MIN', name: 'Minnesota Timberwolves', conference: 'West', division: 'Northwest' },
+        { abbr: 'OKC', name: 'Oklahoma City Thunder', conference: 'West', division: 'Northwest' },
+        { abbr: 'PHX', name: 'Phoenix Suns', conference: 'West', division: 'Pacific' }
+      ]
+    },
+    draftState: {
+      controlledTeamAbbr: 'BOS',
+      rostersByTeam: {
+        ATL: [],
+        BOS: [{ id: 1, name: 'Player 1', pos: 'PG', team: 'BOS', fp: 50 }],
+        CHI: [],
+        CLE: [],
+        DET: [],
+        IND: [],
+        MIA: [],
+        MIL: [],
+        NYK: [],
+        ORL: [],
+        DAL: [],
+        DEN: [],
+        GSW: [],
+        HOU: [],
+        LAC: [],
+        LAL: [],
+        MEM: [],
+        MIN: [],
+        OKC: [],
+        PHX: []
+      },
+      freeAgents: []
+    },
+    seasonState: {
+      currentDay: 2,
+      currentWeek: 1,
+      lineupIdsByTeam: { BOS: [1] },
+      standings: [
+        { teamIdx: 0, teamAbbr: 'ATL', conference: 'East', division: 'Southeast', w: 60, l: 22, pf: 9200, pa: 8800 },
+        { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 58, l: 24, pf: 9180, pa: 8820 },
+        { teamIdx: 2, teamAbbr: 'CHI', conference: 'East', division: 'Central', w: 56, l: 26, pf: 9100, pa: 8850 },
+        { teamIdx: 3, teamAbbr: 'CLE', conference: 'East', division: 'Central', w: 54, l: 28, pf: 9050, pa: 8900 },
+        { teamIdx: 4, teamAbbr: 'DET', conference: 'East', division: 'Central', w: 52, l: 30, pf: 9000, pa: 8925 },
+        { teamIdx: 5, teamAbbr: 'IND', conference: 'East', division: 'Central', w: 50, l: 32, pf: 8960, pa: 8940 },
+        { teamIdx: 6, teamAbbr: 'MIA', conference: 'East', division: 'Southeast', w: 48, l: 34, pf: 8920, pa: 8960 },
+        { teamIdx: 7, teamAbbr: 'MIL', conference: 'East', division: 'Central', w: 46, l: 36, pf: 8880, pa: 8990 },
+        { teamIdx: 8, teamAbbr: 'NYK', conference: 'East', division: 'Atlantic', w: 44, l: 38, pf: 8840, pa: 9020 },
+        { teamIdx: 9, teamAbbr: 'ORL', conference: 'East', division: 'Southeast', w: 42, l: 40, pf: 8800, pa: 9050 },
+        { teamIdx: 10, teamAbbr: 'DAL', conference: 'West', division: 'Southwest', w: 61, l: 21, pf: 9250, pa: 8780 },
+        { teamIdx: 11, teamAbbr: 'DEN', conference: 'West', division: 'Northwest', w: 59, l: 23, pf: 9210, pa: 8810 },
+        { teamIdx: 12, teamAbbr: 'GSW', conference: 'West', division: 'Pacific', w: 57, l: 25, pf: 9160, pa: 8840 },
+        { teamIdx: 13, teamAbbr: 'HOU', conference: 'West', division: 'Southwest', w: 55, l: 27, pf: 9110, pa: 8880 },
+        { teamIdx: 14, teamAbbr: 'LAC', conference: 'West', division: 'Pacific', w: 53, l: 29, pf: 9070, pa: 8910 },
+        { teamIdx: 15, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 51, l: 31, pf: 9030, pa: 8940 },
+        { teamIdx: 16, teamAbbr: 'MEM', conference: 'West', division: 'Southwest', w: 49, l: 33, pf: 8990, pa: 8970 },
+        { teamIdx: 17, teamAbbr: 'MIN', conference: 'West', division: 'Northwest', w: 47, l: 35, pf: 8950, pa: 9000 },
+        { teamIdx: 18, teamAbbr: 'OKC', conference: 'West', division: 'Northwest', w: 45, l: 37, pf: 8910, pa: 9030 },
+        { teamIdx: 19, teamAbbr: 'PHX', conference: 'West', division: 'Pacific', w: 43, l: 39, pf: 8870, pa: 9060 }
+      ],
+      completedGameLogs: [],
+      scheduleByDay: {
+        2: [{ homeAbbr: 'ATL', awayAbbr: 'BOS' }]
+      },
+      activityLog: []
+    },
+    postseasonState: {
+      phase: 'regular_season',
+      champion: null
+    }
+  }
+});
+
+const postseasonReadyState = postseasonTransitionAdapter.simulateNextDay();
+assert.equal(
+  postseasonReadyState.seasonState.currentDay,
+  3,
+  'simulateNextDay should still advance through the final scheduled day before entering postseason-ready state'
+);
+assert.equal(
+  postseasonReadyState.postseasonState.phase,
+  'postseason_ready',
+  'simulateNextDay should transition the shared shell into postseason-ready state after the final scheduled day'
+);
+assert.ok(postseasonReadyState.postseasonState.playIn?.east, 'simulateNextDay should seed the East play-in snapshot when the regular season ends');
+assert.ok(postseasonReadyState.postseasonState.playIn?.west, 'simulateNextDay should seed the West play-in snapshot when the regular season ends');
+assert.ok(postseasonReadyState.postseasonState.bracket?.east, 'simulateNextDay should seed the East playoff bracket when the regular season ends');
+assert.ok(postseasonReadyState.postseasonState.bracket?.west, 'simulateNextDay should seed the West playoff bracket when the regular season ends');
+
+const postseasonDayCount = postseasonReadyState.seasonState.currentDay;
+const postseasonLogCount = postseasonReadyState.seasonState.completedGameLogs.length;
+const postseasonAlreadyOverState = postseasonTransitionAdapter.simulateNextDay();
+assert.equal(
+  postseasonAlreadyOverState.seasonState.currentDay,
+  postseasonDayCount,
+  'simulateNextDay should stop advancing empty days once the regular season schedule is exhausted'
+);
+assert.equal(
+  postseasonAlreadyOverState.seasonState.completedGameLogs.length,
+  postseasonLogCount,
+  'simulateNextDay should not add empty regular-season logs once postseason seeding is ready'
+);
+assert.equal(
+  postseasonAlreadyOverState.postseasonState.phase,
+  'postseason_ready',
+  'simulateNextDay should keep postseason-ready state when called after the regular season is already over'
+);
+
 console.log('simulation season adapter test passed');
