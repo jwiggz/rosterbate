@@ -4,6 +4,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'rosterbate-season.html'), 'utf8');
+const adapterSource = fs.readFileSync(path.join(__dirname, '..', 'simulation-season-adapter.js'), 'utf8');
 
 function toPlain(value) {
   return JSON.parse(JSON.stringify(value));
@@ -246,6 +247,9 @@ assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season 
 assert.match(html, /function applySimulationSuggestedLineupFromShell\(/, 'season shell should expose a simulation lineup action helper');
 assert.match(html, /SEASON_MODE_ADAPTER\.setLineup\(/, 'simulation lineup action should flow through the adapter');
 assert.match(html, /persistSimulationSeasonState\('simulation_lineup'\)/, 'simulation lineup action should persist shared state');
+assert.match(adapterSource, /RosterBateSimulationModeRuntime\.claimSimulationFreeAgent/, 'adapter should explicitly bind browser waiver mutations to RosterBateSimulationModeRuntime.claimSimulationFreeAgent');
+assert.match(adapterSource, /RosterBateSimulationModeRuntime\.applySimulationTrade/, 'adapter should explicitly bind browser trade mutations to RosterBateSimulationModeRuntime.applySimulationTrade');
+assert.match(adapterSource, /RosterBateSimulationModeRuntime\.setSimulationLineup/, 'adapter should explicitly bind browser lineup mutations to RosterBateSimulationModeRuntime.setSimulationLineup');
 assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should centralize mode-aware screen rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');

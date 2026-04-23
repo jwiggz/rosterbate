@@ -2,12 +2,23 @@
   'use strict';
 
   const MODE_ID = 'nba_mixed_era_single_player_v1';
+  const browserEngineApi = root?.RosterBateSimulationEngine || null;
   const runtimeApi = (typeof module !== 'undefined' && module.exports)
     ? require('./simulation-mode-runtime.js')
-    : root.RosterBateSimulationModeRuntime;
+    : {
+      setSimulationLineup(...args){
+        return root.RosterBateSimulationModeRuntime.setSimulationLineup(...args);
+      },
+      claimSimulationFreeAgent(...args){
+        return root.RosterBateSimulationModeRuntime.claimSimulationFreeAgent(...args);
+      },
+      applySimulationTrade(...args){
+        return root.RosterBateSimulationModeRuntime.applySimulationTrade(...args);
+      }
+    };
   const engineApi = (typeof module !== 'undefined' && module.exports)
     ? require('./simulation-league-engine.js')
-    : root.RosterBateSimulationEngine;
+    : browserEngineApi;
   const NAV_ITEMS = Object.freeze([
     { id: 'hub', label: 'Hub' },
     { id: 'roster', label: 'Roster' },
