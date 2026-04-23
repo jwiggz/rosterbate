@@ -841,10 +841,10 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             </div>
           </div>
           <div class="hub-summary-stats">
-            <div class="hub-stat"><div id="hubOpp" class="hub-stat-value">—</div><div class="hub-stat-label">This Week</div></div>
-            <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">—</div><div class="hub-stat-label">Your Revealed</div></div>
-            <div class="hub-stat"><div id="hubOppProj" class="hub-stat-value" style="color:var(--text2);">—</div><div class="hub-stat-label">Opp Revealed</div></div>
-            <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">—</div><div class="hub-stat-label">Streak</div></div>
+            <div class="hub-stat"><div id="hubOpp" class="hub-stat-value">—</div><div id="hubOppLabel" class="hub-stat-label">This Week</div></div>
+            <div class="hub-stat"><div id="hubProj" class="hub-stat-value" style="color:var(--accent);">—</div><div id="hubProjLabel" class="hub-stat-label">Your Revealed</div></div>
+            <div class="hub-stat"><div id="hubOppProj" class="hub-stat-value" style="color:var(--text2);">—</div><div id="hubOppProjLabel" class="hub-stat-label">Opp Revealed</div></div>
+            <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">—</div><div id="hubStreakLabel" class="hub-stat-label">Streak</div></div>
           </div>
           <div class="hub-now-band" id="hubNowBand"></div>
           <div class="hub-actions" style="margin-top:12px;">
@@ -5754,6 +5754,13 @@ function setSeasonSidePanelVisible(targetId, visible){
   }
 }
 
+function setHubSummaryStatLabels(labels){
+  document.getElementById('hubOppLabel').textContent = labels?.opp || 'This Week';
+  document.getElementById('hubProjLabel').textContent = labels?.proj || 'Your Revealed';
+  document.getElementById('hubOppProjLabel').textContent = labels?.oppProj || 'Opp Revealed';
+  document.getElementById('hubStreakLabel').textContent = labels?.streak || 'Streak';
+}
+
 function buildPowerupCardsHtml(){
   const myRoster=G.rosters[D.myPos]||[];
   const weekPowerups=getWeekPowerups(G.week);
@@ -7967,17 +7974,26 @@ function projScore(ti,week=G.week){return getTeamWeekRevealedScore(ti,week);}
 
 function renderSimulationHubInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getHubViewModel();
+  setHubSummaryStatLabels({
+    opp: 'Record',
+    proj: 'Team',
+    oppProj: 'Source Seasons',
+    streak: 'Streak'
+  });
   document.getElementById('hubLeagueName').textContent = vm.leagueLabel;
   document.getElementById('hubName').textContent = vm.controlledTeam?.name || D?.teamName || 'Simulation Team';
   document.getElementById('hubRec').textContent = vm.recordLabel || (vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0');
   document.getElementById('hubCycleMeta').textContent = `Simulation - ${vm.primaryAction.label} ready`;
-  document.getElementById('hubFormat').textContent = '2025-26 NBA Shell';
+  document.getElementById('hubFormat').textContent = vm.shellLabel || D?.leagueShell?.anchorSeasonLabel || D?.leagueName || 'NBA Shell';
   document.getElementById('hubScoringType').textContent = 'Simulated NBA Results';
   document.getElementById('hubTeamCount').textContent = String((D?.leagueShell?.teams || []).length || 30);
   document.getElementById('hubOpp').textContent = vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0';
   document.getElementById('hubProj').textContent = vm.controlledTeam?.abbr || '---';
   document.getElementById('hubOppProj').textContent = vm.sourceSeasonLabels.join(' + ');
   document.getElementById('hubStreak').textContent = vm.userRow?.streak || 'EVEN';
+  document.getElementById('hubProj').style.color = 'var(--accent)';
+  document.getElementById('hubOppProj').style.color = 'var(--text2)';
+  document.getElementById('hubStreak').style.color = '';
   document.getElementById('advBtn').textContent = 'Sim Day';
   document.getElementById('hubMatchups').innerHTML = (SEASON_MODE_ADAPTER.getScheduleViewModel().recentResults || []).slice(0, 4).map((game) => (
     `<div class="hub-mini-row">${game.awayAbbr} ${game.awayScore} at ${game.homeAbbr} ${game.homeScore}</div>`
@@ -8235,6 +8251,12 @@ const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function renderHub(){
   if (ACTIVE_SEASON_MODE === 'simulation') return renderSimulationHubInSharedShell();
+  setHubSummaryStatLabels({
+    opp: 'This Week',
+    proj: 'Your Revealed',
+    oppProj: 'Opp Revealed',
+    streak: 'Streak'
+  });
   applySeasonShellEnhancements();
   repairSeasonUiIcons();
   const isSimulationSeason=isHistoricalSimulationUniverse(D);

@@ -90,11 +90,13 @@ const hub = adapter.getHubViewModel();
 assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
 assert.equal(hub.controlledTeam.abbr, 'LAL');
 assert.equal(hub.primaryAction.label, 'Sim Day');
-assert.equal(hub.sourceSeasonLabels.join(', '), '1986-87,1995-96,2015-16');
+assert.deepStrictEqual(hub.sourceSeasonLabels, ['1986-87', '1995-96', '2015-16']);
 hub.controlledTeam.name = 'Mutated Lakers';
 hub.userRow.w = 999;
+hub.sourceSeasonLabels.push('2020-21');
 assert.equal(adapter.getState().leagueShell.teams[0].name, 'Los Angeles Lakers');
 assert.equal(adapter.getState().seasonState.standings[0].w, 9);
+assert.equal(adapter.getState().sourceSeasons.sourceSeasonLabels.length, 3);
 
 const roster = adapter.getRosterViewModel();
 assert.equal(roster.lineup.length, 2);
@@ -106,8 +108,9 @@ const schedule = adapter.getScheduleViewModel();
 assert.equal(schedule.recentResults.length, 1);
 assert.equal(schedule.recentResults[0].homeAbbr, 'LAL');
 assert.equal(schedule.nextGame.opponentAbbr, 'BOS');
+assert.equal(schedule.nextGame.day, 12);
 schedule.nextGame.opponentName = 'Mutated Opponent';
-assert.equal(adapter.getState().seasonState.upcomingGamesByTeam.LAL[0].opponentName, 'Boston Celtics');
+assert.equal(adapter.getScheduleViewModel().nextGame.opponentName, 'Boston Celtics');
 
 const waivers = adapter.getWaiverViewModel();
 assert.equal(waivers.availablePlayers.length, 1);
@@ -117,6 +120,19 @@ assert.equal(trades.tradePartners.length, 1);
 
 const standings = adapter.getStandingsViewModel();
 assert.equal(standings.userRow.teamAbbr, 'LAL');
+
+const postSimState = adapter.simulateNextDay();
+assert.equal(postSimState.seasonState.currentDay, 13);
+assert.equal(postSimState.seasonState.currentWeek, 2);
+assert.equal(postSimState.seasonState.completedGameLogs.length, 2);
+assert.ok(postSimState.seasonState.scheduleByDay, 'simulateNextDay should persist canonical scheduleByDay');
+assert.ok(
+  postSimState.seasonState.standings.some((row) => row.teamAbbr === 'LAL' && (Number(row.w) + Number(row.l)) === 13),
+  'simulateNextDay should advance standings totals for the controlled team'
+);
+const postSimSchedule = adapter.getScheduleViewModel();
+assert.equal(postSimSchedule.nextGame.day, 13);
+assert.equal(postSimSchedule.nextGame.opponentAbbr, 'BOS');
 
 const nextState = {
   simulationMode: 'nba_mixed_era_single_player_v1',
@@ -149,7 +165,10 @@ const nextState = {
       { teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 8, l: 5, pf: 1301, pa: 1276, streak: 'W1' }
     ],
     completedGameLogs: [],
-    upcomingGamesByTeam: {},
+    scheduleByDay: {
+      13: [{ homeAbbr: 'LAL', awayAbbr: 'BOS' }],
+      14: [{ homeAbbr: 'BOS', awayAbbr: 'LAL' }]
+    },
     activityLog: []
   },
   postseasonState: {
@@ -162,5 +181,7 @@ const replacedState = adapter.replaceState(nextState);
 assert.equal(replacedState.draftState.controlledTeamAbbr, 'BOS');
 assert.equal(adapter.getHubViewModel().controlledTeam.abbr, 'BOS');
 assert.equal(adapter.getRosterViewModel().lineup.length, 1);
+assert.equal(adapter.getScheduleViewModel().nextGame.day, 13);
+assert.equal(adapter.getScheduleViewModel().nextGame.opponentAbbr, 'LAL');
 
 console.log('simulation season adapter test passed');

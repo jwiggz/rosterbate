@@ -21,6 +21,9 @@ const harnessSource = `
 ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
 ${extractBetween('function isHistoricalSimulationUniverse(', 'function isHistoricalDraftUniverse(')}
+${extractBetween('function setSeasonSidePanelVisible(', 'function buildPowerupCardsHtml(')}
+${extractBetween('function setHubSummaryStatLabels(', 'function renderSimulationHubInSharedShell(')}
+${extractBetween('function renderSimulationHubInSharedShell(', 'function renderActiveSeasonScreen(')}
 
 module.exports = {
   getRequestedSimulationMode,
@@ -31,16 +34,65 @@ module.exports = {
   getActiveSeasonLabels,
   normalizeSharedSimulationSeasonBootState,
   buildSharedSimulationPersistenceState,
+  renderSimulationHubInSharedShell,
+  renderSimulationRosterInSharedShell,
+  renderSimulationScheduleInSharedShell,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
-  setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; }
+  setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; },
+  setData(value){ D = value; }
 };
 `;
+
+function createElement(id) {
+  const shell = { style: {} };
+  return {
+    id,
+    textContent: '',
+    innerHTML: '',
+    style: {},
+    closest(selector) {
+      return selector === '.season-screen-shell' ? shell : null;
+    },
+    _shell: shell
+  };
+}
+
+const elements = Object.fromEntries([
+  'hubLeagueName',
+  'hubName',
+  'hubRec',
+  'hubCycleMeta',
+  'hubFormat',
+  'hubScoringType',
+  'hubTeamCount',
+  'hubOpp',
+  'hubProj',
+  'hubOppProj',
+  'hubStreak',
+  'hubOppLabel',
+  'hubProjLabel',
+  'hubOppProjLabel',
+  'hubStreakLabel',
+  'advBtn',
+  'hubMatchups',
+  'rWk',
+  'rosterContent',
+  'rosterPowerups',
+  'mWk',
+  'matchupContent',
+  'matchupPowerups'
+].map((id) => [id, createElement(id)]));
 
 const sandbox = {
   module: { exports: {} },
   exports: {},
   console,
   URLSearchParams,
+  document: {
+    getElementById(id) {
+      return elements[id] || null;
+    }
+  },
   window: {
     RosterBateSimulationSeasonAdapter: {
       isSupportedSimulationSeasonState(state) {
@@ -63,9 +115,9 @@ assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should c
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationScheduleInSharedShell\(\);/, 'renderMatchup should branch into simulation rendering');
-assert.match(html, /function setSeasonSidePanelVisible\(targetId, visible\)\{/, 'season shell should expose a shared side panel visibility helper');
-assert.match(html, /function renderSimulationRosterInSharedShell\(\)\{[\s\S]*setSeasonSidePanelVisible\('rosterPowerups', false\);/, 'simulation roster should hide the fantasy side rail');
-assert.match(html, /function renderSimulationScheduleInSharedShell\(\)\{[\s\S]*setSeasonSidePanelVisible\('matchupPowerups', false\);/, 'simulation schedule should hide the fantasy side rail');
+assert.match(html, /id="hubOppLabel"/, 'hub markup should expose a label node for the first simulation stat');
+assert.match(html, /id="hubProjLabel"/, 'hub markup should expose a label node for the second simulation stat');
+assert.match(html, /id="hubOppProjLabel"/, 'hub markup should expose a label node for the third simulation stat');
 
 const params = new URLSearchParams('?simulation=NBA_Mixed_Era&historicalUniverse=sim-slot-1');
 assert.equal(api.getRequestedSimulationMode(params), 'nba_mixed_era', 'simulation query param should normalize to lowercase');
@@ -112,6 +164,65 @@ assert.deepEqual(
   { hub: 'Overview', roster: 'Lineups', matchup: 'Schedule' },
   'season labels should be derived from adapter nav items when available'
 );
+
+api.setSeasonModeAdapter({
+  getHubViewModel() {
+    return {
+      leagueLabel: '2025-26 NBA Simulation',
+      shellLabel: '1995-96 + 2015-16 Mixed Era Shell',
+      controlledTeam: { abbr: 'LAL', name: 'Los Angeles Lakers' },
+      userRow: { w: 9, l: 3, streak: 'W3' },
+      recordLabel: '9-3',
+      primaryAction: { label: 'Sim Day' },
+      sourceSeasonLabels: ['1986-87', '1995-96', '2015-16']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      title: 'Schedule / Results',
+      cycleLabel: 'Day 12 - Week 2',
+      recentResults: [
+        { awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112 }
+      ]
+    };
+  },
+  getRosterViewModel() {
+    return {
+      roster: [
+        { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+      ]
+    };
+  }
+});
+api.setData({
+  leagueShell: {
+    teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
+  }
+});
+
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.hubLeagueName.textContent, '2025-26 NBA Simulation');
+assert.equal(elements.hubFormat.textContent, '1995-96 + 2015-16 Mixed Era Shell');
+assert.equal(elements.hubScoringType.textContent, 'Simulated NBA Results');
+assert.equal(elements.hubTeamCount.textContent, '3');
+assert.equal(elements.hubOpp.textContent, '9-3');
+assert.equal(elements.hubOppLabel.textContent, 'Record');
+assert.equal(elements.hubProj.textContent, 'LAL');
+assert.equal(elements.hubProjLabel.textContent, 'Team');
+assert.equal(elements.hubOppProj.textContent, '1986-87 + 1995-96 + 2015-16');
+assert.equal(elements.hubOppProjLabel.textContent, 'Source Seasons');
+assert.match(elements.hubMatchups.innerHTML, /BOS 108 at LAL 112/);
+
+api.renderSimulationRosterInSharedShell();
+assert.equal(elements.rosterPowerups.style.display, 'none');
+assert.equal(elements.rosterPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
+assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
+
+api.renderSimulationScheduleInSharedShell();
+assert.equal(elements.matchupPowerups.style.display, 'none');
+assert.equal(elements.matchupPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
+assert.match(elements.matchupContent.innerHTML, /Schedule \/ Results/);
+assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
 
 const fixture = {
   simulationMode: 'nba_mixed_era_single_player_v1',

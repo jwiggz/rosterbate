@@ -51,18 +51,61 @@
     return `${Number(row.w || 0)}-${Number(row.l || 0)}`;
   }
 
-  function buildSourceSeasonLabels(state){
-    const labels = clone(state?.sourceSeasons?.sourceSeasonLabels || []);
-    if (!Array.isArray(labels)) return [];
-    Object.defineProperty(labels, 'join', {
-      value(separator){
-        const normalizedSeparator = separator === ', ' ? ',' : separator;
-        return Array.prototype.join.call(this, normalizedSeparator);
-      },
-      configurable: true,
-      writable: true
+  function getCanonicalScheduleByDay(state, shell){
+    const persistedSchedule = state?.seasonState?.scheduleByDay;
+    if (persistedSchedule && typeof persistedSchedule === 'object' && Object.keys(persistedSchedule).length) {
+      return clone(persistedSchedule);
+    }
+    const schedule = engineApi.buildSimulationSeasonSchedule(clone(shell || {}));
+    return clone(schedule?.byDay || {});
+  }
+
+  function buildSimulationNextGame(state, scheduleByDay){
+    const teamAbbr = getControlledTeamAbbr(state);
+    if (!teamAbbr) return null;
+    const currentDay = Number(state?.seasonState?.currentDay || 1);
+    const teamLookup = new Map(
+      clone(state?.leagueShell?.teams || []).map((team) => [String(team?.abbr || '').trim().toUpperCase(), team])
+    );
+    const orderedDays = Object.keys(scheduleByDay || {})
+      .map((day) => Number(day))
+      .filter((day) => Number.isFinite(day) && day >= currentDay)
+      .sort((a, b) => a - b);
+
+    for (const day of orderedDays) {
+      const matchup = (scheduleByDay?.[day] || []).find((game) => (
+        String(game?.homeAbbr || '').trim().toUpperCase() === teamAbbr ||
+        String(game?.awayAbbr || '').trim().toUpperCase() === teamAbbr
+      ));
+      if (!matchup) continue;
+      const isHome = String(matchup?.homeAbbr || '').trim().toUpperCase() === teamAbbr;
+      const opponentAbbr = isHome ? matchup.awayAbbr : matchup.homeAbbr;
+      const opponent = teamLookup.get(String(opponentAbbr || '').trim().toUpperCase()) || null;
+      return {
+        day,
+        home: isHome,
+        homeAbbr: matchup.homeAbbr,
+        awayAbbr: matchup.awayAbbr,
+        opponentAbbr,
+        opponentName: opponent?.name || opponent?.displayName || opponentAbbr || 'Opponent'
+      };
+    }
+    return null;
+  }
+
+  function normalizeSimulationStandingsRows(state, teamMeta){
+    const standings = clone(state?.seasonState?.standings || []);
+    return teamMeta.map((team, teamIdx) => {
+      const abbr = String(team?.abbr || '').trim().toUpperCase();
+      const row = standings.find((entry) => String(entry?.teamAbbr || '').trim().toUpperCase() === abbr) || standings[teamIdx] || {};
+      return {
+        ...row,
+        teamIdx,
+        teamAbbr: abbr || row.teamAbbr || null,
+        conference: row.conference || team?.conference || '',
+        division: row.division || team?.division || ''
+      };
     });
-    return labels;
   }
 
   function createSimulationSeasonAdapter(options){
@@ -90,11 +133,12 @@
         return {
           slotId,
           leagueLabel: `${state?.leagueShell?.anchorSeasonLabel || 'NBA'} Simulation`,
+          shellLabel: `${state?.leagueShell?.anchorSeasonLabel || 'NBA'} Shell`,
           controlledTeam: team ? clone(team) : null,
           userRow: userRow ? clone(userRow) : null,
           recordLabel: buildSimulationRecordLabel(userRow),
           primaryAction: { id: 'sim-day', label: 'Sim Day' },
-          sourceSeasonLabels: buildSourceSeasonLabels(state),
+          sourceSeasonLabels: clone(state?.sourceSeasons?.sourceSeasonLabels || []),
           recentActivity: clone(state?.seasonState?.activityLog || []).slice(-5).reverse()
         };
       },
@@ -108,12 +152,13 @@
         };
       },
       getScheduleViewModel(){
-        const teamAbbr = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
-        const nextGame = (state?.seasonState?.upcomingGamesByTeam?.[teamAbbr] || [])[0] || null;
+        const scheduleByDay = getCanonicalScheduleByDay(state, state?.leagueShell || {});
+        const nextGame = buildSimulationNextGame(state, scheduleByDay);
         return {
           title: 'Schedule / Results',
           cycleLabel: formatSimulationCycleLabel(state),
           recentResults: clone(state?.seasonState?.completedGameLogs || []).slice(-10).reverse(),
+          scheduleByDay,
           nextGame: nextGame ? clone(nextGame) : null
         };
       },
@@ -139,14 +184,19 @@
       },
       simulateNextDay(){
         const shell = clone(state?.leagueShell || {});
-        const schedule = engineApi.buildSimulationSeasonSchedule(shell);
+        const scheduleByDay = getCanonicalScheduleByDay(state, shell);
+        const schedule = { byDay: clone(scheduleByDay) };
         const teamMeta = clone(shell.teams || []);
         const teamNames = teamMeta.map((team) => team.name);
         const allRosters = teamMeta.map((team) => clone(state?.draftState?.rostersByTeam?.[team.abbr] || []));
         const currentSeasonState = clone(state?.seasonState || {});
+        const engineSeasonState = {
+          ...currentSeasonState,
+          standings: normalizeSimulationStandingsRows(state, teamMeta)
+        };
         const dayResult = engineApi.simulateSimulationGameDay({
           state: {
-            ...currentSeasonState,
+            ...engineSeasonState,
             seasonId: state?.seasonId || state?.historicalUniverseSlotId || null,
             teamMeta,
             teams: teamNames,
@@ -156,9 +206,13 @@
           day: Number(currentSeasonState.currentDay || 1),
           lineupIdsByTeam: clone(currentSeasonState.lineupIdsByTeam || {})
         });
+        const nextSeasonState = engineApi.applySimulationDayResults(engineSeasonState, dayResult);
         state = {
           ...clone(state),
-          seasonState: engineApi.applySimulationDayResults(currentSeasonState, dayResult)
+          seasonState: {
+            ...nextSeasonState,
+            scheduleByDay: clone(scheduleByDay)
+          }
         };
         return this.getState();
       }
