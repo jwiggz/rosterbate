@@ -128,6 +128,8 @@ function buildState(overrides = {}) {
   };
 }
 
+const universeLabel = '1985-86 NBA shell \u00b7 1996-97 + 2003-04 player universe';
+
 const playInState = buildState({
   postseasonState: {
     phase: 'play_in',
@@ -153,7 +155,7 @@ assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, playInState))),
   {
     title: 'Simulation play-in push',
-    body: '1985-86 NBA shell · 1996-97 + 2003-04 player universe. The play-in tournament is deciding the final playoff field.',
+    body: universeLabel + '. The play-in tournament is deciding the final playoff field.',
     meta: ['Record 53-29', 'Play-In tournament live']
   },
   'play-in universes should get play-in aware archive copy while preserving shell context'
@@ -167,6 +169,68 @@ assert.deepStrictEqual(
     meta: ['Phase: Play-In', 'Bracket race active']
   },
   'play-in universes should describe the active play-in bracket'
+);
+
+const postseasonReadyState = buildState({
+  postseasonState: {
+    phase: 'postseason_ready',
+    currentRound: null,
+    champion: null,
+    runnerUp: null,
+    seriesById: {},
+    completedAt: null
+  }
+});
+
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, postseasonReadyState))),
+  {
+    title: 'Simulation bracket set',
+    body: universeLabel + '. The field is locked and the title chase is ready to open.',
+    meta: ['Record 53-29', 'Bracket locked']
+  },
+  'postseason-ready universes should get bracket-set archive copy before the games begin'
+);
+
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, postseasonReadyState))),
+  {
+    title: 'Simulation playoff field locked',
+    body: 'The regular season is over, the bracket is set, and the postseason is ready to tip.',
+    meta: ['Phase: Postseason Ready', 'Bracket locked']
+  },
+  'postseason-ready universes should describe the bridge between the regular season and the bracket opener'
+);
+
+const roundTwoState = buildState({
+  postseasonState: {
+    phase: 'playoffs_round_2',
+    currentRound: 'playoffs_round_2',
+    champion: null,
+    runnerUp: null,
+    seriesById: {},
+    completedAt: null
+  }
+});
+
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, roundTwoState))),
+  {
+    title: 'Simulation Round 2 live',
+    body: universeLabel + '. The second round is underway and the conference finalists are coming into focus.',
+    meta: ['Record 53-29', 'Round 2 underway']
+  },
+  'second-round universes should get phase-specific archive copy instead of regular-season language'
+);
+
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, roundTwoState))),
+  {
+    title: 'Simulation Round 2 underway',
+    body: 'Second-round series are deciding which teams will reach the conference finals.',
+    meta: ['Phase: Round 2', 'Conference finals spots at stake']
+  },
+  'second-round universes should render phase-specific playoff summary copy'
 );
 
 const finalsState = buildState({
@@ -230,7 +294,7 @@ assert.deepStrictEqual(
   JSON.parse(JSON.stringify(context.buildSimulationModeSummary({}, completedState))),
   {
     title: 'Simulation title claimed',
-    body: '1985-86 NBA shell · 1996-97 + 2003-04 player universe. LAL finished the run on top and closed out the title chase.',
+    body: universeLabel + '. LAL finished the run on top and closed out the title chase.',
     meta: ['Record 53-29', 'Champion: LAL']
   },
   'completed universes should get title-complete framing without losing season context'

@@ -748,6 +748,11 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         body: universeLabel + '. The opening playoff round is underway and every bracket line matters now.',
         meta: 'Round 1 underway'
       },
+      playoffs_round_2: {
+        title: 'Simulation Round 2 live',
+        body: universeLabel + '. The second round is underway and the conference finalists are coming into focus.',
+        meta: 'Round 2 underway'
+      },
       conference_semifinals: {
         title: 'Simulation semifinals live',
         body: universeLabel + '. The bracket has tightened and the conference semifinal push is on.',
@@ -816,6 +821,33 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     ).trim();
     const finalsGames = Number(champion.finalsGames || finals.games || postseason.finalsGames || 0);
     const completedAt = String(postseason.completedAt || champion.completedAt || '').trim();
+    const phaseSummary = {
+      postseason_ready: {
+        title: 'Simulation playoff field locked',
+        body: 'The regular season is over, the bracket is set, and the postseason is ready to tip.',
+        meta: ['Phase: Postseason Ready', 'Bracket locked']
+      },
+      play_in: {
+        title: 'Play-In tournament live',
+        body: 'Win-and-in games are underway to lock the final East and West playoff seeds.',
+        meta: ['Phase: Play-In', 'Bracket race active']
+      },
+      playoffs_round_1: {
+        title: 'Simulation Round 1 underway',
+        body: 'Opening-round series are underway and the bracket is already tightening.',
+        meta: ['Phase: Round 1', 'Round 2 spots at stake']
+      },
+      playoffs_round_2: {
+        title: 'Simulation Round 2 underway',
+        body: 'Second-round series are deciding which teams will reach the conference finals.',
+        meta: ['Phase: Round 2', 'Conference finals spots at stake']
+      },
+      conference_finals: {
+        title: 'Simulation conference finals underway',
+        body: 'The last conference series are deciding who will advance to the Finals.',
+        meta: ['Phase: Conference Finals', 'Finals berths at stake']
+      }
+    };
 
     if(championAbbr){
       const finalsResultText = championAbbr + ' beat ' + (runnerUpAbbr || 'the runner-up') +
@@ -843,12 +875,8 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         ]
       };
     }
-    if(phase === 'play_in'){
-      return {
-        title: 'Play-In tournament live',
-        body: 'Win-and-in games are underway to lock the final East and West playoff seeds.',
-        meta: ['Phase: Play-In', 'Bracket race active']
-      };
+    if(phaseSummary[phase]){
+      return phaseSummary[phase];
     }
     return {
       title: 'Play-In and playoff path pending',
