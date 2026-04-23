@@ -17,6 +17,8 @@
 <script src="historical-pack-loader.js"></script>
 <script src="simulation-league-engine.js"></script>
 <script src="mixed-era-runtime.js"></script>
+<script src="simulation-mode-config.js"></script>
+<script src="simulation-mode-runtime.js"></script>
 <script src="global-nav.js" defer></script>
 <script src="historical-pack-dev-runner.js" defer></script>
 <style>
@@ -3240,6 +3242,8 @@ const SPORT_RULES = getRosterbateLeagueRuleDefaults(SPORT);
 const POSITION_LABELS = getRosterbatePositionLabels(SPORT);
 let PLAYERS = [];
 let DRAFT_POSITION_RULES = JSON.parse(JSON.stringify(SPORT_RULES.positions||{}));
+const RB_SIMULATION_MODE_LOCAL_STATE_KEY = 'rbSimulationModeLocalState';
+const RB_SIMULATION_MODE_COMPLETED_DRAFT_KEY = 'rbSimulationModeCompletedDraft';
 const RETRO_NBA_ROOM_ASSET='assets/retro-draft/new placeholder room.png';
 const RETRO_NBA_TV_MEDIA_ASSETS=[
   { src:'assets/retro-draft/nba-tv-loop-01.gif', type:'image' },
@@ -3491,9 +3495,10 @@ function syncDraftSpotBounds(){
   const sizeEl=document.getElementById('iSize');
   const spotEl=document.getElementById('iSpot');
   if(!sizeEl || !spotEl) return;
+  const maxLeagueSize=SIMULATION_MODE_DRAFT_CONTEXT ? Math.max(2, Number(SIMULATION_MODE_DRAFT_CONTEXT?.teamCount || 30)) : 20;
   let leagueSize=parseInt(sizeEl.value,10);
   leagueSize=Number.isFinite(leagueSize)?leagueSize:2;
-  leagueSize=Math.max(1, Math.min(20, leagueSize));
+  leagueSize=Math.max(1, Math.min(maxLeagueSize, leagueSize));
   sizeEl.value=String(leagueSize);
   spotEl.max=String(leagueSize);
   let draftSpot=parseInt(spotEl.value,10);
@@ -3505,6 +3510,12 @@ function randomizeDraftSpot(){
   const sizeEl=document.getElementById('iSize');
   const spotEl=document.getElementById('iSpot');
   if(!sizeEl || !spotEl) return;
+  if(SIMULATION_MODE_DRAFT_CONTEXT){
+    spotEl.value=String(Math.max(1, Number(SIMULATION_MODE_DRAFT_CONTEXT?.draftSlot || 1)));
+    syncDraftSpotBounds();
+    showToast('Simulation draft slot is locked from setup.');
+    return;
+  }
   let leagueSize=parseInt(sizeEl.value,10);
   leagueSize=Number.isFinite(leagueSize)?leagueSize:10;
   leagueSize=Math.max(1, Math.min(20, leagueSize));
@@ -3540,6 +3551,7 @@ let auctionCpuActionTimer=null;
 let auctionClockInt=null;
 const RB_HISTORICAL_PACK_LOCAL_STATE_KEY='rbHistoricalPackDevLocalState';
 let HISTORICAL_DRAFT_CONTEXT=null;
+let SIMULATION_MODE_DRAFT_CONTEXT=null;
 
 function cloneDraftJsonSafe(value){
   return JSON.parse(JSON.stringify(value));
@@ -3600,10 +3612,157 @@ function getRequestedMixedEraDraftSpot(){
   }
 }
 
+function shouldBootSimulationModeDraft(){
+  try{
+    const params = new URLSearchParams(window.location.search || '');
+    return String(params.get('simulation') || '').trim().toLowerCase() === 'nba_mixed_era';
+  }catch(e){
+    return false;
+  }
+}
+
 function shouldBootHistoricalDraft(){
   if(!isHistoricalDraftLocalhost()) return false;
   const mode=getHistoricalDraftQueryMode();
   return mode==='dev' || mode==='mixed';
+}
+
+function readSimulationModeLocalState(){
+  try{
+    return JSON.parse(localStorage.getItem(RB_SIMULATION_MODE_LOCAL_STATE_KEY) || 'null');
+  }catch(e){
+    console.warn('Could not read simulation mode local state:', e);
+    return null;
+  }
+}
+
+function buildSimulationModeDraftRules(baseRules){
+  const rules=cloneDraftJsonSafe(baseRules || SPORT_RULES || {});
+  const positions=rules.positions && typeof rules.positions==='object' ? rules.positions : {};
+  Object.keys(positions).forEach((key)=>{
+    positions[key]=Object.assign({}, positions[key] || {}, { starters:0 });
+  });
+  ['PG','SG','SF','PF','C'].forEach((key)=>{
+    if(positions[key]){
+      positions[key]=Object.assign({}, positions[key], { starters:1 });
+    }
+  });
+  if(!positions.PG && positions.UTIL){
+    positions.UTIL=Object.assign({}, positions.UTIL, { starters:5 });
+  }
+  if(positions.BN){
+    positions.BN=Object.assign({}, positions.BN, { starters:5 });
+  }
+  if(positions.BE){
+    positions.BE=Object.assign({}, positions.BE, { starters:5 });
+  }
+  const irKey=Object.keys(positions).find((key)=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL');
+  if(irKey){
+    positions[irKey]=Object.assign({}, positions[irKey], { starters:0 });
+  }
+  rules.positions=positions;
+  rules.starters=5;
+  rules.benchSlots=5;
+  rules.irSlots=0;
+  return rules;
+}
+
+function applySimulationModeDraftLobbySettings(context){
+  const shell=context?.shell;
+  const sizeEl=document.getElementById('iSize');
+  const spotEl=document.getElementById('iSpot');
+  const roundsEl=document.getElementById('iRounds');
+  const teamNameEl=document.getElementById('iName');
+  const leagueNameEl=document.getElementById('iLeagueName');
+  const teamCount=Math.max(2, Number(context?.teamCount || shell?.teams?.length || 30));
+  const draftSlot=Math.max(1, Number(context?.draftSlot || 1));
+  const teamName=String(context?.controlledTeamName || 'Simulation Team').trim();
+  if(sizeEl){
+    sizeEl.min=String(teamCount);
+    sizeEl.max=String(teamCount);
+    sizeEl.value=String(teamCount);
+    sizeEl.readOnly=true;
+  }
+  if(spotEl){
+    spotEl.min='1';
+    spotEl.max=String(teamCount);
+    spotEl.value=String(draftSlot);
+    spotEl.readOnly=true;
+  }
+  if(roundsEl){
+    roundsEl.value=String(Number(shell?.rosterSize || 10));
+    roundsEl.readOnly=true;
+  }
+  if(teamNameEl){
+    teamNameEl.value=teamName;
+    teamNameEl.readOnly=true;
+  }
+  if(leagueNameEl && !leagueNameEl.value.trim()){
+    leagueNameEl.value=String(shell?.anchorSeasonLabel || 'Simulation Mode') + ' Simulation League';
+  }
+  renderAdvancedLeagueRules(buildSimulationModeDraftRules(SPORT_RULES));
+  syncDraftSpotBounds();
+}
+
+async function buildSimulationDraftContextFromState(){
+  const setupState = readSimulationModeLocalState();
+  const shell = window.RosterBateSimulationModeConfig.getSimulationShell();
+  const bundles = await Promise.all(
+    (setupState?.sourcePackIds || []).map((packId) => window.RosterBateHistoricalPackLoader.loadPackById(packId))
+  );
+  const mixedEraContext = window.RosterBateMixedEraRuntime.buildMixedEraDraftContextFromBundles({
+    config: {
+      mixedEraConfigId: 'simulation_custom_mix',
+      sport: 'nba',
+      seasonLabel: 'Simulation Mode Mixed Era Draft',
+      sourcePackIds: setupState.sourcePackIds,
+      topPlayersPerPack: 120
+    },
+    bundles,
+    requestedSport: 'nba',
+    buildPlayerSimulationProfile: window.RosterBateSimulationEngine.buildPlayerSimulationProfile
+  });
+  const bootstrap = window.RosterBateSimulationModeRuntime.buildSimulationUniverseBootstrap({
+    shell,
+    mixedEraContext: {
+      ...mixedEraContext,
+      sourceSeasonLabels: bundles.map((bundle) => bundle?.season?.seasonLabel || bundle?.manifest?.seasonLabel).filter(Boolean)
+    },
+    controlledTeamAbbr: setupState.controlledTeamAbbr,
+    draftSlot: setupState.draftSlot
+  });
+  const controlledTeam=shell.teams.find((team)=>team.abbr===String(setupState?.controlledTeamAbbr || '').trim().toUpperCase()) || null;
+  return {
+    ...mixedEraContext,
+    bootstrap,
+    shell,
+    controlledTeamAbbr: String(setupState?.controlledTeamAbbr || '').trim().toUpperCase(),
+    controlledTeamName: controlledTeam?.name || 'Simulation Team',
+    draftSlot: Math.max(1, Number(setupState?.draftSlot || 1)),
+    draftPool: bootstrap.draftState.draftPool,
+    playerPool: bootstrap.draftState.draftPool,
+    teams: shell.teams.map((team) => team.name),
+    teamCount: shell.teams.length,
+    myPos: Math.max(0, Number(setupState?.draftSlot || 1) - 1),
+    preferredDraftSpot: Math.max(1, Number(setupState?.draftSlot || 1)),
+    suggestedLeagueSize: shell.teams.length,
+    draftTitleKicker: 'Simulation Mode Draft',
+    lobbySubLabel: '2025-26 NBA Shell · Mixed Era Pool',
+    lobbyPillText: 'Simulation Mode | ' + shell.teams.length + ' Teams | ' + bootstrap.draftState.draftPool.length + ' Players',
+    entryButtonLabel: 'Enter Simulation Draft',
+    leagueNamePlaceholder: 'e.g. 2025-26 NBA Simulation League',
+    teamNamePlaceholder: controlledTeam?.name || 'Simulation Team',
+    seasonLabel: 'Simulation Mode Mixed Era Draft',
+    mixedEraConfigId: mixedEraContext?.mixedEraConfigId || 'simulation_custom_mix',
+    mixedEraTopPlayersPerPack: 120,
+    sourceSeasonLabels: bootstrap.sourceSeasons?.sourceSeasonLabels || [],
+    sourcePackIds: bootstrap.sourceSeasons?.sourcePackIds || [],
+    isHistoricalPack: false,
+    isHistoricalPackDev: false,
+    isMixedEraDraft: true,
+    isSimulationModeDraft: true,
+    devLocalOnly: true
+  };
 }
 
 function readHistoricalDraftLocalState(){
@@ -4322,7 +4481,7 @@ function buildDraftLobbyPillText(options={}){
 }
 
 function applySportToDraftUI(){
-  const historicalContext=HISTORICAL_DRAFT_CONTEXT;
+  const historicalContext=SIMULATION_MODE_DRAFT_CONTEXT || HISTORICAL_DRAFT_CONTEXT;
   const isMultiplayerDraft=isMultiplayerDraftContext();
   const useStaticSoloData=!historicalContext && SPORT==='nba';
   const isLiveServiceSportForDraft=typeof isRosterbateLiveServiceSport === 'function'
@@ -4406,6 +4565,9 @@ function applySportToDraftUI(){
   S.myPos = preferredDraftSpot - 1;
   S.posF = 'ALL';
   syncDraftSpotBounds();
+  if(SIMULATION_MODE_DRAFT_CONTEXT){
+    applySimulationModeDraftLobbySettings(SIMULATION_MODE_DRAFT_CONTEXT);
+  }
 }
 
 function applySavedLobbySettings(){
@@ -4761,6 +4923,19 @@ function buildSoloDraftTeams(teamName, teamCount, myPos){
 }
 
 function normalizeCompletedDraftContext(){
+  if(SIMULATION_MODE_DRAFT_CONTEXT){
+    const teamCount=Math.max(2, Number(SIMULATION_MODE_DRAFT_CONTEXT?.teamCount || 30));
+    const myPos=Math.max(0, Math.min(teamCount-1, Number(SIMULATION_MODE_DRAFT_CONTEXT?.myPos || 0)));
+    const teams=Array.isArray(SIMULATION_MODE_DRAFT_CONTEXT?.teams)
+      ? SIMULATION_MODE_DRAFT_CONTEXT.teams.slice()
+      : buildSoloDraftTeams(SIMULATION_MODE_DRAFT_CONTEXT?.controlledTeamName || 'Simulation Team', teamCount, myPos);
+    const teamName=teams[myPos] || SIMULATION_MODE_DRAFT_CONTEXT?.controlledTeamName || 'Simulation Team';
+    S.ls=teamCount;
+    S.myPos=myPos;
+    S.name=teamName;
+    S.teams=teams.slice();
+    return { lobbyState:null, orderedLobbyPlayers:[], teamCount, myPos, teamName, teams, isMultiplayer:false };
+  }
   const useLobbyDraft=isLobbyDraftContext();
   const lobbyState=useLobbyDraft ? getSavedMultiplayerLobbyState() : null;
   const orderedLobbyPlayers=useLobbyDraft ? getOrderedLobbyPlayers(lobbyState) : [];
@@ -4818,13 +4993,15 @@ function startDraft(){
   const ls=parseInt(document.getElementById('iSize').value);
   const sp=parseInt(document.getElementById('iSpot').value);
   const rd=rules.rosterSize;
+  const simulationContext=SIMULATION_MODE_DRAFT_CONTEXT;
+  const simulationLeagueSize=Math.max(2, Number(simulationContext?.teamCount || 30));
   const useLobbyDraft=isLobbyDraftContext();
   const lobbyState=useLobbyDraft ? getSavedMultiplayerLobbyState() : null;
   const allowSoloTest=!!(useLobbyDraft && lobbyState?.soloTest && lobbyState?.lobbyId);
   const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
-  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
+  if(isNaN(ls)||ls<(allowSoloTest?1:2)||ls>(simulationContext ? simulationLeagueSize : 20)){e.textContent=simulationContext?'Simulation drafts require a locked 30-team league.':(allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.');e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
   const need=ls*rd;
@@ -4857,7 +5034,11 @@ function startDraft(){
       S.teams=orderedLobbyPlayers.map((player,idx)=>player?.name||('Team '+(idx+1)));
     }
   }
-  if(!Array.isArray(S.teams)||S.teams.length!==ls){
+  if(simulationContext){
+    S.myPos=Math.max(0, Math.min(ls-1, Number(simulationContext?.myPos || 0)));
+    S.name=simulationContext?.controlledTeamName || S.name;
+    S.teams=Array.isArray(simulationContext?.teams) ? simulationContext.teams.slice() : S.teams;
+  }else if(!Array.isArray(S.teams)||S.teams.length!==ls){
     const tn=getSportOpponentNames(SPORT);
     S.teams=Array.from({length:ls},(_,i)=>i===S.myPos?S.name:(tn[i]||'Team '+(i+1)));
   }
@@ -8090,6 +8271,7 @@ async function endDraft(){
       : null;
 
     const isHistoricalDraft=!!HISTORICAL_DRAFT_CONTEXT;
+    const isSimulationModeDraft=!!SIMULATION_MODE_DRAFT_CONTEXT;
     const serializePlayer=p=>({
       id:p?.id,
       historicalPlayerId:p?.historicalPlayerId||null,
@@ -8124,6 +8306,44 @@ async function endDraft(){
       mixedEraProjection:Number.isFinite(Number(p?.mixedEraProjection)) ? Number(p.mixedEraProjection) : null,
       mixedEraContext:p?.mixedEraContext ? cloneDraftJsonSafe(p.mixedEraContext) : null
     });
+
+    if(isSimulationModeDraft){
+      const bootstrap=cloneDraftJsonSafe(SIMULATION_MODE_DRAFT_CONTEXT?.bootstrap || {});
+      const teamMeta=Array.isArray(bootstrap?.leagueShell?.teams) ? bootstrap.leagueShell.teams : [];
+      const rostersByTeam={};
+      teamMeta.forEach((team, teamIndex)=>{
+        rostersByTeam[team.abbr]=(Array.isArray(S.picks) ? S.picks : [])
+          .filter((pick)=>Number(pick?.ti)===teamIndex)
+          .map((pick)=>{
+            const player=(Array.isArray(PLAYERS) ? PLAYERS : []).find((entry)=>Number(entry?.id)===Number(pick?.pid));
+            return player ? serializePlayer(player) : null;
+          })
+          .filter(Boolean);
+      });
+      const draftedPlayerIds=new Set(
+        Object.values(rostersByTeam).flat().map((player)=>Number(player?.id)).filter(Number.isFinite)
+      );
+      const finalState={
+        ...bootstrap,
+        simulationMode: 'nba_mixed_era_single_player_v1',
+        sourceSeasons: {
+          ...(bootstrap.sourceSeasons || {}),
+          sourcePackIds: cloneDraftJsonSafe(SIMULATION_MODE_DRAFT_CONTEXT?.sourcePackIds || bootstrap?.sourceSeasons?.sourcePackIds || []),
+          sourceSeasonLabels: cloneDraftJsonSafe(SIMULATION_MODE_DRAFT_CONTEXT?.sourceSeasonLabels || bootstrap?.sourceSeasons?.sourceSeasonLabels || [])
+        },
+        draftState: {
+          ...(bootstrap.draftState || {}),
+          controlledTeamAbbr: String(SIMULATION_MODE_DRAFT_CONTEXT?.controlledTeamAbbr || bootstrap?.draftState?.controlledTeamAbbr || '').trim().toUpperCase(),
+          draftSlot: Number(SIMULATION_MODE_DRAFT_CONTEXT?.draftSlot || bootstrap?.draftState?.draftSlot || 1),
+          rostersByTeam,
+          completedPicks: cloneDraftJsonSafe(Array.isArray(S.picks) ? S.picks : []),
+          completedAt: Date.now(),
+          draftPool: (bootstrap?.draftState?.draftPool || []).filter((player)=>!draftedPlayerIds.has(Number(player?.id)))
+        }
+      };
+      completeSimulationModeDraft(finalState);
+      return;
+    }
 
     // Save draft data to localStorage for the season manager to pick up
     // Note: seasonId will be generated when saving to Firebase
@@ -8458,6 +8678,17 @@ function persistPendingSeasonLaunch(draftData){
     localStorage.setItem(RB_PENDING_SEASON_KEY, JSON.stringify(payload));
   }catch(e){
     console.warn('Could not persist pending season handoff:', e);
+  }
+}
+
+function completeSimulationModeDraft(finalState){
+  const payload = {
+    ...finalState,
+    simulationMode: 'nba_mixed_era_single_player_v1'
+  };
+  if(payload.simulationMode==='nba_mixed_era_single_player_v1'){
+    localStorage.setItem(RB_SIMULATION_MODE_COMPLETED_DRAFT_KEY, JSON.stringify(payload));
+    window.location.href = 'rosterbate-simulation-season.html?simulation=nba_mixed_era';
   }
 }
 
@@ -9638,8 +9869,20 @@ function rbEnsureChatListenerActive() {
     document.getElementById('lobby')?.classList.add('active');
     document.getElementById('draft')?.classList.remove('active');
     document.getElementById('draftComplete')?.classList.remove('active');
-    HISTORICAL_DRAFT_CONTEXT=await resolveHistoricalDraftContext(SPORT);
-    if(HISTORICAL_DRAFT_CONTEXT){
+    SIMULATION_MODE_DRAFT_CONTEXT=shouldBootSimulationModeDraft()
+      ? await buildSimulationDraftContextFromState()
+      : null;
+    HISTORICAL_DRAFT_CONTEXT=SIMULATION_MODE_DRAFT_CONTEXT ? null : await resolveHistoricalDraftContext(SPORT);
+    if(SIMULATION_MODE_DRAFT_CONTEXT){
+      PLAYERS=Array.isArray(SIMULATION_MODE_DRAFT_CONTEXT.draftPool)
+        ? SIMULATION_MODE_DRAFT_CONTEXT.draftPool.map(player=>cloneDraftJsonSafe(player))
+        : [];
+      console.log('🎮 Booting simulation mode draft...', {
+        controlledTeamAbbr: SIMULATION_MODE_DRAFT_CONTEXT.controlledTeamAbbr,
+        draftSlot: SIMULATION_MODE_DRAFT_CONTEXT.draftSlot,
+        playerCount: PLAYERS.length
+      });
+    } else if(HISTORICAL_DRAFT_CONTEXT){
       console.log('🕰️ Booting Draft The Era from historical pack...', {
         packId:HISTORICAL_DRAFT_CONTEXT.packId,
         seasonId:HISTORICAL_DRAFT_CONTEXT.seasonId,
