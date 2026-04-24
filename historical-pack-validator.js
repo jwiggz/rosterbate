@@ -60,19 +60,6 @@
       ? rawSupportedModes.map(function(mode){ return normalizeSupportedMode(mode); })
       : null;
     const normalizedDefaultEntryMode=normalizeSupportedMode(manifest && manifest.defaultEntryMode);
-    const legacyModeCount=rawSupportedModes
-      ? rawSupportedModes.filter(function(mode){ return String(mode || '').trim().toLowerCase()==='real_season'; }).length
-      : 0;
-    const legacyDefaultMode=String(manifest && manifest.defaultEntryMode || '').trim().toLowerCase()==='real_season';
-
-    if((legacyModeCount>0 || legacyDefaultMode) && report){
-      addWarning(
-        report,
-        'legacy_real_season_mode',
-        '`real_season` is deprecated and is being treated as `single_player_season` for runtime compatibility.',
-        legacyDefaultMode ? 'manifest.defaultEntryMode' : 'manifest.supportedModes'
-      );
-    }
 
     if(isPlainObject(manifest)){
       if(normalizedSupportedModes) manifest.supportedModes=normalizedSupportedModes.slice();

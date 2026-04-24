@@ -89,8 +89,13 @@ assert.equal(
 );
 assert.equal(
   legacyManifestReport.warnings.some(warning => warning.code === 'legacy_real_season_mode'),
-  true,
-  'legacy manifests should emit a compatibility warning when real_season is normalized'
+  false,
+  'legacy manifests should normalize real_season silently so shipped packs still validate cleanly'
+);
+assert.equal(
+  legacyManifestReport.status,
+  'validation_passed_clean',
+  'legacy manifests should stay validation_passed_clean when compatibility normalization succeeds'
 );
 
 assert.deepEqual(
