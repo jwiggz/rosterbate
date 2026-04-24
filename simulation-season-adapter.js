@@ -205,7 +205,7 @@
         teamAbbr: normalizedAbbr,
         conference,
         seed: index + 1,
-        berth: index < 2 ? 'division_winner' : 'wild_card',
+        berth: index < 4 ? 'division_winner' : 'wild_card',
         bye: index < 2
       };
     });
@@ -225,6 +225,13 @@
       { conference: 'NFC', round: 'wild_card', seed: 3, homeAbbr: 'DAL', awayAbbr: 'DET' },
       { conference: 'NFC', round: 'wild_card', seed: 4, homeAbbr: 'CAR', awayAbbr: 'ARI' }
     ];
+  }
+
+  function hasAllTeamAbbrs(rows, teamAbbrs){
+    const standingsAbbrs = new Set(
+      (Array.isArray(rows) ? rows : []).map((row) => String(row?.teamAbbr || '').trim().toUpperCase())
+    );
+    return (Array.isArray(teamAbbrs) ? teamAbbrs : []).every((teamAbbr) => standingsAbbrs.has(String(teamAbbr || '').trim().toUpperCase()));
   }
 
   function getScheduleDayCount(scheduleByDay){
@@ -443,9 +450,8 @@
     if (getSimulationSportForState(nextState) === 'nfl') {
       const anchorSeasonId = String(nextState?.leagueShell?.anchorSeasonId || '').trim().toLowerCase();
       const standings = clone(nextState?.seasonState?.standings || []);
-      const afcRows = standings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'AFC');
-      const nfcRows = standings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'NFC');
-      if (anchorSeasonId === 'nfl_2014' && afcRows.length >= 6 && nfcRows.length >= 6) {
+      const expectedNfl2014PlayoffTeams = ['NE', 'DEN', 'IND', 'PIT', 'CIN', 'BAL', 'SEA', 'GB', 'DAL', 'CAR', 'ARI', 'DET'];
+      if (anchorSeasonId === 'nfl_2014' && hasAllTeamAbbrs(standings, expectedNfl2014PlayoffTeams)) {
         const playoffPicture = buildExactNfl2014PlayoffPicture(standings);
         const currentWeekSchedule = buildExactNfl2014WildCardSchedule();
         return {

@@ -861,14 +861,99 @@ assert.deepStrictEqual(
   'nfl postseason seeding should give the AFC top two seeds a bye'
 );
 assert.deepStrictEqual(
+  nfl2014PostseasonState.postseasonState.playoffPicture.afc.slice(0, 4).map((row) => row.berth),
+  ['division_winner', 'division_winner', 'division_winner', 'division_winner'],
+  'nfl postseason seeding should mark the top four 2014 AFC seeds as division winners'
+);
+assert.deepStrictEqual(
   nfl2014PostseasonState.postseasonState.playoffPicture.nfc.slice(0, 2).map((row) => row.bye),
   [true, true],
   'nfl postseason seeding should give the NFC top two seeds a bye'
 );
 assert.deepStrictEqual(
+  nfl2014PostseasonState.postseasonState.playoffPicture.nfc.slice(0, 4).map((row) => row.berth),
+  ['division_winner', 'division_winner', 'division_winner', 'division_winner'],
+  'nfl postseason seeding should mark the top four 2014 NFC seeds as division winners'
+);
+assert.deepStrictEqual(
   (nfl2014PostseasonState.postseasonState.currentWeekSchedule || []).map((game) => `${game.homeAbbr}-${game.awayAbbr}`),
   ['IND-BAL', 'PIT-CIN', 'DAL-DET', 'CAR-ARI'],
   'nfl postseason seeding should build the exact 2014 wild-card schedule'
+);
+
+const nfl2014FallbackAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-2014-fallback',
+  state: {
+    simulationMode: 'nfl_mixed_era_single_player_v1',
+    leagueShell: {
+      anchorSeasonId: 'nfl_2014',
+      anchorSeasonLabel: '2014 NFL',
+      sport: 'nfl',
+      teams: [
+        { abbr: 'NE', name: 'New England Patriots', conference: 'AFC', division: 'East' },
+        { abbr: 'DEN', name: 'Denver Broncos', conference: 'AFC', division: 'West' },
+        { abbr: 'IND', name: 'Indianapolis Colts', conference: 'AFC', division: 'South' },
+        { abbr: 'PIT', name: 'Pittsburgh Steelers', conference: 'AFC', division: 'North' },
+        { abbr: 'BAL', name: 'Baltimore Ravens', conference: 'AFC', division: 'North' },
+        { abbr: 'BUF', name: 'Buffalo Bills', conference: 'AFC', division: 'East' },
+        { abbr: 'SEA', name: 'Seattle Seahawks', conference: 'NFC', division: 'West' },
+        { abbr: 'GB', name: 'Green Bay Packers', conference: 'NFC', division: 'North' },
+        { abbr: 'DAL', name: 'Dallas Cowboys', conference: 'NFC', division: 'East' },
+        { abbr: 'CAR', name: 'Carolina Panthers', conference: 'NFC', division: 'South' },
+        { abbr: 'ARI', name: 'Arizona Cardinals', conference: 'NFC', division: 'West' },
+        { abbr: 'DET', name: 'Detroit Lions', conference: 'NFC', division: 'North' }
+      ]
+    },
+    sourceSeasons: { sourceSeasonLabels: ['2014'] },
+    draftState: {
+      controlledTeamAbbr: 'NE',
+      rostersByTeam: {
+        NE: [], DEN: [], IND: [], PIT: [], BAL: [], BUF: [],
+        SEA: [], GB: [], DAL: [], CAR: [], ARI: [], DET: []
+      },
+      freeAgents: []
+    },
+    seasonState: {
+      currentDay: 18,
+      currentWeek: 18,
+      scheduleByDay: { 1: [] },
+      lineupIdsByTeam: {},
+      standings: [
+        { teamAbbr: 'NE', conference: 'AFC', division: 'East', w: 12, l: 4, pf: 468, pa: 313 },
+        { teamAbbr: 'DEN', conference: 'AFC', division: 'West', w: 12, l: 4, pf: 482, pa: 354 },
+        { teamAbbr: 'IND', conference: 'AFC', division: 'South', w: 11, l: 5, pf: 458, pa: 357 },
+        { teamAbbr: 'PIT', conference: 'AFC', division: 'North', w: 11, l: 5, pf: 432, pa: 348 },
+        { teamAbbr: 'BAL', conference: 'AFC', division: 'North', w: 10, l: 6, pf: 409, pa: 302 },
+        { teamAbbr: 'BUF', conference: 'AFC', division: 'East', w: 9, l: 7, pf: 339, pa: 376 },
+        { teamAbbr: 'SEA', conference: 'NFC', division: 'West', w: 12, l: 4, pf: 412, pa: 254 },
+        { teamAbbr: 'GB', conference: 'NFC', division: 'North', w: 12, l: 4, pf: 486, pa: 301 },
+        { teamAbbr: 'DAL', conference: 'NFC', division: 'East', w: 12, l: 4, pf: 467, pa: 352 },
+        { teamAbbr: 'CAR', conference: 'NFC', division: 'South', w: 7, l: 8, pf: 339, pa: 376 },
+        { teamAbbr: 'ARI', conference: 'NFC', division: 'West', w: 11, l: 5, pf: 358, pa: 313 },
+        { teamAbbr: 'DET', conference: 'NFC', division: 'North', w: 11, l: 5, pf: 326, pa: 262 }
+      ],
+      completedGameLogs: [],
+      activityLog: []
+    },
+    postseasonState: { phase: 'regular_season' }
+  }
+});
+
+const nfl2014FallbackState = nfl2014FallbackAdapter.simulateNextDay();
+assert.equal(
+  nfl2014FallbackState.postseasonState.phase,
+  'postseason_ready',
+  'the exact 2014 shortcut should fall back to the computed playoff picture when an expected playoff team is missing'
+);
+assert.equal(
+  nfl2014FallbackState.postseasonState.playoffPicture.afc.some((row) => row.teamAbbr === 'CIN'),
+  false,
+  'the fallback computed playoff picture should not fabricate a missing 2014 playoff team'
+);
+assert.equal(
+  nfl2014FallbackState.postseasonState.playoffPicture.afc.some((row) => row.teamAbbr === 'BUF'),
+  true,
+  'the fallback computed playoff picture should preserve the actual standings team in place of a missing 2014 playoff team'
 );
 
 console.log('simulation season adapter test passed');
