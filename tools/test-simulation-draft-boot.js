@@ -80,7 +80,18 @@ assert.match(source, /function shouldBootSimulationModeDraft\(\)/, 'draft page n
 assert.match(source, /function buildSimulationDraftContextFromState\(/, 'draft page needs a simulation context builder');
 assert.match(source, /function getSimulationLeagueSize\(simulationContext\)/, 'draft page should define a simulation league-size helper');
 assert.match(source, /function getSimulationRosterSize\(simulationContext\)/, 'draft page should define a simulation roster-size helper');
+assert.match(source, /function getSimulationTopPlayersPerPack\(simulationContext\)/, 'draft page should define a simulation player-pool cap helper');
 assert.match(source, /function getSimulationSeasonRedirect\(simulationMode\)/, 'draft page should define a simulation season redirect helper');
+assert.match(
+  source,
+  /const\s+simulationTopPlayersPerPack\s*=\s*getSimulationTopPlayersPerPack\(\s*\{\s*simulationMode\s*,\s*shell\s*\}\s*\)\s*;[\s\S]*topPlayersPerPack:\s*simulationTopPlayersPerPack/,
+  'draft boot should derive topPlayersPerPack from the simulation shell helper instead of a fixed literal'
+);
+assert.match(
+  source,
+  /mixedEraTopPlayersPerPack:\s*simulationTopPlayersPerPack/,
+  'draft context should retain the derived simulation pack cap for downstream NFL boot flow'
+);
 assert.match(
   source,
   /const\s+simulationSport\s*=\s*normalizeRosterbateSport\(setupState\?\.sport\s*\|\|\s*SPORT\s*\|\|\s*['"]nba['"]\)\s*;[\s\S]*getSimulationShell\(\{\s*sport:\s*simulationSport\s*\}\)/,
@@ -118,6 +129,33 @@ assert.match(source, /nfl_mixed_era_single_player_v1[\s\S]*return\s+13\b/, 'foot
 assert.match(source, /rosterbate-season\.html\?sport=nfl&simulation=nfl_mixed_era/, 'completed football simulation drafts should route into the NFL season shell');
 assert.match(source, /rosterbate-season\.html\?sport=nba&simulation=nba_mixed_era/, 'completed simulation drafts should route into the shared season shell');
 assert.match(seasonSource, /Football simulation season shell is coming next/i, 'season page should include the NFL simulation placeholder copy');
+
+{
+  const topPlayersContext = {
+    SPORT: 'nba',
+    normalizeRosterbateSport: (value) => String(value || 'nba').trim().toLowerCase() || 'nba'
+  };
+  vm.createContext(topPlayersContext);
+  ['getSimulationModeFromContext', 'getSimulationLeagueSize', 'getSimulationRosterSize', 'getSimulationTopPlayersPerPack'].forEach((name) => {
+    vm.runInContext(extractFunction(source, name), topPlayersContext, { filename: `draft:${name}` });
+  });
+  assert.equal(
+    topPlayersContext.getSimulationTopPlayersPerPack({
+      simulationMode: 'nba_mixed_era_single_player_v1',
+      shell: { sport: 'nba', rosterSize: 10, teams: Array.from({ length: 30 }, (_, index) => ({ abbr: `T${index}` })) }
+    }),
+    120,
+    'nba simulation drafts should preserve the 120-player per-pack cap'
+  );
+  assert.equal(
+    topPlayersContext.getSimulationTopPlayersPerPack({
+      simulationMode: 'nfl_mixed_era_single_player_v1',
+      shell: { sport: 'nfl', rosterSize: 13, teams: Array.from({ length: 32 }, (_, index) => ({ abbr: `F${index}` })) }
+    }),
+    416,
+    'nfl simulation drafts should derive a 416-player per-pack cap from the football shell requirement'
+  );
+}
 
 {
   const harness = loadSeasonRedirectHarness({

@@ -320,6 +320,13 @@
       return teamCount * rosterSize;
     }
 
+    function getSimulationTopPlayersPerPack(shell){
+      if (getSimulationSport() === 'nfl') {
+        return getSimulationRequiredDraftSlots(shell);
+      }
+      return SIMULATION_TOP_PLAYERS_PER_PACK;
+    }
+
     function getSelectedSimulationSourcePackIds(){
       return Array.from(document.querySelectorAll('#simulationSourceSeasonList input:checked')).map(function(node){
         return node.value;
@@ -391,7 +398,7 @@
           sport: sport,
           seasonLabel: 'Simulation Mode Mixed Era Draft',
           sourcePackIds: selectedPackIds,
-          topPlayersPerPack: SIMULATION_TOP_PLAYERS_PER_PACK
+          topPlayersPerPack: getSimulationTopPlayersPerPack(shell)
         },
         bundles,
         requestedSport: sport

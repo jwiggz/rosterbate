@@ -3645,6 +3645,14 @@ function getSimulationRosterSize(simulationContext){
   return 10;
 }
 
+function getSimulationTopPlayersPerPack(simulationContext){
+  const simulationMode=getSimulationModeFromContext(simulationContext);
+  if(simulationMode==='nfl_mixed_era_single_player_v1'){
+    return getSimulationLeagueSize(simulationContext) * getSimulationRosterSize(simulationContext);
+  }
+  return 120;
+}
+
 function getSimulationSeasonRedirect(simulationMode){
   const normalizedMode=String(simulationMode || '').trim().toLowerCase();
   if(normalizedMode==='nfl_mixed_era_single_player_v1' || normalizedMode==='nfl_mixed_era'){
@@ -3756,6 +3764,7 @@ async function buildSimulationDraftContextFromState(){
   const simulationSport=normalizeRosterbateSport(setupState?.sport || SPORT || 'nba');
   const shell = window.RosterBateSimulationModeConfig.getSimulationShell({ sport: simulationSport });
   const simulationMode=simulationSport==='nfl' ? 'nfl_mixed_era_single_player_v1' : 'nba_mixed_era_single_player_v1';
+  const simulationTopPlayersPerPack=getSimulationTopPlayersPerPack({ simulationMode, shell });
   const shellLabel=String(shell?.anchorSeasonLabel || '').trim() || (simulationSport==='nfl' ? 'Football Shell' : 'NBA Shell');
   const bundles = await Promise.all(
     (setupState?.sourcePackIds || []).map((packId) => window.RosterBateHistoricalPackLoader.loadPackById(packId))
@@ -3766,7 +3775,7 @@ async function buildSimulationDraftContextFromState(){
       sport: simulationSport,
       seasonLabel: shellLabel + ' Mixed Era Draft',
       sourcePackIds: setupState.sourcePackIds,
-      topPlayersPerPack: 120
+      topPlayersPerPack: simulationTopPlayersPerPack
     },
     bundles,
     requestedSport: simulationSport,
@@ -3809,7 +3818,7 @@ async function buildSimulationDraftContextFromState(){
     leagueNamePlaceholder: 'e.g. ' + shellLabel + ' Simulation League',
     seasonLabel: shellLabel + ' Mixed Era Draft',
     mixedEraConfigId: mixedEraContext?.mixedEraConfigId || 'simulation_custom_mix',
-    mixedEraTopPlayersPerPack: 120,
+    mixedEraTopPlayersPerPack: simulationTopPlayersPerPack,
     sourceSeasonLabels: bootstrap.sourceSeasons?.sourceSeasonLabels || [],
     sourcePackIds: bootstrap.sourceSeasons?.sourcePackIds || [],
     isHistoricalPack: false,

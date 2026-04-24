@@ -22,6 +22,12 @@ async function main(){
   assert.match(inlineScript, /writeCompletedSimulationState/, 'setup page should persist the completed simulation state');
   assert.match(inlineScript, /function getSimulationSport\(\)/, 'setup page should expose a sport helper');
   assert.match(inlineScript, /getSimulationSport\(\)\s*===\s*'nfl'/, 'setup page should branch on the nfl sport helper');
+  assert.match(inlineScript, /function getSimulationTopPlayersPerPack\(shell\)/, 'setup page should define a sport-aware mixed-era pack cap helper');
+  assert.match(
+    inlineScript,
+    /topPlayersPerPack:\s*getSimulationTopPlayersPerPack\(shell\)/,
+    'setup page should derive the preview cap from the shell helper instead of a fixed literal'
+  );
 
   let seasonNodes = [
     { value: 'nba_1987_full_season_v1', checked: true, disabled: false },
@@ -57,6 +63,7 @@ async function main(){
     simulationDraftSlotHelper: draftSlotHelperNode
   };
   const storageWrites = [];
+  const mixedEraConfigCalls = [];
   const locationState = { href: 'rosterbate-simulation-setup.html?sport=nba', search: '?sport=nba' };
   const mockCatalog = [
     { packId: 'nba_1987_full_season_v1', seasonLabel: '1986-87', sport: 'nba' },
@@ -162,7 +169,15 @@ async function main(){
   context.window.RosterBateMixedEraRuntime = {
     buildMixedEraDraftContextFromBundles(input){
       const bundles = Array.isArray(input?.bundles) ? input.bundles : [];
-      const totalPlayers = bundles.reduce((sum, bundle) => sum + (Array.isArray(bundle?.players) ? bundle.players.length : 0), 0);
+      const topPlayersPerPack = Number(input?.config?.topPlayersPerPack || 0);
+      mixedEraConfigCalls.push(input?.config || null);
+      const totalPlayers = bundles.reduce((sum, bundle) => {
+        const players = Array.isArray(bundle?.players) ? bundle.players : [];
+        const eligiblePlayers = Number.isFinite(topPlayersPerPack) && topPlayersPerPack > 0
+          ? players.slice(0, topPlayersPerPack)
+          : players;
+        return sum + eligiblePlayers.length;
+      }, 0);
       return {
         mixedEraConfigId: 'simulation_custom_mix',
         sourcePackIds: bundles.map((bundle) => bundle.packId),
@@ -243,6 +258,7 @@ async function main(){
   assert.equal(savedPayload.mode, 'nba_mixed_era_single_player_v1', 'payload should use the simulation mode id');
   assert.equal(savedPayload.controlledTeamAbbr, 'LAL', 'payload should store the controlled franchise');
   assert.equal(savedPayload.draftSlot, 4, 'payload should store the chosen draft slot');
+  assert.ok(mixedEraConfigCalls.every((config) => Number(config?.topPlayersPerPack) === 120), 'nba setup preview should preserve the 120-player pack cap');
   assert.equal(locationState.href, 'rosterbate-draft.html?sport=nba&simulation=nba_mixed_era', 'setup page should navigate into the simulation draft flow');
 
   const autoDraftStatusNode = { textContent: '' };
@@ -541,6 +557,7 @@ async function main(){
     simulationDraftSlotHelper: nflDraftSlotHelperNode
   };
   const nflStorageWrites = [];
+  const nflMixedEraConfigCalls = [];
   const nflLocationState = { href: 'rosterbate-simulation-setup.html?sport=nfl', search: '?sport=nfl' };
   const nflMockCatalog = [
     { packId: 'nfl_2014_full_season_v1', seasonLabel: '2014', sport: 'nfl' },
@@ -646,11 +663,18 @@ async function main(){
   nflContext.window.RosterBateMixedEraRuntime = {
     buildMixedEraDraftContextFromBundles(input){
       const bundles = Array.isArray(input?.bundles) ? input.bundles : [];
+      const topPlayersPerPack = Number(input?.config?.topPlayersPerPack || 0);
+      nflMixedEraConfigCalls.push(input?.config || null);
       return {
         mixedEraConfigId: 'simulation_custom_mix',
         sourcePackIds: bundles.map((bundle) => bundle.packId),
         sourceSeasonLabels: bundles.map((bundle) => bundle?.season?.seasonLabel || bundle.packId),
-        playerPool: bundles.flatMap((bundle) => Array.isArray(bundle?.players) ? bundle.players : [])
+        playerPool: bundles.flatMap((bundle) => {
+          const players = Array.isArray(bundle?.players) ? bundle.players : [];
+          return Number.isFinite(topPlayersPerPack) && topPlayersPerPack > 0
+            ? players.slice(0, topPlayersPerPack)
+            : players;
+        })
       };
     }
   };
@@ -675,6 +699,7 @@ async function main(){
   assert.deepStrictEqual(nflSavedPayload.sourcePackIds, ['nfl_2014_full_season_v1'], 'nfl payload should capture only the nfl source pack');
   assert.equal(nflSavedPayload.mode, 'nfl_mixed_era_single_player_v1', 'nfl payload should use the nfl simulation mode id');
   assert.equal(nflSavedPayload.controlledTeamAbbr, 'DAL', 'nfl payload should store the selected franchise');
+  assert.ok(nflMixedEraConfigCalls.every((config) => Number(config?.topPlayersPerPack) === 416), 'nfl setup preview should derive a 416-player pack cap from the football shell requirement');
   assert.equal(nflLocationState.href, 'rosterbate-draft.html?sport=nfl&simulation=nfl_mixed_era', 'nfl setup page should navigate into the nfl simulation draft flow');
 
   console.log('simulation setup page test passed');
