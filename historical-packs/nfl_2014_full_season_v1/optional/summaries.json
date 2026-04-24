@@ -1,5 +1,5 @@
 {
-  "packSummary": "The 2014 NFL season pack gives the archive its first football foundation with real 2014 team context, marquee stars, and a 32-team player pool sized for simulation setup and Draft The Era.",
+  "packSummary": "The 2014 NFL season pack is the archive's first football foundation preview, with real 2014 team context, marquee stars, and a 32-team player pool sized for simulation setup rather than a finished live pack.",
   "featuredStorylines": [
     "Brady, Rodgers, Watt, and the Legion of Boom anchor the first football archive tentpole.",
     "The player pool is draft-sized for 32-team football universes with quarterbacks, kickers, DST, and defensive roles included.",
@@ -30,11 +30,11 @@
   "modeSummaries": [
     {
       "mode": "single_player_season",
-      "summary": "Choose a single 2014 team and enter the shared football simulation shell with that historical context."
+      "summary": "Choose a single 2014 team and preview how this foundation pack will plug into the shared football simulation shell."
     },
     {
       "mode": "historical_draft",
-      "summary": "Remix the full 2014 player pool into a new fantasy football universe built for 32-team setup and draft flow."
+      "summary": "Remix the full 2014 player pool into a draft-sized fantasy football universe while the pack remains in foundation-preview state."
     }
   ],
   "auditSummary": {
