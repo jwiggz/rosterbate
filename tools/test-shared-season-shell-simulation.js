@@ -1808,6 +1808,95 @@ api.setSeasonModeAdapter({
   getState() {
     return {
       leagueShell: {
+        sport: 'nfl',
+        anchorSeasonLabel: '2014 NFL'
+      },
+      postseasonState: {
+        phase: 'completed'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' },
+      { id: 'playoffs', label: 'Playoffs' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'NE', name: 'New England Patriots' },
+      userRow: { w: 12, l: 4, streak: 'W1' },
+      recordLabel: '12-4',
+      primaryAction: { id: 'review-playoffs', label: 'Season Complete' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Season Complete',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'completed',
+      currentRound: 'super_bowl',
+      shellLabel: '2014 NFL',
+      champion: { teamAbbr: 'NE', teamName: 'New England Patriots' },
+      runnerUp: { teamAbbr: 'SEA', teamName: 'Seattle Seahawks' },
+      playoffPicture: {
+        afc: [{ seed: 1, teamAbbr: 'NE', teamName: 'Patriots', w: 12, l: 4, berth: 'division_winner', bye: true }],
+        nfc: [{ seed: 1, teamAbbr: 'SEA', teamName: 'Seahawks', w: 12, l: 4, berth: 'division_winner', bye: true }]
+      },
+      currentWeekSchedule: []
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationPlayoffsInSharedShell();
+assert.match(elements.playoffsContent.innerHTML, /New England Patriots/i, 'nfl completed playoffs screen should show the champion');
+assert.match(elements.playoffsContent.innerHTML, /Seattle Seahawks/i, 'nfl completed playoffs screen should show the runner-up');
+assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX Complete/i, 'nfl completed playoffs screen should keep the 2014 championship completion framing');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
         sport: 'nfl'
       }
     };

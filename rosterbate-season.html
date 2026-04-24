@@ -8662,6 +8662,27 @@ function renderSimulationPlayoffsInSharedShell(){
         </div>
       `).join('');
     };
+    const renderCompletedSummary = () => {
+      if (phase !== 'completed' || (!vm?.champion && !vm?.runnerUp)) return '';
+      const championLabel = String(vm?.champion?.teamName || vm?.champion?.teamAbbr || 'Champion').trim() || 'Champion';
+      const runnerUpLabel = String(vm?.runnerUp?.teamName || vm?.runnerUp?.teamAbbr || 'Runner-Up').trim() || 'Runner-Up';
+      return `
+        <div class="card" style="background:linear-gradient(135deg,rgba(74,44,13,.98),rgba(18,26,41,.98));border-color:rgba(247,199,106,.42);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);">Super Bowl XLIX Champions</div>
+              <div style="font-family:var(--fd);font-size:30px;font-weight:900;text-transform:uppercase;line-height:.92;margin-top:6px;">&#127942; ${championLabel}</div>
+              <div style="color:var(--text2);font-size:12px;margin-top:8px;">Finished the 2014 NFL shell on top of ${runnerUpLabel}.</div>
+            </div>
+            <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);min-width:180px;">
+              <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Result</div>
+              <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-top:6px;">${championLabel}</div>
+              <div style="color:var(--text2);font-size:12px;margin-top:6px;">Runner-up: ${runnerUpLabel}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    };
     document.getElementById('playoffsContent').innerHTML = `
       <div class="card">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
@@ -8676,6 +8697,7 @@ function renderSimulationPlayoffsInSharedShell(){
           </div>
         </div>
       </div>
+      ${renderCompletedSummary()}
       ${renderConferenceField('AFC', vm.playoffPicture?.afc || [])}
       ${renderConferenceField('NFC', vm.playoffPicture?.nfc || [])}
       <div class="card">
