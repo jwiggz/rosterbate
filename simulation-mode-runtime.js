@@ -50,6 +50,23 @@
     };
   }
 
+  function getSimulationSport(shell){
+    return String(shell?.sport || 'nba').trim().toLowerCase() || 'nba';
+  }
+
+  function getSimulationModeId(shell){
+    return getSimulationSport(shell) === 'nfl'
+      ? 'nfl_mixed_era_single_player_v1'
+      : 'nba_mixed_era_single_player_v1';
+  }
+
+  function getSimulationRosterNeeds(shell){
+    if (getSimulationSport(shell) === 'nfl') {
+      return ['QB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'DST'];
+    }
+    return ['PG', 'SG', 'SF', 'PF', 'C'];
+  }
+
   function sortPlayers(players){
     return (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
       const overallDiff = Number(b?.mixedEraOverall || 0) - Number(a?.mixedEraOverall || 0);
@@ -95,7 +112,7 @@
     const leagueShell = normalizeShell(shell);
     const pool = buildSimulationPlayerPool({ mixedEraContext, shell });
     return {
-      simulationMode: 'nba_mixed_era_single_player_v1',
+      simulationMode: getSimulationModeId(leagueShell),
       leagueShell: clone(leagueShell),
       sourceSeasons: {
         mixedEraConfigId: String(mixedEraContext?.mixedEraConfigId || '').trim(),
@@ -141,13 +158,45 @@
     return String(player?.pos || player?.primaryPosition || 'UTIL').trim().toUpperCase();
   }
 
-  function getSimulationAutoDraftScore(player, roster){
+  function getFootballCoverageBonus(position, roster){
+    const minimumCounts = {
+      QB: 1,
+      RB: 1,
+      WR: 2,
+      TE: 1,
+      FLEX: 1,
+      OL: 1,
+      DL: 1,
+      LB: 1,
+      CB: 1,
+      S: 1,
+      K: 1,
+      DST: 1
+    };
+    const requiredCount = Number(minimumCounts[position] || 0);
+    if (!requiredCount) {
+      return 0;
+    }
+    const nextRoster = Array.isArray(roster) ? roster : [];
+    const currentCount = nextRoster.reduce((count, entry) => (
+      getSimulationPlayerPosition(entry) === position ? count + 1 : count
+    ), 0);
+    if (currentCount >= requiredCount) {
+      return 0;
+    }
+    return 1000 + ((requiredCount - currentCount) * 100);
+  }
+
+  function getSimulationAutoDraftScore(player, roster, shell){
     const nextRoster = Array.isArray(roster) ? roster : [];
     const position = getSimulationPlayerPosition(player);
     const samePositionCount = nextRoster.reduce((count, entry) => (
       getSimulationPlayerPosition(entry) === position ? count + 1 : count
     ), 0);
     const baseScore = (Number(player?.mixedEraOverall || 0) * 100) + Number(player?.fp || 0);
+    if (getSimulationSport(shell) === 'nfl') {
+      return baseScore + getFootballCoverageBonus(position, nextRoster) - (samePositionCount * 2);
+    }
     const coverageBonus = samePositionCount === 0 ? 6 : 0;
     const duplicatePenalty = samePositionCount * 3;
     return baseScore + coverageBonus - duplicatePenalty;
@@ -187,7 +236,7 @@
         let bestIndex = 0;
         let bestScore = -Infinity;
         for (let index = 0; index < draftablePlayers.length; index += 1) {
-          const score = getSimulationAutoDraftScore(draftablePlayers[index], roster);
+          const score = getSimulationAutoDraftScore(draftablePlayers[index], roster, next.leagueShell);
           if (score > bestScore) {
             bestScore = score;
             bestIndex = index;
@@ -339,6 +388,10 @@
     readCompletedSimulationState,
     writeCompletedSimulationState,
     clearCompletedSimulationState,
+    getSimulationSport,
+    getSimulationModeId,
+    getSimulationRosterNeeds,
+    getFootballCoverageBonus,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,
     buildCompletedSimulationAutoDraftState,

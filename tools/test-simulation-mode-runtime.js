@@ -9,6 +9,7 @@ const {
 } = require('../simulation-mode-runtime.js');
 
 const shell = getSimulationShell();
+const nflShell = getSimulationShell({ sport: 'nfl' });
 
 function rankPlayers(players) {
   return players.slice().sort((a, b) => {
@@ -47,6 +48,31 @@ const mixedEraContext = {
   ],
   sourceSeasonLabels: ['1986-87', '1992-93', '1995-96', '2015-16'],
   playerPool
+};
+
+const nflRosterTemplate = ['QB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'DST'];
+const nflPlayerPool = Array.from({ length: 480 }, (_, index) => {
+  const position = nflRosterTemplate[index % nflRosterTemplate.length];
+  return {
+    id: 5000 + index + 1,
+    name: `NFL Player ${String(index + 1).padStart(3, '0')}`,
+    team: 'HIS',
+    pos: position,
+    fp: 120 - (index % nflRosterTemplate.length),
+    mixedEraOverall: 99 - Math.floor(index / nflRosterTemplate.length),
+    historicalPackId: index < 160 ? 'nfl_1998_full_season_v1' : index < 320 ? 'nfl_2007_full_season_v1' : 'nfl_2014_full_season_v1'
+  };
+});
+
+const nflMixedEraContext = {
+  mixedEraConfigId: '1998-2007-2014-nfl',
+  sourcePackIds: [
+    'nfl_1998_full_season_v1',
+    'nfl_2007_full_season_v1',
+    'nfl_2014_full_season_v1'
+  ],
+  sourceSeasonLabels: ['1998', '2007', '2014'],
+  playerPool: nflPlayerPool
 };
 
 const expectedRankedNames = rankPlayers(playerPool).map((player) => player.name);
@@ -122,6 +148,20 @@ assert.equal(partialShellBootstrap.leagueShell.teams.length, 0);
 assert.deepStrictEqual(partialShellBootstrap.draftState.rostersByTeam, {});
 assert.deepStrictEqual(partialShellBootstrap.seasonState.standings, []);
 
+const nflBootstrap = buildSimulationUniverseBootstrap({
+  shell: nflShell,
+  mixedEraContext: nflMixedEraContext,
+  controlledTeamAbbr: 'GB',
+  draftSlot: 12
+});
+
+assert.equal(nflBootstrap.simulationMode, 'nfl_mixed_era_single_player_v1');
+assert.equal(nflBootstrap.leagueShell.sport, 'nfl');
+assert.equal(nflBootstrap.draftState.teamCount, 32);
+assert.equal(nflBootstrap.draftState.rosterSize, 13);
+assert.equal(nflBootstrap.seasonState.currentWeek, 1);
+assert.equal(nflBootstrap.draftState.controlledTeamAbbr, 'GB');
+
 const autoDraftState = buildCompletedSimulationAutoDraftState({
   shell,
   mixedEraContext,
@@ -146,6 +186,23 @@ assert.deepStrictEqual(
 );
 assert.equal(autoDraftState.seasonState.currentDay, 1);
 assert.equal(autoDraftState.postseasonState.phase, 'regular_season');
+
+const nflAutoDraftState = buildCompletedSimulationAutoDraftState({
+  shell: nflShell,
+  mixedEraContext: nflMixedEraContext,
+  controlledTeamAbbr: 'GB'
+});
+
+const gbRoster = nflAutoDraftState.draftState.rostersByTeam.GB || [];
+
+assert.equal(gbRoster.length, 13);
+assert.ok(gbRoster.some((player) => player.pos === 'QB'), 'GB roster should include a QB');
+assert.ok(gbRoster.some((player) => player.pos === 'OL'), 'GB roster should include an OL');
+assert.ok(gbRoster.some((player) => player.pos === 'DST'), 'GB roster should include a DST');
+assert.ok(
+  Object.values(nflAutoDraftState.draftState.rostersByTeam).every((roster) => Array.isArray(roster) && roster.length === 13),
+  'every NFL team roster should contain 13 drafted players'
+);
 
 assert.throws(() => buildCompletedSimulationAutoDraftState({
   shell,
