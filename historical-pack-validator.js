@@ -48,6 +48,43 @@
     return Array.isArray(value) ? value : [];
   }
 
+  function normalizeSupportedMode(mode){
+    const normalized=String(mode || '').trim().toLowerCase();
+    if(normalized==='real_season') return 'single_player_season';
+    return normalized;
+  }
+
+  function normalizeManifestModes(manifest, report){
+    const rawSupportedModes=Array.isArray(manifest && manifest.supportedModes) ? manifest.supportedModes : null;
+    const normalizedSupportedModes=rawSupportedModes
+      ? rawSupportedModes.map(function(mode){ return normalizeSupportedMode(mode); })
+      : null;
+    const normalizedDefaultEntryMode=normalizeSupportedMode(manifest && manifest.defaultEntryMode);
+    const legacyModeCount=rawSupportedModes
+      ? rawSupportedModes.filter(function(mode){ return String(mode || '').trim().toLowerCase()==='real_season'; }).length
+      : 0;
+    const legacyDefaultMode=String(manifest && manifest.defaultEntryMode || '').trim().toLowerCase()==='real_season';
+
+    if((legacyModeCount>0 || legacyDefaultMode) && report){
+      addWarning(
+        report,
+        'legacy_real_season_mode',
+        '`real_season` is deprecated and is being treated as `single_player_season` for runtime compatibility.',
+        legacyDefaultMode ? 'manifest.defaultEntryMode' : 'manifest.supportedModes'
+      );
+    }
+
+    if(isPlainObject(manifest)){
+      if(normalizedSupportedModes) manifest.supportedModes=normalizedSupportedModes.slice();
+      if(isNonEmptyString(manifest.defaultEntryMode)) manifest.defaultEntryMode=normalizedDefaultEntryMode;
+    }
+
+    return {
+      supportedModes: normalizedSupportedModes,
+      defaultEntryMode: normalizedDefaultEntryMode
+    };
+  }
+
   function createReport(packId){
     return {
       status: 'validation_passed_clean',
@@ -144,15 +181,17 @@
       addError(report, 'invalid_source_profile', 'Unsupported source profile `'+String(manifest.sourceProfile || '')+'`.', 'manifest.sourceProfile');
     }
 
-    if(!Array.isArray(manifest.supportedModes) || manifest.supportedModes.length===0){
+    const normalizedModes=normalizeManifestModes(manifest, report);
+
+    if(!Array.isArray(normalizedModes.supportedModes) || normalizedModes.supportedModes.length===0){
       addError(report, 'missing_supported_modes', '`supportedModes` must be a non-empty array.', 'manifest.supportedModes');
     }else{
-      manifest.supportedModes.forEach(function(mode, index){
+      normalizedModes.supportedModes.forEach(function(mode, index){
         if(!ALLOWED_SUPPORTED_MODES.includes(mode)){
           addError(report, 'invalid_supported_mode', 'Unsupported mode `'+String(mode || '')+'`.', 'manifest.supportedModes['+index+']');
         }
       });
-      if(!manifest.supportedModes.includes(manifest.defaultEntryMode)){
+      if(!normalizedModes.supportedModes.includes(normalizedModes.defaultEntryMode)){
         addError(report, 'default_mode_not_supported', '`defaultEntryMode` must appear in `supportedModes`.', 'manifest.defaultEntryMode');
       }
     }

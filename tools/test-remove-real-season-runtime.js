@@ -29,20 +29,33 @@ const fixtures = loadModule('historical-pack-fixtures.js', 'RosterBateHistorical
 const slotsSource = read('historical-universe-slots.js');
 const devRunnerSource = read('historical-pack-dev-runner.js');
 
-const slotsSandbox = {
-  console,
-  window: {
-    localStorage: {
-      getItem() { return null; },
-      setItem() {},
-      removeItem() {}
+function createLocalStorage() {
+  const store = new Map();
+  return {
+    getItem(key) {
+      return store.has(String(key)) ? store.get(String(key)) : null;
+    },
+    setItem(key, value) {
+      store.set(String(key), String(value));
+    },
+    removeItem(key) {
+      store.delete(String(key));
     }
-  }
-};
-slotsSandbox.window.window = slotsSandbox.window;
-vm.createContext(slotsSandbox);
-vm.runInContext(slotsSource, slotsSandbox, { filename: 'historical-universe-slots.js' });
-const slotsApi = slotsSandbox.window.RosterBateHistoricalUniverseSlots;
+  };
+}
+
+function loadSlotsApi(localStorage) {
+  const slotsSandbox = {
+    console,
+    window: { localStorage }
+  };
+  slotsSandbox.window.window = slotsSandbox.window;
+  vm.createContext(slotsSandbox);
+  vm.runInContext(slotsSource, slotsSandbox, { filename: 'historical-universe-slots.js' });
+  return slotsSandbox.window.RosterBateHistoricalUniverseSlots;
+}
+
+const slotsApi = loadSlotsApi(createLocalStorage());
 
 const bundle = fixtures.getSample1995_96Bundle();
 const manifestModes = Array.from(bundle.manifest.supportedModes || []);
@@ -55,6 +68,29 @@ assert.equal(
   validator.constants.ALLOWED_SUPPORTED_MODES.includes('real_season'),
   false,
   'historical-pack-validator.js should not allow real_season in ALLOWED_SUPPORTED_MODES'
+);
+
+const legacyManifest = {
+  ...bundle.manifest,
+  supportedModes: ['real_season', 'historical_draft'],
+  defaultEntryMode: 'real_season'
+};
+const legacyManifestReport = validator.validateHistoricalPackManifest(legacyManifest);
+
+assert.notEqual(
+  legacyManifestReport.status,
+  'validation_failed',
+  'legacy manifests that still declare real_season should remain runtime-compatible during validation'
+);
+assert.equal(
+  legacyManifestReport.errors.some(error => error.code === 'invalid_supported_mode' || error.code === 'default_mode_not_supported'),
+  false,
+  'legacy manifests should not fail validation for real_season compatibility fields'
+);
+assert.equal(
+  legacyManifestReport.warnings.some(warning => warning.code === 'legacy_real_season_mode'),
+  true,
+  'legacy manifests should emit a compatibility warning when real_season is normalized'
 );
 
 assert.deepEqual(
@@ -98,6 +134,55 @@ assert.equal(
   slotsApi.getModeTone('real_season'),
   'historical',
   'historical-universe-slots.js should degrade legacy real_season tone to historical'
+);
+assert.equal(
+  slotsApi.getModeLabel(''),
+  'Historic Season',
+  'historical-universe-slots.js should treat missing entry modes as neutral historical saves'
+);
+assert.equal(
+  slotsApi.getModeTone('mystery_mode'),
+  'historical',
+  'historical-universe-slots.js should treat unknown entry modes as neutral historical saves'
+);
+
+const legacySlotsStorage = createLocalStorage();
+const legacySlotsApi = loadSlotsApi(legacySlotsStorage);
+const legacySlotPersist = legacySlotsApi.upsertFromState({
+  sport: 'nba',
+  historicalPackId: 'nba_1996_full_season_v1',
+  historicalSeasonId: 'nba_1996_historic',
+  leagueName: '1995-96 NBA Historic Season',
+  teamName: 'Chicago Bulls',
+  currentWeek: 3,
+  currentDay: 2
+});
+
+assert.ok(legacySlotPersist, 'legacy historical saves should still persist to a slot');
+assert.match(
+  legacySlotPersist.slotId,
+  /single_player_season|historic/,
+  'legacy/missing entry mode saves should avoid draft-flavored slot ids'
+);
+assert.doesNotMatch(
+  legacySlotPersist.slotId,
+  /historical_draft/,
+  'legacy/missing entry mode saves should not generate historical_draft slot ids'
+);
+assert.equal(
+  legacySlotPersist.metadata.historicalEntryMode,
+  'single_player_season',
+  'legacy/missing entry mode saves should normalize to the neutral historical entry mode'
+);
+assert.equal(
+  legacySlotPersist.metadata.modeTone,
+  'historical',
+  'legacy/missing entry mode saves should keep the neutral historical tone'
+);
+assert.match(
+  legacySlotPersist.metadata.title,
+  /Historic Season$/,
+  'legacy/missing entry mode saves should render the neutral Historic Season label'
 );
 
 assert.doesNotMatch(

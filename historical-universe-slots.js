@@ -47,7 +47,7 @@
       case 'real_season':
         return 'single_player_season';
       default:
-        return fallback || 'historical_draft';
+        return fallback || 'single_player_season';
     }
   }
 
@@ -89,7 +89,7 @@
       : slugifyKey(state?.historicalPackId || 'historic_pack');
     const entryMode = isSimulationModeState(state)
       ? 'simulation_universe'
-      : slugifyKey(normalizeHistoricalEntryMode(state?.historicalEntryMode, 'historical_draft'));
+      : slugifyKey(normalizeHistoricalEntryMode(state?.historicalEntryMode, 'single_player_season'));
     const stamp = Date.now().toString(36);
     const rand = Math.random().toString(36).slice(2, 8);
     return [sport, packId, entryMode, stamp, rand].join('_');
@@ -330,7 +330,7 @@
   }
 
   function summarizeHistoricalState(state, slotId, existingMeta){
-    const historicalEntryMode = normalizeHistoricalEntryMode(state?.historicalEntryMode, 'historical_draft');
+    const historicalEntryMode = normalizeHistoricalEntryMode(state?.historicalEntryMode, 'single_player_season');
     const title = getSeasonLabel(state) + ' - ' + getModeLabel(historicalEntryMode);
     const createdAt = Number(existingMeta?.createdAt || state?.historicalUniverseCreatedAt || state?.createdAt || state?.savedAt || Date.now());
     const updatedAt = Date.now();
