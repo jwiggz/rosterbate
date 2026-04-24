@@ -95,7 +95,7 @@
     { abbr: 'STL', name: 'St. Louis Rams', conference: 'NFC', division: 'West' },
     { abbr: 'TB', name: 'Tampa Bay Buccaneers', conference: 'NFC', division: 'South' },
     { abbr: 'TEN', name: 'Tennessee Titans', conference: 'AFC', division: 'South' },
-    { abbr: 'WAS', name: 'Washington', conference: 'NFC', division: 'East' }
+    { abbr: 'WAS', name: 'Washington Redskins', conference: 'NFC', division: 'East' }
   ]);
 
   const SIMULATION_SHELLS = deepFreeze({

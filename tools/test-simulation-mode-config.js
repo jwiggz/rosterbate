@@ -27,6 +27,7 @@ assert.ok(allShells.some((shell) => shell.anchorSeasonId === 'nfl_2014'));
 
 const patriots = findSimulationTeamByAbbr('NE', { sport: 'nfl' });
 const packers = findSimulationTeamByAbbr('GB', { sport: 'nfl' });
+const redskins = findSimulationTeamByAbbr('WAS', { sport: 'nfl' });
 
 assert.deepStrictEqual(
   { conference: patriots.conference, division: patriots.division },
@@ -36,6 +37,7 @@ assert.deepStrictEqual(
   { conference: packers.conference, division: packers.division },
   { conference: 'NFC', division: 'North' }
 );
+assert.equal(redskins.name, 'Washington Redskins');
 
 nflShell.teams[0].conference = 'Mutated';
 
