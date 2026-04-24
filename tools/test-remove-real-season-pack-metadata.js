@@ -20,6 +20,11 @@ const builderScripts = [
 ];
 
 const manifestExpectations = {
+  'historical-packs/nba_1987_full_season_v1/manifest.json': [
+    'historical_draft',
+    'single_player_season',
+    'reimagined_season'
+  ],
   'historical-packs/nba_1993_full_season_v1/manifest.json': [
     'historical_draft',
     'single_player_season',
@@ -44,6 +49,7 @@ const manifestExpectations = {
 const filesRequiringHistoricalStatsLabel = [
   ...builderScripts,
   ...Object.keys(manifestExpectations),
+  'historical-packs/nba_1987_full_season_v1/optional/summaries.json',
   'historical-packs/nba_1996_full_season_v1/optional/summaries.json',
   'historical-packs/nba_2001_full_season_v1/optional/summaries.json',
   'historical-packs/nba_2016_full_season_v1/optional/summaries.json'
@@ -51,6 +57,9 @@ const filesRequiringHistoricalStatsLabel = [
 
 const metadataFiles = [
   ...Object.keys(manifestExpectations),
+  'historical-packs/nba_1987_full_season_v1/optional/pack_challenges.json',
+  'historical-packs/nba_1987_full_season_v1/optional/presentation.json',
+  'historical-packs/nba_1987_full_season_v1/optional/summaries.json',
   'historical-packs/nba_1993_full_season_v1/optional/pack_challenges.json',
   'historical-packs/nba_1993_full_season_v1/optional/summaries.json',
   'historical-packs/nba_1996_full_season_v1/optional/pack_challenges.json',
@@ -104,6 +113,7 @@ for (const [relativePath, expectedModes] of Object.entries(manifestExpectations)
 }
 
 for (const relativePath of [
+  'historical-packs/nba_1987_full_season_v1/optional/pack_challenges.json',
   'historical-packs/nba_1993_full_season_v1/optional/pack_challenges.json',
   'historical-packs/nba_1996_full_season_v1/optional/pack_challenges.json',
   'historical-packs/nba_2001_full_season_v1/optional/pack_challenges.json',
@@ -142,6 +152,7 @@ for (const relativePath of [
 }
 
 for (const relativePath of [
+  'historical-packs/nba_1987_full_season_v1/optional/presentation.json',
   'historical-packs/nba_1996_full_season_v1/optional/presentation.json',
   'historical-packs/nba_2001_full_season_v1/optional/presentation.json',
   'historical-packs/nba_2016_full_season_v1/optional/presentation.json'
@@ -167,6 +178,7 @@ for (const relativePath of [
 }
 
 for (const relativePath of [
+  'historical-packs/nba_1987_full_season_v1/optional/summaries.json',
   'historical-packs/nba_1996_full_season_v1/optional/summaries.json',
   'historical-packs/nba_2001_full_season_v1/optional/summaries.json',
   'historical-packs/nba_2016_full_season_v1/optional/summaries.json'

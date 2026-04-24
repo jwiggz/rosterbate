@@ -18,14 +18,13 @@
     "pbpstats_1986"
   ],
   "supportedModes": [
-    "real_season",
     "historical_draft",
     "single_player_season",
     "reimagined_season"
   ],
-  "defaultEntryMode": "real_season",
+  "defaultEntryMode": "single_player_season",
   "focusTeamId": "nba_1987_lal",
-  "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 replay foundation with Lakers prestige at the center.",
+  "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 historical season foundation with Lakers prestige at the center.",
   "description": "A playable 1986-87 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
   "tagline": "Replay the Bird-Magic-Jordan season with real scores and disclosed inferred box lines.",
   "eraTags": [
@@ -68,7 +67,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 335,
       "playerCount": 335,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 0,

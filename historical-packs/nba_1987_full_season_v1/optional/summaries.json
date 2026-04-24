@@ -29,8 +29,8 @@
   ],
   "modeSummaries": [
     {
-      "mode": "real_season",
-      "summary": "Replay the real 1986-87 campaign from opening night through the final regular-season standings."
+      "mode": "single_player_season",
+      "summary": "Choose one 1986-87 franchise and guide it through the full historical season."
     },
     {
       "mode": "historical_draft",
@@ -45,7 +45,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 335,
       "playerCount": 335,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 0,
