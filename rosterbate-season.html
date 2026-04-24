@@ -33,7 +33,7 @@ try{
     const host=String(window.location.hostname||'').trim().toLowerCase();
     historicalPending=(host==='localhost' || host==='127.0.0.1') && !!window.localStorage.getItem('rbHistoricalPackDevPendingSeasonBoot');
   }catch(e){}
-  if(requestedHistoricalUniverse || requestedSimulation==='nba_mixed_era' || requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='sim' || requestedHistorical==='simulation' || historicalPending){
+  if(requestedHistoricalUniverse || requestedSimulation==='nba_mixed_era' || requestedSimulation==='nfl_mixed_era' || requestedHistorical==='dev' || requestedHistorical==='reimagined' || requestedHistorical==='sim' || requestedHistorical==='simulation' || historicalPending){
     document.documentElement.dataset.seasonRoute='historical';
   }else if(requestedLeague && requestedLeague!=='demo'){
     document.documentElement.dataset.seasonRoute='league';
@@ -2064,7 +2064,7 @@ const authReady=new Promise(resolve=>{
 function getRequestedLeagueId(){
   try{
     const params=new URLSearchParams(window.location.search || '');
-    if(getRequestedSimulationMode(params)==='nba_mixed_era') return null;
+    if(isRequestedSharedSimulationMode(getRequestedSimulationMode(params))) return null;
     const leagueId=(params.get('league')||'').trim();
     return leagueId && leagueId!=='demo' ? leagueId : null;
   }catch(e){
@@ -2114,6 +2114,34 @@ function hideSeasonEmptyState(){
   document.body.dataset.seasonBoot='idle';
   const emptyScreen=document.getElementById('noData');
   if(emptyScreen) emptyScreen.classList.remove('active');
+}
+
+function renderFootballSimulationPhaseOnePlaceholder(simulationState){
+  const emptyScreen=document.getElementById('noData');
+  const icon=document.getElementById('seasonEmptyIcon');
+  const title=document.getElementById('seasonEmptyTitle');
+  const copy=document.getElementById('seasonEmptyCopy');
+  const actions=document.getElementById('seasonEmptyActions');
+  const controlledTeamAbbr=String(simulationState?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  const controlledTeam=(simulationState?.leagueShell?.teams || []).find((team)=>String(team?.abbr || '').trim().toUpperCase()===controlledTeamAbbr) || null;
+  const franchiseLabel=String(controlledTeam?.name || simulationState?.teamName || 'your selected franchise').trim();
+  document.querySelectorAll('.screen').forEach((screen)=>screen.classList.remove('active'));
+  document.documentElement.dataset.seasonRoute='historical';
+  document.body.dataset.seasonBoot='idle';
+  if(emptyScreen) emptyScreen.classList.add('active');
+  if(icon) icon.innerHTML='&#127944;';
+  if(title) title.textContent='Football Simulation';
+  if(copy) copy.textContent='Football simulation season shell is coming next.';
+  if(actions){
+    actions.style.display='block';
+    actions.innerHTML=`
+      <div class="card" style="max-width:420px;text-align:left;background:linear-gradient(180deg,rgba(18,26,39,.96),rgba(11,17,28,.98));border-color:rgba(249,115,22,.26);box-shadow:0 18px 34px rgba(2,6,23,.32);">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;color:#f8fafc;">Football simulation season shell is coming next.</div>
+        <div style="margin-top:10px;color:var(--text2);font-size:13px;line-height:1.65;">${franchiseLabel} is already saved from the draft handoff, so you can safely reopen this season shell without losing your selected team.</div>
+        <div style="margin-top:10px;color:var(--text2);font-size:13px;line-height:1.65;">Phase 2 will add weekly schedule, standings, playoffs, and Super Bowl flow for the NFL mixed-era simulation path.</div>
+      </div>
+    `;
+  }
 }
 
 function getSeasonEmptyStateCopy(sport){
@@ -2284,6 +2312,17 @@ function getRequestedSimulationMode(params){
   return String(params?.get('simulation') || '').trim().toLowerCase();
 }
 
+function getSharedSimulationRouteMode(value){
+  const mode=String(value || '').trim().toLowerCase();
+  if(mode==='nfl_mixed_era' || mode==='nfl_mixed_era_single_player_v1') return 'nfl_mixed_era';
+  return mode==='nba_mixed_era_single_player_v1' ? 'nba_mixed_era' : mode;
+}
+
+function isRequestedSharedSimulationMode(value){
+  const mode=getSharedSimulationRouteMode(value);
+  return mode==='nba_mixed_era' || mode==='nfl_mixed_era';
+}
+
 function getRequestedHistoricalUniverseSlotId(params){
   const direct=String(params?.get('historicalUniverse') || '').trim();
   if(direct) return direct;
@@ -2303,10 +2342,12 @@ function readCompletedSimulationDraftState(){
 
 function resolveCompletedSimulationDraftSeasonBoot(params, requestedSport){
   if(getRequestedHistoricalUniverseSlotId(params)) return null;
-  if(getRequestedSimulationMode(params)!=='nba_mixed_era') return null;
+  const requestedSimulationMode=getRequestedSimulationMode(params);
+  if(!isRequestedSharedSimulationMode(requestedSimulationMode)) return null;
   const rawState=readCompletedSimulationDraftState();
   if(!rawState) return null;
   const targetSport=normalizeRosterbateSport(rawState?.sport || rawState?.leagueShell?.sport || requestedSport || CURRENT_SPORT);
+  const sharedSimulationRouteMode=getSharedSimulationRouteMode(rawState?.simulationMode || requestedSimulationMode || (targetSport==='nfl' ? 'nfl_mixed_era' : 'nba_mixed_era'));
   const historicalSlotApi=window.RosterBateHistoricalUniverseSlots;
   if(historicalSlotApi?.upsertFromState){
     try{
@@ -2321,7 +2362,7 @@ function resolveCompletedSimulationDraftSeasonBoot(params, requestedSport){
             ? historicalSlotApi.buildSeasonUrl({slotId:persisted.slotId, sport:targetSport}, targetSport, persisted.state || rawState)
             : ('rosterbate-season.html?sport='
               + encodeURIComponent(targetSport)
-              + '&simulation=nba_mixed_era&historicalUniverse='
+              + '&simulation=' + encodeURIComponent(sharedSimulationRouteMode) + '&historicalUniverse='
               + encodeURIComponent(persisted.slotId)),
           slotId:persisted.slotId,
           rawState:persisted.state || rawState,
@@ -2929,11 +2970,13 @@ function isHistoricalSimulationUniverse(state){
     || mode==='simulation'
     || mode==='sim'
     || mode==='historical_box_score'
-    || mode==='nba_mixed_era_single_player_v1';
+    || mode==='nba_mixed_era_single_player_v1'
+    || mode==='nfl_mixed_era_single_player_v1';
 }
 
 function isSharedSimulationSeason(params, state){
-  if(getRequestedSimulationMode(params)==='nba_mixed_era') return true;
+  if(isRequestedSharedSimulationMode(getRequestedSimulationMode(params))) return true;
+  if(isRequestedSharedSimulationMode(state?.simulationMode)) return true;
   return !!(window.RosterBateSimulationSeasonAdapter?.isSupportedSimulationSeasonState?.(state));
 }
 
@@ -2949,7 +2992,7 @@ function cloneSharedSimulationBootValue(value){
 
 function shouldPersistSharedSimulationState(state){
   const mode=String(state?.simulationMode || '').trim().toLowerCase();
-  if(mode==='nba_mixed_era_single_player_v1') return true;
+  if(mode==='nba_mixed_era_single_player_v1' || mode==='nfl_mixed_era_single_player_v1') return true;
   return !!(window.RosterBateSimulationSeasonAdapter?.isSupportedSimulationSeasonState?.(state));
 }
 
@@ -3122,19 +3165,20 @@ function normalizeSharedSimulationSeasonBootState(state, slotId){
   });
   const stableSlotId=String(slotId || rawState?.historicalUniverseSlotId || rawState?.slotId || '').trim();
   const sport=String(rawState?.sport || rawState?.leagueShell?.sport || 'nba').trim().toLowerCase() || 'nba';
+  const defaultSimulationMode=sport==='nfl' ? 'nfl_mixed_era_single_player_v1' : 'nba_mixed_era_single_player_v1';
   const currentDay=Math.max(1, Number(rawState?.seasonState?.currentDay || rawState?.currentDay || 1) || 1);
   const currentWeek=Math.max(1, Number(rawState?.seasonState?.currentWeek || rawState?.currentWeek || 1) || 1);
   const seasonId=String(rawState?.seasonId || rawState?.leagueId || (stableSlotId ? ('simulation:' + stableSlotId) : 'simulation:shared-season')).trim();
   return {
     ...rawState,
     sport,
-    simulationMode: String(rawState?.simulationMode || 'nba_mixed_era_single_player_v1').trim() || 'nba_mixed_era_single_player_v1',
+    simulationMode: String(rawState?.simulationMode || defaultSimulationMode).trim() || defaultSimulationMode,
     historicalEntryMode: String(rawState?.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
     seasonId,
     leagueId: seasonId,
     historicalUniverseSlotId: stableSlotId || null,
     sharedSimulationSlotId: stableSlotId || null,
-    leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || 'NBA Simulation').trim() || 'NBA Simulation',
+    leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || (sport==='nfl' ? 'NFL Simulation' : 'NBA Simulation')).trim() || (sport==='nfl' ? 'NFL Simulation' : 'NBA Simulation'),
     teamName: teams[myPos] || 'My Team',
     teams,
     teamMeta: rawTeams.map(team=>cloneSharedSimulationBootValue(team)),
@@ -7252,16 +7296,8 @@ window.onload=async function(){
 
   if (completedSimulationDraftBoot?.state && completedSimulationDraftBoot.rawState) {
     hideSeasonEmptyState();
-    ACTIVE_SEASON_MODE = 'simulation';
-    SEASON_MODE_ADAPTER = buildSimulationSeasonAdapterFromState(
-      completedSimulationDraftBoot.slotId,
-      completedSimulationDraftBoot.rawState
-    );
     D = completedSimulationDraftBoot.state;
     D.historicalUniverseSlotId = completedSimulationDraftBoot.slotId || null;
-    if (isHistoricalSimulationUniverse(D)) {
-      ensureCpuTeamPersonalitiesByTeam(D);
-    }
     applySportContext(D.sport || requestedSport);
     hydrateDraftUserContextFromLobby();
     refreshCommissionerAccess();
@@ -7271,6 +7307,23 @@ window.onload=async function(){
       storedFallbackResumeState = true;
     }catch(e){
       console.warn('Failed to persist fallback simulation resume state before boot:', e);
+    }
+    if(String(D?.leagueShell?.sport || D?.sport || '').trim().toLowerCase()==='nfl'){
+      ACTIVE_SEASON_MODE = 'simulation';
+      SEASON_MODE_ADAPTER = null;
+      renderFootballSimulationPhaseOnePlaceholder(D);
+      if (storedFallbackResumeState) {
+        consumeCompletedSimulationDraftFallbackBoot(completedSimulationDraftBoot);
+      }
+      return;
+    }
+    ACTIVE_SEASON_MODE = 'simulation';
+    SEASON_MODE_ADAPTER = buildSimulationSeasonAdapterFromState(
+      completedSimulationDraftBoot.slotId,
+      completedSimulationDraftBoot.rawState
+    );
+    if (isHistoricalSimulationUniverse(D)) {
+      ensureCpuTeamPersonalitiesByTeam(D);
     }
     initSeason();
     applyRequestedSeasonView();
@@ -7291,21 +7344,27 @@ window.onload=async function(){
         entryMode: slotState.historicalEntryMode || null
       });
       hideSeasonEmptyState();
-      ACTIVE_SEASON_MODE = sharedSimulationSeason ? 'simulation' : 'fantasy';
-      SEASON_MODE_ADAPTER = sharedSimulationSeason
-        ? buildSimulationSeasonAdapterFromState(requestedHistoricalUniverse, slotState)
-        : null;
       D = sharedSimulationSeason
         ? normalizeSharedSimulationSeasonBootState(slotState, requestedHistoricalUniverse)
         : slotState;
       D.historicalUniverseSlotId = requestedHistoricalUniverse;
-      if (isHistoricalSimulationUniverse(D)) {
-        ensureCpuTeamPersonalitiesByTeam(D);
-      }
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();
       refreshCommissionerAccess();
       try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+      if(sharedSimulationSeason && String(D?.leagueShell?.sport || D?.sport || '').trim().toLowerCase()==='nfl'){
+        ACTIVE_SEASON_MODE = 'simulation';
+        SEASON_MODE_ADAPTER = null;
+        renderFootballSimulationPhaseOnePlaceholder(D);
+        return;
+      }
+      ACTIVE_SEASON_MODE = sharedSimulationSeason ? 'simulation' : 'fantasy';
+      SEASON_MODE_ADAPTER = sharedSimulationSeason
+        ? buildSimulationSeasonAdapterFromState(requestedHistoricalUniverse, slotState)
+        : null;
+      if (isHistoricalSimulationUniverse(D)) {
+        ensureCpuTeamPersonalitiesByTeam(D);
+      }
       initSeason();
       applyRequestedSeasonView();
       return;
@@ -7667,6 +7726,12 @@ window.onload=async function(){
         applySportContext(localAutoLoad.sport);
         hydrateDraftUserContextFromLobby();
         refreshCommissionerAccess();
+        if(localAutoLoad.activeSeasonMode==='simulation' && String(D?.leagueShell?.sport || D?.sport || '').trim().toLowerCase()==='nfl'){
+          ACTIVE_SEASON_MODE='simulation';
+          SEASON_MODE_ADAPTER=null;
+          renderFootballSimulationPhaseOnePlaceholder(D);
+          return;
+        }
         let seasonLoaded=false;
         try{
           seasonLoaded=await loadOrCreateSharedSeason();

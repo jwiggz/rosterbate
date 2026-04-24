@@ -3495,7 +3495,7 @@ function syncDraftSpotBounds(){
   const sizeEl=document.getElementById('iSize');
   const spotEl=document.getElementById('iSpot');
   if(!sizeEl || !spotEl) return;
-  const maxLeagueSize=SIMULATION_MODE_DRAFT_CONTEXT ? Math.max(2, Number(SIMULATION_MODE_DRAFT_CONTEXT?.teamCount || 30)) : 20;
+  const maxLeagueSize=SIMULATION_MODE_DRAFT_CONTEXT ? getSimulationLeagueSize(SIMULATION_MODE_DRAFT_CONTEXT) : 20;
   let leagueSize=parseInt(sizeEl.value,10);
   leagueSize=Number.isFinite(leagueSize)?leagueSize:2;
   leagueSize=Math.max(1, Math.min(maxLeagueSize, leagueSize));
@@ -3615,10 +3615,42 @@ function getRequestedMixedEraDraftSpot(){
 function shouldBootSimulationModeDraft(){
   try{
     const params = new URLSearchParams(window.location.search || '');
-    return String(params.get('simulation') || '').trim().toLowerCase() === 'nba_mixed_era';
+    const simulationMode=String(params.get('simulation') || '').trim().toLowerCase();
+    return simulationMode === 'nba_mixed_era' || simulationMode === 'nfl_mixed_era';
   }catch(e){
     return false;
   }
+}
+
+function getSimulationModeFromContext(simulationContext){
+  const explicitMode=String(simulationContext?.simulationMode || simulationContext?.bootstrap?.simulationMode || '').trim().toLowerCase();
+  if(explicitMode) return explicitMode;
+  const shellSport=normalizeRosterbateSport(simulationContext?.shell?.sport || SPORT || 'nba');
+  return shellSport === 'nfl' ? 'nfl_mixed_era_single_player_v1' : 'nba_mixed_era_single_player_v1';
+}
+
+function getSimulationLeagueSize(simulationContext){
+  const simulationMode=getSimulationModeFromContext(simulationContext);
+  if(simulationMode==='nfl_mixed_era_single_player_v1') return 32;
+  const shellTeamCount=Number(simulationContext?.shell?.teams?.length || simulationContext?.teamCount || simulationContext?.bootstrap?.leagueShell?.teams?.length || 0);
+  if(Number.isFinite(shellTeamCount) && shellTeamCount>0) return Math.max(2, Math.round(shellTeamCount));
+  return 30;
+}
+
+function getSimulationRosterSize(simulationContext){
+  const simulationMode=getSimulationModeFromContext(simulationContext);
+  if(simulationMode==='nfl_mixed_era_single_player_v1') return 13;
+  const shellRosterSize=Number(simulationContext?.shell?.rosterSize || simulationContext?.bootstrap?.leagueShell?.rosterSize || simulationContext?.bootstrap?.draftState?.rosterSize || 0);
+  if(Number.isFinite(shellRosterSize) && shellRosterSize>0) return Math.max(1, Math.round(shellRosterSize));
+  return 10;
+}
+
+function getSimulationSeasonRedirect(simulationMode){
+  const normalizedMode=String(simulationMode || '').trim().toLowerCase();
+  if(normalizedMode==='nfl_mixed_era_single_player_v1' || normalizedMode==='nfl_mixed_era'){
+    return 'rosterbate-season.html?sport=nfl&simulation=nfl_mixed_era';
+  }
+  return 'rosterbate-season.html?sport=nba&simulation=nba_mixed_era';
 }
 
 function shouldBootHistoricalDraft(){
@@ -3639,6 +3671,16 @@ function readSimulationModeLocalState(){
 function buildSimulationModeDraftRules(baseRules){
   const rules=cloneDraftJsonSafe(baseRules || SPORT_RULES || {});
   const positions=rules.positions && typeof rules.positions==='object' ? rules.positions : {};
+  const simulationSport=normalizeRosterbateSport(SIMULATION_MODE_DRAFT_CONTEXT?.shell?.sport || SPORT || 'nba');
+  if(simulationSport!=='nba'){
+    const irKey=Object.keys(positions).find((key)=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL');
+    if(irKey){
+      positions[irKey]=Object.assign({}, positions[irKey], { starters:0 });
+    }
+    rules.positions=positions;
+    rules.irSlots=0;
+    return rules;
+  }
   Object.keys(positions).forEach((key)=>{
     positions[key]=Object.assign({}, positions[key] || {}, { starters:0 });
   });
@@ -3674,7 +3716,8 @@ function applySimulationModeDraftLobbySettings(context){
   const roundsEl=document.getElementById('iRounds');
   const teamNameEl=document.getElementById('iName');
   const leagueNameEl=document.getElementById('iLeagueName');
-  const teamCount=Math.max(2, Number(context?.teamCount || shell?.teams?.length || 30));
+  const teamCount=getSimulationLeagueSize(context);
+  const rosterSize=getSimulationRosterSize(context);
   const draftSlot=Math.max(1, Number(context?.draftSlot || 1));
   const teamName=String(context?.controlledTeamName || 'Simulation Team').trim();
   if(sizeEl){
@@ -3690,7 +3733,7 @@ function applySimulationModeDraftLobbySettings(context){
     spotEl.readOnly=true;
   }
   if(roundsEl){
-    roundsEl.value=String(Number(shell?.rosterSize || 10));
+    roundsEl.value=String(rosterSize);
     roundsEl.readOnly=true;
   }
   if(teamNameEl){
@@ -3711,19 +3754,22 @@ async function buildSimulationDraftContextFromState(){
     return null;
   }
   const shell = window.RosterBateSimulationModeConfig.getSimulationShell();
+  const simulationSport=normalizeRosterbateSport(setupState?.sport || shell?.sport || SPORT || 'nba');
+  const simulationMode=simulationSport==='nfl' ? 'nfl_mixed_era_single_player_v1' : 'nba_mixed_era_single_player_v1';
+  const shellLabel=String(shell?.anchorSeasonLabel || '').trim() || (simulationSport==='nfl' ? 'Football Shell' : 'NBA Shell');
   const bundles = await Promise.all(
     (setupState?.sourcePackIds || []).map((packId) => window.RosterBateHistoricalPackLoader.loadPackById(packId))
   );
   const mixedEraContext = window.RosterBateMixedEraRuntime.buildMixedEraDraftContextFromBundles({
     config: {
       mixedEraConfigId: 'simulation_custom_mix',
-      sport: 'nba',
-      seasonLabel: 'Simulation Mode Mixed Era Draft',
+      sport: simulationSport,
+      seasonLabel: shellLabel + ' Mixed Era Draft',
       sourcePackIds: setupState.sourcePackIds,
       topPlayersPerPack: 120
     },
     bundles,
-    requestedSport: 'nba',
+    requestedSport: simulationSport,
     buildPlayerSimulationProfile: window.RosterBateSimulationEngine.buildPlayerSimulationProfile
   });
   const bootstrap = window.RosterBateSimulationModeRuntime.buildSimulationUniverseBootstrap({
@@ -3739,7 +3785,9 @@ async function buildSimulationDraftContextFromState(){
   return {
     ...mixedEraContext,
     bootstrap,
+    simulationMode,
     shell,
+    sport: simulationSport,
     controlledTeamAbbr: String(setupState?.controlledTeamAbbr || '').trim().toUpperCase(),
     controlledTeamName: controlledTeam?.name || 'Simulation Team',
     draftSlot: Math.max(1, Number(setupState?.draftSlot || 1)),
@@ -3757,6 +3805,9 @@ async function buildSimulationDraftContextFromState(){
     leagueNamePlaceholder: 'e.g. 2025-26 NBA Simulation League',
     teamNamePlaceholder: controlledTeam?.name || 'Simulation Team',
     seasonLabel: 'Simulation Mode Mixed Era Draft',
+    lobbySubLabel: shellLabel + ' · Mixed Era Pool',
+    leagueNamePlaceholder: 'e.g. ' + shellLabel + ' Simulation League',
+    seasonLabel: shellLabel + ' Mixed Era Draft',
     mixedEraConfigId: mixedEraContext?.mixedEraConfigId || 'simulation_custom_mix',
     mixedEraTopPlayersPerPack: 120,
     sourceSeasonLabels: bootstrap.sourceSeasons?.sourceSeasonLabels || [],
@@ -4998,17 +5049,19 @@ function startDraft(){
   const sp=parseInt(document.getElementById('iSpot').value);
   const rd=rules.rosterSize;
   const simulationContext=SIMULATION_MODE_DRAFT_CONTEXT;
-  const simulationLeagueSize=Math.max(2, Number(simulationContext?.teamCount || 30));
+  const simulationLeagueSize=getSimulationLeagueSize(simulationContext);
+  const simulationRosterSize=getSimulationRosterSize(simulationContext);
   const useLobbyDraft=isLobbyDraftContext();
   const lobbyState=useLobbyDraft ? getSavedMultiplayerLobbyState() : null;
   const allowSoloTest=!!(useLobbyDraft && lobbyState?.soloTest && lobbyState?.lobbyId);
   const teamName=document.getElementById('iName').value.trim().replace(/\s+/g,' ');
   const leagueName=(document.getElementById('iLeagueName')?.value||'').trim();
   if(!teamName){e.textContent='Please enter a team name.';e.classList.add('show');return;}
-  if(simulationContext && ls !== simulationLeagueSize){e.textContent='Simulation drafts require a locked 30-team league.';e.classList.add('show');return;}
+  if(simulationContext && ls !== simulationLeagueSize){e.textContent='Simulation drafts require a locked ' + simulationLeagueSize + '-team league.';e.classList.add('show');return;}
   if(!simulationContext && (isNaN(ls)||ls<(allowSoloTest?1:2)||ls>20)){e.textContent=allowSoloTest?'League size must be 1–20 for solo multiplayer test.':'League size must be 2–20.';e.classList.add('show');return;}
   if(isNaN(sp)||sp<1||sp>ls){e.textContent='Draft spot must be 1–'+ls+'.';e.classList.add('show');return;}
   if(isNaN(rd)||rd<5||rd>25){e.textContent='Rounds must be 5–25.';e.classList.add('show');return;}
+  if(simulationContext && rd !== simulationRosterSize){e.textContent='Simulation drafts require a locked ' + simulationRosterSize + '-player roster.';e.classList.add('show');return;}
   const need=ls*rd;
   if(simulationContext && need>PLAYERS.length){e.textContent='This simulation league needs '+need+' draftable players, but the selected eras only produced '+PLAYERS.length+'. Go back and add more source seasons.';e.classList.add('show');return;}
   if(need>PLAYERS.length){e.textContent='Need '+need+' slots but only '+PLAYERS.length+' players. Reduce teams or rounds.';e.classList.add('show');return;}
@@ -8357,9 +8410,10 @@ async function endDraft(){
       const draftedPlayerIds=new Set(
         Object.values(rostersByTeam).flat().map((player)=>Number(player?.id)).filter(Number.isFinite)
       );
+      const simulationMode=getSimulationModeFromContext(SIMULATION_MODE_DRAFT_CONTEXT);
       const finalState={
         ...bootstrap,
-        simulationMode: 'nba_mixed_era_single_player_v1',
+        simulationMode,
         sourceSeasons: {
           ...(bootstrap.sourceSeasons || {}),
           sourcePackIds: cloneDraftJsonSafe(SIMULATION_MODE_DRAFT_CONTEXT?.sourcePackIds || bootstrap?.sourceSeasons?.sourcePackIds || []),
@@ -8716,13 +8770,17 @@ function persistPendingSeasonLaunch(draftData){
 }
 
 function completeSimulationModeDraft(finalState){
+  const simulationMode=getSimulationModeFromContext(finalState);
   const payload = {
     ...finalState,
-    simulationMode: 'nba_mixed_era_single_player_v1'
+    simulationMode
   };
   if(payload.simulationMode==='nba_mixed_era_single_player_v1'){
     localStorage.setItem(RB_SIMULATION_MODE_COMPLETED_DRAFT_KEY, JSON.stringify(payload));
-    window.location.href = 'rosterbate-simulation-season.html?simulation=nba_mixed_era';
+    window.location.href = getSimulationSeasonRedirect(payload.simulationMode);
+  }else if(payload.simulationMode==='nfl_mixed_era_single_player_v1'){
+    localStorage.setItem(RB_SIMULATION_MODE_COMPLETED_DRAFT_KEY, JSON.stringify(payload));
+    window.location.href = getSimulationSeasonRedirect(payload.simulationMode);
   }
 }
 
