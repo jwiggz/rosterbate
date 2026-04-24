@@ -518,6 +518,274 @@ assert.match(
   'completed postseason state should include an ISO-like completion timestamp'
 );
 
+const nfl2014LeagueShell = {
+  anchorSeasonId: 'nfl_2014',
+  anchorSeasonLabel: '2014 NFL',
+  sport: 'nfl',
+  teams: [
+    { abbr: 'NE', name: 'New England Patriots', conference: 'AFC', division: 'East' },
+    { abbr: 'DEN', name: 'Denver Broncos', conference: 'AFC', division: 'West' },
+    { abbr: 'IND', name: 'Indianapolis Colts', conference: 'AFC', division: 'South' },
+    { abbr: 'PIT', name: 'Pittsburgh Steelers', conference: 'AFC', division: 'North' },
+    { abbr: 'CIN', name: 'Cincinnati Bengals', conference: 'AFC', division: 'North' },
+    { abbr: 'BAL', name: 'Baltimore Ravens', conference: 'AFC', division: 'North' },
+    { abbr: 'SEA', name: 'Seattle Seahawks', conference: 'NFC', division: 'West' },
+    { abbr: 'GB', name: 'Green Bay Packers', conference: 'NFC', division: 'North' },
+    { abbr: 'DAL', name: 'Dallas Cowboys', conference: 'NFC', division: 'East' },
+    { abbr: 'CAR', name: 'Carolina Panthers', conference: 'NFC', division: 'South' },
+    { abbr: 'ARI', name: 'Arizona Cardinals', conference: 'NFC', division: 'West' },
+    { abbr: 'DET', name: 'Detroit Lions', conference: 'NFC', division: 'North' }
+  ]
+};
+
+const nfl2014Teams = nfl2014LeagueShell.teams.map((team) => team.abbr);
+const nfl2014EmptyRosters = Object.fromEntries(nfl2014Teams.map((teamAbbr) => [teamAbbr, []]));
+
+function buildCompletedNflSeries(id, conference, round, higherSeed, lowerSeed, winnerTeamAbbr){
+  return {
+    id,
+    conference,
+    round,
+    higherSeed,
+    lowerSeed,
+    targetWins: 1,
+    higherSeedWins: String(winnerTeamAbbr || '').toUpperCase() === String(higherSeed.teamAbbr || '').toUpperCase() ? 1 : 0,
+    lowerSeedWins: String(winnerTeamAbbr || '').toUpperCase() === String(lowerSeed.teamAbbr || '').toUpperCase() ? 1 : 0,
+    winnerTeamAbbr,
+    games: 1
+  };
+}
+
+const seededNflPostseasonState = {
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: nfl2014LeagueShell,
+  sourceSeasons: {
+    sourceSeasonLabels: ['2014']
+  },
+  draftState: {
+    controlledTeamAbbr: 'NE',
+    rostersByTeam: nfl2014EmptyRosters,
+    freeAgents: []
+  },
+  seasonState: {
+    currentDay: 19,
+    currentWeek: 19,
+    standings: nfl2014Teams.map((teamAbbr, index) => ({
+      teamAbbr,
+      conference: ['NE', 'DEN', 'IND', 'PIT', 'CIN', 'BAL'].includes(teamAbbr) ? 'AFC' : 'NFC',
+      division: index < 6 ? 'A' : 'N',
+      w: 0,
+      l: 0,
+      pf: 0,
+      pa: 0
+    })),
+    scheduleByDay: {
+      1: []
+    },
+    lineupIdsByTeam: {},
+    completedGameLogs: []
+  },
+  postseasonState: {
+    phase: 'wild_card',
+    currentRound: 'wild_card',
+    currentDay: 19,
+    playoffPicture: {
+      afc: [
+        { teamAbbr: 'NE', seed: 1 },
+        { teamAbbr: 'DEN', seed: 2 },
+        { teamAbbr: 'IND', seed: 3 },
+        { teamAbbr: 'PIT', seed: 4 },
+        { teamAbbr: 'CIN', seed: 5 },
+        { teamAbbr: 'BAL', seed: 6 }
+      ],
+      nfc: [
+        { teamAbbr: 'SEA', seed: 1 },
+        { teamAbbr: 'GB', seed: 2 },
+        { teamAbbr: 'DAL', seed: 3 },
+        { teamAbbr: 'CAR', seed: 4 },
+        { teamAbbr: 'ARI', seed: 5 },
+        { teamAbbr: 'DET', seed: 6 }
+      ]
+    },
+    currentWeekSchedule: [],
+    currentDaySchedule: [],
+    seriesById: {
+      'AFC-wild-card-1': buildCompletedNflSeries(
+        'AFC-wild-card-1',
+        'AFC',
+        'wild_card',
+        { teamAbbr: 'IND', seed: 3, conference: 'AFC' },
+        { teamAbbr: 'BAL', seed: 6, conference: 'AFC' },
+        'BAL'
+      ),
+      'AFC-wild-card-2': buildCompletedNflSeries(
+        'AFC-wild-card-2',
+        'AFC',
+        'wild_card',
+        { teamAbbr: 'PIT', seed: 4, conference: 'AFC' },
+        { teamAbbr: 'CIN', seed: 5, conference: 'AFC' },
+        'PIT'
+      ),
+      'NFC-wild-card-1': buildCompletedNflSeries(
+        'NFC-wild-card-1',
+        'NFC',
+        'wild_card',
+        { teamAbbr: 'DAL', seed: 3, conference: 'NFC' },
+        { teamAbbr: 'DET', seed: 6, conference: 'NFC' },
+        'DAL'
+      ),
+      'NFC-wild-card-2': buildCompletedNflSeries(
+        'NFC-wild-card-2',
+        'NFC',
+        'wild_card',
+        { teamAbbr: 'CAR', seed: 4, conference: 'NFC' },
+        { teamAbbr: 'ARI', seed: 5, conference: 'NFC' },
+        'CAR'
+      )
+    }
+  }
+};
+
+const nflPostseasonAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-nfl-postseason-completion',
+  state: seededNflPostseasonState
+});
+
+const afterWildCard = nflPostseasonAdapter.simulateNextDay();
+assert.equal(afterWildCard.postseasonState.phase, 'divisional');
+assert.deepStrictEqual(
+  afterWildCard.postseasonState.currentWeekSchedule.map((game) => `${game.homeAbbr}-${game.awayAbbr}`),
+  ['NE-BAL', 'DEN-PIT', 'SEA-CAR', 'GB-DAL']
+);
+
+const divisionalResultsState = {
+  ...afterWildCard,
+  postseasonState: {
+    ...afterWildCard.postseasonState,
+    phase: 'divisional',
+    currentRound: 'divisional',
+    currentWeekSchedule: [],
+    currentDaySchedule: [],
+    seriesById: {
+      'AFC-divisional-1': buildCompletedNflSeries(
+        'AFC-divisional-1',
+        'AFC',
+        'divisional',
+        { teamAbbr: 'NE', seed: 1, conference: 'AFC' },
+        { teamAbbr: 'BAL', seed: 6, conference: 'AFC' },
+        'NE'
+      ),
+      'AFC-divisional-2': buildCompletedNflSeries(
+        'AFC-divisional-2',
+        'AFC',
+        'divisional',
+        { teamAbbr: 'DEN', seed: 2, conference: 'AFC' },
+        { teamAbbr: 'PIT', seed: 4, conference: 'AFC' },
+        'DEN'
+      ),
+      'NFC-divisional-1': buildCompletedNflSeries(
+        'NFC-divisional-1',
+        'NFC',
+        'divisional',
+        { teamAbbr: 'SEA', seed: 1, conference: 'NFC' },
+        { teamAbbr: 'CAR', seed: 4, conference: 'NFC' },
+        'SEA'
+      ),
+      'NFC-divisional-2': buildCompletedNflSeries(
+        'NFC-divisional-2',
+        'NFC',
+        'divisional',
+        { teamAbbr: 'GB', seed: 2, conference: 'NFC' },
+        { teamAbbr: 'DAL', seed: 3, conference: 'NFC' },
+        'GB'
+      )
+    }
+  }
+};
+
+const afterDivisionalRound = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-nfl-conference-completion',
+  state: divisionalResultsState
+}).simulateNextDay();
+
+assert.equal(afterDivisionalRound.postseasonState.phase, 'conference_championship');
+assert.deepStrictEqual(
+  afterDivisionalRound.postseasonState.currentWeekSchedule.map((game) => `${game.homeAbbr}-${game.awayAbbr}`),
+  ['NE-DEN', 'SEA-GB']
+);
+
+const conferenceChampionshipResultsState = {
+  ...afterDivisionalRound,
+  postseasonState: {
+    ...afterDivisionalRound.postseasonState,
+    phase: 'conference_championship',
+    currentRound: 'conference_championship',
+    currentWeekSchedule: [],
+    currentDaySchedule: [],
+    seriesById: {
+      ...afterDivisionalRound.postseasonState.seriesById,
+      'AFC-conference-championship': buildCompletedNflSeries(
+        'AFC-conference-championship',
+        'AFC',
+        'conference_championship',
+        { teamAbbr: 'NE', seed: 1, conference: 'AFC' },
+        { teamAbbr: 'DEN', seed: 2, conference: 'AFC' },
+        'NE'
+      ),
+      'NFC-conference-championship': buildCompletedNflSeries(
+        'NFC-conference-championship',
+        'NFC',
+        'conference_championship',
+        { teamAbbr: 'SEA', seed: 1, conference: 'NFC' },
+        { teamAbbr: 'GB', seed: 2, conference: 'NFC' },
+        'SEA'
+      )
+    }
+  }
+};
+
+const afterConferenceTitles = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-nfl-super-bowl-completion',
+  state: conferenceChampionshipResultsState
+}).simulateNextDay();
+
+assert.equal(afterConferenceTitles.postseasonState.phase, 'super_bowl');
+assert.deepStrictEqual(
+  afterConferenceTitles.postseasonState.currentWeekSchedule.map((game) => `${game.homeAbbr}-${game.awayAbbr}`),
+  ['NE-SEA']
+);
+
+const superBowlResultsState = {
+  ...afterConferenceTitles,
+  postseasonState: {
+    ...afterConferenceTitles.postseasonState,
+    phase: 'super_bowl',
+    currentRound: 'super_bowl',
+    currentWeekSchedule: [],
+    currentDaySchedule: [],
+    seriesById: {
+      ...afterConferenceTitles.postseasonState.seriesById,
+      'super-bowl-xlix': buildCompletedNflSeries(
+        'super-bowl-xlix',
+        'league',
+        'super_bowl',
+        { teamAbbr: 'NE', seed: 1, conference: 'AFC' },
+        { teamAbbr: 'SEA', seed: 1, conference: 'NFC' },
+        'NE'
+      )
+    }
+  }
+};
+
+const completedNflSeason = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-nfl-complete',
+  state: superBowlResultsState
+}).simulateNextDay();
+
+assert.equal(completedNflSeason.postseasonState.phase, 'completed');
+assert.equal(completedNflSeason.postseasonState.champion?.teamAbbr, 'NE');
+assert.equal(completedNflSeason.postseasonState.runnerUp?.teamAbbr, 'SEA');
+
 const completedFreezeDay = completedFinalsState.seasonState.currentDay;
 const completedFreezeChampion = JSON.parse(JSON.stringify(completedFinalsState.postseasonState.champion));
 const completedFreezeRunnerUp = JSON.parse(JSON.stringify(completedFinalsState.postseasonState.runnerUp));
