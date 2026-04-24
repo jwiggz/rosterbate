@@ -10,7 +10,7 @@
   "isHistorical": true,
   "era": "2010s",
   "version": 1,
-  "status": "concept",
+  "status": "ready",
   "sourceProfile": "historical_curated",
   "supportedModes": [
     "historical_draft",
@@ -20,7 +20,7 @@
   "defaultEntryMode": "single_player_season",
   "focusTeamId": "nba_2016_gsw",
   "subtitle": "Start a historic season, redraft the era, or branch into a reimagined universe.",
-  "description": "A 2015-16 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
+  "description": "A 2015-16 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
   "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
   "eraTags": [
     "2010s",
@@ -56,7 +56,7 @@
     "sourceProfile": "historical_curated",
     "curationOwner": "RosterBate",
     "reviewStatus": "draft",
-    "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from real game details and the full regular-season schedule/results."
+    "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from historical game details and the full regular-season schedule/results."
   },
   "auditSummary": {
     "realStatCoverage": {
@@ -74,9 +74,9 @@
     }
   },
   "notes": [
-    "Player ranking is driven by real 2015-16 season production aggregated from real game-detail rows.",
+    "Player ranking is driven by historical 2015-16 season production aggregated from historical game-detail rows.",
     "Schedule and game results span the full 2015-16 regular season.",
-    "Reimagined Season uses the same real historical player pool and pack health metadata."
+    "Reimagined Season uses the same historical player pool and pack health metadata."
   ],
   "createdAt": "2026-04-18T17:09:30.390Z",
   "updatedAt": "2026-04-18T17:09:30.390Z"

@@ -1,20 +1,37 @@
 {
-  "packId": "nba_1993_full_season_v1",
-  "seasonLabel": "1992-93 NBA Historic Season",
-  "shortLabel": "1992-93",
-  "significanceLabel": "First Three-Peat Prestige",
-  "significanceTone": "dynasty",
-  "focusTeamName": "Chicago Bulls",
-  "art": {
-    "theme": "dynasty",
-    "eyebrow": "First Three-Peat",
-    "headline": "Jordan.\nBarkley.\nPippen.",
-    "subline": "Bulls title gravity with Phoenix and Barkley as the Finals counterweight."
-  },
-  "previewStars": [
-    "Michael Jordan",
-    "Charles Barkley",
-    "Scottie Pippen"
+  "heroTitle": "1992-93 NBA Historic Season",
+  "heroSubtitle": "Jordan's Bulls, Barkley's Suns, and a trust-forward 1992-93 historical season foundation.",
+  "featuredTeamId": "nba_1993_chi",
+  "featuredStars": [
+    "893",
+    "787",
+    "937",
+    "134"
   ],
-  "tagline": "Jordan. Barkley. Pippen. One first-three-peat universe."
+  "artDirection": {
+    "heroTone": "dynasty",
+    "primaryPalette": [
+      "#CE1141",
+      "#1D1160",
+      "#F9A01B"
+    ],
+    "backgroundStyle": "historic_arena_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "single_player_season",
+      "label": "Historic Season",
+      "description": "Choose one 1992-93 team and play through the full historical season."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the Jordan-Barkley-Pippen season from the full-league player pool."
+    },
+    {
+      "mode": "reimagined_season",
+      "label": "Reimagined Season",
+      "description": "Launch an alternate-history 1992-93 branch from the same foundation pack."
+    }
+  ]
 }

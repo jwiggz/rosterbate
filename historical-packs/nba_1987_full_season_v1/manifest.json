@@ -25,8 +25,8 @@
   "defaultEntryMode": "single_player_season",
   "focusTeamId": "nba_1987_lal",
   "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 historical season foundation with Lakers prestige at the center.",
-  "description": "A playable 1986-87 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
-  "tagline": "Replay the Bird-Magic-Jordan season with real scores and disclosed inferred box lines.",
+  "description": "A playable 1986-87 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
+  "tagline": "Draft the Bird-Magic-Jordan season with disclosed inferred box lines.",
   "eraTags": [
     "1980s",
     "Bird-Magic Era",
@@ -82,7 +82,7 @@
     "The 23-team league map uses era-appropriate 1986-87 abbreviations, including GOS, SAN, UTH, and WAS.",
     "Schedule/results span the full 943-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
     "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
-    "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable and replayable."
+    "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable."
   ],
   "createdAt": "2026-04-22T16:40:31.822Z",
   "updatedAt": "2026-04-22T16:40:31.822Z"

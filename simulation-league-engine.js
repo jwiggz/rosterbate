@@ -493,7 +493,7 @@
     return {
       version:ENGINE_VERSION,
       packId:packId || null,
-      source:'real_season_stats_plus_light_authored_tuning',
+      source:'historical_season_stats_plus_light_authored_tuning',
       archetype:detectArchetype(player, baseline),
       gamesPlayed:gp,
       totalFantasyPoints:roundStat(totalFantasyPoints),

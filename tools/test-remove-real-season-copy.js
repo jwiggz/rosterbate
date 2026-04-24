@@ -41,6 +41,36 @@ assert.doesNotMatch(
   'historical-packs/catalog.json should not market real-season data in loader-backed catalog copy'
 );
 assert.doesNotMatch(
+  files.simulationLeagueEngine,
+  /real_season_stats_plus_light_authored_tuning/,
+  'simulation-league-engine.js should not persist removed real_season wording in sim profile metadata'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /Replay Era Rosters/i,
+  'historic-seasons.html should not expose a replay lane in the archive browser'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /Real Season/i,
+  'historic-seasons.html should not advertise a removed real-season mode'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /playRealSeasonBtn/i,
+  'historic-seasons.html should not keep the replay button id around'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /seasonUrl:\s*'rosterbate-season\.html\?sport=nba&historical=dev/i,
+  'historic-seasons.html should not route the season launch through the removed dev historical mode'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /plannedModes:\s*\[[^\]]*Replay Era Rosters[^\]]*\]/i,
+  'historic-seasons.html should not keep replay-era planned mode copy'
+);
+assert.doesNotMatch(
   files.myLeagues,
   /continue your saved historical run/i,
   'my-leagues.html should keep generic shared-season fallback copy'

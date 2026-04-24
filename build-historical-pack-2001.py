@@ -1015,7 +1015,7 @@ def main():
         "eraTags": ["2000s", "Dynasty Transition", "Historic Season"],
         "notes": [
             "Full-league historical foundation pack for 2000-01.",
-            "Supports real-season boots, Draft The Era, and Reimagined Season.",
+            "Supports Historic Season, Draft The Era, and Reimagined Season.",
         ],
     }
 
@@ -1040,7 +1040,7 @@ def main():
         "defaultEntryMode": "single_player_season",
         "focusTeamId": "nba_2001_lal",
         "subtitle": "Start a historic season, redraft the era, or branch into a turn-of-the-century alternate universe.",
-        "description": "A 2000-01 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
+        "description": "A 2000-01 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
         "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
         "eraTags": ["2000s", "Dynasty Era", "Historic Season"],
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
@@ -1115,7 +1115,7 @@ def main():
     }
 
     summaries = {
-        "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
+        "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with historical full-season player production, the full schedule/results grid, and a full-league player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
         "featuredStorylines": [
             "The Lakers title-defense season anchors the pack with Shaq-and-Kobe dynasty energy from opening night forward.",
             "Iverson's MVP season, Duncan's Spurs, Garnett's rise, and Webber's Kings keep the full-league fantasy board loaded well beyond Los Angeles.",
@@ -1136,7 +1136,7 @@ def main():
         "auditSummary": manifest["auditSummary"],
         "auditNotes": [
             "Historical season stats cover every included player who logged official 2000-01 regular-season minutes.",
-            "Schedule and results span the full regular season using real historical game records.",
+            "Schedule and results span the full regular season using historical game records.",
             "Per-game stat lines use official event totals with inferred minute estimates normalized to season-average workloads.",
         ],
     }
@@ -1226,7 +1226,7 @@ def main():
                 "rosterSnapshots": len(roster_snapshots),
                 "scheduleGames": len(schedule),
                 "playerGameStats": len(player_game_stats),
-                "realSeasonStats": real_stat_players,
+                "historicalSeasonStats": real_stat_players,
                 "zeroGamePlayers": zero_game_players,
             },
             indent=2,

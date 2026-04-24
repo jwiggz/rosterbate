@@ -25,8 +25,8 @@
   "defaultEntryMode": "single_player_season",
   "focusTeamId": "nba_1993_chi",
   "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 historical season foundation centered on the Bulls.",
-  "description": "A playable 1992-93 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
-  "tagline": "Replay the Jordan-Barkley-Pippen season with real scores and disclosed inferred box lines.",
+  "description": "A playable 1992-93 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
+  "tagline": "Draft the Jordan-Barkley-Pippen season with disclosed inferred box lines.",
   "eraTags": [
     "1990s",
     "First Three-Peat Prestige",
@@ -82,7 +82,7 @@
     "The 27-team league map uses era-appropriate 1992-93 abbreviations, including CHH, GOS, SAN, UTH, and WAS.",
     "Schedule/results span the full 1107-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
     "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
-    "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable and ready for alternate-history runs."
+    "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable."
   ],
   "createdAt": "2026-04-22T20:07:49.855Z",
   "updatedAt": "2026-04-22T20:07:49.855Z"

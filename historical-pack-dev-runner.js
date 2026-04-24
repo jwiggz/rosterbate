@@ -284,7 +284,7 @@
         playersWithRealSeasonStats: playersWithRealSeasonStats,
         playerCount: players.length,
         playersWithSeasonStats: playersWithSeasonStats,
-        label: 'Real season stats'
+        label: 'Historical season stats'
       },
       zeroGamePlayers: {
         count: zeroGamePlayers,
@@ -310,9 +310,9 @@
     const removedCount=sanitizeCount(removed.count);
     health.innerHTML=
       '<div class="rbh-health-card" data-tone="'+(coverageCovered!=null && coverageTotal!=null && coverageCovered===coverageTotal ? 'success' : 'neutral')+'">'+
-        '<span class="rbh-health-label">'+(real.label || 'Real stat coverage')+'</span>'+
+        '<span class="rbh-health-label">'+(real.label || 'Historical season stats')+'</span>'+
         '<span class="rbh-health-value">'+formatCoverageText(coverageCovered, coverageTotal)+'</span>'+
-        '<span class="rbh-health-sub">'+(coverageTotal!=null ? 'players with real season lines' : 'coverage not published')+'</span>'+
+        '<span class="rbh-health-sub">'+(coverageTotal!=null ? 'players with historical season lines' : 'coverage not published')+'</span>'+
       '</div>'+
       '<div class="rbh-health-card" data-tone="'+(zeroCount===0 ? 'success' : 'warn')+'">'+
         '<span class="rbh-health-label">'+(zero.label || 'Zero-game players')+'</span>'+
@@ -600,10 +600,10 @@
           '<span class="rbh-toggle-meta" data-role="toggle-meta">Open</span>'+
         '</button>'+
         '<div class="rbh-body">'+
-          '<div class="rbh-title"><div><strong>Pack Dev</strong><span>Localhost-only runner for real historical packs and archive flows.</span></div></div>'+
+          '<div class="rbh-title"><div><strong>Pack Dev</strong><span>Localhost-only runner for historical packs and archive flows.</span></div></div>'+
           '<div class="rbh-status" id="'+PANEL_ROOT_ID+'_status" data-tone="neutral"><strong>Idle</strong><br>Use Validate or Dry Import to test the selected historical pack.</div>'+
           '<div class="rbh-health" id="'+HEALTH_PANEL_ID+'">'+
-            '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Real stat coverage</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
+            '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Historical season stats</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
             '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Zero-game players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
             '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Removed invalid players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
           '</div>'+
@@ -616,7 +616,7 @@
             '<button type="button" class="rbh-btn" data-role="action" data-action="validate">Validate</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="import">Dry Import</button>'+
             '<button type="button" class="rbh-btn rbh-btn--success" data-role="action" data-action="apply">Apply To Local</button>'+
-            '<button type="button" class="rbh-btn" data-role="action" data-action="season">Open Real Season</button>'+
+            '<button type="button" class="rbh-btn" data-role="action" data-action="season">Open Historic Season</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="draft">Open Draft The Era</button>'+
             '<button type="button" class="rbh-btn rbh-btn--ghost" data-role="action" data-action="mixed">Open Mixed Era</button>'+
           '</div>'+

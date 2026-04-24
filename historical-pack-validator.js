@@ -54,12 +54,28 @@
     return normalized;
   }
 
+  function addCompatibilityNote(report, code, message, path){
+    if(!report || !Array.isArray(report.compatibilityNotes)) return;
+    report.compatibilityNotes.push({code: code, message: message, path: path || ''});
+  }
+
   function normalizeManifestModes(manifest, report){
     const rawSupportedModes=Array.isArray(manifest && manifest.supportedModes) ? manifest.supportedModes : null;
     const normalizedSupportedModes=rawSupportedModes
       ? rawSupportedModes.map(function(mode){ return normalizeSupportedMode(mode); })
       : null;
     const normalizedDefaultEntryMode=normalizeSupportedMode(manifest && manifest.defaultEntryMode);
+
+    if(rawSupportedModes){
+      rawSupportedModes.forEach(function(mode, index){
+        if(String(mode || '').trim().toLowerCase()==='real_season'){
+          addCompatibilityNote(report, 'legacy_real_season_mode', 'Normalized legacy `real_season` supported mode to `single_player_season`.', 'manifest.supportedModes['+index+']');
+        }
+      });
+    }
+    if(String(manifest && manifest.defaultEntryMode || '').trim().toLowerCase()==='real_season'){
+      addCompatibilityNote(report, 'legacy_real_season_default_entry_mode', 'Normalized legacy `real_season` default entry mode to `single_player_season`.', 'manifest.defaultEntryMode');
+    }
 
     if(isPlainObject(manifest)){
       if(normalizedSupportedModes) manifest.supportedModes=normalizedSupportedModes.slice();
@@ -77,6 +93,7 @@
       status: 'validation_passed_clean',
       errors: [],
       warnings: [],
+      compatibilityNotes: [],
       summary: {
         packId: packId || '',
         schemaVersion: null,

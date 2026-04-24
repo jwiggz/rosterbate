@@ -517,7 +517,7 @@ def main():
         "eraTags": ["2010s", "Pace and Space", "Historic Season"],
         "notes": [
             "Full-league historical foundation pack for 2015-16.",
-            "Supports real-season boots, Draft The Era, and Reimagined Season."
+            "Supports Historic Season, Draft The Era, and Reimagined Season."
         ],
     }
 
@@ -536,13 +536,13 @@ def main():
         "isHistorical": True,
         "era": "2010s",
         "version": 1,
-        "status": "concept",
+        "status": "ready",
         "sourceProfile": "historical_curated",
         "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
         "defaultEntryMode": "single_player_season",
         "focusTeamId": "nba_2016_gsw",
         "subtitle": "Start a historic season, redraft the era, or branch into a reimagined universe.",
-        "description": "A 2015-16 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
+        "description": "A 2015-16 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
         "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
         "eraTags": ["2010s", "Warriors Era", "Historic Season"],
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
@@ -565,7 +565,7 @@ def main():
             "sourceProfile": "historical_curated",
             "curationOwner": "RosterBate",
             "reviewStatus": "draft",
-            "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from real game details and the full regular-season schedule/results.",
+            "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from historical game details and the full regular-season schedule/results.",
         },
         "auditSummary": {
             "realStatCoverage": {
@@ -583,9 +583,9 @@ def main():
             },
         },
         "notes": [
-            "Player ranking is driven by real 2015-16 season production aggregated from real game-detail rows.",
+            "Player ranking is driven by historical 2015-16 season production aggregated from historical game-detail rows.",
             "Schedule and game results span the full 2015-16 regular season.",
-            "Reimagined Season uses the same real historical player pool and pack health metadata."
+            "Reimagined Season uses the same historical player pool and pack health metadata."
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
@@ -616,7 +616,7 @@ def main():
     }
 
     summaries = {
-        "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with real full-season player production, the full schedule/results grid, and a player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
+        "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with historical full-season player production, the full schedule/results grid, and a player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
         "featuredStorylines": [
             "Seventy-three wins and unanimous-MVP gravity reshape the fantasy board.",
             "LeBron, Steph, Kawhi, KD, Russ, and Harden collide in one modern historic pool.",
@@ -636,8 +636,8 @@ def main():
         ],
         "auditSummary": manifest["auditSummary"],
         "auditNotes": [
-            "Historical season stats cover every included player in the pack.",
-            "Schedule and results span the full regular season using real historical game records.",
+            "Historical season stats cover every included player who logged official 2015-16 regular-season minutes.",
+            "Schedule and results span the full regular season using historical game records.",
             "No synthetic player stat generation is used in this pack path.",
         ],
     }
@@ -727,7 +727,7 @@ def main():
                 "rosterSnapshots": len(roster_snapshots),
                 "scheduleGames": len(schedule),
                 "playerGameStats": len(player_game_stats),
-                "realSeasonStats": real_stat_players,
+                "historicalSeasonStats": real_stat_players,
                 "zeroGamePlayers": zero_game_players,
             },
             indent=2,

@@ -2836,9 +2836,16 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
   ).trim();
   const selectedTeamIndex=teams.findIndex(team=>String(team?.teamId||'').trim()===selectedTeamId);
   const myPos=Math.max(0, selectedTeamIndex);
-  const historicalMode=String(entryMode || devState?.pendingBoot?.entryMode || 'real_season').trim().toLowerCase();
-  const isSimulationSeason=historicalMode==='simulation_season' || historicalMode==='simulation' || historicalMode==='sim';
-  const isReimaginedSeason=historicalMode==='reimagined_season' || historicalMode==='reimagined';
+  const requestedHistoricalMode=String(entryMode || devState?.pendingBoot?.entryMode || 'single_player_season').trim().toLowerCase();
+  const historicalMode=requestedHistoricalMode==='simulation_season' || requestedHistoricalMode==='simulation' || requestedHistoricalMode==='sim'
+    ? 'simulation_season'
+    : requestedHistoricalMode==='reimagined_season' || requestedHistoricalMode==='reimagined'
+    ? 'reimagined_season'
+    : requestedHistoricalMode==='historical_draft'
+    ? 'historical_draft'
+    : 'single_player_season';
+  const isSimulationSeason=historicalMode==='simulation_season';
+  const isReimaginedSeason=historicalMode==='reimagined_season';
   const leagueNameBase=season.label || authored?.presentation?.heroTitle || 'Historical NBA Season';
   const leagueName=isSimulationSeason
     ? (leagueNameBase + ' Sim Season')
@@ -2867,7 +2874,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     myPos: myPos,
     commissionerTeamIdx: myPos,
     multiplayer: false,
-    draftFormat: isSimulationSeason ? 'historical_simulation' : (isReimaginedSeason ? 'historical_reimagined' : 'historical_real_season'),
+    draftFormat: isSimulationSeason ? 'historical_simulation' : (isReimaginedSeason ? 'historical_reimagined' : (historicalMode==='historical_draft' ? 'historical_draft' : 'single_player_season')),
     scoringFormat: 'h2h_pts',
     currentWeek: 1,
     currentDay: 1,
@@ -2877,7 +2884,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     playerPoolSource: 'historical_pack',
     historicalPackId: importPlan?.metadata?.packId || null,
     historicalSeasonId: season.seasonId || null,
-    historicalEntryMode: isSimulationSeason ? 'simulation_season' : (isReimaginedSeason ? 'reimagined_season' : 'real_season'),
+    historicalEntryMode: historicalMode,
     historicalSelectedTeamId: activeTeam?.teamId || null,
     historicalPlayerPool: historicalPlayerPool.map(player=>({...player})),
     freeAgents: freeAgents,

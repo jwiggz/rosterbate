@@ -28,6 +28,7 @@ const validator = loadModule('historical-pack-validator.js', 'RosterBateHistoric
 const fixtures = loadModule('historical-pack-fixtures.js', 'RosterBateHistoricalPackFixtures');
 const slotsSource = read('historical-universe-slots.js');
 const devRunnerSource = read('historical-pack-dev-runner.js');
+const rosterbateSeasonSource = read('rosterbate-season.html');
 
 function createLocalStorage() {
   const store = new Map();
@@ -55,7 +56,108 @@ function loadSlotsApi(localStorage) {
   return slotsSandbox.window.RosterBateHistoricalUniverseSlots;
 }
 
+function sliceSourceBetweenSentinels(source, startSentinel, endSentinel) {
+  const start = source.indexOf(startSentinel);
+  assert.notEqual(start, -1, `Could not find start sentinel: ${startSentinel}`);
+  const end = source.indexOf(endSentinel, start);
+  assert.notEqual(end, -1, `Could not find end sentinel: ${endSentinel}`);
+  return source.slice(start, end).trim();
+}
+
+function loadHistoricalSeasonLaunchBuilder() {
+  const functionSource = sliceSourceBetweenSentinels(
+    rosterbateSeasonSource,
+    'function buildHistoricalSeasonLaunchData(',
+    'function isHistoricalSimulationUniverse('
+  );
+  const sandbox = {
+    console,
+    CURRENT_SPORT: 'nba',
+    Date,
+    window: {
+      RosterBateSimulationEngine: null
+    },
+    normalizeRosterbateSport(value) {
+      return String(value || 'nba').trim().toLowerCase() || 'nba';
+    },
+    isLikelyGeneratedHistoricalRow() {
+      return false;
+    },
+    accumulateHistoricalAggregate(target, row) {
+      target.count += 1;
+      target.pts += Number(row?.points || 0);
+      target.reb += Number(row?.rebounds || 0);
+      target.ast += Number(row?.assists || 0);
+      target.stl += Number(row?.steals || 0);
+      target.blk += Number(row?.blocks || 0);
+      target.to += Number(row?.turnovers || 0);
+      target.min += Number(row?.minutes || 0);
+      target.fgm += Number(row?.fgm || 0);
+      target.fga += Number(row?.fga || 0);
+      target.ftm += Number(row?.ftm || 0);
+      target.fta += Number(row?.fta || 0);
+      target.threes += Number(row?.threePointersMade || 0);
+    },
+    getHistoricalSeasonStatProfile() {
+      return null;
+    },
+    averageHistoricalAggregate(aggregate) {
+      const count = Math.max(1, Number(aggregate?.count || 0));
+      return {
+        pts: Number(aggregate?.pts || 0) / count,
+        reb: Number(aggregate?.reb || 0) / count,
+        ast: Number(aggregate?.ast || 0) / count,
+        stl: Number(aggregate?.stl || 0) / count,
+        blk: Number(aggregate?.blk || 0) / count,
+        to: Number(aggregate?.to || 0) / count,
+        min: Number(aggregate?.min || 0) / count,
+        fgm: Number(aggregate?.fgm || 0) / count,
+        fga: Number(aggregate?.fga || 0) / count,
+        ftm: Number(aggregate?.ftm || 0) / count,
+        fta: Number(aggregate?.fta || 0) / count,
+        threes: Number(aggregate?.threes || 0) / count
+      };
+    },
+    applyHistoricalSeasonAvailabilityAdjustment(value) {
+      return Number(value || 0);
+    },
+    computeHistoricalFantasyPoints(stats) {
+      return Number(stats?.pts || 0)
+        + (Number(stats?.reb || 0) * 1.2)
+        + (Number(stats?.ast || 0) * 1.5)
+        + (Number(stats?.stl || 0) * 3)
+        + (Number(stats?.blk || 0) * 3)
+        - Number(stats?.to || 0);
+    },
+    cloneJsonSafe(value) {
+      try {
+        return JSON.parse(JSON.stringify(value));
+      } catch (error) {
+        return null;
+      }
+    },
+    buildHistoricalSnakeDistributedRosters(playerPool, teamCount) {
+      const rosters = Array.from({ length: Number(teamCount || 0) }, () => []);
+      playerPool.forEach((player, index) => {
+        if (!rosters.length) return;
+        rosters[index % rosters.length].push({ ...player });
+      });
+      return rosters;
+    },
+    ensureCpuTeamPersonalitiesByTeam() {}
+  };
+  sandbox.window.window = sandbox.window;
+  vm.createContext(sandbox);
+  vm.runInContext(
+    `${functionSource}\nthis.buildHistoricalSeasonLaunchData = buildHistoricalSeasonLaunchData;`,
+    sandbox,
+    { filename: 'rosterbate-season.html#buildHistoricalSeasonLaunchData' }
+  );
+  return sandbox.buildHistoricalSeasonLaunchData;
+}
+
 const slotsApi = loadSlotsApi(createLocalStorage());
+const buildHistoricalSeasonLaunchData = loadHistoricalSeasonLaunchBuilder();
 
 const bundle = fixtures.getSample1995_96Bundle();
 const manifestModes = Array.from(bundle.manifest.supportedModes || []);
@@ -91,6 +193,16 @@ assert.equal(
   legacyManifestReport.warnings.some(warning => warning.code === 'legacy_real_season_mode'),
   false,
   'legacy manifests should normalize real_season silently so shipped packs still validate cleanly'
+);
+assert.equal(
+  legacyManifestReport.compatibilityNotes.some(note => note.code === 'legacy_real_season_mode'),
+  true,
+  'legacy manifests should record a compatibility note when real_season is normalized from supportedModes'
+);
+assert.equal(
+  legacyManifestReport.compatibilityNotes.some(note => note.code === 'legacy_real_season_default_entry_mode'),
+  true,
+  'legacy manifests should record a compatibility note when real_season is normalized from defaultEntryMode'
 );
 assert.equal(
   legacyManifestReport.status,
@@ -151,6 +263,59 @@ assert.equal(
   'historical-universe-slots.js should treat unknown entry modes as neutral historical saves'
 );
 
+assert.doesNotMatch(
+  rosterbateSeasonSource,
+  /draftFormat:\s*isSimulationSeason\s*\?\s*'historical_simulation'\s*:\s*\(isReimaginedSeason\s*\?\s*'historical_reimagined'\s*:\s*'historical_real_season'\)/,
+  'rosterbate-season.html should not persist historical_real_season as the default draft format'
+);
+assert.doesNotMatch(
+  rosterbateSeasonSource,
+  /historicalEntryMode:\s*isSimulationSeason\s*\?\s*'simulation_season'\s*:\s*\(isReimaginedSeason\s*\?\s*'reimagined_season'\s*:\s*'real_season'\)/,
+  'rosterbate-season.html should not persist real_season as the default historical entry mode'
+);
+
+const fallbackDevState = {
+  importPlan: {
+    metadata: {
+      packId: bundle.manifest.packId,
+      seasonId: bundle.season.seasonId
+    },
+    canonical: {
+      seasons: [bundle.season],
+      teams: bundle.teams,
+      players: bundle.players,
+      rosterSnapshots: bundle.rosterSnapshots,
+      playerGameStats: bundle.playerGameStats || []
+    },
+    authored: {
+      presentation: bundle.presentation || null,
+      packChallenges: bundle.packChallenges || null,
+      summaries: bundle.summaries || null
+    }
+  },
+  pendingBoot: {
+    entryMode: 'dev',
+    selectedTeamId: bundle.presentation?.featuredTeamId || bundle.manifest.focusTeamId || bundle.teams?.[0]?.teamId || null
+  }
+};
+
+const fallbackLaunchData = buildHistoricalSeasonLaunchData(fallbackDevState, 'nba');
+
+assert.ok(
+  fallbackLaunchData,
+  'buildHistoricalSeasonLaunchData should build launch data for a valid historical pack bundle'
+);
+assert.equal(
+  fallbackLaunchData.historicalEntryMode,
+  'single_player_season',
+  'buildHistoricalSeasonLaunchData should normalize stale dev historical launches to single_player_season at runtime'
+);
+assert.equal(
+  fallbackLaunchData.draftFormat,
+  'single_player_season',
+  'buildHistoricalSeasonLaunchData should persist single_player_season draft metadata for the neutral historical fallback at runtime'
+);
+
 const legacySlotsStorage = createLocalStorage();
 const legacySlotsApi = loadSlotsApi(legacySlotsStorage);
 const legacySlotPersist = legacySlotsApi.upsertFromState({
@@ -194,6 +359,11 @@ assert.doesNotMatch(
   devRunnerSource,
   /entryMode\s*:\s*String\(options && options\.entryMode \|\| 'real_season'\)\.trim\(\) \|\| 'real_season'/,
   'historical-pack-dev-runner.js should not default entryMode to real_season when applying fixtures'
+);
+assert.doesNotMatch(
+  devRunnerSource,
+  /Real stat coverage|players with real season lines|real historical packs|Open Real Season/,
+  'historical-pack-dev-runner.js should not keep removed real-season phrasing in the dev runner surface'
 );
 assert.doesNotMatch(
   devRunnerSource,

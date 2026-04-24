@@ -20,20 +20,56 @@
   ],
   "challenges": [
     {
-      "challengeId": "bulls_threepeat_push",
-      "groupId": "historic_season_paths",
-      "teamId": "nba_1993_chi",
-      "label": "Complete The First Three-Peat"
+      "challengeId": "bulls_threepeat_pace",
+      "mode": "single_player_season",
+      "path": "featured_team_path",
+      "title": "Complete The First Three-Peat",
+      "description": "Take the featured Bulls lane and clear 57 wins while keeping the title pace intact.",
+      "type": "season_wins_min",
+      "target": 57,
+      "evaluation": "season_end",
+      "reward": "Three-Peat Pace",
+      "required": false,
+      "featured": true
     },
     {
-      "challengeId": "redraft_1993",
-      "groupId": "draft_the_era_paths",
-      "label": "Redraft Jordan, Barkley, and Pippen"
+      "challengeId": "challenger_55_wins",
+      "mode": "single_player_season",
+      "path": "open_team_path",
+      "title": "Break The Bulls-Suns Collision Course",
+      "description": "Choose any team and reach 55 wins while trying to disrupt the Finals-bound prestige track.",
+      "type": "season_wins_min",
+      "target": 55,
+      "evaluation": "season_end",
+      "reward": "Collision Course Breaker",
+      "required": false,
+      "featured": false
     },
     {
-      "challengeId": "rewrite_1993_finals",
-      "groupId": "reimagined_paths",
-      "label": "Break The Bulls-Suns Collision Course"
+      "challengeId": "draft_1993_superteam",
+      "mode": "historical_draft",
+      "path": "alternate_history_success",
+      "title": "Draft The Rivalry Board",
+      "description": "Redraft 1992-93 from the full player pool and finish with at least 58 wins.",
+      "type": "season_wins_min",
+      "target": 58,
+      "evaluation": "season_end",
+      "reward": "Era Architect",
+      "required": false,
+      "featured": true
+    },
+    {
+      "challengeId": "reimagined_title",
+      "mode": "reimagined_season",
+      "path": "reshuffled_league",
+      "title": "Rewrite 1992-93",
+      "description": "Spin the league into an alternate-history branch and win the title with the same trust-forward data disclosures intact.",
+      "type": "win_championship",
+      "target": true,
+      "evaluation": "season_end",
+      "reward": "Alternate History Champion",
+      "required": false,
+      "featured": true
     }
   ]
 }

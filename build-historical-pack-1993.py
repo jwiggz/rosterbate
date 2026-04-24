@@ -1223,9 +1223,9 @@ def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_
         "teamCoverage": team_coverage,
         "notes": [
             "Live nbastats_1992 / pbpstats_1992 feeds are absent, so the pack cannot use the same play-by-play ingestion lane as later seasons.",
-            "Accessible Wikipedia team-season game logs are parsed wherever they expose real regular-season rows.",
+            "Accessible Wikipedia team-season game logs are parsed wherever they expose historical regular-season rows.",
             "A FiveThirtyEight historical results backfill completes the schedule grid for teams whose Wikipedia season pages are empty or partial.",
-            "Player-game stat rows remain inferred from season totals and are not marketed as real event box scores.",
+            "Player-game stat rows remain inferred from season totals and are not marketed as event-level box scores.",
         ],
         "games": ordered_games,
         "audit": {
@@ -1503,7 +1503,7 @@ def sanitize_player_source_record(player):
     team_code = canonical_team_code_from_team_id(cleaned["teamId"])
     if not cleaned.get("bio"):
         cleaned["bio"] = (
-            f"{cleaned['displayName']} belongs to the {SOURCE_SEASON} player pool with real season totals "
+            f"{cleaned['displayName']} belongs to the {SOURCE_SEASON} player pool with historical season totals "
             f"and inferred game-by-game coverage anchored to the {team_code or 'primary-team'} lane."
         )
 
@@ -1747,7 +1747,7 @@ def main():
         "isHistorical": True,
         "eraTags": ERA_TAGS,
         "notes": [
-            "This pack uses the real 1992-93 regular-season schedule and final scores.",
+            "This pack uses the historical 1992-93 regular-season schedule and final scores.",
             "Normal builds consume checked-in schedule and normalized player source snapshots rather than live network fetches.",
             "Player season totals originate from curated checked-in historical source artifacts.",
             "Player-game rows are deterministic season-average weighted estimates because live 1992 play-by-play feeds are absent.",
@@ -1774,8 +1774,8 @@ def main():
         "defaultEntryMode": "single_player_season",
         "focusTeamId": FEATURED_TEAM_ID,
         "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 historical season foundation centered on the Bulls.",
-        "description": "A playable 1992-93 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
-        "tagline": "Replay the Jordan-Barkley-Pippen season with real scores and disclosed inferred box lines.",
+        "description": "A playable 1992-93 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
+        "tagline": "Draft the Jordan-Barkley-Pippen season with disclosed inferred box lines.",
         "eraTags": ERA_TAGS,
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
         "playerPoolType": "full_season_player_pool",
@@ -1822,39 +1822,56 @@ def main():
             "The 27-team league map uses era-appropriate 1992-93 abbreviations, including CHH, GOS, SAN, UTH, and WAS.",
             "Schedule/results span the full 1107-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
             "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
-            "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable and replayable.",
+            "The Bulls are the featured prestige lane, but the full Jordan-Barkley-Pippen league remains draftable.",
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
     }
 
     presentation = {
-        "packId": PACK_ID,
-        "seasonLabel": SEASON_LABEL,
-        "shortLabel": "1992-93",
-        "significanceLabel": "First Three-Peat Prestige",
-        "significanceTone": "dynasty",
-        "focusTeamName": "Chicago Bulls",
-        "art": {
-            "theme": "dynasty",
-            "eyebrow": "First Three-Peat",
-            "headline": "Jordan.\nBarkley.\nPippen.",
-            "subline": "Bulls title gravity with Phoenix and Barkley as the Finals counterweight.",
+        "heroTitle": SEASON_LABEL,
+        "heroSubtitle": "Jordan's Bulls, Barkley's Suns, and a trust-forward 1992-93 historical season foundation.",
+        "featuredTeamId": FEATURED_TEAM_ID,
+        "featuredStars": featured_stars,
+        "artDirection": {
+            "heroTone": "dynasty",
+            "primaryPalette": ["#CE1141", "#1D1160", "#F9A01B"],
+            "backgroundStyle": "historic_arena_spotlight",
         },
-        "previewStars": ["Michael Jordan", "Charles Barkley", "Scottie Pippen"],
-        "tagline": "Jordan. Barkley. Pippen. One first-three-peat universe.",
+        "entryModes": [
+            {"mode": "single_player_season", "label": "Historic Season", "description": "Choose one 1992-93 team and play through the full historical season."},
+            {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Jordan-Barkley-Pippen season from the full-league player pool."},
+            {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1992-93 branch from the same foundation pack."},
+        ],
     }
 
     summaries = {
-        "packSummary": "The 1992-93 foundation pack brings the full 27-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
-        "historicalNotes": [
-            "Schedule and final results are captured as real 1992-93 season data.",
-            "Player-game stat rows are deterministic estimates distributed from real season totals because the live 1992 archive feeds were unavailable.",
+        "packSummary": "The 1992-93 foundation pack brings the full 27-team league into Historic Seasons with historical regular-season schedule/results, historical player season totals, and clearly disclosed inferred player-game coverage.",
+        "featuredStorylines": [
+            "Chicago is the front-door title path, with Jordan and Pippen anchoring the first three-peat season at the center of the pack.",
+            "Phoenix keeps Barkley's challenger Suns fully loaded and gives the pack a true Finals counterweight from the opening menu.",
+            "The schedule/results foundation is historical, and every inferred player-game row stays clearly labeled as an estimate rather than event-level truth.",
         ],
         "teamSpotlights": [
-            "Chicago is the flagship title-era lane, built around Jordan, Pippen, and the first three-peat front door.",
-            "Phoenix keeps Barkley's challenger Suns at full strength as the Finals counterweight.",
-            "New York and the rest of the early-90s East keep the season from collapsing into a one-team nostalgia pack.",
+            {"teamId": f"{ENTITY_PREFIX}_chi", "summary": "Chicago is the flagship title-era lane, built around Jordan, Pippen, and the first three-peat front door."},
+            {"teamId": f"{ENTITY_PREFIX}_phx", "summary": "Phoenix keeps Barkley's challenger Suns at full strength as the Finals counterweight."},
+            {"teamId": f"{ENTITY_PREFIX}_nyk", "summary": "New York offers the bruising East challenger route and one of the clearest anti-Bulls prestige paths."},
+            {"teamId": f"{ENTITY_PREFIX}_sea", "summary": "Seattle brings an elite West contender lane that plays differently from both Chicago and Phoenix."},
+            {"teamId": f"{ENTITY_PREFIX}_orl", "summary": "Orlando adds the young-Shaq breakout lane and a future-facing roster arc that cuts across the established powers."},
+        ],
+        "modeSummaries": [
+            {"mode": "single_player_season", "summary": "Choose one 1992-93 franchise and guide it through the full historical season."},
+            {"mode": "historical_draft", "summary": "Reshuffle the full Jordan-Barkley-Pippen player pool and discover how the era changes under a custom draft."},
+            {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1992-93 universe while keeping the same historical team and player foundation."},
+        ],
+        "auditSummary": manifest["auditSummary"],
+        "buildSourceMode": source_audit["mode"],
+        "missingSourceFeeds": source_audit["missingFeeds"],
+        "auditNotes": [
+            "Live nbastats_1992 / pbpstats_1992 feeds are absent, so player-game rows are inferred rather than imported from event archives.",
+            "Normal builds are reproducible from checked-in source artifacts and do not need live Wikipedia, TheBasketballDatabase, or list-data fetches.",
+            "Schedule and results cover the complete regular season from a mixed-source checked-in snapshot with FiveThirtyEight backfill support where source pages are partial.",
+            "Every player-game row sets statSource and minutesSource to season_average_weighted_estimate and is emitted only for the player's canonical teamId.",
         ],
     }
 
@@ -1868,20 +1885,56 @@ def main():
         ],
         "challenges": [
             {
-                "challengeId": "bulls_threepeat_push",
-                "groupId": "historic_season_paths",
-                "teamId": f"{ENTITY_PREFIX}_chi",
-                "label": "Complete The First Three-Peat",
+                "challengeId": "bulls_threepeat_pace",
+                "mode": "single_player_season",
+                "path": "featured_team_path",
+                "title": "Complete The First Three-Peat",
+                "description": "Take the featured Bulls lane and clear 57 wins while keeping the title pace intact.",
+                "type": "season_wins_min",
+                "target": 57,
+                "evaluation": "season_end",
+                "reward": "Three-Peat Pace",
+                "required": False,
+                "featured": True,
             },
             {
-                "challengeId": "redraft_1993",
-                "groupId": "draft_the_era_paths",
-                "label": "Redraft Jordan, Barkley, and Pippen",
+                "challengeId": "challenger_55_wins",
+                "mode": "single_player_season",
+                "path": "open_team_path",
+                "title": "Break The Bulls-Suns Collision Course",
+                "description": "Choose any team and reach 55 wins while trying to disrupt the Finals-bound prestige track.",
+                "type": "season_wins_min",
+                "target": 55,
+                "evaluation": "season_end",
+                "reward": "Collision Course Breaker",
+                "required": False,
+                "featured": False,
             },
             {
-                "challengeId": "rewrite_1993_finals",
-                "groupId": "reimagined_paths",
-                "label": "Break The Bulls-Suns Collision Course",
+                "challengeId": "draft_1993_superteam",
+                "mode": "historical_draft",
+                "path": "alternate_history_success",
+                "title": "Draft The Rivalry Board",
+                "description": "Redraft 1992-93 from the full player pool and finish with at least 58 wins.",
+                "type": "season_wins_min",
+                "target": 58,
+                "evaluation": "season_end",
+                "reward": "Era Architect",
+                "required": False,
+                "featured": True,
+            },
+            {
+                "challengeId": "reimagined_title",
+                "mode": "reimagined_season",
+                "path": "reshuffled_league",
+                "title": "Rewrite 1992-93",
+                "description": "Spin the league into an alternate-history branch and win the title with the same trust-forward data disclosures intact.",
+                "type": "win_championship",
+                "target": True,
+                "evaluation": "season_end",
+                "reward": "Alternate History Champion",
+                "required": False,
+                "featured": True,
             },
         ],
     }
@@ -1907,7 +1960,7 @@ def main():
                 "rosterSnapshots": len(roster_snapshots),
                 "scheduleGames": len(schedule),
                 "playerGameStats": len(player_game_stats),
-                "realSeasonStats": real_stat_players,
+                "historicalSeasonStats": real_stat_players,
                 "zeroGamePlayers": zero_game_players,
                 "wikipediaScheduleGames": schedule_results_snapshot["coverage"]["wikipediaGamesMatched"],
                 "backfilledScheduleGames": schedule_results_snapshot["coverage"]["backfilledGames"],

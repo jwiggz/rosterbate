@@ -6,7 +6,7 @@ const validator = require('../historical-pack-validator.js');
 const repoRoot = path.join(__dirname, '..');
 const packId = 'nba_2001_full_season_v1';
 const packRoot = path.join(repoRoot, 'historical-packs', packId);
-const expectedSeasonUrl = 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2001_full_season_v1';
+const expectedSeasonUrl = 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1';
 const expectedSimUrl = 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1';
 const expectedDraftUrl = 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2001_full_season_v1';
 const expectedReimaginedUrl = 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2001_full_season_v1';
