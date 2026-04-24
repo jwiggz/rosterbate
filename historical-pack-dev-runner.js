@@ -397,7 +397,7 @@
     const importPlan=importResult && importResult.importPlan ? importResult.importPlan : null;
     const summary=importPlan && importPlan.summary ? importPlan.summary : null;
     const selectedTeamId=String(options && options.selectedTeamId || '').trim();
-    const entryMode=String(options && options.entryMode || 'real_season').trim() || 'real_season';
+    const entryMode=String(options && options.entryMode || 'historical_draft').trim() || 'historical_draft';
     return {
       schemaVersion: 1,
       savedAt: new Date().toISOString(),
@@ -736,7 +736,7 @@
         writer: function(importResult){
           return writeImportToLocalState(importResult, {
             selectedTeamId:selectedTeamId,
-            entryMode:String(options && options.entryMode || 'real_season').trim() || 'real_season'
+            entryMode:String(options && options.entryMode || 'historical_draft').trim() || 'historical_draft'
           });
         }
       });
@@ -750,7 +750,7 @@
         selectedTeamId:selectedTeamId,
         entryMode: mode==='reimagined'
           ? 'reimagined_season'
-          : (mode==='sim' || mode==='simulation' ? 'simulation_season' : 'real_season')
+          : (mode==='sim' || mode==='simulation' ? 'simulation_season' : 'historical_draft')
       });
       const url=buildHistoricalSeasonUrl(id, mode);
       if(isBrowser && global.location){
