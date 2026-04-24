@@ -62,7 +62,7 @@
 
   function getSimulationRosterNeeds(shell){
     if (getSimulationSport(shell) === 'nfl') {
-      return ['QB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'DST'];
+      return ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'EDGE', 'LB', 'CB', 'S', 'K', 'DST'];
     }
     return ['PG', 'SG', 'SF', 'PF', 'C'];
   }
@@ -248,7 +248,11 @@
   }
 
   function getSimulationPlayerPosition(player){
-    return String(player?.pos || player?.primaryPosition || 'UTIL').trim().toUpperCase();
+    const normalizedPosition = String(player?.pos || player?.primaryPosition || 'UTIL').trim().toUpperCase();
+    if (normalizedPosition === 'DL') {
+      return 'EDGE';
+    }
+    return normalizedPosition;
   }
 
   function isFootballFlexEligiblePosition(position){
@@ -259,11 +263,10 @@
     const nextRoster = Array.isArray(roster) ? roster : [];
     const minimumCounts = {
       QB: 1,
-      RB: 1,
+      RB: 2,
       WR: 2,
       TE: 1,
-      OL: 1,
-      DL: 1,
+      EDGE: 1,
       LB: 1,
       CB: 1,
       S: 1,
@@ -298,8 +301,8 @@
     }
 
     if (isFootballFlexEligiblePosition(normalizedPosition)) {
-      if (coverage.flexEligibleCount < 5) {
-        bonus += 1000000 + ((5 - coverage.flexEligibleCount) * 10000);
+      if (coverage.flexEligibleCount < 6) {
+        bonus += 1000000 + ((6 - coverage.flexEligibleCount) * 10000);
       }
     }
 

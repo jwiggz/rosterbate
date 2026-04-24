@@ -1,7 +1,10 @@
+const fs = require('node:fs');
 const assert = require('node:assert/strict');
+const path = require('node:path');
 
 const { getSimulationShell } = require('../simulation-mode-config.js');
 const {
+  getSimulationRosterNeeds,
   buildSimulationPlayerPool,
   buildSimulationUniverseBootstrap,
   buildCompletedSimulationAutoDraftState,
@@ -50,29 +53,15 @@ const mixedEraContext = {
   playerPool
 };
 
-const nflRosterTemplate = ['QB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'DST'];
-const nflPlayerPool = Array.from({ length: 480 }, (_, index) => {
-  const position = nflRosterTemplate[index % nflRosterTemplate.length];
-  return {
-    id: 5000 + index + 1,
-    name: `NFL Player ${String(index + 1).padStart(3, '0')}`,
-    team: 'HIS',
-    pos: position,
-    fp: 120 - (index % nflRosterTemplate.length),
-    mixedEraOverall: 99 - Math.floor(index / nflRosterTemplate.length),
-    historicalPackId: index < 160 ? 'nfl_1998_full_season_v1' : index < 320 ? 'nfl_2007_full_season_v1' : 'nfl_2014_full_season_v1'
-  };
-});
+const realNflPlayerPool = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '..', 'historical-packs', 'nfl_2014_full_season_v1', 'players.json'), 'utf8')
+);
 
-const nflMixedEraContext = {
-  mixedEraConfigId: '1998-2007-2014-nfl',
-  sourcePackIds: [
-    'nfl_1998_full_season_v1',
-    'nfl_2007_full_season_v1',
-    'nfl_2014_full_season_v1'
-  ],
-  sourceSeasonLabels: ['1998', '2007', '2014'],
-  playerPool: nflPlayerPool
+const realNflMixedEraContext = {
+  mixedEraConfigId: '2014-nfl',
+  sourcePackIds: ['nfl_2014_full_season_v1'],
+  sourceSeasonLabels: ['2014'],
+  playerPool: realNflPlayerPool
 };
 
 function buildSkewedNflPlayers(position, count, startId, baseOverall, baseFp) {
@@ -89,11 +78,10 @@ function buildSkewedNflPlayers(position, count, startId, baseOverall, baseFp) {
 
 const skewedNflPlayerPool = [
   ...buildSkewedNflPlayers('WR', 96, 9000, 99, 140),
-  ...buildSkewedNflPlayers('RB', 32, 10000, 98, 132),
+  ...buildSkewedNflPlayers('RB', 64, 10000, 98, 132),
   ...buildSkewedNflPlayers('TE', 32, 11000, 97, 126),
   ...buildSkewedNflPlayers('QB', 32, 12000, 92, 90),
-  ...buildSkewedNflPlayers('OL', 32, 13000, 60, 30),
-  ...buildSkewedNflPlayers('DL', 48, 14000, 96, 85),
+  ...buildSkewedNflPlayers('EDGE', 32, 13000, 96, 85),
   ...buildSkewedNflPlayers('LB', 64, 15000, 95, 82),
   ...buildSkewedNflPlayers('S', 128, 15500, 39, 9),
   ...buildSkewedNflPlayers('K', 32, 16000, 58, 22),
@@ -117,21 +105,26 @@ function countRosterPlayersByPosition(roster, position) {
 
 function assertNflRosterCoverage(roster, label) {
   assert.ok(countRosterPlayersByPosition(roster, 'QB') >= 1, `${label} should include at least one QB`);
-  assert.ok(countRosterPlayersByPosition(roster, 'RB') >= 1, `${label} should include at least one RB`);
+  assert.ok(countRosterPlayersByPosition(roster, 'RB') >= 2, `${label} should include at least two RBs`);
   assert.ok(countRosterPlayersByPosition(roster, 'TE') >= 1, `${label} should include at least one TE`);
   assert.ok(countRosterPlayersByPosition(roster, 'K') >= 1, `${label} should include at least one K`);
   assert.ok(countRosterPlayersByPosition(roster, 'DST') >= 1, `${label} should include at least one DST`);
-  assert.ok(countRosterPlayersByPosition(roster, 'OL') >= 1, `${label} should include at least one OL`);
-  assert.ok(countRosterPlayersByPosition(roster, 'DL') >= 1, `${label} should include at least one DL`);
+  assert.ok(countRosterPlayersByPosition(roster, 'EDGE') >= 1, `${label} should include at least one EDGE`);
   assert.ok(countRosterPlayersByPosition(roster, 'LB') >= 1, `${label} should include at least one LB`);
   assert.ok(countRosterPlayersByPosition(roster, 'CB') >= 1, `${label} should include at least one CB`);
   assert.ok(countRosterPlayersByPosition(roster, 'S') >= 1, `${label} should include at least one S`);
   assert.ok(countRosterPlayersByPosition(roster, 'WR') >= 2, `${label} should include at least two WRs`);
   assert.ok(
-    roster.filter((player) => ['RB', 'WR', 'TE'].includes(player.pos)).length >= 5,
+    roster.filter((player) => ['RB', 'WR', 'TE'].includes(player.pos)).length >= 6,
     `${label} should include enough RB/WR/TE coverage to satisfy the flex concept`
   );
 }
+
+assert.deepStrictEqual(
+  getSimulationRosterNeeds(nflShell),
+  ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'EDGE', 'LB', 'CB', 'S', 'K', 'DST'],
+  'nfl simulation runtime should use the phase-1 roster template that matches the shipped 2014 pack'
+);
 
 const expectedRankedNames = rankPlayers(playerPool).map((player) => player.name);
 
@@ -208,7 +201,7 @@ assert.deepStrictEqual(partialShellBootstrap.seasonState.standings, []);
 
 const nflBootstrap = buildSimulationUniverseBootstrap({
   shell: nflShell,
-  mixedEraContext: nflMixedEraContext,
+  mixedEraContext: realNflMixedEraContext,
   controlledTeamAbbr: 'GB',
   draftSlot: 12
 });
@@ -219,6 +212,25 @@ assert.equal(nflBootstrap.draftState.teamCount, 32);
 assert.equal(nflBootstrap.draftState.rosterSize, 13);
 assert.equal(nflBootstrap.seasonState.currentWeek, 1);
 assert.equal(nflBootstrap.draftState.controlledTeamAbbr, 'GB');
+assert.equal(nflBootstrap.draftState.draftPool.length, 416, 'real 2014 nfl pack should fill the full 32x13 draft pool');
+assert.equal(nflBootstrap.draftState.freeAgents.length, 0, 'real 2014 nfl pack should not need extra free agents to satisfy phase-1 shell');
+
+const realNflPositionCounts = realNflPlayerPool.reduce((counts, player) => {
+  counts[player.pos] = Number(counts[player.pos] || 0) + 1;
+  return counts;
+}, {});
+assert.deepStrictEqual(realNflPositionCounts, {
+  QB: 32,
+  RB: 64,
+  WR: 96,
+  TE: 32,
+  EDGE: 32,
+  LB: 32,
+  CB: 32,
+  S: 32,
+  K: 32,
+  DST: 32
+}, 'real nfl 2014 pack position counts should match the phase-1 roster template');
 
 const skewedNflPool = buildSimulationPlayerPool({
   shell: nflShell,
@@ -227,18 +239,17 @@ const skewedNflPool = buildSimulationPlayerPool({
 
 assert.equal(skewedNflPool.draftPool.length, 416);
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'QB') >= 32, 'skewed NFL draft pool should reserve 32 QBs');
-assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'RB') >= 32, 'skewed NFL draft pool should reserve 32 RBs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'RB') >= 64, 'skewed NFL draft pool should reserve 64 RBs');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'WR') >= 64, 'skewed NFL draft pool should reserve 64 WRs');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'TE') >= 32, 'skewed NFL draft pool should reserve 32 TEs');
-assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'OL') >= 32, 'skewed NFL draft pool should reserve 32 OLs');
-assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'DL') >= 32, 'skewed NFL draft pool should reserve 32 DLs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'EDGE') >= 32, 'skewed NFL draft pool should reserve 32 EDGEs');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'LB') >= 32, 'skewed NFL draft pool should reserve 32 LBs');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'CB') >= 32, 'skewed NFL draft pool should reserve 32 CBs');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'S') >= 32, 'skewed NFL draft pool should reserve 32 Ss');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'K') >= 32, 'skewed NFL draft pool should reserve 32 Ks');
 assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'DST') >= 32, 'skewed NFL draft pool should reserve 32 DST units');
 assert.ok(
-  skewedNflPool.draftPool.filter((player) => ['RB', 'WR', 'TE', 'FLEX'].includes(player.pos)).length >= 160,
+  skewedNflPool.draftPool.filter((player) => ['RB', 'WR', 'TE', 'FLEX'].includes(player.pos)).length >= 192,
   'skewed NFL draft pool should reserve enough RB/WR/TE/FLEX players to satisfy flex slots'
 );
 
@@ -269,20 +280,27 @@ assert.equal(autoDraftState.postseasonState.phase, 'regular_season');
 
 const nflAutoDraftState = buildCompletedSimulationAutoDraftState({
   shell: nflShell,
-  mixedEraContext: nflMixedEraContext,
+  mixedEraContext: realNflMixedEraContext,
   controlledTeamAbbr: 'GB'
 });
 
 const gbRoster = nflAutoDraftState.draftState.rostersByTeam.GB || [];
 
 assert.equal(gbRoster.length, 13);
-assert.ok(gbRoster.some((player) => player.pos === 'QB'), 'GB roster should include a QB');
-assert.ok(gbRoster.some((player) => player.pos === 'OL'), 'GB roster should include an OL');
-assert.ok(gbRoster.some((player) => player.pos === 'DST'), 'GB roster should include a DST');
+assertNflRosterCoverage(gbRoster, 'GB real 2014 NFL roster');
 assert.ok(
   Object.values(nflAutoDraftState.draftState.rostersByTeam).every((roster) => Array.isArray(roster) && roster.length === 13),
   'every NFL team roster should contain 13 drafted players'
 );
+Object.entries(nflAutoDraftState.draftState.rostersByTeam).forEach(([teamAbbr, roster]) => {
+  assertNflRosterCoverage(roster, `${teamAbbr} real 2014 NFL roster`);
+});
+assert.equal(
+  new Set(Object.values(nflAutoDraftState.draftState.rostersByTeam).flat().map((player) => player.id)).size,
+  416,
+  'real 2014 NFL auto-draft should use the full one-pack player pool exactly once'
+);
+assert.equal(nflAutoDraftState.draftState.freeAgents.length, 0, 'real 2014 NFL auto-draft should leave no free agents when only the exact shell is available');
 
 const skewedNflAutoDraftState = buildCompletedSimulationAutoDraftState({
   shell: nflShell,
