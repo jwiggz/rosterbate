@@ -92,4 +92,54 @@ assert.equal(
   'non-simulation universes should keep the classic season route'
 );
 
+const persistedNfl = api.upsertFromState({
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: {
+    sport: 'nfl',
+    anchorSeasonLabel: '2014 NFL',
+    teams: [
+      { abbr: 'DEN', name: 'Denver Broncos', conference: 'AFC', division: 'West' },
+      { abbr: 'SEA', name: 'Seattle Seahawks', conference: 'NFC', division: 'West' }
+    ]
+  },
+  sourceSeasons: {
+    mixedEraConfigId: '1984-1998-2014',
+    sourcePackIds: ['nfl_1984_full_season_v1', 'nfl_1998_full_season_v1', 'nfl_2014_full_season_v1'],
+    sourceSeasonLabels: ['1984', '1998', '2014']
+  },
+  draftState: {
+    controlledTeamAbbr: 'DEN',
+    rostersByTeam: {
+      DEN: [{ id: 18, name: 'Peyton Manning' }],
+      SEA: [{ id: 3, name: 'Russell Wilson' }]
+    },
+    freeAgents: [{ id: 34, name: 'Walter Payton' }]
+  },
+  seasonState: {
+    currentDay: 6,
+    currentWeek: 1,
+    standings: [
+      { teamAbbr: 'DEN', conference: 'AFC', division: 'West', w: 1, l: 0, pf: 31, pa: 17 },
+      { teamAbbr: 'SEA', conference: 'NFC', division: 'West', w: 0, l: 1, pf: 17, pa: 31 }
+    ]
+  }
+}, {
+  slotId: 'sim-slot-nfl-1'
+});
+
+assert.ok(persistedNfl, 'NFL simulation universes should persist into historical slot storage');
+assert.equal(persistedNfl.metadata.simulationMode, 'nfl_mixed_era_single_player_v1');
+assert.equal(persistedNfl.metadata.teamName, 'Denver Broncos');
+assert.equal(api.getState('sim-slot-nfl-1').simulationMode, 'nfl_mixed_era_single_player_v1');
+
+assert.equal(
+  api.buildSeasonUrl({
+    slotId: 'sim-slot-nfl-1',
+    sport: 'nfl',
+    simulationMode: 'nfl_mixed_era_single_player_v1'
+  }, 'nfl'),
+  'rosterbate-season.html?sport=nfl&simulation=nfl_mixed_era&historicalUniverse=sim-slot-nfl-1',
+  'NFL simulation universes should open in the NFL shared season shell'
+);
+
 console.log('simulation slot routing test passed');

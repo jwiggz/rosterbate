@@ -4,6 +4,7 @@
   const INDEX_KEY = 'rbHistoricalUniverseSlots';
   const STATE_PREFIX = 'rbHistoricalUniverseState:';
   const NBA_SIMULATION_MODE = 'nba_mixed_era_single_player_v1';
+  const NFL_SIMULATION_MODE = 'nfl_mixed_era_single_player_v1';
 
   function safeJsonParse(raw){
     try{
@@ -23,6 +24,13 @@
 
   function normalizeSport(value){
     return String(value || 'nba').trim().toLowerCase() || 'nba';
+  }
+
+  function getSimulationRouteMode(value, sport){
+    const mode = String(value || '').trim().toLowerCase();
+    if(mode === NFL_SIMULATION_MODE) return 'nfl_mixed_era';
+    if(mode === NBA_SIMULATION_MODE) return 'nba_mixed_era';
+    return normalizeSport(sport) === 'nfl' ? 'nfl_mixed_era' : 'nba_mixed_era';
   }
 
   function slugifyKey(value){
@@ -52,7 +60,8 @@
   }
 
   function isSimulationModeState(state){
-    return String(state?.simulationMode || '').trim() === NBA_SIMULATION_MODE;
+    const mode = String(state?.simulationMode || '').trim().toLowerCase();
+    return mode === NBA_SIMULATION_MODE || mode === NFL_SIMULATION_MODE;
   }
 
   function isSimulationModeUniverse(slot, state){
@@ -323,7 +332,7 @@
       pf: standing?.pf ?? null,
       pa: standing?.pa ?? null,
       teamRank: standing?.rank ?? null,
-      simulationMode: NBA_SIMULATION_MODE,
+      simulationMode: String(state?.simulationMode || (normalizeSport(state?.sport || state?.leagueShell?.sport || 'nba') === 'nfl' ? NFL_SIMULATION_MODE : NBA_SIMULATION_MODE)).trim() || NBA_SIMULATION_MODE,
       createdAt,
       updatedAt
     };
@@ -457,9 +466,13 @@
     const targetSport = normalizeSport(sport || slot?.sport || 'nba');
     const id = String(slot?.slotId || '').trim();
     if(isSimulationModeUniverse(slot, state)){
+      const simulationMode = getSimulationRouteMode(
+        state?.simulationMode || slot?.simulationMode,
+        targetSport
+      );
       return 'rosterbate-season.html?sport='
         + encodeURIComponent(targetSport)
-        + '&simulation=nba_mixed_era&historicalUniverse='
+        + '&simulation=' + encodeURIComponent(simulationMode) + '&historicalUniverse='
         + encodeURIComponent(id);
     }
     return 'rosterbate-season.html?sport=' + encodeURIComponent(targetSport) + '&historicalUniverse=' + encodeURIComponent(id);
