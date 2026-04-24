@@ -2,48 +2,53 @@ const assert = require('node:assert/strict');
 
 const {
   getSimulationShell,
-  findSimulationTeamByAbbr
+  findSimulationTeamByAbbr,
+  listSimulationShells
 } = require('../simulation-mode-config.js');
 
 assert.equal(typeof getSimulationShell, 'function');
 assert.equal(typeof findSimulationTeamByAbbr, 'function');
+assert.equal(typeof listSimulationShells, 'function');
 
-const shell = getSimulationShell();
+const defaultShell = getSimulationShell();
+const nflShell = getSimulationShell({ sport: 'nfl' });
+const allShells = listSimulationShells();
 
-assert.equal(shell.anchorSeasonId, 'nba_2025_26');
-assert.equal(shell.anchorSeasonLabel, '2025-26 NBA');
-assert.equal(shell.teams.length, 30);
-assert.equal(shell.regularSeasonGamesPerTeam, 82);
-assert.deepStrictEqual(shell.playInSeeds, [7, 8, 9, 10]);
-assert.equal(shell.finalsStartDate, '2026-06-03');
+assert.equal(defaultShell.anchorSeasonId, 'nba_2025_26');
+assert.equal(defaultShell.sport, 'nba');
+assert.equal(nflShell.anchorSeasonId, 'nfl_2014');
+assert.equal(nflShell.anchorSeasonLabel, '2014 NFL');
+assert.equal(nflShell.sport, 'nfl');
+assert.equal(nflShell.teams.length, 32);
+assert.equal(nflShell.rosterSize, 13);
+assert.equal(nflShell.regularSeasonWeeks, 17);
+assert.equal(nflShell.playoffFieldPerConference, 6);
+assert.ok(allShells.some((shell) => shell.anchorSeasonId === 'nfl_2014'));
 
-const lakers = findSimulationTeamByAbbr('LAL');
-const magic = findSimulationTeamByAbbr('ORL');
+const patriots = findSimulationTeamByAbbr('NE', { sport: 'nfl' });
+const packers = findSimulationTeamByAbbr('GB', { sport: 'nfl' });
 
 assert.deepStrictEqual(
-  { conference: lakers.conference, division: lakers.division },
-  { conference: 'West', division: 'Pacific' }
+  { conference: patriots.conference, division: patriots.division },
+  { conference: 'AFC', division: 'East' }
 );
 assert.deepStrictEqual(
-  { conference: magic.conference, division: magic.division },
-  { conference: 'East', division: 'Southeast' }
+  { conference: packers.conference, division: packers.division },
+  { conference: 'NFC', division: 'North' }
 );
 
-shell.teams[0].conference = 'Mutated';
-shell.playInSeeds.push(11);
+nflShell.teams[0].conference = 'Mutated';
 
-const freshShell = getSimulationShell();
+const freshNflShell = getSimulationShell({ sport: 'nfl' });
 
 assert.deepStrictEqual(
   {
-    conference: freshShell.teams[0].conference,
-    playInSeeds: freshShell.playInSeeds
+    conference: freshNflShell.teams[0].conference
   },
   {
-    conference: 'East',
-    playInSeeds: [7, 8, 9, 10]
+    conference: 'NFC'
   }
 );
-assert.equal(findSimulationTeamByAbbr('ZZZ'), null);
+assert.equal(findSimulationTeamByAbbr('ZZZ', { sport: 'nfl' }), null);
 
 console.log('simulation mode config test passed');
