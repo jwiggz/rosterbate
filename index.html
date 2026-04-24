@@ -1796,8 +1796,8 @@
                   <div class="historical-desc" id="historicalEntryDesc">Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.</div>
                   <div class="historical-meta-row">
                     <span class="cta-meta-pill open" id="historicalEntryStatus">Playable Now</span>
-                    <span class="cta-meta-pill info">Basketball First</span>
-                    <span class="cta-meta-pill info">Classic Era Mode</span>
+                    <span class="cta-meta-pill info" id="historicalEntrySportPill">Basketball First</span>
+                    <span class="cta-meta-pill info" id="historicalEntryModePill">Classic Era Mode</span>
                   </div>
                   <div class="historical-footnote" id="historicalEntryNote">Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.</div>
                 </div>
@@ -1819,7 +1819,7 @@
               <div class="historical-action-row">
                 <a id="historicalBrowseLink" class="historical-btn tertiary" href="historic-seasons.html?sport=nba">Browse Historic Seasons</a>
                 <a id="historicalDraftLink" class="historical-btn secondary" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
-                <a class="historical-btn secondary hero-cta" href="rosterbate-simulation-setup.html?sport=nba">Start Simulation League</a>
+                <a id="historicalSimLink" class="historical-btn secondary hero-cta" href="rosterbate-simulation-setup.html?sport=nba">Start Simulation League</a>
               </div>
             </div>
           </div>
@@ -2352,15 +2352,61 @@ const HOME_SPORT_SIGNALS = {
     mockStripStatus:'Open Now'
   }
 };
-const HOME_HISTORICAL_SURFACE = {
-  title: '1995-96 NBA Universe',
-  description: 'Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.',
-  teamCount: 29,
-  playerCount: 436,
-  gameCount: 183,
-  browserUrl: 'historic-seasons.html?sport=nba',
-  seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev',
-  draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev'
+const HOME_HISTORICAL_SURFACES = {
+  nba: {
+    title: '1995-96 NBA Universe',
+    description: 'Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.',
+    teamCount: 29,
+    playerCount: 436,
+    gameCount: 183,
+    sportPill: 'Basketball First',
+    modePill: 'Classic Era Mode',
+    localStatus: 'Playable Now',
+    previewStatus: 'Founder Preview',
+    localNote: 'Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.',
+    previewNote: 'Historic Seasons is being developed as a flagship mode. Basketball is the first universe coming online before wider release.',
+    browserUrl: 'historic-seasons.html?sport=nba',
+    draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev',
+    simulationUrl: 'rosterbate-simulation-setup.html?sport=nba',
+    draftEnabled: true,
+    simulationEnabled: true
+  },
+  nfl: {
+    title: '2014 NFL Universe',
+    description: 'Load the 2014 historical NFL player pool as source material for drafts, simulation leagues, and alternate-history builds with Brady, Rodgers, Bell, Watt, Sherman, and the rest of the era in one sandbox.',
+    teamCount: 32,
+    playerCount: 416,
+    gameCount: 256,
+    sportPill: 'Football First',
+    modePill: 'Mixed-Era Sim',
+    localStatus: 'Playable Now',
+    previewStatus: 'Foundation Preview',
+    localNote: 'Historic football now feeds mixed-era drafts, simulation setup, and alternate-history league builds from a loaded 2014 source pack.',
+    previewNote: 'Historic football is the next archive lane being brought online after basketball, starting with the 2014 NFL shell.',
+    browserUrl: 'historic-seasons.html?sport=nfl',
+    draftUrl: 'rosterbate-draft.html?sport=nfl&historical=dev',
+    simulationUrl: 'rosterbate-simulation-setup.html?sport=nfl',
+    draftEnabled: true,
+    simulationEnabled: true
+  },
+  mlb: {
+    title: 'Baseball Archive Incoming',
+    description: 'Historic baseball seasons are being prepared as future source material for mixed-era drafts, simulation leagues, and alternate-history builds.',
+    teamCount: 30,
+    playerCount: 'TBD',
+    gameCount: 'TBD',
+    sportPill: 'Baseball Preview',
+    modePill: 'Archive In Progress',
+    localStatus: 'Preview',
+    previewStatus: 'Coming Soon',
+    localNote: 'Baseball historical archives are still in development and will follow the same browse, draft, and simulation lane once packs are ready.',
+    previewNote: 'Historic baseball is in development and will join the archive once the first season packs are ready.',
+    browserUrl: 'historic-seasons.html?sport=mlb',
+    draftUrl: '',
+    simulationUrl: '',
+    draftEnabled: false,
+    simulationEnabled: false
+  }
 };
 const HOME_POWERUP_ICON_EXTENSIONS = ['png','webp','svg'];
 const HOME_POWERUP_ICON_LIBRARY = {
@@ -2554,30 +2600,42 @@ function subscribeNavNotifications(userNumber){
   });
 }
 
+function getHomeHistoricalSurface(){
+  const sport = normalizeRosterbateSport(selectedHomeSport);
+  return HOME_HISTORICAL_SURFACES[sport] || HOME_HISTORICAL_SURFACES.nba;
+}
+
 function updateHistoricalEntrySurface(){
   const host = String(window.location.hostname || '').toLowerCase();
-  const isLocalHistorical = host === 'localhost' || host === '127.0.0.1';
-  const surface = HOME_HISTORICAL_SURFACE;
+  const protocol = String(window.location.protocol || '').toLowerCase();
+  const isLocalHistorical = protocol === 'file:' || host === 'localhost' || host === '127.0.0.1';
+  const surface = getHomeHistoricalSurface();
   const titleEl = document.getElementById('historicalEntryTitle');
   const descEl = document.getElementById('historicalEntryDesc');
   const teamsEl = document.getElementById('historicalTeamsCount');
   const playersEl = document.getElementById('historicalPlayersCount');
   const gamesEl = document.getElementById('historicalGamesCount');
   const statusEl = document.getElementById('historicalEntryStatus');
+  const sportPillEl = document.getElementById('historicalEntrySportPill');
+  const modePillEl = document.getElementById('historicalEntryModePill');
   const noteEl = document.getElementById('historicalEntryNote');
   const browseLink = document.getElementById('historicalBrowseLink');
-  const seasonLink = document.getElementById('historicalSeasonLink');
   const draftLink = document.getElementById('historicalDraftLink');
+  const simLink = document.getElementById('historicalSimLink');
+  const canDraft = surface.draftEnabled !== false && !!surface.draftUrl && isLocalHistorical;
+  const canSim = surface.simulationEnabled !== false && !!surface.simulationUrl;
   if(titleEl) titleEl.textContent = surface.title;
   if(descEl) descEl.textContent = surface.description;
   if(teamsEl) teamsEl.textContent = String(surface.teamCount);
   if(playersEl) playersEl.textContent = String(surface.playerCount);
   if(gamesEl) gamesEl.textContent = String(surface.gameCount);
-  if(statusEl) statusEl.textContent = isLocalHistorical ? 'Playable Now' : 'Founder Preview';
+  if(statusEl) statusEl.textContent = isLocalHistorical ? (surface.localStatus || 'Playable Now') : (surface.previewStatus || 'Founder Preview');
+  if(sportPillEl) sportPillEl.textContent = surface.sportPill || '';
+  if(modePillEl) modePillEl.textContent = surface.modePill || '';
   if(noteEl){
     noteEl.textContent = isLocalHistorical
-      ? 'Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.'
-      : 'Historic Seasons is being developed as a flagship mode. Basketball is the first universe coming online before wider release.';
+      ? (surface.localNote || '')
+      : (surface.previewNote || '');
   }
   if(browseLink){
     browseLink.textContent = 'Browse Historic Seasons';
@@ -2589,12 +2647,19 @@ function updateHistoricalEntrySurface(){
     [draftLink, surface.draftUrl, 'Draft The Era']
   ].forEach(([el, href, label]) => {
     if(!el) return;
-    el.textContent = isLocalHistorical ? label : (label + ' Soon');
-    el.href = isLocalHistorical ? href : '#';
-    el.classList.toggle('disabled', !isLocalHistorical);
-    if(isLocalHistorical) el.removeAttribute('aria-disabled');
+    el.textContent = canDraft ? label : (label + ' Soon');
+    el.href = canDraft ? href : '#';
+    el.classList.toggle('disabled', !canDraft);
+    if(canDraft) el.removeAttribute('aria-disabled');
     else el.setAttribute('aria-disabled', 'true');
   });
+  if(simLink){
+    simLink.textContent = canSim ? 'Start Simulation League' : 'Simulation Soon';
+    simLink.href = canSim ? surface.simulationUrl : '#';
+    simLink.classList.toggle('disabled', !canSim);
+    if(canSim) simLink.removeAttribute('aria-disabled');
+    else simLink.setAttribute('aria-disabled', 'true');
+  }
 }
 
 function updateHomeSportUI(){
