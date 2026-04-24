@@ -13,6 +13,11 @@ assert.match(source, /function getSimulationRosterSize\(simulationContext\)/, 'd
 assert.match(source, /function getSimulationSeasonRedirect\(simulationMode\)/, 'draft page should define a simulation season redirect helper');
 assert.match(
   source,
+  /const\s+simulationSport\s*=\s*normalizeRosterbateSport\(setupState\?\.sport\s*\|\|\s*SPORT\s*\|\|\s*['"]nba['"]\)\s*;[\s\S]*getSimulationShell\(\{\s*sport:\s*simulationSport\s*\}\)/,
+  'draft page should look up the simulation shell using the setup-state sport so NFL draft boot uses the NFL shell'
+);
+assert.match(
+  source,
   /if\s*\(!setupState\s*\|\|\s*!Array\.isArray\(setupState\.sourcePackIds\)\s*\|\|\s*!setupState\.sourcePackIds\.length\s*\|\|\s*!String\(setupState\.controlledTeamAbbr\s*\|\|\s*''\)\.trim\(\)\s*\|\|\s*!\w+\.isFinite\(Number\(setupState\.draftSlot\)\)\s*\)\s*\{/,
   'draft page should guard against a missing or invalid simulation setup payload'
 );

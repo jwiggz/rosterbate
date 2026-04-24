@@ -3753,8 +3753,8 @@ async function buildSimulationDraftContextFromState(){
     console.warn('Simulation mode setup payload missing or invalid. Falling back to the standard draft boot.');
     return null;
   }
-  const shell = window.RosterBateSimulationModeConfig.getSimulationShell();
-  const simulationSport=normalizeRosterbateSport(setupState?.sport || shell?.sport || SPORT || 'nba');
+  const simulationSport=normalizeRosterbateSport(setupState?.sport || SPORT || 'nba');
+  const shell = window.RosterBateSimulationModeConfig.getSimulationShell({ sport: simulationSport });
   const simulationMode=simulationSport==='nfl' ? 'nfl_mixed_era_single_player_v1' : 'nba_mixed_era_single_player_v1';
   const shellLabel=String(shell?.anchorSeasonLabel || '').trim() || (simulationSport==='nfl' ? 'Football Shell' : 'NBA Shell');
   const bundles = await Promise.all(
