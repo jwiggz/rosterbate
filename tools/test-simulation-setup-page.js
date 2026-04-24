@@ -20,6 +20,8 @@ async function main(){
   assert.match(inlineScript, /simDraftAndStartSeason/, 'setup page needs an auto-draft handoff function');
   assert.match(inlineScript, /buildCompletedSimulationAutoDraftState/, 'setup page should build the completed auto-draft simulation state');
   assert.match(inlineScript, /writeCompletedSimulationState/, 'setup page should persist the completed simulation state');
+  assert.match(inlineScript, /function getSimulationSport\(\)/, 'setup page should expose a sport helper');
+  assert.match(inlineScript, /getSimulationSport\(\)\s*===\s*'nfl'/, 'setup page should branch on the nfl sport helper');
 
   let seasonNodes = [
     { value: 'nba_1987_full_season_v1', checked: true, disabled: false },
@@ -32,13 +34,27 @@ async function main(){
   const autoDraftButton = { disabled: false };
   const sourceSeasonList = { innerHTML: '' };
   const statusNode = { textContent: '' };
+  const heroCopyNode = { textContent: '' };
+  const sourceCopyNode = { textContent: '' };
+  const shellChipNode = { textContent: '' };
+  const rosterChipNode = { textContent: '' };
+  const teamLabelNode = { textContent: '' };
+  const draftSlotLabelNode = { textContent: '' };
+  const draftSlotHelperNode = { textContent: '' };
   const elementMap = {
     simulationContinueBtn: continueButton,
     simulationAutoDraftBtn: autoDraftButton,
     simulationFranchiseSelect: franchiseSelect,
     simulationDraftSlotSelect: draftSlotSelect,
     simulationSourceSeasonList: sourceSeasonList,
-    simulationSetupStatus: statusNode
+    simulationSetupStatus: statusNode,
+    simulationHeroCopy: heroCopyNode,
+    simulationSourceCopy: sourceCopyNode,
+    simulationShellChip: shellChipNode,
+    simulationRosterChip: rosterChipNode,
+    simulationTeamLabel: teamLabelNode,
+    simulationDraftSlotLabel: draftSlotLabelNode,
+    simulationDraftSlotHelper: draftSlotHelperNode
   };
   const storageWrites = [];
   const locationState = { href: 'rosterbate-simulation-setup.html?sport=nba', search: '?sport=nba' };
@@ -227,7 +243,7 @@ async function main(){
   assert.equal(savedPayload.mode, 'nba_mixed_era_single_player_v1', 'payload should use the simulation mode id');
   assert.equal(savedPayload.controlledTeamAbbr, 'LAL', 'payload should store the controlled franchise');
   assert.equal(savedPayload.draftSlot, 4, 'payload should store the chosen draft slot');
-  assert.equal(locationState.href, 'rosterbate-draft.html?simulation=nba_mixed_era', 'setup page should navigate into the simulation draft flow');
+  assert.equal(locationState.href, 'rosterbate-draft.html?sport=nba&simulation=nba_mixed_era', 'setup page should navigate into the simulation draft flow');
 
   const autoDraftStatusNode = { textContent: '' };
   const autoDraftContinueButton = { disabled: false };
@@ -266,6 +282,13 @@ async function main(){
         if (id === 'simulationFranchiseSelect') return autoDraftFranchiseSelect;
         if (id === 'simulationDraftSlotSelect') return autoDraftDraftSlotSelect;
         if (id === 'simulationSourceSeasonList') return { innerHTML: '' };
+        if (id === 'simulationHeroCopy') return { textContent: '' };
+        if (id === 'simulationSourceCopy') return { textContent: '' };
+        if (id === 'simulationShellChip') return { textContent: '' };
+        if (id === 'simulationRosterChip') return { textContent: '' };
+        if (id === 'simulationTeamLabel') return { textContent: '' };
+        if (id === 'simulationDraftSlotLabel') return { textContent: '' };
+        if (id === 'simulationDraftSlotHelper') return { textContent: '' };
         throw new Error(`Unknown element requested: ${id}`);
       },
       querySelectorAll(selector){
@@ -404,6 +427,13 @@ async function main(){
         if (id === 'simulationFranchiseSelect') return failedAutoDraftFranchiseSelect;
         if (id === 'simulationDraftSlotSelect') return failedAutoDraftDraftSlotSelect;
         if (id === 'simulationSourceSeasonList') return { innerHTML: '' };
+        if (id === 'simulationHeroCopy') return { textContent: '' };
+        if (id === 'simulationSourceCopy') return { textContent: '' };
+        if (id === 'simulationShellChip') return { textContent: '' };
+        if (id === 'simulationRosterChip') return { textContent: '' };
+        if (id === 'simulationTeamLabel') return { textContent: '' };
+        if (id === 'simulationDraftSlotLabel') return { textContent: '' };
+        if (id === 'simulationDraftSlotHelper') return { textContent: '' };
         throw new Error(`Unknown element requested: ${id}`);
       },
       querySelectorAll(selector){
@@ -473,6 +503,179 @@ async function main(){
   assert.equal(failedAutoDraftFranchiseSelect.disabled, false, 'auto-draft failure path should re-enable franchise selection');
   assert.equal(failedAutoDraftDraftSlotSelect.disabled, false, 'auto-draft failure path should re-enable draft slot selection');
   assert.ok(failedAutoDraftSeasonNodes.every((node) => node.disabled === false), 'auto-draft failure path should re-enable all season inputs');
+
+  const nflSetupHtml = fs.readFileSync(path.join(__dirname, '..', 'rosterbate-simulation-setup.html'), 'utf8');
+  assert.match(nflSetupHtml, /2014 NFL shell/i, 'setup page should include nfl shell copy');
+
+  const nflScriptMatches = Array.from(nflSetupHtml.matchAll(/<script>([\s\S]*?)<\/script>/g));
+  const nflInlineScript = nflScriptMatches.length ? nflScriptMatches[nflScriptMatches.length - 1][1] : '';
+  let nflSeasonNodes = [
+    { value: 'nfl_2014_full_season_v1', checked: true, disabled: false }
+  ];
+  const nflFranchiseSelect = { value: 'DAL', innerHTML: '', disabled: false };
+  const nflDraftSlotSelect = { value: '7', innerHTML: '', disabled: false };
+  const nflContinueButton = { disabled: false };
+  const nflAutoDraftButton = { disabled: false };
+  const nflSourceSeasonList = { innerHTML: '' };
+  const nflStatusNode = { textContent: '' };
+  const nflHeroCopyNode = { textContent: '' };
+  const nflSourceCopyNode = { textContent: '' };
+  const nflShellChipNode = { textContent: '' };
+  const nflRosterChipNode = { textContent: '' };
+  const nflTeamLabelNode = { textContent: '' };
+  const nflDraftSlotLabelNode = { textContent: '' };
+  const nflDraftSlotHelperNode = { textContent: '' };
+  const nflElementMap = {
+    simulationContinueBtn: nflContinueButton,
+    simulationAutoDraftBtn: nflAutoDraftButton,
+    simulationFranchiseSelect: nflFranchiseSelect,
+    simulationDraftSlotSelect: nflDraftSlotSelect,
+    simulationSourceSeasonList: nflSourceSeasonList,
+    simulationSetupStatus: nflStatusNode,
+    simulationHeroCopy: nflHeroCopyNode,
+    simulationSourceCopy: nflSourceCopyNode,
+    simulationShellChip: nflShellChipNode,
+    simulationRosterChip: nflRosterChipNode,
+    simulationTeamLabel: nflTeamLabelNode,
+    simulationDraftSlotLabel: nflDraftSlotLabelNode,
+    simulationDraftSlotHelper: nflDraftSlotHelperNode
+  };
+  const nflStorageWrites = [];
+  const nflLocationState = { href: 'rosterbate-simulation-setup.html?sport=nfl', search: '?sport=nfl' };
+  const nflMockCatalog = [
+    { packId: 'nfl_2014_full_season_v1', seasonLabel: '2014', sport: 'nfl' },
+    { packId: 'nba_1996_full_season_v1', seasonLabel: '1995-96', sport: 'nba' }
+  ];
+  const nflContext = {
+    console,
+    URLSearchParams,
+    setTimeout,
+    clearTimeout,
+    Promise,
+    Array,
+    Number,
+    String,
+    Object,
+    JSON,
+    Math,
+    document: {
+      getElementById(id){
+        const node = nflElementMap[id];
+        if (!node) throw new Error(`Unknown element requested: ${id}`);
+        return node;
+      },
+      querySelectorAll(selector){
+        if (selector === '#simulationSourceSeasonList input:checked') {
+          return nflSeasonNodes.filter((node) => node.checked);
+        }
+        if (selector === '#simulationSourceSeasonList input') {
+          return nflSeasonNodes;
+        }
+        throw new Error(`Unexpected selector requested: ${selector}`);
+      }
+    },
+    localStorage: {
+      setItem(key, value){
+        nflStorageWrites.push({ key, value });
+      }
+    }
+  };
+
+  nflContext.window = nflContext;
+  nflContext.window.location = nflLocationState;
+  nflContext.window.RosterBateSimulationModeRuntime = {
+    STORAGE_KEY: 'rbSimulationModeLocalState__fromRuntime',
+    writeCompletedSimulationState(state){
+      nflStorageWrites.push({ kind: 'completed', state });
+      return state;
+    },
+    buildCompletedSimulationAutoDraftState(input){
+      return {
+        simulationMode: 'nfl_mixed_era_single_player_v1',
+        leagueShell: input.shell,
+        sourceSeasons: input.mixedEraContext,
+        draftState: {
+          controlledTeamAbbr: input.controlledTeamAbbr,
+          rostersByTeam: {
+            DAL: Array.from({ length: 13 }, (_, index) => ({ id: index + 1 }))
+          },
+          freeAgents: [],
+          draftPool: [],
+          teamCount: 1,
+          rosterSize: 13
+        },
+        seasonState: {
+          currentDay: 1
+        },
+        postseasonState: {
+          phase: 'regular_season'
+        }
+      };
+    }
+  };
+  nflContext.window.RosterBateSimulationModeConfig = {
+    getSimulationShell(input){
+      assert.equal(input?.sport, 'nfl', 'setup page should request the nfl shell when the sport query is nfl');
+      return {
+        sport: 'nfl',
+        rosterSize: 13,
+        teams: Array.from({ length: 32 }, (_, index) => ({
+          abbr: index === 0 ? 'DAL' : `F${String(index + 1).padStart(2, '0')}`,
+          name: index === 0 ? 'Dallas Cowboys' : `Football Team ${index + 1}`
+        }))
+      };
+    }
+  };
+  nflContext.window.RosterBateHistoricalPackLoader = {
+    loadCatalog(){
+      return Promise.resolve(nflMockCatalog);
+    },
+    loadPackById(packId){
+      return Promise.resolve({
+        packId,
+        season: {
+          seasonLabel: nflMockCatalog.find((entry) => entry.packId === packId)?.seasonLabel || packId
+        },
+        players: Array.from({ length: 420 }, (_, index) => ({
+          id: `${packId}-${index + 1}`,
+          name: `${packId} Player ${index + 1}`
+        }))
+      });
+    }
+  };
+  nflContext.window.RosterBateMixedEraRuntime = {
+    buildMixedEraDraftContextFromBundles(input){
+      const bundles = Array.isArray(input?.bundles) ? input.bundles : [];
+      return {
+        mixedEraConfigId: 'simulation_custom_mix',
+        sourcePackIds: bundles.map((bundle) => bundle.packId),
+        sourceSeasonLabels: bundles.map((bundle) => bundle?.season?.seasonLabel || bundle.packId),
+        playerPool: bundles.flatMap((bundle) => Array.isArray(bundle?.players) ? bundle.players : [])
+      };
+    }
+  };
+
+  vm.runInNewContext(nflInlineScript, nflContext, { filename: 'rosterbate-simulation-setup.inline.nfl.js' });
+  await Promise.resolve();
+  await Promise.resolve();
+
+  assert.match(nflSetupHtml, /2014 NFL shell/i, 'setup page hero copy should mention the nfl shell');
+  assert.equal(nflSourceSeasonList.innerHTML.includes('nfl_2014_full_season_v1'), true, 'setup page should render nfl catalog entries');
+  assert.equal(nflSourceSeasonList.innerHTML.includes('nba_1996_full_season_v1'), false, 'setup page should filter out nba entries when sport is nfl');
+  assert.equal(nflFranchiseSelect.innerHTML.includes('Dallas Cowboys'), true, 'setup page should render nfl franchises from the nfl shell');
+  assert.equal(nflHeroCopyNode.textContent.includes('historical NFL seasons'), true, 'setup page should render nfl-specific hero copy');
+  assert.equal(nflShellChipNode.textContent, '2014 NFL shell', 'setup page should render the nfl shell chip');
+  assert.equal(nflRosterChipNode.textContent, '13-slot football roster', 'setup page should render the nfl roster chip');
+  assert.equal(nflDraftSlotLabelNode.textContent, 'Manual Draft Slot Only', 'setup page should render the nfl draft slot label');
+
+  await nflContext.enterSimulationDraft();
+
+  assert.equal(nflStorageWrites.length, 1, 'nfl setup page should persist one simulation setup payload');
+  const nflSavedPayload = JSON.parse(nflStorageWrites[0].value);
+  assert.deepStrictEqual(nflSavedPayload.sourcePackIds, ['nfl_2014_full_season_v1'], 'nfl payload should capture only the nfl source pack');
+  assert.equal(nflSavedPayload.mode, 'nfl_mixed_era_single_player_v1', 'nfl payload should use the nfl simulation mode id');
+  assert.equal(nflSavedPayload.controlledTeamAbbr, 'DAL', 'nfl payload should store the selected franchise');
+  assert.equal(nflLocationState.href, 'rosterbate-draft.html?sport=nfl&simulation=nfl_mixed_era', 'nfl setup page should navigate into the nfl simulation draft flow');
 
   console.log('simulation setup page test passed');
 }

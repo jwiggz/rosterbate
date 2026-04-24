@@ -54,6 +54,25 @@
       color:var(--muted);
       line-height:1.6;
     }
+    .setup-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+    .setup-chip{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border:1px solid rgba(167,195,230,.16);
+      border-radius:999px;
+      background:rgba(7,13,24,.32);
+      color:var(--accent-2);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+    }
     .setup-grid{
       display:grid;
       grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);
@@ -165,23 +184,27 @@
   <main>
     <section class="setup-shell">
       <h1>Start Simulation League</h1>
-      <p class="setup-copy">Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. Draft slot only applies if you want to enter the board yourself.</p>
+      <p class="setup-copy" id="simulationHeroCopy">Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. Draft slot only applies if you want to enter the board yourself.</p>
+      <div class="setup-chips" aria-label="Simulation shell details">
+        <span class="setup-chip" id="simulationShellChip">2025-26 NBA shell</span>
+        <span class="setup-chip" id="simulationRosterChip">10-player basketball roster</span>
+      </div>
       <div class="setup-grid">
         <section class="setup-card">
           <h2>Source Seasons</h2>
-          <p>Pick one or more NBA historical packs. These selections will define the crossover player pool for your simulation league.</p>
+          <p id="simulationSourceCopy">Pick one or more NBA historical packs. These selections will define the crossover player pool for your simulation league.</p>
           <div id="simulationSourceSeasonList"></div>
         </section>
         <section class="setup-card">
           <div class="field">
-            <label for="simulationFranchiseSelect">Franchise</label>
+            <label for="simulationFranchiseSelect" id="simulationTeamLabel">Franchise</label>
             <select id="simulationFranchiseSelect"></select>
           </div>
           <div class="field">
-            <label for="simulationDraftSlotSelect">Draft Slot</label>
+            <label for="simulationDraftSlotSelect" id="simulationDraftSlotLabel">Draft Slot</label>
             <select id="simulationDraftSlotSelect"></select>
           </div>
-          <p class="helper-text">Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.</p>
+          <p class="helper-text" id="simulationDraftSlotHelper">Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.</p>
           <button id="simulationContinueBtn" onclick="enterSimulationDraft()">Enter Draft</button>
           <button id="simulationAutoDraftBtn" onclick="simDraftAndStartSeason()">Sim Draft and Start Season</button>
           <p class="helper-text">The setup payload is stored locally and handed off to the dedicated simulation draft or season flow.</p>
@@ -197,12 +220,50 @@
       window.RosterBateSimulationModeRuntime.STORAGE_KEY
     ) || 'rbSimulationModeLocalState';
 
-    function readSportFromQuery(){
+    function getSimulationSport(){
       try{
         return String(new URLSearchParams(window.location.search).get('sport') || 'nba').trim().toLowerCase() || 'nba';
       }catch(error){
         return 'nba';
       }
+    }
+
+    function getSimulationShell(){
+      return window.RosterBateSimulationModeConfig.getSimulationShell({
+        sport: getSimulationSport()
+      });
+    }
+
+    function getSimulationModeId(){
+      if (getSimulationSport() === 'nfl') {
+        return 'nfl_mixed_era_single_player_v1';
+      }
+      return 'nba_mixed_era_single_player_v1';
+    }
+
+    function getSimulationCopy(){
+      if (getSimulationSport() === 'nfl') {
+        return {
+          heroBody: 'Choose the historical NFL seasons that will feed your mixed-era draft pool, then claim a 2014 franchise. Manual draft slot only applies if you want to enter the board yourself.',
+          sourceBody: 'Pick one or more NFL historical packs. These selections will define the crossover player pool for your football simulation league.',
+          shellChip: '2014 NFL shell',
+          rosterChip: '13-slot football roster',
+          teamLabel: 'Franchise',
+          draftSlotLabel: 'Manual Draft Slot Only',
+          draftSlotHelper: 'Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into franchise management.',
+          emptyStatus: 'No historical NFL packs were found.'
+        };
+      }
+      return {
+        heroBody: 'Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. Draft slot only applies if you want to enter the board yourself.',
+        sourceBody: 'Pick one or more NBA historical packs. These selections will define the crossover player pool for your simulation league.',
+        shellChip: '2025-26 NBA shell',
+        rosterChip: '10-player basketball roster',
+        teamLabel: 'Franchise',
+        draftSlotLabel: 'Draft Slot',
+        draftSlotHelper: 'Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.',
+        emptyStatus: 'No historical NBA packs were found.'
+      };
     }
 
     function getSimulationSetupStatusNode(){
@@ -216,8 +277,40 @@
       }
     }
 
-    function getSimulationShell(){
-      return window.RosterBateSimulationModeConfig.getSimulationShell();
+    function getSimulationFlowId(){
+      return getSimulationSport() === 'nfl' ? 'nfl_mixed_era' : 'nba_mixed_era';
+    }
+
+    function applySimulationCopy(copy){
+      const simulationCopy = copy || getSimulationCopy();
+      const heroCopyNode = document.getElementById('simulationHeroCopy');
+      const sourceCopyNode = document.getElementById('simulationSourceCopy');
+      const shellChipNode = document.getElementById('simulationShellChip');
+      const rosterChipNode = document.getElementById('simulationRosterChip');
+      const teamLabelNode = document.getElementById('simulationTeamLabel');
+      const draftSlotLabelNode = document.getElementById('simulationDraftSlotLabel');
+      const draftSlotHelperNode = document.getElementById('simulationDraftSlotHelper');
+      if (heroCopyNode) {
+        heroCopyNode.textContent = simulationCopy.heroBody || '';
+      }
+      if (sourceCopyNode) {
+        sourceCopyNode.textContent = simulationCopy.sourceBody || '';
+      }
+      if (shellChipNode) {
+        shellChipNode.textContent = simulationCopy.shellChip || '';
+      }
+      if (rosterChipNode) {
+        rosterChipNode.textContent = simulationCopy.rosterChip || '';
+      }
+      if (teamLabelNode) {
+        teamLabelNode.textContent = simulationCopy.teamLabel || 'Franchise';
+      }
+      if (draftSlotLabelNode) {
+        draftSlotLabelNode.textContent = simulationCopy.draftSlotLabel || 'Draft Slot';
+      }
+      if (draftSlotHelperNode) {
+        draftSlotHelperNode.textContent = simulationCopy.draftSlotHelper || '';
+      }
     }
 
     function getSimulationRequiredDraftSlots(shell){
@@ -253,7 +346,7 @@
 
     function buildSimulationSetupPayload(selectedPackIds){
       return {
-        mode: 'nba_mixed_era_single_player_v1',
+        mode: getSimulationModeId(),
         sourcePackIds: Array.isArray(selectedPackIds) ? selectedPackIds.slice() : [],
         controlledTeamAbbr: document.getElementById('simulationFranchiseSelect').value,
         draftSlot: Number(document.getElementById('simulationDraftSlotSelect').value || 1)
@@ -286,6 +379,7 @@
     }
 
     async function buildSimulationPoolPreview(selectedPackIds, shell){
+      const sport = getSimulationSport();
       const bundles = await Promise.all(
         (Array.isArray(selectedPackIds) ? selectedPackIds : []).map(function(packId){
           return window.RosterBateHistoricalPackLoader.loadPackById(packId);
@@ -294,13 +388,13 @@
       const mixedEraContext = window.RosterBateMixedEraRuntime.buildMixedEraDraftContextFromBundles({
         config: {
           mixedEraConfigId: 'simulation_setup_preview',
-          sport: 'nba',
+          sport: sport,
           seasonLabel: 'Simulation Mode Mixed Era Draft',
           sourcePackIds: selectedPackIds,
           topPlayersPerPack: SIMULATION_TOP_PLAYERS_PER_PACK
         },
         bundles,
-        requestedSport: 'nba'
+        requestedSport: sport
       });
       return {
         mixedEraContext: mixedEraContext,
@@ -311,18 +405,19 @@
 
     async function bootSimulationSetup(){
       const shell = getSimulationShell();
-      const requestedSport = readSportFromQuery();
+      const simulationCopy = getSimulationCopy();
+      applySimulationCopy(simulationCopy);
       renderFranchiseOptions(shell);
       renderDraftSlotOptions(shell);
       setSimulationSetupStatus('Loading available source seasons...');
       try{
         const catalog = await window.RosterBateHistoricalPackLoader.loadCatalog();
-        const nbaSeasons = catalog.filter(function(entry){
-          return String(entry && entry.sport || 'nba').trim().toLowerCase() === requestedSport
+        const sportSeasons = catalog.filter(function(entry){
+          return String(entry && entry.sport || 'nba').trim().toLowerCase() === getSimulationSport()
             && String(entry && entry.syntheticType || '').trim().toLowerCase() !== 'mixed_era';
         });
-        renderSeasonOptions(nbaSeasons);
-        setSimulationSetupStatus(nbaSeasons.length ? 'Choose your eras and enter the draft.' : 'No historical NBA packs were found.');
+        renderSeasonOptions(sportSeasons);
+        setSimulationSetupStatus(sportSeasons.length ? 'Choose your eras and enter the draft.' : simulationCopy.emptyStatus);
       }catch(error){
         console.error('[Simulation Setup] Failed to load historical catalog', error);
         renderSeasonOptions([]);
@@ -336,7 +431,9 @@
         setSimulationSetupStatus('Select at least one historical season before entering the draft.');
         return;
       }
+      const sport = getSimulationSport();
       const shell = getSimulationShell();
+      const simulationCopy = getSimulationCopy();
       const payload = buildSimulationSetupPayload(selectedPackIds);
       let redirecting = false;
       setSimulationSetupStatus('Building mixed-era player pool...');
@@ -344,12 +441,12 @@
       try{
         const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
         if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
-          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the 2025-26 NBA shell needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
+          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the ' + String(simulationCopy.shellChip || 'simulation shell') + ' needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
           return;
         }
         localStorage.setItem(SIMULATION_SETUP_STORAGE_KEY, JSON.stringify(payload));
         redirecting = true;
-        window.location.href = 'rosterbate-draft.html?simulation=nba_mixed_era';
+        window.location.href = 'rosterbate-draft.html?sport=' + encodeURIComponent(sport) + '&simulation=' + encodeURIComponent(getSimulationFlowId());
       }catch(error){
         console.error('[Simulation Setup] Failed to build mixed-era preview', error);
         setSimulationSetupStatus('Unable to build the mixed-era player pool right now.');
@@ -366,7 +463,9 @@
         setSimulationSetupStatus('Select at least one historical season before starting the season.');
         return;
       }
+      const sport = getSimulationSport();
       const shell = getSimulationShell();
+      const simulationCopy = getSimulationCopy();
       const setupPayload = buildSimulationSetupPayload(selectedPackIds);
       let redirecting = false;
       setSimulationSetupStatus('Building mixed-era player pool...');
@@ -374,7 +473,7 @@
       try{
         const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
         if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
-          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the 2025-26 NBA shell needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
+          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the ' + String(simulationCopy.shellChip || 'simulation shell') + ' needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
           return;
         }
         const finalState = window.RosterBateSimulationModeRuntime.buildCompletedSimulationAutoDraftState({
@@ -385,7 +484,7 @@
         window.RosterBateSimulationModeRuntime.writeCompletedSimulationState(finalState);
         setSimulationSetupStatus('Opening season manager...');
         redirecting = true;
-        window.location.href = 'rosterbate-season.html?sport=nba&simulation=nba_mixed_era';
+        window.location.href = 'rosterbate-season.html?sport=' + encodeURIComponent(sport) + '&simulation=' + encodeURIComponent(getSimulationFlowId());
       }catch(error){
         console.error('[Simulation Setup] Failed to auto-draft season', error);
         setSimulationSetupStatus(error && error.message ? error.message : 'Unable to auto-draft the simulation season right now.');
