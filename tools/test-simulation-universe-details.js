@@ -100,6 +100,11 @@ assert.equal(
   'simulation universes should also be detected from the saved state'
 );
 assert.equal(
+  context.isSimulationModeUniverse({ simulationMode: 'nfl_mixed_era_single_player_v1' }, {}),
+  true,
+  'NFL simulation universes should also be detected from the slot payload'
+);
+assert.equal(
   context.isSimulationModeUniverse({}, {}),
   false,
   'non-simulation universes should not be flagged'
@@ -337,6 +342,94 @@ assert.deepStrictEqual(
     ]
   },
   'completed universes should surface champion, runner-up, Finals result, and completion timing'
+);
+
+const nflWildCardState = buildState({
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: { anchorSeasonLabel: '2014 NFL', sport: 'nfl' },
+  sourceSeasons: { sourceSeasonLabels: ['1998', '2007'] },
+  draftState: { controlledTeamAbbr: 'NE' },
+  seasonState: {
+    standings: [
+      { teamAbbr: 'NE', w: 12, l: 4, conference: 'AFC' },
+      { teamAbbr: 'SEA', w: 12, l: 4, conference: 'NFC' }
+    ]
+  },
+  postseasonState: {
+    phase: 'wild_card',
+    currentRound: 'wild_card',
+    champion: null,
+    runnerUp: null,
+    championship: {
+      title: 'Super Bowl XLIX'
+    },
+    bracket: {
+      wild_card: {
+        afc: [{ higherSeed: { teamAbbr: 'IND' }, lowerSeed: { teamAbbr: 'BAL' } }],
+        nfc: [{ higherSeed: { teamAbbr: 'DAL' }, lowerSeed: { teamAbbr: 'DET' } }]
+      }
+    },
+    seriesById: {},
+    completedAt: null
+  }
+});
+
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, nflWildCardState))),
+  {
+    currentStanding: null,
+    items: [
+      {
+        title: 'NFL Wild Card weekend is live',
+        body: 'The 2014 bracket is open, the bye teams are waiting, and the wild-card winners will advance to the divisional round.',
+        meta: ['Phase: Wild Card', 'Byes: Seeds 1 and 2']
+      }
+    ]
+  },
+  'NFL wild-card universes should get football-specific archive playoff copy'
+);
+
+const nflCompletedState = buildState({
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: { anchorSeasonLabel: '2014 NFL', sport: 'nfl' },
+  sourceSeasons: { sourceSeasonLabels: ['1998', '2007'] },
+  draftState: { controlledTeamAbbr: 'NE' },
+  seasonState: {
+    standings: [
+      { teamAbbr: 'NE', w: 12, l: 4, conference: 'AFC' },
+      { teamAbbr: 'SEA', w: 12, l: 4, conference: 'NFC' }
+    ]
+  },
+  postseasonState: {
+    phase: 'completed',
+    currentRound: 'completed',
+    champion: { teamAbbr: 'NE', teamName: 'New England Patriots' },
+    runnerUp: { teamAbbr: 'SEA', teamName: 'Seattle Seahawks' },
+    championship: {
+      title: 'Super Bowl XLIX',
+      result: 'NE beat SEA 28-24',
+      matchup: {
+        homeAbbr: 'NE',
+        awayAbbr: 'SEA'
+      }
+    },
+    completedAt: '2026-02-01T00:00:00.000Z'
+  }
+});
+
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(context.buildSimulationPlayoffSummary({}, nflCompletedState))),
+  {
+    currentStanding: null,
+    items: [
+      {
+        title: 'Super Bowl champion crowned',
+        body: 'NE beat SEA and closed the 2014 NFL simulation season with the Lombardi Trophy.',
+        meta: ['Phase: Completed', 'Super Bowl XLIX']
+      }
+    ]
+  },
+  'completed NFL universes should tell the saved Super Bowl story with football-specific framing'
 );
 
 console.log('simulation universe details test passed');

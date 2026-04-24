@@ -894,6 +894,7 @@
           superBowlSeries.forEach((series) => {
             seriesById[series.id] = series;
           });
+          const championshipSeries = clone(superBowlSeries[0] || null);
           const schedule = buildNflSuperBowlSchedule(resolvedState);
           return {
             ...resolvedState,
@@ -901,6 +902,13 @@
             currentRound: 'super_bowl',
             currentWeekSchedule: clone(schedule),
             currentDaySchedule: clone(schedule),
+            championship: {
+              title: 'Super Bowl XLIX',
+              matchup: {
+                homeAbbr: championshipSeries?.higherSeed?.teamAbbr || null,
+                awayAbbr: championshipSeries?.lowerSeed?.teamAbbr || null
+              }
+            },
             bracket: {
               ...(resolvedState.bracket || {}),
               superBowl: clone(schedule)
@@ -932,6 +940,18 @@
             }
           },
           seriesById,
+          championship: {
+            title: 'Super Bowl XLIX',
+            matchup: {
+              homeAbbr: superBowl?.higherSeed?.teamAbbr || null,
+              awayAbbr: superBowl?.lowerSeed?.teamAbbr || null
+            },
+            championTeamAbbr: winnerTeamAbbr,
+            runnerUpTeamAbbr: runnerUpTeamAbbr,
+            result: winnerTeamAbbr && runnerUpTeamAbbr
+              ? `${winnerTeamAbbr} beat ${runnerUpTeamAbbr}`
+              : ''
+          },
           champion: buildPostseasonTeamMetadata(
             nextState,
             getSeriesTeam(superBowl, winnerTeamAbbr) || winnerTeamAbbr,

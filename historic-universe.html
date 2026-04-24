@@ -707,10 +707,16 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function isSimulationModeUniverse(slot, state){
-    return String(slot?.simulationMode || state?.simulationMode || '').trim() === 'nba_mixed_era_single_player_v1';
+    const simulationMode = String(slot?.simulationMode || state?.simulationMode || '').trim().toLowerCase();
+    return simulationMode === 'nba_mixed_era_single_player_v1' || simulationMode === 'nfl_mixed_era_single_player_v1';
   }
 
   function buildSimulationModeSummary(slot, state){
+    const simulationMode = String(slot?.simulationMode || state?.simulationMode || '').trim().toLowerCase();
+    const sport = String(
+      state?.leagueShell?.sport ||
+      (simulationMode.startsWith('nfl_') ? 'nfl' : 'nba')
+    ).trim().toLowerCase();
     const postseason = state?.postseasonState && typeof state.postseasonState === 'object'
       ? state.postseasonState
       : {};
@@ -727,6 +733,79 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       return String(row?.teamAbbr || '') === String(state?.draftState?.controlledTeamAbbr || '');
     });
     const universeLabel = String((state?.leagueShell?.anchorSeasonLabel || 'NBA')) + ' shell · ' + String((state?.sourceSeasons?.sourceSeasonLabels || []).join(' + ') || 'Mixed era') + ' player universe';
+    const championship = postseason.championship && typeof postseason.championship === 'object'
+      ? postseason.championship
+      : {};
+    const championshipMatchup = championship.matchup && typeof championship.matchup === 'object'
+      ? championship.matchup
+      : {};
+    if(sport === 'nfl'){
+      const superBowlMatchup = [championshipMatchup.homeAbbr, championshipMatchup.awayAbbr]
+        .filter(Boolean)
+        .join(' vs ');
+      const nflPhaseSummary = {
+        regular_season: {
+          headline: 'Simulation playoff chase',
+          copy: universeLabel + '. The regular season is still shaping the six-team field in each conference.',
+          narrative: 'The 2014 standings are still deciding division crowns, wild cards, and first-round byes.',
+          pill: 'Division race active'
+        },
+        postseason_ready: {
+          headline: 'NFL bracket locked',
+          copy: universeLabel + '. The playoff field is locked and Wild Card weekend is next.',
+          narrative: 'The regular season is over, the byes are set, and the bracket is ready to open.',
+          pill: 'Field locked'
+        },
+        wild_card: {
+          headline: 'NFL Wild Card weekend',
+          copy: universeLabel + '. Wild Card weekend is live and the first knockout winners will decide the divisional slate.',
+          narrative: 'The 2014 bracket is open, two bye teams per conference are waiting, and four elimination games are reshaping the field.',
+          pill: 'Wild Card weekend'
+        },
+        divisional: {
+          headline: 'NFL Divisional round live',
+          copy: universeLabel + '. The byes are over and the divisional round is deciding the conference title games.',
+          narrative: 'The top seeds are in now, and every result will lock the championship Sunday matchups.',
+          pill: 'Divisional round'
+        },
+        conference_championship: {
+          headline: 'NFL conference titles live',
+          copy: universeLabel + '. The AFC and NFC title games are deciding who reaches Super Bowl XLIX.',
+          narrative: 'Only two games remain before the final matchup is locked in.',
+          pill: 'Conference championships'
+        },
+        super_bowl: {
+          headline: 'Super Bowl XLIX spotlight',
+          copy: universeLabel + '. ' + (
+            superBowlMatchup
+              ? superBowlMatchup + ' will decide the title in Super Bowl XLIX.'
+              : 'The final matchup will decide the title in Super Bowl XLIX.'
+          ),
+          narrative: 'The playoff path is down to one game and the Lombardi Trophy is on the line.',
+          pill: 'Super Bowl XLIX'
+        },
+        completed: {
+          headline: 'Super Bowl champion crowned',
+          copy: universeLabel + '. ' + (
+            championAbbr
+              ? championAbbr + ' closed the 2014 NFL simulation season with the Lombardi Trophy.'
+              : 'The 2014 NFL postseason is complete and the Lombardi Trophy has been claimed.'
+          ),
+          narrative: 'The playoff path is finished and this universe now reads like a completed Super Bowl archive.',
+          pill: championAbbr ? 'Champion: ' + championAbbr : 'Champion crowned'
+        }
+      };
+      const summary = nflPhaseSummary[phase] || nflPhaseSummary.regular_season;
+      return {
+        copy: summary.copy,
+        headline: summary.headline,
+        narrative: summary.narrative,
+        pills: [
+          standing ? 'Record ' + standing.w + '-' + standing.l : 'Record pending',
+          summary.pill
+        ]
+      };
+    }
     const phaseSummary = {
       regular_season: {
         headline: 'Simulation champion chase',
@@ -800,6 +879,11 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function buildSimulationPlayoffSummary(slot, state){
+    const simulationMode = String(slot?.simulationMode || state?.simulationMode || '').trim().toLowerCase();
+    const sport = String(
+      state?.leagueShell?.sport ||
+      (simulationMode.startsWith('nfl_') ? 'nfl' : 'nba')
+    ).trim().toLowerCase();
     const postseason = state?.postseasonState && typeof state.postseasonState === 'object'
       ? state.postseasonState
       : {};
@@ -831,6 +915,13 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     ).trim();
     const finalsGames = Number(champion.finalsGames || finals.games || postseason.finalsGames || 0);
     const completedAt = String(postseason.completedAt || champion.completedAt || '').trim();
+    const championship = postseason.championship && typeof postseason.championship === 'object'
+      ? postseason.championship
+      : {};
+    const championshipTitle = String(championship.title || 'Super Bowl XLIX').trim();
+    const championshipMatchup = championship.matchup && typeof championship.matchup === 'object'
+      ? championship.matchup
+      : {};
     const phaseSummary = {
       postseason_ready: {
         title: 'Simulation playoff field locked',
@@ -863,6 +954,28 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         currentStanding: null,
         items: [item]
       };
+    }
+
+    if(sport === 'nfl' && phase === 'wild_card'){
+      return wrapSummary({
+        title: 'NFL Wild Card weekend is live',
+        body: 'The 2014 bracket is open, the bye teams are waiting, and the wild-card winners will advance to the divisional round.',
+        meta: ['Phase: Wild Card', 'Byes: Seeds 1 and 2']
+      });
+    }
+    if(sport === 'nfl' && phase === 'super_bowl'){
+      return wrapSummary({
+        title: 'Super Bowl matchup is set',
+        body: (championshipMatchup.homeAbbr || 'AFC champion') + ' vs ' + (championshipMatchup.awayAbbr || 'NFC champion') + ' will decide the title in Super Bowl XLIX.',
+        meta: ['Phase: Super Bowl', championshipTitle]
+      });
+    }
+    if(sport === 'nfl' && phase === 'completed'){
+      return wrapSummary({
+        title: 'Super Bowl champion crowned',
+        body: (championAbbr || 'Champion') + ' beat ' + (runnerUpAbbr || 'runner-up') + ' and closed the 2014 NFL simulation season with the Lombardi Trophy.',
+        meta: ['Phase: Completed', championshipTitle]
+      });
     }
 
     if(championAbbr){
