@@ -84,6 +84,91 @@
     }));
   }
 
+  function takeRankedPlayersByPredicate(players, count, predicate, label){
+    const picked = [];
+    const remaining = [];
+    (Array.isArray(players) ? players : []).forEach((player) => {
+      if (picked.length < count && predicate(player)) {
+        picked.push(player);
+        return;
+      }
+      remaining.push(player);
+    });
+    if (picked.length < count) {
+      throw new Error(`Unable to build NFL simulation draft pool: need ${count} ${label}, found ${picked.length}.`);
+    }
+    return { picked, remaining };
+  }
+
+  function buildFootballDraftPoolRequirements(shell){
+    const teamCount = Array.isArray(shell?.teams) ? shell.teams.length : 0;
+    const rosterNeeds = getSimulationRosterNeeds(shell);
+    const exactCountsByPosition = {};
+    let flexSlotsPerTeam = 0;
+
+    rosterNeeds.forEach((slot) => {
+      const normalizedSlot = String(slot || '').trim().toUpperCase();
+      if (!normalizedSlot) return;
+      if (normalizedSlot === 'FLEX') {
+        flexSlotsPerTeam += 1;
+        return;
+      }
+      exactCountsByPosition[normalizedSlot] = Number(exactCountsByPosition[normalizedSlot] || 0) + 1;
+    });
+
+    return {
+      exactCountsByPosition,
+      exactDraftCountsByPosition: Object.fromEntries(
+        Object.entries(exactCountsByPosition).map(([position, count]) => [position, count * teamCount])
+      ),
+      flexDraftCount: flexSlotsPerTeam * teamCount
+    };
+  }
+
+  function buildFootballSimulationPlayerPool({ rankedPlayers, shell, draftTarget, freeAgentTarget }){
+    const ranked = Array.isArray(rankedPlayers) ? rankedPlayers : [];
+    const requirements = buildFootballDraftPoolRequirements(shell);
+    let remaining = ranked.slice();
+    const reserved = [];
+
+    Object.entries(requirements.exactDraftCountsByPosition).forEach(([position, count]) => {
+      const selection = takeRankedPlayersByPredicate(
+        remaining,
+        count,
+        (player) => getSimulationPlayerPosition(player) === position,
+        position
+      );
+      reserved.push(...selection.picked);
+      remaining = selection.remaining;
+    });
+
+    if (requirements.flexDraftCount > 0) {
+      const flexSelection = takeRankedPlayersByPredicate(
+        remaining,
+        requirements.flexDraftCount,
+        (player) => isFootballFlexEligiblePosition(getSimulationPlayerPosition(player)),
+        'FLEX-eligible players'
+      );
+      reserved.push(...flexSelection.picked);
+      remaining = flexSelection.remaining;
+    }
+
+    if (reserved.length > draftTarget) {
+      throw new Error(`Unable to build NFL simulation draft pool: need ${reserved.length} reserved players, but draft target is ${draftTarget}.`);
+    }
+
+    const remainingCapacity = Math.max(0, draftTarget - reserved.length);
+    const fillPlayers = remaining.slice(0, remainingCapacity);
+    const draftPoolIds = new Set(reserved.concat(fillPlayers).map((player) => Number(player?.id)));
+    const draftPool = ranked.filter((player) => draftPoolIds.has(Number(player?.id)));
+    const freeAgents = remaining.slice(remainingCapacity, remainingCapacity + freeAgentTarget);
+
+    return {
+      draftPool,
+      freeAgents
+    };
+  }
+
   function buildSimulationPlayerPool({ mixedEraContext, shell }){
     const leagueShell = normalizeShell(shell);
     const rosterSize = Number(leagueShell.rosterSize || 10);
@@ -91,9 +176,17 @@
     const draftTarget = rosterSize * teamCount;
     const freeAgentTarget = 60;
     const ranked = decorateSimulationTier(sortPlayers(mixedEraContext?.playerPool || []));
+    const reservedPool = getSimulationSport(leagueShell) === 'nfl'
+      ? buildFootballSimulationPlayerPool({
+        rankedPlayers: ranked,
+        shell: leagueShell,
+        draftTarget,
+        freeAgentTarget
+      })
+      : null;
     return {
-      draftPool: ranked.slice(0, draftTarget),
-      freeAgents: ranked.slice(draftTarget, draftTarget + freeAgentTarget),
+      draftPool: reservedPool ? reservedPool.draftPool : ranked.slice(0, draftTarget),
+      freeAgents: reservedPool ? reservedPool.freeAgents : ranked.slice(draftTarget, draftTarget + freeAgentTarget),
       poolMeta: {
         rosterSize,
         teamCount,

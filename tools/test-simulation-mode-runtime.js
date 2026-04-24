@@ -95,6 +95,7 @@ const skewedNflPlayerPool = [
   ...buildSkewedNflPlayers('OL', 32, 13000, 60, 30),
   ...buildSkewedNflPlayers('DL', 48, 14000, 96, 85),
   ...buildSkewedNflPlayers('LB', 64, 15000, 95, 82),
+  ...buildSkewedNflPlayers('S', 128, 15500, 39, 9),
   ...buildSkewedNflPlayers('K', 32, 16000, 58, 22),
   ...buildSkewedNflPlayers('DST', 32, 17000, 57, 20),
   ...buildSkewedNflPlayers('CB', 128, 18000, 40, 10)
@@ -116,9 +117,16 @@ function countRosterPlayersByPosition(roster, position) {
 
 function assertNflRosterCoverage(roster, label) {
   assert.ok(countRosterPlayersByPosition(roster, 'QB') >= 1, `${label} should include at least one QB`);
+  assert.ok(countRosterPlayersByPosition(roster, 'RB') >= 1, `${label} should include at least one RB`);
+  assert.ok(countRosterPlayersByPosition(roster, 'TE') >= 1, `${label} should include at least one TE`);
   assert.ok(countRosterPlayersByPosition(roster, 'K') >= 1, `${label} should include at least one K`);
   assert.ok(countRosterPlayersByPosition(roster, 'DST') >= 1, `${label} should include at least one DST`);
   assert.ok(countRosterPlayersByPosition(roster, 'OL') >= 1, `${label} should include at least one OL`);
+  assert.ok(countRosterPlayersByPosition(roster, 'DL') >= 1, `${label} should include at least one DL`);
+  assert.ok(countRosterPlayersByPosition(roster, 'LB') >= 1, `${label} should include at least one LB`);
+  assert.ok(countRosterPlayersByPosition(roster, 'CB') >= 1, `${label} should include at least one CB`);
+  assert.ok(countRosterPlayersByPosition(roster, 'S') >= 1, `${label} should include at least one S`);
+  assert.ok(countRosterPlayersByPosition(roster, 'WR') >= 2, `${label} should include at least two WRs`);
   assert.ok(
     roster.filter((player) => ['RB', 'WR', 'TE'].includes(player.pos)).length >= 5,
     `${label} should include enough RB/WR/TE coverage to satisfy the flex concept`
@@ -211,6 +219,28 @@ assert.equal(nflBootstrap.draftState.teamCount, 32);
 assert.equal(nflBootstrap.draftState.rosterSize, 13);
 assert.equal(nflBootstrap.seasonState.currentWeek, 1);
 assert.equal(nflBootstrap.draftState.controlledTeamAbbr, 'GB');
+
+const skewedNflPool = buildSimulationPlayerPool({
+  shell: nflShell,
+  mixedEraContext: skewedNflMixedEraContext
+});
+
+assert.equal(skewedNflPool.draftPool.length, 416);
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'QB') >= 32, 'skewed NFL draft pool should reserve 32 QBs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'RB') >= 32, 'skewed NFL draft pool should reserve 32 RBs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'WR') >= 64, 'skewed NFL draft pool should reserve 64 WRs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'TE') >= 32, 'skewed NFL draft pool should reserve 32 TEs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'OL') >= 32, 'skewed NFL draft pool should reserve 32 OLs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'DL') >= 32, 'skewed NFL draft pool should reserve 32 DLs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'LB') >= 32, 'skewed NFL draft pool should reserve 32 LBs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'CB') >= 32, 'skewed NFL draft pool should reserve 32 CBs');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'S') >= 32, 'skewed NFL draft pool should reserve 32 Ss');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'K') >= 32, 'skewed NFL draft pool should reserve 32 Ks');
+assert.ok(countRosterPlayersByPosition(skewedNflPool.draftPool, 'DST') >= 32, 'skewed NFL draft pool should reserve 32 DST units');
+assert.ok(
+  skewedNflPool.draftPool.filter((player) => ['RB', 'WR', 'TE', 'FLEX'].includes(player.pos)).length >= 160,
+  'skewed NFL draft pool should reserve enough RB/WR/TE/FLEX players to satisfy flex slots'
+);
 
 const autoDraftState = buildCompletedSimulationAutoDraftState({
   shell,
