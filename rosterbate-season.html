@@ -1819,7 +1819,7 @@ function renderSimulationRunnerCard(snapshot){
       <div class="hub-sim-copy">
         <div class="hub-sim-kicker">Simulation Day Runner</div>
         <div class="hub-sim-title">${snapshot.packLabel}</div>
-        <div class="hub-sim-sub">Run one day at a time from real season stats plus light authored tuning. Each click generates box-score outcomes for the full fantasy slate, writes a reveal report, and saves the universe state immediately.</div>
+        <div class="hub-sim-sub">Run one day at a time from Historical season stats plus light authored tuning. Each click generates box-score outcomes for the full fantasy slate, writes a reveal report, and saves the universe state immediately.</div>
         <div class="hub-sim-pills">
           <span class="hub-sim-pill blue">Day ${snapshot.day}</span>
           <span class="hub-sim-pill ${readinessTone}">${snapshot.lineupReadyCount}/${snapshot.teamCount} lineups ready</span>
@@ -2893,7 +2893,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     simulationMode: isSimulationSeason ? 'historical_box_score' : null,
     simulationProfile: isSimulationSeason ? {
       engineVersion: String(window.RosterBateSimulationEngine?.ENGINE_VERSION || '').trim() || null,
-      ratingsSource: 'real season stats + light authored tuning',
+      ratingsSource: 'Historical season stats + light authored tuning',
       cadence: 'daily_reveal',
       output: 'box_score'
     } : null,
@@ -3376,7 +3376,7 @@ function startHistoricalDraftSimSeason(){
     D.simulationLogsByDay=(D.simulationLogsByDay && typeof D.simulationLogsByDay==='object') ? D.simulationLogsByDay : {};
     D.simulationProfile=Object.assign({}, D.simulationProfile || {}, {
       engineVersion:String(window.RosterBateSimulationEngine?.ENGINE_VERSION || '').trim() || null,
-      ratingsSource:'real season stats + light authored tuning',
+      ratingsSource:'Historical season stats + light authored tuning',
       mixedEraNormalization:'season_context_plus_light_authored_tuning',
       cadence:'daily_reveal',
       output:'box_score',

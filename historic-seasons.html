@@ -754,7 +754,7 @@
             <div class="saved-universe-count" id="savedUniverseCount">0</div>
           </div>
           <div class="future-copy">
-            Every real season, reimagined branch, and drafted universe can live here as its own revisit-able archive slot.
+            Every historical pack, saved simulation, and drafted universe can live here as its own revisit-able archive slot.
           </div>
           <div class="saved-universe-list" id="savedUniversesList">
             <div class="saved-universe-empty">Loading saved universes...</div>
@@ -863,7 +863,7 @@ const HISTORIC_1993_FALLBACK = {
       startingSlotCount: 10,
       playerCount: 300,
       auditSummary: {
-        realStatCoverage: { playersWithRealSeasonStats: 300, playerCount: 300, label: 'Real season stats' },
+        realStatCoverage: { playersWithRealSeasonStats: 300, playerCount: 300, label: 'Historical season stats' },
         zeroGamePlayers: { count: 0, label: 'Zero-game players' },
         removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
       }
@@ -881,8 +881,8 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable foundation',
       completenessPercent: 82,
       tagline: 'Draft the era and build a 72-win dream roster of your own.',
-      summary: 'Full-league historical universe with real season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
-      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox instead of only a preserved roster replay.',
+      summary: 'Full-league historical universe with Historical season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.',
       focusTeamName: 'Chicago Bulls',
       art: {
         theme: 'dynasty',
@@ -911,7 +911,7 @@ const HISTORIC_1993_FALLBACK = {
         completenessLabel: 'Playable iconic season',
         completenessPercent: 80,
         tagline: 'Draft a turn-of-the-century superteam from one loaded player pool.',
-        summary: 'A first-class 2000-01 historical universe with real season data, a full league player pool, and marquee early-2000s star power.',
+        summary: 'A first-class 2000-01 historical universe with Historical season stats, a full league player pool, and marquee early-2000s star power.',
         whyItMatters: 'This is the archive lane\'s turn-of-the-century flagship: a recognizable Shaq-and-Kobe title-defense universe that plays differently from both the 1990s and 2010s packs.',
         focusTeamName: 'Los Angeles Lakers',
         art: {
@@ -940,7 +940,7 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable modern foundation',
       completenessPercent: 80,
       tagline: 'Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.',
-      summary: 'A modern historical universe with a loaded full-season player pool, real season stats, and a strong foundation for drafted or simulated alternate-history runs.',
+      summary: 'A modern historical universe with a loaded full-season player pool, Historical season stats, and a strong foundation for drafted or simulated alternate-history runs.',
       whyItMatters: 'This season gives the archive lane a modern tentpole pack where the biggest fantasy is not replaying one roster intact, but drafting the entire era into custom universes.',
       focusTeamName: 'Golden State Warriors',
       art: {
@@ -1248,7 +1248,7 @@ const HISTORIC_1993_FALLBACK = {
     const realSeason = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) > 0).length;
     const zeroGames = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) <= 0).length;
     return {
-      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Real season stats' },
+      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Historical season stats' },
       zeroGamePlayers: { count: zeroGames, label: 'Zero-game players' },
       removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
     };
@@ -1292,8 +1292,8 @@ const HISTORIC_1993_FALLBACK = {
       {
         tone: covered && total && covered === total ? 'good' : '',
         value: (covered || 0) + ' / ' + (total || 0),
-        label: real.label || 'Real Stat Coverage',
-        sub: 'players with real season production'
+        label: real.label || 'Historical Stat Coverage',
+        sub: 'players with historical season production'
       },
       {
         tone: zeroCount === 0 ? 'good' : 'warn',
@@ -1571,7 +1571,7 @@ const HISTORIC_1993_FALLBACK = {
     const slots = api.listSlots({ sport:getBrowserSport() });
     countEl.textContent = String(slots.length || 0);
     if(!slots.length){
-      listEl.innerHTML = '<div class="saved-universe-empty">No saved historical universes yet. Launch a real season, a reimagined branch, or complete a historical draft and it will show up here.</div>';
+      listEl.innerHTML = '<div class="saved-universe-empty">No saved historical universes yet. Start a simulation league or complete a historical draft and it will show up here.</div>';
       return;
     }
     listEl.innerHTML = slots.map(function(slot){
