@@ -8602,22 +8602,88 @@ function renderSimulationPlayoffsInSharedShell(){
   const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
   if (isNflSimulation) {
     const shellLabel = String(D?.leagueShell?.anchorSeasonLabel || vm?.shellLabel || 'NFL').trim() || 'NFL';
+    const phase = String(vm?.phase || vm?.currentRound || 'postseason_ready').trim().toLowerCase();
+    const phaseLabels = {
+      postseason_ready: 'Playoff Picture',
+      wild_card: 'Wild Card Weekend',
+      divisional: 'Divisional Round',
+      conference_championship: 'Conference Championships',
+      super_bowl: 'Super Bowl XLIX',
+      completed: 'Super Bowl XLIX Complete'
+    };
+    const roundLabel = phaseLabels[phase] || 'NFL Playoffs';
+    const formatBerthLabel = (team) => {
+      if (!team || typeof team !== 'object') return '';
+      if (team.bye) return 'First-Round Bye';
+      const berth = String(team.berth || '').trim().toLowerCase();
+      if (berth === 'division_winner') return 'Division Winner';
+      if (berth === 'wild_card') return 'Wild Card';
+      return '';
+    };
+    const renderConferenceField = (conferenceLabel, teams) => {
+      const rows = Array.isArray(teams) ? teams.filter(Boolean) : [];
+      return `
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${conferenceLabel} Seeds</div>
+            <div style="color:var(--text2);font-size:12px;">Seeds 1-2 lock a First-Round Bye in the exact 2014 bracket.</div>
+          </div>
+          <div style="margin-top:10px;">
+            ${rows.length ? rows.map((team) => `
+              <div style="padding:12px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">#${Number(team.seed || 0) || '-'} ${team.teamAbbr || 'TBD'}${team.teamName ? ' · ' + team.teamName : ''}</div>
+                  <div style="color:var(--text2);font-size:12px;margin-top:4px;">${Number(team.w || 0)}-${Number(team.l || 0)}${team.division ? ' · ' + team.division : ''}</div>
+                </div>
+                ${formatBerthLabel(team) ? `<div style="padding:6px 10px;border-radius:999px;border:1px solid rgba(247,199,106,.28);background:rgba(247,199,106,.08);color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">${formatBerthLabel(team)}</div>` : ''}
+              </div>
+            `).join('') : '<div class="muted" style="padding-top:12px;">Conference seeds appear once the regular season locks.</div>'}
+          </div>
+        </div>
+      `;
+    };
+    const currentRoundSchedule = (Array.isArray(vm?.currentWeekSchedule) ? vm.currentWeekSchedule : [])
+      .concat(Array.isArray(vm?.currentDaySchedule) ? vm.currentDaySchedule : [])
+      .filter((game, index, list) => {
+        const key = `${game?.awayAbbr || ''}-${game?.homeAbbr || ''}-${game?.round || ''}-${game?.conference || ''}`;
+        return list.findIndex((candidate) => `${candidate?.awayAbbr || ''}-${candidate?.homeAbbr || ''}-${candidate?.round || ''}-${candidate?.conference || ''}` === key) === index;
+      });
+    const renderScheduleRows = () => {
+      if (!currentRoundSchedule.length) {
+        return '<div class="muted" style="padding-top:12px;">The current postseason slate will populate once the adapter seeds the round.</div>';
+      }
+      return currentRoundSchedule.map((game) => `
+        <div style="padding:12px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${String(game.awayAbbr || 'TBD').trim()} @ ${String(game.homeAbbr || 'TBD').trim()}</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:4px;">${String(game.conference || 'League').trim()} · ${String(game.round || vm?.currentRound || phase).trim().replace(/_/g, ' ')}</div>
+          </div>
+          <div style="padding:6px 10px;border-radius:999px;border:1px solid rgba(113,209,255,.24);background:rgba(113,209,255,.08);color:#9ad8ff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">${roundLabel}</div>
+        </div>
+      `).join('');
+    };
     document.getElementById('playoffsContent').innerHTML = `
       <div class="card">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Playoff Picture</div>
-        <div style="color:var(--text2);margin-top:6px;">Postseason-ready handoff for the ${shellLabel} shell with conference seeds and wildcard tracking.</div>
-      </div>
-      <div class="card">
-        <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">AFC</div>
-        <div style="margin-top:10px;">
-          ${((vm.playoffPicture?.afc || []).map((team) => `<div style="padding:8px 0;border-top:1px solid rgba(255,255,255,.08);">${team.teamAbbr} · ${team.w}-${team.l}</div>`).join('')) || '<div class="muted">Playoff picture will appear when the regular season is complete.</div>'}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${roundLabel}</div>
+            <div style="color:var(--text2);margin-top:6px;">Exact 2014 NFL postseason context for the ${shellLabel} shell with seeded conference fields, live round matchups, and bye tracking.</div>
+          </div>
+          <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);min-width:180px;">
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);">Championship</div>
+            <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;margin-top:6px;">Super Bowl XLIX</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:6px;">Twelve-team field, two byes per conference, one title game in Glendale.</div>
+          </div>
         </div>
       </div>
+      ${renderConferenceField('AFC', vm.playoffPicture?.afc || [])}
+      ${renderConferenceField('NFC', vm.playoffPicture?.nfc || [])}
       <div class="card">
-        <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">NFC</div>
-        <div style="margin-top:10px;">
-          ${((vm.playoffPicture?.nfc || []).map((team) => `<div style="padding:8px 0;border-top:1px solid rgba(255,255,255,.08);">${team.teamAbbr} · ${team.w}-${team.l}</div>`).join('')) || '<div class="muted">Playoff picture will appear when the regular season is complete.</div>'}
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${roundLabel} Slate</div>
+          <div style="color:var(--text2);font-size:12px;">The shared shell keeps roster moves open while the weekly bracket advances.</div>
         </div>
+        <div style="margin-top:10px;">${renderScheduleRows()}</div>
       </div>
     `;
     return;

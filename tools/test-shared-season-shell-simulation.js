@@ -1700,6 +1700,114 @@ api.setSeasonModeAdapter({
   getState() {
     return {
       leagueShell: {
+        sport: 'nfl',
+        anchorSeasonLabel: '2014 NFL'
+      },
+      postseasonState: {
+        phase: 'wild_card'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' },
+      { id: 'playoffs', label: 'Playoffs' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 12, l: 4, streak: 'W2' },
+      recordLabel: '12-4',
+      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Wild Card Weekend',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'wild_card',
+      currentRound: 'wild_card',
+      shellLabel: '2014 NFL',
+      playoffPicture: {
+        afc: [
+          { seed: 1, teamAbbr: 'NE', teamName: 'Patriots', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 2, teamAbbr: 'DEN', teamName: 'Broncos', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 3, teamAbbr: 'IND', teamName: 'Colts', w: 11, l: 5, berth: 'division_winner' },
+          { seed: 4, teamAbbr: 'PIT', teamName: 'Steelers', w: 11, l: 5, berth: 'division_winner' },
+          { seed: 5, teamAbbr: 'CIN', teamName: 'Bengals', w: 10, l: 5, berth: 'wild_card' },
+          { seed: 6, teamAbbr: 'BAL', teamName: 'Ravens', w: 10, l: 6, berth: 'wild_card' }
+        ],
+        nfc: [
+          { seed: 1, teamAbbr: 'SEA', teamName: 'Seahawks', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 2, teamAbbr: 'GB', teamName: 'Packers', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 3, teamAbbr: 'DAL', teamName: 'Cowboys', w: 12, l: 4, berth: 'division_winner' },
+          { seed: 4, teamAbbr: 'CAR', teamName: 'Panthers', w: 7, l: 8, berth: 'division_winner' },
+          { seed: 5, teamAbbr: 'ARI', teamName: 'Cardinals', w: 11, l: 5, berth: 'wild_card' },
+          { seed: 6, teamAbbr: 'DET', teamName: 'Lions', w: 11, l: 5, berth: 'wild_card' }
+        ]
+      },
+      currentWeekSchedule: [
+        { awayAbbr: 'BAL', homeAbbr: 'IND' },
+        { awayAbbr: 'CIN', homeAbbr: 'PIT' },
+        { awayAbbr: 'DET', homeAbbr: 'DAL' },
+        { awayAbbr: 'ARI', homeAbbr: 'CAR' }
+      ]
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationPlayoffsInSharedShell();
+assert.match(elements.playoffsContent.innerHTML, /Wild Card/i, 'nfl playoffs screen should call out the current wild card round');
+assert.match(elements.playoffsContent.innerHTML, /First-Round Bye/i, 'nfl playoffs screen should show bye language for the top two seeds');
+assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX/i, 'nfl playoffs screen should use the 2014 championship title');
+assert.match(elements.playoffsContent.innerHTML, /BAL\s*@\s*IND/i, 'nfl playoffs screen should render afc matchup abbreviations');
+assert.match(elements.playoffsContent.innerHTML, /DET\s*@\s*DAL/i, 'nfl playoffs screen should render nfc matchup abbreviations');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
         sport: 'nfl'
       }
     };
