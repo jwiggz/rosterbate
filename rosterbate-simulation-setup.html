@@ -3,214 +3,653 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RosterBate Simulation Setup</title>
+  <title>RosterBate - Simulation Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="global-nav.css">
   <script src="historical-pack-loader.js"></script>
   <script src="mixed-era-runtime.js"></script>
   <script src="simulation-mode-config.js"></script>
   <script src="simulation-mode-runtime.js"></script>
+  <script src="global-nav.js" defer></script>
   <style>
     :root{
       color-scheme:dark;
-      --bg:#08101d;
-      --panel:#132036;
-      --panel-2:#1a2942;
-      --border:rgba(167,195,230,.18);
-      --text:#eef5ff;
-      --muted:#b7c9df;
-      --accent:#68f1a0;
-      --accent-2:#7dc5ff;
-      --shadow:0 24px 48px rgba(0,0,0,.28);
+      --bg:#060a13;
+      --bg-soft:#0c1425;
+      --ink:#f8f4ec;
+      --muted:#9bb0cf;
+      --line:rgba(255,255,255,.1);
+      --glass:rgba(11,19,34,.82);
+      --glass-strong:rgba(9,14,25,.92);
+      --accent:#f5a34b;
+      --accent-soft:#ffd7a7;
+      --green:#67efa0;
+      --green-deep:#159a4d;
+      --blue:#7dc5ff;
+      --blue-deep:#1768cb;
+      --red-soft:#ffb5a8;
+      --shadow:0 24px 60px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
+      --teko:'Teko', Impact, sans-serif;
+      --plex:'IBM Plex Sans','Segoe UI',sans-serif;
     }
     *{box-sizing:border-box}
-    body{
+    html,body{
       margin:0;
-      min-height:100vh;
-      font-family:Arial,sans-serif;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:var(--plex);
+    }
+    body{
       background:
-        radial-gradient(circle at top,rgba(125,197,255,.18),transparent 34%),
-        linear-gradient(180deg,#0b1424 0%,var(--bg) 100%);
-      color:var(--text);
+        radial-gradient(42% 24% at 50% 0%,rgba(245,163,75,.16),transparent 65%),
+        linear-gradient(180deg,rgba(7,12,22,.74),rgba(6,10,19,.96)),
+        url("hero-hall-of-fame.avif") center top / cover no-repeat fixed;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        linear-gradient(180deg,rgba(6,10,18,.55) 0%,rgba(6,10,18,.74) 34%,rgba(5,8,14,.92) 100%),
+        radial-gradient(28% 20% at 14% 22%,rgba(255,255,255,.11),transparent 70%),
+        radial-gradient(26% 18% at 86% 24%,rgba(255,255,255,.08),transparent 72%);
+      pointer-events:none;
     }
     main{
-      width:min(980px,calc(100% - 32px));
+      position:relative;
+      z-index:1;
+      width:min(1440px,calc(100% - 32px));
       margin:0 auto;
-      padding:48px 0 64px;
+      padding:14px 0 22px;
     }
-    .setup-shell{
-      padding:28px;
-      border:1px solid var(--border);
-      border-radius:24px;
-      background:linear-gradient(180deg,rgba(19,32,54,.96),rgba(10,19,34,.94));
+    .hero-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);
+      gap:14px;
+      align-items:stretch;
+    }
+    .workspace-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.14fr) minmax(360px,.86fr);
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
+    }
+    .panel{
+      position:relative;
+      overflow:hidden;
+      border-radius:28px;
+      border:1px solid rgba(255,182,109,.18);
+      background:linear-gradient(180deg,rgba(18,29,49,.88),rgba(8,14,24,.94));
       box-shadow:var(--shadow);
     }
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(90% 120% at 0% 0%,rgba(125,182,255,.14),transparent 54%),
+        radial-gradient(70% 90% at 100% 0%,rgba(245,163,75,.12),transparent 52%);
+      pointer-events:none;
+    }
+    .hero-main{
+      padding:24px 24px 20px;
+    }
+    .hero-side,
+    .workspace-card{
+      padding:18px;
+      position:relative;
+      z-index:1;
+    }
+    .hero-side{
+      display:flex;
+      flex-direction:column;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,182,109,.22);
+      background:rgba(15,20,31,.58);
+      font:700 11px/1 var(--plex);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--accent-soft);
+    }
+    .eyebrow::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--accent);
+      box-shadow:0 0 0 4px rgba(245,163,75,.12),0 0 18px rgba(245,163,75,.38);
+    }
     h1{
-      margin:0;
-      font-size:40px;
-      line-height:1;
+      margin:18px 0 0;
+      font:700 clamp(46px,5.7vw,72px)/.88 var(--teko);
+      letter-spacing:.02em;
+      text-transform:uppercase;
+      text-shadow:0 18px 40px rgba(0,0,0,.38);
+    }
+    h1 span{
+      display:block;
+      color:var(--accent);
     }
     .setup-copy{
+      max-width:58ch;
       margin:12px 0 0;
-      max-width:62ch;
-      color:var(--muted);
+      font-size:14px;
       line-height:1.6;
+      color:#d7e4f5;
     }
-    .setup-chips{
+    .hero-chip-row{
       display:flex;
       flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
+    .hero-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(9,15,26,.52);
+      font:700 11px/1 var(--plex);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#d9e9ff;
+    }
+    .hero-foot{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:10px;
       margin-top:16px;
     }
-    .setup-chip{
-      display:inline-flex;
-      align-items:center;
-      padding:8px 12px;
-      border:1px solid rgba(167,195,230,.16);
-      border-radius:999px;
-      background:rgba(7,13,24,.32);
-      color:var(--accent-2);
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.02em;
+    .hero-stat{
+      padding:12px 12px 10px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(20,30,48,.86),rgba(12,18,31,.94));
+    }
+    .hero-stat-value{
+      font:700 30px/.9 var(--teko);
+    }
+    .hero-stat-label{
+      margin-top:4px;
+      font:700 10px/1 var(--plex);
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .hero-side-kicker,
+    .card-kicker{
+      font:700 11px/1 var(--plex);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#9ec8ff;
+    }
+    .hero-side-title{
+      margin-top:8px;
+      font:700 34px/.92 var(--teko);
       text-transform:uppercase;
     }
-    .setup-grid{
+    .hero-side-copy{
+      margin-top:10px;
+      font-size:13px;
+      line-height:1.58;
+      color:#d1dff2;
+    }
+    .process-list{
       display:grid;
-      grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);
-      gap:20px;
-      margin-top:24px;
+      gap:8px;
+      margin-top:14px;
     }
-    .setup-card{
-      padding:20px;
-      border:1px solid var(--border);
+    .process-item{
+      padding:10px 12px;
       border-radius:18px;
-      background:linear-gradient(180deg,rgba(26,41,66,.9),rgba(16,26,43,.92));
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98));
     }
-    .setup-card h2{
-      margin:0 0 8px;
-      font-size:18px;
+    .process-item strong{
+      display:block;
+      font:700 16px/.95 var(--teko);
+      letter-spacing:.03em;
+      text-transform:uppercase;
     }
-    .setup-card p{
-      margin:0 0 16px;
-      color:var(--muted);
-      line-height:1.55;
+    .process-item span{
+      display:block;
+      margin-top:4px;
+      font:600 12px/1.45 var(--plex);
+      color:#cdd9ea;
+    }
+    .card-title{
+      margin-top:8px;
+      font:700 34px/.94 var(--teko);
+      text-transform:uppercase;
+    }
+    .card-copy{
+      max-width:60ch;
+      margin-top:8px;
+      font-size:13px;
+      line-height:1.58;
+      color:#cbd8eb;
     }
     #simulationSourceSeasonList{
       display:grid;
       gap:10px;
-      max-height:420px;
+      max-height:clamp(320px, 38vh, 420px);
+      margin-top:14px;
       overflow:auto;
-      padding-right:8px;
+      padding-right:6px;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(125,197,255,.28) transparent;
+    }
+    #simulationSourceSeasonList::-webkit-scrollbar{
+      width:8px;
+    }
+    #simulationSourceSeasonList::-webkit-scrollbar-thumb{
+      border-radius:999px;
+      background:rgba(125,197,255,.28);
+    }
+    .season-empty{
+      padding:18px;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.12);
+      background:rgba(9,14,24,.7);
+      font:600 13px/1.6 var(--plex);
+      color:#c8d6ea;
     }
     .season-option{
-      display:flex;
-      align-items:flex-start;
+      position:relative;
+      display:block;
+      cursor:pointer;
+    }
+    .season-option-input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      pointer-events:none;
+    }
+    .season-option-body{
+      position:relative;
+      display:grid;
       gap:10px;
-      padding:12px 14px;
-      border:1px solid rgba(167,195,230,.12);
-      border-radius:14px;
-      background:rgba(7,13,24,.34);
+      overflow:hidden;
+      padding:14px 14px 13px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,13,23,.98));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 14px 24px rgba(0,0,0,.14);
+      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease;
     }
-    .season-option strong{
-      display:block;
-      font-size:15px;
+    .season-option-body::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(120% 120% at 100% 0%,rgba(255,183,102,.12),transparent 44%),
+        radial-gradient(80% 100% at 0% 0%,rgba(125,197,255,.1),transparent 52%);
+      pointer-events:none;
     }
-    .season-option span{
-      display:block;
-      margin-top:3px;
-      color:var(--muted);
-      font-size:12px;
+    .season-option-body.tone-dynasty::before{
+      background:
+        radial-gradient(120% 120% at 100% 0%,rgba(255,170,94,.16),transparent 44%),
+        radial-gradient(80% 100% at 0% 0%,rgba(255,213,143,.08),transparent 52%);
+    }
+    .season-option-body.tone-heritage::before{
+      background:
+        radial-gradient(120% 120% at 100% 0%,rgba(181,161,255,.16),transparent 44%),
+        radial-gradient(80% 100% at 0% 0%,rgba(255,215,159,.08),transparent 52%);
+    }
+    .season-option-body.tone-spotlight::before{
+      background:
+        radial-gradient(120% 120% at 100% 0%,rgba(116,179,255,.18),transparent 44%),
+        radial-gradient(80% 100% at 0% 0%,rgba(125,197,255,.12),transparent 52%);
+    }
+    .season-option-body.tone-modern::before{
+      background:
+        radial-gradient(120% 120% at 100% 0%,rgba(92,239,160,.18),transparent 44%),
+        radial-gradient(80% 100% at 0% 0%,rgba(125,197,255,.08),transparent 52%);
+    }
+    .season-option:hover .season-option-body{
+      transform:translateY(-1px);
+      border-color:rgba(255,182,109,.24);
+      filter:brightness(1.02);
+    }
+    .season-option-input:checked + .season-option-body{
+      border-color:rgba(103,239,160,.42);
+      box-shadow:
+        inset 0 0 0 1px rgba(187,247,208,.12),
+        0 18px 30px rgba(2,6,23,.28),
+        0 0 0 1px rgba(103,239,160,.12);
+    }
+    .season-option-top,
+    .season-option-title,
+    .season-option-copy,
+    .season-option-meta{
+      position:relative;
+      z-index:1;
+    }
+    .season-option-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .season-option-era{
+      font:700 10px/1 var(--plex);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#dce7f4;
+    }
+    .season-option-status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(10,18,30,.76);
+      font:700 10px/1 var(--plex);
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:#dce8f7;
+      white-space:nowrap;
+    }
+    .season-option-title{
+      font:700 24px/.92 var(--teko);
+      text-transform:uppercase;
+    }
+    .season-option-copy{
+      font:600 12px/1.48 var(--plex);
+      color:#d3dfef;
+    }
+    .season-option-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .season-option-pill,
+    .control-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(10,18,30,.72);
+      font:700 10px/1 var(--plex);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#d7e7fb;
+    }
+    .control-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:14px;
     }
     .field{
       display:grid;
       gap:8px;
-      margin-bottom:16px;
+      margin-top:14px;
     }
-    .field:last-child{
-      margin-bottom:0;
+    .field:first-of-type{
+      margin-top:0;
     }
     label{
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:.02em;
-    }
-    select, button{
-      width:100%;
-      border-radius:14px;
-      border:1px solid rgba(167,195,230,.18);
-      font:inherit;
+      font:700 11px/1 var(--plex);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#a7bddb;
     }
     select{
-      padding:12px 14px;
-      color:var(--text);
-      background:#0f192b;
+      width:100%;
+      padding:14px 42px 14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,182,109,.18);
+      background:linear-gradient(135deg,rgba(25,38,61,.96),rgba(12,18,30,.98));
+      color:#fbf7f1;
+      font:700 14px/1 var(--plex);
+      outline:none;
+      appearance:none;
+      background-image:
+        linear-gradient(45deg,transparent 50%,#ffbd78 50%),
+        linear-gradient(135deg,#ffbd78 50%,transparent 50%);
+      background-position:calc(100% - 18px) 20px,calc(100% - 12px) 20px;
+      background-size:6px 6px,6px 6px;
+      background-repeat:no-repeat;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
     }
-    button{
-      padding:14px 16px;
-      font-weight:700;
-      color:#06111c;
-      background:linear-gradient(180deg,var(--accent) 0%,#2ed376 100%);
+    select:focus{
+      border-color:rgba(255,193,133,.42);
+      box-shadow:0 0 0 3px rgba(245,163,75,.12);
+    }
+    select:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .helper-text,
+    .launch-copy{
+      margin-top:8px;
+      font:600 12px/1.45 var(--plex);
+      color:#d0ddef;
+    }
+    .launch-stack{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+    .launch-lane{
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,13,23,.98));
+    }
+    .launch-kicker{
+      font:700 10px/1 var(--plex);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#9ec8ff;
+    }
+    .launch-btn{
+      width:100%;
+      min-height:50px;
+      margin-top:8px;
+      border-radius:18px;
       cursor:pointer;
+      font:700 16px/1 var(--teko);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 28px rgba(0,0,0,.24);
+      transition:transform .18s ease,filter .18s ease,box-shadow .18s ease,opacity .18s ease;
     }
-    .helper-text{
-      margin-top:12px;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
+    .launch-btn:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.04);
+    }
+    .launch-btn:disabled{
+      opacity:.58;
+      cursor:not-allowed;
+      filter:saturate(.66);
+      transform:none;
+    }
+    .launch-btn.primary{
+      border:1px solid rgba(187,247,208,.34);
+      background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);
+      color:#082312;
+    }
+    .launch-btn.secondary{
+      border:1px solid rgba(191,219,254,.38);
+      background:linear-gradient(180deg,#91cbff,#5aa8ff 42%,#2d84ea 74%,#1768cb 100%);
+      color:#081b36;
+    }
+    .status-shell{
+      margin-top:14px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,13,23,.98));
+    }
+    .status-label{
+      font:700 10px/1 var(--plex);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#9ec8ff;
     }
     .status{
-      margin-top:16px;
+      margin-top:8px;
       min-height:20px;
-      color:var(--accent-2);
-      font-size:13px;
+      font:600 12px/1.45 var(--plex);
+      color:#cfe3ff;
+    }
+    .status[data-state="working"]{color:#9ed7ff}
+    .status[data-state="ready"]{color:#d8ebff}
+    .status[data-state="warn"]{color:#ffd9a6}
+    .status[data-state="error"]{color:var(--red-soft)}
+    @media (max-width: 1100px){
+      .hero-grid,
+      .workspace-grid{
+        grid-template-columns:1fr;
+      }
+      .hero-foot{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
     }
     @media (max-width: 760px){
       main{
         width:min(100%,calc(100% - 24px));
         padding:24px 0 40px;
       }
-      .setup-shell{
+      .hero-main,
+      .hero-side,
+      .workspace-card{
         padding:20px;
       }
       h1{
-        font-size:32px;
+        font-size:clamp(42px,18vw,62px);
       }
-      .setup-grid{
+      .card-title,
+      .hero-side-title{
+        font-size:34px;
+      }
+      .hero-foot{
         grid-template-columns:1fr;
+      }
+      .season-option-title{
+        font-size:24px;
       }
     }
   </style>
 </head>
 <body>
+  <nav class="rb-global-nav">
+    <button class="rb-global-logo" type="button" onclick="window.location.href='index.html'"><img src="rosterbate-main-logo-final.png" alt="RosterBate"></button>
+    <div class="rb-global-actions">
+      <div class="rb-global-badge">Beta</div>
+      <button id="rbGlobalProfileBtn" class="rb-global-profile" type="button" onclick="window.location.href='profile.html'">Profile</button>
+    </div>
+  </nav>
   <main>
-    <section class="setup-shell">
-      <h1>Start Simulation League</h1>
-      <p class="setup-copy" id="simulationHeroCopy">Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. Draft slot only applies if you want to enter the board yourself.</p>
-      <div class="setup-chips" aria-label="Simulation shell details">
-        <span class="setup-chip" id="simulationShellChip">2025-26 NBA shell</span>
-        <span class="setup-chip" id="simulationRosterChip">10-player basketball roster</span>
-      </div>
-      <div class="setup-grid">
-        <section class="setup-card">
-          <h2>Source Seasons</h2>
-          <p id="simulationSourceCopy">Pick one or more NBA historical packs. These selections will define the crossover player pool for your simulation league.</p>
-          <div id="simulationSourceSeasonList"></div>
-        </section>
-        <section class="setup-card">
-          <div class="field">
-            <label for="simulationFranchiseSelect" id="simulationTeamLabel">Franchise</label>
-            <select id="simulationFranchiseSelect"></select>
+    <section class="hero-grid">
+      <section class="panel hero-main">
+        <div class="eyebrow">Archive Commission</div>
+        <h1>Start <span>Simulation League</span></h1>
+        <p class="setup-copy" id="simulationHeroCopy">Choose the historical seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.</p>
+        <div class="hero-chip-row" aria-label="Simulation shell details">
+          <span class="hero-chip" id="simulationShellChip">2025-26 NBA shell</span>
+          <span class="hero-chip" id="simulationRosterChip">10-player basketball roster</span>
+          <span class="hero-chip" id="simulationModeChip">Single-player simulation</span>
+          <span class="hero-chip" id="simulationLaunchChip">Draft or instant season start</span>
+        </div>
+        <div class="hero-foot">
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="simulationTeamCountValue">30</div>
+            <div class="hero-stat-label" id="simulationTeamCountLabel">Real Franchises</div>
           </div>
-          <div class="field">
-            <label for="simulationDraftSlotSelect" id="simulationDraftSlotLabel">Draft Slot</label>
-            <select id="simulationDraftSlotSelect"></select>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="simulationRosterSizeValue">10</div>
+            <div class="hero-stat-label" id="simulationRosterSizeLabel">Roster Spots Per Team</div>
           </div>
-          <p class="helper-text" id="simulationDraftSlotHelper">Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.</p>
-          <button id="simulationContinueBtn" onclick="enterSimulationDraft()">Enter Draft</button>
-          <button id="simulationAutoDraftBtn" onclick="simDraftAndStartSeason()">Sim Draft and Start Season</button>
-          <p class="helper-text">The setup payload is stored locally and handed off to the dedicated simulation draft or season flow.</p>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="simulationDraftSlotsValue">300</div>
+            <div class="hero-stat-label" id="simulationDraftSlotsLabel">Draft Slots Locked</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="simulationLeagueFormatValue">2025-26 NBA</div>
+            <div class="hero-stat-label" id="simulationLeagueFormatLabel">League Format</div>
+          </div>
+        </div>
+      </section>
+      <aside class="panel hero-side">
+        <div class="hero-side-kicker">Commissioner Flow</div>
+        <div class="hero-side-title" id="simulationFlowTitle">Pick The Eras. Claim The Franchise. Choose The Opening Lane.</div>
+        <div class="hero-side-copy" id="simulationFlowCopy">Manual draft sends you into the board yourself. The instant lane auto-builds every roster and hands the league off to the simulation season shell.</div>
+        <div class="process-list">
+          <div class="process-item">
+            <strong id="simulationProcessPoolTitle">1. Build The Pool</strong>
+            <span id="simulationProcessPoolCopy">Check the seasons you want in the mixed-era universe. More eras means a deeper crossover draft board.</span>
+          </div>
+          <div class="process-item">
+            <strong id="simulationProcessTeamTitle">2. Lock Your Team</strong>
+            <span id="simulationProcessTeamCopy">Choose which real 2025-26 NBA franchise you will control once the drafted league boots into the season shell.</span>
+          </div>
+          <div class="process-item">
+            <strong id="simulationProcessLaneTitle">3. Enter Or Skip The Board</strong>
+            <span id="simulationProcessLaneCopy">Draft slot only matters for the manual board path. The instant lane ignores it and auto-generates the whole league.</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+    <section class="workspace-grid">
+      <section class="panel workspace-card">
+        <div class="card-kicker">Source Seasons</div>
+        <h2 class="card-title">Build The Mixed-Era Player Pool</h2>
+        <p class="card-copy" id="simulationSourceCopy">Pick one or more NBA historical packs. These selections define the crossover player pool your single-player simulation league will draft from.</p>
+        <div id="simulationSourceSeasonList"></div>
+      </section>
+      <aside class="panel workspace-card">
+        <div class="card-kicker">Commissioner Desk</div>
+        <h2 class="card-title">Lock Your Entry Point</h2>
+        <p class="card-copy">Choose the franchise you will manage once the league is created. Draft slot only applies if you want to enter the draft room yourself.</p>
+        <div class="control-meta">
+          <span class="control-pill" id="simulationControlShellPill">2025-26 shell locked</span>
+          <span class="control-pill" id="simulationControlTeamCountPill">30 teams</span>
+          <span class="control-pill" id="simulationControlModePill">Single player</span>
+        </div>
+        <div class="field">
+          <label for="simulationFranchiseSelect" id="simulationTeamLabel">Franchise</label>
+          <select id="simulationFranchiseSelect"></select>
+        </div>
+        <div class="field">
+          <label for="simulationDraftSlotSelect" id="simulationDraftSlotLabel">Draft Slot</label>
+          <select id="simulationDraftSlotSelect"></select>
+        </div>
+        <p class="helper-text" id="simulationDraftSlotHelper">Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.</p>
+        <div class="launch-stack">
+          <div class="launch-lane">
+            <div class="launch-kicker">Manual Draft Lane</div>
+            <button class="launch-btn primary" id="simulationContinueBtn" type="button" onclick="enterSimulationDraft()">Enter Draft</button>
+            <p class="launch-copy" id="simulationManualLaneCopy">Open the mixed-era board, make the picks yourself, and carry that drafted roster straight into the simulation season.</p>
+          </div>
+          <div class="launch-lane">
+            <div class="launch-kicker">Instant Season Lane</div>
+            <button class="launch-btn secondary" id="simulationAutoDraftBtn" type="button" onclick="simDraftAndStartSeason()">Sim Draft and Start Season</button>
+            <p class="launch-copy" id="simulationAutoLaneCopy">Auto-build the whole league in the background and jump directly into the season shell with your chosen franchise.</p>
+          </div>
+        </div>
+        <div class="status-shell">
+          <div class="status-label">Setup Feed</div>
           <div class="status" id="simulationSetupStatus" aria-live="polite"></div>
-        </section>
-      </div>
+        </div>
+      </aside>
     </section>
   </main>
   <script>
@@ -225,6 +664,14 @@
         return String(new URLSearchParams(window.location.search).get('sport') || 'nba').trim().toLowerCase() || 'nba';
       }catch(error){
         return 'nba';
+      }
+    }
+
+    function getSimulationNode(id){
+      try{
+        return document.getElementById(id);
+      }catch(error){
+        return null;
       }
     }
 
@@ -244,36 +691,95 @@
     function getSimulationCopy(){
       if (getSimulationSport() === 'nfl') {
         return {
-          heroBody: 'Choose the historical NFL seasons that will feed your mixed-era draft pool, then claim a 2014 franchise. Manual draft slot only applies if you want to enter the board yourself.',
-          sourceBody: 'Pick one or more NFL historical packs. These selections will define the crossover player pool for your football simulation league.',
+          heroBody: 'Choose the historical NFL seasons that feed your mixed-era draft pool, then claim a 2014 NFL franchise. This page is where the universe gets defined before the season shell takes over.',
+          sourceBody: 'Pick one or more NFL historical packs. These selections define the crossover player pool your single-player simulation league will draft from.',
           shellChip: '2014 NFL shell',
           rosterChip: '13-slot football roster',
+          modeChip: 'Single-player simulation',
+          launchChip: 'Draft or instant season start',
           teamLabel: 'Franchise',
           draftSlotLabel: 'Manual Draft Slot Only',
           draftSlotHelper: 'Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into franchise management.',
-          emptyStatus: 'No historical NFL packs were found.'
+          emptyStatus: 'No historical NFL packs were found.',
+          readyStatus: 'Choose your eras and pick your opening lane.',
+          flowTitle: 'Pick The Eras. Claim The Franchise. Choose The Opening Lane.',
+          flowCopy: 'Manual draft sends you into the board yourself. The instant lane auto-builds all 32 rosters and hands the league off to the football season shell.',
+          processPoolTitle: '1. Build The Pool',
+          processPoolCopy: 'Check the seasons you want in the mixed-era universe. More eras means a deeper crossover draft board.',
+          processTeamTitle: '2. Lock Your Team',
+          processTeamCopy: 'Choose which real 2014 NFL franchise you will control once the drafted league boots into the season shell.',
+          processLaneTitle: '3. Enter Or Skip The Board',
+          processLaneCopy: 'Draft slot only matters for the manual board path. The instant lane ignores it and auto-generates the whole league.',
+          controlShellPill: '2014 shell locked',
+          controlModePill: 'Single player',
+          manualLaneCopy: 'Open the mixed-era board, make the picks yourself, and carry that drafted roster straight into the simulation season.',
+          autoLaneCopy: 'Auto-build the whole league in the background and jump directly into the season shell with your chosen franchise.',
+          teamCountLabel: 'Real Franchises',
+          rosterSizeLabel: 'Roster Spots Per Team',
+          draftSlotsLabel: 'Draft Slots Locked',
+          leagueFormatLabel: 'League Format'
         };
       }
       return {
-        heroBody: 'Choose the historical seasons that will feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. Draft slot only applies if you want to enter the board yourself.',
-        sourceBody: 'Pick one or more NBA historical packs. These selections will define the crossover player pool for your simulation league.',
+        heroBody: 'Choose the historical seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.',
+        sourceBody: 'Pick one or more NBA historical packs. These selections define the crossover player pool your single-player simulation league will draft from.',
         shellChip: '2025-26 NBA shell',
         rosterChip: '10-player basketball roster',
+        modeChip: 'Single-player simulation',
+        launchChip: 'Draft or instant season start',
         teamLabel: 'Franchise',
         draftSlotLabel: 'Draft Slot',
         draftSlotHelper: 'Draft slot is only used for the manual draft path. The season-skip option auto-drafts the full league and jumps straight into team management.',
-        emptyStatus: 'No historical NBA packs were found.'
+        emptyStatus: 'No historical NBA packs were found.',
+        readyStatus: 'Choose your eras and pick your opening lane.',
+        flowTitle: 'Pick The Eras. Claim The Franchise. Choose The Opening Lane.',
+        flowCopy: 'Manual draft sends you into the board yourself. The instant lane auto-builds all 30 rosters and hands the league off to the simulation season shell.',
+        processPoolTitle: '1. Build The Pool',
+        processPoolCopy: 'Check the seasons you want in the mixed-era universe. More eras means a deeper crossover draft board.',
+        processTeamTitle: '2. Lock Your Team',
+        processTeamCopy: 'Choose which real 2025-26 NBA franchise you will control once the drafted league boots into the season shell.',
+        processLaneTitle: '3. Enter Or Skip The Board',
+        processLaneCopy: 'Draft slot only matters for the manual board path. The instant lane ignores it and auto-generates the whole league.',
+        controlShellPill: '2025-26 shell locked',
+        controlModePill: 'Single player',
+        manualLaneCopy: 'Open the mixed-era board, make the picks yourself, and carry that drafted roster straight into the simulation season.',
+        autoLaneCopy: 'Auto-build the whole league in the background and jump directly into the season shell with your chosen franchise.',
+        teamCountLabel: 'Real Franchises',
+        rosterSizeLabel: 'Roster Spots Per Team',
+        draftSlotsLabel: 'Draft Slots Locked',
+        leagueFormatLabel: 'League Format'
       };
     }
 
-    function getSimulationSetupStatusNode(){
-      return document.getElementById('simulationSetupStatus');
+    function escapeSimulationHtml(value){
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(character){
+        return ({
+          '&':'&amp;',
+          '<':'&lt;',
+          '>':'&gt;',
+          '"':'&quot;',
+          "'":'&#39;'
+        })[character] || character;
+      });
     }
 
-    function setSimulationSetupStatus(message){
+    function getSimulationSeasonTone(entry){
+      const rawTone = entry && (entry.significanceTone || (entry.art && entry.art.theme) || 'heritage');
+      return String(rawTone || 'heritage').trim().toLowerCase() || 'heritage';
+    }
+
+    function getSimulationSetupStatusNode(){
+      return getSimulationNode('simulationSetupStatus');
+    }
+
+    function setSimulationSetupStatus(message, state){
       const node = getSimulationSetupStatusNode();
       if (node) {
         node.textContent = String(message || '');
+        if (!node.dataset) {
+          node.dataset = {};
+        }
+        node.dataset.state = String(state || (message ? 'ready' : 'idle'));
       }
     }
 
@@ -281,36 +787,48 @@
       return getSimulationSport() === 'nfl' ? 'nfl_mixed_era' : 'nba_mixed_era';
     }
 
-    function applySimulationCopy(copy){
+    function setSimulationNodeText(id, value){
+      const node = getSimulationNode(id);
+      if (node) {
+        node.textContent = String(value == null ? '' : value);
+      }
+    }
+
+    function applySimulationCopy(copy, shell){
       const simulationCopy = copy || getSimulationCopy();
-      const heroCopyNode = document.getElementById('simulationHeroCopy');
-      const sourceCopyNode = document.getElementById('simulationSourceCopy');
-      const shellChipNode = document.getElementById('simulationShellChip');
-      const rosterChipNode = document.getElementById('simulationRosterChip');
-      const teamLabelNode = document.getElementById('simulationTeamLabel');
-      const draftSlotLabelNode = document.getElementById('simulationDraftSlotLabel');
-      const draftSlotHelperNode = document.getElementById('simulationDraftSlotHelper');
-      if (heroCopyNode) {
-        heroCopyNode.textContent = simulationCopy.heroBody || '';
-      }
-      if (sourceCopyNode) {
-        sourceCopyNode.textContent = simulationCopy.sourceBody || '';
-      }
-      if (shellChipNode) {
-        shellChipNode.textContent = simulationCopy.shellChip || '';
-      }
-      if (rosterChipNode) {
-        rosterChipNode.textContent = simulationCopy.rosterChip || '';
-      }
-      if (teamLabelNode) {
-        teamLabelNode.textContent = simulationCopy.teamLabel || 'Franchise';
-      }
-      if (draftSlotLabelNode) {
-        draftSlotLabelNode.textContent = simulationCopy.draftSlotLabel || 'Draft Slot';
-      }
-      if (draftSlotHelperNode) {
-        draftSlotHelperNode.textContent = simulationCopy.draftSlotHelper || '';
-      }
+      const leagueShell = shell || getSimulationShell();
+      const teamCount = Array.isArray(leagueShell?.teams) ? leagueShell.teams.length : 0;
+      const rosterSize = Math.max(1, Number(leagueShell?.rosterSize || 0));
+      setSimulationNodeText('simulationHeroCopy', simulationCopy.heroBody || '');
+      setSimulationNodeText('simulationSourceCopy', simulationCopy.sourceBody || '');
+      setSimulationNodeText('simulationShellChip', simulationCopy.shellChip || '');
+      setSimulationNodeText('simulationRosterChip', simulationCopy.rosterChip || '');
+      setSimulationNodeText('simulationModeChip', simulationCopy.modeChip || 'Single-player simulation');
+      setSimulationNodeText('simulationLaunchChip', simulationCopy.launchChip || 'Draft or instant season start');
+      setSimulationNodeText('simulationTeamLabel', simulationCopy.teamLabel || 'Franchise');
+      setSimulationNodeText('simulationDraftSlotLabel', simulationCopy.draftSlotLabel || 'Draft Slot');
+      setSimulationNodeText('simulationDraftSlotHelper', simulationCopy.draftSlotHelper || '');
+      setSimulationNodeText('simulationFlowTitle', simulationCopy.flowTitle || '');
+      setSimulationNodeText('simulationFlowCopy', simulationCopy.flowCopy || '');
+      setSimulationNodeText('simulationProcessPoolTitle', simulationCopy.processPoolTitle || '');
+      setSimulationNodeText('simulationProcessPoolCopy', simulationCopy.processPoolCopy || '');
+      setSimulationNodeText('simulationProcessTeamTitle', simulationCopy.processTeamTitle || '');
+      setSimulationNodeText('simulationProcessTeamCopy', simulationCopy.processTeamCopy || '');
+      setSimulationNodeText('simulationProcessLaneTitle', simulationCopy.processLaneTitle || '');
+      setSimulationNodeText('simulationProcessLaneCopy', simulationCopy.processLaneCopy || '');
+      setSimulationNodeText('simulationControlShellPill', simulationCopy.controlShellPill || '');
+      setSimulationNodeText('simulationControlTeamCountPill', teamCount ? (String(teamCount) + ' teams') : '');
+      setSimulationNodeText('simulationControlModePill', simulationCopy.controlModePill || 'Single player');
+      setSimulationNodeText('simulationManualLaneCopy', simulationCopy.manualLaneCopy || '');
+      setSimulationNodeText('simulationAutoLaneCopy', simulationCopy.autoLaneCopy || '');
+      setSimulationNodeText('simulationTeamCountValue', teamCount);
+      setSimulationNodeText('simulationTeamCountLabel', simulationCopy.teamCountLabel || 'Real Franchises');
+      setSimulationNodeText('simulationRosterSizeValue', rosterSize);
+      setSimulationNodeText('simulationRosterSizeLabel', simulationCopy.rosterSizeLabel || 'Roster Spots Per Team');
+      setSimulationNodeText('simulationDraftSlotsValue', getSimulationRequiredDraftSlots(leagueShell));
+      setSimulationNodeText('simulationDraftSlotsLabel', simulationCopy.draftSlotsLabel || 'Draft Slots Locked');
+      setSimulationNodeText('simulationLeagueFormatValue', leagueShell?.anchorSeasonLabel || simulationCopy.shellChip || '');
+      setSimulationNodeText('simulationLeagueFormatLabel', simulationCopy.leagueFormatLabel || 'League Format');
     }
 
     function getSimulationRequiredDraftSlots(shell){
@@ -334,11 +852,14 @@
     }
 
     function setSimulationSetupBusyState(isBusy){
+      if (document.body && document.body.dataset) {
+        document.body.dataset.setupBusy = isBusy ? 'true' : 'false';
+      }
       [
-        document.getElementById('simulationContinueBtn'),
-        document.getElementById('simulationAutoDraftBtn'),
-        document.getElementById('simulationFranchiseSelect'),
-        document.getElementById('simulationDraftSlotSelect')
+        getSimulationNode('simulationContinueBtn'),
+        getSimulationNode('simulationAutoDraftBtn'),
+        getSimulationNode('simulationFranchiseSelect'),
+        getSimulationNode('simulationDraftSlotSelect')
       ].forEach(function(node){
         if (node) {
           node.disabled = !!isBusy;
@@ -352,35 +873,70 @@
     }
 
     function buildSimulationSetupPayload(selectedPackIds){
+      const franchiseSelect = getSimulationNode('simulationFranchiseSelect');
+      const draftSlotSelect = getSimulationNode('simulationDraftSlotSelect');
       return {
         mode: getSimulationModeId(),
         sourcePackIds: Array.isArray(selectedPackIds) ? selectedPackIds.slice() : [],
-        controlledTeamAbbr: document.getElementById('simulationFranchiseSelect').value,
-        draftSlot: Number(document.getElementById('simulationDraftSlotSelect').value || 1)
+        controlledTeamAbbr: franchiseSelect ? franchiseSelect.value : '',
+        draftSlot: Number((draftSlotSelect && draftSlotSelect.value) || 1)
       };
     }
 
-    function renderSeasonOptions(entries){
-      const container = document.getElementById('simulationSourceSeasonList');
-      container.innerHTML = entries.map((entry, index) => (
-        '<label class="season-option">' +
-          '<input type="checkbox" value="' + String(entry.packId || '') + '"' + (index < 3 ? ' checked' : '') + '>' +
-          '<span>' +
-            '<strong>' + String(entry.seasonLabel || entry.packId || 'Unknown Season') + '</strong>' +
-            '<span>' + String(entry.packId || '') + '</span>' +
-          '</span>' +
-        '</label>'
-      )).join('');
+    function renderSeasonOptions(entries, emptyMessage){
+      const container = getSimulationNode('simulationSourceSeasonList');
+      if (!container) {
+        return;
+      }
+      if (!Array.isArray(entries) || !entries.length) {
+        container.innerHTML = '<div class="season-empty">' + escapeSimulationHtml(emptyMessage || getSimulationCopy().emptyStatus || 'No historical packs are available right now.') + '</div>';
+        return;
+      }
+      container.innerHTML = entries.map(function(entry, index){
+        const seasonLabel = escapeSimulationHtml(entry && (entry.seasonLabel || entry.packId || 'Unknown Season'));
+        const packId = escapeSimulationHtml(entry && entry.packId || '');
+        const eraLabel = escapeSimulationHtml(entry && ((entry.art && entry.art.eyebrow) || entry.era || 'Historic Archive'));
+        const statusLabel = escapeSimulationHtml(entry && (entry.statusLabel || (String(entry.availability || '').trim().toLowerCase() === 'playable' ? 'Playable Now' : 'Archive Preview')));
+        const summary = escapeSimulationHtml(entry && (entry.tagline || entry.summary || entry.packId || 'Historical season pack'));
+        const significanceLabel = escapeSimulationHtml(entry && (entry.significanceLabel || entry.completenessLabel || 'Historic Pack'));
+        const shortLabel = escapeSimulationHtml(entry && (entry.shortLabel || entry.packId || ''));
+        const tone = getSimulationSeasonTone(entry).replace(/[^a-z0-9_-]/g, '') || 'heritage';
+        return (
+          '<label class="season-option">' +
+            '<input class="season-option-input" type="checkbox" value="' + packId + '"' + (index < 3 ? ' checked' : '') + '>' +
+            '<span class="season-option-body tone-' + tone + '">' +
+              '<span class="season-option-top">' +
+                '<span class="season-option-era">' + eraLabel + '</span>' +
+                '<span class="season-option-status">' + statusLabel + '</span>' +
+              '</span>' +
+              '<span class="season-option-title">' + seasonLabel + '</span>' +
+              '<span class="season-option-copy">' + summary + '</span>' +
+              '<span class="season-option-meta">' +
+                '<span class="season-option-pill">' + significanceLabel + '</span>' +
+                (shortLabel ? '<span class="season-option-pill">' + shortLabel + '</span>' : '') +
+              '</span>' +
+            '</span>' +
+          '</label>'
+        );
+      }).join('');
     }
 
     function renderFranchiseOptions(shell){
-      document.getElementById('simulationFranchiseSelect').innerHTML = shell.teams.map((team) => (
+      const selectNode = getSimulationNode('simulationFranchiseSelect');
+      if (!selectNode) {
+        return;
+      }
+      selectNode.innerHTML = shell.teams.map((team) => (
         '<option value="' + team.abbr + '">' + team.name + '</option>'
       )).join('');
     }
 
     function renderDraftSlotOptions(shell){
-      document.getElementById('simulationDraftSlotSelect').innerHTML = Array.from({ length: shell.teams.length }, function(_, index){
+      const selectNode = getSimulationNode('simulationDraftSlotSelect');
+      if (!selectNode) {
+        return;
+      }
+      selectNode.innerHTML = Array.from({ length: shell.teams.length }, function(_, index){
         return '<option value="' + String(index + 1) + '">Pick ' + String(index + 1) + '</option>';
       }).join('');
     }
@@ -413,29 +969,32 @@
     async function bootSimulationSetup(){
       const shell = getSimulationShell();
       const simulationCopy = getSimulationCopy();
-      applySimulationCopy(simulationCopy);
+      applySimulationCopy(simulationCopy, shell);
       renderFranchiseOptions(shell);
       renderDraftSlotOptions(shell);
-      setSimulationSetupStatus('Loading available source seasons...');
+      setSimulationSetupStatus('Loading available source seasons...', 'working');
       try{
         const catalog = await window.RosterBateHistoricalPackLoader.loadCatalog();
         const sportSeasons = catalog.filter(function(entry){
           return String(entry && entry.sport || 'nba').trim().toLowerCase() === getSimulationSport()
             && String(entry && entry.syntheticType || '').trim().toLowerCase() !== 'mixed_era';
         });
-        renderSeasonOptions(sportSeasons);
-        setSimulationSetupStatus(sportSeasons.length ? 'Choose your eras and enter the draft.' : simulationCopy.emptyStatus);
+        renderSeasonOptions(sportSeasons, simulationCopy.emptyStatus);
+        setSimulationSetupStatus(
+          sportSeasons.length ? (simulationCopy.readyStatus || 'Choose your eras and pick your opening lane.') : simulationCopy.emptyStatus,
+          sportSeasons.length ? 'ready' : 'warn'
+        );
       }catch(error){
         console.error('[Simulation Setup] Failed to load historical catalog', error);
-        renderSeasonOptions([]);
-        setSimulationSetupStatus('Unable to load historical packs right now.');
+        renderSeasonOptions([], simulationCopy.emptyStatus);
+        setSimulationSetupStatus('Unable to load historical packs right now.', 'error');
       }
     }
 
     async function enterSimulationDraft(){
       const selectedPackIds = getSelectedSimulationSourcePackIds();
       if (!selectedPackIds.length) {
-        setSimulationSetupStatus('Select at least one historical season before entering the draft.');
+        setSimulationSetupStatus('Select at least one historical season before entering the draft.', 'warn');
         return;
       }
       const sport = getSimulationSport();
@@ -443,20 +1002,21 @@
       const simulationCopy = getSimulationCopy();
       const payload = buildSimulationSetupPayload(selectedPackIds);
       let redirecting = false;
-      setSimulationSetupStatus('Building mixed-era player pool...');
+      setSimulationSetupStatus('Building mixed-era player pool...', 'working');
       setSimulationSetupBusyState(true);
       try{
         const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
         if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
-          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the ' + String(simulationCopy.shellChip || 'simulation shell') + ' needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
+          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the ' + String(simulationCopy.shellChip || 'simulation shell') + ' needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.', 'warn');
           return;
         }
         localStorage.setItem(SIMULATION_SETUP_STORAGE_KEY, JSON.stringify(payload));
+        setSimulationSetupStatus('Opening the draft room...', 'working');
         redirecting = true;
         window.location.href = 'rosterbate-draft.html?sport=' + encodeURIComponent(sport) + '&simulation=' + encodeURIComponent(getSimulationFlowId());
       }catch(error){
         console.error('[Simulation Setup] Failed to build mixed-era preview', error);
-        setSimulationSetupStatus('Unable to build the mixed-era player pool right now.');
+        setSimulationSetupStatus('Unable to build the mixed-era player pool right now.', 'error');
       }finally{
         if (!redirecting) {
           setSimulationSetupBusyState(false);
@@ -467,7 +1027,7 @@
     async function simDraftAndStartSeason(){
       const selectedPackIds = getSelectedSimulationSourcePackIds();
       if (!selectedPackIds.length) {
-        setSimulationSetupStatus('Select at least one historical season before starting the season.');
+        setSimulationSetupStatus('Select at least one historical season before starting the season.', 'warn');
         return;
       }
       const sport = getSimulationSport();
@@ -475,12 +1035,12 @@
       const simulationCopy = getSimulationCopy();
       const setupPayload = buildSimulationSetupPayload(selectedPackIds);
       let redirecting = false;
-      setSimulationSetupStatus('Building mixed-era player pool...');
+      setSimulationSetupStatus('Building mixed-era player pool...', 'working');
       setSimulationSetupBusyState(true);
       try{
         const preview = await buildSimulationPoolPreview(selectedPackIds, shell);
         if (!preview?.mixedEraContext || preview.playerCount < preview.requiredSlots) {
-          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the ' + String(simulationCopy.shellChip || 'simulation shell') + ' needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.');
+          setSimulationSetupStatus('Add more source seasons. This setup only yields ' + String(preview?.playerCount || 0) + ' draftable players, but the ' + String(simulationCopy.shellChip || 'simulation shell') + ' needs ' + String(preview?.requiredSlots || getSimulationRequiredDraftSlots(shell)) + '.', 'warn');
           return;
         }
         const finalState = window.RosterBateSimulationModeRuntime.buildCompletedSimulationAutoDraftState({
@@ -489,12 +1049,12 @@
           controlledTeamAbbr: setupPayload.controlledTeamAbbr
         });
         window.RosterBateSimulationModeRuntime.writeCompletedSimulationState(finalState);
-        setSimulationSetupStatus('Opening season manager...');
+        setSimulationSetupStatus('Opening season manager...', 'working');
         redirecting = true;
         window.location.href = 'rosterbate-season.html?sport=' + encodeURIComponent(sport) + '&simulation=' + encodeURIComponent(getSimulationFlowId());
       }catch(error){
         console.error('[Simulation Setup] Failed to auto-draft season', error);
-        setSimulationSetupStatus(error && error.message ? error.message : 'Unable to auto-draft the simulation season right now.');
+        setSimulationSetupStatus(error && error.message ? error.message : 'Unable to auto-draft the simulation season right now.', 'error');
       }finally{
         if (!redirecting) {
           setSimulationSetupBusyState(false);

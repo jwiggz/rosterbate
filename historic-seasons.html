@@ -315,23 +315,9 @@
   }
   .pack-box-title{font:700 26px/.94 var(--teko);text-transform:uppercase}
   .star-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-  .spotlight-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
   .star-pill{
     display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:999px;border:1px solid rgba(125,196,255,.16);
     background:rgba(9,17,29,.7);font:700 12px/1 var(--plex);letter-spacing:.04em;color:#eef5ff
-  }
-  .spotlight{
-    width:100%;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.07);
-    background:linear-gradient(180deg,rgba(14,21,34,.92),rgba(9,13,23,.98))
-  }
-  .spotlight-title{font:700 18px/.95 var(--teko);text-transform:uppercase}
-  .spotlight-copy{margin-top:8px;font-size:13px;line-height:1.58;color:#cfdbeb}
-  .spotlight-copy strong{color:#fff3df}
-  .roadmap-mode-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .roadmap-mode{
-    display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:999px;
-    border:1px solid rgba(125,196,255,.14);background:rgba(10,19,33,.72);
-    font:700 11px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#e6f1ff
   }
   .selector-shell{display:grid;gap:12px;align-content:start}
   .selector-label{font:700 11px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#a7bddb}
@@ -382,24 +368,28 @@
 
   .side-stack{display:grid;gap:18px}
   .future-card{padding:22px}
-  .future-title{font:700 34px/.92 var(--teko);text-transform:uppercase}
-  .future-copy{margin-top:10px;font-size:14px;line-height:1.68;color:#d3deed}
+  .future-card .section-kicker{font-family:var(--plex)}
+  .future-title{font:700 34px/.92 var(--teko);letter-spacing:.03em;text-transform:uppercase}
+  .future-copy{margin-top:10px;font:600 14px/1.68 var(--plex);color:#d3deed}
   .future-list{display:grid;gap:10px;margin-top:16px}
   .future-item{
     padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
   }
-  .future-item strong{display:block;font:700 18px/.95 var(--teko);text-transform:uppercase}
-  .future-item span{display:block;margin-top:6px;font-size:13px;line-height:1.55;color:#cdd9ea}
-  .saved-universe-panel{display:grid;gap:14px}
+  .future-item strong{display:block;font:700 18px/.95 var(--teko);letter-spacing:.03em;text-transform:uppercase}
+  .future-item span{display:block;margin-top:6px;font:600 13px/1.55 var(--plex);color:#cdd9ea}
+  .saved-universe-panel{
+    display:grid;gap:14px;font-family:var(--plex);
+    text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased
+  }
   .saved-universe-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .saved-universe-count{
     display:inline-flex;align-items:center;justify-content:center;min-width:40px;padding:8px 11px;border-radius:999px;
     border:1px solid rgba(255,194,122,.2);background:rgba(36,24,12,.64);font:700 12px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#ffe0b9
   }
-  .saved-universe-list{display:grid;gap:10px}
+  .saved-universe-list{display:grid;gap:10px;font-family:var(--plex)}
   .saved-universe-card{
     padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
-    background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98))
+    background:linear-gradient(180deg,rgba(13,20,33,.92),rgba(8,12,22,.98));font-family:var(--plex)
   }
   .saved-universe-card.active-pack{
     border-color:rgba(125,196,255,.2);
@@ -454,13 +444,13 @@
       linear-gradient(180deg,rgba(21,55,53,.94),rgba(10,17,28,.98))
   }
   .saved-universe-era{font:700 9px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#d6e2f1}
-  .saved-universe-season{font:700 30px/.88 var(--teko);text-transform:uppercase}
+  .saved-universe-season{font:700 30px/.88 var(--teko);letter-spacing:.03em;text-transform:uppercase}
   .saved-universe-significance{
     display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
     background:rgba(10,18,30,.76);font:700 9px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#f4e2c7
   }
   .saved-universe-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-  .saved-universe-title{font:700 24px/.92 var(--teko);text-transform:uppercase}
+  .saved-universe-title{font:700 24px/.92 var(--teko);letter-spacing:.03em;text-transform:uppercase}
   .saved-universe-mode{
     display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
     background:rgba(10,18,30,.74);font:700 10px/1 var(--plex);letter-spacing:.1em;text-transform:uppercase;color:#dce8f7;white-space:nowrap
@@ -469,7 +459,7 @@
   .saved-universe-mode.tone-draft{background:rgba(10,26,48,.8);border-color:rgba(191,219,254,.18);color:#d8e8ff}
   .saved-universe-mode.tone-reimagined{background:rgba(45,30,10,.8);border-color:rgba(248,225,161,.2);color:#ffe5b8}
   .saved-universe-mode.tone-simulation{background:rgba(8,32,44,.82);border-color:rgba(125,211,252,.22);color:#d8f4ff}
-  .saved-universe-subtitle{margin-top:8px;font-size:13px;line-height:1.52;color:#d2ddef}
+  .saved-universe-subtitle{margin-top:8px;font:600 13px/1.52 var(--plex);color:#d2ddef}
   .saved-universe-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .saved-universe-pill{
     display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
@@ -479,7 +469,7 @@
   .saved-universe-progress-card{
     padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(9,15,24,.72)
   }
-  .saved-universe-progress-value{font:700 24px/.92 var(--teko)}
+  .saved-universe-progress-value{font:700 24px/.92 var(--teko);letter-spacing:.03em}
   .saved-universe-progress-label{margin-top:4px;font:700 9px/1 var(--plex);letter-spacing:.12em;text-transform:uppercase;color:#afc3df}
   .saved-universe-actions{display:flex;gap:10px;margin-top:12px}
   .saved-universe-btn{
@@ -489,7 +479,7 @@
   .saved-universe-btn.open{background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);color:#072314;border-color:rgba(187,247,208,.34)}
   .saved-universe-btn.delete{background:linear-gradient(180deg,#263246,#151e2e);color:#eef5ff}
   .saved-universe-empty{
-    padding:14px;border-radius:18px;border:1px dashed rgba(255,255,255,.12);background:rgba(9,14,24,.7);font-size:13px;line-height:1.6;color:#c8d6ea
+    padding:14px;border-radius:18px;border:1px dashed rgba(255,255,255,.12);background:rgba(9,14,24,.7);font:600 13px/1.6 var(--plex);color:#c8d6ea
   }
   .status-bar{
     margin-top:18px;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
@@ -520,7 +510,7 @@
     .hero-main,.hero-side,.browser-panel,.future-card{padding:18px}
     .hero-title{font-size:54px}
     .section-title,.pack-title,.future-title{font-size:34px}
-    .hero-foot,.snapshot-grid,.pack-health,.mode-buttons,.spotlight-list{grid-template-columns:1fr}
+    .hero-foot,.snapshot-grid,.pack-health,.mode-buttons{grid-template-columns:1fr}
     .mode-btn.hero{grid-column:auto}
     .pack-top{grid-template-columns:1fr}
     .saved-universe-top,.saved-universe-progress{grid-template-columns:1fr}
@@ -684,13 +674,6 @@
                   <div class="pack-box-title">Featured Stars</div>
                   <div class="star-row" id="featuredStars">
                     <span class="star-pill">Loading...</span>
-                  </div>
-                  <div class="pack-box-title" style="margin-top:18px">Team Spotlights</div>
-                  <div class="spotlight-list" id="teamSpotlights">
-                    <div class="spotlight">
-                      <div class="spotlight-title">Loading</div>
-                      <div class="spotlight-copy">Preparing team spotlight summaries.</div>
-                    </div>
                   </div>
                 </div>
 
@@ -1255,12 +1238,6 @@ const HISTORIC_1993_FALLBACK = {
     return map;
   }
 
-  function buildTeamMap(bundle){
-    const map = new Map();
-    (bundle && bundle.teams || []).forEach(team => map.set(String(team.teamId), team));
-    return map;
-  }
-
   function buildLaunchUrl(config, mode){
     const packId=encodeURIComponent(String(config.packId || ''));
     if(mode === 'draft'){
@@ -1444,12 +1421,6 @@ const HISTORIC_1993_FALLBACK = {
     }).join('');
 
     document.getElementById('featuredStars').innerHTML = '<span class="star-pill">No active pack selected</span>';
-    document.getElementById('teamSpotlights').innerHTML = [
-      '<div class="spotlight">',
-      '<div class="spotlight-title">Archive Shelf Cleared</div>',
-      '<div class="spotlight-copy">This zero-results state intentionally clears the previous active pack so the detail pane matches the filtered shelf.</div>',
-      '</div>'
-    ].join('');
 
     const select = document.getElementById('featuredTeamSelect');
     select.innerHTML = '<option value="">No visible seasons</option>';
@@ -1678,7 +1649,6 @@ const HISTORIC_1993_FALLBACK = {
     const presentation = bundle && bundle.presentation ? bundle.presentation : {};
     const summaries = bundle && bundle.summaries ? bundle.summaries : {};
     const playerMap = buildPlayerMap(bundle);
-    const teamMap = buildTeamMap(bundle);
     const audit = deriveAuditSummary(bundle, config);
     const isMixedEra=isMixedEraConfig(config);
     const teams = Array.isArray(bundle && bundle.teams) ? bundle.teams : [];
@@ -1724,33 +1694,7 @@ const HISTORIC_1993_FALLBACK = {
       ? starNames.map(function(name){ return '<span class="star-pill">' + name + '</span>'; }).join('')
       : '<span class="star-pill">Star slate not published yet</span>';
 
-    const teamSpotlights = Array.isArray(summaries.teamSpotlights) ? summaries.teamSpotlights.slice(0, 4) : [];
-      const spotlightMarkup = teamSpotlights.length
-        ? teamSpotlights.map(function(spotlight){
-            const team = teamMap.get(String(spotlight.teamId));
-            return [
-              '<div class="spotlight">',
-            '<div class="spotlight-title">' + teamDisplayName(team) + '</div>',
-            '<div class="spotlight-copy">' + (spotlight.summary || '') + '</div>',
-            '</div>'
-          ].join('');
-          }).join('')
-        : [
-            '<div class="spotlight">',
-            '<div class="spotlight-title">Why This Season Matters</div>',
-            '<div class="spotlight-copy">' + (config.whyItMatters || config.summary || 'This archive slot is visible now so the shelf can grow before every pack becomes playable.') + '</div>',
-            '</div>',
-            '<div class="spotlight">',
-            '<div class="spotlight-title">Planned Modes</div>',
-            '<div class="roadmap-mode-list">' + (plannedModes.length
-              ? plannedModes.map(function(mode){ return '<span class="roadmap-mode">' + mode + '</span>'; }).join('')
-              : '<span class="roadmap-mode">Archive Preview</span>') + '</div>',
-            '<div class="spotlight-copy"><strong>Pack completeness:</strong> ' + completenessText + '</div>',
-            '</div>'
-          ].join('');
-      document.getElementById('teamSpotlights').innerHTML = spotlightMarkup;
-
-      const select = document.getElementById('featuredTeamSelect');
+    const select = document.getElementById('featuredTeamSelect');
     if(isMixedEra){
       const slotCount=Math.max(2, Math.min(20, Number(config.startingSlotCount || 10) || 10));
       select.innerHTML = Array.from({length:slotCount}, function(_, index){
