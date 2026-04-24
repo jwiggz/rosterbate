@@ -75,6 +75,56 @@ const nflMixedEraContext = {
   playerPool: nflPlayerPool
 };
 
+function buildSkewedNflPlayers(position, count, startId, baseOverall, baseFp) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: startId + index,
+    name: `${position} Skew ${String(index + 1).padStart(3, '0')}`,
+    team: 'HIS',
+    pos: position,
+    fp: baseFp - (index % 7),
+    mixedEraOverall: baseOverall - Math.floor(index / 32),
+    historicalPackId: index < Math.ceil(count / 2) ? 'nfl_2007_full_season_v1' : 'nfl_2014_full_season_v1'
+  }));
+}
+
+const skewedNflPlayerPool = [
+  ...buildSkewedNflPlayers('WR', 96, 9000, 99, 140),
+  ...buildSkewedNflPlayers('RB', 32, 10000, 98, 132),
+  ...buildSkewedNflPlayers('TE', 32, 11000, 97, 126),
+  ...buildSkewedNflPlayers('QB', 32, 12000, 92, 90),
+  ...buildSkewedNflPlayers('OL', 32, 13000, 60, 30),
+  ...buildSkewedNflPlayers('DL', 48, 14000, 96, 85),
+  ...buildSkewedNflPlayers('LB', 64, 15000, 95, 82),
+  ...buildSkewedNflPlayers('K', 32, 16000, 58, 22),
+  ...buildSkewedNflPlayers('DST', 32, 17000, 57, 20),
+  ...buildSkewedNflPlayers('CB', 128, 18000, 40, 10)
+];
+
+const skewedNflMixedEraContext = {
+  mixedEraConfigId: '2007-2014-nfl-skewed',
+  sourcePackIds: [
+    'nfl_2007_full_season_v1',
+    'nfl_2014_full_season_v1'
+  ],
+  sourceSeasonLabels: ['2007', '2014'],
+  playerPool: skewedNflPlayerPool
+};
+
+function countRosterPlayersByPosition(roster, position) {
+  return roster.filter((player) => player.pos === position).length;
+}
+
+function assertNflRosterCoverage(roster, label) {
+  assert.ok(countRosterPlayersByPosition(roster, 'QB') >= 1, `${label} should include at least one QB`);
+  assert.ok(countRosterPlayersByPosition(roster, 'K') >= 1, `${label} should include at least one K`);
+  assert.ok(countRosterPlayersByPosition(roster, 'DST') >= 1, `${label} should include at least one DST`);
+  assert.ok(countRosterPlayersByPosition(roster, 'OL') >= 1, `${label} should include at least one OL`);
+  assert.ok(
+    roster.filter((player) => ['RB', 'WR', 'TE'].includes(player.pos)).length >= 5,
+    `${label} should include enough RB/WR/TE coverage to satisfy the flex concept`
+  );
+}
+
 const expectedRankedNames = rankPlayers(playerPool).map((player) => player.name);
 
 const pool = buildSimulationPlayerPool({ mixedEraContext, shell });
@@ -203,6 +253,18 @@ assert.ok(
   Object.values(nflAutoDraftState.draftState.rostersByTeam).every((roster) => Array.isArray(roster) && roster.length === 13),
   'every NFL team roster should contain 13 drafted players'
 );
+
+const skewedNflAutoDraftState = buildCompletedSimulationAutoDraftState({
+  shell: nflShell,
+  mixedEraContext: skewedNflMixedEraContext,
+  controlledTeamAbbr: 'GB'
+});
+
+assert.equal(Object.keys(skewedNflAutoDraftState.draftState.rostersByTeam).length, 32);
+Object.entries(skewedNflAutoDraftState.draftState.rostersByTeam).forEach(([teamAbbr, roster]) => {
+  assert.equal(roster.length, 13, `${teamAbbr} should finish the skewed NFL autodraft with 13 players`);
+  assertNflRosterCoverage(roster, `${teamAbbr} skewed NFL roster`);
+});
 
 assert.throws(() => buildCompletedSimulationAutoDraftState({
   shell,

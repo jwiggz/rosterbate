@@ -158,13 +158,17 @@
     return String(player?.pos || player?.primaryPosition || 'UTIL').trim().toUpperCase();
   }
 
-  function getFootballCoverageBonus(position, roster){
+  function isFootballFlexEligiblePosition(position){
+    return ['RB', 'WR', 'TE', 'FLEX'].includes(String(position || '').trim().toUpperCase());
+  }
+
+  function getFootballRosterCoverageState(roster){
+    const nextRoster = Array.isArray(roster) ? roster : [];
     const minimumCounts = {
       QB: 1,
       RB: 1,
       WR: 2,
       TE: 1,
-      FLEX: 1,
       OL: 1,
       DL: 1,
       LB: 1,
@@ -173,18 +177,40 @@
       K: 1,
       DST: 1
     };
-    const requiredCount = Number(minimumCounts[position] || 0);
-    if (!requiredCount) {
-      return 0;
+    const currentCounts = nextRoster.reduce((counts, entry) => {
+      const entryPosition = getSimulationPlayerPosition(entry);
+      counts[entryPosition] = Number(counts[entryPosition] || 0) + 1;
+      return counts;
+    }, {});
+    const getCount = (key) => Number(currentCounts[key] || 0);
+    return {
+      counts: currentCounts,
+      minimumCounts,
+      getCount,
+      flexEligibleCount: getCount('RB') + getCount('WR') + getCount('TE') + getCount('FLEX')
+    };
+  }
+
+  function getFootballCoverageBonus(position, roster){
+    const normalizedPosition = String(position || '').trim().toUpperCase();
+    const coverage = getFootballRosterCoverageState(roster);
+    let bonus = 0;
+
+    if (coverage.minimumCounts[normalizedPosition]) {
+      const requiredCount = Number(coverage.minimumCounts[normalizedPosition] || 0);
+      const currentCount = coverage.getCount(normalizedPosition);
+      if (currentCount < requiredCount) {
+        bonus += 1000000 + ((requiredCount - currentCount) * 10000);
+      }
     }
-    const nextRoster = Array.isArray(roster) ? roster : [];
-    const currentCount = nextRoster.reduce((count, entry) => (
-      getSimulationPlayerPosition(entry) === position ? count + 1 : count
-    ), 0);
-    if (currentCount >= requiredCount) {
-      return 0;
+
+    if (isFootballFlexEligiblePosition(normalizedPosition)) {
+      if (coverage.flexEligibleCount < 5) {
+        bonus += 1000000 + ((5 - coverage.flexEligibleCount) * 10000);
+      }
     }
-    return 1000 + ((requiredCount - currentCount) * 100);
+
+    return bonus;
   }
 
   function getSimulationAutoDraftScore(player, roster, shell){
