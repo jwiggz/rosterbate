@@ -7,7 +7,7 @@
   const ALLOWED_SEASON_TYPES=['historical_pack'];
   const ALLOWED_STATUS=['concept','draft','review','ready','deprecated'];
   const ALLOWED_SOURCE_PROFILES=['historical_curated','historical_internal','historical_partnered'];
-  const ALLOWED_SUPPORTED_MODES=['real_season','historical_draft','single_player_season','reimagined_season'];
+  const ALLOWED_SUPPORTED_MODES=['historical_draft','single_player_season','reimagined_season'];
   const ALLOWED_DRAFT_MODES=['snake','auction'];
   const REQUIRED_CONTENT_FILE_KEYS=['season','teams','players','rosterSnapshots','schedule','games','playerGameStats'];
   const OPTIONAL_CONTENT_FILE_KEYS=['packChallenges','presentation','summaries'];
@@ -48,11 +48,52 @@
     return Array.isArray(value) ? value : [];
   }
 
+  function normalizeSupportedMode(mode){
+    const normalized=String(mode || '').trim().toLowerCase();
+    if(normalized==='real_season') return 'single_player_season';
+    return normalized;
+  }
+
+  function addCompatibilityNote(report, code, message, path){
+    if(!report || !Array.isArray(report.compatibilityNotes)) return;
+    report.compatibilityNotes.push({code: code, message: message, path: path || ''});
+  }
+
+  function normalizeManifestModes(manifest, report){
+    const rawSupportedModes=Array.isArray(manifest && manifest.supportedModes) ? manifest.supportedModes : null;
+    const normalizedSupportedModes=rawSupportedModes
+      ? rawSupportedModes.map(function(mode){ return normalizeSupportedMode(mode); })
+      : null;
+    const normalizedDefaultEntryMode=normalizeSupportedMode(manifest && manifest.defaultEntryMode);
+
+    if(rawSupportedModes){
+      rawSupportedModes.forEach(function(mode, index){
+        if(String(mode || '').trim().toLowerCase()==='real_season'){
+          addCompatibilityNote(report, 'legacy_real_season_mode', 'Normalized legacy `real_season` supported mode to `single_player_season`.', 'manifest.supportedModes['+index+']');
+        }
+      });
+    }
+    if(String(manifest && manifest.defaultEntryMode || '').trim().toLowerCase()==='real_season'){
+      addCompatibilityNote(report, 'legacy_real_season_default_entry_mode', 'Normalized legacy `real_season` default entry mode to `single_player_season`.', 'manifest.defaultEntryMode');
+    }
+
+    if(isPlainObject(manifest)){
+      if(normalizedSupportedModes) manifest.supportedModes=normalizedSupportedModes.slice();
+      if(isNonEmptyString(manifest.defaultEntryMode)) manifest.defaultEntryMode=normalizedDefaultEntryMode;
+    }
+
+    return {
+      supportedModes: normalizedSupportedModes,
+      defaultEntryMode: normalizedDefaultEntryMode
+    };
+  }
+
   function createReport(packId){
     return {
       status: 'validation_passed_clean',
       errors: [],
       warnings: [],
+      compatibilityNotes: [],
       summary: {
         packId: packId || '',
         schemaVersion: null,
@@ -144,15 +185,17 @@
       addError(report, 'invalid_source_profile', 'Unsupported source profile `'+String(manifest.sourceProfile || '')+'`.', 'manifest.sourceProfile');
     }
 
-    if(!Array.isArray(manifest.supportedModes) || manifest.supportedModes.length===0){
+    const normalizedModes=normalizeManifestModes(manifest, report);
+
+    if(!Array.isArray(normalizedModes.supportedModes) || normalizedModes.supportedModes.length===0){
       addError(report, 'missing_supported_modes', '`supportedModes` must be a non-empty array.', 'manifest.supportedModes');
     }else{
-      manifest.supportedModes.forEach(function(mode, index){
+      normalizedModes.supportedModes.forEach(function(mode, index){
         if(!ALLOWED_SUPPORTED_MODES.includes(mode)){
           addError(report, 'invalid_supported_mode', 'Unsupported mode `'+String(mode || '')+'`.', 'manifest.supportedModes['+index+']');
         }
       });
-      if(!manifest.supportedModes.includes(manifest.defaultEntryMode)){
+      if(!normalizedModes.supportedModes.includes(normalizedModes.defaultEntryMode)){
         addError(report, 'default_mode_not_supported', '`defaultEntryMode` must appear in `supportedModes`.', 'manifest.defaultEntryMode');
       }
     }

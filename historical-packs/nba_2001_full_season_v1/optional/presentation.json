@@ -1,6 +1,6 @@
 {
   "heroTitle": "2000-01 NBA Historic Season",
-  "heroSubtitle": "Step into the Shaq-and-Kobe title-defense season or redraft the full turn-of-the-century league.",
+  "heroSubtitle": "Choose a historic season path around Shaq and Kobe or redraft the full turn-of-the-century league.",
   "featuredTeamId": "nba_2001_lal",
   "featuredStars": [
     "nba_2001_shaquille_o_neal_406",
@@ -21,9 +21,9 @@
   },
   "entryModes": [
     {
-      "mode": "real_season",
-      "label": "Play The Real Season",
-      "description": "Step into 2000-01 with the historical league intact."
+      "mode": "single_player_season",
+      "label": "Historic Season",
+      "description": "Choose one 2000-01 team and play through the full historical season."
     },
     {
       "mode": "historical_draft",

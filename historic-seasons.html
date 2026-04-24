@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="RosterBate Historic Seasons - Play classic seasons, draft full historical player pools, and launch alternate basketball universes.">
+<meta name="description" content="RosterBate Historic Seasons - Browse classic seasons, draft full historical player pools, and launch alternate basketball universes.">
 <title>RosterBate - Historic Seasons</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -536,7 +536,7 @@
       </a>
       <div class="nav-links">
         <a class="nav-link" href="index.html">Home</a>
-        <a class="nav-link" href="rosterbate-season.html?sport=nba&historical=dev">Real Season</a>
+        <a class="nav-link" href="rosterbate-season.html?sport=nba&historical=sim">Sim Season</a>
         <a class="nav-link accent" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
       </div>
     </header>
@@ -546,7 +546,7 @@
         <div class="eyebrow">Archive Browser</div>
         <h1 class="hero-title">Historic <span>Seasons</span></h1>
         <div class="hero-copy">
-          Open a complete era as its own playable universe. Keep history intact, redraft the entire league, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
+          Open a complete era as its own historical universe. Draft the entire league, simulate the pack, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
         </div>
         <div class="hero-chip-row">
           <div class="hero-chip">Full-League Player Pool</div>
@@ -705,10 +705,9 @@
                     <a href="#" class="mode-btn primary hero" id="draftEraBtn">Draft The Era</a>
                     <a href="#" class="mode-btn secondary" id="simSeasonBtn">Sim Season</a>
                     <a href="#" class="mode-btn tertiary" id="reimaginedSeasonBtn">Reimagined Season</a>
-                    <a href="#" class="mode-btn subtle" id="playRealSeasonBtn">Replay Era Rosters</a>
                   </div>
                   <div class="mode-note" id="modeNote">
-                    On localhost, the selected slot becomes your controlled entry point before the drafted or simulated universe opens.
+                    On localhost, the selected slot becomes your controlled entry point before the drafted, simulated, or reimagined universe opens.
                   </div>
                 </div>
               </div>
@@ -738,10 +737,6 @@
               <strong>Reimagined Season</strong>
               <span>Branch the era into a new alternate timeline before the season unfolds, then let the reveal loop tell the new story forward.</span>
             </div>
-            <div class="future-item">
-              <strong>Replay Era Rosters</strong>
-              <span>Keep the real roster identities intact as an authenticity lane, but treat it as the supporting mode beside the custom-universe fantasy.</span>
-            </div>
           </div>
         </div>
 
@@ -754,7 +749,7 @@
             <div class="saved-universe-count" id="savedUniverseCount">0</div>
           </div>
           <div class="future-copy">
-            Every real season, reimagined branch, and drafted universe can live here as its own revisit-able archive slot.
+            Every historical pack, saved simulation, and drafted universe can live here as its own revisit-able archive slot.
           </div>
           <div class="saved-universe-list" id="savedUniversesList">
             <div class="saved-universe-empty">Loading saved universes...</div>
@@ -796,7 +791,7 @@ const HISTORIC_1987_FALLBACK = {
     subline: 'Peak Celtics-Lakers tension with a young Jordan entering the frame.'
   },
   previewStars: ['Magic Johnson', 'Larry Bird', 'Michael Jordan'],
-  seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1987_full_season_v1',
+  seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1987_full_season_v1',
   simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1987_full_season_v1',
   draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1987_full_season_v1',
   reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1987_full_season_v1'
@@ -824,7 +819,7 @@ const HISTORIC_1993_FALLBACK = {
     subline: 'Bulls title gravity with Phoenix and Barkley as the Finals counterweight.'
   },
   previewStars: ['Michael Jordan', 'Charles Barkley', 'Scottie Pippen'],
-  seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1',
+  seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1',
   simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1',
   draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1',
   reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'
@@ -863,7 +858,7 @@ const HISTORIC_1993_FALLBACK = {
       startingSlotCount: 10,
       playerCount: 300,
       auditSummary: {
-        realStatCoverage: { playersWithRealSeasonStats: 300, playerCount: 300, label: 'Real season stats' },
+        realStatCoverage: { playersWithRealSeasonStats: 300, playerCount: 300, label: 'Historical season stats' },
         zeroGamePlayers: { count: 0, label: 'Zero-game players' },
         removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
       }
@@ -881,8 +876,8 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable foundation',
       completenessPercent: 82,
       tagline: 'Draft the era and build a 72-win dream roster of your own.',
-      summary: 'Full-league historical universe with real season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
-      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox instead of only a preserved roster replay.',
+      summary: 'Full-league historical universe with Historical season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.',
       focusTeamName: 'Chicago Bulls',
       art: {
         theme: 'dynasty',
@@ -890,9 +885,9 @@ const HISTORIC_1993_FALLBACK = {
         headline: '72-Win Empire',
         subline: 'Jordan, Hakeem, Shaq, and the full season universe.'
       },
-      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season', 'Replay Era Rosters'],
+      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season'],
       previewStars: ['Michael Jordan', 'Hakeem Olajuwon', "Shaquille O'Neal"],
-      seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1',
+      seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1',
       simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1',
       draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1996_full_season_v1'
     },
@@ -911,7 +906,7 @@ const HISTORIC_1993_FALLBACK = {
         completenessLabel: 'Playable iconic season',
         completenessPercent: 80,
         tagline: 'Draft a turn-of-the-century superteam from one loaded player pool.',
-        summary: 'A first-class 2000-01 historical universe with real season data, a full league player pool, and marquee early-2000s star power.',
+        summary: 'A first-class 2000-01 historical universe with Historical season stats, a full league player pool, and marquee early-2000s star power.',
         whyItMatters: 'This is the archive lane\'s turn-of-the-century flagship: a recognizable Shaq-and-Kobe title-defense universe that plays differently from both the 1990s and 2010s packs.',
         focusTeamName: 'Los Angeles Lakers',
         art: {
@@ -920,9 +915,9 @@ const HISTORIC_1993_FALLBACK = {
           headline: 'Shaq. Kobe. AI.',
           subline: 'An early-2000s spotlight season built on dominant bigs, electric guards, and playoff gravity.'
         },
-        plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season', 'Replay Era Rosters'],
+        plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season'],
         previewStars: ["Shaquille O'Neal", 'Kobe Bryant', 'Allen Iverson'],
-        seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2001_full_season_v1',
+        seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1',
         simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1',
         draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2001_full_season_v1',
         reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2001_full_season_v1'
@@ -940,8 +935,8 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable modern foundation',
       completenessPercent: 80,
       tagline: 'Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.',
-      summary: 'A modern historical universe with a loaded full-season player pool, real season stats, and a strong foundation for drafted or simulated alternate-history runs.',
-      whyItMatters: 'This season gives the archive lane a modern tentpole pack where the biggest fantasy is not replaying one roster intact, but drafting the entire era into custom universes.',
+      summary: 'A modern historical universe with a loaded full-season player pool, Historical season stats, and a strong foundation for drafted or simulated alternate-history runs.',
+      whyItMatters: 'This season gives the archive lane a modern tentpole pack where the biggest fantasy is drafting the entire era into custom universes from one loaded player pool.',
       focusTeamName: 'Golden State Warriors',
       art: {
         theme: 'modern',
@@ -949,9 +944,9 @@ const HISTORIC_1993_FALLBACK = {
         headline: '73 Wins. 3-1 Swing.',
         subline: 'Unanimous MVP energy and the most volatile Finals pivot of the era.'
       },
-      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season', 'Replay Era Rosters'],
+      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season'],
       previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard'],
-      seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
+      seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1',
       simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1',
       draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1',
       reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2016_full_season_v1'
@@ -1248,7 +1243,7 @@ const HISTORIC_1993_FALLBACK = {
     const realSeason = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) > 0).length;
     const zeroGames = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) <= 0).length;
     return {
-      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Real season stats' },
+      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Historical season stats' },
       zeroGamePlayers: { count: zeroGames, label: 'Zero-game players' },
       removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
     };
@@ -1277,7 +1272,7 @@ const HISTORIC_1993_FALLBACK = {
     if(mode === 'reimagined'){
       return String(config.reimaginedUrl || ('rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=' + packId));
     }
-    return String(config.seasonUrl || ('rosterbate-season.html?sport=nba&historical=dev&historicalPackId=' + packId));
+    return String(config.seasonUrl || config.simUrl || ('rosterbate-season.html?sport=nba&historical=sim&historicalPackId=' + packId));
   }
 
   function renderHealthCards(audit){
@@ -1292,8 +1287,8 @@ const HISTORIC_1993_FALLBACK = {
       {
         tone: covered && total && covered === total ? 'good' : '',
         value: (covered || 0) + ' / ' + (total || 0),
-        label: real.label || 'Real Stat Coverage',
-        sub: 'players with real season production'
+        label: real.label || 'Historical Stat Coverage',
+        sub: 'players with historical season production'
       },
       {
         tone: zeroCount === 0 ? 'good' : 'warn',
@@ -1463,8 +1458,7 @@ const HISTORIC_1993_FALLBACK = {
     const buttonResets = [
       { id: 'draftEraBtn', label: 'Draft The Era' },
       { id: 'simSeasonBtn', label: 'Sim Season' },
-      { id: 'reimaginedSeasonBtn', label: 'Reimagined Season' },
-      { id: 'playRealSeasonBtn', label: 'Replay Era Rosters' }
+      { id: 'reimaginedSeasonBtn', label: 'Reimagined Season' }
     ];
     buttonResets.forEach(function(buttonConfig){
       const button = document.getElementById(buttonConfig.id);
@@ -1477,7 +1471,7 @@ const HISTORIC_1993_FALLBACK = {
       };
     });
 
-    document.getElementById('modeNote').textContent = 'Clear filters to load a season before launching Draft The Era, Sim Season, or Replay Era Rosters.';
+    document.getElementById('modeNote').textContent = 'Clear filters to load a season before launching Draft The Era, Sim Season, or Reimagined Season.';
     document.getElementById('detailNote').textContent = 'The archive browser resets its hero and detail state when filters produce zero matches so no hidden pack appears active.';
   }
 
@@ -1571,7 +1565,7 @@ const HISTORIC_1993_FALLBACK = {
     const slots = api.listSlots({ sport:getBrowserSport() });
     countEl.textContent = String(slots.length || 0);
     if(!slots.length){
-      listEl.innerHTML = '<div class="saved-universe-empty">No saved historical universes yet. Launch a real season, a reimagined branch, or complete a historical draft and it will show up here.</div>';
+      listEl.innerHTML = '<div class="saved-universe-empty">No saved historical universes yet. Start a simulation league or complete a historical draft and it will show up here.</div>';
       return;
     }
     listEl.innerHTML = slots.map(function(slot){
@@ -1780,24 +1774,19 @@ const HISTORIC_1993_FALLBACK = {
       select.disabled = true;
     }
 
-    const playBtn = document.getElementById('playRealSeasonBtn');
     const simBtn = document.getElementById('simSeasonBtn');
     const draftBtn = document.getElementById('draftEraBtn');
     const reimaginedBtn = document.getElementById('reimaginedSeasonBtn');
     const playableHere = config.availability === 'playable' && isLocalHistorical;
     const canDraft=playableHere;
-    const canReplay=playableHere && !isMixedEra;
     const canSim=playableHere && !isMixedEra;
     const canReimagined=playableHere && !isMixedEra;
-    playBtn.textContent=isMixedEra ? 'Replay Locked' : 'Replay Era Rosters';
     simBtn.textContent=isMixedEra ? 'Sim After Draft' : 'Sim Season';
     draftBtn.textContent='Draft The Era';
     reimaginedBtn.textContent=isMixedEra ? 'Reimagined Later' : 'Reimagined Season';
-    playBtn.classList.toggle('disabled', !canReplay);
     simBtn.classList.toggle('disabled', !canSim);
     draftBtn.classList.toggle('disabled', !canDraft);
     reimaginedBtn.classList.toggle('disabled', !canReimagined);
-    playBtn.setAttribute('href', canReplay ? buildLaunchUrl(config, 'season') : '#');
     simBtn.setAttribute('href', canSim ? buildLaunchUrl(config, 'simulation') : '#');
     draftBtn.setAttribute('href', canDraft ? (isMixedEra ? buildMixedEraDraftLaunchUrl(config, String(select.value || '1').trim()) : buildLaunchUrl(config, 'draft')) : '#');
     reimaginedBtn.setAttribute('href', canReimagined ? buildLaunchUrl(config, 'reimagined') : '#');
@@ -1808,7 +1797,7 @@ const HISTORIC_1993_FALLBACK = {
           : 'This crossover lane is visible now, but direct launch stays localhost-first until the mixed-era lane graduates.')
       : playableHere
         ? 'On localhost, launching from here stages your selected slot before opening the drafted or simulated universe.'
-        : (config.availability === 'playable'
+      : (config.availability === 'playable'
           ? 'This pack is real, but direct launch stays localhost-first until the lane graduates from preview.'
           : 'Preview packs stay visible early on purpose. Planned modes: ' + (plannedModes.length ? plannedModes.join(', ') : 'Archive preview') + '.');
 
@@ -1817,25 +1806,6 @@ const HISTORIC_1993_FALLBACK = {
       : config.availability === 'playable'
         ? 'This pack is being read from the real historical pack artifact. The shelf is ready for more eras whenever the next pack lands.'
         : 'Preview packs are intentionally listed before they are playable. Completeness: ' + completenessText + '. Why this season matters: ' + (config.whyItMatters || 'This archive slot is here to make the roadmap feel tangible before the pack is authored.');
-
-    playBtn.onclick = async function(event){
-      event.preventDefault();
-      if(!canReplay){
-        setStatus(config.availability === 'playable'
-          ? (isMixedEra
-              ? 'This lane is draft-first. Replaying intact era rosters is intentionally not the main fantasy promise here.'
-              : 'This pack is playable, but direct launch remains localhost-first for now.')
-          : 'This archive slot is a preview. It is visible now so the shelf reads like a real archive, not a single-pack experiment.', 'warn');
-        return;
-      }
-      setStatus('Staging the selected slot and opening roster replay...', 'good');
-      try{
-        await stageSelectedTeam(config, String(select.value || '').trim());
-        window.location.href = buildLaunchUrl(config, 'season');
-      }catch(error){
-        setStatus('Could not stage roster replay: ' + (error && error.message ? error.message : String(error)), 'warn');
-      }
-    };
 
     simBtn.onclick = async function(event){
       event.preventDefault();

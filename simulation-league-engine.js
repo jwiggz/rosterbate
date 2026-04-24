@@ -493,7 +493,7 @@
     return {
       version:ENGINE_VERSION,
       packId:packId || null,
-      source:'real_season_stats_plus_light_authored_tuning',
+      source:'historical_season_stats_plus_light_authored_tuning',
       archetype:detectArchetype(player, baseline),
       gamesPlayed:gp,
       totalFantasyPoints:roundStat(totalFantasyPoints),
@@ -540,7 +540,7 @@
     if(Array.isArray(state.historicalPlayerPool)) enrichRosterCollection(state.historicalPlayerPool, { packId:packId });
     state.simulationProfile=Object.assign({}, state.simulationProfile || {}, {
       engineVersion:ENGINE_VERSION,
-      ratingsSource:'real season stats + light authored tuning',
+      ratingsSource:'Historical season stats + light authored tuning',
       mixedEraNormalization:'season_context_plus_light_authored_tuning',
       simulationCadence:'daily_reveal',
       simulationOutput:'box_score'

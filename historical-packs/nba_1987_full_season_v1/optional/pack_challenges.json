@@ -3,9 +3,9 @@
   "version": 1,
   "challengeGroups": [
     {
-      "groupId": "real_season_paths",
-      "label": "Play The Real Season",
-      "mode": "real_season"
+      "groupId": "historic_season_paths",
+      "label": "Historic Season Paths",
+      "mode": "single_player_season"
     },
     {
       "groupId": "draft_the_era_paths",
@@ -21,10 +21,10 @@
   "challenges": [
     {
       "challengeId": "lakers_repeat_pace",
-      "mode": "real_season",
+      "mode": "single_player_season",
       "path": "featured_team_path",
       "title": "Keep Showtime On Top",
-      "description": "Take the featured Lakers lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
+      "description": "Take the featured Lakers lane and clear 60 wins in a season whose schedule/results come from the historical foundation while player-game box lines remain explicitly inferred.",
       "type": "season_wins_min",
       "target": 60,
       "evaluation": "season_end",
@@ -34,7 +34,7 @@
     },
     {
       "challengeId": "east_challenger_55",
-      "mode": "real_season",
+      "mode": "single_player_season",
       "path": "open_team_path",
       "title": "Break The Rivalry",
       "description": "Choose any team and reach 55 wins while trying to interrupt the Bird-Magic prestige track.",
@@ -50,7 +50,7 @@
       "mode": "historical_draft",
       "path": "alternate_history_success",
       "title": "Draft The Superteam",
-      "description": "Redraft 1986-87 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
+      "description": "Redraft 1986-87 from the full player pool, knowing the schedule/results come from the historical foundation while the player-game box lines are weighted season estimates.",
       "type": "season_wins_min",
       "target": 58,
       "evaluation": "season_end",

@@ -162,11 +162,7 @@ global.localStorage = {
     throw new Error('quota exceeded');
   }
 };
-assert.throws(
-  () => writeCompletedSimulationState({ ok: true }),
-  /quota exceeded/i,
-  'completed simulation draft writes should surface localStorage failures'
-);
+assert.throws(() => writeCompletedSimulationState({ ok: true }), /quota exceeded/i);
 global.localStorage = originalLocalStorage;
 
 console.log('simulation mode runtime test passed');

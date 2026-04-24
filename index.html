@@ -1786,20 +1786,20 @@
           <div class="cta-lane historical">
             <div class="cta-pane-head historical">
               <div class="cta-pane-title">Historic Seasons</div>
-              <span class="cta-pane-sub">Play The Real Season • Draft The Era</span>
+              <span class="cta-pane-sub">Browse Historic Seasons • Draft The Era</span>
             </div>
             <div class="cta-card historical-era" id="historicalCard">
               <div class="historical-shell">
                 <div class="historical-copy">
                   <div class="historical-kicker">Flagship Universe</div>
                   <div class="historical-title" id="historicalEntryTitle">1995-96 NBA Universe</div>
-                  <div class="historical-desc" id="historicalEntryDesc">Load the full historical player pool, relive the real season, or redraft the era with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the league in one alternate-history sandbox.</div>
+                  <div class="historical-desc" id="historicalEntryDesc">Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.</div>
                   <div class="historical-meta-row">
                     <span class="cta-meta-pill open" id="historicalEntryStatus">Playable Now</span>
                     <span class="cta-meta-pill info">Basketball First</span>
                     <span class="cta-meta-pill info">Classic Era Mode</span>
                   </div>
-                  <div class="historical-footnote" id="historicalEntryNote">Historic mode is now a real product lane: franchise runs, daily reveal seasons, and full-pool fantasy drafts from a loaded era pack.</div>
+                  <div class="historical-footnote" id="historicalEntryNote">Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.</div>
                 </div>
                 <div class="historical-scoreboard">
                   <div class="historical-stat-card">
@@ -1818,7 +1818,6 @@
               </div>
               <div class="historical-action-row">
                 <a id="historicalBrowseLink" class="historical-btn tertiary" href="historic-seasons.html?sport=nba">Browse Historic Seasons</a>
-                <a id="historicalSeasonLink" class="historical-btn primary" href="rosterbate-season.html?sport=nba&historical=dev">Play The Real Season</a>
                 <a id="historicalDraftLink" class="historical-btn secondary" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
                 <a class="historical-btn secondary hero-cta" href="rosterbate-simulation-setup.html?sport=nba">Start Simulation League</a>
               </div>
@@ -2355,7 +2354,7 @@ const HOME_SPORT_SIGNALS = {
 };
 const HOME_HISTORICAL_SURFACE = {
   title: '1995-96 NBA Universe',
-  description: 'Load the full historical player pool, relive the real season, or redraft the era with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the league in one alternate-history sandbox.',
+  description: 'Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.',
   teamCount: 29,
   playerCount: 436,
   gameCount: 183,
@@ -2577,7 +2576,7 @@ function updateHistoricalEntrySurface(){
   if(statusEl) statusEl.textContent = isLocalHistorical ? 'Playable Now' : 'Founder Preview';
   if(noteEl){
     noteEl.textContent = isLocalHistorical
-      ? 'Historic mode is now a real product lane: franchise runs, daily reveal seasons, and full-pool fantasy drafts from a loaded era pack.'
+      ? 'Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.'
       : 'Historic Seasons is being developed as a flagship mode. Basketball is the first universe coming online before wider release.';
   }
   if(browseLink){
@@ -2587,7 +2586,6 @@ function updateHistoricalEntrySurface(){
     browseLink.removeAttribute('aria-disabled');
   }
   [
-    [seasonLink, surface.seasonUrl, 'Play The Real Season'],
     [draftLink, surface.draftUrl, 'Draft The Era']
   ].forEach(([el, href, label]) => {
     if(!el) return;

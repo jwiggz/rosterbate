@@ -517,7 +517,7 @@ def main():
         "eraTags": ["2010s", "Pace and Space", "Historic Season"],
         "notes": [
             "Full-league historical foundation pack for 2015-16.",
-            "Supports real-season boots, Draft The Era, and Reimagined Season."
+            "Supports Historic Season, Draft The Era, and Reimagined Season."
         ],
     }
 
@@ -536,13 +536,13 @@ def main():
         "isHistorical": True,
         "era": "2010s",
         "version": 1,
-        "status": "concept",
+        "status": "ready",
         "sourceProfile": "historical_curated",
-        "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
-        "defaultEntryMode": "real_season",
+        "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
+        "defaultEntryMode": "single_player_season",
         "focusTeamId": "nba_2016_gsw",
-        "subtitle": "Play the real season, redraft the era, or branch into a reimagined universe.",
-        "description": "A 2015-16 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
+        "subtitle": "Start a historic season, redraft the era, or branch into a reimagined universe.",
+        "description": "A 2015-16 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
         "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
         "eraTags": ["2010s", "Warriors Era", "Historic Season"],
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
@@ -565,13 +565,13 @@ def main():
             "sourceProfile": "historical_curated",
             "curationOwner": "RosterBate",
             "reviewStatus": "draft",
-            "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from real game details and the full regular-season schedule/results.",
+            "importNotes": "2015-16 pack built from the public hamzas/nba-games dataset on Hugging Face, with season totals aggregated from historical game details and the full regular-season schedule/results.",
         },
         "auditSummary": {
             "realStatCoverage": {
                 "playersWithRealSeasonStats": real_stat_players,
                 "playerCount": len(players),
-                "label": "Real season stats",
+                "label": "Historical season stats",
             },
             "zeroGamePlayers": {
                 "count": zero_game_players,
@@ -583,9 +583,9 @@ def main():
             },
         },
         "notes": [
-            "Player ranking is driven by real 2015-16 season production aggregated from real game-detail rows.",
+            "Player ranking is driven by historical 2015-16 season production aggregated from historical game-detail rows.",
             "Schedule and game results span the full 2015-16 regular season.",
-            "Reimagined Season uses the same real historical player pool and pack health metadata."
+            "Reimagined Season uses the same historical player pool and pack health metadata."
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
@@ -593,7 +593,7 @@ def main():
 
     presentation = {
         "heroTitle": SEASON_LABEL,
-        "heroSubtitle": "Play the real season, draft the era, or branch into a reimagined universe.",
+        "heroSubtitle": "Start a historic season, draft the era, or branch into a reimagined universe.",
         "featuredTeamId": "nba_2016_gsw",
         "featuredStars": [
             "nba_2016_stephencurry_201939",
@@ -609,14 +609,14 @@ def main():
             "backgroundStyle": "historic_modern_spotlight",
         },
         "entryModes": [
-            {"mode": "real_season", "label": "Play The Real Season", "description": "Step into 2015-16 with historical rosters intact."},
+            {"mode": "single_player_season", "label": "Historic Season", "description": "Choose one 2015-16 team and play through the full historical season."},
             {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the full 2015-16 player pool into a new fantasy universe."},
             {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch a fully reshuffled 2015-16 and play the alternate branch from opening night."},
         ],
     }
 
     summaries = {
-        "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with real full-season player production, the full schedule/results grid, and a player pool built for real-season play, Draft The Era, and Reimagined Season.",
+        "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with historical full-season player production, the full schedule/results grid, and a player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
         "featuredStorylines": [
             "Seventy-three wins and unanimous-MVP gravity reshape the fantasy board.",
             "LeBron, Steph, Kawhi, KD, Russ, and Harden collide in one modern historic pool.",
@@ -630,14 +630,14 @@ def main():
             {"teamId": "nba_2016_tor", "summary": "Toronto adds a strong East contender lane with Lowry and DeRozan leading the way."},
         ],
         "modeSummaries": [
-            {"mode": "real_season", "summary": "Keep the 2015-16 season intact and see whether you can match or surpass the era-defining outcomes."},
+            {"mode": "single_player_season", "summary": "Choose one franchise and guide it through the full 2015-16 historical season."},
             {"mode": "historical_draft", "summary": "Remix the full-league 2015-16 player universe and discover what the season becomes with custom rosters."},
             {"mode": "reimagined_season", "summary": "Launch a fully reshuffled version of 2015-16 and treat the season like an alternate-history branch from day one."},
         ],
         "auditSummary": manifest["auditSummary"],
         "auditNotes": [
-            "Real season stats cover every included player in the pack.",
-            "Schedule and results span the full regular season using real historical game records.",
+            "Historical season stats cover every included player who logged official 2015-16 regular-season minutes.",
+            "Schedule and results span the full regular season using historical game records.",
             "No synthetic player stat generation is used in this pack path.",
         ],
     }
@@ -646,14 +646,14 @@ def main():
         "packId": PACK_ID,
         "version": 1,
         "challengeGroups": [
-            {"groupId": "real_season_paths", "label": "Play The Real Season", "mode": "real_season"},
+            {"groupId": "historic_season_paths", "label": "Historic Season Paths", "mode": "single_player_season"},
             {"groupId": "draft_the_era_paths", "label": "Draft The Era", "mode": "historical_draft"},
             {"groupId": "reimagined_paths", "label": "Reimagined Season", "mode": "reimagined_season"},
         ],
         "challenges": [
             {
                 "challengeId": "warriors_73_wins",
-                "mode": "real_season",
+                "mode": "single_player_season",
                 "path": "warriors_featured_path",
                 "title": "Match 73 Wins",
                 "description": "Finish the season with at least 73 wins.",
@@ -666,7 +666,7 @@ def main():
             },
             {
                 "challengeId": "open_team_50_wins",
-                "mode": "real_season",
+                "mode": "single_player_season",
                 "path": "open_team_path",
                 "title": "Modern Contender",
                 "description": "Choose any included team and finish with at least 50 wins.",
@@ -727,7 +727,7 @@ def main():
                 "rosterSnapshots": len(roster_snapshots),
                 "scheduleGames": len(schedule),
                 "playerGameStats": len(player_game_stats),
-                "realSeasonStats": real_stat_players,
+                "historicalSeasonStats": real_stat_players,
                 "zeroGamePlayers": zero_game_players,
             },
             indent=2,

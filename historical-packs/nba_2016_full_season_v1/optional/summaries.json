@@ -1,5 +1,5 @@
 {
-  "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with real full-season player production, the full schedule/results grid, and a player pool built for real-season play, Draft The Era, and Reimagined Season.",
+  "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with historical full-season player production, the full schedule/results grid, and a player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
   "featuredStorylines": [
     "Seventy-three wins and unanimous-MVP gravity reshape the fantasy board.",
     "LeBron, Steph, Kawhi, KD, Russ, and Harden collide in one modern historic pool.",
@@ -29,8 +29,8 @@
   ],
   "modeSummaries": [
     {
-      "mode": "real_season",
-      "summary": "Keep the 2015-16 season intact and see whether you can match or surpass the era-defining outcomes."
+      "mode": "single_player_season",
+      "summary": "Choose one franchise and guide it through the full 2015-16 historical season."
     },
     {
       "mode": "historical_draft",
@@ -45,7 +45,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 476,
       "playerCount": 596,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 120,
@@ -57,8 +57,8 @@
     }
   },
   "auditNotes": [
-    "Real season stats cover every included player in the pack.",
-    "Schedule and results span the full regular season using real historical game records.",
+    "Historical season stats cover every included player who logged official 2015-16 regular-season minutes.",
+    "Schedule and results span the full regular season using historical game records.",
     "No synthetic player stat generation is used in this pack path."
   ]
 }

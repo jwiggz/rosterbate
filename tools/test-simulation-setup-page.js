@@ -383,6 +383,7 @@ async function main(){
     href: 'rosterbate-simulation-setup.html?sport=nba',
     search: '?sport=nba'
   };
+  let failedAutoDraftHelperInput = null;
   const failedAutoDraftContext = {
     console,
     URLSearchParams,
@@ -417,7 +418,7 @@ async function main(){
     },
     localStorage: {
       setItem(){
-        throw new Error('storage write failed');
+        throw new Error('should not write setup payload during completed-draft failure test');
       }
     }
   };
@@ -427,9 +428,10 @@ async function main(){
   failedAutoDraftContext.window.RosterBateSimulationModeRuntime = {
     STORAGE_KEY: 'rbSimulationModeLocalState__fromRuntime',
     writeCompletedSimulationState(){
-      throw new Error('storage write failed');
+      throw new Error('quota exceeded');
     },
     buildCompletedSimulationAutoDraftState(input){
+      failedAutoDraftHelperInput = input;
       return {
         simulationMode: 'nba_mixed_era_single_player_v1',
         leagueShell: input.shell,
@@ -463,24 +465,14 @@ async function main(){
 
   await failedAutoDraftContext.simDraftAndStartSeason();
 
-  assert.equal(
-    failedAutoDraftStatusNode.textContent,
-    'storage write failed',
-    'auto-draft path should surface completed-state storage failures to the user'
-  );
-  assert.equal(
-    failedAutoDraftLocationState.href,
-    'rosterbate-simulation-setup.html?sport=nba',
-    'auto-draft path should stay on setup when the completed-state write fails'
-  );
-  assert.equal(failedAutoDraftContinueButton.disabled, false, 'auto-draft write failures should re-enable the manual CTA');
-  assert.equal(failedAutoDraftButtonNode.disabled, false, 'auto-draft write failures should re-enable the auto CTA');
-  assert.equal(failedAutoDraftFranchiseSelect.disabled, false, 'auto-draft write failures should re-enable franchise selection');
-  assert.equal(failedAutoDraftDraftSlotSelect.disabled, false, 'auto-draft write failures should re-enable draft slot selection');
-  assert.ok(
-    failedAutoDraftSeasonNodes.every((node) => node.disabled === false),
-    'auto-draft write failures should re-enable the selected era inputs'
-  );
+  assert.equal(failedAutoDraftHelperInput.controlledTeamAbbr, 'LAL', 'auto-draft failure path should still build the completed simulation state before the write fails');
+  assert.equal(failedAutoDraftStatusNode.textContent, 'quota exceeded', 'auto-draft failure path should surface the storage write error');
+  assert.equal(failedAutoDraftLocationState.href, 'rosterbate-simulation-setup.html?sport=nba', 'auto-draft failure path should stay on setup when the completed state cannot be written');
+  assert.equal(failedAutoDraftContinueButton.disabled, false, 'auto-draft failure path should re-enable the manual CTA');
+  assert.equal(failedAutoDraftButtonNode.disabled, false, 'auto-draft failure path should re-enable the auto CTA');
+  assert.equal(failedAutoDraftFranchiseSelect.disabled, false, 'auto-draft failure path should re-enable franchise selection');
+  assert.equal(failedAutoDraftDraftSlotSelect.disabled, false, 'auto-draft failure path should re-enable draft slot selection');
+  assert.ok(failedAutoDraftSeasonNodes.every((node) => node.disabled === false), 'auto-draft failure path should re-enable all season inputs');
 
   console.log('simulation setup page test passed');
 }

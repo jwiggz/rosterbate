@@ -78,8 +78,8 @@ assert.equal(
     sport: 'nba',
     simulationMode: 'nba_mixed_era_single_player_v1'
   }, 'nba'),
-  'rosterbate-simulation-season.html?simulation=nba_mixed_era&historicalUniverse=sim-slot-1',
-  'simulation universes should open in the dedicated simulation season page'
+  'rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=sim-slot-1',
+  'simulation universes should open in the shared season shell'
 );
 
 assert.equal(

@@ -1194,9 +1194,9 @@ def build_schedule_results_snapshot(team_defs, wiki_pages, wiki_player_stats_by_
         "teamCoverage": team_coverage,
         "notes": [
             "Live nbastats_1986 / pbpstats_1986 feeds are absent, so the pack cannot use the same play-by-play ingestion lane as later seasons.",
-            "Accessible Wikipedia team-season game logs are parsed wherever they expose real regular-season rows.",
+            "Accessible Wikipedia team-season game logs are parsed wherever they expose historical regular-season rows.",
             "A FiveThirtyEight historical results backfill completes the schedule grid for teams whose Wikipedia season pages are empty or partial.",
-            "Player-game stat rows remain inferred from season totals and are not marketed as real event box scores.",
+            "Player-game stat rows remain inferred from season totals and are not marketed as event-level box scores.",
         ],
         "games": ordered_games,
         "audit": {
@@ -1674,7 +1674,7 @@ def main():
         "isHistorical": True,
         "eraTags": ERA_TAGS,
         "notes": [
-            "This pack uses the real 1986-87 regular-season schedule and final scores.",
+            "This pack uses the historical 1986-87 regular-season schedule and final scores.",
             "Normal builds consume checked-in schedule and normalized player source snapshots rather than live network fetches.",
             "Player season totals originate from curated checked-in historical source artifacts.",
             "Player-game rows are deterministic season-average weighted estimates because live 1986 play-by-play feeds are absent.",
@@ -1697,12 +1697,12 @@ def main():
         "sourceProfile": SOURCE_PROFILE,
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
-        "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
-        "defaultEntryMode": "real_season",
+        "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
+        "defaultEntryMode": "single_player_season",
         "focusTeamId": FEATURED_TEAM_ID,
-        "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 replay foundation with Lakers prestige at the center.",
-        "description": "A playable 1986-87 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
-        "tagline": "Replay the Bird-Magic-Jordan season with real scores and disclosed inferred box lines.",
+        "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 historical season foundation with Lakers prestige at the center.",
+        "description": "A playable 1986-87 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
+        "tagline": "Draft the Bird-Magic-Jordan season with disclosed inferred box lines.",
         "eraTags": ERA_TAGS,
         "packTags": ["historical-full-league-foundation", "single-player", "historical-draft", "reimagined-season", "featured-pack"],
         "playerPoolType": "full_season_player_pool",
@@ -1734,7 +1734,7 @@ def main():
             "realStatCoverage": {
                 "playersWithRealSeasonStats": real_stat_players,
                 "playerCount": len(players),
-                "label": "Real season stats",
+                "label": "Historical season stats",
             },
             "zeroGamePlayers": {
                 "count": zero_game_players,
@@ -1749,7 +1749,7 @@ def main():
             "The 23-team league map uses era-appropriate 1986-87 abbreviations, including GOS, SAN, UTH, and WAS.",
             "Schedule/results span the full 943-game regular season from a checked-in mixed-source foundation snapshot with explicit provenance.",
             "Player-game rows are season-average weighted estimates built only against each player's canonical primary-team schedule subset.",
-            "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable and replayable.",
+            "The Lakers are the featured prestige lane, but the full Bird-Magic-Jordan league remains draftable.",
         ],
         "createdAt": generated_at,
         "updatedAt": generated_at,
@@ -1757,7 +1757,7 @@ def main():
 
     presentation = {
         "heroTitle": SEASON_LABEL,
-        "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a full-season 1986-87 foundation built with honest provenance.",
+        "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a trust-forward 1986-87 historical season foundation.",
         "featuredTeamId": FEATURED_TEAM_ID,
         "featuredStars": featured_stars,
         "artDirection": {
@@ -1766,18 +1766,18 @@ def main():
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "real_season", "label": "Play The Real Season", "description": "Replay 1986-87 with the real full schedule and final scores."},
+            {"mode": "single_player_season", "label": "Historic Season", "description": "Choose one 1986-87 team and play through the full historical season."},
             {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Bird-Magic-Jordan season from the full-league player pool."},
             {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1986-87 branch from the same foundation pack."},
         ],
     }
 
     summaries = {
-        "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
+        "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with historical regular-season schedule/results, historical player season totals, and clearly disclosed inferred player-game coverage.",
         "featuredStorylines": [
             "The Lakers headline the pack as the featured prestige lane, with Magic's MVP season and championship gravity defining the front door.",
             "Boston and Los Angeles keep the Bird-Magic rivalry alive, while Chicago adds the Michael Jordan scoring-explosion path to the same board.",
-            "Every included game result is real, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth.",
+            "Every included game result comes from the historical schedule/results foundation, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth.",
         ],
         "teamSpotlights": [
             {"teamId": f"{ENTITY_PREFIX}_lal", "summary": "The Lakers are the flagship prestige route, built around Magic, Kareem, Worthy, and the title-winning West power lane."},
@@ -1787,9 +1787,9 @@ def main():
             {"teamId": f"{ENTITY_PREFIX}_det", "summary": "Detroit brings the rising Bad Boys lane into a season that still sits just before their title breakthrough."},
         ],
         "modeSummaries": [
-            {"mode": "real_season", "summary": "Replay the real 1986-87 campaign from opening night through the final regular-season standings."},
+            {"mode": "single_player_season", "summary": "Choose one 1986-87 franchise and guide it through the full historical season."},
             {"mode": "historical_draft", "summary": "Reshuffle the full Bird-Magic-Jordan player pool and discover how the era changes under a custom draft."},
-            {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1986-87 universe while keeping the same real team and player foundation."},
+            {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1986-87 universe while keeping the same historical team and player foundation."},
         ],
         "auditSummary": manifest["auditSummary"],
         "buildSourceMode": source_audit["mode"],
@@ -1806,17 +1806,17 @@ def main():
         "packId": PACK_ID,
         "version": 1,
         "challengeGroups": [
-            {"groupId": "real_season_paths", "label": "Play The Real Season", "mode": "real_season"},
+            {"groupId": "historic_season_paths", "label": "Historic Season Paths", "mode": "single_player_season"},
             {"groupId": "draft_the_era_paths", "label": "Draft The Era", "mode": "historical_draft"},
             {"groupId": "reimagined_paths", "label": "Reimagined Season", "mode": "reimagined_season"},
         ],
         "challenges": [
             {
                 "challengeId": "lakers_repeat_pace",
-                "mode": "real_season",
+                "mode": "single_player_season",
                 "path": "featured_team_path",
                 "title": "Keep Showtime On Top",
-                "description": "Take the featured Lakers lane and clear 60 wins in a season whose game results are real but whose player-game box lines remain explicitly inferred.",
+                "description": "Take the featured Lakers lane and clear 60 wins in a season whose schedule/results come from the historical foundation while player-game box lines remain explicitly inferred.",
                 "type": "season_wins_min",
                 "target": 60,
                 "evaluation": "season_end",
@@ -1826,7 +1826,7 @@ def main():
             },
             {
                 "challengeId": "east_challenger_55",
-                "mode": "real_season",
+                "mode": "single_player_season",
                 "path": "open_team_path",
                 "title": "Break The Rivalry",
                 "description": "Choose any team and reach 55 wins while trying to interrupt the Bird-Magic prestige track.",
@@ -1842,7 +1842,7 @@ def main():
                 "mode": "historical_draft",
                 "path": "alternate_history_success",
                 "title": "Draft The Superteam",
-                "description": "Redraft 1986-87 from the full player pool, knowing the schedule is real but the player-game box lines are weighted season estimates.",
+                "description": "Redraft 1986-87 from the full player pool, knowing the schedule/results come from the historical foundation while the player-game box lines are weighted season estimates.",
                 "type": "season_wins_min",
                 "target": 58,
                 "evaluation": "season_end",
@@ -1887,7 +1887,7 @@ def main():
                 "rosterSnapshots": len(roster_snapshots),
                 "scheduleGames": len(schedule),
                 "playerGameStats": len(player_game_stats),
-                "realSeasonStats": real_stat_players,
+                "historicalSeasonStats": real_stat_players,
                 "zeroGamePlayers": zero_game_players,
                 "wikipediaScheduleGames": schedule_results_snapshot["coverage"]["wikipediaGamesMatched"],
                 "backfilledScheduleGames": schedule_results_snapshot["coverage"]["backfilledGames"],

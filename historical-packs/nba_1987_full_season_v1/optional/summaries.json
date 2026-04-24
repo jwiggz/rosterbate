@@ -1,9 +1,9 @@
 {
-  "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with real regular-season schedule/results, real player season totals, and clearly disclosed inferred player-game coverage.",
+  "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with historical regular-season schedule/results, historical player season totals, and clearly disclosed inferred player-game coverage.",
   "featuredStorylines": [
     "The Lakers headline the pack as the featured prestige lane, with Magic's MVP season and championship gravity defining the front door.",
     "Boston and Los Angeles keep the Bird-Magic rivalry alive, while Chicago adds the Michael Jordan scoring-explosion path to the same board.",
-    "Every included game result is real, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth."
+    "Every included game result comes from the historical schedule/results foundation, and every inferred player-game row is labeled as an estimate rather than being passed off as event-level truth."
   ],
   "teamSpotlights": [
     {
@@ -29,8 +29,8 @@
   ],
   "modeSummaries": [
     {
-      "mode": "real_season",
-      "summary": "Replay the real 1986-87 campaign from opening night through the final regular-season standings."
+      "mode": "single_player_season",
+      "summary": "Choose one 1986-87 franchise and guide it through the full historical season."
     },
     {
       "mode": "historical_draft",
@@ -38,14 +38,14 @@
     },
     {
       "mode": "reimagined_season",
-      "summary": "Branch into an alternate-history 1986-87 universe while keeping the same real team and player foundation."
+      "summary": "Branch into an alternate-history 1986-87 universe while keeping the same historical team and player foundation."
     }
   ],
   "auditSummary": {
     "realStatCoverage": {
       "playersWithRealSeasonStats": 335,
       "playerCount": 335,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 0,

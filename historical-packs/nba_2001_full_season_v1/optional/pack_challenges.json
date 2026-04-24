@@ -3,9 +3,9 @@
   "version": 1,
   "challengeGroups": [
     {
-      "groupId": "real_season_paths",
-      "label": "Play The Real Season",
-      "mode": "real_season"
+      "groupId": "historic_season_paths",
+      "label": "Historic Season Paths",
+      "mode": "single_player_season"
     },
     {
       "groupId": "draft_the_era_paths",
@@ -21,7 +21,7 @@
   "challenges": [
     {
       "challengeId": "lakers_repeat",
-      "mode": "real_season",
+      "mode": "single_player_season",
       "path": "lakers_dynasty_path",
       "title": "Repeat The Title Run",
       "description": "Choose the Lakers and finish the season with the league's best record.",
@@ -34,7 +34,7 @@
     },
     {
       "challengeId": "iverson_50_wins",
-      "mode": "real_season",
+      "mode": "single_player_season",
       "path": "open_team_path",
       "title": "MVP Support Run",
       "description": "Choose any included team and finish with at least 50 wins.",

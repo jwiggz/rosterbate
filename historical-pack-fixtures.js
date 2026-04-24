@@ -282,12 +282,12 @@
       version:1,
       status:'concept',
       sourceProfile:'historical_curated',
-      supportedModes:['real_season','historical_draft','single_player_season'],
-      defaultEntryMode:'real_season',
+      supportedModes:['historical_draft','single_player_season'],
+      defaultEntryMode:'historical_draft',
       focusTeamId:'nba_1996_chi',
-      subtitle:'Play the real season or draft the era.',
-      description:'An expanded playable 1995-96 NBA dev slice with a broader historical player pool and multiple featured franchise paths.',
-      tagline:'Rewrite the greatest regular season ever.',
+      subtitle:'Draft the era or steer a historic franchise run.',
+      description:'An expanded playable 1995-96 NBA dev slice with a broader historical player pool, draft-first entry, and featured historic franchise runs.',
+      tagline:'Remix a landmark season your way.',
       eraTags:['1990s','Jordan Era','Historic Season'],
       packTags:['historical-dev-slice','single-player','historical-draft','featured-pack'],
       playerPoolType:'full_season_player_pool',
@@ -313,7 +313,7 @@
       },
       notes:[
         'Expanded 10-team 1995-96 dev slice for historical fantasy draft validation.',
-        'Use the Historical Pack Lab team selector to swap the default franchise path.'
+        'Use the Historical Pack Lab team selector to stage a historic franchise run.'
       ],
       createdAt:'2026-04-17T00:00:00Z',
       updatedAt:'2026-04-17T00:00:00Z'
@@ -330,7 +330,7 @@
       eraTags:['1990s','Jordan Era','Historic Season'],
       notes:[
         'Expanded dev-slice season object.',
-        'Supports both real-season and historical-draft paths while the importer is still fixture-backed.'
+        'Supports historic franchise and historical-draft paths while the importer is still fixture-backed.'
       ]
     },
     teams:teams,
@@ -343,13 +343,13 @@
       packId:'nba_1996_full_season_v1',
       version:1,
       challengeGroups:[
-        {groupId:'real_season_paths',label:'Play The Real Season',mode:'real_season'},
+        {groupId:'historic_franchise_paths',label:'Historic Franchise Run',mode:'single_player_season'},
         {groupId:'draft_the_era_paths',label:'Draft The Era',mode:'historical_draft'}
       ],
       challenges:[
         {
           challengeId:'bulls_72_wins',
-          mode:'real_season',
+          mode:'single_player_season',
           path:'bulls_featured_path',
           title:'Match 72 Wins',
           description:'Finish the season with at least 72 wins.',
@@ -362,9 +362,9 @@
         },
         {
           challengeId:'open_team_above_500',
-          mode:'real_season',
+          mode:'single_player_season',
           path:'open_team_path',
-          title:'Flip The Season',
+          title:'Guide A Historic Run',
           description:'Choose any included team and finish above .500.',
           type:'season_finish_record_min',
           target:{wins:42},
@@ -390,7 +390,7 @@
     },
     presentation:{
       heroTitle:'1995-96 NBA Historic Season',
-      heroSubtitle:'Play the real season or draft the era.',
+      heroSubtitle:'Draft the era or steer a historic franchise run.',
       featuredTeamId:'nba_1996_chi',
       featuredStars:[
         'nba_1996_michael_jordan',
@@ -405,12 +405,12 @@
         backgroundStyle:'historic_arena_spotlight'
       },
       entryModes:[
-        {mode:'real_season',label:'Play The Real Season',description:'Step into the 1995-96 season with historical rosters intact.'},
+        {mode:'single_player_season',label:'Historic Franchise Run',description:'Take over an included 1995-96 team and chase a signature season outcome.'},
         {mode:'historical_draft',label:'Draft The Era',description:'Redraft the included 1995-96 player pool and build an alternate-history league.'}
       ]
     },
     summaries:{
-      packSummary:'The 1995-96 NBA season is the flagship historical universe for RosterBate, combining full-season authenticity with alternate-history fantasy draft potential. This expanded dev slice now supports multiple franchise entry points before the full-pack loader lands.',
+      packSummary:'The 1995-96 NBA season is the flagship historical universe for RosterBate, combining guided historic franchise runs with alternate-history fantasy draft potential. This expanded dev slice now supports multiple franchise entry points before the full-pack loader lands.',
       featuredStorylines:[
         'The 72-win Bulls chase',
         'A broader historical fantasy draft sandbox',
@@ -424,7 +424,7 @@
         {teamId:'nba_1996_ind',summary:'Indiana brings a balanced East contender core built around Reggie Miller.'}
       ],
       modeSummaries:[
-        {mode:'real_season',summary:'Keep history intact and see whether you can match or beat the era-defining outcomes.'},
+        {mode:'single_player_season',summary:'Choose a featured franchise lane and chase benchmark outcomes from the era without leaning on real-season replay framing.'},
         {mode:'historical_draft',summary:'Remix the included 1995-96 league slice and discover what the era looks like with custom rosters.'}
       ]
     }

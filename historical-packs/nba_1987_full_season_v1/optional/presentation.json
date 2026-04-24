@@ -1,6 +1,6 @@
 {
   "heroTitle": "1986-87 NBA Historic Season",
-  "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a full-season 1986-87 foundation built with honest provenance.",
+  "heroSubtitle": "Magic's Lakers, Bird's Celtics, Jordan's scoring explosion, and a trust-forward 1986-87 historical season foundation.",
   "featuredTeamId": "nba_1987_lal",
   "featuredStars": [
     "nba_1987_magic_johnson_77142",
@@ -19,9 +19,9 @@
   },
   "entryModes": [
     {
-      "mode": "real_season",
-      "label": "Play The Real Season",
-      "description": "Replay 1986-87 with the real full schedule and final scores."
+      "mode": "single_player_season",
+      "label": "Historic Season",
+      "description": "Choose one 1986-87 team and play through the full historical season."
     },
     {
       "mode": "historical_draft",

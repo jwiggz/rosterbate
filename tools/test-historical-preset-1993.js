@@ -29,7 +29,7 @@ assert.ok(entry, 'catalog is missing the 1992-93 pack entry');
 assert.equal(entry.availability, 'playable', '1992-93 catalog entry should be playable');
 assert.equal(entry.statusLabel, 'Playable Now');
 const expectedCatalogUrls = {
-  seasonUrl: 'rosterbate-season.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1',
+  seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1',
   simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1',
   draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1',
   reimaginedUrl: 'rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'
@@ -43,7 +43,7 @@ const historicSeasonsSource = readText('historic-seasons.html');
 const historicSeasonsEntry = extractEntryRegion(historicSeasonsSource, "packId: 'nba_1993_full_season_v1'");
 assert.match(
   historicSeasonsEntry,
-  /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?statusLabel:\s*'Playable Now'[\s\S]*?seasonUrl:\s*'rosterbate-season\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?simUrl:\s*'rosterbate-season\.html\?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1'[\s\S]*?draftUrl:\s*'rosterbate-draft\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?reimaginedUrl:\s*'rosterbate-season\.html\?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'/,
+  /packId:\s*'nba_1993_full_season_v1'[\s\S]*?availability:\s*'playable'[\s\S]*?statusLabel:\s*'Playable Now'[\s\S]*?seasonUrl:\s*'rosterbate-season\.html\?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1'[\s\S]*?simUrl:\s*'rosterbate-season\.html\?sport=nba&historical=sim&historicalPackId=nba_1993_full_season_v1'[\s\S]*?draftUrl:\s*'rosterbate-draft\.html\?sport=nba&historical=dev&historicalPackId=nba_1993_full_season_v1'[\s\S]*?reimaginedUrl:\s*'rosterbate-season\.html\?sport=nba&historical=reimagined&historicalPackId=nba_1993_full_season_v1'/,
   'historic-seasons fallback should include a single coherent playable 1992-93 entry'
 );
 
