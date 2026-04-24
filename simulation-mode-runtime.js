@@ -67,6 +67,17 @@
     return ['PG', 'SG', 'SF', 'PF', 'C'];
   }
 
+  function getSimulationStarterSlots(shell){
+    if (getSimulationSport(shell) === 'nfl') {
+      return ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'];
+    }
+    return ['PG', 'SG', 'SF', 'PF', 'C'];
+  }
+
+  function getSimulationRequiredStarterCount(shell){
+    return getSimulationStarterSlots(shell).length;
+  }
+
   function sortPlayers(players){
     return (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
       const overallDiff = Number(b?.mixedEraOverall || 0) - Number(a?.mixedEraOverall || 0);
@@ -380,6 +391,9 @@
   function setSimulationLineup(state, teamAbbr, lineupIds){
     const next = clone(state);
     const key = normalizeTeamAbbr(teamAbbr);
+    if (!key) {
+      return next;
+    }
     next.seasonState = next.seasonState || {};
     next.seasonState.lineupIdsByTeam = next.seasonState.lineupIdsByTeam || {};
     next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
@@ -426,8 +440,8 @@
     next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
 
     const nextRoster = Array.isArray(next.draftState.rostersByTeam[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
-    next.draftState.rostersByTeam[teamAbbr] = nextRoster.filter((player) => Number(player.id) !== dropId).concat(addPlayer);
-    next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player.id) !== addId).concat(droppedPlayer);
+    next.draftState.rostersByTeam[teamAbbr] = nextRoster.filter((player) => Number(player.id) !== dropId).concat(clone(addPlayer));
+    next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player.id) !== addId).concat(clone(droppedPlayer));
     pruneLineupIds(next, teamAbbr, [dropId]);
     next.seasonState.activityLog.unshift({
       type: 'waiver',
@@ -441,11 +455,14 @@
   function applySimulationTrade(state, trade){
     const fromTeamAbbr = normalizeTeamAbbr(trade?.fromTeamAbbr);
     const toTeamAbbr = normalizeTeamAbbr(trade?.toTeamAbbr);
-    if (fromTeamAbbr && fromTeamAbbr === toTeamAbbr) {
+    if (!fromTeamAbbr || !toTeamAbbr || fromTeamAbbr === toTeamAbbr) {
       return clone(state);
     }
     const outgoingIds = new Set((Array.isArray(trade?.outgoingPlayerIds) ? trade.outgoingPlayerIds : []).map(Number));
     const incomingIds = new Set((Array.isArray(trade?.incomingPlayerIds) ? trade.incomingPlayerIds : []).map(Number));
+    if (!outgoingIds.size || !incomingIds.size) {
+      return clone(state);
+    }
 
     const draftState = state?.draftState || {};
     const fromRoster = Array.isArray(draftState.rostersByTeam?.[fromTeamAbbr]) ? draftState.rostersByTeam[fromTeamAbbr] : [];
@@ -465,9 +482,11 @@
 
     const nextFromRoster = Array.isArray(next.draftState.rostersByTeam[fromTeamAbbr]) ? next.draftState.rostersByTeam[fromTeamAbbr] : [];
     const nextToRoster = Array.isArray(next.draftState.rostersByTeam[toTeamAbbr]) ? next.draftState.rostersByTeam[toTeamAbbr] : [];
+    const clonedIncoming = clone(incoming);
+    const clonedOutgoing = clone(outgoing);
 
-    next.draftState.rostersByTeam[fromTeamAbbr] = nextFromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(incoming);
-    next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(outgoing);
+    next.draftState.rostersByTeam[fromTeamAbbr] = nextFromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(clonedIncoming);
+    next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(clonedOutgoing);
     pruneLineupIds(next, fromTeamAbbr, Array.from(outgoingIds));
     pruneLineupIds(next, toTeamAbbr, Array.from(incomingIds));
     next.seasonState.activityLog.unshift({
@@ -513,6 +532,8 @@
     getSimulationSport,
     getSimulationModeId,
     getSimulationRosterNeeds,
+    getSimulationStarterSlots,
+    getSimulationRequiredStarterCount,
     getFootballCoverageBonus,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,

@@ -2,6 +2,9 @@
   'use strict';
 
   const ENGINE_VERSION='2026-04-19-sim-mvp-v3';
+  const nfl2014ScheduleHelpers=typeof require==='function' && typeof module!=='undefined' && module.exports
+    ? require('./simulation-nfl-2014-schedule.js')
+    : global.RosterBateNfl2014Schedule || null;
   const DEFAULT_PACK_TUNING={
     pace:1,
     variance:1,
@@ -128,6 +131,47 @@
 
   function getPackEraContext(packId){
     return Object.assign({}, DEFAULT_ERA_CONTEXT, PACK_ERA_CONTEXT[String(packId||'').trim()] || {});
+  }
+
+  function getSimulationSport(state){
+    const explicitSport=String(state?.sport || state?.leagueShell?.sport || '').trim().toLowerCase();
+    if(explicitSport) return explicitSport;
+    return String(state?.simulationMode || '').trim().toLowerCase().indexOf('nfl_')===0 ? 'nfl' : 'nba';
+  }
+
+  function getSimulationStarterCount(state){
+    return getSimulationSport(state)==='nfl' ? 9 : 5;
+  }
+
+  function getSimulationStarterSlotsForState(state){
+    return getSimulationSport(state)==='nfl'
+      ? ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K']
+      : ['PG', 'SG', 'SF', 'PF', 'C'];
+  }
+
+  function getSimulationPlayerPosition(player){
+    const normalizedPosition=String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
+    if(normalizedPosition==='DEF') return 'DST';
+    if(normalizedPosition==='PK') return 'K';
+    return normalizedPosition;
+  }
+
+  function isSimulationPlayerEligibleForSlot(player, slot, state){
+    if(getSimulationSport(state)!=='nfl') return true;
+    const normalizedSlot=String(slot || '').trim().toUpperCase();
+    const position=getSimulationPlayerPosition(player);
+    if(normalizedSlot==='FLEX'){
+      return ['RB', 'WR', 'TE', 'FLEX'].includes(position);
+    }
+    return position===normalizedSlot;
+  }
+
+  function takeFirstEligibleSimulationStarter(players, slot, state){
+    const index=(Array.isArray(players) ? players : []).findIndex(function(player){
+      return isSimulationPlayerEligibleForSlot(player, slot, state);
+    });
+    if(index < 0) return null;
+    return players.splice(index, 1)[0] || null;
   }
 
   function getLowGamesMixedEraConfidence(gp){
@@ -592,10 +636,12 @@
     ) || 0;
   }
 
-  function selectSimulationStarters(roster, requestedStarters, packId){
+  function selectSimulationStarters(roster, requestedStarters, packId, state){
     const availableRequested=(Array.isArray(requestedStarters) ? requestedStarters : [])
       .filter(function(player){ return player && !isUnavailableForSimulation(player); });
     const requestedIds=new Set(availableRequested.map(function(player){ return Number(player?.id); }));
+    const starterCount=getSimulationStarterCount(state);
+    const starterSlots=getSimulationStarterSlotsForState(state).slice(0, starterCount);
     const availableBench=(Array.isArray(roster) ? roster : [])
       .filter(function(player){
         return player &&
@@ -610,14 +656,29 @@
         if(fpDiff) return fpDiff;
         return String(a?.name || '').localeCompare(String(b?.name || ''));
       });
-    return availableRequested.concat(availableBench).slice(0, 5);
+    if(getSimulationSport(state)!=='nfl'){
+      return availableRequested.concat(availableBench).slice(0, starterCount);
+    }
+    const remainingRequested=availableRequested.slice();
+    const remainingBench=availableBench.slice();
+    const starters=[];
+    starterSlots.forEach(function(slot){
+      const slottedStarter=takeFirstEligibleSimulationStarter(remainingRequested, slot, state) ||
+        takeFirstEligibleSimulationStarter(remainingBench, slot, state);
+      if(slottedStarter) starters.push(slottedStarter);
+    });
+    const remainingFallback=remainingRequested.concat(remainingBench);
+    while(starters.length < starterCount && remainingFallback.length){
+      starters.push(remainingFallback.shift());
+    }
+    return starters.slice(0, starterCount);
   }
 
-  function buildTeamProfile(roster, lineupIds, packId){
+  function buildTeamProfile(roster, lineupIds, packId, state){
     const requestedStarters=(Array.isArray(lineupIds) ? lineupIds : [])
       .map(function(playerId){ return getPlayerById(roster, playerId); })
       .filter(Boolean);
-    const starters=selectSimulationStarters(roster, requestedStarters, packId);
+    const starters=selectSimulationStarters(roster, requestedStarters, packId, state);
     const tuning=getPackTuning(packId);
     const avg=function(selector, fallback){
       if(!starters.length) return fallback;
@@ -763,6 +824,15 @@
   }
 
   function buildSimulationSeasonSchedule(shell){
+    const sport=String(shell?.sport || '').trim().toLowerCase();
+    const anchorSeasonId=String(shell?.anchorSeasonId || '').trim().toLowerCase();
+    if(sport==='nfl' && anchorSeasonId==='nfl_2014'){
+      return {
+        byDay:nfl2014ScheduleHelpers && typeof nfl2014ScheduleHelpers.buildNfl2014ScheduleByWeek==='function'
+          ? nfl2014ScheduleHelpers.buildNfl2014ScheduleByWeek()
+          : {}
+      };
+    }
     const teams=Array.isArray(shell?.teams) ? shell.teams : [];
     const targetGames=Math.max(0, Number(shell?.regularSeasonGamesPerTeam || 82) || 82);
     const byDay={};
@@ -923,6 +993,16 @@
     return Math.max(70, Math.round(82 + (Number(total || 0) * 0.72)));
   }
 
+  function convertFantasyTotalToNflScore(total){
+    return Math.max(7, Math.round(8 + (Number(total || 0) * 0.12)));
+  }
+
+  function convertFantasyTotalToRenderedScore(total, state){
+    return getSimulationSport(state)==='nfl'
+      ? convertFantasyTotalToNflScore(total)
+      : convertFantasyTotalToNbaScore(total);
+  }
+
   function simulateLeagueDay(options){
     const opts=options && typeof options==='object' ? options : {};
     const state=opts.state || {};
@@ -944,8 +1024,8 @@
       const awayRoster=Array.isArray(state.allRosters?.[awayIdx]) ? state.allRosters[awayIdx] : [];
       enrichRosterCollection(homeRoster, { packId:packId });
       enrichRosterCollection(awayRoster, { packId:packId });
-      const homeProfile=buildTeamProfile(homeRoster, lineupIdsByTeam[homeIdx], packId);
-      const awayProfile=buildTeamProfile(awayRoster, lineupIdsByTeam[awayIdx], packId);
+      const homeProfile=buildTeamProfile(homeRoster, lineupIdsByTeam[homeIdx], packId, state);
+      const awayProfile=buildTeamProfile(awayRoster, lineupIdsByTeam[awayIdx], packId, state);
       const seedParts=[
         ENGINE_VERSION,
         packId,
@@ -1047,12 +1127,24 @@
       day:opts.day,
       week:state.currentWeek
     });
+    const activeTeamIndexes=new Set();
+    matchups.forEach(function(matchup){
+      activeTeamIndexes.add(Number(matchup.home));
+      activeTeamIndexes.add(Number(matchup.away));
+    });
+    const filteredResultsByTeam={};
+    Object.keys(lowLevel.resultsByTeam || {}).forEach(function(teamIdx){
+      const numericTeamIdx=Number(teamIdx);
+      if(!activeTeamIndexes.has(numericTeamIdx)) return;
+      filteredResultsByTeam[teamIdx]=lowLevel.resultsByTeam[teamIdx];
+    });
 
     return Object.assign({}, lowLevel, {
+      resultsByTeam:filteredResultsByTeam,
       gameLogs:lowLevel.gameLogs.map(function(game){
         return Object.assign({}, game, {
-          homeScore:convertFantasyTotalToNbaScore(game.homeTotal),
-          awayScore:convertFantasyTotalToNbaScore(game.awayTotal),
+          homeScore:convertFantasyTotalToRenderedScore(game.homeTotal, state),
+          awayScore:convertFantasyTotalToRenderedScore(game.awayTotal, state),
           winner:game.homeTotal >= game.awayTotal ? 'home' : 'away'
         });
       })
@@ -1074,7 +1166,13 @@
       home.pa=Number(home.pa || 0) + Number(game.awayScore || 0);
       away.pf=Number(away.pf || 0) + Number(game.awayScore || 0);
       away.pa=Number(away.pa || 0) + Number(game.homeScore || 0);
-      if(Number(game.homeScore || 0) >= Number(game.awayScore || 0)){
+      const authoritativeWinner=String(game?.winner || '').trim().toLowerCase();
+      const homeWon=authoritativeWinner==='home'
+        ? true
+        : authoritativeWinner==='away'
+          ? false
+          : Number(game.homeScore || 0) >= Number(game.awayScore || 0);
+      if(homeWon){
         home.w=Number(home.w || 0) + 1;
         away.l=Number(away.l || 0) + 1;
       }else{
@@ -1083,7 +1181,9 @@
       }
     });
     next.currentDay=Number(next.currentDay || 1) + 1;
-    next.currentWeek=Math.max(1, Math.ceil(next.currentDay / 7));
+    next.currentWeek=getSimulationSport(state)==='nfl'
+      ? next.currentDay
+      : Math.max(1, Math.ceil(next.currentDay / 7));
     return next;
   }
 
