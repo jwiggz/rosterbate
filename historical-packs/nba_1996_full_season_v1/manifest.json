@@ -13,14 +13,13 @@
   "status": "concept",
   "sourceProfile": "historical_curated",
   "supportedModes": [
-    "real_season",
     "historical_draft",
     "single_player_season"
   ],
-  "defaultEntryMode": "real_season",
+  "defaultEntryMode": "single_player_season",
   "focusTeamId": "nba_1996_chi",
-  "subtitle": "Play the real season or draft the era.",
-  "description": "A 1995-96 NBA historical season pack with real team-page season totals imported for player ranking, drafting, and season boots.",
+  "subtitle": "Start a historic season or draft the era.",
+  "description": "A 1995-96 NBA historical season pack with team-page season totals imported for player ranking, drafting, and historic-season runs.",
   "tagline": "Rewrite the greatest regular season ever.",
   "eraTags": [
     "1990s",
@@ -60,7 +59,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 435,
       "playerCount": 436,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 1,

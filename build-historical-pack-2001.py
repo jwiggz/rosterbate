@@ -1036,10 +1036,10 @@ def main():
         "version": 1,
         "status": "ready",
         "sourceProfile": "historical_curated",
-        "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
-        "defaultEntryMode": "real_season",
+        "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
+        "defaultEntryMode": "single_player_season",
         "focusTeamId": "nba_2001_lal",
-        "subtitle": "Play the real season, redraft the era, or branch into a turn-of-the-century alternate universe.",
+        "subtitle": "Start a historic season, redraft the era, or branch into a turn-of-the-century alternate universe.",
         "description": "A 2000-01 NBA historical season pack built from real team, player, schedule, result, and player-game data.",
         "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
         "eraTags": ["2000s", "Dynasty Era", "Historic Season"],
@@ -1069,7 +1069,7 @@ def main():
             "realStatCoverage": {
                 "playersWithRealSeasonStats": real_stat_players,
                 "playerCount": len(players),
-                "label": "Real season stats",
+                "label": "Historical season stats",
             },
             "zeroGamePlayers": {
                 "count": zero_game_players,
@@ -1092,7 +1092,7 @@ def main():
 
     presentation = {
         "heroTitle": SEASON_LABEL,
-        "heroSubtitle": "Step into the Shaq-and-Kobe title-defense season or redraft the full turn-of-the-century league.",
+        "heroSubtitle": "Choose a historic season path around Shaq and Kobe or redraft the full turn-of-the-century league.",
         "featuredTeamId": "nba_2001_lal",
         "featuredStars": [
             "nba_2001_shaquille_o_neal_406",
@@ -1108,14 +1108,14 @@ def main():
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "real_season", "label": "Play The Real Season", "description": "Step into 2000-01 with the historical league intact."},
+            {"mode": "single_player_season", "label": "Historic Season", "description": "Choose one 2000-01 team and play through the full historical season."},
             {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the full 2000-01 player pool into a new fantasy universe."},
             {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch a reshuffled 2000-01 and play the alternate branch from opening night."},
         ],
     }
 
     summaries = {
-        "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for real-season play, Draft The Era, and Reimagined Season.",
+        "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
         "featuredStorylines": [
             "The Lakers title-defense season anchors the pack with Shaq-and-Kobe dynasty energy from opening night forward.",
             "Iverson's MVP season, Duncan's Spurs, Garnett's rise, and Webber's Kings keep the full-league fantasy board loaded well beyond Los Angeles.",
@@ -1129,13 +1129,13 @@ def main():
             {"teamId": "nba_2001_por", "summary": "Portland brings a deep veteran roster and a different West contender route from the dynasty spotlight teams."},
         ],
         "modeSummaries": [
-            {"mode": "real_season", "summary": "Keep the 2000-01 season intact and see whether you can outpace the Lakers dynasty branch or rewrite it."},
+            {"mode": "single_player_season", "summary": "Choose one franchise and guide it through the full 2000-01 historical season."},
             {"mode": "historical_draft", "summary": "Remix the full-league 2000-01 player universe and discover what the era becomes with custom rosters."},
             {"mode": "reimagined_season", "summary": "Launch a reshuffled version of 2000-01 and treat the season like an alternate-history branch from day one."},
         ],
         "auditSummary": manifest["auditSummary"],
         "auditNotes": [
-            "Real season stats cover every included player who logged official 2000-01 regular-season minutes.",
+            "Historical season stats cover every included player who logged official 2000-01 regular-season minutes.",
             "Schedule and results span the full regular season using real historical game records.",
             "Per-game stat lines use official event totals with inferred minute estimates normalized to season-average workloads.",
         ],
@@ -1145,14 +1145,14 @@ def main():
         "packId": PACK_ID,
         "version": 1,
         "challengeGroups": [
-            {"groupId": "real_season_paths", "label": "Play The Real Season", "mode": "real_season"},
+            {"groupId": "historic_season_paths", "label": "Historic Season Paths", "mode": "single_player_season"},
             {"groupId": "draft_the_era_paths", "label": "Draft The Era", "mode": "historical_draft"},
             {"groupId": "reimagined_paths", "label": "Reimagined Season", "mode": "reimagined_season"},
         ],
         "challenges": [
             {
                 "challengeId": "lakers_repeat",
-                "mode": "real_season",
+                "mode": "single_player_season",
                 "path": "lakers_dynasty_path",
                 "title": "Repeat The Title Run",
                 "description": "Choose the Lakers and finish the season with the league's best record.",
@@ -1165,7 +1165,7 @@ def main():
             },
             {
                 "challengeId": "iverson_50_wins",
-                "mode": "real_season",
+                "mode": "single_player_season",
                 "path": "open_team_path",
                 "title": "MVP Support Run",
                 "description": "Choose any included team and finish with at least 50 wins.",

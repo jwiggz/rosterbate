@@ -1,6 +1,6 @@
 {
   "heroTitle": "1995-96 NBA Historic Season",
-  "heroSubtitle": "Play the real season or draft the era.",
+  "heroSubtitle": "Start a historic season or draft the era.",
   "featuredTeamId": "nba_1996_chi",
   "featuredStars": [
     "nba_1996_michael_jordan",
@@ -21,9 +21,9 @@
   },
   "entryModes": [
     {
-      "mode": "real_season",
-      "label": "Play The Real Season",
-      "description": "Step into the 1995-96 season with historical rosters intact."
+      "mode": "single_player_season",
+      "label": "Historic Season",
+      "description": "Choose one 1995-96 team and play through the full historical season."
     },
     {
       "mode": "historical_draft",

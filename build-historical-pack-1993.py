@@ -1770,10 +1770,10 @@ def main():
         "sourceProfile": SOURCE_PROFILE,
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
-        "supportedModes": ["real_season", "historical_draft", "single_player_season", "reimagined_season"],
-        "defaultEntryMode": "real_season",
+        "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
+        "defaultEntryMode": "single_player_season",
         "focusTeamId": FEATURED_TEAM_ID,
-        "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 replay foundation centered on the Bulls.",
+        "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 historical season foundation centered on the Bulls.",
         "description": "A playable 1992-93 NBA historical season pack with the full real schedule/results grid, real season totals, and explicitly inferred player-game rows.",
         "tagline": "Replay the Jordan-Barkley-Pippen season with real scores and disclosed inferred box lines.",
         "eraTags": ERA_TAGS,
@@ -1807,7 +1807,7 @@ def main():
             "realStatCoverage": {
                 "playersWithRealSeasonStats": real_stat_players,
                 "playerCount": len(players),
-                "label": "Real season stats",
+                "label": "Historical season stats",
             },
             "zeroGamePlayers": {
                 "count": zero_game_players,
@@ -1862,14 +1862,14 @@ def main():
         "packId": PACK_ID,
         "version": 1,
         "challengeGroups": [
-            {"groupId": "real_season_paths", "label": "Play The Real Season", "mode": "real_season"},
+            {"groupId": "historic_season_paths", "label": "Historic Season Paths", "mode": "single_player_season"},
             {"groupId": "draft_the_era_paths", "label": "Draft The Era", "mode": "historical_draft"},
             {"groupId": "reimagined_paths", "label": "Reimagined Season", "mode": "reimagined_season"},
         ],
         "challenges": [
             {
                 "challengeId": "bulls_threepeat_push",
-                "groupId": "real_season_paths",
+                "groupId": "historic_season_paths",
                 "teamId": f"{ENTITY_PREFIX}_chi",
                 "label": "Complete The First Three-Peat",
             },

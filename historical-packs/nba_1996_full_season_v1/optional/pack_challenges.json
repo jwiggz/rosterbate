@@ -3,9 +3,9 @@
   "version": 1,
   "challengeGroups": [
     {
-      "groupId": "real_season_paths",
-      "label": "Play The Real Season",
-      "mode": "real_season"
+      "groupId": "historic_season_paths",
+      "label": "Historic Season Paths",
+      "mode": "single_player_season"
     },
     {
       "groupId": "draft_the_era_paths",
@@ -16,7 +16,7 @@
   "challenges": [
     {
       "challengeId": "bulls_72_wins",
-      "mode": "real_season",
+      "mode": "single_player_season",
       "path": "bulls_featured_path",
       "title": "Match 72 Wins",
       "description": "Finish the season with at least 72 wins.",
@@ -29,7 +29,7 @@
     },
     {
       "challengeId": "open_team_above_500",
-      "mode": "real_season",
+      "mode": "single_player_season",
       "path": "open_team_path",
       "title": "Flip The Season",
       "description": "Choose any included team and finish above .500.",

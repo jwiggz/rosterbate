@@ -1,5 +1,5 @@
 {
-  "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for real-season play, Draft The Era, and Reimagined Season.",
+  "packSummary": "The 2000-01 NBA season pack gives Historic Seasons a turn-of-the-century flagship with real full-season player production, the full schedule/results grid, and a full-league player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
   "featuredStorylines": [
     "The Lakers title-defense season anchors the pack with Shaq-and-Kobe dynasty energy from opening night forward.",
     "Iverson's MVP season, Duncan's Spurs, Garnett's rise, and Webber's Kings keep the full-league fantasy board loaded well beyond Los Angeles.",
@@ -29,8 +29,8 @@
   ],
   "modeSummaries": [
     {
-      "mode": "real_season",
-      "summary": "Keep the 2000-01 season intact and see whether you can outpace the Lakers dynasty branch or rewrite it."
+      "mode": "single_player_season",
+      "summary": "Choose one franchise and guide it through the full 2000-01 historical season."
     },
     {
       "mode": "historical_draft",
@@ -45,7 +45,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 441,
       "playerCount": 441,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 0,
@@ -57,7 +57,7 @@
     }
   },
   "auditNotes": [
-    "Real season stats cover every included player who logged official 2000-01 regular-season minutes.",
+    "Historical season stats cover every included player who logged official 2000-01 regular-season minutes.",
     "Schedule and results span the full regular season using real historical game records.",
     "Per-game stat lines use official event totals with inferred minute estimates normalized to season-average workloads."
   ]

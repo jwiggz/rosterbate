@@ -29,8 +29,8 @@
   ],
   "modeSummaries": [
     {
-      "mode": "real_season",
-      "summary": "Keep history intact and see whether you can match or beat the era-defining outcomes."
+      "mode": "single_player_season",
+      "summary": "Choose one franchise and guide it through the full 1995-96 historical season."
     },
     {
       "mode": "historical_draft",
@@ -41,7 +41,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 435,
       "playerCount": 436,
-      "label": "Real season stats"
+      "label": "Historical season stats"
     },
     "zeroGamePlayers": {
       "count": 1,

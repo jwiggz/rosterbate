@@ -3,9 +3,9 @@
   "version": 1,
   "challengeGroups": [
     {
-      "groupId": "real_season_paths",
-      "label": "Play The Real Season",
-      "mode": "real_season"
+      "groupId": "historic_season_paths",
+      "label": "Historic Season Paths",
+      "mode": "single_player_season"
     },
     {
       "groupId": "draft_the_era_paths",
@@ -21,7 +21,7 @@
   "challenges": [
     {
       "challengeId": "bulls_threepeat_push",
-      "groupId": "real_season_paths",
+      "groupId": "historic_season_paths",
       "teamId": "nba_1993_chi",
       "label": "Complete The First Three-Peat"
     },
