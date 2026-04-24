@@ -2356,14 +2356,15 @@ function resolveCompletedSimulationDraftSeasonBoot(params, requestedSport){
       });
       if(persisted?.slotId){
         window.RosterBateSimulationModeRuntime?.clearCompletedSimulationState?.();
+        const safeRedirectUrl='rosterbate-season.html?sport='
+          + encodeURIComponent(targetSport)
+          + '&simulation=' + encodeURIComponent(sharedSimulationRouteMode) + '&historicalUniverse='
+          + encodeURIComponent(persisted.slotId);
         return {
           redirected:true,
-          redirectUrl:historicalSlotApi.buildSeasonUrl
+          redirectUrl:targetSport!=='nfl' && historicalSlotApi.buildSeasonUrl
             ? historicalSlotApi.buildSeasonUrl({slotId:persisted.slotId, sport:targetSport}, targetSport, persisted.state || rawState)
-            : ('rosterbate-season.html?sport='
-              + encodeURIComponent(targetSport)
-              + '&simulation=' + encodeURIComponent(sharedSimulationRouteMode) + '&historicalUniverse='
-              + encodeURIComponent(persisted.slotId)),
+            : safeRedirectUrl,
           slotId:persisted.slotId,
           rawState:persisted.state || rawState,
           state:normalizeSharedSimulationSeasonBootState(persisted.state || rawState, persisted.slotId)
