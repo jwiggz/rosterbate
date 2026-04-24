@@ -218,13 +218,28 @@
     };
   }
 
-  function buildExactNfl2014WildCardSchedule(){
+  function buildExactNfl2014WildCardSeries(){
     return [
-      { conference: 'AFC', round: 'wild_card', seed: 3, homeAbbr: 'IND', awayAbbr: 'BAL' },
-      { conference: 'AFC', round: 'wild_card', seed: 4, homeAbbr: 'PIT', awayAbbr: 'CIN' },
-      { conference: 'NFC', round: 'wild_card', seed: 3, homeAbbr: 'DAL', awayAbbr: 'DET' },
-      { conference: 'NFC', round: 'wild_card', seed: 4, homeAbbr: 'CAR', awayAbbr: 'ARI' }
+      buildSeriesState('AFC-wild-card-1', 'AFC', 'wild_card', { teamAbbr: 'IND', seed: 3, conference: 'AFC' }, { teamAbbr: 'BAL', seed: 6, conference: 'AFC' }, 1),
+      buildSeriesState('AFC-wild-card-2', 'AFC', 'wild_card', { teamAbbr: 'PIT', seed: 4, conference: 'AFC' }, { teamAbbr: 'CIN', seed: 5, conference: 'AFC' }, 1),
+      buildSeriesState('NFC-wild-card-1', 'NFC', 'wild_card', { teamAbbr: 'DAL', seed: 3, conference: 'NFC' }, { teamAbbr: 'DET', seed: 6, conference: 'NFC' }, 1),
+      buildSeriesState('NFC-wild-card-2', 'NFC', 'wild_card', { teamAbbr: 'CAR', seed: 4, conference: 'NFC' }, { teamAbbr: 'ARI', seed: 5, conference: 'NFC' }, 1)
     ];
+  }
+
+  function buildNflScheduleEntries(seriesList, day){
+    return (Array.isArray(seriesList) ? seriesList : [])
+      .map((series) => ({
+        id: series.id,
+        seriesId: series.id,
+        gameId: series.id,
+        day: Number(day || 1),
+        round: series.round,
+        conference: series.conference,
+        homeAbbr: series.higherSeed?.teamAbbr || null,
+        awayAbbr: series.lowerSeed?.teamAbbr || null
+      }))
+      .filter((game) => game.homeAbbr && game.awayAbbr);
   }
 
   function hasAllTeamAbbrs(rows, teamAbbrs){
@@ -453,15 +468,21 @@
       const expectedNfl2014PlayoffTeams = ['NE', 'DEN', 'IND', 'PIT', 'CIN', 'BAL', 'SEA', 'GB', 'DAL', 'CAR', 'ARI', 'DET'];
       if (anchorSeasonId === 'nfl_2014' && hasAllTeamAbbrs(standings, expectedNfl2014PlayoffTeams)) {
         const playoffPicture = buildExactNfl2014PlayoffPicture(standings);
-        const currentWeekSchedule = buildExactNfl2014WildCardSchedule();
+        const wildCardSeries = buildExactNfl2014WildCardSeries();
+        const currentDay = Number(nextState?.seasonState?.currentDay || 1);
+        const currentWeekSchedule = buildNflScheduleEntries(wildCardSeries, currentDay);
+        const seriesById = {};
+        wildCardSeries.forEach((series) => {
+          seriesById[series.id] = series;
+        });
         return {
           phase: 'wild_card',
           currentRound: 'wild_card',
-          currentDay: Number(nextState?.seasonState?.currentDay || 1),
+          currentDay,
           playIn: null,
           bracket: null,
           playoffPicture,
-          seriesById: {},
+          seriesById,
           currentWeekSchedule: clone(currentWeekSchedule),
           currentDaySchedule: clone(currentWeekSchedule),
           champion: null,
@@ -631,13 +652,7 @@
   }
 
   function buildNflDivisionalSchedule(postseasonState){
-    return buildNflDivisionalSeries(postseasonState).map((series) => ({
-      id: series.id,
-      round: series.round,
-      conference: series.conference,
-      homeAbbr: series.higherSeed?.teamAbbr || null,
-      awayAbbr: series.lowerSeed?.teamAbbr || null
-    }));
+    return buildNflScheduleEntries(buildNflDivisionalSeries(postseasonState), postseasonState?.currentDay);
   }
 
   function buildNflConferenceChampionshipSeries(postseasonState){
@@ -652,13 +667,7 @@
   }
 
   function buildNflConferenceChampionshipSchedule(postseasonState){
-    return buildNflConferenceChampionshipSeries(postseasonState).map((series) => ({
-      id: series.id,
-      round: series.round,
-      conference: series.conference,
-      homeAbbr: series.higherSeed?.teamAbbr || null,
-      awayAbbr: series.lowerSeed?.teamAbbr || null
-    }));
+    return buildNflScheduleEntries(buildNflConferenceChampionshipSeries(postseasonState), postseasonState?.currentDay);
   }
 
   function buildNflSuperBowlSeries(postseasonState){
@@ -670,13 +679,7 @@
   }
 
   function buildNflSuperBowlSchedule(postseasonState){
-    return buildNflSuperBowlSeries(postseasonState).map((series) => ({
-      id: series.id,
-      round: series.round,
-      conference: series.conference,
-      homeAbbr: series.higherSeed?.teamAbbr || null,
-      awayAbbr: series.lowerSeed?.teamAbbr || null
-    }));
+    return buildNflScheduleEntries(buildNflSuperBowlSeries(postseasonState), postseasonState?.currentDay);
   }
 
   function getWinningTeamsForRound(postseasonState, round, conference){

@@ -1148,6 +1148,32 @@ assert.deepStrictEqual(
   ['IND-BAL', 'PIT-CIN', 'DAL-DET', 'CAR-ARI'],
   'nfl postseason seeding should build the exact 2014 wild-card schedule'
 );
+assert.ok(
+  (nfl2014PostseasonState.postseasonState.currentWeekSchedule || []).every((game) => (
+    Number.isFinite(Number(game?.day)) &&
+    String(game?.seriesId || '').length > 0
+  )),
+  'nfl postseason seeding should attach stable day and series identity to each wild-card game'
+);
+
+const nfl2014LiveAdvanceState = nfl2014PostseasonAdapter.simulateNextDay();
+assert.equal(
+  nfl2014LiveAdvanceState.postseasonState.phase,
+  'divisional',
+  'the live nfl postseason flow should advance out of wild_card after the seeded wild-card slate resolves'
+);
+assert.equal(
+  (nfl2014LiveAdvanceState.postseasonState.currentWeekSchedule || []).length,
+  4,
+  'the live nfl postseason flow should seed four divisional games after wild-card results'
+);
+assert.ok(
+  (nfl2014LiveAdvanceState.postseasonState.currentWeekSchedule || []).every((game) => (
+    Number.isFinite(Number(game?.day)) &&
+    String(game?.seriesId || '').length > 0
+  )),
+  'the live nfl postseason flow should keep stable day and series identity on divisional schedules'
+);
 
 const nfl2014FallbackAdapter = createSimulationSeasonAdapter({
   slotId: 'nfl-slot-2014-fallback',
