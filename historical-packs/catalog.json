@@ -182,5 +182,34 @@
     "simUrl": "rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1",
     "draftUrl": "rosterbate-draft.html?sport=nba&historical=dev&historicalPackId=nba_2016_full_season_v1",
     "reimaginedUrl": "rosterbate-season.html?sport=nba&historical=reimagined&historicalPackId=nba_2016_full_season_v1"
+  },
+  {
+    "packId": "nfl_2014_full_season_v1",
+    "sport": "nfl",
+    "seasonLabel": "2014 NFL Historic Season",
+    "shortLabel": "2014",
+    "era": "2010s",
+    "availability": "playable",
+    "statusLabel": "Playable Now",
+    "significanceLabel": "Modern Football Anchor",
+    "significanceTone": "modern",
+    "completenessLabel": "Simulation setup foundation",
+    "completenessPercent": 60,
+    "tagline": "Build a 2014 football universe from Brady, Rodgers, Watt, and the whole season pool.",
+    "summary": "A playable 2014 NFL historical foundation with football rating baselines, historical season context, and a draft-ready player pool for simulation setup.",
+    "whyItMatters": "This is the first football anchor season for the archive lane and the foundation for mixed-era NFL simulation leagues.",
+    "focusTeamName": "Seattle Seahawks",
+    "plannedModes": [
+      "Draft The Era",
+      "Sim Season"
+    ],
+    "previewStars": [
+      "Tom Brady",
+      "Aaron Rodgers",
+      "J.J. Watt"
+    ],
+    "seasonUrl": "rosterbate-season.html?sport=nfl&historical=sim&historicalPackId=nfl_2014_full_season_v1",
+    "simUrl": "rosterbate-season.html?sport=nfl&historical=sim&historicalPackId=nfl_2014_full_season_v1",
+    "draftUrl": "rosterbate-draft.html?sport=nfl&historical=dev&historicalPackId=nfl_2014_full_season_v1"
   }
 ]

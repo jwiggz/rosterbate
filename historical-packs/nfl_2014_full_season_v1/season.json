@@ -1,0 +1,23 @@
+{
+  "sport": "nfl",
+  "seasonId": "nfl_2014_historic",
+  "seasonLabel": "2014 NFL Historic Season",
+  "shellSeasonId": "nfl_2014",
+  "regularSeasonWeeks": 17,
+  "playoffFormat": "2014_nfl",
+  "league": "nfl",
+  "label": "2014 NFL Historic Season",
+  "startDate": "2014-09-04",
+  "endDate": "2014-12-28",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "eraTags": [
+    "2010s",
+    "Modern NFL",
+    "Historic Season"
+  ],
+  "notes": [
+    "Full-league 2014 NFL historical foundation pack.",
+    "Supports Sim Season and Draft The Era for the shared football shell."
+  ]
+}

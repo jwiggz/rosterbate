@@ -1,0 +1,54 @@
+{
+  "packId": "nfl_2014_full_season_v1",
+  "schemaVersion": 1,
+  "canonicalModelVersion": 1,
+  "sport": "nfl",
+  "league": "nfl",
+  "seasonId": "nfl_2014_historic",
+  "seasonLabel": "2014 NFL Historic Season",
+  "seasonType": "historical_pack",
+  "isHistorical": true,
+  "era": "2010s",
+  "version": 1,
+  "status": "ready",
+  "sourceProfile": "historical_curated",
+  "supportedModes": [
+    "historical_draft",
+    "single_player_season"
+  ],
+  "defaultEntryMode": "single_player_season",
+  "subtitle": "Draft the era or build a mixed-era football universe.",
+  "description": "A 2014 NFL historical season pack with Madden 25-era ratings context, football roster roles, and a full-league player pool for mixed-era simulation setup.",
+  "tagline": "Legion of Boom, Brady, Rodgers, and one full-season football sandbox.",
+  "contentFiles": {
+    "season": "season.json",
+    "teams": "teams.json",
+    "players": "players.json",
+    "rosterSnapshots": "roster_snapshots.json",
+    "schedule": "schedule.json",
+    "games": "games.json",
+    "presentation": "optional/presentation.json",
+    "summaries": "optional/summaries.json"
+  },
+  "focusTeamId": "nfl_2014_sea",
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 160,
+      "playerCount": 416,
+      "label": "Historical and curated stat blend"
+    },
+    "generatedSupportPlayers": {
+      "count": 256,
+      "label": "Generated support players"
+    },
+    "dstCoverage": {
+      "count": 32,
+      "label": "DST team records"
+    }
+  },
+  "notes": [
+    "Phase 1 pack foundation uses a real-star-plus-generated-support player pool for 32-team NFL draft coverage.",
+    "Roster snapshots, schedule, and game logs remain intentionally empty until weekly football simulation data is added.",
+    "Optional presentation and summary metadata follow the shared archive structure so the pack renders without NFL-only branches."
+  ]
+}

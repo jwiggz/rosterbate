@@ -1,0 +1,60 @@
+{
+  "packSummary": "The 2014 NFL season pack gives the archive its first football foundation with real 2014 team context, marquee stars, and a 32-team player pool sized for simulation setup and Draft The Era.",
+  "featuredStorylines": [
+    "Brady, Rodgers, Watt, and the Legion of Boom anchor the first football archive tentpole.",
+    "The player pool is draft-sized for 32-team football universes with quarterbacks, kickers, DST, and defensive roles included.",
+    "Phase 1 keeps schedule, roster snapshots, and games lightweight so the shared simulation shell can open football safely before weekly-engine work lands."
+  ],
+  "teamSpotlights": [
+    {
+      "teamId": "nfl_2014_sea",
+      "summary": "Seattle is the focus team: Legion of Boom defense, Russell Wilson mobility, and a Marshawn Lynch power core."
+    },
+    {
+      "teamId": "nfl_2014_ne",
+      "summary": "New England provides the Brady-Gronk starting point for modern passing-era builds."
+    },
+    {
+      "teamId": "nfl_2014_gb",
+      "summary": "Green Bay adds peak Aaron Rodgers efficiency and a top-tier receiving stack led by Jordy Nelson."
+    },
+    {
+      "teamId": "nfl_2014_pit",
+      "summary": "Pittsburgh brings the Bell-Brown fantasy engine and one of the most explosive offensive cores in the pool."
+    },
+    {
+      "teamId": "nfl_2014_hou",
+      "summary": "Houston gives the pack a defensive apex with J.J. Watt plus a strong Arian Foster-led offense."
+    }
+  ],
+  "modeSummaries": [
+    {
+      "mode": "single_player_season",
+      "summary": "Choose a single 2014 team and enter the shared football simulation shell with that historical context."
+    },
+    {
+      "mode": "historical_draft",
+      "summary": "Remix the full 2014 player pool into a new fantasy football universe built for 32-team setup and draft flow."
+    }
+  ],
+  "auditSummary": {
+    "realStatCoverage": {
+      "playersWithRealSeasonStats": 160,
+      "playerCount": 416,
+      "label": "Historical and curated stat blend"
+    },
+    "generatedSupportPlayers": {
+      "count": 256,
+      "label": "Generated support players"
+    },
+    "dstCoverage": {
+      "count": 32,
+      "label": "DST team records"
+    }
+  },
+  "auditNotes": [
+    "Marquee 2014 stars use real-season context while support records are curated phase-1 roster fillers for football simulation setup.",
+    "Every team includes a quarterback, kicker, DST, and defensive-role coverage so 32-team drafts can initialize cleanly.",
+    "Schedule, roster snapshots, and game logs remain empty placeholders in this foundation pack until the weekly football engine expands the lane."
+  ]
+}

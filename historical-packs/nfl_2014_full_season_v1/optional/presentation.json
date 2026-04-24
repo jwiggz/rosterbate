@@ -1,0 +1,34 @@
+{
+  "heroTitle": "2014 NFL Historic Season",
+  "heroSubtitle": "Draft the era or build a mixed-era football universe.",
+  "featuredTeamId": "nfl_2014_sea",
+  "featuredStars": [
+    "2014027",
+    "2014287",
+    "2014114",
+    "2014404",
+    "2014093",
+    "2014095"
+  ],
+  "artDirection": {
+    "heroTone": "modern",
+    "primaryPalette": [
+      "#002244",
+      "#69be28",
+      "#d5d8dc"
+    ],
+    "backgroundStyle": "historic_modern_spotlight"
+  },
+  "entryModes": [
+    {
+      "mode": "single_player_season",
+      "label": "Sim Season",
+      "description": "Choose one 2014 franchise and launch a football sim shell from the full-season historical pool."
+    },
+    {
+      "mode": "historical_draft",
+      "label": "Draft The Era",
+      "description": "Redraft the 2014 league into a new mixed-era football universe with 32-team roster coverage."
+    }
+  ]
+}
