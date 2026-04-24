@@ -84,11 +84,11 @@
     if (sport !== 'nfl') {
       return { id: 'sim-day', label: 'Sim Day' };
     }
-    if (postseasonPhase === 'postseason_ready') {
-      return { id: 'review-playoffs', label: 'Review Playoffs' };
-    }
     if (postseasonPhase === 'completed') {
       return { id: 'season-complete', label: 'Season Complete' };
+    }
+    if (postseasonPhase !== 'regular_season') {
+      return { id: 'review-playoffs', label: 'Review Playoffs' };
     }
     return { id: 'sim-day', label: 'Sim Week' };
   }
@@ -191,6 +191,40 @@
       seed: null,
       berth: 'outside'
     })));
+  }
+
+  function buildExactNflConferencePlayoffPicture(rows, conference, seedOrder){
+    const standingsByTeam = new Map(
+      (Array.isArray(rows) ? rows : []).map((row) => [String(row?.teamAbbr || '').trim().toUpperCase(), clone(row)])
+    );
+    return (Array.isArray(seedOrder) ? seedOrder : []).map((teamAbbr, index) => {
+      const normalizedAbbr = String(teamAbbr || '').trim().toUpperCase();
+      const row = standingsByTeam.get(normalizedAbbr) || { teamAbbr: normalizedAbbr };
+      return {
+        ...clone(row),
+        teamAbbr: normalizedAbbr,
+        conference,
+        seed: index + 1,
+        berth: index < 2 ? 'division_winner' : 'wild_card',
+        bye: index < 2
+      };
+    });
+  }
+
+  function buildExactNfl2014PlayoffPicture(rows){
+    return {
+      afc: buildExactNflConferencePlayoffPicture(rows, 'AFC', ['NE', 'DEN', 'IND', 'PIT', 'CIN', 'BAL']),
+      nfc: buildExactNflConferencePlayoffPicture(rows, 'NFC', ['SEA', 'GB', 'DAL', 'CAR', 'ARI', 'DET'])
+    };
+  }
+
+  function buildExactNfl2014WildCardSchedule(){
+    return [
+      { conference: 'AFC', round: 'wild_card', seed: 3, homeAbbr: 'IND', awayAbbr: 'BAL' },
+      { conference: 'AFC', round: 'wild_card', seed: 4, homeAbbr: 'PIT', awayAbbr: 'CIN' },
+      { conference: 'NFC', round: 'wild_card', seed: 3, homeAbbr: 'DAL', awayAbbr: 'DET' },
+      { conference: 'NFC', round: 'wild_card', seed: 4, homeAbbr: 'CAR', awayAbbr: 'ARI' }
+    ];
   }
 
   function getScheduleDayCount(scheduleByDay){
@@ -407,7 +441,29 @@
 
   function buildSeededPostseasonState(nextState){
     if (getSimulationSportForState(nextState) === 'nfl') {
-      const standings = sortStandingsRows(clone(nextState?.seasonState?.standings || []));
+      const anchorSeasonId = String(nextState?.leagueShell?.anchorSeasonId || '').trim().toLowerCase();
+      const standings = clone(nextState?.seasonState?.standings || []);
+      const afcRows = standings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'AFC');
+      const nfcRows = standings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'NFC');
+      if (anchorSeasonId === 'nfl_2014' && afcRows.length >= 6 && nfcRows.length >= 6) {
+        const playoffPicture = buildExactNfl2014PlayoffPicture(standings);
+        const currentWeekSchedule = buildExactNfl2014WildCardSchedule();
+        return {
+          phase: 'wild_card',
+          currentRound: 'wild_card',
+          currentDay: Number(nextState?.seasonState?.currentDay || 1),
+          playIn: null,
+          bracket: null,
+          playoffPicture,
+          seriesById: {},
+          currentWeekSchedule: clone(currentWeekSchedule),
+          currentDaySchedule: clone(currentWeekSchedule),
+          champion: null,
+          runnerUp: null,
+          completedAt: null
+        };
+      }
+      const sortedStandings = sortStandingsRows(standings);
       return {
         phase: 'postseason_ready',
         currentRound: 'playoff_picture',
@@ -416,10 +472,10 @@
         bracket: null,
         playoffPicture: {
           afc: buildNflConferencePlayoffPicture(
-            standings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'AFC')
+            sortedStandings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'AFC')
           ),
           nfc: buildNflConferencePlayoffPicture(
-            standings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'NFC')
+            sortedStandings.filter((row) => String(row?.conference || '').trim().toUpperCase() === 'NFC')
           )
         },
         seriesById: {},
@@ -571,6 +627,11 @@
       .map((game) => clone(game));
     if (phase === 'completed') return [];
     if (persistedCurrentDaySchedule.length) return persistedCurrentDaySchedule;
+    if (phase === 'wild_card') {
+      return clone(Array.isArray(postseasonState?.currentWeekSchedule)
+        ? postseasonState.currentWeekSchedule
+        : postseasonState?.currentDaySchedule || []);
+    }
     if (phase === 'postseason_ready' || phase === 'play_in') {
       const initialPlayInGames = [
         seriesById['east-play-in-7-8'],
@@ -1075,6 +1136,7 @@
           bracket: clone(state?.postseasonState?.bracket || null),
           playoffPicture: clone(state?.postseasonState?.playoffPicture || null),
           seriesById: clone(state?.postseasonState?.seriesById || {}),
+          currentWeekSchedule: clone(state?.postseasonState?.currentWeekSchedule || []),
           currentDaySchedule: clone(state?.postseasonState?.currentDaySchedule || []),
           champion: clone(state?.postseasonState?.champion || null),
           runnerUp: clone(state?.postseasonState?.runnerUp || null),
