@@ -8274,6 +8274,7 @@ function getSharedSimulationSport(){
 function getSimulationHubPrimaryActionHandler(primaryAction){
   const actionId=String(primaryAction?.id || '').trim().toLowerCase();
   if(actionId==='review-playoffs') return "goPage('playoffs')";
+  if(actionId==='season-complete') return "goPage('playoffs')";
   if(actionId==='sim-day') return 'advanceWeek()';
   return '';
 }
@@ -8642,7 +8643,9 @@ function renderSimulationPlayoffsInSharedShell(){
         </div>
       `;
     };
-    const currentRoundSchedule = (Array.isArray(vm?.currentWeekSchedule) ? vm.currentWeekSchedule : [])
+    const currentRoundSchedule = phase === 'completed'
+      ? []
+      : (Array.isArray(vm?.currentWeekSchedule) ? vm.currentWeekSchedule : [])
       .concat(Array.isArray(vm?.currentDaySchedule) ? vm.currentDaySchedule : [])
       .filter((game, index, list) => {
         const key = `${game?.awayAbbr || ''}-${game?.homeAbbr || ''}-${game?.round || ''}-${game?.conference || ''}`;

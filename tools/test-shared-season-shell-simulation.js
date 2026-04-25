@@ -1800,6 +1800,9 @@ assert.match(elements.playoffsContent.innerHTML, /First-Round Bye/i, 'nfl playof
 assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX/i, 'nfl playoffs screen should use the 2014 championship title');
 assert.match(elements.playoffsContent.innerHTML, /BAL\s*@\s*IND/i, 'nfl playoffs screen should render afc matchup abbreviations');
 assert.match(elements.playoffsContent.innerHTML, /DET\s*@\s*DAL/i, 'nfl playoffs screen should render nfc matchup abbreviations');
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Sim Week', 'active nfl postseason hub states should keep the Sim Week CTA available');
+assert.equal(elements.advBtn.onclick, 'advanceWeek()', 'active nfl postseason hub CTA should keep advancing the bracket');
 
 api.setSeasonModeAdapter({
   getModeId() {
@@ -1835,7 +1838,7 @@ api.setSeasonModeAdapter({
       controlledTeam: { abbr: 'NE', name: 'New England Patriots' },
       userRow: { w: 12, l: 4, streak: 'W1' },
       recordLabel: '12-4',
-      primaryAction: { id: 'review-playoffs', label: 'Season Complete' },
+      primaryAction: { id: 'season-complete', label: 'Season Complete' },
       sourceSeasonLabels: ['2014']
     };
   },
@@ -1877,7 +1880,9 @@ api.setSeasonModeAdapter({
         afc: [{ seed: 1, teamAbbr: 'NE', teamName: 'Patriots', w: 12, l: 4, berth: 'division_winner', bye: true }],
         nfc: [{ seed: 1, teamAbbr: 'SEA', teamName: 'Seahawks', w: 12, l: 4, berth: 'division_winner', bye: true }]
       },
-      currentWeekSchedule: []
+      currentWeekSchedule: [
+        { awayAbbr: 'SEA', homeAbbr: 'NE', round: 'super_bowl', conference: 'league' }
+      ]
     };
   },
   setLineup() { return null; },
@@ -1889,6 +1894,10 @@ api.renderSimulationPlayoffsInSharedShell();
 assert.match(elements.playoffsContent.innerHTML, /New England Patriots/i, 'nfl completed playoffs screen should show the champion');
 assert.match(elements.playoffsContent.innerHTML, /Seattle Seahawks/i, 'nfl completed playoffs screen should show the runner-up');
 assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX Complete/i, 'nfl completed playoffs screen should keep the 2014 championship completion framing');
+assert.doesNotMatch(elements.playoffsContent.innerHTML, /SEA\s*@\s*NE/i, 'completed nfl playoffs screen should not keep rendering a live Super Bowl slate');
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Season Complete', 'completed nfl seasons should keep the done-state CTA label');
+assert.equal(elements.advBtn.onclick, "goPage('playoffs')", 'completed nfl seasons should still let the user reopen the playoffs summary from the hub');
 
 api.setSeasonModeAdapter({
   getModeId() {

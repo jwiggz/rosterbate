@@ -1113,6 +1113,20 @@ assert.equal(
   'wild_card',
   'nfl postseason seeding should enter the exact 2014 wild-card phase after the regular season ends'
 );
+const seededNflPostseasonAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-2014-seeded',
+  state: nfl2014PostseasonState
+});
+assert.equal(
+  seededNflPostseasonAdapter.getHubViewModel().primaryAction?.id,
+  'sim-day',
+  'active NFL postseason phases should keep the shared-shell CTA wired to Sim Week'
+);
+assert.equal(
+  seededNflPostseasonAdapter.getScheduleViewModel().cycleLabel,
+  'Wild Card Weekend',
+  'active NFL postseason schedule labels should use playoff phase copy instead of regular-season week math'
+);
 assert.deepStrictEqual(
   nfl2014PostseasonState.postseasonState.playoffPicture.afc.map((row) => row.teamAbbr),
   ['NE', 'DEN', 'IND', 'PIT', 'CIN', 'BAL'],
@@ -1163,6 +1177,11 @@ assert.equal(
   'the live nfl postseason flow should advance out of wild_card after the seeded wild-card slate resolves'
 );
 assert.equal(
+  nfl2014LiveAdvanceState.seasonState.currentWeek,
+  19,
+  'nfl postseason progression should keep NFL playoff weeks in sequence instead of collapsing back to regular-season math'
+);
+assert.equal(
   (nfl2014LiveAdvanceState.postseasonState.currentWeekSchedule || []).length,
   4,
   'the live nfl postseason flow should seed four divisional games after wild-card results'
@@ -1173,6 +1192,15 @@ assert.ok(
     String(game?.seriesId || '').length > 0
   )),
   'the live nfl postseason flow should keep stable day and series identity on divisional schedules'
+);
+const divisionalScheduleAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-2014-divisional-view',
+  state: nfl2014LiveAdvanceState
+});
+assert.equal(
+  divisionalScheduleAdapter.getScheduleViewModel().cycleLabel,
+  'Divisional Round',
+  'reopened NFL postseason states should keep playoff round labels instead of collapsing back to Week N'
 );
 
 const nfl2014FallbackAdapter = createSimulationSeasonAdapter({

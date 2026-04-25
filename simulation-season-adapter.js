@@ -73,6 +73,18 @@
 
   function formatSimulationCycleLabel(state){
     if (getSimulationSportForState(state) === 'nfl') {
+      const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
+      const postseasonLabels = {
+        postseason_ready: 'Playoff Picture',
+        wild_card: 'Wild Card Weekend',
+        divisional: 'Divisional Round',
+        conference_championship: 'Conference Championships',
+        super_bowl: 'Super Bowl XLIX',
+        completed: 'Season Complete'
+      };
+      if (postseasonPhase && postseasonPhase !== 'regular_season') {
+        return postseasonLabels[postseasonPhase] || 'NFL Postseason';
+      }
       return `Week ${Number(state?.seasonState?.currentWeek || state?.seasonState?.currentDay || 1)}`;
     }
     return `Day ${Number(state?.seasonState?.currentDay || 1)} - Week ${Number(state?.seasonState?.currentWeek || 1)}`;
@@ -87,7 +99,7 @@
     if (postseasonPhase === 'completed') {
       return { id: 'season-complete', label: 'Season Complete' };
     }
-    if (postseasonPhase !== 'regular_season') {
+    if (postseasonPhase === 'postseason_ready') {
       return { id: 'review-playoffs', label: 'Review Playoffs' };
     }
     return { id: 'sim-day', label: 'Sim Week' };
@@ -952,6 +964,8 @@
               ? `${winnerTeamAbbr} beat ${runnerUpTeamAbbr}`
               : ''
           },
+          currentWeekSchedule: [],
+          currentDaySchedule: [],
           champion: buildPostseasonTeamMetadata(
             nextState,
             getSeriesTeam(superBowl, winnerTeamAbbr) || winnerTeamAbbr,
@@ -1107,11 +1121,15 @@
     };
   }
 
-  function applyPostseasonDayResults(currentSeasonState, dayResult){
+  function applyPostseasonDayResults(currentSeasonState, dayResult, state){
     const nextSeasonState = clone(currentSeasonState || {});
     nextSeasonState.completedGameLogs = (nextSeasonState.completedGameLogs || []).concat(dayResult?.gameLogs || []);
     nextSeasonState.currentDay = Number(nextSeasonState.currentDay || 1) + 1;
-    nextSeasonState.currentWeek = Math.max(1, Math.ceil(Number(nextSeasonState.currentDay || 1) / 7));
+    if (getSimulationSportForState(state) === 'nfl') {
+      nextSeasonState.currentWeek = Math.max(1, Number(currentSeasonState?.currentWeek || currentSeasonState?.currentDay || 1) + 1);
+    } else {
+      nextSeasonState.currentWeek = Math.max(1, Math.ceil(Number(nextSeasonState.currentDay || 1) / 7));
+    }
     return nextSeasonState;
   }
 
@@ -1139,7 +1157,7 @@
       { [currentDay]: clone(todayGames) },
       currentDay
     );
-    const nextSeasonState = applyPostseasonDayResults(currentSeasonState, dayResult);
+    const nextSeasonState = applyPostseasonDayResults(currentSeasonState, dayResult, workingState);
     const nextPostseasonState = advancePostseasonStateFromResults(workingState, nextSeasonState, todayGames, dayResult);
     return {
       ...clone(workingState),
