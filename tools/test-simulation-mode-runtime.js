@@ -5,9 +5,14 @@ const path = require('node:path');
 const { getSimulationShell } = require('../simulation-mode-config.js');
 const {
   getSimulationRosterNeeds,
+  getSimulationStarterSlots,
+  getSimulationRequiredStarterCount,
   buildSimulationPlayerPool,
   buildSimulationUniverseBootstrap,
   buildCompletedSimulationAutoDraftState,
+  setSimulationLineup,
+  claimSimulationFreeAgent,
+  applySimulationTrade,
   writeCompletedSimulationState
 } = require('../simulation-mode-runtime.js');
 
@@ -126,6 +131,21 @@ assert.deepStrictEqual(
   'nfl simulation runtime should use the phase-1 roster template that matches the shipped 2014 pack'
 );
 
+assert.deepStrictEqual(
+  getSimulationStarterSlots(nflShell),
+  ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+  'nfl simulation runtime should expose football starter slots'
+);
+
+assert.deepStrictEqual(
+  getSimulationStarterSlots(shell),
+  ['PG', 'SG', 'SF', 'PF', 'C'],
+  'nba simulation runtime should keep the basketball starter slots'
+);
+
+assert.equal(getSimulationRequiredStarterCount(nflShell), 9);
+assert.equal(getSimulationRequiredStarterCount(shell), 5);
+
 const expectedRankedNames = rankPlayers(playerPool).map((player) => player.name);
 
 const pool = buildSimulationPlayerPool({ mixedEraContext, shell });
@@ -187,6 +207,147 @@ assert.equal(freshBootstrap.draftState.draftPool[0].name, 'Overall First');
 assert.equal(freshBootstrap.sourceSeasons.sourcePackIds.length, 4);
 assert.equal(freshBootstrap.seasonState.standings[0].w, 0);
 assert.equal(freshBootstrap.postseasonState.phase, 'regular_season');
+
+const blankLineupState = setSimulationLineup(
+  {
+    seasonState: {
+      lineupIdsByTeam: {
+        GB: [201, 202]
+      },
+      activityLog: []
+    }
+  },
+  '   ',
+  [301, 302]
+);
+
+assert.deepStrictEqual(
+  blankLineupState.seasonState.lineupIdsByTeam,
+  { GB: [201, 202] },
+  'blank team abbreviations should not write a lineup under an empty key'
+);
+assert.equal(
+  blankLineupState.seasonState.activityLog.length,
+  0,
+  'blank team abbreviations should not add a lineup activity log entry'
+);
+
+const nflLineupState = setSimulationLineup(
+  {
+    seasonState: {
+      lineupIdsByTeam: {
+        GB: [101, 102, 103, 104, 105, 106, 107, 108, 109]
+      },
+      activityLog: []
+    }
+  },
+  'gb',
+  [101, 102, 103, 104, 105, 106, 107, 108, 109]
+);
+
+assert.deepStrictEqual(
+  nflLineupState.seasonState.lineupIdsByTeam.GB,
+  [101, 102, 103, 104, 105, 106, 107, 108, 109],
+  'nfl lineup ids should persist without being expanded to an nba starter count'
+);
+
+const waiverSnapshotState = {
+  draftState: {
+    rostersByTeam: {
+      GB: [{ id: 1, name: 'Roster Original', designation: 'ACTIVE' }]
+    },
+    freeAgents: [{ id: 2, name: 'Free Agent Original', designation: 'ACTIVE' }]
+  },
+  seasonState: {
+    lineupIdsByTeam: {
+      GB: [1]
+    },
+    activityLog: []
+  }
+};
+
+const waivedState = claimSimulationFreeAgent(waiverSnapshotState, {
+  teamAbbr: 'GB',
+  addPlayerId: 2,
+  dropPlayerId: 1
+});
+
+waivedState.draftState.rostersByTeam.GB[0].designation = 'OUT';
+waivedState.draftState.freeAgents[0].designation = 'BENCH';
+
+assert.equal(
+  waiverSnapshotState.draftState.freeAgents[0].designation,
+  'ACTIVE',
+  'successful waiver claims should not reuse free agent objects from the prior snapshot'
+);
+assert.equal(
+  waiverSnapshotState.draftState.rostersByTeam.GB[0].designation,
+  'ACTIVE',
+  'successful waiver claims should not reuse dropped roster objects from the prior snapshot'
+);
+
+const tradeSnapshotState = {
+  draftState: {
+    rostersByTeam: {
+      GB: [{ id: 10, name: 'GB Original', designation: 'ACTIVE' }],
+      CHI: [{ id: 20, name: 'CHI Original', designation: 'ACTIVE' }]
+    }
+  },
+  seasonState: {
+    activityLog: []
+  }
+};
+
+const tradedState = applySimulationTrade(tradeSnapshotState, {
+  fromTeamAbbr: 'GB',
+  toTeamAbbr: 'CHI',
+  outgoingPlayerIds: [10],
+  incomingPlayerIds: [20]
+});
+
+tradedState.draftState.rostersByTeam.GB[0].designation = 'QUESTIONABLE';
+tradedState.draftState.rostersByTeam.CHI[0].designation = 'IR';
+
+assert.equal(
+  tradeSnapshotState.draftState.rostersByTeam.CHI[0].designation,
+  'ACTIVE',
+  'successful trades should not reuse incoming player objects from the prior snapshot'
+);
+assert.equal(
+  tradeSnapshotState.draftState.rostersByTeam.GB[0].designation,
+  'ACTIVE',
+  'successful trades should not reuse outgoing player objects from the prior snapshot'
+);
+
+const malformedTradeState = applySimulationTrade(
+  {
+    draftState: {
+      rostersByTeam: {
+        GB: [{ id: 1, name: 'One' }]
+      }
+    },
+    seasonState: {
+      activityLog: []
+    }
+  },
+  {
+    fromTeamAbbr: '  ',
+    toTeamAbbr: 'GB',
+    outgoingPlayerIds: [],
+    incomingPlayerIds: []
+  }
+);
+
+assert.deepStrictEqual(
+  malformedTradeState.draftState.rostersByTeam,
+  { GB: [{ id: 1, name: 'One' }] },
+  'blank team abbreviations and empty trade ids should not mutate rosters'
+);
+assert.equal(
+  malformedTradeState.seasonState.activityLog.length,
+  0,
+  'blank team abbreviations and empty trade ids should not log a trade'
+);
 
 const partialShellBootstrap = buildSimulationUniverseBootstrap({
   shell: { rosterSize: 10 },

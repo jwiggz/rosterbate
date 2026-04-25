@@ -34,6 +34,7 @@ ${extractBetween('function isHistoricalSimulationUniverse(', 'function isHistori
 ${extractBetween('function setSeasonSidePanelVisible(', 'function buildPowerupCardsHtml(')}
 ${extractBetween('function setHubSummaryStatLabels(', 'function persistSimulationSeasonState(')}
 ${extractBetween('function persistSimulationSeasonState(', 'function buildPowerupCardsHtml(')}
+${extractBetween('function getSharedSimulationSport(', 'function renderSimulationHubInSharedShell(')}
 ${extractBetween('function renderSimulationHubInSharedShell(', 'function renderSimulationWaiverInSharedShell(')}
 ${extractBetween('function renderSimulationWaiverInSharedShell(', 'function claimSimulationFreeAgentFromShell(')}
 ${extractBetween('function claimSimulationFreeAgentFromShell(', 'function renderSimulationTradesInSharedShell(')}
@@ -531,6 +532,7 @@ const simulationAdapterStub = {
   },
   getRosterViewModel() {
     return {
+      starterSlots: ['PG', 'SG', 'SF', 'PF', 'C'],
       roster: [
         { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
         { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
@@ -766,6 +768,7 @@ assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season 
 assert.match(html, /function applySimulationSuggestedLineupFromShell\(/, 'season shell should expose a simulation lineup action helper');
 assert.match(html, /SEASON_MODE_ADAPTER\.setLineup\(/, 'simulation lineup action should flow through the adapter');
 assert.match(html, /persistSimulationSeasonState\('simulation_lineup'\)/, 'simulation lineup action should persist shared state');
+assert.match(html, /simulation-nfl-2014-schedule\.js/, 'season shell should load the nfl 2014 schedule helper before the shared simulation engine');
 assert.match(adapterSource, /RosterBateSimulationModeRuntime\.claimSimulationFreeAgent/, 'adapter should explicitly bind browser waiver mutations to RosterBateSimulationModeRuntime.claimSimulationFreeAgent');
 assert.match(adapterSource, /RosterBateSimulationModeRuntime\.applySimulationTrade/, 'adapter should explicitly bind browser trade mutations to RosterBateSimulationModeRuntime.applySimulationTrade');
 assert.match(adapterSource, /RosterBateSimulationModeRuntime\.setSimulationLineup/, 'adapter should explicitly bind browser lineup mutations to RosterBateSimulationModeRuntime.setSimulationLineup');
@@ -786,6 +789,8 @@ assert.match(html, /id="rosterScheduleChip"/, 'roster markup should expose the s
 assert.match(html, /id="matchupTitle"/, 'schedule screen title should be targetable for simulation mode');
 assert.match(html, /id="playoffsContent"/, 'playoffs markup should expose a dedicated content mount');
 assert.match(html, /id="playoffsPowerups"/, 'playoffs markup should expose a dedicated powerups mount');
+assert.doesNotMatch(html, /Postseason bracket, play-in races, and the champion path/, 'shared shell playoffs header copy should not promise active playoff simulation for every sport path');
+assert.doesNotMatch(html, /This screen reflects adapter-driven postseason state as the season rolls into the play-in and playoffs\./, 'shared shell playoffs note should not imply active playoff simulation flow by default');
 
 const params = new URLSearchParams('?simulation=NBA_Mixed_Era&historicalUniverse=sim-slot-1');
 assert.equal(api.getRequestedSimulationMode(params), 'nba_mixed_era', 'simulation query param should normalize to lowercase');
@@ -1030,13 +1035,18 @@ assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michae
 
 historicalSlotUpsertCalls = [];
 api.applySimulationSuggestedLineupFromShell();
-assert.deepStrictEqual(toPlain(simulationAdapterStub.lastLineupIds), [34]);
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastLineupIds),
+  [34, 23],
+  'partial shared-shell simulation lineups should expand to the available roster cap instead of freezing at the saved lineup size'
+);
 
 const freshRosterAdapterStub = {
   ...simulationAdapterStub,
   lastLineupIds: null,
   getRosterViewModel() {
     return {
+      starterSlots: ['PG', 'SG', 'SF', 'PF', 'C'],
       roster: [
         { id: 1, name: 'Player 1', team: 'AAA', pos: 'PG' },
         { id: 2, name: 'Player 2', team: 'AAA', pos: 'SG' },
@@ -1359,6 +1369,33 @@ assert.deepEqual(
   'simulation persistence should prefer adapter lineup ids over stale legacy starters'
 );
 
+const normalizedStreakFixture = toPlain({
+  ...fixture,
+  seasonState: {
+    ...fixture.seasonState,
+    standings: [
+      { ...fixture.seasonState.standings[0], streak: 'W3' },
+      { ...fixture.seasonState.standings[1], streak: 'L1' }
+    ]
+  }
+});
+const normalizedStreakState = toPlain(api.normalizeSharedSimulationSeasonBootState(normalizedStreakFixture, null));
+assert.equal(
+  normalizedStreakState.standings[0].streak,
+  'W3',
+  'shared simulation boot should preserve string streak labels instead of coercing them away'
+);
+assert.equal(
+  normalizedStreakState.standings[0].streakW,
+  true,
+  'shared simulation boot should infer a win-direction flag from preserved W-prefixed streak labels when streakW is omitted'
+);
+assert.equal(
+  normalizedStreakState.standings[1].streakW,
+  false,
+  'shared simulation boot should infer a loss-direction flag from preserved L-prefixed streak labels when streakW is omitted'
+);
+
 const postseasonPersistenceState = toPlain(
   api.buildSharedSimulationPersistenceState(
     {
@@ -1472,6 +1509,576 @@ assert.equal(
   'sim-slot-from-completed-draft',
   'fallback shared-shell adapters should retain the assigned slot id after the first successful save'
 );
+
+assert.match(
+  adapterSource,
+  /nfl_mixed_era_single_player_v1/,
+  'shared shell adapter should support nfl simulation mode'
+);
+
+api.setSeasonModeAdapter({
+  getHubViewModel() {
+    return {
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 0, l: 0, streak: 'EVEN' },
+      recordLabel: '0-0',
+      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Week 1',
+      recentResults: [{ awayAbbr: 'GB', awayScore: 24, homeAbbr: 'SEA', homeScore: 27 }],
+      nextGame: { day: 1, opponentAbbr: 'SF', opponentName: 'San Francisco 49ers' }
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [
+        { id: 9, name: 'Tony Romo', team: 'DAL', pos: 'QB' },
+        { id: 29, name: 'DeMarco Murray', team: 'DAL', pos: 'RB' },
+        { id: 9001, name: 'Dallas DST', team: 'DAL', pos: 'DST' }
+      ],
+      lineup: [
+        { id: 9, name: 'Tony Romo', team: 'DAL', pos: 'QB' },
+        { id: 29, name: 'DeMarco Murray', team: 'DAL', pos: 'RB' }
+      ],
+      bench: [
+        { id: 9001, name: 'Dallas DST', team: 'DAL', pos: 'DST' }
+      ]
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [
+        { teamAbbr: 'DAL', conference: 'NFC', division: 'East', w: 0, l: 0 },
+        { teamAbbr: 'PHI', conference: 'NFC', division: 'East', w: 0, l: 0 }
+      ],
+      userRow: { teamAbbr: 'DAL', w: 0, l: 0 },
+      postseasonPhase: 'regular_season',
+      sections: [
+        {
+          title: 'NFC East',
+          rows: [
+            { teamAbbr: 'DAL', conference: 'NFC', division: 'East', w: 0, l: 0 },
+            { teamAbbr: 'PHI', conference: 'NFC', division: 'East', w: 0, l: 0 }
+          ]
+        }
+      ]
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'postseason_ready',
+      playoffPicture: {
+        afc: [{ teamAbbr: 'NE', w: 12, l: 4 }],
+        nfc: [{ teamAbbr: 'DAL', w: 12, l: 4 }]
+      }
+    };
+  },
+  setLineup() {
+    return null;
+  },
+  claimFreeAgent() {
+    return null;
+  },
+  applyTrade() {
+    return null;
+  }
+});
+api.setData({
+  leagueShell: {
+    sport: 'nfl',
+    teams: new Array(32).fill(null).map((_, index) => ({ abbr: `T${index}`, name: `Team ${index}` }))
+  },
+  draftState: {
+    controlledTeamAbbr: 'DAL'
+  }
+});
+
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Sim Week', 'nfl hub should expose a weekly simulation action');
+assert.equal(elements.hubScoringType.textContent, 'Simulated NFL Results', 'nfl hub should use football result copy');
+assert.equal(elements.advBtn.disabled, false, 'nfl hub sim CTA should remain enabled during regular season');
+
+simulationStubState.postseasonState = { phase: 'postseason_ready' };
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' },
+      { id: 'playoffs', label: 'Playoffs' }
+    ];
+  },
+  getState() {
+    return {};
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 12, l: 4, streak: 'W3' },
+      recordLabel: '12-4',
+      primaryAction: { id: 'review-playoffs', label: 'Review Playoffs' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Week 18',
+      recentResults: [
+        { awayAbbr: 'PHI', awayScore: 20, homeAbbr: 'DAL', homeScore: 27 }
+      ],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'postseason_ready',
+      playoffPicture: {
+        afc: [{ teamAbbr: 'NE', w: 12, l: 4 }],
+        nfc: [{ teamAbbr: 'DAL', w: 12, l: 4 }]
+      }
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Review Playoffs', 'nfl hub should relabel the CTA once the playoff picture is ready');
+assert.equal(elements.advBtn.disabled, false, 'review-playoffs CTA should stay usable');
+assert.equal(elements.advBtn.onclick, "goPage('playoffs')", 'review-playoffs CTA should navigate to the playoffs tab instead of calling advanceWeek');
+
+api.renderSimulationPlayoffsInSharedShell();
+assert.match(elements.playoffsContent.innerHTML, /Playoff Picture/i, 'nfl playoffs screen should frame postseason-ready state as a playoff picture review');
+assert.doesNotMatch(elements.playoffsContent.innerHTML, /Play-In/i, 'nfl phase-1 playoffs screen should not imply active play-in simulation');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
+        sport: 'nfl',
+        anchorSeasonLabel: '2014 NFL'
+      },
+      postseasonState: {
+        phase: 'wild_card'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' },
+      { id: 'playoffs', label: 'Playoffs' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 12, l: 4, streak: 'W2' },
+      recordLabel: '12-4',
+      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Wild Card Weekend',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'wild_card',
+      currentRound: 'wild_card',
+      shellLabel: '2014 NFL',
+      playoffPicture: {
+        afc: [
+          { seed: 1, teamAbbr: 'NE', teamName: 'Patriots', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 2, teamAbbr: 'DEN', teamName: 'Broncos', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 3, teamAbbr: 'IND', teamName: 'Colts', w: 11, l: 5, berth: 'division_winner' },
+          { seed: 4, teamAbbr: 'PIT', teamName: 'Steelers', w: 11, l: 5, berth: 'division_winner' },
+          { seed: 5, teamAbbr: 'CIN', teamName: 'Bengals', w: 10, l: 5, berth: 'wild_card' },
+          { seed: 6, teamAbbr: 'BAL', teamName: 'Ravens', w: 10, l: 6, berth: 'wild_card' }
+        ],
+        nfc: [
+          { seed: 1, teamAbbr: 'SEA', teamName: 'Seahawks', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 2, teamAbbr: 'GB', teamName: 'Packers', w: 12, l: 4, berth: 'division_winner', bye: true },
+          { seed: 3, teamAbbr: 'DAL', teamName: 'Cowboys', w: 12, l: 4, berth: 'division_winner' },
+          { seed: 4, teamAbbr: 'CAR', teamName: 'Panthers', w: 7, l: 8, berth: 'division_winner' },
+          { seed: 5, teamAbbr: 'ARI', teamName: 'Cardinals', w: 11, l: 5, berth: 'wild_card' },
+          { seed: 6, teamAbbr: 'DET', teamName: 'Lions', w: 11, l: 5, berth: 'wild_card' }
+        ]
+      },
+      currentWeekSchedule: [
+        { awayAbbr: 'BAL', homeAbbr: 'IND' },
+        { awayAbbr: 'CIN', homeAbbr: 'PIT' },
+        { awayAbbr: 'DET', homeAbbr: 'DAL' },
+        { awayAbbr: 'ARI', homeAbbr: 'CAR' }
+      ]
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationPlayoffsInSharedShell();
+assert.match(elements.playoffsContent.innerHTML, /Wild Card/i, 'nfl playoffs screen should call out the current wild card round');
+assert.match(elements.playoffsContent.innerHTML, /First-Round Bye/i, 'nfl playoffs screen should show bye language for the top two seeds');
+assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX/i, 'nfl playoffs screen should use the 2014 championship title');
+assert.match(elements.playoffsContent.innerHTML, /BAL\s*@\s*IND/i, 'nfl playoffs screen should render afc matchup abbreviations');
+assert.match(elements.playoffsContent.innerHTML, /DET\s*@\s*DAL/i, 'nfl playoffs screen should render nfc matchup abbreviations');
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Sim Week', 'active nfl postseason hub states should keep the Sim Week CTA available');
+assert.equal(elements.advBtn.onclick, 'advanceWeek()', 'active nfl postseason hub CTA should keep advancing the bracket');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
+        sport: 'nfl',
+        anchorSeasonLabel: '2014 NFL'
+      },
+      postseasonState: {
+        phase: 'completed'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' },
+      { id: 'playoffs', label: 'Playoffs' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'NE', name: 'New England Patriots' },
+      userRow: { w: 12, l: 4, streak: 'W1' },
+      recordLabel: '12-4',
+      primaryAction: { id: 'season-complete', label: 'Season Complete' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Season Complete',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'completed',
+      currentRound: 'super_bowl',
+      shellLabel: '2014 NFL',
+      champion: { teamAbbr: 'NE', teamName: 'New England Patriots' },
+      runnerUp: { teamAbbr: 'SEA', teamName: 'Seattle Seahawks' },
+      playoffPicture: {
+        afc: [{ seed: 1, teamAbbr: 'NE', teamName: 'Patriots', w: 12, l: 4, berth: 'division_winner', bye: true }],
+        nfc: [{ seed: 1, teamAbbr: 'SEA', teamName: 'Seahawks', w: 12, l: 4, berth: 'division_winner', bye: true }]
+      },
+      currentWeekSchedule: [
+        { awayAbbr: 'SEA', homeAbbr: 'NE', round: 'super_bowl', conference: 'league' }
+      ]
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationPlayoffsInSharedShell();
+assert.match(elements.playoffsContent.innerHTML, /New England Patriots/i, 'nfl completed playoffs screen should show the champion');
+assert.match(elements.playoffsContent.innerHTML, /Seattle Seahawks/i, 'nfl completed playoffs screen should show the runner-up');
+assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX Complete/i, 'nfl completed playoffs screen should keep the 2014 championship completion framing');
+assert.doesNotMatch(elements.playoffsContent.innerHTML, /SEA\s*@\s*NE/i, 'completed nfl playoffs screen should not keep rendering a live Super Bowl slate');
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Season Complete', 'completed nfl seasons should keep the done-state CTA label');
+assert.equal(elements.advBtn.onclick, "goPage('playoffs')", 'completed nfl seasons should still let the user reopen the playoffs summary from the hub');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
+        sport: 'nfl'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 0, l: 0, streak: 'EVEN' },
+      recordLabel: '0-0',
+      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Week 1',
+      recentResults: [
+        { awayAbbr: 'PHI', awayScore: 17, homeAbbr: 'DAL', homeScore: 24 }
+      ],
+      nextGame: { day: 1, home: true, opponentAbbr: 'PHI', opponentName: 'Philadelphia Eagles' }
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [
+        { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' },
+        { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL' },
+        { id: 88, name: 'Dez Bryant', pos: 'WR', team: 'DAL' },
+        { id: 82, name: 'Jason Witten', pos: 'TE', team: 'DAL' },
+        { id: 9001, name: 'Dallas DST', pos: 'DST', team: 'DAL' },
+        { id: 5, name: 'Dan Bailey', pos: 'K', team: 'DAL' }
+      ],
+      lineup: [
+        { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' },
+        { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL' }
+      ],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: [
+        { title: 'NFC East', rows: [{ teamAbbr: 'DAL', w: 0, l: 0 }] }
+      ]
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'regular_season',
+      playoffPicture: null
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationRosterInSharedShell();
+assert.match(elements.rosterContent.innerHTML, /QB/, 'nfl roster view should render football starter slot labels');
+assert.match(elements.rosterContent.innerHTML, /DST/, 'nfl roster view should render dst starter slot labels');
+
+const nflSuggestedLineupAdapterStub = {
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+      controlledTeam: { abbr: 'DAL' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Week 1',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      roster: [
+        { id: 1, name: 'QB One', pos: 'QB', team: 'DAL', mixedEraOverall: 99 },
+        { id: 2, name: 'QB Two', pos: 'QB', team: 'DAL', mixedEraOverall: 98 },
+        { id: 3, name: 'RB One', pos: 'RB', team: 'DAL', mixedEraOverall: 97 },
+        { id: 4, name: 'RB Two', pos: 'RB', team: 'DAL', mixedEraOverall: 96 },
+        { id: 5, name: 'WR One', pos: 'WR', team: 'DAL', mixedEraOverall: 95 },
+        { id: 6, name: 'WR Two', pos: 'WR', team: 'DAL', mixedEraOverall: 94 },
+        { id: 7, name: 'TE One', pos: 'TE', team: 'DAL', mixedEraOverall: 93 },
+        { id: 8, name: 'WR Three', pos: 'WR', team: 'DAL', mixedEraOverall: 92 },
+        { id: 9, name: 'Dallas DST', pos: 'DST', team: 'DAL', mixedEraOverall: 91 },
+        { id: 10, name: 'Kicker One', pos: 'K', team: 'DAL', mixedEraOverall: 90 }
+      ],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: [
+        { title: 'NFC East', rows: [{ teamAbbr: 'DAL', w: 0, l: 0 }] }
+      ]
+    };
+  },
+  getPlayoffsViewModel() {
+    return { sport: 'nfl', phase: 'regular_season', playoffPicture: null };
+  },
+  getState() {
+    return {
+      leagueShell: { sport: 'nfl', anchorSeasonLabel: '2014 NFL', teams: [{ abbr: 'DAL' }] },
+      seasonState: { lineupIdsByTeam: { DAL: this.lastLineupIds || [] } },
+      draftState: { controlledTeamAbbr: 'DAL', rostersByTeam: { DAL: [] }, freeAgents: [] },
+      sourceSeasons: { sourceSeasonLabels: ['2014'] },
+      simulationMode: 'nfl_mixed_era_single_player_v1',
+      postseasonState: { phase: 'regular_season' }
+    };
+  },
+  setLineup(lineupIds) {
+    this.lastLineupIds = lineupIds;
+    return null;
+  },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+};
+
+api.setSeasonModeAdapter(nflSuggestedLineupAdapterStub);
+api.applySimulationSuggestedLineupFromShell();
+assert.equal(
+  nflSuggestedLineupAdapterStub.lastLineupIds.filter((id) => id === 1 || id === 2).length,
+  1,
+  'nfl suggested lineups should not save duplicate qbs when filling required starter slots'
+);
+assert.ok(
+  nflSuggestedLineupAdapterStub.lastLineupIds.includes(9),
+  'nfl suggested lineups should include dst when filling required starter slots'
+);
+assert.ok(
+  nflSuggestedLineupAdapterStub.lastLineupIds.includes(10),
+  'nfl suggested lineups should include kicker when filling required starter slots'
+);
+
+api.renderSimulationScheduleInSharedShell();
+assert.equal(elements.mWk.textContent, 'Week 1', 'nfl schedule view should use week-centric labels');
+assert.match(elements.matchupContent.innerHTML, /Weekly Schedule \/ Results/, 'nfl schedule view should render weekly schedule copy');
+
+api.renderSimulationStandingsInSharedShell();
+assert.match(elements.standingsContent.innerHTML, /NFC East/, 'nfl standings view should render division-grouped sections');
 
 api.setActiveSeasonMode('simulation');
 api.setSeasonModeAdapter(null);

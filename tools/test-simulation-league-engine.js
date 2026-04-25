@@ -110,4 +110,191 @@ assert.equal(
   30
 );
 
+const nflShell = getSimulationShell({ sport: 'nfl', anchorSeasonId: 'nfl_2014' });
+const nflRoster = Array.from({ length: 13 }, (_, index) => ({
+  id: index + 1,
+  name: `NFL Starter ${index + 1}`,
+  team: 'DAL',
+  pos: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K', 'LB', 'CB', 'S', 'EDGE'][index] || 'FLEX',
+  designation: 'ACTIVE',
+  fp: 28 - index,
+  mixedEraOverall: 94 - index,
+  pts: 20 - Math.floor(index / 2),
+  reb: 6 - Math.floor(index / 4),
+  ast: 5 - Math.floor(index / 5),
+  stl: index < 6 ? 2 : 1,
+  blk: index < 4 ? 1 : 0,
+  to: 2,
+  min: 34 - index,
+  fgm: 8 - Math.floor(index / 2),
+  fga: 14 - index,
+  ftm: 4 - Math.floor(index / 4),
+  fta: 5 - Math.floor(index / 4),
+  tpm: index < 5 ? 2 : 0
+}));
+
+const nflState = {
+  sport: 'nfl',
+  seasonId: 'nfl-sim-season-1',
+  currentDay: 1,
+  currentWeek: 1,
+  teams: nflShell.teams.map((team) => team.name),
+  teamMeta: nflShell.teams,
+  allRosters: nflShell.teams.map((team, teamIdx) => nflRoster.map((player) => ({
+    ...player,
+    id: teamIdx * 100 + player.id,
+    team: team.abbr
+  }))),
+  standings: nflShell.teams.map((team, index) => ({
+    teamIdx: index,
+    teamAbbr: team.abbr,
+    conference: team.conference,
+    division: team.division,
+    w: 0,
+    l: 0,
+    pf: 0,
+    pa: 0
+  }))
+};
+
+const nflLineups = Object.fromEntries(nflShell.teams.map((team, teamIdx) => [
+  team.abbr,
+  nflState.allRosters[teamIdx].slice(0, 9).map((player) => player.id)
+]));
+
+const nflDayResult = simulateSimulationGameDay({
+  state: nflState,
+  schedule: { byDay: { 1: [{ homeAbbr: 'DAL', awayAbbr: 'PHI' }] } },
+  day: 1,
+  lineupIdsByTeam: nflLineups
+});
+
+assert.equal(nflDayResult.gameLogs.length, 1);
+assert.ok(
+  Object.values(nflDayResult.resultsByTeam).every((teamResult) => teamResult.entries.length === 9),
+  'nfl simulation should use all nine starter slots instead of hard-capping at five players'
+);
+assert.ok(
+  nflDayResult.gameLogs.every((game) => game.homeScore < 70 && game.awayScore < 70),
+  'nfl simulation should render football-sized scores instead of nba-style triple-digit totals'
+);
+
+const nflPartialLineupDayResult = simulateSimulationGameDay({
+  state: nflState,
+  schedule: { byDay: { 1: [{ homeAbbr: 'DAL', awayAbbr: 'PHI' }] } },
+  day: 1,
+  lineupIdsByTeam: {
+    DAL: nflState.allRosters[0].slice(0, 3).map((player) => player.id),
+    PHI: nflState.allRosters[1].slice(0, 4).map((player) => player.id)
+  }
+});
+
+assert.ok(
+  Object.values(nflPartialLineupDayResult.resultsByTeam).every((teamResult) => teamResult.entries.length === 9),
+  'partial nfl requested lineups should still backfill to the full nine starter slots'
+);
+
+const nflInvalidRosterTemplate = [
+  { id: 1, name: 'QB One', team: 'DAL', pos: 'QB', designation: 'ACTIVE', fp: 32, mixedEraOverall: 98 },
+  { id: 2, name: 'QB Two', team: 'DAL', pos: 'QB', designation: 'ACTIVE', fp: 31, mixedEraOverall: 97 },
+  { id: 3, name: 'RB One', team: 'DAL', pos: 'RB', designation: 'ACTIVE', fp: 30, mixedEraOverall: 96 },
+  { id: 4, name: 'RB Two', team: 'DAL', pos: 'RB', designation: 'ACTIVE', fp: 29, mixedEraOverall: 95 },
+  { id: 5, name: 'WR One', team: 'DAL', pos: 'WR', designation: 'ACTIVE', fp: 28, mixedEraOverall: 94 },
+  { id: 6, name: 'WR Two', team: 'DAL', pos: 'WR', designation: 'ACTIVE', fp: 27, mixedEraOverall: 93 },
+  { id: 7, name: 'TE One', team: 'DAL', pos: 'TE', designation: 'ACTIVE', fp: 26, mixedEraOverall: 92 },
+  { id: 8, name: 'WR Three', team: 'DAL', pos: 'WR', designation: 'ACTIVE', fp: 25, mixedEraOverall: 91 },
+  { id: 9, name: 'Corner One', team: 'DAL', pos: 'CB', designation: 'ACTIVE', fp: 24, mixedEraOverall: 90 },
+  { id: 10, name: 'Dallas DST', team: 'DAL', pos: 'DST', designation: 'ACTIVE', fp: 23, mixedEraOverall: 89 },
+  { id: 11, name: 'Kicker One', team: 'DAL', pos: 'K', designation: 'ACTIVE', fp: 22, mixedEraOverall: 88 }
+].map((player) => ({
+  ...player,
+  pts: 12,
+  reb: 3,
+  ast: 2,
+  stl: 1,
+  blk: 0,
+  to: 1,
+  min: 20,
+  fgm: 5,
+  fga: 9,
+  ftm: 2,
+  fta: 2,
+  tpm: 0
+}));
+
+const nflInvalidState = {
+  ...nflState,
+  allRosters: nflShell.teams.map((team, teamIdx) => nflInvalidRosterTemplate.map((player) => ({
+    ...player,
+    id: teamIdx * 100 + player.id,
+    team: team.abbr
+  })))
+};
+
+const nflInvalidLineups = Object.fromEntries(nflShell.teams.map((team, teamIdx) => [
+  team.abbr,
+  nflInvalidState.allRosters[teamIdx].slice(0, 9).map((player) => player.id)
+]));
+
+const nflInvalidDayResult = simulateSimulationGameDay({
+  state: nflInvalidState,
+  schedule: { byDay: { 1: [{ homeAbbr: 'DAL', awayAbbr: 'PHI' }] } },
+  day: 1,
+  lineupIdsByTeam: nflInvalidLineups
+});
+
+const nflSlotValidatedEntries = Object.values(nflInvalidDayResult.resultsByTeam)[0]?.entries || [];
+const nflHomePositions = nflSlotValidatedEntries.map((entry) => String(entry?.player?.pos || '').trim().toUpperCase());
+assert.equal(
+  nflHomePositions.filter((position) => position === 'QB').length,
+  1,
+  'nfl starter selection should avoid carrying duplicate qbs into the weekly sim when required slots are missing'
+);
+assert.ok(
+  nflHomePositions.includes('DST'),
+  'nfl starter selection should backfill the required dst slot from the bench when a requested lineup omits it'
+);
+assert.ok(
+  nflHomePositions.includes('K'),
+  'nfl starter selection should backfill the required kicker slot from the bench when a requested lineup omits it'
+);
+
+const roundedTieState = {
+  sport: 'nfl',
+  currentDay: 1,
+  currentWeek: 1,
+  standings: [
+    { teamIdx: 0, teamAbbr: 'DAL', w: 0, l: 0, pf: 0, pa: 0 },
+    { teamIdx: 1, teamAbbr: 'PHI', w: 0, l: 0, pf: 0, pa: 0 }
+  ]
+};
+
+const roundedTieUpdated = applySimulationDayResults(roundedTieState, {
+  gameLogs: [
+    {
+      home: 0,
+      away: 1,
+      homeScore: 14,
+      awayScore: 14,
+      winner: 'away'
+    }
+  ]
+});
+
+assert.equal(
+  roundedTieUpdated.standings.find((row) => row.teamIdx === 1)?.w,
+  1,
+  'standings should respect the authoritative winner even when rounded rendered scores tie'
+);
+assert.equal(
+  roundedTieUpdated.standings.find((row) => row.teamIdx === 0)?.l,
+  1,
+  'authoritative winner handling should prevent the rounded-score tie from crediting the wrong home team'
+);
+assert.equal(
+  roundedTieUpdated.currentWeek,
+  2,
+  'direct nfl engine callers should advance the simulation week one-for-one with each completed week'
+);
+
 console.log('simulation league engine test passed');

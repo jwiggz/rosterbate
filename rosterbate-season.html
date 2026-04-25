@@ -15,6 +15,7 @@
 <script src="sport-config-live.js"></script>
 <script src="historical-universe-slots.js"></script>
 <script src="simulation-mode-runtime.js"></script>
+<script src="simulation-nfl-2014-schedule.js"></script>
 <script src="simulation-league-engine.js"></script>
 <script src="simulation-season-adapter.js"></script>
 <script src="cpu-sim-personalities.js"></script>
@@ -979,7 +980,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       <button class="season-back" onclick="goPage('hub')">‹</button>
       <div>
         <div class="season-subbar-title">Playoffs</div>
-        <div class="season-subbar-copy">Postseason bracket, play-in races, and the champion path</div>
+        <div class="season-subbar-copy">Postseason picture, bracket snapshots, and season-end review</div>
       </div>
     </div>
     <div class="season-topmeta">
@@ -987,7 +988,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       <a href="index.html" class="season-chip action" style="text-decoration:none;">Home</a>
     </div>
   </div>
-  <div class="season-page-note">Simulation mode only. This screen reflects adapter-driven postseason state as the season rolls into the play-in and playoffs.</div>
+  <div class="season-page-note">Simulation mode only. This screen reflects adapter-driven postseason state, including postseason-ready handoff views when a league stops short of live playoff simulation.</div>
   <div class="sbb season-light-body">
     <div class="season-screen-shell">
       <div class="season-screen-main" id="playoffsContent"></div>
@@ -3087,8 +3088,10 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
       l: Number(row?.l || 0) || 0,
       pf: Number(row?.pf || 0) || 0,
       pa: Number(row?.pa || 0) || 0,
-      streak: Number(row?.streak || 0) || 0,
-      streakW: row?.streakW !== false
+      streak: String(row?.streak || '').trim() || 'EVEN',
+      streakW: typeof row?.streakW === 'boolean'
+        ? row.streakW
+        : !/^L/i.test(String(row?.streak || '').trim())
     };
   });
 
@@ -3160,8 +3163,10 @@ function normalizeSharedSimulationSeasonBootState(state, slotId){
       l: Number(row?.l || 0) || 0,
       pf: Number(row?.pf || 0) || 0,
       pa: Number(row?.pa || 0) || 0,
-      streak: Number(row?.streak || 0) || 0,
-      streakW: row?.streakW !== false
+      streak: String(row?.streak || '').trim() || 'EVEN',
+      streakW: typeof row?.streakW === 'boolean'
+        ? row.streakW
+        : !/^L/i.test(String(row?.streak || '').trim())
     };
   });
   const stableSlotId=String(slotId || rawState?.historicalUniverseSlotId || rawState?.slotId || '').trim();
@@ -8257,8 +8262,28 @@ function buildSched(n,weeks){
 function weekGames(w){return G.schedule.filter(g=>g.week===w);}
 function projScore(ti,week=G.week){return getTeamWeekRevealedScore(ti,week);}
 
+function getSharedSimulationSport(){
+  return String(
+    SEASON_MODE_ADAPTER?.getState?.()?.leagueShell?.sport
+    || D?.leagueShell?.sport
+    || CURRENT_SPORT
+    || 'nba'
+  ).trim().toLowerCase();
+}
+
+function getSimulationHubPrimaryActionHandler(primaryAction){
+  const actionId=String(primaryAction?.id || '').trim().toLowerCase();
+  if(actionId==='review-playoffs') return "goPage('playoffs')";
+  if(actionId==='season-complete') return "goPage('playoffs')";
+  if(actionId==='sim-day') return 'advanceWeek()';
+  return '';
+}
+
 function renderSimulationHubInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getHubViewModel();
+  const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
+  const primaryAction = vm?.primaryAction || null;
+  const advBtn = document.getElementById('advBtn');
   setHubSummaryStatLabels({
     opp: 'Record',
     proj: 'Team',
@@ -8270,8 +8295,8 @@ function renderSimulationHubInSharedShell(){
   document.getElementById('hubRec').textContent = vm.recordLabel || (vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0');
   document.getElementById('hubCycleMeta').textContent = `Simulation - ${vm.primaryAction.label} ready`;
   document.getElementById('hubFormat').textContent = vm.shellLabel || D?.leagueShell?.anchorSeasonLabel || D?.leagueName || 'NBA Shell';
-  document.getElementById('hubScoringType').textContent = 'Simulated NBA Results';
-  document.getElementById('hubTeamCount').textContent = String((D?.leagueShell?.teams || []).length || 30);
+  document.getElementById('hubScoringType').textContent = isNflSimulation ? 'Simulated NFL Results' : 'Simulated NBA Results';
+  document.getElementById('hubTeamCount').textContent = String((D?.leagueShell?.teams || []).length || (isNflSimulation ? 32 : 30));
   document.getElementById('hubOpp').textContent = vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0';
   document.getElementById('hubProj').textContent = vm.controlledTeam?.abbr || '---';
   document.getElementById('hubOppProj').textContent = vm.sourceSeasonLabels.join(' + ');
@@ -8291,11 +8316,22 @@ function renderSimulationHubInSharedShell(){
   const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
   const matchupActionSub=document.getElementById('hubMatchupActionSub');
   if(matchupActionTitle) matchupActionTitle.textContent='Schedule';
-  if(matchupActionSub) matchupActionSub.textContent='Open recent results and the upcoming sim slate';
+  if(matchupActionSub) matchupActionSub.textContent=isNflSimulation
+    ? 'Open recent results and the upcoming weekly slate'
+    : 'Open recent results and the upcoming sim slate';
   document.getElementById('hubProj').style.color = 'var(--accent)';
   document.getElementById('hubOppProj').style.color = 'var(--text2)';
   document.getElementById('hubStreak').style.color = '';
-  document.getElementById('advBtn').textContent = 'Sim Day';
+  if(advBtn){
+    const actionHandler=getSimulationHubPrimaryActionHandler(primaryAction);
+    advBtn.textContent = primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Sim Day');
+    advBtn.disabled = !actionHandler;
+    advBtn.setAttribute('onclick', actionHandler);
+    if(advBtn.classList && typeof advBtn.classList.toggle === 'function'){
+      advBtn.classList.toggle('is-sim', primaryAction?.id === 'sim-day');
+      advBtn.classList.toggle('is-done', primaryAction?.id === 'season-complete');
+    }
+  }
   document.getElementById('hubMatchups').innerHTML = (SEASON_MODE_ADAPTER.getScheduleViewModel().recentResults || []).slice(0, 4).map((game) => (
     `<div class="hub-mini-row">${game.awayAbbr} ${game.awayScore} at ${game.homeAbbr} ${game.homeScore}</div>`
   )).join('') || '<div class="hub-card-sub">No completed games yet.</div>';
@@ -8412,6 +8448,20 @@ function applySimulationTradeFromShell(partnerAbbr){
 function renderSimulationStandingsInSharedShell(){
   setSeasonSidePanelVisible('standingsPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getStandingsViewModel();
+  const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
+  if (isNflSimulation && Array.isArray(vm?.sections) && vm.sections.length) {
+    document.getElementById('standingsContent').innerHTML = vm.sections.map((section) => (
+      `<div class="card">
+        <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${section.title}</div>
+        <div style="margin-top:10px;">
+          ${(section.rows || []).map((row) => (
+            `<div style="padding:8px 0;border-top:1px solid rgba(255,255,255,.08);">${row.teamAbbr} · ${row.w}-${row.l}</div>`
+          )).join('')}
+        </div>
+      </div>`
+    )).join('');
+    return;
+  }
   document.getElementById('standingsContent').innerHTML = (vm.rows || []).map((row) => (
     `<div class="card">${row.teamAbbr} · ${row.w}-${row.l}</div>`
   )).join('') || '<div class="card">No standings available.</div>';
@@ -8419,13 +8469,49 @@ function renderSimulationStandingsInSharedShell(){
 
 function applySimulationSuggestedLineupFromShell(){
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
-  const currentLineupSize = Number((vm.lineup || []).length || 0);
+  const sport = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase();
+  const starterSlots = Array.isArray(vm?.starterSlots) ? vm.starterSlots : [];
   const targetLineupSize = Math.min(
-    currentLineupSize > 0 ? currentLineupSize : 5,
+    starterSlots.length || 5,
     Number((vm.roster || []).length || 0)
   );
-  const suggestedLineupIds = (vm.roster || [])
-    .slice(0, targetLineupSize)
+  const normalizePosition = (player) => {
+    const position = String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
+    if (position === 'DEF') return 'DST';
+    if (position === 'PK') return 'K';
+    return position;
+  };
+  const isEligibleForSlot = (player, slot) => {
+    if (sport !== 'nfl') return true;
+    const normalizedSlot = String(slot || '').trim().toUpperCase();
+    const position = normalizePosition(player);
+    if (normalizedSlot === 'FLEX') {
+      return ['RB', 'WR', 'TE', 'FLEX'].includes(position);
+    }
+    return position === normalizedSlot;
+  };
+  const rankPlayers = (players) => (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
+    const overallDiff = Number(b?.mixedEraOverall || 0) - Number(a?.mixedEraOverall || 0);
+    if (overallDiff) return overallDiff;
+    const fpDiff = Number(b?.fp || 0) - Number(a?.fp || 0);
+    if (fpDiff) return fpDiff;
+    return String(a?.name || '').localeCompare(String(b?.name || ''));
+  });
+  const takeEligiblePlayer = (players, slot) => {
+    const index = players.findIndex((player) => isEligibleForSlot(player, slot));
+    if (index < 0) return null;
+    return players.splice(index, 1)[0] || null;
+  };
+  const sortedRoster = rankPlayers(vm?.roster || []);
+  const suggestedPlayers = [];
+  starterSlots.slice(0, targetLineupSize).forEach((slot) => {
+    const player = takeEligiblePlayer(sortedRoster, slot);
+    if (player) suggestedPlayers.push(player);
+  });
+  while (suggestedPlayers.length < targetLineupSize && sortedRoster.length) {
+    suggestedPlayers.push(sortedRoster.shift());
+  }
+  const suggestedLineupIds = suggestedPlayers
     .map((player) => Number(player?.id))
     .filter((id) => Number.isFinite(id));
   if (!suggestedLineupIds.length) return;
@@ -8439,15 +8525,20 @@ function applySimulationSuggestedLineupFromShell(){
 function renderSimulationRosterInSharedShell(){
   setSeasonSidePanelVisible('rosterPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
+  const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
+  const starterSlots = Array.isArray(vm?.starterSlots) ? vm.starterSlots : [];
+  const lineupPlayers = Array.isArray(vm?.lineup) ? vm.lineup : [];
   const scheduleChip=document.getElementById('rosterScheduleChip');
   if(scheduleChip) scheduleChip.textContent='Schedule';
-  document.getElementById('rWk').textContent = 'Set starters, bench order, and injury availability';
+  document.getElementById('rWk').textContent = isNflSimulation
+    ? 'Set weekly starters, bench depth, and injury availability'
+    : 'Set starters, bench order, and injury availability';
   document.getElementById('rosterContent').innerHTML = `
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Lineup Control</div>
-          <div style="color:var(--text2);font-size:12px;margin-top:4px;">Apply a runtime-backed starter set for the next simulation day.</div>
+          <div style="color:var(--text2);font-size:12px;margin-top:4px;">Apply a runtime-backed starter set for the next ${isNflSimulation ? 'simulation week' : 'simulation day'}.</div>
         </div>
         <button class="bp" onclick="applySimulationSuggestedLineupFromShell()">Use Suggested Starters</button>
       </div>
@@ -8455,7 +8546,14 @@ function renderSimulationRosterInSharedShell(){
     <div class="card">
       <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">Starters</div>
       <div style="margin-top:12px;">
-        ${(vm.lineup || []).map((player) => (
+        ${starterSlots.length ? starterSlots.map((slot, index) => {
+          const player = lineupPlayers[index] || null;
+          return `<div data-slot="${slot}" style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);">
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text2);">${slot}</div>
+            <div style="font-family:var(--fd);font-weight:800;">${player ? player.name : 'Empty Slot'}</div>
+            <div style="color:var(--text2);font-size:12px;">${player ? `${player.team} - ${player.pos}` : 'Awaiting starter assignment'}</div>
+          </div>`
+        }).join('') : (vm.lineup || []).map((player) => (
           `<div data-player-id="${player.id}" style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);">
             <div style="font-family:var(--fd);font-weight:800;">${player.name}</div>
             <div style="color:var(--text2);font-size:12px;">${player.team} - ${player.pos}</div>
@@ -8480,10 +8578,13 @@ function renderSimulationRosterInSharedShell(){
 function renderSimulationScheduleInSharedShell(){
   setSeasonSidePanelVisible('matchupPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getScheduleViewModel();
+  const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
   const title=document.getElementById('matchupTitle');
   const note=document.getElementById('matchupNote');
   if(title) title.textContent='Schedule';
-  if(note) note.textContent='Recent results and the upcoming simulation slate for your controlled team.';
+  if(note) note.textContent=isNflSimulation
+    ? 'Recent results and the upcoming weekly slate for your controlled team.'
+    : 'Recent results and the upcoming simulation slate for your controlled team.';
   document.getElementById('mWk').textContent = vm.cycleLabel;
   document.getElementById('matchupContent').innerHTML = `
     <div class="card">
@@ -8499,6 +8600,119 @@ function renderSimulationScheduleInSharedShell(){
 function renderSimulationPlayoffsInSharedShell(){
   setSeasonSidePanelVisible('playoffsPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getPlayoffsViewModel?.() || {};
+  const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
+  if (isNflSimulation) {
+    const shellLabel = String(D?.leagueShell?.anchorSeasonLabel || vm?.shellLabel || 'NFL').trim() || 'NFL';
+    const phase = String(vm?.phase || vm?.currentRound || 'postseason_ready').trim().toLowerCase();
+    const phaseLabels = {
+      postseason_ready: 'Playoff Picture',
+      wild_card: 'Wild Card Weekend',
+      divisional: 'Divisional Round',
+      conference_championship: 'Conference Championships',
+      super_bowl: 'Super Bowl XLIX',
+      completed: 'Super Bowl XLIX Complete'
+    };
+    const roundLabel = phaseLabels[phase] || 'NFL Playoffs';
+    const formatBerthLabel = (team) => {
+      if (!team || typeof team !== 'object') return '';
+      if (team.bye) return 'First-Round Bye';
+      const berth = String(team.berth || '').trim().toLowerCase();
+      if (berth === 'division_winner') return 'Division Winner';
+      if (berth === 'wild_card') return 'Wild Card';
+      return '';
+    };
+    const renderConferenceField = (conferenceLabel, teams) => {
+      const rows = Array.isArray(teams) ? teams.filter(Boolean) : [];
+      return `
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${conferenceLabel} Seeds</div>
+            <div style="color:var(--text2);font-size:12px;">Seeds 1-2 lock a First-Round Bye in the exact 2014 bracket.</div>
+          </div>
+          <div style="margin-top:10px;">
+            ${rows.length ? rows.map((team) => `
+              <div style="padding:12px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">#${Number(team.seed || 0) || '-'} ${team.teamAbbr || 'TBD'}${team.teamName ? ' · ' + team.teamName : ''}</div>
+                  <div style="color:var(--text2);font-size:12px;margin-top:4px;">${Number(team.w || 0)}-${Number(team.l || 0)}${team.division ? ' · ' + team.division : ''}</div>
+                </div>
+                ${formatBerthLabel(team) ? `<div style="padding:6px 10px;border-radius:999px;border:1px solid rgba(247,199,106,.28);background:rgba(247,199,106,.08);color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">${formatBerthLabel(team)}</div>` : ''}
+              </div>
+            `).join('') : '<div class="muted" style="padding-top:12px;">Conference seeds appear once the regular season locks.</div>'}
+          </div>
+        </div>
+      `;
+    };
+    const currentRoundSchedule = phase === 'completed'
+      ? []
+      : (Array.isArray(vm?.currentWeekSchedule) ? vm.currentWeekSchedule : [])
+      .concat(Array.isArray(vm?.currentDaySchedule) ? vm.currentDaySchedule : [])
+      .filter((game, index, list) => {
+        const key = `${game?.awayAbbr || ''}-${game?.homeAbbr || ''}-${game?.round || ''}-${game?.conference || ''}`;
+        return list.findIndex((candidate) => `${candidate?.awayAbbr || ''}-${candidate?.homeAbbr || ''}-${candidate?.round || ''}-${candidate?.conference || ''}` === key) === index;
+      });
+    const renderScheduleRows = () => {
+      if (!currentRoundSchedule.length) {
+        return '<div class="muted" style="padding-top:12px;">The current postseason slate will populate once the adapter seeds the round.</div>';
+      }
+      return currentRoundSchedule.map((game) => `
+        <div style="padding:12px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${String(game.awayAbbr || 'TBD').trim()} @ ${String(game.homeAbbr || 'TBD').trim()}</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:4px;">${String(game.conference || 'League').trim()} · ${String(game.round || vm?.currentRound || phase).trim().replace(/_/g, ' ')}</div>
+          </div>
+          <div style="padding:6px 10px;border-radius:999px;border:1px solid rgba(113,209,255,.24);background:rgba(113,209,255,.08);color:#9ad8ff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">${roundLabel}</div>
+        </div>
+      `).join('');
+    };
+    const renderCompletedSummary = () => {
+      if (phase !== 'completed' || (!vm?.champion && !vm?.runnerUp)) return '';
+      const championLabel = String(vm?.champion?.teamName || vm?.champion?.teamAbbr || 'Champion').trim() || 'Champion';
+      const runnerUpLabel = String(vm?.runnerUp?.teamName || vm?.runnerUp?.teamAbbr || 'Runner-Up').trim() || 'Runner-Up';
+      return `
+        <div class="card" style="background:linear-gradient(135deg,rgba(74,44,13,.98),rgba(18,26,41,.98));border-color:rgba(247,199,106,.42);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);">Super Bowl XLIX Champions</div>
+              <div style="font-family:var(--fd);font-size:30px;font-weight:900;text-transform:uppercase;line-height:.92;margin-top:6px;">&#127942; ${championLabel}</div>
+              <div style="color:var(--text2);font-size:12px;margin-top:8px;">Finished the 2014 NFL shell on top of ${runnerUpLabel}.</div>
+            </div>
+            <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);min-width:180px;">
+              <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Result</div>
+              <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-top:6px;">${championLabel}</div>
+              <div style="color:var(--text2);font-size:12px;margin-top:6px;">Runner-up: ${runnerUpLabel}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    };
+    document.getElementById('playoffsContent').innerHTML = `
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${roundLabel}</div>
+            <div style="color:var(--text2);margin-top:6px;">Exact 2014 NFL postseason context for the ${shellLabel} shell with seeded conference fields, live round matchups, and bye tracking.</div>
+          </div>
+          <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);min-width:180px;">
+            <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);">Championship</div>
+            <div style="font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;margin-top:6px;">Super Bowl XLIX</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:6px;">Twelve-team field, two byes per conference, one title game in Glendale.</div>
+          </div>
+        </div>
+      </div>
+      ${renderCompletedSummary()}
+      ${renderConferenceField('AFC', vm.playoffPicture?.afc || [])}
+      ${renderConferenceField('NFC', vm.playoffPicture?.nfc || [])}
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${roundLabel} Slate</div>
+          <div style="color:var(--text2);font-size:12px;">The shared shell keeps roster moves open while the weekly bracket advances.</div>
+        </div>
+        <div style="margin-top:10px;">${renderScheduleRows()}</div>
+      </div>
+    `;
+    return;
+  }
   const formatLabel = (value) => String(value || '')
     .trim()
     .replace(/_/g, ' ')
