@@ -8275,6 +8275,7 @@ function getSimulationHubPrimaryActionHandler(primaryAction){
   const actionId=String(primaryAction?.id || '').trim().toLowerCase();
   if(actionId==='review-playoffs') return "goPage('playoffs')";
   if(actionId==='season-complete') return "goPage('playoffs')";
+  if(actionId==='fix-lineup') return "goPage('roster')";
   if(actionId==='sim-day') return 'advanceWeek()';
   return '';
 }
@@ -8707,9 +8708,18 @@ function renderSimulationRosterInSharedShell(){
         ? lineupSlots[slot]
         : { slot, player: null, playerId: null, suggestedPlayerId: null };
       const player = slotEntry.player || null;
-      const suggestedPlayer = slotEntry.suggestedPlayerId == null || slotEntry.suggestedPlayerId === ''
+      const currentPlayerId = slotEntry.playerId == null || slotEntry.playerId === ''
         ? null
-        : rosterById.get(Number(slotEntry.suggestedPlayerId)) || null;
+        : Number(slotEntry.playerId);
+      const suggestedPlayerId = slotEntry.suggestedPlayerId == null || slotEntry.suggestedPlayerId === ''
+        ? null
+        : Number(slotEntry.suggestedPlayerId);
+      const showSuggestedFix = Number.isFinite(suggestedPlayerId)
+        && suggestedPlayerId > 0
+        && suggestedPlayerId !== currentPlayerId;
+      const suggestedPlayer = showSuggestedFix
+        ? rosterById.get(suggestedPlayerId) || null
+        : null;
       const warnings = Array.isArray(slotWarningsByKey[slot]) ? slotWarningsByKey[slot] : [];
       return `
         <div class="picker-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;">
@@ -8722,7 +8732,7 @@ function renderSimulationRosterInSharedShell(){
             ${player ? `<button class="lineup-move-btn" style="border-color:rgba(239,68,68,.4);color:#fca5a5;background:rgba(239,68,68,.12);" onclick="clearSimulationNflSlotAssignmentFromShell('${String(slot).replace(/'/g,"\\'")}')">Clear</button>` : ''}
           </div>
           ${warnings.length ? `<div class="season-now-card alert" style="min-height:0;padding:10px;">${warnings.map((warning) => `<div class="season-now-copy" style="flex:initial;">${escapeHtml(warning)}</div>`).join('')}</div>` : ''}
-          ${slotEntry.suggestedPlayerId ? `
+          ${showSuggestedFix ? `
             <div class="season-now-card info" style="min-height:0;padding:10px;">
               <div class="season-now-label">Suggested Fix</div>
               <div class="season-now-copy" style="flex:initial;">${suggestedPlayer ? escapeHtml(`${suggestedPlayer.name} · ${renderPlayerMeta(suggestedPlayer)}`) : 'Suggested starter available.'}</div>

@@ -1499,10 +1499,11 @@
         };
       },
       simulateNextDay(){
+        const normalizedState = normalizeLegacyNflLineupSlots(state);
+        state = clone(normalizedState);
         const shell = clone(state?.leagueShell || {});
         const sport = getSimulationSportForState(state);
         const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
-        const normalizedState = normalizeLegacyNflLineupSlots(state);
         const scheduleByDay = getCanonicalScheduleByDay(normalizedState, shell);
         const totalDays = getScheduleDayCount(scheduleByDay);
         if (state?.postseasonState?.phase === 'completed') {

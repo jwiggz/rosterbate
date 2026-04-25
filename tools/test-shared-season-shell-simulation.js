@@ -1704,6 +1704,86 @@ api.setSeasonModeAdapter({
         anchorSeasonLabel: '2014 NFL'
       },
       postseasonState: {
+        phase: 'regular_season'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 0, l: 0, streak: 'EVEN' },
+      recordLabel: '0-0',
+      primaryAction: { id: 'fix-lineup', label: 'Fix Lineup' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Week 1',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      starterSlots: ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
+      roster: [],
+      lineup: [],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'regular_season',
+      playoffPicture: null
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationHubInSharedShell();
+assert.equal(elements.advBtn.textContent, 'Fix Lineup', 'nfl hub should surface the fix-lineup CTA when the weekly lineup is invalid');
+assert.equal(elements.advBtn.disabled, false, 'fix-lineup CTA should stay actionable from the hub');
+assert.equal(elements.advBtn.onclick, "goPage('roster')", 'fix-lineup CTA should route the user straight to the roster tab');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
+        sport: 'nfl',
+        anchorSeasonLabel: '2014 NFL'
+      },
+      postseasonState: {
         phase: 'wild_card'
       }
     };
@@ -2068,6 +2148,95 @@ assert.match(elements.rosterContent.innerHTML, /TE is empty/i, 'nfl roster view 
 assert.match(elements.rosterContent.innerHTML, /Bench/, 'nfl roster view should render a bench section');
 assert.match(elements.rosterContent.innerHTML, /Andrew Quarless/, 'nfl roster view should render nfl bench players');
 assert.match(elements.rosterContent.innerHTML, /Use Suggestion/, 'nfl roster view should render suggestion controls for empty slots');
+
+api.setSeasonModeAdapter({
+  getModeId() {
+    return 'nfl_mixed_era_single_player_v1';
+  },
+  getState() {
+    return {
+      leagueShell: {
+        sport: 'nfl'
+      }
+    };
+  },
+  getNavItems() {
+    return [
+      { id: 'hub', label: 'Hub' },
+      { id: 'roster', label: 'Roster' },
+      { id: 'matchup', label: 'Schedule' },
+      { id: 'waiver', label: 'Waivers' },
+      { id: 'trades', label: 'Trades' },
+      { id: 'standings', label: 'Stand.' }
+    ];
+  },
+  getHubViewModel() {
+    return {
+      sport: 'nfl',
+      leagueLabel: '2014 NFL Simulation',
+      shellLabel: '2014 NFL Shell',
+      controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
+      userRow: { w: 0, l: 0, streak: 'EVEN' },
+      recordLabel: '0-0',
+      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+      sourceSeasonLabels: ['2014']
+    };
+  },
+  getScheduleViewModel() {
+    return {
+      sport: 'nfl',
+      title: 'Weekly Schedule / Results',
+      cycleLabel: 'Week 1',
+      recentResults: [],
+      nextGame: null
+    };
+  },
+  getRosterViewModel() {
+    return {
+      sport: 'nfl',
+      readyLabel: 'Ready For Week',
+      recommendationSummary: 'Starting lineup is legal.',
+      validation: { valid: true, issues: [] },
+      starterSlots: ['QB'],
+      lineupSlots: {
+        QB: {
+          slot: 'QB',
+          playerId: 9,
+          player: { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' },
+          suggestedPlayerId: 9
+        }
+      },
+      roster: [
+        { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' }
+      ],
+      lineup: [
+        { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' }
+      ],
+      bench: []
+    };
+  },
+  getStandingsViewModel() {
+    return {
+      sport: 'nfl',
+      rows: [],
+      userRow: null,
+      sections: []
+    };
+  },
+  getPlayoffsViewModel() {
+    return {
+      sport: 'nfl',
+      phase: 'regular_season',
+      playoffPicture: null
+    };
+  },
+  setLineup() { return null; },
+  claimFreeAgent() { return null; },
+  applyTrade() { return null; }
+});
+
+api.renderSimulationRosterInSharedShell();
+assert.doesNotMatch(elements.rosterContent.innerHTML, /Suggested Fix/i, 'nfl roster view should suppress suggestion cards when the suggested player is already assigned to the slot');
 
 const nflSuggestedLineupAdapterStub = {
   getHubViewModel() {

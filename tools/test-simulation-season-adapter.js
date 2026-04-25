@@ -1180,6 +1180,43 @@ assert.equal(invalidPackersNextState.seasonState.currentWeek, 1);
 assert.equal(invalidPackersNextState.seasonState.activityLog[0].type, 'lineup-warning');
 assert.match(invalidPackersNextState.seasonState.activityLog[0].title, /must fix/i);
 
+const legacyPackersLineupOnlyState = {
+  ...packersNflState,
+  seasonState: {
+    ...packersNflState.seasonState,
+    currentDay: 1,
+    currentWeek: 1,
+    lineupIdsByTeam: {
+      GB: [12, 27, 44, 87, 18, 89, 84, 9001, 2]
+    },
+    completedGameLogs: [],
+    activityLog: []
+  }
+};
+delete legacyPackersLineupOnlyState.seasonState.lineupSlotsByTeam;
+
+const legacyPackersLineupOnlyAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-packers-legacy-lineup-only',
+  state: legacyPackersLineupOnlyState
+});
+
+const legacyPackersLineupOnlyNextState = legacyPackersLineupOnlyAdapter.simulateNextDay();
+assert.deepStrictEqual(
+  legacyPackersLineupOnlyNextState.seasonState.lineupSlotsByTeam.GB,
+  {
+    QB: 12,
+    RB1: 27,
+    RB2: 44,
+    WR1: 87,
+    WR2: 18,
+    TE: 89,
+    FLEX: 84,
+    DST: 9001,
+    K: 2
+  },
+  'simulateNextDay should persist a normalized NFL slot map for legacy lineup-id saves before running the week'
+);
+
 const nflLegacyWashingtonState = {
   simulationMode: 'nfl_mixed_era_single_player_v1',
   leagueShell: {
