@@ -1037,7 +1037,37 @@ assert.deepStrictEqual(
 );
 assert.equal(packersRosterVm.validation.valid, true);
 assert.equal(packersRosterVm.readyLabel, 'Ready For Week');
+assert.equal(packersRosterVm.recommendationSummary, 'Starting lineup is legal.');
+assert.equal(packersRosterVm.lineupSlots.QB.player.name, 'Aaron Rodgers');
+assert.equal(packersRosterVm.lineupSlots.TE.suggestedPlayerId, 89);
 assert.equal(packersRosterVm.bench.length, 0);
+
+const legacyPackersLineupState = {
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: packersNflState.leagueShell,
+  sourceSeasons: packersNflState.sourceSeasons,
+  draftState: packersNflState.draftState,
+  seasonState: {
+    ...packersNflState.seasonState,
+    lineupIdsByTeam: {
+      GB: [12, 27, 44, 87, 18, 89, 84, 9001, 2]
+    },
+    lineupSlotsByTeam: undefined
+  },
+  postseasonState: packersNflState.postseasonState
+};
+
+const legacyPackersLineupAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-legacy-packers',
+  state: legacyPackersLineupState
+});
+
+const legacyPackersRosterVm = legacyPackersLineupAdapter.getRosterViewModel();
+assert.equal(legacyPackersRosterVm.validation.valid, true);
+assert.equal(legacyPackersRosterVm.lineupSlots.K.playerId, 2);
+assert.equal(legacyPackersRosterVm.lineupSlots.DST.playerId, 9001);
+assert.equal(legacyPackersRosterVm.lineupSlots.K.player.name, 'Mason Crosby');
+assert.equal(legacyPackersRosterVm.lineupSlots.DST.player.name, 'Packers DST');
 
 const emptyNflLineupState = {
   simulationMode: 'nfl_mixed_era_single_player_v1',

@@ -41,6 +41,7 @@
     { id: 'standings', label: 'Stand.' }
   ]);
   const PLAYOFFS_NAV_ITEM = Object.freeze({ id: 'playoffs', label: 'Playoffs' });
+  const NFL_LEGACY_LINEUP_SLOT_ORDER = Object.freeze(['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'DST', 'K']);
 
   function clone(value){
     return JSON.parse(JSON.stringify(value));
@@ -77,20 +78,61 @@
       : [];
   }
 
+  function normalizeLegacyNflLineupSlots(state){
+    if (getSimulationSportForState(state) !== 'nfl') {
+      return state;
+    }
+    const seasonState = state?.seasonState || {};
+    const lineupSlotsByTeam = seasonState.lineupSlotsByTeam || {};
+    const lineupIdsByTeam = seasonState.lineupIdsByTeam || {};
+    let needsNormalization = false;
+    const normalizedSlotsByTeam = clone(lineupSlotsByTeam);
+
+    Object.keys(lineupIdsByTeam).forEach((teamAbbr) => {
+      const key = String(teamAbbr || '').trim().toUpperCase();
+      const existingSlots = normalizedSlotsByTeam[key];
+      const hasSlotMap = existingSlots && typeof existingSlots === 'object' && !Array.isArray(existingSlots);
+      const lineupIds = lineupIdsByTeam[key];
+      if (hasSlotMap || !Array.isArray(lineupIds) || !lineupIds.length) {
+        return;
+      }
+      normalizedSlotsByTeam[key] = NFL_LEGACY_LINEUP_SLOT_ORDER.reduce((slots, slot, index) => {
+        slots[slot] = lineupIds[index] == null || lineupIds[index] === ''
+          ? null
+          : Number(lineupIds[index]);
+        return slots;
+      }, {});
+      needsNormalization = true;
+    });
+
+    if (!needsNormalization) {
+      return state;
+    }
+
+    return {
+      ...clone(state),
+      seasonState: {
+        ...clone(seasonState),
+        lineupSlotsByTeam: normalizedSlotsByTeam
+      }
+    };
+  }
+
   function getControlledRosterSlots(state){
-    const teamAbbr = getControlledTeamAbbr(state);
+    const normalizedState = normalizeLegacyNflLineupSlots(state);
+    const teamAbbr = getControlledTeamAbbr(normalizedState);
     const starterSlots = getSimulationStarterSlotsForState(state);
-    const roster = getControlledRoster(state);
+    const roster = getControlledRoster(normalizedState);
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
-    const explicitSlots = state?.seasonState?.lineupSlotsByTeam?.[teamAbbr];
-    const lineupIds = Array.isArray(state?.seasonState?.lineupIdsByTeam?.[teamAbbr])
-      ? state.seasonState.lineupIdsByTeam[teamAbbr]
+    const explicitSlots = normalizedState?.seasonState?.lineupSlotsByTeam?.[teamAbbr];
+    const lineupIds = Array.isArray(normalizedState?.seasonState?.lineupIdsByTeam?.[teamAbbr])
+      ? normalizedState.seasonState.lineupIdsByTeam[teamAbbr]
       : [];
     const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
-      ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
+      ? runtimeApi.validateSimulationLineup(clone(normalizedState), teamAbbr)
       : { valid: true, issues: [] };
     const suggestedLineup = (typeof runtimeApi.buildSuggestedSimulationLineup === 'function')
-      ? runtimeApi.buildSuggestedSimulationLineup(clone(state), teamAbbr) || {}
+      ? runtimeApi.buildSuggestedSimulationLineup(clone(normalizedState), teamAbbr) || {}
       : {};
     const fallbackSlots = starterSlots.reduce((slots, slot, index) => {
       slots[slot] = lineupIds[index] == null || lineupIds[index] === ''
@@ -162,8 +204,9 @@
     if (sport !== 'nfl') {
       return { id: 'sim-day', label: 'Sim Day' };
     }
+    const normalizedState = normalizeLegacyNflLineupSlots(state);
     const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
-      ? runtimeApi.validateSimulationLineup(clone(state), getControlledTeamAbbr(state))
+      ? runtimeApi.validateSimulationLineup(clone(normalizedState), getControlledTeamAbbr(normalizedState))
       : { valid: true, issues: [] };
     if (!validation.valid) {
       return { id: 'fix-lineup', label: 'Fix Lineup' };
@@ -1459,31 +1502,32 @@
         const shell = clone(state?.leagueShell || {});
         const sport = getSimulationSportForState(state);
         const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
-        const scheduleByDay = getCanonicalScheduleByDay(state, shell);
+        const normalizedState = normalizeLegacyNflLineupSlots(state);
+        const scheduleByDay = getCanonicalScheduleByDay(normalizedState, shell);
         const totalDays = getScheduleDayCount(scheduleByDay);
         if (state?.postseasonState?.phase === 'completed') {
           return this.getState();
         }
         if (sport === 'nfl') {
-          const teamAbbr = getControlledTeamAbbr(state);
+          const teamAbbr = getControlledTeamAbbr(normalizedState);
           const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
-            ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
+            ? runtimeApi.validateSimulationLineup(clone(normalizedState), teamAbbr)
             : { valid: true, issues: [] };
           if (!validation.valid) {
-            const currentWeek = Number(state?.seasonState?.currentWeek || 1);
+            const currentWeek = Number(normalizedState?.seasonState?.currentWeek || 1);
             const warning = {
               type: 'lineup-warning',
               teamAbbr,
               title: `${teamAbbr} must fix its lineup before simming Week ${currentWeek}.`,
               text: `${teamAbbr} must fix its lineup before simming Week ${currentWeek}.`,
-              day: Number(state?.seasonState?.currentDay || 1),
+              day: Number(normalizedState?.seasonState?.currentDay || 1),
               ts: Date.now()
             };
             state = {
-              ...clone(state),
+              ...clone(normalizedState),
               seasonState: {
-                ...clone(state?.seasonState || {}),
-                activityLog: [warning].concat(clone(state?.seasonState?.activityLog || []))
+                ...clone(normalizedState?.seasonState || {}),
+                activityLog: [warning].concat(clone(normalizedState?.seasonState?.activityLog || []))
               }
             };
             return this.getState();
