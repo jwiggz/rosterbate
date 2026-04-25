@@ -258,8 +258,59 @@ assert.equal(
   'blank team abbreviations should not add a lineup activity log entry'
 );
 
+const nbaLineupState = setSimulationLineup(
+  {
+    leagueShell: shell,
+    seasonState: {
+      lineupIdsByTeam: {
+        GB: [9, 8, 7, 6, 5]
+      },
+      lineupSlotsByTeam: {
+        GB: {
+          QB: 1,
+          RB1: 2,
+          RB2: 3,
+          WR1: 4,
+          WR2: 5,
+          TE: 6,
+          FLEX: 7,
+          K: 8,
+          DST: 9
+        }
+      },
+      activityLog: []
+    }
+  },
+  'gb',
+  [401, 402, 403, 404, 405]
+);
+
+assert.deepStrictEqual(
+  nbaLineupState.seasonState.lineupIdsByTeam.GB,
+  [401, 402, 403, 404, 405],
+  'nba lineup ids should remain a direct ordered array'
+);
+assert.deepStrictEqual(
+  nbaLineupState.seasonState.lineupSlotsByTeam,
+  {
+    GB: {
+      QB: 1,
+      RB1: 2,
+      RB2: 3,
+      WR1: 4,
+      WR2: 5,
+      TE: 6,
+      FLEX: 7,
+      K: 8,
+      DST: 9
+    }
+  },
+  'nba lineup updates should not write or alter slot state'
+);
+
 const nflLineupState = setSimulationLineup(
   {
+    leagueShell: nflShell,
     seasonState: {
       lineupIdsByTeam: {
         GB: [101, 102, 103, 104, 105, 106, 107, 108, 109]
@@ -617,6 +668,7 @@ assert.deepStrictEqual(
 
 const invalidNflLineupState = setSimulationLineup(
   {
+    leagueShell: nflShell,
     draftState: {
       rostersByTeam: {
         GB: [

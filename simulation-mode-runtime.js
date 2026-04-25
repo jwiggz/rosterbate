@@ -558,10 +558,10 @@
     }
     next.seasonState = next.seasonState || {};
     next.seasonState.lineupIdsByTeam = next.seasonState.lineupIdsByTeam || {};
-    next.seasonState.lineupSlotsByTeam = next.seasonState.lineupSlotsByTeam || {};
     next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
-    const isNflLineup = !Array.isArray(lineupIds) || lineupIds.length !== getSimulationStarterSlots({ sport: 'nba' }).length;
+    const isNflLineup = getSimulationSport(next.leagueShell || {}) === 'nfl';
     if (isNflLineup) {
+      next.seasonState.lineupSlotsByTeam = next.seasonState.lineupSlotsByTeam || {};
       const normalizedSlots = normalizeSimulationLineupSlots({ sport: 'nfl' }, lineupIds);
       next.seasonState.lineupSlotsByTeam[key] = normalizedSlots;
       next.seasonState.lineupIdsByTeam[key] = getSimulationLineupIdsFromSlots({ sport: 'nfl' }, normalizedSlots);
