@@ -8471,6 +8471,60 @@ function applySimulationSuggestedLineupFromShell(){
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
   const sport = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase();
   const starterSlots = Array.isArray(vm?.starterSlots) ? vm.starterSlots : [];
+  if (sport === 'nfl') {
+    const lineupSlots = vm?.lineupSlots && typeof vm.lineupSlots === 'object' ? vm.lineupSlots : {};
+    const rankPlayers = (players) => (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
+      const overallDiff = Number(b?.mixedEraOverall || 0) - Number(a?.mixedEraOverall || 0);
+      if (overallDiff) return overallDiff;
+      const fpDiff = Number(b?.fp || 0) - Number(a?.fp || 0);
+      if (fpDiff) return fpDiff;
+      return String(a?.name || '').localeCompare(String(b?.name || ''));
+    });
+    const takeEligiblePlayer = (players, slot) => {
+      const index = players.findIndex((player) => isSimulationNflPlayerEligibleForSlot(player, slot));
+      if (index < 0) return null;
+      return players.splice(index, 1)[0] || null;
+    };
+    const reservedIds = new Set();
+    const nextSlots = starterSlots.reduce((slotMap, slot) => {
+      const slotEntry = lineupSlots?.[slot];
+      const suggestedPlayerId = slotEntry?.suggestedPlayerId == null || slotEntry?.suggestedPlayerId === ''
+        ? null
+        : Number(slotEntry.suggestedPlayerId);
+      const currentPlayerId = slotEntry?.playerId == null || slotEntry?.playerId === ''
+        ? null
+        : Number(slotEntry.playerId);
+      const preferredPlayerId = Number.isFinite(suggestedPlayerId) && suggestedPlayerId > 0
+        ? suggestedPlayerId
+        : Number.isFinite(currentPlayerId) && currentPlayerId > 0
+        ? currentPlayerId
+        : null;
+      slotMap[slot] = preferredPlayerId != null && !reservedIds.has(preferredPlayerId)
+        ? preferredPlayerId
+        : null;
+      if (slotMap[slot] != null) reservedIds.add(slotMap[slot]);
+      return slotMap;
+    }, {});
+    const remainingPlayers = rankPlayers(vm?.roster || []).filter((player) => !reservedIds.has(Number(player?.id)));
+    starterSlots.forEach((slot) => {
+      if (nextSlots[slot] != null) return;
+      const player = takeEligiblePlayer(remainingPlayers, slot);
+      const playerId = player?.id == null || player?.id === ''
+        ? null
+        : Number(player.id);
+      if (Number.isFinite(playerId) && playerId > 0) {
+        nextSlots[slot] = playerId;
+        reservedIds.add(playerId);
+      }
+    });
+    if (!Object.values(nextSlots).some((playerId) => playerId != null)) return;
+    SEASON_MODE_ADAPTER.setLineup(nextSlots);
+    persistSimulationSeasonState('simulation_lineup');
+    renderSimulationRosterInSharedShell();
+    renderSimulationHubInSharedShell();
+    renderSimulationScheduleInSharedShell();
+    return;
+  }
   const targetLineupSize = Math.min(
     starterSlots.length || 5,
     Number((vm.roster || []).length || 0)
@@ -8630,14 +8684,20 @@ function renderSimulationRosterInSharedShell(){
     const readyLabel = String(vm?.readyLabel || 'Ready For Week').trim() || 'Ready For Week';
     const recommendationSummary = String(vm?.recommendationSummary || '').trim();
     const slotWarningsByKey = validationIssues.reduce((map, issue) => {
-      const message = String(issue || '').trim();
-      const normalizedMessage = message.toUpperCase();
-      const matchedSlot = starterSlots.find((slot) => normalizedMessage.startsWith(String(slot || '').trim().toUpperCase()));
-      if (!matchedSlot) return map;
-      if (!Array.isArray(map[matchedSlot])) map[matchedSlot] = [];
-      map[matchedSlot].push(message);
+      const normalizedIssue = issue && typeof issue === 'object'
+        ? issue
+        : { slot: '', message: String(issue || '').trim() };
+      const slotKey = String(normalizedIssue?.slot || '').trim();
+      const message = String(normalizedIssue?.message || '').trim();
+      if (!slotKey || !message) return map;
+      if (!Array.isArray(map[slotKey])) map[slotKey] = [];
+      map[slotKey].push(message);
       return map;
     }, {});
+    starterSlots.forEach((slot) => {
+      if (Array.isArray(slotWarningsByKey[slot])) return;
+      slotWarningsByKey[slot] = [];
+    });
     const renderPlayerMeta = (player) => {
       if (!player || typeof player !== 'object') return 'Awaiting starter assignment';
       return [player.team, normalizeSimulationNflRosterPosition(player)].filter(Boolean).join(' - ') || 'Roster player';

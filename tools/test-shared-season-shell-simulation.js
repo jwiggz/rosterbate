@@ -1950,7 +1950,10 @@ api.setSeasonModeAdapter({
       recommendationSummary: 'Suggested fixes are available below.',
       validation: {
         valid: false,
-        issues: ['TE is empty.', 'DST is empty.']
+        issues: [
+          { slot: 'TE', message: 'TE is empty.' },
+          { slot: 'DST', message: 'DST is empty.' }
+        ]
       },
       starterSlots: ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
       lineupSlots: {
@@ -2087,7 +2090,7 @@ const nflSuggestedLineupAdapterStub = {
   getRosterViewModel() {
     return {
       sport: 'nfl',
-      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      starterSlots: ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'DST', 'K'],
       roster: [
         { id: 1, name: 'QB One', pos: 'QB', team: 'DAL', mixedEraOverall: 99 },
         { id: 2, name: 'QB Two', pos: 'QB', team: 'DAL', mixedEraOverall: 98 },
@@ -2137,18 +2140,20 @@ const nflSuggestedLineupAdapterStub = {
 
 api.setSeasonModeAdapter(nflSuggestedLineupAdapterStub);
 api.applySimulationSuggestedLineupFromShell();
-assert.equal(
-  nflSuggestedLineupAdapterStub.lastLineupIds.filter((id) => id === 1 || id === 2).length,
-  1,
-  'nfl suggested lineups should not save duplicate qbs when filling required starter slots'
-);
-assert.ok(
-  nflSuggestedLineupAdapterStub.lastLineupIds.includes(9),
-  'nfl suggested lineups should include dst when filling required starter slots'
-);
-assert.ok(
-  nflSuggestedLineupAdapterStub.lastLineupIds.includes(10),
-  'nfl suggested lineups should include kicker when filling required starter slots'
+assert.deepEqual(
+  toPlain(nflSuggestedLineupAdapterStub.lastLineupIds),
+  {
+    QB: 1,
+    RB1: 3,
+    RB2: 4,
+    WR1: 5,
+    WR2: 6,
+    TE: 7,
+    FLEX: 8,
+    DST: 9,
+    K: 10
+  },
+  'nfl suggested lineups should save a slot-aware lineup map for numbered football slots'
 );
 
 api.renderSimulationScheduleInSharedShell();
