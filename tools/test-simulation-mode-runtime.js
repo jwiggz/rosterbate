@@ -258,6 +258,54 @@ assert.equal(
   'blank team abbreviations should not add a lineup activity log entry'
 );
 
+const nbaNullLineupState = setSimulationLineup(
+  {
+    leagueShell: shell,
+    seasonState: {
+      lineupIdsByTeam: {},
+      lineupSlotsByTeam: {
+        GB: {
+          QB: 1,
+          RB1: 2,
+          RB2: 3,
+          WR1: 4,
+          WR2: 5,
+          TE: 6,
+          FLEX: 7,
+          K: 8,
+          DST: 9
+        }
+      },
+      activityLog: []
+    }
+  },
+  'gb',
+  null
+);
+
+assert.deepStrictEqual(
+  nbaNullLineupState.seasonState.lineupIdsByTeam.GB,
+  [],
+  'nba null lineup input should normalize to an empty starter array'
+);
+assert.deepStrictEqual(
+  nbaNullLineupState.seasonState.lineupSlotsByTeam,
+  {
+    GB: {
+      QB: 1,
+      RB1: 2,
+      RB2: 3,
+      WR1: 4,
+      WR2: 5,
+      TE: 6,
+      FLEX: 7,
+      K: 8,
+      DST: 9
+    }
+  },
+  'nba null lineup input should not create or alter slot state'
+);
+
 const nbaLineupState = setSimulationLineup(
   {
     leagueShell: shell,
@@ -656,8 +704,18 @@ assert.equal(nflAutoDraftState.draftState.freeAgents.length, 0, 'real 2014 NFL a
 
 const suggestedNflLineup = buildSuggestedSimulationLineup(nflAutoDraftState, 'GB');
 assert.deepStrictEqual(
-  Object.keys(suggestedNflLineup),
-  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+  suggestedNflLineup,
+  {
+    QB: 2014053,
+    RB1: 2014314,
+    RB2: 2014289,
+    WR1: 2014368,
+    WR2: 2014226,
+    TE: 2014046,
+    FLEX: 2014292,
+    K: 2014229,
+    DST: 2014022
+  }
 );
 
 const suggestedNflLineupState = setSimulationLineup(nflAutoDraftState, 'GB', suggestedNflLineup);

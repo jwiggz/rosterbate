@@ -566,7 +566,7 @@
       next.seasonState.lineupSlotsByTeam[key] = normalizedSlots;
       next.seasonState.lineupIdsByTeam[key] = getSimulationLineupIdsFromSlots({ sport: 'nfl' }, normalizedSlots);
     } else {
-      next.seasonState.lineupIdsByTeam[key] = lineupIds.map((id) => Number(id));
+      next.seasonState.lineupIdsByTeam[key] = (Array.isArray(lineupIds) ? lineupIds : []).map((id) => Number(id));
     }
     next.seasonState.activityLog.unshift({
       type: 'lineup',
