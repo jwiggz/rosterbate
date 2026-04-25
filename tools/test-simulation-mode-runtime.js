@@ -7,10 +7,16 @@ const {
   getSimulationRosterNeeds,
   getSimulationStarterSlots,
   getSimulationRequiredStarterCount,
+  getSimulationLineupSlotTemplate,
+  getNflSlotEligibilityMap,
+  normalizeSimulationLineupSlots,
+  validateSimulationLineup,
+  buildSuggestedSimulationLineup,
   buildSimulationPlayerPool,
   buildSimulationUniverseBootstrap,
   buildCompletedSimulationAutoDraftState,
   setSimulationLineup,
+  pruneLineupState,
   claimSimulationFreeAgent,
   applySimulationTrade,
   writeCompletedSimulationState
@@ -133,7 +139,7 @@ assert.deepStrictEqual(
 
 assert.deepStrictEqual(
   getSimulationStarterSlots(nflShell),
-  ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
   'nfl simulation runtime should expose football starter slots'
 );
 
@@ -145,6 +151,26 @@ assert.deepStrictEqual(
 
 assert.equal(getSimulationRequiredStarterCount(nflShell), 9);
 assert.equal(getSimulationRequiredStarterCount(shell), 5);
+
+assert.deepStrictEqual(
+  getSimulationLineupSlotTemplate(nflShell),
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+);
+
+assert.deepStrictEqual(
+  getNflSlotEligibilityMap(),
+  {
+    QB: ['QB'],
+    RB1: ['RB'],
+    RB2: ['RB'],
+    WR1: ['WR'],
+    WR2: ['WR'],
+    TE: ['TE'],
+    FLEX: ['RB', 'WR', 'TE'],
+    K: ['K'],
+    DST: ['DST']
+  }
+);
 
 const expectedRankedNames = rankPlayers(playerPool).map((player) => player.name);
 
@@ -242,13 +268,54 @@ const nflLineupState = setSimulationLineup(
     }
   },
   'gb',
-  [101, 102, 103, 104, 105, 106, 107, 108, 109]
+  {
+    QB: 2014287,
+    RB1: 2014288,
+    RB2: 2014289,
+    WR1: 2014290,
+    WR2: 2014291,
+    TE: 2014293,
+    FLEX: 2014292,
+    K: 2014294,
+    DST: 2014295
+  }
+);
+
+assert.deepStrictEqual(
+  nflLineupState.seasonState.lineupSlotsByTeam.GB,
+  {
+    QB: 2014287,
+    RB1: 2014288,
+    RB2: 2014289,
+    WR1: 2014290,
+    WR2: 2014291,
+    TE: 2014293,
+    FLEX: 2014292,
+    K: 2014294,
+    DST: 2014295
+  },
+  'nfl lineup slots should persist as a normalized slot map'
 );
 
 assert.deepStrictEqual(
   nflLineupState.seasonState.lineupIdsByTeam.GB,
-  [101, 102, 103, 104, 105, 106, 107, 108, 109],
-  'nfl lineup ids should persist without being expanded to an nba starter count'
+  [2014287, 2014288, 2014289, 2014290, 2014291, 2014293, 2014292, 2014294, 2014295],
+  'nfl lineup ids should be derived in slot order for compatibility'
+);
+
+assert.deepStrictEqual(
+  normalizeSimulationLineupSlots(nflShell, [2014287, 2014288, 2014289, 2014290, 2014291, 2014293, 2014292, 2014294, 2014295]),
+  {
+    QB: 2014287,
+    RB1: 2014288,
+    RB2: 2014289,
+    WR1: 2014290,
+    WR2: 2014291,
+    TE: 2014293,
+    FLEX: 2014292,
+    K: 2014294,
+    DST: 2014295
+  }
 );
 
 const waiverSnapshotState = {
@@ -261,6 +328,19 @@ const waiverSnapshotState = {
   seasonState: {
     lineupIdsByTeam: {
       GB: [1]
+    },
+    lineupSlotsByTeam: {
+      GB: {
+        QB: 1,
+        RB1: null,
+        RB2: null,
+        WR1: null,
+        WR2: null,
+        TE: null,
+        FLEX: null,
+        K: null,
+        DST: null
+      }
     },
     activityLog: []
   }
@@ -285,6 +365,8 @@ assert.equal(
   'ACTIVE',
   'successful waiver claims should not reuse dropped roster objects from the prior snapshot'
 );
+assert.deepStrictEqual(waivedState.seasonState.lineupIdsByTeam.GB, []);
+assert.equal(waivedState.seasonState.lineupSlotsByTeam.GB.QB, null);
 
 const tradeSnapshotState = {
   draftState: {
@@ -294,6 +376,34 @@ const tradeSnapshotState = {
     }
   },
   seasonState: {
+    lineupIdsByTeam: {
+      GB: [10],
+      CHI: [20]
+    },
+    lineupSlotsByTeam: {
+      GB: {
+        QB: 10,
+        RB1: null,
+        RB2: null,
+        WR1: null,
+        WR2: null,
+        TE: null,
+        FLEX: null,
+        K: null,
+        DST: null
+      },
+      CHI: {
+        QB: 20,
+        RB1: null,
+        RB2: null,
+        WR1: null,
+        WR2: null,
+        TE: null,
+        FLEX: null,
+        K: null,
+        DST: null
+      }
+    },
     activityLog: []
   }
 };
@@ -318,6 +428,36 @@ assert.equal(
   'ACTIVE',
   'successful trades should not reuse outgoing player objects from the prior snapshot'
 );
+assert.deepStrictEqual(tradedState.seasonState.lineupIdsByTeam.GB, []);
+assert.equal(tradedState.seasonState.lineupSlotsByTeam.GB.QB, null);
+assert.deepStrictEqual(tradedState.seasonState.lineupIdsByTeam.CHI, []);
+assert.equal(tradedState.seasonState.lineupSlotsByTeam.CHI.QB, null);
+
+const explicitPruneState = pruneLineupState(
+  {
+    seasonState: {
+      lineupIdsByTeam: { GB: [1, 2, 3] },
+      lineupSlotsByTeam: {
+        GB: {
+          QB: 1,
+          RB1: 2,
+          RB2: 3,
+          WR1: null,
+          WR2: null,
+          TE: null,
+          FLEX: null,
+          K: null,
+          DST: null
+        }
+      }
+    }
+  },
+  'GB',
+  [2]
+);
+
+assert.deepStrictEqual(explicitPruneState.seasonState.lineupIdsByTeam.GB, [1, 3]);
+assert.equal(explicitPruneState.seasonState.lineupSlotsByTeam.GB.RB1, null);
 
 const malformedTradeState = applySimulationTrade(
   {
@@ -462,6 +602,61 @@ assert.equal(
   'real 2014 NFL auto-draft should use the full one-pack player pool exactly once'
 );
 assert.equal(nflAutoDraftState.draftState.freeAgents.length, 0, 'real 2014 NFL auto-draft should leave no free agents when only the exact shell is available');
+
+const suggestedNflLineup = buildSuggestedSimulationLineup(nflAutoDraftState, 'GB');
+assert.deepStrictEqual(
+  Object.keys(suggestedNflLineup),
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+);
+
+const suggestedNflLineupState = setSimulationLineup(nflAutoDraftState, 'GB', suggestedNflLineup);
+assert.deepStrictEqual(
+  validateSimulationLineup(suggestedNflLineupState, 'GB'),
+  { valid: true, issues: [] }
+);
+
+const invalidNflLineupState = setSimulationLineup(
+  {
+    draftState: {
+      rostersByTeam: {
+        GB: [
+          { id: 1, name: 'Aaron Rodgers', pos: 'QB', designation: 'ACTIVE' },
+          { id: 2, name: 'Eddie Lacy', pos: 'RB', designation: 'ACTIVE' },
+          { id: 3, name: 'James Starks', pos: 'RB', designation: 'ACTIVE' },
+          { id: 4, name: 'Jordy Nelson', pos: 'WR', designation: 'ACTIVE' },
+          { id: 5, name: 'Randall Cobb', pos: 'WR', designation: 'ACTIVE' },
+          { id: 6, name: 'Andrew Quarless', pos: 'TE', designation: 'OUT' },
+          { id: 7, name: 'Mason Crosby', pos: 'K', designation: 'ACTIVE' },
+          { id: 8, name: 'Green Bay Packers DST', pos: 'DST', designation: 'ACTIVE' }
+        ]
+      }
+    },
+    seasonState: {}
+  },
+  'GB',
+  {
+    QB: 1,
+    RB1: 2,
+    RB2: 3,
+    WR1: 4,
+    WR2: 5,
+    TE: 6,
+    FLEX: 5,
+    K: 7,
+    DST: 8
+  }
+);
+
+assert.deepStrictEqual(
+  validateSimulationLineup(invalidNflLineupState, 'GB'),
+  {
+    valid: false,
+    issues: [
+      { slot: 'TE', code: 'player_out', message: 'TE starter is OUT.' },
+      { slot: 'FLEX', code: 'duplicate_player', message: 'Randall Cobb is already assigned to another slot.' }
+    ]
+  }
+);
 
 const skewedNflAutoDraftState = buildCompletedSimulationAutoDraftState({
   shell: nflShell,

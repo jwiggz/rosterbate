@@ -69,9 +69,171 @@
 
   function getSimulationStarterSlots(shell){
     if (getSimulationSport(shell) === 'nfl') {
-      return ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'];
+      return ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'];
     }
     return ['PG', 'SG', 'SF', 'PF', 'C'];
+  }
+
+  function getSimulationLineupSlotTemplate(shell){
+    return getSimulationStarterSlots(shell);
+  }
+
+  function getNflSlotEligibilityMap(){
+    return {
+      QB: ['QB'],
+      RB1: ['RB'],
+      RB2: ['RB'],
+      WR1: ['WR'],
+      WR2: ['WR'],
+      TE: ['TE'],
+      FLEX: ['RB', 'WR', 'TE'],
+      K: ['K'],
+      DST: ['DST']
+    };
+  }
+
+  function normalizeSimulationLineupSlots(shell, lineupValue){
+    const sport = getSimulationSport(shell);
+    if (sport !== 'nfl') {
+      return (Array.isArray(lineupValue) ? lineupValue : []).map((id) => Number(id));
+    }
+
+    const template = getSimulationLineupSlotTemplate(shell);
+    const source = Array.isArray(lineupValue)
+      ? Object.fromEntries(template.map((slot, index) => [slot, lineupValue[index]]))
+      : (lineupValue && typeof lineupValue === 'object' ? lineupValue : {});
+
+    return template.reduce((slots, slot) => {
+      const value = source[slot];
+      slots[slot] = value == null || value === '' ? null : Number(value);
+      return slots;
+    }, {});
+  }
+
+  function getSimulationLineupIdsFromSlots(shell, lineupSlots){
+    return getSimulationLineupSlotTemplate(shell).reduce((ids, slot) => {
+      const value = lineupSlots?.[slot];
+      if (value == null || value === '') {
+        return ids;
+      }
+      ids.push(Number(value));
+      return ids;
+    }, []);
+  }
+
+  function getSimulationTeamRoster(state, teamAbbr){
+    const key = normalizeTeamAbbr(teamAbbr);
+    const roster = state?.draftState?.rostersByTeam?.[key];
+    return Array.isArray(roster) ? roster : [];
+  }
+
+  function getSimulationLineupDetails(state, teamAbbr){
+    const key = normalizeTeamAbbr(teamAbbr);
+    const seasonState = state?.seasonState || {};
+    const lineupSlotsByTeam = seasonState.lineupSlotsByTeam || {};
+    const lineupIdsByTeam = seasonState.lineupIdsByTeam || {};
+    const lineupSlots = lineupSlotsByTeam[key];
+    const lineupIds = lineupIdsByTeam[key];
+    const shell = state?.leagueShell || state?.shell || {};
+    const isNfl = Boolean(lineupSlots) || getSimulationSport(shell) === 'nfl' || (Array.isArray(lineupIds) && lineupIds.length === getSimulationLineupSlotTemplate({ sport: 'nfl' }).length);
+
+    return {
+      key,
+      shell,
+      isNfl,
+      lineupSlots: lineupSlots && typeof lineupSlots === 'object' && !Array.isArray(lineupSlots)
+        ? normalizeSimulationLineupSlots({ sport: 'nfl' }, lineupSlots)
+        : null,
+      lineupIds: Array.isArray(lineupIds) ? lineupIds.slice() : []
+    };
+  }
+
+  function validateSimulationLineup(state, teamAbbr){
+    const details = getSimulationLineupDetails(state, teamAbbr);
+    if (!details.key) {
+      return { valid: false, issues: [] };
+    }
+    if (!details.isNfl) {
+      return { valid: true, issues: [] };
+    }
+
+    const rosterById = new Map(getSimulationTeamRoster(state, details.key).map((player) => [Number(player?.id), player]));
+    const slots = details.lineupSlots || normalizeSimulationLineupSlots({ sport: 'nfl' }, details.lineupIds);
+    const eligibilityMap = getNflSlotEligibilityMap();
+    const issues = [];
+    const assignedIds = new Set();
+
+    getSimulationLineupSlotTemplate({ sport: 'nfl' }).forEach((slot) => {
+      const playerId = slots[slot];
+      if (playerId == null) {
+        issues.push({ slot, code: 'missing_player', message: `${slot} starter is missing.` });
+        return;
+      }
+
+      const player = rosterById.get(Number(playerId));
+      if (!player) {
+        issues.push({ slot, code: 'missing_player', message: `${slot} starter is missing.` });
+        return;
+      }
+
+      if (String(player?.designation || '').trim().toUpperCase() === 'OUT') {
+        issues.push({ slot, code: 'player_out', message: `${slot} starter is OUT.` });
+      }
+
+      const eligiblePositions = eligibilityMap[slot] || [slot];
+      const playerPosition = getSimulationPlayerPosition(player);
+      if (!eligiblePositions.includes(playerPosition)) {
+        issues.push({
+          slot,
+          code: 'ineligible_position',
+          message: `${String(player?.name || 'Player')} is not eligible for ${slot}.`
+        });
+      }
+
+      if (assignedIds.has(Number(playerId))) {
+        issues.push({
+          slot,
+          code: 'duplicate_player',
+          message: `${String(player?.name || 'Player')} is already assigned to another slot.`
+        });
+        return;
+      }
+
+      assignedIds.add(Number(playerId));
+    });
+
+    return {
+      valid: issues.length === 0,
+      issues
+    };
+  }
+
+  function buildSuggestedSimulationLineup(state, teamAbbr){
+    const details = getSimulationLineupDetails(state, teamAbbr);
+    const roster = sortPlayers(getSimulationTeamRoster(state, details.key));
+    if (!details.isNfl) {
+      return roster.slice(0, getSimulationRequiredStarterCount(details.shell)).map((player) => Number(player?.id));
+    }
+
+    const eligibilityMap = getNflSlotEligibilityMap();
+    const usedIds = new Set();
+
+    return getSimulationLineupSlotTemplate({ sport: 'nfl' }).reduce((lineup, slot) => {
+      const eligiblePositions = eligibilityMap[slot] || [slot];
+      const player = roster.find((entry) => {
+        const playerId = Number(entry?.id);
+        return !usedIds.has(playerId)
+          && eligiblePositions.includes(getSimulationPlayerPosition(entry))
+          && String(entry?.designation || '').trim().toUpperCase() !== 'OUT';
+      }) || null;
+      if (player) {
+        usedIds.add(Number(player.id));
+        lineup[slot] = Number(player.id);
+        return lineup;
+      }
+      lineup[slot] = null;
+      return lineup;
+    }, {});
   }
 
   function getSimulationRequiredStarterCount(shell){
@@ -396,8 +558,16 @@
     }
     next.seasonState = next.seasonState || {};
     next.seasonState.lineupIdsByTeam = next.seasonState.lineupIdsByTeam || {};
+    next.seasonState.lineupSlotsByTeam = next.seasonState.lineupSlotsByTeam || {};
     next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
-    next.seasonState.lineupIdsByTeam[key] = (Array.isArray(lineupIds) ? lineupIds : []).map((id) => Number(id));
+    const isNflLineup = !Array.isArray(lineupIds) || lineupIds.length !== getSimulationStarterSlots({ sport: 'nba' }).length;
+    if (isNflLineup) {
+      const normalizedSlots = normalizeSimulationLineupSlots({ sport: 'nfl' }, lineupIds);
+      next.seasonState.lineupSlotsByTeam[key] = normalizedSlots;
+      next.seasonState.lineupIdsByTeam[key] = getSimulationLineupIdsFromSlots({ sport: 'nfl' }, normalizedSlots);
+    } else {
+      next.seasonState.lineupIdsByTeam[key] = lineupIds.map((id) => Number(id));
+    }
     next.seasonState.activityLog.unshift({
       type: 'lineup',
       teamAbbr: key,
@@ -407,14 +577,35 @@
     return next;
   }
 
-  function pruneLineupIds(next, teamAbbr, removedPlayerIds){
+  function pruneLineupState(next, teamAbbr, removedPlayerIds){
     const seasonState = next.seasonState || {};
     const lineupIdsByTeam = seasonState.lineupIdsByTeam || {};
-    const currentLineup = Array.isArray(lineupIdsByTeam[teamAbbr]) ? lineupIdsByTeam[teamAbbr] : [];
+    const lineupSlotsByTeam = seasonState.lineupSlotsByTeam || {};
     const removedIds = new Set((Array.isArray(removedPlayerIds) ? removedPlayerIds : []).map(Number));
-    lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(Number(id)));
+    const currentSlots = lineupSlotsByTeam[teamAbbr];
+
+    if (currentSlots && typeof currentSlots === 'object' && !Array.isArray(currentSlots)) {
+      const normalizedSlots = normalizeSimulationLineupSlots({ sport: 'nfl' }, currentSlots);
+      Object.keys(normalizedSlots).forEach((slot) => {
+        if (removedIds.has(Number(normalizedSlots[slot]))) {
+          normalizedSlots[slot] = null;
+        }
+      });
+      lineupSlotsByTeam[teamAbbr] = normalizedSlots;
+      lineupIdsByTeam[teamAbbr] = getSimulationLineupIdsFromSlots({ sport: 'nfl' }, normalizedSlots);
+      seasonState.lineupSlotsByTeam = lineupSlotsByTeam;
+    } else {
+      const currentLineup = Array.isArray(lineupIdsByTeam[teamAbbr]) ? lineupIdsByTeam[teamAbbr] : [];
+      lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(Number(id)));
+    }
+
     seasonState.lineupIdsByTeam = lineupIdsByTeam;
     next.seasonState = seasonState;
+    return next;
+  }
+
+  function pruneLineupIds(next, teamAbbr, removedPlayerIds){
+    return pruneLineupState(next, teamAbbr, removedPlayerIds);
   }
 
   function claimSimulationFreeAgent(state, move){
@@ -442,7 +633,7 @@
     const nextRoster = Array.isArray(next.draftState.rostersByTeam[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
     next.draftState.rostersByTeam[teamAbbr] = nextRoster.filter((player) => Number(player.id) !== dropId).concat(clone(addPlayer));
     next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player.id) !== addId).concat(clone(droppedPlayer));
-    pruneLineupIds(next, teamAbbr, [dropId]);
+    pruneLineupState(next, teamAbbr, [dropId]);
     next.seasonState.activityLog.unshift({
       type: 'waiver',
       teamAbbr,
@@ -487,8 +678,8 @@
 
     next.draftState.rostersByTeam[fromTeamAbbr] = nextFromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(clonedIncoming);
     next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(clonedOutgoing);
-    pruneLineupIds(next, fromTeamAbbr, Array.from(outgoingIds));
-    pruneLineupIds(next, toTeamAbbr, Array.from(incomingIds));
+    pruneLineupState(next, fromTeamAbbr, Array.from(outgoingIds));
+    pruneLineupState(next, toTeamAbbr, Array.from(incomingIds));
     next.seasonState.activityLog.unshift({
       type: 'trade',
       title: `${fromTeamAbbr} traded with ${toTeamAbbr}`,
@@ -534,11 +725,17 @@
     getSimulationRosterNeeds,
     getSimulationStarterSlots,
     getSimulationRequiredStarterCount,
+    getSimulationLineupSlotTemplate,
+    getNflSlotEligibilityMap,
+    normalizeSimulationLineupSlots,
+    validateSimulationLineup,
+    buildSuggestedSimulationLineup,
     getFootballCoverageBonus,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,
     buildCompletedSimulationAutoDraftState,
     setSimulationLineup,
+    pruneLineupState,
     claimSimulationFreeAgent,
     applySimulationTrade,
     applySimulationInjuryDesignations
