@@ -8522,6 +8522,89 @@ function applySimulationSuggestedLineupFromShell(){
   renderSimulationScheduleInSharedShell();
 }
 
+function normalizeSimulationNflRosterPosition(player){
+  const position = String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
+  if (position === 'DEF') return 'DST';
+  if (position === 'PK') return 'K';
+  return position;
+}
+
+function isSimulationNflPlayerEligibleForSlot(player, slot){
+  const normalizedSlot = String(slot || '').trim().toUpperCase().replace(/[0-9]+$/,'');
+  const position = normalizeSimulationNflRosterPosition(player);
+  if (!normalizedSlot) return false;
+  if (normalizedSlot === 'FLEX') return ['RB','WR','TE','FLEX'].includes(position);
+  return position === normalizedSlot;
+}
+
+function buildSimulationNflLineupSlotsFromShell(){
+  const vm = SEASON_MODE_ADAPTER.getRosterViewModel?.() || {};
+  const starterSlots = Array.isArray(vm?.starterSlots) ? vm.starterSlots : [];
+  const lineupSlots = vm?.lineupSlots && typeof vm.lineupSlots === 'object' ? vm.lineupSlots : {};
+  return starterSlots.reduce((nextSlots, slot, index) => {
+    const slotEntry = lineupSlots?.[slot];
+    if (slotEntry && typeof slotEntry === 'object') {
+      const playerId = slotEntry.playerId == null || slotEntry.playerId === ''
+        ? null
+        : Number(slotEntry.playerId);
+      nextSlots[slot] = Number.isFinite(playerId) && playerId > 0
+        ? playerId
+        : null;
+      return nextSlots;
+    }
+    const lineupPlayer = Array.isArray(vm?.lineup) ? vm.lineup[index] : null;
+    const fallbackPlayerId = lineupPlayer?.id == null || lineupPlayer?.id === ''
+      ? null
+      : Number(lineupPlayer.id);
+    nextSlots[slot] = Number.isFinite(fallbackPlayerId) && fallbackPlayerId > 0
+      ? fallbackPlayerId
+      : null;
+    return nextSlots;
+  }, {});
+}
+
+function applySimulationNflLineupSlotsFromShell(nextSlots){
+  if (!SEASON_MODE_ADAPTER || typeof SEASON_MODE_ADAPTER.setLineup !== 'function') return;
+  SEASON_MODE_ADAPTER.setLineup(nextSlots);
+  persistSimulationSeasonState('simulation_lineup');
+  renderSimulationRosterInSharedShell();
+  renderSimulationHubInSharedShell();
+  renderSimulationScheduleInSharedShell();
+}
+
+function setSimulationNflSlotAssignmentFromShell(slot, playerId){
+  const normalizedSlot = String(slot || '').trim();
+  if (!normalizedSlot) return;
+  const nextSlots = buildSimulationNflLineupSlotsFromShell();
+  const normalizedPlayerId = playerId == null || playerId === ''
+    ? null
+    : Number(playerId);
+  Object.keys(nextSlots).forEach((slotKey) => {
+    if (normalizedPlayerId != null && nextSlots[slotKey] === normalizedPlayerId) {
+      nextSlots[slotKey] = null;
+    }
+  });
+  nextSlots[normalizedSlot] = Number.isFinite(normalizedPlayerId) && normalizedPlayerId > 0
+    ? normalizedPlayerId
+    : null;
+  applySimulationNflLineupSlotsFromShell(nextSlots);
+}
+
+function clearSimulationNflSlotAssignmentFromShell(slot){
+  setSimulationNflSlotAssignmentFromShell(slot, null);
+}
+
+function applySimulationNflSuggestedSlotFromShell(slot){
+  const vm = SEASON_MODE_ADAPTER.getRosterViewModel?.() || {};
+  const suggestedPlayerId = vm?.lineupSlots?.[slot]?.suggestedPlayerId;
+  if (suggestedPlayerId == null || suggestedPlayerId === '') return;
+  setSimulationNflSlotAssignmentFromShell(slot, suggestedPlayerId);
+}
+
+function assignSimulationNflBenchPlayerToSlotFromShell(playerId, slot){
+  setSimulationNflSlotAssignmentFromShell(slot, playerId);
+}
+
 function renderSimulationRosterInSharedShell(){
   setSeasonSidePanelVisible('rosterPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
@@ -8533,6 +8616,117 @@ function renderSimulationRosterInSharedShell(){
   document.getElementById('rWk').textContent = isNflSimulation
     ? 'Set weekly starters, bench depth, and injury availability'
     : 'Set starters, bench order, and injury availability';
+  if (isNflSimulation) {
+    const lineupSlots = vm?.lineupSlots && typeof vm.lineupSlots === 'object' ? vm.lineupSlots : {};
+    const roster = Array.isArray(vm?.roster) ? vm.roster : [];
+    const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
+    const validationIssues = Array.isArray(vm?.validation?.issues) ? vm.validation.issues : [];
+    const escapeHtml = (value) => String(value == null ? '' : value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+    const readyLabel = String(vm?.readyLabel || 'Ready For Week').trim() || 'Ready For Week';
+    const recommendationSummary = String(vm?.recommendationSummary || '').trim();
+    const slotWarningsByKey = validationIssues.reduce((map, issue) => {
+      const message = String(issue || '').trim();
+      const normalizedMessage = message.toUpperCase();
+      const matchedSlot = starterSlots.find((slot) => normalizedMessage.startsWith(String(slot || '').trim().toUpperCase()));
+      if (!matchedSlot) return map;
+      if (!Array.isArray(map[matchedSlot])) map[matchedSlot] = [];
+      map[matchedSlot].push(message);
+      return map;
+    }, {});
+    const renderPlayerMeta = (player) => {
+      if (!player || typeof player !== 'object') return 'Awaiting starter assignment';
+      return [player.team, normalizeSimulationNflRosterPosition(player)].filter(Boolean).join(' - ') || 'Roster player';
+    };
+    const renderSlotCard = (slot) => {
+      const slotEntry = lineupSlots?.[slot] && typeof lineupSlots[slot] === 'object'
+        ? lineupSlots[slot]
+        : { slot, player: null, playerId: null, suggestedPlayerId: null };
+      const player = slotEntry.player || null;
+      const suggestedPlayer = slotEntry.suggestedPlayerId == null || slotEntry.suggestedPlayerId === ''
+        ? null
+        : rosterById.get(Number(slotEntry.suggestedPlayerId)) || null;
+      const warnings = Array.isArray(slotWarningsByKey[slot]) ? slotWarningsByKey[slot] : [];
+      return `
+        <div class="picker-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${escapeHtml(slot)}</div>
+              <div style="color:var(--text2);font-size:12px;margin-top:4px;">${player ? escapeHtml(player.name) : 'Empty Slot'}</div>
+              <div style="color:var(--text3);font-size:11px;margin-top:4px;">${escapeHtml(renderPlayerMeta(player))}</div>
+            </div>
+            ${player ? `<button class="lineup-move-btn" style="border-color:rgba(239,68,68,.4);color:#fca5a5;background:rgba(239,68,68,.12);" onclick="clearSimulationNflSlotAssignmentFromShell('${String(slot).replace(/'/g,"\\'")}')">Clear</button>` : ''}
+          </div>
+          ${warnings.length ? `<div class="season-now-card alert" style="min-height:0;padding:10px;">${warnings.map((warning) => `<div class="season-now-copy" style="flex:initial;">${escapeHtml(warning)}</div>`).join('')}</div>` : ''}
+          ${slotEntry.suggestedPlayerId ? `
+            <div class="season-now-card info" style="min-height:0;padding:10px;">
+              <div class="season-now-label">Suggested Fix</div>
+              <div class="season-now-copy" style="flex:initial;">${suggestedPlayer ? escapeHtml(`${suggestedPlayer.name} · ${renderPlayerMeta(suggestedPlayer)}`) : 'Suggested starter available.'}</div>
+              <div><button class="lineup-move-btn" onclick="applySimulationNflSuggestedSlotFromShell('${String(slot).replace(/'/g,"\\'")}')">Use Suggestion</button></div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    };
+    const renderBenchActions = (player) => {
+      const eligibleSlots = starterSlots.filter((slot) => isSimulationNflPlayerEligibleForSlot(player, slot));
+      if (!eligibleSlots.length) {
+        return '<span class="lineup-move-btn" style="opacity:.32;border-color:rgba(100,116,139,.35);color:#64748b;cursor:not-allowed;pointer-events:none;">No Eligible Slots</span>';
+      }
+      return eligibleSlots.map((slot) => (
+        `<button class="lineup-move-btn" onclick="assignSimulationNflBenchPlayerToSlotFromShell(${Number(player.id)},'${String(slot).replace(/'/g,"\\'")}')">Assign ${escapeHtml(slot)}</button>`
+      )).join('');
+    };
+    document.getElementById('rosterContent').innerHTML = `
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Lineup Control</div>
+            <div style="color:var(--text2);font-size:12px;margin-top:4px;">Apply runtime-backed football slot assignments for the next simulation week.</div>
+          </div>
+          <button class="bp" onclick="applySimulationSuggestedLineupFromShell()">Use Suggested Starters</button>
+        </div>
+        <div class="season-now-band" style="margin-top:14px;">
+          <div class="season-now-card ${validationIssues.length ? 'alert' : 'live'}">
+            <div class="season-now-label">Roster Status</div>
+            <div class="season-now-value">${escapeHtml(readyLabel)}</div>
+            <div class="season-now-copy">${escapeHtml(recommendationSummary || (validationIssues.length ? 'Suggested fixes are available below.' : 'Starting lineup is legal.'))}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">Starters</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px;">QB, RB1, RB2, WR1, WR2, TE, FLEX, K, and DST all update inside the shared shell.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px;">
+          ${starterSlots.map(renderSlotCard).join('') || '<div class="muted">No starter slots available.</div>'}
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">Bench</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Assign bench depth directly into any eligible football slot.</div>
+        <div style="display:grid;gap:10px;margin-top:12px;">
+          ${(vm.bench || []).map((player) => (
+            `<div class="picker-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-family:var(--fd);font-size:17px;font-weight:800;">${escapeHtml(player.name)}</div>
+                  <div style="color:var(--text2);font-size:12px;margin-top:4px;">${escapeHtml(renderPlayerMeta(player))}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                ${renderBenchActions(player)}
+              </div>
+            </div>`
+          )).join('') || '<div class="muted" style="margin-top:10px;">No bench players available.</div>'}
+        </div>
+      </div>
+    `;
+    return;
+  }
   document.getElementById('rosterContent').innerHTML = `
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">

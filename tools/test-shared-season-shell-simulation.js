@@ -1946,20 +1946,93 @@ api.setSeasonModeAdapter({
   getRosterViewModel() {
     return {
       sport: 'nfl',
-      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K'],
+      readyLabel: '2 lineup issues to fix',
+      recommendationSummary: 'Suggested fixes are available below.',
+      validation: {
+        valid: false,
+        issues: ['TE is empty.', 'DST is empty.']
+      },
+      starterSlots: ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
+      lineupSlots: {
+        QB: {
+          slot: 'QB',
+          playerId: 9,
+          player: { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        RB1: {
+          slot: 'RB1',
+          playerId: 29,
+          player: { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        RB2: {
+          slot: 'RB2',
+          playerId: 21,
+          player: { id: 21, name: 'Joseph Randle', pos: 'RB', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        WR1: {
+          slot: 'WR1',
+          playerId: 88,
+          player: { id: 88, name: 'Dez Bryant', pos: 'WR', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        WR2: {
+          slot: 'WR2',
+          playerId: 11,
+          player: { id: 11, name: 'Cole Beasley', pos: 'WR', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        TE: {
+          slot: 'TE',
+          playerId: null,
+          player: null,
+          suggestedPlayerId: 81
+        },
+        FLEX: {
+          slot: 'FLEX',
+          playerId: 83,
+          player: { id: 83, name: 'Terrance Williams', pos: 'WR', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        K: {
+          slot: 'K',
+          playerId: 5,
+          player: { id: 5, name: 'Dan Bailey', pos: 'K', team: 'DAL' },
+          suggestedPlayerId: null
+        },
+        DST: {
+          slot: 'DST',
+          playerId: null,
+          player: null,
+          suggestedPlayerId: 9002
+        }
+      },
       roster: [
         { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' },
         { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL' },
         { id: 88, name: 'Dez Bryant', pos: 'WR', team: 'DAL' },
-        { id: 82, name: 'Jason Witten', pos: 'TE', team: 'DAL' },
-        { id: 9001, name: 'Dallas DST', pos: 'DST', team: 'DAL' },
+        { id: 21, name: 'Joseph Randle', pos: 'RB', team: 'DAL' },
+        { id: 11, name: 'Cole Beasley', pos: 'WR', team: 'DAL' },
+        { id: 83, name: 'Terrance Williams', pos: 'WR', team: 'DAL' },
+        { id: 81, name: 'Andrew Quarless', pos: 'TE', team: 'GB' },
+        { id: 9002, name: 'Packers DST', pos: 'DST', team: 'GB' },
         { id: 5, name: 'Dan Bailey', pos: 'K', team: 'DAL' }
       ],
       lineup: [
         { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' },
-        { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL' }
+        { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL' },
+        { id: 21, name: 'Joseph Randle', pos: 'RB', team: 'DAL' },
+        { id: 88, name: 'Dez Bryant', pos: 'WR', team: 'DAL' },
+        { id: 11, name: 'Cole Beasley', pos: 'WR', team: 'DAL' },
+        { id: 83, name: 'Terrance Williams', pos: 'WR', team: 'DAL' },
+        { id: 5, name: 'Dan Bailey', pos: 'K', team: 'DAL' }
       ],
-      bench: []
+      bench: [
+        { id: 81, name: 'Andrew Quarless', pos: 'TE', team: 'GB' },
+        { id: 9002, name: 'Packers DST', pos: 'DST', team: 'GB' }
+      ]
     };
   },
   getStandingsViewModel() {
@@ -1986,7 +2059,12 @@ api.setSeasonModeAdapter({
 
 api.renderSimulationRosterInSharedShell();
 assert.match(elements.rosterContent.innerHTML, /QB/, 'nfl roster view should render football starter slot labels');
-assert.match(elements.rosterContent.innerHTML, /DST/, 'nfl roster view should render dst starter slot labels');
+assert.match(elements.rosterContent.innerHTML, /RB1/, 'nfl roster view should render numbered football starter slot labels');
+assert.match(elements.rosterContent.innerHTML, /2 lineup issues to fix/, 'nfl roster view should surface the lineup readiness status');
+assert.match(elements.rosterContent.innerHTML, /TE is empty/i, 'nfl roster view should surface slot-level validation warnings');
+assert.match(elements.rosterContent.innerHTML, /Bench/, 'nfl roster view should render a bench section');
+assert.match(elements.rosterContent.innerHTML, /Andrew Quarless/, 'nfl roster view should render nfl bench players');
+assert.match(elements.rosterContent.innerHTML, /Use Suggestion/, 'nfl roster view should render suggestion controls for empty slots');
 
 const nflSuggestedLineupAdapterStub = {
   getHubViewModel() {
