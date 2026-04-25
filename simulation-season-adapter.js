@@ -13,6 +13,12 @@
       getSimulationStarterSlots(...args){
         return root.RosterBateSimulationModeRuntime.getSimulationStarterSlots(...args);
       },
+      validateSimulationLineup(...args){
+        return root.RosterBateSimulationModeRuntime.validateSimulationLineup(...args);
+      },
+      buildSuggestedSimulationLineup(...args){
+        return root.RosterBateSimulationModeRuntime.buildSuggestedSimulationLineup(...args);
+      },
       setSimulationLineup(...args){
         return root.RosterBateSimulationModeRuntime.setSimulationLineup(...args);
       },
@@ -71,6 +77,74 @@
       : [];
   }
 
+  function hasControlledNflLineupState(state){
+    const teamAbbr = getControlledTeamAbbr(state);
+    const lineupSlots = state?.seasonState?.lineupSlotsByTeam?.[teamAbbr];
+    const lineupIds = state?.seasonState?.lineupIdsByTeam?.[teamAbbr];
+    return Boolean(lineupSlots && typeof lineupSlots === 'object' && !Array.isArray(lineupSlots)) ||
+      (Array.isArray(lineupIds) && lineupIds.length > 0);
+  }
+
+  function getControlledRosterSlots(state){
+    const teamAbbr = getControlledTeamAbbr(state);
+    const starterSlots = getSimulationStarterSlotsForState(state);
+    const roster = getControlledRoster(state);
+    const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
+    const explicitSlots = state?.seasonState?.lineupSlotsByTeam?.[teamAbbr];
+    const lineupIds = Array.isArray(state?.seasonState?.lineupIdsByTeam?.[teamAbbr])
+      ? state.seasonState.lineupIdsByTeam[teamAbbr]
+      : [];
+    const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
+      ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
+      : { valid: true, issues: [] };
+    const suggestedLineup = (typeof runtimeApi.buildSuggestedSimulationLineup === 'function')
+      ? runtimeApi.buildSuggestedSimulationLineup(clone(state), teamAbbr) || {}
+      : {};
+    const fallbackSlots = starterSlots.reduce((slots, slot, index) => {
+      slots[slot] = lineupIds[index] == null || lineupIds[index] === ''
+        ? null
+        : Number(lineupIds[index]);
+      return slots;
+    }, {});
+    const lineupSlotIds = explicitSlots && typeof explicitSlots === 'object' && !Array.isArray(explicitSlots)
+      ? explicitSlots
+      : fallbackSlots;
+    const assignedIds = new Set();
+
+    const lineupSlots = Object.fromEntries(starterSlots.map((slot) => {
+      const playerId = lineupSlotIds?.[slot];
+      const normalizedPlayerId = playerId == null || playerId === ''
+        ? null
+        : Number(playerId);
+      if (Number.isFinite(normalizedPlayerId) && normalizedPlayerId > 0) {
+        assignedIds.add(normalizedPlayerId);
+      }
+      return [slot, {
+        slot,
+        playerId: normalizedPlayerId,
+        player: normalizedPlayerId == null ? null : clone(rosterById.get(normalizedPlayerId) || null),
+        suggestedPlayerId: suggestedLineup?.[slot] == null || suggestedLineup?.[slot] === ''
+          ? null
+          : Number(suggestedLineup[slot])
+      }];
+    }));
+
+    return {
+      sport: getSimulationSportForState(state),
+      starterSlots,
+      lineupSlots,
+      validation,
+      readyLabel: validation.valid ? 'Ready For Week' : `${validation.issues.length} lineup issues to fix`,
+      recommendationSummary: validation.valid ? 'Starting lineup is legal.' : 'Suggested fixes are available below.',
+      roster,
+      bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
+      lineup: starterSlots
+        .map((slot) => lineupSlots[slot]?.player)
+        .filter(Boolean)
+        .map((player) => clone(player))
+    };
+  }
+
   function formatSimulationCycleLabel(state){
     if (getSimulationSportForState(state) === 'nfl') {
       const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
@@ -95,6 +169,12 @@
     const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
     if (sport !== 'nfl') {
       return { id: 'sim-day', label: 'Sim Day' };
+    }
+    const validation = hasControlledNflLineupState(state) && (typeof runtimeApi.validateSimulationLineup === 'function')
+      ? runtimeApi.validateSimulationLineup(clone(state), getControlledTeamAbbr(state))
+      : { valid: true, issues: [] };
+    if (!validation.valid) {
+      return { id: 'fix-lineup', label: 'Fix Lineup' };
     }
     if (postseasonPhase === 'completed') {
       return { id: 'season-complete', label: 'Season Complete' };
@@ -1304,21 +1384,25 @@
         };
       },
       getRosterViewModel(){
-        const roster = getControlledRoster(state);
-        const lineupIdList = Array.isArray(state?.seasonState?.lineupIdsByTeam?.[getControlledTeamAbbr(state)])
-          ? state.seasonState.lineupIdsByTeam[getControlledTeamAbbr(state)]
-          : [];
-        const lineupIds = new Set(lineupIdList);
-        return {
-          sport: getSimulationSportForState(state),
-          starterSlots: getSimulationStarterSlotsForState(state),
-          roster,
-          lineup: lineupIdList
-            .map((playerId) => roster.find((player) => Number(player?.id) === Number(playerId)))
-            .filter(Boolean)
-            .map((player) => clone(player)),
-          bench: roster.filter((player) => !lineupIds.has(player.id)).map((player) => clone(player))
-        };
+        const sport = getSimulationSportForState(state);
+        if (sport !== 'nfl') {
+          const roster = getControlledRoster(state);
+          const lineupIdList = Array.isArray(state?.seasonState?.lineupIdsByTeam?.[getControlledTeamAbbr(state)])
+            ? state.seasonState.lineupIdsByTeam[getControlledTeamAbbr(state)]
+            : [];
+          const lineupIds = new Set(lineupIdList);
+          return {
+            sport,
+            starterSlots: getSimulationStarterSlotsForState(state),
+            roster,
+            lineup: lineupIdList
+              .map((playerId) => roster.find((player) => Number(player?.id) === Number(playerId)))
+              .filter(Boolean)
+              .map((player) => clone(player)),
+            bench: roster.filter((player) => !lineupIds.has(player.id)).map((player) => clone(player))
+          };
+        }
+        return getControlledRosterSlots(state);
       },
       getScheduleViewModel(){
         const scheduleByDay = getCanonicalScheduleByDay(state, state?.leagueShell || {});
@@ -1382,10 +1466,36 @@
       simulateNextDay(){
         const shell = clone(state?.leagueShell || {});
         const sport = getSimulationSportForState(state);
+        const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
         const scheduleByDay = getCanonicalScheduleByDay(state, shell);
         const totalDays = getScheduleDayCount(scheduleByDay);
         if (state?.postseasonState?.phase === 'completed') {
           return this.getState();
+        }
+        if (sport === 'nfl' && postseasonPhase === 'regular_season' && hasControlledNflLineupState(state)) {
+          const teamAbbr = getControlledTeamAbbr(state);
+          const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
+            ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
+            : { valid: true, issues: [] };
+          if (!validation.valid) {
+            const currentWeek = Number(state?.seasonState?.currentWeek || 1);
+            const warning = {
+              type: 'lineup-warning',
+              teamAbbr,
+              title: `${teamAbbr} must fix its lineup before simming Week ${currentWeek}.`,
+              text: `${teamAbbr} must fix its lineup before simming Week ${currentWeek}.`,
+              day: Number(state?.seasonState?.currentDay || 1),
+              ts: Date.now()
+            };
+            state = {
+              ...clone(state),
+              seasonState: {
+                ...clone(state?.seasonState || {}),
+                activityLog: [warning].concat(clone(state?.seasonState?.activityLog || []))
+              }
+            };
+            return this.getState();
+          }
         }
         if (totalDays > 0 && Number(state?.seasonState?.currentDay || 1) > totalDays) {
           const existingPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();

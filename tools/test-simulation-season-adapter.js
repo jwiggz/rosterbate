@@ -850,10 +850,14 @@ const nflState = {
       DAL: [
         { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL', fp: 30 },
         { id: 29, name: 'DeMarco Murray', pos: 'RB', team: 'DAL', fp: 24 },
+        { id: 44, name: 'Joseph Randle', pos: 'RB', team: 'DAL', fp: 16 },
         { id: 88, name: 'Dez Bryant', pos: 'WR', team: 'DAL', fp: 21 },
+        { id: 84, name: 'Terrance Williams', pos: 'WR', team: 'DAL', fp: 15 },
         { id: 82, name: 'Jason Witten', pos: 'TE', team: 'DAL', fp: 14 },
+        { id: 18, name: 'Cole Beasley', pos: 'WR', team: 'DAL', fp: 11 },
+        { id: 5, name: 'Dan Bailey', pos: 'K', team: 'DAL', fp: 9 },
         { id: 9001, name: 'Dallas DST', pos: 'DST', team: 'DAL', fp: 11 },
-        { id: 5, name: 'Dan Bailey', pos: 'K', team: 'DAL', fp: 9 }
+        { id: 21, name: 'Lance Dunbar', pos: 'RB', team: 'DAL', fp: 10 }
       ],
       PHI: [],
       NE: [],
@@ -867,7 +871,20 @@ const nflState = {
     currentDay: 1,
     currentWeek: 1,
     lineupIdsByTeam: {
-      DAL: [9, 29, 88, 82, 9001, 5]
+      DAL: [9, 29, 44, 88, 84, 82, 18, 5, 9001]
+    },
+    lineupSlotsByTeam: {
+      DAL: {
+        QB: 9,
+        RB1: 29,
+        RB2: 44,
+        WR1: 88,
+        WR2: 84,
+        TE: 82,
+        FLEX: 18,
+        K: 5,
+        DST: 9001
+      }
     },
     scheduleByDay: {
       1: [
@@ -908,12 +925,126 @@ assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');
 assert.ok(Array.isArray(nflAdapter.getRosterViewModel().starterSlots));
 assert.deepStrictEqual(
   nflAdapter.getRosterViewModel().starterSlots,
-  ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K']
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
 );
 assert.ok(
   nflAdapter.getStandingsViewModel().sections.some((section) => section.title === 'NFC East'),
   'NFL standings view should expose division-grouped sections'
 );
+
+const packersNflState = {
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: {
+    anchorSeasonId: 'nfl_2014',
+    anchorSeasonLabel: '2014 NFL',
+    sport: 'nfl',
+    rosterSize: 9,
+    teams: [
+      { abbr: 'GB', name: 'Green Bay Packers', conference: 'NFC', division: 'North' },
+      { abbr: 'CHI', name: 'Chicago Bears', conference: 'NFC', division: 'North' }
+    ]
+  },
+  sourceSeasons: {
+    sourceSeasonLabels: ['2014']
+  },
+  draftState: {
+    controlledTeamAbbr: 'GB',
+    rostersByTeam: {
+      GB: [
+        { id: 12, name: 'Aaron Rodgers', pos: 'QB', team: 'GB', fp: 31 },
+        { id: 27, name: 'Eddie Lacy', pos: 'RB', team: 'GB', fp: 22 },
+        { id: 44, name: 'James Starks', pos: 'RB', team: 'GB', fp: 18 },
+        { id: 87, name: 'Jordy Nelson', pos: 'WR', team: 'GB', fp: 26 },
+        { id: 18, name: 'Randall Cobb', pos: 'WR', team: 'GB', fp: 24 },
+        { id: 89, name: 'Andrew Quarless', pos: 'TE', team: 'GB', fp: 13 },
+        { id: 84, name: 'Davante Adams', pos: 'WR', team: 'GB', fp: 17 },
+        { id: 2, name: 'Mason Crosby', pos: 'K', team: 'GB', fp: 10 },
+        { id: 9001, name: 'Packers DST', pos: 'DST', team: 'GB', fp: 12 }
+      ],
+      CHI: []
+    },
+    freeAgents: []
+  },
+  seasonState: {
+    currentDay: 1,
+    currentWeek: 1,
+    lineupIdsByTeam: {
+      GB: [12, 27, 44, 87, 18, 89, 84, 2, 9001]
+    },
+    lineupSlotsByTeam: {
+      GB: {
+        QB: 12,
+        RB1: 27,
+        RB2: 44,
+        WR1: 87,
+        WR2: 18,
+        TE: 89,
+        FLEX: 84,
+        K: 2,
+        DST: 9001
+      }
+    },
+    standings: [
+      { teamAbbr: 'GB', conference: 'NFC', division: 'North', w: 0, l: 0, pf: 0, pa: 0 },
+      { teamAbbr: 'CHI', conference: 'NFC', division: 'North', w: 0, l: 0, pf: 0, pa: 0 }
+    ],
+    completedGameLogs: [],
+    activityLog: []
+  },
+  postseasonState: {
+    phase: 'regular_season'
+  }
+};
+
+const packersNflAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-packers',
+  state: packersNflState
+});
+
+const packersRosterVm = packersNflAdapter.getRosterViewModel();
+assert.equal(packersRosterVm.sport, 'nfl');
+assert.deepStrictEqual(
+  Object.keys(packersRosterVm.lineupSlots),
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+);
+assert.equal(packersRosterVm.validation.valid, true);
+assert.equal(packersRosterVm.readyLabel, 'Ready For Week');
+assert.equal(packersRosterVm.bench.length, 0);
+
+const invalidPackersNflState = {
+  ...packersNflState,
+  seasonState: {
+    ...packersNflState.seasonState,
+    lineupIdsByTeam: {
+      GB: [12, 27, 44, 87, 18, 84, 2, 9001]
+    },
+    lineupSlotsByTeam: {
+      GB: {
+        QB: 12,
+        RB1: 27,
+        RB2: 44,
+        WR1: 87,
+        WR2: 18,
+        TE: null,
+        FLEX: 84,
+        K: 2,
+        DST: 9001
+      }
+    }
+  }
+};
+
+const invalidPackersNflAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-packers-invalid',
+  state: invalidPackersNflState
+});
+
+assert.equal(invalidPackersNflAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
+assert.equal(invalidPackersNflAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
+const invalidPackersNextState = invalidPackersNflAdapter.simulateNextDay();
+assert.equal(invalidPackersNextState.seasonState.currentWeek, 1);
+assert.equal(invalidPackersNextState.seasonState.activityLog[0].type, 'lineup-warning');
+assert.match(invalidPackersNextState.seasonState.activityLog[0].title, /must fix/i);
 
 const nflLegacyWashingtonState = {
   simulationMode: 'nfl_mixed_era_single_player_v1',
