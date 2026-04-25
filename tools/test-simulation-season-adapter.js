@@ -564,7 +564,20 @@ const seededNflPostseasonState = {
   },
   draftState: {
     controlledTeamAbbr: 'NE',
-    rostersByTeam: nfl2014EmptyRosters,
+    rostersByTeam: {
+      ...nfl2014EmptyRosters,
+      NE: [
+        { id: 101, name: 'Tom Brady', pos: 'QB', team: 'NE', fp: 33 },
+        { id: 102, name: 'LeGarrette Blount', pos: 'RB', team: 'NE', fp: 21 },
+        { id: 103, name: 'Jonas Gray', pos: 'RB', team: 'NE', fp: 16 },
+        { id: 104, name: 'Julian Edelman', pos: 'WR', team: 'NE', fp: 25 },
+        { id: 105, name: 'Brandon LaFell', pos: 'WR', team: 'NE', fp: 19 },
+        { id: 106, name: 'Rob Gronkowski', pos: 'TE', team: 'NE', fp: 27 },
+        { id: 107, name: 'Danny Amendola', pos: 'WR', team: 'NE', fp: 14 },
+        { id: 108, name: 'Stephen Gostkowski', pos: 'K', team: 'NE', fp: 11 },
+        { id: 109, name: 'Patriots DST', pos: 'DST', team: 'NE', fp: 13 }
+      ]
+    },
     freeAgents: []
   },
   seasonState: {
@@ -582,7 +595,22 @@ const seededNflPostseasonState = {
     scheduleByDay: {
       1: []
     },
-    lineupIdsByTeam: {},
+    lineupIdsByTeam: {
+      NE: [101, 102, 103, 104, 105, 106, 107, 108, 109]
+    },
+    lineupSlotsByTeam: {
+      NE: {
+        QB: 101,
+        RB1: 102,
+        RB2: 103,
+        WR1: 104,
+        WR2: 105,
+        TE: 106,
+        FLEX: 107,
+        K: 108,
+        DST: 109
+      }
+    },
     completedGameLogs: []
   },
   postseasonState: {
@@ -1011,6 +1039,82 @@ assert.equal(packersRosterVm.validation.valid, true);
 assert.equal(packersRosterVm.readyLabel, 'Ready For Week');
 assert.equal(packersRosterVm.bench.length, 0);
 
+const emptyNflLineupState = {
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  leagueShell: {
+    anchorSeasonId: 'nfl_2014',
+    anchorSeasonLabel: '2014 NFL',
+    sport: 'nfl',
+    rosterSize: 9,
+    teams: [
+      { abbr: 'GB', name: 'Green Bay Packers', conference: 'NFC', division: 'North' },
+      { abbr: 'CHI', name: 'Chicago Bears', conference: 'NFC', division: 'North' }
+    ]
+  },
+  sourceSeasons: {
+    sourceSeasonLabels: ['2014']
+  },
+  draftState: {
+    controlledTeamAbbr: 'GB',
+    rostersByTeam: {
+      GB: [
+        { id: 12, name: 'Aaron Rodgers', pos: 'QB', team: 'GB', fp: 31 },
+        { id: 27, name: 'Eddie Lacy', pos: 'RB', team: 'GB', fp: 22 },
+        { id: 44, name: 'James Starks', pos: 'RB', team: 'GB', fp: 18 },
+        { id: 87, name: 'Jordy Nelson', pos: 'WR', team: 'GB', fp: 26 },
+        { id: 18, name: 'Randall Cobb', pos: 'WR', team: 'GB', fp: 24 },
+        { id: 89, name: 'Andrew Quarless', pos: 'TE', team: 'GB', fp: 13 },
+        { id: 84, name: 'Davante Adams', pos: 'WR', team: 'GB', fp: 17 },
+        { id: 2, name: 'Mason Crosby', pos: 'K', team: 'GB', fp: 10 },
+        { id: 9001, name: 'Packers DST', pos: 'DST', team: 'GB', fp: 12 }
+      ],
+      CHI: []
+    },
+    freeAgents: []
+  },
+  seasonState: {
+    currentDay: 1,
+    currentWeek: 1,
+    lineupIdsByTeam: {},
+    standings: [
+      { teamAbbr: 'GB', conference: 'NFC', division: 'North', w: 0, l: 0, pf: 0, pa: 0 },
+      { teamAbbr: 'CHI', conference: 'NFC', division: 'North', w: 0, l: 0, pf: 0, pa: 0 }
+    ],
+    completedGameLogs: [],
+    activityLog: []
+  },
+  postseasonState: {
+    phase: 'regular_season'
+  }
+};
+
+const emptyNflLineupAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-empty-lineup',
+  state: emptyNflLineupState
+});
+
+assert.equal(emptyNflLineupAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
+assert.equal(emptyNflLineupAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
+
+const emptyNflPostseasonAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-empty-postseason',
+  state: {
+    ...emptyNflLineupState,
+    postseasonState: {
+      phase: 'wild_card'
+    }
+  }
+});
+
+assert.equal(emptyNflPostseasonAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
+assert.equal(emptyNflPostseasonAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
+const blockedPostseasonState = emptyNflPostseasonAdapter.simulateNextDay();
+assert.equal(blockedPostseasonState.postseasonState.phase, 'wild_card');
+assert.equal(blockedPostseasonState.seasonState.currentWeek, 1);
+assert.equal(blockedPostseasonState.seasonState.currentDay, 1);
+assert.equal(blockedPostseasonState.seasonState.activityLog[0].type, 'lineup-warning');
+assert.match(blockedPostseasonState.seasonState.activityLog[0].title, /must fix/i);
+
 const invalidPackersNflState = {
   ...packersNflState,
   seasonState: {
@@ -1064,7 +1168,17 @@ const nflLegacyWashingtonState = {
   draftState: {
     controlledTeamAbbr: 'WAS',
     rostersByTeam: {
-      WAS: [],
+      WAS: [
+        { id: 50, name: 'Robert Griffin III', pos: 'QB', team: 'WAS', fp: 24 },
+        { id: 51, name: 'Alfred Morris', pos: 'RB', team: 'WAS', fp: 19 },
+        { id: 52, name: 'Roy Helu Jr.', pos: 'RB', team: 'WAS', fp: 13 },
+        { id: 53, name: 'Pierre Garcon', pos: 'WR', team: 'WAS', fp: 18 },
+        { id: 54, name: 'DeSean Jackson', pos: 'WR', team: 'WAS', fp: 21 },
+        { id: 55, name: 'Jordan Reed', pos: 'TE', team: 'WAS', fp: 15 },
+        { id: 56, name: 'Andre Roberts', pos: 'WR', team: 'WAS', fp: 11 },
+        { id: 57, name: 'Kai Forbath', pos: 'K', team: 'WAS', fp: 9 },
+        { id: 58, name: 'Washington DST', pos: 'DST', team: 'WAS', fp: 10 }
+      ],
       DAL: []
     },
     freeAgents: []
@@ -1072,7 +1186,22 @@ const nflLegacyWashingtonState = {
   seasonState: {
     currentDay: 1,
     currentWeek: 1,
-    lineupIdsByTeam: {},
+    lineupIdsByTeam: {
+      WAS: [50, 51, 52, 53, 54, 55, 56, 57, 58]
+    },
+    lineupSlotsByTeam: {
+      WAS: {
+        QB: 50,
+        RB1: 51,
+        RB2: 52,
+        WR1: 53,
+        WR2: 54,
+        TE: 55,
+        FLEX: 56,
+        K: 57,
+        DST: 58
+      }
+    },
     standings: [
       { teamAbbr: 'WAS', conference: 'NFC', division: 'East', w: 0, l: 0, pf: 0, pa: 0 },
       { teamAbbr: 'DAL', conference: 'NFC', division: 'East', w: 0, l: 0, pf: 0, pa: 0 }
@@ -1148,16 +1277,44 @@ const nflPlayoffPictureAdapter = createSimulationSeasonAdapter({
       ]
     },
     sourceSeasons: { sourceSeasonLabels: ['2014'] },
-    draftState: {
-      controlledTeamAbbr: 'BUF',
-      rostersByTeam: { BUF: [], NE: [], IND: [], PIT: [], BAL: [], DEN: [] },
-      freeAgents: []
+  draftState: {
+    controlledTeamAbbr: 'BUF',
+    rostersByTeam: {
+      BUF: [
+        { id: 201, name: 'Tyrod Taylor', pos: 'QB', team: 'BUF', fp: 28 },
+        { id: 202, name: 'Fred Jackson', pos: 'RB', team: 'BUF', fp: 20 },
+        { id: 203, name: 'C.J. Spiller', pos: 'RB', team: 'BUF', fp: 18 },
+        { id: 204, name: 'Sammy Watkins', pos: 'WR', team: 'BUF', fp: 23 },
+        { id: 205, name: 'Robert Woods', pos: 'WR', team: 'BUF', fp: 17 },
+        { id: 206, name: 'Scott Chandler', pos: 'TE', team: 'BUF', fp: 12 },
+        { id: 207, name: 'Chris Hogan', pos: 'WR', team: 'BUF', fp: 11 },
+        { id: 208, name: 'Dan Carpenter', pos: 'K', team: 'BUF', fp: 9 },
+        { id: 209, name: 'Bills DST', pos: 'DST', team: 'BUF', fp: 10 }
+      ],
+      NE: [], IND: [], PIT: [], BAL: [], DEN: []
     },
-    seasonState: {
+    freeAgents: []
+  },
+  seasonState: {
       currentDay: 2,
       currentWeek: 2,
       scheduleByDay: { 1: [] },
-      lineupIdsByTeam: {},
+      lineupIdsByTeam: {
+        BUF: [201, 202, 203, 204, 205, 206, 207, 208, 209]
+      },
+      lineupSlotsByTeam: {
+        BUF: {
+          QB: 201,
+          RB1: 202,
+          RB2: 203,
+          WR1: 204,
+          WR2: 205,
+          TE: 206,
+          FLEX: 207,
+          K: 208,
+          DST: 209
+        }
+      },
       standings: [
         { teamAbbr: 'BUF', conference: 'AFC', division: 'East', w: 12, l: 4, pf: 410, pa: 300 },
         { teamAbbr: 'NE', conference: 'AFC', division: 'East', w: 11, l: 5, pf: 390, pa: 310 },
@@ -1204,19 +1361,45 @@ const nfl2014PostseasonAdapter = createSimulationSeasonAdapter({
       ]
     },
     sourceSeasons: { sourceSeasonLabels: ['2014'] },
-    draftState: {
-      controlledTeamAbbr: 'NE',
-      rostersByTeam: {
-        NE: [], DEN: [], IND: [], PIT: [], CIN: [], BAL: [],
-        SEA: [], GB: [], DAL: [], CAR: [], ARI: [], DET: []
-      },
-      freeAgents: []
+  draftState: {
+    controlledTeamAbbr: 'NE',
+    rostersByTeam: {
+      NE: [
+        { id: 301, name: 'Tom Brady', pos: 'QB', team: 'NE', fp: 33 },
+        { id: 302, name: 'LeGarrette Blount', pos: 'RB', team: 'NE', fp: 21 },
+        { id: 303, name: 'Jonas Gray', pos: 'RB', team: 'NE', fp: 16 },
+        { id: 304, name: 'Julian Edelman', pos: 'WR', team: 'NE', fp: 25 },
+        { id: 305, name: 'Brandon LaFell', pos: 'WR', team: 'NE', fp: 19 },
+        { id: 306, name: 'Rob Gronkowski', pos: 'TE', team: 'NE', fp: 27 },
+        { id: 307, name: 'Danny Amendola', pos: 'WR', team: 'NE', fp: 14 },
+        { id: 308, name: 'Stephen Gostkowski', pos: 'K', team: 'NE', fp: 11 },
+        { id: 309, name: 'Patriots DST', pos: 'DST', team: 'NE', fp: 13 }
+      ],
+      DEN: [], IND: [], PIT: [], CIN: [], BAL: [],
+      SEA: [], GB: [], DAL: [], CAR: [], ARI: [], DET: []
     },
-    seasonState: {
+    freeAgents: []
+  },
+  seasonState: {
       currentDay: 18,
       currentWeek: 18,
       scheduleByDay: { 1: [] },
-      lineupIdsByTeam: {},
+      lineupIdsByTeam: {
+        NE: [301, 302, 303, 304, 305, 306, 307, 308, 309]
+      },
+      lineupSlotsByTeam: {
+        NE: {
+          QB: 301,
+          RB1: 302,
+          RB2: 303,
+          WR1: 304,
+          WR2: 305,
+          TE: 306,
+          FLEX: 307,
+          K: 308,
+          DST: 309
+        }
+      },
       standings: [
         { teamAbbr: 'NE', conference: 'AFC', division: 'East', w: 12, l: 4, pf: 468, pa: 313 },
         { teamAbbr: 'DEN', conference: 'AFC', division: 'West', w: 12, l: 4, pf: 482, pa: 354 },
@@ -1361,7 +1544,17 @@ const nfl2014FallbackAdapter = createSimulationSeasonAdapter({
     draftState: {
       controlledTeamAbbr: 'NE',
       rostersByTeam: {
-        NE: [], DEN: [], IND: [], PIT: [], BAL: [], BUF: [],
+        NE: [
+          { id: 301, name: 'Tom Brady', pos: 'QB', team: 'NE', fp: 33 },
+          { id: 302, name: 'LeGarrette Blount', pos: 'RB', team: 'NE', fp: 21 },
+          { id: 303, name: 'Jonas Gray', pos: 'RB', team: 'NE', fp: 16 },
+          { id: 304, name: 'Julian Edelman', pos: 'WR', team: 'NE', fp: 25 },
+          { id: 305, name: 'Brandon LaFell', pos: 'WR', team: 'NE', fp: 19 },
+          { id: 306, name: 'Rob Gronkowski', pos: 'TE', team: 'NE', fp: 27 },
+          { id: 307, name: 'Danny Amendola', pos: 'WR', team: 'NE', fp: 14 },
+          { id: 308, name: 'Stephen Gostkowski', pos: 'K', team: 'NE', fp: 11 },
+          { id: 309, name: 'Patriots DST', pos: 'DST', team: 'NE', fp: 13 }
+        ], DEN: [], IND: [], PIT: [], BAL: [], BUF: [],
         SEA: [], GB: [], DAL: [], CAR: [], ARI: [], DET: []
       },
       freeAgents: []
@@ -1370,7 +1563,22 @@ const nfl2014FallbackAdapter = createSimulationSeasonAdapter({
       currentDay: 18,
       currentWeek: 18,
       scheduleByDay: { 1: [] },
-      lineupIdsByTeam: {},
+      lineupIdsByTeam: {
+        NE: [301, 302, 303, 304, 305, 306, 307, 308, 309]
+      },
+      lineupSlotsByTeam: {
+        NE: {
+          QB: 301,
+          RB1: 302,
+          RB2: 303,
+          WR1: 304,
+          WR2: 305,
+          TE: 306,
+          FLEX: 307,
+          K: 308,
+          DST: 309
+        }
+      },
       standings: [
         { teamAbbr: 'NE', conference: 'AFC', division: 'East', w: 12, l: 4, pf: 468, pa: 313 },
         { teamAbbr: 'DEN', conference: 'AFC', division: 'West', w: 12, l: 4, pf: 482, pa: 354 },

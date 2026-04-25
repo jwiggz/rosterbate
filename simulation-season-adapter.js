@@ -77,14 +77,6 @@
       : [];
   }
 
-  function hasControlledNflLineupState(state){
-    const teamAbbr = getControlledTeamAbbr(state);
-    const lineupSlots = state?.seasonState?.lineupSlotsByTeam?.[teamAbbr];
-    const lineupIds = state?.seasonState?.lineupIdsByTeam?.[teamAbbr];
-    return Boolean(lineupSlots && typeof lineupSlots === 'object' && !Array.isArray(lineupSlots)) ||
-      (Array.isArray(lineupIds) && lineupIds.length > 0);
-  }
-
   function getControlledRosterSlots(state){
     const teamAbbr = getControlledTeamAbbr(state);
     const starterSlots = getSimulationStarterSlotsForState(state);
@@ -170,7 +162,7 @@
     if (sport !== 'nfl') {
       return { id: 'sim-day', label: 'Sim Day' };
     }
-    const validation = hasControlledNflLineupState(state) && (typeof runtimeApi.validateSimulationLineup === 'function')
+    const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
       ? runtimeApi.validateSimulationLineup(clone(state), getControlledTeamAbbr(state))
       : { valid: true, issues: [] };
     if (!validation.valid) {
@@ -1472,7 +1464,7 @@
         if (state?.postseasonState?.phase === 'completed') {
           return this.getState();
         }
-        if (sport === 'nfl' && postseasonPhase === 'regular_season' && hasControlledNflLineupState(state)) {
+        if (sport === 'nfl') {
           const teamAbbr = getControlledTeamAbbr(state);
           const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
             ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
