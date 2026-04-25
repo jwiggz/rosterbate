@@ -259,6 +259,108 @@ assert.ok(
   'nfl starter selection should backfill the required kicker slot from the bench when a requested lineup omits it'
 );
 
+const controlledNflRosterTemplate = [
+  { id: 1, name: 'Dak Prescott', team: 'DAL', pos: 'QB', designation: 'ACTIVE', fp: 30, mixedEraOverall: 95 },
+  { id: 2, name: 'DeMarco Murray', team: 'DAL', pos: 'RB', designation: 'ACTIVE', fp: 24, mixedEraOverall: 93 },
+  { id: 3, name: 'Joseph Randle', team: 'DAL', pos: 'RB', designation: 'ACTIVE', fp: 15, mixedEraOverall: 81 },
+  { id: 4, name: 'Dez Bryant', team: 'DAL', pos: 'WR', designation: 'ACTIVE', fp: 26, mixedEraOverall: 97 },
+  { id: 5, name: 'Terrance Williams', team: 'DAL', pos: 'WR', designation: 'ACTIVE', fp: 17, mixedEraOverall: 84 },
+  { id: 6, name: 'Jason Witten', team: 'DAL', pos: 'TE', designation: 'ACTIVE', fp: 14, mixedEraOverall: 88 },
+  { id: 7, name: 'Cole Beasley', team: 'DAL', pos: 'WR', designation: 'ACTIVE', fp: 12, mixedEraOverall: 79 },
+  { id: 8, name: 'Dan Bailey', team: 'DAL', pos: 'K', designation: 'ACTIVE', fp: 9, mixedEraOverall: 82 },
+  { id: 9, name: 'Cowboys DST', team: 'DAL', pos: 'DST', designation: 'ACTIVE', fp: 10, mixedEraOverall: 83 },
+  { id: 10, name: 'Bench RB Star', team: 'DAL', pos: 'RB', designation: 'ACTIVE', fp: 35, mixedEraOverall: 99 }
+].map((player) => ({
+  ...player,
+  pts: 14,
+  reb: 4,
+  ast: 3,
+  stl: 1,
+  blk: 0,
+  to: 1,
+  min: 24,
+  fgm: 5,
+  fga: 9,
+  ftm: 2,
+  fta: 2,
+  tpm: 0
+}));
+
+const controlledNflState = {
+  sport: 'nfl',
+  seasonId: 'nfl-controlled-lineup-1',
+  currentDay: 1,
+  currentWeek: 1,
+  teamMeta: [
+    { abbr: 'DAL', name: 'Dallas Cowboys', conference: 'NFC', division: 'East' },
+    { abbr: 'PHI', name: 'Philadelphia Eagles', conference: 'NFC', division: 'East' }
+  ],
+  teams: ['Dallas Cowboys', 'Philadelphia Eagles'],
+  draftState: {
+    controlledTeamAbbr: 'DAL'
+  },
+  seasonState: {
+    lineupSlotsByTeam: {
+      DAL: {
+        QB: 1,
+        RB1: 2,
+        RB2: 3,
+        WR1: 4,
+        WR2: 5,
+        TE: 6,
+        FLEX: 7,
+        K: 8,
+        DST: 9
+      }
+    }
+  },
+  allRosters: [
+    controlledNflRosterTemplate.map((player) => ({ ...player })),
+    controlledNflRosterTemplate.map((player) => ({
+      ...player,
+      id: player.id + 100,
+      team: 'PHI',
+      name: player.name.replace('Cowboys', 'Eagles')
+    }))
+  ],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'DAL', conference: 'NFC', division: 'East', w: 0, l: 0, pf: 0, pa: 0 },
+    { teamIdx: 1, teamAbbr: 'PHI', conference: 'NFC', division: 'East', w: 0, l: 0, pf: 0, pa: 0 }
+  ]
+};
+
+const controlledNflDayResult = simulateSimulationGameDay({
+  state: controlledNflState,
+  schedule: { byDay: { 1: [{ homeAbbr: 'DAL', awayAbbr: 'PHI' }] } },
+  day: 1,
+  lineupIdsByTeam: {
+    DAL: [1, 2, 10, 4, 5, 6, 7, 8, 9]
+  }
+});
+
+const controlledHomeEntries = controlledNflDayResult.resultsByTeam[0]?.entries || [];
+const controlledHomeIds = controlledHomeEntries.map((entry) => Number(entry?.player?.id));
+const controlledAwayEntries = controlledNflDayResult.resultsByTeam[1]?.entries || [];
+const controlledAwayPositions = controlledAwayEntries.map((entry) => String(entry?.player?.pos || '').trim().toUpperCase());
+
+assert.ok(
+  controlledHomeIds.includes(3),
+  'controlled nfl teams should honor the saved slot-based lineup for RB2 instead of dropping to bench best-available starters'
+);
+assert.ok(
+  !controlledHomeIds.includes(10),
+  'controlled nfl teams should not let a benched player silently count as a starter when a slot lineup is already assigned'
+);
+assert.equal(
+  controlledAwayEntries.length,
+  9,
+  'cpu nfl teams should still auto-build a full legal fantasy lineup when no slot lineup is assigned'
+);
+assert.ok(
+  controlledAwayPositions.includes('K') && controlledAwayPositions.includes('DST'),
+  'cpu nfl auto-lineups should still cover the required kicker and dst slots'
+);
+
 const roundedTieState = {
   sport: 'nfl',
   currentDay: 1,

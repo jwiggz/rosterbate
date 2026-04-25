@@ -5,6 +5,9 @@
   const nfl2014ScheduleHelpers=typeof require==='function' && typeof module!=='undefined' && module.exports
     ? require('./simulation-nfl-2014-schedule.js')
     : global.RosterBateNfl2014Schedule || null;
+  const simulationRuntimeApi=typeof require==='function' && typeof module!=='undefined' && module.exports
+    ? require('./simulation-mode-runtime.js')
+    : global.RosterBateSimulationModeRuntime || null;
   const DEFAULT_PACK_TUNING={
     pace:1,
     variance:1,
@@ -160,10 +163,59 @@
     if(getSimulationSport(state)!=='nfl') return true;
     const normalizedSlot=String(slot || '').trim().toUpperCase();
     const position=getSimulationPlayerPosition(player);
+    if(simulationRuntimeApi && typeof simulationRuntimeApi.getNflSlotEligibilityMap==='function'){
+      const eligibilityMap=simulationRuntimeApi.getNflSlotEligibilityMap();
+      if(Array.isArray(eligibilityMap?.[normalizedSlot])){
+        return eligibilityMap[normalizedSlot].includes(position);
+      }
+    }
     if(normalizedSlot==='FLEX'){
       return ['RB', 'WR', 'TE', 'FLEX'].includes(position);
     }
+    if(/^RB\d+$/.test(normalizedSlot)) return position==='RB';
+    if(/^WR\d+$/.test(normalizedSlot)) return position==='WR';
     return position===normalizedSlot;
+  }
+
+  function getControlledSimulationTeamAbbr(state){
+    return String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  }
+
+  function getNflStarterSlotOrder(){
+    if(simulationRuntimeApi && typeof simulationRuntimeApi.getSimulationStarterSlots==='function'){
+      return simulationRuntimeApi.getSimulationStarterSlots({ sport:'nfl' });
+    }
+    return ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'];
+  }
+
+  function normalizeRequestedNflLineupSlots(lineupSlots){
+    if(simulationRuntimeApi && typeof simulationRuntimeApi.normalizeSimulationLineupSlots==='function'){
+      return simulationRuntimeApi.normalizeSimulationLineupSlots({ sport:'nfl' }, lineupSlots);
+    }
+    return getNflStarterSlotOrder().reduce(function(normalized, slot){
+      const value=lineupSlots && typeof lineupSlots==='object' ? lineupSlots[slot] : null;
+      normalized[slot]=value == null || value === '' ? null : Number(value);
+      return normalized;
+    }, {});
+  }
+
+  function buildExactNflSlotStarters(roster, lineupSlots){
+    const availableById=new Map((Array.isArray(roster) ? roster : []).map(function(player){
+      return [Number(player?.id), player];
+    }));
+    const starters=[];
+    const usedIds=new Set();
+    const normalizedSlots=normalizeRequestedNflLineupSlots(lineupSlots);
+    getNflStarterSlotOrder().forEach(function(slot){
+      const playerId=Number(normalizedSlots?.[slot]);
+      if(!Number.isFinite(playerId) || playerId <= 0 || usedIds.has(playerId)) return;
+      const player=availableById.get(playerId);
+      if(!player || isUnavailableForSimulation(player)) return;
+      if(!isSimulationPlayerEligibleForSlot(player, slot, { sport:'nfl' })) return;
+      starters.push(player);
+      usedIds.add(playerId);
+    });
+    return starters;
   }
 
   function takeFirstEligibleSimulationStarter(players, slot, state){
@@ -636,17 +688,33 @@
     ) || 0;
   }
 
-  function selectSimulationStarters(roster, requestedStarters, packId, state){
+  function selectSimulationStarters(roster, requestedSelection, packId, state){
+    const strictNflSlots=requestedSelection && typeof requestedSelection==='object' && !Array.isArray(requestedSelection)
+      ? requestedSelection.strictNflSlots === true
+      : false;
+    if(getSimulationSport(state)==='nfl' && strictNflSlots){
+      return buildExactNflSlotStarters(roster, requestedSelection?.lineupSlots).slice(0, getSimulationStarterCount(state));
+    }
+    const requestedIds=Array.isArray(requestedSelection)
+      ? requestedSelection
+      : Array.isArray(requestedSelection?.lineupIds)
+        ? requestedSelection.lineupIds
+        : [];
+    const requestedStarters=Array.isArray(requestedSelection?.requestedStarters)
+      ? requestedSelection.requestedStarters.filter(Boolean)
+      : requestedIds.map(function(playerId){
+          return getPlayerById(roster, playerId);
+        }).filter(Boolean);
     const availableRequested=(Array.isArray(requestedStarters) ? requestedStarters : [])
       .filter(function(player){ return player && !isUnavailableForSimulation(player); });
-    const requestedIds=new Set(availableRequested.map(function(player){ return Number(player?.id); }));
+    const requestedIdSet=new Set(availableRequested.map(function(player){ return Number(player?.id); }));
     const starterCount=getSimulationStarterCount(state);
     const starterSlots=getSimulationStarterSlotsForState(state).slice(0, starterCount);
     const availableBench=(Array.isArray(roster) ? roster : [])
       .filter(function(player){
         return player &&
           !isUnavailableForSimulation(player) &&
-          !requestedIds.has(Number(player?.id));
+          !requestedIdSet.has(Number(player?.id));
       })
       .slice()
       .sort(function(a, b){
@@ -674,11 +742,23 @@
     return starters.slice(0, starterCount);
   }
 
-  function buildTeamProfile(roster, lineupIds, packId, state){
-    const requestedStarters=(Array.isArray(lineupIds) ? lineupIds : [])
+  function buildTeamProfile(roster, lineupSelection, packId, state){
+    const requestedIds=Array.isArray(lineupSelection)
+      ? lineupSelection
+      : Array.isArray(lineupSelection?.lineupIds)
+        ? lineupSelection.lineupIds
+        : [];
+    const requestedStarters=(Array.isArray(requestedIds) ? requestedIds : [])
       .map(function(playerId){ return getPlayerById(roster, playerId); })
       .filter(Boolean);
-    const starters=selectSimulationStarters(roster, requestedStarters, packId, state);
+    const starters=selectSimulationStarters(
+      roster,
+      lineupSelection && typeof lineupSelection==='object' && !Array.isArray(lineupSelection)
+        ? Object.assign({}, lineupSelection, { lineupIds: requestedIds, requestedStarters: requestedStarters })
+        : requestedStarters,
+      packId,
+      state
+    );
     const tuning=getPackTuning(packId);
     const avg=function(selector, fallback){
       if(!starters.length) return fallback;
@@ -1008,7 +1088,11 @@
     const state=opts.state || {};
     const packId=String(opts.packId || state.historicalPackId || '').trim();
     const matchups=Array.isArray(opts.matchups) ? opts.matchups : [];
-    const lineupIdsByTeam=Array.isArray(opts.lineupIdsByTeam) ? opts.lineupIdsByTeam : [];
+    const lineupSelectionsByTeam=Array.isArray(opts.lineupSelectionsByTeam)
+      ? opts.lineupSelectionsByTeam
+      : Array.isArray(opts.lineupIdsByTeam)
+        ? opts.lineupIdsByTeam
+        : [];
     const teamNames=Array.isArray(opts.teamNames) ? opts.teamNames : (Array.isArray(state.teams) ? state.teams : []);
     const day=Number(opts.day || state.currentDay || 1) || 1;
     const week=Number(opts.week || state.currentWeek || 1) || 1;
@@ -1024,8 +1108,8 @@
       const awayRoster=Array.isArray(state.allRosters?.[awayIdx]) ? state.allRosters[awayIdx] : [];
       enrichRosterCollection(homeRoster, { packId:packId });
       enrichRosterCollection(awayRoster, { packId:packId });
-      const homeProfile=buildTeamProfile(homeRoster, lineupIdsByTeam[homeIdx], packId, state);
-      const awayProfile=buildTeamProfile(awayRoster, lineupIdsByTeam[awayIdx], packId, state);
+      const homeProfile=buildTeamProfile(homeRoster, lineupSelectionsByTeam[homeIdx], packId, state);
+      const awayProfile=buildTeamProfile(awayRoster, lineupSelectionsByTeam[awayIdx], packId, state);
       const seedParts=[
         ENGINE_VERSION,
         packId,
@@ -1107,9 +1191,14 @@
     const opts=options && typeof options==='object' ? options : {};
     const state=opts.state || {};
     const teamMeta=Array.isArray(state.teamMeta) ? state.teamMeta : [];
+    const sport=getSimulationSport(state);
+    const controlledTeamAbbr=getControlledSimulationTeamAbbr(state);
     const lineupMap=opts.lineupIdsByTeam && !Array.isArray(opts.lineupIdsByTeam)
       ? opts.lineupIdsByTeam
-      : {};
+      : (state?.seasonState?.lineupIdsByTeam && typeof state.seasonState.lineupIdsByTeam==='object' ? state.seasonState.lineupIdsByTeam : {});
+    const lineupSlotsMap=opts.lineupSlotsByTeam && !Array.isArray(opts.lineupSlotsByTeam)
+      ? opts.lineupSlotsByTeam
+      : (state?.seasonState?.lineupSlotsByTeam && typeof state.seasonState.lineupSlotsByTeam==='object' ? state.seasonState.lineupSlotsByTeam : {});
     const matchups=(opts.schedule?.byDay?.[Number(opts.day)] || []).map(function(matchup){
       return {
         home:teamMeta.findIndex(function(team){ return team.abbr === matchup.homeAbbr; }),
@@ -1121,8 +1210,18 @@
     const lowLevel=simulateLeagueDay({
       state:state,
       matchups:matchups,
-      lineupIdsByTeam:teamMeta.map(function(team){
-        return Array.isArray(lineupMap[team.abbr]) ? lineupMap[team.abbr] : [];
+      lineupSelectionsByTeam:teamMeta.map(function(team){
+        const teamAbbr=String(team?.abbr || '').trim().toUpperCase();
+        const lineupIds=Array.isArray(lineupMap[teamAbbr]) ? lineupMap[teamAbbr] : [];
+        const lineupSlots=lineupSlotsMap[teamAbbr] && typeof lineupSlotsMap[teamAbbr]==='object' && !Array.isArray(lineupSlotsMap[teamAbbr])
+          ? lineupSlotsMap[teamAbbr]
+          : null;
+        return {
+          teamAbbr:teamAbbr,
+          lineupIds:lineupIds,
+          lineupSlots:lineupSlots,
+          strictNflSlots:sport==='nfl' && !!lineupSlots && teamAbbr===controlledTeamAbbr
+        };
       }),
       day:opts.day,
       week:state.currentWeek
