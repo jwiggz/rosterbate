@@ -9228,9 +9228,9 @@ function renderSimulationHubInSharedShell(){
   if(settingsLink){
     settingsLink.textContent='Settings';
     settingsLink.setAttribute('onclick',"goPage('commissioner')");
-    settingsLink.style.display='none';
+    settingsLink.style.display='';
   }
-  if(settingsDivider) settingsDivider.style.display='none';
+  if(settingsDivider) settingsDivider.style.display='';
   if(leagueTeamsButton) leagueTeamsButton.style.display='';
   if(matchupsTitle) matchupsTitle.textContent=hasUpcomingSlate ? "This Week's Matchups" : 'Recent Results';
   const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
