@@ -621,6 +621,20 @@ const simulationAdapterStub = {
     return {
       title: 'Schedule / Results',
       cycleLabel: 'Day 12 - Week 2',
+      nextGame: {
+        day: 12,
+        home: false,
+        awayAbbr: 'CHI',
+        homeAbbr: 'LAL',
+        opponentAbbr: 'LAL',
+        opponentName: 'Los Angeles Lakers'
+      },
+      scheduleByDay: {
+        12: [
+          { awayAbbr: 'CHI', homeAbbr: 'LAL' },
+          { awayAbbr: 'BOS', homeAbbr: 'DET' }
+        ]
+      },
       recentResults: [
         { awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112 }
       ]
@@ -1507,10 +1521,10 @@ assert.equal(elements.hubSettingsLink.textContent, 'Settings');
 assert.equal(elements.hubSettingsLink.style.display, 'none');
 assert.equal(elements.hubSettingsDivider.style.display, 'none');
 assert.equal(elements.hubLeagueTeamsButton.style.display, '');
-assert.equal(elements.hubMatchupsTitle.textContent, 'Recent Results');
-assert.equal(elements.hubMatchupActionTitle.textContent, 'Schedule');
-assert.match(elements.hubMatchupActionSub.textContent, /recent results/i);
-assert.match(elements.hubMatchups.innerHTML, /BOS 108 at LAL 112/);
+assert.equal(elements.hubMatchupsTitle.textContent, "This Week's Matchups");
+assert.equal(elements.hubMatchupActionTitle.textContent, 'Matchup');
+assert.match(elements.hubMatchupActionSub.textContent, /head-to-head box score/i);
+assert.match(elements.hubMatchups.innerHTML, /CHI[\s\S]*vs[\s\S]*LAL|BOS[\s\S]*vs[\s\S]*LAL|BOS[\s\S]*vs[\s\S]*CHI/i);
 assert.match(elements.hubStandingsMini.innerHTML, /LAL/, 'simulation hub should render the mini standings board');
 assert.match(elements.hubNowBand.innerHTML, /Watch List|Trade Desk/, 'simulation hub should render the live now-band cards');
 assert.match(elements.hubActivity.innerHTML, /League update|League moves will show up here/, 'simulation hub should render the league activity feed');

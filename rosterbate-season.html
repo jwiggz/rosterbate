@@ -9080,11 +9080,34 @@ function buildSimulationHubRunnerCard(vm, options){
   `;
 }
 
+function buildSimulationHubMatchupRows(scheduleVm, currentDay){
+  const scheduleByDay=scheduleVm && typeof scheduleVm==='object' ? scheduleVm.scheduleByDay || {} : {};
+  const nextGame=scheduleVm?.nextGame || scheduleVm?.currentMatchup || null;
+  const targetDay=Number(nextGame?.day || currentDay || 1);
+  const orderedDays=Object.keys(scheduleByDay || {})
+    .map((day)=>Number(day))
+    .filter((day)=>Number.isFinite(day) && day>0)
+    .sort((a,b)=>a-b);
+  const selectedDay=orderedDays.find((day)=>day>=targetDay) || orderedDays[0] || targetDay;
+  const games=Array.isArray(scheduleByDay?.[selectedDay]) ? scheduleByDay[selectedDay] : [];
+  const gamePool=games.length ? games : (nextGame ? [nextGame] : []);
+  const rows=gamePool.map((game)=>{
+    const away=escapeSimulationShellHtml(String(game?.awayAbbr || game?.awayName || 'AWAY').trim() || 'AWAY');
+    const home=escapeSimulationShellHtml(String(game?.homeAbbr || game?.homeName || 'HOME').trim() || 'HOME');
+    return `<div class="hub-mini-row">${away} <span style="font-size:10px;color:var(--text3);">vs</span> ${home}</div>`;
+  });
+  return {
+    selectedDay,
+    rows
+  };
+}
+
 function renderSimulationHubInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getHubViewModel();
   const rosterVm=SEASON_MODE_ADAPTER.getRosterViewModel?.() || null;
   const waiverVm=SEASON_MODE_ADAPTER.getWaiverViewModel?.() || null;
   const standingsVm=SEASON_MODE_ADAPTER.getStandingsViewModel?.() || null;
+  const scheduleVm=SEASON_MODE_ADAPTER.getScheduleViewModel?.() || null;
   const teamSummary=rosterVm?.teamSummary || {};
   const heroMeta=buildSimulationHeroMetaLinks(teamSummary);
   const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
@@ -9136,6 +9159,9 @@ function renderSimulationHubInSharedShell(){
   const settingsDivider=document.getElementById('hubSettingsDivider');
   const leagueTeamsButton=document.getElementById('hubLeagueTeamsButton');
   const matchupsTitle=document.getElementById('hubMatchupsTitle');
+  const currentDay=Number(scheduleVm?.nextGame?.day || scheduleVm?.currentMatchup?.day || G?.day || 1);
+  const matchupRows=buildSimulationHubMatchupRows(scheduleVm, currentDay);
+  const hasUpcomingSlate=Array.isArray(matchupRows.rows) && matchupRows.rows.length>0;
   if(settingsLink){
     settingsLink.textContent='Settings';
     settingsLink.setAttribute('onclick',"goPage('commissioner')");
@@ -9143,13 +9169,11 @@ function renderSimulationHubInSharedShell(){
   }
   if(settingsDivider) settingsDivider.style.display='none';
   if(leagueTeamsButton) leagueTeamsButton.style.display='';
-  if(matchupsTitle) matchupsTitle.textContent='Recent Results';
+  if(matchupsTitle) matchupsTitle.textContent=hasUpcomingSlate ? "This Week's Matchups" : 'Recent Results';
   const matchupActionTitle=document.getElementById('hubMatchupActionTitle');
   const matchupActionSub=document.getElementById('hubMatchupActionSub');
-  if(matchupActionTitle) matchupActionTitle.textContent='Schedule';
-  if(matchupActionSub) matchupActionSub.textContent=isNflSimulation
-    ? 'Open recent results and the upcoming weekly slate'
-    : 'Open recent results and the upcoming sim slate';
+  if(matchupActionTitle) matchupActionTitle.textContent='Matchup';
+  if(matchupActionSub) matchupActionSub.textContent='Open the head-to-head box score';
   renderSimulationHubActionRail(vm, {
     watchCount,
     watchSummary,
@@ -9158,19 +9182,15 @@ function renderSimulationHubInSharedShell(){
     availableCount,
     playersCopy,
     rankLabel,
-    matchupTitle: 'Schedule',
-    matchupSub: isNflSimulation
-      ? 'Open recent results and the upcoming weekly slate'
-      : 'Open recent results and the upcoming sim slate'
+    matchupTitle: 'Matchup',
+    matchupSub: 'Open the head-to-head box score'
   });
   const matchupActionTitleAfter=document.getElementById('hubMatchupActionTitle');
   const matchupActionSubAfter=document.getElementById('hubMatchupActionSub');
   const playersCard=document.getElementById('hubWC');
   const rankCard=document.getElementById('hubRank');
-  if(matchupActionTitleAfter) matchupActionTitleAfter.textContent='Schedule';
-  if(matchupActionSubAfter) matchupActionSubAfter.textContent=isNflSimulation
-    ? 'Open recent results and the upcoming weekly slate'
-    : 'Open recent results and the upcoming sim slate';
+  if(matchupActionTitleAfter) matchupActionTitleAfter.textContent='Matchup';
+  if(matchupActionSubAfter) matchupActionSubAfter.textContent='Open the head-to-head box score';
   if(playersCard) playersCard.textContent=playersCopy;
   if(rankCard) rankCard.textContent=rankLabel;
   const standingsMini=document.getElementById('hubStandingsMini');
@@ -9355,9 +9375,11 @@ function renderSimulationHubInSharedShell(){
   if(hubPowerups){
     hubPowerups.innerHTML=buildSimulationHubPowerupRail(vm?.powerupCards);
   }
-  document.getElementById('hubMatchups').innerHTML = (SEASON_MODE_ADAPTER.getScheduleViewModel().recentResults || []).slice(0, 4).map((game) => (
-    `<div class="hub-mini-row">${game.awayAbbr} ${game.awayScore} at ${game.homeAbbr} ${game.homeScore}</div>`
-  )).join('') || '<div class="hub-card-sub">No completed games yet.</div>';
+  document.getElementById('hubMatchups').innerHTML = hasUpcomingSlate
+    ? matchupRows.rows.slice(0, 5).join('')
+    : ((scheduleVm?.recentResults || []).slice(0, 4).map((game) => (
+        `<div class="hub-mini-row">${game.awayAbbr} ${game.awayScore} at ${game.homeAbbr} ${game.homeScore}</div>`
+      )).join('') || '<div class="hub-card-sub">No completed games yet.</div>');
 }
 
 function renderSimulationWaiverInSharedShell(){
