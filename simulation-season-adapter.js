@@ -285,6 +285,20 @@
     return `Waiver Order (${displayIndex} of ${resolvedTeamCount})`;
   }
 
+  function buildSimulationLeagueLabel(state, sport){
+    const explicitLeagueName = String(
+      state?.leagueName ||
+      state?.leagueShell?.leagueName ||
+      ''
+    ).trim();
+    if (explicitLeagueName) return explicitLeagueName;
+    const anchorSeasonLabel = String(
+      state?.leagueShell?.anchorSeasonLabel ||
+      (sport === 'nfl' ? 'NFL' : 'NBA')
+    ).trim() || (sport === 'nfl' ? 'NFL' : 'NBA');
+    return `${anchorSeasonLabel} Simulation`;
+  }
+
   function buildSimulationTeamSummary(state, rosterState){
     const team = rosterState?.controlledTeam || getControlledTeam(state);
     const sport = getSimulationSportForState(state);
@@ -292,11 +306,10 @@
     const controlledAbbr = String(team?.abbr || getControlledTeamAbbr(state) || '').trim().toUpperCase();
     const controlledTeamIndex = teams.findIndex((entry) => String(entry?.abbr || '').trim().toUpperCase() === controlledAbbr);
     const teamCount = Math.max(1, teams.length || 0);
-    const anchorSeasonLabel = String(state?.leagueShell?.anchorSeasonLabel || (sport === 'nfl' ? 'NFL' : 'NBA')).trim() || (sport === 'nfl' ? 'NFL' : 'NBA');
     return {
       name: team?.name || team?.displayName || team?.abbr || '',
       abbr: team?.abbr || getControlledTeamAbbr(state) || '',
-      leagueLabel: `${anchorSeasonLabel} Simulation`,
+      leagueLabel: buildSimulationLeagueLabel(state, sport),
       teamCount,
       watchListEnabled: true,
       watchListLabel: 'Watch List',
@@ -2444,7 +2457,7 @@
         return {
           slotId,
           sport,
-          leagueLabel: `${anchorSeasonLabel} Simulation`,
+          leagueLabel: buildSimulationLeagueLabel(state, sport),
           shellLabel: `${anchorSeasonLabel} Shell`,
           statSourceLabel: 'Simulated',
           controlledTeam: team ? clone(team) : null,

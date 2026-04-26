@@ -131,7 +131,7 @@ assert.match(adapterSource, /runtimeApi\.applySimulationTrade\(/, 'adapter trade
 assert.match(adapterSource, /runtimeApi\.activateSimulationPowerup\(/, 'adapter powerup mutation should stay runtime-backed');
 assert.match(adapterSource, /gameLog\?\.winner/, 'postseason advancement should prefer the authoritative game winner over rounded display scores');
 
-  const hub = adapter.getHubViewModel();
+const hub = adapter.getHubViewModel();
   assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
   assert.equal(hub.controlledTeam.abbr, 'LAL');
   assert.equal(hub.primaryAction.label, 'Reveal Day 12 Results');
@@ -161,6 +161,24 @@ hub.sourceSeasonLabels.push('2020-21');
 assert.equal(adapter.getState().leagueShell.teams[0].name, 'Los Angeles Lakers');
 assert.equal(adapter.getState().seasonState.standings[0].w, 9);
 assert.equal(adapter.getState().sourceSeasons.sourceSeasonLabels.length, 3);
+
+const namedLeagueAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-named-league',
+  state: {
+    ...slotState,
+    leagueName: 'Showtime Revival'
+  }
+});
+assert.equal(
+  namedLeagueAdapter.getHubViewModel().leagueLabel,
+  'Showtime Revival',
+  'simulation hub vm should prefer an explicit saved league name over the generic anchor-season label'
+);
+assert.equal(
+  namedLeagueAdapter.getRosterViewModel().teamSummary.leagueLabel,
+  'Showtime Revival',
+  'simulation roster vm should carry the same explicit league identity into the shared local-league shell'
+);
 
 const unrelatedPowerupAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-powerups',
