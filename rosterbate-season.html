@@ -9259,6 +9259,8 @@ function renderSimulationHubInSharedShell(){
   const standingsMini=document.getElementById('hubStandingsMini');
   if(standingsMini){
     const topRows=standingsRows.slice(0, Math.min(10, standingsRows.length));
+    const shellTeams=Array.isArray(D?.leagueShell?.teams) ? D.leagueShell.teams : [];
+    const teamPalette=(typeof TCOLORS !== 'undefined' && Array.isArray(TCOLORS) && TCOLORS.length ? TCOLORS : ['#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#22c55e']);
     standingsMini.innerHTML=topRows.length
       ? `
         <div class="hub-standings-head">
@@ -9271,6 +9273,12 @@ function renderSimulationHubInSharedShell(){
         </div>
         ${topRows.map((row, index)=>{
           const abbr=escapeSimulationShellHtml(String(row?.teamAbbr || row?.abbr || '---').trim().toUpperCase() || '---');
+          const rowTeamIdx=Number(row?.teamIdx);
+          const shellTeam=Number.isFinite(rowTeamIdx) ? (shellTeams[rowTeamIdx] || null) : null;
+          const teamName=escapeSimulationShellHtml(String(shellTeam?.name || shellTeam?.displayName || row?.teamName || row?.name || abbr).trim() || abbr);
+          const teamInitials=escapeSimulationShellHtml(typeof ini === 'function'
+            ? ini(String(shellTeam?.name || shellTeam?.displayName || teamName || abbr))
+            : abbr.slice(0, Math.min(3, abbr.length)));
           const wins=Number.isFinite(Number(row?.w)) ? Number(row.w) : 0;
           const losses=Number.isFinite(Number(row?.l)) ? Number(row.l) : 0;
           const pointsFor=Number.isFinite(Number(row?.pf)) ? Number(row.pf).toFixed(1) : '0.0';
@@ -9278,7 +9286,10 @@ function renderSimulationHubInSharedShell(){
           const mine=String(row?.teamAbbr || '').trim().toUpperCase()===controlledAbbr;
           return `<button type="button" class="hub-standings-row${mine?' mine':''}" data-open-viewer="${Number(row?.teamIdx)}">
             <div style="text-align:center;">${index+1}</div>
-            <div>${abbr}</div>
+            <div class="hub-standings-team">
+              <div class="pav" style="background:${teamPalette[Math.max(0, rowTeamIdx)%teamPalette.length]};width:24px;height:24px;font-size:10px;">${teamInitials}</div>
+              <div class="hub-standings-name"${mine?' style="color:#fdba74;"':''}>${teamName}</div>
+            </div>
             <div style="text-align:right;">${wins}</div>
             <div style="text-align:right;">${losses}</div>
             <div style="text-align:right;">${pointsFor}</div>
