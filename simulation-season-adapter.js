@@ -1111,11 +1111,11 @@ function buildSimulationFormatLabel(state){
         title: cardTitle,
         label: 'White Gloves',
         body: 'Protect the floor by copying your lowest active starter score onto injured slots once simulation-side injury resolution catches up.',
-        status: 'Visible for parity',
+        status: 'Future unlock',
         active: false,
         supported: false,
         disabled: true,
-        disabledReason: 'White Gloves is shown here for parity, but simulation injury-copy logic is not wired through the shared shell yet.',
+        disabledReason: 'White Gloves is planned for simulation leagues, but the injury-copy rules are not live in the shared shell yet.',
         actionLabel: 'Coming Soon'
       },
       {
@@ -1124,11 +1124,11 @@ function buildSimulationFormatLabel(state){
         title: cardTitle,
         label: 'Bench Boost',
         body: 'Push bench contributions into the weekly result once simulation-side reserve scoring is fully hooked into the shared shell.',
-        status: 'Visible for parity',
+        status: 'Future unlock',
         active: false,
         supported: false,
         disabled: true,
-        disabledReason: 'Bench Boost is shown here for parity, but simulation bench-powerup scoring is not wired through the shared shell yet.',
+        disabledReason: 'Bench Boost is planned for simulation leagues, but bench-side scoring boosts are not live in the shared shell yet.',
         actionLabel: 'Coming Soon'
       },
       {
@@ -1137,11 +1137,11 @@ function buildSimulationFormatLabel(state){
         title: cardTitle,
         label: 'Sunday Surge',
         body: 'Amplify end-of-week starter output once simulation cadence-specific boost timing is available in the shared shell.',
-        status: 'Visible for parity',
+        status: 'Future unlock',
         active: false,
         supported: false,
         disabled: true,
-        disabledReason: 'Sunday Surge is shown here for parity, but simulation timing-based scoring boosts are not wired through the shared shell yet.',
+        disabledReason: 'Sunday Surge is planned for simulation leagues, but timing-based scoring boosts are not live in the shared shell yet.',
         actionLabel: 'Coming Soon'
       }
     ];

@@ -591,10 +591,10 @@ const simulationAdapterStub = {
           label: 'White Gloves',
           body: 'Protect the floor for injured starters later.',
           active: false,
-          status: 'Visible for parity',
+          status: 'Future unlock',
           actionLabel: 'Coming Soon',
           disabled: true,
-          disabledReason: 'Visible for parity only.'
+          disabledReason: 'Future unlock for simulation leagues.'
         },
         {
           key: 'bench-boost',
@@ -602,10 +602,10 @@ const simulationAdapterStub = {
           label: 'Bench Boost',
           body: 'Bench scoring boost will land later.',
           active: false,
-          status: 'Visible for parity',
+          status: 'Future unlock',
           actionLabel: 'Coming Soon',
           disabled: true,
-          disabledReason: 'Visible for parity only.'
+          disabledReason: 'Future unlock for simulation leagues.'
         },
         {
           key: 'sunday-surge',
@@ -613,10 +613,10 @@ const simulationAdapterStub = {
           label: 'Sunday Surge',
           body: 'Sunday timing boost will land later.',
           active: false,
-          status: 'Visible for parity',
+          status: 'Future unlock',
           actionLabel: 'Coming Soon',
           disabled: true,
-          disabledReason: 'Visible for parity only.'
+          disabledReason: 'Future unlock for simulation leagues.'
         }
       ]
     };
