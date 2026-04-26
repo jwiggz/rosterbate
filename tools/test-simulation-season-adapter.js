@@ -141,6 +141,16 @@ const hub = adapter.getHubViewModel();
   assert.equal(hub.statSourceLabel, 'Simulated', 'single-player replacement hub vm should label engine-backed output as simulated');
 assert.deepStrictEqual(hub.sourceSeasonLabels, ['1986-87', '1995-96', '2015-16']);
 assert.ok(Array.isArray(hub.summaryCards), 'hub vm should expose summaryCards for shared-shell parity');
+assert.deepStrictEqual(
+  hub.summaryCards.map((card) => ({ label: card.label, value: card.value })),
+  [
+    { label: 'Record', value: '9-3' },
+    { label: 'Reveal Window', value: 'Day 12 - Week 2' },
+    { label: 'Team', value: 'LAL' },
+    { label: 'Era Pool', value: '1986-87 + 2 more' }
+  ],
+  'hub vm should expose polished summary-pill labels and compact era-pool context'
+);
 assert.ok(Array.isArray(hub.powerupCards), 'hub vm should expose powerupCards for shared-shell parity');
 assert.equal(hub.powerupCards.length, 4, 'hub vm should expose the familiar four-card powerup rail for parity');
 assert.equal(hub.powerupCards[0]?.active, false, 'captain-mode hub powerup cards should stay inactive until that specific powerup is active');
@@ -178,6 +188,26 @@ assert.equal(
   namedLeagueAdapter.getRosterViewModel().teamSummary.leagueLabel,
   'Showtime Revival',
   'simulation roster vm should carry the same explicit league identity into the shared local-league shell'
+);
+
+const singleSourceLeagueAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-single-source-league',
+  state: {
+    ...slotState,
+    sourceSeasons: {
+      sourceSeasonLabels: ['2014']
+    }
+  }
+});
+assert.deepStrictEqual(
+  singleSourceLeagueAdapter.getHubViewModel().summaryCards.map((card) => ({ label: card.label, value: card.value })),
+  [
+    { label: 'Record', value: '9-3' },
+    { label: 'Reveal Window', value: 'Day 12 - Week 2' },
+    { label: 'Team', value: 'LAL' },
+    { label: 'Source Pool', value: '2014' }
+  ],
+  'single-source simulation hubs should downgrade the era pill to a source-pool pill cleanly'
 );
 
 const unrelatedPowerupAdapter = createSimulationSeasonAdapter({

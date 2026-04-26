@@ -567,7 +567,13 @@ const simulationAdapterStub = {
       controlledTeam: { abbr: 'LAL', name: 'Los Angeles Lakers' },
       userRow: { w: 9, l: 3, streak: 'W3' },
       recordLabel: '9-3',
-        primaryAction: { label: 'Reveal Day 12 Results', shortLabel: 'Reveal Day', cadenceLabel: 'Day 12', shellTone: 'reveal' },
+      primaryAction: { label: 'Reveal Day 12 Results', shortLabel: 'Reveal Day', cadenceLabel: 'Day 12', shellTone: 'reveal' },
+      summaryCards: [
+        { label: 'Record', value: '9-3' },
+        { label: 'Reveal Window', value: 'Day 12 - Week 2' },
+        { label: 'Team', value: 'LAL' },
+        { label: 'Era Pool', value: '1986-87 + 2 more' }
+      ],
       sourceSeasonLabels: ['1986-87', '1995-96', '2015-16'],
       powerupCards: [
         {
@@ -1560,6 +1566,9 @@ assert.match(elements.hubActions.innerHTML, /Trade Desk/, 'simulation hub should
 assert.match(elements.hubActions.innerHTML, /Open the league trade desk|incoming offer|pending sent offer/, 'simulation hub trade card should keep live trade context');
 assert.match(elements.hubDataStamp.innerHTML, /openWatchList\(\)/, 'simulation hub should keep the watch-list meta action live');
 assert.match(elements.hubDataStamp.innerHTML, /openTeamSettings\(\)/, 'simulation hub should keep the team-settings meta action live');
+assert.match(elements.hubDataStamp.innerHTML, /Record:\s*9-3/, 'simulation hub should keep the record summary pill');
+assert.match(elements.hubDataStamp.innerHTML, /Reveal Window:\s*Day 12 - Week 2/, 'simulation hub should use polished reveal-window pill wording for nba seasons');
+assert.match(elements.hubDataStamp.innerHTML, /Era Pool:\s*1986-87 \+ 2 more/, 'simulation hub should keep the summary pill era pool compact');
 assert.match(elements.hubPowerups.innerHTML, /Michael Jordan/, 'simulation hub should render the adapter-approved captain target');
 assert.doesNotMatch(elements.hubPowerups.innerHTML, /Hakeem Olajuwon/, 'simulation hub should not rebuild captain targets from non-starter roster players');
 

@@ -918,6 +918,17 @@ function buildSimulationFormatLabel(state){
     return `Day ${Number(state?.seasonState?.currentDay || 1)} - Week ${Number(state?.seasonState?.currentWeek || 1)}`;
   }
 
+  function buildSimulationSourcePoolSummary(state){
+    const sourceSeasonLabels = clone(state?.sourceSeasons?.sourceSeasonLabels || []);
+    const count = sourceSeasonLabels.length;
+    return {
+      label: count > 1 ? 'Era Pool' : 'Source Pool',
+      value: count > 1
+        ? `${sourceSeasonLabels[0]} + ${count - 1} more`
+        : (count === 1 ? sourceSeasonLabels[0] : 'Simulation Pool')
+    };
+  }
+
   function getSimulationPrimaryAction(state){
     const sport = getSimulationSportForState(state);
     const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
@@ -1027,7 +1038,7 @@ function buildSimulationFormatLabel(state){
 
   function buildSimulationHubSummaryCards(state, team, userRow){
     const sport = getSimulationSportForState(state);
-    const sourceSeasonLabels = clone(state?.sourceSeasons?.sourceSeasonLabels || []);
+    const sourcePoolSummary = buildSimulationSourcePoolSummary(state);
     return [
       {
         key: 'record',
@@ -1036,7 +1047,7 @@ function buildSimulationFormatLabel(state){
       },
       {
         key: 'cycle',
-        label: sport === 'nfl' ? 'Current Week' : 'Current Cycle',
+        label: sport === 'nfl' ? 'Current Week' : 'Reveal Window',
         value: formatSimulationCycleLabel(state)
       },
       {
@@ -1046,8 +1057,8 @@ function buildSimulationFormatLabel(state){
       },
       {
         key: 'source-seasons',
-        label: 'Source Seasons',
-        value: sourceSeasonLabels.length ? sourceSeasonLabels.join(' + ') : 'Simulation Pool'
+        label: sourcePoolSummary.label,
+        value: sourcePoolSummary.value
       }
     ];
   }
