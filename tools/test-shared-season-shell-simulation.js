@@ -1515,8 +1515,8 @@ assert.ok(!api.getActiveSeasonPages().includes('playoffs'), 'regular-season nav 
 
 api.renderSimulationHubInSharedShell();
 assert.equal(elements.hubLeagueName.textContent, '2025-26 NBA Simulation');
-assert.equal(elements.hubFormat.textContent, '1995-96 + 2015-16 Mixed Era Shell');
-assert.equal(elements.hubScoringType.textContent, 'Simulated NBA Results');
+assert.equal(elements.hubFormat.textContent, 'Mixed Era');
+assert.equal(elements.hubScoringType.textContent, 'Head to Head Points');
 assert.equal(elements.hubTeamCount.textContent, '3');
 assert.equal(elements.hubRec.textContent, '9-3 | 1360.0 PF | 1288.0 PA');
 assert.equal(elements.hubTeamMeta.textContent, 'Day 12 · 3 source seasons');
@@ -2843,7 +2843,7 @@ api.setData({
 
 api.renderSimulationHubInSharedShell();
 assert.equal(elements.advBtn.textContent, 'Sim Week 1', 'nfl hub should expose a weekly simulation action');
-assert.equal(elements.hubScoringType.textContent, 'Simulated NFL Results', 'nfl hub should use football result copy');
+assert.equal(elements.hubScoringType.textContent, 'Head to Head Points', 'nfl hub should keep the polished local-league fantasy scoring copy');
 assert.equal(elements.advBtn.disabled, false, 'nfl hub sim CTA should remain enabled during regular season');
 
 simulationStubState.postseasonState = { phase: 'postseason_ready' };

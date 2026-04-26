@@ -9193,6 +9193,10 @@ function renderSimulationHubInSharedShell(){
   const primaryActionTone=String(primaryAction?.shellTone || '').trim().toLowerCase();
   const primaryActionShortLabel=primaryAction?.shortLabel || primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Reveal Day');
   const primaryActionCadence=primaryAction?.cadenceLabel || (isNflSimulation ? `Week ${Number(vm?.userRow?.w || 0) + Number(vm?.userRow?.l || 0) + 1}` : `Day ${Number(scheduleVm?.nextGame?.day || scheduleVm?.currentMatchup?.day || G?.day || 1)}`);
+  const sourceSeasonCountForFormat=Math.max(0, Array.isArray(vm?.sourceSeasonLabels) ? vm.sourceSeasonLabels.length : 0);
+  const fallbackFormatLabel=sourceSeasonCountForFormat>1
+    ? 'Mixed Era'
+    : (sourceSeasonCountForFormat===1 ? 'Single Era' : 'Standard');
   const hubTeamMeta=document.getElementById('hubTeamMeta');
   if(hubTeamMeta){
     const sourceSeasonCount=Math.max(0, Array.isArray(vm?.sourceSeasonLabels) ? vm.sourceSeasonLabels.length : 0);
@@ -9204,8 +9208,8 @@ function renderSimulationHubInSharedShell(){
   document.getElementById('hubCycleMeta').textContent = primaryActionTone==='reveal'
     ? `Local League - ${primaryActionCadence} reveal ready`
     : `Simulation - ${primaryActionShortLabel} ready`;
-  document.getElementById('hubFormat').textContent = vm.shellLabel || D?.leagueShell?.anchorSeasonLabel || D?.leagueName || 'NBA Shell';
-  document.getElementById('hubScoringType').textContent = isNflSimulation ? 'Simulated NFL Results' : 'Simulated NBA Results';
+  document.getElementById('hubFormat').textContent = vm.formatLabel || D?.leagueShell?.formatLabel || fallbackFormatLabel;
+  document.getElementById('hubScoringType').textContent = vm.scoringTypeLabel || 'Head to Head Points';
   document.getElementById('hubTeamCount').textContent = String((D?.leagueShell?.teams || []).length || (isNflSimulation ? 32 : 30));
   document.getElementById('hubOpp').textContent = vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0';
   document.getElementById('hubProj').textContent = vm.controlledTeam?.abbr || '---';

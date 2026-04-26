@@ -285,10 +285,10 @@
     return `Waiver Order (${displayIndex} of ${resolvedTeamCount})`;
   }
 
-  function buildSimulationLeagueLabel(state, sport){
-    const explicitLeagueName = String(
-      state?.leagueName ||
-      state?.leagueShell?.leagueName ||
+function buildSimulationLeagueLabel(state, sport){
+  const explicitLeagueName = String(
+    state?.leagueName ||
+    state?.leagueShell?.leagueName ||
       ''
     ).trim();
     if (explicitLeagueName) return explicitLeagueName;
@@ -296,8 +296,19 @@
       state?.leagueShell?.anchorSeasonLabel ||
       (sport === 'nfl' ? 'NFL' : 'NBA')
     ).trim() || (sport === 'nfl' ? 'NFL' : 'NBA');
-    return `${anchorSeasonLabel} Simulation`;
-  }
+  return `${anchorSeasonLabel} Simulation`;
+}
+
+function buildSimulationFormatLabel(state){
+  const sourceSeasonCount = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
+    ? state.sourceSeasons.sourceSeasonLabels.length
+    : 0;
+  if (sourceSeasonCount > 1) return 'Mixed Era';
+  if (sourceSeasonCount === 1) return 'Single Era';
+  const anchorSeasonLabel = String(state?.leagueShell?.anchorSeasonLabel || '').trim().toLowerCase();
+  if (anchorSeasonLabel.includes('mixed era')) return 'Mixed Era';
+  return 'Standard';
+}
 
   function buildSimulationTeamSummary(state, rosterState){
     const team = rosterState?.controlledTeam || getControlledTeam(state);
@@ -2458,7 +2469,9 @@
           slotId,
           sport,
           leagueLabel: buildSimulationLeagueLabel(state, sport),
+          formatLabel: buildSimulationFormatLabel(state),
           shellLabel: `${anchorSeasonLabel} Shell`,
+          scoringTypeLabel: 'Head to Head Points',
           statSourceLabel: 'Simulated',
           controlledTeam: team ? clone(team) : null,
           userRow: userRow ? clone(userRow) : null,
