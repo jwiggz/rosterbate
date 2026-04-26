@@ -1519,7 +1519,7 @@ assert.equal(elements.hubFormat.textContent, 'Mixed Era');
 assert.equal(elements.hubScoringType.textContent, 'Head to Head Points');
 assert.equal(elements.hubTeamCount.textContent, '3');
 assert.equal(elements.hubRec.textContent, '9-3 | 1360.0 PF | 1288.0 PA');
-assert.equal(elements.hubTeamMeta.textContent, 'Day 12 · 3 source seasons');
+assert.equal(elements.hubTeamMeta.textContent, 'Reveal Day 12 · 3 source seasons');
 assert.equal(elements.hubOpp.textContent, '9-3');
 assert.equal(elements.hubOppLabel.textContent, 'Record');
 assert.equal(elements.hubProj.textContent, 'LAL');

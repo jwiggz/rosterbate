@@ -9202,8 +9202,11 @@ function renderSimulationHubInSharedShell(){
     const sourceSeasonCount=Math.max(0, Array.isArray(vm?.sourceSeasonLabels) ? vm.sourceSeasonLabels.length : 0);
     const sourceLabel=sourceSeasonCount>1
       ? `${sourceSeasonCount} source seasons`
-      : (sourceSeasonCount===1 ? `${vm.sourceSeasonLabels[0]} source season` : 'simulation-backed local league');
-    hubTeamMeta.textContent=`${primaryActionCadence} · ${sourceLabel}`;
+      : (sourceSeasonCount===1 ? `${vm.sourceSeasonLabels[0]} pool` : 'local simulation league');
+    const teamMetaCycleLabel=primaryActionTone==='reveal'
+      ? `Reveal ${primaryActionCadence}`
+      : primaryActionCadence;
+    hubTeamMeta.textContent=`${teamMetaCycleLabel} · ${sourceLabel}`;
   }
   document.getElementById('hubCycleMeta').textContent = primaryActionTone==='reveal'
     ? `Local League - ${primaryActionCadence} reveal ready`
