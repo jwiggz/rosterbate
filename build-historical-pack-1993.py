@@ -1770,8 +1770,8 @@ def main():
         "sourceProfile": SOURCE_PROFILE,
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
-        "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
-        "defaultEntryMode": "single_player_season",
+        "supportedModes": ["historical_draft", "simulation_season", "reimagined_season"],
+        "defaultEntryMode": "simulation_season",
         "focusTeamId": FEATURED_TEAM_ID,
         "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 historical season foundation centered on the Bulls.",
         "description": "A playable 1992-93 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
@@ -1807,7 +1807,7 @@ def main():
             "realStatCoverage": {
                 "playersWithRealSeasonStats": real_stat_players,
                 "playerCount": len(players),
-                "label": "Historical season stats",
+                "label": "Simulation ratings coverage",
             },
             "zeroGamePlayers": {
                 "count": zero_game_players,
@@ -1839,7 +1839,7 @@ def main():
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "single_player_season", "label": "Historic Season", "description": "Choose one 1992-93 team and play through the full historical season."},
+            {"mode": "simulation_season", "label": "Sim Season", "description": "Choose one 1992-93 team and play through a ratings-driven sim season built from the historical foundation."},
             {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Jordan-Barkley-Pippen season from the full-league player pool."},
             {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1992-93 branch from the same foundation pack."},
         ],
@@ -1860,7 +1860,7 @@ def main():
             {"teamId": f"{ENTITY_PREFIX}_orl", "summary": "Orlando adds the young-Shaq breakout lane and a future-facing roster arc that cuts across the established powers."},
         ],
         "modeSummaries": [
-            {"mode": "single_player_season", "summary": "Choose one 1992-93 franchise and guide it through the full historical season."},
+            {"mode": "simulation_season", "summary": "Choose one 1992-93 franchise and guide it through a full ratings-driven sim season from the historical foundation."},
             {"mode": "historical_draft", "summary": "Reshuffle the full Jordan-Barkley-Pippen player pool and discover how the era changes under a custom draft."},
             {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1992-93 universe while keeping the same historical team and player foundation."},
         ],
@@ -1879,14 +1879,14 @@ def main():
         "packId": PACK_ID,
         "version": 1,
         "challengeGroups": [
-            {"groupId": "historic_season_paths", "label": "Historic Season Paths", "mode": "single_player_season"},
+            {"groupId": "historic_season_paths", "label": "Sim Season Paths", "mode": "simulation_season"},
             {"groupId": "draft_the_era_paths", "label": "Draft The Era", "mode": "historical_draft"},
             {"groupId": "reimagined_paths", "label": "Reimagined Season", "mode": "reimagined_season"},
         ],
         "challenges": [
             {
                 "challengeId": "bulls_threepeat_pace",
-                "mode": "single_player_season",
+                "mode": "simulation_season",
                 "path": "featured_team_path",
                 "title": "Complete The First Three-Peat",
                 "description": "Take the featured Bulls lane and clear 57 wins while keeping the title pace intact.",
@@ -1899,7 +1899,7 @@ def main():
             },
             {
                 "challengeId": "challenger_55_wins",
-                "mode": "single_player_season",
+                "mode": "simulation_season",
                 "path": "open_team_path",
                 "title": "Break The Bulls-Suns Collision Course",
                 "description": "Choose any team and reach 55 wins while trying to disrupt the Finals-bound prestige track.",

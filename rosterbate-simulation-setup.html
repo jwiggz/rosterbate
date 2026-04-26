@@ -566,7 +566,7 @@
         <div class="hero-chip-row" aria-label="Simulation shell details">
           <span class="hero-chip" id="simulationShellChip">2025-26 NBA shell</span>
           <span class="hero-chip" id="simulationRosterChip">10-player basketball roster</span>
-          <span class="hero-chip" id="simulationModeChip">Single-player simulation</span>
+          <span class="hero-chip" id="simulationModeChip">Local simulation league</span>
           <span class="hero-chip" id="simulationLaunchChip">Draft or instant season start</span>
         </div>
         <div class="hero-foot">
@@ -612,7 +612,7 @@
       <section class="panel workspace-card">
         <div class="card-kicker">Source Seasons</div>
         <h2 class="card-title">Build The Mixed-Era Player Pool</h2>
-        <p class="card-copy" id="simulationSourceCopy">Pick one or more NBA historical packs. These selections define the crossover player pool your single-player simulation league will draft from.</p>
+        <p class="card-copy" id="simulationSourceCopy">Pick one or more NBA historical packs. These selections define the crossover player pool your local simulation league will draft from.</p>
         <div id="simulationSourceSeasonList"></div>
       </section>
       <aside class="panel workspace-card">
@@ -622,7 +622,7 @@
         <div class="control-meta">
           <span class="control-pill" id="simulationControlShellPill">2025-26 shell locked</span>
           <span class="control-pill" id="simulationControlTeamCountPill">30 teams</span>
-          <span class="control-pill" id="simulationControlModePill">Single player</span>
+          <span class="control-pill" id="simulationControlModePill">Local control</span>
         </div>
         <div class="field">
           <label for="simulationFranchiseSelect" id="simulationTeamLabel">Franchise</label>
@@ -692,10 +692,10 @@
       if (getSimulationSport() === 'nfl') {
         return {
           heroBody: 'Choose the historical NFL seasons that feed your mixed-era draft pool, then claim a 2014 NFL franchise. This page is where the universe gets defined before the season shell takes over.',
-          sourceBody: 'Pick one or more NFL historical packs. These selections define the crossover player pool your single-player simulation league will draft from.',
+          sourceBody: 'Pick one or more NFL historical packs. These selections define the crossover player pool your local simulation league will draft from.',
           shellChip: '2014 NFL shell',
           rosterChip: '13-slot football roster',
-          modeChip: 'Single-player simulation',
+          modeChip: 'Local simulation league',
           launchChip: 'Draft or instant season start',
           teamLabel: 'Franchise',
           draftSlotLabel: 'Manual Draft Slot Only',
@@ -711,7 +711,7 @@
           processLaneTitle: '3. Enter Or Skip The Board',
           processLaneCopy: 'Draft slot only matters for the manual board path. The instant lane ignores it and auto-generates the whole league.',
           controlShellPill: '2014 shell locked',
-          controlModePill: 'Single player',
+          controlModePill: 'Local control',
           manualLaneCopy: 'Open the mixed-era board, make the picks yourself, and carry that drafted roster straight into the simulation season.',
           autoLaneCopy: 'Auto-build the whole league in the background and jump directly into the season shell with your chosen franchise.',
           teamCountLabel: 'Real Franchises',
@@ -722,10 +722,10 @@
       }
       return {
         heroBody: 'Choose the historical seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.',
-        sourceBody: 'Pick one or more NBA historical packs. These selections define the crossover player pool your single-player simulation league will draft from.',
+        sourceBody: 'Pick one or more NBA historical packs. These selections define the crossover player pool your local simulation league will draft from.',
         shellChip: '2025-26 NBA shell',
         rosterChip: '10-player basketball roster',
-        modeChip: 'Single-player simulation',
+        modeChip: 'Local simulation league',
         launchChip: 'Draft or instant season start',
         teamLabel: 'Franchise',
         draftSlotLabel: 'Draft Slot',
@@ -741,7 +741,7 @@
         processLaneTitle: '3. Enter Or Skip The Board',
         processLaneCopy: 'Draft slot only matters for the manual board path. The instant lane ignores it and auto-generates the whole league.',
         controlShellPill: '2025-26 shell locked',
-        controlModePill: 'Single player',
+        controlModePill: 'Local control',
         manualLaneCopy: 'Open the mixed-era board, make the picks yourself, and carry that drafted roster straight into the simulation season.',
         autoLaneCopy: 'Auto-build the whole league in the background and jump directly into the season shell with your chosen franchise.',
         teamCountLabel: 'Real Franchises',
@@ -803,7 +803,7 @@
       setSimulationNodeText('simulationSourceCopy', simulationCopy.sourceBody || '');
       setSimulationNodeText('simulationShellChip', simulationCopy.shellChip || '');
       setSimulationNodeText('simulationRosterChip', simulationCopy.rosterChip || '');
-      setSimulationNodeText('simulationModeChip', simulationCopy.modeChip || 'Single-player simulation');
+    setSimulationNodeText('simulationModeChip', simulationCopy.modeChip || 'Local simulation league');
       setSimulationNodeText('simulationLaunchChip', simulationCopy.launchChip || 'Draft or instant season start');
       setSimulationNodeText('simulationTeamLabel', simulationCopy.teamLabel || 'Franchise');
       setSimulationNodeText('simulationDraftSlotLabel', simulationCopy.draftSlotLabel || 'Draft Slot');
@@ -818,7 +818,7 @@
       setSimulationNodeText('simulationProcessLaneCopy', simulationCopy.processLaneCopy || '');
       setSimulationNodeText('simulationControlShellPill', simulationCopy.controlShellPill || '');
       setSimulationNodeText('simulationControlTeamCountPill', teamCount ? (String(teamCount) + ' teams') : '');
-      setSimulationNodeText('simulationControlModePill', simulationCopy.controlModePill || 'Single player');
+    setSimulationNodeText('simulationControlModePill', simulationCopy.controlModePill || 'Local control');
       setSimulationNodeText('simulationManualLaneCopy', simulationCopy.manualLaneCopy || '');
       setSimulationNodeText('simulationAutoLaneCopy', simulationCopy.autoLaneCopy || '');
       setSimulationNodeText('simulationTeamCountValue', teamCount);

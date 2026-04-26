@@ -101,10 +101,25 @@ assert.ok(
   ),
   'engine should not auto-start players marked OUT'
 );
+assert.ok(
+  dayResult.gameLogs.every((game) => game.outcomeSource === 'simulation_engine'),
+  'engine game logs should explicitly mark simulation_engine as the only outcome source'
+);
+assert.ok(
+  Object.values(dayResult.resultsByTeam).every((teamResult) =>
+    String(teamResult?.statSource || '') === 'simulation_engine_generated' &&
+    teamResult.entries.every((entry) => String(entry?.statSource || '') === 'simulation_engine_generated')
+  ),
+  'engine day results should explicitly mark generated team and player stats instead of relying on historical-source assumptions'
+);
 
 const updated = applySimulationDayResults(state, dayResult);
 assert.equal(updated.currentDay, 2);
 assert.equal(updated.completedGameLogs.length, 15);
+assert.ok(
+  updated.completedGameLogs.every((game) => game.outcomeSource === 'simulation_engine'),
+  'applied day results should preserve the engine outcome-source marker on persisted logs'
+);
 assert.equal(
   updated.standings.reduce((sum, row) => sum + Number(row.w || 0) + Number(row.l || 0), 0),
   30
@@ -177,6 +192,10 @@ assert.ok(
 assert.ok(
   nflDayResult.gameLogs.every((game) => game.homeScore < 70 && game.awayScore < 70),
   'nfl simulation should render football-sized scores instead of nba-style triple-digit totals'
+);
+assert.ok(
+  nflDayResult.gameLogs.every((game) => game.outcomeSource === 'simulation_engine'),
+  'nfl simulation should tag weekly outcomes as engine-generated instead of replayed historical results'
 );
 
 const nflPartialLineupDayResult = simulateSimulationGameDay({

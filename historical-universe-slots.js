@@ -46,16 +46,15 @@
     switch(normalized){
       case 'simulation_season':
       case 'historical_sim':
+      case 'single_player_season':
+      case 'real_season':
         return 'simulation_season';
       case 'historical_draft':
         return 'historical_draft';
       case 'reimagined_season':
         return 'reimagined_season';
-      case 'single_player_season':
-      case 'real_season':
-        return 'single_player_season';
       default:
-        return fallback || 'single_player_season';
+        return fallback || 'simulation_season';
     }
   }
 
@@ -98,37 +97,35 @@
       : slugifyKey(state?.historicalPackId || 'historic_pack');
     const entryMode = isSimulationModeState(state)
       ? 'simulation_universe'
-      : slugifyKey(normalizeHistoricalEntryMode(state?.historicalEntryMode, 'single_player_season'));
+      : slugifyKey(normalizeHistoricalEntryMode(state?.historicalEntryMode, 'simulation_season'));
     const stamp = Date.now().toString(36);
     const rand = Math.random().toString(36).slice(2, 8);
     return [sport, packId, entryMode, stamp, rand].join('_');
   }
 
   function getModeLabel(entryMode){
-    switch(normalizeHistoricalEntryMode(entryMode, 'single_player_season')){
+    switch(normalizeHistoricalEntryMode(entryMode, 'simulation_season')){
       case 'simulation_season':
         return 'Sim Season';
       case 'historical_draft':
         return 'Drafted Universe';
       case 'reimagined_season':
         return 'Reimagined Season';
-      case 'single_player_season':
       default:
-        return 'Historic Season';
+        return 'Sim Season';
     }
   }
 
   function getModeTone(entryMode){
-    switch(normalizeHistoricalEntryMode(entryMode, 'single_player_season')){
+    switch(normalizeHistoricalEntryMode(entryMode, 'simulation_season')){
       case 'simulation_season':
         return 'simulation';
       case 'historical_draft':
         return 'draft';
       case 'reimagined_season':
         return 'reimagined';
-      case 'single_player_season':
       default:
-        return 'historical';
+        return 'simulation';
     }
   }
 
@@ -271,6 +268,52 @@
     return seen.size;
   }
 
+  function getSimulationProgressLabel(state){
+    const sport = normalizeSport(state?.sport || state?.leagueShell?.sport || 'nba');
+    const postseason = state?.postseasonState && typeof state.postseasonState === 'object'
+      ? state.postseasonState
+      : {};
+    const phase = String(postseason.phase || 'regular_season').trim().toLowerCase();
+    const championAbbr = String(postseason?.champion?.teamAbbr || postseason?.champion?.championTeamAbbr || '').trim();
+    const currentWeek = Number(state?.seasonState?.currentWeek || 1) || 1;
+    const currentDay = Number(state?.seasonState?.currentDay || 1) || 1;
+    if(championAbbr || phase === 'completed'){
+      return 'Season complete';
+    }
+    if(sport === 'nfl'){
+      const nflPhaseLabels = {
+        postseason_ready: 'Playoffs locked',
+        wild_card: 'Wild Card round',
+        divisional: 'Divisional round',
+        conference_championship: 'Conference championships',
+        super_bowl: 'Super Bowl'
+      };
+      if(nflPhaseLabels[phase]){
+        return nflPhaseLabels[phase];
+      }
+      return 'Week ' + currentWeek;
+    }
+    const nbaPhaseLabels = {
+      postseason_ready: 'Bracket locked',
+      play_in: 'Play-In tournament',
+      playoffs_round_1: 'Round 1',
+      playoffs_round_2: 'Round 2',
+      conference_semifinals: 'Semifinals',
+      conference_finals: 'Conference finals',
+      finals: 'Finals'
+    };
+    if(nbaPhaseLabels[phase]){
+      return nbaPhaseLabels[phase];
+    }
+    return 'Week ' + currentWeek + ' - Day ' + currentDay;
+  }
+
+  function getSimulationSubtitle(state){
+    const controlledTeam = getSimulationControlledTeam(state);
+    const teamLabel = String(controlledTeam?.name || controlledTeam?.abbr || 'Simulation universe').trim();
+    return teamLabel + ' - ' + getSimulationProgressLabel(state);
+  }
+
   function buildPersistedState(state, slotId, existingMeta){
     const payload = safeClone(state);
     if(!payload) return null;
@@ -308,7 +351,7 @@
     return {
       slotId,
       title: leagueName + ' - Simulation Universe',
-      subtitle: String(controlledTeam?.name || controlledTeam?.abbr || 'Simulation universe').trim() + ' - Day ' + currentDay,
+      subtitle: getSimulationSubtitle(state),
       sport: normalizeSport(state?.sport || state?.leagueShell?.sport || 'nba'),
       historicalPackId: String(state?.sourceSeasons?.mixedEraConfigId || '').trim() || null,
       historicalSourcePackIds: sourcePackIds.length ? sourcePackIds : null,
@@ -326,7 +369,7 @@
       leagueSize: Number(Array.isArray(state?.leagueShell?.teams) ? state.leagueShell.teams.length : 0),
       playerPoolCount: getSimulationPlayerPoolCount(state),
       modeTone: 'simulation',
-      progressLabel: state?.postseasonState?.champion?.championTeamAbbr ? 'Season complete' : ('Week ' + currentWeek + ' - Day ' + currentDay),
+      progressLabel: getSimulationProgressLabel(state),
       wins: standing?.wins ?? null,
       losses: standing?.losses ?? null,
       pf: standing?.pf ?? null,
@@ -339,7 +382,7 @@
   }
 
   function summarizeHistoricalState(state, slotId, existingMeta){
-    const historicalEntryMode = normalizeHistoricalEntryMode(state?.historicalEntryMode, 'single_player_season');
+    const historicalEntryMode = normalizeHistoricalEntryMode(state?.historicalEntryMode, 'simulation_season');
     const title = getSeasonLabel(state) + ' - ' + getModeLabel(historicalEntryMode);
     const createdAt = Number(existingMeta?.createdAt || state?.historicalUniverseCreatedAt || state?.createdAt || state?.savedAt || Date.now());
     const updatedAt = Date.now();

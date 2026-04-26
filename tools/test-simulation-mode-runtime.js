@@ -14,11 +14,17 @@ const {
   buildSuggestedSimulationLineup,
   buildSimulationPlayerPool,
   buildSimulationUniverseBootstrap,
+  buildUnifiedSimulationSeasonState,
   buildCompletedSimulationAutoDraftState,
   setSimulationLineup,
   pruneLineupState,
   claimSimulationFreeAgent,
+  submitSimulationWaiverClaim,
+  cancelSimulationWaiverClaim,
+  processSimulationWaiverClaims,
   applySimulationTrade,
+  activateSimulationPowerup,
+  updateSimulationTeamSettings,
   writeCompletedSimulationState
 } = require('../simulation-mode-runtime.js');
 
@@ -175,6 +181,167 @@ assert.deepStrictEqual(
 const expectedRankedNames = rankPlayers(playerPool).map((player) => player.name);
 
 const pool = buildSimulationPlayerPool({ mixedEraContext, shell });
+
+assert.equal(
+  typeof buildUnifiedSimulationSeasonState,
+  'function',
+  'simulation runtime should expose buildUnifiedSimulationSeasonState for single-player replacement boot'
+);
+
+if (typeof buildUnifiedSimulationSeasonState === 'function') {
+  const unifiedSinglePlayerSeed = buildUnifiedSimulationSeasonState({
+    simulationMode: 'single_player_historical_v1',
+    sport: 'nba',
+    leagueName: 'Unified Test League',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    rosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG', team: 'GSW' }]
+    ],
+    freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C', team: 'HOU' }],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ]
+  });
+
+  assert.ok(
+    unifiedSinglePlayerSeed?.seasonState,
+    'unified single-player boot state should always carry simulation-native seasonState'
+  );
+  assert.equal(
+    unifiedSinglePlayerSeed?.legacyHistoricalStatMode ?? false,
+    false,
+    'unified single-player boot state should reject legacy stat-replay mode flags'
+  );
+  assert.equal(
+    unifiedSinglePlayerSeed?.simulationMode,
+    'nba_mixed_era_single_player_v1',
+    'unified single-player boot state should normalize the canonical simulation mode id from the resolved sport'
+  );
+  assert.ok(
+    Array.isArray(unifiedSinglePlayerSeed?.leagueShell?.teams),
+    'unified single-player boot state should guarantee a canonical leagueShell.teams array'
+  );
+  assert.ok(
+    unifiedSinglePlayerSeed?.draftState?.rostersByTeam?.LAL,
+    'unified single-player boot state should guarantee canonical rostersByTeam storage'
+  );
+  assert.ok(
+    unifiedSinglePlayerSeed?.seasonState?.lineupIdsByTeam?.LAL,
+    'unified single-player boot state should guarantee canonical lineupIdsByTeam storage'
+  );
+  assert.equal(
+    unifiedSinglePlayerSeed?.seasonState?.standings?.length,
+    2,
+    'unified single-player boot state should preserve canonical standings rows for each team'
+  );
+  assert.equal(
+    unifiedSinglePlayerSeed?.postseasonState?.phase,
+    'regular_season',
+    'unified single-player boot state should guarantee canonical postseason state'
+  );
+
+  const standinglessSeed = buildUnifiedSimulationSeasonState({
+    simulationMode: 'single_player_historical_v1',
+    sport: 'nba',
+    teams: ['Chicago Bulls', 'New York Knicks'],
+    rosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI' }],
+      [{ id: 33, name: 'Patrick Ewing', pos: 'C', team: 'NYK' }]
+    ],
+    postseasonState: {
+      phase: 'playoffs_round_1',
+      currentRound: 'playoffs_round_1',
+      runnerUp: { teamAbbr: 'NYK' }
+    }
+  });
+  assert.equal(
+    standinglessSeed?.seasonState?.standings?.length,
+    2,
+    'unified single-player boot state should synthesize zeroed standings rows when the seed does not include standings yet'
+  );
+  assert.deepStrictEqual(
+    standinglessSeed.seasonState.standings.map((row) => ({ teamAbbr: row.teamAbbr, w: row.w, l: row.l })),
+    [
+      { teamAbbr: 'CB', w: 0, l: 0 },
+      { teamAbbr: 'NYK', w: 0, l: 0 }
+    ],
+    'unified single-player boot state should zero-initialize synthesized standings rows per team'
+  );
+  assert.equal(
+    standinglessSeed?.postseasonState?.currentRound,
+    'playoffs_round_1',
+    'unified single-player boot state should preserve existing postseason metadata instead of rebuilding a smaller object'
+  );
+  assert.deepStrictEqual(
+    standinglessSeed?.postseasonState?.runnerUp,
+    { teamAbbr: 'NYK' },
+    'unified single-player boot state should preserve existing postseason runner-up metadata'
+  );
+
+  const reorderedStandingsSeed = buildUnifiedSimulationSeasonState({
+    simulationMode: 'single_player_historical_v1',
+    sport: 'nba',
+    leagueShell: {
+      sport: 'nba',
+      teams: [
+        { abbr: 'LAL', name: 'Los Angeles Lakers' },
+        { abbr: 'BOS', name: 'Boston Celtics' }
+      ]
+    },
+    rosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG', team: 'GSW' }]
+    ],
+    standings: [
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 },
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 }
+    ]
+  });
+  assert.deepStrictEqual(
+    reorderedStandingsSeed.draftState.rostersByTeam.LAL.map((player) => player.id),
+    [23],
+    'unified single-player boot state should key rostersByTeam from the canonical team entries, not from standings order'
+  );
+  assert.deepStrictEqual(
+    reorderedStandingsSeed.seasonState.standings.map((row) => row.teamAbbr),
+    ['LAL', 'BOS'],
+    'unified single-player boot state should backfill standings in canonical team order even when the incoming standings are reordered'
+  );
+
+  const partialStandingsSeed = buildUnifiedSimulationSeasonState({
+    simulationMode: 'single_player_historical_v1',
+    sport: 'nba',
+    leagueShell: {
+      sport: 'nba',
+      teams: [
+        { abbr: 'LAL', name: 'Los Angeles Lakers' },
+        { abbr: 'BOS', name: 'Boston Celtics' }
+      ]
+    },
+    rosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG', team: 'GSW' }]
+    ],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 }
+    ]
+  });
+  assert.equal(
+    partialStandingsSeed.seasonState.standings.length,
+    2,
+    'unified single-player boot state should backfill missing teams when the incoming standings are partial'
+  );
+  assert.deepStrictEqual(
+    partialStandingsSeed.seasonState.standings.map((row) => ({ teamAbbr: row.teamAbbr, w: row.w, l: row.l })),
+    [
+      { teamAbbr: 'LAL', w: 9, l: 3 },
+      { teamAbbr: 'BOS', w: 0, l: 0 }
+    ],
+    'unified single-player boot state should preserve known standings rows while zero-initializing missing teams'
+  );
+}
 
 assert.equal(pool.draftPool.length, 300);
 assert.equal(pool.freeAgents.length, 60);
@@ -402,6 +569,36 @@ assert.deepStrictEqual(
   'nfl lineup ids should be derived in slot order for compatibility'
 );
 
+const sparseNflLineupState = setSimulationLineup(
+  {
+    leagueShell: nflShell,
+    seasonState: {
+      lineupIdsByTeam: {
+        GB: [101, 102, 103, 104, 105, 106, 107, 108, 109]
+      },
+      activityLog: []
+    }
+  },
+  'GB',
+  {
+    QB: 2014287,
+    RB1: 2014288,
+    RB2: 2014289,
+    WR1: 2014290,
+    WR2: 2014291,
+    TE: null,
+    FLEX: 2014292,
+    K: 2014294,
+    DST: 2014295
+  }
+);
+
+assert.deepStrictEqual(
+  sparseNflLineupState.seasonState.lineupIdsByTeam.GB,
+  [2014287, 2014288, 2014289, 2014290, 2014291, null, 2014292, 2014294, 2014295],
+  'nfl lineup ids should preserve null slot alignment for compatibility fallbacks'
+);
+
 assert.deepStrictEqual(
   normalizeSimulationLineupSlots(nflShell, [2014287, 2014288, 2014289, 2014290, 2014291, 2014293, 2014292, 2014294, 2014295]),
   {
@@ -418,6 +615,7 @@ assert.deepStrictEqual(
 );
 
 const waiverSnapshotState = {
+  leagueShell: nflShell,
   draftState: {
     rostersByTeam: {
       GB: [{ id: 1, name: 'Roster Original', designation: 'ACTIVE' }]
@@ -445,6 +643,312 @@ const waiverSnapshotState = {
   }
 };
 
+assert.equal(
+  typeof submitSimulationWaiverClaim,
+  'function',
+  'simulation runtime should expose submitSimulationWaiverClaim for pending shared-shell waiver actions'
+);
+
+if (typeof submitSimulationWaiverClaim === 'function') {
+  const submittedClaimState = submitSimulationWaiverClaim(waiverSnapshotState, {
+    teamAbbr: 'GB',
+    addPlayerId: 2,
+    dropPlayerId: 1
+  });
+
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims.length,
+    1,
+    'submitting a simulation waiver claim should create one pending claim'
+  );
+  assert.equal(
+    typeof submittedClaimState.seasonState.pendingWaiverClaims[0]?.claimId,
+    'string',
+    'submitting a simulation waiver claim should assign a stable claim id'
+  );
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims[0]?.teamAbbr,
+    'GB',
+    'submitting a simulation waiver claim should preserve the submitting team'
+  );
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims[0]?.addPlayerId,
+    2,
+    'submitting a simulation waiver claim should preserve the add target'
+  );
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims[0]?.dropPlayerId,
+    1,
+    'submitting a simulation waiver claim should preserve explicit drop consequences'
+  );
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims[0]?.status,
+    'pending',
+    'submitting a simulation waiver claim should create a pending claim instead of resolving it immediately'
+  );
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims[0]?.processOnAdvance,
+    'week',
+    'submitting an NFL simulation waiver claim should preserve weekly resolution timing'
+  );
+}
+
+assert.equal(
+  typeof cancelSimulationWaiverClaim,
+  'function',
+  'simulation runtime should expose cancelSimulationWaiverClaim for pending waiver desk edits'
+);
+
+if (typeof cancelSimulationWaiverClaim === 'function' && typeof submitSimulationWaiverClaim === 'function') {
+  const submittedClaimState = submitSimulationWaiverClaim(waiverSnapshotState, {
+    teamAbbr: 'GB',
+    addPlayerId: 2,
+    dropPlayerId: 1
+  });
+  const pendingClaimId = submittedClaimState.seasonState.pendingWaiverClaims?.[0]?.claimId;
+  const cancelledClaimState = cancelSimulationWaiverClaim(submittedClaimState, {
+    claimId: pendingClaimId
+  });
+
+  assert.equal(
+    cancelledClaimState.seasonState.pendingWaiverClaims.length,
+    0,
+    'cancelling a simulation waiver claim should remove it from the pending queue'
+  );
+  assert.equal(
+    submittedClaimState.seasonState.pendingWaiverClaims.length,
+    1,
+    'cancelling a simulation waiver claim should not mutate the prior state snapshot'
+  );
+}
+
+assert.equal(
+  typeof processSimulationWaiverClaims,
+  'function',
+  'simulation runtime should expose processSimulationWaiverClaims for cadence-based waiver resolution'
+);
+
+if (typeof processSimulationWaiverClaims === 'function' && typeof submitSimulationWaiverClaim === 'function') {
+  const pendingNflClaimState = submitSimulationWaiverClaim(waiverSnapshotState, {
+    teamAbbr: 'GB',
+    addPlayerId: 2,
+    dropPlayerId: 1
+  });
+  const earlyProcessedNflState = processSimulationWaiverClaims(pendingNflClaimState, { cadence: 'day' });
+  const resolvedNflState = processSimulationWaiverClaims(pendingNflClaimState, { cadence: 'week' });
+
+  assert.equal(
+    earlyProcessedNflState.seasonState.pendingWaiverClaims.length,
+    1,
+    'NFL waiver claims should remain pending on day-based advances'
+  );
+  assert.equal(
+    resolvedNflState.seasonState.pendingWaiverClaims.length,
+    0,
+    'NFL waiver claims should resolve on week-based advances'
+  );
+  assert.equal(
+    resolvedNflState.draftState.rostersByTeam.GB.some((player) => Number(player.id) === 2),
+    true,
+    'NFL waiver processing should add the approved player when the weekly cadence hits'
+  );
+}
+
+if (typeof processSimulationWaiverClaims === 'function' && typeof submitSimulationWaiverClaim === 'function') {
+  const competingClaimState = submitSimulationWaiverClaim(
+    submitSimulationWaiverClaim(
+      {
+        leagueShell: {
+          sport: 'nfl',
+          teams: [{ abbr: 'CHI' }, { abbr: 'GB' }]
+        },
+        draftState: {
+          rostersByTeam: {
+            CHI: [{ id: 10, name: 'CHI Drop', designation: 'ACTIVE' }],
+            GB: [{ id: 11, name: 'GB Drop', designation: 'ACTIVE' }]
+          },
+          freeAgents: [{ id: 2, name: 'Claim Target', designation: 'ACTIVE' }]
+        },
+        seasonState: {
+          waiverOrder: ['CHI', 'GB'],
+          activityLog: []
+        }
+      },
+      {
+        teamAbbr: 'GB',
+        addPlayerId: 2,
+        dropPlayerId: 11
+      }
+    ),
+    {
+      teamAbbr: 'CHI',
+      addPlayerId: 2,
+      dropPlayerId: 10
+    }
+  );
+  const resolvedCompetingClaimState = processSimulationWaiverClaims(competingClaimState, { cadence: 'week' });
+
+  assert.equal(
+    resolvedCompetingClaimState.draftState.rostersByTeam.CHI.some((player) => Number(player.id) === 2),
+    true,
+    'competing waiver claims should award the player to the higher-priority waiver team'
+  );
+  assert.equal(
+    resolvedCompetingClaimState.draftState.rostersByTeam.GB.some((player) => Number(player.id) === 2),
+    false,
+    'competing waiver claims should not award the same player to lower-priority waiver teams'
+  );
+  assert.deepStrictEqual(
+    resolvedCompetingClaimState.seasonState.waiverOrder,
+    ['GB', 'CHI'],
+    'successful competing claims should move the winning waiver team to the back of the priority order'
+  );
+
+  const partialOrderClaimState = submitSimulationWaiverClaim(
+    {
+      leagueShell: {
+        sport: 'nfl',
+        teams: [{ abbr: 'CHI' }, { abbr: 'GB' }, { abbr: 'MIN' }]
+      },
+      draftState: {
+        rostersByTeam: {
+          CHI: [{ id: 10, name: 'CHI Drop', designation: 'ACTIVE' }],
+          GB: [{ id: 11, name: 'GB Drop', designation: 'ACTIVE' }],
+          MIN: [{ id: 12, name: 'MIN Drop', designation: 'ACTIVE' }]
+        },
+        freeAgents: [{ id: 2, name: 'Claim Target', designation: 'ACTIVE' }]
+      },
+      seasonState: {
+        waiverOrder: ['CHI', 'CHI'],
+        activityLog: []
+      }
+    },
+    {
+      teamAbbr: 'MIN',
+      addPlayerId: 2,
+      dropPlayerId: 12
+    }
+  );
+  const resolvedPartialOrderClaimState = processSimulationWaiverClaims(partialOrderClaimState, { cadence: 'week' });
+  assert.ok(
+    resolvedPartialOrderClaimState.seasonState.waiverOrder.includes('MIN'),
+    'partial explicit waiver orders should be normalized to include missing shell teams'
+  );
+  assert.equal(
+    resolvedPartialOrderClaimState.seasonState.waiverOrder.filter((teamAbbr) => teamAbbr === 'CHI').length,
+    1,
+    'normalized waiver orders should collapse duplicate saved priority entries'
+  );
+
+  const rotatingCompetingClaimState = submitSimulationWaiverClaim(
+    submitSimulationWaiverClaim(
+      submitSimulationWaiverClaim(
+        submitSimulationWaiverClaim(
+          {
+            leagueShell: {
+              sport: 'nfl',
+              teams: [{ abbr: 'CHI' }, { abbr: 'GB' }]
+            },
+            draftState: {
+              rostersByTeam: {
+                CHI: [{ id: 10, name: 'CHI Drop 1', designation: 'ACTIVE' }, { id: 12, name: 'CHI Drop 2', designation: 'ACTIVE' }],
+                GB: [{ id: 11, name: 'GB Drop 1', designation: 'ACTIVE' }, { id: 13, name: 'GB Drop 2', designation: 'ACTIVE' }]
+              },
+              freeAgents: [
+                { id: 2, name: 'Claim Target 1', designation: 'ACTIVE' },
+                { id: 3, name: 'Claim Target 2', designation: 'ACTIVE' }
+              ]
+            },
+            seasonState: {
+              waiverOrder: ['CHI', 'GB'],
+              activityLog: []
+            }
+          },
+          {
+            teamAbbr: 'CHI',
+            addPlayerId: 2,
+            dropPlayerId: 10
+          }
+        ),
+        {
+          teamAbbr: 'GB',
+          addPlayerId: 2,
+          dropPlayerId: 11
+        }
+      ),
+      {
+        teamAbbr: 'CHI',
+        addPlayerId: 3,
+        dropPlayerId: 12
+      }
+    ),
+    {
+      teamAbbr: 'GB',
+      addPlayerId: 3,
+      dropPlayerId: 13
+    }
+  );
+  const resolvedRotatingCompetingClaimState = processSimulationWaiverClaims(rotatingCompetingClaimState, { cadence: 'week' });
+
+  assert.equal(
+    resolvedRotatingCompetingClaimState.draftState.rostersByTeam.CHI.some((player) => Number(player.id) === 2),
+    true,
+    'the initial top-priority team should still win the first contested player'
+  );
+  assert.equal(
+    resolvedRotatingCompetingClaimState.draftState.rostersByTeam.GB.some((player) => Number(player.id) === 3),
+    true,
+    'after winning once, the former top-priority team should move back so the next team can win the next contested player'
+  );
+}
+
+const nbaWaiverSnapshotState = {
+  leagueShell: shell,
+  draftState: {
+    rostersByTeam: {
+      LAL: [{ id: 101, name: 'NBA Starter', pos: 'PG', designation: 'ACTIVE' }]
+    },
+    freeAgents: [{ id: 102, name: 'NBA Add', pos: 'SG', designation: 'ACTIVE' }]
+  },
+  seasonState: {
+    activityLog: []
+  }
+};
+
+if (typeof submitSimulationWaiverClaim === 'function') {
+  const submittedNbaClaimState = submitSimulationWaiverClaim(nbaWaiverSnapshotState, {
+    teamAbbr: 'LAL',
+    addPlayerId: 102,
+    dropPlayerId: 101
+  });
+
+  assert.equal(
+    submittedNbaClaimState.seasonState.pendingWaiverClaims[0]?.processOnAdvance,
+    'day',
+    'NBA simulation waiver claims should preserve daily resolution timing'
+  );
+}
+
+if (typeof processSimulationWaiverClaims === 'function' && typeof submitSimulationWaiverClaim === 'function') {
+  const pendingNbaClaimState = submitSimulationWaiverClaim(nbaWaiverSnapshotState, {
+    teamAbbr: 'LAL',
+    addPlayerId: 102,
+    dropPlayerId: 101
+  });
+  const resolvedNbaState = processSimulationWaiverClaims(pendingNbaClaimState, { cadence: 'day' });
+
+  assert.equal(
+    resolvedNbaState.seasonState.pendingWaiverClaims.length,
+    0,
+    'NBA waiver claims should resolve on day-based advances'
+  );
+  assert.equal(
+    resolvedNbaState.draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 102),
+    true,
+    'NBA waiver processing should add the approved player when the daily cadence hits'
+  );
+}
+
 const waivedState = claimSimulationFreeAgent(waiverSnapshotState, {
   teamAbbr: 'GB',
   addPlayerId: 2,
@@ -464,7 +968,11 @@ assert.equal(
   'ACTIVE',
   'successful waiver claims should not reuse dropped roster objects from the prior snapshot'
 );
-assert.deepStrictEqual(waivedState.seasonState.lineupIdsByTeam.GB, []);
+assert.deepStrictEqual(
+  waivedState.seasonState.lineupIdsByTeam.GB,
+  [null, null, null, null, null, null, null, null, null],
+  'successful NFL waiver claims should keep compatibility lineup ids aligned with empty slot placeholders'
+);
 assert.equal(waivedState.seasonState.lineupSlotsByTeam.GB.QB, null);
 
 const tradeSnapshotState = {
@@ -527,10 +1035,91 @@ assert.equal(
   'ACTIVE',
   'successful trades should not reuse outgoing player objects from the prior snapshot'
 );
-assert.deepStrictEqual(tradedState.seasonState.lineupIdsByTeam.GB, []);
+assert.deepStrictEqual(
+  tradedState.seasonState.lineupIdsByTeam.GB,
+  [null, null, null, null, null, null, null, null, null],
+  'successful NFL trades should keep outgoing compatibility lineup ids aligned with empty slot placeholders'
+);
 assert.equal(tradedState.seasonState.lineupSlotsByTeam.GB.QB, null);
-assert.deepStrictEqual(tradedState.seasonState.lineupIdsByTeam.CHI, []);
+assert.deepStrictEqual(
+  tradedState.seasonState.lineupIdsByTeam.CHI,
+  [null, null, null, null, null, null, null, null, null],
+  'successful NFL trades should keep incoming compatibility lineup ids aligned with empty slot placeholders'
+);
 assert.equal(tradedState.seasonState.lineupSlotsByTeam.CHI.QB, null);
+
+assert.equal(
+  typeof activateSimulationPowerup,
+  'function',
+  'simulation runtime should expose activateSimulationPowerup for shared-shell powerup actions'
+);
+
+if (typeof activateSimulationPowerup === 'function') {
+  const activatedPowerupState = activateSimulationPowerup(
+    {
+      seasonState: {
+        currentWeek: 2,
+        powerupsByWeek: {
+          1: {
+            heat_check: {
+              active: true,
+              targetId: 1
+            }
+          }
+        }
+      }
+    },
+    {
+      teamAbbr: 'LAL',
+      powerupId: 'captain_mode',
+      targetId: 23
+    }
+  );
+
+  assert.equal(
+    activatedPowerupState.seasonState.powerupsByWeek[2].captain_mode.active,
+    true,
+    'simulation powerup activation should mark the selected weekly powerup active'
+  );
+  assert.equal(
+    activatedPowerupState.seasonState.powerupsByWeek[2].captain_mode.targetId,
+    23,
+    'simulation powerup activation should persist the chosen target id'
+  );
+}
+
+assert.equal(
+  typeof updateSimulationTeamSettings,
+  'function',
+  'simulation runtime should expose updateSimulationTeamSettings for shared-shell team customization'
+);
+
+if (typeof updateSimulationTeamSettings === 'function') {
+  const updatedTeamState = updateSimulationTeamSettings(
+    {
+      leagueShell: {
+        teams: [
+          { abbr: 'LAL', name: 'Los Angeles Lakers', displayName: 'Los Angeles Lakers' },
+          { abbr: 'BOS', name: 'Boston Celtics', displayName: 'Boston Celtics' }
+        ]
+      },
+      draftState: {
+        controlledTeamAbbr: 'LAL'
+      },
+      teamAvatarUrls: ['', '']
+    },
+    {
+      teamAbbr: 'LAL',
+      name: 'Showtime Legends',
+      avatarUrl: 'https://example.com/showtime.png'
+    }
+  );
+
+  assert.equal(updatedTeamState.leagueShell.teams[0].name, 'Showtime Legends');
+  assert.equal(updatedTeamState.leagueShell.teams[0].displayName, 'Showtime Legends');
+  assert.equal(updatedTeamState.teamAvatarUrls[0], 'https://example.com/showtime.png');
+  assert.equal(updatedTeamState.draftState.controlledTeamName, 'Showtime Legends');
+}
 
 const explicitPruneState = pruneLineupState(
   {
@@ -555,8 +1144,31 @@ const explicitPruneState = pruneLineupState(
   [2]
 );
 
-assert.deepStrictEqual(explicitPruneState.seasonState.lineupIdsByTeam.GB, [1, 3]);
+assert.deepStrictEqual(
+  explicitPruneState.seasonState.lineupIdsByTeam.GB,
+  [1, null, 3, null, null, null, null, null, null],
+  'pruning an nfl lineup should preserve slot alignment instead of compacting later starters left'
+);
 assert.equal(explicitPruneState.seasonState.lineupSlotsByTeam.GB.RB1, null);
+
+const legacyNflPruneState = pruneLineupState(
+  {
+    leagueShell: nflShell,
+    seasonState: {
+      lineupIdsByTeam: {
+        GB: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      }
+    }
+  },
+  'GB',
+  [2, 6]
+);
+
+assert.deepStrictEqual(
+  legacyNflPruneState.seasonState.lineupIdsByTeam.GB,
+  [1, null, 3, 4, 5, null, 7, 8, 9],
+  'legacy NFL prune paths should preserve slot alignment even before lineupSlotsByTeam exists'
+);
 
 const malformedTradeState = applySimulationTrade(
   {

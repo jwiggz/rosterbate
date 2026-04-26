@@ -9,12 +9,15 @@ function read(relativePath) {
 }
 
 const files = {
+  adminLeagues: read('admin-leagues.html'),
   index: read('index.html'),
   historicSeasons: read('historic-seasons.html'),
   historicalCatalog: read('historical-packs/catalog.json'),
   myLeagues: read('my-leagues.html'),
   historicUniverse: read('historic-universe.html'),
+  historicalPackDevRunner: read('historical-pack-dev-runner.js'),
   rosterbateSeason: read('rosterbate-season.html'),
+  simulationSetup: read('rosterbate-simulation-setup.html'),
   simulationLeagueEngine: read('simulation-league-engine.js')
 };
 
@@ -39,6 +42,26 @@ assert.doesNotMatch(
   files.historicalCatalog,
   /real season data/i,
   'historical-packs/catalog.json should not market real-season data in loader-backed catalog copy'
+);
+assert.doesNotMatch(
+  files.index,
+  /Historic Seasons|Browse Historic Seasons|Classic Era Mode|single-player draft board|Solo Reps|No Single Player Leagues Yet|<div class="cta-pane-title">Single Player<\/div>|My Single Player Leagues|personal season manager|solo run left off|Choose one of your solo saves/i,
+  'index.html should not market homepage archive and local-league entry points with older historical or single-player wording'
+);
+assert.doesNotMatch(
+  files.adminLeagues,
+  /<div class="summary-label">Solo<\/div>|Single-player and personal leagues|solo league|No solo leagues|Solo-heavy snapshot|This snapshot leans solo|Type: Solo/i,
+  'admin-leagues.html should not present local leagues with older solo or single-player wording'
+);
+assert.match(
+  files.adminLeagues,
+  /<div class="summary-label">Local<\/div>|Local and personal leagues|local league|No local leagues|Local-heavy snapshot|This snapshot leans local|Type: Local/i,
+  'admin-leagues.html should present non-multiplayer leagues with local league wording'
+);
+assert.match(
+  files.index,
+  /Simulation Archives|Browse Simulation Archives|Simulation Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|local league manager|saved sim run left off|Choose one of your local saves/i,
+  'index.html should frame homepage archive and local-league entry points with simulation-first wording'
 );
 assert.doesNotMatch(
   files.simulationLeagueEngine,
@@ -75,31 +98,106 @@ assert.doesNotMatch(
   /continue your saved historical run/i,
   'my-leagues.html should keep generic shared-season fallback copy'
 );
+assert.doesNotMatch(
+  files.myLeagues,
+  /single-player/i,
+  'my-leagues.html should not present unified local saves as a separate single-player mode'
+);
+assert.doesNotMatch(
+  files.myLeagues,
+  /Solo Leagues|Solo Saves|solo league/i,
+  'my-leagues.html should present local simulation saves with simulation-first local league wording'
+);
 assert.match(
   files.myLeagues,
   /Open the shared season manager and continue your shared season\./,
   'my-leagues.html should keep a neutral shared-season fallback line'
 );
+assert.match(
+  files.myLeagues,
+  /Local Leagues|local simulation league|saved sim leagues/i,
+  'my-leagues.html should describe local saves as simulation-backed local leagues'
+);
 
 assert.match(
   files.historicSeasons,
-  /Historical season stats/,
-  'historic-seasons.html should label coverage as Historical season stats'
+  /Simulation ratings coverage|Simulation Ratings Coverage|simulation-ready ratings/,
+  'historic-seasons.html should describe archive coverage with simulation-first wording'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /RosterBate - Historic Seasons|Loading historical pack browser|Historical mode only works if users trust it|No historical packs/i,
+  'historic-seasons.html should not keep old historical-browser chrome copy once the unified simulation archive replacement is active'
+);
+assert.match(
+  files.historicSeasons,
+  /Simulation Archives|simulation archive browser|Archive mode is no longer a hidden tool|No archive packs/i,
+  'historic-seasons.html should present the archive browser as a simulation archive surface'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
+  /Historical Stat Coverage|players with historical season production|No saved historical universes yet|Historical universe slots are unavailable/i,
+  'historic-seasons.html should not keep older historical-universe fallback wording in archive details and saved-slot surfaces'
+);
+assert.doesNotMatch(
+  files.historicUniverse,
+  /RosterBate - Historical Universe|Saved Historical Universe|saved historical universe|Saved historical run/i,
+  'historic-universe.html should not keep old historical-universe chrome copy once the unified simulation archive replacement is active'
+);
+assert.match(
+  files.historicUniverse,
+  /Simulation Archive|Saved Simulation Archive|saved simulation archive/i,
+  'historic-universe.html should present saved universes as simulation archives'
+);
+assert.doesNotMatch(
+  files.historicUniverse,
+  /This saved run keeps that pack alive|full turn-of-the-century historical universe|real modern historical universe/i,
+  'historic-universe.html should not keep historical-run fallback summaries once the archive surface is simulation-first'
 );
 assert.match(
   files.historicalCatalog,
-  /Historical season stats/,
-  'historical-packs/catalog.json should carry Historical season stats copy for loader-backed runtime'
+  /simulation-ready ratings/i,
+  'historical-packs/catalog.json should carry simulation-first pack summary copy for loader-backed runtime'
+);
+assert.doesNotMatch(
+  files.historicalPackDevRunner,
+  /Historical pack dev runner|Historical pack runner|historical packs and archive flows|selected historical pack|Real pack load failed|local historical season boot/i,
+  'historical-pack-dev-runner.js should not keep older historical-pack-facing chrome copy in localhost tooling'
+);
+assert.match(
+  files.historicalPackDevRunner,
+  /Simulation archive dev runner|Simulation archive runner|simulation archives and pack flows|selected simulation archive pack|Archive pack load failed|local simulation archive boot/i,
+  'historical-pack-dev-runner.js should describe localhost tooling as a simulation archive authoring surface'
 );
 assert.match(
   files.rosterbateSeason,
-  /Historical season stats \+ light authored tuning/,
-  'rosterbate-season.html should describe simulation ratings as Historical season stats plus light authored tuning'
+  /Ratings-driven simulation \+ sport-specific tuning/,
+  'rosterbate-season.html should describe simulation ratings as ratings-driven simulation plus sport-specific tuning'
+);
+assert.doesNotMatch(
+  files.rosterbateSeason,
+  /single-player shell layout|shared single-player team surface|Single Player leagues default you as commissioner|single-player leagues because|same historical player pool you just drafted|historical universe slot save|historical slot\. Booting from runtime storage instead|Loading saved historical universe slot|Requested historical universe slot was not found|In solo leagues, AI teams will review offers automatically/i,
+  'rosterbate-season.html should not present unified simulation leagues with legacy single-player phrasing in visible UI copy'
+);
+assert.match(
+  files.rosterbateSeason,
+  /polished league shell|shared team-management surface|Local leagues default you as commissioner|Unavailable in local leagues|same source-pack player pool you just drafted|simulation archive slot save|simulation archive slot\. Booting from runtime storage instead|Loading saved simulation archive slot|Requested simulation archive slot was not found|In local leagues, AI teams will review offers automatically/i,
+  'rosterbate-season.html should use neutral unified-engine league wording in season-shell copy'
+);
+assert.doesNotMatch(
+  files.simulationSetup,
+  /Single-player simulation|Single player|single-player simulation league/i,
+  'rosterbate-simulation-setup.html should not market the unified setup flow as a separate single-player mode'
+);
+assert.match(
+  files.simulationSetup,
+  /Local simulation league|Local control|local simulation league/i,
+  'rosterbate-simulation-setup.html should present the setup flow as a local simulation league launch'
 );
 assert.match(
   files.simulationLeagueEngine,
-  /Historical season stats \+ light authored tuning/,
-  'simulation-league-engine.js should persist simulation ratings as Historical season stats plus light authored tuning'
+  /Ratings-driven simulation \+ sport-specific tuning/,
+  'simulation-league-engine.js should persist simulation ratings as ratings-driven simulation plus sport-specific tuning'
 );
 
 console.log('remove real season copy audit test passed');

@@ -212,13 +212,13 @@ assert.equal(
 
 assert.deepEqual(
   manifestModes,
-  ['historical_draft', 'single_player_season'],
+  ['historical_draft', 'simulation_season'],
   'fixture manifest should only expose supported historical lanes'
 );
 assert.equal(
   bundle.manifest.defaultEntryMode,
-  'historical_draft',
-  'fixture manifest should default entry mode to historical_draft'
+  'simulation_season',
+  'fixture manifest should default entry mode to simulation_season'
 );
 
 assert.equal(
@@ -244,23 +244,23 @@ assert.equal(
 
 assert.equal(
   slotsApi.getModeLabel('real_season'),
-  'Historic Season',
-  'historical-universe-slots.js should degrade legacy real_season labels to Historic Season'
+  'Sim Season',
+  'historical-universe-slots.js should normalize legacy real_season labels forward to Sim Season'
 );
 assert.equal(
   slotsApi.getModeTone('real_season'),
-  'historical',
-  'historical-universe-slots.js should degrade legacy real_season tone to historical'
+  'simulation',
+  'historical-universe-slots.js should normalize legacy real_season tone forward to simulation'
 );
 assert.equal(
   slotsApi.getModeLabel(''),
-  'Historic Season',
-  'historical-universe-slots.js should treat missing entry modes as neutral historical saves'
+  'Sim Season',
+  'historical-universe-slots.js should treat missing entry modes as simulation-season saves'
 );
 assert.equal(
   slotsApi.getModeTone('mystery_mode'),
-  'historical',
-  'historical-universe-slots.js should treat unknown entry modes as neutral historical saves'
+  'simulation',
+  'historical-universe-slots.js should treat unknown entry modes as simulation-season saves'
 );
 
 assert.doesNotMatch(
@@ -307,13 +307,73 @@ assert.ok(
 );
 assert.equal(
   fallbackLaunchData.historicalEntryMode,
-  'single_player_season',
-  'buildHistoricalSeasonLaunchData should normalize stale dev historical launches to single_player_season at runtime'
+  'simulation_season',
+  'buildHistoricalSeasonLaunchData should normalize stale dev historical launches to simulation_season at runtime'
 );
 assert.equal(
   fallbackLaunchData.draftFormat,
-  'single_player_season',
-  'buildHistoricalSeasonLaunchData should persist single_player_season draft metadata for the neutral historical fallback at runtime'
+  'historical_simulation',
+  'buildHistoricalSeasonLaunchData should persist historical_simulation draft metadata for the neutral historical fallback at runtime'
+);
+assert.equal(
+  fallbackLaunchData.simulationMode,
+  'nba_mixed_era_single_player_v1',
+  'buildHistoricalSeasonLaunchData should stamp the canonical nba simulation mode id for neutral historical fallback launches'
+);
+
+const simulationLaunchData = buildHistoricalSeasonLaunchData(
+  {
+    ...fallbackDevState,
+    pendingBoot: {
+      ...fallbackDevState.pendingBoot,
+      entryMode: 'simulation_season'
+    }
+  },
+  'nba'
+);
+
+assert.equal(
+  simulationLaunchData.simulationMode,
+  'nba_mixed_era_single_player_v1',
+  'buildHistoricalSeasonLaunchData should stamp the canonical nba simulation mode id for new simulation-season launches'
+);
+assert.notEqual(
+  simulationLaunchData.simulationMode,
+  'historical_box_score',
+  'buildHistoricalSeasonLaunchData should stop minting the legacy historical_box_score mode for new simulation launches'
+);
+
+const nflSimulationLaunchData = buildHistoricalSeasonLaunchData(
+  {
+    ...fallbackDevState,
+    importPlan: {
+      ...fallbackDevState.importPlan,
+      canonical: {
+        ...fallbackDevState.importPlan.canonical,
+        seasons: fallbackDevState.importPlan.canonical.seasons.map((season, index) => (
+          index === 0
+            ? { ...season, sport: 'nfl' }
+            : season
+        ))
+      }
+    },
+    pendingBoot: {
+      ...fallbackDevState.pendingBoot,
+      entryMode: 'simulation_season'
+    }
+  },
+  'nfl'
+);
+
+assert.equal(
+  nflSimulationLaunchData.simulationMode,
+  'nfl_mixed_era_single_player_v1',
+  'buildHistoricalSeasonLaunchData should stamp the canonical nfl simulation mode id for new simulation-season launches'
+);
+assert.notEqual(
+  nflSimulationLaunchData.simulationMode,
+  'historical_box_score',
+  'buildHistoricalSeasonLaunchData should stop minting the legacy historical_box_score mode for new nfl simulation launches'
 );
 
 const legacySlotsStorage = createLocalStorage();
@@ -331,8 +391,8 @@ const legacySlotPersist = legacySlotsApi.upsertFromState({
 assert.ok(legacySlotPersist, 'legacy historical saves should still persist to a slot');
 assert.match(
   legacySlotPersist.slotId,
-  /single_player_season|historic/,
-  'legacy/missing entry mode saves should avoid draft-flavored slot ids'
+  /simulation_season|historic/,
+  'legacy/missing entry mode saves should normalize into sim-season flavored slot ids'
 );
 assert.doesNotMatch(
   legacySlotPersist.slotId,
@@ -341,18 +401,18 @@ assert.doesNotMatch(
 );
 assert.equal(
   legacySlotPersist.metadata.historicalEntryMode,
-  'single_player_season',
-  'legacy/missing entry mode saves should normalize to the neutral historical entry mode'
+  'simulation_season',
+  'legacy/missing entry mode saves should normalize forward to simulation_season'
 );
 assert.equal(
   legacySlotPersist.metadata.modeTone,
-  'historical',
-  'legacy/missing entry mode saves should keep the neutral historical tone'
+  'simulation',
+  'legacy/missing entry mode saves should normalize forward to the simulation tone'
 );
 assert.match(
   legacySlotPersist.metadata.title,
-  /Historic Season$/,
-  'legacy/missing entry mode saves should render the neutral Historic Season label'
+  /Sim Season$/,
+  'legacy/missing entry mode saves should render the normalized Sim Season label'
 );
 
 assert.doesNotMatch(

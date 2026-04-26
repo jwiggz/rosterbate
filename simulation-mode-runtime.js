@@ -36,6 +36,34 @@
     return true;
   }
 
+  function readJsonFromStorageArea(storage, key){
+    if (!storage) {
+      return null;
+    }
+    try{
+      const raw = storage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    }catch(error){
+      return null;
+    }
+  }
+
+  function writeJsonToStorageArea(storage, key, value){
+    if (!storage) {
+      return false;
+    }
+    storage.setItem(key, JSON.stringify(value));
+    return true;
+  }
+
+  function clearJsonFromStorageArea(storage, key){
+    if (!storage) {
+      return false;
+    }
+    storage.removeItem(key);
+    return true;
+  }
+
   function normalizeTeamAbbr(teamAbbr){
     return String(teamAbbr || '').trim().toUpperCase();
   }
@@ -111,14 +139,13 @@
   }
 
   function getSimulationLineupIdsFromSlots(shell, lineupSlots){
-    return getSimulationLineupSlotTemplate(shell).reduce((ids, slot) => {
+    return getSimulationLineupSlotTemplate(shell).map((slot) => {
       const value = lineupSlots?.[slot];
       if (value == null || value === '') {
-        return ids;
+        return null;
       }
-      ids.push(Number(value));
-      return ids;
-    }, []);
+      return Number(value);
+    });
   }
 
   function getSimulationTeamRoster(state, teamAbbr){
@@ -399,6 +426,8 @@
         currentWeek: 1,
         scheduleByDay: {},
         completedGameLogs: [],
+        pendingWaiverClaims: [],
+        recentWaiverResults: [],
         standings: leagueShell.teams.map((team, index) => ({
           teamIdx: index,
           teamAbbr: team.abbr,
@@ -416,6 +445,197 @@
         playIn: null,
         bracket: null,
         champion: null
+      }
+    };
+  }
+
+  function buildUnifiedSimulationSeasonState(seed){
+    const source = seed && typeof seed === 'object' ? clone(seed) : {};
+    const sourceTeams = Array.isArray(source?.leagueShell?.teams)
+      ? source.leagueShell.teams
+      : Array.isArray(source?.teams)
+        ? source.teams
+        : [];
+    const sourceStandings = Array.isArray(source?.seasonState?.standings)
+      ? source.seasonState.standings
+      : Array.isArray(source?.standings)
+        ? source.standings
+        : [];
+    const sourceRosters = Array.isArray(source?.allRosters)
+      ? source.allRosters
+      : Array.isArray(source?.rosters)
+        ? source.rosters
+        : [];
+    const teamEntries = sourceTeams.map((team, index) => {
+      const standingRow = sourceStandings[index] || {};
+      const teamName = typeof team === 'string'
+        ? team
+        : String(team?.name || team?.displayName || team?.teamName || team?.abbr || '').trim();
+      const teamAbbr = normalizeTeamAbbr(
+        (typeof team === 'object' ? team?.abbr : '') ||
+        teamName.split(/\s+/).map((part) => part.charAt(0)).join('').slice(0, 3) ||
+        standingRow?.teamAbbr ||
+        `T${index + 1}`
+      );
+      return {
+        abbr: teamAbbr,
+        name: teamName || teamAbbr,
+        conference: typeof team === 'object' ? team?.conference || standingRow?.conference || '' : standingRow?.conference || '',
+        division: typeof team === 'object' ? team?.division || standingRow?.division || '' : standingRow?.division || ''
+      };
+    });
+    const leagueShell = normalizeShell({
+      sport: source?.leagueShell?.sport || source?.sport || 'nba',
+      anchorSeasonLabel: source?.leagueShell?.anchorSeasonLabel || source?.leagueName || '',
+      rosterSize: Number(
+        source?.leagueShell?.rosterSize ||
+        source?.draftState?.rosterSize ||
+        sourceRosters.reduce((maxCount, roster) => Math.max(maxCount, Array.isArray(roster) ? roster.length : 0), 0) ||
+        0
+      ) || 0,
+      teams: teamEntries
+    });
+    const rostersByTeam = Object.fromEntries(teamEntries.map((team, index) => [
+      team.abbr,
+      clone(
+        Array.isArray(source?.draftState?.rostersByTeam?.[team.abbr])
+          ? source.draftState.rostersByTeam[team.abbr]
+          : (Array.isArray(sourceRosters[index]) ? sourceRosters[index] : [])
+      )
+    ]));
+    const starterSlots = getSimulationLineupSlotTemplate(leagueShell);
+    const sourceSeasonState = source?.seasonState && typeof source.seasonState === 'object'
+      ? source.seasonState
+      : {};
+    const sourceLineupIdsByTeam = (
+      sourceSeasonState.lineupIdsByTeam &&
+      typeof sourceSeasonState.lineupIdsByTeam === 'object' &&
+      !Array.isArray(sourceSeasonState.lineupIdsByTeam)
+    ) ? sourceSeasonState.lineupIdsByTeam : {};
+    const sourceLineupSlotsByTeam = (
+      sourceSeasonState.lineupSlotsByTeam &&
+      typeof sourceSeasonState.lineupSlotsByTeam === 'object' &&
+      !Array.isArray(sourceSeasonState.lineupSlotsByTeam)
+    ) ? sourceSeasonState.lineupSlotsByTeam : {};
+    const lineupIdsByTeam = Object.fromEntries(teamEntries.map((team) => {
+      const teamAbbr = team.abbr;
+      const teamRoster = Array.isArray(rostersByTeam[teamAbbr]) ? rostersByTeam[teamAbbr] : [];
+      const existingLineupIds = Array.isArray(sourceLineupIdsByTeam[teamAbbr])
+        ? clone(sourceLineupIdsByTeam[teamAbbr])
+        : null;
+      const existingLineupSlots = sourceLineupSlotsByTeam[teamAbbr];
+      if (existingLineupIds) {
+        if (getSimulationSport(leagueShell) === 'nfl') {
+          const normalizedIds = existingLineupIds
+            .slice(0, starterSlots.length)
+            .map((id) => (id == null || id === '' ? null : Number(id)));
+          while (normalizedIds.length < starterSlots.length) {
+            normalizedIds.push(null);
+          }
+          return [teamAbbr, normalizedIds];
+        }
+        return [teamAbbr, existingLineupIds.map((id) => Number(id)).filter(Number.isFinite)];
+      }
+      if (existingLineupSlots && typeof existingLineupSlots === 'object' && !Array.isArray(existingLineupSlots)) {
+        return [teamAbbr, getSimulationLineupIdsFromSlots(leagueShell, existingLineupSlots)];
+      }
+      const fallbackIds = teamRoster
+        .slice(0, starterSlots.length)
+        .map((player) => Number(player?.id))
+        .filter(Number.isFinite);
+      if (getSimulationSport(leagueShell) === 'nfl') {
+        while (fallbackIds.length < starterSlots.length) {
+          fallbackIds.push(null);
+        }
+      }
+      return [teamAbbr, fallbackIds];
+    }));
+    const lineupSlotsByTeam = getSimulationSport(leagueShell) === 'nfl'
+      ? Object.fromEntries(teamEntries.map((team) => {
+        const teamAbbr = team.abbr;
+        const existingLineupSlots = sourceLineupSlotsByTeam[teamAbbr];
+        if (existingLineupSlots && typeof existingLineupSlots === 'object' && !Array.isArray(existingLineupSlots)) {
+          return [teamAbbr, normalizeSimulationLineupSlots(leagueShell, existingLineupSlots)];
+        }
+        const normalizedIds = Array.isArray(lineupIdsByTeam[teamAbbr]) ? lineupIdsByTeam[teamAbbr] : [];
+        return [teamAbbr, starterSlots.reduce((slots, slot, index) => {
+          const value = normalizedIds[index];
+          slots[slot] = value == null || value === '' ? null : Number(value);
+          return slots;
+        }, {})];
+      }))
+      : undefined;
+    const controlledTeamAbbr = normalizeTeamAbbr(
+      source?.draftState?.controlledTeamAbbr ||
+      source?.controlledTeamAbbr ||
+      teamEntries[0]?.abbr ||
+      ''
+    );
+    const standingsByAbbr = new Map(
+      sourceStandings
+        .filter((row) => normalizeTeamAbbr(row?.teamAbbr))
+        .map((row) => [normalizeTeamAbbr(row?.teamAbbr), row])
+    );
+    const standings = teamEntries.map((team, index) => {
+      const matchedStanding = standingsByAbbr.get(team.abbr);
+      const fallbackStanding = !matchedStanding && sourceStandings.length === teamEntries.length
+        ? sourceStandings[index]
+        : null;
+      const row = matchedStanding || fallbackStanding || {
+        teamIdx: index,
+        teamAbbr: team.abbr,
+        conference: team.conference,
+        division: team.division,
+        w: 0,
+        l: 0,
+        pf: 0,
+        pa: 0
+      };
+      return {
+        teamIdx: Number.isFinite(Number(row?.teamIdx)) ? Number(row.teamIdx) : index,
+        teamAbbr: normalizeTeamAbbr(row?.teamAbbr || team.abbr || ''),
+        conference: row?.conference || team.conference || '',
+        division: row?.division || team.division || '',
+        w: Number(row?.w || 0),
+        l: Number(row?.l || 0),
+        pf: Number(row?.pf || 0),
+        pa: Number(row?.pa || 0)
+      };
+    });
+
+    return {
+      ...source,
+      simulationMode: getSimulationModeId(leagueShell),
+      legacyHistoricalStatMode: false,
+      leagueShell,
+      draftState: {
+        ...(source?.draftState && typeof source.draftState === 'object' ? source.draftState : {}),
+        controlledTeamAbbr,
+        teamCount: teamEntries.length,
+        rosterSize: Number(source?.draftState?.rosterSize || leagueShell.rosterSize || 0),
+        draftPool: clone(source?.draftState?.draftPool || []),
+        freeAgents: clone(source?.draftState?.freeAgents || source?.freeAgents || []),
+        rostersByTeam
+      },
+      seasonState: {
+        ...sourceSeasonState,
+        currentDay: Number(sourceSeasonState?.currentDay || source?.currentDay || 1),
+        currentWeek: Number(sourceSeasonState?.currentWeek || source?.currentWeek || 1),
+        lineupIdsByTeam,
+        ...(lineupSlotsByTeam ? { lineupSlotsByTeam } : {}),
+        scheduleByDay: clone(sourceSeasonState?.scheduleByDay || {}),
+        completedGameLogs: clone(sourceSeasonState?.completedGameLogs || source?.completedGameLogs || []),
+        pendingWaiverClaims: clone(sourceSeasonState?.pendingWaiverClaims || []),
+        recentWaiverResults: clone(sourceSeasonState?.recentWaiverResults || []),
+        standings,
+        activityLog: clone(sourceSeasonState?.activityLog || source?.activityLog || [])
+      },
+      postseasonState: {
+        ...(source?.postseasonState && typeof source.postseasonState === 'object' ? source.postseasonState : {}),
+        phase: source?.postseasonState?.phase || 'regular_season',
+        playIn: clone(source?.postseasonState?.playIn || null),
+        bracket: clone(source?.postseasonState?.bracket || null),
+        champion: clone(source?.postseasonState?.champion || null)
       }
     };
   }
@@ -596,7 +816,17 @@
       seasonState.lineupSlotsByTeam = lineupSlotsByTeam;
     } else {
       const currentLineup = Array.isArray(lineupIdsByTeam[teamAbbr]) ? lineupIdsByTeam[teamAbbr] : [];
-      lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(Number(id)));
+      if (getSimulationSport(next?.leagueShell || next?.shell || {}) === 'nfl') {
+        const slotCount = getSimulationLineupSlotTemplate({ sport: 'nfl' }).length;
+        lineupIdsByTeam[teamAbbr] = currentLineup
+          .slice(0, slotCount)
+          .map((id) => (removedIds.has(Number(id)) ? null : id == null || id === '' ? null : Number(id)));
+        while (lineupIdsByTeam[teamAbbr].length < slotCount) {
+          lineupIdsByTeam[teamAbbr].push(null);
+        }
+      } else {
+        lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(Number(id)));
+      }
     }
 
     seasonState.lineupIdsByTeam = lineupIdsByTeam;
@@ -608,36 +838,207 @@
     return pruneLineupState(next, teamAbbr, removedPlayerIds);
   }
 
-  function claimSimulationFreeAgent(state, move){
+  function getSimulationWaiverCadence(state){
+    return getSimulationSport(state?.leagueShell || state?.shell || state || {}) === 'nfl'
+      ? 'week'
+      : 'day';
+  }
+
+  function getSimulationWaiverOrder(state){
+    const explicitOrder = Array.isArray(state?.seasonState?.waiverOrder)
+      ? Array.from(new Set(state.seasonState.waiverOrder.map((teamAbbr) => normalizeTeamAbbr(teamAbbr)).filter(Boolean)))
+      : [];
+    const shellOrder = Array.isArray(state?.leagueShell?.teams)
+      ? state.leagueShell.teams.map((team) => normalizeTeamAbbr(team?.abbr)).filter(Boolean)
+      : [];
+    if (!explicitOrder.length) {
+      return shellOrder;
+    }
+    const combinedOrder = explicitOrder.slice();
+    shellOrder.forEach((teamAbbr) => {
+      if (teamAbbr && !combinedOrder.includes(teamAbbr)) {
+        combinedOrder.push(teamAbbr);
+      }
+    });
+    return combinedOrder;
+  }
+
+  function ensureSimulationWaiverState(next){
+    next.draftState = next.draftState || {};
+    next.draftState.rostersByTeam = next.draftState.rostersByTeam || {};
+    next.draftState.freeAgents = Array.isArray(next.draftState.freeAgents) ? next.draftState.freeAgents : [];
+    next.seasonState = next.seasonState || {};
+    next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
+    next.seasonState.pendingWaiverClaims = Array.isArray(next.seasonState.pendingWaiverClaims)
+      ? next.seasonState.pendingWaiverClaims
+      : [];
+    next.seasonState.recentWaiverResults = Array.isArray(next.seasonState.recentWaiverResults)
+      ? next.seasonState.recentWaiverResults
+      : [];
+    return next;
+  }
+
+  function applySimulationWaiverMove(next, move){
     const teamAbbr = normalizeTeamAbbr(move?.teamAbbr);
     const addId = Number(move?.addPlayerId);
     const dropId = Number(move?.dropPlayerId);
 
-    const draftState = state?.draftState || {};
+    const draftState = next?.draftState || {};
     const roster = Array.isArray(draftState.rostersByTeam?.[teamAbbr]) ? draftState.rostersByTeam[teamAbbr] : [];
     const freeAgents = Array.isArray(draftState.freeAgents) ? draftState.freeAgents : [];
     const addPlayer = freeAgents.find((player) => Number(player.id) === addId);
     const droppedPlayer = roster.find((player) => Number(player.id) === dropId);
 
     if (!addPlayer || !droppedPlayer) {
-      return clone(state);
+      return { approved: false, addPlayer: null, droppedPlayer: null };
     }
 
-    const next = clone(state);
-    next.draftState = next.draftState || {};
-    next.draftState.rostersByTeam = next.draftState.rostersByTeam || {};
-    next.draftState.freeAgents = Array.isArray(next.draftState.freeAgents) ? next.draftState.freeAgents : [];
-    next.seasonState = next.seasonState || {};
-    next.seasonState.activityLog = Array.isArray(next.seasonState.activityLog) ? next.seasonState.activityLog : [];
-
-    const nextRoster = Array.isArray(next.draftState.rostersByTeam[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
-    next.draftState.rostersByTeam[teamAbbr] = nextRoster.filter((player) => Number(player.id) !== dropId).concat(clone(addPlayer));
-    next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player.id) !== addId).concat(clone(droppedPlayer));
+    next.draftState.rostersByTeam[teamAbbr] = roster
+      .filter((player) => Number(player.id) !== dropId)
+      .concat(clone(addPlayer));
+    next.draftState.freeAgents = freeAgents
+      .filter((player) => Number(player.id) !== addId)
+      .concat(clone(droppedPlayer));
     pruneLineupState(next, teamAbbr, [dropId]);
+    return {
+      approved: true,
+      addPlayer: clone(addPlayer),
+      droppedPlayer: clone(droppedPlayer)
+    };
+  }
+
+  function buildSimulationWaiverClaim(state, payload){
+    const teamAbbr = normalizeTeamAbbr(payload?.teamAbbr);
+    const addPlayerId = Number(payload?.addPlayerId);
+    const dropPlayerId = Number(payload?.dropPlayerId);
+    return {
+      claimId: String(payload?.claimId || `waiver_${teamAbbr || 'team'}_${addPlayerId}_${dropPlayerId}_${Date.now()}`),
+      teamAbbr,
+      addPlayerId,
+      dropPlayerId,
+      processOnAdvance: getSimulationWaiverCadence(state),
+      status: 'pending',
+      submittedAt: Date.now()
+    };
+  }
+
+  function submitSimulationWaiverClaim(state, payload){
+    const next = ensureSimulationWaiverState(clone(state));
+    const claim = buildSimulationWaiverClaim(state, payload);
+    const roster = Array.isArray(next.draftState.rostersByTeam?.[claim.teamAbbr]) ? next.draftState.rostersByTeam[claim.teamAbbr] : [];
+    const addPlayer = next.draftState.freeAgents.find((player) => Number(player.id) === claim.addPlayerId);
+    const droppedPlayer = roster.find((player) => Number(player.id) === claim.dropPlayerId);
+
+    if (!claim.teamAbbr || !addPlayer || !droppedPlayer) {
+      return next;
+    }
+
+    next.seasonState.pendingWaiverClaims = next.seasonState.pendingWaiverClaims.concat(claim);
+    next.seasonState.activityLog.unshift({
+      type: 'waiver_claim_submitted',
+      teamAbbr: claim.teamAbbr,
+      title: `${claim.teamAbbr} submitted a waiver claim`,
+      ts: Date.now()
+    });
+    return next;
+  }
+
+  function cancelSimulationWaiverClaim(state, payload){
+    const next = ensureSimulationWaiverState(clone(state));
+    const claimId = String(payload?.claimId || '').trim();
+    if (!claimId) {
+      return next;
+    }
+    const removedClaim = next.seasonState.pendingWaiverClaims.find((claim) => String(claim?.claimId || '') === claimId);
+    next.seasonState.pendingWaiverClaims = next.seasonState.pendingWaiverClaims.filter((claim) => String(claim?.claimId || '') !== claimId);
+    if (removedClaim) {
+      next.seasonState.activityLog.unshift({
+        type: 'waiver_claim_cancelled',
+        teamAbbr: removedClaim.teamAbbr,
+        title: `${removedClaim.teamAbbr} cancelled a waiver claim`,
+        ts: Date.now()
+      });
+    }
+    return next;
+  }
+
+  function processSimulationWaiverClaims(state, payload){
+    const next = ensureSimulationWaiverState(clone(state));
+    const cadence = String(payload?.cadence || '').trim().toLowerCase();
+    if (!cadence) {
+      return next;
+    }
+
+    const waiverOrder = getSimulationWaiverOrder(next);
+    const remainingClaims = [];
+    const pendingClaims = next.seasonState.pendingWaiverClaims.slice();
+    const pickNextClaimIndex = (claims) => {
+      let bestIndex = -1;
+      let bestPriority = Number.MAX_SAFE_INTEGER;
+      let bestSubmittedAt = Number.MAX_SAFE_INTEGER;
+      claims.forEach((claim, index) => {
+        const teamPriority = waiverOrder.indexOf(normalizeTeamAbbr(claim?.teamAbbr));
+        const normalizedPriority = teamPriority >= 0 ? teamPriority : Number.MAX_SAFE_INTEGER;
+        const submittedAt = Number(claim?.submittedAt || 0);
+        if (
+          normalizedPriority < bestPriority ||
+          (normalizedPriority === bestPriority && submittedAt < bestSubmittedAt)
+        ) {
+          bestIndex = index;
+          bestPriority = normalizedPriority;
+          bestSubmittedAt = submittedAt;
+        }
+      });
+      return bestIndex;
+    };
+
+    while (pendingClaims.length) {
+      const nextIndex = pickNextClaimIndex(pendingClaims);
+      const claim = nextIndex >= 0 ? pendingClaims.splice(nextIndex, 1)[0] : pendingClaims.shift();
+      const processOnAdvance = String(claim?.processOnAdvance || '').trim().toLowerCase();
+      if (processOnAdvance !== cadence || String(claim?.status || 'pending').trim().toLowerCase() !== 'pending') {
+        remainingClaims.push(claim);
+        continue;
+      }
+
+      const resolution = applySimulationWaiverMove(next, claim);
+      const result = {
+        ...claim,
+        status: resolution.approved ? 'approved' : 'failed',
+        processedAt: Date.now()
+      };
+      next.seasonState.recentWaiverResults.unshift(result);
+      if (resolution.approved) {
+        const winnerIndex = waiverOrder.indexOf(normalizeTeamAbbr(claim?.teamAbbr));
+        if (winnerIndex >= 0) {
+          const [winner] = waiverOrder.splice(winnerIndex, 1);
+          waiverOrder.push(winner);
+        }
+        next.seasonState.activityLog.unshift({
+          type: 'waiver',
+          teamAbbr: claim.teamAbbr,
+          title: `${claim.teamAbbr} added ${resolution.addPlayer?.name || 'player'}`,
+          ts: Date.now()
+        });
+      }
+    }
+
+    next.seasonState.pendingWaiverClaims = remainingClaims;
+    next.seasonState.waiverOrder = waiverOrder;
+    return next;
+  }
+
+  function claimSimulationFreeAgent(state, move){
+    const next = ensureSimulationWaiverState(clone(state));
+    const teamAbbr = normalizeTeamAbbr(move?.teamAbbr);
+    const resolution = applySimulationWaiverMove(next, move);
+    if (!resolution.approved) {
+      return next;
+    }
     next.seasonState.activityLog.unshift({
       type: 'waiver',
       teamAbbr,
-      title: `${teamAbbr} added ${addPlayer?.name || 'player'}`,
+      title: `${teamAbbr} added ${resolution.addPlayer?.name || 'player'}`,
       ts: Date.now()
     });
     return next;
@@ -688,6 +1089,80 @@
     return next;
   }
 
+  function activateSimulationPowerup(state, payload){
+    const next = clone(state);
+    const powerupId = String(payload?.powerupId || '').trim();
+    if (!powerupId) {
+      return next;
+    }
+    next.seasonState = next.seasonState || {};
+    const currentWeek = Math.max(1, Number(next.seasonState.currentWeek || 1));
+    const teamAbbr = normalizeTeamAbbr(payload?.teamAbbr);
+    const existingPowerupsByWeek = (
+      next.seasonState.powerupsByWeek &&
+      typeof next.seasonState.powerupsByWeek === 'object' &&
+      !Array.isArray(next.seasonState.powerupsByWeek)
+    ) ? next.seasonState.powerupsByWeek : {};
+    const currentWeekPowerups = (
+      existingPowerupsByWeek[currentWeek] &&
+      typeof existingPowerupsByWeek[currentWeek] === 'object' &&
+      !Array.isArray(existingPowerupsByWeek[currentWeek])
+    ) ? existingPowerupsByWeek[currentWeek] : {};
+
+    next.seasonState.powerupsByWeek = {
+      ...existingPowerupsByWeek,
+      [currentWeek]: {
+        ...currentWeekPowerups,
+        [powerupId]: {
+          ...(currentWeekPowerups[powerupId] || {}),
+          active: true,
+          powerupId,
+          teamAbbr: teamAbbr || null,
+          targetId: payload?.targetId == null || payload?.targetId === ''
+            ? null
+            : Number(payload.targetId)
+        }
+      }
+    };
+    return next;
+  }
+
+  function updateSimulationTeamSettings(state, payload){
+    const next = clone(state);
+    const teamAbbr = normalizeTeamAbbr(payload?.teamAbbr || next?.draftState?.controlledTeamAbbr);
+    if (!teamAbbr) {
+      return next;
+    }
+    const nextName = String(payload?.name || '').trim();
+    const nextAvatarUrl = String(payload?.avatarUrl || '').trim();
+    const teams = Array.isArray(next?.leagueShell?.teams) ? next.leagueShell.teams : [];
+    const teamIndex = teams.findIndex((team) => normalizeTeamAbbr(team?.abbr) === teamAbbr);
+    if (teamIndex < 0) {
+      return next;
+    }
+    const team = teams[teamIndex] || {};
+    if (nextName) {
+      next.leagueShell.teams[teamIndex] = {
+        ...team,
+        name: nextName,
+        displayName: nextName
+      };
+    }
+    const avatarStore = (
+      next.teamAvatarUrls &&
+      typeof next.teamAvatarUrls === 'object'
+    ) ? clone(next.teamAvatarUrls) : (Array.isArray(teams) ? Array(teams.length).fill('') : {});
+    avatarStore[teamIndex] = nextAvatarUrl;
+    next.teamAvatarUrls = avatarStore;
+    if (next.draftState && typeof next.draftState === 'object') {
+      next.draftState = {
+        ...next.draftState,
+        controlledTeamName: nextName || next.draftState.controlledTeamName || team.name || team.displayName || teamAbbr
+      };
+    }
+    return next;
+  }
+
   function applySimulationInjuryDesignations(state, injuries){
     const next = clone(state);
     next.draftState = next.draftState || {};
@@ -703,15 +1178,24 @@
   }
 
   function readCompletedSimulationState(){
-    return readJsonStorage(COMPLETED_DRAFT_KEY);
+    return readJsonFromStorageArea(root && root.sessionStorage, COMPLETED_DRAFT_KEY)
+      ?? readJsonStorage(COMPLETED_DRAFT_KEY);
   }
 
   function writeCompletedSimulationState(state){
+    if (writeJsonToStorageArea(root && root.sessionStorage, COMPLETED_DRAFT_KEY, state)) {
+      try{
+        clearJsonFromStorageArea(root && root.localStorage, COMPLETED_DRAFT_KEY);
+      }catch(error){}
+      return state;
+    }
     return writeJsonStorage(COMPLETED_DRAFT_KEY, state);
   }
 
   function clearCompletedSimulationState(){
-    return clearJsonStorage(COMPLETED_DRAFT_KEY);
+    const clearedSession = clearJsonFromStorageArea(root && root.sessionStorage, COMPLETED_DRAFT_KEY);
+    const clearedLocal = clearJsonStorage(COMPLETED_DRAFT_KEY);
+    return clearedSession || clearedLocal;
   }
 
   const api = {
@@ -733,11 +1217,18 @@
     getFootballCoverageBonus,
     buildSimulationPlayerPool,
     buildSimulationUniverseBootstrap,
+    buildUnifiedSimulationSeasonState,
     buildCompletedSimulationAutoDraftState,
     setSimulationLineup,
     pruneLineupState,
+    getSimulationWaiverCadence,
     claimSimulationFreeAgent,
+    submitSimulationWaiverClaim,
+    cancelSimulationWaiverClaim,
+    processSimulationWaiverClaims,
     applySimulationTrade,
+    activateSimulationPowerup,
+    updateSimulationTeamSettings,
     applySimulationInjuryDesignations
   };
 

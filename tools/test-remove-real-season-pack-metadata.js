@@ -46,26 +46,26 @@ const prohibitedHistoricalMarketingPatterns = [
 const manifestExpectations = {
   'historical-packs/nba_1987_full_season_v1/manifest.json': [
     'historical_draft',
-    'single_player_season',
+    'simulation_season',
     'reimagined_season'
   ],
   'historical-packs/nba_1993_full_season_v1/manifest.json': [
     'historical_draft',
-    'single_player_season',
+    'simulation_season',
     'reimagined_season'
   ],
   'historical-packs/nba_1996_full_season_v1/manifest.json': [
     'historical_draft',
-    'single_player_season'
+    'simulation_season'
   ],
   'historical-packs/nba_2001_full_season_v1/manifest.json': [
     'historical_draft',
-    'single_player_season',
+    'simulation_season',
     'reimagined_season'
   ],
   'historical-packs/nba_2016_full_season_v1/manifest.json': [
     'historical_draft',
-    'single_player_season',
+    'simulation_season',
     'reimagined_season'
   ]
 };
@@ -213,8 +213,8 @@ for (const relativePath of [
 for (const relativePath of filesRequiringHistoricalStatsLabel) {
   assert.match(
     read(relativePath),
-    /Historical season stats/,
-    `${relativePath} should label stat coverage as Historical season stats`
+    /Simulation ratings coverage|simulation-ready ratings/,
+    `${relativePath} should label stat coverage with simulation-first wording`
   );
   assert.doesNotMatch(
     read(relativePath),
@@ -233,13 +233,13 @@ for (const [relativePath, expectedModes] of Object.entries(manifestExpectations)
   );
   assert.equal(
     manifest.defaultEntryMode,
-    'single_player_season',
-    `${relativePath} should default to single_player_season`
+    'simulation_season',
+    `${relativePath} should default to simulation_season`
   );
   assert.equal(
     manifest.auditSummary.realStatCoverage.label,
-    'Historical season stats',
-    `${relativePath} should use Historical season stats in auditSummary.realStatCoverage.label`
+    'Simulation ratings coverage',
+    `${relativePath} should use Simulation ratings coverage in auditSummary.realStatCoverage.label`
   );
   assert.equal(
     manifest.status,
@@ -273,7 +273,7 @@ for (const packId of expandedOptionalContractPackIds) {
   );
   assert.deepEqual(
     (presentation.entryModes || []).map((entry) => entry.mode),
-    ['single_player_season', 'historical_draft', 'reimagined_season'],
+    ['simulation_season', 'historical_draft', 'reimagined_season'],
     `${presentationPath} should expose the current entry mode contract`
   );
 
@@ -293,13 +293,13 @@ for (const packId of expandedOptionalContractPackIds) {
   );
   assert.deepEqual(
     (summaries.modeSummaries || []).map((entry) => entry.mode),
-    ['single_player_season', 'historical_draft', 'reimagined_season'],
+    ['simulation_season', 'historical_draft', 'reimagined_season'],
     `${summariesPath} should expose modeSummaries for each supported mode`
   );
   assert.equal(
     summaries.auditSummary?.realStatCoverage?.label,
-    'Historical season stats',
-    `${summariesPath} should expose auditSummary.realStatCoverage.label`
+    'Simulation ratings coverage',
+    `${summariesPath} should expose simulation-first auditSummary.realStatCoverage.label`
   );
 
   const packChallengesPath = `historical-packs/${packId}/optional/pack_challenges.json`;
@@ -378,9 +378,9 @@ for (const relativePath of [
     `${relativePath} heroSubtitle should use neutral historical wording`
   );
   assert.equal(
-    entryModes.some((entry) => entry.mode === 'single_player_season' && /historic/i.test(entry.label)),
+    entryModes.some((entry) => entry.mode === 'simulation_season' && /sim/i.test(entry.label)),
     true,
-    `${relativePath} should expose single_player_season with a Historic Season label`
+    `${relativePath} should expose simulation_season with a Sim Season label`
   );
   assert.equal(
     entryModes.some((entry) => entry.mode === 'real_season'),
@@ -400,9 +400,9 @@ for (const relativePath of [
   const modeSummaries = summaries.modeSummaries || [];
 
   assert.equal(
-    modeSummaries.some((entry) => entry.mode === 'single_player_season'),
+    modeSummaries.some((entry) => entry.mode === 'simulation_season'),
     true,
-    `${relativePath} should include a single_player_season summary`
+    `${relativePath} should include a simulation_season summary`
   );
   assert.equal(
     modeSummaries.some((entry) => entry.mode === 'real_season'),
@@ -411,7 +411,7 @@ for (const relativePath of [
   );
   assert.equal(
     summaries.auditSummary.realStatCoverage.label,
-    'Historical season stats',
+    'Simulation ratings coverage',
     `${relativePath} should rename auditSummary.realStatCoverage.label`
   );
 }

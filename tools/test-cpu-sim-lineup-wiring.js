@@ -48,7 +48,7 @@ const getCpuTeamSimPersonalitySource = extractFunctionSource(
 );
 const startHistoricalDraftSimSeasonSource = extractFunctionSource(
   'startHistoricalDraftSimSeason()',
-  'runHistoricalSimulationDay(day)'
+  'getSimulationStarterIdsForTeamDay(teamIdx, day)'
 );
 const buildCpuManagedStarterIdsForDaySource = extractFunctionSource(
   'buildCpuManagedStarterIdsForDay(teamIdx, roster, day)',
@@ -78,6 +78,15 @@ const context = {
       buildCpuSimLineupIds(options) {
         calls.push(options);
         return ['cpu'];
+      }
+    },
+    RosterBateSimulationSeasonAdapter: {
+      createSimulationSeasonAdapter() {
+        return {
+          getState() {
+            return {};
+          }
+        };
       }
     }
   },
@@ -126,13 +135,50 @@ const context = {
   getHistoricalUniverseSourcePackIds() {
     return ['source-pack'];
   },
-  persistHistoricalUniverseSlotSnapshot() {},
+  persistHistoricalUniverseSlotSnapshot() {
+    return { slotId: 'slot-1' };
+  },
   localStorage: {
     setItem() {}
   },
   toast() {},
+  ACTIVE_SEASON_MODE: 'fantasy',
+  SEASON_MODE_ADAPTER: null,
   renderHub() {},
+  initSeasonCalls: 0,
+  applyRequestedSeasonViewCalls: 0,
+  initSeason() {
+    context.initSeasonCalls += 1;
+  },
+  applyRequestedSeasonView() {
+    context.applyRequestedSeasonViewCalls += 1;
+  },
   scheduleRosterRender() {},
+  buildUnifiedSimulationBootState(state, slotId, sport) {
+    return {
+      ...state,
+      sport,
+      historicalUniverseSlotId: slotId,
+      draftState: { controlledTeamAbbr: 'USER' },
+      seasonState: { currentDay: 1, currentWeek: 1, standings: [] },
+      postseasonState: { phase: 'regular_season' }
+    };
+  },
+  buildSimulationSeasonAdapterFromState(slotId, state) {
+    return {
+      slotId,
+      getState() {
+        return state;
+      }
+    };
+  },
+  normalizeSharedSimulationSeasonBootState(state, slotId) {
+    return {
+      ...state,
+      historicalUniverseSlotId: slotId,
+      normalizedByTest: true
+    };
+  },
   document: {
     getElementById() {
       return { classList: { contains() { return false; } } };
@@ -211,6 +257,16 @@ calls.length = 0;
 context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);
 assert.equal(calls[0].personality, 'balanced');
 
+context.D = {
+  activeSeasonBackend: 'simulation',
+  historicalEntryMode: 'historical_draft',
+  cpuTeamPersonalitiesByTeam: ['balanced']
+};
+calls.length = 0;
+context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);
+assert.equal(calls.length, 1);
+assert.equal(calls[0].personality, 'balanced', 'cpu-managed starter selection should honor unified simulation backends even when legacy historicalEntryMode flags are absent');
+
 personalityBuilds.length = 0;
 context.D = {
   historicalEntryMode: 'historical_draft',
@@ -229,8 +285,33 @@ context.window.RosterBateSimulationEngine = {
     state.allRosters = [[{ id: 'post' }], [{ id: 'post-cpu' }]];
   }
 };
+context.D.processed = ['legacy-processed-flag'];
+context.D.dayResults = { 3: { stale: true } };
+context.D.revealedDays = { 3: true };
+context.D.settledWeeks = { 1: true };
+context.D.dailyRevealReports = { 3: { headline: 'stale report' } };
+context.D.simulationLogsByDay = { 3: { engineVersion: 'legacy-shell' } };
+context.D.lastRevealedDay = 3;
 assert.equal(context.startHistoricalDraftSimSeason(), true);
 assert.equal(context.D.historicalEntryMode, 'simulation_season');
+assert.equal(
+  context.D.simulationMode,
+  'nba_mixed_era_single_player_v1',
+  'draft-to-sim conversion should stamp the canonical simulation mode id for new seasons'
+);
+assert.equal(context.D.activeSeasonBackend, 'simulation', 'draft-to-sim conversion should flip the season onto the simulation backend immediately');
+assert.equal(context.ACTIVE_SEASON_MODE, 'fantasy', 'draft-to-sim conversion should keep the polished fantasy presentation shell');
+assert.ok(context.SEASON_MODE_ADAPTER, 'draft-to-sim conversion should attach a simulation adapter in the same session');
+assert.equal(context.D.historicalUniverseSlotId, 'slot-1', 'draft-to-sim conversion should retain the assigned slot id when rebuilding simulation state');
+assert.equal(JSON.stringify(context.D.processed), JSON.stringify([]), 'draft-to-sim conversion should clear stale processed markers when switching to the unified backend');
+assert.equal(JSON.stringify(context.D.dayResults), JSON.stringify({}), 'draft-to-sim conversion should clear stale reveal-day caches when switching to the unified backend');
+assert.equal(JSON.stringify(context.D.revealedDays), JSON.stringify({}), 'draft-to-sim conversion should clear stale revealed-day markers when switching to the unified backend');
+assert.equal(JSON.stringify(context.D.settledWeeks), JSON.stringify({}), 'draft-to-sim conversion should clear stale settled-week caches when switching to the unified backend');
+assert.equal(JSON.stringify(context.D.dailyRevealReports), JSON.stringify({}), 'draft-to-sim conversion should clear stale reveal reports when switching to the unified backend');
+assert.equal(JSON.stringify(context.D.simulationLogsByDay), JSON.stringify({}), 'draft-to-sim conversion should clear stale simulation day logs when switching to the unified backend');
+assert.equal(context.D.lastRevealedDay, 0, 'draft-to-sim conversion should reset stale last-revealed bookkeeping when switching to the unified backend');
+assert.equal(context.initSeasonCalls, 1, 'draft-to-sim conversion should reinitialize the season shell after attaching the simulation backend');
+assert.equal(context.applyRequestedSeasonViewCalls, 1, 'draft-to-sim conversion should restore the active season view after the backend swap');
 assert.equal(personalityBuilds.length, 1);
 assert.equal(
   JSON.stringify(personalityBuilds[0]),
@@ -242,6 +323,7 @@ assert.equal(
   JSON.stringify(['balanced', 'guards_bias'])
 );
 
+context.D.activeSeasonBackend = null;
 context.isHistoricalSimulationUniverse = () => false;
 const fallbackResult = context.buildCpuManagedStarterIdsForDay(0, context.G.rosters[0], 4);
 assert.deepStrictEqual(fallbackResult, ['fallback']);

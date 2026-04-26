@@ -14,12 +14,12 @@
   "sourceProfile": "historical_curated",
   "supportedModes": [
     "historical_draft",
-    "single_player_season",
+    "simulation_season",
     "reimagined_season"
   ],
-  "defaultEntryMode": "single_player_season",
+  "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_2001_lal",
-  "subtitle": "Start a historic season, redraft the era, or branch into a turn-of-the-century alternate universe.",
+  "subtitle": "Start a sim season from the historical foundation, redraft the era, or branch into a turn-of-the-century alternate universe.",
   "description": "A 2000-01 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
   "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
   "eraTags": [
@@ -62,7 +62,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 441,
       "playerCount": 441,
-      "label": "Historical season stats"
+      "label": "Simulation ratings coverage"
     },
     "zeroGamePlayers": {
       "count": 0,

@@ -4,8 +4,8 @@
   "challengeGroups": [
     {
       "groupId": "historic_season_paths",
-      "label": "Historic Season Paths",
-      "mode": "single_player_season"
+      "label": "Sim Season Paths",
+      "mode": "simulation_season"
     },
     {
       "groupId": "draft_the_era_paths",
@@ -21,7 +21,7 @@
   "challenges": [
     {
       "challengeId": "warriors_73_wins",
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "path": "warriors_featured_path",
       "title": "Match 73 Wins",
       "description": "Finish the season with at least 73 wins.",
@@ -34,7 +34,7 @@
     },
     {
       "challengeId": "open_team_50_wins",
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "path": "open_team_path",
       "title": "Modern Contender",
       "description": "Choose any included team and finish with at least 50 wins.",

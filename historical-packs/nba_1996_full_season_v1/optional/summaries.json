@@ -29,7 +29,7 @@
   ],
   "modeSummaries": [
     {
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "summary": "Choose one franchise and guide it through the full 1995-96 historical season."
     },
     {
@@ -41,7 +41,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 435,
       "playerCount": 436,
-      "label": "Historical season stats"
+      "label": "Simulation ratings coverage"
     },
     "zeroGamePlayers": {
       "count": 1,

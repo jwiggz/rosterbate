@@ -1,6 +1,10 @@
 const assert = require('node:assert/strict');
 
 const { createSimulationSeasonAdapter } = require('../simulation-season-adapter.js');
+const {
+  submitSimulationWaiverClaim,
+  processSimulationWaiverClaims
+} = require('../simulation-mode-runtime.js');
 
 function buildNflWeeklyRoster(team, startId, qbName) {
   return [
@@ -79,6 +83,173 @@ const adapter = createSimulationSeasonAdapter({
     postseasonState: { phase: 'regular_season' }
   }
 });
+
+const nflWaiverState = {
+  leagueShell: {
+    sport: 'nfl',
+    teams: [
+      { abbr: 'DAL', name: 'Dallas Cowboys' },
+      { abbr: 'SF', name: 'San Francisco 49ers' }
+    ]
+  },
+  draftState: {
+    rostersByTeam: {
+      DAL: dalRoster,
+      SF: sfRoster
+    },
+    freeAgents: [
+      { id: 999, name: 'Bench Upgrade', pos: 'WR', team: 'FA', fp: 11 }
+    ]
+  },
+  seasonState: {
+    activityLog: []
+  }
+};
+
+const pendingWeeklyWaiverState = submitSimulationWaiverClaim(nflWaiverState, {
+  teamAbbr: 'DAL',
+  addPlayerId: 999,
+  dropPlayerId: 106
+});
+
+assert.equal(
+  pendingWeeklyWaiverState.seasonState.pendingWaiverClaims[0]?.processOnAdvance,
+  'week',
+  'nfl waiver claims should keep weekly resolution timing in runtime state'
+);
+
+const unresolvedWeeklyWaiverState = processSimulationWaiverClaims(pendingWeeklyWaiverState, {
+  cadence: 'day'
+});
+assert.equal(
+  unresolvedWeeklyWaiverState.seasonState.pendingWaiverClaims.length,
+  1,
+  'nfl waiver claims should stay pending until a weekly advance occurs'
+);
+
+const resolvedWeeklyWaiverState = processSimulationWaiverClaims(pendingWeeklyWaiverState, {
+  cadence: 'week'
+});
+assert.equal(
+  resolvedWeeklyWaiverState.seasonState.pendingWaiverClaims.length,
+  0,
+  'nfl waiver claims should resolve when the sim advances by week'
+);
+
+const competingWeeklyWaiverState = submitSimulationWaiverClaim(
+  submitSimulationWaiverClaim(
+    {
+      leagueShell: {
+        sport: 'nfl',
+        teams: [
+          { abbr: 'DAL', name: 'Dallas Cowboys' },
+          { abbr: 'SF', name: 'San Francisco 49ers' }
+        ]
+      },
+      draftState: {
+        rostersByTeam: {
+          DAL: dalRoster,
+          SF: sfRoster
+        },
+        freeAgents: [
+          { id: 999, name: 'Bench Upgrade', pos: 'WR', team: 'FA', fp: 11 }
+        ]
+      },
+      seasonState: {
+        waiverOrder: ['DAL', 'SF'],
+        activityLog: []
+      }
+    },
+    {
+      teamAbbr: 'SF',
+      addPlayerId: 999,
+      dropPlayerId: 206
+    }
+  ),
+  {
+    teamAbbr: 'DAL',
+    addPlayerId: 999,
+    dropPlayerId: 106
+  }
+);
+const resolvedCompetingWeeklyWaiverState = processSimulationWaiverClaims(competingWeeklyWaiverState, {
+  cadence: 'week'
+});
+assert.equal(
+  resolvedCompetingWeeklyWaiverState.draftState.rostersByTeam.DAL.some((player) => Number(player.id) === 999),
+  true,
+  'nfl weekly waiver processing should respect waiver priority when teams compete for the same player'
+);
+assert.equal(
+  resolvedCompetingWeeklyWaiverState.draftState.rostersByTeam.SF.some((player) => Number(player.id) === 999),
+  false,
+  'nfl weekly waiver processing should keep lower-priority teams from winning the same player'
+);
+
+const rotatingWeeklyWaiverState = submitSimulationWaiverClaim(
+  submitSimulationWaiverClaim(
+    submitSimulationWaiverClaim(
+      submitSimulationWaiverClaim(
+        {
+          leagueShell: {
+            sport: 'nfl',
+            teams: [
+              { abbr: 'DAL', name: 'Dallas Cowboys' },
+              { abbr: 'SF', name: 'San Francisco 49ers' }
+            ]
+          },
+          draftState: {
+            rostersByTeam: {
+              DAL: dalRoster.concat([{ id: 150, name: 'Dallas Depth', pos: 'WR', team: 'DAL', fp: 8 }]),
+              SF: sfRoster.concat([{ id: 250, name: 'San Francisco Depth', pos: 'WR', team: 'SF', fp: 8 }])
+            },
+            freeAgents: [
+              { id: 999, name: 'Bench Upgrade', pos: 'WR', team: 'FA', fp: 11 },
+              { id: 1000, name: 'Second Upgrade', pos: 'RB', team: 'FA', fp: 10 }
+            ]
+          },
+          seasonState: {
+            waiverOrder: ['DAL', 'SF'],
+            activityLog: []
+          }
+        },
+        {
+          teamAbbr: 'DAL',
+          addPlayerId: 999,
+          dropPlayerId: 106
+        }
+      ),
+      {
+        teamAbbr: 'SF',
+        addPlayerId: 999,
+        dropPlayerId: 206
+      }
+    ),
+    {
+      teamAbbr: 'DAL',
+      addPlayerId: 1000,
+      dropPlayerId: 150
+    }
+  ),
+  {
+    teamAbbr: 'SF',
+    addPlayerId: 1000,
+    dropPlayerId: 250
+  }
+);
+const resolvedRotatingWeeklyWaiverState = processSimulationWaiverClaims(rotatingWeeklyWaiverState, {
+  cadence: 'week'
+});
+assert.equal(
+  resolvedRotatingWeeklyWaiverState.draftState.rostersByTeam.DAL.some((player) => Number(player.id) === 999),
+  true,
+  'nfl weekly waiver priority should still let the top team win the first contested claim'
+);
+assert.equal(
+  resolvedRotatingWeeklyWaiverState.draftState.rostersByTeam.SF.some((player) => Number(player.id) === 1000),
+  true,
+  'nfl weekly waiver priority should rotate after the first award so the next team can win the next contested claim'
+);
 
 const nextState = adapter.simulateNextDay();
 

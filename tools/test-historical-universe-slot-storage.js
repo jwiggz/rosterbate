@@ -243,4 +243,66 @@ assert.equal(
   'compact slot persistence should retain cpu team personalities'
 );
 
+const nflSimulationState = {
+  simulationMode: 'nfl_mixed_era_single_player_v1',
+  sport: 'nfl',
+  leagueShell: {
+    sport: 'nfl',
+    anchorSeasonLabel: '2014 NFL',
+    anchorSeasonId: 'nfl_2014',
+    teams: [
+      { abbr: 'ARI', name: 'Arizona Cardinals' },
+      { abbr: 'DAL', name: 'Dallas Cowboys' }
+    ]
+  },
+  sourceSeasons: {
+    sourceSeasonLabels: ['2014 NFL Historic Season']
+  },
+  draftState: {
+    controlledTeamAbbr: 'ARI',
+    rostersByTeam: {
+      ARI: [{ id: 1, name: 'Carson Palmer' }],
+      DAL: [{ id: 2, name: 'Tony Romo' }]
+    },
+    freeAgents: [{ id: 3, name: 'Depth QB' }]
+  },
+  seasonState: {
+    currentWeek: 4,
+    currentDay: 4,
+    standings: [
+      { teamAbbr: 'ARI', w: 3, l: 1, pf: 102.4, pa: 88.2 },
+      { teamAbbr: 'DAL', w: 2, l: 2, pf: 97.9, pa: 95.0 }
+    ]
+  },
+  postseasonState: {
+    phase: 'regular_season'
+  }
+};
+
+const nflPersisted = api.upsertFromState(nflSimulationState, {
+  slotId: 'slot_nfl_sim_regression',
+  reason: 'nfl_progress_copy'
+});
+
+assert.ok(nflPersisted, 'expected nfl simulation slot snapshot to persist');
+assert.equal(nflPersisted.metadata.subtitle, 'Arizona Cardinals - Week 4');
+assert.equal(nflPersisted.metadata.progressLabel, 'Week 4');
+
+const nflPlayoffPersisted = api.upsertFromState(
+  {
+    ...nflSimulationState,
+    postseasonState: {
+      phase: 'wild_card'
+    }
+  },
+  {
+    slotId: 'slot_nfl_sim_playoff_regression',
+    reason: 'nfl_progress_copy_playoffs'
+  }
+);
+
+assert.ok(nflPlayoffPersisted, 'expected nfl playoff simulation slot snapshot to persist');
+assert.equal(nflPlayoffPersisted.metadata.subtitle, 'Arizona Cardinals - Wild Card round');
+assert.equal(nflPlayoffPersisted.metadata.progressLabel, 'Wild Card round');
+
 console.log('historical universe slot storage test passed');

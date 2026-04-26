@@ -29,7 +29,7 @@
   ],
   "modeSummaries": [
     {
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "summary": "Choose one franchise and guide it through the full 2000-01 historical season."
     },
     {
@@ -45,7 +45,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 441,
       "playerCount": 441,
-      "label": "Historical season stats"
+      "label": "Simulation ratings coverage"
     },
     "zeroGamePlayers": {
       "count": 0,
@@ -57,7 +57,7 @@
     }
   },
   "auditNotes": [
-    "Historical season stats cover every included player who logged official 2000-01 regular-season minutes.",
+    "Simulation-ready ratings cover every included player who logged official 2000-01 regular-season minutes.",
     "Schedule and results span the full regular season using historical game records.",
     "Per-game stat lines use official event totals with inferred minute estimates normalized to season-average workloads."
   ]

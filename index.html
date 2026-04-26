@@ -1707,13 +1707,13 @@
         <div class="cta-grid">
           <div class="cta-lane single">
             <div class="cta-pane-head single">
-              <div class="cta-pane-title">Single Player</div>
+            <div class="cta-pane-title">Local League</div>
               <span class="cta-pane-sub">Play vs AI</span>
             </div>
             <div class="cta-card orange" id="single-player-card">
             <div class="cta-top">
               <div class="cta-copy">
-                <div class="cta-title" style="display:none;">Single Player<span>Play vs AI</span></div>
+                <div class="cta-title" style="display:none;">Local League<span>Play vs AI</span></div>
               </div>
               <div class="cta-emoji" aria-hidden="true">
                 <svg viewBox="0 0 64 64" role="presentation" focusable="false">
@@ -1785,21 +1785,21 @@
 
           <div class="cta-lane historical">
             <div class="cta-pane-head historical">
-              <div class="cta-pane-title">Historic Seasons</div>
-              <span class="cta-pane-sub">Browse Historic Seasons • Draft The Era</span>
+            <div class="cta-pane-title">Simulation Archives</div>
+            <span class="cta-pane-sub">Browse Simulation Archives • Draft The Era</span>
             </div>
             <div class="cta-card historical-era" id="historicalCard">
               <div class="historical-shell">
                 <div class="historical-copy">
                   <div class="historical-kicker">Flagship Universe</div>
                   <div class="historical-title" id="historicalEntryTitle">1995-96 NBA Universe</div>
-                  <div class="historical-desc" id="historicalEntryDesc">Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.</div>
+                  <div class="historical-desc" id="historicalEntryDesc">Load the full source-pack player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.</div>
                   <div class="historical-meta-row">
                     <span class="cta-meta-pill open" id="historicalEntryStatus">Playable Now</span>
                     <span class="cta-meta-pill info" id="historicalEntrySportPill">Basketball First</span>
-                    <span class="cta-meta-pill info" id="historicalEntryModePill">Classic Era Mode</span>
+                    <span class="cta-meta-pill info" id="historicalEntryModePill">Simulation Archive</span>
                   </div>
-                  <div class="historical-footnote" id="historicalEntryNote">Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.</div>
+                  <div class="historical-footnote" id="historicalEntryNote">Simulation archives now power player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.</div>
                 </div>
                 <div class="historical-scoreboard">
                   <div class="historical-stat-card">
@@ -1817,7 +1817,7 @@
                 </div>
               </div>
               <div class="historical-action-row">
-                <a id="historicalBrowseLink" class="historical-btn tertiary" href="historic-seasons.html?sport=nba">Browse Historic Seasons</a>
+                <a id="historicalBrowseLink" class="historical-btn tertiary" href="historic-seasons.html?sport=nba">Browse Simulation Archives</a>
                 <a id="historicalDraftLink" class="historical-btn secondary" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
                 <a id="historicalSimLink" class="historical-btn secondary hero-cta" href="rosterbate-simulation-setup.html?sport=nba">Start Simulation League</a>
               </div>
@@ -1832,11 +1832,11 @@
     <div class="mock-strip-copy">
       <div class="mock-strip-kicker">Fastest Way To Learn The Board</div>
       <div class="mock-strip-title">Try A Demo Draft</div>
-      <div class="mock-strip-desc">Use the single-player draft board as a mock-draft lab. Test snake or auction settings, learn the flow, and get comfortable before your real room opens.</div>
+      <div class="mock-strip-desc">Use the local draft board as a mock-draft lab. Test snake or auction settings, learn the flow, and get comfortable before your real room opens.</div>
       <div class="mock-strip-pills">
         <span class="mock-strip-pill open" id="mockStripStatus">Open Now</span>
         <span class="mock-strip-pill info">Snake · Auction</span>
-        <span class="mock-strip-pill info">Solo Reps</span>
+        <span class="mock-strip-pill info">Local Reps</span>
       </div>
     </div>
     <a class="mock-strip-cta" id="mockDraftLink" href="rosterbate-draft.html?sport=nba"><span>Launch Demo Draft</span></a>
@@ -2355,16 +2355,16 @@ const HOME_SPORT_SIGNALS = {
 const HOME_HISTORICAL_SURFACES = {
   nba: {
     title: '1995-96 NBA Universe',
-    description: 'Load the full historical player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.',
+    description: 'Load the full source-pack player pool as source material for drafts, simulation leagues, and alternate-history builds with Jordan, Hakeem, Shaq, Malone, Ewing, Robinson, and the rest of the era in one sandbox.',
     teamCount: 29,
     playerCount: 436,
     gameCount: 183,
     sportPill: 'Basketball First',
-    modePill: 'Classic Era Mode',
+    modePill: 'Simulation Archive',
     localStatus: 'Playable Now',
     previewStatus: 'Founder Preview',
-    localNote: 'Historic mode now powers player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.',
-    previewNote: 'Historic Seasons is being developed as a flagship mode. Basketball is the first universe coming online before wider release.',
+    localNote: 'Simulation archives now power player-pool fantasy drafts, saved universes, and daily-reveal simulation leagues from a loaded era pack.',
+    previewNote: 'Simulation Archives is being developed as a flagship mode. Basketball is the first universe coming online before wider release.',
     browserUrl: 'historic-seasons.html?sport=nba',
     draftUrl: 'rosterbate-draft.html?sport=nba&historical=dev',
     simulationUrl: 'rosterbate-simulation-setup.html?sport=nba',
@@ -2373,7 +2373,7 @@ const HOME_HISTORICAL_SURFACES = {
   },
   nfl: {
     title: '2014 NFL Universe',
-    description: 'Load the 2014 historical NFL player pool as source material for drafts, simulation leagues, and alternate-history builds with Brady, Rodgers, Bell, Watt, Sherman, and the rest of the era in one sandbox.',
+    description: 'Load the 2014 source-pack NFL player pool as source material for drafts, simulation leagues, and alternate-history builds with Brady, Rodgers, Bell, Watt, Sherman, and the rest of the era in one sandbox.',
     teamCount: 32,
     playerCount: 416,
     gameCount: 256,
@@ -2381,8 +2381,8 @@ const HOME_HISTORICAL_SURFACES = {
     modePill: 'Mixed-Era Sim',
     localStatus: 'Playable Now',
     previewStatus: 'Foundation Preview',
-    localNote: 'Historic football now feeds mixed-era drafts, simulation setup, and alternate-history league builds from a loaded 2014 source pack.',
-    previewNote: 'Historic football is the next archive lane being brought online after basketball, starting with the 2014 NFL shell.',
+    localNote: 'Simulation-archive football now feeds mixed-era drafts, simulation setup, and alternate-history league builds from a loaded 2014 source pack.',
+    previewNote: 'Simulation-archive football is the next archive lane being brought online after basketball, starting with the 2014 NFL shell.',
     browserUrl: 'historic-seasons.html?sport=nfl',
     draftUrl: 'rosterbate-draft.html?sport=nfl&historical=dev',
     simulationUrl: 'rosterbate-simulation-setup.html?sport=nfl',
@@ -2391,7 +2391,7 @@ const HOME_HISTORICAL_SURFACES = {
   },
   mlb: {
     title: 'Baseball Archive Incoming',
-    description: 'Historic baseball seasons are being prepared as future source material for mixed-era drafts, simulation leagues, and alternate-history builds.',
+    description: 'Baseball simulation archives are being prepared as future source material for mixed-era drafts, simulation leagues, and alternate-history builds.',
     teamCount: 30,
     playerCount: 'TBD',
     gameCount: 'TBD',
@@ -2399,8 +2399,8 @@ const HOME_HISTORICAL_SURFACES = {
     modePill: 'Archive In Progress',
     localStatus: 'Preview',
     previewStatus: 'Coming Soon',
-    localNote: 'Baseball historical archives are still in development and will follow the same browse, draft, and simulation lane once packs are ready.',
-    previewNote: 'Historic baseball is in development and will join the archive once the first season packs are ready.',
+    localNote: 'Baseball simulation archives are still in development and will follow the same browse, draft, and simulation lane once packs are ready.',
+    previewNote: 'Simulation-archive baseball is in development and will join the archive once the first season packs are ready.',
     browserUrl: 'historic-seasons.html?sport=mlb',
     draftUrl: '',
     simulationUrl: '',
@@ -2638,7 +2638,7 @@ function updateHistoricalEntrySurface(){
       : (surface.previewNote || '');
   }
   if(browseLink){
-    browseLink.textContent = 'Browse Historic Seasons';
+    browseLink.textContent = 'Browse Simulation Archives';
     browseLink.href = surface.browserUrl;
     browseLink.classList.remove('disabled');
     browseLink.removeAttribute('aria-disabled');
@@ -3045,7 +3045,7 @@ function renderLeaguePickerList(mode){
   const rows=mode==='single' ? homeLeaguePickerSolo : homeLeaguePickerMulti;
   if(!rows.length){
     if(mode==='single'){
-      renderLeaguePickerEmpty('No Single Player Leagues Yet','Finish a solo draft and it will show up here for quick reopen access.', !auth.currentUser && !localStorage.getItem('rosterbateDraft'));
+      renderLeaguePickerEmpty('No Local Leagues Yet','Finish a local draft and it will show up here for quick reopen access.', !auth.currentUser && !localStorage.getItem('rosterbateDraft'));
     }else if(!auth.currentUser){
       renderLeaguePickerEmpty('Sign In For Multiplayer Leagues','Your shared season leagues are tied to your account, so sign in to reopen them here.', true);
     }else{
@@ -3056,7 +3056,7 @@ function renderLeaguePickerList(mode){
   host.innerHTML=rows.map(row=>{
     const sport=HOME_SPORT_LABELS[row.sport] || HOME_SPORT_LABELS.nba;
     const typePill=mode==='single'
-      ? '<span class="league-picker-pill single">Single Player</span>'
+      ? '<span class="league-picker-pill single">Local League</span>'
       : '<span class="league-picker-pill multi">Multiplayer</span>';
     const action=mode==='single'
       ? `openHomepageSoloLeague('${escapeHtml(row.id)}')`
@@ -3068,9 +3068,9 @@ function renderLeaguePickerList(mode){
       ? (row.savedLabel || 'Saved recently')
       : (row.updatedLabel || 'Updated recently');
     const copy=mode==='single'
-      ? 'Reopen your personal season manager and pick up exactly where your solo run left off.'
+      ? 'Reopen your local league manager and pick up exactly where your saved sim run left off.'
       : 'Jump back into your shared season hub, standings, waivers, trades, and roster management.';
-    const kicker=mode==='single' ? 'Personal Season Save' : 'Shared Season Access';
+    const kicker=mode==='single' ? 'Local League Save' : 'Shared Season Access';
     return `<div class="league-picker-card ${mode==='single' ? 'single' : 'multi'}">
       <div class="league-picker-kicker">${escapeHtml(kicker)}</div>
       <div class="league-picker-card-title">${escapeHtml(row.name || 'RosterBate League')}</div>
@@ -3184,9 +3184,9 @@ async function openLeaguePicker(mode){
   const host=document.getElementById('leaguePickerList');
   if(!modal || !title || !sub || !host) return;
   modal.querySelector('.league-picker-panel')?.setAttribute('data-mode', homeLeaguePickerMode);
-  title.textContent=homeLeaguePickerMode === 'single' ? 'My Single Player Leagues' : 'My Multiplayer Leagues';
+title.textContent=homeLeaguePickerMode === 'single' ? 'My Local Leagues' : 'My Multiplayer Leagues';
   sub.textContent=homeLeaguePickerMode === 'single'
-    ? 'Choose one of your solo saves to reopen your personal season manager.'
+    ? 'Choose one of your local saves to reopen your local league manager.'
     : 'Choose one of your shared season leagues to jump back into live multiplayer play.';
   host.innerHTML='<div class="league-picker-empty"><div class="league-picker-empty-title">Loading Leagues</div><div class="league-picker-empty-copy">Pulling your saved league list now.</div></div>';
   modal.classList.add('open');

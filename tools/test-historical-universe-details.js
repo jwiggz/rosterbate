@@ -1230,6 +1230,92 @@ const revealOnlyActivity = JSON.parse(JSON.stringify(
   )
 ));
 
+const simulationArchiveWithoutRevealReports = JSON.parse(JSON.stringify(
+  context.buildUniverseDetailsViewModel(
+    {
+      ...slot,
+      teamName: 'Audit Agents'
+    },
+    {
+      simulationMode: 'nba_mixed_era_single_player_v1',
+      myPos: 0,
+      teams: ['Audit Agents', 'CPU Team 1', 'CPU Team 2'],
+      rosters: [[]],
+      standings: [
+        { teamIdx: 0, teamAbbr: 'AUD', w: 7, l: 2, pf: 933.4 },
+        { teamIdx: 1, teamAbbr: 'CPU1', w: 6, l: 3, pf: 920.2 },
+        { teamIdx: 2, teamAbbr: 'CPU2', w: 4, l: 5, pf: 884.1 }
+      ],
+      seasonState: {
+        completedGameLogs: [
+          { day: 9, week: 3, home: 0, away: 1, homeName: 'Audit Agents', awayName: 'CPU Team 1', homeScore: 144.2, awayScore: 141.9 },
+          { day: 10, week: 3, home: 0, away: 2, homeName: 'Audit Agents', awayName: 'CPU Team 2', homeScore: 150.1, awayScore: 145.4 },
+          { day: 10, week: 3, home: 1, away: 2, homeName: 'CPU Team 1', awayName: 'CPU Team 2', homeScore: 138.8, awayScore: 129.7 }
+        ],
+        activityLog: [
+          { type: 'trade', title: 'CPU Team 1 completed a trade', text: 'CPU Team 1 traded a scorer to CPU Team 2.', ts: 1000 }
+        ]
+      }
+    },
+    {}
+  )
+));
+
+assert.deepStrictEqual(simulationArchiveWithoutRevealReports.recentActivity, {
+  items: [
+    {
+      title: 'CPU Team 1 completed a trade',
+      body: 'CPU Team 1 traded a scorer to CPU Team 2.',
+      meta: ['TRADE']
+    }
+  ]
+});
+assert.deepStrictEqual(simulationArchiveWithoutRevealReports.latestSimDay, {
+  copy: 'Week 3, Day 10 is the latest completed archive beat for Audit Agents.',
+  headline: 'Audit Agents beat CPU Team 2',
+  narrative: 'Day 10 finished with 2 archived simulation matchups.',
+  pills: ['Week 3 Day 10', '150.1 - 145.4', 'Rank #1']
+});
+assert.deepStrictEqual(
+  simulationArchiveWithoutRevealReports.recentSimDays.map(item => item.day),
+  [10, 9]
+);
+assert.deepStrictEqual(
+  simulationArchiveWithoutRevealReports.recentSimDays.map(item => item.week),
+  [3, 3]
+);
+assert.deepStrictEqual(simulationArchiveWithoutRevealReports.recentSimDays[0], {
+  day: 10,
+  week: 3,
+  teamResult: {
+    headline: 'Audit Agents beat CPU Team 2',
+    subline: '150.1 - 145.4'
+  },
+  story: {
+    headline: 'Audit Agents beat CPU Team 2',
+    body: 'Day 10 finished with 2 archived simulation matchups.'
+  },
+  teamActivity: [],
+  leagueNote: {
+    title: '2 completed games archived',
+    body: 'Day 10 saved a full batch of simulation engine results for this universe.'
+  }
+});
+assert.deepStrictEqual(simulationArchiveWithoutRevealReports.recentSimDays[1], {
+  day: 9,
+  week: 3,
+  teamResult: {
+    headline: 'Audit Agents beat CPU Team 1',
+    subline: '144.2 - 141.9'
+  },
+  story: {
+    headline: 'Audit Agents beat CPU Team 1',
+    body: 'Day 9 finished with 1 archived simulation matchup.'
+  },
+  teamActivity: [],
+  leagueNote: null
+});
+
 assert.deepStrictEqual(revealOnlyActivity.latestSimDay, {
   copy: 'Week 3, Day 4 is the current archive checkpoint for Audit Agents.',
   headline: 'No completed sim day yet',

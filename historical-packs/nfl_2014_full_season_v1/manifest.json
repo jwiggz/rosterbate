@@ -14,9 +14,9 @@
   "sourceProfile": "historical_curated",
   "supportedModes": [
     "historical_draft",
-    "single_player_season"
+    "simulation_season"
   ],
-  "defaultEntryMode": "single_player_season",
+  "defaultEntryMode": "simulation_season",
   "subtitle": "Draft the era or build a mixed-era football universe.",
   "description": "A 2014 NFL historical season pack with Madden 25-era ratings context, football roster roles, and a full-league player pool for mixed-era simulation setup.",
   "tagline": "Legion of Boom, Brady, Rodgers, and one full-season football sandbox.",

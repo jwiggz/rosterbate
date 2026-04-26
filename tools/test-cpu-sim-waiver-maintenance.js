@@ -118,6 +118,7 @@ const cleanupCpuDeadRosterSpotsFromWaiversSource = extractFunctionSource(
   'cleanupCpuDeadRosterSpotsFromWaivers',
   { optional: true }
 );
+const maintainCpuTeamRosterSource = tryExtractFunctionSource('maintainCpuTeamRoster');
 
 function makePlayer(id, name, pos, fp, extra = {}) {
   return {
@@ -142,7 +143,8 @@ function buildContext(options = {}) {
     D: {
       myPos: 0,
       multiplayer: false,
-      historicalEntryMode: options.entryMode || 'simulation_season'
+      historicalEntryMode: options.entryMode || 'simulation_season',
+      activeSeasonBackend: options.activeSeasonBackend || null
     },
     G: {
       day: options.day || 3,
@@ -217,6 +219,15 @@ function buildContext(options = {}) {
     },
     getCpuIlMaintenanceValue(player) {
       return Number(player?.fp || 0);
+    },
+    isIlEligiblePlayer(player, injury) {
+      return context.isUnavailableInjury(injury) && Number(player?.fp || 0) > 0;
+    },
+    getHealthyCpuIlActivationCandidates(ilRoster) {
+      return (ilRoster || []).filter(player => !context.getInjuryStatus(player));
+    },
+    getActiveCpuIlSwapCandidates(roster, week) {
+      return (roster || []).filter(player => !context.isIlEligiblePlayer(player, context.getInjuryStatus(player, week)));
     }
   };
 
@@ -240,7 +251,8 @@ function buildContext(options = {}) {
       getBestCpuWaiverCandidateForSlotSource,
       getCpuWaiverDropCandidateSource,
       fillCpuTeamStarterNeedsFromWaiversSource,
-      cleanupCpuDeadRosterSpotsFromWaiversSource
+      cleanupCpuDeadRosterSpotsFromWaiversSource,
+      maintainCpuTeamRosterSource
     ].filter(Boolean).join('\n'),
     context
   );
@@ -258,6 +270,18 @@ function buildSeamContext(options = {}) {
   assert.ok(getCpuWaiverPositionNeedBonusSource, 'missing getCpuWaiverPositionNeedBonus');
   assert.ok(getCpuWaiverDropProtectionBonusSource, 'missing getCpuWaiverDropProtectionBonus');
   return buildContext(options);
+}
+
+{
+  const { context } = buildSeamContext({
+    entryMode: 'historical_draft',
+    activeSeasonBackend: 'simulation'
+  });
+  assert.equal(
+    context.isCpuWaiverSimulationUniverse(),
+    true,
+    'cpu waiver maintenance should treat unified simulation backends as simulation seasons even without legacy historicalEntryMode flags'
+  );
 }
 
 {
@@ -336,6 +360,8 @@ function buildSeamContext(options = {}) {
 
 {
   const { context, claimCalls } = buildContext({
+    entryMode: 'historical_draft',
+    activeSeasonBackend: 'simulation',
     roster: [
       makePlayer(101, 'Starter PG', 'PG', 52),
       makePlayer(102, 'Starter SG', 'SG', 50),
@@ -357,6 +383,32 @@ function buildSeamContext(options = {}) {
   assert.equal(result.adds, 1);
   assert.equal(result.drops, 1);
   assert.deepStrictEqual(claimCalls[0], { teamIdx: 1, addId: 210, dropId: 106 });
+  assert.equal(
+    context.buildCpuWaiverRosterNeedSummary(1, 3).positionNeed.G >= 0,
+    true,
+    'backend-only unified simulation seasons should still use simulation-aware waiver need scoring'
+  );
+}
+
+{
+  const { context } = buildContext({
+    entryMode: 'historical_draft',
+    activeSeasonBackend: 'simulation',
+    roster: [
+      makePlayer(401, 'Starter PG', 'PG', 50),
+      makePlayer(402, 'Starter SG', 'SG', 49),
+      makePlayer(403, 'Starter SF', 'SF', 48),
+      makePlayer(404, 'Starter PF', 'PF', 47),
+      makePlayer(405, 'Starter C', 'C', 51),
+      makePlayer(406, 'Out Bench', 'SG', 12)
+    ],
+    injuries: [[406, { label: 'OUT' }]],
+    starterIds: [401, 402, 403, 404, 405],
+    totalRosterLimit: 6
+  });
+  const result = context.maintainCpuTeamRoster(1, { day: 3 });
+  assert.equal(result.movedToIl, 1, 'backend-only unified simulation seasons should still run CPU IL maintenance');
+  assert.equal((context.G.ilByTeam[1] || []).some(player => Number(player.id) === 406), true, 'backend-only unified simulation seasons should move eligible CPU players onto IL');
 }
 
 {

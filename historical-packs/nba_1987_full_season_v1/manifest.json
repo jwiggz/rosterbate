@@ -19,10 +19,10 @@
   ],
   "supportedModes": [
     "historical_draft",
-    "single_player_season",
+    "simulation_season",
     "reimagined_season"
   ],
-  "defaultEntryMode": "single_player_season",
+  "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_1987_lal",
   "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 historical season foundation with Lakers prestige at the center.",
   "description": "A playable 1986-87 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
@@ -67,7 +67,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 335,
       "playerCount": 335,
-      "label": "Historical season stats"
+      "label": "Simulation ratings coverage"
     },
     "zeroGamePlayers": {
       "count": 0,

@@ -636,7 +636,7 @@
     if(Array.isArray(state.historicalPlayerPool)) enrichRosterCollection(state.historicalPlayerPool, { packId:packId });
     state.simulationProfile=Object.assign({}, state.simulationProfile || {}, {
       engineVersion:ENGINE_VERSION,
-      ratingsSource:'Historical season stats + light authored tuning',
+      ratingsSource:'Ratings-driven simulation + sport-specific tuning',
       mixedEraNormalization:'season_context_plus_light_authored_tuning',
       simulationCadence:'daily_reveal',
       simulationOutput:'box_score'
@@ -862,6 +862,7 @@
         player:player,
         baseScore:fantasyPoints,
         finalScore:fantasyPoints,
+        statSource:'simulation_engine_generated',
         game:{
           opp:opponentLabel,
           time:'Sim',
@@ -1129,6 +1130,7 @@
       resultsByTeam[homeIdx]={
         total:roundStat(homeEntries.reduce(function(sum, entry){ return sum + Number(entry.finalScore || 0); }, 0)),
         entries:homeEntries,
+        statSource:'simulation_engine_generated',
         powerups:null,
         simMeta:{
           opponentTeamIdx:awayIdx,
@@ -1140,6 +1142,7 @@
       resultsByTeam[awayIdx]={
         total:roundStat(awayEntries.reduce(function(sum, entry){ return sum + Number(entry.finalScore || 0); }, 0)),
         entries:awayEntries,
+        statSource:'simulation_engine_generated',
         powerups:null,
         simMeta:{
           opponentTeamIdx:homeIdx,
@@ -1157,6 +1160,7 @@
         awayName:awayName,
         homeTotal:resultsByTeam[homeIdx].total,
         awayTotal:resultsByTeam[awayIdx].total,
+        outcomeSource:'simulation_engine',
         sharedPace:roundStat(gameContext.sharedPace),
         engineVersion:ENGINE_VERSION
       });
@@ -1167,6 +1171,7 @@
       resultsByTeam[teamIdx]={
         total:0,
         entries:[],
+        statSource:'simulation_engine_generated',
         powerups:null,
         simMeta:{
           opponentTeamIdx:null,
@@ -1244,6 +1249,7 @@
         return Object.assign({}, game, {
           homeScore:convertFantasyTotalToRenderedScore(game.homeTotal, state),
           awayScore:convertFantasyTotalToRenderedScore(game.awayTotal, state),
+          outcomeSource:'simulation_engine',
           winner:game.homeTotal >= game.awayTotal ? 'home' : 'away'
         });
       })

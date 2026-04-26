@@ -29,7 +29,7 @@
   ],
   "modeSummaries": [
     {
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "summary": "Choose one 1992-93 franchise and guide it through the full historical season."
     },
     {
@@ -45,7 +45,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 392,
       "playerCount": 392,
-      "label": "Historical season stats"
+      "label": "Simulation ratings coverage"
     },
     "zeroGamePlayers": {
       "count": 0,

@@ -19,9 +19,9 @@
   },
   "entryModes": [
     {
-      "mode": "single_player_season",
-      "label": "Historic Season",
-      "description": "Choose one 1992-93 team and play through the full historical season."
+      "mode": "simulation_season",
+      "label": "Sim Season",
+      "description": "Choose one 1992-93 team and play through a ratings-driven sim season built from the historical foundation."
     },
     {
       "mode": "historical_draft",

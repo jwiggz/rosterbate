@@ -4,8 +4,8 @@
   "challengeGroups": [
     {
       "groupId": "historic_season_paths",
-      "label": "Historic Season Paths",
-      "mode": "single_player_season"
+      "label": "Sim Season Paths",
+      "mode": "simulation_season"
     },
     {
       "groupId": "draft_the_era_paths",
@@ -21,7 +21,7 @@
   "challenges": [
     {
       "challengeId": "bulls_threepeat_pace",
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "path": "featured_team_path",
       "title": "Complete The First Three-Peat",
       "description": "Take the featured Bulls lane and clear 57 wins while keeping the title pace intact.",
@@ -34,7 +34,7 @@
     },
     {
       "challengeId": "challenger_55_wins",
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "path": "open_team_path",
       "title": "Break The Bulls-Suns Collision Course",
       "description": "Choose any team and reach 55 wins while trying to disrupt the Finals-bound prestige track.",

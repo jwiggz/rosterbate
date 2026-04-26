@@ -10,6 +10,20 @@ function toPlain(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function assertSharedSinglePlayerRosterMarkers(markup, label) {
+  assert.match(markup, /Roster Operations/, `${label} should render the shared single-player roster operations heading`);
+  assert.match(markup, /season-mini-tabs/, `${label} should render the shared single-player mini-tab rail`);
+  assert.match(markup, /season-mini-tab[^>]*>\s*Stats\s*</, `${label} should render the shared Stats tab`);
+  assert.match(markup, /season-mini-tab[^>]*>\s*Schedule\s*</, `${label} should render the shared Schedule tab`);
+  assert.doesNotMatch(markup, /Lineup Control/, `${label} should not keep the legacy simulation-only lineup-control card`);
+}
+
+function assertSimulationParityMeta(markup, label) {
+  assert.match(markup, /season-team-link[^>]*>[^<]*Waiver Order[^<]*</, `${label} should surface waiver-order parity metadata`);
+  assert.match(markup, /season-team-link[^>]*>[^<]*Watch List[^<]*</, `${label} should keep the watch-list affordance visible`);
+  assert.match(markup, /season-team-link(?:-btn)?[^>]*>[^<]*Settings[^<]*</, `${label} should keep the team-settings affordance visible`);
+}
+
 function extractBetween(startMarker, endMarker) {
   const start = html.indexOf(startMarker);
   assert.notEqual(start, -1, `expected to find start marker: ${startMarker}`);
@@ -27,6 +41,7 @@ function extractFrom(startMarker, endMarker) {
 }
 
 const harnessSource = `
+let HISTORICAL_SLOT_QUOTA_BLOCKED = false;
 ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
 ${extractBetween('function loadHistoricalUniverseSlotState(', 'function shouldBootHistoricalDevSeason(')}
@@ -34,6 +49,9 @@ ${extractBetween('function isHistoricalSimulationUniverse(', 'function isHistori
 ${extractBetween('function setSeasonSidePanelVisible(', 'function buildPowerupCardsHtml(')}
 ${extractBetween('function setHubSummaryStatLabels(', 'function persistSimulationSeasonState(')}
 ${extractBetween('function persistSimulationSeasonState(', 'function buildPowerupCardsHtml(')}
+${extractBetween('function syncGameStateToD()', 'function queueSharedSeasonSave(')}
+${extractBetween('function handleRosterAction(', 'function closeIlModal(')}
+${extractBetween('function getLatestRevealReportDay(', 'function buildSimulationDayRunnerSnapshot(')}
 ${extractBetween('function getSharedSimulationSport(', 'function renderSimulationHubInSharedShell(')}
 ${extractBetween('function renderSimulationHubInSharedShell(', 'function renderSimulationWaiverInSharedShell(')}
 ${extractBetween('function renderSimulationWaiverInSharedShell(', 'function claimSimulationFreeAgentFromShell(')}
@@ -46,12 +64,20 @@ ${extractBetween('function renderSimulationRosterInSharedShell(', 'function rend
 ${extractBetween('function renderSimulationScheduleInSharedShell(', 'function renderSimulationPlayoffsInSharedShell(')}
 ${extractBetween('function renderSimulationPlayoffsInSharedShell(', 'function renderActiveSeasonScreen(')}
 ${extractBetween('function getActiveSeasonPageId(', 'function buildLifetimeSeasonPayload(')}
+${extractBetween('function getAuthoritativeSimulationSeasonState(', 'let wAdd=null')}
+${extractBetween('function weekForDay(', 'function dayOfWeek(')}
+${extractBetween('function initSeason(', 'function refreshSeasonPlayerUniverse(').replace('function initSeason(', 'function realInitSeason(')}
 ${extractBetween('async function loadDemo(', 'function isDemoSeasonData(')}
 ${extractFrom('window.onload=async function(){', 'function clearAllData(')}
 
 module.exports = {
   getRequestedSimulationMode,
   getRequestedHistoricalUniverseSlotId,
+  getResolvedSeasonBackend,
+  getActiveSeasonBackend,
+  getLatestRevealReportDay,
+  getDailyRevealReport,
+  getSimulationDayLog,
   readCompletedSimulationDraftState,
   resolveCompletedSimulationDraftSeasonBoot,
   consumeCompletedSimulationDraftFallbackBoot,
@@ -64,19 +90,31 @@ module.exports = {
   buildSharedSimulationPersistenceState,
   persistHistoricalUniverseSlotSnapshot,
   persistSimulationSeasonState,
+  syncGameStateToD,
   renderSimulationHubInSharedShell,
+  applySimulationPowerupFromShell,
   renderSimulationRosterInSharedShell,
   renderSimulationScheduleInSharedShell,
   renderSimulationPlayoffsInSharedShell,
   renderSimulationWaiverInSharedShell,
   renderSimulationTradesInSharedShell,
   renderSimulationStandingsInSharedShell,
+  submitSimulationWaiverClaimFromShell,
+  cancelSimulationWaiverClaimFromShell,
   claimSimulationFreeAgentFromShell,
   applySimulationTradeFromShell,
   applySimulationSuggestedLineupFromShell,
+  handleRosterAction,
   getActiveSeasonPageId,
+  isDayRevealed,
+  getDayResult,
+  getTeamWeekRevealedScore,
+  getLiveStandingsSnapshot,
+  revealDay,
+  settleWeek,
   goPage,
   advanceWeek,
+  initSeason: realInitSeason,
   resolveLocalSavedSeasonAutoLoad,
   loadDemo,
   setActiveSeasonMode(value){ ACTIVE_SEASON_MODE = value; },
@@ -495,6 +533,11 @@ const simulationAdapterStub = {
   getState() {
     return toPlain(simulationStubState);
   },
+  replaceState(nextState) {
+    simulationStubState = toPlain(nextState);
+    this.lastReplacedState = toPlain(nextState);
+    return this.getState();
+  },
   getNavItems() {
     const statePhase = String(simulationStubState?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
     const navItems = [
@@ -511,6 +554,8 @@ const simulationAdapterStub = {
     return navItems;
   },
   getHubViewModel() {
+    const currentWeek = Number(simulationStubState?.seasonState?.currentWeek || 2) || 2;
+    const captainModeState = simulationStubState?.seasonState?.powerupsByWeek?.[currentWeek]?.captain_mode || null;
     return {
       leagueLabel: '2025-26 NBA Simulation',
       shellLabel: '1995-96 + 2015-16 Mixed Era Shell',
@@ -518,7 +563,57 @@ const simulationAdapterStub = {
       userRow: { w: 9, l: 3, streak: 'W3' },
       recordLabel: '9-3',
       primaryAction: { label: 'Sim Day' },
-      sourceSeasonLabels: ['1986-87', '1995-96', '2015-16']
+      sourceSeasonLabels: ['1986-87', '1995-96', '2015-16'],
+      powerupCards: [
+        {
+          key: 'captain-mode',
+          powerupId: 'captain_mode',
+          label: 'Captain Mode',
+          body: 'Flag a featured starter.',
+          active: Boolean(captainModeState?.active),
+          status: captainModeState?.active ? 'Active' : 'Available soon',
+          actionLabel: captainModeState?.active ? 'Update Captain' : 'Activate Captain',
+          targetLabel: 'Choose your captain',
+          targetId: captainModeState?.targetId || 23,
+          targetOptions: [
+            { value: 23, label: 'Michael Jordan · SG' }
+          ],
+          disabled: false
+        },
+        {
+          key: 'white-gloves',
+          powerupId: 'white_gloves',
+          label: 'White Gloves',
+          body: 'Protect the floor for injured starters later.',
+          active: false,
+          status: 'Visible for parity',
+          actionLabel: 'Coming Soon',
+          disabled: true,
+          disabledReason: 'Visible for parity only.'
+        },
+        {
+          key: 'bench-boost',
+          powerupId: 'bench_boost',
+          label: 'Bench Boost',
+          body: 'Bench scoring boost will land later.',
+          active: false,
+          status: 'Visible for parity',
+          actionLabel: 'Coming Soon',
+          disabled: true,
+          disabledReason: 'Visible for parity only.'
+        },
+        {
+          key: 'sunday-surge',
+          powerupId: 'sunday_surge',
+          label: 'Sunday Surge',
+          body: 'Sunday timing boost will land later.',
+          active: false,
+          status: 'Visible for parity',
+          actionLabel: 'Coming Soon',
+          disabled: true,
+          disabledReason: 'Visible for parity only.'
+        }
+      ]
     };
   },
   getScheduleViewModel() {
@@ -532,6 +627,48 @@ const simulationAdapterStub = {
   },
   getRosterViewModel() {
     return {
+      layoutMode: 'single-player-parity',
+      summaryCards: [
+        { label: 'Revealed Score', value: '112.0' }
+      ],
+      actionCards: [
+        { title: 'Lineup Pulse', body: 'Jordan is locked in at SG.' }
+      ],
+      operations: {
+        actions: [
+          { id: 'set-lineup', label: 'Set Lineup' },
+          { id: 'waivers', label: 'Waivers' }
+        ]
+      },
+      tabs: [
+        { id: 'stats', label: 'Stats', active: true },
+        { id: 'schedule', label: 'Schedule', active: false }
+      ],
+      teamSummary: {
+        name: 'Adapter Test Team',
+        leagueLabel: 'Adapter League Label',
+        waiverOrderLabel: 'Adapter Waiver Order',
+        watchListLabel: 'Adapter Watch List',
+        watchListEnabled: true,
+        watchListDisabledCopy: '',
+        waiverOrderEnabled: true,
+        waiverOrderCopy: 'Open waivers to inspect the current claim order.',
+        settingsLabel: 'Adapter Settings',
+        settingsEnabled: true,
+        settingsDisabledCopy: ''
+      },
+      sections: {
+        starters: {
+          rows: [
+            { slot: 'SG', player: { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' } }
+          ]
+        },
+        bench: {
+          rows: [
+            { slot: 'BENCH', player: { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' } }
+          ]
+        }
+      },
       starterSlots: ['PG', 'SG', 'SF', 'PF', 'C'],
       roster: [
         { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
@@ -547,23 +684,102 @@ const simulationAdapterStub = {
   },
   getWaiverViewModel() {
     return {
+      layoutMode: 'single-player-parity',
+      claimTimingLabel: 'Processing next sim day',
+      teamSummary: {
+        waiverOrderLabel: 'Waiver Order (1 of 30)',
+        watchListLabel: 'Watch List'
+      },
+      pendingClaims: [
+        {
+          claimId: 'pending-1',
+          playerId: 77,
+          playerName: 'Grant Hill',
+          timingLabel: 'Processing next sim day',
+          consequenceLabel: 'Adds Grant Hill and drops Hakeem Olajuwon if awarded.'
+        }
+      ],
+      recentClaimResults: [
+        {
+          claimId: 'recent-1',
+          playerId: 44,
+          playerName: 'Chris Mullin',
+          resolutionLabel: 'Resolved: added Chris Mullin after the previous waiver run.'
+        }
+      ],
+      sections: {
+        pending: {
+          rows: [
+            {
+              claimId: 'pending-1',
+              playerId: 77,
+              playerName: 'Grant Hill',
+              timingLabel: 'Processing next sim day',
+              consequenceLabel: 'Adds Grant Hill and drops Hakeem Olajuwon if awarded.'
+            }
+          ]
+        },
+        recent: {
+          rows: [
+            {
+              claimId: 'recent-1',
+              playerId: 44,
+              playerName: 'Chris Mullin',
+              resolutionLabel: 'Resolved: added Chris Mullin after the previous waiver run.'
+            }
+          ]
+        },
+        available: {
+          rows: [
+            {
+              playerId: 33,
+              player: { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' },
+              submitLabel: 'Submit Claim',
+              consequenceLabel: 'Adds Scottie Pippen and drops Hakeem Olajuwon if awarded.',
+              suggestedDropPlayerId: 34,
+              dropOptions: [
+                { value: 34, label: 'Hakeem Olajuwon · C' },
+                { value: 23, label: 'Michael Jordan · SG' }
+              ]
+            },
+            {
+              playerId: 91,
+              player: { id: 91, name: 'Dennis Rodman', team: 'CHI', pos: 'PF' },
+              submitLabel: 'Submit Claim',
+              consequenceLabel: 'Open roster spot available',
+              dropOptions: []
+            }
+          ]
+        }
+      },
       availablePlayers: [
-        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' },
-        { id: 91, name: 'Dennis Rodman', team: 'CHI', pos: 'PF' }
+        { id: 333, name: 'Legacy Waiver Fallback', team: 'LEG', pos: 'SG' }
       ]
     };
   },
   getTradeViewModel() {
     return {
+      sections: {
+        partners: {
+          rows: [
+            {
+              team: { abbr: 'BOS', name: 'Boston Celtics' },
+              incomingRoster: [
+                { id: 30, name: 'Stephen Curry' }
+              ]
+            }
+          ]
+        }
+      },
       tradePartners: [
-        { abbr: 'BOS', name: 'Boston Celtics' }
+        { abbr: 'LEG', name: 'Legacy Trade Fallback' }
       ],
       outgoingRoster: [
         { id: 34, name: 'Hakeem Olajuwon' }
       ],
       incomingRostersByTeam: {
-        BOS: [
-          { id: 30, name: 'Stephen Curry' }
+        LEG: [
+          { id: 404, name: 'Legacy Incoming' }
         ]
       }
     };
@@ -595,15 +811,45 @@ const simulationAdapterStub = {
     this.lastClaim = move;
     return {};
   },
+  submitWaiverClaim(move) {
+    this.lastSubmittedWaiverClaim = move;
+    return {};
+  },
+  cancelWaiverClaim(payload) {
+    this.lastCancelledWaiverClaim = payload;
+    return {};
+  },
   applyTrade(trade) {
     this.lastTrade = trade;
     return {};
+  },
+  activateSimulationPowerup(payload) {
+    this.lastPowerup = payload;
+    simulationStubState = {
+      ...simulationStubState,
+      seasonState: {
+        ...simulationStubState.seasonState,
+        powerupsByWeek: {
+          ...(simulationStubState.seasonState?.powerupsByWeek || {}),
+          2: {
+            ...((simulationStubState.seasonState?.powerupsByWeek || {})[2] || {}),
+            [payload.powerupId]: {
+              active: true,
+              targetId: payload.targetId,
+              teamAbbr: payload.teamAbbr
+            }
+          }
+        }
+      }
+    };
+    return this.getState();
   },
   setLineup(lineupIds) {
     this.lastLineupIds = lineupIds;
     return this.getState();
   },
   simulateNextDay() {
+    this.simulateNextDayCalls = Number(this.simulateNextDayCalls || 0) + 1;
     const phase = String(simulationStubState?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
     if (phase === 'regular_season') {
       setSimulationStubPhase('postseason_ready');
@@ -616,12 +862,49 @@ const sandbox = {
   module: { exports: {} },
   exports: {},
   console: sandboxConsole,
+  RB_SEASON_DEBUG: false,
   CURRENT_SPORT: 'nba',
   URLSearchParams,
   normalizeRosterbateSport(value) {
     return String(value || 'nba').trim().toLowerCase() || 'nba';
   },
   applySportContext() {},
+  repairDraftLeagueShapeFromPicks() {
+    return false;
+  },
+  ensureCpuTeamPersonalitiesByTeam() {},
+  getRequestedLeagueId() {
+    return null;
+  },
+  buildCpuManagedStarterIdsForDay(teamIdx, roster) {
+    return Array.isArray(roster) ? roster.slice(0, 1).map((player) => player.id) : [];
+  },
+  getSeasonPlayerPool() {
+    return [];
+  },
+  rebuildSeasonWaiverPool() {
+    return [];
+  },
+  buildSched() {
+    return [];
+  },
+  syncCalendarFromDay() {},
+  maintainCpuLeagueRosters() {
+    return {};
+  },
+  queueSharedSeasonSave() {},
+  ensurePowerupState() {},
+  ensureRosterbatePools() {
+    return Promise.resolve();
+  },
+  ensureSeasonNbaReferenceContext() {
+    return Promise.resolve();
+  },
+  rollWeeklyPowerupDrops() {},
+  logActivity() {},
+  awardRosterbateScore() {
+    return Promise.resolve();
+  },
   hideSeasonEmptyState() {
     lastEmptyState = 'hidden';
   },
@@ -734,10 +1017,60 @@ const sandbox = {
       readCompletedSimulationState() {
         return completedDraftState ? toPlain(completedDraftState) : null;
       },
+      buildUnifiedSimulationSeasonState(state) {
+        return {
+          ...toPlain(state || {}),
+          simulationMode: 'nba_mixed_era_single_player_v1',
+          legacyHistoricalStatMode: false,
+          leagueShell: {
+            sport: 'nba',
+            teams: [
+              { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
+              { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' }
+            ]
+          },
+          draftState: {
+            controlledTeamAbbr: 'LAL',
+            rostersByTeam: {
+              LAL: [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+              BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+            },
+            freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }]
+          },
+          seasonState: {
+            currentDay: Number(state?.currentDay || state?.seasonState?.currentDay || 12),
+            currentWeek: Number(state?.currentWeek || state?.seasonState?.currentWeek || 2),
+            standings: toPlain(state?.standings || state?.seasonState?.standings || [
+              { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+              { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
+            ]),
+            activityLog: []
+          },
+          postseasonState: {
+            phase: 'regular_season',
+            playIn: null,
+            bracket: null,
+            champion: null
+          }
+        };
+      },
       clearCompletedSimulationState() {
         completedDraftClearCount += 1;
         completedDraftState = null;
         return true;
+      },
+      activateSimulationPowerup(state, payload) {
+        const nextState = toPlain(state || {});
+        const currentWeek = Number(nextState?.seasonState?.currentWeek || 1) || 1;
+        nextState.seasonState = nextState.seasonState || {};
+        nextState.seasonState.powerupsByWeek = nextState.seasonState.powerupsByWeek || {};
+        nextState.seasonState.powerupsByWeek[currentWeek] = nextState.seasonState.powerupsByWeek[currentWeek] || {};
+        nextState.seasonState.powerupsByWeek[currentWeek][payload.powerupId] = {
+          active: true,
+          targetId: payload.targetId == null ? null : Number(payload.targetId),
+          teamAbbr: payload.teamAbbr || null
+        };
+        return nextState;
       }
     },
     RosterBateSimulationSeasonAdapter: {
@@ -771,10 +1104,11 @@ assert.match(html, /persistSimulationSeasonState\('simulation_lineup'\)/, 'simul
 assert.match(html, /simulation-nfl-2014-schedule\.js/, 'season shell should load the nfl 2014 schedule helper before the shared simulation engine');
 assert.match(adapterSource, /RosterBateSimulationModeRuntime\.claimSimulationFreeAgent/, 'adapter should explicitly bind browser waiver mutations to RosterBateSimulationModeRuntime.claimSimulationFreeAgent');
 assert.match(adapterSource, /RosterBateSimulationModeRuntime\.applySimulationTrade/, 'adapter should explicitly bind browser trade mutations to RosterBateSimulationModeRuntime.applySimulationTrade');
+assert.match(adapterSource, /RosterBateSimulationModeRuntime\.activateSimulationPowerup/, 'adapter should explicitly bind browser powerup mutations to RosterBateSimulationModeRuntime.activateSimulationPowerup');
 assert.match(adapterSource, /RosterBateSimulationModeRuntime\.setSimulationLineup/, 'adapter should explicitly bind browser lineup mutations to RosterBateSimulationModeRuntime.setSimulationLineup');
 assert.match(html, /function renderActiveSeasonScreen\(/, 'season shell should centralize mode-aware screen rendering');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationHubInSharedShell\(\);/, 'renderHub should branch into simulation rendering');
-assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should branch into simulation rendering');
+assert.doesNotMatch(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationRosterInSharedShell\(\);/, 'renderRoster should no longer short-circuit into the legacy simulation-only roster layout');
 assert.match(html, /if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationScheduleInSharedShell\(\);/, 'renderMatchup should branch into simulation rendering');
 assert.match(html, /function renderWaiver\(\)\{\s*if \(ACTIVE_SEASON_MODE === 'simulation'\) return renderSimulationWaiverInSharedShell\(\);/, 'renderWaiver should branch into simulation rendering before fantasy waiver logic');
 assert.match(html, /SEASON_MODE_ADAPTER\.simulateNextDay\(\)/, 'Sim Day should flow through the adapter');
@@ -802,6 +1136,56 @@ assert.equal(
 assert.match(html, /function resolveCompletedSimulationDraftSeasonBoot\(/, 'season shell should expose a completed-draft handoff helper');
 assert.match(html, /const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot\(urlParams, requestedSport\);/, 'season shell should check runtime completed-draft handoffs during boot');
 assert.match(html, /function consumeCompletedSimulationDraftFallbackBoot\(/, 'season shell should expose a fallback-handoff consumption helper');
+assert.match(html, /function\s+[A-Za-z0-9_]*SeasonBackend\(/, 'single-player replacement boot should expose an explicit season-backend resolver helper');
+assert.match(html, /[A-Za-z0-9_]+\s*=\s*[A-Za-z0-9_]*SeasonBackend\(/, 'single-player replacement boot should explicitly resolve the backend before season init');
+assert.match(html, /function getActiveSeasonBackend\(/, 'season shell should expose an active-season backend helper');
+assert.match(html, /if \(getActiveSeasonBackend\(\) === 'simulation' && SEASON_MODE_ADAPTER\)/, 'advanceWeek should route simulation backends through the adapter instead of presentation mode alone');
+assert.doesNotMatch(
+  html,
+  /mode==='historical_box_score'/,
+  'season shell runtime helpers should not keep the legacy historical_box_score alias as a live simulation universe mode'
+);
+assert.equal(
+  api.getResolvedSeasonBackend(new URLSearchParams(''), {
+    sport: 'nba',
+    leagueName: 'Legacy Single Player League',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    allRosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    ],
+    waiver: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ]
+  })?.backend,
+  'simulation',
+  'legacy non-demo single-player saves should resolve the simulation backend'
+);
+
+api.setSeasonModeAdapter(simulationAdapterStub);
+api.setActiveSeasonMode('simulation');
+setSimulationStubPhase('regular_season');
+api.setData({
+  leagueName: 'Conflicting League Name',
+  leagueShell: {
+    teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
+  },
+  draftState: {
+    controlledTeamAbbr: 'LAL'
+  }
+});
+api.setGame({ day: 12, week: 2 });
+api.renderSimulationRosterInSharedShell();
+assertSharedSinglePlayerRosterMarkers(
+  elements.rosterContent.innerHTML,
+  'simulation roster'
+);
+assertSimulationParityMeta(elements.rosterContent.innerHTML, 'simulation roster');
+assert.match(elements.rosterContent.innerHTML, /Adapter League Label/, 'simulation roster header should prefer the adapter-provided league label');
+assert.match(elements.rosterContent.innerHTML, /Adapter Waiver Order/, 'simulation roster header should prefer the adapter-provided waiver-order label');
+assert.doesNotMatch(elements.rosterContent.innerHTML, /Conflicting League Name/, 'simulation roster header should avoid falling back to unrelated page-global league copy when the VM provides it');
 
 const fixture = {
   simulationMode: 'nba_mixed_era_single_player_v1',
@@ -893,13 +1277,13 @@ assert.equal(completedDraftFallback.shouldConsumeAfterBoot, true, 'fallback hand
 assert.equal(completedDraftFallback.slotId, null, 'fallback handoff should boot without a slot when no slot could be created');
 assert.equal(completedDraftFallback.state.seasonId, 'simulation:shared-season', 'fallback handoff should normalize the raw simulation state into the shared shell boot shape');
 assert.equal(completedDraftFallback.state.allRosters[0][0].name, 'Michael Jordan', 'fallback handoff should preserve completed-draft rosters');
-assert.equal(completedDraftClearCount, 0, 'fallback handoff should keep the runtime payload available when slot persistence fails');
+assert.equal(completedDraftClearCount, 1, 'fallback handoff should clear once before the quota retry path restores the runtime payload');
 assert.equal(
   api.consumeCompletedSimulationDraftFallbackBoot(completedDraftFallback),
   true,
   'fallback handoff should be clearable after the season shell establishes its own resume state'
 );
-assert.equal(completedDraftClearCount, 1, 'fallback handoff consumption should clear the one-shot runtime payload after a successful boot');
+assert.equal(completedDraftClearCount, 2, 'fallback handoff consumption should clear the restored one-shot runtime payload after a successful boot');
 assert.equal(
   api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era'), 'nba'),
   null,
@@ -1022,16 +1406,66 @@ assert.equal(elements.hubMatchupsTitle.textContent, 'Recent Results');
 assert.equal(elements.hubMatchupActionTitle.textContent, 'Schedule');
 assert.match(elements.hubMatchupActionSub.textContent, /recent results/i);
 assert.match(elements.hubMatchups.innerHTML, /BOS 108 at LAL 112/);
+assert.match(elements.hubPowerups.innerHTML, /Weekly Powerups/, 'simulation hub should reuse the single-player powerup rail');
+assert.match(elements.hubPowerups.innerHTML, /White Gloves/, 'simulation hub should include the familiar white-gloves parity card');
+assert.match(elements.hubPowerups.innerHTML, /Bench Boost/, 'simulation hub should include the familiar bench-boost parity card');
+assert.match(elements.hubPowerups.innerHTML, /Sunday Surge/, 'simulation hub should include the familiar sunday-surge parity card');
+assert.match(elements.hubDataStamp.innerHTML, /openWatchList\(\)/, 'simulation hub should keep the watch-list meta action live');
+assert.match(elements.hubDataStamp.innerHTML, /openTeamSettings\(\)/, 'simulation hub should keep the team-settings meta action live');
+assert.match(elements.hubPowerups.innerHTML, /Michael Jordan/, 'simulation hub should render the adapter-approved captain target');
+assert.doesNotMatch(elements.hubPowerups.innerHTML, /Hakeem Olajuwon/, 'simulation hub should not rebuild captain targets from non-starter roster players');
 
 api.renderSimulationRosterInSharedShell();
 assert.equal(elements.rosterPowerups.style.display, 'none');
 assert.equal(elements.rosterPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
 assert.equal(elements.rosterScheduleChip.textContent, 'Schedule');
+assertSharedSinglePlayerRosterMarkers(
+  elements.rosterContent.innerHTML,
+  'simulation roster'
+);
 assert.match(elements.rosterContent.innerHTML, /Use Suggested Starters/);
 assert.match(elements.rosterContent.innerHTML, /Starters/);
-assert.match(elements.rosterContent.innerHTML, /Bench/);
+assert.match(elements.rosterContent.innerHTML, /bench/i);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
+assert.match(elements.rosterContent.innerHTML, /openWatchList\(\)/, 'simulation roster should keep the watch-list action live');
+assert.match(elements.rosterContent.innerHTML, /openTeamSettings\(\)/, 'simulation roster should keep the team-settings action live');
 assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michael Jordan/);
+
+api.goPage('roster');
+demoToasts = [];
+simulationAdapterStub.lastLineupIds = null;
+api.handleRosterAction('matchup');
+assert.equal(api.getActiveSeasonPageId(), 'matchup', 'simulation matchup actions should route through goPage(matchup)');
+api.goPage('roster');
+api.handleRosterAction('schedule');
+assert.equal(api.getActiveSeasonPageId(), 'matchup', 'simulation schedule actions should route through goPage(matchup)');
+api.goPage('roster');
+api.handleRosterAction('add');
+assert.equal(api.getActiveSeasonPageId(), 'waiver', 'simulation add actions should route through goPage(waiver)');
+api.goPage('roster');
+api.handleRosterAction('waivers');
+assert.equal(api.getActiveSeasonPageId(), 'waiver', 'simulation waivers actions should route through goPage(waiver)');
+api.goPage('roster');
+api.handleRosterAction('trades');
+assert.equal(api.getActiveSeasonPageId(), 'trades', 'simulation trades actions should route through goPage(trades)');
+api.goPage('roster');
+api.handleRosterAction('set-lineup');
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastLineupIds),
+  [34, 23],
+  'simulation set-lineup actions should route through applySimulationSuggestedLineupFromShell'
+);
+demoToasts = [];
+api.handleRosterAction('il');
+api.handleRosterAction('drop');
+assert.deepStrictEqual(
+  demoToasts,
+  [
+    'That roster action is not available for simulation leagues yet.',
+    'That roster action is not available for simulation leagues yet.'
+  ],
+  'simulation il/drop actions should surface the unavailable-flow toast instead of touching fantasy-only state'
+);
 
 historicalSlotUpsertCalls = [];
 api.applySimulationSuggestedLineupFromShell();
@@ -1082,13 +1516,62 @@ assert.deepStrictEqual(
 );
 api.setSeasonModeAdapter(simulationAdapterStub);
 
+api.renderSimulationWaiverInSharedShell();
+assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'simulation waiver desk should render a pending-claims section');
+assert.match(elements.waiverContent.innerHTML, /Processing next sim day|Processing next sim week/i, 'simulation waiver desk should show delayed pending-claim timing');
+assert.match(elements.waiverContent.innerHTML, /Submit Claim/i, 'simulation waiver desk should expose an explicit submit-claim action');
+assert.doesNotMatch(elements.waiverContent.innerHTML, /claim resolves immediately/i, 'simulation waiver desk should not imply immediate claim resolution');
+
 api.renderSimulationScheduleInSharedShell();
 assert.equal(elements.matchupPowerups.style.display, 'none');
 assert.equal(elements.matchupPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
-assert.equal(elements.matchupTitle.textContent, 'Schedule');
-assert.match(elements.matchupNote.textContent, /results/i);
-assert.match(elements.matchupContent.innerHTML, /Schedule \/ Results/);
+assert.equal(elements.matchupTitle.textContent, 'Matchup');
+assert.match(elements.matchupNote.textContent, /head-to-head|matchup actions/i);
+assert.match(elements.matchupContent.innerHTML, /Current Matchup|Schedule \/ Results/);
 assert.match(elements.matchupContent.innerHTML, /BOS 108 at LAL 112/);
+assert.match(elements.matchupContent.innerHTML, /season-hero-card|Current Matchup/, 'simulation matchup should reuse the single-player matchup framing');
+assert.match(elements.matchupContent.innerHTML, /Current Matchup|Matchup Room/, 'simulation matchup should expose richer matchup hero framing');
+assert.match(elements.matchupContent.innerHTML, /Open My Team|My Team/i, 'simulation matchup should expose a direct path back to the shared roster room');
+assert.match(elements.matchupContent.innerHTML, /Open Waivers|Waivers/i, 'simulation matchup should expose a direct path into waivers');
+assert.match(elements.matchupContent.innerHTML, /Previous Matchup|Recent Results/i, 'simulation matchup should expose historical matchup context instead of only a flat schedule list');
+assert.match(elements.matchupContent.innerHTML, /Michael Jordan|Los Angeles Lakers|Boston Celtics/, 'simulation matchup should render richer side-by-side team context');
+assert.match(elements.matchupContent.innerHTML, /setSimulationMatchupNavigationValue/, 'simulation matchup navigation should route through a live shared-shell navigation handler');
+
+api.setSeasonModeAdapter({
+  ...simulationAdapterStub,
+  getScheduleViewModel() {
+    return {
+      title: 'Schedule / Results',
+      cycleLabel: 'Day 12 - Week 2',
+      detailCards: [
+        { key: 'cycle', label: 'Season Cycle', value: 'Day 12 - Week 2' },
+        { key: 'next-game', label: 'Current Matchup', value: 'vs Boston Celtics' }
+      ],
+      navigation: {
+        mode: 'day',
+        items: [
+          { id: 'day-12', label: 'Day 12', active: true, cycleValue: 12 },
+          { id: 'day-13', label: 'Day 13', active: false, cycleValue: 13 }
+        ]
+      },
+      currentMatchup: { day: 12, home: true, opponentAbbr: 'BOS', opponentName: 'Boston Celtics' },
+      recentResults: [
+        { awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112 }
+      ],
+      scheduleByDay: {
+        12: [{ awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112, home: true, opponentAbbr: 'BOS', opponentName: 'Boston Celtics' }],
+        13: [{ awayAbbr: 'NYK', awayScore: 101, homeAbbr: 'LAL', homeScore: 99, home: true, opponentAbbr: 'NYK', opponentName: 'New York Knicks' }]
+      }
+    };
+  }
+});
+sandbox.setSimulationMatchupNavigationValue(13);
+api.renderSimulationScheduleInSharedShell();
+assert.match(elements.matchupContent.innerHTML, /New York Knicks|NYK/, 'simulation matchup navigation should swap the displayed opponent context when a new day is selected');
+assert.match(elements.matchupContent.innerHTML, /Day 13/, 'simulation matchup navigation should update the displayed navigation window');
+assert.match(elements.matchupContent.innerHTML, /vs New York Knicks|vs NYK/, 'simulation matchup navigation should keep the matchup detail cards in sync with the selected opponent');
+api.setSeasonModeAdapter(simulationAdapterStub);
+sandbox.setSimulationMatchupNavigationValue(12);
 
 api.goPage('waiver');
 const waiverSearchInput = sandbox.document.getElementById('wSrch');
@@ -1098,6 +1581,7 @@ waiverPosInput.value = 'SF';
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/, 'simulation waiver renderer should show matching searched players');
 assert.doesNotMatch(elements.waiverContent.innerHTML, /Dennis Rodman/, 'simulation waiver renderer should exclude non-matching players before the advance');
+assert.match(elements.waiverContent.innerHTML, /Watch List|Waiver Order/, 'simulation waivers should expose parity meta affordances');
 api.advanceWeek();
 assert.ok(api.getActiveSeasonPages().includes('playoffs'), 'nav should expose Playoffs after the adapter enters postseason');
 assert.match(elements.hn.innerHTML, /Playoffs/, 'advanceWeek should rebuild hub nav when playoffs become available');
@@ -1131,30 +1615,86 @@ assert.match(elements.playoffsContent.innerHTML, /Completed/i, 'active-screen re
 
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
-assert.match(elements.waiverContent.innerHTML, /claimSimulationFreeAgentFromShell\(33\)/);
-assert.match(elements.waiverContent.innerHTML, /Drop Player/i);
-
-simulationAdapterStub.lastClaim = null;
+assert.match(elements.waiverContent.innerHTML, /Submit Claim/i, 'simulation waiver desk should switch from immediate adds to claim submission copy');
+assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'simulation waiver desk should reserve space for pending claims instead of immediate roster mutation');
+assert.match(elements.waiverContent.innerHTML, /Recent Waiver Results/i, 'simulation waiver desk should surface recent claim outcomes alongside pending claims');
+assert.match(elements.waiverContent.innerHTML, /Grant Hill/, 'simulation waiver desk should render pending claim rows from the adapter view model');
+assert.match(elements.waiverContent.innerHTML, /Chris Mullin/, 'simulation waiver desk should render recent claim-result rows from the adapter view model');
+assert.match(elements.waiverContent.innerHTML, /Drop Player/i, 'simulation waiver desk should show drop consequences before submitting a full-roster claim');
+assert.match(elements.waiverContent.innerHTML, /submitSimulationWaiverClaimFromShell\(/, 'simulation waiver desk should route claim submission through a dedicated pending-claim shell helper');
+assert.doesNotMatch(elements.waiverContent.innerHTML, /claimSimulationFreeAgentFromShell\(/, 'simulation waiver desk should stop wiring add buttons directly to the legacy immediate-claim helper');
+simulationAdapterStub.lastSubmittedWaiverClaim = null;
+simulationAdapterStub.lastCancelledWaiverClaim = null;
 historicalSlotUpsertCalls = [];
-api.claimSimulationFreeAgentFromShell(33);
-assert.equal(simulationAdapterStub.lastClaim, null, 'waiver claim should require an explicit drop selection');
-assert.equal(historicalSlotUpsertCalls.length, 0, 'waiver claim should not persist until a drop player is chosen');
+api.submitSimulationWaiverClaimFromShell(33);
+assert.equal(simulationAdapterStub.lastSubmittedWaiverClaim, null, 'simulation waiver submit helper should require an explicit drop selection when the roster is full');
+assert.equal(historicalSlotUpsertCalls.length, 0, 'simulation waiver submit helper should not persist until the claim is valid');
 elements['simulation-waiver-drop-select-33'].value = '34';
-api.claimSimulationFreeAgentFromShell(33);
+api.submitSimulationWaiverClaimFromShell(33);
 assert.deepStrictEqual(
-  toPlain(simulationAdapterStub.lastClaim),
+  toPlain(simulationAdapterStub.lastSubmittedWaiverClaim),
   {
     teamAbbr: 'LAL',
     addPlayerId: 33,
     dropPlayerId: 34
-  }
+  },
+  'simulation waiver submit helper should pass add/drop claim details through the adapter'
 );
+api.cancelSimulationWaiverClaimFromShell('pending-1');
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastCancelledWaiverClaim),
+  { claimId: 'pending-1' },
+  'simulation waiver cancel helper should route claim cancellation through the adapter'
+);
+
+const fallbackWaiverAdapter = {
+  ...simulationAdapterStub,
+  getWaiverViewModel() {
+    return {
+      claimTimingLabel: 'Processing next sim day',
+      availablePlayers: [
+        {
+          id: 333,
+          name: 'Legacy Waiver Fallback',
+          team: 'LEG',
+          pos: 'SG',
+          dropOptions: [
+            { value: 34, label: 'Hakeem Olajuwon · C' }
+          ],
+          suggestedDropPlayerId: 34
+        }
+      ]
+    };
+  }
+};
+api.setSeasonModeAdapter(fallbackWaiverAdapter);
+fallbackWaiverAdapter.lastSubmittedWaiverClaim = null;
+elements.wSrch.value = '';
+elements.wPos.value = 'ALL';
+api.renderSimulationWaiverInSharedShell();
+assert.match(elements.waiverContent.innerHTML, /Legacy Waiver Fallback/, 'simulation waiver desk should continue rendering compatibility fallback players');
+assert.match(elements.waiverContent.innerHTML, /simulation-waiver-drop-select-333/, 'simulation waiver desk should key fallback drop selectors from plain player ids too');
+api.submitSimulationWaiverClaimFromShell(333);
+assert.equal(fallbackWaiverAdapter.lastSubmittedWaiverClaim, null, 'simulation waiver submit helper should still require a drop selection for fallback players when one is needed');
+elements['simulation-waiver-drop-select-333'].value = '34';
+api.submitSimulationWaiverClaimFromShell(333);
+assert.deepStrictEqual(
+  toPlain(fallbackWaiverAdapter.lastSubmittedWaiverClaim),
+  {
+    teamAbbr: 'LAL',
+    addPlayerId: 333,
+    dropPlayerId: 34
+  },
+  'simulation waiver submit helper should support compatibility fallback players rendered from availablePlayers'
+);
+api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationTradesInSharedShell();
 assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
 assert.match(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/);
 assert.match(elements.tradesContent.innerHTML, /Choose outgoing player/i);
 assert.match(elements.tradesContent.innerHTML, /Choose incoming player/i);
+assert.match(elements.tradesContent.innerHTML, /Trade Desk|Pending Offers/, 'simulation trades should feel like the single-player trade desk');
 
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];
@@ -1177,6 +1717,20 @@ assert.deepStrictEqual(
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /LAL/);
 assert.match(elements.standingsContent.innerHTML, /9-3/);
+assert.match(elements.standingsContent.innerHTML, /season-hero-card|Standings/, 'simulation standings should reuse the single-player standings framing');
+
+api.setSeasonModeAdapter({
+  getStandingsViewModel() {
+    return {
+      sport: 'nba',
+      rows: [],
+      sections: []
+    };
+  }
+});
+api.renderSimulationStandingsInSharedShell();
+assert.match(elements.standingsContent.innerHTML, /No standings available\./, 'shared simulation standings should preserve the empty-state message when no rows are available');
+api.setSeasonModeAdapter(simulationAdapterStub);
 
 const normalized = toPlain(api.normalizeSharedSimulationSeasonBootState(fixture, 'sim-slot-1'));
 
@@ -1186,6 +1740,15 @@ assert.equal(normalized.seasonId, 'simulation:sim-slot-1', 'boot normalization s
 assert.equal(normalized.leagueSize, 2, 'boot normalization should derive the league size from the simulation teams');
 assert.equal(normalized.currentDay, 12, 'boot normalization should copy the current day');
 assert.equal(normalized.currentWeek, 2, 'boot normalization should copy the current week');
+assert.ok(
+  normalized.seasonState,
+  'single-player replacement boot normalization should preserve simulation-native seasonState for unified engine handoff'
+);
+assert.equal(
+  normalized.legacyHistoricalStatMode ?? false,
+  false,
+  'single-player replacement boot normalization should not advertise legacy stat-replay mode'
+);
 assert.deepEqual(
   normalized.teams,
   ['Los Angeles Lakers', 'Boston Celtics'],
@@ -1302,7 +1865,14 @@ const updatedAdapterState = {
       LAL: [33, 34],
       BOS: [30]
     }
-  }
+  },
+  processed: ['legacy-processed-flag'],
+  dayResults: { 21: { stale: true } },
+  revealedDays: { 21: true },
+  settledWeeks: { 4: true },
+  dailyRevealReports: { 21: { headline: 'Stale reveal report' } },
+  simulationLogsByDay: { 21: { engineVersion: 'legacy-shell' } },
+  lastRevealedDay: 21
 };
 
 const staleLegacyShell = {
@@ -1328,7 +1898,12 @@ const staleLegacyGame = {
   starters: [
     [23],
     [30]
-  ]
+  ],
+  processed: ['legacy-processed-flag'],
+  dayResults: { 18: { stale: true } },
+  revealedDays: { 18: true },
+  settledWeeks: { 3: true },
+  dailyRevealReports: { 18: { headline: 'Stale reveal report' } }
 };
 
 const rawPreferredPersistenceState = toPlain(
@@ -1367,6 +1942,41 @@ assert.deepEqual(
     BOS: [30]
   },
   'simulation persistence should prefer adapter lineup ids over stale legacy starters'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'processed'),
+  false,
+  'simulation persistence should drop stale processed markers from the raw persistence state'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'dayResults'),
+  false,
+  'simulation persistence should drop stale reveal-day caches from the raw persistence state'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'revealedDays'),
+  false,
+  'simulation persistence should drop stale revealed-day markers from the raw persistence state'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'settledWeeks'),
+  false,
+  'simulation persistence should drop stale settled-week caches from the raw persistence state'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'dailyRevealReports'),
+  false,
+  'simulation persistence should drop stale reveal reports from the raw persistence state'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'simulationLogsByDay'),
+  false,
+  'simulation persistence should drop stale simulation day logs from the raw persistence state'
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'lastRevealedDay'),
+  false,
+  'simulation persistence should drop stale last-revealed markers from the raw persistence state'
 );
 
 const normalizedStreakFixture = toPlain({
@@ -1471,6 +2081,443 @@ assert.equal(
   'local auto-load should rebuild the adapter from the raw simulation payload'
 );
 
+createdSimulationAdapters = [];
+const legacySinglePlayerResume = toPlain(api.resolveLocalSavedSeasonAutoLoad({
+  sport: 'nba',
+  leagueName: 'Legacy Single Player League',
+  teams: ['Los Angeles Lakers', 'Boston Celtics'],
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+  ],
+  waiver: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+    { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
+  ],
+  currentDay: 12,
+  currentWeek: 2
+}, 'nba'));
+
+assert.equal(legacySinglePlayerResume.activeSeasonMode, 'fantasy', 'legacy single-player saves should keep fantasy presentation mode for now');
+assert.equal(legacySinglePlayerResume.backend, 'simulation', 'legacy single-player saves should resolve onto the unified simulation backend');
+assert.ok(legacySinglePlayerResume.state.seasonState, 'legacy single-player local auto-load should land in unified simulation-native state');
+assert.equal(legacySinglePlayerResume.state.simulationMode, 'nba_mixed_era_single_player_v1', 'legacy single-player local auto-load should normalize into a simulation-native mode id');
+assert.equal(createdSimulationAdapters.length, 1, 'legacy single-player local auto-load should still build a simulation adapter');
+assert.equal(api.getActiveSeasonBackend(), 'simulation', 'legacy single-player local auto-load should expose a simulation backend even while presentation stays fantasy');
+
+createdSimulationAdapters = [];
+const legacyHistoricalBoxScoreResume = toPlain(api.resolveLocalSavedSeasonAutoLoad({
+  sport: 'nba',
+  leagueName: 'Legacy Historical Simulation',
+  historicalEntryMode: 'simulation_season',
+  simulationMode: 'historical_box_score',
+  teams: ['Chicago Bulls', 'Seattle SuperSonics'],
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+    [{ id: 20, name: 'Gary Payton', pos: 'PG' }]
+  ],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'CHI', conference: 'East', division: 'Central', w: 8, l: 4, pf: 1210, pa: 1188 },
+    { teamIdx: 1, teamAbbr: 'SEA', conference: 'West', division: 'Pacific', w: 7, l: 5, pf: 1199, pa: 1174 }
+  ],
+  currentDay: 12,
+  currentWeek: 2
+}, 'nba'));
+
+assert.equal(legacyHistoricalBoxScoreResume.backend, 'simulation', 'persisted historical_box_score saves should still resolve onto the simulation backend');
+assert.equal(legacyHistoricalBoxScoreResume.activeSeasonMode, 'fantasy', 'persisted historical_box_score saves should keep fantasy presentation mode during the replacement transition');
+assert.ok(legacyHistoricalBoxScoreResume.state.seasonState, 'persisted historical_box_score saves should still normalize into simulation-native state');
+assert.equal(legacyHistoricalBoxScoreResume.state.simulationMode, 'nba_mixed_era_single_player_v1', 'persisted historical_box_score saves should normalize forward into the canonical simulation mode id');
+assert.equal(createdSimulationAdapters.length, 1, 'persisted historical_box_score saves should still build a simulation adapter through the shell load path');
+
+simulationAdapterStub.simulateNextDayCalls = 0;
+historicalSlotUpsertCalls = [];
+vm.runInContext('HISTORICAL_SLOT_QUOTA_BLOCKED = false;', sandbox);
+api.setActiveSeasonMode('fantasy');
+api.setSeasonModeAdapter(simulationAdapterStub);
+api.setData({
+  activeSeasonBackend: 'simulation',
+  historicalUniverseSlotId: 'legacy-unified-slot',
+  leagueShell: {
+    sport: 'nba',
+    teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
+  },
+  draftState: {
+    controlledTeamAbbr: 'LAL'
+  }
+});
+api.setGame({
+  day: 12,
+  week: 2,
+  isSeasonComplete: false,
+  rosters: [[], [], []],
+  waiver: [],
+  standings: [],
+  processed: ['legacy-processed-flag'],
+  dayResults: { 12: { stale: true } },
+  settledWeeks: {},
+  revealedDays: { 12: true },
+  dailyRevealReports: { 12: { headline: 'Stale reveal report' } },
+  simulationLogsByDay: { 12: { engineVersion: 'legacy-shell' } },
+  recentDrops: [{ playerId: 999 }],
+  moneyBallLocks: { 2: { PG: 23 } },
+  cpuTradeMarketDaysProcessed: { 12: true }
+});
+const originalRevealDay = sandbox.revealDay;
+const originalSetActiveSeasonScreen = sandbox.setActiveSeasonScreen;
+const originalRebuildActiveSeasonNav = sandbox.rebuildActiveSeasonNav;
+let adapterBackedRenderSnapshot = null;
+const captureAdapterBackedRender = () => {
+  adapterBackedRenderSnapshot = {
+    gameDay: api.getGame().day,
+    stateDay: api.getData().seasonState?.currentDay,
+    rosterCount: Array.isArray(api.getGame().rosters) ? api.getGame().rosters.length : 0
+  };
+};
+sandbox.revealDay = () => {
+  throw new Error('legacy reveal path should not run for unified simulation backends');
+};
+sandbox.renderHub = captureAdapterBackedRender;
+sandbox.renderRoster = captureAdapterBackedRender;
+sandbox.renderMatchup = captureAdapterBackedRender;
+sandbox.renderWaiver = captureAdapterBackedRender;
+sandbox.renderTrades = captureAdapterBackedRender;
+sandbox.renderStandings = captureAdapterBackedRender;
+sandbox.renderCommissioner = captureAdapterBackedRender;
+sandbox.setActiveSeasonScreen = () => {};
+sandbox.rebuildActiveSeasonNav = () => {};
+api.advanceWeek();
+sandbox.revealDay = originalRevealDay;
+sandbox.setActiveSeasonScreen = originalSetActiveSeasonScreen;
+sandbox.rebuildActiveSeasonNav = originalRebuildActiveSeasonNav;
+assert.equal(simulationAdapterStub.simulateNextDayCalls, 1, 'fantasy-presented unified single-player seasons should advance through the simulation adapter');
+assert.equal(api.getGame().day, 13, 'adapter-backed unified progression should rehydrate the fantasy shell from the advanced simulation state');
+assert.equal(api.getData().seasonState?.currentDay, 13, 'adapter-backed unified progression should keep D synchronized with the advanced simulation state');
+assert.equal(Object.prototype.toString.call(api.getGame().processed), '[object Set]', 'adapter-backed unified progression should preserve the legacy processed tracker as a Set');
+assert.deepStrictEqual(Array.from(api.getGame().processed), [], 'adapter-backed unified progression should clear stale legacy processed markers when the adapter state does not carry them forward');
+assert.deepStrictEqual(toPlain(api.getGame().dayResults), {}, 'adapter-backed unified progression should clear stale legacy reveal-day caches');
+assert.deepStrictEqual(toPlain(api.getGame().revealedDays), {}, 'adapter-backed unified progression should clear stale revealed-day state after adapter rehydration');
+assert.deepStrictEqual(toPlain(api.getGame().dailyRevealReports), {}, 'adapter-backed unified progression should clear stale reveal reports after adapter rehydration');
+assert.deepStrictEqual(toPlain(api.getGame().simulationLogsByDay), {}, 'adapter-backed unified progression should clear stale legacy simulation log caches after adapter rehydration');
+assert.deepStrictEqual(toPlain(api.getGame().recentDrops), [], 'adapter-backed unified progression should clear stale drop history when the adapter state does not carry it forward');
+assert.deepStrictEqual(toPlain(api.getGame().moneyBallLocks), {}, 'adapter-backed unified progression should clear stale money-ball lock state when the adapter state does not carry it forward');
+assert.deepStrictEqual(toPlain(api.getGame().cpuTradeMarketDaysProcessed), {}, 'adapter-backed unified progression should clear stale CPU trade market progress when the adapter state does not carry it forward');
+adapterBackedRenderSnapshot = null;
+sandbox.renderActiveSeasonScreen('hub');
+assert.deepStrictEqual(adapterBackedRenderSnapshot, { gameDay: 13, stateDay: 13, rosterCount: 3 }, 'adapter-backed unified progression should still reach the fantasy render dispatch with rehydrated shell state');
+assert.equal(historicalSlotUpsertCalls.length, 1, 'adapter-backed unified progression should still persist the updated simulation state');
+
+api.setActiveSeasonMode('fantasy');
+api.setSeasonModeAdapter(simulationAdapterStub);
+api.setData({
+  activeSeasonBackend: 'simulation',
+  sport: 'nba',
+  leagueName: 'Init Resume League',
+  teams: ['Los Angeles Lakers', 'Boston Celtics', 'Chicago Bulls'],
+  myPos: 0,
+  currentWeek: 2,
+  currentDay: 12,
+  isSeasonComplete: false,
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }],
+    [{ id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' }]
+  ],
+  ilRosters: [[], [], []],
+  starters: [[23], [30], [34]],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+    { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 },
+    { teamIdx: 2, teamAbbr: 'CHI', w: 5, l: 7, pf: 1180, pa: 1210 }
+  ],
+  processed: ['legacy-processed-flag'],
+  dayResults: { 12: { stale: true } },
+  revealedDays: { 12: true },
+  settledWeeks: { 1: true },
+  dailyRevealReports: { 12: { headline: 'Stale reveal report' } },
+  simulationLogsByDay: { 12: { engineVersion: 'legacy-shell' } },
+  recentDrops: [{ playerId: 999 }],
+  moneyBallLocks: { 2: { PG: 23 } },
+  lastRevealedDay: 18,
+  activityLog: [{ id: 'waiver-1', type: 'waiver', title: 'Added depth', text: 'Synthetic resume activity', ts: 250 }],
+  dailyLineups: {},
+  dailyLineupsByTeam: {},
+  tradeOffers: [],
+  waiver: [],
+  freeAgents: [],
+  cpuTradeMarketDaysProcessed: { 12: true }
+});
+api.setGame({
+  week: 99,
+  day: 99,
+  totalWeeks: 17,
+  rosters: [],
+  ilByTeam: [],
+  starters: [],
+  dailyLineups: {},
+  waiver: [],
+  schedule: [],
+  standings: [],
+  tradeOffers: [],
+  processed: new Set(['bad-cache']),
+  powerupsByWeek: {},
+  dayResults: { 99: { stale: true } },
+  revealedDays: { 99: true },
+  settledWeeks: { 99: true },
+  isSeasonComplete: false,
+  activityLog: [],
+  recentDrops: [],
+  moneyBallLocks: {},
+  dailyRevealReports: { 99: { headline: 'bad-cache' } },
+  simulationLogsByDay: { 99: { engineVersion: 'bad-cache' } },
+  cpuTradeMarketDaysProcessed: {}
+});
+api.initSeason();
+assert.equal(api.getGame().week, 2, 'initSeason should restore simulation-backed resume week from canonical state');
+assert.equal(api.getGame().day, 12, 'initSeason should restore simulation-backed resume day from canonical state');
+assert.equal(Object.prototype.toString.call(api.getGame().processed), '[object Set]', 'initSeason should normalize processed markers into a Set');
+assert.deepStrictEqual(Array.from(api.getGame().processed), [], 'initSeason should clear stale processed markers for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getGame().dayResults), {}, 'initSeason should not revive stale reveal-day caches for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getGame().revealedDays), {}, 'initSeason should not revive stale revealed-day markers for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getGame().settledWeeks), {}, 'initSeason should not revive stale settled-week caches for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getGame().dailyRevealReports), {}, 'initSeason should not revive stale reveal reports for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getGame().simulationLogsByDay), {}, 'initSeason should not revive stale simulation log caches for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getData().dayResults), {}, 'initSeason should clear stale persisted reveal-day caches for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getData().revealedDays), {}, 'initSeason should clear stale persisted revealed-day markers for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getData().settledWeeks), {}, 'initSeason should clear stale persisted settled-week caches for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getData().dailyRevealReports), {}, 'initSeason should clear stale persisted reveal reports for unified simulation resumes');
+assert.deepStrictEqual(toPlain(api.getData().simulationLogsByDay), {}, 'initSeason should clear stale persisted simulation log caches for unified simulation resumes');
+assert.equal(api.getData().lastRevealedDay, 0, 'initSeason should reset stale last-revealed bookkeeping for unified simulation resumes');
+
+api.setData({
+  activeSeasonBackend: 'simulation',
+  currentWeek: 4,
+  currentDay: 21,
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', w: 12, l: 4, pf: 1601, pa: 1450 },
+    { teamIdx: 1, teamAbbr: 'BOS', w: 8, l: 8, pf: 1492, pa: 1510 }
+  ],
+  dayResults: { 20: { stale: true } },
+  revealedDays: { 20: true },
+  settledWeeks: { 3: true },
+  processed: ['legacy-processed-flag'],
+  dailyRevealReports: { 20: { headline: 'stale report' } },
+  simulationLogsByDay: { 20: { engineVersion: 'legacy-shell' } },
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }]
+  ]
+});
+api.setGame({
+  week: 4,
+  day: 21,
+  rosters: [
+    [{ id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }]
+  ],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', w: 12, l: 4, pf: 1601, pa: 1450 },
+    { teamIdx: 1, teamAbbr: 'BOS', w: 8, l: 8, pf: 1492, pa: 1510 }
+  ],
+  dayResults: { 21: { stale: true } },
+  revealedDays: { 21: true },
+  settledWeeks: { 4: true },
+  processed: new Set(['legacy-processed-flag']),
+  dailyRevealReports: { 21: { headline: 'stale report' } },
+  simulationLogsByDay: { 21: { engineVersion: 'legacy-shell' } },
+  activityLog: [],
+  tradeOffers: [],
+  waiver: []
+});
+api.syncGameStateToD();
+assert.deepStrictEqual(toPlain(api.getData().dayResults), {}, 'syncGameStateToD should not persist reveal-day caches for unified simulation seasons');
+assert.deepStrictEqual(toPlain(api.getData().revealedDays), {}, 'syncGameStateToD should not persist revealed-day markers for unified simulation seasons');
+assert.deepStrictEqual(toPlain(api.getData().settledWeeks), {}, 'syncGameStateToD should not persist settled-week caches for unified simulation seasons');
+assert.deepStrictEqual(toPlain(api.getData().processed), [], 'syncGameStateToD should not persist processed markers for unified simulation seasons');
+assert.deepStrictEqual(toPlain(api.getData().dailyRevealReports), {}, 'syncGameStateToD should not persist reveal reports for unified simulation seasons');
+assert.deepStrictEqual(toPlain(api.getData().simulationLogsByDay), {}, 'syncGameStateToD should not persist simulation day logs for unified simulation seasons');
+assert.equal(api.getData().lastRevealedDay, 0, 'syncGameStateToD should zero last-revealed bookkeeping for unified simulation seasons');
+
+api.setActiveSeasonMode('fantasy');
+api.setData({
+  activeSeasonBackend: 'simulation',
+  leagueShell: {
+    sport: 'nba',
+    teams: [
+      { abbr: 'LAL', name: 'Los Angeles Lakers' },
+      { abbr: 'BOS', name: 'Boston Celtics' }
+    ]
+  },
+  seasonState: {
+    currentDay: 13,
+    currentWeek: 2,
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 10, l: 3, pf: 1402.4, pa: 1290.1 },
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 6, pf: 1328.1, pa: 1333.4 }
+    ],
+    completedGameLogs: [
+      {
+        day: 11,
+        week: 2,
+        home: 1,
+        away: 0,
+        homeScore: 94.2,
+        awayScore: 90.5,
+        outcomeSource: 'simulation_engine'
+      },
+      {
+        day: 12,
+        week: 2,
+        home: 0,
+        away: 1,
+        homeScore: 102.4,
+        awayScore: 98.1,
+        outcomeSource: 'simulation_engine'
+      }
+    ]
+  }
+});
+api.setGame({
+  day: 13,
+  week: 2,
+  totalWeeks: 17,
+  schedule: [{ week: 2, home: 0, away: 1 }],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', w: 0, l: 0, pf: 0, pa: 0 },
+    { teamIdx: 1, teamAbbr: 'BOS', w: 0, l: 0, pf: 0, pa: 0 }
+  ],
+  activityLog: [
+    { id: 'waiver-1', type: 'waiver', title: 'Added depth', text: 'Synthetic resume activity', ts: 250 }
+  ],
+  dayResults: {},
+  revealedDays: {},
+  settledWeeks: {}
+});
+sandbox.DAYS_PER_WEEK = 7;
+sandbox.TOTAL_DAYS = () => 17;
+sandbox.teamName = (teamIdx) => api.getData().leagueShell.teams[teamIdx]?.name || `Team ${teamIdx + 1}`;
+sandbox.weekGames = (week) => (api.getGame().schedule || []).filter((game) => Number(game?.week || 0) === Number(week || 0));
+
+assert.equal(api.isDayRevealed(12), true, 'unified simulation backends should treat completed engine logs as revealed days for the fantasy shell');
+assert.deepStrictEqual(
+  toPlain(api.getDayResult(0, 12)),
+  {
+    total: 102.4,
+    entries: [],
+    statSource: 'simulation_engine_generated',
+    outcomeSource: 'simulation_engine'
+  },
+  'unified simulation backends should synthesize revealed day totals from completed engine logs'
+);
+assert.equal(api.getTeamWeekRevealedScore(0, 2), 192.9, 'unified simulation backends should aggregate week totals from completed engine logs');
+assert.deepStrictEqual(
+  toPlain(api.getLiveStandingsSnapshot()),
+  toPlain(api.getData().seasonState.standings),
+  'unified simulation backends should use canonical simulation standings instead of replay-era derived standings'
+);
+assert.equal(api.getLatestRevealReportDay(), 12, 'unified simulation backends should treat completed engine logs as the latest reveal window when no legacy report cache exists');
+assert.equal(
+  toPlain(api.getSimulationDayLog(12))?.gameLogs?.length,
+  1,
+  'unified simulation backends should synthesize simulation day logs from authoritative completed engine logs'
+);
+const synthesizedRevealReport = toPlain(api.getDailyRevealReport(12));
+assert.equal(
+  synthesizedRevealReport?.simulationMeta?.gameCount,
+  1,
+  'unified simulation backends should synthesize reveal reports from completed engine logs when legacy report caches are empty'
+);
+assert.equal(
+  synthesizedRevealReport?.totalTransactions,
+  0,
+  'synthesized reveal reports should avoid inventing multi-day transaction windows when no cached legacy report boundary exists'
+);
+const originalRunHistoricalSimulationDay = sandbox.runHistoricalSimulationDay;
+let revealFallbackCalled = false;
+sandbox.runHistoricalSimulationDay = () => {
+  revealFallbackCalled = true;
+  throw new Error('legacy historical simulation day path should not run for unified simulation backends');
+};
+api.setData({
+  ...api.getData(),
+  activeSeasonBackend: 'simulation',
+  historicalEntryMode: 'simulation_season'
+});
+api.setGame({
+  ...api.getGame(),
+  day: 13,
+  dayResults: {},
+  revealedDays: {},
+  dailyRevealReports: {},
+  simulationLogsByDay: {}
+});
+api.revealDay(13);
+sandbox.runHistoricalSimulationDay = originalRunHistoricalSimulationDay;
+assert.equal(revealFallbackCalled, false, 'revealDay should not fall back to the legacy historical simulation path for unified simulation backends');
+assert.deepStrictEqual(toPlain(api.getGame().dayResults), {}, 'simulation-backed revealDay compatibility shims should not repopulate legacy day result caches');
+assert.equal(api.settleWeek(2), true, 'settleWeek should recognize completed simulation weeks without replay-era mutation');
+assert.deepStrictEqual(
+  toPlain(api.getGame().standings),
+  [
+    { teamIdx: 0, teamAbbr: 'LAL', w: 0, l: 0, pf: 0, pa: 0 },
+    { teamIdx: 1, teamAbbr: 'BOS', w: 0, l: 0, pf: 0, pa: 0 }
+  ],
+  'settleWeek should not mutate stale fantasy-shell standings when the simulation backend is already authoritative'
+);
+
+const originalUnifiedBuilder = sandbox.window.RosterBateSimulationModeRuntime.buildUnifiedSimulationSeasonState;
+delete sandbox.window.RosterBateSimulationModeRuntime.buildUnifiedSimulationSeasonState;
+createdSimulationAdapters = [];
+const legacySinglePlayerResumeWithoutRuntimeBuilder = toPlain(api.resolveLocalSavedSeasonAutoLoad({
+  sport: 'nba',
+  leagueName: 'Legacy Single Player League',
+  teams: ['Los Angeles Lakers', 'Boston Celtics'],
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+  ],
+  waiver: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 },
+    { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 }
+  ],
+  currentDay: 12,
+  currentWeek: 2
+}, 'nba'));
+sandbox.window.RosterBateSimulationModeRuntime.buildUnifiedSimulationSeasonState = originalUnifiedBuilder;
+
+assert.equal(legacySinglePlayerResumeWithoutRuntimeBuilder.backend, 'simulation', 'legacy single-player saves should still resolve to the simulation backend when the runtime builder is unavailable');
+assert.ok(legacySinglePlayerResumeWithoutRuntimeBuilder.state.seasonState, 'legacy single-player saves should still synthesize simulation-native seasonState when the runtime builder is unavailable');
+assert.equal(legacySinglePlayerResumeWithoutRuntimeBuilder.state.leagueShell?.teams?.[0]?.abbr, 'LAL', 'legacy single-player fallback synthesis should preserve team identity for the adapter boot path');
+assert.equal(legacySinglePlayerResumeWithoutRuntimeBuilder.state.draftState?.rostersByTeam?.LAL?.[0]?.name, 'Michael Jordan', 'legacy single-player fallback synthesis should preserve roster assignments for the adapter boot path');
+assert.equal(createdSimulationAdapters.length, 1, 'legacy single-player fallback synthesis should still build a simulation adapter');
+
+createdSimulationAdapters = [];
+delete sandbox.window.RosterBateSimulationModeRuntime.buildUnifiedSimulationSeasonState;
+const legacySinglePlayerResumeWithReorderedStandings = toPlain(api.resolveLocalSavedSeasonAutoLoad({
+  sport: 'nba',
+  leagueName: 'Legacy Single Player League',
+  teams: ['Los Angeles Lakers', 'Boston Celtics'],
+  allRosters: [
+    [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+    [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+  ],
+  standings: [
+    { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274 },
+    { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288 }
+  ],
+  currentDay: 12,
+  currentWeek: 2
+}, 'nba'));
+sandbox.window.RosterBateSimulationModeRuntime.buildUnifiedSimulationSeasonState = originalUnifiedBuilder;
+
+assert.equal(legacySinglePlayerResumeWithReorderedStandings.state.leagueShell?.teams?.[0]?.abbr, 'LAL', 'legacy single-player fallback synthesis should respect stable teamIdx values instead of standings array order');
+assert.equal(legacySinglePlayerResumeWithReorderedStandings.state.leagueShell?.teams?.[1]?.abbr, 'BOS', 'legacy single-player fallback synthesis should keep the reordered standings rows attached to the correct teams');
+assert.equal(legacySinglePlayerResumeWithReorderedStandings.state.draftState?.rostersByTeam?.LAL?.[0]?.name, 'Michael Jordan', 'legacy single-player fallback synthesis should keep the LAL roster keyed to LAL after standings reorder');
+assert.equal(legacySinglePlayerResumeWithReorderedStandings.state.draftState?.rostersByTeam?.BOS?.[0]?.name, 'Stephen Curry', 'legacy single-player fallback synthesis should keep the BOS roster keyed to BOS after standings reorder');
+assert.equal(createdSimulationAdapters.length, 1, 'legacy single-player fallback synthesis should still build an adapter when standings are reordered');
+
 historicalSlotUpsertCalls = [];
 completedDraftUpsertError = null;
 const fallbackBootState = toPlain(api.normalizeSharedSimulationSeasonBootState(fixture, null));
@@ -1500,14 +2547,14 @@ api.setGame({
 api.persistHistoricalUniverseSlotSnapshot('simulation_claim');
 api.persistSimulationSeasonState('simulation_lineup');
 assert.equal(
-  historicalSlotUpsertCalls[1]?.options?.slotId,
-  'sim-slot-from-completed-draft',
-  'fallback shared-shell saves should adopt the first assigned historical slot id for later adapter-backed saves'
+  historicalSlotUpsertCalls.length,
+  0,
+  'fallback shared-shell saves should stay paused for the rest of the page session after a quota-blocked fallback path'
 );
 assert.equal(
-  fallbackBootAdapter.getState().historicalUniverseSlotId,
-  'sim-slot-from-completed-draft',
-  'fallback shared-shell adapters should retain the assigned slot id after the first successful save'
+  fallbackBootAdapter.getState().historicalUniverseSlotId ?? null,
+  null,
+  'fallback shared-shell adapters should not gain a slot id while session-level slot saves remain paused'
 );
 
 assert.match(
@@ -2026,6 +3073,50 @@ api.setSeasonModeAdapter({
   getRosterViewModel() {
     return {
       sport: 'nfl',
+      layoutMode: 'single-player-parity',
+      summaryCards: [
+        { label: 'Week Outlook', value: 'Fix 2 slots' }
+      ],
+      actionCards: [
+        { title: 'Opponent Scout', body: 'Dallas hosts Philadelphia.' }
+      ],
+      operations: {
+        actions: [
+          { id: 'set-lineup', label: 'Set Lineup' },
+          { id: 'waivers', label: 'Waivers' }
+        ]
+      },
+      tabs: [
+        { id: 'stats', label: 'Stats', active: true },
+        { id: 'schedule', label: 'Schedule', active: false }
+      ],
+      teamSummary: {
+        name: 'Dallas Cowboys',
+        leagueLabel: '2014 NFL Simulation',
+        watchListLabel: 'Watch List',
+        watchListEnabled: false,
+        watchListDisabledCopy: 'Simulation watch list tracking is not available yet.',
+        waiverOrderLabel: 'Waiver Order (3 of 12)',
+        waiverOrderEnabled: true,
+        waiverOrderCopy: 'Open waivers to inspect the current claim order.',
+        settingsLabel: 'Team Settings',
+        settingsEnabled: false,
+        settingsDisabledCopy: 'Simulation team settings stay read-only for now.'
+      },
+      sections: {
+        starters: {
+          title: 'Weekly Starters',
+          rows: [
+            { slot: 'QB', player: { id: 9, name: 'Tony Romo', pos: 'QB', team: 'DAL' } }
+          ]
+        },
+        bench: {
+          title: 'Bench / Depth',
+          rows: [
+            { slot: 'BENCH', player: { id: 81, name: 'Andrew Quarless', pos: 'TE', team: 'GB' } }
+          ]
+        }
+      },
       readyLabel: '2 lineup issues to fix',
       recommendationSummary: 'Suggested fixes are available below.',
       validation: {
@@ -2141,13 +3232,19 @@ api.setSeasonModeAdapter({
 });
 
 api.renderSimulationRosterInSharedShell();
+assertSharedSinglePlayerRosterMarkers(
+  elements.rosterContent.innerHTML,
+  'nfl simulation roster'
+);
+assertSimulationParityMeta(elements.rosterContent.innerHTML, 'nfl simulation roster');
 assert.match(elements.rosterContent.innerHTML, /QB/, 'nfl roster view should render football starter slot labels');
-assert.match(elements.rosterContent.innerHTML, /RB1/, 'nfl roster view should render numbered football starter slot labels');
 assert.match(elements.rosterContent.innerHTML, /2 lineup issues to fix/, 'nfl roster view should surface the lineup readiness status');
-assert.match(elements.rosterContent.innerHTML, /TE is empty/i, 'nfl roster view should surface slot-level validation warnings');
-assert.match(elements.rosterContent.innerHTML, /Bench/, 'nfl roster view should render a bench section');
+assert.match(elements.rosterContent.innerHTML, /Weekly Starters/, 'nfl roster view should use football-friendly section titles');
+assert.match(elements.rosterContent.innerHTML, /Bench \/ Depth/, 'nfl roster view should render football-friendly bench labeling');
+assert.match(elements.rosterContent.innerHTML, /Weekly Outlook/, 'nfl roster view should render football-friendly recommendation column copy');
+assert.match(elements.rosterContent.innerHTML, /bench/i, 'nfl roster view should render a bench section');
 assert.match(elements.rosterContent.innerHTML, /Andrew Quarless/, 'nfl roster view should render nfl bench players');
-assert.match(elements.rosterContent.innerHTML, /Use Suggestion/, 'nfl roster view should render suggestion controls for empty slots');
+assert.match(elements.rosterContent.innerHTML, /Assign TE|Assign FLEX/, 'nfl roster view should render shared bench-assignment controls');
 
 api.setSeasonModeAdapter({
   getModeId() {
@@ -2259,7 +3356,19 @@ const nflSuggestedLineupAdapterStub = {
   getRosterViewModel() {
     return {
       sport: 'nfl',
-      starterSlots: ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'DST', 'K'],
+      starterSlots: ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'K', 'DST'],
+      legacyStarterSlots: ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
+      lineupSlots: {
+        QB: { slot: 'QB', playerId: 2, suggestedPlayerId: 1 },
+        RB1: { slot: 'RB1', playerId: 3, suggestedPlayerId: 4 },
+        RB2: { slot: 'RB2', playerId: 4, suggestedPlayerId: 3 },
+        WR1: { slot: 'WR1', playerId: 5, suggestedPlayerId: 6 },
+        WR2: { slot: 'WR2', playerId: 6, suggestedPlayerId: 5 },
+        TE: { slot: 'TE', playerId: 7, suggestedPlayerId: 7 },
+        FLEX: { slot: 'FLEX', playerId: 8, suggestedPlayerId: 8 },
+        K: { slot: 'K', playerId: 10, suggestedPlayerId: 10 },
+        DST: { slot: 'DST', playerId: 9, suggestedPlayerId: 9 }
+      },
       roster: [
         { id: 1, name: 'QB One', pos: 'QB', team: 'DAL', mixedEraOverall: 99 },
         { id: 2, name: 'QB Two', pos: 'QB', team: 'DAL', mixedEraOverall: 98 },
@@ -2310,24 +3419,86 @@ const nflSuggestedLineupAdapterStub = {
 api.setSeasonModeAdapter(nflSuggestedLineupAdapterStub);
 api.applySimulationSuggestedLineupFromShell();
 assert.deepEqual(
+  Object.keys(toPlain(nflSuggestedLineupAdapterStub.lastLineupIds)),
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
+  'nfl suggested lineups should preserve the keyed starter-slot save order when routing through setLineup'
+);
+assert.deepEqual(
   toPlain(nflSuggestedLineupAdapterStub.lastLineupIds),
   {
     QB: 1,
-    RB1: 3,
-    RB2: 4,
-    WR1: 5,
-    WR2: 6,
+    RB1: 4,
+    RB2: 3,
+    WR1: 6,
+    WR2: 5,
     TE: 7,
     FLEX: 8,
-    DST: 9,
-    K: 10
+    K: 10,
+    DST: 9
   },
-  'nfl suggested lineups should save a slot-aware lineup map for numbered football slots'
+  'nfl suggested lineups should save a slot-aware lineup map using keyed football starter slots instead of collapsing duplicate display slots'
 );
 
 api.renderSimulationScheduleInSharedShell();
 assert.equal(elements.mWk.textContent, 'Week 1', 'nfl schedule view should use week-centric labels');
-assert.match(elements.matchupContent.innerHTML, /Weekly Schedule \/ Results/, 'nfl schedule view should render weekly schedule copy');
+assert.match(elements.matchupContent.innerHTML, /Current Matchup|Weekly Starters|Bench \/ Depth/, 'nfl matchup should render the richer weekly matchup-room framing');
+assert.match(elements.matchupContent.innerHTML, /Week 1|Wild Card Weekend/, 'nfl matchup should stay framed around weeks or playoff rounds');
+assert.doesNotMatch(elements.matchupContent.innerHTML, /Oct 22|Tue|Wed|Thu|Fri|Sat|Sun/, 'nfl matchup should not render nba-style daily navigation chips');
+assert.match(elements.matchupContent.innerHTML, /setSimulationMatchupNavigationValue/, 'nfl matchup navigation should also use the live shared-shell navigation handler');
+
+api.setSeasonModeAdapter({
+  ...nflSuggestedLineupAdapterStub,
+  getWaiverViewModel() {
+    return {
+      sport: 'nfl',
+      layoutMode: 'single-player-parity',
+      claimTimingLabel: 'Processing next sim week',
+      pendingClaims: [
+        {
+          claimId: 'pending-1',
+          teamAbbr: 'DAL',
+          addPlayerId: 81,
+          dropPlayerId: 83,
+          status: 'pending'
+        }
+      ],
+      recentClaimResults: [],
+      teamSummary: {
+        watchListLabel: 'Watch List',
+        watchListEnabled: false,
+        watchListDisabledCopy: 'Simulation watch list tracking is not available yet.',
+        waiverOrderLabel: 'Waiver Order (3 of 12)',
+        waiverOrderEnabled: true,
+        waiverOrderCopy: 'Open waivers to inspect the current claim order.',
+        settingsLabel: 'Team Settings',
+        settingsEnabled: false,
+        settingsDisabledCopy: 'Simulation team settings stay read-only for now.'
+      },
+      sections: {
+        available: {
+          rows: [
+            {
+              player: { id: 81, name: 'Andrew Quarless', pos: 'TE', team: 'GB' },
+              consequenceLabel: 'Drop required to submit claim'
+            }
+          ]
+        },
+        pending: {
+          rows: [
+            {
+              claimId: 'pending-1',
+              status: 'pending',
+              player: { id: 81, name: 'Andrew Quarless', pos: 'TE', team: 'GB' }
+            }
+          ]
+        }
+      }
+    };
+  }
+});
+api.renderSimulationWaiverInSharedShell();
+assert.match(elements.waiverContent.innerHTML, /Processing next sim week/i, 'nfl waiver desk should render weekly claim-processing copy through the shared shell');
+assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'nfl waiver desk should render the pending-claims section through the shared shell');
 
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /NFC East/, 'nfl standings view should render division-grouped sections');

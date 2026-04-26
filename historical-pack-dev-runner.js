@@ -81,16 +81,16 @@
     if(!enabled){
       return Promise.resolve({
         status:'disabled',
-        message:'Historical pack dev runner only enables itself on localhost.'
+        message:'Simulation archive dev runner only enables itself on localhost.'
       });
     }
     if(initPromise) return initPromise;
     initPromise=dependencyDefs.reduce(function(chain, dep){
       return chain.then(function(){ return loadDependency(dep); });
     }, Promise.resolve()).then(function(){
-      if(!helpAnnounced && global.console && typeof global.console.info==='function'){
+      if(!helpAnnounced && global.console && typeof global.console.debug==='function'){
         helpAnnounced=true;
-        global.console.info('[RosterBate dev] Historical pack runner ready. Try `rbHistoricalPackDev.help()`.');
+        global.console.debug('[RosterBate dev] Simulation archive runner ready. Try `rbHistoricalPackDev.help()`.');
       }
       return api;
     });
@@ -115,7 +115,7 @@
         return await deps.loader.loadPackById(id);
       }catch(error){
         if(global.console && typeof global.console.warn==='function'){
-          global.console.warn('[RosterBate dev] Real pack load failed, falling back to embedded fixture:', error && error.message ? error.message : error);
+          global.console.warn('[RosterBate dev] Archive pack load failed, falling back to embedded fixture:', error && error.message ? error.message : error);
         }
       }
     }
@@ -125,7 +125,7 @@
   function disabledResponse(){
     return {
       status:'disabled',
-      message:'Historical pack dev runner is only active on localhost.'
+      message:'Simulation archive dev runner is only active on localhost.'
     };
   }
 
@@ -284,7 +284,7 @@
         playersWithRealSeasonStats: playersWithRealSeasonStats,
         playerCount: players.length,
         playersWithSeasonStats: playersWithSeasonStats,
-        label: 'Historical season stats'
+        label: 'Simulation ratings coverage'
       },
       zeroGamePlayers: {
         count: zeroGamePlayers,
@@ -310,7 +310,7 @@
     const removedCount=sanitizeCount(removed.count);
     health.innerHTML=
       '<div class="rbh-health-card" data-tone="'+(coverageCovered!=null && coverageTotal!=null && coverageCovered===coverageTotal ? 'success' : 'neutral')+'">'+
-        '<span class="rbh-health-label">'+(real.label || 'Historical season stats')+'</span>'+
+        '<span class="rbh-health-label">'+(real.label || 'Simulation ratings coverage')+'</span>'+
         '<span class="rbh-health-value">'+formatCoverageText(coverageCovered, coverageTotal)+'</span>'+
         '<span class="rbh-health-sub">'+(coverageTotal!=null ? 'players with historical season lines' : 'coverage not published')+'</span>'+
       '</div>'+
@@ -397,7 +397,7 @@
     const importPlan=importResult && importResult.importPlan ? importResult.importPlan : null;
     const summary=importPlan && importPlan.summary ? importPlan.summary : null;
     const selectedTeamId=String(options && options.selectedTeamId || '').trim();
-    const entryMode=String(options && options.entryMode || 'historical_draft').trim() || 'historical_draft';
+    const entryMode=String(options && options.entryMode || 'simulation_season').trim() || 'simulation_season';
     return {
       schemaVersion: 1,
       savedAt: new Date().toISOString(),
@@ -596,14 +596,14 @@
     root.innerHTML=
       '<div class="rbh-shell">'+
         '<button type="button" class="rbh-toggle" data-role="toggle" aria-expanded="false">'+
-          '<span class="rbh-toggle-badge"><span class="rbh-dot"></span><span>Historical Pack Lab</span></span>'+
+      '<span class="rbh-toggle-badge"><span class="rbh-dot"></span><span>Simulation Archive Lab</span></span>'+
           '<span class="rbh-toggle-meta" data-role="toggle-meta">Open</span>'+
         '</button>'+
         '<div class="rbh-body">'+
-          '<div class="rbh-title"><div><strong>Pack Dev</strong><span>Localhost-only runner for historical packs and archive flows.</span></div></div>'+
-          '<div class="rbh-status" id="'+PANEL_ROOT_ID+'_status" data-tone="neutral"><strong>Idle</strong><br>Use Validate or Dry Import to test the selected historical pack.</div>'+
+      '<div class="rbh-title"><div><strong>Archive Dev</strong><span>Localhost-only runner for simulation archives and pack flows.</span></div></div>'+
+      '<div class="rbh-status" id="'+PANEL_ROOT_ID+'_status" data-tone="neutral"><strong>Idle</strong><br>Use Validate or Dry Import to test the selected simulation archive pack.</div>'+
           '<div class="rbh-health" id="'+HEALTH_PANEL_ID+'">'+
-            '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Historical season stats</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
+      '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Simulation ratings coverage</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
             '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Zero-game players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
             '<div class="rbh-health-card" data-tone="neutral"><span class="rbh-health-label">Removed invalid players</span><span class="rbh-health-value">—</span><span class="rbh-health-sub">loading pack audit</span></div>'+
           '</div>'+
@@ -616,7 +616,7 @@
             '<button type="button" class="rbh-btn" data-role="action" data-action="validate">Validate</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="import">Dry Import</button>'+
             '<button type="button" class="rbh-btn rbh-btn--success" data-role="action" data-action="apply">Apply To Local</button>'+
-            '<button type="button" class="rbh-btn" data-role="action" data-action="season">Open Historic Season</button>'+
+            '<button type="button" class="rbh-btn" data-role="action" data-action="season">Open Sim Season</button>'+
             '<button type="button" class="rbh-btn rbh-btn--accent" data-role="action" data-action="draft">Open Draft The Era</button>'+
             '<button type="button" class="rbh-btn rbh-btn--ghost" data-role="action" data-action="mixed">Open Mixed Era</button>'+
           '</div>'+
@@ -639,7 +639,7 @@
     if(teamSelect){
       teamSelect.addEventListener('change', function(){
         persistSelectedTeamId(teamSelect.value, getCurrentPackId());
-        setPanelStatus('<strong>Featured team staged</strong><br>Next local historical season boot will open as '+(getSelectedTeamLabel() || 'the selected team')+'.', 'success');
+        setPanelStatus('<strong>Featured team staged</strong><br>Next local simulation archive boot will open as '+(getSelectedTeamLabel() || 'the selected team')+'.', 'success');
       });
     }
     panelReady=true;
@@ -736,7 +736,7 @@
         writer: function(importResult){
           return writeImportToLocalState(importResult, {
             selectedTeamId:selectedTeamId,
-            entryMode:String(options && options.entryMode || 'historical_draft').trim() || 'historical_draft'
+            entryMode:String(options && options.entryMode || 'simulation_season').trim() || 'simulation_season'
           });
         }
       });
@@ -745,7 +745,7 @@
       if(!enabled) return disabledResponse();
       const id=getCurrentPackId(packId);
       const selectedTeamId=String(getPanelSelectedTeamId(id) || getPersistedSelectedTeamId(id) || '').trim();
-      const mode=String(historicalMode || 'dev').trim() || 'dev';
+      const mode=String(historicalMode || 'sim').trim() || 'sim';
       await api.applyFixtureToLocalState(id, {
         selectedTeamId:selectedTeamId,
         entryMode: mode==='reimagined'
@@ -846,7 +846,7 @@
     }
     ensureReady().catch(function(error){
       if(global.console && typeof global.console.warn==='function'){
-        global.console.warn('[RosterBate dev] Historical pack runner failed to initialize:', error && error.message ? error.message : error);
+    global.console.warn('[RosterBate dev] Simulation archive runner failed to initialize:', error && error.message ? error.message : error);
       }
     });
   }

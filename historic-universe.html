@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="RosterBate Historical Universe Details - inspect saved historic runs, continue them, and manage your archive.">
-<title>RosterBate - Historical Universe</title>
+<meta name="description" content="RosterBate Simulation Archive Details - inspect saved simulation runs, continue them, and manage your archive.">
+<title>RosterBate - Simulation Archive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
@@ -215,7 +215,7 @@
         <img src="rosterbate-main-logo.png" alt="RosterBate">
       </a>
       <div class="nav-links">
-        <a class="nav-link" id="archiveNavLink" href="historic-seasons.html?sport=nba">Historic Seasons</a>
+    <a class="nav-link" id="archiveNavLink" href="historic-seasons.html?sport=nba">Simulation Archives</a>
         <a class="nav-link" id="continueNavLink" href="#">Continue Universe</a>
         <a class="nav-link accent" id="seasonNavLink" href="#">Open Season</a>
       </div>
@@ -223,7 +223,7 @@
 
     <div id="missingState" class="empty-state" style="display:none;margin-top:18px;">
       <div class="empty-title">Universe Not Found</div>
-      <div class="empty-copy">This saved historical universe could not be found in local storage. It may have been deleted, or it may belong to a different browser profile.</div>
+      <div class="empty-copy">This saved simulation archive could not be found in local storage. It may have been deleted, or it may belong to a different browser profile.</div>
       <div class="empty-actions">
         <a class="action-btn neutral" id="missingArchiveLink" href="historic-seasons.html?sport=nba">Back To Archive</a>
       </div>
@@ -232,7 +232,7 @@
     <div id="detailsShell" style="display:none;">
       <section class="hero">
         <article class="panel hero-main">
-          <div class="eyebrow" id="heroEyebrow">Saved Historical Universe</div>
+        <div class="eyebrow" id="heroEyebrow">Saved Simulation Archive</div>
           <h1 class="hero-title" id="heroTitle">Universe <span>Details</span></h1>
           <div class="hero-copy" id="heroCopy">Loading saved universe context...</div>
           <div class="meta-pills" id="heroPills"></div>
@@ -259,7 +259,7 @@
         <aside class="panel hero-side">
           <div id="universeArtSlot">
             <div class="universe-art theme-spotlight">
-              <div class="universe-art-eyebrow">Historic Archive</div>
+              <div class="universe-art-eyebrow">Simulation Archive</div>
               <div class="universe-art-headline">Loading</div>
               <div class="universe-art-subline">Pulling saved universe details.</div>
             </div>
@@ -271,7 +271,7 @@
               <a href="#" class="action-btn neutral" id="backArchiveBtn">Back To Archive</a>
               <button type="button" class="action-btn delete" id="deleteUniverseBtn">Delete Universe</button>
             </div>
-            <div class="status-note" id="statusNote">Historical runs live locally for now. This page is the landing zone before you jump back into the season.</div>
+              <div class="status-note" id="statusNote">Simulation archive saves live locally for now. This page is the landing zone before you jump back into the season.</div>
           </div>
         </aside>
       </section>
@@ -371,7 +371,7 @@
 <script>
 const HISTORIC_UNIVERSE_1987_FALLBACK = {
   packId: 'nba_1987_full_season_v1',
-  seasonLabel: '1986-87 NBA Historic Season',
+      seasonLabel: '1986-87 NBA Historic Season',
   shortLabel: '1986-87',
   era: '1980s',
   availability: 'playable',
@@ -380,13 +380,13 @@ const HISTORIC_UNIVERSE_1987_FALLBACK = {
   significanceTone: 'heritage',
   focusTeamName: 'Los Angeles Lakers',
   tagline: 'Magic. Bird. Jordan. One prestige-rivalry universe.',
-  summary: 'A playable 1986-87 historical foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.',
+      summary: 'A playable 1986-87 simulation archive foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.',
   whyItMatters: 'This is the archive\'s premium 1980s tentpole: Finals rivalry gravity, Lakers focus-team energy, and a young Jordan expanding the draft sandbox.',
   art: { theme:'heritage', eyebrow:'1980s Rivalry', headline:'Bird.\nMagic.\nJordan.', subline:'Peak Celtics-Lakers tension with a young Jordan entering the frame.' }
 };
 const HISTORIC_UNIVERSE_1993_FALLBACK = {
   packId: 'nba_1993_full_season_v1',
-  seasonLabel: '1992-93 NBA Historic Season',
+      seasonLabel: '1992-93 NBA Historic Season',
   era: '1990s',
   availability: 'playable',
   shortLabel: '1992-93',
@@ -395,7 +395,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   significanceTone: 'dynasty',
   focusTeamName: 'Chicago Bulls',
   tagline: 'Jordan. Barkley. Pippen. One first-three-peat universe.',
-  summary: 'A playable 1992-93 historical foundation built around the Bulls\' first three-peat push and the Suns\' Finals-era challenge.',
+      summary: 'A playable 1992-93 simulation archive foundation built around the Bulls\' first three-peat push and the Suns\' Finals-era challenge.',
   whyItMatters: 'This is the archive\'s premium early-1990s tentpole: Jordan\'s title-era gravity, Barkley\'s challenger Suns, and a player pool that bridges 1980s prestige to 1995-96 dynasty apex.',
   art: { theme:'dynasty', eyebrow:'First Three-Peat', headline:'Jordan.\nBarkley.\nPippen.', subline:'Bulls title gravity with Phoenix and Barkley as the Finals counterweight.' }
 };
@@ -426,8 +426,8 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       significanceTone: 'dynasty',
       focusTeamName: 'Chicago Bulls',
       tagline: 'Rewrite the greatest regular season ever.',
-      summary: 'Full-league historical universe with historical season stats, sim-ready player pools, and Draft The Era support.',
-      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a saved archive sandbox for drafts, simulations, and alternate-history team builds.',
+      summary: 'Full-league simulation archive with simulation-ready ratings, sim-ready player pools, and Draft The Era support.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a source-season foundation into a saved archive sandbox for drafts, simulations, and alternate-history team builds.',
       art: { theme:'dynasty', eyebrow:'1990s Archive', headline:'72-Win Empire', subline:'Jordan, Hakeem, Shaq, and the full season universe.' }
     },
     HISTORIC_UNIVERSE_1987_FALLBACK,
@@ -440,8 +440,8 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         significanceLabel: 'Dynasty Spotlight',
         significanceTone: 'dynasty',
         focusTeamName: 'Los Angeles Lakers',
-        tagline: 'Shaq, Kobe, Iverson, and a full turn-of-the-century historical universe.',
-        summary: 'A first-class 2000-01 historical season pack with historical season stats, a full player pool, and early-2000s dynasty energy.',
+      tagline: 'Shaq, Kobe, Iverson, and a full turn-of-the-century simulation archive.',
+      summary: 'A first-class 2000-01 simulation archive pack with simulation-ready ratings, a full player pool, and early-2000s dynasty energy.',
         whyItMatters: 'This preset gives the archive a widely recognizable turn-of-the-century tentpole that feels distinct from the 1990s and 2010s seasons.',
         art: { theme:'dynasty', eyebrow:'Turn-of-Century Dynasty', headline:'Shaq. Kobe. AI.', subline:'Dominant bigs, electric guards, and a championship-era universe.' }
       },
@@ -454,7 +454,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       significanceTone: 'modern',
       focusTeamName: 'Golden State Warriors',
       tagline: 'Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.',
-      summary: 'A real modern historical universe built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.',
+      summary: 'A modern simulation archive built around the Warriors, Cavs, and one of the most recognizable NBA seasons ever.',
       whyItMatters: 'This season gives the archive lane a modern tentpole pack that new players instantly recognize, with a very different strategic texture from older eras.',
       art: { theme:'modern', eyebrow:'Modern Breakthrough', headline:'73 Wins. 3-1 Swing.', subline:'Unanimous MVP energy and the most volatile Finals pivot of the era.' }
     }
@@ -499,9 +499,9 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const art = config && typeof config.art === 'object' && config.art ? config.art : {};
     return {
       theme: String(art.theme || config?.significanceTone || 'spotlight').trim().toLowerCase() || 'spotlight',
-      eyebrow: String(art.eyebrow || ((config?.era || 'Historic') + ' Archive')).trim() || 'Historic Archive',
-      headline: String(art.headline || config?.shortLabel || config?.seasonLabel || 'Historic Universe').trim() || 'Historic Universe',
-      subline: String(art.subline || config?.tagline || config?.significanceLabel || 'Saved historical run').trim() || 'Saved historical run'
+      eyebrow: String(art.eyebrow || ((config?.era || 'Simulation') + ' Archive')).trim() || 'Simulation Archive',
+      headline: String(art.headline || config?.shortLabel || config?.seasonLabel || 'Simulation Universe').trim() || 'Simulation Universe',
+      subline: String(art.subline || config?.tagline || config?.significanceLabel || 'Saved simulation archive').trim() || 'Saved simulation archive'
     };
   }
 
@@ -527,7 +527,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         if(Array.isArray(catalog) && catalog.length) return catalog;
       }
     }catch(error){
-      console.warn('[Historic Universe] Falling back to embedded catalog', error);
+      console.warn('[Simulation Archive] Falling back to embedded catalog', error);
     }
     return buildFallbackCatalog();
   }
@@ -1014,8 +1014,71 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     });
   }
 
+  function getSimulationStandingContext(state){
+    const teamAbbr = String(state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+    const myPos = Number(state?.myPos);
+    const standings = Array.isArray(state?.seasonState?.standings)
+      ? state.seasonState.standings.slice()
+      : (Array.isArray(state?.standings) ? state.standings.slice() : []);
+    if((!teamAbbr && !Number.isFinite(myPos)) || !standings.length){
+      return null;
+    }
+    const sorted = standings.sort(function(a, b){
+      const winDiff = Number(b?.w || 0) - Number(a?.w || 0);
+      if(winDiff) return winDiff;
+      const pfDiff = Number(b?.pf || 0) - Number(a?.pf || 0);
+      if(pfDiff) return pfDiff;
+      return Number(a?.l || 0) - Number(b?.l || 0);
+    });
+    const rank = sorted.findIndex(function(entry){
+      if(teamAbbr && String(entry?.teamAbbr || '').trim().toUpperCase() === teamAbbr){
+        return true;
+      }
+      return Number(entry?.teamIdx) === myPos;
+    });
+    if(rank < 0) return null;
+    return {
+      rank: rank + 1
+    };
+  }
+
+  function getUniverseActivityLog(state){
+    const rootLog = Array.isArray(state?.activityLog) ? state.activityLog : [];
+    if(rootLog.length) return rootLog;
+    return Array.isArray(state?.seasonState?.activityLog) ? state.seasonState.activityLog : [];
+  }
+
+  function getCompletedSimulationArchiveWindows(state, limit){
+    const completedGameLogs = Array.isArray(state?.seasonState?.completedGameLogs)
+      ? state.seasonState.completedGameLogs
+      : (Array.isArray(state?.completedGameLogs) ? state.completedGameLogs : []);
+    const windowsByDay = {};
+    completedGameLogs.forEach(function(game){
+      const day = Number(game?.day || 0);
+      if(!(day > 0)) return;
+      const key = String(day);
+      if(!windowsByDay[key]){
+        windowsByDay[key] = {
+          day: day,
+          week: Number(game?.week || 0),
+          gameLogs: []
+        };
+      }
+      if(!(windowsByDay[key].week > 0) && Number(game?.week || 0) > 0){
+        windowsByDay[key].week = Number(game.week || 0);
+      }
+      windowsByDay[key].gameLogs.push(game);
+    });
+    return Object.keys(windowsByDay)
+      .map(function(key){ return windowsByDay[key]; })
+      .sort(function(a, b){
+        return Number(b?.day || 0) - Number(a?.day || 0);
+      })
+      .slice(0, Math.max(0, Number(limit || 0)));
+  }
+
   function buildRecentUniverseActivitySummary(state, reveal){
-    const activityLog = Array.isArray(state?.activityLog) ? state.activityLog : [];
+    const activityLog = getUniverseActivityLog(state);
     if(!activityLog.length){
       if(Number(reveal?.totalTransactions) > 0){
         return {
@@ -1023,6 +1086,18 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
             title: Number(reveal.totalTransactions) + ' league transactions in the latest sim',
             body: 'The latest completed sim day logged league activity, even though the detailed activity feed is still unavailable.',
             meta: ['REVEAL SUMMARY']
+          }]
+        };
+      }
+      const recentArchiveWindows = getCompletedSimulationArchiveWindows(state, 1);
+      if(recentArchiveWindows.length){
+        const latestWindow = recentArchiveWindows[0];
+        const completedGames = Array.isArray(latestWindow?.gameLogs) ? latestWindow.gameLogs.length : 0;
+        return {
+          items: [{
+            title: 'Recent sim day archived',
+            body: 'Day ' + Number(latestWindow.day || 0) + ' already has ' + completedGames + ' completed simulation matchup' + (completedGames === 1 ? '' : 's') + ' saved, even though the older reveal feed is empty.',
+            meta: ['SIMULATION ARCHIVE']
           }]
         };
       }
@@ -1064,12 +1139,86 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       .filter(function(item){ return Number(item?.day || 0) < currentDay; })
       .sort(function(a, b){ return Number(b?.day || 0) - Number(a?.day || 0); })[0] || null;
     const minTs = Number(previousReveal?.generatedAt || 0);
-    return (Array.isArray(state?.activityLog) ? state.activityLog : []).filter(function(entry){
+    return getUniverseActivityLog(state).filter(function(entry){
       const ts = Number(entry?.ts || 0);
       return ts > minTs && ts <= maxTs;
     }).sort(function(a, b){
       return Number(b?.ts || 0) - Number(a?.ts || 0);
     });
+  }
+
+  function getControlledSimulationArchiveGame(slot, state, gameLogs){
+    const myPos = Number(state?.myPos);
+    const teamNames = getRecentSimulationTeamNameCandidates(slot, state);
+    const standings = Array.isArray(state?.standings)
+      ? state.standings
+      : (Array.isArray(state?.seasonState?.standings) ? state.seasonState.standings : []);
+    const myStanding = standings.find(function(entry){
+      return Number(entry?.teamIdx) === myPos;
+    }) || null;
+    const controlledTeamAbbr = String(
+      myStanding?.teamAbbr ||
+      state?.draftState?.controlledTeamAbbr ||
+      state?.seasonState?.controlledTeamAbbr ||
+      ''
+    ).trim().toLowerCase();
+    return (Array.isArray(gameLogs) ? gameLogs : []).find(function(game){
+      const homeIdx = Number(game?.home);
+      const awayIdx = Number(game?.away);
+      if(homeIdx === myPos || awayIdx === myPos) return true;
+      const homeAbbr = String(game?.homeAbbr || '').trim().toLowerCase();
+      const awayAbbr = String(game?.awayAbbr || '').trim().toLowerCase();
+      if(controlledTeamAbbr && (homeAbbr === controlledTeamAbbr || awayAbbr === controlledTeamAbbr)){
+        return true;
+      }
+      const homeName = String(game?.homeName || '').trim().toLowerCase();
+      const awayName = String(game?.awayName || '').trim().toLowerCase();
+      return teamNames.some(function(teamName){
+        return teamName === homeName || teamName === awayName;
+      });
+    }) || null;
+  }
+
+  function buildSimulationArchiveWindowResult(slot, state, window){
+    const fallbackTeamName = getControlledTeamName(slot, state) || 'Your Team';
+    const game = getControlledSimulationArchiveGame(slot, state, window?.gameLogs || []);
+    if(!game) return null;
+    const teamNames = getRecentSimulationTeamNameCandidates(slot, state);
+    const controlledTeamAbbr = String(
+      state?.draftState?.controlledTeamAbbr ||
+      state?.seasonState?.controlledTeamAbbr ||
+      ''
+    ).trim().toLowerCase();
+    const homeName = String(game?.homeName || '').trim();
+    const awayName = String(game?.awayName || '').trim();
+    const homeAbbr = String(game?.homeAbbr || '').trim().toLowerCase();
+    const awayAbbr = String(game?.awayAbbr || '').trim().toLowerCase();
+    const myPos = Number(state?.myPos);
+    const teamIsHome = Number(game?.home) === myPos
+      || (!!controlledTeamAbbr && homeAbbr === controlledTeamAbbr)
+      || (!!homeName && teamNames.includes(homeName.toLowerCase()));
+    const teamName = teamIsHome ? (homeName || fallbackTeamName) : (awayName || fallbackTeamName);
+    const opponentName = teamIsHome ? (awayName || 'Unknown Opponent') : (homeName || 'Unknown Opponent');
+    const myScore = Number(teamIsHome ? game?.homeScore : game?.awayScore);
+    const opponentScore = Number(teamIsHome ? game?.awayScore : game?.homeScore);
+    const verb = Number.isFinite(myScore) && Number.isFinite(opponentScore)
+      ? (myScore === opponentScore ? 'tied' : (myScore > opponentScore ? 'beat' : 'fell to'))
+      : 'faced';
+    return {
+      headline: teamName + ' ' + verb + ' ' + opponentName,
+      subline: Number.isFinite(myScore) && Number.isFinite(opponentScore)
+        ? myScore.toFixed(1) + ' - ' + opponentScore.toFixed(1)
+        : 'Result still loading'
+    };
+  }
+
+  function buildSimulationArchiveWindowLeagueNote(window){
+    const completedGames = Array.isArray(window?.gameLogs) ? window.gameLogs.length : 0;
+    if(!(completedGames > 1)) return null;
+    return {
+      title: completedGames + ' completed games archived',
+      body: 'Day ' + Number(window?.day || 0) + ' saved a full batch of simulation engine results for this universe.'
+    };
   }
 
   function buildRecentSimulationTeamResult(slot, state, reveal){
@@ -1188,21 +1337,62 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function buildRecentSimulationSummary(slot, state){
-    return getRecentRevealReports(state, 3).map(function(reveal){
-      const storyHeadline = String(reveal?.story?.headline || '').trim();
-      const storySubheadline = String(reveal?.story?.subheadline || '').trim();
+    const recentRevealReports = getRecentRevealReports(state, 3);
+    if(recentRevealReports.length){
+      return recentRevealReports.map(function(reveal){
+        const storyHeadline = String(reveal?.story?.headline || '').trim();
+        const storySubheadline = String(reveal?.story?.subheadline || '').trim();
+        return {
+          day: Number(reveal?.day || 0),
+          week: Number(reveal?.week || 0),
+          teamResult: buildRecentSimulationTeamResult(slot, state, reveal),
+          story: {
+            headline: storyHeadline || 'Simulation day completed.',
+            body: storySubheadline || storyHeadline || 'Simulation day completed.'
+          },
+          teamActivity: buildRecentSimulationTeamActivity(slot, state, reveal),
+          leagueNote: buildRecentSimulationLeagueNote(slot, state, reveal)
+        };
+      });
+    }
+    return getCompletedSimulationArchiveWindows(state, 3).map(function(window){
+      const completedGames = Array.isArray(window?.gameLogs) ? window.gameLogs.length : 0;
+      const teamResult = buildSimulationArchiveWindowResult(slot, state, window);
       return {
-        day: Number(reveal?.day || 0),
-        week: Number(reveal?.week || 0),
-        teamResult: buildRecentSimulationTeamResult(slot, state, reveal),
+        day: Number(window?.day || 0),
+        week: Number(window?.week || 0),
+        teamResult: teamResult,
         story: {
-          headline: storyHeadline || 'Simulation day completed.',
-          body: storySubheadline || storyHeadline || 'Simulation day completed.'
+          headline: teamResult?.headline || 'Simulation day completed.',
+          body: 'Day ' + Number(window?.day || 0) + ' finished with ' + completedGames + ' archived simulation matchup' + (completedGames === 1 ? '' : 's') + '.'
         },
-        teamActivity: buildRecentSimulationTeamActivity(slot, state, reveal),
-        leagueNote: buildRecentSimulationLeagueNote(slot, state, reveal)
+        teamActivity: [],
+        leagueNote: buildSimulationArchiveWindowLeagueNote(window)
       };
     });
+  }
+
+  function buildSimulationLatestUniverseSummary(slot, state, recentSimDays){
+    const latestEntry = Array.isArray(recentSimDays) && recentSimDays.length ? recentSimDays[0] : null;
+    if(!(latestEntry && latestEntry.teamResult)){
+      return buildSimulationModeSummary(slot, state);
+    }
+    const standing = getSimulationStandingContext(state);
+    const pills = [
+      'Week ' + Number(latestEntry.week || 0) + ' Day ' + Number(latestEntry.day || 0)
+    ];
+    if(String(latestEntry?.teamResult?.subline || '').trim()){
+      pills.push(String(latestEntry.teamResult.subline).trim());
+    }
+    if(standing?.rank){
+      pills.push('Rank #' + Number(standing.rank));
+    }
+    return {
+      copy: 'Week ' + Number(latestEntry.week || 0) + ', Day ' + Number(latestEntry.day || 0) + ' is the latest completed archive beat for ' + getControlledTeamName(slot, state) + '.',
+      headline: String(latestEntry?.teamResult?.headline || 'Simulation day completed.').trim(),
+      narrative: String(latestEntry?.story?.body || latestEntry?.story?.headline || 'Simulation day completed.').trim(),
+      pills: pills
+    };
   }
 
   const RECENT_ROSTER_MOVES_LIMIT = 5;
@@ -1348,7 +1538,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function buildRecentRosterMovesSummary(slot, state){
-    const entries = (Array.isArray(state?.activityLog) ? state.activityLog : [])
+    const entries = getUniverseActivityLog(state)
       .filter(function(entry){
         return isControlledTeamActivity(slot, state, entry) && isRosterChangingActivityEntry(entry);
       })
@@ -1385,7 +1575,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function buildRecentLeagueTradesSummary(slot, state){
-    return (Array.isArray(state?.activityLog) ? state.activityLog : [])
+    return getUniverseActivityLog(state)
       .filter(function(entry){
         return isCompletedTradeActivityEntry(entry) && !isControlledTeamActivity(slot, state, entry);
       })
@@ -1434,7 +1624,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const players = rosterItems.slice(0, 3).map(function(player){
       return {
         title: String(player?.name || 'Unknown Player').trim(),
-        body: [player?.team, player?.pos].filter(Boolean).join(' - ') || 'Historical roster piece',
+      body: [player?.team, player?.pos].filter(Boolean).join(' - ') || 'Archive roster piece',
         meta: ['FP ' + String(player?.fp || '--'), 'TFP ' + String(player?.tfp || '--')]
       };
     });
@@ -1528,11 +1718,15 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const standing = getStandingContext(state);
     const rosterCore = buildRosterCore(state);
     const simulationMode = isSimulationModeUniverse(slot, state);
+    const recentSimDays = buildRecentSimulationSummary(slot, state);
+    const recentActivity = simulationMode
+      ? buildRecentUniverseActivitySummary(state, null)
+      : buildRecentUniverseActivitySummary(state, reveal);
     return {
-      latestSimDay: simulationMode ? buildSimulationModeSummary(slot, state) : buildLatestSimDaySummary(slot, state, reveal, standing),
+      latestSimDay: simulationMode ? buildSimulationLatestUniverseSummary(slot, state, recentSimDays) : buildLatestSimDaySummary(slot, state, reveal, standing),
       leagueSnapshot: simulationMode ? buildSimulationPlayoffSummary(slot, state) : buildLeagueSnapshotSummary(slot, state, standing),
-      recentActivity: buildRecentUniverseActivitySummary(state, reveal),
-      recentSimDays: buildRecentSimulationSummary(slot, state),
+      recentActivity: recentActivity,
+      recentSimDays: recentSimDays,
       recentRosterMoves: buildRecentRosterMovesSummary(slot, state),
       recentLeagueTrades: buildRecentLeagueTradesSummary(slot, state),
       currentTeamState: buildCurrentTeamStateSummary(slot, state, rosterCore)
@@ -1577,11 +1771,11 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       ? (Number(slot.wins) + '-' + Number(slot.losses))
       : '--';
     const pfText = Number.isFinite(Number(slot.pf)) ? Number(slot.pf).toFixed(1) : '--';
-    const title = String(slot.title || config?.seasonLabel || 'Historical Universe').trim();
+    const title = String(slot.title || config?.seasonLabel || 'Simulation Universe').trim();
     const heroTeam = String(slot.teamName || config?.focusTeamName || 'Featured Team').trim();
     const heroCopy = config?.whyItMatters
-      ? (config.summary + ' This saved run keeps that pack alive through your own branch: ' + config.whyItMatters)
-      : (config?.summary || 'This saved universe captures a living historical branch you can revisit anytime.');
+      ? (config.summary + ' This saved archive keeps that pack alive through your own branch: ' + config.whyItMatters)
+      : (config?.summary || 'This saved universe captures a living simulation branch you can revisit anytime.');
 
     document.getElementById('missingState').style.display = 'none';
     document.getElementById('detailsShell').style.display = '';
@@ -1594,7 +1788,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       ? 'This simulation archive tracks the play-in race, the postseason bracket, and the current champion chase for ' + heroTeam + '.'
       : heroCopy;
     document.getElementById('heroPills').innerHTML = [
-      '<span class="meta-pill">' + escapeHtml(config?.shortLabel || slot.historicalSeasonId || 'Historic') + '</span>',
+      '<span class="meta-pill">' + escapeHtml(config?.shortLabel || slot.historicalSeasonId || 'Archive') + '</span>',
       '<span class="meta-pill">' + escapeHtml(config?.significanceLabel || 'Archive Run') + '</span>',
       '<span class="meta-pill">' + escapeHtml(progressLabel) + '</span>',
       '<span class="meta-pill">' + escapeHtml(String(slot.playerPoolCount || 0)) + ' player pool</span>'
@@ -1609,7 +1803,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     document.getElementById('backArchiveBtn').href = archiveUrl;
     document.getElementById('statusNote').textContent = [
       modeLabel + ' is saved locally.',
-      'Pack: ' + (config?.seasonLabel || slot.historicalSeasonId || 'historic archive') + '.',
+            'Pack: ' + (config?.seasonLabel || slot.historicalSeasonId || 'simulation archive') + '.',
       'Updated ' + normalizeDate(slot.updatedAt) + '.'
     ].join(' ');
 

@@ -13,6 +13,7 @@ const slotState = {
   simulationMode: 'nba_mixed_era_single_player_v1',
   leagueShell: {
     anchorSeasonLabel: '2025-26 NBA',
+    rosterSize: 2,
     teams: [
       { abbr: 'LAL', name: 'Los Angeles Lakers', conference: 'West', division: 'Pacific' },
       { abbr: 'BOS', name: 'Boston Celtics', conference: 'East', division: 'Atlantic' }
@@ -40,6 +41,26 @@ const slotState = {
     currentDay: 12,
     currentWeek: 2,
     lineupIdsByTeam: { LAL: [23, 34] },
+    pendingWaiverClaims: [
+      {
+        claimId: 'claim-1',
+        teamAbbr: 'LAL',
+        addPlayerId: 50,
+        dropPlayerId: 23,
+        status: 'pending',
+        processOnAdvance: 'day'
+      }
+    ],
+    recentWaiverResults: [
+      {
+        claimId: 'claim-0',
+        teamAbbr: 'LAL',
+        addPlayerId: 50,
+        dropPlayerId: 34,
+        status: 'approved',
+        resolutionNote: 'Claim processed successfully.'
+      }
+    ],
     standings: [
       { teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 9, l: 3, pf: 1360, pa: 1288, streak: 'W3' },
       { teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 7, l: 5, pf: 1299, pa: 1274, streak: 'L1' }
@@ -76,6 +97,17 @@ const adapter = createSimulationSeasonAdapter({
   state: slotState
 });
 
+function assertSinglePlayerParityRosterVm(rosterVm, label) {
+  assert.equal(rosterVm.layoutMode, 'single-player-parity', `${label} roster vm should opt into the shared single-player parity layout`);
+  assert.ok(Array.isArray(rosterVm.summaryCards), `${label} roster vm should expose shared summary cards`);
+  assert.ok(Array.isArray(rosterVm.actionCards), `${label} roster vm should expose shared action cards`);
+  assert.ok(Array.isArray(rosterVm.operations?.actions), `${label} roster vm should expose shared roster operations actions`);
+  assert.ok(Array.isArray(rosterVm.tabs), `${label} roster vm should expose shared roster mini-tabs`);
+  assert.ok(Array.isArray(rosterVm.sections?.starters?.rows), `${label} roster vm should expose starter rows through shared sections`);
+  assert.ok(Array.isArray(rosterVm.sections?.bench?.rows), `${label} roster vm should expose bench rows through shared sections`);
+  assert.equal(Object.prototype.hasOwnProperty.call(rosterVm, 'slotKeys'), false, `${label} roster vm should not expose overlapping slot collections`);
+}
+
 assert.equal(adapter.getModeId(), simulationSeasonAdapterApi.MODE_ID);
 const stateSnapshot = adapter.getState();
 stateSnapshot.draftState.controlledTeamAbbr = 'BOS';
@@ -91,17 +123,35 @@ assert.equal(adapter.getNavItems().find((item) => item.id === 'matchup').label, 
 assert.equal(typeof adapter.setLineup, 'function');
 assert.equal(typeof adapter.claimFreeAgent, 'function');
 assert.equal(typeof adapter.applyTrade, 'function');
+assert.equal(typeof adapter.activateSimulationPowerup, 'function');
 assert.equal(typeof adapter.simulateNextDay, 'function');
 assert.match(adapterSource, /runtimeApi\.setSimulationLineup\(/, 'adapter lineup mutation should stay runtime-backed');
 assert.match(adapterSource, /runtimeApi\.claimSimulationFreeAgent\(/, 'adapter waiver mutation should stay runtime-backed');
 assert.match(adapterSource, /runtimeApi\.applySimulationTrade\(/, 'adapter trade mutation should stay runtime-backed');
+assert.match(adapterSource, /runtimeApi\.activateSimulationPowerup\(/, 'adapter powerup mutation should stay runtime-backed');
 assert.match(adapterSource, /gameLog\?\.winner/, 'postseason advancement should prefer the authoritative game winner over rounded display scores');
 
 const hub = adapter.getHubViewModel();
 assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
 assert.equal(hub.controlledTeam.abbr, 'LAL');
 assert.equal(hub.primaryAction.label, 'Sim Day');
+assert.equal(hub.statSourceLabel, 'Simulated', 'single-player replacement hub vm should label engine-backed output as simulated');
 assert.deepStrictEqual(hub.sourceSeasonLabels, ['1986-87', '1995-96', '2015-16']);
+assert.ok(Array.isArray(hub.summaryCards), 'hub vm should expose summaryCards for shared-shell parity');
+assert.ok(Array.isArray(hub.powerupCards), 'hub vm should expose powerupCards for shared-shell parity');
+assert.equal(hub.powerupCards.length, 4, 'hub vm should expose the familiar four-card powerup rail for parity');
+assert.equal(hub.powerupCards[0]?.active, false, 'captain-mode hub powerup cards should stay inactive until that specific powerup is active');
+assert.equal(hub.powerupCards[0]?.status, 'Ready to activate', 'captain-mode hub powerup cards should expose an actionable ready state when that specific powerup is inactive');
+assert.equal(hub.powerupCards[0]?.disabled, false, 'captain-mode hub cards should stay enabled when a valid lineup exists');
+assert.equal(hub.powerupCards[0]?.actionLabel, 'Activate Captain', 'captain-mode hub cards should expose an activation label through the adapter vm');
+assert.ok(Array.isArray(hub.powerupCards[0]?.targetOptions), 'captain-mode hub cards should expose starter target options');
+assert.equal(hub.powerupCards[0]?.targetOptions?.[0]?.value, 23, 'captain-mode hub cards should default to the first starter target');
+assert.deepStrictEqual(
+  hub.powerupCards.map((card) => card.label),
+  ['Captain Mode', 'White Gloves', 'Bench Boost', 'Sunday Surge'],
+  'hub vm should mirror the familiar single-player powerup rail ordering'
+);
+assert.equal(hub.powerupCards[1]?.disabled, true, 'non-wired parity powerups should stay visibly disabled until simulation support exists');
 hub.controlledTeam.name = 'Mutated Lakers';
 hub.userRow.w = 999;
 hub.sourceSeasonLabels.push('2020-21');
@@ -109,31 +159,185 @@ assert.equal(adapter.getState().leagueShell.teams[0].name, 'Los Angeles Lakers')
 assert.equal(adapter.getState().seasonState.standings[0].w, 9);
 assert.equal(adapter.getState().sourceSeasons.sourceSeasonLabels.length, 3);
 
+const unrelatedPowerupAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-powerups',
+  state: {
+    ...slotState,
+    seasonState: {
+      ...slotState.seasonState,
+      powerupsByWeek: {
+        2: {
+          heat_check: {
+            active: true,
+            targetId: 23
+          }
+        }
+      }
+    }
+  }
+});
+
+const unrelatedPowerupHub = unrelatedPowerupAdapter.getHubViewModel();
+assert.equal(unrelatedPowerupHub.powerupCards[0]?.active, false, 'captain-mode hub cards should remain inactive when a different weekly powerup is active');
+assert.equal(unrelatedPowerupHub.powerupCards[0]?.status, 'Ready to activate', 'captain-mode hub cards should stay actionable when only unrelated weekly powerups are active');
+
+const activatedPowerupState = adapter.activateSimulationPowerup({
+  powerupId: 'captain_mode',
+  targetId: 34
+});
+assert.equal(
+  activatedPowerupState.seasonState.powerupsByWeek[2].captain_mode.active,
+  true,
+  'adapter powerup actions should store the active weekly powerup state through the runtime contract'
+);
+assert.equal(
+  activatedPowerupState.seasonState.powerupsByWeek[2].captain_mode.targetId,
+  34,
+  'adapter powerup actions should preserve the selected starter target'
+);
+assert.equal(
+  adapter.getHubViewModel().powerupCards[0]?.actionLabel,
+  'Update Captain',
+  'adapter powerup cards should relabel the shared-shell action once Captain Mode is active'
+);
+
 const roster = adapter.getRosterViewModel();
+assertSinglePlayerParityRosterVm(roster, 'nba simulation');
+assert.equal(roster.statSourceLabel, 'Simulated', 'single-player replacement roster vm should label generated stats as simulated');
 assert.equal(roster.lineup.length, 2);
 assert.equal(roster.bench.length, 0);
+assert.ok(roster.teamSummary, 'shared simulation roster vm should expose a teamSummary bridge object');
+assert.equal(roster.teamSummary.watchListEnabled, true, 'simulation roster vm should expose a live watch-list affordance');
+assert.equal(roster.teamSummary.settingsEnabled, true, 'simulation roster vm should expose live team-settings affordance');
 roster.roster[0].name = 'Mutated Player';
 assert.equal(adapter.getState().draftState.rostersByTeam.LAL[0].name, 'Michael Jordan');
+
+const sparseNbaAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-sparse-nba',
+  state: {
+    ...slotState,
+    draftState: {
+      ...slotState.draftState,
+      rostersByTeam: {
+        ...slotState.draftState.rostersByTeam,
+        LAL: [
+          { id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI', fp: 60.2 },
+          { id: 34, name: 'Hakeem Olajuwon', pos: 'C', team: 'HOU', fp: 61.8 },
+          { id: 50, name: 'Scottie Pippen', pos: 'SF', team: 'CHI', fp: 46.4 }
+        ]
+      }
+    },
+    seasonState: {
+      ...slotState.seasonState,
+      lineupIdsByTeam: { LAL: [23, 9999, 34] }
+    }
+  }
+});
+
+const sparseNbaRosterVm = sparseNbaAdapter.getRosterViewModel();
+assert.deepStrictEqual(
+  sparseNbaRosterVm.lineup.map((player) => player?.id ?? null),
+  [23, null, 34],
+  'nba simulation roster vm should preserve sparse lineup slot alignment instead of compacting unknown starters'
+);
+assert.equal(sparseNbaRosterVm.sections.starters.rows[0].player?.id, 23);
+assert.equal(sparseNbaRosterVm.sections.starters.rows[1].player, null);
+assert.equal(sparseNbaRosterVm.sections.starters.rows[2].player?.id, 34);
 
 const schedule = adapter.getScheduleViewModel();
 assert.equal(schedule.recentResults.length, 1);
 assert.equal(schedule.recentResults[0].homeAbbr, 'LAL');
 assert.equal(schedule.nextGame.opponentAbbr, 'BOS');
 assert.equal(schedule.nextGame.day, 12);
+assert.ok(Array.isArray(schedule.detailCards), 'schedule vm should expose detailCards for shared-shell parity');
+assert.equal(schedule.hero?.title, 'Current Matchup', 'schedule vm should expose a matchup-room hero title');
+assert.equal(schedule.hero?.controlledTeamAbbr, 'LAL', 'schedule vm hero should identify the controlled team');
+assert.equal(schedule.hero?.opponentAbbr, 'BOS', 'schedule vm hero should identify the current opponent');
+assert.equal(schedule.navigation?.mode, 'day', 'nba schedule vm should expose day-based matchup navigation');
+assert.ok(Array.isArray(schedule.navigation?.items), 'schedule vm should expose concrete matchup navigation items');
+assert.deepStrictEqual(
+  Array.isArray(schedule.actionCards) ? schedule.actionCards.map((card) => card.label) : [],
+  ['Open My Team', 'Open Waivers', 'Review Schedule'],
+  'schedule vm should expose the shared matchup action cards needed by the renderer'
+);
+assert.equal(schedule.teamPanels?.mine?.teamAbbr, 'LAL', 'schedule vm should expose my team matchup panel');
+assert.equal(schedule.teamPanels?.opponent?.teamAbbr, 'BOS', 'schedule vm should expose opponent matchup panel');
+assert.equal(schedule.lineupSections?.mine?.[0]?.title, 'Starters', 'schedule vm should expose my lineup comparison sections');
+assert.equal(schedule.lineupSections?.opponent?.[0]?.title, 'Starters', 'schedule vm should expose opponent lineup comparison sections');
 schedule.nextGame.opponentName = 'Mutated Opponent';
 assert.equal(adapter.getScheduleViewModel().nextGame.opponentName, 'Boston Celtics');
 
 const waivers = adapter.getWaiverViewModel();
+assert.ok(waivers.teamSummary, 'waiver vm should expose a teamSummary bridge object');
+assert.equal(waivers.teamSummary.watchListEnabled, true, 'simulation waiver vm should keep watch-list navigation live');
+assert.equal(waivers.teamSummary.settingsEnabled, true, 'simulation waiver vm should keep team settings live');
+assert.equal(waivers.layoutMode, 'single-player-parity', 'waiver vm should opt into the shared single-player parity layout');
+assert.ok(Array.isArray(waivers.pendingClaims), 'waiver vm should expose pending claims for the shared waiver desk');
+assert.ok(Array.isArray(waivers.recentClaimResults), 'waiver vm should expose recent claim results for the shared waiver desk');
+assert.ok(Array.isArray(waivers.sections?.available?.rows), 'waiver vm should expose available rows through shared-shell sections');
+assert.ok(Array.isArray(waivers.sections?.pending?.rows), 'waiver vm should expose pending rows through shared-shell sections');
+assert.match(waivers.claimTimingLabel || '', /next sim day|next sim week/i, 'waiver vm should expose when pending claims will process');
 assert.equal(waivers.availablePlayers.length, 1);
 assert.equal(waivers.availablePlayers[0].name, 'Scottie Pippen');
+assert.equal(waivers.claimTimingLabel, 'Processing next sim day', 'nba waiver desks should expose day-based processing copy');
+assert.equal(waivers.sections.available.rows[0]?.actionLabel, 'Submit Claim', 'available waiver rows should surface the shared-shell submit action copy');
+assert.equal(waivers.sections.available.rows[0]?.dropNeeded, true, 'available waiver rows should flag when a drop is required');
+assert.equal(waivers.sections.available.rows[0]?.suggestedDropPlayerId, 23, 'available waiver rows should suggest the likely drop candidate when the roster is full');
+assert.match(waivers.sections.available.rows[0]?.consequenceLabel || '', /Drop required: Michael Jordan/, 'available waiver rows should explain the roster consequence with player context');
+assert.equal(waivers.sections.pending.rows[0]?.playerName, 'Scottie Pippen', 'pending waiver rows should resolve the add target into player-facing copy');
+assert.equal(waivers.sections.pending.rows[0]?.dropPlayerName, 'Michael Jordan', 'pending waiver rows should resolve the drop target into player-facing copy');
+assert.match(waivers.sections.pending.rows[0]?.consequenceLabel || '', /Dropping Michael Jordan/, 'pending waiver rows should describe the pending roster consequence');
+assert.equal(waivers.sections.recent.rows[0]?.playerName, 'Scottie Pippen', 'recent waiver rows should preserve the added player context');
+assert.equal(waivers.sections.recent.rows[0]?.dropPlayerName, 'Hakeem Olajuwon', 'recent waiver rows should preserve the dropped player context');
+assert.equal(waivers.sections.recent.rows[0]?.resolutionLabel, 'Claim processed successfully', 'recent waiver rows should expose shared-shell friendly result copy');
+
+const waiverOrderAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-waiver-order',
+  state: {
+    ...slotState,
+    seasonState: {
+      ...slotState.seasonState,
+      waiverOrder: ['BOS', 'LAL']
+    }
+  }
+});
+assert.equal(
+  waiverOrderAdapter.getWaiverViewModel().teamSummary?.waiverOrderLabel,
+  'Waiver Order (2 of 2)',
+  'waiver vm should reflect the runtime-managed waiver order instead of falling back to standings'
+);
+const partialWaiverOrderAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-partial-waiver-order',
+  state: {
+    ...slotState,
+    leagueShell: {
+      ...slotState.leagueShell,
+      teams: [
+        ...slotState.leagueShell.teams,
+        { abbr: 'CHI', name: 'Chicago Bulls', conference: 'East', division: 'Central' }
+      ]
+    },
+    seasonState: {
+      ...slotState.seasonState,
+      waiverOrder: ['BOS', 'BOS']
+    }
+  }
+});
+assert.equal(
+  partialWaiverOrderAdapter.getWaiverViewModel().teamSummary?.waiverOrderLabel,
+  'Waiver Order (2 of 3)',
+  'waiver vm should normalize duplicate and partial saved waiver orders before computing display priority'
+);
 
 const trades = adapter.getTradeViewModel();
+assert.ok(Array.isArray(trades.sections?.partners?.rows), 'trade vm should expose partner rows through shared-shell sections');
 assert.equal(trades.tradePartners.length, 1);
 assert.equal(trades.tradePartners[0].abbr, 'BOS');
 assert.equal(trades.outgoingRoster.length, 2);
 assert.equal(trades.incomingRostersByTeam.BOS.length, 1);
 
 const standings = adapter.getStandingsViewModel();
+assert.ok(Array.isArray(standings.sections), 'standings vm should expose shared-shell sections');
 assert.equal(standings.userRow.teamAbbr, 'LAL');
 assert.equal(standings.rows.length, 2);
 
@@ -172,6 +376,30 @@ assert.ok(
 const postSimSchedule = adapter.getScheduleViewModel();
 assert.equal(postSimSchedule.nextGame.day, 13);
 assert.equal(postSimSchedule.nextGame.opponentAbbr, 'BOS');
+
+const pendingNbaWaiverAdvanceAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-waiver-advance-nba',
+  state: slotState
+});
+const nbaWaiverAdvanceState = pendingNbaWaiverAdvanceAdapter.simulateNextDay();
+assert.equal(
+  nbaWaiverAdvanceState.seasonState.pendingWaiverClaims.length,
+  0,
+  'simulateNextDay should resolve pending NBA waiver claims on the next sim day'
+);
+assert.ok(
+  nbaWaiverAdvanceState.draftState.rostersByTeam.LAL.some((player) => player.id === 50),
+  'simulateNextDay should add awarded NBA waiver players to the controlled roster before the day advances'
+);
+assert.ok(
+  nbaWaiverAdvanceState.draftState.freeAgents.some((player) => player.id === 23),
+  'simulateNextDay should return the dropped NBA player to free agency when the claim resolves'
+);
+assert.equal(
+  nbaWaiverAdvanceState.seasonState.recentWaiverResults[0]?.status,
+  'approved',
+  'simulateNextDay should record the resolved NBA waiver result in recent claim history'
+);
 
 const nextState = {
   simulationMode: 'nba_mixed_era_single_player_v1',
@@ -950,10 +1178,28 @@ assert.equal(nflAdapter.getModeId(), 'nfl_mixed_era_single_player_v1');
 assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Simulation');
 assert.equal(nflAdapter.getHubViewModel().primaryAction.label, 'Sim Week');
 assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');
+assert.equal(nflAdapter.getWaiverViewModel().claimTimingLabel, 'Processing next sim week', 'nfl waiver desks should stay week-based');
+assert.ok(Array.isArray(nflAdapter.getWaiverViewModel().sections?.recent?.rows), 'nfl waiver desks should keep shared-shell recent-result sections available');
+assert.equal(
+  nflAdapter.getScheduleViewModel().navigation?.mode,
+  'week',
+  'nfl schedule vm should stay week-based instead of inheriting nba-style daily navigation'
+);
+assert.doesNotMatch(
+  JSON.stringify(nflAdapter.getScheduleViewModel().navigation || {}),
+  /Tue|Wed|Thu/,
+  'nfl schedule vm should not expose nba-style daily navigation labels'
+);
 assert.ok(Array.isArray(nflAdapter.getRosterViewModel().starterSlots));
 assert.deepStrictEqual(
   nflAdapter.getRosterViewModel().starterSlots,
-  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+  ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'K', 'DST'],
+  'nfl simulation roster vm should expose normalized starter slots for the shared parity layout'
+);
+assert.deepStrictEqual(
+  nflAdapter.getRosterViewModel().legacyStarterSlots,
+  ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'],
+  'nfl simulation roster vm should keep the NFL slot-key order available for later adapter-backed interactions'
 );
 assert.ok(
   nflAdapter.getStandingsViewModel().sections.some((section) => section.title === 'NFC East'),
@@ -1030,7 +1276,13 @@ const packersNflAdapter = createSimulationSeasonAdapter({
 });
 
 const packersRosterVm = packersNflAdapter.getRosterViewModel();
+assertSinglePlayerParityRosterVm(packersRosterVm, 'nfl simulation');
 assert.equal(packersRosterVm.sport, 'nfl');
+assert.deepStrictEqual(
+  packersRosterVm.starterSlots,
+  ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'K', 'DST'],
+  'nfl simulation roster vm should preserve the shared football starter-slot order'
+);
 assert.deepStrictEqual(
   Object.keys(packersRosterVm.lineupSlots),
   ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
@@ -1040,7 +1292,73 @@ assert.equal(packersRosterVm.readyLabel, 'Ready For Week');
 assert.equal(packersRosterVm.recommendationSummary, 'Starting lineup is legal.');
 assert.equal(packersRosterVm.lineupSlots.QB.player.name, 'Aaron Rodgers');
 assert.equal(packersRosterVm.lineupSlots.TE.suggestedPlayerId, 89);
+assert.equal(packersRosterVm.sections.starters.rows[1].slot, 'RB');
+assert.equal(packersRosterVm.sections.starters.rows[1].slotKey, 'RB1');
+assert.equal(packersRosterVm.sections.starters.rows[7].slotKey, 'K');
+assert.equal(packersRosterVm.sections.starters.rows[8].slotKey, 'DST');
 assert.equal(packersRosterVm.bench.length, 0);
+assert.equal(packersRosterVm.sections.starters.title, 'Weekly Starters', 'nfl simulation starters should use football-friendly weekly labeling in the shared roster layout');
+assert.equal(packersRosterVm.sections.bench.title, 'Bench / Depth', 'nfl simulation bench rows should render as depth-chart rows in the shared roster layout');
+assert.ok(packersRosterVm.teamSummary, 'nfl simulation roster vm should expose a teamSummary bridge object');
+
+const packersWaiverAdvanceAdapter = createSimulationSeasonAdapter({
+  slotId: 'nfl-slot-packers-waiver-advance',
+  state: {
+    ...packersNflState,
+    leagueShell: {
+      ...packersNflState.leagueShell,
+      rosterSize: 10
+    },
+    draftState: {
+      ...packersNflState.draftState,
+      rostersByTeam: {
+        ...packersNflState.draftState.rostersByTeam,
+        GB: packersNflState.draftState.rostersByTeam.GB.concat([
+          { id: 33, name: 'John Kuhn', pos: 'RB', team: 'GB', fp: 6 }
+        ])
+      },
+      freeAgents: [
+        { id: 81, name: 'Richard Rodgers', pos: 'TE', team: 'GB', fp: 9 }
+      ]
+    },
+    seasonState: {
+      ...packersNflState.seasonState,
+      scheduleByDay: {
+        1: []
+      },
+      pendingWaiverClaims: [
+        {
+          claimId: 'nfl-claim-1',
+          teamAbbr: 'GB',
+          addPlayerId: 81,
+          dropPlayerId: 33,
+          status: 'pending',
+          processOnAdvance: 'week'
+        }
+      ],
+      recentWaiverResults: []
+    }
+  }
+});
+const packersWaiverAdvanceState = packersWaiverAdvanceAdapter.simulateNextDay();
+assert.equal(
+  packersWaiverAdvanceState.seasonState.pendingWaiverClaims.length,
+  0,
+  'simulateNextDay should resolve pending NFL waiver claims on the next sim week'
+);
+assert.ok(
+  packersWaiverAdvanceState.draftState.rostersByTeam.GB.some((player) => player.id === 81),
+  'simulateNextDay should add awarded NFL waiver players to the controlled roster before the week advances'
+);
+assert.ok(
+  packersWaiverAdvanceState.draftState.freeAgents.some((player) => player.id === 33),
+  'simulateNextDay should return the dropped NFL depth player to free agency when the claim resolves'
+);
+assert.equal(
+  packersWaiverAdvanceState.seasonState.recentWaiverResults[0]?.status,
+  'approved',
+  'simulateNextDay should record the resolved NFL waiver result in recent claim history'
+);
 
 const legacyPackersLineupState = {
   simulationMode: 'nfl_mixed_era_single_player_v1',
@@ -1147,6 +1465,22 @@ assert.match(blockedPostseasonState.seasonState.activityLog[0].title, /must fix/
 
 const invalidPackersNflState = {
   ...packersNflState,
+  leagueShell: {
+    ...packersNflState.leagueShell,
+    rosterSize: 10
+  },
+  draftState: {
+    ...packersNflState.draftState,
+    rostersByTeam: {
+      ...packersNflState.draftState.rostersByTeam,
+      GB: packersNflState.draftState.rostersByTeam.GB.concat([
+        { id: 33, name: 'John Kuhn', pos: 'RB', team: 'GB', fp: 6 }
+      ])
+    },
+    freeAgents: [
+      { id: 81, name: 'Richard Rodgers', pos: 'TE', team: 'GB', fp: 9 }
+    ]
+  },
   seasonState: {
     ...packersNflState.seasonState,
     lineupIdsByTeam: {
@@ -1164,7 +1498,18 @@ const invalidPackersNflState = {
         K: 2,
         DST: 9001
       }
-    }
+    },
+    pendingWaiverClaims: [
+      {
+        claimId: 'nfl-invalid-claim',
+        teamAbbr: 'GB',
+        addPlayerId: 81,
+        dropPlayerId: 33,
+        status: 'pending',
+        processOnAdvance: 'week'
+      }
+    ],
+    recentWaiverResults: []
   }
 };
 
@@ -1179,6 +1524,15 @@ const invalidPackersNextState = invalidPackersNflAdapter.simulateNextDay();
 assert.equal(invalidPackersNextState.seasonState.currentWeek, 1);
 assert.equal(invalidPackersNextState.seasonState.activityLog[0].type, 'lineup-warning');
 assert.match(invalidPackersNextState.seasonState.activityLog[0].title, /must fix/i);
+assert.equal(
+  invalidPackersNextState.seasonState.pendingWaiverClaims.length,
+  1,
+  'simulateNextDay should leave pending NFL waiver claims untouched when the lineup gate blocks the week'
+);
+assert.ok(
+  !invalidPackersNextState.draftState.rostersByTeam.GB.some((player) => player.id === 81),
+  'simulateNextDay should not award NFL waiver claims when the week is blocked by an invalid lineup'
+);
 
 const legacyPackersLineupOnlyState = {
   ...packersNflState,

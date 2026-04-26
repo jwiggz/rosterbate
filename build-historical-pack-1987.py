@@ -1697,8 +1697,8 @@ def main():
         "sourceProfile": SOURCE_PROFILE,
         "buildSourceMode": source_audit["mode"],
         "missingSourceFeeds": source_audit["missingFeeds"],
-        "supportedModes": ["historical_draft", "single_player_season", "reimagined_season"],
-        "defaultEntryMode": "single_player_season",
+        "supportedModes": ["historical_draft", "simulation_season", "reimagined_season"],
+        "defaultEntryMode": "simulation_season",
         "focusTeamId": FEATURED_TEAM_ID,
         "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 historical season foundation with Lakers prestige at the center.",
         "description": "A playable 1986-87 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
@@ -1734,7 +1734,7 @@ def main():
             "realStatCoverage": {
                 "playersWithRealSeasonStats": real_stat_players,
                 "playerCount": len(players),
-                "label": "Historical season stats",
+                "label": "Simulation ratings coverage",
             },
             "zeroGamePlayers": {
                 "count": zero_game_players,
@@ -1766,7 +1766,7 @@ def main():
             "backgroundStyle": "historic_arena_spotlight",
         },
         "entryModes": [
-            {"mode": "single_player_season", "label": "Historic Season", "description": "Choose one 1986-87 team and play through the full historical season."},
+            {"mode": "simulation_season", "label": "Sim Season", "description": "Choose one 1986-87 team and play through a ratings-driven sim season built from the historical foundation."},
             {"mode": "historical_draft", "label": "Draft The Era", "description": "Redraft the Bird-Magic-Jordan season from the full-league player pool."},
             {"mode": "reimagined_season", "label": "Reimagined Season", "description": "Launch an alternate-history 1986-87 branch from the same foundation pack."},
         ],
@@ -1787,7 +1787,7 @@ def main():
             {"teamId": f"{ENTITY_PREFIX}_det", "summary": "Detroit brings the rising Bad Boys lane into a season that still sits just before their title breakthrough."},
         ],
         "modeSummaries": [
-            {"mode": "single_player_season", "summary": "Choose one 1986-87 franchise and guide it through the full historical season."},
+            {"mode": "simulation_season", "summary": "Choose one 1986-87 franchise and guide it through a full ratings-driven sim season from the historical foundation."},
             {"mode": "historical_draft", "summary": "Reshuffle the full Bird-Magic-Jordan player pool and discover how the era changes under a custom draft."},
             {"mode": "reimagined_season", "summary": "Branch into an alternate-history 1986-87 universe while keeping the same historical team and player foundation."},
         ],
@@ -1806,14 +1806,14 @@ def main():
         "packId": PACK_ID,
         "version": 1,
         "challengeGroups": [
-            {"groupId": "historic_season_paths", "label": "Historic Season Paths", "mode": "single_player_season"},
+            {"groupId": "historic_season_paths", "label": "Sim Season Paths", "mode": "simulation_season"},
             {"groupId": "draft_the_era_paths", "label": "Draft The Era", "mode": "historical_draft"},
             {"groupId": "reimagined_paths", "label": "Reimagined Season", "mode": "reimagined_season"},
         ],
         "challenges": [
             {
                 "challengeId": "lakers_repeat_pace",
-                "mode": "single_player_season",
+                "mode": "simulation_season",
                 "path": "featured_team_path",
                 "title": "Keep Showtime On Top",
                 "description": "Take the featured Lakers lane and clear 60 wins in a season whose schedule/results come from the historical foundation while player-game box lines remain explicitly inferred.",
@@ -1826,7 +1826,7 @@ def main():
             },
             {
                 "challengeId": "east_challenger_55",
-                "mode": "single_player_season",
+                "mode": "simulation_season",
                 "path": "open_team_path",
                 "title": "Break The Rivalry",
                 "description": "Choose any team and reach 55 wins while trying to interrupt the Bird-Magic prestige track.",

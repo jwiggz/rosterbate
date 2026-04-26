@@ -21,7 +21,7 @@
   },
   "entryModes": [
     {
-      "mode": "single_player_season",
+      "mode": "simulation_season",
       "label": "Sim Season",
       "description": "Choose one 2014 franchise and launch a football sim shell from the full-season historical pool."
     },

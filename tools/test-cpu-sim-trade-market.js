@@ -147,6 +147,7 @@ function buildContext(options = {}) {
       myPos: 0,
       multiplayer: false,
       historicalEntryMode: options.entryMode || 'simulation_season',
+      activeSeasonBackend: options.activeSeasonBackend || null,
       teams: options.teams || ['User Team', 'CPU Team 1', 'CPU Team 2', 'CPU Team 3']
     },
     G: {
@@ -164,6 +165,12 @@ function buildContext(options = {}) {
     Object,
     Set,
     console,
+    RB_SEASON_DEBUG: false,
+    getActiveSeasonBackend() {
+      return String(context.D?.activeSeasonBackend || '').trim().toLowerCase() === 'simulation'
+        ? 'simulation'
+        : 'fantasy';
+    },
     isCpuManagedTeam(teamIdx) {
       if (typeof options.cpuManagedTeam === 'number') return teamIdx === options.cpuManagedTeam;
       return teamIdx !== 0;
@@ -420,6 +427,14 @@ function buildContext(options = {}) {
       .some(entry => Number(entry.player.id) === 211),
     false
   );
+}
+
+{
+  const backendOnlyContext = buildContext({
+    entryMode: 'historical_draft',
+    activeSeasonBackend: 'simulation'
+  });
+  assert.equal(backendOnlyContext.context.isCpuTradeSimulationUniverse(), true, 'cpu trade market should treat unified simulation backends as simulation seasons even without legacy historicalEntryMode flags');
 }
 
 {

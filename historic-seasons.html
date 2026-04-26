@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="RosterBate Historic Seasons - Browse classic seasons, draft full historical player pools, and launch alternate basketball universes.">
-<title>RosterBate - Historic Seasons</title>
+<meta name="description" content="RosterBate Simulation Archives - Browse classic seasons, draft full era player pools, and launch ratings-driven basketball universes.">
+<title>RosterBate - Simulation Archives</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
@@ -534,9 +534,9 @@
     <section class="hero">
       <div class="panel hero-main">
         <div class="eyebrow">Archive Browser</div>
-        <h1 class="hero-title">Historic <span>Seasons</span></h1>
+        <h1 class="hero-title">Simulation <span>Archives</span></h1>
         <div class="hero-copy">
-          Open a complete era as its own historical universe. Draft the entire league, simulate the pack, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
+          Open a complete era as its own simulation archive. Draft the entire league, simulate the pack, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
         </div>
         <div class="hero-chip-row">
           <div class="hero-chip">Full-League Player Pool</div>
@@ -551,23 +551,23 @@
           </div>
           <div class="hero-stat">
             <div class="hero-stat-value" id="heroPlayerCount">--</div>
-            <div class="hero-stat-label">Historical Players</div>
+            <div class="hero-stat-label">Archive Players</div>
           </div>
           <div class="hero-stat">
             <div class="hero-stat-value" id="heroCoverageValue">--</div>
-            <div class="hero-stat-label">Real Stat Coverage</div>
+            <div class="hero-stat-label">Simulation Ratings Coverage</div>
           </div>
         </div>
       </div>
 
       <aside class="panel hero-side">
         <div class="hero-side-kicker">Flagship Universe</div>
-        <div class="hero-side-title" id="heroPackTitle">Historic Pack</div>
+        <div class="hero-side-title" id="heroPackTitle">Simulation Archive</div>
         <div class="hero-side-copy" id="heroPackSummary">Loading pack summary...</div>
         <div class="snapshot-grid">
           <div class="snapshot-card good">
             <div class="snapshot-value" id="heroAuditCoverage">--</div>
-            <div class="snapshot-label">Real Stat Coverage</div>
+            <div class="snapshot-label">Simulation Ratings Coverage</div>
           </div>
           <div class="snapshot-card warn">
             <div class="snapshot-value" id="heroZeroGames">--</div>
@@ -579,7 +579,7 @@
           </div>
         </div>
         <div class="status-bar" id="pageStatus">
-          <strong>Status:</strong> <span class="page-status-inline">Loading historical pack browser...</span>
+          <strong>Status:</strong> <span class="page-status-inline">Loading simulation archive browser...</span>
         </div>
       </aside>
     </section>
@@ -589,7 +589,7 @@
         <div class="section-kicker">Archive Shelf</div>
         <div class="section-title">Browse The Era</div>
         <div class="section-copy">
-          Historic mode is no longer a hidden tool. This browser is the front door to full-season universes, classic franchise runs, and alternate-history drafts built from real packs instead of one-off demos.
+          Archive mode is no longer a hidden tool. This browser is the front door to full-season universes, classic franchise runs, and alternate-history drafts built from ratings-ready packs instead of one-off demos.
         </div>
 
         <div class="archive-filter-bar" id="archiveFilterBar">
@@ -624,11 +624,11 @@
               <div class="archive-card-title">Loading Pack</div>
               <div class="archive-card-tagline">Preparing the shelf...</div>
               <div class="archive-card-art theme-spotlight">
-                <div class="archive-art-eyebrow">Historic Archive</div>
+                <div class="archive-art-eyebrow">Simulation Archive</div>
                 <div class="archive-art-headline">Loading Pack</div>
-                <div class="archive-art-subline">Pulling authored art from the historical catalog.</div>
+                <div class="archive-art-subline">Pulling authored art from the simulation archive catalog.</div>
               </div>
-              <div class="archive-card-summary">Pulling historical catalog metadata.</div>
+              <div class="archive-card-summary">Pulling simulation archive metadata.</div>
             </button>
           </div>
 
@@ -636,16 +636,16 @@
             <div class="pack-card" id="packCard">
               <div class="pack-top">
                 <div>
-                  <div class="pack-label" id="packEraLabel">Historic Archive</div>
+                  <div class="pack-label" id="packEraLabel">Simulation Archive</div>
                   <div class="pack-title" id="packTitle">Loading Pack...</div>
                   <div class="pack-tagline" id="packTagline">Loading...</div>
-                  <div class="pack-desc" id="packDesc">Pulling live pack metadata from the historical loader.</div>
+                  <div class="pack-desc" id="packDesc">Pulling live pack metadata from the simulation archive loader.</div>
                 </div>
                 <div id="packPosterSlot">
                   <div class="pack-poster theme-spotlight">
-                    <div class="pack-poster-eyebrow">Historic Archive</div>
+                    <div class="pack-poster-eyebrow">Simulation Archive</div>
                     <div class="pack-poster-headline">Loading Pack</div>
-                    <div class="pack-poster-subline">Pulling authored art from the historical catalog.</div>
+                    <div class="pack-poster-subline">Pulling authored art from the simulation archive catalog.</div>
                   </div>
                 </div>
                 <div class="pack-status" id="packStatusPill">Loading</div>
@@ -654,7 +654,7 @@
               <div class="pack-health" id="packHealth">
                 <div class="health-card">
                   <div class="health-value">--</div>
-                  <div class="health-label">Real Stat Coverage</div>
+                  <div class="health-label">Simulation Ratings Coverage</div>
                   <div class="health-sub">Loading audit...</div>
                 </div>
                 <div class="health-card">
@@ -732,7 +732,7 @@
             <div class="saved-universe-count" id="savedUniverseCount">0</div>
           </div>
           <div class="future-copy">
-            Every historical pack, saved simulation, and drafted universe can live here as its own revisit-able archive slot.
+            Every source pack, saved simulation, and drafted universe can live here as its own revisit-able archive slot.
           </div>
           <div class="saved-universe-list" id="savedUniversesList">
             <div class="saved-universe-empty">Loading saved universes...</div>
@@ -743,7 +743,7 @@
           <div class="section-kicker">Audit Mindset</div>
           <div class="future-title">Pack Truth Over Hype</div>
           <div class="future-copy">
-            Historical mode only works if users trust it. This browser keeps the pack health visible: real-stat coverage, zero-game roster-only cases, and removed invalid players stay front-and-center so future eras can be audited quickly.
+          Archive mode only works if users trust it. This browser keeps the pack health visible: simulation-ratings coverage, zero-game roster-only cases, and removed invalid players stay front-and-center so future eras can be audited quickly.
           </div>
         </div>
       </aside>
@@ -754,7 +754,7 @@
 const HISTORIC_1987_FALLBACK = {
   packId: 'nba_1987_full_season_v1',
   sport: 'nba',
-  seasonLabel: '1986-87 NBA Historic Season',
+      seasonLabel: '1986-87 NBA Historic Season',
   shortLabel: '1986-87',
   era: '1980s',
   availability: 'playable',
@@ -764,7 +764,7 @@ const HISTORIC_1987_FALLBACK = {
   completenessLabel: 'Playable foundation',
   completenessPercent: 18,
   tagline: 'Magic. Bird. Jordan. One prestige-rivalry universe.',
-  summary: 'A playable 1986-87 historical foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.',
+  summary: 'A playable 1986-87 simulation archive foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.',
   whyItMatters: 'This is the archive\'s premium 1980s tentpole: Finals rivalry gravity, Lakers focus-team energy, and a young Jordan expanding the draft sandbox.',
   focusTeamName: 'Los Angeles Lakers',
   art: {
@@ -782,7 +782,7 @@ const HISTORIC_1987_FALLBACK = {
 const HISTORIC_1993_FALLBACK = {
   packId: 'nba_1993_full_season_v1',
   sport: 'nba',
-  seasonLabel: '1992-93 NBA Historic Season',
+      seasonLabel: '1992-93 NBA Historic Season',
   shortLabel: '1992-93',
   era: '1990s',
   availability: 'playable',
@@ -792,7 +792,7 @@ const HISTORIC_1993_FALLBACK = {
   completenessLabel: 'Playable foundation',
   completenessPercent: 18,
   tagline: 'Jordan. Barkley. Pippen. One first-three-peat universe.',
-  summary: 'A playable 1992-93 historical foundation built around the Bulls\' first three-peat push and the Suns\' Finals-era challenge.',
+  summary: 'A playable 1992-93 simulation archive foundation built around the Bulls\' first three-peat push and the Suns\' Finals-era challenge.',
   whyItMatters: 'This is the archive\'s premium early-1990s tentpole: Jordan\'s title-era gravity, Barkley\'s challenger Suns, and a player pool that bridges 1980s prestige to 1995-96 dynasty apex.',
   focusTeamName: 'Chicago Bulls',
   art: {
@@ -841,7 +841,7 @@ const HISTORIC_1993_FALLBACK = {
       startingSlotCount: 10,
       playerCount: 300,
       auditSummary: {
-        realStatCoverage: { playersWithRealSeasonStats: 300, playerCount: 300, label: 'Historical season stats' },
+        realStatCoverage: { playersWithRealSeasonStats: 300, playerCount: 300, label: 'Simulation ratings coverage' },
         zeroGamePlayers: { count: 0, label: 'Zero-game players' },
         removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
       }
@@ -859,8 +859,8 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable foundation',
       completenessPercent: 82,
       tagline: 'Draft the era and build a 72-win dream roster of your own.',
-      summary: 'Full-league historical universe with Historical season stats, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
-      whyItMatters: 'This is the first proof that RosterBate can turn a real historic season into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.',
+      summary: 'Full-league simulation archive with simulation-ready ratings, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
+      whyItMatters: 'This is the first proof that RosterBate can turn a source-season foundation into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.',
       focusTeamName: 'Chicago Bulls',
       art: {
         theme: 'dynasty',
@@ -889,7 +889,7 @@ const HISTORIC_1993_FALLBACK = {
         completenessLabel: 'Playable iconic season',
         completenessPercent: 80,
         tagline: 'Draft a turn-of-the-century superteam from one loaded player pool.',
-        summary: 'A first-class 2000-01 historical universe with Historical season stats, a full league player pool, and marquee early-2000s star power.',
+        summary: 'A first-class 2000-01 simulation archive with simulation-ready ratings, a full league player pool, and marquee early-2000s star power.',
         whyItMatters: 'This is the archive lane\'s turn-of-the-century flagship: a recognizable Shaq-and-Kobe title-defense universe that plays differently from both the 1990s and 2010s packs.',
         focusTeamName: 'Los Angeles Lakers',
         art: {
@@ -918,7 +918,7 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable modern foundation',
       completenessPercent: 80,
       tagline: 'Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.',
-      summary: 'A modern historical universe with a loaded full-season player pool, Historical season stats, and a strong foundation for drafted or simulated alternate-history runs.',
+      summary: 'A modern simulation archive with a loaded full-season player pool, simulation-ready ratings, and a strong foundation for drafted or simulated alternate-history runs.',
       whyItMatters: 'This season gives the archive lane a modern tentpole pack where the biggest fantasy is drafting the entire era into custom universes from one loaded player pool.',
       focusTeamName: 'Golden State Warriors',
       art: {
@@ -1188,9 +1188,9 @@ const HISTORIC_1993_FALLBACK = {
     const art = config && typeof config.art === 'object' && config.art ? config.art : {};
     return {
       theme: String(art.theme || config?.significanceTone || 'spotlight').trim().toLowerCase() || 'spotlight',
-      eyebrow: String(art.eyebrow || ((config?.era || 'Historic') + ' Archive')).trim() || 'Historic Archive',
-      headline: String(art.headline || config?.shortLabel || config?.seasonLabel || 'Historic Pack').trim() || 'Historic Pack',
-      subline: String(art.subline || config?.tagline || config?.significanceLabel || 'Historical season archive').trim() || 'Historical season archive'
+      eyebrow: String(art.eyebrow || ((config?.era || 'Simulation') + ' Archive')).trim() || 'Simulation Archive',
+      headline: String(art.headline || config?.shortLabel || config?.seasonLabel || 'Simulation Archive').trim() || 'Simulation Archive',
+      subline: String(art.subline || config?.tagline || config?.significanceLabel || 'Saved simulation archive').trim() || 'Saved simulation archive'
     };
   }
 
@@ -1226,7 +1226,7 @@ const HISTORIC_1993_FALLBACK = {
     const realSeason = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) > 0).length;
     const zeroGames = players.filter(player => player && player.seasonStats && Number(player.seasonStats.games || 0) <= 0).length;
     return {
-      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Historical season stats' },
+      realStatCoverage: { playersWithRealSeasonStats: realSeason, playerCount: players.length, label: 'Simulation ratings coverage' },
       zeroGamePlayers: { count: zeroGames, label: 'Zero-game players' },
       removedInvalidPlayers: { count: null, label: 'Removed invalid players' }
     };
@@ -1264,8 +1264,8 @@ const HISTORIC_1993_FALLBACK = {
       {
         tone: covered && total && covered === total ? 'good' : '',
         value: (covered || 0) + ' / ' + (total || 0),
-        label: real.label || 'Historical Stat Coverage',
-        sub: 'players with historical season production'
+        label: real.label || 'Simulation Ratings Coverage',
+        sub: 'players with simulation-ready ratings'
       },
       {
         tone: zeroCount === 0 ? 'good' : 'warn',
@@ -1368,8 +1368,8 @@ const HISTORIC_1993_FALLBACK = {
   }
 
   function resetArchiveDetailToEmptyState(){
-    document.getElementById('heroPackTitle').textContent = 'Historic Archive';
-    document.getElementById('heroPackSummary').textContent = 'Adjust the filters to bring historical packs back onto the shelf.';
+    document.getElementById('heroPackTitle').textContent = 'Simulation Archive';
+    document.getElementById('heroPackSummary').textContent = 'Adjust the filters to bring archive packs back onto the shelf.';
     document.getElementById('heroPackCount').textContent = '0';
     document.getElementById('heroPlayerCount').textContent = '--';
     document.getElementById('heroAuditCoverage').textContent = '--';
@@ -1397,7 +1397,7 @@ const HISTORIC_1993_FALLBACK = {
     document.getElementById('packHealth').innerHTML = [
       {
         value: '--',
-        label: 'Real Stat Coverage',
+        label: 'Simulation Ratings Coverage',
         sub: 'Load a visible season to inspect audit data.'
       },
       {
@@ -1438,7 +1438,7 @@ const HISTORIC_1993_FALLBACK = {
       button.setAttribute('href', '#');
       button.onclick = function(event){
         event.preventDefault();
-        setStatus('No historical packs match the current archive filters.', 'warn');
+        setStatus('No archive packs match the current archive filters.', 'warn');
       };
     });
 
@@ -1457,7 +1457,7 @@ const HISTORIC_1993_FALLBACK = {
       createActivePackRenderToken('');
       renderShelf();
       resetArchiveDetailToEmptyState();
-      setStatus('No historical packs match the current archive filters.', 'warn');
+      setStatus('No archive packs match the current archive filters.', 'warn');
       return;
     }
     const nextPackId = resolveVisibleActivePackId(visibleCatalog, activePackId);
@@ -1499,14 +1499,14 @@ const HISTORIC_1993_FALLBACK = {
       return [
         '<button class="archive-card' + previewClass + activeClass + '" type="button" data-pack-id="' + config.packId + '">',
         '<div class="archive-card-head">',
-        '<div class="archive-card-era">' + (config.era || 'Historic Era') + '</div>',
+        '<div class="archive-card-era">' + (config.era || 'Archive Era') + '</div>',
         '<div class="archive-card-status">' + (config.statusLabel || (config.availability === 'playable' ? 'Playable' : 'Preview')) + '</div>',
         '</div>',
         '<div class="archive-card-title">' + (config.shortLabel || config.seasonLabel || config.packId) + '</div>',
-        '<div class="archive-card-tagline">' + (config.tagline || 'Historic season archive.') + '</div>',
+        '<div class="archive-card-tagline">' + (config.tagline || 'Simulation archive.') + '</div>',
         renderCatalogArt(config, 'card'),
         significance,
-        '<div class="archive-card-summary">' + (config.summary || 'Historical season preview.') + '</div>',
+        '<div class="archive-card-summary">' + (config.summary || 'Simulation archive preview.') + '</div>',
         config.whyItMatters ? '<div class="archive-card-why"><strong>Why this matters:</strong> ' + config.whyItMatters + '</div>' : '',
         meta ? '<div class="archive-card-meta">' + meta + '</div>' : '',
         plannedModes.length ? '<div class="archive-card-meta">' + plannedModes.map(function(mode){ return '<span class="archive-meta-pill">' + mode + '</span>'; }).join('') + '</div>' : '',
@@ -1530,13 +1530,13 @@ const HISTORIC_1993_FALLBACK = {
     const api = window.RosterBateHistoricalUniverseSlots;
     if(!api){
       countEl.textContent = '--';
-      listEl.innerHTML = '<div class="saved-universe-empty">Historical universe slots are unavailable in this build.</div>';
+      listEl.innerHTML = '<div class="saved-universe-empty">Simulation archive slots are unavailable in this build.</div>';
       return;
     }
     const slots = api.listSlots({ sport:getBrowserSport() });
     countEl.textContent = String(slots.length || 0);
     if(!slots.length){
-      listEl.innerHTML = '<div class="saved-universe-empty">No saved historical universes yet. Start a simulation league or complete a historical draft and it will show up here.</div>';
+      listEl.innerHTML = '<div class="saved-universe-empty">No saved simulation archives yet. Start a simulation league or complete a draft and it will show up here.</div>';
       return;
     }
     listEl.innerHTML = slots.map(function(slot){
@@ -1545,8 +1545,8 @@ const HISTORIC_1993_FALLBACK = {
       const openUrl = api.buildDetailsUrl(slot, getBrowserSport());
       const modeTone = String(slot.modeTone || api.getModeTone(slot.historicalEntryMode) || 'real').trim().toLowerCase();
       const eraClass = 'era-' + String(config.era || '').trim().toLowerCase();
-      const significance = String(config.significanceLabel || 'Historical Run').trim();
-      const shortLabel = String(config.shortLabel || slot.historicalSeasonId || 'Historic').trim();
+      const significance = String(config.significanceLabel || 'Archive Run').trim();
+      const shortLabel = String(config.shortLabel || slot.historicalSeasonId || 'Archive').trim();
       const sourceEraCount=Array.isArray(slot.historicalSourcePackIds) ? slot.historicalSourcePackIds.length : 0;
       const rankText = Number.isFinite(Number(slot.teamRank)) ? ('#' + Number(slot.teamRank)) : '--';
       const recordText = Number.isFinite(Number(slot.wins)) && Number.isFinite(Number(slot.losses))
@@ -1558,18 +1558,18 @@ const HISTORIC_1993_FALLBACK = {
         '<article class="saved-universe-card tone-' + modeTone + (isActivePack ? ' active-pack' : '') + '">',
           '<div class="saved-universe-top">',
             '<div class="saved-universe-art ' + escapeHtml(eraClass) + '">',
-              '<div class="saved-universe-era">' + escapeHtml(config.era || 'Historic Era') + '</div>',
+              '<div class="saved-universe-era">' + escapeHtml(config.era || 'Archive Era') + '</div>',
               '<div class="saved-universe-season">' + escapeHtml(shortLabel) + '</div>',
               '<div class="saved-universe-significance">' + escapeHtml(significance) + '</div>',
             '</div>',
             '<div>',
               '<div class="saved-universe-title-row">',
-                '<div class="saved-universe-title">' + escapeHtml(slot.title || 'Historical Universe') + '</div>',
+                '<div class="saved-universe-title">' + escapeHtml(slot.title || 'Simulation Universe') + '</div>',
                 '<div class="saved-universe-mode tone-' + modeTone + '">' + escapeHtml(api.getModeLabel(slot.historicalEntryMode)) + '</div>',
               '</div>',
-              '<div class="saved-universe-subtitle">' + escapeHtml(slot.subtitle || 'Historical universe save') + '</div>',
+              '<div class="saved-universe-subtitle">' + escapeHtml(slot.subtitle || 'Simulation archive save') + '</div>',
               '<div class="saved-universe-meta">',
-                '<span class="saved-universe-pill">' + escapeHtml(shortLabel || slot.historicalPackId || 'historic_pack') + '</span>',
+                '<span class="saved-universe-pill">' + escapeHtml(shortLabel || slot.historicalPackId || 'simulation_archive') + '</span>',
                 '<span class="saved-universe-pill">' + escapeHtml(progressText) + '</span>',
                 '<span class="saved-universe-pill">' + escapeHtml(config.significanceLabel || 'Archive Run') + '</span>',
                 (sourceEraCount > 1 ? '<span class="saved-universe-pill">' + escapeHtml(String(sourceEraCount)) + ' eras</span>' : ''),
@@ -1654,8 +1654,8 @@ const HISTORIC_1993_FALLBACK = {
     const teams = Array.isArray(bundle && bundle.teams) ? bundle.teams : [];
     const players = Array.isArray(bundle && bundle.players) ? bundle.players : [];
     const configuredPlayerCount=Number(config.playerCount || audit?.realStatCoverage?.playerCount || 0);
-    const packLabel = manifest.seasonLabel || config.seasonLabel || 'Historic Pack';
-    const packSummary = summaries.packSummary || manifest.description || config.summary || 'A historical season pack built for RosterBate.';
+      const packLabel = manifest.seasonLabel || config.seasonLabel || 'Simulation Archive';
+      const packSummary = summaries.packSummary || manifest.description || config.summary || 'A simulation archive built for RosterBate.';
     const plannedModes = Array.isArray(config.plannedModes) ? config.plannedModes : [];
     const completenessText = config.completenessLabel
       ? (config.completenessLabel + (config.completenessPercent != null ? ' - ' + config.completenessPercent + '%' : ''))
@@ -1668,7 +1668,7 @@ const HISTORIC_1993_FALLBACK = {
       ? String(players.length)
       : (configuredPlayerCount ? String(configuredPlayerCount) : '--');
 
-    document.getElementById('packEraLabel').textContent = (manifest.era || config.era || 'Historic').toUpperCase() + ' Archive';
+      document.getElementById('packEraLabel').textContent = (manifest.era || config.era || 'Simulation').toUpperCase() + ' Archive';
     document.getElementById('packTitle').textContent = packLabel;
     document.getElementById('packTagline').textContent = manifest.tagline || config.tagline || 'Draft the era, sim the season, rewrite the universe.';
     document.getElementById('packDesc').textContent = config.whyItMatters
@@ -1748,7 +1748,7 @@ const HISTORIC_1993_FALLBACK = {
     document.getElementById('detailNote').textContent = isMixedEra
       ? 'This crossover slot is intentionally draft-first. Draft the curated mixed-era board now, then let Sim Season take over once the custom universe exists.'
       : config.availability === 'playable'
-        ? 'This pack is being read from the real historical pack artifact. The shelf is ready for more eras whenever the next pack lands.'
+        ? 'This pack is being read from the live simulation archive artifact. The shelf is ready for more eras whenever the next pack lands.'
         : 'Preview packs are intentionally listed before they are playable. Completeness: ' + completenessText + '. Why this season matters: ' + (config.whyItMatters || 'This archive slot is here to make the roadmap feel tangible before the pack is authored.');
 
     simBtn.onclick = async function(event){
@@ -1836,7 +1836,7 @@ const HISTORIC_1993_FALLBACK = {
 
     setStatus(
       config.availability === 'playable'
-        ? 'Historical browser loaded with archive filters active. Pick a slot and launch directly into a drafted or simulated universe.'
+      ? 'Simulation archive browser loaded with archive filters active. Pick a slot and launch directly into a drafted or simulated universe.'
         : 'Archive shelf loaded with preview packs filtered into view.',
       config.availability === 'playable' ? 'good' : 'warn'
     );
@@ -1856,7 +1856,7 @@ const HISTORIC_1993_FALLBACK = {
       renderPack(config, bundle);
     }catch(error){
       if(!isCurrentActivePackRenderToken(renderToken)) return;
-      console.error('[Historic Seasons] Failed to load active pack', error);
+      console.error('[Simulation Archives] Failed to load active pack', error);
       renderPack(config, null);
       setStatus('Could not load pack "' + config.packId + '": ' + (error && error.message ? error.message : String(error)), 'warn');
     }
@@ -1870,7 +1870,7 @@ const HISTORIC_1993_FALLBACK = {
         catalog = await window.RosterBateHistoricalPackLoader.loadCatalog();
       }
     }catch(error){
-      console.warn('[Historic Seasons] Falling back to embedded catalog', error);
+        console.warn('[Simulation Archives] Falling back to embedded catalog', error);
     }
     if(!Array.isArray(catalog) || !catalog.length){
       catalog = buildFallbackCatalog();
@@ -1892,7 +1892,7 @@ const HISTORIC_1993_FALLBACK = {
         });
     }
     if(!fullCatalog.length){
-      setStatus('No historical packs are cataloged for this sport yet.', 'warn');
+        setStatus('No archive packs are cataloged for this sport yet.', 'warn');
       renderSavedUniverses();
       return;
     }
@@ -1905,7 +1905,7 @@ const HISTORIC_1993_FALLBACK = {
       createActivePackRenderToken('');
       renderShelf();
       resetArchiveDetailToEmptyState();
-      setStatus('No historical packs match the current archive filters.', 'warn');
+      setStatus('No archive packs match the current archive filters.', 'warn');
       renderSavedUniverses();
       return;
     }

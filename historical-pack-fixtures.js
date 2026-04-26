@@ -282,8 +282,8 @@
       version:1,
       status:'concept',
       sourceProfile:'historical_curated',
-      supportedModes:['historical_draft','single_player_season'],
-      defaultEntryMode:'historical_draft',
+      supportedModes:['historical_draft','simulation_season'],
+      defaultEntryMode:'simulation_season',
       focusTeamId:'nba_1996_chi',
       subtitle:'Draft the era or steer a historic franchise run.',
       description:'An expanded playable 1995-96 NBA dev slice with a broader historical player pool, draft-first entry, and featured historic franchise runs.',
@@ -313,7 +313,7 @@
       },
       notes:[
         'Expanded 10-team 1995-96 dev slice for historical fantasy draft validation.',
-        'Use the Historical Pack Lab team selector to stage a historic franchise run.'
+        'Use the Historical Pack Lab team selector to stage a ratings-driven sim season from the historical foundation.'
       ],
       createdAt:'2026-04-17T00:00:00Z',
       updatedAt:'2026-04-17T00:00:00Z'
@@ -330,7 +330,7 @@
       eraTags:['1990s','Jordan Era','Historic Season'],
       notes:[
         'Expanded dev-slice season object.',
-        'Supports historic franchise and historical-draft paths while the importer is still fixture-backed.'
+        'Supports Sim Season and historical-draft paths while the importer is still fixture-backed.'
       ]
     },
     teams:teams,
@@ -343,13 +343,13 @@
       packId:'nba_1996_full_season_v1',
       version:1,
       challengeGroups:[
-        {groupId:'historic_franchise_paths',label:'Historic Franchise Run',mode:'single_player_season'},
+        {groupId:'historic_franchise_paths',label:'Sim Season Paths',mode:'simulation_season'},
         {groupId:'draft_the_era_paths',label:'Draft The Era',mode:'historical_draft'}
       ],
       challenges:[
         {
           challengeId:'bulls_72_wins',
-          mode:'single_player_season',
+          mode:'simulation_season',
           path:'bulls_featured_path',
           title:'Match 72 Wins',
           description:'Finish the season with at least 72 wins.',
@@ -362,7 +362,7 @@
         },
         {
           challengeId:'open_team_above_500',
-          mode:'single_player_season',
+          mode:'simulation_season',
           path:'open_team_path',
           title:'Guide A Historic Run',
           description:'Choose any included team and finish above .500.',
@@ -390,7 +390,7 @@
     },
     presentation:{
       heroTitle:'1995-96 NBA Historic Season',
-      heroSubtitle:'Draft the era or steer a historic franchise run.',
+      heroSubtitle:'Draft the era or steer a ratings-driven sim season from the historical foundation.',
       featuredTeamId:'nba_1996_chi',
       featuredStars:[
         'nba_1996_michael_jordan',
@@ -405,7 +405,7 @@
         backgroundStyle:'historic_arena_spotlight'
       },
       entryModes:[
-        {mode:'single_player_season',label:'Historic Franchise Run',description:'Take over an included 1995-96 team and chase a signature season outcome.'},
+        {mode:'simulation_season',label:'Sim Season',description:'Take over an included 1995-96 team and chase a signature season outcome through simulated results.'},
         {mode:'historical_draft',label:'Draft The Era',description:'Redraft the included 1995-96 player pool and build an alternate-history league.'}
       ]
     },
@@ -424,7 +424,7 @@
         {teamId:'nba_1996_ind',summary:'Indiana brings a balanced East contender core built around Reggie Miller.'}
       ],
       modeSummaries:[
-        {mode:'single_player_season',summary:'Choose a featured franchise lane and chase benchmark outcomes from the era without leaning on real-season replay framing.'},
+        {mode:'simulation_season',summary:'Choose a featured franchise lane and chase benchmark outcomes from the era through the unified simulation engine.'},
         {mode:'historical_draft',summary:'Remix the included 1995-96 league slice and discover what the era looks like with custom rosters.'}
       ]
     }

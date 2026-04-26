@@ -7,7 +7,7 @@
   const ALLOWED_SEASON_TYPES=['historical_pack'];
   const ALLOWED_STATUS=['concept','draft','review','ready','deprecated'];
   const ALLOWED_SOURCE_PROFILES=['historical_curated','historical_internal','historical_partnered'];
-  const ALLOWED_SUPPORTED_MODES=['historical_draft','single_player_season','reimagined_season'];
+  const ALLOWED_SUPPORTED_MODES=['historical_draft','simulation_season','reimagined_season'];
   const ALLOWED_DRAFT_MODES=['snake','auction'];
   const REQUIRED_CONTENT_FILE_KEYS=['season','teams','players','rosterSnapshots','schedule','games','playerGameStats'];
   const OPTIONAL_CONTENT_FILE_KEYS=['packChallenges','presentation','summaries'];
@@ -50,7 +50,7 @@
 
   function normalizeSupportedMode(mode){
     const normalized=String(mode || '').trim().toLowerCase();
-    if(normalized==='real_season') return 'single_player_season';
+    if(normalized==='real_season' || normalized==='single_player_season') return 'simulation_season';
     return normalized;
   }
 
@@ -69,12 +69,18 @@
     if(rawSupportedModes){
       rawSupportedModes.forEach(function(mode, index){
         if(String(mode || '').trim().toLowerCase()==='real_season'){
-          addCompatibilityNote(report, 'legacy_real_season_mode', 'Normalized legacy `real_season` supported mode to `single_player_season`.', 'manifest.supportedModes['+index+']');
+          addCompatibilityNote(report, 'legacy_real_season_mode', 'Normalized legacy `real_season` supported mode to `simulation_season`.', 'manifest.supportedModes['+index+']');
+        }
+        if(String(mode || '').trim().toLowerCase()==='single_player_season'){
+          addCompatibilityNote(report, 'legacy_single_player_season_mode', 'Normalized legacy `single_player_season` supported mode to `simulation_season`.', 'manifest.supportedModes['+index+']');
         }
       });
     }
     if(String(manifest && manifest.defaultEntryMode || '').trim().toLowerCase()==='real_season'){
-      addCompatibilityNote(report, 'legacy_real_season_default_entry_mode', 'Normalized legacy `real_season` default entry mode to `single_player_season`.', 'manifest.defaultEntryMode');
+      addCompatibilityNote(report, 'legacy_real_season_default_entry_mode', 'Normalized legacy `real_season` default entry mode to `simulation_season`.', 'manifest.defaultEntryMode');
+    }
+    if(String(manifest && manifest.defaultEntryMode || '').trim().toLowerCase()==='single_player_season'){
+      addCompatibilityNote(report, 'legacy_single_player_season_default_entry_mode', 'Normalized legacy `single_player_season` default entry mode to `simulation_season`.', 'manifest.defaultEntryMode');
     }
 
     if(isPlainObject(manifest)){
