@@ -9140,6 +9140,12 @@ function renderSimulationHubInSharedShell(){
   const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
   const primaryAction = vm?.primaryAction || null;
   const advBtn = document.getElementById('advBtn');
+  const sourceSeasonLabels=Array.isArray(vm?.sourceSeasonLabels) ? vm.sourceSeasonLabels : [];
+  const sourceSeasonCount=sourceSeasonLabels.length;
+  const sourcePoolLabel=sourceSeasonCount>1 ? 'Era Pool' : 'Source Pool';
+  const sourcePoolValue=sourceSeasonCount>2
+    ? `${String(sourceSeasonLabels[0] || 'Mixed Era')} + ${sourceSeasonCount-1} more`
+    : (sourceSeasonCount ? sourceSeasonLabels.join(' + ') : 'Simulation Pool');
   const watchIds=typeof getWatchListIds==='function' ? getWatchListIds() : [];
   const watchCount=watchIds.length;
   const watchedTargets=typeof getWatchedWaiverTargets==='function' ? getWatchedWaiverTargets(3) : [];
@@ -9169,7 +9175,7 @@ function renderSimulationHubInSharedShell(){
   setHubSummaryStatLabels({
     opp: 'Record',
     proj: 'Team',
-    oppProj: 'Source Seasons',
+    oppProj: sourcePoolLabel,
     streak: 'Streak'
   });
   if(typeof setAvatarNode === 'function'){
@@ -9199,10 +9205,9 @@ function renderSimulationHubInSharedShell(){
     : (sourceSeasonCountForFormat===1 ? 'Single Era' : 'Standard');
   const hubTeamMeta=document.getElementById('hubTeamMeta');
   if(hubTeamMeta){
-    const sourceSeasonCount=Math.max(0, Array.isArray(vm?.sourceSeasonLabels) ? vm.sourceSeasonLabels.length : 0);
     const sourceLabel=sourceSeasonCount>1
       ? `${sourceSeasonCount} source seasons`
-      : (sourceSeasonCount===1 ? `${vm.sourceSeasonLabels[0]} pool` : 'local simulation league');
+      : (sourceSeasonCount===1 ? `${sourceSeasonLabels[0]} pool` : 'local simulation league');
     const teamMetaCycleLabel=primaryActionTone==='reveal'
       ? `Reveal ${primaryActionCadence}`
       : primaryActionCadence;
@@ -9216,7 +9221,7 @@ function renderSimulationHubInSharedShell(){
   document.getElementById('hubTeamCount').textContent = String((D?.leagueShell?.teams || []).length || (isNflSimulation ? 32 : 30));
   document.getElementById('hubOpp').textContent = vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0';
   document.getElementById('hubProj').textContent = vm.controlledTeam?.abbr || '---';
-  document.getElementById('hubOppProj').textContent = vm.sourceSeasonLabels.join(' + ');
+  document.getElementById('hubOppProj').textContent = sourcePoolValue;
   document.getElementById('hubStreak').textContent = vm.userRow?.streak || 'EVEN';
   const settingsLink=document.getElementById('hubSettingsLink');
   const settingsDivider=document.getElementById('hubSettingsDivider');
