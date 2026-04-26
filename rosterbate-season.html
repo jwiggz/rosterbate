@@ -9425,10 +9425,18 @@ function renderSimulationHubInSharedShell(){
     const latestRevealReport=latestRevealReportDay && typeof getDailyRevealReport==='function'
       ? getDailyRevealReport(latestRevealReportDay)
       : null;
+    const simulationReportKicker = latestRevealReport?.isSimulation
+      ? (isNflSimulation ? 'Weekly Sim Report' : 'Reveal Day Report')
+      : 'Daily Reveal Report';
+    const simulationRevealEmptyCopy = primaryActionTone==='reveal'
+      ? 'Reveal reports will appear here once the first simulated day lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.'
+      : (isNflSimulation
+        ? 'Weekly sim reports will appear here once the first week settles. When you hit <b style="color:#f8fafc;">Sim Week</b>, the hub will publish matchup results, league movement, and weekly standouts from that simulation window.'
+        : 'Simulation reports will appear here once the first run lands. When you hit <b style="color:#f8fafc;">Run Sim Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.');
     revealMount.innerHTML=latestRevealReport ? `
       <div class="hub-reveal-grid">
         <div class="hub-reveal-copy">
-          <div class="hub-reveal-kicker">${latestRevealReport.isSimulation ? 'Sim Day Report' : 'Daily Reveal Report'}</div>
+          <div class="hub-reveal-kicker">${simulationReportKicker}</div>
           <div class="hub-reveal-title">${escapeSimulationShellHtml(latestRevealReport.story?.headline || ('Day '+latestRevealReport.day+' Is Official'))}</div>
           <div class="hub-reveal-sub">${escapeSimulationShellHtml(latestRevealReport.story?.subheadline || (latestRevealReport.leader ? `${latestRevealReport.leader.teamName} led the board with ${latestRevealReport.leader.total.toFixed(1)} points.` : 'Scores are now live league-wide.'))}</div>
           <div class="hub-reveal-pills">
@@ -9447,9 +9455,7 @@ function renderSimulationHubInSharedShell(){
       </div>
     ` : `
       <div class="hub-reveal-empty">
-        ${primaryActionTone==='reveal'
-          ? 'Reveal reports will appear here once the first simulated day lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.'
-          : 'Sim day reports will appear here once the first run lands. When you hit <b style="color:#f8fafc;">Run Sim Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.'}
+        ${simulationRevealEmptyCopy}
       </div>
     `;
   }
@@ -11277,10 +11283,20 @@ function renderHub(){
   }
   const revealMount=document.getElementById('hubRevealReportCard');
   if(revealMount){
+    const simulationReportKicker = latestRevealReport?.isSimulation
+      ? (CURRENT_SPORT==='nfl' ? 'Weekly Sim Report' : 'Reveal Day Report')
+      : 'Daily Reveal Report';
+    const historicalRevealEmptyCopy = isSimulationSeason
+      ? (CURRENT_SPORT==='nfl'
+        ? 'Weekly sim reports will appear here once the first week settles. When you hit <b style="color:#f8fafc;">Sim Week</b>, the hub will publish matchup results, league movement, and weekly standouts from that simulation window.'
+        : 'Simulation reports will appear here once the first run lands. When you hit <b style="color:#f8fafc;">Run Sim Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.')
+      : (isDraftedHistoricalUniverse
+        ? 'This drafted universe is ready for simulation. When you hit <b style="color:#f8fafc;">Start Sim Season</b>, the hub will begin publishing day-by-day sim reports from your drafted rosters.'
+        : 'Reveal reports will appear here once the first day is unlocked. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the new scores, top performers, and waiver/trade movement from that window.');
     revealMount.innerHTML=latestRevealReport ? `
       <div class="hub-reveal-grid">
         <div class="hub-reveal-copy">
-          <div class="hub-reveal-kicker">${latestRevealReport.isSimulation ? 'Sim Day Report' : 'Daily Reveal Report'}</div>
+          <div class="hub-reveal-kicker">${simulationReportKicker}</div>
           <div class="hub-reveal-title">${latestRevealReport.story?.headline || ('Day '+latestRevealReport.day+' Is Official')}</div>
           <div class="hub-reveal-sub">${latestRevealReport.story?.subheadline || (latestRevealReport.leader ? `${latestRevealReport.leader.teamName} led the board with ${latestRevealReport.leader.total.toFixed(1)} points.` : 'Scores are now live league-wide.')}</div>
           <div class="hub-reveal-pills">
@@ -11312,11 +11328,7 @@ function renderHub(){
       </div>
     ` : `
       <div class="hub-reveal-empty">
-        ${isSimulationSeason
-          ? 'Sim day reports will appear here once the first run lands. When you hit <b style="color:#f8fafc;">Run Sim Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.'
-          : isDraftedHistoricalUniverse
-            ? 'This drafted universe is ready for simulation. When you hit <b style="color:#f8fafc;">Start Sim Season</b>, the hub will begin publishing day-by-day sim reports from your drafted rosters.'
-            : 'Reveal reports will appear here once the first day is unlocked. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the new scores, top performers, and waiver/trade movement from that window.'}
+        ${historicalRevealEmptyCopy}
       </div>
     `;
   }

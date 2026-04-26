@@ -2856,6 +2856,8 @@ assert.match(elements.advBtn.innerHTML, /Sim Week 1/, 'nfl hub should expose a w
 assert.match(elements.advBtn.innerHTML, /Advance the week and publish results/, 'nfl hub CTA should carry the polished local-league subcopy');
 assert.equal(elements.hubScoringType.textContent, 'Head to Head Points', 'nfl hub should keep the polished local-league fantasy scoring copy');
 assert.equal(elements.advBtn.disabled, false, 'nfl hub sim CTA should remain enabled during regular season');
+assert.match(elements.hubRevealReportCard.innerHTML, /Weekly sim reports will appear here/i, 'nfl hub should use cadence-aware weekly report framing in the reveal lane');
+assert.doesNotMatch(elements.hubRevealReportCard.innerHTML, /Sim day reports/i, 'nfl hub should not fall back to day-based report copy');
 
 simulationStubState.postseasonState = { phase: 'postseason_ready' };
 api.setSeasonModeAdapter({
