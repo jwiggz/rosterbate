@@ -148,10 +148,25 @@
     });
   }
 
+  function dedupeSimulationRosterPlayers(players){
+    const seenIds = new Set();
+    return (Array.isArray(players) ? players : []).filter((player) => {
+      const playerId = Number(player?.id);
+      if (!Number.isFinite(playerId) || playerId <= 0) {
+        return true;
+      }
+      if (seenIds.has(playerId)) {
+        return false;
+      }
+      seenIds.add(playerId);
+      return true;
+    });
+  }
+
   function getSimulationTeamRoster(state, teamAbbr){
     const key = normalizeTeamAbbr(teamAbbr);
     const roster = state?.draftState?.rostersByTeam?.[key];
-    return Array.isArray(roster) ? roster : [];
+    return dedupeSimulationRosterPlayers(roster);
   }
 
   function getSimulationLineupDetails(state, teamAbbr){

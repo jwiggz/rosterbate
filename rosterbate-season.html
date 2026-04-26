@@ -9644,12 +9644,13 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
       : String(action?.label || actionId || 'Action').trim();
     return `<button data-roster-action="${escapeHtml(actionId)}" type="button" onclick="handleRosterAction('${actionId.replace(/'/g,"\\'")}')" class="season-outline-btn" style="pointer-events:auto;${enabled?'':'opacity:.4;cursor:not-allowed;pointer-events:none;'}">${escapeHtml(actionLabel)}</button>`;
   }).join('');
-  const renderPlayerMeta=(player)=>{
+  const renderPlayerMeta=(player, entry)=>{
     if(!player || typeof player!=='object') return 'Awaiting starter assignment';
     const position=sport==='nfl'
       ? normalizeSimulationNflRosterPosition(player)
       : String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
-    return [player.team, position].filter(Boolean).join(' · ') || 'Roster player';
+    const variantLabel=String(entry?.playerVariantLabel || '').trim();
+    return [player.team, position, variantLabel].filter(Boolean).join(' · ') || 'Roster player';
   };
   const renderBenchActions=(entry)=>{
     if(sport!=='nfl' || !entry?.player) return `<span class="season-soft-muted" style="font-weight:700;">${escapeHtml(entry?.actionLabel || 'Ready')}</span>`;
@@ -9691,7 +9692,7 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
         <tbody>${rows.length ? rows.map((entry)=>{
           const player=entry?.player || null;
           const primaryText=player ? escapeHtml(player?.name || 'Player') : `Open ${escapeHtml(entry?.slot || entry?.positionSlot || 'Slot')} Slot`;
-          const secondaryText=escapeHtml(renderPlayerMeta(player));
+          const secondaryText=escapeHtml(renderPlayerMeta(player, entry));
           const recommendationText=escapeHtml(
             entry?.warning
               || entry?.recommendationHint

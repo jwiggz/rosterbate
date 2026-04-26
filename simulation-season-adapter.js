@@ -81,11 +81,26 @@
     return (state?.leagueShell?.teams || []).find((team) => team.abbr === abbr) || null;
   }
 
+  function dedupeSimulationRosterPlayers(players){
+    const seenIds = new Set();
+    return (Array.isArray(players) ? players : []).filter((player) => {
+      const playerId = Number(player?.id);
+      if (!Number.isFinite(playerId) || playerId <= 0) {
+        return true;
+      }
+      if (seenIds.has(playerId)) {
+        return false;
+      }
+      seenIds.add(playerId);
+      return true;
+    });
+  }
+
   function getControlledRoster(state){
     const team = getControlledTeam(state);
     if (!team) return [];
     return Array.isArray(state?.draftState?.rostersByTeam?.[team.abbr])
-      ? clone(state.draftState.rostersByTeam[team.abbr])
+      ? clone(dedupeSimulationRosterPlayers(state.draftState.rostersByTeam[team.abbr]))
       : [];
   }
 
@@ -201,6 +216,7 @@
         lineupSlotKey: slotKey,
         player: player ? clone(player) : null,
         playerId: Number.isFinite(playerId) ? playerId : null,
+        playerVariantLabel: rosterState?.playerVariantLabelsById?.[Number(playerId)] || null,
         suggestedPlayerId: Number.isFinite(suggestedPlayerId) ? suggestedPlayerId : null,
         recommendationHint: slotEntry?.recommendationHint || null,
         warning: Array.isArray(warningsBySlot[slotKey]) ? warningsBySlot[slotKey][0] || '' : '',
@@ -219,6 +235,7 @@
       lineupSlotKey: null,
       player: clone(player),
       playerId: Number.isFinite(Number(player?.id)) ? Number(player.id) : null,
+      playerVariantLabel: rosterState?.playerVariantLabelsById?.[Number(player?.id)] || null,
       suggestedPlayerId: null,
       recommendationHint: null,
       warning: '',
@@ -300,6 +317,51 @@
       return `${rosterCount}/${rosterSize} filled`;
     }
     return `${rosterCount} players rostered`;
+  }
+
+  function getSimulationRosterIdentityKey(player){
+    if (!player || typeof player !== 'object') return '';
+    const name = String(player?.name || '').trim().toLowerCase();
+    const team = String(player?.team || '').trim().toLowerCase();
+    const position = String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
+    return [name, team, position].filter(Boolean).join('|');
+  }
+
+  function getSimulationPlayerVariantLabel(player){
+    const rawLabel = String(
+      player?.historicalPackLabel ||
+      player?.mixedEraContext?.seasonLabel ||
+      player?.historicalSeasonId ||
+      player?.historicalPackId ||
+      ''
+    ).trim();
+    if (!rawLabel) return null;
+    const leadingSeason = rawLabel.match(/^\d{4}(?:-\d{2,4})?/);
+    if (leadingSeason && leadingSeason[0]) {
+      return leadingSeason[0];
+    }
+    return rawLabel.replace(/\bSimulation Archive\b/i, '').trim() || rawLabel;
+  }
+
+  function buildSimulationPlayerVariantLabelsById(roster){
+    const identityCounts = (Array.isArray(roster) ? roster : []).reduce((counts, player) => {
+      const key = getSimulationRosterIdentityKey(player);
+      if (!key) return counts;
+      counts[key] = Number(counts[key] || 0) + 1;
+      return counts;
+    }, {});
+    return (Array.isArray(roster) ? roster : []).reduce((labels, player) => {
+      const playerId = Number(player?.id);
+      const key = getSimulationRosterIdentityKey(player);
+      if (!Number.isFinite(playerId) || playerId <= 0 || !key || Number(identityCounts[key] || 0) < 2) {
+        return labels;
+      }
+      const variantLabel = getSimulationPlayerVariantLabel(player);
+      if (variantLabel) {
+        labels[playerId] = variantLabel;
+      }
+      return labels;
+    }, {});
   }
 
   function buildSimulationLastMatchupLabel(state){
@@ -617,6 +679,7 @@
     const legacyStarterSlots = getSimulationStarterSlotsForState(state);
     const starterSlots = getSharedStarterSlotsForState(state, legacyStarterSlots);
     const roster = getControlledRoster(state);
+    const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(roster);
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
     const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
       ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
@@ -665,6 +728,7 @@
         ? 'Starting lineup is ready.'
         : 'Suggested fixes are available below.',
       roster,
+      playerVariantLabelsById,
       lineup,
       bench,
       filledStarters,
@@ -747,6 +811,7 @@
     const legacyStarterSlots = getSimulationStarterSlotsForState(state);
     const starterSlots = getSharedStarterSlotsForState(state, legacyStarterSlots);
     const roster = getControlledRoster(normalizedState);
+    const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(roster);
     const controlledTeam = getControlledTeam(normalizedState);
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
     const explicitSlots = normalizedState?.seasonState?.lineupSlotsByTeam?.[teamAbbr];
@@ -802,6 +867,7 @@
       rosterSpaceLabel: buildSimulationRosterSpaceLabel(normalizedState, roster),
       lastMatchupLabel: buildSimulationLastMatchupLabel(normalizedState),
       currentMatchupLabel: buildSimulationCurrentMatchupLabel(normalizedState),
+      playerVariantLabelsById,
       bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
       lineup: legacyStarterSlots
         .map((slot) => lineupSlots[slot]?.player)

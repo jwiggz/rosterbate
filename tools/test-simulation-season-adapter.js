@@ -277,6 +277,55 @@ assert.equal(positionedNbaRosterVm.lineupSlots.SF.suggestedPlayerId, 31, 'nba ro
 assert.equal(positionedNbaRosterVm.lineupSlots.PF.suggestedPlayerId, 55, 'nba roster vm should expose the slot-aware suggested forward for PF');
 assert.equal(positionedNbaRosterVm.lineupSlots.C.suggestedPlayerId, 34, 'nba roster vm should expose the slot-aware suggested center for C');
 
+const duplicateBenchAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-duplicate-bench',
+  state: {
+    ...slotState,
+    draftState: {
+      ...slotState.draftState,
+      rostersByTeam: {
+        ...slotState.draftState.rostersByTeam,
+        LAL: [
+          { id: 9, name: 'Ron Harper', pos: 'PG', team: 'LAC', fp: 41.2 },
+          { id: 13, name: 'Gerald Wilkins', pos: 'SG', team: 'NYK', fp: 39.4 },
+          { id: 31, name: 'Sean Elliott', pos: 'SF', team: 'SAS', fp: 44.7 },
+          { id: 55, name: 'Larry Nance', pos: 'PF', team: 'CLE', fp: 48.1 },
+          { id: 34, name: 'Hakeem Olajuwon', pos: 'C', team: 'HOU', fp: 61.8 },
+          { id: 3, name: 'Mahmoud Abdul-Rauf', pos: 'PG', team: 'DEN', fp: 35.2, historicalPackLabel: '1992-93 NBA Simulation Archive' },
+          { id: 103, name: 'Mahmoud Abdul-Rauf', pos: 'PG', team: 'DEN', fp: 34.8, historicalPackLabel: '1995-96 NBA Simulation Archive' },
+          { id: 22, name: 'Nate McMillan', pos: 'SG', team: 'SEA', fp: 29.3 }
+        ]
+      }
+    },
+    seasonState: {
+      ...slotState.seasonState,
+      lineupIdsByTeam: { LAL: [9, 13, 31, 55, 34] }
+    }
+  }
+});
+
+const duplicateBenchRosterVm = duplicateBenchAdapter.getRosterViewModel();
+assert.deepStrictEqual(
+  duplicateBenchRosterVm.sections.bench.rows.map((row) => row.player?.id),
+  [3, 103, 22],
+  'nba simulation roster vm should preserve distinct mixed-era variants instead of collapsing players who share the same visible identity'
+);
+assert.equal(
+  duplicateBenchRosterVm.sections.bench.rows[0]?.playerVariantLabel,
+  '1992-93',
+  'nba simulation roster vm should expose a compact source-season label for duplicate-name mixed-era variants'
+);
+assert.equal(
+  duplicateBenchRosterVm.sections.bench.rows[1]?.playerVariantLabel,
+  '1995-96',
+  'nba simulation roster vm should distinguish later mixed-era variants with their own source-season label'
+);
+assert.equal(
+  duplicateBenchRosterVm.sections.bench.rows[2]?.playerVariantLabel,
+  null,
+  'nba simulation roster vm should avoid adding variant labels when the player identity is unique on the roster'
+);
+
 const indexOnlyResultAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-index-only-results',
   state: {
