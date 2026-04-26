@@ -809,8 +809,8 @@ const simulationAdapterStub = {
   getStandingsViewModel() {
     return {
       rows: [
-        { teamAbbr: 'LAL', w: 9, l: 3 },
-        { teamAbbr: 'BOS', w: 7, l: 5 }
+        { teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+        { teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 }
       ]
     };
   },
@@ -1518,6 +1518,7 @@ assert.equal(elements.hubLeagueName.textContent, '2025-26 NBA Simulation');
 assert.equal(elements.hubFormat.textContent, '1995-96 + 2015-16 Mixed Era Shell');
 assert.equal(elements.hubScoringType.textContent, 'Simulated NBA Results');
 assert.equal(elements.hubTeamCount.textContent, '3');
+assert.equal(elements.hubRec.textContent, '9-3 | 1360.0 PF | 1288.0 PA');
 assert.equal(elements.hubOpp.textContent, '9-3');
 assert.equal(elements.hubOppLabel.textContent, 'Record');
 assert.equal(elements.hubProj.textContent, 'LAL');

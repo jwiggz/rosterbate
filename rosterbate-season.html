@@ -9156,6 +9156,7 @@ function renderSimulationHubInSharedShell(){
   const availableCount=Array.isArray(G?.waiver) ? G.waiver.length : (Array.isArray(waiverVm?.availablePlayers) ? waiverVm.availablePlayers.length : 0);
   const standingsRows=Array.isArray(standingsVm?.rows) ? standingsVm.rows : [];
   const controlledAbbr=String(vm?.controlledTeam?.abbr || '').trim().toUpperCase();
+  const controlledStandingRow=standingsRows.find((row)=>String(row?.teamAbbr || row?.abbr || '').trim().toUpperCase()===controlledAbbr) || vm?.userRow || null;
   const rankIndex=standingsRows.findIndex((row)=>String(row?.teamAbbr || '').trim().toUpperCase()===controlledAbbr);
   const rankLabel=rankIndex>=0 ? `${rankIndex+1}${rankIndex===0?'st':rankIndex===1?'nd':rankIndex===2?'rd':'th'} place` : '--';
   const playersCopy=pendingIncoming>0
@@ -9169,9 +9170,24 @@ function renderSimulationHubInSharedShell(){
     oppProj: 'Source Seasons',
     streak: 'Streak'
   });
+  if(typeof setAvatarNode === 'function'){
+    setAvatarNode(
+      document.getElementById('hubAv'),
+      vm.controlledTeam?.name || D?.teamName || 'Simulation Team',
+      62,
+      'var(--accent)',
+      typeof getCurrentTeamAvatarUrl === 'function' ? getCurrentTeamAvatarUrl() : null,
+      'box-shadow:0 10px 20px rgba(249,115,22,.18);margin:6px auto 0;'
+    );
+  }
   document.getElementById('hubLeagueName').textContent = vm.leagueLabel;
   document.getElementById('hubName').textContent = vm.controlledTeam?.name || D?.teamName || 'Simulation Team';
-  document.getElementById('hubRec').textContent = vm.recordLabel || (vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0');
+  const hubRecordLabel = vm.recordLabel || (vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0');
+  const hubPf = Number.isFinite(Number(controlledStandingRow?.pf)) ? Number(controlledStandingRow.pf).toFixed(1) : null;
+  const hubPa = Number.isFinite(Number(controlledStandingRow?.pa)) ? Number(controlledStandingRow.pa).toFixed(1) : null;
+  document.getElementById('hubRec').textContent = hubPf != null && hubPa != null
+    ? `${hubRecordLabel} | ${hubPf} PF | ${hubPa} PA`
+    : hubRecordLabel;
   const primaryActionTone=String(primaryAction?.shellTone || '').trim().toLowerCase();
   const primaryActionShortLabel=primaryAction?.shortLabel || primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Reveal Day');
   const primaryActionCadence=primaryAction?.cadenceLabel || (isNflSimulation ? `Week ${Number(vm?.userRow?.w || 0) + Number(vm?.userRow?.l || 0) + 1}` : `Day ${Number(scheduleVm?.nextGame?.day || scheduleVm?.currentMatchup?.day || G?.day || 1)}`);
