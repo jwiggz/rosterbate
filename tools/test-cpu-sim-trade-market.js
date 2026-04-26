@@ -167,9 +167,9 @@ function buildContext(options = {}) {
     console,
     RB_SEASON_DEBUG: false,
     getActiveSeasonBackend() {
-      return String(context.D?.activeSeasonBackend || '').trim().toLowerCase() === 'simulation'
-        ? 'simulation'
-        : 'fantasy';
+      const explicitBackend = String(context.D?.activeSeasonBackend || '').trim().toLowerCase();
+      if (explicitBackend === 'simulation') return 'simulation';
+      return context.isHistoricalSimulationUniverse(context.D) ? 'simulation' : 'fantasy';
     },
     isCpuManagedTeam(teamIdx) {
       if (typeof options.cpuManagedTeam === 'number') return teamIdx === options.cpuManagedTeam;

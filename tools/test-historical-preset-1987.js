@@ -162,7 +162,7 @@ assert.match(historicSeasonsFallbackEntry, new RegExp(`reimaginedUrl:\\s*'${esca
 
 const historicUniverseSource = readText('historic-universe.html');
 const historicUniverseFallbackEntry = extractObjectLiteralBlock(historicUniverseSource, packId, 'historic-universe fallback catalog');
-assert.match(historicUniverseFallbackEntry, /seasonLabel:\s*'1986-87 NBA Historic Season'/, 'historic-universe fallback catalog should know about 1986-87');
+assert.match(historicUniverseFallbackEntry, /seasonLabel:\s*'1986-87 NBA Simulation Archive'/, 'historic-universe fallback catalog should know about 1986-87');
 assert.match(historicUniverseFallbackEntry, /shortLabel:\s*'1986-87'/, 'historic-universe fallback catalog should preserve the 1986-87 short label');
 assert.match(historicUniverseFallbackEntry, /focusTeamName:\s*'Los Angeles Lakers'/, 'historic-universe fallback catalog should preserve the Lakers spotlight');
 

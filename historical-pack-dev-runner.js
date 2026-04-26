@@ -398,6 +398,7 @@
     const summary=importPlan && importPlan.summary ? importPlan.summary : null;
     const selectedTeamId=String(options && options.selectedTeamId || '').trim();
     const entryMode=String(options && options.entryMode || 'simulation_season').trim() || 'simulation_season';
+    const isSimulationSeason=entryMode==='simulation_season';
     return {
       schemaVersion: 1,
       savedAt: new Date().toISOString(),
@@ -406,6 +407,8 @@
       seasonId: importPlan && importPlan.metadata ? importPlan.metadata.seasonId : null,
       selectedTeamId: selectedTeamId || null,
       entryMode: entryMode,
+      activeSeasonBackend: isSimulationSeason ? 'simulation' : null,
+      legacyHistoricalStatMode: isSimulationSeason ? false : null,
       validationStatus: importResult && importResult.validation ? importResult.validation.status : null,
       summary: summary,
       importPlan: importPlan
@@ -425,6 +428,8 @@
       seasonId: payload.seasonId,
       selectedTeamId: selectedTeamId || null,
       entryMode: payload.entryMode,
+      activeSeasonBackend: payload.activeSeasonBackend,
+      legacyHistoricalStatMode: payload.legacyHistoricalStatMode,
       savedAt: payload.savedAt,
       source: payload.source
     }));

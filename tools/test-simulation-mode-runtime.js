@@ -116,6 +116,25 @@ const skewedNflMixedEraContext = {
   playerPool: skewedNflPlayerPool
 };
 
+const positionedNbaShell = {
+  sport: 'nba',
+  rosterSize: 5,
+  teams: [{ abbr: 'LAL', name: 'Los Angeles Lakers' }]
+};
+
+const positionedNbaMixedEraContext = {
+  mixedEraConfigId: 'positioned-nba-demo',
+  sourcePackIds: ['nba_1996_full_season_v1'],
+  sourceSeasonLabels: ['1995-96'],
+  playerPool: [
+    { id: 34, name: 'Hakeem Olajuwon', pos: 'C', designation: 'ACTIVE', mixedEraOverall: 99, fp: 58, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 55, name: 'Larry Nance', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 97, fp: 48, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 9, name: 'Ron Harper', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 95, fp: 41, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 13, name: 'Gerald Wilkins', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 94, fp: 39, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 31, name: 'Sean Elliott', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 96, fp: 44, historicalPackId: 'nba_1996_full_season_v1' }
+  ]
+};
+
 function countRosterPlayersByPosition(roster, position) {
   return roster.filter((player) => player.pos === position).length;
 }
@@ -161,6 +180,47 @@ assert.equal(getSimulationRequiredStarterCount(shell), 5);
 assert.deepStrictEqual(
   getSimulationLineupSlotTemplate(nflShell),
   ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+);
+
+const positionedNbaLineupState = {
+  leagueShell: shell,
+  draftState: {
+    rostersByTeam: {
+      LAL: [
+        { id: 34, name: 'Hakeem Olajuwon', pos: 'C', designation: 'ACTIVE', mixedEraOverall: 99, fp: 58 },
+        { id: 55, name: 'Larry Nance', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 97, fp: 48 },
+        { id: 9, name: 'Ron Harper', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 95, fp: 41 },
+        { id: 13, name: 'Gerald Wilkins', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 94, fp: 39 },
+        { id: 31, name: 'Sean Elliott', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 96, fp: 44 }
+      ]
+    }
+  },
+  seasonState: {
+    lineupIdsByTeam: {
+      LAL: [34, 55, 9, 13, 31]
+    }
+  }
+};
+
+assert.deepStrictEqual(
+  buildSuggestedSimulationLineup(positionedNbaLineupState, 'LAL'),
+  [9, 13, 31, 55, 34],
+  'nba suggested lineups should assign players by slot fit instead of raw roster order'
+);
+
+assert.deepStrictEqual(
+  validateSimulationLineup(positionedNbaLineupState, 'LAL'),
+  {
+    valid: false,
+    issues: [
+      { slot: 'PG', code: 'ineligible_position', message: 'Hakeem Olajuwon is not eligible for PG.' },
+      { slot: 'SG', code: 'ineligible_position', message: 'Larry Nance is not eligible for SG.' },
+      { slot: 'SF', code: 'ineligible_position', message: 'Ron Harper is not eligible for SF.' },
+      { slot: 'PF', code: 'ineligible_position', message: 'Gerald Wilkins is not eligible for PF.' },
+      { slot: 'C', code: 'ineligible_position', message: 'Sean Elliott is not eligible for C.' }
+    ]
+  },
+  'nba lineup validation should catch starters assigned to the wrong position slots'
 );
 
 assert.deepStrictEqual(
@@ -373,6 +433,8 @@ const bootstrap = buildSimulationUniverseBootstrap({
 });
 
 assert.equal(bootstrap.simulationMode, 'nba_mixed_era_single_player_v1');
+assert.equal(bootstrap.activeSeasonBackend, 'simulation');
+assert.equal(bootstrap.historicalEntryMode, 'simulation_season');
 assert.equal(bootstrap.leagueShell.teams.length, 30);
 assert.equal(bootstrap.sourceSeasons.sourcePackIds.length, 4);
 assert.equal(bootstrap.draftState.controlledTeamAbbr, 'LAL');
@@ -1272,6 +1334,8 @@ const autoDraftState = buildCompletedSimulationAutoDraftState({
 });
 
 assert.equal(autoDraftState.simulationMode, 'nba_mixed_era_single_player_v1');
+assert.equal(autoDraftState.activeSeasonBackend, 'simulation');
+assert.equal(autoDraftState.historicalEntryMode, 'simulation_season');
 assert.equal(autoDraftState.draftState.controlledTeamAbbr, 'LAL');
 assert.equal(Object.keys(autoDraftState.draftState.rostersByTeam).length, 30);
 assert.ok(
@@ -1392,6 +1456,18 @@ Object.entries(skewedNflAutoDraftState.draftState.rostersByTeam).forEach(([teamA
   assertNflRosterCoverage(roster, `${teamAbbr} skewed NFL roster`);
 });
 
+const positionedNbaAutoDraftState = buildCompletedSimulationAutoDraftState({
+  shell: positionedNbaShell,
+  mixedEraContext: positionedNbaMixedEraContext,
+  controlledTeamAbbr: 'LAL'
+});
+
+assert.deepStrictEqual(
+  positionedNbaAutoDraftState.seasonState.lineupIdsByTeam.LAL,
+  [9, 13, 31, 55, 34],
+  'nba auto-draft seasons should seed position-aware starter lineups instead of raw roster-order starters'
+);
+
 assert.throws(() => buildCompletedSimulationAutoDraftState({
   shell,
   mixedEraContext: {
@@ -1402,12 +1478,62 @@ assert.throws(() => buildCompletedSimulationAutoDraftState({
 }), /Unable to auto-draft simulation league/i);
 
 const originalLocalStorage = global.localStorage;
+const originalSessionStorage = global.sessionStorage;
+const sessionWrites = new Map();
+global.sessionStorage = {
+  setItem(key, value){
+    sessionWrites.set(String(key), String(value));
+  },
+  getItem(key){
+    return sessionWrites.has(String(key)) ? sessionWrites.get(String(key)) : null;
+  },
+  removeItem(key){
+    sessionWrites.delete(String(key));
+  }
+};
+global.localStorage = {
+  removedKeys: [],
+  setItem(){},
+  getItem(){ return null; },
+  removeItem(key){
+    this.removedKeys.push(String(key));
+  }
+};
+const completedDraftState = writeCompletedSimulationState({ ok: true });
+assert.equal(completedDraftState.activeSeasonBackend, 'simulation');
+assert.equal(completedDraftState.historicalEntryMode, 'simulation_season');
+assert.equal(completedDraftState.legacyHistoricalStatMode, false);
+assert.equal(
+  JSON.parse(sessionWrites.get('rbSimulationModeCompletedDraft')).activeSeasonBackend,
+  'simulation',
+  'completed simulation draft storage should stamp an explicit simulation backend on persisted handoff state'
+);
+assert.equal(
+  JSON.parse(sessionWrites.get('rbSimulationModeCompletedDraft')).historicalEntryMode,
+  'simulation_season',
+  'completed simulation draft storage should preserve the canonical simulation_season entry mode on persisted handoff state'
+);
+assert.equal(
+  JSON.parse(sessionWrites.get('rbSimulationModeCompletedDraft')).legacyHistoricalStatMode,
+  false,
+  'completed simulation draft storage should clear replay-era legacy flags on persisted handoff state'
+);
+assert.ok(global.localStorage.removedKeys.includes('rbSimulationModeCompletedDraft'));
+
 global.localStorage = {
   setItem(){
     throw new Error('quota exceeded');
   }
 };
+global.sessionStorage = {
+  setItem(){
+    throw new Error('session quota exceeded');
+  },
+  getItem(){ return null; },
+  removeItem(){}
+};
 assert.throws(() => writeCompletedSimulationState({ ok: true }), /quota exceeded/i);
 global.localStorage = originalLocalStorage;
+global.sessionStorage = originalSessionStorage;
 
 console.log('simulation mode runtime test passed');

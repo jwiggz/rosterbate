@@ -46,6 +46,14 @@ const getCpuTeamSimPersonalitySource = extractFunctionSource(
   'getCpuTeamSimPersonality(teamIdx, state)',
   'buildCpuManagedStarterIdsForDay(teamIdx, roster, day)'
 );
+const normalizeLocalLeagueDraftSnapshotSource = extractFunctionSource(
+  'normalizeLocalLeagueDraftSnapshot(state)',
+  'writeLocalDraftSnapshot(state)'
+);
+const writeLocalDraftSnapshotSource = extractFunctionSource(
+  'writeLocalDraftSnapshot(state)',
+  'buildSharedSimulationPersistenceState(rawState, shellState, gameState)'
+);
 const startHistoricalDraftSimSeasonSource = extractFunctionSource(
   'startHistoricalDraftSimSeason()',
   'getSimulationStarterIdsForTeamDay(teamIdx, day)'
@@ -112,6 +120,22 @@ const context = {
   },
   isHistoricalSimulationUniverse(state) {
     return String(state?.historicalEntryMode || '').trim().toLowerCase() === 'simulation_season';
+  },
+  isSimulationBackedSeasonState(state) {
+    const explicitBackend = String(
+      state?.activeSeasonBackend
+      || state?.seasonBackend
+      || state?.backend
+      || ''
+    ).trim().toLowerCase();
+    if (explicitBackend === 'simulation') return true;
+    if (explicitBackend === 'fantasy') return false;
+    return context.isHistoricalSimulationUniverse(state);
+  },
+  getActiveSeasonBackend() {
+    const explicitBackend = String(context.D?.activeSeasonBackend || '').trim().toLowerCase();
+    if (explicitBackend === 'simulation') return 'simulation';
+    return context.isHistoricalSimulationUniverse(context.D) ? 'simulation' : 'fantasy';
   },
   buildBestLineupIdsForRoster(roster) {
     fallbackCalls.push(roster);
@@ -195,6 +219,8 @@ vm.runInNewContext(
     buildDeterministicCpuTeamPersonalitiesByTeamSource,
     ensureCpuTeamPersonalitiesByTeamSource,
     getCpuTeamSimPersonalitySource,
+    normalizeLocalLeagueDraftSnapshotSource,
+    writeLocalDraftSnapshotSource,
     startHistoricalDraftSimSeasonSource,
     buildCpuManagedStarterIdsForDaySource,
     rebuildLineupsAfterRosterChangeSource
@@ -300,6 +326,7 @@ assert.equal(
   'draft-to-sim conversion should stamp the canonical simulation mode id for new seasons'
 );
 assert.equal(context.D.activeSeasonBackend, 'simulation', 'draft-to-sim conversion should flip the season onto the simulation backend immediately');
+assert.equal(context.D.legacyHistoricalStatMode, false, 'draft-to-sim conversion should clear replay-era legacy flags during same-session simulation handoff');
 assert.equal(context.ACTIVE_SEASON_MODE, 'fantasy', 'draft-to-sim conversion should keep the polished fantasy presentation shell');
 assert.ok(context.SEASON_MODE_ADAPTER, 'draft-to-sim conversion should attach a simulation adapter in the same session');
 assert.equal(context.D.historicalUniverseSlotId, 'slot-1', 'draft-to-sim conversion should retain the assigned slot id when rebuilding simulation state');

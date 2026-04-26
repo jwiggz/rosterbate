@@ -75,6 +75,7 @@ module.exports = {
   getRequestedHistoricalUniverseSlotId,
   getResolvedSeasonBackend,
   getActiveSeasonBackend,
+  normalizeLocalLeagueDraftSnapshot,
   getLatestRevealReportDay,
   getDailyRevealReport,
   getSimulationDayLog,
@@ -1163,6 +1164,90 @@ assert.equal(
   'simulation',
   'legacy non-demo single-player saves should resolve the simulation backend'
 );
+assert.deepEqual(
+  toPlain(api.getResolvedSeasonBackend(new URLSearchParams(''), {
+    sport: 'nba',
+    leagueName: 'Explicit Simulation Backend League',
+    activeSeasonBackend: 'simulation'
+  })),
+  {
+    backend: 'simulation',
+    activeSeasonMode: 'simulation',
+    sharedSimulationSeason: false,
+    normalizeToUnifiedSimulation: true,
+    useSimulationAdapter: true
+  },
+  'simulation-backed saves should stay on the unified simulation backend even when they are not classified as shared sim requests or legacy local leagues'
+);
+assert.deepEqual(
+  toPlain(api.getResolvedSeasonBackend(new URLSearchParams(''), {
+    sport: 'nba',
+    leagueName: 'Explicit Simulation Local League',
+    activeSeasonBackend: 'simulation',
+    historicalEntryMode: 'simulation_season',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    allRosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    ],
+    waiver: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C' }],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ]
+  })),
+  {
+    backend: 'simulation',
+    activeSeasonMode: 'fantasy',
+    sharedSimulationSeason: false,
+    normalizeToUnifiedSimulation: true,
+    useSimulationAdapter: true
+  },
+  'simulation-backed local league saves should keep the polished fantasy presentation shell while still using the unified simulation backend'
+);
+assert.deepEqual(
+  toPlain(api.normalizeLocalLeagueDraftSnapshot({
+    sport: 'nba',
+    leagueName: 'Legacy Local League',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    allRosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    ],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ]
+  })),
+  {
+    sport: 'nba',
+    leagueName: 'Legacy Local League',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    allRosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    ],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL', w: 9, l: 3, pf: 1360, pa: 1288 },
+      { teamIdx: 1, teamAbbr: 'BOS', w: 7, l: 5, pf: 1299, pa: 1274 }
+    ],
+    activeSeasonBackend: 'simulation',
+    historicalEntryMode: 'simulation_season',
+    legacyHistoricalStatMode: false
+  },
+  'local league snapshot normalization should explicitly stamp simulation metadata onto legacy local league-shaped saves'
+);
+assert.equal(
+  api.normalizeLocalLeagueDraftSnapshot({
+    leagueName: 'Live Multiplayer League',
+    multiplayer: true,
+    teams: ['A', 'B'],
+    allRosters: [[], []],
+    standings: [{ teamIdx: 0 }, { teamIdx: 1 }]
+  }).multiplayer,
+  true,
+  'local league snapshot normalization should leave multiplayer saves untouched'
+);
 
 api.setSeasonModeAdapter(simulationAdapterStub);
 api.setActiveSeasonMode('simulation');
@@ -1220,6 +1305,24 @@ completedDraftClearCount = 0;
 completedDraftUpsertInput = null;
 completedDraftUpsertOptions = null;
 completedDraftUpsertError = null;
+assert.equal(
+  toPlain(api.readCompletedSimulationDraftState())?.draftState?.controlledTeamAbbr,
+  'LAL',
+  'completed-draft handoff reader should accept canonical simulation-native payloads from runtime storage'
+);
+completedDraftState = {
+  activeSeasonBackend: 'simulation',
+  sport: 'nba',
+  leagueShell: fixture.leagueShell,
+  draftState: fixture.draftState,
+  seasonState: fixture.seasonState
+};
+assert.equal(
+  toPlain(api.readCompletedSimulationDraftState())?.activeSeasonBackend,
+  'simulation',
+  'completed-draft handoff reader should also accept explicit simulation-backed payloads even when older mode ids are absent'
+);
+completedDraftState = fixture;
 
 const completedDraftRedirect = toPlain(
   api.resolveCompletedSimulationDraftSeasonBoot(new URLSearchParams('?sport=nba&simulation=nba_mixed_era'), 'nba')
@@ -1978,6 +2081,16 @@ assert.equal(
   false,
   'simulation persistence should drop stale last-revealed markers from the raw persistence state'
 );
+assert.equal(
+  rawPreferredPersistenceState.activeSeasonBackend,
+  'simulation',
+  'simulation persistence should stamp an explicit simulation backend onto the raw persistence state'
+);
+assert.equal(
+  rawPreferredPersistenceState.legacyHistoricalStatMode,
+  false,
+  'simulation persistence should explicitly clear any stale legacy stat-replay flag from the raw persistence state'
+);
 
 const normalizedStreakFixture = toPlain({
   ...fixture,
@@ -2004,6 +2117,15 @@ assert.equal(
   normalizedStreakState.standings[1].streakW,
   false,
   'shared simulation boot should infer a loss-direction flag from preserved L-prefixed streak labels when streakW is omitted'
+);
+const normalizedLegacyReplayFlagState = toPlain(api.normalizeSharedSimulationSeasonBootState({
+  ...fixture,
+  legacyHistoricalStatMode: true
+}, null));
+assert.equal(
+  normalizedLegacyReplayFlagState.legacyHistoricalStatMode,
+  false,
+  'shared simulation boot should explicitly clear any stale legacy stat-replay flag carried by older saves'
 );
 
 const postseasonPersistenceState = toPlain(
@@ -2061,6 +2183,14 @@ assert.equal(
   api.shouldPersistSharedSimulationState(legacyHistoricalSimulation),
   false,
   'legacy historical simulations should not be claimed by the shared simulation persistence serializer'
+);
+api.setSeasonModeAdapter(null);
+api.setActiveSeasonMode('fantasy');
+api.setData(toPlain(legacyHistoricalSimulation));
+assert.equal(
+  api.getActiveSeasonBackend(),
+  'simulation',
+  'legacy simulation-season saves should still resolve the active backend to simulation even without an explicit backend flag'
 );
 
 createdSimulationAdapters = [];
@@ -2194,6 +2324,8 @@ sandbox.rebuildActiveSeasonNav = originalRebuildActiveSeasonNav;
 assert.equal(simulationAdapterStub.simulateNextDayCalls, 1, 'fantasy-presented unified single-player seasons should advance through the simulation adapter');
 assert.equal(api.getGame().day, 13, 'adapter-backed unified progression should rehydrate the fantasy shell from the advanced simulation state');
 assert.equal(api.getData().seasonState?.currentDay, 13, 'adapter-backed unified progression should keep D synchronized with the advanced simulation state');
+assert.equal(api.getData().activeSeasonBackend, 'simulation', 'adapter-backed unified progression should keep D explicitly marked as simulation-backed');
+assert.equal(api.getData().legacyHistoricalStatMode, false, 'adapter-backed unified progression should keep replay-era legacy flags cleared on persisted simulation state');
 assert.equal(Object.prototype.toString.call(api.getGame().processed), '[object Set]', 'adapter-backed unified progression should preserve the legacy processed tracker as a Set');
 assert.deepStrictEqual(Array.from(api.getGame().processed), [], 'adapter-backed unified progression should clear stale legacy processed markers when the adapter state does not carry them forward');
 assert.deepStrictEqual(toPlain(api.getGame().dayResults), {}, 'adapter-backed unified progression should clear stale legacy reveal-day caches');

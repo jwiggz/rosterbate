@@ -64,6 +64,8 @@ function loadSeasonRedirectHarness(overrides = {}) {
     'getSharedSimulationRouteMode',
     'isRequestedSharedSimulationMode',
     'getRequestedHistoricalUniverseSlotId',
+    'isHistoricalSimulationUniverse',
+    'isSimulationBackedSeasonState',
     'readCompletedSimulationDraftState',
     'resolveCompletedSimulationDraftSeasonBoot'
   ].forEach((name) => {
@@ -78,6 +80,7 @@ function loadSeasonRedirectHarness(overrides = {}) {
 assert.match(source, /RB_SIMULATION_MODE_LOCAL_STATE_KEY/, 'draft page should define a simulation setup storage key');
 assert.match(source, /function shouldBootSimulationModeDraft\(\)/, 'draft page needs a simulation boot predicate');
 assert.match(source, /function buildSimulationDraftContextFromState\(/, 'draft page needs a simulation context builder');
+assert.match(source, /function normalizeSeasonManagerDraftPayload\(/, 'draft page should normalize ordinary draft handoff payloads before opening the season manager');
 assert.match(source, /function getSimulationLeagueSize\(simulationContext\)/, 'draft page should define a simulation league-size helper');
 assert.match(source, /function getSimulationRosterSize\(simulationContext\)/, 'draft page should define a simulation roster-size helper');
 assert.match(source, /function getSimulationTopPlayersPerPack\(simulationContext\)/, 'draft page should define a simulation player-pool cap helper');
@@ -124,6 +127,20 @@ assert.match(
 );
 assert.match(source, /simulationMode===['"]nba_mixed_era_single_player_v1['"]/, 'draft page should stamp simulation mode onto the finished save');
 assert.match(source, /simulationMode===['"]nfl_mixed_era_single_player_v1['"]/, 'draft page should recognize football simulation mode completion');
+assert.match(source, /activeSeasonBackend:['"]simulation['"]/, 'completed simulation draft payloads should stamp an explicit simulation backend');
+assert.match(source, /historicalEntryMode:['"]simulation_season['"]/, 'completed simulation draft payloads should stamp the canonical simulation_season entry mode');
+assert.match(source, /legacyHistoricalStatMode:false/, 'completed simulation draft payloads should clear replay-era legacy flags');
+assert.match(source, /RosterBateSimulationModeRuntime\.writeCompletedSimulationState\(payload\)/, 'completed simulation drafts should prefer the runtime completed-state writer for canonical handoff storage');
+assert.match(
+  source,
+  /let\s+draftData\s*=\s*normalizeSeasonManagerDraftPayload\(\s*\{/,
+  'ordinary draft completion should normalize the initial handoff payload into the unified simulation-backed state model'
+);
+assert.match(
+  source,
+  /if\(!normalized\.multiplayer\)\{[\s\S]*activeSeasonBackend='simulation'[\s\S]*legacyHistoricalStatMode=false[\s\S]*historicalEntryMode=historicalEntryMode==='historical_draft'[\s\S]*'simulation_season'/,
+  'ordinary local leagues should stamp explicit simulation backend metadata while preserving historical_draft payloads'
+);
 assert.match(source, /nfl_mixed_era_single_player_v1[\s\S]*return\s+32\b/, 'football simulation drafts should enforce a locked 32-team shell size');
 assert.match(source, /nfl_mixed_era_single_player_v1[\s\S]*return\s+13\b/, 'football simulation drafts should enforce a locked 13-slot roster size');
 assert.match(source, /rosterbate-season\.html\?sport=nfl&simulation=nfl_mixed_era/, 'completed football simulation drafts should route into the NFL season shell');
@@ -155,6 +172,53 @@ assert.match(seasonSource, /Football simulation season shell is coming next/i, '
     416,
     'nfl simulation drafts should derive a 416-player per-pack cap from the football shell requirement'
   );
+}
+
+{
+  const normalizeContext = {};
+  vm.createContext(normalizeContext);
+  vm.runInContext(extractFunction(source, 'normalizeSeasonManagerDraftPayload'), normalizeContext, { filename: 'draft:normalizeSeasonManagerDraftPayload' });
+  const normalizedLocalLeague = JSON.parse(JSON.stringify(normalizeContext.normalizeSeasonManagerDraftPayload({
+    sport: 'nba',
+    leagueName: 'Local League',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    allRosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    ],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL' },
+      { teamIdx: 1, teamAbbr: 'BOS' }
+    ],
+    historicalEntryMode: null
+  })));
+  assert.equal(normalizedLocalLeague.activeSeasonBackend, 'simulation', 'ordinary local draft handoff payloads should stamp an explicit simulation backend');
+  assert.equal(normalizedLocalLeague.historicalEntryMode, 'simulation_season', 'ordinary local draft handoff payloads should normalize to simulation_season');
+  assert.equal(normalizedLocalLeague.legacyHistoricalStatMode, false, 'ordinary local draft handoff payloads should clear legacy replay flags');
+
+  const normalizedHistoricalDraft = JSON.parse(JSON.stringify(normalizeContext.normalizeSeasonManagerDraftPayload({
+    sport: 'nba',
+    leagueName: 'Historical Draft League',
+    teams: ['Los Angeles Lakers', 'Boston Celtics'],
+    allRosters: [
+      [{ id: 23, name: 'Michael Jordan', pos: 'SG' }],
+      [{ id: 30, name: 'Stephen Curry', pos: 'PG' }]
+    ],
+    standings: [
+      { teamIdx: 0, teamAbbr: 'LAL' },
+      { teamIdx: 1, teamAbbr: 'BOS' }
+    ],
+    historicalEntryMode: 'historical_draft'
+  })));
+  assert.equal(normalizedHistoricalDraft.historicalEntryMode, 'historical_draft', 'historical drafted universes should preserve historical_draft while still getting explicit simulation backend metadata');
+
+  const multiplayerPayload = JSON.parse(JSON.stringify(normalizeContext.normalizeSeasonManagerDraftPayload({
+    sport: 'nba',
+    multiplayer: true,
+    leagueName: 'Shared League',
+    historicalEntryMode: null
+  })));
+  assert.equal(multiplayerPayload.activeSeasonBackend, undefined, 'multiplayer draft handoff payloads should not be forcibly rewritten as local simulation saves');
 }
 
 {

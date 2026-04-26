@@ -231,6 +231,8 @@ assert.equal(persisted.metadata.playerPoolCount, 300);
 const savedState = api.getState('slot_top300_regression');
 assert.ok(savedState, 'expected saved state to be readable');
 assert.equal(savedState.mixedEraConfigId, '1996-2016-top300');
+assert.equal(savedState.activeSeasonBackend, 'simulation', 'saved simulation archive slots should stay explicitly marked as simulation-backed');
+assert.equal(savedState.legacyHistoricalStatMode, false, 'saved simulation archive slots should keep replay-era legacy flags cleared');
 assert.equal(savedState.historicalPlayerPool, undefined, 'saved slot should not duplicate the full historical player pool');
 assert.equal(savedState.freeAgents, undefined, 'saved slot should rely on waiver data instead of duplicating free agents');
 assert.equal(Array.isArray(savedState.waiver), true);
@@ -287,6 +289,9 @@ const nflPersisted = api.upsertFromState(nflSimulationState, {
 assert.ok(nflPersisted, 'expected nfl simulation slot snapshot to persist');
 assert.equal(nflPersisted.metadata.subtitle, 'Arizona Cardinals - Week 4');
 assert.equal(nflPersisted.metadata.progressLabel, 'Week 4');
+const nflSavedState = api.getState('slot_nfl_sim_regression');
+assert.equal(nflSavedState.activeSeasonBackend, 'simulation', 'nfl simulation archive slots should stay explicitly marked as simulation-backed');
+assert.equal(nflSavedState.legacyHistoricalStatMode, false, 'nfl simulation archive slots should keep replay-era legacy flags cleared');
 
 const nflPlayoffPersisted = api.upsertFromState(
   {

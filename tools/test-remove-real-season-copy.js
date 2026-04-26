@@ -68,6 +68,11 @@ assert.match(
   /Simulation Archives|Browse Simulation Archives|Simulation Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|local league manager|saved sim run left off|Choose one of your local saves/i,
   'index.html should frame homepage archive and local-league entry points with simulation-first wording'
 );
+assert.match(
+  files.index,
+  /const looksLikeLocalLeague=!payload\.multiplayer[\s\S]*Array\.isArray\(payload\.teams\)[\s\S]*Array\.isArray\(payload\.allRosters\)[\s\S]*Array\.isArray\(payload\.standings\)[\s\S]*activeSeasonBackend:'simulation'[\s\S]*historicalEntryMode:String\(payload\.historicalEntryMode \|\| 'simulation_season'\)\.trim\(\) \|\| 'simulation_season'[\s\S]*legacyHistoricalStatMode:false/s,
+  'index.html should normalize both explicit simulation payloads and older local league-shaped saves before reopening them'
+);
 assert.doesNotMatch(
   files.simulationLeagueEngine,
   /real_season_stats_plus_light_authored_tuning/,
@@ -122,6 +127,16 @@ assert.match(
   files.myLeagues,
   /Local Leagues|local simulation league|saved sim leagues/i,
   'my-leagues.html should describe local saves as simulation-backed local leagues'
+);
+assert.match(
+  files.myLeagues,
+  /const looksLikeLocalLeague=!payload\.multiplayer[\s\S]*Array\.isArray\(payload\.teams\)[\s\S]*Array\.isArray\(payload\.allRosters\)[\s\S]*Array\.isArray\(payload\.standings\)[\s\S]*activeSeasonBackend:'simulation'[\s\S]*historicalEntryMode:String\(payload\.historicalEntryMode \|\| 'simulation_season'\)\.trim\(\) \|\| 'simulation_season'[\s\S]*legacyHistoricalStatMode:false/s,
+  'my-leagues.html should normalize both explicit simulation payloads and older local league-shaped saves before reopening them'
+);
+assert.match(
+  files.adminLeagues,
+  /looksLikeLocalLeague=!payload\.multiplayer&&Array\.isArray\(payload\.teams\)&&Array\.isArray\(payload\.allRosters\)&&Array\.isArray\(payload\.standings\)[\s\S]*activeSeasonBackend:"simulation"[\s\S]*historicalEntryMode:String\(payload\.historicalEntryMode\|\|"simulation_season"\)\.trim\(\)\|\|"simulation_season"[\s\S]*legacyHistoricalStatMode:false/s,
+  'admin-leagues.html should normalize both explicit simulation payloads and older local league-shaped saves before reopening them from the admin surface'
 );
 
 assert.match(

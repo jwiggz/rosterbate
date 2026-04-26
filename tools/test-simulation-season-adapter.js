@@ -244,6 +244,39 @@ assert.equal(sparseNbaRosterVm.sections.starters.rows[0].player?.id, 23);
 assert.equal(sparseNbaRosterVm.sections.starters.rows[1].player, null);
 assert.equal(sparseNbaRosterVm.sections.starters.rows[2].player?.id, 34);
 
+const positionedNbaAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-positioned-nba',
+  state: {
+    ...slotState,
+    draftState: {
+      ...slotState.draftState,
+      rostersByTeam: {
+        ...slotState.draftState.rostersByTeam,
+        LAL: [
+          { id: 34, name: 'Hakeem Olajuwon', pos: 'C', team: 'HOU', fp: 61.8 },
+          { id: 55, name: 'Larry Nance', pos: 'PF', team: 'CLE', fp: 48.1 },
+          { id: 9, name: 'Ron Harper', pos: 'PG', team: 'LAC', fp: 41.2 },
+          { id: 13, name: 'Gerald Wilkins', pos: 'SG', team: 'NYK', fp: 39.4 },
+          { id: 31, name: 'Sean Elliott', pos: 'SF', team: 'SAS', fp: 44.7 }
+        ]
+      }
+    },
+    seasonState: {
+      ...slotState.seasonState,
+      lineupIdsByTeam: { LAL: [34, 55, 9, 13, 31] }
+    }
+  }
+});
+
+const positionedNbaRosterVm = positionedNbaAdapter.getRosterViewModel();
+assert.equal(positionedNbaRosterVm.validation.valid, false, 'nba roster vm should surface invalid starter-slot assignments');
+assert.equal(positionedNbaRosterVm.lineupSlots.PG.player?.id, 34, 'nba roster vm should preserve the currently assigned player in each starter slot');
+assert.equal(positionedNbaRosterVm.lineupSlots.PG.suggestedPlayerId, 9, 'nba roster vm should expose the slot-aware suggested guard for PG');
+assert.equal(positionedNbaRosterVm.lineupSlots.SG.suggestedPlayerId, 13, 'nba roster vm should expose the slot-aware suggested guard for SG');
+assert.equal(positionedNbaRosterVm.lineupSlots.SF.suggestedPlayerId, 31, 'nba roster vm should expose the slot-aware suggested wing for SF');
+assert.equal(positionedNbaRosterVm.lineupSlots.PF.suggestedPlayerId, 55, 'nba roster vm should expose the slot-aware suggested forward for PF');
+assert.equal(positionedNbaRosterVm.lineupSlots.C.suggestedPlayerId, 34, 'nba roster vm should expose the slot-aware suggested center for C');
+
 const schedule = adapter.getScheduleViewModel();
 assert.equal(schedule.recentResults.length, 1);
 assert.equal(schedule.recentResults[0].homeAbbr, 'LAL');
@@ -1368,7 +1401,7 @@ const legacyPackersLineupState = {
   seasonState: {
     ...packersNflState.seasonState,
     lineupIdsByTeam: {
-      GB: [12, 27, 44, 87, 18, 89, 84, 9001, 2]
+      GB: [12, 27, 44, 87, 18, 89, 84, 2, 9001]
     },
     lineupSlotsByTeam: undefined
   },
@@ -1541,7 +1574,7 @@ const legacyPackersLineupOnlyState = {
     currentDay: 1,
     currentWeek: 1,
     lineupIdsByTeam: {
-      GB: [12, 27, 44, 87, 18, 89, 84, 9001, 2]
+      GB: [12, 27, 44, 87, 18, 89, 84, 2, 9001]
     },
     completedGameLogs: [],
     activityLog: []
@@ -1565,8 +1598,8 @@ assert.deepStrictEqual(
     WR2: 18,
     TE: 89,
     FLEX: 84,
-    DST: 9001,
-    K: 2
+    K: 2,
+    DST: 9001
   },
   'simulateNextDay should persist a normalized NFL slot map for legacy lineup-id saves before running the week'
 );

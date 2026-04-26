@@ -181,7 +181,56 @@
       return { valid: false, issues: [] };
     }
     if (!details.isNfl) {
-      return { valid: true, issues: [] };
+      const rosterById = new Map(getSimulationTeamRoster(state, details.key).map((player) => [Number(player?.id), player]));
+      const starterSlots = getSimulationLineupSlotTemplate(details.shell);
+      const eligibilityMap = getNbaSlotEligibilityMap();
+      const issues = [];
+      const assignedIds = new Set();
+
+      starterSlots.forEach((slot, index) => {
+        const rawPlayerId = details.lineupIds[index];
+        const playerId = rawPlayerId == null || rawPlayerId === '' ? null : Number(rawPlayerId);
+        if (playerId == null || !Number.isFinite(playerId)) {
+          issues.push({ slot, code: 'missing_player', message: `${slot} starter is missing.` });
+          return;
+        }
+
+        const player = rosterById.get(playerId);
+        if (!player) {
+          issues.push({ slot, code: 'missing_player', message: `${slot} starter is missing.` });
+          return;
+        }
+
+        if (isSimulationPlayerOut(player)) {
+          issues.push({ slot, code: 'player_out', message: `${slot} starter is OUT.` });
+        }
+
+        const eligiblePositions = eligibilityMap[slot] || [slot];
+        const playerTags = getSimulationBasketballPositionTags(player);
+        if (!eligiblePositions.some((position) => playerTags.has(position))) {
+          issues.push({
+            slot,
+            code: 'ineligible_position',
+            message: `${String(player?.name || 'Player')} is not eligible for ${slot}.`
+          });
+        }
+
+        if (assignedIds.has(playerId)) {
+          issues.push({
+            slot,
+            code: 'duplicate_player',
+            message: `${String(player?.name || 'Player')} is already assigned to another slot.`
+          });
+          return;
+        }
+
+        assignedIds.add(playerId);
+      });
+
+      return {
+        valid: issues.length === 0,
+        issues
+      };
     }
 
     const rosterById = new Map(getSimulationTeamRoster(state, details.key).map((player) => [Number(player?.id), player]));
@@ -239,7 +288,7 @@
     const details = getSimulationLineupDetails(state, teamAbbr);
     const roster = sortPlayers(getSimulationTeamRoster(state, details.key));
     if (!details.isNfl) {
-      return roster.slice(0, getSimulationRequiredStarterCount(details.shell)).map((player) => Number(player?.id));
+      return buildSuggestedNbaLineupIds(roster, details.shell);
     }
 
     const eligibilityMap = getNflSlotEligibilityMap();
@@ -405,6 +454,8 @@
     const leagueShell = normalizeShell(shell);
     const pool = buildSimulationPlayerPool({ mixedEraContext, shell });
     return {
+      activeSeasonBackend: 'simulation',
+      historicalEntryMode: 'simulation_season',
       simulationMode: getSimulationModeId(leagueShell),
       leagueShell: clone(leagueShell),
       sourceSeasons: {
@@ -539,10 +590,12 @@
       if (existingLineupSlots && typeof existingLineupSlots === 'object' && !Array.isArray(existingLineupSlots)) {
         return [teamAbbr, getSimulationLineupIdsFromSlots(leagueShell, existingLineupSlots)];
       }
-      const fallbackIds = teamRoster
-        .slice(0, starterSlots.length)
-        .map((player) => Number(player?.id))
-        .filter(Number.isFinite);
+      const fallbackIds = getSimulationSport(leagueShell) === 'nfl'
+        ? teamRoster
+          .slice(0, starterSlots.length)
+          .map((player) => Number(player?.id))
+          .filter(Number.isFinite)
+        : buildSuggestedNbaLineupIds(teamRoster, leagueShell);
       if (getSimulationSport(leagueShell) === 'nfl') {
         while (fallbackIds.length < starterSlots.length) {
           fallbackIds.push(null);
@@ -605,6 +658,8 @@
 
     return {
       ...source,
+      activeSeasonBackend: 'simulation',
+      historicalEntryMode: String(source?.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
       simulationMode: getSimulationModeId(leagueShell),
       legacyHistoricalStatMode: false,
       leagueShell,
@@ -646,6 +701,96 @@
       return 'EDGE';
     }
     return normalizedPosition;
+  }
+
+  function getSimulationBasketballPositionTags(player){
+    const rawPosition = String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
+    const matches = rawPosition.match(/\b(PG|SG|SF|PF|C|G|F)\b/g);
+    const tags = new Set(matches || []);
+    if (tags.has('PG') || tags.has('SG')) {
+      tags.add('G');
+    }
+    if (tags.has('SF') || tags.has('PF')) {
+      tags.add('F');
+    }
+    return tags;
+  }
+
+  function getNbaSlotEligibilityMap(){
+    return {
+      PG: ['PG', 'G'],
+      SG: ['SG', 'G'],
+      SF: ['SF', 'F'],
+      PF: ['PF', 'F'],
+      C: ['C']
+    };
+  }
+
+  function isSimulationPlayerOut(player){
+    return String(player?.designation || '').trim().toUpperCase() === 'OUT';
+  }
+
+  function getNbaSlotFitScore(slot, player){
+    const normalizedSlot = String(slot || '').trim().toUpperCase();
+    const tags = getSimulationBasketballPositionTags(player);
+    if (!tags.size) {
+      return -Infinity;
+    }
+    if (tags.has(normalizedSlot)) {
+      return 2;
+    }
+    if ((normalizedSlot === 'PG' || normalizedSlot === 'SG') && tags.has('G')) {
+      return 1;
+    }
+    if ((normalizedSlot === 'SF' || normalizedSlot === 'PF') && tags.has('F')) {
+      return 1;
+    }
+    return -Infinity;
+  }
+
+  function buildSuggestedNbaLineupIds(roster, shell){
+    const sortedRoster = sortPlayers(roster).filter((player) => !isSimulationPlayerOut(player));
+    const starterSlots = getSimulationLineupSlotTemplate(shell);
+    const slotPriority = { C: 0, PG: 1, SG: 2, SF: 3, PF: 4 };
+    const usedIds = new Set();
+    const slotAssignments = {};
+    const orderedSlots = starterSlots
+      .map((slot) => ({
+        slot,
+        candidates: sortedRoster.filter((player) => Number.isFinite(getNbaSlotFitScore(slot, player)))
+      }))
+      .sort((a, b) => {
+        const candidateDiff = a.candidates.length - b.candidates.length;
+        if (candidateDiff) return candidateDiff;
+        return Number(slotPriority[a.slot] || 99) - Number(slotPriority[b.slot] || 99);
+      });
+
+    orderedSlots.forEach(({ slot }) => {
+      const player = sortedRoster.reduce((bestPlayer, entry) => {
+        const playerId = Number(entry?.id);
+        const fitScore = getNbaSlotFitScore(slot, entry);
+        if (!Number.isFinite(playerId) || usedIds.has(playerId) || !Number.isFinite(fitScore)) {
+          return bestPlayer;
+        }
+        if (!bestPlayer) {
+          return entry;
+        }
+        const bestFitScore = getNbaSlotFitScore(slot, bestPlayer);
+        return fitScore > bestFitScore ? entry : bestPlayer;
+      }, null) || null;
+      if (!player) {
+        slotAssignments[slot] = null;
+        return;
+      }
+      usedIds.add(Number(player.id));
+      slotAssignments[slot] = Number(player.id);
+    });
+
+    return starterSlots.map((slot) => (
+      slotAssignments[slot] == null || slotAssignments[slot] === ''
+        ? null
+        : Number(slotAssignments[slot])
+    ));
   }
 
   function isFootballFlexEligiblePosition(position){
@@ -767,6 +912,34 @@
     draftState.draftPool = [];
     draftState.freeAgents = reserveFreeAgents;
     next.draftState = draftState;
+    next.seasonState = next.seasonState || {};
+    next.seasonState.lineupIdsByTeam = Object.fromEntries(teams.map((team) => {
+      const teamAbbr = normalizeTeamAbbr(team?.abbr);
+      const roster = Array.isArray(draftState.rostersByTeam?.[teamAbbr]) ? draftState.rostersByTeam[teamAbbr] : [];
+      if (getSimulationSport(next.leagueShell) === 'nfl') {
+        const suggestedSlots = buildSuggestedSimulationLineup({
+          leagueShell: next.leagueShell,
+          draftState: { rostersByTeam: { [teamAbbr]: roster } },
+          seasonState: {}
+        }, teamAbbr);
+        return [teamAbbr, getSimulationLineupIdsFromSlots({ sport: 'nfl' }, suggestedSlots)];
+      }
+      return [teamAbbr, buildSuggestedNbaLineupIds(roster, next.leagueShell)];
+    }));
+    if (getSimulationSport(next.leagueShell) === 'nfl') {
+      const starterSlots = getSimulationLineupSlotTemplate(next.leagueShell);
+      next.seasonState.lineupSlotsByTeam = Object.fromEntries(teams.map((team) => {
+        const teamAbbr = normalizeTeamAbbr(team?.abbr);
+        const lineupIds = Array.isArray(next.seasonState.lineupIdsByTeam?.[teamAbbr])
+          ? next.seasonState.lineupIdsByTeam[teamAbbr]
+          : [];
+        return [teamAbbr, starterSlots.reduce((slots, slot, index) => {
+          const value = lineupIds[index];
+          slots[slot] = value == null || value === '' ? null : Number(value);
+          return slots;
+        }, {})];
+      }));
+    }
     return next;
   }
 
@@ -1183,13 +1356,21 @@
   }
 
   function writeCompletedSimulationState(state){
-    if (writeJsonToStorageArea(root && root.sessionStorage, COMPLETED_DRAFT_KEY, state)) {
+    const payload = state && typeof state === 'object'
+      ? {
+          ...state,
+          activeSeasonBackend: 'simulation',
+          historicalEntryMode: String(state?.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+          legacyHistoricalStatMode: false
+        }
+      : state;
+    if (writeJsonToStorageArea(root && root.sessionStorage, COMPLETED_DRAFT_KEY, payload)) {
       try{
         clearJsonFromStorageArea(root && root.localStorage, COMPLETED_DRAFT_KEY);
       }catch(error){}
-      return state;
+      return payload;
     }
-    return writeJsonStorage(COMPLETED_DRAFT_KEY, state);
+    return writeJsonStorage(COMPLETED_DRAFT_KEY, payload);
   }
 
   function clearCompletedSimulationState(){

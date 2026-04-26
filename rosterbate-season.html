@@ -1522,7 +1522,7 @@ function saveTeamSettings(){
     D.teamUsers[D.myPlayerId].name=nextName;
     D.teamUsers[D.myPlayerId].avatarUrl=nextAvatar;
   }
-  try{localStorage.setItem('rosterbateDraft', JSON.stringify(D));}catch(e){}
+  D=writeLocalDraftSnapshot(D);
   
   // Save to Firebase for solo leagues
   if(!D?.multiplayer) {
@@ -1818,8 +1818,7 @@ function buildDailyRevealReport(day, generatedAt){
     matchups,
     topPerformers:playerLeaders,
     isSimulation:Boolean(simulationLog)
-      || String(D?.activeSeasonBackend || '').trim().toLowerCase()==='simulation'
-      || isHistoricalSimulationUniverse(D),
+      || getActiveSeasonBackend()==='simulation',
     simulationMeta:simulationLog ? {
       gameCount:Array.isArray(simulationLog.gameLogs) ? simulationLog.gameLogs.length : 0,
       engineVersion:simulationLog.engineVersion || null,
@@ -1839,10 +1838,7 @@ function buildDailyRevealReport(day, generatedAt){
   };
 }
 function buildSimulationDayRunnerSnapshot(day){
-  if(
-    String(D?.activeSeasonBackend || '').trim().toLowerCase()!=='simulation'
-    && !isHistoricalSimulationUniverse(D)
-  ) return null;
+  if(getActiveSeasonBackend()!=='simulation') return null;
   const currentDay=Number(day||G?.day||1) || 1;
   const week=weekForDay(currentDay);
   const teamCount=Array.isArray(D?.teams) ? D.teams.length : (Array.isArray(G?.rosters) ? G.rosters.length : 0);
@@ -2270,28 +2266,29 @@ async function saveSeasonToFirebase() {
       return false;
     }
     
-    const seasonId = D.seasonId;
+    const canonicalSeasonState = normalizeLocalLeagueDraftSnapshot(D) || D;
+    const seasonId = canonicalSeasonState.seasonId || D.seasonId;
     const userId = currentRbUser.uid;
     const userEmail = currentRbUser.email || 'unknown';
     
     // Prepare data to save - include ALL properties from D to preserve everything
     const saveData = {
-      ...D,  // Start with all existing data
+      ...canonicalSeasonState,  // Start with all existing data
       // Override/ensure critical fields
       seasonId: seasonId,
       userId: userId,
       userEmail: userEmail,
-      sport: D.sport || 'nba',
-      leagueName: D.leagueName || 'RosterBate League',
-      teamName: D.teamName || 'My Team',
-      isMultiplayer: !!D.multiplayer,
-      leagueSize: D.leagueSize || 0,
-      scoringFormat: D.scoringFormat || 'h2h_pts',
-      draftFormat: D.draftFormat || 'snake',
-      myTeamIndex: D.myTeamIndex || 0,
-      myPos: D.myPos || 0,
-      currentWeek: D.currentWeek || 1,
-      createdAt: D.createdAt || D.savedAt || Date.now(),
+      sport: canonicalSeasonState.sport || 'nba',
+      leagueName: canonicalSeasonState.leagueName || 'RosterBate League',
+      teamName: canonicalSeasonState.teamName || 'My Team',
+      isMultiplayer: !!canonicalSeasonState.multiplayer,
+      leagueSize: canonicalSeasonState.leagueSize || 0,
+      scoringFormat: canonicalSeasonState.scoringFormat || 'h2h_pts',
+      draftFormat: canonicalSeasonState.draftFormat || 'snake',
+      myTeamIndex: canonicalSeasonState.myTeamIndex || 0,
+      myPos: canonicalSeasonState.myPos || 0,
+      currentWeek: canonicalSeasonState.currentWeek || 1,
+      createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || Date.now(),
       updatedAt: Date.now()
     };
     
@@ -2306,15 +2303,15 @@ async function saveSeasonToFirebase() {
       seasonId: seasonId,  // Required by validation
       userId: userId,
       userEmail: userEmail,
-      sport: D.sport || 'nba',
-      leagueName: D.leagueName || 'RosterBate League',
-      teamName: D.teamName || 'My Team',
-      isMultiplayer: !!D.multiplayer,
-      leagueSize: D.leagueSize || 0,
-      scoringFormat: D.scoringFormat || 'h2h_pts',
-      draftFormat: D.draftFormat || 'snake',
-      currentWeek: D.currentWeek || 1,
-      createdAt: D.createdAt || D.savedAt || Date.now(),  // Required by validation
+      sport: canonicalSeasonState.sport || 'nba',
+      leagueName: canonicalSeasonState.leagueName || 'RosterBate League',
+      teamName: canonicalSeasonState.teamName || 'My Team',
+      isMultiplayer: !!canonicalSeasonState.multiplayer,
+      leagueSize: canonicalSeasonState.leagueSize || 0,
+      scoringFormat: canonicalSeasonState.scoringFormat || 'h2h_pts',
+      draftFormat: canonicalSeasonState.draftFormat || 'snake',
+      currentWeek: canonicalSeasonState.currentWeek || 1,
+      createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || Date.now(),  // Required by validation
       updatedAt: Date.now()
     };
     
@@ -2411,7 +2408,10 @@ function getRequestedHistoricalUniverseSlotId(params){
 function isLegacySinglePlayerSeasonState(state){
   if(!state || typeof state!=='object') return false;
   if(String(state?.leagueName || '').trim().toLowerCase()==='demo league' && Array.isArray(state?.teams)) return false;
-  if(shouldPersistSharedSimulationState(state)) return false;
+  const simulationMode=String(state?.simulationMode || '').trim().toLowerCase();
+  const sharedSimulationMode=getSharedSimulationRouteMode(simulationMode);
+  const explicitSharedSimulation=sharedSimulationMode==='nba_mixed_era' || sharedSimulationMode==='nfl_mixed_era';
+  if(explicitSharedSimulation) return false;
   return !state.multiplayer
     && Array.isArray(state?.teams)
     && Array.isArray(state?.allRosters)
@@ -2424,6 +2424,8 @@ function buildUnifiedSimulationBootState(rawState, slotId, requestedSport){
   const runtimeApi=window.RosterBateSimulationModeRuntime;
   const preparedState={
     ...baseState,
+    activeSeasonBackend:'simulation',
+    legacyHistoricalStatMode:false,
     sport:targetSport,
     historicalUniverseSlotId:String(slotId || baseState?.historicalUniverseSlotId || baseState?.slotId || '').trim() || null
   };
@@ -2513,6 +2515,9 @@ function buildUnifiedSimulationBootState(rawState, slotId, requestedSport){
 
 function getResolvedSeasonBackend(params, state){
   const rawState=(state && typeof state==='object') ? state : null;
+  const simulationBackedState=isSimulationBackedSeasonState(rawState);
+  const sharedSimulationSeason=isSharedSimulationSeason(params, rawState);
+  const legacySinglePlayerSeason=isLegacySinglePlayerSeasonState(rawState);
   const looksLikeDemoSeason=!!(
     rawState
     && String(rawState?.leagueName || '').trim().toLowerCase()==='demo league'
@@ -2527,7 +2532,7 @@ function getResolvedSeasonBackend(params, state){
       useSimulationAdapter:false
     };
   }
-  if(isSharedSimulationSeason(params, rawState)){
+  if(sharedSimulationSeason){
     return {
       backend:'simulation',
       activeSeasonMode:'simulation',
@@ -2536,10 +2541,19 @@ function getResolvedSeasonBackend(params, state){
       useSimulationAdapter:true
     };
   }
-  if(isLegacySinglePlayerSeasonState(rawState)){
+  if(legacySinglePlayerSeason){
     return {
       backend:'simulation',
       activeSeasonMode:'fantasy',
+      sharedSimulationSeason:false,
+      normalizeToUnifiedSimulation:true,
+      useSimulationAdapter:true
+    };
+  }
+  if(simulationBackedState){
+    return {
+      backend:'simulation',
+      activeSeasonMode:'simulation',
       sharedSimulationSeason:false,
       normalizeToUnifiedSimulation:true,
       useSimulationAdapter:true
@@ -2557,7 +2571,7 @@ function getResolvedSeasonBackend(params, state){
 function readCompletedSimulationDraftState(){
   try{
     const state=window.RosterBateSimulationModeRuntime?.readCompletedSimulationState?.();
-    return shouldPersistSharedSimulationState(state) ? state : null;
+    return isSimulationBackedSeasonState(state) ? state : null;
   }catch(e){
     console.warn('Failed to read completed simulation draft handoff:', e);
     return null;
@@ -2711,7 +2725,7 @@ function loadHistoricalUniverseSlotState(slotId, requestedSport){
 
 function persistHistoricalUniverseSlotSnapshot(reason){
   const api=window.RosterBateHistoricalUniverseSlots;
-  const shouldPersistSimulationState=shouldPersistSharedSimulationState(SEASON_MODE_ADAPTER?.getState?.() || D);
+  const shouldPersistSimulationState=isSimulationBackedSeasonState(SEASON_MODE_ADAPTER?.getState?.() || D);
   if(!api || !D || typeof D!=='object' || (!D.historicalPackId && !shouldPersistSimulationState)) return null;
   if(HISTORICAL_SLOT_QUOTA_BLOCKED) return null;
   try{
@@ -2736,7 +2750,7 @@ function persistHistoricalUniverseSlotSnapshot(reason){
             };
         SEASON_MODE_ADAPTER?.replaceState?.(adapterPersistedState);
       }
-      try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+      D=writeLocalDraftSnapshot(D);
     }
     HISTORICAL_SLOT_QUOTA_BLOCKED=false;
     return persisted;
@@ -3222,6 +3236,8 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     createdAt: Date.now(),
     updatedAt: Date.now(),
     savedAt: Date.now(),
+    activeSeasonBackend: isSimulationSeason ? 'simulation' : null,
+    legacyHistoricalStatMode: isSimulationSeason ? false : null,
     historicalPresentation: cloneJsonSafe(authored?.presentation || null),
     historicalChallenges: cloneJsonSafe(authored?.packChallenges || null),
     historicalSummaries: cloneJsonSafe(authored?.summaries || null),
@@ -3261,6 +3277,19 @@ function isHistoricalSimulationUniverse(state){
     || mode==='nfl_mixed_era_single_player_v1';
 }
 
+function isSimulationBackedSeasonState(state){
+  const explicitBackend=String(
+    state?.activeSeasonBackend
+    || state?.seasonBackend
+    || state?.backend
+    || ''
+  ).trim().toLowerCase();
+  if(explicitBackend==='simulation') return true;
+  if(explicitBackend==='fantasy') return false;
+  if(isHistoricalSimulationUniverse(state)) return true;
+  return shouldPersistSharedSimulationState(state);
+}
+
 function isSharedSimulationSeason(params, state){
   if(isRequestedSharedSimulationMode(getRequestedSimulationMode(params))) return true;
   if(isRequestedSharedSimulationMode(state?.simulationMode)) return true;
@@ -3283,6 +3312,24 @@ function shouldPersistSharedSimulationState(state){
   return !!(window.RosterBateSimulationSeasonAdapter?.isSupportedSimulationSeasonState?.(state));
 }
 
+function normalizeLocalLeagueDraftSnapshot(state){
+  if(!state || typeof state!=='object') return state;
+  if(state.multiplayer) return state;
+  if(!isSimulationBackedSeasonState(state) && !isLegacySinglePlayerSeasonState(state)) return state;
+  return {
+    ...state,
+    activeSeasonBackend:'simulation',
+    historicalEntryMode:String(state.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+    legacyHistoricalStatMode:false
+  };
+}
+
+function writeLocalDraftSnapshot(state){
+  const normalizedState=normalizeLocalLeagueDraftSnapshot(state);
+  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(normalizedState)); }catch(e){}
+  return normalizedState;
+}
+
 function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
   const baseState=(rawState && typeof rawState==='object') ? cloneSharedSimulationBootValue(rawState) : {};
   const {
@@ -3297,7 +3344,7 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
   } = baseState;
   const shell=(shellState && typeof shellState==='object') ? shellState : {};
   const game=(gameState && typeof gameState==='object') ? gameState : {};
-  const preferRawSimulationState=shouldPersistSharedSimulationState(baseStateWithoutLegacyShellCaches);
+  const preferRawSimulationState=isSimulationBackedSeasonState(baseStateWithoutLegacyShellCaches);
   const leagueShell=(baseStateWithoutLegacyShellCaches?.leagueShell && typeof baseStateWithoutLegacyShellCaches.leagueShell==='object') ? baseStateWithoutLegacyShellCaches.leagueShell : {};
   const rawTeams=Array.isArray(leagueShell?.teams) ? leagueShell.teams.filter(Boolean) : [];
   const teamMeta=Array.isArray(shell?.teamMeta) ? shell.teamMeta.filter(Boolean) : [];
@@ -3410,6 +3457,8 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
 
   return {
     ...baseStateWithoutLegacyShellCaches,
+    activeSeasonBackend: 'simulation',
+    legacyHistoricalStatMode: false,
     draftState,
     seasonState,
     currentWeek: shellWeek,
@@ -3610,6 +3659,7 @@ function normalizeSharedSimulationSeasonBootState(state, slotId){
     recentDrops: Array.isArray(rawState?.recentDrops) ? rawState.recentDrops.map(entry=>cloneSharedSimulationBootValue(entry)) : [],
     moneyBallLocks: rawState?.moneyBallLocks && typeof rawState.moneyBallLocks==='object' ? cloneSharedSimulationBootValue(rawState.moneyBallLocks) : {},
     cpuTradeMarketDaysProcessed: rawState?.cpuTradeMarketDaysProcessed && typeof rawState.cpuTradeMarketDaysProcessed==='object' ? cloneSharedSimulationBootValue(rawState.cpuTradeMarketDaysProcessed) : {},
+    legacyHistoricalStatMode: false,
     isFreshDraftLaunch: false,
     multiplayer: false
   };
@@ -3655,6 +3705,7 @@ function getActiveSeasonBackend(){
   if(explicitBackend==='simulation' || explicitBackend==='fantasy'){
     return explicitBackend;
   }
+  if(isSimulationBackedSeasonState(D)) return 'simulation';
   if(SEASON_MODE_ADAPTER) return 'simulation';
   return ACTIVE_SEASON_MODE==='simulation' ? 'simulation' : 'fantasy';
 }
@@ -3848,6 +3899,7 @@ function startHistoricalDraftSimSeason(){
     D.historicalEntryMode='simulation_season';
     D.simulationMode=canonicalSimulationMode;
     D.activeSeasonBackend='simulation';
+    D.legacyHistoricalStatMode=false;
     D.processed=[];
     D.dayResults={};
     D.revealedDays={};
@@ -3886,10 +3938,11 @@ ratingsSource:'Ratings-driven simulation + sport-specific tuning',
       if(typeof normalizeSharedSimulationSeasonBootState==='function'){
         D=normalizeSharedSimulationSeasonBootState(adapterState, slotId);
         D.activeSeasonBackend='simulation';
+        D.legacyHistoricalStatMode=false;
       }
       ACTIVE_SEASON_MODE='fantasy';
     }
-    try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+    D=writeLocalDraftSnapshot(D);
     toast(sourcePackIds.length > 1 ? 'Mixed-era drafted universe is now a Sim Season.' : 'Drafted universe is now a Sim Season.');
     if(SEASON_MODE_ADAPTER && typeof initSeason==='function'){
       initSeason();
@@ -4032,7 +4085,8 @@ function getMatchingLocalLeagueData(requestedLeagueId){
   try{
     const raw=localStorage.getItem('rosterbateDraft');
     if(!raw) return null;
-    const parsed=JSON.parse(raw);
+    const rawParsed=JSON.parse(raw);
+    const parsed=normalizeLocalLeagueDraftSnapshot(rawParsed) || rawParsed;
     if(!parsed || typeof parsed!=='object') return null;
     return String(parsed.seasonId || '').trim()===target ? parsed : null;
   }catch(e){
@@ -4346,11 +4400,11 @@ function rebuildSeasonWaiverPool(){
     return true;
   }).map(player=>({...player}));
   const rosterCoverage = sourcePool.length ? (rosterIds.size / sourcePool.length) : 0;
-  if(shouldPersistSharedSimulationState(D) && sourcePool.length && !rebuilt.length && rosterIds.size >= sourcePool.length){
+  if(isSimulationBackedSeasonState(D) && sourcePool.length && !rebuilt.length && rosterIds.size >= sourcePool.length){
     return [];
   }
   if(sourcePool.length && (!rebuilt.length || rosterCoverage >= 0.9)){
-    if(D?.isHistoricalPack || shouldPersistSharedSimulationState(D)){
+    if(D?.isHistoricalPack || isSimulationBackedSeasonState(D)){
       return rebuilt;
     }
     console.warn('Season waiver pool looked corrupted; falling back to canonical player pool.', {
@@ -4437,7 +4491,7 @@ function applySharedSeasonPayload(payload){
   refreshCommissionerAccess();
   applySportContext(D?.sport || CURRENT_SPORT);
   ensureSeasonWaiverPool(true);
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  D=writeLocalDraftSnapshot(D);
   sharedSeasonHydrating=false;
   return true;
 }
@@ -4619,7 +4673,7 @@ function queueSharedSeasonSave(reason, delay){
   syncGameStateToD();
 
   // Save to localStorage for all leagues
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  D=writeLocalDraftSnapshot(D);
   persistHistoricalUniverseSlotSnapshot(reason || 'shared_save');
 
   // Save to Firebase for solo leagues (async, non-blocking)
@@ -4980,7 +5034,7 @@ function ensureCpuTeamPersonalitiesByTeam(state, options){
   const teamCount=getCpuSimTeamCount(state);
   const existing=Array.isArray(state.cpuTeamPersonalitiesByTeam) ? state.cpuTeamPersonalitiesByTeam : [];
   const preferDeterministic=!!(options && options.preferDeterministic);
-  const shouldUseDeterministicFallback=preferDeterministic || isHistoricalSimulationUniverse(state);
+  const shouldUseDeterministicFallback=preferDeterministic || isSimulationBackedSeasonState(state);
   const deterministic=shouldUseDeterministicFallback ? buildDeterministicCpuTeamPersonalitiesByTeam(state) : [];
   const next=Array.from({length:teamCount},(_,teamIdx)=>{
     const value=existing[teamIdx];
@@ -5003,10 +5057,7 @@ function getCpuTeamSimPersonality(teamIdx, state){
 function buildCpuManagedStarterIdsForDay(teamIdx, roster, day){
   if(
     isCpuManagedTeam(teamIdx) &&
-    (
-      String(D?.activeSeasonBackend || '').trim().toLowerCase()==='simulation'
-      || isHistoricalSimulationUniverse(D)
-    ) &&
+    getActiveSeasonBackend()==='simulation' &&
     window.RosterBateCpuSimLineups &&
     typeof window.RosterBateCpuSimLineups.buildCpuSimLineupIds === 'function'
   ){
@@ -5067,10 +5118,7 @@ function canCpuWaiverFillSlot(player, slot){
 }
 
 function isCpuWaiverSimulationUniverse(){
-  return CURRENT_SPORT==='nba' && (
-    String(D?.activeSeasonBackend || '').trim().toLowerCase()==='simulation'
-    || isHistoricalSimulationUniverse(D)
-  );
+  return CURRENT_SPORT==='nba' && getActiveSeasonBackend()==='simulation';
 }
 
 function getCpuWaiverRoleShape(player){
@@ -5471,10 +5519,7 @@ function buildCpuTradeRosterNeedSummary(teamIdx, day, rosterOverride){
 }
 
 function isCpuTradeSimulationUniverse(){
-  return CURRENT_SPORT==='nba' && (
-    String(D?.activeSeasonBackend || '').trim().toLowerCase()==='simulation'
-    || isHistoricalSimulationUniverse(D)
-  );
+  return CURRENT_SPORT==='nba' && getActiveSeasonBackend()==='simulation';
 }
 
 function shouldRunCpuTradeMarketForDay(day){
@@ -5750,10 +5795,7 @@ function maintainCpuTeamRoster(teamIdx, options){
 
   if(
     ilSlots>0 &&
-    (
-      String(D?.activeSeasonBackend || '').trim().toLowerCase()==='simulation'
-      || isHistoricalSimulationUniverse(D)
-    )
+    getActiveSeasonBackend()==='simulation'
   ){
     const ilCandidates=[...roster]
       .filter(player=>isIlEligiblePlayer(player,getInjuryStatus(player,week)))
@@ -6432,7 +6474,8 @@ function rehydrateFantasyShellFromSimulationState(rawState){
   D={
     ...previousState,
     ...normalizedState,
-    activeSeasonBackend:'simulation'
+    activeSeasonBackend:'simulation',
+    legacyHistoricalStatMode:false
   };
   G.week=Number(D?.currentWeek || D?.seasonState?.currentWeek || G?.week || 1) || 1;
   G.day=Number(D?.currentDay || D?.seasonState?.currentDay || G?.day || 1) || 1;
@@ -6469,7 +6512,10 @@ function persistSimulationSeasonState(reason){
   const adapterState=SEASON_MODE_ADAPTER.getState();
   if(ACTIVE_SEASON_MODE==='simulation'){
     D=adapterState;
-    if(D && typeof D==='object') D.activeSeasonBackend='simulation';
+    if(D && typeof D==='object'){
+      D.activeSeasonBackend='simulation';
+      D.legacyHistoricalStatMode=false;
+    }
   }else{
     rehydrateFantasyShellFromSimulationState(adapterState);
   }
@@ -7865,7 +7911,7 @@ window.onload=async function(){
     refreshCommissionerAccess();
     let storedFallbackResumeState = false;
     try{
-      localStorage.setItem('rosterbateDraft', JSON.stringify(D));
+      D=writeLocalDraftSnapshot(D);
       storedFallbackResumeState = true;
     }catch(e){
       console.warn('Failed to persist fallback simulation resume state before boot:', e);
@@ -7909,7 +7955,7 @@ window.onload=async function(){
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();
       refreshCommissionerAccess();
-      try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+      D=writeLocalDraftSnapshot(D);
       ACTIVE_SEASON_MODE = resolvedSeasonBackend.activeSeasonMode;
       SEASON_MODE_ADAPTER = resolvedSeasonBackend.useSimulationAdapter
         ? buildSimulationSeasonAdapterFromState(requestedHistoricalUniverse, resolvedAdapterState)
@@ -7941,7 +7987,7 @@ window.onload=async function(){
         applySportContext(D.sport || requestedSport);
         hydrateDraftUserContextFromLobby();
         refreshCommissionerAccess();
-        try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+        D=writeLocalDraftSnapshot(D);
         clearHistoricalPackDevPendingBoot();
         initSeason();
         applyRequestedSeasonView();
@@ -7974,19 +8020,18 @@ window.onload=async function(){
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();
       refreshCommissionerAccess();
-      try {
-        localStorage.setItem('rosterbateDraft', JSON.stringify(D));
-      } catch(e) {}
+      D=writeLocalDraftSnapshot(D);
       await authReady;
       if (currentRbUser) {
         try {
           const userId = currentRbUser.uid;
+          const canonicalSeasonState = normalizeLocalLeagueDraftSnapshot(D) || D;
           const saveData = {
-            ...D,
+            ...canonicalSeasonState,
             seasonId: leagueId,
             userId: userId,
             userEmail: currentRbUser.email || 'unknown',
-            createdAt: D.createdAt || D.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
+            createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
             updatedAt: Date.now()
           };
           await db.ref(`userSeasons/${userId}/${leagueId}`).set(removeUndefined(saveData));
@@ -7994,15 +8039,15 @@ window.onload=async function(){
             seasonId: leagueId,
             userId: userId,
             userEmail: currentRbUser.email || 'unknown',
-            sport: D.sport || 'nba',
-            leagueName: D.leagueName || 'RosterBate League',
-            teamName: D.teamName || 'My Team',
-            isMultiplayer: !!D.multiplayer,
-            leagueSize: getLeagueTeamCount(D),
-            scoringFormat: D.scoringFormat || 'h2h_pts',
-            draftFormat: D.draftFormat || 'snake',
-            currentWeek: Number(D.currentWeek || 1),
-            createdAt: D.createdAt || D.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
+            sport: canonicalSeasonState.sport || 'nba',
+            leagueName: canonicalSeasonState.leagueName || 'RosterBate League',
+            teamName: canonicalSeasonState.teamName || 'My Team',
+            isMultiplayer: !!canonicalSeasonState.multiplayer,
+            leagueSize: getLeagueTeamCount(canonicalSeasonState),
+            scoringFormat: canonicalSeasonState.scoringFormat || 'h2h_pts',
+            draftFormat: canonicalSeasonState.draftFormat || 'snake',
+            currentWeek: Number(canonicalSeasonState.currentWeek || 1),
+            createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
             updatedAt: Date.now()
           }));
         } catch(saveErr) {
@@ -8047,7 +8092,8 @@ window.onload=async function(){
           const localRaw = localStorage.getItem('rosterbateDraft');
           if (localRaw) {
             try {
-              const localData = JSON.parse(localRaw);
+              const localParsed = JSON.parse(localRaw);
+              const localData = normalizeLocalLeagueDraftSnapshot(localParsed) || localParsed;
               // Check if localStorage has this league
               if (localData.seasonId === leagueId) {
                 console.log('? Found league in localStorage, will use that and save to Firebase');
@@ -8058,12 +8104,13 @@ window.onload=async function(){
                 
                 // Save to Firebase now
                 try {
+                  const normalizedLeagueData = normalizeLocalLeagueDraftSnapshot(leagueData) || leagueData;
                   const saveData = {
-                    ...leagueData,
+                    ...normalizedLeagueData,
                     seasonId: leagueId,
                     userId: userId,
                     userEmail: currentRbUser.email || 'unknown',
-                    createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                    createdAt: normalizedLeagueData.createdAt || normalizedLeagueData.savedAt || Date.now(),
                     updatedAt: Date.now()
                   };
                   
@@ -8075,14 +8122,14 @@ window.onload=async function(){
                     seasonId: leagueId,
                     userId: userId,
                     userEmail: currentRbUser.email || 'unknown',
-                    sport: leagueData.sport || 'nba',
-                    leagueName: leagueData.leagueName || 'RosterBate League',
-                    teamName: leagueData.teamName || 'My Team',
-                    isMultiplayer: !!leagueData.multiplayer,
-                    leagueSize: leagueData.leagueSize || 0,
-                    scoringFormat: leagueData.scoringFormat || 'h2h_pts',
-                    draftFormat: leagueData.draftFormat || 'snake',
-                    createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                    sport: normalizedLeagueData.sport || 'nba',
+                    leagueName: normalizedLeagueData.leagueName || 'RosterBate League',
+                    teamName: normalizedLeagueData.teamName || 'My Team',
+                    isMultiplayer: !!normalizedLeagueData.multiplayer,
+                    leagueSize: normalizedLeagueData.leagueSize || 0,
+                    scoringFormat: normalizedLeagueData.scoringFormat || 'h2h_pts',
+                    draftFormat: normalizedLeagueData.draftFormat || 'snake',
+                    createdAt: normalizedLeagueData.createdAt || normalizedLeagueData.savedAt || Date.now(),
                     updatedAt: Date.now()
                   });
                   
@@ -8155,12 +8202,13 @@ window.onload=async function(){
               firebaseDay: Number(firebaseLeagueData?.currentDay || 1)
             });
             try {
+              const normalizedLeagueData = normalizeLocalLeagueDraftSnapshot(leagueData) || leagueData;
               const saveData = {
-                ...leagueData,
+                ...normalizedLeagueData,
                 seasonId: leagueId,
                 userId: userId,
                 userEmail: currentRbUser.email || 'unknown',
-                createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                createdAt: normalizedLeagueData.createdAt || normalizedLeagueData.savedAt || Date.now(),
                 updatedAt: Date.now()
               };
               await db.ref(`userSeasons/${userId}/${leagueId}`).set(removeUndefined(saveData));
@@ -8168,15 +8216,15 @@ window.onload=async function(){
                 seasonId: leagueId,
                 userId: userId,
                 userEmail: currentRbUser.email || 'unknown',
-                sport: leagueData.sport || 'nba',
-                leagueName: leagueData.leagueName || 'RosterBate League',
-                teamName: leagueData.teamName || 'My Team',
-                isMultiplayer: !!leagueData.multiplayer,
-                leagueSize: getLeagueTeamCount(leagueData),
-                scoringFormat: leagueData.scoringFormat || 'h2h_pts',
-                draftFormat: leagueData.draftFormat || 'snake',
-                currentWeek: Number(leagueData.currentWeek || 1),
-                createdAt: leagueData.createdAt || leagueData.savedAt || Date.now(),
+                sport: normalizedLeagueData.sport || 'nba',
+                leagueName: normalizedLeagueData.leagueName || 'RosterBate League',
+                teamName: normalizedLeagueData.teamName || 'My Team',
+                isMultiplayer: !!normalizedLeagueData.multiplayer,
+                leagueSize: getLeagueTeamCount(normalizedLeagueData),
+                scoringFormat: normalizedLeagueData.scoringFormat || 'h2h_pts',
+                draftFormat: normalizedLeagueData.draftFormat || 'snake',
+                currentWeek: Number(normalizedLeagueData.currentWeek || 1),
+                createdAt: normalizedLeagueData.createdAt || normalizedLeagueData.savedAt || Date.now(),
                 updatedAt: Date.now()
               }));
             } catch(saveErr) {
@@ -8193,15 +8241,27 @@ window.onload=async function(){
             return;
           }
           
+          const normalizedOfflineLeagueData = (
+            !leagueData?.multiplayer
+            && (isSimulationBackedSeasonState(leagueData) || isLegacySinglePlayerSeasonState(leagueData))
+          )
+            ? {
+                ...leagueData,
+                activeSeasonBackend:'simulation',
+                historicalEntryMode:String(leagueData.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+                legacyHistoricalStatMode:false
+              }
+            : leagueData;
+
           // Save to localStorage for offline access
           try {
-            localStorage.setItem('rosterbateDraft', JSON.stringify(leagueData));
+            writeLocalDraftSnapshot(normalizedOfflineLeagueData);
           } catch(e) {
             console.warn('Failed to save to localStorage:', e);
           }
           
           // Set as current data
-          D = leagueData;
+          D = normalizedOfflineLeagueData;
           
           // Ensure D has required properties
           if (!D.myPos && D.myPos !== 0) D.myPos = 0;
@@ -8257,7 +8317,8 @@ window.onload=async function(){
   if(raw){
     console.log('?? Found saved data in localStorage, auto-loading...');
     try{
-      const parsed=JSON.parse(raw);
+      const rawParsed=JSON.parse(raw);
+      const parsed=normalizeLocalLeagueDraftSnapshot(rawParsed) || rawParsed;
       const localAutoLoad=resolveLocalSavedSeasonAutoLoad(parsed, requestedSport);
       if(localAutoLoad){
         if(isDemoSeasonData(parsed)){
@@ -8265,7 +8326,7 @@ window.onload=async function(){
           ACTIVE_SEASON_MODE='fantasy';
           SEASON_MODE_ADAPTER=null;
           D=rebuildDemoSeasonData(localAutoLoad.sport);
-          try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+          D=writeLocalDraftSnapshot(D);
         } else {
           console.log('?? Loading saved season data...');
           ACTIVE_SEASON_MODE=localAutoLoad.activeSeasonMode;
@@ -8278,12 +8339,6 @@ window.onload=async function(){
         applySportContext(localAutoLoad.sport);
         hydrateDraftUserContextFromLobby();
         refreshCommissionerAccess();
-        if(localAutoLoad.activeSeasonMode==='simulation' && String(D?.leagueShell?.sport || D?.sport || '').trim().toLowerCase()==='nfl'){
-          ACTIVE_SEASON_MODE='simulation';
-          SEASON_MODE_ADAPTER=null;
-          renderFootballSimulationPhaseOnePlaceholder(D);
-          return;
-        }
         let seasonLoaded=false;
         try{
           seasonLoaded=await loadOrCreateSharedSeason();
@@ -8387,7 +8442,7 @@ async function loadDemo(){
   
   // Save to localStorage
   try { 
-    localStorage.setItem('rosterbateDraft', JSON.stringify(D)); 
+    D=writeLocalDraftSnapshot(D);
     console.log('?? Saved to localStorage');
   } catch(e) {
     console.error('? Failed to save demo data:', e);
@@ -8479,8 +8534,7 @@ function normalizeSeasonPlayerPool(players, sport){
 
 function getSeasonPlayerPool(){
   const historicalPool = normalizeSeasonPlayerPool(Array.isArray(D?.historicalPlayerPool) ? D.historicalPlayerPool : [], CURRENT_SPORT);
-  if(historicalPool.length) return historicalPool;
-  if(shouldPersistSharedSimulationState(D)){
+  if(isSimulationBackedSeasonState(D)){
     const rosterMap=(D?.draftState && typeof D.draftState==='object' && D.draftState.rostersByTeam && typeof D.draftState.rostersByTeam==='object')
       ? D.draftState.rostersByTeam
       : {};
@@ -8492,6 +8546,7 @@ function getSeasonPlayerPool(){
     ], CURRENT_SPORT);
     if(simulationPool.length) return simulationPool;
   }
+  if(historicalPool.length) return historicalPool;
   const source=String(D?.playerPoolSource || '').trim().toLowerCase();
   const savedFreeAgents = normalizeSeasonPlayerPool(Array.isArray(D?.freeAgents) ? D.freeAgents : [], CURRENT_SPORT);
   const savedWaiver = normalizeSeasonPlayerPool(Array.isArray(D?.waiver) ? D.waiver : [], CURRENT_SPORT);
@@ -12644,7 +12699,7 @@ function getTradeConversation(teamIdx){
 
 function saveTradeConversation(){
   ensureTradeConversationState();
-  try{ localStorage.setItem('rosterbateDraft', JSON.stringify(D)); }catch(e){}
+  D=writeLocalDraftSnapshot(D);
   if(typeof queueSharedSeasonSave==='function' && D?.multiplayer){
     queueSharedSeasonSave('trade_conversation');
   }

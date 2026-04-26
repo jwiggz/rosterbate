@@ -44,7 +44,7 @@
     { id: 'standings', label: 'Stand.' }
   ]);
   const PLAYOFFS_NAV_ITEM = Object.freeze({ id: 'playoffs', label: 'Playoffs' });
-  const NFL_LEGACY_LINEUP_SLOT_ORDER = Object.freeze(['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'DST', 'K']);
+  const NFL_LEGACY_LINEUP_SLOT_ORDER = Object.freeze(['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']);
   const SHARED_ROSTER_TABS = Object.freeze([
     { id: 'stats', label: 'Stats', active: true },
     { id: 'schedule', label: 'Schedule', active: false }
@@ -602,6 +602,12 @@
     const starterSlots = getSharedStarterSlotsForState(state, legacyStarterSlots);
     const roster = getControlledRoster(state);
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
+    const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
+      ? runtimeApi.validateSimulationLineup(clone(state), teamAbbr)
+      : { valid: true, issues: [] };
+    const suggestedLineup = (typeof runtimeApi.buildSuggestedSimulationLineup === 'function')
+      ? runtimeApi.buildSuggestedSimulationLineup(clone(state), teamAbbr) || []
+      : [];
     const lineupIdList = Array.isArray(state?.seasonState?.lineupIdsByTeam?.[teamAbbr])
       ? state.seasonState.lineupIdsByTeam[teamAbbr]
       : [];
@@ -613,7 +619,9 @@
         slot,
         playerId: Number.isFinite(playerId) ? playerId : null,
         player: player ? clone(player) : null,
-        suggestedPlayerId: null,
+        suggestedPlayerId: suggestedLineup[index] == null || suggestedLineup[index] === ''
+          ? null
+          : Number(suggestedLineup[index]),
         recommendationHint: null
       }];
     }));
@@ -629,21 +637,17 @@
       .filter((player) => !assignedIds.has(Number(player?.id)))
       .map((player) => clone(player));
     const filledStarters = legacyStarterSlots.reduce((count, slot) => count + (lineupSlots[slot]?.player ? 1 : 0), 0);
-    const validationIssues = buildSimulationRosterValidationIssues(starterSlots, legacyStarterSlots, lineupSlots);
     return {
       sport: 'nba',
       controlledTeam: controlledTeam ? clone(controlledTeam) : null,
       starterSlots: clone(starterSlots),
       legacyStarterSlots: clone(legacyStarterSlots),
       lineupSlots,
-      validation: {
-        valid: validationIssues.length === 0,
-        issues: validationIssues
-      },
-      readyLabel: validationIssues.length ? `${validationIssues.length} lineup issues to fix` : 'Ready For Tipoff',
-      recommendationSummary: validationIssues.length
-        ? 'Complete the starting lineup before the next sim.'
-        : 'Starting lineup is ready.',
+      validation,
+      readyLabel: validation.valid ? 'Ready For Tipoff' : `${validation.issues.length} lineup issues to fix`,
+      recommendationSummary: validation.valid
+        ? 'Starting lineup is ready.'
+        : 'Suggested fixes are available below.',
       roster,
       lineup,
       bench,

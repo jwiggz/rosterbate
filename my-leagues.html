@@ -549,6 +549,28 @@ function getSeasonPendingTradeCount(payload,mySeat){
   return gamePayload.tradeOffers.filter(trade=>trade && Number(trade.toTeam)===teamIdx && String(trade.status||'').toLowerCase()==='pending').length;
 }
 
+function normalizeLocalLaunchPayload(payload){
+  if(!payload || typeof payload!=='object') return payload;
+  const explicitBackend=String(payload.activeSeasonBackend || payload.seasonBackend || payload.backend || '').trim().toLowerCase();
+  const mode=String(payload.simulationMode || payload.historicalEntryMode || '').trim().toLowerCase();
+  const looksLikeLocalLeague=!payload.multiplayer
+    && Array.isArray(payload.teams)
+    && Array.isArray(payload.allRosters)
+    && Array.isArray(payload.standings);
+  const isSimulationBacked=explicitBackend==='simulation'
+    || mode==='simulation_season'
+    || mode==='nba_mixed_era_single_player_v1'
+    || mode==='nfl_mixed_era_single_player_v1'
+    || looksLikeLocalLeague;
+  if(!isSimulationBacked) return payload;
+  return {
+    ...payload,
+    activeSeasonBackend:'simulation',
+    historicalEntryMode:String(payload.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+    legacyHistoricalStatMode:false
+  };
+}
+
 function getSeasonUrgency(row){
   const watchCount=getSeasonWatchCount(row.payload);
   const waiverCount=getSeasonWaiverCount(row.payload);
@@ -941,7 +963,7 @@ async function loadMyLeagues(){
       try{
         const saved=localStorage.getItem('rosterbateDraft');
         if(saved){
-          const data=JSON.parse(saved);
+          const data=normalizeLocalLaunchPayload(JSON.parse(saved));
           if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
             solo.push({
               id:'local',
@@ -964,7 +986,7 @@ async function loadMyLeagues(){
     try{
       const saved=localStorage.getItem('rosterbateDraft');
       if(saved){
-        const data=JSON.parse(saved);
+        const data=normalizeLocalLaunchPayload(JSON.parse(saved));
         if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
           solo.push({
             id:'local',
@@ -1040,7 +1062,7 @@ function openSeasonLeague(id,sport,page='',waiver=''){
     localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
     const draftPayload=(row.payload?.draft && typeof row.payload.draft === 'object') ? row.payload.draft : row.payload;
     if(draftPayload && typeof draftPayload === 'object'){
-      localStorage.setItem('rosterbateDraft', JSON.stringify(draftPayload));
+      localStorage.setItem('rosterbateDraft', JSON.stringify(normalizeLocalLaunchPayload(draftPayload)));
     }
   }catch(e){}
   const params=new URLSearchParams();
@@ -1145,10 +1167,11 @@ function openSoloLeague(seasonId){
   if(!row) return;
   const accessTs=noteSoloLeagueAccess(row);
   const payload=(row.data && typeof row.data==='object') ? {...row.data, lastAccessedAt:accessTs} : {lastAccessedAt:accessTs};
+  const launchPayload=normalizeLocalLaunchPayload(payload);
   
   // Load the league data into localStorage so season manager can use it
   try{
-    localStorage.setItem('rosterbateDraft', JSON.stringify(payload));
+    localStorage.setItem('rosterbateDraft', JSON.stringify(launchPayload));
   }catch(e){
     console.error('Failed to load league into localStorage:', e);
   }

@@ -3003,11 +3003,32 @@ function homePickerBuildLobbyStateFromSeason(id,payload,member){
     players:teamUsers
   };
 }
+function normalizeHomepageLaunchPayload(payload){
+  if(!payload || typeof payload!=='object') return payload;
+  const explicitBackend=String(payload.activeSeasonBackend || payload.seasonBackend || payload.backend || '').trim().toLowerCase();
+  const mode=String(payload.simulationMode || payload.historicalEntryMode || '').trim().toLowerCase();
+  const looksLikeLocalLeague=!payload.multiplayer
+    && Array.isArray(payload.teams)
+    && Array.isArray(payload.allRosters)
+    && Array.isArray(payload.standings);
+  const isSimulationBacked=explicitBackend==='simulation'
+    || mode==='simulation_season'
+    || mode==='nba_mixed_era_single_player_v1'
+    || mode==='nfl_mixed_era_single_player_v1'
+    || looksLikeLocalLeague;
+  if(!isSimulationBacked) return payload;
+  return {
+    ...payload,
+    activeSeasonBackend:'simulation',
+    historicalEntryMode:String(payload.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
+    legacyHistoricalStatMode:false
+  };
+}
 function openHomepageSoloLeague(seasonId){
   const row=homeLeaguePickerSolo.find(x=>x.id===seasonId);
   if(!row) return;
   try{
-    localStorage.setItem('rosterbateDraft', JSON.stringify(row.data));
+    localStorage.setItem('rosterbateDraft', JSON.stringify(normalizeHomepageLaunchPayload(row.data)));
   }catch(_error){}
   window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport || 'nba')+'&league='+encodeURIComponent(seasonId);
 }
@@ -3019,7 +3040,7 @@ function openHomepageSeasonLeague(seasonId){
     localStorage.setItem('rbMultiplayerLobby', JSON.stringify(state));
     const draftPayload=(row.payload?.draft && typeof row.payload.draft==='object') ? row.payload.draft : row.payload;
     if(draftPayload && typeof draftPayload==='object'){
-      localStorage.setItem('rosterbateDraft', JSON.stringify(draftPayload));
+      localStorage.setItem('rosterbateDraft', JSON.stringify(normalizeHomepageLaunchPayload(draftPayload)));
     }
   }catch(_error){}
   const params=new URLSearchParams();
@@ -3108,7 +3129,7 @@ async function loadHomepageSingleLeagues(){
     try{
       const saved=localStorage.getItem('rosterbateDraft');
       if(saved){
-        const data=JSON.parse(saved);
+        const data=normalizeHomepageLaunchPayload(JSON.parse(saved));
         if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
           rows.push({
             id:'local',

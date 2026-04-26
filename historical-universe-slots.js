@@ -59,8 +59,16 @@
   }
 
   function isSimulationModeState(state){
+    const explicitBackend = String(state?.activeSeasonBackend || state?.seasonBackend || state?.backend || '').trim().toLowerCase();
+    if(explicitBackend === 'simulation') return true;
+    if(explicitBackend === 'fantasy') return false;
     const mode = String(state?.simulationMode || '').trim().toLowerCase();
-    return mode === NBA_SIMULATION_MODE || mode === NFL_SIMULATION_MODE;
+    if(mode === NBA_SIMULATION_MODE || mode === NFL_SIMULATION_MODE) return true;
+    const entryMode = String(state?.historicalEntryMode || '').trim();
+    if(entryMode){
+      return normalizeHistoricalEntryMode(entryMode, '') === 'simulation_season';
+    }
+    return false;
   }
 
   function isSimulationModeUniverse(slot, state){
@@ -265,6 +273,11 @@
     });
     countUniquePlayers(state?.draftState?.draftPool, seen);
     countUniquePlayers(state?.draftState?.freeAgents, seen);
+    countUniquePlayers(state?.historicalPlayerPool, seen);
+    countUniquePlayers(state?.waiver, seen);
+    (Array.isArray(state?.allRosters) ? state.allRosters : []).forEach(function(roster){
+      countUniquePlayers(roster, seen);
+    });
     return seen.size;
   }
 
@@ -324,6 +337,13 @@
     if(isSimulationModeState(payload)){
       payload.sport = normalizeSport(payload?.sport || payload?.leagueShell?.sport || 'nba');
       payload.historicalEntryMode = 'simulation_season';
+      payload.activeSeasonBackend = 'simulation';
+      payload.legacyHistoricalStatMode = false;
+      if((!Array.isArray(payload.waiver) || !payload.waiver.length) && Array.isArray(payload.freeAgents) && payload.freeAgents.length){
+        payload.waiver = safeClone(payload.freeAgents) || [];
+      }
+      delete payload.historicalPlayerPool;
+      delete payload.freeAgents;
       return payload;
     }
     if((!Array.isArray(payload.waiver) || !payload.waiver.length) && Array.isArray(payload.freeAgents) && payload.freeAgents.length){
@@ -344,19 +364,23 @@
     const leagueName = String(state?.leagueShell?.anchorSeasonLabel || 'NBA Simulation').trim();
     const sourcePackIds = Array.isArray(state?.sourceSeasons?.sourcePackIds)
       ? state.sourceSeasons.sourcePackIds.map(function(id){ return String(id || '').trim(); }).filter(Boolean)
+      : Array.isArray(state?.historicalSourcePackIds)
+      ? state.historicalSourcePackIds.map(function(id){ return String(id || '').trim(); }).filter(Boolean)
       : [];
     const sourceSeasonLabels = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
       ? state.sourceSeasons.sourceSeasonLabels.map(function(label){ return String(label || '').trim(); }).filter(Boolean)
+      : Array.isArray(state?.mixedEraSourceSeasonLabels)
+      ? state.mixedEraSourceSeasonLabels.map(function(label){ return String(label || '').trim(); }).filter(Boolean)
       : [];
     return {
       slotId,
       title: leagueName + ' - Simulation Universe',
       subtitle: getSimulationSubtitle(state),
       sport: normalizeSport(state?.sport || state?.leagueShell?.sport || 'nba'),
-      historicalPackId: String(state?.sourceSeasons?.mixedEraConfigId || '').trim() || null,
+      historicalPackId: String(state?.sourceSeasons?.mixedEraConfigId || state?.mixedEraConfigId || state?.historicalPackId || '').trim() || null,
       historicalSourcePackIds: sourcePackIds.length ? sourcePackIds : null,
       historicalSeasonId: String(state?.leagueShell?.anchorSeasonId || '').trim() || null,
-      mixedEraConfigId: String(state?.sourceSeasons?.mixedEraConfigId || '').trim() || null,
+      mixedEraConfigId: String(state?.sourceSeasons?.mixedEraConfigId || state?.mixedEraConfigId || '').trim() || null,
       mixedEraTopPlayersPerPack: null,
       mixedEraSourceSeasonLabels: sourceSeasonLabels.length ? sourceSeasonLabels : null,
       historicalEntryMode: 'simulation_season',

@@ -168,6 +168,11 @@ function buildContext(options = {}) {
     isHistoricalSimulationUniverse(state) {
       return String(state?.historicalEntryMode || '').trim().toLowerCase() === 'simulation_season';
     },
+    getActiveSeasonBackend() {
+      const explicitBackend = String(context.D?.activeSeasonBackend || '').trim().toLowerCase();
+      if (explicitBackend === 'simulation') return 'simulation';
+      return context.isHistoricalSimulationUniverse(context.D) ? 'simulation' : 'fantasy';
+    },
     weekForDay() {
       return 1;
     },
