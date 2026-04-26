@@ -9376,12 +9376,13 @@ function renderSimulationHubInSharedShell(){
           const text=escapeSimulationShellHtml(item?.text || 'Simulation activity posted.');
           const teamLabel=escapeSimulationShellHtml(item?.teamName || item?.teamAbbr || 'League-wide');
           const icon=String(item?.icon || '&#128221;');
+          const activityMetaLabel=Number.isFinite(Number(item?.ts)) ? activityAge(Number(item.ts)) : 'Live now';
           return `<div class="activity-item">
             <div class="activity-icon" style="border-color:${accent}55;color:${accent};background:${accent}18;">${icon}</div>
             <div class="activity-copy">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                 <div class="activity-title">${title}</div>
-                <div class="activity-meta">Sim log</div>
+                <div class="activity-meta">${activityMetaLabel}</div>
               </div>
               <div class="activity-text">${text}</div>
               <div class="activity-meta" style="margin-top:6px;color:${accent};">${teamLabel}</div>

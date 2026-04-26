@@ -2467,7 +2467,7 @@
           powerupCards: buildSimulationHubPowerupCards(state),
           primaryAction,
           sourceSeasonLabels: clone(state?.sourceSeasons?.sourceSeasonLabels || []),
-          recentActivity: clone(state?.seasonState?.activityLog || []).slice(-5).reverse()
+          recentActivity: clone(state?.seasonState?.activityLog || []).slice(-8).reverse()
         };
       },
       getRosterViewModel(){

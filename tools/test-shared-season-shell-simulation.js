@@ -1540,6 +1540,10 @@ assert.match(elements.hubStandingsMini.innerHTML, /PF/, 'simulation hub should i
 assert.match(elements.hubStandingsMini.innerHTML, /PA/, 'simulation hub should include the fuller points-against context on the mini standings board');
 assert.match(elements.hubNowBand.innerHTML, /Watch List|Trade Desk/, 'simulation hub should render the live now-band cards');
 assert.match(elements.hubActivity.innerHTML, /League update|League moves will show up here/, 'simulation hub should render the league activity feed');
+assert.doesNotMatch(elements.hubActivity.innerHTML, /Sim log/, 'simulation hub activity feed should not fall back to the old hardcoded simulation-only meta label');
+if (!/League moves will show up here/.test(elements.hubActivity.innerHTML)) {
+  assert.match(elements.hubActivity.innerHTML, /Just now|ago|Live now/, 'simulation hub activity feed should render polished age-aware or live activity metadata when entries exist');
+}
 assert.match(elements.hubSimRunnerCard.innerHTML, /Reveal Runner|Reveal Day 12 Results|Reveal Ready/, 'simulation hub should render the upgraded center-lane runner card for nba seasons');
 assert.match(elements.hubRevealReportCard.innerHTML, /Reveal reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
 assert.match(elements.hubCycleMeta.textContent, /Local League - Day 12 reveal ready/, 'simulation hub should surface the polished reveal-ready cycle copy for nba seasons');
