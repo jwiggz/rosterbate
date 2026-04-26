@@ -1533,6 +1533,8 @@ assert.equal(elements.hubMatchupActionTitle.textContent, 'Matchup');
 assert.match(elements.hubMatchupActionSub.textContent, /head-to-head box score/i);
 assert.match(elements.hubMatchups.innerHTML, /CHI[\s\S]*vs[\s\S]*LAL|BOS[\s\S]*vs[\s\S]*LAL|BOS[\s\S]*vs[\s\S]*CHI/i);
 assert.match(elements.hubStandingsMini.innerHTML, /LAL/, 'simulation hub should render the mini standings board');
+assert.match(elements.hubStandingsMini.innerHTML, /PF/, 'simulation hub should include the fuller points-for context on the mini standings board');
+assert.match(elements.hubStandingsMini.innerHTML, /PA/, 'simulation hub should include the fuller points-against context on the mini standings board');
 assert.match(elements.hubNowBand.innerHTML, /Watch List|Trade Desk/, 'simulation hub should render the live now-band cards');
 assert.match(elements.hubActivity.innerHTML, /League update|League moves will show up here/, 'simulation hub should render the league activity feed');
 assert.match(elements.hubSimRunnerCard.innerHTML, /Reveal Runner|Reveal Day 12 Results|Reveal Ready/, 'simulation hub should render the upgraded center-lane runner card for nba seasons');

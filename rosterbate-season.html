@@ -9238,19 +9238,25 @@ function renderSimulationHubInSharedShell(){
         <div class="hub-standings-head">
           <div style="text-align:center;">#</div>
           <div>Team</div>
-          <div>W</div>
-          <div>L</div>
+          <div style="text-align:right;">W</div>
+          <div style="text-align:right;">L</div>
+          <div style="text-align:right;">PF</div>
+          <div style="text-align:right;">PA</div>
         </div>
         ${topRows.map((row, index)=>{
           const abbr=escapeSimulationShellHtml(String(row?.teamAbbr || row?.abbr || '---').trim().toUpperCase() || '---');
           const wins=Number.isFinite(Number(row?.w)) ? Number(row.w) : 0;
           const losses=Number.isFinite(Number(row?.l)) ? Number(row.l) : 0;
+          const pointsFor=Number.isFinite(Number(row?.pf)) ? Number(row.pf).toFixed(1) : '0.0';
+          const pointsAgainst=Number.isFinite(Number(row?.pa)) ? Number(row.pa).toFixed(1) : '0.0';
           const mine=String(row?.teamAbbr || '').trim().toUpperCase()===controlledAbbr;
           return `<button type="button" class="hub-standings-row${mine?' mine':''}" data-open-viewer="${Number(row?.teamIdx)}">
             <div style="text-align:center;">${index+1}</div>
             <div>${abbr}</div>
-            <div>${wins}</div>
-            <div>${losses}</div>
+            <div style="text-align:right;">${wins}</div>
+            <div style="text-align:right;">${losses}</div>
+            <div style="text-align:right;">${pointsFor}</div>
+            <div style="text-align:right;">${pointsAgainst}</div>
           </button>`;
         }).join('')}
       `
