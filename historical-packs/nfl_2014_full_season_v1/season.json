@@ -1,12 +1,12 @@
 {
   "sport": "nfl",
   "seasonId": "nfl_2014_historic",
-  "seasonLabel": "2014 NFL Historic Season",
+  "seasonLabel": "2014 NFL Simulation Archive",
   "shellSeasonId": "nfl_2014",
   "regularSeasonWeeks": 17,
   "playoffFormat": "2014_nfl",
   "league": "nfl",
-  "label": "2014 NFL Historic Season",
+  "label": "2014 NFL Simulation Archive",
   "startDate": "2014-09-04",
   "endDate": "2014-12-28",
   "seasonType": "historical_pack",
@@ -14,7 +14,7 @@
   "eraTags": [
     "2010s",
     "Modern NFL",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "notes": [
     "Full-league 2014 NFL historical foundation pack.",

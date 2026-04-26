@@ -2,7 +2,7 @@
   "seasonId": "nba_2016_historic",
   "sport": "nba",
   "league": "nba",
-  "label": "2015-16 NBA Historic Season",
+  "label": "2015-16 NBA Simulation Archive",
   "startDate": "2015-10-27",
   "endDate": "2016-04-13",
   "seasonType": "historical_pack",
@@ -10,7 +10,7 @@
   "eraTags": [
     "2010s",
     "Pace and Space",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "notes": [
     "Full-league historical foundation pack for 2015-16.",

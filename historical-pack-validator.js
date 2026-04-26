@@ -172,7 +172,7 @@
     if(!isBoolean(manifest.isHistorical)){
       addError(report, 'invalid_isHistorical', '`isHistorical` must be a boolean.', 'manifest.isHistorical');
     }else if(manifest.isHistorical!==true){
-      addError(report, 'non_historical_pack', 'Historical pack manifest must have `isHistorical === true`.', 'manifest.isHistorical');
+      addError(report, 'non_historical_pack', 'Simulation archive manifest must have `isHistorical === true`.', 'manifest.isHistorical');
     }
 
     if(!ALLOWED_SPORTS.includes(manifest.sport)){
@@ -254,7 +254,7 @@
     report.summary.seasonId=isNonEmptyString(manifest.seasonId) ? manifest.seasonId : '';
 
     if(report.summary.schemaVersion!==HISTORICAL_PACK_SCHEMA_VERSION){
-      addError(report, 'unsupported_schema_version', 'Unsupported historical pack schema version `'+String(manifest.schemaVersion)+'`.', 'manifest.schemaVersion');
+    addError(report, 'unsupported_schema_version', 'Unsupported simulation archive schema version `'+String(manifest.schemaVersion)+'`.', 'manifest.schemaVersion');
     }
 
     return report.errors.length===0;
@@ -535,7 +535,7 @@
   function validateHistoricalPackBundle(bundle){
     const report=createReport(bundle && bundle.manifest && bundle.manifest.packId);
     if(!isPlainObject(bundle)){
-      addError(report, 'invalid_bundle', 'Historical pack bundle must be a plain object.', 'bundle');
+    addError(report, 'invalid_bundle', 'Simulation archive bundle must be a plain object.', 'bundle');
       return report;
     }
 

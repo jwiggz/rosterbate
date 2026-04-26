@@ -2,7 +2,7 @@
   "seasonId": "nba_1987_historic",
   "sport": "nba",
   "league": "nba",
-  "label": "1986-87 NBA Historic Season",
+  "label": "1986-87 NBA Simulation Archive",
   "startDate": "1986-10-31",
   "endDate": "1987-04-19",
   "seasonType": "historical_pack",
@@ -10,7 +10,7 @@
   "eraTags": [
     "1980s",
     "Bird-Magic Era",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "notes": [
     "This pack uses the real 1986-87 regular-season schedule and final scores.",

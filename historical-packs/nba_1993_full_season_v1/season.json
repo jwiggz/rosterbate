@@ -2,7 +2,7 @@
   "seasonId": "nba_1993_historic",
   "sport": "nba",
   "league": "nba",
-  "label": "1992-93 NBA Historic Season",
+  "label": "1992-93 NBA Simulation Archive",
   "startDate": "1992-11-06",
   "endDate": "1993-04-25",
   "seasonType": "historical_pack",
@@ -10,7 +10,7 @@
   "eraTags": [
     "1990s",
     "First Three-Peat Prestige",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "notes": [
     "This pack uses the real 1992-93 regular-season schedule and final scores.",

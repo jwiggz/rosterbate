@@ -125,7 +125,7 @@
         status: 'fixture_not_found',
         validation: null,
         importPlan: null,
-        message: 'No historical pack fixture found for `'+String(packId || '')+'`.'
+      message: 'No simulation archive fixture found for `'+String(packId || '')+'`.'
       };
     }
     return importHistoricalPackBundle(bundle, options);

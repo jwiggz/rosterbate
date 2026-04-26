@@ -523,20 +523,20 @@
   });
 
   manifest.version = Number(manifest.version || 1) + 1;
-  manifest.description = 'A 1995-96 NBA historical season pack reconciled to real team roster pages, with real team-page season totals imported for player ranking, drafting, and season boots.';
+  manifest.description = 'A 1995-96 NBA simulation archive pack reconciled to real team roster pages, with real team-page season totals imported for player ranking, drafting, and season boots.';
   manifest.provenance = Object.assign({}, manifest.provenance || {}, {
     importNotes: 'Player membership was reconciled against Basketball Reference 1995-96 team roster pages, and seasonStats were imported from team totals pages so historical ranking uses real era production instead of sparse seed samples.'
   });
   manifest.notes = [
-    'Historical players now carry real 1995-96 regular-season totals and derived per-game stats.',
-    'Historical player membership is now reconciled against real 1995-96 roster pages.',
+    'Archive players now carry real 1995-96 regular-season totals and derived per-game stats.',
+    'Archive player membership is now reconciled against real 1995-96 roster pages.',
     'Roster-only players with no recorded 1995-96 stats carry explicit zero seasonStats instead of falling back to seed samples.',
-    'Historical draft and season ranking should prefer seasonStats over sparse foundation seed rows.'
+    'Draft and simulation ranking should prefer seasonStats over sparse foundation seed rows.'
   ];
 
-  summaries.packSummary = 'The 1995-96 NBA season pack now reconciles to real roster pages and carries real team-page season totals for its player pool, giving Draft The Era and historical season boots a far more authentic ranking foundation.';
+  summaries.packSummary = 'The 1995-96 NBA season pack now reconciles to real roster pages and carries real team-page season totals for its player pool, giving Draft The Era and simulation archive boots a far more authentic ranking foundation.';
   summaries.featuredStorylines = [
-    'Real 1995-96 season production now drives historical rankings',
+    'Real 1995-96 season production now drives archive rankings',
     'Draft The Era pulls from actual season performance instead of seed-only snapshots',
     'Roster-only zero-stat cases are explicit instead of being backfilled by fake production'
   ];

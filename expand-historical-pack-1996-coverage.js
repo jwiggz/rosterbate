@@ -40,20 +40,20 @@
 
   manifest.version=Number(manifest.version||1)+1;
   manifest.updatedAt=new Date().toISOString();
-  manifest.description='A strict 1995-96 NBA historical foundation pack that only carries non-generated seed stat rows while the real pack expands toward authentic era coverage.';
+  manifest.description='A strict 1995-96 NBA simulation foundation pack that only carries non-generated seed stat rows while the ratings-ready pack expands toward fuller era coverage.';
   manifest.provenance=manifest.provenance||{};
-  manifest.provenance.importNotes='Generated coverage rows removed. Historical mode now uses only non-generated seed stat rows until real era data is added.';
+  manifest.provenance.importNotes='Generated coverage rows removed. Simulation archive mode now uses only non-generated seed stat rows until fuller era data is added.';
   manifest.notes=[
-    'Carries a full-league 1995-96 player base for historical season and draft experiments.',
-    'Uses only non-generated seed stat rows in historical mode.',
-    'Players without real seed coverage stay in the universe, but no longer receive invented production.'
+    'Carries a full-league 1995-96 player base for simulation archive and draft experiments.',
+    'Uses only non-generated seed stat rows in simulation archive mode.',
+    'Players without real seed coverage stay in the archive pool, but no longer receive invented production.'
   ];
 
-  summaries.packSummary='The 1995-96 NBA season pack is now in strict no-synthetic-stat mode: Draft The Era and historical season views only use non-generated seed rows, keeping the historical universe honest while real era coverage is expanded.';
+  summaries.packSummary='The 1995-96 NBA season pack is now in strict no-synthetic-stat mode: Draft The Era and simulation archive views only use non-generated seed rows, keeping the source pack honest while ratings-ready era coverage expands.';
   summaries.featuredStorylines=[
     'The 72-win Bulls chase',
     'A full-league Draft The Era sandbox',
-    'Strict no-synthetic historical stat mode'
+    'Strict no-synthetic simulation stat mode'
   ];
 
   writeJson('manifest.json', manifest);

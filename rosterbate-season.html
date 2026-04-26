@@ -1859,10 +1859,10 @@ function buildSimulationDayRunnerSnapshot(day){
   const latestLog=latestReportDay ? getSimulationDayLog(latestReportDay) : null;
   const latestTopGame=getSimulationTopGame(latestLog);
   const latestTopPerformer=(latestReport?.topPerformers||[])[0] || null;
-  const packLabel=String(D?.historicalPackName || D?.leagueName || 'Historical Universe')
+  const packLabel=String(D?.historicalPackName || D?.leagueName || 'Simulation Archive')
     .replace(/\s+Sim Season$/i,'')
-    .replace(/\s+Historic Season$/i,' Historic Season')
-    .trim() || 'Historical Universe';
+    .replace(/\s+Simulation Archive$/i,' Simulation Archive')
+    .trim() || 'Simulation Archive';
   return {
     day:currentDay,
     week,
@@ -2356,7 +2356,7 @@ function getHistoricalPackDevPendingBoot(){
     const parsed=JSON.parse(raw);
     return parsed && typeof parsed==='object' ? parsed : null;
   }catch(e){
-    console.warn('Failed to parse pending historical season boot flag:', e);
+    console.warn('Failed to parse pending simulation archive boot flag:', e);
     return null;
   }
 }
@@ -2785,7 +2785,7 @@ async function resolveHistoricalDevBootState(requestedSport, params){
   if(stagedState){
     const stagedPackId=String(stagedState?.packId || stagedState?.importPlan?.metadata?.packId || '').trim();
     if(!requestedPackId || requestedPackId===stagedPackId){
-    console.log('🕰️ Found staged historical pack state in localStorage.');
+    console.log('🕰️ Found staged simulation archive state in localStorage.');
     return stagedState;
     }
   }
@@ -2800,7 +2800,7 @@ async function resolveHistoricalDevBootState(requestedSport, params){
           ? await window.RosterBateHistoricalPackLoader.loadDefaultPack()
           : null);
       if(directBundle?.manifest?.packId){
-        console.log('🕰️ Built historical pack state directly from the pack loader.', {
+        console.log('🕰️ Built simulation archive state directly from the pack loader.', {
           packId: directBundle.manifest.packId
         });
         return {
@@ -2840,7 +2840,7 @@ async function resolveHistoricalDevBootState(requestedSport, params){
         };
       }
     }catch(e){
-      console.warn('Historical pack-loader bootstrap failed:', e);
+      console.warn('Simulation archive loader bootstrap failed:', e);
     }
   }
   if(!window.rbHistoricalPackDev || typeof window.rbHistoricalPackDev.ready!=='function'){
@@ -2851,7 +2851,7 @@ async function resolveHistoricalDevBootState(requestedSport, params){
     await window.rbHistoricalPackDev.ready();
     const directImport=await window.rbHistoricalPackDev.importFixture(requestedPackId || 'nba_1996_full_season_v1');
     if(directImport?.importPlan?.canonical){
-      console.log('🕰️ Built historical pack state directly from the dev fixture.');
+      console.log('🕰️ Built simulation archive state directly from the dev fixture.');
       return directImport;
     }
   }catch(e){
@@ -7930,7 +7930,7 @@ window.onload=async function(){
       const historicalMode = String(urlParams.get('historical') || historicalDevState?.pendingBoot?.entryMode || 'dev').trim().toLowerCase();
       const historicalLaunchData = buildHistoricalSeasonLaunchData(historicalDevState, requestedSport, historicalMode);
       if (historicalLaunchData) {
-        console.log('🕰️ Booting localhost historical pack into Season Manager...', {
+        console.log('🕰️ Booting localhost simulation archive into Season Manager...', {
           packId: historicalLaunchData.historicalPackId,
           seasonId: historicalLaunchData.seasonId,
           leagueSize: Number(historicalLaunchData.leagueSize || 0),
@@ -7947,9 +7947,9 @@ window.onload=async function(){
         applyRequestedSeasonView();
         return;
       }
-      console.warn('Historical season boot was requested, but no usable pack state could be resolved.');
+      console.warn('Simulation archive boot was requested, but no usable pack state could be resolved.');
     } catch (historicalErr) {
-      console.error('Historical pack dev boot failed, falling back to normal season loading.', historicalErr);
+      console.error('Simulation archive dev boot failed, falling back to normal season loading.', historicalErr);
     }
   }
   

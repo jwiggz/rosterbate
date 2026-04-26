@@ -312,7 +312,7 @@
       '<div class="rbh-health-card" data-tone="'+(coverageCovered!=null && coverageTotal!=null && coverageCovered===coverageTotal ? 'success' : 'neutral')+'">'+
         '<span class="rbh-health-label">'+(real.label || 'Simulation ratings coverage')+'</span>'+
         '<span class="rbh-health-value">'+formatCoverageText(coverageCovered, coverageTotal)+'</span>'+
-        '<span class="rbh-health-sub">'+(coverageTotal!=null ? 'players with historical season lines' : 'coverage not published')+'</span>'+
+      '<span class="rbh-health-sub">'+(coverageTotal!=null ? 'players with simulation-ready lines' : 'coverage not published')+'</span>'+
       '</div>'+
       '<div class="rbh-health-card" data-tone="'+(zeroCount===0 ? 'success' : 'warn')+'">'+
         '<span class="rbh-health-label">'+(zero.label || 'Zero-game players')+'</span>'+
@@ -568,7 +568,7 @@
       }
       if(action==='season'){
         const result=await api.openHistoricalSeason();
-        setPanelStatus('<strong>Opening Historical Season</strong><br>'+result.url, 'success');
+    setPanelStatus('<strong>Opening Simulation Archive</strong><br>'+result.url, 'success');
         return;
       }
       if(action==='draft'){

@@ -2,7 +2,7 @@
   "seasonId": "nba_2001_historic",
   "sport": "nba",
   "league": "nba",
-  "label": "2000-01 NBA Historic Season",
+  "label": "2000-01 NBA Simulation Archive",
   "startDate": "2000-10-31",
   "endDate": "2001-04-18",
   "seasonType": "historical_pack",
@@ -10,7 +10,7 @@
   "eraTags": [
     "2000s",
     "Dynasty Transition",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "notes": [
     "Full-league historical foundation pack for 2000-01.",

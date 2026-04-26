@@ -275,7 +275,7 @@
       sport:'nba',
       league:'nba',
       seasonId:'nba_1996_historic',
-      seasonLabel:'1995-96 NBA Historic Season',
+    seasonLabel:'1995-96 NBA Simulation Archive',
       seasonType:'historical_pack',
       isHistorical:true,
       era:'1990s',
@@ -288,8 +288,8 @@
       subtitle:'Draft the era or steer a historic franchise run.',
       description:'An expanded playable 1995-96 NBA dev slice with a broader historical player pool, draft-first entry, and featured historic franchise runs.',
       tagline:'Remix a landmark season your way.',
-      eraTags:['1990s','Jordan Era','Historic Season'],
-      packTags:['historical-dev-slice','single-player','historical-draft','featured-pack'],
+    eraTags:['1990s','Jordan Era','Simulation Archive'],
+      packTags:['historical-dev-slice','local-league','historical-draft','featured-pack'],
       playerPoolType:'full_season_player_pool',
       draftModes:['snake'],
       challengeProfile:'featured_team_plus_open_draft',
@@ -309,11 +309,11 @@
         sourceProfile:'historical_curated',
         curationOwner:'RosterBate',
         reviewStatus:'draft',
-        importNotes:'Expanded code fixture for validator, importer, and localhost historical season boot development.'
+        importNotes:'Expanded code fixture for validator, importer, and localhost simulation archive boot development.'
       },
       notes:[
-        'Expanded 10-team 1995-96 dev slice for historical fantasy draft validation.',
-        'Use the Historical Pack Lab team selector to stage a ratings-driven sim season from the historical foundation.'
+        'Expanded 10-team 1995-96 dev slice for simulation-first fantasy draft validation.',
+        'Use the Simulation Archive Lab team selector to stage a ratings-driven sim season from the source-pack foundation.'
       ],
       createdAt:'2026-04-17T00:00:00Z',
       updatedAt:'2026-04-17T00:00:00Z'
@@ -322,12 +322,12 @@
       seasonId:'nba_1996_historic',
       sport:'nba',
       league:'nba',
-      label:'1995-96 NBA Historic Season',
+      label:'1995-96 NBA Simulation Archive',
       startDate:'1995-11-03',
       endDate:'1996-04-21',
       seasonType:'historical_pack',
       isHistorical:true,
-      eraTags:['1990s','Jordan Era','Historic Season'],
+      eraTags:['1990s','Jordan Era','Simulation Archive'],
       notes:[
         'Expanded dev-slice season object.',
         'Supports Sim Season and historical-draft paths while the importer is still fixture-backed.'
@@ -389,7 +389,7 @@
       ]
     },
     presentation:{
-      heroTitle:'1995-96 NBA Historic Season',
+      heroTitle:'1995-96 NBA Simulation Archive',
       heroSubtitle:'Draft the era or steer a ratings-driven sim season from the historical foundation.',
       featuredTeamId:'nba_1996_chi',
       featuredStars:[
@@ -410,7 +410,7 @@
       ]
     },
     summaries:{
-      packSummary:'The 1995-96 NBA season is the flagship historical universe for RosterBate, combining guided historic franchise runs with alternate-history fantasy draft potential. This expanded dev slice now supports multiple franchise entry points before the full-pack loader lands.',
+      packSummary:'The 1995-96 NBA season is the flagship simulation archive for RosterBate, combining guided franchise runs with alternate-history fantasy draft potential. This expanded dev slice now supports multiple franchise entry points before the full-pack loader lands.',
       featuredStorylines:[
         'The 72-win Bulls chase',
         'A broader historical fantasy draft sandbox',

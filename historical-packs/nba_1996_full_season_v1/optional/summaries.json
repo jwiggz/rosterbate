@@ -1,14 +1,14 @@
 {
-  "packSummary": "The 1995-96 NBA season pack now removes unmatched non-roster leftovers and treats roster-only no-stat cases explicitly, giving historical ranking a cleaner real-data base.",
+  "packSummary": "The 1995-96 NBA season pack now removes unmatched non-roster leftovers and treats roster-only no-stat cases explicitly, giving archive ranking a cleaner real-data base.",
   "featuredStorylines": [
-    "Real 1995-96 season production now drives historical rankings",
+    "Real 1995-96 season production now drives archive rankings",
     "Draft The Era pulls from actual season performance instead of seed-only snapshots",
-    "The historical pack keeps authored schedule coverage while ranking from real era data"
+    "The source pack keeps authored schedule coverage while ranking from real era data"
   ],
   "teamSpotlights": [
     {
       "teamId": "nba_1996_chi",
-      "summary": "Chicago remains the flagship path and the benchmark every historical run will be measured against."
+      "summary": "Chicago remains the flagship path and the benchmark every archive run will be measured against."
     },
     {
       "teamId": "nba_1996_hou",
@@ -30,7 +30,7 @@
   "modeSummaries": [
     {
       "mode": "simulation_season",
-      "summary": "Choose one franchise and guide it through the full 1995-96 historical season."
+      "summary": "Choose one franchise and guide it through the full 1995-96 source season."
     },
     {
       "mode": "historical_draft",
@@ -53,7 +53,7 @@
     }
   },
   "auditNotes": [
-    "Historical ranking now prefers real 1995-96 season production.",
+    "Archive ranking now prefers real 1995-96 season production.",
     "Victor Alexander remains the explicit roster-only zero-game case.",
     "Known invalid leftovers removed from the pack are tracked as an audit count instead of staying hidden in cleanup notes."
   ]

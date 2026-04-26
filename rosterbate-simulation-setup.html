@@ -562,7 +562,7 @@
       <section class="panel hero-main">
         <div class="eyebrow">Archive Commission</div>
         <h1>Start <span>Simulation League</span></h1>
-        <p class="setup-copy" id="simulationHeroCopy">Choose the historical seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.</p>
+        <p class="setup-copy" id="simulationHeroCopy">Choose the source seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.</p>
         <div class="hero-chip-row" aria-label="Simulation shell details">
           <span class="hero-chip" id="simulationShellChip">2025-26 NBA shell</span>
           <span class="hero-chip" id="simulationRosterChip">10-player basketball roster</span>
@@ -612,7 +612,7 @@
       <section class="panel workspace-card">
         <div class="card-kicker">Source Seasons</div>
         <h2 class="card-title">Build The Mixed-Era Player Pool</h2>
-        <p class="card-copy" id="simulationSourceCopy">Pick one or more NBA historical packs. These selections define the crossover player pool your local simulation league will draft from.</p>
+        <p class="card-copy" id="simulationSourceCopy">Pick one or more NBA source packs. These selections define the crossover player pool your local simulation league will draft from.</p>
         <div id="simulationSourceSeasonList"></div>
       </section>
       <aside class="panel workspace-card">
@@ -691,8 +691,8 @@
     function getSimulationCopy(){
       if (getSimulationSport() === 'nfl') {
         return {
-          heroBody: 'Choose the historical NFL seasons that feed your mixed-era draft pool, then claim a 2014 NFL franchise. This page is where the universe gets defined before the season shell takes over.',
-          sourceBody: 'Pick one or more NFL historical packs. These selections define the crossover player pool your local simulation league will draft from.',
+          heroBody: 'Choose the source NFL seasons that feed your mixed-era draft pool, then claim a 2014 NFL franchise. This page is where the universe gets defined before the season shell takes over.',
+          sourceBody: 'Pick one or more NFL source packs. These selections define the crossover player pool your local simulation league will draft from.',
           shellChip: '2014 NFL shell',
           rosterChip: '13-slot football roster',
           modeChip: 'Local simulation league',
@@ -721,8 +721,8 @@
         };
       }
       return {
-        heroBody: 'Choose the historical seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.',
-        sourceBody: 'Pick one or more NBA historical packs. These selections define the crossover player pool your local simulation league will draft from.',
+        heroBody: 'Choose the source seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.',
+        sourceBody: 'Pick one or more NBA source packs. These selections define the crossover player pool your local simulation league will draft from.',
         shellChip: '2025-26 NBA shell',
         rosterChip: '10-player basketball roster',
         modeChip: 'Local simulation league',
@@ -889,7 +889,7 @@
         return;
       }
       if (!Array.isArray(entries) || !entries.length) {
-        container.innerHTML = '<div class="season-empty">' + escapeSimulationHtml(emptyMessage || getSimulationCopy().emptyStatus || 'No historical packs are available right now.') + '</div>';
+        container.innerHTML = '<div class="season-empty">' + escapeSimulationHtml(emptyMessage || getSimulationCopy().emptyStatus || 'No source packs are available right now.') + '</div>';
         return;
       }
       container.innerHTML = entries.map(function(entry, index){
@@ -897,7 +897,7 @@
         const packId = escapeSimulationHtml(entry && entry.packId || '');
         const eraLabel = escapeSimulationHtml(entry && ((entry.art && entry.art.eyebrow) || entry.era || 'Historic Archive'));
         const statusLabel = escapeSimulationHtml(entry && (entry.statusLabel || (String(entry.availability || '').trim().toLowerCase() === 'playable' ? 'Playable Now' : 'Archive Preview')));
-        const summary = escapeSimulationHtml(entry && (entry.tagline || entry.summary || entry.packId || 'Historical season pack'));
+      const summary = escapeSimulationHtml(entry && (entry.tagline || entry.summary || entry.packId || 'Simulation archive pack'));
         const significanceLabel = escapeSimulationHtml(entry && (entry.significanceLabel || entry.completenessLabel || 'Historic Pack'));
         const shortLabel = escapeSimulationHtml(entry && (entry.shortLabel || entry.packId || ''));
         const tone = getSimulationSeasonTone(entry).replace(/[^a-z0-9_-]/g, '') || 'heritage';
@@ -987,14 +987,14 @@
       }catch(error){
         console.error('[Simulation Setup] Failed to load historical catalog', error);
         renderSeasonOptions([], simulationCopy.emptyStatus);
-        setSimulationSetupStatus('Unable to load historical packs right now.', 'error');
+        setSimulationSetupStatus('Unable to load source packs right now.', 'error');
       }
     }
 
     async function enterSimulationDraft(){
       const selectedPackIds = getSelectedSimulationSourcePackIds();
       if (!selectedPackIds.length) {
-        setSimulationSetupStatus('Select at least one historical season before entering the draft.', 'warn');
+      setSimulationSetupStatus('Select at least one source season before entering the draft.', 'warn');
         return;
       }
       const sport = getSimulationSport();
@@ -1027,7 +1027,7 @@
     async function simDraftAndStartSeason(){
       const selectedPackIds = getSelectedSimulationSourcePackIds();
       if (!selectedPackIds.length) {
-        setSimulationSetupStatus('Select at least one historical season before starting the season.', 'warn');
+      setSimulationSetupStatus('Select at least one source season before starting the season.', 'warn');
         return;
       }
       const sport = getSimulationSport();

@@ -2,7 +2,7 @@
   {
     "packId": "nba_1996_full_season_v1",
     "sport": "nba",
-    "seasonLabel": "1995-96 NBA Historic Season",
+    "seasonLabel": "1995-96 NBA Simulation Archive",
     "shortLabel": "1995-96",
     "era": "1990s",
     "availability": "playable",
@@ -12,8 +12,8 @@
     "completenessLabel": "Playable foundation",
     "completenessPercent": 82,
     "tagline": "Draft the era and build a 72-win dream roster of your own.",
-      "summary": "Full-league historical universe with simulation-ready ratings, a full-era player pool, and strong Draft The Era / Sim Season foundations.",
-    "whyItMatters": "This is the first proof that RosterBate can turn a historical season foundation into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.",
+      "summary": "Full-league simulation archive with simulation-ready ratings, a full-era player pool, and strong Draft The Era / Sim Season foundations.",
+    "whyItMatters": "This is the first proof that RosterBate can turn a source-season foundation into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.",
     "focusTeamName": "Chicago Bulls",
     "art": {
       "theme": "dynasty",
@@ -38,7 +38,7 @@
   {
     "packId": "nba_1987_full_season_v1",
     "sport": "nba",
-    "seasonLabel": "1986-87 NBA Historic Season",
+    "seasonLabel": "1986-87 NBA Simulation Archive",
     "shortLabel": "1986-87",
     "era": "1980s",
     "availability": "playable",
@@ -48,7 +48,7 @@
     "completenessLabel": "Playable foundation",
     "completenessPercent": 18,
     "tagline": "Magic. Bird. Jordan. One prestige-rivalry universe.",
-    "summary": "A playable 1986-87 historical foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.",
+    "summary": "A playable 1986-87 simulation archive foundation built around the Lakers-Celtics prestige season and Jordan entering the frame.",
     "whyItMatters": "This is the archive's premium 1980s tentpole: Finals rivalry gravity, Lakers focus-team energy, and a young Jordan expanding the draft sandbox.",
     "focusTeamName": "Los Angeles Lakers",
     "art": {
@@ -75,7 +75,7 @@
   {
     "packId": "nba_1993_full_season_v1",
     "sport": "nba",
-    "seasonLabel": "1992-93 NBA Historic Season",
+    "seasonLabel": "1992-93 NBA Simulation Archive",
     "shortLabel": "1992-93",
     "era": "1990s",
     "availability": "playable",
@@ -112,7 +112,7 @@
   {
     "packId": "nba_2001_full_season_v1",
     "sport": "nba",
-    "seasonLabel": "2000-01 NBA Historic Season",
+    "seasonLabel": "2000-01 NBA Simulation Archive",
     "shortLabel": "2000-01",
     "era": "2000s",
     "availability": "playable",
@@ -122,7 +122,7 @@
       "completenessLabel": "Playable iconic season",
       "completenessPercent": 80,
       "tagline": "Draft a turn-of-the-century superteam from one loaded player pool.",
-      "summary": "A first-class 2000-01 historical universe with simulation-ready ratings, a full league player pool, and marquee early-2000s star power.",
+      "summary": "A first-class 2000-01 simulation archive with simulation-ready ratings, a full league player pool, and marquee early-2000s star power.",
       "whyItMatters": "This is the archive lane's turn-of-the-century flagship: a recognizable Shaq-and-Kobe title-defense universe that plays differently from both the 1990s and 2010s packs.",
       "focusTeamName": "Los Angeles Lakers",
       "art": {
@@ -149,7 +149,7 @@
   {
     "packId": "nba_2016_full_season_v1",
     "sport": "nba",
-    "seasonLabel": "2015-16 NBA Historic Season",
+    "seasonLabel": "2015-16 NBA Simulation Archive",
     "shortLabel": "2015-16",
     "era": "2010s",
     "availability": "playable",
@@ -159,7 +159,7 @@
     "completenessLabel": "Playable modern foundation",
     "completenessPercent": 80,
     "tagline": "Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.",
-      "summary": "A modern historical universe with a loaded full-season player pool, simulation-ready ratings, and a strong foundation for drafted or simulated alternate-history runs.",
+      "summary": "A modern simulation archive with a loaded full-season player pool, simulation-ready ratings, and a strong foundation for drafted or simulated alternate-history runs.",
     "whyItMatters": "This season gives the archive lane a modern tentpole pack where the biggest fantasy is drafting the entire era into custom universes from one loaded player pool.",
     "focusTeamName": "Golden State Warriors",
     "art": {
@@ -186,7 +186,7 @@
   {
     "packId": "nfl_2014_full_season_v1",
     "sport": "nfl",
-    "seasonLabel": "2014 NFL Historic Season",
+    "seasonLabel": "2014 NFL Simulation Archive",
     "shortLabel": "2014",
     "era": "2010s",
     "availability": "preview",
@@ -196,7 +196,7 @@
     "completenessLabel": "Scaffold-level foundation",
     "completenessPercent": 35,
     "tagline": "Build a 2014 football universe from Brady, Rodgers, Watt, and the whole season pool.",
-    "summary": "A visible 2014 NFL foundation preview with football rating baselines, historical season context, and a draft-sized player pool, but not yet a finished live archive pack.",
+    "summary": "A visible 2014 NFL foundation preview with football rating baselines, source-season context, and a draft-sized player pool, but not yet a finished live archive pack.",
     "whyItMatters": "This is the first football anchor season for the archive lane and the foundation for mixed-era NFL simulation leagues.",
     "focusTeamName": "Seattle Seahawks",
     "plannedModes": [

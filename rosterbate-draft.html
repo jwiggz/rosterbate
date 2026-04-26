@@ -4610,7 +4610,7 @@ function applySportToDraftUI(){
   if(historicalContext && !document.getElementById('iLeagueName').value.trim()){
     document.getElementById('iLeagueName').value=historicalContext.isMixedEraDraft
       ? ((historicalContext.seasonLabel || 'Mixed Era') + ' Mixed Era Draft')
-      : ((historicalContext.seasonLabel || 'Historic Season') + ' Draft The Era');
+      : ((historicalContext.seasonLabel || 'Simulation Archive') + ' Draft The Era');
   }
   const suggestedLeagueSize=Number(historicalContext?.suggestedLeagueSize || SPORT_CFG.defaultLeagueSize || 10) || 10;
   const preferredDraftSpot=Math.max(1, Math.min(suggestedLeagueSize, Number(historicalContext?.preferredDraftSpot || 1) || 1));
@@ -9984,7 +9984,7 @@ function rbEnsureChatListenerActive() {
         playerCount: PLAYERS.length
       });
     } else if(HISTORICAL_DRAFT_CONTEXT){
-      console.log('🕰️ Booting Draft The Era from historical pack...', {
+      console.log('🕰️ Booting Draft The Era from simulation archive pack...', {
         packId:HISTORICAL_DRAFT_CONTEXT.packId,
         seasonId:HISTORICAL_DRAFT_CONTEXT.seasonId,
         playerCount:Array.isArray(HISTORICAL_DRAFT_CONTEXT.playerPool) ? HISTORICAL_DRAFT_CONTEXT.playerPool.length : 0,

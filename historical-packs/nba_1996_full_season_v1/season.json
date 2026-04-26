@@ -2,7 +2,7 @@
   "seasonId": "nba_1996_historic",
   "sport": "nba",
   "league": "nba",
-  "label": "1995-96 NBA Historic Season",
+  "label": "1995-96 NBA Simulation Archive",
   "startDate": "1995-11-03",
   "endDate": "1996-04-21",
   "seasonType": "historical_pack",
@@ -10,7 +10,7 @@
   "eraTags": [
     "1990s",
     "Jordan Era",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "notes": [
     "Full-league historical foundation pack for 1995-96.",

@@ -1,5 +1,5 @@
 {
-  "packSummary": "The 2015-16 NBA season pack gives Historic Seasons a modern flagship with historical full-season player production, the full schedule/results grid, and a player pool built for Historic Season runs, Draft The Era, and Reimagined Season.",
+  "packSummary": "The 2015-16 NBA season pack gives Simulation Archives a modern flagship with source full-season player production, the full schedule/results grid, and a player pool built for Sim Season runs, Draft The Era, and Reimagined Season.",
   "featuredStorylines": [
     "Seventy-three wins and unanimous-MVP gravity reshape the fantasy board.",
     "LeBron, Steph, Kawhi, KD, Russ, and Harden collide in one modern historic pool.",
@@ -30,7 +30,7 @@
   "modeSummaries": [
     {
       "mode": "simulation_season",
-      "summary": "Choose one franchise and guide it through the full 2015-16 historical season."
+      "summary": "Choose one franchise and guide it through the full 2015-16 source season."
     },
     {
       "mode": "historical_draft",

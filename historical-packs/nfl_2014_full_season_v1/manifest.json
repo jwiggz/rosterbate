@@ -5,7 +5,7 @@
   "sport": "nfl",
   "league": "nfl",
   "seasonId": "nfl_2014_historic",
-  "seasonLabel": "2014 NFL Historic Season",
+  "seasonLabel": "2014 NFL Simulation Archive",
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "2010s",
@@ -18,7 +18,7 @@
   ],
   "defaultEntryMode": "simulation_season",
   "subtitle": "Draft the era or build a mixed-era football universe.",
-  "description": "A 2014 NFL historical season pack with Madden 25-era ratings context, football roster roles, and a full-league player pool for mixed-era simulation setup.",
+  "description": "A 2014 NFL simulation archive pack with Madden 25-era ratings context, football roster roles, and a full-league player pool for mixed-era simulation setup.",
   "tagline": "Legion of Boom, Brady, Rodgers, and one full-season football sandbox.",
   "contentFiles": {
     "season": "season.json",
@@ -36,7 +36,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 160,
       "playerCount": 416,
-      "label": "Historical and curated stat blend"
+      "label": "Simulation and curated stat blend"
     },
     "generatedSupportPlayers": {
       "count": 256,

@@ -1,5 +1,5 @@
 {
-  "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Historic Seasons with historical regular-season schedule/results, historical player season totals, and clearly disclosed inferred player-game coverage.",
+  "packSummary": "The 1986-87 foundation pack brings the full 23-team league into Simulation Archives with source regular-season schedule/results, source player season totals, and clearly disclosed inferred player-game coverage.",
   "featuredStorylines": [
     "The Lakers headline the pack as the featured prestige lane, with Magic's MVP season and championship gravity defining the front door.",
     "Boston and Los Angeles keep the Bird-Magic rivalry alive, while Chicago adds the Michael Jordan scoring-explosion path to the same board.",
@@ -30,7 +30,7 @@
   "modeSummaries": [
     {
       "mode": "simulation_season",
-      "summary": "Choose one 1986-87 franchise and guide it through the full historical season."
+      "summary": "Choose one 1986-87 franchise and guide it through the full source season."
     },
     {
       "mode": "historical_draft",

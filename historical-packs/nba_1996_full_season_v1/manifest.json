@@ -5,7 +5,7 @@
   "sport": "nba",
   "league": "nba",
   "seasonId": "nba_1996_historic",
-  "seasonLabel": "1995-96 NBA Historic Season",
+  "seasonLabel": "1995-96 NBA Simulation Archive",
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "1990s",
@@ -18,17 +18,17 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_1996_chi",
-  "subtitle": "Start a sim season from the historical foundation or draft the era.",
-  "description": "A 1995-96 NBA historical season pack with team-page season totals imported for player ranking, drafting, and historic-season runs.",
+  "subtitle": "Start a sim season from the source-season foundation or draft the era.",
+  "description": "A 1995-96 NBA simulation archive pack with team-page season totals imported for player ranking, drafting, and sim-season runs.",
   "tagline": "Rewrite the greatest regular season ever.",
   "eraTags": [
     "1990s",
     "Jordan Era",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "packTags": [
     "historical-full-league-foundation",
-    "single-player",
+    "local-league",
     "historical-draft",
     "featured-pack"
   ],
@@ -53,7 +53,7 @@
     "sourceProfile": "historical_curated",
     "curationOwner": "RosterBate",
     "reviewStatus": "draft",
-    "importNotes": "Historical pack cleanup removed unmatched non-roster players and made Victor Alexander an explicit roster-only zero-stat case so seasonStats coverage is effectively complete without synthetic fallback."
+    "importNotes": "Simulation archive cleanup removed unmatched non-roster players and made Victor Alexander an explicit roster-only zero-stat case so seasonStats coverage is effectively complete without synthetic fallback."
   },
   "auditSummary": {
     "realStatCoverage": {
@@ -71,7 +71,7 @@
     }
   },
   "notes": [
-    "Historical players now carry real 1995-96 regular-season totals and derived per-game stats.",
+    "Archive players now carry real 1995-96 regular-season totals and derived per-game stats.",
     "Known invalid pack leftovers were removed when they could not be found on any 1995-96 team page.",
     "Roster-only zero-stat cases stay explicit instead of falling back to seed samples."
   ],

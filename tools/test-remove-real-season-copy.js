@@ -13,9 +13,13 @@ const files = {
   index: read('index.html'),
   historicSeasons: read('historic-seasons.html'),
   historicalCatalog: read('historical-packs/catalog.json'),
+  historicalPackFixtures: read('historical-pack-fixtures.js'),
+  historicalPack1996CoverageScript: read('expand-historical-pack-1996-coverage.js'),
+  historicalPack1996IngestScript: read('ingest-historical-pack-1996-season-stats.js'),
   myLeagues: read('my-leagues.html'),
   historicUniverse: read('historic-universe.html'),
   historicalPackDevRunner: read('historical-pack-dev-runner.js'),
+  historicalUniverseSlots: read('historical-universe-slots.js'),
   rosterbateSeason: read('rosterbate-season.html'),
   simulationSetup: read('rosterbate-simulation-setup.html'),
   simulationLeagueEngine: read('simulation-league-engine.js')
@@ -169,6 +173,46 @@ assert.match(
   /Simulation archive dev runner|Simulation archive runner|simulation archives and pack flows|selected simulation archive pack|Archive pack load failed|local simulation archive boot/i,
   'historical-pack-dev-runner.js should describe localhost tooling as a simulation archive authoring surface'
 );
+assert.doesNotMatch(
+  files.historicalPackFixtures,
+  /historical season boot development|Historical Pack Lab|historical universe/i,
+  'historical-pack-fixtures.js should not keep older historical fixture copy in localhost fallback content'
+);
+assert.match(
+  files.historicalPackFixtures,
+  /simulation archive boot development|Simulation Archive Lab|simulation archive/i,
+  'historical-pack-fixtures.js should describe fallback fixture content with simulation-first wording'
+);
+assert.doesNotMatch(
+  files.historicalPack1996CoverageScript,
+  /historical season|historical universe|historical mode/i,
+  'expand-historical-pack-1996-coverage.js should not keep older historical mode phrasing in generated pack copy'
+);
+assert.match(
+  files.historicalPack1996CoverageScript,
+  /simulation archive|ratings-ready pack|simulation stat mode|source pack/i,
+  'expand-historical-pack-1996-coverage.js should generate simulation-first pack copy'
+);
+assert.doesNotMatch(
+  files.historicalPack1996IngestScript,
+  /Historical players|historical season boots|historical rankings/i,
+  'ingest-historical-pack-1996-season-stats.js should not keep older historical replay wording in generated pack copy'
+);
+assert.match(
+  files.historicalPack1996IngestScript,
+  /Archive players|simulation archive boots|archive rankings/i,
+  'ingest-historical-pack-1996-season-stats.js should generate simulation-first pack copy'
+);
+assert.doesNotMatch(
+  files.historicalUniverseSlots,
+  /Historical universe/i,
+  'historical-universe-slots.js should not keep older historical-universe fallback copy in saved slot metadata'
+);
+assert.match(
+  files.historicalUniverseSlots,
+  /Simulation archive/i,
+  'historical-universe-slots.js should expose simulation-archive fallback copy for saved slot metadata'
+);
 assert.match(
   files.rosterbateSeason,
   /Ratings-driven simulation \+ sport-specific tuning/,
@@ -176,12 +220,12 @@ assert.match(
 );
 assert.doesNotMatch(
   files.rosterbateSeason,
-  /single-player shell layout|shared single-player team surface|Single Player leagues default you as commissioner|single-player leagues because|same historical player pool you just drafted|historical universe slot save|historical slot\. Booting from runtime storage instead|Loading saved historical universe slot|Requested historical universe slot was not found|In solo leagues, AI teams will review offers automatically/i,
+  /single-player shell layout|shared single-player team surface|Single Player leagues default you as commissioner|single-player leagues because|same historical player pool you just drafted|historical universe slot save|historical slot\. Booting from runtime storage instead|Loading saved historical universe slot|Requested historical universe slot was not found|In solo leagues, AI teams will review offers automatically|pending historical season boot flag|Historical season boot was requested|Historical pack dev boot failed/i,
   'rosterbate-season.html should not present unified simulation leagues with legacy single-player phrasing in visible UI copy'
 );
 assert.match(
   files.rosterbateSeason,
-  /polished league shell|shared team-management surface|Local leagues default you as commissioner|Unavailable in local leagues|same source-pack player pool you just drafted|simulation archive slot save|simulation archive slot\. Booting from runtime storage instead|Loading saved simulation archive slot|Requested simulation archive slot was not found|In local leagues, AI teams will review offers automatically/i,
+  /polished league shell|shared team-management surface|Local leagues default you as commissioner|Unavailable in local leagues|same source-pack player pool you just drafted|simulation archive slot save|simulation archive slot\. Booting from runtime storage instead|Loading saved simulation archive slot|Requested simulation archive slot was not found|In local leagues, AI teams will review offers automatically|pending simulation archive boot flag|Simulation archive boot was requested|Simulation archive dev boot failed/i,
   'rosterbate-season.html should use neutral unified-engine league wording in season-shell copy'
 );
 assert.doesNotMatch(

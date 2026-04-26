@@ -89,7 +89,7 @@
     try{
       mixedEraCatalog=await loadMixedEraConfigs();
     }catch(error){
-      console.warn('[Historical Pack Loader] Could not load mixed-era configs', error);
+      console.warn('[Simulation Archive Loader] Could not load mixed-era configs', error);
       throw error;
     }
 

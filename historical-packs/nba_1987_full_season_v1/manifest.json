@@ -5,7 +5,7 @@
   "sport": "nba",
   "league": "nba",
   "seasonId": "nba_1987_historic",
-  "seasonLabel": "1986-87 NBA Historic Season",
+  "seasonLabel": "1986-87 NBA Simulation Archive",
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "1980s",
@@ -24,17 +24,17 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_1987_lal",
-  "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 historical season foundation with Lakers prestige at the center.",
-  "description": "A playable 1986-87 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
+  "subtitle": "Bird, Magic, Jordan, and a trust-forward 1986-87 source-season foundation with Lakers prestige at the center.",
+  "description": "A playable 1986-87 NBA simulation archive pack with the full source schedule/results grid, source-season totals, and explicitly inferred player-game rows.",
   "tagline": "Draft the Bird-Magic-Jordan season with disclosed inferred box lines.",
   "eraTags": [
     "1980s",
     "Bird-Magic Era",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "packTags": [
     "historical-full-league-foundation",
-    "single-player",
+    "local-league",
     "historical-draft",
     "reimagined-season",
     "featured-pack"

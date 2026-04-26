@@ -5,7 +5,7 @@
   "sport": "nba",
   "league": "nba",
   "seasonId": "nba_1993_historic",
-  "seasonLabel": "1992-93 NBA Historic Season",
+  "seasonLabel": "1992-93 NBA Simulation Archive",
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "1990s",
@@ -24,17 +24,17 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_1993_chi",
-  "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 historical season foundation centered on the Bulls.",
-  "description": "A playable 1992-93 NBA historical season pack with the full historical schedule/results grid, historical season totals, and explicitly inferred player-game rows.",
+  "subtitle": "Jordan, Barkley, and Pippen lead a trust-forward 1992-93 source-season foundation centered on the Bulls.",
+  "description": "A playable 1992-93 NBA simulation archive pack with the full source schedule/results grid, source-season totals, and explicitly inferred player-game rows.",
   "tagline": "Draft the Jordan-Barkley-Pippen season with disclosed inferred box lines.",
   "eraTags": [
     "1990s",
     "First Three-Peat Prestige",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "packTags": [
     "historical-full-league-foundation",
-    "single-player",
+    "local-league",
     "historical-draft",
     "reimagined-season",
     "featured-pack"

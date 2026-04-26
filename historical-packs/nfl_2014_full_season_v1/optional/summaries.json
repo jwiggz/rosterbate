@@ -41,7 +41,7 @@
     "realStatCoverage": {
       "playersWithRealSeasonStats": 160,
       "playerCount": 416,
-      "label": "Historical and curated stat blend"
+      "label": "Simulation and curated stat blend"
     },
     "generatedSupportPlayers": {
       "count": 256,
@@ -53,7 +53,7 @@
     }
   },
   "auditNotes": [
-    "Marquee 2014 stars use real-season context while support records are curated phase-1 roster fillers for football simulation setup.",
+    "Marquee 2014 stars use source-season context while support records are curated phase-1 roster fillers for football simulation setup.",
     "Every team includes a quarterback, kicker, DST, and defensive-role coverage so 32-team drafts can initialize cleanly.",
     "Schedule, roster snapshots, and game logs remain empty placeholders in this foundation pack until the weekly football engine expands the lane."
   ]

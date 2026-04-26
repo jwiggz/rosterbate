@@ -1,5 +1,5 @@
 {
-  "packSummary": "The 1992-93 foundation pack brings the full 27-team league into Historic Seasons with historical regular-season schedule/results, historical player season totals, and clearly disclosed inferred player-game coverage.",
+  "packSummary": "The 1992-93 foundation pack brings the full 27-team league into Simulation Archives with source regular-season schedule/results, source player season totals, and clearly disclosed inferred player-game coverage.",
   "featuredStorylines": [
     "Chicago is the front-door title path, with Jordan and Pippen anchoring the first three-peat season at the center of the pack.",
     "Phoenix keeps Barkley's challenger Suns fully loaded and gives the pack a true Finals counterweight from the opening menu.",
@@ -30,7 +30,7 @@
   "modeSummaries": [
     {
       "mode": "simulation_season",
-      "summary": "Choose one 1992-93 franchise and guide it through the full historical season."
+      "summary": "Choose one 1992-93 franchise and guide it through the full source season."
     },
     {
       "mode": "historical_draft",

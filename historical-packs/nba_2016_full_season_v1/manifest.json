@@ -5,7 +5,7 @@
   "sport": "nba",
   "league": "nba",
   "seasonId": "nba_2016_historic",
-  "seasonLabel": "2015-16 NBA Historic Season",
+  "seasonLabel": "2015-16 NBA Simulation Archive",
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "2010s",
@@ -19,17 +19,17 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_2016_gsw",
-  "subtitle": "Start a sim season from the historical foundation, redraft the era, or branch into a reimagined universe.",
-  "description": "A 2015-16 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
+  "subtitle": "Start a sim season from the source-season foundation, redraft the era, or branch into a reimagined universe.",
+  "description": "A 2015-16 NBA simulation archive pack built from source team, player, schedule, result, and player-game data.",
   "tagline": "Seventy-three wins, unanimous MVP, and the 3-1 Finals swing.",
   "eraTags": [
     "2010s",
     "Warriors Era",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "packTags": [
     "historical-full-league-foundation",
-    "single-player",
+    "local-league",
     "historical-draft",
     "reimagined-season",
     "featured-pack"
@@ -74,9 +74,9 @@
     }
   },
   "notes": [
-    "Player ranking is driven by historical 2015-16 season production aggregated from historical game-detail rows.",
+    "Player ranking is driven by source 2015-16 season production aggregated from source game-detail rows.",
     "Schedule and game results span the full 2015-16 regular season.",
-    "Reimagined Season uses the same historical player pool and pack health metadata."
+    "Reimagined Season uses the same source player pool and pack health metadata."
   ],
   "createdAt": "2026-04-18T17:09:30.390Z",
   "updatedAt": "2026-04-18T17:09:30.390Z"

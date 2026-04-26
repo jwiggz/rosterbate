@@ -19,7 +19,7 @@ const catalogEntry = catalog.find((entry) => entry.packId === 'nfl_2014_full_sea
 assert.ok(catalogEntry, 'catalog should advertise the 2014 NFL pack');
 assert.equal(catalogEntry.sport, 'nfl');
 assert.equal(catalogEntry.shortLabel, '2014');
-assert.match(catalogEntry.seasonLabel, /2014 NFL Historic Season/i);
+assert.match(catalogEntry.seasonLabel, /2014 NFL Simulation Archive/i);
 assert.equal(catalogEntry.availability, 'preview');
 assert.equal(catalogEntry.statusLabel, 'Foundation Preview');
 assert.deepStrictEqual(catalogEntry.plannedModes, ['Draft The Era', 'Sim Season']);
@@ -35,7 +35,7 @@ assert.match(manifest.createdAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3}
 assert.match(manifest.updatedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/);
 
 assert.equal(season.sport, 'nfl');
-assert.equal(season.seasonLabel, '2014 NFL Historic Season');
+assert.equal(season.seasonLabel, '2014 NFL Simulation Archive');
 assert.equal(teams.length, 32);
 assert.ok(players.length >= 416, 'pack needs enough players to fill a 32-team x 13-slot sim draft');
 assert.ok(Array.isArray(rosterSnapshots), 'roster snapshots should be an array scaffold');

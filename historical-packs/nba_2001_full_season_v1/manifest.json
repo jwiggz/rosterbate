@@ -5,7 +5,7 @@
   "sport": "nba",
   "league": "nba",
   "seasonId": "nba_2001_historic",
-  "seasonLabel": "2000-01 NBA Historic Season",
+  "seasonLabel": "2000-01 NBA Simulation Archive",
   "seasonType": "historical_pack",
   "isHistorical": true,
   "era": "2000s",
@@ -19,17 +19,17 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_2001_lal",
-  "subtitle": "Start a sim season from the historical foundation, redraft the era, or branch into a turn-of-the-century alternate universe.",
-  "description": "A 2000-01 NBA historical season pack built from historical team, player, schedule, result, and player-game data.",
+  "subtitle": "Start a sim season from the source-season foundation, redraft the era, or branch into a turn-of-the-century alternate universe.",
+  "description": "A 2000-01 NBA simulation archive pack built from source team, player, schedule, result, and player-game data.",
   "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
   "eraTags": [
     "2000s",
     "Dynasty Era",
-    "Historic Season"
+    "Simulation Archive"
   ],
   "packTags": [
     "historical-full-league-foundation",
-    "single-player",
+    "local-league",
     "historical-draft",
     "reimagined-season",
     "featured-pack"

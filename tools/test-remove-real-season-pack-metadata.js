@@ -374,8 +374,8 @@ for (const relativePath of [
 
   assert.match(
     presentation.heroSubtitle,
-    /historic|historical/i,
-    `${relativePath} heroSubtitle should use neutral historical wording`
+    /historic|historical|source-season|simulation archive/i,
+    `${relativePath} heroSubtitle should use neutral archive wording`
   );
   assert.equal(
     entryModes.some((entry) => entry.mode === 'simulation_season' && /sim/i.test(entry.label)),

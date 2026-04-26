@@ -135,7 +135,7 @@
       state?.leagueName ||
       state?.historicalSeasonId ||
       state?.historicalPackId ||
-      'Historic Season'
+      'Simulation Archive'
     ).trim();
   }
 
@@ -147,7 +147,7 @@
     ).trim();
     const week = Number(state?.currentWeek || state?.week || 1) || 1;
     const day = Number(state?.currentDay || state?.day || 1) || 1;
-    const base = teamName || 'Historical universe';
+    const base = teamName || 'Simulation archive';
     return base + ' - Wk ' + week + ' - Day ' + day;
   }
 

@@ -29,6 +29,7 @@ const fixtures = loadModule('historical-pack-fixtures.js', 'RosterBateHistorical
 const slotsSource = read('historical-universe-slots.js');
 const devRunnerSource = read('historical-pack-dev-runner.js');
 const rosterbateSeasonSource = read('rosterbate-season.html');
+const historicSeasonsSource = read('historic-seasons.html');
 
 function createLocalStorage() {
   const store = new Map();
@@ -413,6 +414,11 @@ assert.match(
   legacySlotPersist.metadata.title,
   /Sim Season$/,
   'legacy/missing entry mode saves should render the normalized Sim Season label'
+);
+assert.doesNotMatch(
+  historicSeasonsSource,
+  /slot\.modeTone\s*\|\|\s*api\.getModeTone\(slot\.historicalEntryMode\)\s*\|\|\s*'real'/,
+  'historic-seasons.html should not fall back to the legacy real tone for saved simulation archive cards'
 );
 
 assert.doesNotMatch(
