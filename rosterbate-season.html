@@ -9036,6 +9036,50 @@ function renderSimulationHubActionRail(vm, options){
   `;
 }
 
+function buildSimulationHubRunnerCard(vm, options){
+  const opts=options && typeof options==='object' ? options : {};
+  const primaryAction=opts.primaryAction || null;
+  const controlledTeamName=String(vm?.controlledTeam?.name || D?.teamName || 'Simulation Team').trim() || 'Simulation Team';
+  const sourceSeasonLabel=escapeSimulationShellHtml(String(vm?.sourceSeasonLabels?.join(' + ') || vm?.shellLabel || 'Simulation Archive').trim() || 'Simulation Archive');
+  const availableCount=Math.max(0, Number(opts.availableCount || 0));
+  const watchCount=Math.max(0, Number(opts.watchCount || 0));
+  const primaryLabel=escapeSimulationShellHtml(String(primaryAction?.label || 'Sim Day').trim() || 'Sim Day');
+  const primaryActionHandler=getSimulationHubPrimaryActionHandler(primaryAction) || "goPage('roster')";
+  const helperCopy=primaryAction?.id==='fix-lineup'
+    ? 'Your lineup still needs attention before the next simulation can run.'
+    : (primaryAction?.id==='season-complete'
+      ? 'Simulation is wrapped. Review the final standings and league history from the hub.'
+      : 'Advance the ratings-driven sim, publish the next report, and keep this local league moving one slate at a time.');
+  return `
+    <div class="hub-sim-grid">
+      <div class="hub-sim-copy">
+        <div class="hub-sim-kicker">Simulation Runner</div>
+        <div class="hub-sim-title">${sourceSeasonLabel}</div>
+        <div class="hub-sim-sub">${escapeSimulationShellHtml(helperCopy)}</div>
+        <div class="hub-sim-pills">
+          <span class="hub-sim-pill blue">${escapeSimulationShellHtml(primaryLabel)}</span>
+          <span class="hub-sim-pill green">${escapeSimulationShellHtml(controlledTeamName)}</span>
+          <span class="hub-sim-pill orange">${availableCount} player${availableCount===1?'':'s'} on the wire</span>
+          <span class="hub-sim-pill blue">${watchCount} watched</span>
+        </div>
+        <div class="hub-sim-actions">
+          <button type="button" class="hub-sim-action primary" onclick="${primaryActionHandler}">${escapeSimulationShellHtml(primaryAction?.id==='season-complete' ? 'Review Standings' : primaryLabel)}</button>
+          <button type="button" class="hub-sim-action" onclick="goPage('roster')">Open My Team</button>
+          <button type="button" class="hub-sim-action" onclick="goPage('matchup')">Open Matchup</button>
+          <button type="button" class="hub-sim-action" onclick="goPage('waiver')">Open Players</button>
+        </div>
+      </div>
+      <div class="hub-sim-side">
+        <div class="hub-sim-stat">
+          <div class="hub-sim-stat-label">Current Focus</div>
+          <div class="hub-sim-stat-value">${escapeSimulationShellHtml(primaryAction?.id==='fix-lineup' ? 'Fix Lineup' : (primaryAction?.id==='season-complete' ? 'Season Done' : 'Sim Ready'))}</div>
+          <div class="hub-sim-stat-copy">${escapeSimulationShellHtml(primaryAction?.id==='fix-lineup' ? 'Open My Team and repair the starter shell before the next run.' : 'This league is running on the unified simulation engine now, not legacy stat playback.')}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderSimulationHubInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getHubViewModel();
   const rosterVm=SEASON_MODE_ADAPTER.getRosterViewModel?.() || null;
@@ -9245,6 +9289,49 @@ function renderSimulationHubInSharedShell(){
           </div>`;
         }).join('')
       : '<div style="padding:14px 4px;text-align:center;color:var(--text3);font-size:12px;">League moves will show up here as managers add, drop, and trade.</div>';
+  }
+  const simRunnerMount=document.getElementById('hubSimRunnerCard');
+  if(simRunnerMount){
+    simRunnerMount.style.display=!isNflSimulation ? '' : 'none';
+    simRunnerMount.innerHTML=!isNflSimulation
+      ? buildSimulationHubRunnerCard(vm, {
+          primaryAction,
+          availableCount,
+          watchCount
+        })
+      : '';
+  }
+  const revealMount=document.getElementById('hubRevealReportCard');
+  if(revealMount){
+    const latestRevealReportDay=typeof getLatestRevealReportDay==='function' ? getLatestRevealReportDay() : 0;
+    const latestRevealReport=latestRevealReportDay && typeof getDailyRevealReport==='function'
+      ? getDailyRevealReport(latestRevealReportDay)
+      : null;
+    revealMount.innerHTML=latestRevealReport ? `
+      <div class="hub-reveal-grid">
+        <div class="hub-reveal-copy">
+          <div class="hub-reveal-kicker">${latestRevealReport.isSimulation ? 'Sim Day Report' : 'Daily Reveal Report'}</div>
+          <div class="hub-reveal-title">${escapeSimulationShellHtml(latestRevealReport.story?.headline || ('Day '+latestRevealReport.day+' Is Official'))}</div>
+          <div class="hub-reveal-sub">${escapeSimulationShellHtml(latestRevealReport.story?.subheadline || (latestRevealReport.leader ? `${latestRevealReport.leader.teamName} led the board with ${latestRevealReport.leader.total.toFixed(1)} points.` : 'Scores are now live league-wide.'))}</div>
+          <div class="hub-reveal-pills">
+            <span class="hub-reveal-pill">${escapeSimulationShellHtml(latestRevealReport.isSimulation ? 'Simulation' : 'Reveal')}</span>
+            <span class="hub-reveal-pill">${escapeSimulationShellHtml(`Day ${latestRevealReport.day}`)}</span>
+            ${latestRevealReport.totalTransactions ? `<span class="hub-reveal-pill">${escapeSimulationShellHtml(`${latestRevealReport.totalTransactions} move${latestRevealReport.totalTransactions===1?'':'s'}`)}</span>` : ''}
+          </div>
+        </div>
+        <div class="hub-reveal-side">
+          <div class="hub-reveal-stat">
+            <div class="hub-reveal-stat-value">${escapeSimulationShellHtml(latestRevealReport.myTeam ? `${Number(latestRevealReport.myTeam.total||0).toFixed(1)}` : '--')}</div>
+            <div class="hub-reveal-stat-label">${escapeSimulationShellHtml(latestRevealReport.myTeam ? `${latestRevealReport.myTeam.teamName} revealed` : 'My team')}</div>
+          </div>
+          <button type="button" class="hub-sim-action primary" onclick="openRevealReport(${Number(latestRevealReport.day||latestRevealReportDay||0)})">Open Report</button>
+        </div>
+      </div>
+    ` : `
+      <div class="hub-reveal-empty">
+        Sim day reports will appear here once the first run lands. When you hit <b style="color:#f8fafc;">Run Sim Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.
+      </div>
+    `;
   }
   const hubDataStamp=document.getElementById('hubDataStamp');
   if(hubDataStamp){

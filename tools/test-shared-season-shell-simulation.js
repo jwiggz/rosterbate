@@ -865,6 +865,8 @@ const sandbox = {
   console: sandboxConsole,
   RB_SEASON_DEBUG: false,
   CURRENT_SPORT: 'nba',
+  STARTERS: 5,
+  SLOT_LABELS: ['PG', 'SG', 'SF', 'PF', 'C'],
   URLSearchParams,
   normalizeRosterbateSport(value) {
     return String(value || 'nba').trim().toLowerCase() || 'nba';
@@ -1512,6 +1514,8 @@ assert.match(elements.hubMatchups.innerHTML, /BOS 108 at LAL 112/);
 assert.match(elements.hubStandingsMini.innerHTML, /LAL/, 'simulation hub should render the mini standings board');
 assert.match(elements.hubNowBand.innerHTML, /Watch List|Trade Desk/, 'simulation hub should render the live now-band cards');
 assert.match(elements.hubActivity.innerHTML, /League update|League moves will show up here/, 'simulation hub should render the league activity feed');
+assert.match(elements.hubSimRunnerCard.innerHTML, /Simulation Runner|Sim Day|Sim Ready/, 'simulation hub should render the sim runner card for nba seasons');
+assert.match(elements.hubRevealReportCard.innerHTML, /Sim day reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
 assert.match(elements.hubPowerups.innerHTML, /Weekly Powerups/, 'simulation hub should reuse the single-player powerup rail');
 assert.match(elements.hubPowerups.innerHTML, /White Gloves/, 'simulation hub should include the familiar white-gloves parity card');
 assert.match(elements.hubPowerups.innerHTML, /Bench Boost/, 'simulation hub should include the familiar bench-boost parity card');
