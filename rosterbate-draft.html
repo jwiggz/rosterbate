@@ -7862,7 +7862,7 @@ function triggerPause(reason, isAdmin=false){
   // Show pause overlay
   document.getElementById('pauseReason').textContent = reason;
   document.getElementById('pauseOverlay').classList.add('show');
-  // Show resume button to commissioner in multiplayer, or always in single-player
+  // Show resume button to commissioner in multiplayer, or always in local leagues
   document.getElementById('pauseResumeBtn').className = 'pause-resume-btn' + ((PS.isAdmin || !requiresPauseVote()) ? ' show' : '');
   // Start pause elapsed clock
   clearInterval(PS.pauseElapsedInt);
@@ -7943,7 +7943,7 @@ function startPauseVote(reason){
   renderVotePips();
   document.getElementById('voteBar').classList.add('show');
   showToast('🗳️ Pause vote started — need '+PS.votesNeeded+' yes votes');
-  // Simulate other players voting over time (since this is single-player)
+  // Simulate other players voting over time (since this is a local league flow)
   simulateCpuVotes();
 }
 

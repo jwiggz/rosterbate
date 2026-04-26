@@ -420,6 +420,11 @@ assert.doesNotMatch(
   /slot\.modeTone\s*\|\|\s*api\.getModeTone\(slot\.historicalEntryMode\)\s*\|\|\s*'real'/,
   'historic-seasons.html should not fall back to the legacy real tone for saved simulation archive cards'
 );
+assert.match(
+  rosterbateSeasonSource,
+  /if\(D\?\.isHistoricalPack \|\| shouldPersistSharedSimulationState\(D\)\)\{\s*return rebuilt;/,
+  'rosterbate-season.html should trust simulation-backed local leagues in the high-coverage waiver-pool rebuild path'
+);
 
 assert.doesNotMatch(
   devRunnerSource,

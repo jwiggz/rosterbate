@@ -627,7 +627,7 @@ const simulationAdapterStub = {
   },
   getRosterViewModel() {
     return {
-      layoutMode: 'single-player-parity',
+    layoutMode: 'local-league-parity',
       summaryCards: [
         { label: 'Revealed Score', value: '112.0' }
       ],
@@ -684,7 +684,7 @@ const simulationAdapterStub = {
   },
   getWaiverViewModel() {
     return {
-      layoutMode: 'single-player-parity',
+    layoutMode: 'local-league-parity',
       claimTimingLabel: 'Processing next sim day',
       teamSummary: {
         waiverOrderLabel: 'Waiver Order (1 of 30)',
@@ -3073,7 +3073,7 @@ api.setSeasonModeAdapter({
   getRosterViewModel() {
     return {
       sport: 'nfl',
-      layoutMode: 'single-player-parity',
+    layoutMode: 'local-league-parity',
       summaryCards: [
         { label: 'Week Outlook', value: 'Fix 2 slots' }
       ],
@@ -3451,7 +3451,7 @@ api.setSeasonModeAdapter({
   getWaiverViewModel() {
     return {
       sport: 'nfl',
-      layoutMode: 'single-player-parity',
+    layoutMode: 'local-league-parity',
       claimTimingLabel: 'Processing next sim week',
       pendingClaims: [
         {

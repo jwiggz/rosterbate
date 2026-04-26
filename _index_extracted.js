@@ -85,7 +85,7 @@ function updateHomeSportUI(){
     card.classList.toggle('active', card.dataset.sport === sport);
   });
   document.getElementById('sportSectionLabel').textContent = 'Get Started — ' + HOME_SPORT_LABELS[sport];
-  document.getElementById('single-player-card').href = 'rosterbate-draft.html?sport=' + sport;
+  document.getElementById('local-league-card').href = 'rosterbate-draft.html?sport=' + sport;
   document.getElementById('multiplayer-card').href = 'rosterbate-matchmaking.html?sport=' + sport;
   document.getElementById('season-card').href = 'rosterbate-season.html?sport=' + sport;
 }

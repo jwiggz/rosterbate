@@ -872,7 +872,7 @@
       radial-gradient(120% 120% at 12% 0%,rgba(255,160,74,.2),transparent 38%),
       radial-gradient(90% 70% at 100% 100%,rgba(255,255,255,.05),transparent 48%),
       linear-gradient(180deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.045) 12%,transparent 13%),
-      url("single player pane.jpg"),
+      url("local league pane.jpg"),
       linear-gradient(180deg,#5f6676 0%,#474e5e 24%,#343b4a 58%,#262c39 100%);
     background-size:auto,auto,auto,auto,cover,auto;
     background-position:center,12% 0%,100% 100%,center,68% center,center;
@@ -1710,7 +1710,7 @@
             <div class="cta-pane-title">Local League</div>
               <span class="cta-pane-sub">Play vs AI</span>
             </div>
-            <div class="cta-card orange" id="single-player-card">
+            <div class="cta-card orange" id="local-league-card">
             <div class="cta-top">
               <div class="cta-copy">
                 <div class="cta-title" style="display:none;">Local League<span>Play vs AI</span></div>
@@ -2670,7 +2670,7 @@ function updateHomeSportUI(){
     card.classList.toggle('active', card.dataset.sport === sport);
   });
   document.getElementById('sportSectionLabel').textContent = 'Get Started — ' + HOME_SPORT_LABELS[sport];
-  document.getElementById('single-player-card').href = 'rosterbate-draft.html?sport=' + sport;
+  document.getElementById('local-league-card').href = 'rosterbate-draft.html?sport=' + sport;
   document.getElementById('multiplayer-card').href = 'rosterbate-matchmaking.html?sport=' + sport;
   const mockDraftHref='rosterbate-draft.html?sport=' + sport;
   const liveRoomsHref='rosterbate-matchmaking.html?sport=' + sport;

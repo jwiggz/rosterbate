@@ -4108,7 +4108,7 @@ function renderTrades(){
   if(isComm){
     h+=`<div class="card" style="margin-bottom:10px;border-color:rgba(249,115,22,.3);background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(15,23,42,.9));">
       <div style="font-family:var(--fd);font-size:14px;font-weight:800;margin-bottom:4px;color:var(--accent);">Commissioner Controls</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Single Player leagues default you as commissioner. You can force trades through, reject any pending offer, and still use the normal team-side accept/reject flow.</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Local leagues default you as commissioner. You can force trades through, reject any pending offer, and still use the normal team-side accept/reject flow.</div>
     </div>`;
   }
   if(pend.length){

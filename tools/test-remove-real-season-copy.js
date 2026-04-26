@@ -17,6 +17,7 @@ const files = {
   historicalPack1996CoverageScript: read('expand-historical-pack-1996-coverage.js'),
   historicalPack1996IngestScript: read('ingest-historical-pack-1996-season-stats.js'),
   myLeagues: read('my-leagues.html'),
+  seasonExtracted: read('_season_extracted.js'),
   historicUniverse: read('historic-universe.html'),
   historicalPackDevRunner: read('historical-pack-dev-runner.js'),
   historicalUniverseSlots: read('historical-universe-slots.js'),

@@ -4350,7 +4350,7 @@ function rebuildSeasonWaiverPool(){
     return [];
   }
   if(sourcePool.length && (!rebuilt.length || rosterCoverage >= 0.9)){
-    if(D?.isHistoricalPack){
+    if(D?.isHistoricalPack || shouldPersistSharedSimulationState(D)){
       return rebuilt;
     }
     console.warn('Season waiver pool looked corrupted; falling back to canonical player pool.', {
@@ -11257,7 +11257,7 @@ function buildSingleRowHtml(entry, day){
 
 function renderRoster(){
   const rosterVm = buildActiveRosterPageViewModel();
-  if(rosterVm?.layoutMode==='single-player-parity'){
+  if(rosterVm?.layoutMode==='local-league-parity'){
     return renderSharedSimulationRosterPageFromViewModel(rosterVm);
   }
   const scheduleChip=document.getElementById('rosterScheduleChip');

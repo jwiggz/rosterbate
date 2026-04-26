@@ -660,7 +660,7 @@
       ? getControlledRosterSlots(state)
       : buildSimulationNbaRosterState(state);
     return {
-      layoutMode: 'single-player-parity',
+      layoutMode: 'local-league-parity',
       statSourceLabel: 'Simulated',
       sport,
       starterSlots: clone(rosterState?.starterSlots || []),
@@ -2370,7 +2370,7 @@
           : (getSimulationSportForState(state) === 'nfl' ? 'week' : 'day');
         return {
           sport: getSimulationSportForState(state),
-          layoutMode: 'single-player-parity',
+          layoutMode: 'local-league-parity',
           roster,
           teamSummary,
           availablePlayers,

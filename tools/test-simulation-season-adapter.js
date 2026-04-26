@@ -98,7 +98,7 @@ const adapter = createSimulationSeasonAdapter({
 });
 
 function assertSinglePlayerParityRosterVm(rosterVm, label) {
-  assert.equal(rosterVm.layoutMode, 'single-player-parity', `${label} roster vm should opt into the shared single-player parity layout`);
+assert.equal(rosterVm.layoutMode, 'local-league-parity', `${label} roster vm should opt into the shared local-league parity layout`);
   assert.ok(Array.isArray(rosterVm.summaryCards), `${label} roster vm should expose shared summary cards`);
   assert.ok(Array.isArray(rosterVm.actionCards), `${label} roster vm should expose shared action cards`);
   assert.ok(Array.isArray(rosterVm.operations?.actions), `${label} roster vm should expose shared roster operations actions`);
@@ -271,7 +271,7 @@ const waivers = adapter.getWaiverViewModel();
 assert.ok(waivers.teamSummary, 'waiver vm should expose a teamSummary bridge object');
 assert.equal(waivers.teamSummary.watchListEnabled, true, 'simulation waiver vm should keep watch-list navigation live');
 assert.equal(waivers.teamSummary.settingsEnabled, true, 'simulation waiver vm should keep team settings live');
-assert.equal(waivers.layoutMode, 'single-player-parity', 'waiver vm should opt into the shared single-player parity layout');
+assert.equal(waivers.layoutMode, 'local-league-parity', 'waiver vm should opt into the shared local-league parity layout');
 assert.ok(Array.isArray(waivers.pendingClaims), 'waiver vm should expose pending claims for the shared waiver desk');
 assert.ok(Array.isArray(waivers.recentClaimResults), 'waiver vm should expose recent claim results for the shared waiver desk');
 assert.ok(Array.isArray(waivers.sections?.available?.rows), 'waiver vm should expose available rows through shared-shell sections');
