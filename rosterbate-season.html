@@ -850,7 +850,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             <div class="hub-stat"><div id="hubStreak" class="hub-stat-value">—</div><div id="hubStreakLabel" class="hub-stat-label">Streak</div></div>
           </div>
           <div class="hub-now-band" id="hubNowBand"></div>
-          <div class="hub-actions" style="margin-top:12px;">
+          <div class="hub-actions" id="hubActions" style="margin-top:12px;">
             <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">&#128101;</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
             <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div id="hubMatchupActionTitle" class="hub-action-title">Matchup</div><div id="hubMatchupActionSub" class="hub-action-sub">Open the head-to-head box score</div></div></button>
             <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">-- available</div></div></button>
@@ -9007,14 +9007,70 @@ function buildSimulationHeroMetaLinks(teamSummary){
   };
 }
 
+function renderSimulationHubActionRail(vm, options){
+  const hubActions=document.getElementById('hubActions');
+  if(!hubActions) return;
+  const opts=options && typeof options==='object' ? options : {};
+  const watchCount=Math.max(0, Number(opts.watchCount || 0));
+  const watchSummary=String(opts.watchSummary || (watchCount ? `${watchCount} tracked` : 'Track free agents before the room shifts')).trim();
+  const pendingIncoming=Math.max(0, Number(opts.pendingIncoming || 0));
+  const pendingOutgoing=Math.max(0, Number(opts.pendingOutgoing || 0));
+  const availableCount=Math.max(0, Number(opts.availableCount || 0));
+  const rankLabel=String(opts.rankLabel || '--').trim() || '--';
+  const matchupTitle=escapeSimulationShellHtml(String(opts.matchupTitle || 'Schedule').trim() || 'Schedule');
+  const matchupSub=escapeSimulationShellHtml(String(opts.matchupSub || 'Open recent results and the upcoming sim slate').trim() || 'Open recent results and the upcoming sim slate');
+  const playersCopy=escapeSimulationShellHtml(String(opts.playersCopy || `${availableCount} available`).trim() || `${availableCount} available`);
+  const tradeSummary=escapeSimulationShellHtml(
+    pendingIncoming
+      ? `${pendingIncoming} incoming offer${pendingIncoming===1?'':'s'}`
+      : (pendingOutgoing ? `${pendingOutgoing} pending sent offer${pendingOutgoing===1?'':'s'}` : 'Open the league trade desk')
+  );
+  const watchCopy=escapeSimulationShellHtml(watchCount ? `${watchCount} tracked | ${watchSummary}` : watchSummary);
+  hubActions.innerHTML=`
+    <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">&#128101;</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
+    <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div id="hubMatchupActionTitle" class="hub-action-title">${matchupTitle}</div><div id="hubMatchupActionSub" class="hub-action-sub">${matchupSub}</div></div></button>
+    <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">${playersCopy}</div></div></button>
+    <button type="button" id="hubWatchListCard" onclick="openWatchList()" class="card hub-action"><div class="hub-action-icon">&#9733;</div><div><div class="hub-action-title">Watch List</div><div class="hub-action-sub">${watchCopy}</div></div></button>
+    <button type="button" id="hubTradeDeskCard" onclick="goPage('trades')" class="card hub-action"><div class="hub-action-icon">&#8646;</div><div><div class="hub-action-title">Trade Desk</div><div class="hub-action-sub">${tradeSummary}</div></div></button>
+    <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">&#127942;</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">${escapeSimulationShellHtml(rankLabel)}</div></div></button>
+  `;
+}
+
 function renderSimulationHubInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getHubViewModel();
   const rosterVm=SEASON_MODE_ADAPTER.getRosterViewModel?.() || null;
+  const waiverVm=SEASON_MODE_ADAPTER.getWaiverViewModel?.() || null;
+  const standingsVm=SEASON_MODE_ADAPTER.getStandingsViewModel?.() || null;
   const teamSummary=rosterVm?.teamSummary || {};
   const heroMeta=buildSimulationHeroMetaLinks(teamSummary);
   const isNflSimulation = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() === 'nfl';
   const primaryAction = vm?.primaryAction || null;
   const advBtn = document.getElementById('advBtn');
+  const watchIds=typeof getWatchListIds==='function' ? getWatchListIds() : [];
+  const watchCount=watchIds.length;
+  const watchedTargets=typeof getWatchedWaiverTargets==='function' ? getWatchedWaiverTargets(3) : [];
+  const recentDropTargets=typeof getRecentDroppedWaiverTargets==='function' ? getRecentDroppedWaiverTargets(3) : [];
+  const radarCandidates=typeof getWaiverRadarCandidates==='function' ? getWaiverRadarCandidates(6) : [];
+  const radarPreview=radarCandidates[0] || null;
+  const watchSummary=watchCount
+    ? (radarPreview ? `${radarPreview.player?.name || 'Tracked target'} leading your board` : `${watchCount} players tracked`)
+    : 'Track free agents before the room shifts';
+  const pendingIncoming=Array.isArray(G?.tradeOffers)
+    ? G.tradeOffers.filter((trade)=>Number(trade?.toTeam)===Number(D?.myPos) && trade?.status==='pending').length
+    : 0;
+  const pendingOutgoing=Array.isArray(G?.tradeOffers)
+    ? G.tradeOffers.filter((trade)=>Number(trade?.fromTeam)===Number(D?.myPos) && trade?.status==='pending').length
+    : 0;
+  const availableCount=Array.isArray(G?.waiver) ? G.waiver.length : (Array.isArray(waiverVm?.availablePlayers) ? waiverVm.availablePlayers.length : 0);
+  const standingsRows=Array.isArray(standingsVm?.rows) ? standingsVm.rows : [];
+  const controlledAbbr=String(vm?.controlledTeam?.abbr || '').trim().toUpperCase();
+  const rankIndex=standingsRows.findIndex((row)=>String(row?.teamAbbr || '').trim().toUpperCase()===controlledAbbr);
+  const rankLabel=rankIndex>=0 ? `${rankIndex+1}${rankIndex===0?'st':rankIndex===1?'nd':rankIndex===2?'rd':'th'} place` : '--';
+  const playersCopy=pendingIncoming>0
+    ? `${availableCount} available | ${pendingIncoming} trade offer${pendingIncoming===1?'':'s'}`
+    : (recentDropTargets.length
+      ? `${availableCount} available | ${recentDropTargets.length} recent drop${recentDropTargets.length===1?'':'s'}`
+      : (watchCount ? `${availableCount} available | ${watchCount} watched` : `${availableCount} available`));
   setHubSummaryStatLabels({
     opp: 'Record',
     proj: 'Team',
@@ -9050,6 +9106,146 @@ function renderSimulationHubInSharedShell(){
   if(matchupActionSub) matchupActionSub.textContent=isNflSimulation
     ? 'Open recent results and the upcoming weekly slate'
     : 'Open recent results and the upcoming sim slate';
+  renderSimulationHubActionRail(vm, {
+    watchCount,
+    watchSummary,
+    pendingIncoming,
+    pendingOutgoing,
+    availableCount,
+    playersCopy,
+    rankLabel,
+    matchupTitle: 'Schedule',
+    matchupSub: isNflSimulation
+      ? 'Open recent results and the upcoming weekly slate'
+      : 'Open recent results and the upcoming sim slate'
+  });
+  const matchupActionTitleAfter=document.getElementById('hubMatchupActionTitle');
+  const matchupActionSubAfter=document.getElementById('hubMatchupActionSub');
+  const playersCard=document.getElementById('hubWC');
+  const rankCard=document.getElementById('hubRank');
+  if(matchupActionTitleAfter) matchupActionTitleAfter.textContent='Schedule';
+  if(matchupActionSubAfter) matchupActionSubAfter.textContent=isNflSimulation
+    ? 'Open recent results and the upcoming weekly slate'
+    : 'Open recent results and the upcoming sim slate';
+  if(playersCard) playersCard.textContent=playersCopy;
+  if(rankCard) rankCard.textContent=rankLabel;
+  const standingsMini=document.getElementById('hubStandingsMini');
+  if(standingsMini){
+    const topRows=standingsRows.slice(0, Math.min(10, standingsRows.length));
+    standingsMini.innerHTML=topRows.length
+      ? `
+        <div class="hub-standings-head">
+          <div style="text-align:center;">#</div>
+          <div>Team</div>
+          <div>W</div>
+          <div>L</div>
+        </div>
+        ${topRows.map((row, index)=>{
+          const abbr=escapeSimulationShellHtml(String(row?.teamAbbr || row?.abbr || '---').trim().toUpperCase() || '---');
+          const wins=Number.isFinite(Number(row?.w)) ? Number(row.w) : 0;
+          const losses=Number.isFinite(Number(row?.l)) ? Number(row.l) : 0;
+          const mine=String(row?.teamAbbr || '').trim().toUpperCase()===controlledAbbr;
+          return `<button type="button" class="hub-standings-row${mine?' mine':''}" data-open-viewer="${Number(row?.teamIdx)}">
+            <div style="text-align:center;">${index+1}</div>
+            <div>${abbr}</div>
+            <div>${wins}</div>
+            <div>${losses}</div>
+          </button>`;
+        }).join('')}
+      `
+      : '<div class="hub-card-sub">Standings will populate as results post.</div>';
+    if(typeof bindHubStandingsInteractions==='function'){
+      bindHubStandingsInteractions(standingsMini);
+    }
+  }
+  const hubNowBand=document.getElementById('hubNowBand');
+  if(hubNowBand){
+    const nowCards=[];
+    if(pendingIncoming>0){
+      nowCards.push({
+        tone:'alert',
+        label:'Trade Desk',
+        value:`${pendingIncoming} incoming`,
+        copy:'Incoming offers are waiting on your response right now.',
+        action:"goPage('trades')",
+        link:'Open trade desk'
+      });
+    } else {
+      nowCards.push({
+        tone:watchCount?'live':'',
+        label:'Watch List',
+        value:watchCount?`${watchCount} tracked`:'Start tracking',
+        copy:watchCount
+          ? (watchedTargets[0] ? `${watchedTargets[0].name} is still available on the wire.` : 'Your tracked names are ready for another look.')
+          : 'Star a few waiver targets so the best names stay surfaced every visit.',
+        action:'openWatchList()',
+        link:watchCount?'Open watch list':'Build watch list'
+      });
+    }
+    nowCards.push({
+      tone:recentDropTargets.length?'alert':(radarPreview?'live':''),
+      label:'Waiver Radar',
+      value:recentDropTargets.length
+        ? `${recentDropTargets.length} fresh drop${recentDropTargets.length===1?'':'s'}`
+        : `${radarCandidates.length||0} targets`,
+      copy:recentDropTargets.length
+        ? `${recentDropTargets[0]?.name || 'A recent drop'} is a fresh cut. Check the wire before the league reacts.`
+        : (radarPreview ? `${radarPreview.player?.name || 'Top target'} is the best available pickup right now.` : 'The wire is quiet right now, but the full pool is ready when you are.'),
+      action:"goPage('waiver')",
+      link:'Open players'
+    });
+    nowCards.push({
+      tone:primaryAction?.id==='season-complete'?'':'live',
+      label:isNflSimulation?'Sim Runner':'Next Action',
+      value:primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Sim Day'),
+      copy:primaryAction?.id==='season-complete'
+        ? 'Everything is locked in. Review standings and league history from the hub.'
+        : (primaryAction?.id==='fix-lineup'
+          ? 'Your lineup needs attention before the next simulation can run.'
+          : (isNflSimulation
+            ? 'Advance the weekly simulation, then review the generated matchup results and league activity.'
+            : 'Generate the next daily box-score slate, publish the reveal report, and save the league in one step.')),
+      action:getSimulationHubPrimaryActionHandler(primaryAction) || "goPage('roster')",
+      link:primaryAction?.id==='season-complete'
+        ? 'Review standings'
+        : (primaryAction?.id==='fix-lineup' ? 'Fix lineup' : String(primaryAction?.label || 'Advance'))
+    });
+    hubNowBand.innerHTML=nowCards.map((card)=>`<div class="hub-now-card ${card.tone||''}">
+      <div class="hub-now-label">${escapeSimulationShellHtml(card.label)}</div>
+      <div class="hub-now-value">${escapeSimulationShellHtml(card.value)}</div>
+      <div class="hub-now-copy">${escapeSimulationShellHtml(card.copy)}</div>
+      <a href="javascript:void(0)" onclick="${card.action}" class="hub-now-link">${escapeSimulationShellHtml(card.link)}</a>
+    </div>`).join('');
+  }
+  const hubActivityMeta=document.getElementById('hubActivityMeta');
+  if(hubActivityMeta){
+    const activityCount=Math.min(Array.isArray(vm?.recentActivity) ? vm.recentActivity.length : 0, 8);
+    hubActivityMeta.textContent=activityCount ? `${activityCount} live update${activityCount===1?'':'s'}` : 'Quiet now';
+  }
+  const hubActivity=document.getElementById('hubActivity');
+  if(hubActivity){
+    const recentActivity=Array.isArray(vm?.recentActivity) ? vm.recentActivity.slice(0, 8) : [];
+    hubActivity.innerHTML=recentActivity.length
+      ? recentActivity.map((item)=>{
+          const accent=item?.type==='trade'?'#8b5cf6':item?.type==='waiver'?'#22c55e':item?.type==='reveal'?'#f59e0b':'var(--accent)';
+          const title=escapeSimulationShellHtml(item?.title || 'League update');
+          const text=escapeSimulationShellHtml(item?.text || 'Simulation activity posted.');
+          const teamLabel=escapeSimulationShellHtml(item?.teamName || item?.teamAbbr || 'League-wide');
+          const icon=String(item?.icon || '&#128221;');
+          return `<div class="activity-item">
+            <div class="activity-icon" style="border-color:${accent}55;color:${accent};background:${accent}18;">${icon}</div>
+            <div class="activity-copy">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <div class="activity-title">${title}</div>
+                <div class="activity-meta">Sim log</div>
+              </div>
+              <div class="activity-text">${text}</div>
+              <div class="activity-meta" style="margin-top:6px;color:${accent};">${teamLabel}</div>
+            </div>
+          </div>`;
+        }).join('')
+      : '<div style="padding:14px 4px;text-align:center;color:var(--text3);font-size:12px;">League moves will show up here as managers add, drop, and trade.</div>';
+  }
   const hubDataStamp=document.getElementById('hubDataStamp');
   if(hubDataStamp){
     hubDataStamp.style.display='';
