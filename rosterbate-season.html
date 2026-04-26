@@ -9450,7 +9450,17 @@ function renderSimulationHubInSharedShell(){
   document.getElementById('hubStreak').style.color = '';
   if(advBtn){
     const actionHandler=getSimulationHubPrimaryActionHandler(primaryAction);
-    advBtn.textContent = primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Reveal Day');
+    const primaryActionLabel = primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Reveal Day');
+    const primaryActionSubcopy = primaryAction?.id === 'season-complete'
+      ? 'League history locked in'
+      : (primaryAction?.id === 'review-playoffs'
+        ? 'Open the postseason picture'
+        : (primaryAction?.id === 'fix-lineup'
+          ? 'Set a legal lineup before the next sim'
+          : (isNflSimulation
+            ? 'Advance the week and publish results'
+            : 'Update scores and league activity')));
+    advBtn.innerHTML = `<span class="season-reveal-btn-label">${escapeSimulationShellHtml(primaryActionLabel)}</span><span class="season-reveal-btn-sub">${escapeSimulationShellHtml(primaryActionSubcopy)}</span>`;
     advBtn.disabled = !actionHandler;
     advBtn.setAttribute('onclick', actionHandler);
     if(advBtn.classList && typeof advBtn.classList.toggle === 'function'){

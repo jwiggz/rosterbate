@@ -2843,7 +2843,8 @@ api.setData({
 });
 
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Sim Week 1', 'nfl hub should expose a weekly simulation action');
+assert.match(elements.advBtn.innerHTML, /Sim Week 1/, 'nfl hub should expose a weekly simulation action');
+assert.match(elements.advBtn.innerHTML, /Advance the week and publish results/, 'nfl hub CTA should carry the polished local-league subcopy');
 assert.equal(elements.hubScoringType.textContent, 'Head to Head Points', 'nfl hub should keep the polished local-league fantasy scoring copy');
 assert.equal(elements.advBtn.disabled, false, 'nfl hub sim CTA should remain enabled during regular season');
 
@@ -2922,7 +2923,8 @@ api.setSeasonModeAdapter({
 });
 
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Review Playoffs', 'nfl hub should relabel the CTA once the playoff picture is ready');
+assert.match(elements.advBtn.innerHTML, /Review Playoffs/, 'nfl hub should relabel the CTA once the playoff picture is ready');
+assert.match(elements.advBtn.innerHTML, /Open the postseason picture/, 'review-playoffs CTA should explain the next action');
 assert.equal(elements.advBtn.disabled, false, 'review-playoffs CTA should stay usable');
 assert.equal(elements.advBtn.onclick, "goPage('playoffs')", 'review-playoffs CTA should navigate to the playoffs tab instead of calling advanceWeek');
 
@@ -3006,7 +3008,8 @@ api.setSeasonModeAdapter({
 });
 
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Fix Lineup', 'nfl hub should surface the fix-lineup CTA when the weekly lineup is invalid');
+assert.match(elements.advBtn.innerHTML, /Fix Lineup/, 'nfl hub should surface the fix-lineup CTA when the weekly lineup is invalid');
+assert.match(elements.advBtn.innerHTML, /Set a legal lineup before the next sim/, 'fix-lineup CTA should explain the blocking issue');
 assert.equal(elements.advBtn.disabled, false, 'fix-lineup CTA should stay actionable from the hub');
 assert.equal(elements.advBtn.onclick, "goPage('roster')", 'fix-lineup CTA should route the user straight to the roster tab');
 
@@ -3118,7 +3121,7 @@ assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX/i, 'nfl playof
 assert.match(elements.playoffsContent.innerHTML, /BAL\s*@\s*IND/i, 'nfl playoffs screen should render afc matchup abbreviations');
 assert.match(elements.playoffsContent.innerHTML, /DET\s*@\s*DAL/i, 'nfl playoffs screen should render nfc matchup abbreviations');
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Sim Week 1', 'active nfl postseason hub states should keep the Sim Week CTA available');
+assert.match(elements.advBtn.innerHTML, /Sim Week 1/, 'active nfl postseason hub states should keep the Sim Week CTA available');
 assert.equal(elements.advBtn.onclick, 'advanceWeek()', 'active nfl postseason hub CTA should keep advancing the bracket');
 
 api.setSeasonModeAdapter({
@@ -3213,7 +3216,8 @@ assert.match(elements.playoffsContent.innerHTML, /Seattle Seahawks/i, 'nfl compl
 assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX Complete/i, 'nfl completed playoffs screen should keep the 2014 championship completion framing');
 assert.doesNotMatch(elements.playoffsContent.innerHTML, /SEA\s*@\s*NE/i, 'completed nfl playoffs screen should not keep rendering a live Super Bowl slate');
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Season Complete', 'completed nfl seasons should keep the done-state CTA label');
+assert.match(elements.advBtn.innerHTML, /Season Complete/, 'completed nfl seasons should keep the done-state CTA label');
+assert.match(elements.advBtn.innerHTML, /League history locked in/, 'completed nfl seasons should keep the polished done-state subcopy');
 assert.equal(elements.advBtn.onclick, "goPage('playoffs')", 'completed nfl seasons should still let the user reopen the playoffs summary from the hub');
 
 api.setSeasonModeAdapter({
