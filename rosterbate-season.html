@@ -874,7 +874,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
           <div class="hub-card compact rb-chat-panel" id="rbChatPanel">
             <div class="rb-chat-hdr">
               <div style="flex:1">
-                <div class="rb-chat-title">Trash Talk</div>
+                <div class="rb-chat-title" id="rbChatTitle">Trash Talk</div>
                 <div class="rb-chat-online" id="rbOnlineCount">Season-long multiplayer thread</div>
                 <div class="hub-card-sub" id="rbChatPrompt" style="margin-top:6px;">Call your shot, answer trades, or stir the room before the next reveal.</div>
               </div>
@@ -8914,6 +8914,28 @@ function escapeSimulationShellHtml(value){
     .replace(/'/g,'&#39;');
 }
 
+function getHubThreadSurfaceCopy(){
+  const isSimulationLocalLeague = ACTIVE_SEASON_MODE === 'simulation';
+  if (isSimulationLocalLeague) {
+    return {
+      title: 'League Notes',
+      status: Array.isArray(D?.teams) && D.teams.length ? `${D.teams.length} team local league` : 'Local league notebook',
+      prompt: 'Track trade ideas, matchup reads, and roster plans between reveal windows.',
+      latestPrefix: 'Latest note from',
+      emptyTitle: 'No league notes yet',
+      emptyBody: 'Use this space to track targets, storylines, and reveal ideas between simulation windows.'
+    };
+  }
+  return {
+    title: 'Trash Talk',
+    status: Array.isArray(D?.teams) && D.teams.length ? `${D.teams.length} teams talking` : 'Season-long multiplayer thread',
+    prompt: 'Call your shot, answer trades, or stir the room before the next reveal.',
+    latestPrefix: 'Latest from',
+    emptyTitle: 'No trash talk yet',
+    emptyBody: 'Start the season-long thread.'
+  };
+}
+
 function buildSimulationSummaryPills(cards){
   const items=Array.isArray(cards) ? cards : [];
   if(!items.length) return '';
@@ -9167,9 +9189,16 @@ function renderSimulationHubInSharedShell(){
   const settingsDivider=document.getElementById('hubSettingsDivider');
   const leagueTeamsButton=document.getElementById('hubLeagueTeamsButton');
   const matchupsTitle=document.getElementById('hubMatchupsTitle');
+  const threadSurface=getHubThreadSurfaceCopy();
+  const rbChatTitle=document.getElementById('rbChatTitle');
+  const rbOnlineCount=document.getElementById('rbOnlineCount');
+  const rbChatPrompt=document.getElementById('rbChatPrompt');
   const currentDay=Number(scheduleVm?.nextGame?.day || scheduleVm?.currentMatchup?.day || G?.day || 1);
   const matchupRows=buildSimulationHubMatchupRows(scheduleVm, currentDay);
   const hasUpcomingSlate=Array.isArray(matchupRows.rows) && matchupRows.rows.length>0;
+  if(rbChatTitle) rbChatTitle.textContent=threadSurface.title;
+  if(rbOnlineCount) rbOnlineCount.textContent=threadSurface.status;
+  if(rbChatPrompt) rbChatPrompt.textContent=threadSurface.prompt;
   if(settingsLink){
     settingsLink.textContent='Settings';
     settingsLink.setAttribute('onclick',"goPage('commissioner')");
@@ -15067,18 +15096,21 @@ function rbRender(){
   const el = document.getElementById('rbMsgs');
   if(!el) return;
   const msgs = Array.isArray(rbChat.msgs) ? rbChat.msgs : [];
-  const seasonLabel = Array.isArray(D?.teams) && D.teams.length ? `${D.teams.length} teams talking` : 'Season-long multiplayer thread';
+  const threadSurface=getHubThreadSurfaceCopy();
+  const seasonLabel = threadSurface.status;
   const onlineEl = document.getElementById('rbOnlineCount');
   if(onlineEl) onlineEl.textContent = seasonLabel;
+  const titleEl=document.getElementById('rbChatTitle');
+  if(titleEl) titleEl.textContent = threadSurface.title;
   const promptEl = document.getElementById('rbChatPrompt');
   const latestMsg = msgs[msgs.length-1];
   if(promptEl){
     promptEl.textContent = latestMsg
-      ? `Latest from ${latestMsg.sender} · ${rbTime(latestMsg.ts)}`
-      : 'Call your shot, answer trades, or stir the room before the next reveal.';
+      ? `${threadSurface.latestPrefix} ${latestMsg.sender} · ${rbTime(latestMsg.ts)}`
+      : threadSurface.prompt;
   }
   if(!msgs.length){
-    el.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);padding:22px 0;"><div style="font-size:34px;">&#128172;</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">No trash talk yet</div><div style="font-size:12px;">Start the season-long thread.</div></div>';
+    el.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text3);padding:22px 0;"><div style="font-size:34px;">&#128172;</div><div style="font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;">${escapeSimulationShellHtml(threadSurface.emptyTitle)}</div><div style="font-size:12px;">${escapeSimulationShellHtml(threadSurface.emptyBody)}</div></div>`;
     rbLastRenderedCount = 0;
     return;
   }

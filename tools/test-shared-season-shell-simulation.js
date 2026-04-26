@@ -200,6 +200,10 @@ const elements = Object.fromEntries([
   'hubSettingsLink',
   'hubSettingsDivider',
   'hubLeagueTeamsButton',
+  'rbChatTitle',
+  'rbOnlineCount',
+  'rbChatPrompt',
+  'rbMsgs',
   'hubMatchupsTitle',
   'hubMatchupActionTitle',
   'hubMatchupActionSub',
@@ -1534,6 +1538,9 @@ assert.match(elements.hubActivity.innerHTML, /League update|League moves will sh
 assert.match(elements.hubSimRunnerCard.innerHTML, /Reveal Runner|Reveal Day 12 Results|Reveal Ready/, 'simulation hub should render the upgraded center-lane runner card for nba seasons');
 assert.match(elements.hubRevealReportCard.innerHTML, /Reveal reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
 assert.match(elements.hubCycleMeta.textContent, /Local League - Day 12 reveal ready/, 'simulation hub should surface the polished reveal-ready cycle copy for nba seasons');
+assert.equal(elements.rbChatTitle.textContent, 'League Notes', 'simulation hub should repurpose the side thread as a local-league notes surface');
+assert.match(elements.rbOnlineCount.textContent, /local league/i, 'simulation hub should avoid multiplayer thread copy in the side notes surface');
+assert.match(elements.rbChatPrompt.textContent, /trade ideas|roster plans|reveal windows/i, 'simulation hub should give the side notes surface local-league planning copy');
 assert.match(elements.hubPowerups.innerHTML, /Weekly Powerups/, 'simulation hub should reuse the single-player powerup rail');
 assert.match(elements.hubPowerups.innerHTML, /White Gloves/, 'simulation hub should include the familiar white-gloves parity card');
 assert.match(elements.hubPowerups.innerHTML, /Bench Boost/, 'simulation hub should include the familiar bench-boost parity card');
