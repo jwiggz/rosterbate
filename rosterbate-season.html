@@ -9213,9 +9213,14 @@ function renderSimulationHubInSharedShell(){
       : primaryActionCadence;
     hubTeamMeta.textContent=`${teamMetaCycleLabel} · ${sourceLabel}`;
   }
-  document.getElementById('hubCycleMeta').textContent = primaryActionTone==='reveal'
-    ? `Local League - ${primaryActionCadence} reveal ready`
-    : `Simulation - ${primaryActionShortLabel} ready`;
+  const hubCycleMetaLabel = primaryAction?.id === 'season-complete'
+    ? 'Local League · Season Complete'
+    : (primaryAction?.id === 'fix-lineup'
+      ? `Local League · ${isNflSimulation ? 'Fix Weekly Lineup' : 'Fix Lineup Before Reveal'}`
+      : (primaryActionTone === 'reveal'
+        ? `Local League · Reveal ${primaryActionCadence} Ready`
+        : `Local League · ${primaryAction?.label || primaryActionShortLabel} Ready`));
+  document.getElementById('hubCycleMeta').textContent = hubCycleMetaLabel;
   document.getElementById('hubFormat').textContent = vm.formatLabel || D?.leagueShell?.formatLabel || fallbackFormatLabel;
   document.getElementById('hubScoringType').textContent = vm.scoringTypeLabel || 'Head to Head Points';
   document.getElementById('hubTeamCount').textContent = String((D?.leagueShell?.teams || []).length || (isNflSimulation ? 32 : 30));
