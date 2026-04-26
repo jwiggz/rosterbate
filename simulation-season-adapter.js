@@ -1197,11 +1197,24 @@
 
   function buildSimulationTradePartnerRows(state, tradePartners){
     const incomingRostersByTeam = clone(state?.draftState?.rostersByTeam || {});
+    const standings = Array.isArray(state?.seasonState?.standings) ? state.seasonState.standings : [];
     return (Array.isArray(tradePartners) ? tradePartners : []).map((team, index) => ({
+      incomingRoster: clone(incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()] || []),
       id: `trade-partner-${String(team?.abbr || index).trim() || index}`,
       team: clone(team),
       teamAbbr: String(team?.abbr || '').trim().toUpperCase(),
       title: team?.name || team?.abbr || 'Trade Partner',
+      recordLabel: (() => {
+        const row = standings.find((entry) => String(entry?.teamAbbr || '').trim().toUpperCase() === String(team?.abbr || '').trim().toUpperCase()) || null;
+        return row ? `${Number(row?.w || 0)}-${Number(row?.l || 0)}` : '0-0';
+      })(),
+      topPlayerName: (() => {
+        const roster = Array.isArray(incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()])
+          ? incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()]
+          : [];
+        const topPlayer = roster.slice().sort((a, b) => Number(b?.fp || 0) - Number(a?.fp || 0))[0] || null;
+        return topPlayer?.name || '';
+      })(),
       rosterCount: Array.isArray(incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()])
         ? incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()].length
         : 0

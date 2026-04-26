@@ -9540,6 +9540,29 @@ function renderSimulationTradesInSharedShell(){
   const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
   const teamSummary=SEASON_MODE_ADAPTER.getRosterViewModel?.()?.teamSummary || {};
   const heroMeta=buildSimulationHeroMetaLinks(teamSummary);
+  const pendingIncoming=(Array.isArray(G?.tradeOffers) ? G.tradeOffers : []).filter((trade)=>Number(trade?.toTeam)===Number(D?.myPos) && trade?.status==='pending');
+  const pendingOutgoing=(Array.isArray(G?.tradeOffers) ? G.tradeOffers : []).filter((trade)=>Number(trade?.fromTeam)===Number(D?.myPos) && trade?.status==='pending');
+  const renderPendingTradeRows=(rows, sideLabel)=>rows.map((trade)=>{
+    const fromName=escapeSimulationShellHtml(D?.teams?.[Number(trade?.fromTeam)] || 'Team');
+    const toName=escapeSimulationShellHtml(D?.teams?.[Number(trade?.toTeam)] || 'Team');
+    const giveNames=(Array.isArray(trade?.give) ? trade.give : []).map((id)=>{
+      const teamRoster=G?.rosters?.[Number(trade?.fromTeam)] || [];
+      return (teamRoster.find((player)=>Number(player?.id)===Number(id)) || {}).name || '?';
+    }).join(', ');
+    const getNames=(Array.isArray(trade?.get) ? trade.get : []).map((id)=>{
+      const teamRoster=G?.rosters?.[Number(trade?.toTeam)] || [];
+      return (teamRoster.find((player)=>Number(player?.id)===Number(id)) || {}).name || '?';
+    }).join(', ');
+    return `<div class="season-table-card season-card-pad">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--fd);font-weight:800;">${sideLabel}: ${fromName} → ${toName}</div>
+          <div class="season-subbar-copy" style="margin-top:6px;">${escapeSimulationShellHtml(giveNames || 'Unknown')} for ${escapeSimulationShellHtml(getNames || 'Unknown')}</div>
+        </div>
+        <span class="season-stat-pill">Pending</span>
+      </div>
+    </div>`;
+  }).join('') || `<div class="season-table-card season-card-pad">No ${sideLabel.toLowerCase()} right now.</div>`;
   const partnerRows=Array.isArray(vm?.sections?.partners?.rows)
     ? vm.sections.partners.rows
     : (Array.isArray(vm?.tradePartners) ? vm.tradePartners : []);
@@ -9547,9 +9570,17 @@ function renderSimulationTradesInSharedShell(){
     const team=row?.team || row;
     const partnerAbbr=String(team?.abbr || row?.teamAbbr || '').trim();
     return (
-    `<div class="card">
-      <div style="font-family:var(--fd);font-size:16px;font-weight:800;">${team.name}</div>
-      <div style="color:var(--text2);font-size:12px;margin-top:4px;">Pick one player to send and one to receive before the trade is applied.</div>
+    `<div class="season-table-card season-card-pad">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--fd);font-size:16px;font-weight:800;">${team.name}</div>
+          <div style="color:var(--text2);font-size:12px;margin-top:4px;">${escapeSimulationShellHtml(row?.recordLabel || '0-0')} · ${Number(row?.rosterCount || 0)} rostered · ${escapeSimulationShellHtml(row?.topPlayerName ? `Top asset: ${row.topPlayerName}` : 'Review the full roster before proposing a swap.')}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="season-stat-pill">${Number(row?.rosterCount || 0)} players</span>
+          <span class="season-stat-pill">${escapeSimulationShellHtml(row?.teamAbbr || '')}</span>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;">
         <div>
           <label for="simulation-trade-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose outgoing player</label>
@@ -9570,6 +9601,7 @@ function renderSimulationTradesInSharedShell(){
           </select>
         </div>
       </div>
+      <div class="season-subbar-copy" style="margin-top:10px;">One-for-one deals resolve immediately through the simulation backend, so use this desk to test roster fit instead of sending blind packages.</div>
       <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${partnerAbbr}')">Apply Trade</button>
     </div>`
   );}).join('') || '<div class="card">No trade partners available.</div>';
@@ -9583,12 +9615,52 @@ function renderSimulationTradesInSharedShell(){
             ${heroMeta?.links || ''}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <span class="season-stat-pill">Pending Offers</span>
+            <span class="season-stat-pill">${pendingIncoming.length} incoming</span>
+            <span class="season-stat-pill">${pendingOutgoing.length} sent pending</span>
             <span class="season-stat-pill">${partnerRows.length} Partners</span>
           </div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">${partnerCards}</div>
+      <div class="season-now-band">
+        <div class="season-now-card ${pendingIncoming.length ? 'alert' : 'info'}">
+          <div class="season-now-label">Incoming Offers</div>
+          <div class="season-now-value">${pendingIncoming.length ? `${pendingIncoming.length} waiting` : 'Quiet now'}</div>
+          <div class="season-now-copy">${pendingIncoming.length ? 'Another manager is waiting on your response. Review the pending section before you shop a new move.' : 'No one is waiting on your answer right now.'}</div>
+        </div>
+        <div class="season-now-card ${pendingOutgoing.length ? 'live' : 'info'}">
+          <div class="season-now-label">Sent Offers</div>
+          <div class="season-now-value">${pendingOutgoing.length ? `${pendingOutgoing.length} pending` : 'No pressure'}</div>
+          <div class="season-now-copy">${pendingOutgoing.length ? 'Your existing outbound offers are still live. You may want to wait before sending another swap.' : 'You can shop for a clean one-for-one deal from a stable position.'}</div>
+        </div>
+        <div class="season-now-card info">
+          <div class="season-now-label">Trade Lane</div>
+          <div class="season-now-value">${partnerRows.length} partners</div>
+          <div class="season-now-copy">Simulation teams review offers through the shared local-league shell, so this desk should feel like a real trade room instead of a simple picker.</div>
+        </div>
+      </div>
+      <div class="season-split-grid">
+        <div>
+          <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;margin-bottom:8px;">Incoming Offers</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">${renderPendingTradeRows(pendingIncoming, 'Incoming Offer')}</div>
+        </div>
+        <div>
+          <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;margin-bottom:8px;">Sent Offers</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">${renderPendingTradeRows(pendingOutgoing, 'Sent Offer')}</div>
+        </div>
+      </div>
+      <div class="season-table-card season-card-pad">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+          <div>
+            <div style="font-family:var(--fb);font-size:20px;font-weight:800;color:#f8fafc;">Open A Conversation</div>
+            <div class="season-subbar-copy">Pick the roster you want to test for an AI-reviewed one-for-one deal.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="season-stat-pill">${(vm.outgoingRoster || []).length} outgoing options</span>
+            <span class="season-stat-pill">${partnerRows.length} partner lanes</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">${partnerCards}</div>
+      </div>
     </div>`;
 }
 

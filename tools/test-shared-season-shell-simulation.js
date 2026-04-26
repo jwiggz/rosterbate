@@ -781,7 +781,10 @@ const simulationAdapterStub = {
               team: { abbr: 'BOS', name: 'Boston Celtics' },
               incomingRoster: [
                 { id: 30, name: 'Stephen Curry' }
-              ]
+              ],
+              recordLabel: '7-5',
+              topPlayerName: 'Stephen Curry',
+              rosterCount: 13
             }
           ]
         }
@@ -1816,12 +1819,25 @@ assert.deepStrictEqual(
 );
 api.setSeasonModeAdapter(simulationAdapterStub);
 
+api.setGame({
+  ...api.getGame(),
+  tradeOffers: [
+    { fromTeam: 1, toTeam: 0, give: [30], get: [34], status: 'pending' },
+    { fromTeam: 0, toTeam: 1, give: [34], get: [30], status: 'pending' }
+  ]
+});
 api.renderSimulationTradesInSharedShell();
 assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
 assert.match(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/);
 assert.match(elements.tradesContent.innerHTML, /Choose outgoing player/i);
 assert.match(elements.tradesContent.innerHTML, /Choose incoming player/i);
 assert.match(elements.tradesContent.innerHTML, /Trade Desk|Pending Offers/, 'simulation trades should feel like the single-player trade desk');
+assert.match(elements.tradesContent.innerHTML, /Incoming Offers/i, 'simulation trades should render an incoming-offers lane');
+assert.match(elements.tradesContent.innerHTML, /Sent Offers/i, 'simulation trades should render a sent-offers lane');
+assert.match(elements.tradesContent.innerHTML, /Open A Conversation/i, 'simulation trades should render the richer conversation section');
+assert.match(elements.tradesContent.innerHTML, /7-5/, 'simulation trades should surface partner record context');
+assert.match(elements.tradesContent.innerHTML, /Top asset: Stephen Curry/, 'simulation trades should surface partner top-player context');
+assert.match(elements.tradesContent.innerHTML, /13 players/, 'simulation trades should surface partner roster counts');
 
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];
