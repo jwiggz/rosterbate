@@ -866,7 +866,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             <div class="hub-card-head">
               <div class="hub-card-head-copy">
                 <div class="hub-card-title" style="text-align:left;margin-bottom:0;">League Activity</div>
-                <div class="hub-card-sub">Trades, waivers, reveals, and commissioner moves in one running feed.</div>
+                <div class="hub-card-sub">Trades, waivers, reveal windows, and league moves in one running feed.</div>
               </div>
               <div class="hub-card-meta" id="hubActivityMeta">Quiet now</div>
             </div>
@@ -9393,7 +9393,7 @@ function renderSimulationHubInSharedShell(){
             </div>
           </div>`;
         }).join('')
-      : '<div style="padding:14px 4px;text-align:center;color:var(--text3);font-size:12px;">League moves will show up here as managers add, drop, and trade.</div>';
+      : '<div style="padding:14px 4px;text-align:center;color:var(--text3);font-size:12px;">League moves will show up here as teams add, drop, trade, and tune their lineups.</div>';
   }
   const simRunnerMount=document.getElementById('hubSimRunnerCard');
   if(simRunnerMount){
