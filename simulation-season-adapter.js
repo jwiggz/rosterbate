@@ -337,6 +337,22 @@
     return `${cycleLabel} ${nextGame.home ? 'vs' : '@'} ${nextGame.opponentName || nextGame.opponentAbbr || 'Opponent'}`;
   }
 
+  function normalizeSimulationRecentResult(state, game){
+    const nextGame = game && typeof game === 'object' ? game : {};
+    const teams = Array.isArray(state?.leagueShell?.teams) ? state.leagueShell.teams : [];
+    const homeIdx = Number(nextGame?.home);
+    const awayIdx = Number(nextGame?.away);
+    const homeTeam = Number.isFinite(homeIdx) ? teams[homeIdx] || null : null;
+    const awayTeam = Number.isFinite(awayIdx) ? teams[awayIdx] || null : null;
+    return {
+      ...clone(nextGame),
+      homeAbbr: String(nextGame?.homeAbbr || homeTeam?.abbr || '').trim().toUpperCase(),
+      awayAbbr: String(nextGame?.awayAbbr || awayTeam?.abbr || '').trim().toUpperCase(),
+      homeName: nextGame?.homeName || homeTeam?.name || homeTeam?.displayName || (Number.isFinite(homeIdx) ? `Team ${homeIdx + 1}` : 'Home Team'),
+      awayName: nextGame?.awayName || awayTeam?.name || awayTeam?.displayName || (Number.isFinite(awayIdx) ? `Team ${awayIdx + 1}` : 'Away Team')
+    };
+  }
+
   function buildSimulationTeamLineupSnapshot(state, teamAbbr){
     const normalizedTeamAbbr = String(teamAbbr || '').trim().toUpperCase();
     if (!normalizedTeamAbbr) {
@@ -2338,7 +2354,10 @@
         const scheduleByDay = getCanonicalScheduleByDay(state, state?.leagueShell || {});
         const nextGame = buildSimulationNextGame(state, scheduleByDay);
         const sport = getSimulationSportForState(state);
-        const recentResults = clone(state?.seasonState?.completedGameLogs || []).slice(-10).reverse();
+        const recentResults = clone(state?.seasonState?.completedGameLogs || [])
+          .slice(-10)
+          .reverse()
+          .map((game) => normalizeSimulationRecentResult(state, game));
         const matchupContext = buildSimulationMatchupContext(state, scheduleByDay, nextGame, recentResults);
         return {
           sport,

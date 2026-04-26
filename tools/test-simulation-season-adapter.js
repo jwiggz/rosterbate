@@ -277,6 +277,23 @@ assert.equal(positionedNbaRosterVm.lineupSlots.SF.suggestedPlayerId, 31, 'nba ro
 assert.equal(positionedNbaRosterVm.lineupSlots.PF.suggestedPlayerId, 55, 'nba roster vm should expose the slot-aware suggested forward for PF');
 assert.equal(positionedNbaRosterVm.lineupSlots.C.suggestedPlayerId, 34, 'nba roster vm should expose the slot-aware suggested center for C');
 
+const indexOnlyResultAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-index-only-results',
+  state: {
+    ...slotState,
+    seasonState: {
+      ...slotState.seasonState,
+      completedGameLogs: [
+        { day: 11, home: 0, away: 1, homeName: 'Los Angeles Lakers', awayName: 'Boston Celtics', homeScore: 112, awayScore: 108 }
+      ]
+    }
+  }
+});
+
+const indexOnlyScheduleVm = indexOnlyResultAdapter.getScheduleViewModel();
+assert.equal(indexOnlyScheduleVm.recentResults[0]?.homeAbbr, 'LAL', 'schedule vm should backfill home abbreviations from team indexes when game logs omit them');
+assert.equal(indexOnlyScheduleVm.recentResults[0]?.awayAbbr, 'BOS', 'schedule vm should backfill away abbreviations from team indexes when game logs omit them');
+
 const schedule = adapter.getScheduleViewModel();
 assert.equal(schedule.recentResults.length, 1);
 assert.equal(schedule.recentResults[0].homeAbbr, 'LAL');

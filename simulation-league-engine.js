@@ -1084,6 +1084,27 @@
       : convertFantasyTotalToNbaScore(total);
   }
 
+  function resolveRenderedGameScores(game, state){
+    const homeScore=convertFantasyTotalToRenderedScore(game?.homeTotal, state);
+    const awayScore=convertFantasyTotalToRenderedScore(game?.awayTotal, state);
+    if(getSimulationSport(state)!=='nfl'){
+      return {
+        homeScore:homeScore,
+        awayScore:awayScore
+      };
+    }
+    const winner=String(game?.winner || '').trim().toLowerCase();
+    if(homeScore!==awayScore || (winner!=='home' && winner!=='away')){
+      return {
+        homeScore:homeScore,
+        awayScore:awayScore
+      };
+    }
+    return winner==='home'
+      ? { homeScore:homeScore + 1, awayScore:awayScore }
+      : { homeScore:homeScore, awayScore:awayScore + 1 };
+  }
+
   function simulateLeagueDay(options){
     const opts=options && typeof options==='object' ? options : {};
     const state=opts.state || {};
@@ -1246,9 +1267,13 @@
     return Object.assign({}, lowLevel, {
       resultsByTeam:filteredResultsByTeam,
       gameLogs:lowLevel.gameLogs.map(function(game){
+        const renderedScores=resolveRenderedGameScores({
+          ...game,
+          winner:game.homeTotal >= game.awayTotal ? 'home' : 'away'
+        }, state);
         return Object.assign({}, game, {
-          homeScore:convertFantasyTotalToRenderedScore(game.homeTotal, state),
-          awayScore:convertFantasyTotalToRenderedScore(game.awayTotal, state),
+          homeScore:renderedScores.homeScore,
+          awayScore:renderedScores.awayScore,
           outcomeSource:'simulation_engine',
           winner:game.homeTotal >= game.awayTotal ? 'home' : 'away'
         });
@@ -1305,6 +1330,7 @@
     advanceSimulationSeries:advanceSimulationSeries,
     finalizeSimulationChampion:finalizeSimulationChampion,
     simulateSimulationGameDay:simulateSimulationGameDay,
+    resolveRenderedGameScores:resolveRenderedGameScores,
     applySimulationDayResults:applySimulationDayResults,
     computeFantasyPoints:computeFantasyPoints
   };

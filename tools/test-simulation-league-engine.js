@@ -6,7 +6,8 @@ const { getSimulationShell } = require('../simulation-mode-config.js');
 const {
   buildSimulationSeasonSchedule,
   simulateSimulationGameDay,
-  applySimulationDayResults
+  applySimulationDayResults,
+  resolveRenderedGameScores
 } = require('../simulation-league-engine.js');
 
 const shell = getSimulationShell();
@@ -416,6 +417,25 @@ assert.equal(
   roundedTieUpdated.currentWeek,
   2,
   'direct nfl engine callers should advance the simulation week one-for-one with each completed week'
+);
+
+const renderedNflTieBreakResult = resolveRenderedGameScores({
+  homeTotal: 0.2,
+  awayTotal: 0.4,
+  winner: 'away'
+}, {
+  sport: 'nfl'
+});
+
+assert.equal(
+  renderedNflTieBreakResult.homeScore,
+  8,
+  'nfl rendered score tie-breaks should keep the loser on the rounded baseline when totals collapse'
+);
+assert.equal(
+  renderedNflTieBreakResult.awayScore,
+  9,
+  'nfl rendered score tie-breaks should bump the displayed winner by one point when rounded totals would otherwise tie'
 );
 
 console.log('simulation league engine test passed');
