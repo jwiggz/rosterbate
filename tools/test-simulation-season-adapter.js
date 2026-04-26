@@ -131,11 +131,14 @@ assert.match(adapterSource, /runtimeApi\.applySimulationTrade\(/, 'adapter trade
 assert.match(adapterSource, /runtimeApi\.activateSimulationPowerup\(/, 'adapter powerup mutation should stay runtime-backed');
 assert.match(adapterSource, /gameLog\?\.winner/, 'postseason advancement should prefer the authoritative game winner over rounded display scores');
 
-const hub = adapter.getHubViewModel();
-assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
-assert.equal(hub.controlledTeam.abbr, 'LAL');
-assert.equal(hub.primaryAction.label, 'Sim Day');
-assert.equal(hub.statSourceLabel, 'Simulated', 'single-player replacement hub vm should label engine-backed output as simulated');
+  const hub = adapter.getHubViewModel();
+  assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
+  assert.equal(hub.controlledTeam.abbr, 'LAL');
+  assert.equal(hub.primaryAction.label, 'Reveal Day 12 Results');
+  assert.equal(hub.primaryAction.shortLabel, 'Reveal Day');
+  assert.equal(hub.primaryAction.cadenceLabel, 'Day 12');
+  assert.equal(hub.primaryAction.shellTone, 'reveal');
+  assert.equal(hub.statSourceLabel, 'Simulated', 'single-player replacement hub vm should label engine-backed output as simulated');
 assert.deepStrictEqual(hub.sourceSeasonLabels, ['1986-87', '1995-96', '2015-16']);
 assert.ok(Array.isArray(hub.summaryCards), 'hub vm should expose summaryCards for shared-shell parity');
 assert.ok(Array.isArray(hub.powerupCards), 'hub vm should expose powerupCards for shared-shell parity');
@@ -1273,10 +1276,11 @@ const nflAdapter = createSimulationSeasonAdapter({
   state: nflState
 });
 
-assert.equal(nflAdapter.getModeId(), 'nfl_mixed_era_single_player_v1');
-assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Simulation');
-assert.equal(nflAdapter.getHubViewModel().primaryAction.label, 'Sim Week');
-assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');
+  assert.equal(nflAdapter.getModeId(), 'nfl_mixed_era_single_player_v1');
+  assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Simulation');
+  assert.equal(nflAdapter.getHubViewModel().primaryAction.label, 'Sim Week 1');
+  assert.equal(nflAdapter.getHubViewModel().primaryAction.shortLabel, 'Sim Week');
+  assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');
 assert.equal(nflAdapter.getWaiverViewModel().claimTimingLabel, 'Processing next sim week', 'nfl waiver desks should stay week-based');
 assert.ok(Array.isArray(nflAdapter.getWaiverViewModel().sections?.recent?.rows), 'nfl waiver desks should keep shared-shell recent-result sections available');
 assert.equal(
@@ -1540,8 +1544,8 @@ const emptyNflLineupAdapter = createSimulationSeasonAdapter({
   state: emptyNflLineupState
 });
 
-assert.equal(emptyNflLineupAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
-assert.equal(emptyNflLineupAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
+  assert.equal(emptyNflLineupAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
+  assert.equal(emptyNflLineupAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
 
 const emptyNflPostseasonAdapter = createSimulationSeasonAdapter({
   slotId: 'nfl-slot-empty-postseason',
@@ -1553,8 +1557,8 @@ const emptyNflPostseasonAdapter = createSimulationSeasonAdapter({
   }
 });
 
-assert.equal(emptyNflPostseasonAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
-assert.equal(emptyNflPostseasonAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
+  assert.equal(emptyNflPostseasonAdapter.getHubViewModel().primaryAction.id, 'fix-lineup');
+  assert.equal(emptyNflPostseasonAdapter.getHubViewModel().primaryAction.label, 'Fix Lineup');
 const blockedPostseasonState = emptyNflPostseasonAdapter.simulateNextDay();
 assert.equal(blockedPostseasonState.postseasonState.phase, 'wild_card');
 assert.equal(blockedPostseasonState.seasonState.currentWeek, 1);

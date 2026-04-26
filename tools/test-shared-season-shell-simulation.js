@@ -563,7 +563,7 @@ const simulationAdapterStub = {
       controlledTeam: { abbr: 'LAL', name: 'Los Angeles Lakers' },
       userRow: { w: 9, l: 3, streak: 'W3' },
       recordLabel: '9-3',
-      primaryAction: { label: 'Sim Day' },
+        primaryAction: { label: 'Reveal Day 12 Results', shortLabel: 'Reveal Day', cadenceLabel: 'Day 12', shellTone: 'reveal' },
       sourceSeasonLabels: ['1986-87', '1995-96', '2015-16'],
       powerupCards: [
         {
@@ -1531,8 +1531,9 @@ assert.match(elements.hubMatchups.innerHTML, /CHI[\s\S]*vs[\s\S]*LAL|BOS[\s\S]*v
 assert.match(elements.hubStandingsMini.innerHTML, /LAL/, 'simulation hub should render the mini standings board');
 assert.match(elements.hubNowBand.innerHTML, /Watch List|Trade Desk/, 'simulation hub should render the live now-band cards');
 assert.match(elements.hubActivity.innerHTML, /League update|League moves will show up here/, 'simulation hub should render the league activity feed');
-assert.match(elements.hubSimRunnerCard.innerHTML, /Simulation Runner|Sim Day|Sim Ready/, 'simulation hub should render the sim runner card for nba seasons');
-assert.match(elements.hubRevealReportCard.innerHTML, /Sim day reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
+assert.match(elements.hubSimRunnerCard.innerHTML, /Reveal Runner|Reveal Day 12 Results|Reveal Ready/, 'simulation hub should render the upgraded center-lane runner card for nba seasons');
+assert.match(elements.hubRevealReportCard.innerHTML, /Reveal reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
+assert.match(elements.hubCycleMeta.textContent, /Local League - Day 12 reveal ready/, 'simulation hub should surface the polished reveal-ready cycle copy for nba seasons');
 assert.match(elements.hubPowerups.innerHTML, /Weekly Powerups/, 'simulation hub should reuse the single-player powerup rail');
 assert.match(elements.hubPowerups.innerHTML, /White Gloves/, 'simulation hub should include the familiar white-gloves parity card');
 assert.match(elements.hubPowerups.innerHTML, /Bench Boost/, 'simulation hub should include the familiar bench-boost parity card');
@@ -2743,7 +2744,7 @@ api.setSeasonModeAdapter({
       controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
       userRow: { w: 0, l: 0, streak: 'EVEN' },
       recordLabel: '0-0',
-      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+        primaryAction: { id: 'sim-day', label: 'Sim Week 1', shortLabel: 'Sim Week', cadenceLabel: 'Week 1', shellTone: 'sim-week' },
       sourceSeasonLabels: ['2014']
     };
   },
@@ -2825,7 +2826,7 @@ api.setData({
 });
 
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Sim Week', 'nfl hub should expose a weekly simulation action');
+assert.equal(elements.advBtn.textContent, 'Sim Week 1', 'nfl hub should expose a weekly simulation action');
 assert.equal(elements.hubScoringType.textContent, 'Simulated NFL Results', 'nfl hub should use football result copy');
 assert.equal(elements.advBtn.disabled, false, 'nfl hub sim CTA should remain enabled during regular season');
 
@@ -3026,7 +3027,7 @@ api.setSeasonModeAdapter({
       controlledTeam: { abbr: 'DAL', name: 'Dallas Cowboys' },
       userRow: { w: 12, l: 4, streak: 'W2' },
       recordLabel: '12-4',
-      primaryAction: { id: 'sim-day', label: 'Sim Week' },
+        primaryAction: { id: 'sim-day', label: 'Sim Week 1', shortLabel: 'Sim Week', cadenceLabel: 'Week 1', shellTone: 'sim-week' },
       sourceSeasonLabels: ['2014']
     };
   },
@@ -3100,7 +3101,7 @@ assert.match(elements.playoffsContent.innerHTML, /Super Bowl XLIX/i, 'nfl playof
 assert.match(elements.playoffsContent.innerHTML, /BAL\s*@\s*IND/i, 'nfl playoffs screen should render afc matchup abbreviations');
 assert.match(elements.playoffsContent.innerHTML, /DET\s*@\s*DAL/i, 'nfl playoffs screen should render nfc matchup abbreviations');
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.advBtn.textContent, 'Sim Week', 'active nfl postseason hub states should keep the Sim Week CTA available');
+assert.equal(elements.advBtn.textContent, 'Sim Week 1', 'active nfl postseason hub states should keep the Sim Week CTA available');
 assert.equal(elements.advBtn.onclick, 'advanceWeek()', 'active nfl postseason hub CTA should keep advancing the bracket');
 
 api.setSeasonModeAdapter({

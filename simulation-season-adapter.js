@@ -898,22 +898,53 @@
     const sport = getSimulationSportForState(state);
     const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
     if (sport !== 'nfl') {
-      return { id: 'sim-day', label: 'Sim Day' };
+      const currentDay = Number(state?.seasonState?.currentDay || 1);
+      return {
+        id: 'sim-day',
+        label: `Reveal Day ${currentDay} Results`,
+        shortLabel: 'Reveal Day',
+        cadenceLabel: `Day ${currentDay}`,
+        shellTone: 'reveal'
+      };
     }
     const normalizedState = normalizeLegacyNflLineupSlots(state);
     const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
       ? runtimeApi.validateSimulationLineup(clone(normalizedState), getControlledTeamAbbr(normalizedState))
       : { valid: true, issues: [] };
     if (!validation.valid) {
-      return { id: 'fix-lineup', label: 'Fix Lineup' };
+      return {
+        id: 'fix-lineup',
+        label: 'Fix Lineup',
+        shortLabel: 'Fix Lineup',
+        cadenceLabel: `Week ${Number(state?.seasonState?.currentWeek || state?.seasonState?.currentDay || 1)}`,
+        shellTone: 'fix-lineup'
+      };
     }
     if (postseasonPhase === 'completed') {
-      return { id: 'season-complete', label: 'Season Complete' };
+      return {
+        id: 'season-complete',
+        label: 'Season Complete',
+        shortLabel: 'Season Complete',
+        cadenceLabel: formatSimulationCycleLabel(state),
+        shellTone: 'complete'
+      };
     }
     if (postseasonPhase === 'postseason_ready') {
-      return { id: 'review-playoffs', label: 'Review Playoffs' };
+      return {
+        id: 'review-playoffs',
+        label: 'Review Playoffs',
+        shortLabel: 'Review Playoffs',
+        cadenceLabel: formatSimulationCycleLabel(state),
+        shellTone: 'postseason'
+      };
     }
-    return { id: 'sim-day', label: 'Sim Week' };
+    return {
+      id: 'sim-day',
+      label: `Sim Week ${Number(state?.seasonState?.currentWeek || state?.seasonState?.currentDay || 1)}`,
+      shortLabel: 'Sim Week',
+      cadenceLabel: `Week ${Number(state?.seasonState?.currentWeek || state?.seasonState?.currentDay || 1)}`,
+      shellTone: 'sim-week'
+    };
   }
 
   function getSimulationStarterSlotsForState(state){
