@@ -3045,7 +3045,7 @@ api.setSeasonModeAdapter({
 
 api.renderSimulationHubInSharedShell();
 assert.match(elements.advBtn.innerHTML, /Fix Lineup/, 'nfl hub should surface the fix-lineup CTA when the weekly lineup is invalid');
-assert.match(elements.advBtn.innerHTML, /Set a legal lineup before the next sim/, 'fix-lineup CTA should explain the blocking issue');
+assert.match(elements.advBtn.innerHTML, /Set a legal lineup before the next league window/, 'fix-lineup CTA should explain the blocking issue');
 assert.equal(elements.advBtn.disabled, false, 'fix-lineup CTA should stay actionable from the hub');
 assert.equal(elements.advBtn.onclick, "goPage('roster')", 'fix-lineup CTA should route the user straight to the roster tab');
 
