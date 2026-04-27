@@ -10607,7 +10607,7 @@ function renderSimulationScheduleInSharedShell(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
           <div>
             <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">${escapeHtml(hero?.title || 'Current Matchup')}</div>
-            <div class="season-subbar-copy">${escapeHtml(hero?.subtitle || vm?.title || 'Schedule / Results')}</div>
+            <div class="season-subbar-copy">${escapeHtml(hero?.subtitle || vm?.title || 'Matchup / Results')}</div>
             ${heroMeta?.links || ''}
             ${renderNavigation()}
           </div>
@@ -12160,7 +12160,7 @@ function renderRoster(){
   }).join('');
   const tabButtons=`<div class="season-mini-tabs">
         <button type="button" class="season-mini-tab ${rosterTab==='stats'?'on':''}" onclick="rosterTab='stats';renderRoster()">Stats</button>
-        <button type="button" class="season-mini-tab ${rosterTab==='schedule'?'on':''}" onclick="rosterTab='schedule';renderRoster()">Schedule</button>
+        <button type="button" class="season-mini-tab ${rosterTab==='schedule'?'on':''}" onclick="rosterTab='schedule';renderRoster()">Matchup</button>
       </div>`;
   const dateSummary=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
     <div class="season-soft-muted" style="font-size:14px;white-space:nowrap;">${DAY_NAMES[dayOfWeek(day)-1]} ${dateLabel} · Week ${week}</div>

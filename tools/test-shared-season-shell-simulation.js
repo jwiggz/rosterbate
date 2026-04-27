@@ -1700,7 +1700,7 @@ api.setSeasonModeAdapter({
   ...simulationAdapterStub,
   getScheduleViewModel() {
     return {
-      title: 'Schedule / Results',
+      title: 'Matchup / Results',
       cycleLabel: 'Day 12 - Week 2',
       detailCards: [
         { key: 'cycle', label: 'Season Cycle', value: 'Day 12 - Week 2' },
@@ -3269,7 +3269,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Week 1',
       recentResults: [
         { awayAbbr: 'PHI', awayScore: 17, homeAbbr: 'DAL', homeScore: 24 }
