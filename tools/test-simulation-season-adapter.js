@@ -209,10 +209,26 @@ assert.deepStrictEqual(
   ],
   'single-source simulation hubs should downgrade the era pill to a source-pool pill cleanly'
 );
+  assert.equal(
+    singleSourceLeagueAdapter.getHubViewModel().leagueLabel,
+    '2025-26 NBA Local League',
+    'single-source unnamed leagues should default to a local-league identity instead of a generic simulation label'
+  );
+
+const genericPlaceholderLeagueAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-generic-placeholder-name',
+  state: {
+    ...slotState,
+    leagueName: 'Simulation Archive Lab',
+    sourceSeasons: {
+      sourceSeasonLabels: ['2025-26 NBA']
+    }
+  }
+});
 assert.equal(
-  singleSourceLeagueAdapter.getHubViewModel().leagueLabel,
+  genericPlaceholderLeagueAdapter.getHubViewModel().leagueLabel,
   '2025-26 NBA Local League',
-  'single-source unnamed leagues should default to a local-league identity instead of a generic simulation label'
+  'generic setup/archive placeholder names should not override the refined local-league fallback label'
 );
 
 const unrelatedPowerupAdapter = createSimulationSeasonAdapter({

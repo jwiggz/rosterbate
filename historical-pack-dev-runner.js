@@ -601,7 +601,7 @@
     root.innerHTML=
       '<div class="rbh-shell">'+
         '<button type="button" class="rbh-toggle" data-role="toggle" aria-expanded="false">'+
-      '<span class="rbh-toggle-badge"><span class="rbh-dot"></span><span>Simulation Archive Lab</span></span>'+
+      '<span class="rbh-toggle-badge"><span class="rbh-dot"></span><span>Dev Tools</span></span>'+
           '<span class="rbh-toggle-meta" data-role="toggle-meta">Open</span>'+
         '</button>'+
         '<div class="rbh-body">'+

@@ -285,16 +285,22 @@
     return `Waiver Order (${displayIndex} of ${resolvedTeamCount})`;
   }
 
-function buildSimulationLeagueLabel(state, sport){
-  const explicitLeagueName = String(
-    state?.leagueName ||
-    state?.leagueShell?.leagueName ||
+  function buildSimulationLeagueLabel(state, sport){
+    const explicitLeagueName = String(
+      state?.leagueName ||
+      state?.leagueShell?.leagueName ||
       ''
     ).trim();
-  if (explicitLeagueName) return explicitLeagueName;
-  const sourceSeasonLabels = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
-    ? state.sourceSeasons.sourceSeasonLabels.filter(Boolean)
-    : [];
+    const normalizedExplicitLeagueName = explicitLeagueName.toLowerCase();
+    const isGenericSimulationPlaceholder = normalizedExplicitLeagueName === 'simulation archive lab'
+      || normalizedExplicitLeagueName === 'simulation archive'
+      || normalizedExplicitLeagueName === 'simulation league'
+      || normalizedExplicitLeagueName === 'nba simulation'
+      || normalizedExplicitLeagueName === 'nfl simulation';
+    if (explicitLeagueName && !isGenericSimulationPlaceholder) return explicitLeagueName;
+    const sourceSeasonLabels = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
+      ? state.sourceSeasons.sourceSeasonLabels.filter(Boolean)
+      : [];
   if (sourceSeasonLabels.length > 1) return 'Mixed Era Local League';
   const anchorSeasonLabel = String(
     state?.leagueShell?.anchorSeasonLabel ||

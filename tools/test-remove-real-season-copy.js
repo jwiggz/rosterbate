@@ -196,7 +196,7 @@ assert.doesNotMatch(
 );
 assert.match(
   files.historicalPackFixtures,
-  /simulation archive boot development|Simulation Archive Lab|simulation archive/i,
+  /simulation archive boot development|Dev Tools|simulation archive/i,
   'historical-pack-fixtures.js should describe fallback fixture content with simulation-first wording'
 );
 assert.doesNotMatch(
