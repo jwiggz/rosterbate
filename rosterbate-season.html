@@ -992,7 +992,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       <a href="index.html" class="season-chip action" style="text-decoration:none;">Home</a>
     </div>
   </div>
-  <div class="season-page-note">Simulation mode only. This screen reflects adapter-driven postseason state, including postseason-ready handoff views when a league stops short of live playoff simulation.</div>
+  <div class="season-page-note">Local league postseason view. This screen reflects adapter-driven postseason state, including postseason-ready handoff views when a league stops short of live playoff simulation.</div>
   <div class="sbb season-light-body">
     <div class="season-screen-shell">
       <div class="season-screen-main" id="playoffsContent"></div>
@@ -1884,10 +1884,10 @@ function renderSimulationRunnerCard(snapshot){
   const primaryLabel=`Reveal Day ${snapshot.day}`;
   const topGameLine=snapshot.latestTopGame
     ? `${snapshot.latestTopGame.homeName} ${Number(snapshot.latestTopGame.homeTotal||0).toFixed(1)} - ${Number(snapshot.latestTopGame.awayTotal||0).toFixed(1)} ${snapshot.latestTopGame.awayName}`
-    : 'No simulated reveal has landed yet.';
+    : 'No league report has landed yet.';
   const topPerformerLine=snapshot.latestTopPerformer
     ? `${snapshot.latestTopPerformer.name} led the last reveal with ${Number(snapshot.latestTopPerformer.score||0).toFixed(1)} fantasy points.`
-    : 'Your next sim day will generate a fresh top-performer board.';
+    : 'Your next reveal window will generate a fresh top-performer board.';
   return `
     <div class="hub-sim-grid">
       <div class="hub-sim-copy">
@@ -1911,7 +1911,7 @@ function renderSimulationRunnerCard(snapshot){
         <div class="hub-sim-stat">
           <div class="hub-sim-stat-label">Today</div>
           <div class="hub-sim-stat-value">${snapshot.myFilled}/${snapshot.requiredSlots}</div>
-          <div class="hub-sim-stat-copy">${myLineupReady?'Your board is locked in for the next simulation run.':'Your lineup still has open starter pressure before the next run.'}</div>
+          <div class="hub-sim-stat-copy">${myLineupReady?'Your board is locked in for the next reveal window.':'Your lineup still has open starter pressure before the next reveal window.'}</div>
         </div>
         <div class="hub-sim-mini-list">
           <div class="hub-sim-mini-item">
@@ -8950,7 +8950,7 @@ function buildSimulationHubPowerupRail(powerupCards){
   const cards=Array.isArray(powerupCards) ? powerupCards : [];
   if(!cards.length) return `<div class="hub-card">
     <div class="hub-card-title">Weekly Powerups</div>
-    <div class="hub-card-sub">Simulation powerups will appear here once the shared shell wires live activation controls.</div>
+    <div class="hub-card-sub">Powerups will show up here once this local league unlocks live activation controls.</div>
   </div>`;
   return `<div class="hub-card">
     <div class="hub-card-title">Weekly Powerups</div>
@@ -8962,7 +8962,7 @@ function buildSimulationHubPowerupRail(powerupCards){
             <div class="hub-powerup-meta">${escapeSimulationShellHtml(card?.status || (card?.active ? 'Active' : 'Available soon'))}</div>
           </div>
         </div>
-        <div class="hub-powerup-copy">${escapeSimulationShellHtml(card?.body || card?.description || 'Simulation shell parity card.')}</div>
+        <div class="hub-powerup-copy">${escapeSimulationShellHtml(card?.body || card?.description || 'Future unlock for this local league.')}</div>
         ${Array.isArray(card?.targetOptions) && card.targetOptions.length
           ? `<div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
               <label for="simulation-hub-powerup-target-${escapeSimulationShellHtml(card?.powerupId || card?.key || 'powerup')}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:#cbd5e1;">${escapeSimulationShellHtml(card?.targetLabel || 'Target')}</label>
@@ -8979,7 +8979,7 @@ function buildSimulationHubPowerupRail(powerupCards){
 
 function applySimulationPowerupFromShell(powerupId, targetId){
   if(!(SEASON_MODE_ADAPTER && typeof SEASON_MODE_ADAPTER.activateSimulationPowerup==='function')){
-    if(typeof toast==='function') toast('Simulation powerups are not available right now.');
+    if(typeof toast==='function') toast('Powerups are not available right now.');
     return;
   }
   const normalizedPowerupId=String(powerupId || '').trim().toLowerCase();
@@ -11510,7 +11510,7 @@ function renderHub(){
   if(G.isSeasonComplete){
     ab.classList.add('is-done');
     ab.classList.remove('is-sim');
-    ab.innerHTML=`<span class="season-reveal-btn-label">${isSimulationSeason?'Sim Season Complete':'Season Complete'}</span><span class="season-reveal-btn-sub">League history locked in</span>`;
+    ab.innerHTML=`<span class="season-reveal-btn-label">Season Complete</span><span class="season-reveal-btn-sub">League history locked in</span>`;
     ab.disabled=true;
   }else{
     ab.classList.remove('is-done');
