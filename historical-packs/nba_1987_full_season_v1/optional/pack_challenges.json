@@ -4,7 +4,7 @@
   "challengeGroups": [
     {
       "groupId": "historic_season_paths",
-      "label": "Sim Season Paths",
+    "label": "Simulation League Paths",
       "mode": "simulation_season"
     },
     {
@@ -24,7 +24,7 @@
       "mode": "simulation_season",
       "path": "featured_team_path",
       "title": "Keep Showtime On Top",
-      "description": "Take the featured Lakers lane and clear 60 wins in a season whose schedule/results come from the historical foundation while player-game box lines remain explicitly inferred.",
+    "description": "Take the featured Lakers lane and clear 60 wins in a season whose schedule/results come from the source-season foundation while player-game box lines remain explicitly inferred.",
       "type": "season_wins_min",
       "target": 60,
       "evaluation": "season_end",
@@ -50,7 +50,7 @@
       "mode": "historical_draft",
       "path": "alternate_history_success",
       "title": "Draft The Superteam",
-      "description": "Redraft 1986-87 from the full player pool, knowing the schedule/results come from the historical foundation while the player-game box lines are weighted season estimates.",
+    "description": "Redraft 1986-87 from the full player pool, knowing the schedule/results come from the source-season foundation while the player-game box lines are weighted season estimates.",
       "type": "season_wins_min",
       "target": 58,
       "evaluation": "season_end",

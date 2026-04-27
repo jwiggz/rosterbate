@@ -75,7 +75,7 @@ assert.match(
 );
 assert.match(
   files.index,
-  /Simulation Archives|Browse Simulation Archives|Simulation Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|local league manager|saved sim run left off|Choose one of your local saves/i,
+  /Simulation Archives|Browse Simulation Archives|Simulation Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|local league manager|saved local league left off|Choose one of your local saves/i,
   'index.html should frame homepage archive and local-league entry points with simulation-first wording'
 );
 assert.match(
@@ -135,8 +135,8 @@ assert.match(
 );
 assert.match(
   files.myLeagues,
-  /Local Leagues|local simulation league|saved sim leagues/i,
-  'my-leagues.html should describe local saves as simulation-backed local leagues'
+  /Local Leagues|local league|saved local leagues/i,
+  'my-leagues.html should describe local saves with local league wording'
 );
 assert.match(
   files.myLeagues,

@@ -4,7 +4,7 @@
   "challengeGroups": [
     {
       "groupId": "historic_season_paths",
-      "label": "Sim Season Paths",
+    "label": "Simulation League Paths",
       "mode": "simulation_season"
     },
     {

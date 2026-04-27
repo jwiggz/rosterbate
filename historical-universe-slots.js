@@ -323,7 +323,7 @@
 
   function getSimulationSubtitle(state){
     const controlledTeam = getSimulationControlledTeam(state);
-    const teamLabel = String(controlledTeam?.name || controlledTeam?.abbr || 'Simulation universe').trim();
+    const teamLabel = String(controlledTeam?.name || controlledTeam?.abbr || 'Simulation league').trim();
     return teamLabel + ' - ' + getSimulationProgressLabel(state);
   }
 
@@ -374,7 +374,7 @@
       : [];
     return {
       slotId,
-      title: leagueName + ' - Simulation Universe',
+      title: leagueName + ' - Simulation League',
       subtitle: getSimulationSubtitle(state),
       sport: normalizeSport(state?.sport || state?.leagueShell?.sport || 'nba'),
       historicalPackId: String(state?.sourceSeasons?.mixedEraConfigId || state?.mixedEraConfigId || state?.historicalPackId || '').trim() || null,

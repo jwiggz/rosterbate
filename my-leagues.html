@@ -177,14 +177,14 @@
       <div class="hero-stat">
         <div class="hero-stat-value">-</div>
         <div class="hero-stat-label">Local Saves</div>
-        <div class="hero-stat-copy">Finding your saved sim leagues.</div>
+        <div class="hero-stat-copy">Finding your saved local leagues.</div>
       </div>
     </div>
     <div class="hero">
       <div class="hero-copy">
         <div class="hero-kicker">Control Room Entry</div>
         <h1>My Leagues</h1>
-        <p>All your draft rooms, shared seasons, and local sim leagues. Draft rooms stay grouped separately from active league saves so it's easy to reopen the right experience.</p>
+        <p>All your draft rooms, shared seasons, and local leagues. Draft rooms stay grouped separately from active league saves so it's easy to reopen the right experience.</p>
       </div>
       <div class="hero-actions">
         <a href="rosterbate-matchmaking.html" class="btn primary">Create or Join League</a>
@@ -218,7 +218,7 @@
       <div class="section-head">
         <div>
           <div class="section-title">Local Leagues</div>
-          <div class="section-sub">Your saved simulation-backed leagues (stored locally or in cloud)</div>
+          <div class="section-sub">Your saved local leagues (stored locally or in cloud)</div>
         </div>
       </div>
       <div class="grid" id="soloList"></div>
@@ -304,7 +304,7 @@ function renderHeroSummary(){
     <div class="hero-stat">
       <div class="hero-stat-value">${soloSaves || 0}</div>
       <div class="hero-stat-label">Local Saves</div>
-      <div class="hero-stat-copy">${soloSaves ? 'Your saved sim leagues are ready to reopen.' : 'Your next local sim league will show up here.'}</div>
+      <div class="hero-stat-copy">${soloSaves ? 'Your saved local leagues are ready to reopen.' : 'Your next local league will show up here.'}</div>
     </div>
   `;
 }
@@ -755,7 +755,7 @@ function renderSolo(rows){
   const host=document.getElementById('soloList');
   if(!host) return;
   if(!rows.length){
-    renderEmpty('soloList','No Local Leagues Yet','Start or save a local sim league and it will appear here.');
+        renderEmpty('soloList','No Local Leagues Yet','Start or save a local league and it will appear here.');
     return;
   }
   host.innerHTML=rows.map(row=>{
@@ -780,7 +780,7 @@ function renderSolo(rows){
         <div class="stat">${renderTimestampStat(savedAt)}<div class="stat-label">Last Saved</div></div>
         <div class="stat">${renderTimestampStat(lastAccessedAt)}<div class="stat-label">Last Accessed</div></div>
       </div>
-      <div class="league-copy">Your local simulation league. ${row.id==='local'?'Saved locally in browser.':'Saved to cloud - accessible anywhere!'}</div>
+        <div class="league-copy">Your local league. ${row.id==='local'?'Saved locally in browser.':'Saved to cloud - accessible anywhere!'}</div>
       <div class="actions">
         <button class="btn primary small" onclick="openSoloLeague('${row.id}')">Open Season</button>
         <button class="btn danger small" onclick="deleteSoloLeague('${row.id}')">Delete League</button>

@@ -4,7 +4,7 @@
   "challengeGroups": [
     {
       "groupId": "historic_season_paths",
-      "label": "Sim Season Paths",
+    "label": "Simulation League Paths",
       "mode": "simulation_season"
     },
     {
@@ -47,7 +47,7 @@
       "mode": "historical_draft",
       "path": "alternate_history_success",
       "title": "Build A 60-Win Team",
-      "description": "Complete a historical fantasy draft and finish with at least 60 wins.",
+    "description": "Complete a source-era fantasy draft and finish with at least 60 wins.",
       "type": "season_wins_min",
       "target": 60,
       "evaluation": "season_end",

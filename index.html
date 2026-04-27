@@ -1819,7 +1819,7 @@
               <div class="historical-action-row">
                 <a id="historicalBrowseLink" class="historical-btn tertiary" href="historic-seasons.html?sport=nba">Browse Simulation Archives</a>
                 <a id="historicalDraftLink" class="historical-btn secondary" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
-                <a id="historicalSimLink" class="historical-btn secondary hero-cta" href="rosterbate-simulation-setup.html?sport=nba">Start Simulation League</a>
+                <a id="historicalSimLink" class="historical-btn secondary hero-cta" href="rosterbate-simulation-setup.html?sport=nba">Start Local League</a>
               </div>
             </div>
           </div>
@@ -2654,7 +2654,7 @@ function updateHistoricalEntrySurface(){
     else el.setAttribute('aria-disabled', 'true');
   });
   if(simLink){
-    simLink.textContent = canSim ? 'Start Simulation League' : 'Simulation Soon';
+  simLink.textContent = canSim ? 'Start Local League' : 'Simulation Soon';
     simLink.href = canSim ? surface.simulationUrl : '#';
     simLink.classList.toggle('disabled', !canSim);
     if(canSim) simLink.removeAttribute('aria-disabled');
@@ -3093,7 +3093,7 @@ function renderLeaguePickerList(mode){
       ? (row.savedLabel || 'Saved recently')
       : (row.updatedLabel || 'Updated recently');
     const copy=mode==='single'
-      ? 'Reopen your local league manager and pick up exactly where your saved sim run left off.'
+      ? 'Reopen your local league manager and pick up exactly where your saved local league left off.'
       : 'Jump back into your shared season hub, standings, waivers, trades, and roster management.';
     const kicker=mode==='single' ? 'Local League Save' : 'Shared Season Access';
     return `<div class="league-picker-card ${mode==='single' ? 'single' : 'multi'}">
