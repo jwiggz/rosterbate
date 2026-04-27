@@ -992,7 +992,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       <a href="index.html" class="season-chip action" style="text-decoration:none;">Home</a>
     </div>
   </div>
-  <div class="season-page-note">Local league postseason view. This screen reflects adapter-driven postseason state, including postseason-ready handoff views when a league stops short of live playoff simulation.</div>
+  <div class="season-page-note">Local league postseason view. Follow the bracket, round pressure, and title path here, including handoff seasons that stop short of live playoff play.</div>
   <div class="sbb season-light-body">
     <div class="season-screen-shell">
       <div class="season-screen-main" id="playoffsContent"></div>
@@ -1893,7 +1893,7 @@ function renderSimulationRunnerCard(snapshot){
       <div class="hub-sim-copy">
         <div class="hub-sim-kicker">Reveal Runner</div>
         <div class="hub-sim-title">${snapshot.packLabel}</div>
-        <div class="hub-sim-sub">Move one reveal window at a time from ratings-driven simulation plus sport-specific tuning. Each click generates box-score outcomes for the full fantasy slate, writes a league report, and saves the universe state immediately.</div>
+        <div class="hub-sim-sub">Move one reveal window at a time from a ratings-driven league engine plus sport-specific tuning. Each click generates box-score outcomes for the full fantasy slate, writes a league report, and saves the universe state immediately.</div>
         <div class="hub-sim-pills">
           <span class="hub-sim-pill blue">Day ${snapshot.day}</span>
           <span class="hub-sim-pill ${readinessTone}">${snapshot.lineupReadyCount}/${snapshot.teamCount} lineups ready</span>
@@ -2051,7 +2051,7 @@ function openRevealReport(day){
         <div class="reveal-modal-badges">
           <span class="hub-reveal-pill green">Week ${report.week}</span>
           <span class="hub-reveal-pill blue">${report.totalLeaguePoints.toFixed(1)} points revealed</span>
-          ${report.simulationMeta?.gameCount ? `<span class="hub-reveal-pill blue">${report.simulationMeta.gameCount} sim matchup${report.simulationMeta.gameCount===1?'':'s'}</span>` : ''}
+          ${report.simulationMeta?.gameCount ? `<span class="hub-reveal-pill blue">${report.simulationMeta.gameCount} matchup${report.simulationMeta.gameCount===1?'':'s'}</span>` : ''}
           <span class="hub-reveal-pill orange">${report.totalTransactions} move${report.totalTransactions===1?'':'s'} logged</span>
           ${report.movement?.biggestRiser ? `<span class="hub-reveal-pill blue">${report.movement.biggestRiser.teamName} +${Math.abs(report.movement.biggestRiser.delta)}</span>` : ''}
         </div>
@@ -2206,15 +2206,15 @@ function renderFootballSimulationPhaseOnePlaceholder(simulationState){
   document.body.dataset.seasonBoot='idle';
   if(emptyScreen) emptyScreen.classList.add('active');
   if(icon) icon.innerHTML='&#127944;';
-  if(title) title.textContent='Football Simulation';
-  if(copy) copy.textContent='Football simulation season shell is coming next.';
+  if(title) title.textContent='Football Local League';
+  if(copy) copy.textContent='Football local league fallback view is still limited.';
   if(actions){
     actions.style.display='block';
     actions.innerHTML=`
       <div class="card" style="max-width:420px;text-align:left;background:linear-gradient(180deg,rgba(18,26,39,.96),rgba(11,17,28,.98));border-color:rgba(249,115,22,.26);box-shadow:0 18px 34px rgba(2,6,23,.32);">
-        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;color:#f8fafc;">Football simulation season shell is coming next.</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;color:#f8fafc;">Football local league fallback view is still limited.</div>
         <div style="margin-top:10px;color:var(--text2);font-size:13px;line-height:1.65;">${franchiseLabel} is already saved from the draft handoff, so you can safely reopen this season shell without losing your selected team.</div>
-        <div style="margin-top:10px;color:var(--text2);font-size:13px;line-height:1.65;">Phase 2 will add weekly schedule, standings, playoffs, and Super Bowl flow for the NFL mixed-era simulation path.</div>
+        <div style="margin-top:10px;color:var(--text2);font-size:13px;line-height:1.65;">Reopen the saved league from your local leagues list to return to the full weekly shell, standings, playoffs, and Super Bowl flow.</div>
       </div>
     `;
   }
@@ -3193,7 +3193,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     : 'nba_mixed_era_single_player_v1';
   const leagueNameBase=season.label || authored?.presentation?.heroTitle || 'Historical NBA Season';
   const leagueName=isSimulationSeason
-    ? (leagueNameBase + ' Sim Season')
+    ? (leagueNameBase + ' Local League')
     : isReimaginedSeason
     ? (leagueNameBase + ' Reimagined Season')
     : leagueNameBase;
@@ -3247,7 +3247,7 @@ function buildHistoricalSeasonLaunchData(devState, requestedSport, entryMode){
     simulationMode: isSimulationSeason ? canonicalSimulationMode : null,
     simulationProfile: isSimulationSeason ? {
       engineVersion: String(window.RosterBateSimulationEngine?.ENGINE_VERSION || '').trim() || null,
-    ratingsSource: 'Ratings-driven simulation + sport-specific tuning',
+    ratingsSource: 'Ratings-driven league engine + sport-specific tuning',
       cadence: 'daily_reveal',
       output: 'box_score'
     } : null,
@@ -3628,7 +3628,7 @@ function normalizeSharedSimulationSeasonBootState(state, slotId){
     leagueId: seasonId,
     historicalUniverseSlotId: stableSlotId || null,
     sharedSimulationSlotId: stableSlotId || null,
-    leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || (sport==='nfl' ? 'NFL Simulation' : 'NBA Simulation')).trim() || (sport==='nfl' ? 'NFL Simulation' : 'NBA Simulation'),
+    leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || (sport==='nfl' ? 'NFL Local League' : 'NBA Local League')).trim() || (sport==='nfl' ? 'NFL Local League' : 'NBA Local League'),
     teamName: teams[myPos] || 'My Team',
     teams,
     teamMeta: rawTeams.map(team=>cloneSharedSimulationBootValue(team)),
@@ -3837,13 +3837,13 @@ function renderDraftedUniverseSimulationStartCard(snapshot){
   if(!snapshot) return '';
   const topTargetLine=snapshot.topTargets.length
     ? snapshot.topTargets.join(' · ')
-    : 'Your drafted board is ready to become a sim league.';
+    : 'Your drafted board is ready to become a local league.';
   return `
     <div class="hub-sim-grid">
       <div class="hub-sim-copy">
-        <div class="hub-sim-kicker">Simulation Launch</div>
-        <div class="hub-sim-title">${snapshot.isMixedEra ? 'Mixed Era Drafted Universe' : 'Drafted Universe Sim Season'}</div>
-        <div class="hub-sim-sub">Your custom roster universe is ready to convert into a one-day-at-a-time Sim Season. The drafted players keep their source-pack-aware ratings, so the sim engine can respect where each era came from instead of flattening the board into one generic pool.</div>
+        <div class="hub-sim-kicker">League Launch</div>
+        <div class="hub-sim-title">${snapshot.isMixedEra ? 'Mixed Era Drafted Universe' : 'Drafted Universe Local League'}</div>
+        <div class="hub-sim-sub">Your custom roster universe is ready to convert into a one-day-at-a-time local league season. The drafted players keep their source-pack-aware ratings, so the league engine can respect where each era came from instead of flattening the board into one generic pool.</div>
         <div class="hub-sim-pills">
           <span class="hub-sim-pill blue">Week ${snapshot.week}</span>
           <span class="hub-sim-pill orange">Day ${snapshot.day}</span>
@@ -3851,7 +3851,7 @@ function renderDraftedUniverseSimulationStartCard(snapshot){
           <span class="hub-sim-pill blue">${snapshot.sourcePackIds.length || 1} source ${snapshot.sourcePackIds.length===1?'era':'eras'}</span>
         </div>
         <div class="hub-sim-actions">
-          <button type="button" class="hub-sim-action primary" onclick="startHistoricalDraftSimSeason()">Start Sim Season</button>
+          <button type="button" class="hub-sim-action primary" onclick="startHistoricalDraftSimSeason()">Start Local League</button>
           <button type="button" class="hub-sim-action" onclick="goPage('roster')">Review Roster</button>
           <button type="button" class="hub-sim-action" onclick="goPage('standings')">Open Standings</button>
         </div>
@@ -3911,7 +3911,7 @@ function startHistoricalDraftSimSeason(){
     D.lastRevealedDay=0;
     D.simulationProfile=Object.assign({}, D.simulationProfile || {}, {
       engineVersion:String(window.RosterBateSimulationEngine?.ENGINE_VERSION || '').trim() || null,
-ratingsSource:'Ratings-driven simulation + sport-specific tuning',
+ratingsSource:'Ratings-driven league engine + sport-specific tuning',
       mixedEraNormalization:'season_context_plus_light_authored_tuning',
       cadence:'daily_reveal',
       output:'box_score',
@@ -3945,7 +3945,7 @@ ratingsSource:'Ratings-driven simulation + sport-specific tuning',
       ACTIVE_SEASON_MODE='fantasy';
     }
     D=writeLocalDraftSnapshot(D);
-    toast(sourcePackIds.length > 1 ? 'Mixed-era drafted universe is now a Sim Season.' : 'Drafted universe is now a Sim Season.');
+    toast(sourcePackIds.length > 1 ? 'Mixed-era drafted universe is now a local league.' : 'Drafted universe is now a local league.');
     if(SEASON_MODE_ADAPTER && typeof initSeason==='function'){
       initSeason();
       if(typeof applyRequestedSeasonView==='function'){
@@ -3960,8 +3960,8 @@ ratingsSource:'Ratings-driven simulation + sport-specific tuning',
     }
     return true;
   }catch(error){
-    console.error('Could not start historical drafted universe sim season:', error);
-    toast('Could not start Sim Season.');
+    console.error('Could not start historical drafted universe local league:', error);
+    toast('Could not start local league.');
     return false;
   }
 }
@@ -8925,7 +8925,7 @@ function getHubThreadSurfaceCopy(){
       prompt: 'Track trade ideas, matchup reads, and roster plans between reveal windows.',
       latestPrefix: 'Latest note from',
       emptyTitle: 'No league notes yet',
-      emptyBody: 'Use this space to track targets, storylines, and reveal ideas between simulation windows.'
+      emptyBody: 'Use this space to track targets, storylines, and reveal ideas between league windows.'
     };
   }
   return {
@@ -9150,7 +9150,7 @@ function renderSimulationHubInSharedShell(){
   const sourcePoolLabel=sourceSeasonCount>1 ? 'Era Pool' : 'Source Pool';
   const sourcePoolValue=sourceSeasonCount>2
     ? `${String(sourceSeasonLabels[0] || 'Mixed Era')} + ${sourceSeasonCount-1} more`
-    : (sourceSeasonCount ? sourceSeasonLabels.join(' + ') : 'Simulation Pool');
+    : (sourceSeasonCount ? sourceSeasonLabels.join(' + ') : 'Local League Pool');
   const watchIds=typeof getWatchListIds==='function' ? getWatchListIds() : [];
   const watchCount=watchIds.length;
   const watchedTargets=typeof getWatchedWaiverTargets==='function' ? getWatchedWaiverTargets(3) : [];
@@ -9186,7 +9186,7 @@ function renderSimulationHubInSharedShell(){
   if(typeof setAvatarNode === 'function'){
     setAvatarNode(
       document.getElementById('hubAv'),
-      vm.controlledTeam?.name || D?.teamName || 'Simulation Team',
+      vm.controlledTeam?.name || D?.teamName || 'Local League Team',
       62,
       'var(--accent)',
       typeof getCurrentTeamAvatarUrl === 'function' ? getCurrentTeamAvatarUrl() : null,
@@ -9194,7 +9194,7 @@ function renderSimulationHubInSharedShell(){
     );
   }
   document.getElementById('hubLeagueName').textContent = vm.leagueLabel;
-  document.getElementById('hubName').textContent = vm.controlledTeam?.name || D?.teamName || 'Simulation Team';
+document.getElementById('hubName').textContent = vm.controlledTeam?.name || D?.teamName || 'Local League Team';
   const hubRecordLabel = vm.recordLabel || (vm.userRow ? `${vm.userRow.w}-${vm.userRow.l}` : '0-0');
   const hubPf = Number.isFinite(Number(controlledStandingRow?.pf)) ? Number(controlledStandingRow.pf).toFixed(1) : null;
   const hubPa = Number.isFinite(Number(controlledStandingRow?.pa)) ? Number(controlledStandingRow.pa).toFixed(1) : null;
@@ -9212,7 +9212,7 @@ function renderSimulationHubInSharedShell(){
   if(hubTeamMeta){
     const sourceLabel=sourceSeasonCount>1
       ? `${sourceSeasonCount} source seasons`
-      : (sourceSeasonCount===1 ? `${sourceSeasonLabels[0]} pool` : 'local simulation league');
+      : (sourceSeasonCount===1 ? `${sourceSeasonLabels[0]} pool` : 'local league');
     const teamMetaCycleLabel=primaryActionTone==='reveal'
       ? `Reveal ${primaryActionCadence}`
       : primaryActionCadence;
@@ -9362,14 +9362,14 @@ function renderSimulationHubInSharedShell(){
     });
       nowCards.push({
         tone:primaryAction?.id==='season-complete'?'':(primaryActionTone==='reveal'?'live':'live'),
-        label:isNflSimulation?'Sim Runner':'Reveal Window',
+        label:isNflSimulation?'League Runner':'Reveal Window',
         value:primaryAction?.label || (isNflSimulation ? 'Sim Week' : 'Reveal Day'),
         copy:primaryAction?.id==='season-complete'
           ? 'Everything is locked in. Review standings and league history from the hub.'
           : (primaryAction?.id==='fix-lineup'
             ? 'Your lineup needs attention before the next simulation can run.'
             : (isNflSimulation
-              ? 'Advance the weekly simulation, then review the generated matchup results and league activity.'
+              ? 'Advance the weekly window, then review the generated matchup results and league activity.'
               : 'Reveal the next box-score slate, publish the league report, and update league movement in one step.')),
         action:getSimulationHubPrimaryActionHandler(primaryAction) || "goPage('roster')",
         link:primaryAction?.id==='season-complete'
@@ -9434,10 +9434,10 @@ function renderSimulationHubInSharedShell(){
       ? (isNflSimulation ? 'Weekly League Report' : 'Reveal Day Report')
       : 'Daily Reveal Report';
     const simulationRevealEmptyCopy = primaryActionTone==='reveal'
-      ? 'Reveal reports will appear here once the first reveal lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.'
+      ? 'Reveal reports will appear here once the first reveal lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that league window.'
       : (isNflSimulation
-        ? 'Weekly reports will appear here once the first week settles. When you hit <b style="color:#f8fafc;">Sim Week</b>, the hub will publish matchup results, league movement, and weekly standouts from that simulation window.'
-        : 'League reports will appear here once the first reveal lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.');
+        ? 'Weekly reports will appear here once the first week settles. When you hit <b style="color:#f8fafc;">Sim Week</b>, the hub will publish matchup results, league movement, and weekly standouts from that weekly window.'
+        : 'League reports will appear here once the first reveal lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that league window.');
     revealMount.innerHTML=latestRevealReport ? `
       <div class="hub-reveal-grid">
         <div class="hub-reveal-copy">
@@ -9578,7 +9578,7 @@ function renderSimulationWaiverInSharedShell(){
           <div style="font-family:var(--fd);font-weight:800;">${escapeHtml(row?.playerName || row?.player?.name || 'Pending Claim')}</div>
           <div style="color:var(--text2);font-size:12px;">${escapeHtml(row?.consequenceLabel || row?.timingLabel || vm?.claimTimingLabel || '')}</div>
         </div>
-        <span class="season-stat-pill">${escapeHtml(row?.timingLabel || vm?.claimTimingLabel || 'Processing next sim day')}</span>
+        <span class="season-stat-pill">${escapeHtml(row?.timingLabel || vm?.claimTimingLabel || 'Processing next reveal window')}</span>
       </div>
       <button class="season-outline-btn" style="margin-top:12px;" onclick="cancelSimulationWaiverClaimFromShell('${String(row?.claimId || '').replace(/'/g,"\\'")}')">Cancel Claim</button>
     </div>
@@ -9595,7 +9595,7 @@ function renderSimulationWaiverInSharedShell(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
           <div>
             <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Waiver Desk</div>
-            <div class="season-subbar-copy">${escapeHtml(vm?.claimTimingLabel || 'Processing next sim day')}</div>
+            <div class="season-subbar-copy">${escapeHtml(vm?.claimTimingLabel || 'Processing next reveal window')}</div>
             ${heroMeta?.links || ''}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -10100,7 +10100,7 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
     .replace(/'/g,'&#39;');
   const teamSummary=vm?.teamSummary && typeof vm.teamSummary==='object' ? vm.teamSummary : {};
   const teamName=String(teamSummary?.name || D?.teamName || 'My Team').trim() || 'My Team';
-  const leagueName=String(teamSummary?.leagueLabel || D?.leagueName || (sport==='nfl' ? 'NFL Simulation League' : 'NBA Simulation League')).trim();
+  const leagueName=String(teamSummary?.leagueLabel || D?.leagueName || (sport==='nfl' ? 'NFL Local League' : 'NBA Local League')).trim();
   const watchListLabel=String(teamSummary?.watchListLabel || 'Watch List').trim() || 'Watch List';
   const watchListEnabled=teamSummary?.watchListEnabled===true;
   const watchListDisabledCopy=String(teamSummary?.watchListDisabledCopy || '').trim();
@@ -11330,10 +11330,10 @@ function renderHub(){
       : 'Daily Reveal Report';
     const historicalRevealEmptyCopy = isSimulationSeason
       ? (CURRENT_SPORT==='nfl'
-        ? 'Weekly reports will appear here once the first week settles. When you hit <b style="color:#f8fafc;">Sim Week</b>, the hub will publish matchup results, league movement, and weekly standouts from that simulation window.'
-        : 'League reports will appear here once the first reveal lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that simulation window.')
+        ? 'Weekly reports will appear here once the first week settles. When you hit <b style="color:#f8fafc;">Sim Week</b>, the hub will publish matchup results, league movement, and weekly standouts from that weekly window.'
+        : 'League reports will appear here once the first reveal lands. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the generated box scores, top performers, and matchup swings from that league window.')
       : (isDraftedHistoricalUniverse
-        ? 'This drafted universe is ready for simulation. When you hit <b style="color:#f8fafc;">Start Sim Season</b>, the hub will begin publishing day-by-day sim reports from your drafted rosters.'
+        ? 'This drafted universe is ready for league play. When you hit <b style="color:#f8fafc;">Start Local League</b>, the hub will begin publishing day-by-day league reports from your drafted rosters.'
         : 'Reveal reports will appear here once the first day is unlocked. When you hit <b style="color:#f8fafc;">Reveal Day</b>, the hub will summarize the new scores, top performers, and waiver/trade movement from that window.');
     revealMount.innerHTML=latestRevealReport ? `
       <div class="hub-reveal-grid">
@@ -11345,7 +11345,7 @@ function renderHub(){
             <span class="hub-reveal-pill green">Week ${latestRevealReport.week}</span>
             <span class="hub-reveal-pill blue">${latestRevealReport.totalLeaguePoints.toFixed(1)} league points</span>
             <span class="hub-reveal-pill orange">${latestRevealReport.matchups?.[0]?.leaderName || latestRevealReport.topPerformers?.[0]?.name || 'No top line yet'}</span>
-            ${latestRevealReport.simulationMeta?.gameCount ? `<span class="hub-reveal-pill blue">${latestRevealReport.simulationMeta.gameCount} sim matchup${latestRevealReport.simulationMeta.gameCount===1?'':'s'}</span>` : ''}
+            ${latestRevealReport.simulationMeta?.gameCount ? `<span class="hub-reveal-pill blue">${latestRevealReport.simulationMeta.gameCount} matchup${latestRevealReport.simulationMeta.gameCount===1?'':'s'}</span>` : ''}
             ${latestRevealReport.movement?.biggestRiser ? `<span class="hub-reveal-pill blue">${latestRevealReport.movement.biggestRiser.teamName} +${Math.abs(latestRevealReport.movement.biggestRiser.delta)}</span>` : ''}
           </div>
           <button type="button" onclick="openRevealReport(${latestRevealReport.day})" class="hub-reveal-action">Open Full Report</button>
@@ -11508,20 +11508,20 @@ function renderHub(){
     if(isDraftedHistoricalUniverse){
       nowCards.push({
         tone:'live',
-        label:'Sim Season Ready',
-        value:'Start Sim Season',
+        label:'League Ready',
+        value:'Start Local League',
         copy:historicalSourcePackIds.length > 1
-          ? 'This drafted mixed-era universe is ready to convert into a daily box-score sim league using the same source-pack-aware players you just drafted.'
-          : 'This drafted universe is ready to convert into a daily box-score sim league using the same source-pack player pool you just drafted.',
+          ? 'This drafted mixed-era universe is ready to convert into a daily box-score local league using the same source-pack-aware players you just drafted.'
+          : 'This drafted universe is ready to convert into a daily box-score local league using the same source-pack player pool you just drafted.',
         action:'startHistoricalDraftSimSeason()',
-        link:'Start sim season'
+        link:'Start local league'
       });
     } else {
       nowCards.push({
         tone:G.isSeasonComplete?'':'live',
-        label:isSimulationSeason?'Sim Runner':'Next Action',
+        label:isSimulationSeason?'League Runner':'Next Action',
         value:G.isSeasonComplete
-          ? (isSimulationSeason ? 'Sim wrapped' : 'Season wrapped')
+          ? (isSimulationSeason ? 'League wrapped' : 'Season wrapped')
           : (isSimulationSeason ? ('Reveal Day '+G.day) : ('Reveal Day '+G.day)),
         copy:G.isSeasonComplete
           ? 'Everything is locked in. Review standings and league history from the hub.'
@@ -11551,7 +11551,7 @@ function renderHub(){
     ab.classList.remove('is-done');
     if(isDraftedHistoricalUniverse){
       ab.classList.add('is-sim');
-      ab.innerHTML=`<span class="season-reveal-btn-label">Start Sim Season</span><span class="season-reveal-btn-sub">Convert this drafted universe into a one-day-at-a-time sim league</span>`;
+      ab.innerHTML=`<span class="season-reveal-btn-label">Start Local League</span><span class="season-reveal-btn-sub">Convert this drafted universe into a one-day-at-a-time local league</span>`;
     } else if(isSimulationSeason){
       ab.classList.add('is-sim');
       ab.innerHTML=`<span class="season-reveal-btn-label">Reveal Day ${G.day} Results</span><span class="season-reveal-btn-sub">Generate box scores and publish the league report</span>`;

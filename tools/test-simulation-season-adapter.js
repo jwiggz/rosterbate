@@ -138,7 +138,7 @@ const hub = adapter.getHubViewModel();
   assert.equal(hub.primaryAction.shortLabel, 'Reveal Day');
   assert.equal(hub.primaryAction.cadenceLabel, 'Day 12');
   assert.equal(hub.primaryAction.shellTone, 'reveal');
-  assert.equal(hub.statSourceLabel, 'Simulated', 'single-player replacement hub vm should label engine-backed output as simulated');
+assert.equal(hub.statSourceLabel, 'Generated', 'single-player replacement hub vm should label engine-backed output as generated');
 assert.deepStrictEqual(hub.sourceSeasonLabels, ['1986-87', '1995-96', '2015-16']);
 assert.ok(Array.isArray(hub.summaryCards), 'hub vm should expose summaryCards for shared-shell parity');
 assert.deepStrictEqual(
@@ -317,7 +317,7 @@ assert.equal(
 
 const roster = adapter.getRosterViewModel();
 assertSinglePlayerParityRosterVm(roster, 'nba simulation');
-assert.equal(roster.statSourceLabel, 'Simulated', 'single-player replacement roster vm should label generated stats as simulated');
+assert.equal(roster.statSourceLabel, 'Generated', 'single-player replacement roster vm should label generated stats as generated');
 assert.equal(roster.lineup.length, 2);
 assert.equal(roster.bench.length, 0);
 assert.ok(roster.teamSummary, 'shared simulation roster vm should expose a teamSummary bridge object');
@@ -523,10 +523,10 @@ assert.ok(Array.isArray(waivers.pendingClaims), 'waiver vm should expose pending
 assert.ok(Array.isArray(waivers.recentClaimResults), 'waiver vm should expose recent claim results for the shared waiver desk');
 assert.ok(Array.isArray(waivers.sections?.available?.rows), 'waiver vm should expose available rows through shared-shell sections');
 assert.ok(Array.isArray(waivers.sections?.pending?.rows), 'waiver vm should expose pending rows through shared-shell sections');
-assert.match(waivers.claimTimingLabel || '', /next sim day|next sim week/i, 'waiver vm should expose when pending claims will process');
+assert.match(waivers.claimTimingLabel || '', /next reveal window|next weekly window/i, 'waiver vm should expose when pending claims will process');
 assert.equal(waivers.availablePlayers.length, 1);
 assert.equal(waivers.availablePlayers[0].name, 'Scottie Pippen');
-assert.equal(waivers.claimTimingLabel, 'Processing next sim day', 'nba waiver desks should expose day-based processing copy');
+assert.equal(waivers.claimTimingLabel, 'Processing next reveal window', 'nba waiver desks should expose reveal-based processing copy');
 assert.equal(waivers.sections.available.rows[0]?.actionLabel, 'Submit Claim', 'available waiver rows should surface the shared-shell submit action copy');
 assert.equal(waivers.sections.available.rows[0]?.dropNeeded, true, 'available waiver rows should flag when a drop is required');
 assert.equal(waivers.sections.available.rows[0]?.suggestedDropPlayerId, 23, 'available waiver rows should suggest the likely drop candidate when the roster is full');
@@ -1430,7 +1430,7 @@ assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Local League');
   assert.equal(nflAdapter.getHubViewModel().primaryAction.shortLabel, 'Sim Week');
   assert.equal(nflAdapter.getScheduleViewModel().title, 'Weekly Matchup / Results', 'nfl schedule vm should use weekly matchup framing');
   assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');
-assert.equal(nflAdapter.getWaiverViewModel().claimTimingLabel, 'Processing next sim week', 'nfl waiver desks should stay week-based');
+assert.equal(nflAdapter.getWaiverViewModel().claimTimingLabel, 'Processing next weekly window', 'nfl waiver desks should stay week-based');
 assert.ok(Array.isArray(nflAdapter.getWaiverViewModel().sections?.recent?.rows), 'nfl waiver desks should keep shared-shell recent-result sections available');
 assert.equal(
   nflAdapter.getScheduleViewModel().navigation?.mode,

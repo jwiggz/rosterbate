@@ -824,7 +824,7 @@ function cleanSimulationSourceLabel(label){
       : buildSimulationNbaRosterState(state);
     return {
       layoutMode: 'local-league-parity',
-      statSourceLabel: 'Simulated',
+      statSourceLabel: 'Generated',
       sport,
       starterSlots: clone(rosterState?.starterSlots || []),
       legacyStarterSlots: clone(rosterState?.legacyStarterSlots || rosterState?.starterSlots || []),
@@ -980,7 +980,7 @@ function cleanSimulationSourceLabel(label){
       label: count > 1 ? 'Era Pool' : 'Source Pool',
       value: count > 1
         ? `${sourceSeasonLabels[0]} + ${count - 1} more`
-        : (count === 1 ? sourceSeasonLabels[0] : 'Simulation Pool')
+        : (count === 1 ? sourceSeasonLabels[0] : 'Local League Pool')
     };
   }
 
@@ -1303,8 +1303,8 @@ function cleanSimulationSourceLabel(label){
       status: String(claim?.status || 'pending').trim().toLowerCase(),
       processOnAdvance: String(claim?.processOnAdvance || '').trim().toLowerCase(),
       timingLabel: String(claim?.processOnAdvance || '').trim().toLowerCase() === 'week'
-        ? 'Processing next sim week'
-        : 'Processing next sim day',
+        ? 'Processing next weekly window'
+        : 'Processing next reveal window',
       consequenceLabel: claim?.dropPlayerId == null
         ? 'No drop required'
         : `Dropping ${findSimulationPlayerById(state, claim?.dropPlayerId)?.name || 'current player'}`
@@ -2569,7 +2569,7 @@ function cleanSimulationSourceLabel(label){
           formatLabel: buildSimulationFormatLabel(state),
           shellLabel: `${anchorSeasonLabel} Shell`,
           scoringTypeLabel: 'Head to Head Points',
-          statSourceLabel: 'Simulated',
+      statSourceLabel: 'Generated',
           controlledTeam: team ? clone(team) : null,
           userRow: userRow ? clone(userRow) : null,
           recordLabel: buildSimulationRecordLabel(userRow),
@@ -2630,7 +2630,7 @@ function cleanSimulationSourceLabel(label){
           roster,
           teamSummary,
           availablePlayers,
-          claimTimingLabel: cadence === 'week' ? 'Processing next sim week' : 'Processing next sim day',
+          claimTimingLabel: cadence === 'week' ? 'Processing next weekly window' : 'Processing next reveal window',
           pendingClaims: clone(state?.seasonState?.pendingWaiverClaims || []),
           recentClaimResults: clone(state?.seasonState?.recentWaiverResults || []),
           sections: {

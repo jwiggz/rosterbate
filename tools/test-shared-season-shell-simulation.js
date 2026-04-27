@@ -602,7 +602,7 @@ const simulationAdapterStub = {
           status: 'Future unlock',
           actionLabel: 'Coming Soon',
           disabled: true,
-          disabledReason: 'Future unlock for simulation leagues.'
+    disabledReason: 'Future unlock for this local league.'
         },
         {
           key: 'bench-boost',
@@ -613,7 +613,7 @@ const simulationAdapterStub = {
           status: 'Future unlock',
           actionLabel: 'Coming Soon',
           disabled: true,
-          disabledReason: 'Future unlock for simulation leagues.'
+    disabledReason: 'Future unlock for this local league.'
         },
         {
           key: 'sunday-surge',
@@ -624,7 +624,7 @@ const simulationAdapterStub = {
           status: 'Future unlock',
           actionLabel: 'Coming Soon',
           disabled: true,
-          disabledReason: 'Future unlock for simulation leagues.'
+    disabledReason: 'Future unlock for this local league.'
         }
       ]
     };
@@ -712,7 +712,7 @@ const simulationAdapterStub = {
   getWaiverViewModel() {
     return {
     layoutMode: 'local-league-parity',
-      claimTimingLabel: 'Processing next sim day',
+  claimTimingLabel: 'Processing next reveal window',
       teamSummary: {
         waiverOrderLabel: 'Waiver Order (1 of 30)',
         watchListLabel: 'Watch List'
@@ -722,7 +722,7 @@ const simulationAdapterStub = {
           claimId: 'pending-1',
           playerId: 77,
           playerName: 'Grant Hill',
-          timingLabel: 'Processing next sim day',
+      timingLabel: 'Processing next reveal window',
           consequenceLabel: 'Adds Grant Hill and drops Hakeem Olajuwon if awarded.'
         }
       ],
@@ -741,7 +741,7 @@ const simulationAdapterStub = {
               claimId: 'pending-1',
               playerId: 77,
               playerName: 'Grant Hill',
-              timingLabel: 'Processing next sim day',
+      timingLabel: 'Processing next reveal window',
               consequenceLabel: 'Adds Grant Hill and drops Hakeem Olajuwon if awarded.'
             }
           ]
@@ -1160,6 +1160,8 @@ assert.match(html, /id="playoffsContent"/, 'playoffs markup should expose a dedi
 assert.match(html, /id="playoffsPowerups"/, 'playoffs markup should expose a dedicated powerups mount');
 assert.doesNotMatch(html, /Postseason bracket, play-in races, and the champion path/, 'shared shell playoffs header copy should not promise active playoff simulation for every sport path');
 assert.doesNotMatch(html, /This screen reflects adapter-driven postseason state as the season rolls into the play-in and playoffs\./, 'shared shell playoffs note should not imply active playoff simulation flow by default');
+assert.doesNotMatch(html, /This screen reflects adapter-driven postseason state, including postseason-ready handoff views when a league stops short of live playoff simulation\./, 'shared shell playoffs note should avoid adapter-facing implementation language');
+assert.match(html, /Follow the bracket, round pressure, and title path here, including handoff seasons that stop short of live playoff play\./, 'shared shell playoffs note should use local-league postseason framing');
 assert.doesNotMatch(html, /The shared shell reads directly from the adapter's postseason snapshot\./, 'playoffs summary copy should avoid adapter-facing implementation language');
 assert.doesNotMatch(html, /Current adapter slate for the active postseason day\./, 'playoffs slate copy should avoid adapter-facing implementation language');
 assert.match(html, /Track the playoff picture, current round, and final title chase from one league view\./, 'playoffs summary copy should use league-facing framing');
@@ -1689,7 +1691,7 @@ api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'simulation waiver desk should render a pending-claims section');
-assert.match(elements.waiverContent.innerHTML, /Processing next sim day|Processing next sim week/i, 'simulation waiver desk should show delayed pending-claim timing');
+assert.match(elements.waiverContent.innerHTML, /Processing next reveal window|Processing next weekly window/i, 'simulation waiver desk should show delayed pending-claim timing');
 assert.match(elements.waiverContent.innerHTML, /Submit Claim/i, 'simulation waiver desk should expose an explicit submit-claim action');
 assert.doesNotMatch(elements.waiverContent.innerHTML, /claim resolves immediately/i, 'simulation waiver desk should not imply immediate claim resolution');
 
@@ -1823,7 +1825,7 @@ const fallbackWaiverAdapter = {
   ...simulationAdapterStub,
   getWaiverViewModel() {
     return {
-      claimTimingLabel: 'Processing next sim day',
+    claimTimingLabel: 'Processing next reveal window',
       availablePlayers: [
         {
           id: 333,
@@ -3329,7 +3331,7 @@ api.setSeasonModeAdapter({
         waiverOrderCopy: 'Open waivers to inspect the current claim order.',
         settingsLabel: 'Team Settings',
         settingsEnabled: false,
-        settingsDisabledCopy: 'Simulation team settings stay read-only for now.'
+  settingsDisabledCopy: 'Local league team settings stay read-only for now.'
       },
       sections: {
         starters: {
@@ -3680,7 +3682,7 @@ api.setSeasonModeAdapter({
     return {
       sport: 'nfl',
     layoutMode: 'local-league-parity',
-      claimTimingLabel: 'Processing next sim week',
+    claimTimingLabel: 'Processing next weekly window',
       pendingClaims: [
         {
           claimId: 'pending-1',
@@ -3700,7 +3702,7 @@ api.setSeasonModeAdapter({
         waiverOrderCopy: 'Open waivers to inspect the current claim order.',
         settingsLabel: 'Team Settings',
         settingsEnabled: false,
-        settingsDisabledCopy: 'Simulation team settings stay read-only for now.'
+  settingsDisabledCopy: 'Local league team settings stay read-only for now.'
       },
       sections: {
         available: {
@@ -3727,7 +3729,7 @@ api.setSeasonModeAdapter({
 api.renderSimulationHubInSharedShell();
 assert.equal(elements.hubPowerupsTitle.textContent, 'Weekly Powerups', 'nfl simulation hub should keep the weekly side-rail title');
 api.renderSimulationWaiverInSharedShell();
-assert.match(elements.waiverContent.innerHTML, /Processing next sim week/i, 'nfl waiver desk should render weekly claim-processing copy through the shared shell');
+assert.match(elements.waiverContent.innerHTML, /Processing next weekly window/i, 'nfl waiver desk should render weekly claim-processing copy through the shared shell');
 assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'nfl waiver desk should render the pending-claims section through the shared shell');
 
 api.renderSimulationStandingsInSharedShell();
