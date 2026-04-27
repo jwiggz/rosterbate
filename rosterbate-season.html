@@ -8948,13 +8948,10 @@ function buildSimulationSummaryPills(cards){
 
 function buildSimulationHubPowerupRail(powerupCards, fallbackTitle){
   const cards=Array.isArray(powerupCards) ? powerupCards : [];
-  const railTitle=String(cards[0]?.title || fallbackTitle || '').trim() || 'League Powerups';
   if(!cards.length) return `<div class="hub-card">
-    <div class="hub-card-title">${escapeSimulationShellHtml(railTitle)}</div>
     <div class="hub-card-sub">Powerups will show up here once this local league unlocks live activation controls.</div>
   </div>`;
   return `<div class="hub-card">
-    <div class="hub-card-title">${escapeSimulationShellHtml(railTitle)}</div>
     <div class="hub-powerup-grid">${cards.map((card)=>`
       <div class="hub-powerup-tile" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.18);">
         <div class="hub-powerup-top">

@@ -1563,7 +1563,6 @@ assert.match(elements.hubCycleMeta.textContent, /Local League .* Reveal Day 12 R
 assert.equal(elements.rbChatTitle.textContent, 'League Notes', 'simulation hub should repurpose the side thread as a local-league notes surface');
 assert.match(elements.rbOnlineCount.textContent, /local league/i, 'simulation hub should avoid multiplayer thread copy in the side notes surface');
 assert.match(elements.rbChatPrompt.textContent, /trade ideas|roster plans|reveal windows/i, 'simulation hub should give the side notes surface local-league planning copy');
-assert.match(elements.hubPowerups.innerHTML, /Reveal Powerups/, 'nba simulation hub should use reveal-first powerup framing');
 assert.equal(elements.hubPowerupsTitle.textContent, 'Reveal Powerups', 'nba simulation hub should title the side rail with reveal-first cadence');
 assert.match(elements.hubPowerups.innerHTML, /White Gloves/, 'simulation hub should include the familiar white-gloves parity card');
 assert.match(elements.hubPowerups.innerHTML, /Bench Boost/, 'simulation hub should include the familiar bench-boost parity card');
@@ -3713,7 +3712,6 @@ api.setSeasonModeAdapter({
   }
 });
 api.renderSimulationHubInSharedShell();
-assert.match(elements.hubPowerups.innerHTML, /Weekly Powerups/, 'nfl simulation hub should keep weekly powerup framing');
 assert.equal(elements.hubPowerupsTitle.textContent, 'Weekly Powerups', 'nfl simulation hub should keep the weekly side-rail title');
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Processing next sim week/i, 'nfl waiver desk should render weekly claim-processing copy through the shared shell');
