@@ -439,6 +439,15 @@ assert.equal(
   null,
   'nba simulation roster vm should avoid adding variant labels when the player identity is unique on the roster'
 );
+const duplicateBenchWaiverVm = duplicateBenchAdapter.getWaiverViewModel();
+assert.ok(
+  duplicateBenchWaiverVm.sections.available.rows[0]?.dropOptions?.some((option) => option?.label === 'Mahmoud Abdul-Rauf · DEN · PG · 1992-93'),
+  'nba simulation waiver vm should disambiguate duplicate mixed-era drop options with compact season labels'
+);
+assert.ok(
+  duplicateBenchWaiverVm.sections.available.rows[0]?.dropOptions?.some((option) => option?.label === 'Mahmoud Abdul-Rauf · DEN · PG · 1995-96'),
+  'nba simulation waiver vm should preserve later mixed-era drop options with their own season labels'
+);
 
 const indexOnlyResultAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-index-only-results',

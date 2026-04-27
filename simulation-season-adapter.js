@@ -413,6 +413,19 @@ function cleanSimulationSourceLabel(label){
     }, {});
   }
 
+  function buildSimulationPlayerChoiceLabel(player, playerVariantLabelsById){
+    const playerId = Number(player?.id);
+    const variantLabel = Number.isFinite(playerId) && playerId > 0
+      ? String(playerVariantLabelsById?.[playerId] || '').trim()
+      : '';
+    return [
+      player?.name || 'Player',
+      player?.team || '',
+      player?.pos || player?.primaryPosition || '',
+      variantLabel
+    ].filter(Boolean).join(' · ').trim();
+  }
+
   function buildSimulationLastMatchupLabel(state){
     const teamAbbr = getControlledTeamAbbr(state);
     const completedGames = Array.isArray(state?.seasonState?.completedGameLogs) ? state.seasonState.completedGameLogs : [];
@@ -1220,15 +1233,23 @@ function cleanSimulationSourceLabel(label){
 
   function buildSimulationWaiverRows(state){
     const roster = getControlledRoster(state);
+    const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(roster);
     const rosterLimit = Number(state?.draftState?.rosterSize || state?.leagueShell?.rosterSize || roster.length || 0);
     const dropRequired = rosterLimit > 0 && roster.length >= rosterLimit;
     const suggestedDropPlayer = dropRequired
       ? roster.slice().sort((left, right) => Number(left?.fp || 0) - Number(right?.fp || 0))[0] || null
       : null;
-    const dropOptions = roster.map((player) => ({
+    let dropOptions = roster.map((player) => ({
       value: Number(player?.id),
       label: `${player?.name || 'Player'} · ${player?.team || ''} · ${player?.pos || player?.primaryPosition || ''}`.trim()
     }));
+    dropOptions = dropOptions.map((option) => {
+      const dropPlayer = roster.find((player) => Number(player?.id) === Number(option?.value)) || null;
+      return {
+        ...option,
+        label: dropPlayer ? buildSimulationPlayerChoiceLabel(dropPlayer, playerVariantLabelsById) : option?.label
+      };
+    });
     return clone(state?.draftState?.freeAgents || []).slice(0, 40).map((player, index) => ({
       id: `waiver-player-${Number(player?.id || index)}`,
       player: clone(player),
@@ -1239,10 +1260,10 @@ function cleanSimulationSourceLabel(label){
       submitLabel: 'Submit Claim',
       dropNeeded: dropRequired,
       suggestedDropPlayerId: suggestedDropPlayer ? Number(suggestedDropPlayer.id) : null,
-      suggestedDropPlayerName: suggestedDropPlayer?.name || '',
+      suggestedDropPlayerName: suggestedDropPlayer ? buildSimulationPlayerChoiceLabel(suggestedDropPlayer, playerVariantLabelsById) : '',
       consequenceLabel: dropRequired
         ? (suggestedDropPlayer
-          ? `Drop required: ${suggestedDropPlayer.name}`
+          ? `Drop required: ${buildSimulationPlayerChoiceLabel(suggestedDropPlayer, playerVariantLabelsById)}`
           : 'Drop required to submit claim')
         : 'Open roster spot available',
       dropOptions: dropRequired ? clone(dropOptions) : []
