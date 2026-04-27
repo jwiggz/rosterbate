@@ -1695,6 +1695,7 @@ assert.match(elements.matchupContent.innerHTML, /season-hero-card|Current Matchu
 assert.match(elements.matchupContent.innerHTML, /Current Matchup|Matchup Room/, 'simulation matchup should expose richer matchup hero framing');
 assert.match(elements.matchupContent.innerHTML, /Open My Team|My Team/i, 'simulation matchup should expose a direct path back to the shared roster room');
 assert.match(elements.matchupContent.innerHTML, /Open Waivers|Waivers/i, 'simulation matchup should expose a direct path into waivers');
+assert.match(elements.matchupContent.innerHTML, /Review Matchup/, 'simulation matchup should keep matchup-first action wording');
 assert.match(elements.matchupContent.innerHTML, /Previous Matchup|Recent Results/i, 'simulation matchup should expose historical matchup context instead of only a flat schedule list');
 assert.match(elements.matchupContent.innerHTML, /Michael Jordan|Los Angeles Lakers|Boston Celtics/, 'simulation matchup should render richer side-by-side team context');
 assert.match(elements.matchupContent.innerHTML, /setSimulationMatchupNavigationValue/, 'simulation matchup navigation should route through a live shared-shell navigation handler');

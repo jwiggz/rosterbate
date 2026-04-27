@@ -10442,7 +10442,7 @@ function renderSimulationScheduleInSharedShell(){
     : [
         { label: 'Open My Team', targetPage: 'roster', body: isNflSimulation ? 'Check weekly starters and depth before the next sim.' : 'Check starters and bench before the next sim.' },
         { label: 'Open Waivers', targetPage: 'waiver', body: 'Review the player pool if this matchup needs a roster move.' },
-        { label: 'Review Schedule', targetPage: 'matchup', body: 'Review recent matchup history and the next slate.' }
+        { label: 'Review Matchup', targetPage: 'matchup', body: 'Review recent matchup history and the next slate.' }
       ];
   const rawOpponentPanelVm = vm?.teamPanels?.opponent && typeof vm.teamPanels.opponent === 'object' ? vm.teamPanels.opponent : null;
   const activeOpponentPanelVm = rawOpponentPanelVm && displayedOpponentAbbr
@@ -10510,7 +10510,7 @@ function renderSimulationScheduleInSharedShell(){
     return `<div class="season-table-card season-card-pad">
       <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${escapeHtml(titleLabel)}</div>
       <div style="margin-top:10px;font-family:var(--fb);font-size:22px;font-weight:800;color:#f8fafc;">${gameCopy || '--'}</div>
-      <div class="season-subbar-copy" style="margin-top:8px;">${gameCopy ? (game?.summary || game?.label || 'Scouted from recent simulation context.') : escapeHtml(emptyCopy)}</div>
+      <div class="season-subbar-copy" style="margin-top:8px;">${gameCopy ? (game?.summary || game?.label || 'Scouted from the latest league window.') : escapeHtml(emptyCopy)}</div>
     </div>`;
   };
   const renderLineupRows = (rows) => {
@@ -10521,13 +10521,18 @@ function renderSimulationScheduleInSharedShell(){
     return safeRows.map((entry)=>{
       const player = entry?.player && typeof entry.player === 'object' ? entry.player : null;
       const playerName = player ? escapeHtml(player.name || 'Player') : '<span class="season-soft-muted">Open</span>';
+      const variantLabel = String(entry?.playerVariantLabel || '').trim();
+      const statusLabel = (() => {
+        const rawStatus = String(player?.status || 'Ready').trim();
+        return rawStatus ? rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1) : 'Ready';
+      })();
       const playerMeta = player
-        ? escapeHtml([player.team, player.pos || player.primaryPosition || ''].filter(Boolean).join(' · ') || 'Roster player')
+        ? escapeHtml([player.team, player.pos || player.primaryPosition || '', variantLabel].filter(Boolean).join(' · ') || 'Roster player')
         : 'Awaiting assignment';
       return `<tr>
         <td>${escapeHtml(entry?.slot || '--')}</td>
         <td><div style="font-weight:700;color:#f8fafc;">${playerName}</div><div class="season-soft-muted">${playerMeta}</div></td>
-        <td>${player ? `<span class="season-stat-pill">${escapeHtml(player.status || 'Ready')}</span>` : '<span class="season-soft-muted">Open</span>'}</td>
+        <td>${player ? `<span class="season-stat-pill">${escapeHtml(statusLabel)}</span>` : '<span class="season-soft-muted">Open</span>'}</td>
       </tr>`;
     }).join('');
   };

@@ -471,13 +471,27 @@ assert.equal(schedule.navigation?.mode, 'day', 'nba schedule vm should expose da
 assert.ok(Array.isArray(schedule.navigation?.items), 'schedule vm should expose concrete matchup navigation items');
 assert.deepStrictEqual(
   Array.isArray(schedule.actionCards) ? schedule.actionCards.map((card) => card.label) : [],
-  ['Open My Team', 'Open Waivers', 'Review Schedule'],
+  ['Open My Team', 'Open Waivers', 'Review Matchup'],
   'schedule vm should expose the shared matchup action cards needed by the renderer'
 );
 assert.equal(schedule.teamPanels?.mine?.teamAbbr, 'LAL', 'schedule vm should expose my team matchup panel');
 assert.equal(schedule.teamPanels?.opponent?.teamAbbr, 'BOS', 'schedule vm should expose opponent matchup panel');
 assert.equal(schedule.lineupSections?.mine?.[0]?.title, 'Starters', 'schedule vm should expose my lineup comparison sections');
 assert.equal(schedule.lineupSections?.opponent?.[0]?.title, 'Starters', 'schedule vm should expose opponent lineup comparison sections');
+const duplicateBenchScheduleVm = duplicateBenchAdapter.getScheduleViewModel();
+const mixedEraScheduleBenchRows = Array.isArray(duplicateBenchScheduleVm.lineupSections?.mine?.[1]?.rows)
+  ? duplicateBenchScheduleVm.lineupSections.mine[1].rows
+  : [];
+assert.equal(
+  mixedEraScheduleBenchRows.find((row) => Number(row?.player?.id) === 3)?.playerVariantLabel || null,
+  '1992-93',
+  'schedule vm should preserve compact mixed-era variant labels in matchup bench rows'
+);
+assert.equal(
+  mixedEraScheduleBenchRows.find((row) => Number(row?.player?.id) === 103)?.playerVariantLabel || null,
+  '1995-96',
+  'schedule vm should preserve later mixed-era variant labels in matchup bench rows'
+);
 schedule.nextGame.opponentName = 'Mutated Opponent';
 assert.equal(adapter.getScheduleViewModel().nextGame.opponentName, 'Boston Celtics');
 

@@ -483,6 +483,7 @@ function cleanSimulationSourceLabel(label){
       ? clone(state.draftState.rostersByTeam[normalizedTeamAbbr])
       : [];
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
+    const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(roster);
 
     if (sport === 'nfl') {
       const normalizedState = normalizeLegacyNflLineupSlots(state);
@@ -522,6 +523,7 @@ function cleanSimulationSourceLabel(label){
           const player = lineupSlots[slot]?.player;
           return player ? clone(player) : null;
         }),
+        playerVariantLabelsById,
         bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
         validation: normalizedTeamAbbr === getControlledTeamAbbr(state) && typeof runtimeApi.validateSimulationLineup === 'function'
           ? runtimeApi.validateSimulationLineup(clone(normalizedState), normalizedTeamAbbr)
@@ -555,6 +557,7 @@ function cleanSimulationSourceLabel(label){
         const player = lineupSlots[slot]?.player;
         return player ? clone(player) : null;
       }),
+      playerVariantLabelsById,
       bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
       validation: { valid: true, issues: [] }
     };
@@ -669,7 +672,7 @@ function cleanSimulationSourceLabel(label){
       },
       {
         id: 'review-schedule',
-        label: 'Review Schedule',
+        label: 'Review Matchup',
         targetPage: 'matchup',
         enabled: true,
         body: matchupContext?.nextGame
@@ -699,20 +702,25 @@ function cleanSimulationSourceLabel(label){
 
   function buildSimulationMatchupLineupSections(state, matchupContext){
     const sport = getSimulationSportForState(state);
-    const buildRows = (slots, lineupSlots) => (Array.isArray(slots) ? slots : []).map((slot) => ({
+    const buildRows = (slots, lineupSlots, playerVariantLabelsById) => (Array.isArray(slots) ? slots : []).map((slot) => ({
       slot,
-      player: lineupSlots?.[slot]?.player ? clone(lineupSlots[slot].player) : null
+      player: lineupSlots?.[slot]?.player ? clone(lineupSlots[slot].player) : null,
+      playerVariantLabel: (() => {
+        const playerId = Number(lineupSlots?.[slot]?.player?.id);
+        return Number.isFinite(playerId) ? String(playerVariantLabelsById?.[playerId] || '').trim() || null : null;
+      })()
     }));
     const buildSections = (rosterState) => ([
       {
         title: sport === 'nfl' ? 'Weekly Starters' : 'Starters',
-        rows: buildRows(rosterState?.legacyStarterSlots || rosterState?.starterSlots, rosterState?.lineupSlots)
+        rows: buildRows(rosterState?.legacyStarterSlots || rosterState?.starterSlots, rosterState?.lineupSlots, rosterState?.playerVariantLabelsById)
       },
       {
         title: sport === 'nfl' ? 'Bench / Depth' : 'Bench',
         rows: clone(rosterState?.bench || []).map((player) => ({
           slot: 'BENCH',
-          player: clone(player)
+          player: clone(player),
+          playerVariantLabel: rosterState?.playerVariantLabelsById?.[Number(player?.id)] || null
         }))
       }
     ]);
