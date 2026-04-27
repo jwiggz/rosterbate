@@ -1128,6 +1128,7 @@ assert.match(html, /function renderSimulationPlayoffsInSharedShell\(/, 'season s
 assert.match(html, /function renderSimulationWaiverInSharedShell\(/, 'season shell should add a simulation waiver renderer');
 assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season shell should add a simulation trade renderer');
 assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season shell should add a simulation standings renderer');
+assert.match(html, /season-subbar-title">Waivers<\/div>[\s\S]*season-subbar-copy">Claim targets, watch list, and pending waiver moves<\/div>/, 'waiver page chrome should keep waiver-first page framing');
 assert.match(html, /function applySimulationSuggestedLineupFromShell\(/, 'season shell should expose a simulation lineup action helper');
 assert.match(html, /SEASON_MODE_ADAPTER\.setLineup\(/, 'simulation lineup action should flow through the adapter');
 assert.match(html, /persistSimulationSeasonState\('simulation_lineup'\)/, 'simulation lineup action should persist shared state');
