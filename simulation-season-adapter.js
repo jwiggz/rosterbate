@@ -38,7 +38,7 @@
   const BASE_NAV_ITEMS = Object.freeze([
     { id: 'hub', label: 'Hub' },
     { id: 'roster', label: 'Roster' },
-    { id: 'matchup', label: 'Schedule' },
+    { id: 'matchup', label: 'Matchup' },
     { id: 'waiver', label: 'Waivers' },
     { id: 'trades', label: 'Trades' },
     { id: 'standings', label: 'Stand.' }
@@ -47,7 +47,7 @@
   const NFL_LEGACY_LINEUP_SLOT_ORDER = Object.freeze(['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']);
   const SHARED_ROSTER_TABS = Object.freeze([
     { id: 'stats', label: 'Stats', active: true },
-    { id: 'schedule', label: 'Schedule', active: false }
+    { id: 'schedule', label: 'Matchup', active: false }
   ]);
 
   function clone(value){
@@ -2514,7 +2514,7 @@ function buildSimulationFormatLabel(state){
         const matchupContext = buildSimulationMatchupContext(state, scheduleByDay, nextGame, recentResults);
         return {
           sport,
-          title: sport === 'nfl' ? 'Weekly Schedule / Results' : 'Schedule / Results',
+          title: sport === 'nfl' ? 'Weekly Matchup / Results' : 'Matchup / Results',
           subtitle: nextGame
             ? `${nextGame.home ? 'vs' : '@'} ${nextGame.opponentName || nextGame.opponentAbbr || 'Opponent'}`
             : 'No upcoming matchup',

@@ -119,7 +119,7 @@ assert.deepStrictEqual(
   adapter.getNavItems().map((item) => item.id),
   ['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings']
 );
-assert.equal(adapter.getNavItems().find((item) => item.id === 'matchup').label, 'Schedule');
+assert.equal(adapter.getNavItems().find((item) => item.id === 'matchup').label, 'Matchup');
 assert.equal(typeof adapter.setLineup, 'function');
 assert.equal(typeof adapter.claimFreeAgent, 'function');
 assert.equal(typeof adapter.applyTrade, 'function');
@@ -400,6 +400,7 @@ assert.equal(indexOnlyScheduleVm.recentResults[0]?.homeAbbr, 'LAL', 'schedule vm
 assert.equal(indexOnlyScheduleVm.recentResults[0]?.awayAbbr, 'BOS', 'schedule vm should backfill away abbreviations from team indexes when game logs omit them');
 
 const schedule = adapter.getScheduleViewModel();
+assert.equal(schedule.title, 'Matchup / Results', 'nba schedule vm should use matchup-first page framing');
 assert.equal(schedule.recentResults.length, 1);
 assert.equal(schedule.recentResults[0].homeAbbr, 'LAL');
 assert.equal(schedule.nextGame.opponentAbbr, 'BOS');
@@ -1333,6 +1334,7 @@ const nflAdapter = createSimulationSeasonAdapter({
 assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Local League');
   assert.equal(nflAdapter.getHubViewModel().primaryAction.label, 'Sim Week 1');
   assert.equal(nflAdapter.getHubViewModel().primaryAction.shortLabel, 'Sim Week');
+  assert.equal(nflAdapter.getScheduleViewModel().title, 'Weekly Matchup / Results', 'nfl schedule vm should use weekly matchup framing');
   assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');
 assert.equal(nflAdapter.getWaiverViewModel().claimTimingLabel, 'Processing next sim week', 'nfl waiver desks should stay week-based');
 assert.ok(Array.isArray(nflAdapter.getWaiverViewModel().sections?.recent?.rows), 'nfl waiver desks should keep shared-shell recent-result sections available');

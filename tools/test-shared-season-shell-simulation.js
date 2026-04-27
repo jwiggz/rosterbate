@@ -14,7 +14,7 @@ function assertSharedSinglePlayerRosterMarkers(markup, label) {
   assert.match(markup, /Roster Operations/, `${label} should render the shared single-player roster operations heading`);
   assert.match(markup, /season-mini-tabs/, `${label} should render the shared single-player mini-tab rail`);
   assert.match(markup, /season-mini-tab[^>]*>\s*Stats\s*</, `${label} should render the shared Stats tab`);
-  assert.match(markup, /season-mini-tab[^>]*>\s*Schedule\s*</, `${label} should render the shared Schedule tab`);
+  assert.match(markup, /season-mini-tab[^>]*>\s*Matchup\s*</, `${label} should render the shared Matchup tab`);
   assert.doesNotMatch(markup, /Lineup Control/, `${label} should not keep the legacy simulation-only lineup-control card`);
 }
 
@@ -548,7 +548,7 @@ const simulationAdapterStub = {
     const navItems = [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' }
@@ -629,7 +629,7 @@ const simulationAdapterStub = {
   },
   getScheduleViewModel() {
     return {
-      title: 'Schedule / Results',
+      title: 'Matchup / Results',
       cycleLabel: 'Day 12 - Week 2',
       nextGame: {
         day: 12,
@@ -667,7 +667,7 @@ const simulationAdapterStub = {
       },
       tabs: [
         { id: 'stats', label: 'Stats', active: true },
-        { id: 'schedule', label: 'Schedule', active: false }
+        { id: 'schedule', label: 'Matchup', active: false }
       ],
       teamSummary: {
         name: 'Adapter Test Team',
@@ -1489,7 +1489,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Overview' },
       { id: 'roster', label: 'Lineups' },
-      { id: 'matchup', label: 'Schedule' }
+  { id: 'matchup', label: 'Matchup' }
     ];
   }
 });
@@ -1500,7 +1500,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   toPlain(api.getActiveSeasonLabels()),
-  { hub: 'Overview', roster: 'Lineups', matchup: 'Schedule' },
+  { hub: 'Overview', roster: 'Lineups', matchup: 'Matchup' },
   'season labels should be derived from adapter nav items when available'
 );
 
@@ -2779,7 +2779,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Week 1',
       recentResults: [{ awayAbbr: 'GB', awayScore: 24, homeAbbr: 'SEA', homeScore: 27 }],
       nextGame: { day: 1, opponentAbbr: 'SF', opponentName: 'San Francisco 49ers' }
@@ -2870,7 +2870,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' },
@@ -2895,7 +2895,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Week 18',
       recentResults: [
         { awayAbbr: 'PHI', awayScore: 20, homeAbbr: 'DAL', homeScore: 27 }
@@ -2964,7 +2964,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' }
@@ -2985,7 +2985,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Week 1',
       recentResults: [],
       nextGame: null
@@ -3045,7 +3045,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' },
@@ -3067,7 +3067,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Wild Card Weekend',
       recentResults: [],
       nextGame: null
@@ -3156,7 +3156,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' },
@@ -3178,7 +3178,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Season Complete',
       recentResults: [],
       nextGame: null
@@ -3248,7 +3248,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' }
@@ -3295,7 +3295,7 @@ api.setSeasonModeAdapter({
       },
       tabs: [
         { id: 'stats', label: 'Stats', active: true },
-        { id: 'schedule', label: 'Schedule', active: false }
+        { id: 'schedule', label: 'Matchup', active: false }
       ],
       teamSummary: {
         name: 'Dallas Cowboys',
@@ -3468,7 +3468,7 @@ api.setSeasonModeAdapter({
     return [
       { id: 'hub', label: 'Hub' },
       { id: 'roster', label: 'Roster' },
-      { id: 'matchup', label: 'Schedule' },
+      { id: 'matchup', label: 'Matchup' },
       { id: 'waiver', label: 'Waivers' },
       { id: 'trades', label: 'Trades' },
       { id: 'standings', label: 'Stand.' }
@@ -3489,7 +3489,7 @@ api.setSeasonModeAdapter({
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Week 1',
       recentResults: [],
       nextGame: null
@@ -3554,7 +3554,7 @@ const nflSuggestedLineupAdapterStub = {
   getScheduleViewModel() {
     return {
       sport: 'nfl',
-      title: 'Weekly Schedule / Results',
+      title: 'Weekly Matchup / Results',
       cycleLabel: 'Week 1',
       recentResults: [],
       nextGame: null
