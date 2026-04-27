@@ -1874,6 +1874,7 @@ assert.match(elements.tradesContent.innerHTML, /Trade Desk|Pending Offers/, 'sim
 assert.match(elements.tradesContent.innerHTML, /Incoming Offers/i, 'simulation trades should render an incoming-offers lane');
 assert.match(elements.tradesContent.innerHTML, /Sent Offers/i, 'simulation trades should render a sent-offers lane');
 assert.match(elements.tradesContent.innerHTML, /Open A Conversation/i, 'simulation trades should render the richer conversation section');
+assert.match(elements.tradesContent.innerHTML, /Review incoming offers, test one-for-one swaps, and track league trade pressure\./, 'simulation trades should use product-facing trade desk framing');
 assert.match(elements.tradesContent.innerHTML, /7-5/, 'simulation trades should surface partner record context');
 assert.match(elements.tradesContent.innerHTML, /Top asset: Stephen Curry/, 'simulation trades should surface partner top-player context');
 assert.match(elements.tradesContent.innerHTML, /13 players/, 'simulation trades should surface partner roster counts');

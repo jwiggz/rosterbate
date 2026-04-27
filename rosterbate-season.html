@@ -9732,7 +9732,7 @@ function renderSimulationTradesInSharedShell(){
           </select>
         </div>
       </div>
-      <div class="season-subbar-copy" style="margin-top:10px;">One-for-one deals resolve immediately through the simulation backend, so use this desk to test roster fit instead of sending blind packages.</div>
+        <div class="season-subbar-copy" style="margin-top:10px;">One-for-one deals resolve immediately, so use this desk to test roster fit instead of sending blind packages.</div>
       <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${partnerAbbr}')">Apply Trade</button>
     </div>`
   );}).join('') || '<div class="card">No trade partners available.</div>';
@@ -9742,7 +9742,7 @@ function renderSimulationTradesInSharedShell(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
           <div>
             <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Trade Desk</div>
-      <div class="season-subbar-copy">Pending offers and trade partners use the polished league shell while still resolving through simulation trades.</div>
+      <div class="season-subbar-copy">Review incoming offers, test one-for-one swaps, and track league trade pressure.</div>
             ${heroMeta?.links || ''}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -9766,7 +9766,7 @@ function renderSimulationTradesInSharedShell(){
         <div class="season-now-card info">
           <div class="season-now-label">Trade Lane</div>
           <div class="season-now-value">${partnerRows.length} partners</div>
-          <div class="season-now-copy">League teams review offers through the shared local-league shell, so this desk should feel like a real trade room instead of a simple picker.</div>
+          <div class="season-now-copy">League teams review offers here, so this desk should feel like a real trade room instead of a simple picker.</div>
         </div>
       </div>
       <div class="season-split-grid">
@@ -9783,7 +9783,7 @@ function renderSimulationTradesInSharedShell(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
           <div>
             <div style="font-family:var(--fb);font-size:20px;font-weight:800;color:#f8fafc;">Open A Conversation</div>
-            <div class="season-subbar-copy">Pick the roster you want to test for an AI-reviewed one-for-one deal.</div>
+            <div class="season-subbar-copy">Pick the roster you want to test for a one-for-one deal.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <span class="season-stat-pill">${(vm.outgoingRoster || []).length} outgoing options</span>
