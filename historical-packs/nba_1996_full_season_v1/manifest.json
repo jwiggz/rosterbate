@@ -18,7 +18,7 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_1996_chi",
-  "subtitle": "Start a sim season from the source-season foundation or draft the era.",
+  "subtitle": "Start a simulation league from the source-season foundation or draft the era.",
   "description": "A 1995-96 NBA simulation archive pack with team-page season totals imported for player ranking, drafting, and sim-season runs.",
   "tagline": "Rewrite the greatest regular season ever.",
   "eraTags": [

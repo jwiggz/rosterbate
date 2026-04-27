@@ -1,6 +1,6 @@
 {
   "heroTitle": "1995-96 NBA Simulation Archive",
-  "heroSubtitle": "Start a sim season from the historical foundation or draft the era.",
+  "heroSubtitle": "Start a simulation league from the source-season foundation or draft the era.",
   "featuredTeamId": "nba_1996_chi",
   "featuredStars": [
     "nba_1996_michael_jordan",
@@ -22,8 +22,8 @@
   "entryModes": [
     {
       "mode": "simulation_season",
-      "label": "Sim Season",
-      "description": "Choose one 1995-96 team and play through a ratings-driven sim season built from the historical foundation."
+      "label": "Simulation League",
+      "description": "Choose one 1995-96 team and play through a ratings-driven simulation league built from the source-season foundation."
     },
     {
       "mode": "historical_draft",

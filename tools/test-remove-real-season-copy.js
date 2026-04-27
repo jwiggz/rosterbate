@@ -49,6 +49,16 @@ assert.doesNotMatch(
   'historical-packs/catalog.json should not market real-season data in loader-backed catalog copy'
 );
 assert.doesNotMatch(
+  files.historicalCatalog,
+  /Sim Season|Sim Season \(After Draft\)/i,
+  'historical-packs/catalog.json should not feed older Sim Season labels back into the live archive browser'
+);
+assert.match(
+  files.historicalCatalog,
+  /Simulation League|Simulation League \(After Draft\)/i,
+  'historical-packs/catalog.json should use simulation-league labels in loader-backed archive metadata'
+);
+assert.doesNotMatch(
   files.index,
   /Historic Seasons|Browse Historic Seasons|Classic Era Mode|single-player draft board|Solo Reps|No Single Player Leagues Yet|<div class="cta-pane-title">Single Player<\/div>|My Single Player Leagues|personal season manager|solo run left off|Choose one of your solo saves/i,
   'index.html should not market homepage archive and local-league entry points with older historical or single-player wording'
@@ -156,6 +166,16 @@ assert.match(
 );
 assert.doesNotMatch(
   files.historicSeasons,
+  /Sim Season|Sim After Draft/i,
+  'historic-seasons.html should not keep older Sim Season labels in visible archive-browser copy'
+);
+assert.match(
+  files.historicSeasons,
+  /Simulation League|League After Draft/i,
+  'historic-seasons.html should use simulation-league wording for archive launch surfaces'
+);
+assert.doesNotMatch(
+  files.historicSeasons,
   /Historical Stat Coverage|players with historical season production|No saved historical universes yet|Historical universe slots are unavailable/i,
   'historic-seasons.html should not keep older historical-universe fallback wording in archive details and saved-slot surfaces'
 );
@@ -231,8 +251,8 @@ assert.match(
 );
 assert.match(
   files.rosterbateSeason,
-  /Ratings-driven simulation \+ sport-specific tuning/,
-  'rosterbate-season.html should describe simulation ratings as ratings-driven simulation plus sport-specific tuning'
+  /Ratings-driven league engine \+ sport-specific tuning|live ratings-based league flow/,
+  'rosterbate-season.html should describe simulation ratings with current league-flow wording'
 );
 assert.doesNotMatch(
   files.rosterbateSeason,

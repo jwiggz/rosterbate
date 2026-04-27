@@ -20,8 +20,8 @@
   "entryModes": [
     {
       "mode": "simulation_season",
-      "label": "Sim Season",
-      "description": "Choose one 1992-93 team and play through a ratings-driven sim season built from the historical foundation."
+      "label": "Simulation League",
+      "description": "Choose one 1992-93 team and play through a ratings-driven simulation league built from the source-season foundation."
     },
     {
       "mode": "historical_draft",

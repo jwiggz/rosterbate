@@ -1,6 +1,6 @@
 {
   "heroTitle": "2015-16 NBA Simulation Archive",
-  "heroSubtitle": "Start a sim season from the historical foundation, draft the era, or branch into a reimagined universe.",
+  "heroSubtitle": "Start a simulation league from the source-season foundation, draft the era, or branch into a reimagined universe.",
   "featuredTeamId": "nba_2016_gsw",
   "featuredStars": [
     "nba_2016_stephencurry_201939",
@@ -22,8 +22,8 @@
   "entryModes": [
     {
       "mode": "simulation_season",
-      "label": "Sim Season",
-      "description": "Choose one 2015-16 team and play through a ratings-driven sim season built from the historical foundation."
+      "label": "Simulation League",
+      "description": "Choose one 2015-16 team and play through a ratings-driven simulation league built from the source-season foundation."
     },
     {
       "mode": "historical_draft",

@@ -526,7 +526,7 @@
       </a>
       <div class="nav-links">
         <a class="nav-link" href="index.html">Home</a>
-        <a class="nav-link" href="rosterbate-season.html?sport=nba&historical=sim">Sim Season</a>
+        <a class="nav-link" href="rosterbate-season.html?sport=nba&historical=sim">Simulation League</a>
         <a class="nav-link accent" href="rosterbate-draft.html?sport=nba&historical=dev">Draft The Era</a>
       </div>
     </header>
@@ -536,12 +536,12 @@
         <div class="eyebrow">Archive Browser</div>
         <h1 class="hero-title">Simulation <span>Archives</span></h1>
         <div class="hero-copy">
-          Open a complete era as its own simulation archive. Draft the entire league, simulate the pack, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
+          Open a complete era as its own simulation archive. Draft the entire league, launch a simulation league, or use the season as the launch point for the future <strong>Reimagined Season</strong> branch.
         </div>
         <div class="hero-chip-row">
           <div class="hero-chip">Full-League Player Pool</div>
           <div class="hero-chip">Draft The Era</div>
-          <div class="hero-chip">Sim Season</div>
+          <div class="hero-chip">Simulation League</div>
           <div class="hero-chip">Daily Reveal Compatible</div>
         </div>
         <div class="hero-foot">
@@ -686,11 +686,11 @@
                   </div>
                   <div class="mode-buttons">
                     <a href="#" class="mode-btn primary hero" id="draftEraBtn">Draft The Era</a>
-                    <a href="#" class="mode-btn secondary" id="simSeasonBtn">Sim Season</a>
+                    <a href="#" class="mode-btn secondary" id="simSeasonBtn">Simulation League</a>
                     <a href="#" class="mode-btn tertiary" id="reimaginedSeasonBtn">Reimagined Season</a>
                   </div>
                   <div class="mode-note" id="modeNote">
-                    On localhost, the selected slot becomes your controlled entry point before the drafted, simulated, or reimagined universe opens.
+                    On localhost, the selected slot becomes your controlled entry point before the drafted, simulation-league, or reimagined universe opens.
                   </div>
                 </div>
               </div>
@@ -713,7 +713,7 @@
               <span>Open the full player pool from that year, build a custom roster, and turn the pack into your own basketball universe.</span>
             </div>
             <div class="future-item">
-              <strong>Sim Season</strong>
+              <strong>Simulation League</strong>
               <span>Run the same pack through the box-score simulation layer so every reveal is generated from ratings and lineup decisions instead of sourced stats.</span>
             </div>
             <div class="future-item">
@@ -833,7 +833,7 @@ const HISTORIC_1993_FALLBACK = {
         headline: '1995-96 x 2015-16',
         subline: 'A full-board crossover draft sized for a real fantasy room.'
       },
-      plannedModes: ['Draft The Era', 'Sim Season (After Draft)', 'Mixed-Era Universes'],
+      plannedModes: ['Draft The Era', 'Simulation League (After Draft)', 'Mixed-Era Universes'],
       previewStars: ['Michael Jordan', 'Stephen Curry', 'LeBron James'],
       draftUrl: 'rosterbate-draft.html?sport=nba&historical=mixed&mixedEraConfigId=1996-2016-top300',
       syntheticType: 'mixed_era',
@@ -859,7 +859,7 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable foundation',
       completenessPercent: 82,
       tagline: 'Draft the era and build a 72-win dream roster of your own.',
-      summary: 'Full-league simulation archive with simulation-ready ratings, a full-era player pool, and strong Draft The Era / Sim Season foundations.',
+      summary: 'Full-league simulation archive with simulation-ready ratings, a full-era player pool, and strong Draft The Era / Simulation League foundations.',
       whyItMatters: 'This is the first proof that RosterBate can turn a source-season foundation into a true fantasy-universe sandbox for drafts, simulations, and alternate-history team builds.',
       focusTeamName: 'Chicago Bulls',
       art: {
@@ -868,7 +868,7 @@ const HISTORIC_1993_FALLBACK = {
         headline: '72-Win Empire',
         subline: 'Jordan, Hakeem, Shaq, and the full season universe.'
       },
-      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season'],
+      plannedModes: ['Draft The Era', 'Simulation League', 'Reimagined Season'],
       previewStars: ['Michael Jordan', 'Hakeem Olajuwon', "Shaquille O'Neal"],
       seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1',
       simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_1996_full_season_v1',
@@ -898,7 +898,7 @@ const HISTORIC_1993_FALLBACK = {
           headline: 'Shaq. Kobe. AI.',
           subline: 'An early-2000s spotlight season built on dominant bigs, electric guards, and playoff gravity.'
         },
-        plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season'],
+        plannedModes: ['Draft The Era', 'Simulation League', 'Reimagined Season'],
         previewStars: ["Shaquille O'Neal", 'Kobe Bryant', 'Allen Iverson'],
         seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1',
         simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2001_full_season_v1',
@@ -918,7 +918,7 @@ const HISTORIC_1993_FALLBACK = {
       completenessLabel: 'Playable modern foundation',
       completenessPercent: 80,
       tagline: 'Draft Steph, LeBron, Kawhi, and the whole modern era into one universe.',
-      summary: 'A modern simulation archive with a loaded full-season player pool, simulation-ready ratings, and a strong foundation for drafted or simulated alternate-history runs.',
+      summary: 'A modern simulation archive with a loaded full-season player pool, simulation-ready ratings, and a strong foundation for drafted or simulation-league alternate-history runs.',
       whyItMatters: 'This season gives the archive lane a modern tentpole pack where the biggest fantasy is drafting the entire era into custom universes from one loaded player pool.',
       focusTeamName: 'Golden State Warriors',
       art: {
@@ -927,7 +927,7 @@ const HISTORIC_1993_FALLBACK = {
         headline: '73 Wins. 3-1 Swing.',
         subline: 'Unanimous MVP energy and the most volatile Finals pivot of the era.'
       },
-      plannedModes: ['Draft The Era', 'Sim Season', 'Reimagined Season'],
+      plannedModes: ['Draft The Era', 'Simulation League', 'Reimagined Season'],
       previewStars: ['Stephen Curry', 'LeBron James', 'Kawhi Leonard'],
       seasonUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1',
       simUrl: 'rosterbate-season.html?sport=nba&historical=sim&historicalPackId=nba_2016_full_season_v1',
@@ -1428,7 +1428,7 @@ const HISTORIC_1993_FALLBACK = {
 
     const buttonResets = [
       { id: 'draftEraBtn', label: 'Draft The Era' },
-      { id: 'simSeasonBtn', label: 'Sim Season' },
+      { id: 'simSeasonBtn', label: 'Simulation League' },
       { id: 'reimaginedSeasonBtn', label: 'Reimagined Season' }
     ];
     buttonResets.forEach(function(buttonConfig){
@@ -1442,7 +1442,7 @@ const HISTORIC_1993_FALLBACK = {
       };
     });
 
-    document.getElementById('modeNote').textContent = 'Clear filters to load a season before launching Draft The Era, Sim Season, or Reimagined Season.';
+    document.getElementById('modeNote').textContent = 'Clear filters to load a season before launching Draft The Era, Simulation League, or Reimagined Season.';
     document.getElementById('detailNote').textContent = 'The archive browser resets its hero and detail state when filters produce zero matches so no hidden pack appears active.';
   }
 
@@ -1725,7 +1725,7 @@ const HISTORIC_1993_FALLBACK = {
     const canDraft=playableHere;
     const canSim=playableHere && !isMixedEra;
     const canReimagined=playableHere && !isMixedEra;
-    simBtn.textContent=isMixedEra ? 'Sim After Draft' : 'Sim Season';
+    simBtn.textContent=isMixedEra ? 'League After Draft' : 'Simulation League';
     draftBtn.textContent='Draft The Era';
     reimaginedBtn.textContent=isMixedEra ? 'Reimagined Later' : 'Reimagined Season';
     simBtn.classList.toggle('disabled', !canSim);
@@ -1737,16 +1737,16 @@ const HISTORIC_1993_FALLBACK = {
 
     document.getElementById('modeNote').textContent = isMixedEra
       ? (playableHere
-          ? 'Choose a starting slot, launch Draft The Era, then turn that drafted universe into Sim Season with the same source-pack-aware players.'
+          ? 'Choose a starting slot, launch Draft The Era, then turn that drafted universe into Simulation League with the same source-pack-aware players.'
           : 'This crossover lane is visible now, but direct launch stays localhost-first until the mixed-era lane graduates.')
       : playableHere
-        ? 'On localhost, launching from here stages your selected slot before opening the drafted or simulated universe.'
+        ? 'On localhost, launching from here stages your selected slot before opening the drafted or simulation-league universe.'
       : (config.availability === 'playable'
           ? 'This pack is real, but direct launch stays localhost-first until the lane graduates from preview.'
           : 'Preview packs stay visible early on purpose. Planned modes: ' + (plannedModes.length ? plannedModes.join(', ') : 'Archive preview') + '.');
 
     document.getElementById('detailNote').textContent = isMixedEra
-      ? 'This crossover slot is intentionally draft-first. Draft the curated mixed-era board now, then let Sim Season take over once the custom universe exists.'
+      ? 'This crossover slot is intentionally draft-first. Draft the curated mixed-era board now, then let Simulation League take over once the custom universe exists.'
       : config.availability === 'playable'
         ? 'This pack is being read from the live simulation archive artifact. The shelf is ready for more eras whenever the next pack lands.'
         : 'Preview packs are intentionally listed before they are playable. Completeness: ' + completenessText + '. Why this season matters: ' + (config.whyItMatters || 'This archive slot is here to make the roadmap feel tangible before the pack is authored.');
@@ -1756,12 +1756,12 @@ const HISTORIC_1993_FALLBACK = {
       if(!canSim){
         setStatus(config.availability === 'playable'
           ? (isMixedEra
-              ? 'Mixed Era Sim Season starts after the draft. Draft the crossover board first, then convert that universe into Sim Season.'
-              : 'This pack is playable, but Sim Season remains localhost-first for now.')
-          : 'This archive slot is a preview. Sim Season will light up once the pack is authored and imported.', 'warn');
+              ? 'Mixed Era Simulation League starts after the draft. Draft the crossover board first, then convert that universe into Simulation League.'
+              : 'This pack is playable, but Simulation League remains localhost-first for now.')
+          : 'This archive slot is a preview. Simulation League will light up once the pack is authored and imported.', 'warn');
         return;
       }
-      setStatus('Staging the selected slot and opening Sim Season...', 'good');
+      setStatus('Staging the selected slot and opening Simulation League...', 'good');
       try{
         if(window.rbHistoricalPackDev && window.rbHistoricalPackDev.enabled){
           await window.rbHistoricalPackDev.ready();
@@ -1775,7 +1775,7 @@ const HISTORIC_1993_FALLBACK = {
         }
         window.location.href = buildLaunchUrl(config, 'simulation');
       }catch(error){
-        setStatus('Could not open Sim Season: ' + (error && error.message ? error.message : String(error)), 'warn');
+        setStatus('Could not open Simulation League: ' + (error && error.message ? error.message : String(error)), 'warn');
       }
     };
 
@@ -1836,7 +1836,7 @@ const HISTORIC_1993_FALLBACK = {
 
     setStatus(
       config.availability === 'playable'
-      ? 'Simulation archive browser loaded with archive filters active. Pick a slot and launch directly into a drafted or simulated universe.'
+      ? 'Simulation archive browser loaded with archive filters active. Pick a slot and launch directly into a drafted universe or simulation league.'
         : 'Archive shelf loaded with preview packs filtered into view.',
       config.availability === 'playable' ? 'good' : 'warn'
     );

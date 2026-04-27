@@ -19,7 +19,7 @@
   ],
   "defaultEntryMode": "simulation_season",
   "focusTeamId": "nba_2001_lal",
-  "subtitle": "Start a sim season from the source-season foundation, redraft the era, or branch into a turn-of-the-century alternate universe.",
+  "subtitle": "Start a simulation league from the source-season foundation, redraft the era, or branch into a turn-of-the-century alternate universe.",
   "description": "A 2000-01 NBA simulation archive pack built from source team, player, schedule, result, and player-game data.",
   "tagline": "Shaq, Kobe, Iverson, and the league at a turn-of-the-century peak.",
   "eraTags": [

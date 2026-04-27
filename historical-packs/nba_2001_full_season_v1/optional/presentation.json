@@ -1,6 +1,6 @@
 {
   "heroTitle": "2000-01 NBA Simulation Archive",
-  "heroSubtitle": "Choose a sim season path around Shaq and Kobe or redraft the full turn-of-the-century league from the historical foundation.",
+  "heroSubtitle": "Choose a simulation league path around Shaq and Kobe or redraft the full turn-of-the-century league from the source-season foundation.",
   "featuredTeamId": "nba_2001_lal",
   "featuredStars": [
     "nba_2001_shaquille_o_neal_406",
@@ -22,8 +22,8 @@
   "entryModes": [
     {
       "mode": "simulation_season",
-      "label": "Sim Season",
-      "description": "Choose one 2000-01 team and play through a ratings-driven sim season built from the historical foundation."
+      "label": "Simulation League",
+      "description": "Choose one 2000-01 team and play through a ratings-driven simulation league built from the source-season foundation."
     },
     {
       "mode": "historical_draft",

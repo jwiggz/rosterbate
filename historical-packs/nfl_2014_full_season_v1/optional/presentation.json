@@ -22,7 +22,7 @@
   "entryModes": [
     {
       "mode": "simulation_season",
-      "label": "Sim Season",
+      "label": "Simulation League",
       "description": "Choose one 2014 franchise and launch a football sim shell from the full-season historical pool."
     },
     {

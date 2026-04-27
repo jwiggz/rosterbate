@@ -114,13 +114,13 @@
   function getModeLabel(entryMode){
     switch(normalizeHistoricalEntryMode(entryMode, 'simulation_season')){
       case 'simulation_season':
-        return 'Sim Season';
+        return 'Simulation League';
       case 'historical_draft':
         return 'Drafted Universe';
       case 'reimagined_season':
         return 'Reimagined Season';
       default:
-        return 'Sim Season';
+        return 'Simulation League';
     }
   }
 
