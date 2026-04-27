@@ -1554,7 +1554,7 @@ if (!/League moves will show up here/.test(elements.hubActivity.innerHTML)) {
 assert.match(elements.hubSimRunnerCard.innerHTML, /Reveal Runner|Reveal Day 12 Results|Reveal Ready/, 'simulation hub should render the upgraded center-lane runner card for nba seasons');
 assert.match(elements.hubSimRunnerCard.innerHTML, /Era Pool/, 'simulation hub runner should frame mixed-era source context with an era-pool label');
 assert.match(elements.hubSimRunnerCard.innerHTML, /1986-87 \+ 2 more/, 'simulation hub runner should keep mixed-era source context compact');
-assert.match(elements.hubRevealReportCard.innerHTML, /Reveal reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
+assert.match(elements.hubRevealReportCard.innerHTML, /Reveal reports will appear here|League reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
 assert.match(elements.hubCycleMeta.textContent, /Local League .* Reveal Day 12 Ready/, 'simulation hub should surface the polished reveal-ready cycle copy for nba seasons');
 assert.equal(elements.rbChatTitle.textContent, 'League Notes', 'simulation hub should repurpose the side thread as a local-league notes surface');
 assert.match(elements.rbOnlineCount.textContent, /local league/i, 'simulation hub should avoid multiplayer thread copy in the side notes surface');
@@ -2858,7 +2858,7 @@ assert.match(elements.advBtn.innerHTML, /Sim Week 1/, 'nfl hub should expose a w
 assert.match(elements.advBtn.innerHTML, /Advance the week and publish results/, 'nfl hub CTA should carry the polished local-league subcopy');
 assert.equal(elements.hubScoringType.textContent, 'Head to Head Points', 'nfl hub should keep the polished local-league fantasy scoring copy');
 assert.equal(elements.advBtn.disabled, false, 'nfl hub sim CTA should remain enabled during regular season');
-assert.match(elements.hubRevealReportCard.innerHTML, /Weekly sim reports will appear here/i, 'nfl hub should use cadence-aware weekly report framing in the reveal lane');
+assert.match(elements.hubRevealReportCard.innerHTML, /Weekly reports will appear here/i, 'nfl hub should use cadence-aware weekly report framing in the reveal lane');
 assert.doesNotMatch(elements.hubRevealReportCard.innerHTML, /Sim day reports/i, 'nfl hub should not fall back to day-based report copy');
 
 simulationStubState.postseasonState = { phase: 'postseason_ready' };
