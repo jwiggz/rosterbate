@@ -8323,6 +8323,7 @@ window.onload=async function(){
       const parsed=normalizeLocalLeagueDraftSnapshot(rawParsed) || rawParsed;
       const localAutoLoad=resolveLocalSavedSeasonAutoLoad(parsed, requestedSport);
       if(localAutoLoad){
+        hideSeasonEmptyState();
         if(isDemoSeasonData(parsed)){
           console.log('?? Loading demo season data...');
           ACTIVE_SEASON_MODE='fantasy';

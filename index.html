@@ -3030,7 +3030,11 @@ function openHomepageSoloLeague(seasonId){
   try{
     localStorage.setItem('rosterbateDraft', JSON.stringify(normalizeHomepageLaunchPayload(row.data)));
   }catch(_error){}
-  window.location.href='rosterbate-season.html?sport='+encodeURIComponent(row.sport || 'nba')+'&league='+encodeURIComponent(seasonId);
+  const params=new URLSearchParams();
+  params.set('sport', row.sport || 'nba');
+  const targetSeasonId=String(seasonId || '').trim();
+  if(targetSeasonId && targetSeasonId!=='local') params.set('league', targetSeasonId);
+  window.location.href='rosterbate-season.html?'+params.toString();
 }
 function openHomepageSeasonLeague(seasonId){
   const row=homeLeaguePickerMulti.find(x=>x.id===seasonId);
