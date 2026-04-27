@@ -909,7 +909,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
       </div>
       <div class="hub-column">
         <div class="hub-card">
-          <div class="hub-card-title">Weekly Powerups</div>
+          <div class="hub-card-title" id="hubPowerupsTitle">League Powerups</div>
           <div class="hub-card hub-team-card" style="margin-bottom:10px;">
             <div class="hub-card-title" style="margin-bottom:10px;">My Team</div>
             <div id="hubAv" class="pav" style="width:62px;height:62px;font-size:22px;background:var(--accent);box-shadow:0 10px 20px rgba(249,115,22,.18);margin:6px auto 0;"></div>
@@ -8946,14 +8946,15 @@ function buildSimulationSummaryPills(cards){
   `).join('')}</div>`;
 }
 
-function buildSimulationHubPowerupRail(powerupCards){
+function buildSimulationHubPowerupRail(powerupCards, fallbackTitle){
   const cards=Array.isArray(powerupCards) ? powerupCards : [];
+  const railTitle=String(cards[0]?.title || fallbackTitle || '').trim() || 'League Powerups';
   if(!cards.length) return `<div class="hub-card">
-    <div class="hub-card-title">Weekly Powerups</div>
+    <div class="hub-card-title">${escapeSimulationShellHtml(railTitle)}</div>
     <div class="hub-card-sub">Powerups will show up here once this local league unlocks live activation controls.</div>
   </div>`;
   return `<div class="hub-card">
-    <div class="hub-card-title">Weekly Powerups</div>
+    <div class="hub-card-title">${escapeSimulationShellHtml(railTitle)}</div>
     <div class="hub-powerup-grid">${cards.map((card)=>`
       <div class="hub-powerup-tile" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.18);">
         <div class="hub-powerup-top">
@@ -9495,8 +9496,14 @@ function renderSimulationHubInSharedShell(){
     }
   }
   const hubPowerups=document.getElementById('hubPowerups');
+  const hubPowerupsTitle=document.getElementById('hubPowerupsTitle');
+  const sharedSimulationSport=String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase();
+  const powerupRailTitle=String(vm?.powerupCards?.[0]?.title || (sharedSimulationSport==='nfl' ? 'Weekly Powerups' : 'Reveal Powerups')).trim() || 'League Powerups';
+  if(hubPowerupsTitle){
+    hubPowerupsTitle.textContent = powerupRailTitle;
+  }
   if(hubPowerups){
-    hubPowerups.innerHTML=buildSimulationHubPowerupRail(vm?.powerupCards);
+    hubPowerups.innerHTML=buildSimulationHubPowerupRail(vm?.powerupCards, powerupRailTitle);
   }
   document.getElementById('hubMatchups').innerHTML = hasUpcomingSlate
     ? matchupRows.rows.slice(0, 5).join('')

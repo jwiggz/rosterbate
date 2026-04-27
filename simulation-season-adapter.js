@@ -1131,7 +1131,7 @@ function cleanSimulationSourceLabel(label){
       ...option,
       label: String(option?.label || '').replace(/ · ([A-Z]+) · \1$/i, ' · $1')
     }));
-    const cardTitle = sport === 'nfl' ? 'Weekly Powerups' : 'Weekly Powerups';
+    const cardTitle = sport === 'nfl' ? 'Weekly Powerups' : 'Reveal Powerups';
     const captainModeState = (
       activePowerups &&
       typeof activePowerups === 'object' &&
