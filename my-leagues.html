@@ -182,7 +182,7 @@
     </div>
     <div class="hero">
       <div class="hero-copy">
-        <div class="hero-kicker">Control Room Entry</div>
+        <div class="hero-kicker">League Access</div>
         <h1>My Leagues</h1>
         <p>All your draft rooms, shared seasons, and local leagues. Draft rooms stay grouped separately from active league saves so it's easy to reopen the right experience.</p>
       </div>
@@ -570,6 +570,20 @@ function normalizeLocalLaunchPayload(payload){
     legacyHistoricalStatMode:false
   };
 }
+const RB_PENDING_SEASON_KEY='rbPendingSeasonLaunch';
+function persistMyLeaguesPendingSeasonLaunch(payload){
+  try{
+    if(!payload || typeof payload!=='object') return;
+    const seasonId=String(payload.seasonId || payload.sharedSeasonId || payload.lobbyId || '').trim();
+    if(!seasonId) return;
+    const pendingPayload={
+      seasonId,
+      savedAt:Number(payload.savedAt || Date.now()),
+      data:JSON.parse(JSON.stringify(payload))
+    };
+    sessionStorage.setItem(RB_PENDING_SEASON_KEY, JSON.stringify(pendingPayload));
+  }catch(e){}
+}
 
 function getSeasonUrgency(row){
   const watchCount=getSeasonWatchCount(row.payload);
@@ -592,7 +606,7 @@ function getSeasonUrgency(row){
   if(watchCount>0) chips.push({tone:'live',label:watchCount+' watched target'+(watchCount===1?'':'s')});
   if(!chips.length) chips.push({tone:'info',label:(waiverCount||0)+' free agent'+(waiverCount===1?'':'s')});
 
-  let copy='Open the shared season manager and continue your shared season.';
+let copy='Open your shared season and continue where you left off.';
   let actionLabel='Open Season';
   let secondaryLabel='Open Watch List';
   let secondaryArgs=['waiver','watch'];
@@ -780,7 +794,7 @@ function renderSolo(rows){
         <div class="stat">${renderTimestampStat(savedAt)}<div class="stat-label">Last Saved</div></div>
         <div class="stat">${renderTimestampStat(lastAccessedAt)}<div class="stat-label">Last Accessed</div></div>
       </div>
-        <div class="league-copy">Your local league. ${row.id==='local'?'Saved locally in browser.':'Saved to cloud - accessible anywhere!'}</div>
+        <div class="league-copy">Your local league. ${row.id==='local'?'Saved locally in browser.':'Saved to your account and ready to reopen anywhere.'}</div>
       <div class="actions">
         <button class="btn primary small" onclick="openSoloLeague('${row.id}')">Open Season</button>
         <button class="btn danger small" onclick="deleteSoloLeague('${row.id}')">Delete League</button>
@@ -1168,6 +1182,7 @@ function openSoloLeague(seasonId){
   const accessTs=noteSoloLeagueAccess(row);
   const payload=(row.data && typeof row.data==='object') ? {...row.data, lastAccessedAt:accessTs} : {lastAccessedAt:accessTs};
   const launchPayload=normalizeLocalLaunchPayload(payload);
+  persistMyLeaguesPendingSeasonLaunch(launchPayload);
   
   // Load the league data into localStorage so season manager can use it
   try{

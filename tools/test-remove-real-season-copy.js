@@ -73,9 +73,19 @@ assert.match(
   /<div class="summary-label">Local<\/div>|Local and personal leagues|local league|No local leagues|Local-heavy snapshot|This snapshot leans local|Type: Local/i,
   'admin-leagues.html should present non-multiplayer leagues with local league wording'
 );
+assert.doesNotMatch(
+  files.adminLeagues,
+  /season shell/i,
+  'admin-leagues.html should not describe direct league inspection with season-shell wording'
+);
+assert.match(
+  files.adminLeagues,
+  /Open league|live league page/i,
+  'admin-leagues.html should describe direct inspection with plain league wording'
+);
 assert.match(
   files.index,
-  /Simulation Archives|Browse Simulation Archives|Simulation Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|local league manager|saved local league left off|Choose one of your local saves/i,
+  /Simulation Archives|Browse Simulation Archives|Simulation Archive|Flagship Archive|NBA Archive|NFL Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|saved local league left off|Choose one of your local saves/i,
   'index.html should frame homepage archive and local-league entry points with simulation-first wording'
 );
 assert.match(
@@ -130,7 +140,7 @@ assert.doesNotMatch(
 );
 assert.match(
   files.myLeagues,
-  /Open the shared season manager and continue your shared season\./,
+  /Open your shared season and continue where you left off\./,
   'my-leagues.html should keep a neutral shared-season fallback line'
 );
 assert.match(

@@ -4050,35 +4050,53 @@ function applySimulationSeasonPowerups(teamIdx, day, result){
 function getPendingSeasonLaunch(requestedLeagueId){
   const target=String(requestedLeagueId || '').trim();
   if(!target) return null;
-  try{
-    const raw=localStorage.getItem(RB_PENDING_SEASON_KEY);
-    if(!raw) return null;
-    const parsed=JSON.parse(raw);
-    if(!parsed || typeof parsed!=='object') return null;
-    const pendingSeasonId=String(parsed.seasonId || '').trim();
-    if(pendingSeasonId!==target) return null;
-    const pendingData=parsed.data;
-    if(!pendingData || typeof pendingData!=='object') return null;
-    return {
-      seasonId: pendingSeasonId,
-      savedAt: Number(parsed.savedAt || pendingData.savedAt || 0),
-      data: pendingData
-    };
-  }catch(e){
-    console.warn('Failed to parse pending season launch data:', e);
-    return null;
+  const storageAreas=[
+    {label:'sessionStorage', storageArea:typeof sessionStorage!=='undefined' ? sessionStorage : null},
+    {label:'localStorage', storageArea:typeof localStorage!=='undefined' ? localStorage : null}
+  ];
+  for(const {label, storageArea} of storageAreas){
+    try{
+      if(!storageArea) continue;
+      const raw=storageArea.getItem(RB_PENDING_SEASON_KEY);
+      if(!raw) continue;
+      const parsed=JSON.parse(raw);
+      if(!parsed || typeof parsed!=='object') continue;
+      const pendingSeasonId=String(parsed.seasonId || '').trim();
+      if(pendingSeasonId!==target) continue;
+      const pendingData=parsed.data;
+      if(!pendingData || typeof pendingData!=='object') continue;
+      return {
+        seasonId: pendingSeasonId,
+        savedAt: Number(parsed.savedAt || pendingData.savedAt || 0),
+        data: pendingData
+      };
+    }catch(e){
+      console.warn(`Failed to parse pending season launch data from ${label}:`, e);
+    }
   }
+  return null;
 }
 
 function clearPendingSeasonLaunch(requestedLeagueId){
-  try{
-    if(!requestedLeagueId){
-      localStorage.removeItem(RB_PENDING_SEASON_KEY);
-      return;
-    }
-    const pending=getPendingSeasonLaunch(requestedLeagueId);
-    if(pending) localStorage.removeItem(RB_PENDING_SEASON_KEY);
-  }catch(e){}
+  const target=String(requestedLeagueId || '').trim();
+  const storageAreas=[
+    typeof sessionStorage!=='undefined' ? sessionStorage : null,
+    typeof localStorage!=='undefined' ? localStorage : null
+  ];
+  for(const storageArea of storageAreas){
+    try{
+      if(!storageArea) continue;
+      if(!target){
+        storageArea.removeItem(RB_PENDING_SEASON_KEY);
+        continue;
+      }
+      const raw=storageArea.getItem(RB_PENDING_SEASON_KEY);
+      if(!raw) continue;
+      const parsed=JSON.parse(raw);
+      const pendingSeasonId=String(parsed?.seasonId || '').trim();
+      if(pendingSeasonId===target) storageArea.removeItem(RB_PENDING_SEASON_KEY);
+    }catch(e){}
+  }
 }
 
 function getMatchingLocalLeagueData(requestedLeagueId){
