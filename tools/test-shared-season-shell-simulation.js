@@ -1129,6 +1129,8 @@ assert.match(html, /function renderSimulationWaiverInSharedShell\(/, 'season she
 assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season shell should add a simulation trade renderer');
 assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season shell should add a simulation standings renderer');
 assert.match(html, /season-subbar-title">Waivers<\/div>[\s\S]*season-subbar-copy">Claim targets, watch list, and pending waiver moves<\/div>/, 'waiver page chrome should keep waiver-first page framing');
+assert.match(html, /hub-action-title">Waivers<\/div><div id="hubWC" class="hub-action-sub">/, 'simulation hub should keep waiver-first action-rail framing');
+assert.match(html, /goPage\('waiver'\)">Open Waivers<\/button>/, 'simulation hub should keep waiver-first runner actions');
 assert.match(html, /function applySimulationSuggestedLineupFromShell\(/, 'season shell should expose a simulation lineup action helper');
 assert.match(html, /SEASON_MODE_ADAPTER\.setLineup\(/, 'simulation lineup action should flow through the adapter');
 assert.match(html, /persistSimulationSeasonState\('simulation_lineup'\)/, 'simulation lineup action should persist shared state');

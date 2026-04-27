@@ -854,7 +854,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
           <div class="hub-actions" id="hubActions" style="margin-top:12px;">
             <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">&#128101;</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
             <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div id="hubMatchupActionTitle" class="hub-action-title">Matchup</div><div id="hubMatchupActionSub" class="hub-action-sub">Open the head-to-head box score</div></div></button>
-            <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">-- available</div></div></button>
+            <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Waivers</div><div id="hubWC" class="hub-action-sub">-- available</div></div></button>
             <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">&#127942;</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">--</div></div></button>
           </div>
         </div>
@@ -9053,7 +9053,7 @@ function renderSimulationHubActionRail(vm, options){
   hubActions.innerHTML=`
     <button onclick="goPage('roster')" class="card hub-action"><div class="hub-action-icon">&#128101;</div><div><div class="hub-action-title">My Team</div><div class="hub-action-sub">Set lineup and view starters</div></div></button>
     <button onclick="goPage('matchup')" class="card hub-action"><div class="hub-action-icon">&#9876;</div><div><div id="hubMatchupActionTitle" class="hub-action-title">${matchupTitle}</div><div id="hubMatchupActionSub" class="hub-action-sub">${matchupSub}</div></div></button>
-    <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Players</div><div id="hubWC" class="hub-action-sub">${playersCopy}</div></div></button>
+    <button onclick="goPage('waiver')" class="card hub-action"><div class="hub-action-icon">&#128269;</div><div><div class="hub-action-title">Waivers</div><div id="hubWC" class="hub-action-sub">${playersCopy}</div></div></button>
     <button type="button" id="hubWatchListCard" onclick="openWatchList()" class="card hub-action"><div class="hub-action-icon">&#9733;</div><div><div class="hub-action-title">Watch List</div><div class="hub-action-sub">${watchCopy}</div></div></button>
     <button type="button" id="hubTradeDeskCard" onclick="goPage('trades')" class="card hub-action"><div class="hub-action-icon">&#8646;</div><div><div class="hub-action-title">Trade Desk</div><div class="hub-action-sub">${tradeSummary}</div></div></button>
     <button onclick="goPage('standings')" class="card hub-action"><div class="hub-action-icon">&#127942;</div><div><div class="hub-action-title">Standings</div><div id="hubRank" class="hub-action-sub">${escapeSimulationShellHtml(rankLabel)}</div></div></button>
@@ -9100,7 +9100,7 @@ function buildSimulationHubRunnerCard(vm, options){
           <button type="button" class="hub-sim-action primary" onclick="${primaryActionHandler}">${escapeSimulationShellHtml(primaryAction?.id==='season-complete' ? 'Review Standings' : primaryLabel)}</button>
           <button type="button" class="hub-sim-action" onclick="goPage('roster')">Open My Team</button>
           <button type="button" class="hub-sim-action" onclick="goPage('matchup')">Open Matchup</button>
-          <button type="button" class="hub-sim-action" onclick="goPage('waiver')">Open Players</button>
+          <button type="button" class="hub-sim-action" onclick="goPage('waiver')">Open Waivers</button>
         </div>
       </div>
       <div class="hub-sim-side">
@@ -9360,7 +9360,7 @@ function renderSimulationHubInSharedShell(){
         ? `${recentDropTargets[0]?.name || 'A recent drop'} is a fresh cut. Check the wire before the league reacts.`
         : (radarPreview ? `${radarPreview.player?.name || 'Top target'} is the best available pickup right now.` : 'The wire is quiet right now, but the full pool is ready when you are.'),
       action:"goPage('waiver')",
-      link:'Open Players'
+      link:'Open Waivers'
     });
       nowCards.push({
         tone:primaryAction?.id==='season-complete'?'':(primaryActionTone==='reveal'?'live':'live'),
@@ -11477,7 +11477,7 @@ function renderHub(){
         ? recentDropTargets[0].name+' is a fresh cut. Check the wire before the league reacts.'
         : (radarPreview ? radarPreview.player.name+' is the best available pickup right now.' : 'The wire is quiet right now, but the full pool is ready when you are.'),
       action:"goPage('waiver')",
-      link:'Open players'
+      link:'Open Waivers'
     });
     if(isDraftedHistoricalUniverse){
       nowCards.push({
