@@ -132,7 +132,7 @@ assert.match(adapterSource, /runtimeApi\.activateSimulationPowerup\(/, 'adapter 
 assert.match(adapterSource, /gameLog\?\.winner/, 'postseason advancement should prefer the authoritative game winner over rounded display scores');
 
 const hub = adapter.getHubViewModel();
-  assert.equal(hub.leagueLabel, '2025-26 NBA Simulation');
+  assert.equal(hub.leagueLabel, 'Mixed Era Local League');
   assert.equal(hub.controlledTeam.abbr, 'LAL');
   assert.equal(hub.primaryAction.label, 'Reveal Day 12 Results');
   assert.equal(hub.primaryAction.shortLabel, 'Reveal Day');
@@ -208,6 +208,11 @@ assert.deepStrictEqual(
     { label: 'Source Pool', value: '2014' }
   ],
   'single-source simulation hubs should downgrade the era pill to a source-pool pill cleanly'
+);
+assert.equal(
+  singleSourceLeagueAdapter.getHubViewModel().leagueLabel,
+  '2025-26 NBA Local League',
+  'single-source unnamed leagues should default to a local-league identity instead of a generic simulation label'
 );
 
 const unrelatedPowerupAdapter = createSimulationSeasonAdapter({
@@ -1325,7 +1330,7 @@ const nflAdapter = createSimulationSeasonAdapter({
 });
 
   assert.equal(nflAdapter.getModeId(), 'nfl_mixed_era_single_player_v1');
-  assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Simulation');
+assert.equal(nflAdapter.getHubViewModel().leagueLabel, '2014 NFL Local League');
   assert.equal(nflAdapter.getHubViewModel().primaryAction.label, 'Sim Week 1');
   assert.equal(nflAdapter.getHubViewModel().primaryAction.shortLabel, 'Sim Week');
   assert.equal(nflAdapter.getScheduleViewModel().cycleLabel, 'Week 1');

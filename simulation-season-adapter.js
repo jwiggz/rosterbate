@@ -291,12 +291,18 @@ function buildSimulationLeagueLabel(state, sport){
     state?.leagueShell?.leagueName ||
       ''
     ).trim();
-    if (explicitLeagueName) return explicitLeagueName;
-    const anchorSeasonLabel = String(
-      state?.leagueShell?.anchorSeasonLabel ||
-      (sport === 'nfl' ? 'NFL' : 'NBA')
-    ).trim() || (sport === 'nfl' ? 'NFL' : 'NBA');
-  return `${anchorSeasonLabel} Simulation`;
+  if (explicitLeagueName) return explicitLeagueName;
+  const sourceSeasonLabels = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
+    ? state.sourceSeasons.sourceSeasonLabels.filter(Boolean)
+    : [];
+  if (sourceSeasonLabels.length > 1) return 'Mixed Era Local League';
+  const anchorSeasonLabel = String(
+    state?.leagueShell?.anchorSeasonLabel ||
+    (sport === 'nfl' ? 'NFL' : 'NBA')
+  ).trim();
+  if (anchorSeasonLabel) return `${anchorSeasonLabel} Local League`;
+  if (sourceSeasonLabels.length === 1) return `${sourceSeasonLabels[0]} Local League`;
+  return `${sport === 'nfl' ? 'NFL' : 'NBA'} Local League`;
 }
 
 function buildSimulationFormatLabel(state){

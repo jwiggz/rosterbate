@@ -562,7 +562,7 @@ const simulationAdapterStub = {
     const currentWeek = Number(simulationStubState?.seasonState?.currentWeek || 2) || 2;
     const captainModeState = simulationStubState?.seasonState?.powerupsByWeek?.[currentWeek]?.captain_mode || null;
     return {
-      leagueLabel: '2025-26 NBA Simulation',
+      leagueLabel: 'Mixed Era Local League',
       shellLabel: '1995-96 + 2015-16 Mixed Era Shell',
       controlledTeam: { abbr: 'LAL', name: 'Los Angeles Lakers' },
       userRow: { w: 9, l: 3, streak: 'W3' },
@@ -1520,7 +1520,7 @@ api.setGame({ day: 12, week: 2 });
 assert.ok(!api.getActiveSeasonPages().includes('playoffs'), 'regular-season nav should not show Playoffs');
 
 api.renderSimulationHubInSharedShell();
-assert.equal(elements.hubLeagueName.textContent, '2025-26 NBA Simulation');
+assert.equal(elements.hubLeagueName.textContent, 'Mixed Era Local League');
 assert.equal(elements.hubFormat.textContent, 'Mixed Era');
 assert.equal(elements.hubScoringType.textContent, 'Head to Head Points');
 assert.equal(elements.hubTeamCount.textContent, '3');
