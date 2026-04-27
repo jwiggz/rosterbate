@@ -5945,7 +5945,7 @@ function handleRosterAction(action){
     if(action==='trades') return goPage('trades');
     if(action==='set-lineup') return applySimulationSuggestedLineupFromShell();
     if(action==='il' || action==='drop'){
-      toast('That roster action is not available for simulation leagues yet.');
+toast('That roster action is not available for this local league yet.');
       return;
     }
   }
@@ -10721,7 +10721,7 @@ function renderSimulationPlayoffsInSharedShell(){
       });
     const renderScheduleRows = () => {
       if (!currentRoundSchedule.length) {
-        return '<div class="muted" style="padding-top:12px;">The current postseason slate will populate once the adapter seeds the round.</div>';
+        return '<div class="muted" style="padding-top:12px;">The current postseason slate will populate once the next round locks in.</div>';
       }
       return currentRoundSchedule.map((game) => `
         <div style="padding:12px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
@@ -10759,7 +10759,7 @@ function renderSimulationPlayoffsInSharedShell(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
           <div>
             <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${roundLabel}</div>
-            <div style="color:var(--text2);margin-top:6px;">Exact 2014 NFL postseason context for the ${shellLabel} shell with seeded conference fields, live round matchups, and bye tracking.</div>
+            <div style="color:var(--text2);margin-top:6px;">Follow the ${shellLabel} playoff race with seeded conference fields, live round matchups, and bye tracking.</div>
           </div>
           <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);min-width:180px;">
             <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);">Championship</div>
@@ -10774,7 +10774,7 @@ function renderSimulationPlayoffsInSharedShell(){
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
           <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">${roundLabel} Slate</div>
-          <div style="color:var(--text2);font-size:12px;">The shared shell keeps roster moves open while the weekly bracket advances.</div>
+          <div style="color:var(--text2);font-size:12px;">Keep roster decisions moving while the weekly bracket advances.</div>
         </div>
         <div style="margin-top:10px;">${renderScheduleRows()}</div>
       </div>
@@ -10901,7 +10901,7 @@ function renderSimulationPlayoffsInSharedShell(){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Postseason Summary</div>
-          <div style="color:var(--text2);font-size:12px;margin-top:4px;">The shared shell reads directly from the adapter's postseason snapshot.</div>
+          <div style="color:var(--text2);font-size:12px;margin-top:4px;">Track the playoff picture, current round, and final title chase from one league view.</div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <div style="padding:10px 12px;border-radius:12px;background:#0f1724;border:1px solid #24324a;min-width:132px;">
@@ -10921,7 +10921,7 @@ function renderSimulationPlayoffsInSharedShell(){
     </div>
     <div class="card">
       <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Today's Postseason Games</div>
-      <div style="color:var(--text2);font-size:12px;margin-top:4px;">Current adapter slate for the active postseason day.</div>
+      <div style="color:var(--text2);font-size:12px;margin-top:4px;">Current postseason slate for the active day.</div>
       <div style="margin-top:14px;">
         ${todayGames.map((game) => `
           <div style="padding:10px 0;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
@@ -10931,7 +10931,7 @@ function renderSimulationPlayoffsInSharedShell(){
             </div>
             <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${game.seriesId || game.gameId || 'Next Up'}</div>
           </div>
-        `).join('') || '<div class="muted" style="margin-top:12px;">No postseason games are scheduled for the current adapter day.</div>'}
+        `).join('') || '<div class="muted" style="margin-top:12px;">No postseason games are scheduled for the current day.</div>'}
       </div>
     </div>
     ${renderConferencePlayIn('East', vm.playIn?.east)}
@@ -10939,7 +10939,7 @@ function renderSimulationPlayoffsInSharedShell(){
     ${bracketSections.length ? `
       <div class="card">
         <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Bracket Snapshot</div>
-        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Adapter bracket groupings for each conference and the Finals.</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Conference brackets and the Finals path at a glance.</div>
         ${bracketSections.map((section) => `
           <div style="margin-top:14px;">
             <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${section.title}</div>
@@ -10951,7 +10951,7 @@ function renderSimulationPlayoffsInSharedShell(){
     ${Object.keys(seriesByRound).length ? `
       <div class="card">
         <div style="font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;">Series Tracker</div>
-        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Live postseason series state from the adapter snapshot.</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px;">Live series scores and winner pressure for the active playoff rounds.</div>
         ${Object.entries(seriesByRound).map(([roundLabel, seriesList]) => `
           <div style="margin-top:14px;">
             <div style="font-family:var(--fd);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">${roundLabel}</div>
@@ -11047,7 +11047,7 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
     G.isSeasonComplete=true;
     recordLifetimeSeasonStats().catch(error=>console.error('Could not record lifetime stats', error));
     queueSharedSeasonSave('season_complete');
-    toast(isSimulationSeason?'Final sim day revealed. Season complete!':'Final day revealed. Season complete!');
+    toast(isSimulationSeason?'Final reveal day is in. Season complete!':'Final day revealed. Season complete!');
     renderHub();
     setTimeout(()=>openRevealReport(revealDayNo),120);
     if(document.getElementById('roster').classList.contains('active')) scheduleRosterRender();
@@ -11060,11 +11060,11 @@ function advanceWeek(){ if(advanceWeek.disabled) return; advanceWeek.disabled=tr
   if(G.week!==previousWeek){
     const drop=rollWeeklyPowerupDrops(G.week);
     const dropNames=drop.drops.map(id=>POWERUP_LIBRARY[id].name).join(', ');
-    toast((isSimulationSeason?'Sim Day ':'Day ')+revealDayNo+' revealed. New drop: '+dropNames);
+    toast((isSimulationSeason?'Reveal Day ':'Day ')+revealDayNo+' is in. New drop: '+dropNames);
   }else if(settled){
     toast((isSimulationSeason?'Week '+finishedWeek+' sim slate is final. Day ':'Week '+finishedWeek+' is final. Day ')+revealDayNo+' revealed.');
   }else{
-    toast((isSimulationSeason?'Sim Day ':'Day ')+revealDayNo+' results revealed.');
+    toast((isSimulationSeason?'Reveal Day ':'Day ')+revealDayNo+' results are in.');
   }
   queueSharedSeasonSave('advance_day'); advanceWeek.disabled=false; renderHub();
   setTimeout(()=>openRevealReport(revealDayNo),120);
@@ -13383,7 +13383,7 @@ function renderTrades(){
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
       <div>
         <div style="font-family:var(--fb);font-size:20px;font-weight:800;color:#f8fafc;">Open A Conversation</div>
-        <div class="season-subbar-copy">${isMultiplayerLeague?'Pick the manager you want to pressure next.':'Pick the roster you want to test for an AI-reviewed deal.'}</div>
+<div class="season-subbar-copy">${isMultiplayerLeague?'Pick the manager you want to pressure next.':'Pick the roster you want to test for a one-for-one deal.'}</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <span class="season-stat-pill">${tradeTargets.length} trade partners</span>

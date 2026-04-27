@@ -1160,6 +1160,9 @@ assert.match(html, /id="playoffsContent"/, 'playoffs markup should expose a dedi
 assert.match(html, /id="playoffsPowerups"/, 'playoffs markup should expose a dedicated powerups mount');
 assert.doesNotMatch(html, /Postseason bracket, play-in races, and the champion path/, 'shared shell playoffs header copy should not promise active playoff simulation for every sport path');
 assert.doesNotMatch(html, /This screen reflects adapter-driven postseason state as the season rolls into the play-in and playoffs\./, 'shared shell playoffs note should not imply active playoff simulation flow by default');
+assert.doesNotMatch(html, /The shared shell reads directly from the adapter's postseason snapshot\./, 'playoffs summary copy should avoid adapter-facing implementation language');
+assert.doesNotMatch(html, /Current adapter slate for the active postseason day\./, 'playoffs slate copy should avoid adapter-facing implementation language');
+assert.match(html, /Track the playoff picture, current round, and final title chase from one league view\./, 'playoffs summary copy should use league-facing framing');
 
 const params = new URLSearchParams('?simulation=NBA_Mixed_Era&historicalUniverse=sim-slot-1');
 assert.equal(api.getRequestedSimulationMode(params), 'nba_mixed_era', 'simulation query param should normalize to lowercase');
@@ -1629,8 +1632,8 @@ api.handleRosterAction('drop');
 assert.deepStrictEqual(
   demoToasts,
   [
-    'That roster action is not available for simulation leagues yet.',
-    'That roster action is not available for simulation leagues yet.'
+    'That roster action is not available for this local league yet.',
+    'That roster action is not available for this local league yet.'
   ],
   'simulation il/drop actions should surface the unavailable-flow toast instead of touching fantasy-only state'
 );
