@@ -253,6 +253,26 @@ assert.equal(
   'mixed-era leagues should not reuse a generic anchor-season title as the active local league name'
 );
 
+const cleanedSourceLabelAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-clean-source-labels',
+  state: {
+    ...slotState,
+    sourceSeasons: {
+      sourceSeasonLabels: ['1995-96 NBA Simulation Archive', '1986-87 NBA Simulation Archive', '2015-16 NBA Simulation Archive']
+    }
+  }
+});
+assert.deepStrictEqual(
+  cleanedSourceLabelAdapter.getHubViewModel().summaryCards.map((card) => ({ label: card.label, value: card.value })),
+  [
+    { label: 'Record', value: '9-3' },
+    { label: 'Reveal Window', value: 'Day 12 - Week 2' },
+    { label: 'Team', value: 'LAL' },
+    { label: 'Era Pool', value: '1995-96 + 2 more' }
+  ],
+  'simulation hub summary pills should trim archive and sport suffixes from source-season labels'
+);
+
 const unrelatedPowerupAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-powerups',
   state: {

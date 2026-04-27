@@ -329,7 +329,10 @@ function buildSimulationFormatLabel(state){
 function cleanSimulationSourceLabel(label){
   const rawLabel = String(label || '').trim();
   if (!rawLabel) return '';
-  return rawLabel.replace(/\s+Simulation Archive\b/i, '').trim();
+  return rawLabel
+    .replace(/\s+Simulation Archive\b/i, '')
+    .replace(/\s+\b(NBA|NFL)\b$/i, '')
+    .trim();
 }
 
   function buildSimulationTeamSummary(state, rosterState){
