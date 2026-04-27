@@ -792,7 +792,7 @@ const simulationAdapterStub = {
             {
               team: { abbr: 'BOS', name: 'Boston Celtics' },
               incomingRoster: [
-                { id: 30, name: 'Stephen Curry' }
+                { id: 30, name: 'Stephen Curry', choiceLabel: 'Stephen Curry Â· GSW Â· PG' }
               ],
               recordLabel: '7-5',
               topPlayerName: 'Stephen Curry',
@@ -805,7 +805,7 @@ const simulationAdapterStub = {
         { abbr: 'LEG', name: 'Legacy Trade Fallback' }
       ],
       outgoingRoster: [
-        { id: 34, name: 'Hakeem Olajuwon' }
+        { id: 34, name: 'Hakeem Olajuwon', choiceLabel: 'Hakeem Olajuwon Â· HOU Â· C' }
       ],
       incomingRostersByTeam: {
         LEG: [
@@ -1877,6 +1877,8 @@ assert.match(elements.tradesContent.innerHTML, /Open A Conversation/i, 'simulati
 assert.match(elements.tradesContent.innerHTML, /7-5/, 'simulation trades should surface partner record context');
 assert.match(elements.tradesContent.innerHTML, /Top asset: Stephen Curry/, 'simulation trades should surface partner top-player context');
 assert.match(elements.tradesContent.innerHTML, /13 players/, 'simulation trades should surface partner roster counts');
+assert.match(elements.tradesContent.innerHTML, /Hakeem Olajuwon [^<]* HOU [^<]* C/i, 'simulation trades should render outgoing option labels with full player context');
+assert.match(elements.tradesContent.innerHTML, /Stephen Curry [^<]* GSW [^<]* PG/i, 'simulation trades should render incoming option labels with full player context');
 
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];

@@ -426,6 +426,15 @@ function cleanSimulationSourceLabel(label){
     ].filter(Boolean).join(' · ').trim();
   }
 
+  function attachSimulationChoiceLabelsToRoster(roster){
+    const clonedRoster = clone(Array.isArray(roster) ? roster : []);
+    const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(clonedRoster);
+    return clonedRoster.map((player) => ({
+      ...clone(player),
+      choiceLabel: buildSimulationPlayerChoiceLabel(player, playerVariantLabelsById)
+    }));
+  }
+
   function buildSimulationLastMatchupLabel(state){
     const teamAbbr = getControlledTeamAbbr(state);
     const completedGames = Array.isArray(state?.seasonState?.completedGameLogs) ? state.seasonState.completedGameLogs : [];
@@ -1323,7 +1332,7 @@ function cleanSimulationSourceLabel(label){
     const incomingRostersByTeam = clone(state?.draftState?.rostersByTeam || {});
     const standings = Array.isArray(state?.seasonState?.standings) ? state.seasonState.standings : [];
     return (Array.isArray(tradePartners) ? tradePartners : []).map((team, index) => ({
-      incomingRoster: clone(incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()] || []),
+      incomingRoster: attachSimulationChoiceLabelsToRoster(incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()] || []),
       id: `trade-partner-${String(team?.abbr || index).trim() || index}`,
       team: clone(team),
       teamAbbr: String(team?.abbr || '').trim().toUpperCase(),
@@ -1337,7 +1346,9 @@ function cleanSimulationSourceLabel(label){
           ? incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()]
           : [];
         const topPlayer = roster.slice().sort((a, b) => Number(b?.fp || 0) - Number(a?.fp || 0))[0] || null;
-        return topPlayer?.name || '';
+        if (!topPlayer) return '';
+        const labeledRoster = attachSimulationChoiceLabelsToRoster(roster);
+        return labeledRoster.find((player) => Number(player?.id) === Number(topPlayer?.id))?.choiceLabel || topPlayer?.name || '';
       })(),
       rosterCount: Array.isArray(incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()])
         ? incomingRostersByTeam[String(team?.abbr || '').trim().toUpperCase()].length
@@ -2628,8 +2639,13 @@ function cleanSimulationSourceLabel(label){
           sport: getSimulationSportForState(state),
           userTeamAbbr: controlled,
           tradePartners,
-          outgoingRoster: getControlledRoster(state),
-          incomingRostersByTeam: clone(state?.draftState?.rostersByTeam || {}),
+          outgoingRoster: attachSimulationChoiceLabelsToRoster(getControlledRoster(state)),
+          incomingRostersByTeam: Object.fromEntries(
+            Object.entries(clone(state?.draftState?.rostersByTeam || {})).map(([teamAbbr, roster]) => [
+              teamAbbr,
+              attachSimulationChoiceLabelsToRoster(roster)
+            ])
+          ),
           sections: {
             partners: {
               title: 'Trade Partners',

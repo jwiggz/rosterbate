@@ -9718,7 +9718,7 @@ function renderSimulationTradesInSharedShell(){
           <select id="simulation-trade-outgoing-select-${partnerAbbr}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
             <option value="">Choose outgoing player</option>
             ${(vm.outgoingRoster || []).map((player) => (
-              `<option value="${player.id}">${player.name}</option>`
+              `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
             )).join('')}
           </select>
         </div>
@@ -9727,7 +9727,7 @@ function renderSimulationTradesInSharedShell(){
           <select id="simulation-trade-incoming-select-${partnerAbbr}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
             <option value="">Choose incoming player</option>
             ${((row?.incomingRoster || vm.incomingRostersByTeam?.[partnerAbbr] || [])).map((player) => (
-              `<option value="${player.id}">${player.name}</option>`
+              `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
             )).join('')}
           </select>
         </div>

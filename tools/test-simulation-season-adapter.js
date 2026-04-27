@@ -449,6 +449,16 @@ assert.ok(
   'nba simulation waiver vm should preserve later mixed-era drop options with their own season labels'
 );
 
+const duplicateBenchTradeVm = duplicateBenchAdapter.getTradeViewModel();
+assert.ok(
+  duplicateBenchTradeVm.outgoingRoster.some((player) => /Mahmoud Abdul-Rauf .*DEN .*PG .*1992-93/.test(player?.choiceLabel || '')),
+  'nba simulation trade vm should disambiguate duplicate mixed-era outgoing options with compact season labels'
+);
+assert.ok(
+  duplicateBenchTradeVm.outgoingRoster.some((player) => /Mahmoud Abdul-Rauf .*DEN .*PG .*1995-96/.test(player?.choiceLabel || '')),
+  'nba simulation trade vm should preserve later mixed-era outgoing options with their own season labels'
+);
+
 const indexOnlyResultAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-index-only-results',
   state: {
@@ -572,6 +582,8 @@ assert.equal(trades.tradePartners.length, 1);
 assert.equal(trades.tradePartners[0].abbr, 'BOS');
 assert.equal(trades.outgoingRoster.length, 2);
 assert.equal(trades.incomingRostersByTeam.BOS.length, 1);
+assert.match(trades.outgoingRoster[0]?.choiceLabel || '', /Michael Jordan .*CHI .*SG/);
+assert.match(trades.incomingRostersByTeam.BOS[0]?.choiceLabel || '', /Stephen Curry .*GSW .*PG/);
 
 const standings = adapter.getStandingsViewModel();
 assert.ok(Array.isArray(standings.sections), 'standings vm should expose shared-shell sections');
@@ -2278,3 +2290,4 @@ assert.equal(
 );
 
 console.log('simulation season adapter test passed');
+
