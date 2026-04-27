@@ -1900,8 +1900,13 @@ assert.deepStrictEqual(
 );
 
 api.renderSimulationStandingsInSharedShell();
+assert.match(elements.standingsContent.innerHTML, /(Los Angeles Lakers|LAL)/);
 assert.match(elements.standingsContent.innerHTML, /LAL/);
-assert.match(elements.standingsContent.innerHTML, /9-3/);
+assert.match(elements.standingsContent.innerHTML, />9</);
+assert.match(elements.standingsContent.innerHTML, />3</);
+assert.match(elements.standingsContent.innerHTML, /1360\.0/);
+assert.match(elements.standingsContent.innerHTML, /1288\.0/);
+assert.match(elements.standingsContent.innerHTML, /Track conference races, division pressure, and full league positioning from one local-league board\./);
 assert.match(elements.standingsContent.innerHTML, /season-hero-card|Standings/, 'simulation standings should reuse the single-player standings framing');
 
 api.setSeasonModeAdapter({

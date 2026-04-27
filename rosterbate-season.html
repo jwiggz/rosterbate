@@ -9837,7 +9837,7 @@ function renderSimulationStandingsInSharedShell(){
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
             <div>
               <div style="font-family:var(--fb);font-size:28px;font-weight:800;color:#f8fafc;">Standings</div>
-              <div class="season-subbar-copy">Conference and division standings stay in the shared season shell while preserving sport-specific grouping.</div>
+              <div class="season-subbar-copy">Track conference races, division pressure, and full league positioning from one local-league board.</div>
               ${heroMeta?.links || ''}
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -9849,12 +9849,28 @@ function renderSimulationStandingsInSharedShell(){
       `<div class="card">
         <div style="font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;">${section.title}</div>
         <div style="margin-top:10px;">
-          ${(Array.isArray(section.rows) && section.rows.length ? section.rows : [{ teamAbbr: null, w: null, l: null, empty: true }]).map((row) => (
-            row?.empty
-              ? `<div class="muted" style="padding:8px 0;">No standings available.</div>`
-              :
-            `<div style="padding:8px 0;border-top:1px solid rgba(255,255,255,.08);">${row.teamAbbr} · ${row.w}-${row.l}</div>`
-          )).join('')}
+          ${(Array.isArray(section.rows) && section.rows.length ? `
+            <div style="display:grid;grid-template-columns:42px minmax(0,1.3fr) 42px 42px 68px 68px;gap:8px;padding:0 0 8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">
+              <div style="text-align:center;">#</div>
+              <div>Team</div>
+              <div style="text-align:right;">W</div>
+              <div style="text-align:right;">L</div>
+              <div style="text-align:right;">PF</div>
+              <div style="text-align:right;">PA</div>
+            </div>
+            ${section.rows.map((row, rowIndex) => `
+                <div style="display:grid;grid-template-columns:42px minmax(0,1.3fr) 42px 42px 68px 68px;gap:8px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.08);">
+                  <div style="text-align:center;font-family:var(--fd);font-size:14px;font-weight:800;color:#f8fafc;">${Number.isFinite(Number(row?.rank)) ? Number(row.rank) : rowIndex + 1}</div>
+                  <div style="min-width:0;">
+                    <div style="font-size:13px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeSimulationShellHtml(row?.teamName || row?.name || row?.teamAbbr || 'Team')}</div>
+                    <div style="font-size:11px;color:var(--text2);margin-top:3px;">${escapeSimulationShellHtml(row?.teamAbbr || '--')}</div>
+                  </div>
+                  <div style="text-align:right;font-size:12px;color:#dbe4f0;">${Number(row?.w || 0)}</div>
+                  <div style="text-align:right;font-size:12px;color:#dbe4f0;">${Number(row?.l || 0)}</div>
+                  <div style="text-align:right;font-size:12px;color:#dbe4f0;">${Number(row?.pf || 0).toFixed(1)}</div>
+                  <div style="text-align:right;font-size:12px;color:#dbe4f0;">${Number(row?.pa || 0).toFixed(1)}</div>
+                </div>`).join('')}
+          ` : '<div class="muted" style="padding:8px 0;">No standings available.</div>')}
         </div>
       </div>`
     )).join('')}

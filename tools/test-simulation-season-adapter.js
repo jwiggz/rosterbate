@@ -588,6 +588,7 @@ assert.match(trades.incomingRostersByTeam.BOS[0]?.choiceLabel || '', /Stephen Cu
 const standings = adapter.getStandingsViewModel();
 assert.ok(Array.isArray(standings.sections), 'standings vm should expose shared-shell sections');
 assert.equal(standings.userRow.teamAbbr, 'LAL');
+assert.equal(standings.userRow.teamName, 'Los Angeles Lakers');
 assert.equal(standings.rows.length, 2);
 
 const lineupState = adapter.setLineup([34, 23]);

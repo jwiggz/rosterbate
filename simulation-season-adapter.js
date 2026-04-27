@@ -1356,6 +1356,23 @@ function cleanSimulationSourceLabel(label){
     }));
   }
 
+  function attachSimulationStandingsIdentity(state, standings){
+    const teamsByAbbr = new Map(
+      clone(state?.leagueShell?.teams || [])
+        .map((team) => [String(team?.abbr || '').trim().toUpperCase(), clone(team)])
+        .filter((entry) => entry[0])
+    );
+    return (Array.isArray(standings) ? standings : []).map((row) => {
+      const abbr = String(row?.teamAbbr || '').trim().toUpperCase();
+      const team = teamsByAbbr.get(abbr) || null;
+      return {
+        ...clone(row),
+        teamAbbr: abbr || String(row?.teamAbbr || '').trim(),
+        teamName: row?.teamName || row?.name || team?.name || abbr || 'Team'
+      };
+    });
+  }
+
   function buildSimulationStandingsSections(state, standings){
     const sport = getSimulationSportForState(state);
     if (sport === 'nfl') {
@@ -2655,7 +2672,7 @@ function cleanSimulationSourceLabel(label){
         };
       },
       getStandingsViewModel(){
-        const standings = sortStandingsRows(clone(state?.seasonState?.standings || []));
+        const standings = attachSimulationStandingsIdentity(state, sortStandingsRows(clone(state?.seasonState?.standings || [])));
         const controlled = getControlledTeamAbbr(state);
         const sport = getSimulationSportForState(state);
         return {
