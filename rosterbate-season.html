@@ -9065,7 +9065,13 @@ function buildSimulationHubRunnerCard(vm, options){
   const primaryAction=opts.primaryAction || null;
   const primaryTone=String(primaryAction?.shellTone || '').trim().toLowerCase();
   const controlledTeamName=String(vm?.controlledTeam?.name || D?.teamName || 'Simulation Team').trim() || 'Simulation Team';
-  const sourceSeasonLabel=escapeSimulationShellHtml(String(vm?.sourceSeasonLabels?.join(' + ') || vm?.shellLabel || 'Simulation Archive').trim() || 'Simulation Archive');
+  const rawSourceSeasonLabels=Array.isArray(vm?.sourceSeasonLabels) ? vm.sourceSeasonLabels.filter(Boolean) : [];
+  const sourceSeasonLabel=escapeSimulationShellHtml(rawSourceSeasonLabels.length > 1
+    ? `${String(rawSourceSeasonLabels[0] || 'Mixed Era').trim() || 'Mixed Era'} + ${rawSourceSeasonLabels.length - 1} more`
+    : (rawSourceSeasonLabels.length === 1
+      ? `${String(rawSourceSeasonLabels[0] || 'Source Pool').trim() || 'Source Pool'} pool`
+      : String(vm?.leagueLabel || vm?.shellLabel || 'Local League').trim() || 'Local League'));
+  const sourceSeasonKicker=rawSourceSeasonLabels.length > 1 ? 'Era Pool' : 'Source Pool';
   const availableCount=Math.max(0, Number(opts.availableCount || 0));
   const watchCount=Math.max(0, Number(opts.watchCount || 0));
   const primaryLabel=escapeSimulationShellHtml(String(primaryAction?.label || 'Reveal Day').trim() || 'Reveal Day');
@@ -9082,6 +9088,7 @@ function buildSimulationHubRunnerCard(vm, options){
       <div class="hub-sim-copy">
         <div class="hub-sim-kicker">${primaryTone==='reveal' ? 'Reveal Runner' : 'Simulation Runner'}</div>
         <div class="hub-sim-title">${sourceSeasonLabel}</div>
+        <div class="hub-sim-meta">${escapeSimulationShellHtml(sourceSeasonKicker)}</div>
         <div class="hub-sim-sub">${escapeSimulationShellHtml(helperCopy)}</div>
         <div class="hub-sim-pills">
           <span class="hub-sim-pill blue">${escapeSimulationShellHtml(primaryLabel)}</span>

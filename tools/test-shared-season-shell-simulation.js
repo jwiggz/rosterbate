@@ -1552,6 +1552,8 @@ if (!/League moves will show up here/.test(elements.hubActivity.innerHTML)) {
   assert.match(elements.hubActivity.innerHTML, /Just now|ago|Live now/, 'simulation hub activity feed should render polished age-aware or live activity metadata when entries exist');
 }
 assert.match(elements.hubSimRunnerCard.innerHTML, /Reveal Runner|Reveal Day 12 Results|Reveal Ready/, 'simulation hub should render the upgraded center-lane runner card for nba seasons');
+assert.match(elements.hubSimRunnerCard.innerHTML, /Era Pool/, 'simulation hub runner should frame mixed-era source context with an era-pool label');
+assert.match(elements.hubSimRunnerCard.innerHTML, /1986-87 \+ 2 more/, 'simulation hub runner should keep mixed-era source context compact');
 assert.match(elements.hubRevealReportCard.innerHTML, /Reveal reports will appear here|Open Report|Day \d+ Is Official/, 'simulation hub should render the reveal-report lane');
 assert.match(elements.hubCycleMeta.textContent, /Local League .* Reveal Day 12 Ready/, 'simulation hub should surface the polished reveal-ready cycle copy for nba seasons');
 assert.equal(elements.rbChatTitle.textContent, 'League Notes', 'simulation hub should repurpose the side thread as a local-league notes surface');
