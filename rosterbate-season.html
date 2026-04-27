@@ -11264,7 +11264,9 @@ function renderHub(){
       dataStampEl.textContent='';
     }
   }
-  document.getElementById('rWk').textContent='Wk '+G.week+' | Day '+G.day;
+  document.getElementById('rWk').textContent=sport==='nfl'
+    ? 'Set weekly starters, tune depth, and check injury availability'
+    : 'Set starters, tune your bench, and check injury availability';
   document.getElementById('sWk').textContent=revealedCount+'/'+(weekEnd-weekStart+1)+' days revealed';
   const stEl=document.getElementById('hubStreak');
   if(myS&&(myS.w+myS.l>0)){stEl.textContent=(myS.streakW?'W':'L')+myS.streak;stEl.style.color=myS.streakW?'var(--green)':'var(--red)';}
