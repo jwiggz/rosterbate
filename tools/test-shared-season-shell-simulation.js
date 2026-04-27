@@ -1577,14 +1577,17 @@ assert.doesNotMatch(elements.hubPowerups.innerHTML, /Hakeem Olajuwon/, 'simulati
 api.renderSimulationRosterInSharedShell();
 assert.equal(elements.rosterPowerups.style.display, 'none');
 assert.equal(elements.rosterPowerups._shell.style.gridTemplateColumns, 'minmax(0,1fr)');
-assert.equal(elements.rosterScheduleChip.textContent, 'Schedule');
+assert.equal(elements.rosterScheduleChip.textContent, 'Matchup');
 assertSharedSinglePlayerRosterMarkers(
   elements.rosterContent.innerHTML,
   'simulation roster'
 );
 assert.match(elements.rosterContent.innerHTML, /Use Suggested Starters/);
+assert.match(elements.rosterContent.innerHTML, /Set starters, tune your bench, and manage roster moves from one local-league room\./);
+assert.match(elements.rosterContent.innerHTML, />Matchup</);
 assert.match(elements.rosterContent.innerHTML, /Starters/);
 assert.match(elements.rosterContent.innerHTML, /bench/i);
+assert.match(elements.rosterContent.innerHTML, /Bench ready/);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
 assert.match(elements.rosterContent.innerHTML, /openWatchList\(\)/, 'simulation roster should keep the watch-list action live');
 assert.match(elements.rosterContent.innerHTML, /openTeamSettings\(\)/, 'simulation roster should keep the team-settings action live');

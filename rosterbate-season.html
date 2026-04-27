@@ -10055,12 +10055,12 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
   const vm=rosterVm && typeof rosterVm==='object' ? rosterVm : {};
   const sport=String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() || 'nba';
   const scheduleChip=document.getElementById('rosterScheduleChip');
-  if(scheduleChip) scheduleChip.textContent='Schedule';
+  if(scheduleChip) scheduleChip.textContent='Matchup';
   const rosterNote=document.querySelector ? document.querySelector('#roster .season-page-note') : null;
   if(rosterNote){
     rosterNote.textContent=sport==='nfl'
-      ? 'Set weekly starters, slot suggestions, and bench depth from the shared team page.'
-      : 'Set suggested starters and review bench depth from the shared team page.';
+      ? 'Set weekly starters, use slot suggestions, and review bench depth from your team room.'
+      : 'Set suggested starters and review bench depth from your team room.';
   }
   const rosterWeekLabel=document.getElementById('rWk');
   if(rosterWeekLabel){
@@ -10196,7 +10196,9 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
           const recommendationText=escapeHtml(
             entry?.warning
               || entry?.recommendationHint
-              || ((entry?.suggestedPlayerId!=null && entry.suggestedPlayerId!==entry.playerId) ? 'Suggested change available' : (player ? 'Starter set' : 'Awaiting assignment'))
+              || ((entry?.suggestedPlayerId!=null && entry.suggestedPlayerId!==entry.playerId)
+                ? 'Suggested change available'
+                : (player ? (sectionKey==='bench' ? 'Bench ready' : 'Starter set') : 'Awaiting assignment'))
           );
           const actionHtml=sectionKey==='bench' ? renderBenchActions(entry) : renderStarterAction(entry);
           return `<tr>
@@ -10234,15 +10236,17 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
           <span class="season-stat-pill">${escapeHtml(summaryCards?.[1]?.value || 'No upcoming matchup')}</span>
           <span class="season-stat-pill">${escapeHtml(operations?.starterSummary || `${starterSlots.length} roster slots`)}</span>
         </div>
-        <button type="button" class="season-outline-btn" onclick="goPage('matchup')">${sport==='nfl' ? 'Open Weekly Schedule' : 'Open Schedule'}</button>
+        <button type="button" class="season-outline-btn" onclick="goPage('matchup')">${sport==='nfl' ? 'Open Weekly Matchup' : 'Open Matchup'}</button>
       </div>
       <div class="season-card-pad">
-        <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${sport==='nfl' ? 'Weekly Planning' : 'Schedule Planning'}</div>
-        <div class="season-subbar-copy" style="margin-top:6px;">${sport==='nfl' ? 'Use the schedule screen for recent weekly results, the next opponent, and lineup planning around the upcoming football slate.' : 'Use the schedule screen for recent results and the next simulation slate.'}</div>
+        <div style="font-family:var(--fb);font-size:18px;font-weight:800;color:#f8fafc;">${sport==='nfl' ? 'Weekly Matchup Planning' : 'Matchup Planning'}</div>
+        <div class="season-subbar-copy" style="margin-top:6px;">${sport==='nfl' ? 'Use the matchup room for recent weekly results, your next opponent, and lineup planning around the upcoming football slate.' : 'Use the matchup room for recent results, your next opponent, and the upcoming reveal window.'}</div>
       </div>`;
   const rosterMain=activeTabId==='schedule' ? scheduleContent : statsContent;
   const rosterSummaryLabel=String(operations?.starterSummary || `${starterSlots.length} roster slots`).trim();
-const operationDescription=String(operations?.description || 'Route simulation roster updates through the shared team-management surface.').trim();
+const operationDescription=String(operations?.description || (sport==='nfl'
+  ? 'Set weekly starters, tune depth, and manage roster moves from one local-league room.'
+  : 'Set starters, tune your bench, and manage roster moves from one local-league room.')).trim();
   document.getElementById('rosterContent').innerHTML=`<div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
     <div class="season-hero-card season-card-pad">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">

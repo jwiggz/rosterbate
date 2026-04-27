@@ -165,8 +165,8 @@
   function buildSimulationRosterOperations(state, rosterState){
     return {
       description: getSimulationSportForState(state) === 'nfl'
-        ? 'Route weekly starters and shared roster actions through the local league team surface.'
-        : 'Route simulation roster updates through the shared local league team surface.',
+        ? 'Set weekly starters, tune depth, and manage roster moves from one local-league room.'
+        : 'Set starters, tune your bench, and manage roster moves from one local-league room.',
       starterSummary: `${Number(rosterState.filledStarters || 0)}/${(rosterState.starterSlots || []).length} starters set`,
       actions: [
         { id: 'set-lineup', label: 'Set Lineup', enabled: true },
