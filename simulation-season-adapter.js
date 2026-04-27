@@ -285,27 +285,31 @@
     return `Waiver Order (${displayIndex} of ${resolvedTeamCount})`;
   }
 
-  function buildSimulationLeagueLabel(state, sport){
-    const explicitLeagueName = String(
-      state?.leagueName ||
-      state?.leagueShell?.leagueName ||
-      ''
-    ).trim();
-    const normalizedExplicitLeagueName = explicitLeagueName.toLowerCase();
-    const isGenericSimulationPlaceholder = normalizedExplicitLeagueName === 'simulation archive lab'
-      || normalizedExplicitLeagueName === 'simulation archive'
-      || normalizedExplicitLeagueName === 'simulation league'
-      || normalizedExplicitLeagueName === 'nba simulation'
-      || normalizedExplicitLeagueName === 'nfl simulation';
-    if (explicitLeagueName && !isGenericSimulationPlaceholder) return explicitLeagueName;
-    const sourceSeasonLabels = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
-      ? state.sourceSeasons.sourceSeasonLabels.filter(Boolean)
-      : [];
-  if (sourceSeasonLabels.length > 1) return 'Mixed Era Local League';
+function buildSimulationLeagueLabel(state, sport){
+  const explicitLeagueName = String(
+    state?.leagueName ||
+    state?.leagueShell?.leagueName ||
+    ''
+  ).trim();
+  const sourceSeasonLabels = Array.isArray(state?.sourceSeasons?.sourceSeasonLabels)
+    ? state.sourceSeasons.sourceSeasonLabels.filter(Boolean)
+    : [];
   const anchorSeasonLabel = String(
     state?.leagueShell?.anchorSeasonLabel ||
     (sport === 'nfl' ? 'NFL' : 'NBA')
   ).trim();
+  const normalizedExplicitLeagueName = explicitLeagueName.toLowerCase();
+  const normalizedAnchorSeasonLabel = anchorSeasonLabel.toLowerCase();
+  const isGenericSimulationPlaceholder = normalizedExplicitLeagueName === 'simulation archive lab'
+    || normalizedExplicitLeagueName === 'simulation archive'
+    || normalizedExplicitLeagueName === 'simulation league'
+    || normalizedExplicitLeagueName === 'nba simulation'
+    || normalizedExplicitLeagueName === 'nfl simulation';
+  const isAnchorSeasonPlaceholder = sourceSeasonLabels.length > 1
+    && normalizedExplicitLeagueName
+    && normalizedExplicitLeagueName === normalizedAnchorSeasonLabel;
+  if (explicitLeagueName && !isGenericSimulationPlaceholder && !isAnchorSeasonPlaceholder) return explicitLeagueName;
+  if (sourceSeasonLabels.length > 1) return 'Mixed Era Local League';
   if (anchorSeasonLabel) return `${anchorSeasonLabel} Local League`;
   if (sourceSeasonLabels.length === 1) return `${sourceSeasonLabels[0]} Local League`;
   return `${sport === 'nfl' ? 'NFL' : 'NBA'} Local League`;
@@ -320,6 +324,12 @@ function buildSimulationFormatLabel(state){
   const anchorSeasonLabel = String(state?.leagueShell?.anchorSeasonLabel || '').trim().toLowerCase();
   if (anchorSeasonLabel.includes('mixed era')) return 'Mixed Era';
   return 'Standard';
+}
+
+function cleanSimulationSourceLabel(label){
+  const rawLabel = String(label || '').trim();
+  if (!rawLabel) return '';
+  return rawLabel.replace(/\s+Simulation Archive\b/i, '').trim();
 }
 
   function buildSimulationTeamSummary(state, rosterState){
@@ -931,7 +941,7 @@ function buildSimulationFormatLabel(state){
   }
 
   function buildSimulationSourcePoolSummary(state){
-    const sourceSeasonLabels = clone(state?.sourceSeasons?.sourceSeasonLabels || []);
+    const sourceSeasonLabels = clone(state?.sourceSeasons?.sourceSeasonLabels || []).map(cleanSimulationSourceLabel).filter(Boolean);
     const count = sourceSeasonLabels.length;
     return {
       label: count > 1 ? 'Era Pool' : 'Source Pool',
@@ -1093,6 +1103,10 @@ function buildSimulationFormatLabel(state){
         };
       })
       .filter(Boolean);
+    const normalizedStarterOptions = starterOptions.map((option) => ({
+      ...option,
+      label: String(option?.label || '').replace(/ · ([A-Z]+) · \1$/i, ' · $1')
+    }));
     const cardTitle = sport === 'nfl' ? 'Weekly Powerups' : 'Weekly Powerups';
     const captainModeState = (
       activePowerups &&
@@ -1100,7 +1114,7 @@ function buildSimulationFormatLabel(state){
       !Array.isArray(activePowerups)
     ) ? activePowerups.captain_mode || null : null;
     const selectedTargetId = captainModeState?.targetId == null || captainModeState?.targetId === ''
-      ? (starterOptions[0]?.value ?? null)
+      ? (normalizedStarterOptions[0]?.value ?? null)
       : Number(captainModeState.targetId);
     return [
       {
@@ -1113,12 +1127,12 @@ function buildSimulationFormatLabel(state){
           : 'Double one locked-in starter once you pick the featured player.',
         status: captainModeState?.active
           ? 'Active'
-          : (starterOptions.length ? 'Ready to activate' : 'Set lineup first'),
+          : (normalizedStarterOptions.length ? 'Ready to activate' : 'Set lineup first'),
         active: Boolean(captainModeState?.active),
         supported: true,
         requiresTarget: true,
-        disabled: !starterOptions.length,
-        disabledReason: starterOptions.length
+        disabled: !normalizedStarterOptions.length,
+        disabledReason: normalizedStarterOptions.length
           ? ''
           : (sport === 'nfl'
             ? 'Set a valid weekly lineup before choosing your captain.'
@@ -1126,19 +1140,19 @@ function buildSimulationFormatLabel(state){
         actionLabel: captainModeState?.active ? 'Update Captain' : 'Activate Captain',
         targetLabel: sport === 'nfl' ? 'Impact Starter' : 'Featured Starter',
         targetId: selectedTargetId,
-        targetOptions: starterOptions
+        targetOptions: normalizedStarterOptions
       },
       {
         key: 'white-gloves',
         powerupId: 'white_gloves',
         title: cardTitle,
         label: 'White Gloves',
-        body: 'Protect the floor by copying your lowest active starter score onto injured slots once simulation-side injury resolution catches up.',
+        body: 'Protect the floor by covering injured slots with your lowest active starter once injury replacements unlock for local leagues.',
         status: 'Future unlock',
         active: false,
         supported: false,
         disabled: true,
-        disabledReason: 'White Gloves is planned for simulation leagues, but the injury-copy rules are not live in the shared shell yet.',
+        disabledReason: 'White Gloves will unlock once injury replacement rules are live for local leagues.',
         actionLabel: 'Coming Soon'
       },
       {
@@ -1146,12 +1160,12 @@ function buildSimulationFormatLabel(state){
         powerupId: 'bench_boost',
         title: cardTitle,
         label: 'Bench Boost',
-        body: 'Push bench contributions into the weekly result once simulation-side reserve scoring is fully hooked into the shared shell.',
+        body: 'Push bench contributions into the weekly result once reserve scoring unlocks for local leagues.',
         status: 'Future unlock',
         active: false,
         supported: false,
         disabled: true,
-        disabledReason: 'Bench Boost is planned for simulation leagues, but bench-side scoring boosts are not live in the shared shell yet.',
+        disabledReason: 'Bench Boost will unlock once reserve scoring is live for local leagues.',
         actionLabel: 'Coming Soon'
       },
       {
@@ -1159,12 +1173,12 @@ function buildSimulationFormatLabel(state){
         powerupId: 'sunday_surge',
         title: cardTitle,
         label: 'Sunday Surge',
-        body: 'Amplify end-of-week starter output once simulation cadence-specific boost timing is available in the shared shell.',
+        body: 'Amplify end-of-week starter output once cadence-based boosts unlock for local leagues.',
         status: 'Future unlock',
         active: false,
         supported: false,
         disabled: true,
-        disabledReason: 'Sunday Surge is planned for simulation leagues, but timing-based scoring boosts are not live in the shared shell yet.',
+        disabledReason: 'Sunday Surge will unlock once cadence-based boosts are live for local leagues.',
         actionLabel: 'Coming Soon'
       }
     ];
@@ -2502,7 +2516,7 @@ function buildSimulationFormatLabel(state){
           summaryCards: buildSimulationHubSummaryCards(state, team, userRow),
           powerupCards: buildSimulationHubPowerupCards(state),
           primaryAction,
-          sourceSeasonLabels: clone(state?.sourceSeasons?.sourceSeasonLabels || []),
+          sourceSeasonLabels: clone(state?.sourceSeasons?.sourceSeasonLabels || []).map(cleanSimulationSourceLabel).filter(Boolean),
           recentActivity: clone(state?.seasonState?.activityLog || []).slice(-8).reverse()
         };
       },

@@ -159,12 +159,21 @@ assert.equal(hub.powerupCards[0]?.disabled, false, 'captain-mode hub cards shoul
 assert.equal(hub.powerupCards[0]?.actionLabel, 'Activate Captain', 'captain-mode hub cards should expose an activation label through the adapter vm');
 assert.ok(Array.isArray(hub.powerupCards[0]?.targetOptions), 'captain-mode hub cards should expose starter target options');
 assert.equal(hub.powerupCards[0]?.targetOptions?.[0]?.value, 23, 'captain-mode hub cards should default to the first starter target');
+assert.doesNotMatch(
+  hub.powerupCards[0]?.targetOptions?.map((option) => option?.label || '').join(' | '),
+  /·\s*([A-Z]+)\s*·\s*\1/i,
+  'captain-mode hub cards should not duplicate identical starter position labels in target options'
+);
 assert.deepStrictEqual(
   hub.powerupCards.map((card) => card.label),
   ['Captain Mode', 'White Gloves', 'Bench Boost', 'Sunday Surge'],
   'hub vm should mirror the familiar single-player powerup rail ordering'
 );
 assert.equal(hub.powerupCards[1]?.disabled, true, 'non-wired parity powerups should stay visibly disabled until simulation support exists');
+assert.equal(hub.powerupCards[1]?.status, 'Future unlock');
+assert.match(hub.powerupCards[1]?.body || '', /injury replacements unlock for local leagues/i);
+assert.match(hub.powerupCards[2]?.body || '', /reserve scoring unlocks for local leagues/i);
+assert.match(hub.powerupCards[3]?.body || '', /cadence-based boosts unlock for local leagues/i);
 hub.controlledTeam.name = 'Mutated Lakers';
 hub.userRow.w = 999;
 hub.sourceSeasonLabels.push('2020-21');
@@ -229,6 +238,19 @@ assert.equal(
   genericPlaceholderLeagueAdapter.getHubViewModel().leagueLabel,
   '2025-26 NBA Local League',
   'generic setup/archive placeholder names should not override the refined local-league fallback label'
+);
+
+const anchorPlaceholderLeagueAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-anchor-placeholder-name',
+  state: {
+    ...slotState,
+    leagueName: '2025-26 NBA'
+  }
+});
+assert.equal(
+  anchorPlaceholderLeagueAdapter.getHubViewModel().leagueLabel,
+  'Mixed Era Local League',
+  'mixed-era leagues should not reuse a generic anchor-season title as the active local league name'
 );
 
 const unrelatedPowerupAdapter = createSimulationSeasonAdapter({
