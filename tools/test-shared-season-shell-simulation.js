@@ -201,6 +201,7 @@ const elements = Object.fromEntries([
   'hubSettingsDivider',
   'hubLeagueTeamsButton',
   'hubPowerupsTitle',
+  'hubTeamSettingsButton',
   'rbChatTitle',
   'rbOnlineCount',
   'rbChatPrompt',
@@ -1572,6 +1573,7 @@ assert.match(elements.hubActions.innerHTML, /Trade Desk/, 'simulation hub should
 assert.match(elements.hubActions.innerHTML, /Open the league trade desk|incoming offer|pending sent offer/, 'simulation hub trade card should keep live trade context');
 assert.match(elements.hubDataStamp.innerHTML, /openWatchList\(\)/, 'simulation hub should keep the watch-list meta action live');
 assert.match(elements.hubDataStamp.innerHTML, /openTeamSettings\(\)/, 'simulation hub should keep the team-settings meta action live');
+assert.equal(elements.hubTeamSettingsButton.style.display, 'none', 'simulation hub should hide the duplicate side-card team-settings button when meta links are present');
 assert.match(elements.hubDataStamp.innerHTML, /Record:\s*9-3/, 'simulation hub should keep the record summary pill');
 assert.match(elements.hubDataStamp.innerHTML, /Reveal Window:\s*Day 12 - Week 2/, 'simulation hub should use polished reveal-window pill wording for nba seasons');
 assert.match(elements.hubDataStamp.innerHTML, /Era Pool:\s*1986-87 \+ 2 more/, 'simulation hub should keep the summary pill era pool compact');

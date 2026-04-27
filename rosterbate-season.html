@@ -917,7 +917,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             <div id="hubRec" class="hub-team-record"></div>
             <div id="hubTeamMeta" class="hub-team-meta"></div>
             <div id="hubDataStamp" class="hub-summary-data" style="display:none;margin-top:10px;"></div>
-            <button type="button" onclick="openTeamSettings()" class="season-team-link-btn" style="margin-top:10px;">Team Settings</button>
+            <button id="hubTeamSettingsButton" type="button" onclick="openTeamSettings()" class="season-team-link-btn" style="margin-top:10px;">Team Settings</button>
           </div>
           <div id="hubPowerups"></div>
         </div>
@@ -9494,8 +9494,12 @@ function renderSimulationHubInSharedShell(){
   }
   const hubPowerups=document.getElementById('hubPowerups');
   const hubPowerupsTitle=document.getElementById('hubPowerupsTitle');
+  const hubTeamSettingsButton=document.getElementById('hubTeamSettingsButton');
   const sharedSimulationSport=String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase();
   const powerupRailTitle=String(vm?.powerupCards?.[0]?.title || (sharedSimulationSport==='nfl' ? 'Weekly Powerups' : 'Reveal Powerups')).trim() || 'League Powerups';
+  if(hubTeamSettingsButton){
+    hubTeamSettingsButton.style.display='none';
+  }
   if(hubPowerupsTitle){
     hubPowerupsTitle.textContent = powerupRailTitle;
   }
@@ -10069,8 +10073,8 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
   const rosterWeekLabel=document.getElementById('rWk');
   if(rosterWeekLabel){
     rosterWeekLabel.textContent=sport==='nfl'
-      ? 'Set weekly starters, bench depth, and injury availability'
-      : 'Set starters, bench order, and injury availability';
+      ? 'Set weekly starters, tune depth, and check injury availability'
+      : 'Set starters, tune your bench, and check injury availability';
   }
   const escapeHtml=(value)=>String(value == null ? '' : value)
     .replace(/&/g,'&amp;')
