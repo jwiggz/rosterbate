@@ -1881,7 +1881,7 @@ function renderSimulationRunnerCard(snapshot){
   if(!snapshot) return '';
   const readinessTone=snapshot.lineupReadyCount>=snapshot.teamCount ? 'green' : (snapshot.lineupReadyCount>=Math.max(1,Math.floor(snapshot.teamCount*0.7)) ? 'blue' : 'orange');
   const myLineupReady=snapshot.myFilled>=snapshot.requiredSlots;
-  const primaryLabel=`Run Sim Day ${snapshot.day}`;
+  const primaryLabel=`Reveal Day ${snapshot.day}`;
   const topGameLine=snapshot.latestTopGame
     ? `${snapshot.latestTopGame.homeName} ${Number(snapshot.latestTopGame.homeTotal||0).toFixed(1)} - ${Number(snapshot.latestTopGame.awayTotal||0).toFixed(1)} ${snapshot.latestTopGame.awayName}`
     : 'No simulated reveal has landed yet.';
@@ -1891,9 +1891,9 @@ function renderSimulationRunnerCard(snapshot){
   return `
     <div class="hub-sim-grid">
       <div class="hub-sim-copy">
-        <div class="hub-sim-kicker">Simulation Day Runner</div>
+        <div class="hub-sim-kicker">Reveal Runner</div>
         <div class="hub-sim-title">${snapshot.packLabel}</div>
-        <div class="hub-sim-sub">Run one day at a time from ratings-driven simulation plus sport-specific tuning. Each click generates box-score outcomes for the full fantasy slate, writes a reveal report, and saves the universe state immediately.</div>
+        <div class="hub-sim-sub">Move one reveal window at a time from ratings-driven simulation plus sport-specific tuning. Each click generates box-score outcomes for the full fantasy slate, writes a league report, and saves the universe state immediately.</div>
         <div class="hub-sim-pills">
           <span class="hub-sim-pill blue">Day ${snapshot.day}</span>
           <span class="hub-sim-pill ${readinessTone}">${snapshot.lineupReadyCount}/${snapshot.teamCount} lineups ready</span>
@@ -1904,7 +1904,7 @@ function renderSimulationRunnerCard(snapshot){
           <button type="button" class="hub-sim-action primary" onclick="advanceWeek()">${primaryLabel}</button>
           <button type="button" class="hub-sim-action" onclick="goPage('roster')">${myLineupReady?'Review Lineup':'Set Lineup'}</button>
           <button type="button" class="hub-sim-action" onclick="goPage('matchup')">Open Matchup</button>
-          ${snapshot.latestReportDay ? `<button type="button" class="hub-sim-action" onclick="openRevealReport(${snapshot.latestReportDay})">Last Sim Report</button>` : ''}
+          ${snapshot.latestReportDay ? `<button type="button" class="hub-sim-action" onclick="openRevealReport(${snapshot.latestReportDay})">Last League Report</button>` : ''}
         </div>
       </div>
       <div class="hub-sim-side">
@@ -11487,16 +11487,16 @@ function renderHub(){
         label:isSimulationSeason?'Sim Runner':'Next Action',
         value:G.isSeasonComplete
           ? (isSimulationSeason ? 'Sim wrapped' : 'Season wrapped')
-          : (isSimulationSeason ? ('Run Day '+G.day) : ('Reveal Day '+G.day)),
+          : (isSimulationSeason ? ('Reveal Day '+G.day) : ('Reveal Day '+G.day)),
         copy:G.isSeasonComplete
           ? 'Everything is locked in. Review standings and league history from the hub.'
           : (revealedToday
               ? 'Today is already revealed. Set tomorrow’s lineup or hunt the wire before the next results drop.'
               : (isSimulationSeason
-                  ? 'Generate the next daily box-score slate, publish the reveal report, and save the universe in one step.'
+                  ? 'Generate the next daily box-score slate, publish the league report, and save the universe in one step.'
                   : 'Results for today are still pending. Reveal them when you are ready, then make your next move.')),
         action:G.isSeasonComplete?"goPage('standings')":(revealedToday?"goPage('roster')":"advanceWeek()"),
-        link:G.isSeasonComplete?'Review standings':(revealedToday?'Set lineup':(isSimulationSeason?'Run sim day':'Reveal results'))
+        link:G.isSeasonComplete?'Review standings':(revealedToday?'Set lineup':(isSimulationSeason?'Reveal day':'Reveal results'))
       });
     }
     hubNowBand.innerHTML=nowCards.map(card=>`<div class="hub-now-card ${card.tone||''}">
@@ -11519,7 +11519,7 @@ function renderHub(){
       ab.innerHTML=`<span class="season-reveal-btn-label">Start Sim Season</span><span class="season-reveal-btn-sub">Convert this drafted universe into a one-day-at-a-time sim league</span>`;
     } else if(isSimulationSeason){
       ab.classList.add('is-sim');
-      ab.innerHTML=`<span class="season-reveal-btn-label">Run Sim Day ${G.day}</span><span class="season-reveal-btn-sub">Generate box scores and publish the reveal</span>`;
+      ab.innerHTML=`<span class="season-reveal-btn-label">Reveal Day ${G.day} Results</span><span class="season-reveal-btn-sub">Generate box scores and publish the league report</span>`;
     } else {
       ab.classList.remove('is-sim');
       ab.innerHTML=`<span class="season-reveal-btn-label">Reveal Day ${G.day} Results</span><span class="season-reveal-btn-sub">Update scores and league activity</span>`;
