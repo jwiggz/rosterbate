@@ -8777,7 +8777,10 @@ function persistPendingSeasonLaunch(draftData){
       data: JSON.parse(JSON.stringify(draftData))
     };
     if(!payload.seasonId) return;
-    localStorage.setItem(RB_PENDING_SEASON_KEY, JSON.stringify(payload));
+    sessionStorage.setItem(RB_PENDING_SEASON_KEY, JSON.stringify(payload));
+    try{
+      localStorage.setItem(RB_PENDING_SEASON_KEY, JSON.stringify(payload));
+    }catch(_storageError){}
   }catch(e){
     console.warn('Could not persist pending season handoff:', e);
   }

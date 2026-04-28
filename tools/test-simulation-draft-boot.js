@@ -145,7 +145,7 @@ assert.match(source, /nfl_mixed_era_single_player_v1[\s\S]*return\s+32\b/, 'foot
 assert.match(source, /nfl_mixed_era_single_player_v1[\s\S]*return\s+13\b/, 'football simulation drafts should enforce a locked 13-slot roster size');
 assert.match(source, /rosterbate-season\.html\?sport=nfl&simulation=nfl_mixed_era/, 'completed football simulation drafts should route into the NFL season shell');
 assert.match(source, /rosterbate-season\.html\?sport=nba&simulation=nba_mixed_era/, 'completed simulation drafts should route into the shared season shell');
-assert.match(seasonSource, /Football simulation season shell is coming next/i, 'season page should include the NFL simulation placeholder copy');
+assert.match(seasonSource, /Football Local League[\s\S]*fallback view is still limited/i, 'season page should include the current NFL local league fallback copy');
 
 {
   const topPlayersContext = {
