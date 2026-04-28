@@ -7042,6 +7042,26 @@ function getCompletedSimulationGameLogs(){
   const seasonState=getAuthoritativeSimulationSeasonState();
   return Array.isArray(seasonState?.completedGameLogs) ? seasonState.completedGameLogs : [];
 }
+function normalizeSimulationBoxScoreEntries(entries){
+  return (Array.isArray(entries) ? entries : []).map(entry=>{
+    const player=entry?.player && typeof entry.player==='object' ? entry.player : {};
+    return {
+      player:{
+        id:Number(player.id||0)||null,
+        name:String(player.name||'Player'),
+        team:String(player.team||''),
+        pos:String(player.pos||player.primaryPosition||''),
+        primaryPosition:String(player.primaryPosition||player.pos||'')
+      },
+      baseScore:Number(entry?.baseScore||entry?.finalScore||0),
+      finalScore:Number(entry?.finalScore||entry?.baseScore||0),
+      statSource:String(entry?.statSource||'simulation_engine_generated'),
+      source:String(entry?.source||'starter_sim'),
+      simulatedStats:entry?.simulatedStats && typeof entry.simulatedStats==='object' ? {...entry.simulatedStats} : null,
+      simSummary:entry?.simSummary && typeof entry.simSummary==='object' ? {...entry.simSummary} : null
+    };
+  }).filter(entry=>Number.isFinite(Number(entry.finalScore)));
+}
 function getCompletedSimulationDayResult(teamIdx,day){
   if(getActiveSeasonBackend()!=='simulation') return null;
   const numericTeamIdx=Number(teamIdx);
@@ -7054,9 +7074,10 @@ function getCompletedSimulationDayResult(teamIdx,day){
   if(!game) return null;
   const isHome=Number(game?.home)===numericTeamIdx;
   const total=Number(isHome ? (game?.homeScore ?? game?.homeTotal ?? 0) : (game?.awayScore ?? game?.awayTotal ?? 0));
+  const entries=normalizeSimulationBoxScoreEntries(isHome ? game?.homeEntries : game?.awayEntries);
   return {
     total:Number(total.toFixed(1)),
-    entries:[],
+    entries,
     statSource:'simulation_engine_generated',
     outcomeSource:String(game?.outcomeSource || 'simulation_engine')
   };
@@ -10369,6 +10390,23 @@ function setSimulationMatchupNavigationValue(value){
   }
 }
 
+function openSimulationLiveMatchup(day, homeAbbr, awayAbbr){
+  const slotId=String(D?.historicalUniverseSlotId || D?.sharedSimulationSlotId || '').trim();
+  if(!slotId){
+    toast('Save this simulation universe before launching a live matchup.');
+    return;
+  }
+  const targetDay=Number(day || D?.seasonState?.currentDay || D?.currentDay || 1) || 1;
+  const params=new URLSearchParams();
+  params.set('sport', String(D?.sport || getSharedSimulationSport() || CURRENT_SPORT || 'nba').trim().toLowerCase() || 'nba');
+  params.set('historicalUniverse', slotId);
+  params.set('day', String(targetDay));
+  params.set('homeAbbr', String(homeAbbr || '').trim().toUpperCase());
+  params.set('awayAbbr', String(awayAbbr || '').trim().toUpperCase());
+  params.set('returnUrl', window.location.pathname + window.location.search + '#matchup');
+  window.location.href='sim-matchup.html?' + params.toString();
+}
+
 function renderSimulationScheduleInSharedShell(){
   setSeasonSidePanelVisible('matchupPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getScheduleViewModel();
@@ -10604,14 +10642,65 @@ function renderSimulationScheduleInSharedShell(){
       return `<div class="season-now-card ${toneClass(card?.tone)}"><div class="season-now-label">${label}</div><div class="season-now-copy" style="flex:initial;">${body}</div>${actionMarkup}</div>`;
     }).join('')}</div>`;
   };
+  const getGameScoreValue = (game, side) => {
+    const raw = side === 'home'
+      ? (game?.homeScore ?? game?.homeTotal)
+      : (game?.awayScore ?? game?.awayTotal);
+    const score = Number(raw);
+    return Number.isFinite(score) ? score.toFixed(score % 1 === 0 ? 0 : 1) : '--';
+  };
+  const hasGameScore = (game) => (
+    Number.isFinite(Number(game?.homeScore ?? game?.homeTotal)) &&
+    Number.isFinite(Number(game?.awayScore ?? game?.awayTotal))
+  );
+  const getGameLeaderEntries = (game) => {
+    const entries = normalizeSimulationBoxScoreEntries([]
+      .concat(Array.isArray(game?.awayEntries) ? game.awayEntries : [])
+      .concat(Array.isArray(game?.homeEntries) ? game.homeEntries : []));
+    return entries
+      .sort((left,right)=>Number(right.finalScore||0)-Number(left.finalScore||0))
+      .slice(0,2);
+  };
+  const buildGameSummaryCopy = (game) => {
+    const summary = String(game?.summary || game?.label || '').trim();
+    if(summary) return escapeHtml(summary);
+    const homeScore = Number(game?.homeScore ?? game?.homeTotal);
+    const awayScore = Number(game?.awayScore ?? game?.awayTotal);
+    const day = Number(game?.day || 0);
+    const cycle = Number.isFinite(day) && day > 0 ? `Day ${day}` : '';
+    if(Number.isFinite(homeScore) && Number.isFinite(awayScore)){
+      const winner = homeScore >= awayScore
+        ? (game?.homeName || game?.homeAbbr || 'Home')
+        : (game?.awayName || game?.awayAbbr || 'Away');
+      const margin = Math.abs(homeScore - awayScore).toFixed(Math.abs(homeScore - awayScore) % 1 === 0 ? 0 : 1);
+      return `${escapeHtml(cycle || 'Game')} final · ${escapeHtml(winner)} by ${escapeHtml(margin)}.`;
+    }
+    return `${escapeHtml(cycle || 'Next matchup')} · Box score will appear after this league window is simulated.`;
+  };
+  const renderGameLeaderStrip = (game) => {
+    const leaders = getGameLeaderEntries(game);
+    if(!leaders.length) return '';
+    return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">${leaders.map(entry=>`
+      <span class="season-stat-pill">${escapeHtml(entry.player?.name || 'Player')} ${Number(entry.finalScore||0).toFixed(1)}</span>
+    `).join('')}</div>`;
+  };
   const renderMatchupSummaryCard = (titleLabel, game, emptyCopy) => {
+    const scored = hasGameScore(game);
+    const canWatchLive = game && !scored && getActiveSeasonBackend()==='simulation';
+    const watchLiveButton = canWatchLive
+      ? `<button type="button" class="season-team-link-btn" style="margin-top:12px;" onclick="openSimulationLiveMatchup(${Number(game?.day || selectedNavigationItem?.cycleValue || D?.seasonState?.currentDay || 1)},'${String(game?.homeAbbr || '').replace(/'/g,"\\'")}','${String(game?.awayAbbr || '').replace(/'/g,"\\'")}')">Watch Live</button>`
+      : '';
     const gameCopy = game && typeof game === 'object'
-      ? `${escapeHtml(game.awayAbbr || '')} ${escapeHtml(game.awayScore ?? '--')} at ${escapeHtml(game.homeAbbr || '')} ${escapeHtml(game.homeScore ?? '--')}`
+      ? scored
+        ? `${escapeHtml(game.awayAbbr || '')} ${escapeHtml(getGameScoreValue(game, 'away'))} at ${escapeHtml(game.homeAbbr || '')} ${escapeHtml(getGameScoreValue(game, 'home'))}`
+        : `${escapeHtml(game.awayAbbr || '')} at ${escapeHtml(game.homeAbbr || '')}`
       : '';
     return `<div class="season-table-card season-card-pad">
       <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;">${escapeHtml(titleLabel)}</div>
       <div style="margin-top:10px;font-family:var(--fb);font-size:22px;font-weight:800;color:#f8fafc;">${gameCopy || '--'}</div>
-      <div class="season-subbar-copy" style="margin-top:8px;">${gameCopy ? (game?.summary || game?.label || 'Scouted from the latest league window.') : escapeHtml(emptyCopy)}</div>
+      <div class="season-subbar-copy" style="margin-top:8px;">${gameCopy ? buildGameSummaryCopy(game) : escapeHtml(emptyCopy)}</div>
+      ${gameCopy && scored ? renderGameLeaderStrip(game) : ''}
+      ${watchLiveButton}
     </div>`;
   };
   const renderLineupRows = (rows) => {
@@ -10730,8 +10819,8 @@ function renderSimulationScheduleInSharedShell(){
       </div>
       ${detailCards ? `<div class="season-split-grid">${detailCards}</div>` : ''}
       <div class="season-split-grid">
-        ${renderMatchupSummaryCard('Previous Matchup', previousMatchup, 'No prior matchup available yet.')}
-        ${renderMatchupSummaryCard('Recent Results', displayedCurrentMatchup || recentResults[0], 'No results yet.')}
+        ${renderMatchupSummaryCard('Latest Final', previousMatchup, 'No prior matchup available yet.')}
+        ${renderMatchupSummaryCard(selectedCompletedGame ? 'Selected Result' : 'Upcoming Matchup', displayedCurrentMatchup || recentResults[0], 'No matchup available yet.')}
       </div>
       ${renderActionCards()}
       <div class="season-matchup-grid">

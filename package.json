@@ -1,0 +1,27 @@
+{
+  "name": "rosterbate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "audit-logger.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test:live-matchup": "node tools/test-live-matchup-playwright.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwiggz/rosterbate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jwiggz/rosterbate/issues"
+  },
+  "homepage": "https://github.com/jwiggz/rosterbate#readme",
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
+}

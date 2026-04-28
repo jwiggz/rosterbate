@@ -520,6 +520,58 @@ assert.equal(
 schedule.nextGame.opponentName = 'Mutated Opponent';
 assert.equal(adapter.getScheduleViewModel().nextGame.opponentName, 'Boston Celtics');
 
+assert.equal(typeof adapter.prepareLiveMatchup, 'function', 'adapter should expose a live matchup preparation API');
+assert.equal(typeof adapter.commitLiveMatchupResult, 'function', 'adapter should expose a live matchup commit API');
+const liveMatchupAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-live-matchup',
+  state: slotState
+});
+const liveMatchupPayload = {
+  day: 12,
+  homeAbbr: 'LAL',
+  awayAbbr: 'BOS'
+};
+const preparedLiveMatchup = liveMatchupAdapter.prepareLiveMatchup(liveMatchupPayload);
+assert.equal(preparedLiveMatchup.status, 'ready', 'live matchup prep should lock an official result for an upcoming selected game');
+assert.equal(preparedLiveMatchup.gameLog.homeAbbr, 'LAL');
+assert.equal(preparedLiveMatchup.gameLog.awayAbbr, 'BOS');
+assert.ok(Array.isArray(preparedLiveMatchup.gameLog.homeEntries), 'live matchup prep should expose home starter box-score entries');
+assert.ok(Array.isArray(preparedLiveMatchup.gameLog.awayEntries), 'live matchup prep should expose away starter box-score entries');
+assert.equal(liveMatchupAdapter.getState().seasonState.completedGameLogs.length, 1, 'preparing a live matchup should not mutate season results');
+const liveCommittedState = liveMatchupAdapter.commitLiveMatchupResult(preparedLiveMatchup);
+assert.equal(liveCommittedState.seasonState.currentDay, 12, 'committing one live matchup should not advance the season day');
+assert.equal(liveCommittedState.seasonState.currentWeek, 2, 'committing one live matchup should not advance the season week');
+assert.equal(liveCommittedState.seasonState.completedGameLogs.length, 2, 'committing one live matchup should append only that selected game');
+assert.ok(
+  liveCommittedState.seasonState.completedGameLogs.some((game) =>
+    String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
+    String(game?.awayAbbr || '').toUpperCase() === 'BOS' &&
+    Number(game?.day || 0) === 12
+  ),
+  'committed live matchup should be visible in completed game logs'
+);
+assert.ok(
+  liveCommittedState.seasonState.standings.some((row) => row.teamAbbr === 'LAL' && (Number(row.w) + Number(row.l)) === 13),
+  'committing one live matchup should update standings for the selected teams'
+);
+const duplicateLiveCommitState = liveMatchupAdapter.commitLiveMatchupResult(preparedLiveMatchup);
+assert.equal(
+  duplicateLiveCommitState.seasonState.completedGameLogs.length,
+  liveCommittedState.seasonState.completedGameLogs.length,
+  'committing an already completed live matchup should not duplicate game logs'
+);
+const liveThenRevealState = liveMatchupAdapter.simulateNextDay();
+assert.equal(liveThenRevealState.seasonState.currentDay, 13, 'normal day reveal should advance after a live matchup has already completed the selected game');
+assert.equal(
+  liveThenRevealState.seasonState.completedGameLogs.filter((game) =>
+    String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
+    String(game?.awayAbbr || '').toUpperCase() === 'BOS' &&
+    Number(game?.day || 0) === 12
+  ).length,
+  1,
+  'normal day reveal should not duplicate a matchup already completed through the live runner'
+);
+
 const waivers = adapter.getWaiverViewModel();
 assert.ok(waivers.teamSummary, 'waiver vm should expose a teamSummary bridge object');
 assert.equal(waivers.teamSummary.watchListEnabled, true, 'simulation waiver vm should keep watch-list navigation live');

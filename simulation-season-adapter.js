@@ -656,10 +656,13 @@ function cleanSimulationSourceLabel(label){
       .map((day) => Number(day))
       .filter((day) => Number.isFinite(day))
       .sort((a, b) => a - b);
-    const dayPool = Array.from(new Set([currentDay - 1, currentDay, currentDay + 1].filter((day) => day >= 1).concat(availableDays.slice(0, 5))));
+    const nearbyDays = [currentDay - 2, currentDay - 1, currentDay, currentDay + 1, currentDay + 2]
+      .filter((day) => day >= 1);
+    const dayPool = Array.from(new Set(nearbyDays.concat(availableDays)));
     const items = dayPool
-      .sort((a, b) => a - b)
+      .sort((a, b) => Math.abs(a - currentDay) - Math.abs(b - currentDay) || a - b)
       .slice(0, 5)
+      .sort((a, b) => a - b)
       .map((day) => ({
         id: `day-${day}`,
         label: `Day ${day}`,
@@ -1655,6 +1658,155 @@ function cleanSimulationSourceLabel(label){
         day: Number(day || simulationContext.currentSeasonState.currentDay || 1),
         lineupIdsByTeam: clone(simulationContext.currentSeasonState.lineupIdsByTeam || {})
       })
+    };
+  }
+
+  function getLiveMatchupIdentity(payload){
+    const source = payload && typeof payload === 'object' ? payload : {};
+    return {
+      day: Number(source.day || source.currentDay || 0) || 0,
+      homeAbbr: String(source.homeAbbr || source.homeTeamAbbr || '').trim().toUpperCase(),
+      awayAbbr: String(source.awayAbbr || source.awayTeamAbbr || '').trim().toUpperCase()
+    };
+  }
+
+  function isSameSimulationMatchup(left, right){
+    const leftIdentity = getLiveMatchupIdentity(left);
+    const rightIdentity = getLiveMatchupIdentity(right);
+    return leftIdentity.day > 0 &&
+      leftIdentity.day === rightIdentity.day &&
+      leftIdentity.homeAbbr === rightIdentity.homeAbbr &&
+      leftIdentity.awayAbbr === rightIdentity.awayAbbr;
+  }
+
+  function findScheduledLiveMatchup(state, scheduleByDay, payload){
+    const target = getLiveMatchupIdentity(payload);
+    const games = Array.isArray(scheduleByDay?.[target.day]) ? scheduleByDay[target.day] : [];
+    return games.find((game) => isSameSimulationMatchup({
+      day: target.day,
+      homeAbbr: game?.homeAbbr,
+      awayAbbr: game?.awayAbbr
+    }, target)) || null;
+  }
+
+  function findCompletedLiveMatchup(state, payload){
+    const games = Array.isArray(state?.seasonState?.completedGameLogs) ? state.seasonState.completedGameLogs : [];
+    return games.find((game) => isSameSimulationMatchup(game, payload)) || null;
+  }
+
+  function filterCompletedMatchupsFromSchedule(state, scheduleByDay, day){
+    const targetDay = Number(day || 0) || 0;
+    if (!targetDay) return clone(scheduleByDay || {});
+    const nextSchedule = clone(scheduleByDay || {});
+    const games = Array.isArray(nextSchedule?.[targetDay]) ? nextSchedule[targetDay] : [];
+    nextSchedule[targetDay] = games.filter((game) => !findCompletedLiveMatchup(state, {
+      day: targetDay,
+      homeAbbr: game?.homeAbbr,
+      awayAbbr: game?.awayAbbr
+    }));
+    return nextSchedule;
+  }
+
+  function buildSimulationLiveMatchupResult(state, payload){
+    const normalizedState = normalizeLegacyNflLineupSlots(state);
+    const shell = clone(normalizedState?.leagueShell || {});
+    const scheduleByDay = getCanonicalScheduleByDay(normalizedState, shell);
+    const target = getLiveMatchupIdentity(payload);
+    const scheduledGame = findScheduledLiveMatchup(normalizedState, scheduleByDay, target);
+    const completedGame = findCompletedLiveMatchup(normalizedState, target);
+    if (completedGame) {
+      return {
+        status: 'completed',
+        sport: getSimulationSportForState(normalizedState),
+        day: target.day,
+        homeAbbr: target.homeAbbr,
+        awayAbbr: target.awayAbbr,
+        gameLog: normalizeSimulationRecentResult(normalizedState, completedGame),
+        dayResult: {
+          day: target.day,
+          gameLogs: [clone(completedGame)],
+          resultsByTeam: {}
+        }
+      };
+    }
+    if (!target.day || !target.homeAbbr || !target.awayAbbr || !scheduledGame) {
+      return {
+        status: 'not_found',
+        sport: getSimulationSportForState(normalizedState),
+        day: target.day,
+        homeAbbr: target.homeAbbr,
+        awayAbbr: target.awayAbbr,
+        gameLog: null,
+        dayResult: null
+      };
+    }
+    const singleGameSchedule = {
+      [target.day]: [clone(scheduledGame)]
+    };
+    const simulation = simulateEngineDay(normalizedState, shell, singleGameSchedule, target.day);
+    const gameLog = clone(simulation.dayResult?.gameLogs?.[0] || null);
+    return {
+      status: gameLog ? 'ready' : 'not_found',
+      sport: getSimulationSportForState(normalizedState),
+      day: target.day,
+      homeAbbr: target.homeAbbr,
+      awayAbbr: target.awayAbbr,
+      gameLog: gameLog ? normalizeSimulationRecentResult(normalizedState, gameLog) : null,
+      dayResult: simulation.dayResult ? clone(simulation.dayResult) : null
+    };
+  }
+
+  function applySingleSimulationGameResult(state, liveResult){
+    const result = liveResult && typeof liveResult === 'object' ? liveResult : {};
+    const gameLog = clone(result.gameLog || result.dayResult?.gameLogs?.[0] || null);
+    if (!gameLog) return clone(state || {});
+    if (findCompletedLiveMatchup(state, gameLog)) return clone(state || {});
+    const nextState = clone(state || {});
+    const seasonState = clone(nextState.seasonState || {});
+    const teamMeta = clone(nextState?.leagueShell?.teams || []);
+    const normalizedGame = normalizeSimulationRecentResult(nextState, gameLog);
+    const standings = normalizeSimulationStandingsRows(nextState, teamMeta);
+    const home = standings.find((row) => String(row?.teamAbbr || '').trim().toUpperCase() === normalizedGame.homeAbbr) ||
+      standings.find((row) => Number(row?.teamIdx) === Number(normalizedGame.home));
+    const away = standings.find((row) => String(row?.teamAbbr || '').trim().toUpperCase() === normalizedGame.awayAbbr) ||
+      standings.find((row) => Number(row?.teamIdx) === Number(normalizedGame.away));
+    if (home && away) {
+      const homeScore = Number(normalizedGame.homeScore ?? normalizedGame.homeTotal ?? 0);
+      const awayScore = Number(normalizedGame.awayScore ?? normalizedGame.awayTotal ?? 0);
+      home.pf = Number(home.pf || 0) + homeScore;
+      home.pa = Number(home.pa || 0) + awayScore;
+      away.pf = Number(away.pf || 0) + awayScore;
+      away.pa = Number(away.pa || 0) + homeScore;
+      const winner = String(normalizedGame.winner || '').trim().toLowerCase();
+      const homeWon = winner === 'home'
+        ? true
+        : winner === 'away'
+          ? false
+          : homeScore >= awayScore;
+      if (homeWon) {
+        home.w = Number(home.w || 0) + 1;
+        away.l = Number(away.l || 0) + 1;
+      } else {
+        away.w = Number(away.w || 0) + 1;
+        home.l = Number(home.l || 0) + 1;
+      }
+    }
+    seasonState.completedGameLogs = (Array.isArray(seasonState.completedGameLogs) ? seasonState.completedGameLogs : []).concat([normalizedGame]);
+    seasonState.standings = standings;
+    if (result.dayResult?.resultsByTeam && typeof result.dayResult.resultsByTeam === 'object') {
+      seasonState.liveMatchupResultsByDay = {
+        ...(seasonState.liveMatchupResultsByDay || {}),
+        [String(normalizedGame.day || result.day || '')]: {
+          ...clone(seasonState.liveMatchupResultsByDay?.[String(normalizedGame.day || result.day || '')] || {}),
+          [`${normalizedGame.awayAbbr}@${normalizedGame.homeAbbr}`]: clone(result.dayResult.resultsByTeam)
+        }
+      };
+    }
+    return {
+      ...nextState,
+      currentDay: Number(seasonState.currentDay || nextState.currentDay || 1),
+      currentWeek: Number(seasonState.currentWeek || nextState.currentWeek || 1),
+      seasonState
     };
   }
 
@@ -2701,6 +2853,13 @@ function cleanSimulationSourceLabel(label){
           completedAt: state?.postseasonState?.completedAt || null
         };
       },
+      prepareLiveMatchup(payload){
+        return buildSimulationLiveMatchupResult(state, payload);
+      },
+      commitLiveMatchupResult(liveResult){
+        state = applySingleSimulationGameResult(state, liveResult);
+        return this.getState();
+      },
       simulateNextDay(){
         const normalizedState = normalizeLegacyNflLineupSlots(state);
         state = clone(normalizedState);
@@ -2750,11 +2909,13 @@ function cleanSimulationSourceLabel(label){
           state = simulatePostseasonDay(seededState, shell);
           return this.getState();
         }
+        const targetDay = Number(state?.seasonState?.currentDay || 1);
+        const remainingScheduleByDay = filterCompletedMatchupsFromSchedule(state, scheduleByDay, targetDay);
         const { currentSeasonState, engineSeasonState, dayResult } = simulateEngineDay(
           state,
           shell,
-          scheduleByDay,
-          Number(state?.seasonState?.currentDay || 1)
+          remainingScheduleByDay,
+          targetDay
         );
         const nextSeasonState = engineApi.applySimulationDayResults(engineSeasonState, dayResult);
         if (sport === 'nfl') {
@@ -2787,6 +2948,8 @@ function cleanSimulationSourceLabel(label){
     getControlledTeam,
     getControlledRoster,
     isSupportedSimulationSeasonState,
+    buildSimulationLiveMatchupResult,
+    applySingleSimulationGameResult,
     createSimulationSeasonAdapter
   };
 
