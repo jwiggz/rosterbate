@@ -166,7 +166,7 @@
       </div>
       <div class="hero-stat">
         <div class="hero-stat-value">-</div>
-        <div class="hero-stat-label">Season Pressure</div>
+        <div class="hero-stat-label">League Pressure</div>
         <div class="hero-stat-copy">Looking for trade and waiver activity.</div>
       </div>
       <div class="hero-stat">
@@ -184,7 +184,7 @@
       <div class="hero-copy">
         <div class="hero-kicker">League Access</div>
         <h1>My Leagues</h1>
-        <p>All your draft rooms, shared seasons, and local leagues. Draft rooms stay grouped separately from active league saves so it's easy to reopen the right experience.</p>
+        <p>All your draft rooms, shared leagues, and local leagues. Draft rooms stay grouped separately from active league saves so it's easy to reopen the right experience.</p>
       </div>
       <div class="hero-actions">
         <a href="rosterbate-matchmaking.html" class="btn primary">Create or Join League</a>
@@ -207,8 +207,8 @@
     <div class="section">
       <div class="section-head">
         <div>
-          <div class="section-title">Season Leagues</div>
-          <div class="section-sub">Shared multiplayer seasons and completed leagues</div>
+          <div class="section-title">Shared Leagues</div>
+          <div class="section-sub">Shared multiplayer leagues and completed runs</div>
         </div>
       </div>
       <div class="grid" id="seasonList"></div>
@@ -293,7 +293,7 @@ function renderHeroSummary(){
     </div>
     <div class="hero-stat">
       <div class="hero-stat-value">${pendingTrades || recentDrops || 0}</div>
-      <div class="hero-stat-label">Season Pressure</div>
+        <div class="hero-stat-label">League Pressure</div>
       <div class="hero-stat-copy">${pendingTrades ? `${pendingTrades} trade response${pendingTrades===1?'':'s'} waiting` : recentDrops ? `${recentDrops} recent drop${recentDrops===1?'':'s'} to review` : 'No urgent league actions right now.'}</div>
     </div>
     <div class="hero-stat">
@@ -570,6 +570,31 @@ function normalizeLocalLaunchPayload(payload){
     legacyHistoricalStatMode:false
   };
 }
+function deriveMyLeaguesLocalLeagueDisplayName(payload){
+  const data=normalizeLocalLaunchPayload(payload);
+  if(!data || typeof data!=='object') return 'RosterBate League';
+  const explicitLeagueName=String(data.leagueName || data.leagueShell?.leagueName || '').trim();
+  const sourceSeasonLabels=Array.isArray(data.sourceSeasons?.sourceSeasonLabels)
+    ? data.sourceSeasons.sourceSeasonLabels.filter(Boolean)
+    : [];
+  const sport=String(data.sport || '').trim().toLowerCase()==='nfl' ? 'nfl' : 'nba';
+  const anchorSeasonLabel=String(data.leagueShell?.anchorSeasonLabel || (sport==='nfl' ? 'NFL' : 'NBA')).trim();
+  const normalizedExplicitLeagueName=explicitLeagueName.toLowerCase();
+  const normalizedAnchorSeasonLabel=anchorSeasonLabel.toLowerCase();
+  const isGenericSimulationPlaceholder=normalizedExplicitLeagueName==='simulation archive lab'
+    || normalizedExplicitLeagueName==='simulation archive'
+    || normalizedExplicitLeagueName==='simulation league'
+    || normalizedExplicitLeagueName==='nba simulation'
+    || normalizedExplicitLeagueName==='nfl simulation';
+  const isAnchorSeasonPlaceholder=sourceSeasonLabels.length>1
+    && normalizedExplicitLeagueName
+    && normalizedExplicitLeagueName===normalizedAnchorSeasonLabel;
+  if(explicitLeagueName && !isGenericSimulationPlaceholder && !isAnchorSeasonPlaceholder) return explicitLeagueName;
+  if(sourceSeasonLabels.length>1) return 'Mixed Era Local League';
+  if(anchorSeasonLabel) return `${anchorSeasonLabel} Local League`;
+  if(sourceSeasonLabels.length===1) return `${sourceSeasonLabels[0]} Local League`;
+  return `${sport==='nfl' ? 'NFL' : 'NBA'} Local League`;
+}
 const RB_PENDING_SEASON_KEY='rbPendingSeasonLaunch';
 function persistMyLeaguesPendingSeasonLaunch(payload){
   try{
@@ -596,8 +621,8 @@ function getSeasonUrgency(row){
         {tone:'muted',label:'History Review'},
         {tone:'info',label:(watchCount||0)+' watched names saved'}
       ],
-      copy:'Reopen standings, matchup history, and saved targets from this finished season.',
-      actionLabel:'Review Season'
+      copy:'Reopen standings, matchup history, and saved targets from this finished league.',
+      actionLabel:'Review League'
     };
   }
   const chips=[];
@@ -606,25 +631,25 @@ function getSeasonUrgency(row){
   if(watchCount>0) chips.push({tone:'live',label:watchCount+' watched target'+(watchCount===1?'':'s')});
   if(!chips.length) chips.push({tone:'info',label:(waiverCount||0)+' free agent'+(waiverCount===1?'':'s')});
 
-let copy='Open your shared season and continue where you left off.';
-  let actionLabel='Open Season';
+let copy='Open your shared league and continue where you left off.';
+  let actionLabel='Open League';
   let secondaryLabel='Open Watch List';
   let secondaryArgs=['waiver','watch'];
 
   if(incomingTrades>0){
     copy='You have trade desk activity waiting. Jump back in and answer incoming offers before the league shifts.';
     actionLabel='Open Trade Desk';
-    secondaryLabel='Open Season';
+    secondaryLabel='Open League';
     secondaryArgs=['','',''];
   }else if(recentDropCount>0){
     copy='Fresh waiver movement is live right now. Check recent drops before the rest of the league reacts.';
     actionLabel='Open Waivers';
-    secondaryLabel=watchCount?'Open Watch List':'Open Season';
+    secondaryLabel=watchCount?'Open Watch List':'Open League';
     secondaryArgs=watchCount?['waiver','watch']:['','',''];
   }else if(watchCount>0){
     copy='Your watch list already has live targets. Reopen the wire and move on your tracked names quickly.';
     actionLabel='Open Watch List';
-    secondaryLabel='Open Season';
+    secondaryLabel='Open League';
     secondaryArgs=['','',''];
   }else{
     copy='The player pool is open. Reopen the league hub and start building a sharper watch list.';
@@ -720,7 +745,7 @@ function renderSeasons(rows){
   const host=document.getElementById('seasonList');
   if(!host) return;
   if(!rows.length){
-    renderEmpty('seasonList','No Shared Seasons Yet','Finish a multiplayer draft and its season league will appear here.');
+    renderEmpty('seasonList','No Shared Leagues Yet','Finish a multiplayer draft and its shared league will appear here.');
     return;
   }
   host.innerHTML=rows.map(row=>{
@@ -738,7 +763,7 @@ function renderSeasons(rows){
         <div>
           <div class="league-title">${escapeHtml(row.name)}</div>
           <div class="league-meta" style="margin-top:8px;">
-            <span class="pill ${row.complete?'complete':'live'}">${row.complete?'Completed':'Season Active'}</span>
+            <span class="pill ${row.complete?'complete':'live'}">${row.complete?'Completed':'League Active'}</span>
             ${isFallbackSeasonSource(row.source)?'<span class="pill">Fallback Index</span>':''}
             ${isLegacySeasonSource(row.source)?'<span class="pill">Legacy Source</span>':''}
             <span class="pill">${escapeHtml(sportLabel(row.sport))}</span>
@@ -759,7 +784,7 @@ function renderSeasons(rows){
       <div class="league-copy">${escapeHtml(urgency.copy)}</div>
       <div class="actions">
         <button class="btn primary small" onclick="${primaryAction}">${escapeHtml(urgency.actionLabel)}</button>
-        ${row.complete?'':`<button class="btn small" onclick="${secondaryAction}">${escapeHtml(urgency.secondaryLabel||'Open Season')}</button>`}
+        ${row.complete?'':`<button class="btn small" onclick="${secondaryAction}">${escapeHtml(urgency.secondaryLabel||'Open League')}</button>`}
         <button class="btn danger small" onclick="leaveSeasonLeague('${row.id}')">Leave League</button>
       </div>
     </div>
@@ -796,7 +821,7 @@ function renderSolo(rows){
       </div>
         <div class="league-copy">Your local league. ${row.id==='local'?'Saved locally in browser.':'Saved to your account and ready to reopen anywhere.'}</div>
       <div class="actions">
-        <button class="btn primary small" onclick="openSoloLeague('${row.id}')">Open Season</button>
+        <button class="btn primary small" onclick="openSoloLeague('${row.id}')">Open League</button>
         <button class="btn danger small" onclick="deleteSoloLeague('${row.id}')">Delete League</button>
       </div>
     </div>
@@ -953,7 +978,7 @@ async function loadMyLeagues(){
             solo.push({
               id:child.key,
               seasonId:child.key,
-              name:data.leagueName||'RosterBate League',
+              name:deriveMyLeaguesLocalLeagueDisplayName(data),
               sport:data.sport||'nba',
               format:data.draftFormat||'snake',
               scoring:data.scoringFormat||'h2h_pts',
@@ -981,7 +1006,7 @@ async function loadMyLeagues(){
           if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
             solo.push({
               id:'local',
-              name:data.leagueName||'RosterBate League',
+              name:deriveMyLeaguesLocalLeagueDisplayName(data),
               sport:data.sport||'nba',
               format:data.draftFormat||'snake',
               scoring:data.scoringFormat||'h2h_pts',
@@ -1004,7 +1029,7 @@ async function loadMyLeagues(){
         if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
           solo.push({
             id:'local',
-            name:data.leagueName||'RosterBate League',
+            name:deriveMyLeaguesLocalLeagueDisplayName(data),
             sport:data.sport||'nba',
             format:data.draftFormat||'snake',
             scoring:data.scoringFormat||'h2h_pts',
@@ -1159,7 +1184,7 @@ async function leaveSeasonLeague(id){
     // Re-render immediately
     renderSeasons(seasons);
     
-    toast('Season removed from your leagues.');
+    toast('League removed from your list.');
     
     // Reload from Firebase after a short delay to confirm
     setTimeout(async () => {
@@ -1169,7 +1194,7 @@ async function leaveSeasonLeague(id){
     
   }catch(e){
     console.error('âŒ Failed to leave season:', e);
-    toast('Could not leave that season: ' + (e.message || 'Unknown error'),'var(--red)');
+    toast('Could not leave that league: ' + (e.message || 'Unknown error'),'var(--red)');
     setBanner('');
     // Reload to show current state
     await loadMyLeagues();
@@ -1275,7 +1300,7 @@ leaveSeasonLeague = async function(id){
     }
 
     renderSeasons(seasons);
-    toast('Season removed from your leagues.');
+  toast('League removed from your list.');
 
     setTimeout(async () => {
       console.log('Reloading leagues from Firebase...');
@@ -1284,7 +1309,7 @@ leaveSeasonLeague = async function(id){
 
   }catch(e){
     console.error('Failed to leave season:', e);
-    toast('Could not leave that season: ' + (e.message || 'Unknown error'),'var(--red)');
+  toast('Could not leave that league: ' + (e.message || 'Unknown error'),'var(--red)');
     setBanner('');
     await loadMyLeagues();
   }
@@ -1311,7 +1336,7 @@ auth.onAuthStateChanged(async user=>{
     setBanner('Could not load your leagues right now.');
     renderHeroSummary();
     renderEmpty('draftList','Unable to Load Draft Rooms','Try refreshing in a moment.');
-    renderEmpty('seasonList','Unable to Load Season Leagues','Try refreshing in a moment.');
+    renderEmpty('seasonList','Unable to Load Shared Leagues','Try refreshing in a moment.');
     renderEmpty('soloList','Unable to Load Local Leagues','Try refreshing in a moment.');
     toast('Could not load leagues','var(--red)');
   }

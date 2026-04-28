@@ -1849,7 +1849,7 @@
       <div class="leaderboard-head">
         <div>
           <div class="leaderboard-title">Top Managers</div>
-          <div class="leaderboard-sub">Every registered member shows up here. Earn score once per day for running leagues, jumping into multiplayer, and opening season mode.</div>
+          <div class="leaderboard-sub">Every registered member shows up here. Earn score once per day for running leagues, jumping into multiplayer, and opening a league.</div>
         </div>
         <div class="leaderboard-badge">Daily Cooldowns Active</div>
       </div>
@@ -1866,8 +1866,8 @@
           <span>Join or create a live room and cash in once per day.</span>
         </div>
         <div class="leaderboard-rule">
-          <strong>Season Manager · +5</strong>
-          <span>Open a season and lock in your daily activity bonus.</span>
+          <strong>Open League · +5</strong>
+          <span>Open a league and lock in your daily activity bonus.</span>
         </div>
       </div>
     </div>
@@ -3024,6 +3024,31 @@ function normalizeHomepageLaunchPayload(payload){
     legacyHistoricalStatMode:false
   };
 }
+function deriveHomepageLocalLeagueDisplayName(payload){
+  const data=normalizeHomepageLaunchPayload(payload);
+  if(!data || typeof data!=='object') return 'RosterBate League';
+  const explicitLeagueName=String(data.leagueName || data.leagueShell?.leagueName || '').trim();
+  const sourceSeasonLabels=Array.isArray(data.sourceSeasons?.sourceSeasonLabels)
+    ? data.sourceSeasons.sourceSeasonLabels.filter(Boolean)
+    : [];
+  const sport=String(data.sport || '').trim().toLowerCase()==='nfl' ? 'nfl' : 'nba';
+  const anchorSeasonLabel=String(data.leagueShell?.anchorSeasonLabel || (sport==='nfl' ? 'NFL' : 'NBA')).trim();
+  const normalizedExplicitLeagueName=explicitLeagueName.toLowerCase();
+  const normalizedAnchorSeasonLabel=anchorSeasonLabel.toLowerCase();
+  const isGenericSimulationPlaceholder=normalizedExplicitLeagueName==='simulation archive lab'
+    || normalizedExplicitLeagueName==='simulation archive'
+    || normalizedExplicitLeagueName==='simulation league'
+    || normalizedExplicitLeagueName==='nba simulation'
+    || normalizedExplicitLeagueName==='nfl simulation';
+  const isAnchorSeasonPlaceholder=sourceSeasonLabels.length>1
+    && normalizedExplicitLeagueName
+    && normalizedExplicitLeagueName===normalizedAnchorSeasonLabel;
+  if(explicitLeagueName && !isGenericSimulationPlaceholder && !isAnchorSeasonPlaceholder) return explicitLeagueName;
+  if(sourceSeasonLabels.length>1) return 'Mixed Era Local League';
+  if(anchorSeasonLabel) return `${anchorSeasonLabel} Local League`;
+  if(sourceSeasonLabels.length===1) return `${sourceSeasonLabels[0]} Local League`;
+  return `${sport==='nfl' ? 'NFL' : 'NBA'} Local League`;
+}
 const RB_PENDING_SEASON_KEY='rbPendingSeasonLaunch';
 function persistHomepagePendingSeasonLaunch(payload){
   try{
@@ -3088,9 +3113,9 @@ function renderLeaguePickerList(mode){
     if(mode==='single'){
       renderLeaguePickerEmpty('No Local Leagues Yet','Finish a local draft and it will show up here for quick reopen access.', !auth.currentUser && !localStorage.getItem('rosterbateDraft'));
     }else if(!auth.currentUser){
-      renderLeaguePickerEmpty('Sign In For Multiplayer Leagues','Your shared season leagues are tied to your account, so sign in to reopen them here.', true);
+      renderLeaguePickerEmpty('Sign In For Multiplayer Leagues','Your shared leagues are tied to your account, so sign in to reopen them here.', true);
     }else{
-      renderLeaguePickerEmpty('No Multiplayer Leagues Yet','Finish or join a multiplayer season and it will show up here for quick access.', false);
+      renderLeaguePickerEmpty('No Multiplayer Leagues Yet','Finish or join a multiplayer league and it will show up here for quick access.', false);
     }
     return;
   }
@@ -3104,14 +3129,14 @@ function renderLeaguePickerList(mode){
       : `openHomepageSeasonLeague('${escapeHtml(row.id)}')`;
     const subtitle=mode==='single'
       ? `${sport} · ${row.teamName || 'My Team'}`
-      : `${sport} · ${row.complete ? 'Season Complete' : 'Season Live'}`;
+      : `${sport} · ${row.complete ? 'League Complete' : 'League Live'}`;
     const stamp=mode==='single'
       ? (row.savedLabel || 'Saved recently')
       : (row.updatedLabel || 'Updated recently');
     const copy=mode==='single'
       ? 'Reopen your local league and pick up exactly where your saved local league left off.'
       : 'Jump back into your shared league, standings, waivers, trades, and roster management.';
-    const kicker=mode==='single' ? 'Local League Save' : 'Shared Season Access';
+    const kicker=mode==='single' ? 'Local League Save' : 'Shared League Access';
     return `<div class="league-picker-card ${mode==='single' ? 'single' : 'multi'}">
       <div class="league-picker-kicker">${escapeHtml(kicker)}</div>
       <div class="league-picker-card-title">${escapeHtml(row.name || 'RosterBate League')}</div>
@@ -3135,7 +3160,7 @@ async function loadHomepageSingleLeagues(){
         if(data.isMultiplayer || data.multiplayer || data.isDemo) return;
         rows.push({
           id:child.key,
-          name:data.leagueName || 'RosterBate League',
+          name:deriveHomepageLocalLeagueDisplayName(data),
           sport:data.sport || 'nba',
           teamName:data.teamName || 'My Team',
           updatedAt:Number(data.updatedAt || data.savedAt || data.createdAt || 0),
@@ -3153,7 +3178,7 @@ async function loadHomepageSingleLeagues(){
         if(!data.isMultiplayer && !data.multiplayer && !data.isDemo){
           rows.push({
             id:'local',
-            name:data.leagueName || 'RosterBate League',
+            name:deriveHomepageLocalLeagueDisplayName(data),
             sport:data.sport || 'nba',
             teamName:data.teamName || 'My Team',
             updatedAt:Number(data.updatedAt || data.savedAt || 0),
@@ -3225,10 +3250,10 @@ async function openLeaguePicker(mode){
   const host=document.getElementById('leaguePickerList');
   if(!modal || !title || !sub || !host) return;
   modal.querySelector('.league-picker-panel')?.setAttribute('data-mode', homeLeaguePickerMode);
-title.textContent=homeLeaguePickerMode === 'single' ? 'My Local Leagues' : 'My Multiplayer Leagues';
+title.textContent=homeLeaguePickerMode === 'single' ? 'My Local Leagues' : 'My Shared Leagues';
   sub.textContent=homeLeaguePickerMode === 'single'
       ? 'Choose one of your local saves to reopen your local league.'
-    : 'Choose one of your shared season leagues to jump back into live multiplayer play.';
+      : 'Choose one of your shared leagues to jump back into live multiplayer play.';
   host.innerHTML='<div class="league-picker-empty"><div class="league-picker-empty-title">Loading Leagues</div><div class="league-picker-empty-copy">Pulling your saved league list now.</div></div>';
   modal.classList.add('open');
   syncHomepageModalState();

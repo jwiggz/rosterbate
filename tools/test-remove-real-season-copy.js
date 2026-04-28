@@ -84,9 +84,29 @@ assert.match(
   'admin-leagues.html should describe direct inspection with plain league wording'
 );
 assert.match(
+  files.adminLeagues,
+  /openLeagueInSeason[\s\S]*Open League/i,
+  'admin-leagues.html should label the direct reopen action as Open League'
+);
+assert.match(
   files.index,
   /Simulation Archives|Browse Simulation Archives|Simulation Archive|Flagship Archive|NBA Archive|NFL Archive|local draft board|Local Reps|No Local Leagues Yet|Local League|My Local Leagues|saved local league left off|Choose one of your local saves/i,
   'index.html should frame homepage archive and local-league entry points with simulation-first wording'
+);
+assert.match(
+  files.index,
+  /Open League · \+5|Open a league and lock in your daily activity bonus\./i,
+  'index.html should use league wording for the homepage daily activity bonus callout'
+);
+assert.match(
+  files.index,
+  /League Complete|League Live|multiplayer league/i,
+  'index.html should use league wording across multiplayer picker status and empty-state copy'
+);
+assert.match(
+  files.index,
+  /My Shared Leagues|Shared League Access|Your shared leagues are tied to your account/i,
+  'index.html should keep the multiplayer reopen picker framed as shared leagues'
 );
 assert.match(
   files.index,
@@ -140,13 +160,28 @@ assert.doesNotMatch(
 );
 assert.match(
   files.myLeagues,
-  /Open your shared season and continue where you left off\./,
-  'my-leagues.html should keep a neutral shared-season fallback line'
+  /Open your shared league and continue where you left off\./,
+  'my-leagues.html should keep a neutral shared-league fallback line'
 );
 assert.match(
   files.myLeagues,
   /Local Leagues|local league|saved local leagues/i,
   'my-leagues.html should describe local saves with local league wording'
+);
+assert.match(
+  files.myLeagues,
+  /League Pressure|shared leagues|Shared Leagues|Shared multiplayer leagues and completed runs/i,
+  'my-leagues.html should frame the shared-league section with league wording instead of older season-centric labels'
+);
+assert.match(
+  files.myLeagues,
+  /Review League|League Active|League removed from your list\.|Could not leave that league:/i,
+  'my-leagues.html should keep shared-league actions and toasts aligned with league wording'
+);
+assert.match(
+  files.myLeagues,
+  /openSoloLeague[\s\S]*Open League/i,
+  'my-leagues.html should use Open League for local-save reopen actions'
 );
 assert.match(
   files.myLeagues,
