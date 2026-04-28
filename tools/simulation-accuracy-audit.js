@@ -157,10 +157,23 @@ function buildPackSanityFailure(packId, message, details) {
   };
 }
 
-function runHistoricalPackSanityCheck() {
+function getAuditSports(sport) {
+  const normalizedSport = String(sport || 'all').trim().toLowerCase();
+  if (!normalizedSport || normalizedSport === 'all') {
+    return Object.keys(AUDIT_CONFIG);
+  }
+  if (!AUDIT_CONFIG[normalizedSport]) {
+    throw new Error(`Unsupported audit sport: ${normalizedSport}`);
+  }
+  return [normalizedSport];
+}
+
+function runHistoricalPackSanityCheck(options = {}) {
+  const sportFilter = String(options.sport || 'all').trim().toLowerCase();
+  const allowedSports = new Set(getAuditSports(sportFilter));
   const packIds = Array.from(new Set(
     Object.values(AUDIT_CONFIG).flatMap((config) => config.sourcePackIds || [])
-  ));
+  )).filter((packId) => allowedSports.has(getPackSport(packId)));
   const failures = [];
 
   packIds.forEach((packId) => {
@@ -868,34 +881,187 @@ function runAccuracyAudit(options = {}) {
   };
 }
 
-function runAccuracyAuditSuite() {
-  const audits = ['nba', 'nfl'].map((sport) => runAccuracyAudit({ sport }));
+function runAccuracyAuditSuite(options = {}) {
+  const audits = getAuditSports(options.sport).map((sport) => runAccuracyAudit({ sport }));
   return {
     audits,
     failedSports: audits.filter((audit) => audit.failedGuardrails.length).map((audit) => audit.sport)
   };
 }
 
-function runSeasonRealismAuditSuite() {
-  const audits = ['nba', 'nfl'].map((sport) => runSeasonRealismAudit({ sport }));
+function runSeasonRealismAuditSuite(options = {}) {
+  const audits = getAuditSports(options.sport).map((sport) => runSeasonRealismAudit({ sport }));
   return {
     audits,
     failedSports: audits.filter((audit) => audit.failedGuardrails.length).map((audit) => audit.sport)
+  };
+}
+
+function parseSimulationAccuracyAuditArgs(argv = []) {
+  const parsed = {
+    sport: 'all',
+    includeSeason: false,
+    includePacks: false,
+    outputMode: 'json',
+    help: false
+  };
+  const args = Array.isArray(argv) ? argv.slice() : [];
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = String(args[index] || '').trim();
+    if (!arg) continue;
+    if (arg === '--help' || arg === '-h') {
+      parsed.help = true;
+    } else if (arg === '--season') {
+      parsed.includeSeason = true;
+    } else if (arg === '--packs') {
+      parsed.includePacks = true;
+    } else if (arg === '--summary') {
+      parsed.outputMode = 'summary';
+    } else if (arg === '--json') {
+      parsed.outputMode = 'json';
+    } else if (arg === '--sport') {
+      index += 1;
+      parsed.sport = String(args[index] || '').trim().toLowerCase() || 'all';
+    } else if (arg.startsWith('--sport=')) {
+      parsed.sport = arg.slice('--sport='.length).trim().toLowerCase() || 'all';
+    } else {
+      throw new Error(`Unknown simulation accuracy audit flag: ${arg}`);
+    }
+  }
+  getAuditSports(parsed.sport);
+  return parsed;
+}
+
+function buildSimulationAccuracyAuditPayload(options = {}) {
+  const sport = String(options.sport || 'all').trim().toLowerCase() || 'all';
+  const payload = runAccuracyAuditSuite({ sport });
+  if (options.includeSeason) {
+    payload.seasonRealism = runSeasonRealismAuditSuite({ sport });
+  }
+  if (options.includePacks) {
+    payload.packSanity = runHistoricalPackSanityCheck({ sport });
+  }
+  return payload;
+}
+
+function formatAuditStatus(failures) {
+  return Array.isArray(failures) && failures.length ? 'FAIL' : 'PASS';
+}
+
+function formatAccuracyAuditLine(audit) {
+  const metrics = audit?.metrics || {};
+  return [
+    `${String(audit?.sport || '').toUpperCase()} ${formatAuditStatus(audit?.failedGuardrails)}`,
+    `team mean ${metrics.teamTotals?.mean}`,
+    `score mean ${metrics.renderedScores?.mean}`,
+    `strength wins ${metrics.strengthWinRate}`,
+    `${metrics.gamesAudited} games`
+  ].join(' | ');
+}
+
+function formatSeasonAuditLine(audit) {
+  const metrics = audit?.metrics || {};
+  return [
+    `${String(audit?.sport || '').toUpperCase()} ${formatAuditStatus(audit?.failedGuardrails)}`,
+    `spread ${metrics.winPctSpread}`,
+    `top-bottom gap ${metrics.topBottomWinPctGap}`,
+    `playoff gap ${metrics.playoffRateGap}`,
+    `${metrics.trials} trials`
+  ].join(' | ');
+}
+
+function formatPackSanityLine(packSanity) {
+  const failures = Array.isArray(packSanity?.failures) ? packSanity.failures : [];
+  const status = failures.length ? 'FAIL' : 'PASS';
+  return `Pack Sanity ${status} | ${Number(packSanity?.packsChecked || 0)} packs checked`;
+}
+
+function formatSimulationAccuracySummary(payload) {
+  const lines = ['Simulation Accuracy Audit', ''];
+  lines.push('Accuracy');
+  (payload?.audits || []).forEach((audit) => {
+    lines.push(`- ${formatAccuracyAuditLine(audit)}`);
+    if (audit.failedGuardrails?.length) {
+      audit.failedGuardrails.forEach((failure) => lines.push(`  - ${failure}`));
+    }
+  });
+  if (payload?.seasonRealism) {
+    lines.push('', 'Season Realism');
+    (payload.seasonRealism.audits || []).forEach((audit) => {
+      lines.push(`- ${formatSeasonAuditLine(audit)}`);
+      if (audit.failedGuardrails?.length) {
+        audit.failedGuardrails.forEach((failure) => lines.push(`  - ${failure}`));
+      }
+    });
+  }
+  if (payload?.packSanity) {
+    lines.push('', formatPackSanityLine(payload.packSanity));
+    (payload.packSanity.failures || []).forEach((failure) => {
+      lines.push(`- ${failure.packId}: ${failure.message}`);
+    });
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function hasSimulationAccuracyFailures(payload) {
+  return Boolean(
+    payload?.failedSports?.length ||
+    payload?.seasonRealism?.failedSports?.length ||
+    payload?.packSanity?.failedPacks?.length
+  );
+}
+
+function getSimulationAccuracyAuditHelp() {
+  return [
+    'Usage: node tools/simulation-accuracy-audit.js [--sport nba|nfl|all] [--season] [--packs] [--json|--summary]',
+    '',
+    'Default: run NBA and NFL accuracy audits and print JSON.',
+    '--sport    Limit audits to one sport.',
+    '--season   Include season-long realism metrics.',
+    '--packs    Include historical pack sanity checks.',
+    '--summary  Print a compact human-readable report.',
+    '--json     Print machine-readable JSON.'
+  ].join('\n');
+}
+
+function runSimulationAccuracyAuditCli(argv = []) {
+  const options = parseSimulationAccuracyAuditArgs(argv);
+  if (options.help) {
+    return {
+      payload: null,
+      output: `${getSimulationAccuracyAuditHelp()}\n`,
+      exitCode: 0
+    };
+  }
+  const payload = buildSimulationAccuracyAuditPayload(options);
+  const output = options.outputMode === 'summary'
+    ? formatSimulationAccuracySummary(payload)
+    : `${JSON.stringify(payload, null, 2)}\n`;
+  return {
+    payload,
+    output,
+    exitCode: hasSimulationAccuracyFailures(payload) ? 1 : 0
   };
 }
 
 if (require.main === module) {
-  const suite = runAccuracyAuditSuite();
-  process.stdout.write(`${JSON.stringify(suite, null, 2)}\n`);
-  if (suite.failedSports.length) {
+  try {
+    const result = runSimulationAccuracyAuditCli(process.argv.slice(2));
+    process.stdout.write(result.output);
+    process.exitCode = result.exitCode;
+  } catch (error) {
+    process.stderr.write(`${error?.message || error}\n`);
+    process.stderr.write(`${getSimulationAccuracyAuditHelp()}\n`);
     process.exitCode = 1;
   }
 }
 
 module.exports = {
+  parseSimulationAccuracyAuditArgs,
   runHistoricalPackSanityCheck,
   runAccuracyAudit,
   runAccuracyAuditSuite,
   runSeasonRealismAudit,
-  runSeasonRealismAuditSuite
+  runSeasonRealismAuditSuite,
+  runSimulationAccuracyAuditCli
 };

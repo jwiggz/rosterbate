@@ -1,10 +1,12 @@
 const assert = require('node:assert/strict');
 
 const {
+  parseSimulationAccuracyAuditArgs,
   runHistoricalPackSanityCheck,
   runAccuracyAudit,
   runAccuracyAuditSuite,
-  runSeasonRealismAuditSuite
+  runSeasonRealismAuditSuite,
+  runSimulationAccuracyAuditCli
 } = require('./simulation-accuracy-audit.js');
 
 const nbaAudit = runAccuracyAudit({ sport: 'nba' });
@@ -168,3 +170,47 @@ seasonSuite.audits.forEach((audit) => {
     `${audit.sport} stronger roster group should finish above weaker roster group`
   );
 });
+
+const nbaSummaryCli = runSimulationAccuracyAuditCli([
+  '--sport',
+  'nba',
+  '--season',
+  '--packs',
+  '--summary'
+]);
+assert.equal(nbaSummaryCli.exitCode, 0, 'nba summary cli should pass when guardrails pass');
+assert.equal(nbaSummaryCli.payload.audits.length, 1, 'sport-filtered cli should run one accuracy audit');
+assert.equal(nbaSummaryCli.payload.audits[0].sport, 'nba', 'sport-filtered cli should run the requested sport');
+assert.equal(nbaSummaryCli.payload.seasonRealism.audits.length, 1, 'sport-filtered season audit should run one sport');
+assert.equal(nbaSummaryCli.payload.seasonRealism.audits[0].sport, 'nba', 'season audit should honor --sport');
+assert.ok(nbaSummaryCli.payload.packSanity.packsChecked > 0, '--packs should include pack sanity results');
+assert.match(nbaSummaryCli.output, /Simulation Accuracy Audit/i, 'summary output should include a readable title');
+assert.match(nbaSummaryCli.output, /NBA\s+PASS/i, 'summary output should show the selected sport result');
+assert.match(nbaSummaryCli.output, /Season Realism/i, 'summary output should include the optional season section');
+assert.match(nbaSummaryCli.output, /Pack Sanity/i, 'summary output should include the optional pack section');
+assert.doesNotMatch(nbaSummaryCli.output, /"audits"/, 'summary output should not be raw JSON');
+
+const defaultJsonCli = runSimulationAccuracyAuditCli([]);
+const defaultPayload = JSON.parse(defaultJsonCli.output);
+assert.equal(defaultJsonCli.exitCode, 0, 'default cli should preserve the passing JSON suite behavior');
+assert.ok(Array.isArray(defaultPayload.audits) && defaultPayload.audits.length >= 2, 'default cli should include both sports');
+assert.equal(
+  Object.prototype.hasOwnProperty.call(defaultPayload, 'seasonRealism'),
+  false,
+  'default cli should not run slower season audits unless requested'
+);
+
+const nflJsonCli = runSimulationAccuracyAuditCli(['--sport=nfl', '--json']);
+const nflPayload = JSON.parse(nflJsonCli.output);
+assert.deepStrictEqual(
+  nflPayload.audits.map((audit) => audit.sport),
+  ['nfl'],
+  '--sport=nfl --json should produce a machine-readable filtered payload'
+);
+
+const parsed = parseSimulationAccuracyAuditArgs(['--sport', 'nba', '--season', '--packs', '--summary']);
+assert.deepStrictEqual(
+  parsed,
+  { sport: 'nba', includeSeason: true, includePacks: true, outputMode: 'summary', help: false },
+  'cli parser should normalize long-form flags'
+);
