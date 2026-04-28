@@ -1,8 +1,11 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 global.window = globalThis;
 
 const { getSimulationShell } = require('../simulation-mode-config.js');
+const { buildCompletedSimulationAutoDraftState } = require('../simulation-mode-runtime.js');
 const {
   buildSimulationSeasonSchedule,
   simulateSimulationGameDay,
@@ -107,6 +110,16 @@ assert.ok(
   'engine game logs should explicitly mark simulation_engine as the only outcome source'
 );
 assert.ok(
+  dayResult.gameLogs.every((game) =>
+    Array.isArray(game.homeEntries) &&
+    Array.isArray(game.awayEntries) &&
+    game.homeEntries.length === 5 &&
+    game.awayEntries.length === 5 &&
+    game.homeEntries.every((entry) => entry?.player?.name && Number(entry?.finalScore || 0) > 0)
+  ),
+  'engine game logs should persist lightweight starter box-score lines for UI recaps'
+);
+assert.ok(
   Object.values(dayResult.resultsByTeam).every((teamResult) =>
     String(teamResult?.statSource || '') === 'simulation_engine_generated' &&
     teamResult.entries.every((entry) => String(entry?.statSource || '') === 'simulation_engine_generated')
@@ -127,6 +140,9 @@ assert.equal(
 );
 
 const nflShell = getSimulationShell({ sport: 'nfl', anchorSeasonId: 'nfl_2014' });
+const realNflPlayerPool = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '..', 'historical-packs', 'nfl_2014_full_season_v1', 'players.json'), 'utf8')
+);
 const nflRoster = Array.from({ length: 13 }, (_, index) => ({
   id: index + 1,
   name: `NFL Starter ${index + 1}`,
@@ -197,6 +213,67 @@ assert.ok(
 assert.ok(
   nflDayResult.gameLogs.every((game) => game.outcomeSource === 'simulation_engine'),
   'nfl simulation should tag weekly outcomes as engine-generated instead of replayed historical results'
+);
+assert.ok(
+  Object.values(nflDayResult.resultsByTeam).every((teamResult) =>
+    Number(teamResult?.total || 0) > 0 &&
+    teamResult.entries.every((entry) => Number(entry?.finalScore || 0) > 0)
+  ),
+  'nfl simulation should generate non-zero fantasy totals for teams and starters instead of flattening football players to zero-score nba baselines'
+);
+const nflStarterEntries = Object.values(nflDayResult.resultsByTeam).flatMap((teamResult) => teamResult.entries);
+const nflQuarterbackLine = nflStarterEntries.find((entry) => String(entry?.player?.pos || '').toUpperCase() === 'QB')?.simulatedStats || {};
+const nflRunningBackLine = nflStarterEntries.find((entry) => String(entry?.player?.pos || '').toUpperCase() === 'RB')?.simulatedStats || {};
+const nflReceiverLine = nflStarterEntries.find((entry) => String(entry?.player?.pos || '').toUpperCase() === 'WR')?.simulatedStats || {};
+assert.ok(
+  Number(nflQuarterbackLine.passingYards || 0) > 0 && Number(nflQuarterbackLine.passingTd || 0) >= 0,
+  'nfl qb simulated stats should include football-native passing production'
+);
+assert.ok(
+  Number(nflRunningBackLine.rushingAttempts || 0) > 0 && Number(nflRunningBackLine.touches || 0) >= Number(nflRunningBackLine.rushingAttempts || 0),
+  'nfl rb simulated stats should include stable touch volume'
+);
+assert.ok(
+  Number(nflReceiverLine.receptions || 0) > 0 && Number(nflReceiverLine.receivingYards || 0) > 0,
+  'nfl wr simulated stats should include receiving production'
+);
+
+const realNflAutoDraftState = buildCompletedSimulationAutoDraftState({
+  shell: nflShell,
+  mixedEraContext: {
+    mixedEraConfigId: 'nfl-real-pack-engine-test',
+    sourcePackIds: ['nfl_2014_full_season_v1'],
+    sourceSeasonLabels: ['2014'],
+    playerPool: realNflPlayerPool
+  },
+  controlledTeamAbbr: 'DAL'
+});
+
+const realNflEngineState = {
+  ...JSON.parse(JSON.stringify(realNflAutoDraftState)),
+  sport: 'nfl',
+  seasonId: 'nfl-real-pack-engine-state',
+  teams: nflShell.teams.map((team) => team.name),
+  teamMeta: nflShell.teams,
+  allRosters: nflShell.teams.map((team) => JSON.parse(JSON.stringify(realNflAutoDraftState.draftState.rostersByTeam[team.abbr] || []))),
+  standings: JSON.parse(JSON.stringify(realNflAutoDraftState.seasonState.standings || [])),
+  currentDay: 1,
+  currentWeek: 1
+};
+
+const realNflPackDayResult = simulateSimulationGameDay({
+  state: realNflEngineState,
+  schedule: { byDay: { 1: [{ homeAbbr: 'DAL', awayAbbr: 'PHI' }] } },
+  day: 1,
+  lineupIdsByTeam: JSON.parse(JSON.stringify(realNflAutoDraftState.seasonState.lineupIdsByTeam || {}))
+});
+
+assert.ok(
+  Object.values(realNflPackDayResult.resultsByTeam).every((teamResult) =>
+    Number(teamResult?.total || 0) > 0 &&
+    teamResult.entries.every((entry) => Number(entry?.finalScore || 0) > 0)
+  ),
+  'nfl simulation should generate non-zero fantasy totals for real 2014 pack players instead of only working for synthetic nba-shaped fallback fixtures'
 );
 
 const nflPartialLineupDayResult = simulateSimulationGameDay({

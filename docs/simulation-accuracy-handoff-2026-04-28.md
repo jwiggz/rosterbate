@@ -1,0 +1,131 @@
+# Simulation Accuracy Handoff - 2026-04-28
+
+## Reviewer Summary
+
+This branch turns the local-league simulation pass into a tested, auditable baseline for NBA and NFL mixed-era leagues. It fixes NFL real-pack scoring collapse, tunes NBA/NFL output shape, adds role/position personality metrics, adds historical pack sanity checks, and verifies the season shell can persist and restore simulated league progress.
+
+## Explicit Exclusion
+
+Do not review, stage, commit, or push:
+
+- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\sim-matchup.html`
+
+That file is an untracked prototype outside this PR.
+
+## Main Changes
+
+### Engine Accuracy
+
+- Fixed NFL starters that previously collapsed to zero because football-shaped player data was routed through NBA stat derivation.
+- Tuned NBA fantasy totals and rendered basketball scores into a lower-variance, more believable range.
+- Preserved winner-aware score rendering so rounded NBA display scores do not create false ties.
+- Made elite NBA players a bit more takeover-prone without materially widening team-total variance.
+- Added NBA role personality for scorers, heliocentric creators, interior bigs, wings, and defensive anchors.
+- Added NFL position personality so QB/RB/WR/TE output reads more position-authentic while keeping weekly totals stable.
+
+### Audit Harness
+
+- `tools/simulation-accuracy-audit.js` now supports:
+  - `--sport nba|nfl|all`
+  - `--season`
+  - `--packs`
+  - `--json`
+  - `--summary`
+- Default behavior remains machine-readable NBA+NFL accuracy JSON.
+- Sport-specific output avoids noisy zero-filled cross-sport metrics.
+- Pack sanity checks catch missing names, bad positions, zero fantasy baselines, and implausible pack means.
+- Season realism checks cover win spread, top-vs-bottom roster separation, and playoff-rate separation.
+
+### Season UX And Persistence
+
+- Reveal reports use real simulation franchise names instead of generic `Team N` labels.
+- My Team last-matchup summaries now handle completed logs that only contain team indexes.
+- Matchup navigation now shows selected completed-day scores instead of unrevealed `--` schedule rows.
+- Completed matchup action copy follows the selected opponent instead of the next scheduled opponent.
+- Browser regression verified local league creation, instant draft completion, day/week simulation, reload persistence, archive detail, and archive restore.
+
+## Useful Commands
+
+Human-readable one-sport pass:
+
+```powershell
+node tools/simulation-accuracy-audit.js --sport nba --season --packs --summary
+```
+
+Machine-readable default pass:
+
+```powershell
+node tools/simulation-accuracy-audit.js
+```
+
+Focused tests:
+
+```powershell
+node tools/test-simulation-league-engine.js
+node tools/test-simulation-season-adapter.js
+node tools/test-shared-season-shell-simulation.js
+node tools/test-simulation-accuracy-audit.js
+node tools/test-historical-universe-slot-storage.js
+node tools/test-simulation-draft-boot.js
+```
+
+Storage fallback checks:
+
+```powershell
+node tools/test-draft-season-storage-fallback.js
+node tools/test-admin-league-storage-fallback.js
+node tools/test-local-league-storage-fallback.js
+```
+
+## Latest Audit Snapshot
+
+Latest `node tools/simulation-accuracy-audit.js` run:
+
+### NBA
+
+- team total mean: `234.34`
+- rendered score mean: `112.86`
+- strength win rate: `0.67`
+- top-star share mean: `0.26`
+- top scorer point share mean: `0.28`
+- assist leader assist share mean: `0.41`
+- rebound leader rebound share mean: `0.34`
+- zero-team-total rate: `0`
+- rendered tie rate: `0`
+
+### NFL
+
+- team total mean: `137.34`
+- rendered score mean: `24.66`
+- strength win rate: `0.67`
+- top-star share mean: `0.20`
+- QB share mean: `0.20`
+- RB share mean: `0.11`
+- WR share mean: `0.11`
+- zero-team-total rate: `0`
+- rendered tie rate: `0`
+
+Both sports pass the current guardrails.
+
+## Browser Regression Notes
+
+Verified in the local app at `http://localhost:8080`:
+
+- New NBA simulation league boots from setup through instant draft.
+- Day 1 simulation advances standings and reveal reports.
+- Reload preserves the same universe URL, standings, PF/PA, and next reveal day.
+- Simulating through Day 7 rolls into Week 2 / Day 8.
+- Archive browser lists the saved universe as `Atlanta Hawks - Week 2 - Day 8`.
+- Archive detail shows the saved record, rank, timeline, and recent sim days.
+- Continue Universe reopens the same season state.
+- No browser console warnings/errors appeared during the pass.
+
+## Known Local Files Outside The PR
+
+The worktree may contain untracked local files generated during validation:
+
+- `.server-8080.err.log`
+- `.server-8080.log`
+- `sim-matchup.html`
+
+They are intentionally not part of this PR.

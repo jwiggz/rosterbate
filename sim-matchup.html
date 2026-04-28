@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RosterBate · Live Sim</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #0a0a12;
+  --surface:   #0f0f1e;
+  --surface2:  #14142a;
+  --border:    #1e1e38;
+  --purple:    #c084fc;
+  --purple-d:  #7c3aed;
+  --cyan:      #38bdf8;
+  --cyan-d:    #0284c7;
+  --green:     #4ade80;
+  --yellow:    #fbbf24;
+  --red:       #f87171;
+  --text:      #e2e2ff;
+  --muted:     #555570;
+  --court-bg:  #1a3a1a;
+  --court-line:#2d5a2d;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* ── Header / Scoreboard ──────────────────────────────────── */
+#header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+#logo {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--purple);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+#scoreboard {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.score-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+.score-team.home { border-radius: 8px 0 0 8px; border-right: none; }
+.score-team.away { border-radius: 0 8px 8px 0; border-left: none; }
+.score-team-name { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.score-team-name.purple { color: var(--purple); }
+.score-team-name.cyan   { color: var(--cyan); }
+.score-val {
+  font-size: 24px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: center;
+}
+.score-val.purple { color: var(--purple); text-shadow: 0 0 16px #c084fc55; }
+.score-val.cyan   { color: var(--cyan);   text-shadow: 0 0 16px #38bdf855; }
+#clock-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 14px;
+  background: #000;
+  border: 1px solid var(--border);
+  min-width: 90px;
+}
+#quarter-label { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+#clock-display { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--yellow); }
+#live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 9px; color: var(--green); letter-spacing: 2px; font-weight: 700;
+}
+#live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); animation: blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+#controls {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.btn {
+  border: none; cursor: pointer; border-radius: 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 6px 14px; transition: opacity .15s;
+}
+.btn:hover { opacity: .85; }
+.btn-primary { background: var(--purple); color: #0a0a12; }
+.btn-secondary { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+.btn-speed { background: var(--surface2); border: 1px solid var(--border); color: var(--yellow); font-size: 10px; padding: 5px 10px; border-radius: 6px; }
+.btn-speed.active { background: var(--yellow); color: #000; }
+
+/* ── Main layout ──────────────────────────────────────────── */
+#main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  grid-template-rows: 1fr 140px;
+  gap: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Side panels ──────────────────────────────────────────── */
+.side-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 7px 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-header.purple { color: var(--purple); border-top: 2px solid var(--purple); }
+.panel-header.cyan   { color: var(--cyan);   border-top: 2px solid var(--cyan); }
+.panel-body { flex: 1; overflow-y: auto; padding: 4px 0; }
+.panel-body::-webkit-scrollbar { width: 3px; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Player rows */
+.player-row {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  gap: 6px;
+  border-bottom: 1px solid #0f0f1e;
+  transition: background .15s;
+}
+.player-row.active-player { background: #1a1a2e; }
+.player-dot-indicator {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.player-info { flex: 1; min-width: 0; }
+.player-name { font-size: 11px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-pos-team { font-size: 9px; color: var(--muted); }
+.player-fp-col { text-align: right; flex-shrink: 0; }
+.player-fp-val { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.player-fp-val.purple { color: var(--purple); }
+.player-fp-val.cyan   { color: var(--cyan); }
+.player-fp-label { font-size: 8px; color: var(--muted); letter-spacing: 1px; }
+.player-last-event { font-size: 8px; color: var(--muted); margin-top: 1px; min-height: 10px; }
+
+/* ── Court ────────────────────────────────────────────────── */
+#court-wrap {
+  position: relative;
+  overflow: hidden;
+  background: var(--court-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#court-svg { width: 100%; height: 100%; }
+
+/* ── Play-by-play ─────────────────────────────────────────── */
+#pbp-panel {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#pbp-header {
+  padding: 5px 12px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#pbp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column-reverse;
+}
+#pbp-body::-webkit-scrollbar { width: 3px; }
+#pbp-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.pbp-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 12px;
+  border-bottom: 1px solid #0d0d1a;
+  font-size: 11px;
+  animation: slideIn .3s ease;
+}
+@keyframes slideIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: translateY(0); } }
+.pbp-time { font-size: 9px; color: var(--muted); font-variant-numeric: tabular-nums; width: 38px; flex-shrink: 0; }
+.pbp-team-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+.pbp-text { flex: 1; color: #aab; }
+.pbp-fp { font-weight: 700; font-size: 11px; flex-shrink: 0; }
+
+/* ── Score popup ──────────────────────────────────────────── */
+.score-popup {
+  position: absolute;
+  pointer-events: none;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  animation: floatUp .9s ease forwards;
+  z-index: 20;
+}
+@keyframes floatUp {
+  0%   { opacity:1; transform: translateY(0) scale(1); }
+  70%  { opacity:1; transform: translateY(-30px) scale(1.05); }
+  100% { opacity:0; transform: translateY(-50px) scale(0.9); }
+}
+
+/* ── Halftime overlay ─────────────────────────────────────── */
+#overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.8);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+#overlay.hidden { display: none; }
+#overlay-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 40px;
+  text-align: center;
+  min-width: 320px;
+}
+#overlay-title { font-size: 18px; font-weight: 900; color: var(--yellow); letter-spacing: 3px; margin-bottom: 16px; }
+#overlay-scores { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }
+.overlay-team { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.overlay-team-name { font-size: 11px; letter-spacing: 1px; font-weight: 700; }
+.overlay-score { font-size: 40px; font-weight: 900; }
+#overlay-btn { margin-top: 8px; }
+#overlay-sub { font-size: 10px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<!-- Overlay for halftime / game over -->
+<div id="overlay" class="hidden">
+  <div id="overlay-card">
+    <div id="overlay-title">HALFTIME</div>
+    <div id="overlay-scores">
+      <div class="overlay-team">
+        <div class="overlay-team-name" id="ov-name-a" style="color:var(--purple)">Team A</div>
+        <div class="overlay-score" id="ov-score-a" style="color:var(--purple)">0.0</div>
+      </div>
+      <div class="overlay-team">
+        <div class="overlay-team-name" id="ov-name-b" style="color:var(--cyan)">Team B</div>
+        <div class="overlay-score" id="ov-score-b" style="color:var(--cyan)">0.0</div>
+      </div>
+    </div>
+    <div id="overlay-top-player" style="font-size:11px;color:var(--muted);margin-bottom:12px"></div>
+    <button class="btn btn-primary" id="overlay-btn" onclick="resumeSim()">▶ Continue</button>
+    <div id="overlay-sub"></div>
+  </div>
+</div>
+
+<!-- Header -->
+<div id="header">
+  <div id="logo">⚡ RosterBate</div>
+
+  <div id="scoreboard">
+    <div class="score-team home">
+      <div class="score-team-name purple" id="team-a-name">PURPLE RAIN</div>
+      <div class="score-val purple" id="score-a">0.0</div>
+    </div>
+    <div id="clock-block">
+      <div id="quarter-label">Q1</div>
+      <div id="clock-display">12:00</div>
+    </div>
+    <div class="score-team away">
+      <div class="score-val cyan" id="score-b">0.0</div>
+      <div class="score-team-name cyan" id="team-b-name">ICE COLD</div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div id="live-badge"><div id="live-dot"></div>LIVE</div>
+    <button class="btn btn-speed active" id="speed-1x" onclick="setSpeed(1)">1×</button>
+    <button class="btn btn-speed" id="speed-5x" onclick="setSpeed(5)">5×</button>
+    <button class="btn btn-secondary" id="btn-pause" onclick="togglePause()">⏸ Pause</button>
+    <button class="btn btn-primary" id="btn-new" onclick="startNewGame()">↺ New Game</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main">
+  <!-- Left roster -->
+  <div class="side-panel" id="panel-a">
+    <div class="panel-header purple" id="panel-a-header">PURPLE RAIN</div>
+    <div class="panel-body" id="roster-a"></div>
+  </div>
+
+  <!-- Court -->
+  <div id="court-wrap">
+    <svg id="court-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <!-- Court background -->
+      <rect width="600" height="400" fill="#1a3a1a"/>
+      <!-- Court outline -->
+      <rect x="20" y="20" width="560" height="360" fill="#1e441e" stroke="#2d6b2d" stroke-width="2" rx="4"/>
+      <!-- Center circle -->
+      <circle cx="300" cy="200" r="40" fill="none" stroke="#2d6b2d" stroke-width="1.5"/>
+      <line x1="300" y1="20" x2="300" y2="380" stroke="#2d6b2d" stroke-width="1.5"/>
+      <!-- Left key -->
+      <rect x="20" y="130" width="120" height="140" fill="#1c3e1c" stroke="#2d6b2d" stroke-width="1.5"/>
+      <rect x="20" y="155" width="60" height="90" fill="none" stroke="#2d6b2d" stroke-width="1"/>
+      <!-- Left basket -->
+      <circle cx="55" cy="200" r="12" fill="none" stroke="#c8a96e" stroke-width="2"/>
+      <line x1="20" y1="200" x2="55" y2="200" stroke="#c8a96e" stroke-width="1.5"/>
+      <!-- Left 3pt arc -->
+      <path d="M 20 80 Q 200 200 20 320" fill="none" stroke="#2d6b2d" stroke-width="1.5"/>
+      <!-- Right key -->
+      <rect x="460" y="130" width="120" height="140" fill="#1c3e1c" stroke="#2d6b2d" stroke-width="1.5"/>
+      <rect x="520" y="155" width="60" height="90" fill="none" stroke="#2d6b2d" stroke-width="1"/>
+      <!-- Right basket -->
+      <circle cx="545" cy="200" r="12" fill="none" stroke="#c8a96e" stroke-width="2"/>
+      <line x1="580" y1="200" x2="545" y2="200" stroke="#c8a96e" stroke-width="1.5"/>
+      <!-- Right 3pt arc -->
+      <path d="M 580 80 Q 400 200 580 320" fill="none" stroke="#2d6b2d" stroke-width="1.5"/>
+      <!-- Center dot -->
+      <circle cx="300" cy="200" r="4" fill="#2d6b2d"/>
+      <!-- Player dots group -->
+      <g id="player-dots"></g>
+    </svg>
+  </div>
+
+  <!-- Right roster -->
+  <div class="side-panel" id="panel-b">
+    <div class="panel-header cyan" id="panel-b-header">ICE COLD</div>
+    <div class="panel-body" id="roster-b"></div>
+  </div>
+
+  <!-- Play-by-play -->
+  <div id="pbp-panel">
+    <div id="pbp-header">
+      <span>Play-by-Play</span>
+      <span id="pbp-count" style="color:var(--muted)">0 plays</span>
+    </div>
+    <div id="pbp-body"></div>
+  </div>
+</div>
+
+<script src="historical-universe-slots.js"></script>
+<script src="simulation-mode-runtime.js"></script>
+<script src="simulation-nfl-2014-schedule.js"></script>
+<script src="simulation-league-engine.js"></script>
+<script src="simulation-season-adapter.js"></script>
+<script>
+// ── Player data (embedded from sport-data-live.json top players) ──────────
+const PLAYER_POOL = [
+  { name:"Luka Doncic",   team:"DAL", pos:"PG", fp:62.6, statValues:{PTS:33.9,REB:9.2,AST:9.8,STL:1.4,BLK:0.5,TO:4.5,"3PM":3.6} },
+  { name:"Joel Embiid",   team:"PHI", pos:"C",  fp:61.2, statValues:{PTS:34.7,REB:11,AST:5.6,STL:1,BLK:1.7,TO:3.8,"3PM":1.1} },
+  { name:"Nikola Jokic",  team:"DEN", pos:"C",  fp:64.8, statValues:{PTS:29.6,REB:12.7,AST:10.2,STL:1.8,BLK:0.6,TO:2.5,"3PM":2.0} },
+  { name:"Giannis",       team:"MIL", pos:"PF", fp:59.1, statValues:{PTS:30.4,REB:11.9,AST:6.5,STL:0.9,BLK:1.2,TO:1.6,"3PM":0.2} },
+  { name:"Jayson Tatum",  team:"BOS", pos:"SF", fp:49.5, statValues:{PTS:26.8,REB:8.7,AST:6.0,STL:1.1,BLK:0.5,TO:1.5,"3PM":3.5} },
+  { name:"Devin Booker",  team:"PHX", pos:"SG", fp:42.7, statValues:{PTS:25.6,REB:4.1,AST:7.1,STL:0.9,BLK:0.2,TO:1.8,"3PM":2.4} },
+  { name:"Trae Young",    team:"ATL", pos:"SG", fp:46.6, statValues:{PTS:24.2,REB:3.1,AST:11.6,STL:1.2,BLK:0.2,TO:2.9,"3PM":2.9} },
+  { name:"SGA",           team:"OKC", pos:"SG", fp:54.8, statValues:{PTS:32.7,REB:5.0,AST:6.4,STL:1.7,BLK:1.0,TO:1.6,"3PM":2.1} },
+  { name:"Anthony Edwards",team:"MIN",pos:"SF", fp:45.5, statValues:{PTS:27.6,REB:5.7,AST:4.5,STL:1.2,BLK:0.6,TO:1.1,"3PM":4.1} },
+  { name:"Kevin Durant",  team:"PHX", pos:"PF", fp:48.2, statValues:{PTS:27.1,REB:6.6,AST:5.0,STL:0.7,BLK:1.1,TO:3.2,"3PM":1.8} },
+  { name:"Damian Lillard",team:"MIL", pos:"PG", fp:41.3, statValues:{PTS:24.3,REB:4.4,AST:7.3,STL:0.9,BLK:0.3,TO:3.0,"3PM":4.1} },
+  { name:"Donovan Mitchell",team:"CLE",pos:"SG",fp:44.2, statValues:{PTS:26.6,REB:5.3,AST:6.1,STL:1.5,BLK:0.4,TO:2.7,"3PM":3.2} },
+  { name:"Bam Adebayo",   team:"MIA", pos:"C",  fp:36.4, statValues:{PTS:19.9,REB:10.4,AST:4.9,STL:1.1,BLK:0.9,TO:2.5,"3PM":0.0} },
+  { name:"Draymond Green",team:"GSW", pos:"PF", fp:28.1, statValues:{PTS:8.5,REB:7.2,AST:6.5,STL:0.9,BLK:0.7,TO:2.1,"3PM":0.8} },
+  { name:"Ja Morant",     team:"MEM", pos:"PG", fp:43.1, statValues:{PTS:25.1,REB:5.6,AST:8.1,STL:1.1,BLK:0.5,TO:2.8,"3PM":1.2} },
+  { name:"Zion Williamson",team:"NOP",pos:"PF", fp:40.2, statValues:{PTS:26.0,REB:7.0,AST:4.6,STL:1.0,BLK:0.6,TO:2.9,"3PM":0.3} },
+  { name:"LeBron James",  team:"LAL", pos:"SF", fp:47.8, statValues:{PTS:25.7,REB:7.3,AST:8.3,STL:1.3,BLK:0.5,TO:3.5,"3PM":2.1} },
+  { name:"Stephen Curry", team:"GSW", pos:"PG", fp:51.2, statValues:{PTS:29.4,REB:5.1,AST:6.3,STL:0.9,BLK:0.4,TO:2.7,"3PM":5.0} },
+  { name:"Tyrese Haliburton",team:"IND",pos:"PG",fp:38.7,statValues:{PTS:20.1,REB:3.9,AST:10.9,STL:1.6,BLK:0.3,TO:2.7,"3PM":2.3} },
+  { name:"Paul George",   team:"LAC", pos:"SF", fp:37.2, statValues:{PTS:22.6,REB:5.2,AST:3.5,STL:1.5,BLK:0.4,TO:1.9,"3PM":3.1} },
+];
+
+// ── Game state ─────────────────────────────────────────────────────────────
+let teamA = [], teamB = [];
+let scoreA = 0, scoreB = 0;
+let quarter = 1, clockSec = 12 * 60;
+let simInterval = null;
+let paused = false;
+let speed = 1;
+let playCount = 0;
+let gameOver = false;
+let liveMatchupMode = false;
+let liveMatchupAdapter = null;
+let liveMatchupPrepared = null;
+let liveMatchupSlotId = '';
+let liveMatchupReturnUrl = 'rosterbate-season.html';
+let liveRevealEvents = [];
+let liveRevealIndex = 0;
+let liveCommitted = false;
+// Which team currently has the ball
+let possession = 'A';
+// Which basket the offense is attacking this possession (flips on every turnover)
+// true = attacking RIGHT basket (x=545), false = attacking LEFT basket (x=55)
+let attackingRight = true;
+const TICK_MS  = 80;   // real ms per sim tick
+const SIM_SECS = 4;    // sim seconds per tick (at 1x)
+
+// ── Full-court coordinate system (SVG 600×400) ────────────────────────────
+// Left basket:  x=55, y=200  — TeamB attacks this (TeamA defends)
+// Right basket: x=545, y=200 — TeamA attacks this (TeamB defends)
+// Left key:  x=20–140, y=130–270    Left 3pt arc peaks ~x=200
+// Right key: x=460–580, y=130–270   Right 3pt arc peaks ~x=400
+// Center line: x=300
+
+// Spawn positions — neutral mid-court spread
+const HOME_POSITIONS = [
+  {x:300, y:200}, {x:250, y:140}, {x:250, y:260}, {x:200, y:80}, {x:200, y:320},
+];
+const AWAY_POSITIONS = [
+  {x:300, y:200}, {x:350, y:140}, {x:350, y:260}, {x:400, y:80}, {x:400, y:320},
+];
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+const rnd  = (min,max) => Math.random()*(max-min)+min;
+const pick  = arr => arr[Math.floor(Math.random()*arr.length)];
+const fmt   = n => n.toFixed(1);
+const fmtClock = s => {
+  const m = Math.floor(s/60), sec = s%60;
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+};
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function pickTeams() {
+  const pool = shuffle([...PLAYER_POOL]);
+  // Weight by fp — higher fp players are more likely to be picked first
+  pool.sort((a,b) => b.fp - a.fp + rnd(-15,15));
+  return [pool.slice(0,8), pool.slice(8,16)];
+}
+
+// ── Dot management ────────────────────────────────────────────────────────
+const dotEls = {};
+
+function createDots(players, side, color, shortColor) {
+  const positions = side==='A' ? HOME_POSITIONS : AWAY_POSITIONS;
+  players.slice(0,5).forEach((p,i) => {
+    const pos = positions[i];
+    p._x = pos.x; p._y = pos.y;
+    p._targetX = pos.x; p._targetY = pos.y;
+    p._color = color;
+    p._shortColor = shortColor;
+    p._side = side;
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("id", `dot-${p._id}`);
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute("r","10");
+    circle.setAttribute("fill", color);
+    circle.setAttribute("fill-opacity","0.85");
+    circle.setAttribute("stroke","#000");
+    circle.setAttribute("stroke-width","1.5");
+
+    const label = document.createElementNS("http://www.w3.org/2000/svg","text");
+    label.setAttribute("text-anchor","middle");
+    label.setAttribute("dominant-baseline","central");
+    label.setAttribute("font-size","7");
+    label.setAttribute("font-weight","bold");
+    label.setAttribute("fill","#fff");
+    label.setAttribute("pointer-events","none");
+    label.textContent = p.name.split(' ').pop().slice(0,5);
+
+    g.appendChild(circle); g.appendChild(label);
+    document.getElementById("player-dots").appendChild(g);
+    dotEls[p._id] = { g, circle, label };
+    moveDot(p, p._x, p._y);
+  });
+}
+
+function moveDot(player, x, y) {
+  const el = dotEls[player._id];
+  if (!el) return;
+  el.g.setAttribute("transform", `translate(${x},${y})`);
+}
+
+function animateDots() {
+  [...teamA, ...teamB].forEach(p => {
+    if (!p._x) return;
+    const dx = p._targetX - p._x, dy = p._targetY - p._y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    // If very close just snap, otherwise move at fixed px/tick speed
+    if (dist < 2) {
+      p._x = p._targetX;
+      p._y = p._targetY;
+    } else {
+      // Move at up to 18px per tick — fast enough to cross the court in ~1.5s
+      const speed = Math.min(18, dist);
+      p._x += (dx / dist) * speed;
+      p._y += (dy / dist) * speed;
+    }
+    moveDot(p, p._x, p._y);
+  });
+}
+
+function setRandomTarget(player) {
+  player._targetX = Math.max(25, Math.min(575, player._x + rnd(-25, 25)));
+  player._targetY = Math.max(25, Math.min(375, player._y + rnd(-20, 20)));
+}
+
+// ── Roster panels ─────────────────────────────────────────────────────────
+function buildRosterPanel(players, panelId, fpClass) {
+  const panel = document.getElementById(panelId);
+  panel.innerHTML = '';
+  players.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    row.id = `prow-${p._id}`;
+    row.innerHTML = `
+      <div class="player-dot-indicator" style="background:${p._color}"></div>
+      <div class="player-info">
+        <div class="player-name">${p.name}</div>
+        <div class="player-pos-team">${p.pos} · ${p.team}</div>
+        <div class="player-last-event" id="pevt-${p._id}"></div>
+      </div>
+      <div class="player-fp-col">
+        <div class="player-fp-val ${fpClass}" id="pfp-${p._id}">0.0</div>
+        <div class="player-fp-label">FPTS</div>
+      </div>
+    `;
+    panel.appendChild(row);
+  });
+}
+
+function updatePlayerFP(player) {
+  const el = document.getElementById(`pfp-${player._id}`);
+  if (el) el.textContent = fmt(player._fp);
+}
+
+function updatePlayerEvent(player, text) {
+  const el = document.getElementById(`pevt-${player._id}`);
+  if (el) { el.textContent = text; el.style.color = '#aaa'; }
+  // Flash the row
+  const row = document.getElementById(`prow-${player._id}`);
+  if (row) {
+    row.classList.add('active-player');
+    setTimeout(() => row.classList.remove('active-player'), 1200);
+  }
+}
+
+// ── Scoreboard update ─────────────────────────────────────────────────────
+function updateScoreboard() {
+  document.getElementById('score-a').textContent = fmt(scoreA);
+  document.getElementById('score-b').textContent = fmt(scoreB);
+  document.getElementById('quarter-label').textContent = `Q${quarter}`;
+  document.getElementById('clock-display').textContent = fmtClock(clockSec);
+}
+
+// ── Possession-based play engine ───────────────────────────────────────────
+// Each possession: offense picks a play type based on their skills,
+// defense contests based on their STL/BLK ratings.
+// Outcome probabilities are driven by real player stat values.
+
+function weightedRandom(options) {
+  // options: [{value, weight}, ...]
+  const total = options.reduce((s,o)=>s+o.weight,0);
+  let r = Math.random()*total;
+  for (const o of options) { r -= o.weight; if (r<=0) return o.value; }
+  return options[options.length-1].value;
+}
+
+// Normalize a stat to a 0-1 scale given reasonable NBA ranges
+function norm(val, lo, hi) { return Math.max(0, Math.min(1, (val-lo)/(hi-lo))); }
+
+function runPossession(offTeam, defTeam) {
+  // Pick ball-handler: weight by offensive rating (fp)
+  const offWeights = offTeam.slice(0,5).map(p=>({value:p, weight:p.fp}));
+  const ballHandler = weightedRandom(offWeights);
+
+  // Pick defender: match roughly by position, else random
+  const defWeights = defTeam.slice(0,5).map(p=>({value:p, weight:p.fp * rnd(0.6,1.4)}));
+  const defender = weightedRandom(defWeights);
+
+  const sv = ballHandler.statValues;
+  const dv = defender.statValues;
+
+  // ── Step 1: Turnover check ────────────────────────────────────────────────
+  // TO chance scales with handler's TO rate; STL chance scales with defender's STL
+  const toChance  = norm(sv.TO,  0.5, 5.0) * 0.18;
+  const stlChance = norm(dv.STL, 0.5, 2.5) * 0.12;
+  const roll = Math.random();
+
+  if (roll < stlChance) {
+    // STEAL — defender gets FP, ball-handler gets TO FP hit
+    const defFP = 3.0;
+    const offFP = -1.0;
+    defender._fp  += defFP;
+    ballHandler._fp += offFP;
+    if (offTeam === teamA) { scoreA += offFP; } else { scoreB += offFP; }
+    addPBP(defender,    `🔥 ${defender.name} picks the pocket of ${ballHandler.name}!`, defFP,  clockSec, defender._color, defender._side);
+    addPBP(ballHandler, `💨 ${ballHandler.name} turns it over — stolen`, offFP, clockSec, ballHandler._color, ballHandler._side);
+    updatePlayerFP(defender);
+    updatePlayerFP(ballHandler);
+    updatePlayerEvent(defender,    `STL on ${ballHandler.name}`);
+    updatePlayerEvent(ballHandler, `Turnover — stolen`);
+    showScorePopup(defender,    defFP);
+    showScorePopup(ballHandler, offFP);
+    // Defender lunges onto ball-handler for the steal
+    defender._targetX = jitter(ballHandler._x, 8);
+    defender._targetY = jitter(ballHandler._y, 8);
+    // Ball-handler stumbles back toward mid-court
+    ballHandler._targetX = jitter(300, 40);
+    ballHandler._targetY = jitter(200, 40);
+    possession = defTeam === teamA ? 'A' : 'B';
+    attackingRight = !attackingRight;
+    return;
+  }
+
+  if (roll < stlChance + toChance) {
+    // Pure turnover (no steal credit)
+    const offFP = -1.0;
+    ballHandler._fp += offFP;
+    if (offTeam === teamA) { scoreA += offFP; } else { scoreB += offFP; }
+    addPBP(ballHandler, `${ballHandler.name} loses the handle — turnover`, offFP, clockSec, ballHandler._color, ballHandler._side);
+    updatePlayerFP(ballHandler);
+    updatePlayerEvent(ballHandler, `Turnover`);
+    showScorePopup(ballHandler, offFP);
+    possession = defTeam === teamA ? 'A' : 'B';
+    attackingRight = !attackingRight;
+    return;
+  }
+
+  // ── Step 2: Choose shot type ───────────────────────────────────────────────
+  // 3-pointer chance scales with player's 3PM stat
+  const threePct = norm(sv["3PM"], 0, 5.0);
+  const shotType = weightedRandom([
+    { value:'3pt',  weight: threePct * 30 + 5 },
+    { value:'2pt',  weight: 40 },
+    { value:'mid',  weight: 15 },
+    { value:'ft',   weight: 10 },
+  ]);
+
+  // ── Step 3: Block check (only on 2pt / mid) ────────────────────────────────
+  if (shotType !== '3pt' && shotType !== 'ft') {
+    const blkChance = norm(dv.BLK, 0.2, 2.5) * 0.10;
+    if (Math.random() < blkChance) {
+      const defFP = 3.0;
+      const offFP = 0; // no TO, just shot blocked
+      defender._fp += defFP;
+      if (offTeam === teamA) { scoreA += offFP; } else { scoreB += offFP; }
+      addPBP(defender,    `🛡️ ${defender.name} BLOCKS ${ballHandler.name}!`, defFP, clockSec, defender._color, defender._side);
+      updatePlayerFP(defender);
+      updatePlayerEvent(defender,    `BLK on ${ballHandler.name}`);
+      updatePlayerEvent(ballHandler, `Shot blocked by ${defender.name}`);
+      showScorePopup(defender, defFP);
+      // Defender sprints to the basket to block
+      defender._targetX = attackingRight ? jitter(530, 10) : jitter(70, 10);
+      defender._targetY = jitter(200, 15);
+      // Rebound after block
+      resolveRebound(offTeam, defTeam, ballHandler);
+      return;  // possession + attackingRight handled inside resolveRebound
+    }
+  }
+
+  // ── Step 4: Assisted shot? ─────────────────────────────────────────────────
+  // AST chance scales with handler's AST stat (passers assist more)
+  const astChance = norm(sv.AST, 1, 12) * 0.55;
+  let assister = null;
+  if (Math.random() < astChance) {
+    // Pick a teammate (not the ball handler) to get the assist
+    const teammates = offTeam.slice(0,5).filter(p=>p._id !== ballHandler._id);
+    assister = pick(teammates);
+  }
+
+  // ── Step 5: Make or miss ──────────────────────────────────────────────────
+  // Make probability: offense quality vs defense quality
+  const offStr = norm(sv.PTS, 8, 35);
+  const defStr = norm(dv.STL + dv.BLK, 0.5, 4.5) * 0.4;
+  let makeProb;
+  if (shotType === '3pt')  makeProb = 0.30 + offStr*0.15 - defStr*0.08;
+  else if (shotType==='ft')makeProb = 0.75 + offStr*0.10;
+  else                     makeProb = 0.45 + offStr*0.20 - defStr*0.10;
+  makeProb = Math.max(0.15, Math.min(0.85, makeProb));
+
+  const made = Math.random() < makeProb;
+
+  if (made) {
+    let pts, fpOff, fpAst=0, label, icon;
+    if (shotType === '3pt')  { pts=3; fpOff=3;   icon='🔥'; label=`${ballHandler.name} drains the three!`; }
+    else if (shotType==='ft'){ pts=2; fpOff=2;   icon='🎯'; label=`${ballHandler.name} makes both FTs`; }
+    else if (shotType==='mid'){ pts=2; fpOff=2;  icon='💫'; label=`${ballHandler.name} mid-range SPLASH`; }
+    else                     { pts=2; fpOff=2;   icon='💥'; label=`${ballHandler.name} drives — scores!`; }
+
+    if (assister) {
+      fpAst = 1.5;
+      assister._fp += fpAst;
+      label += ` (AST: ${assister.name})`;
+      updatePlayerFP(assister);
+      updatePlayerEvent(assister, `AST → ${ballHandler.name}`);
+      showScorePopup(assister, fpAst);
+    }
+
+    ballHandler._fp += fpOff;
+    if (offTeam === teamA) { scoreA += fpOff + fpAst; } else { scoreB += fpOff + fpAst; }
+
+    addPBP(ballHandler, `${icon} ${label}`, fpOff, clockSec, ballHandler._color, ballHandler._side);
+    updatePlayerFP(ballHandler);
+    updatePlayerEvent(ballHandler, `${pts} pts scored`);
+    showScorePopup(ballHandler, fpOff);
+
+    // Scorer drives right to the basket
+    ballHandler._targetX = attackingRight ? jitter(548,8) : jitter(52,8);
+    ballHandler._targetY = jitter(200, 15);
+    if (assister) {
+      // Assister cuts to the wing after the pass
+      assister._targetX = attackingRight ? jitter(490,15) : jitter(110,15);
+      assister._targetY = assister._y < 200 ? jitter(115,12) : jitter(285,12);
+    }
+    // After score, defense gets the ball and attacks the other end
+    possession = defTeam === teamA ? 'A' : 'B';
+    attackingRight = !attackingRight;
+
+  } else {
+    // Miss — contested by defender
+    const contestDesc = shotType==='3pt'
+      ? `${ballHandler.name} fires the three — off the mark (${defender.name} contests)`
+      : `${ballHandler.name} attacks — ${defender.name} contests, no good`;
+    addPBP(ballHandler, `🚫 ${contestDesc}`, 0, clockSec, ballHandler._color, ballHandler._side);
+    updatePlayerEvent(ballHandler, `Miss — ${defender.name} contested`);
+    updatePlayerEvent(defender,   `Contested ${ballHandler.name}`);
+    // Ball-handler drives toward the basket on the shot attempt
+    ballHandler._targetX = attackingRight ? jitter(530, 15) : jitter(70, 15);
+    ballHandler._targetY = jitter(200, 20);
+    defender._targetX = ballHandler._targetX + rnd(-18, 18);
+    defender._targetY = ballHandler._targetY + rnd(-15, 15);
+    // Rebound
+    resolveRebound(offTeam, defTeam, ballHandler);
+    // Defensive rebound → defense gets ball; offensive rebound → offense keeps it
+  }
+}
+
+function resolveRebound(offTeam, defTeam, shooter) {
+  // Weight rebound toward big men (C/PF) and high-REB players
+  const allFive = [
+    ...offTeam.slice(0,5).map(p=>({p, isOff:true})),
+    ...defTeam.slice(0,5).map(p=>({p, isOff:false})),
+  ];
+  const rebWeights = allFive.map(({p,isOff})=>({
+    value:{p,isOff},
+    weight: (p.statValues.REB * 2.5) * (isOff ? 0.6 : 1.0) // defense more likely
+  }));
+  const {p:rebounder, isOff} = weightedRandom(rebWeights);
+  const fpReb = rnd(1.0, 2.4);
+  rebounder._fp += fpReb;
+  const rebTeam = isOff ? offTeam : defTeam;
+  if (rebTeam === teamA) { scoreA += fpReb; } else { scoreB += fpReb; }
+  const rebLabel = isOff ? `${rebounder.name} offensive rebound!` : `${rebounder.name} defensive rebound`;
+  addPBP(rebounder, rebLabel, fpReb, clockSec, rebounder._color, rebounder._side);
+  updatePlayerFP(rebounder);
+  updatePlayerEvent(rebounder, isOff ? `OFF REB` : `DEF REB`);
+  showScorePopup(rebounder, fpReb);
+  // Rebounder crashes to the basket
+  rebounder._targetX = attackingRight ? jitter(535, 20) : jitter(65, 20);
+  rebounder._targetY = jitter(200, 25);
+  // Possession follows the rebound
+  possession = (rebTeam === teamA) ? 'A' : 'B';
+  // Defensive rebound → new offense attacks opposite end; offensive rebound → keep same end
+  if (!isOff) attackingRight = !attackingRight;
+}
+
+function addPBP(player, text, fpGain, time, color, side) {
+  const body = document.getElementById('pbp-body');
+  const entry = document.createElement('div');
+  entry.className = 'pbp-entry';
+  const fpStr = fpGain > 0 ? `+${fmt(fpGain)}` : fpGain === 0 ? '' : fmt(fpGain);
+  const fpColor = fpGain > 0 ? (side==='A'?'var(--purple)':'var(--cyan)') : fpGain < 0 ? 'var(--red)' : 'var(--muted)';
+  entry.innerHTML = `
+    <span class="pbp-time">Q${quarter} ${fmtClock(time)}</span>
+    <span class="pbp-team-dot" style="background:${color}"></span>
+    <span class="pbp-text">${text}</span>
+    <span class="pbp-fp" style="color:${fpColor}">${fpStr}</span>
+  `;
+  body.prepend(entry);
+  playCount++;
+  document.getElementById('pbp-count').textContent = `${playCount} plays`;
+}
+
+function showScorePopup(player, fpGain) {
+  const courtWrap = document.getElementById('court-wrap');
+  const svg = document.getElementById('court-svg');
+  const vb = svg.viewBox.baseVal;
+  const rect = svg.getBoundingClientRect();
+  const scaleX = rect.width  / vb.width;
+  const scaleY = rect.height / vb.height;
+
+  const popup = document.createElement('div');
+  popup.className = 'score-popup';
+  const fpStr = fpGain >= 0 ? `+${fmt(fpGain)} FP` : `${fmt(fpGain)} FP`;
+  popup.textContent = fpStr;
+  popup.style.left = ((player._x * scaleX) - 20) + 'px';
+  popup.style.top  = ((player._y * scaleY) - 20) + 'px';
+  popup.style.background = fpGain >= 0 ? (player._side==='A' ? '#7c3aed' : '#0284c7') : '#dc2626';
+  popup.style.color = '#fff';
+  courtWrap.appendChild(popup);
+  setTimeout(()=>popup.remove(), 950);
+}
+
+function normalizeLiveEntry(entry, side, color, shortColor) {
+  const player = entry?.player || {};
+  return assignId({
+    name: String(player.name || 'Player'),
+    team: String(player.team || ''),
+    pos: String(player.pos || player.primaryPosition || ''),
+    fp: Math.max(1, Number(entry?.finalScore || entry?.simulatedStats?.fantasyPoints || 1)),
+    statValues: entry?.simulatedStats || {},
+    _targetFp: Math.max(0, Number(entry?.finalScore || 0)),
+    _remainingFp: Math.max(0, Number(entry?.finalScore || 0)),
+    _color: color,
+    _shortColor: shortColor,
+    _side: side
+  });
+}
+
+function buildLiveRevealEvents(players, side, scoreTarget) {
+  const totalFp = players.reduce((sum, player) => sum + Number(player._targetFp || 0), 0) || 1;
+  const eventCount = Math.max(18, Math.min(42, players.length * 7));
+  const events = [];
+  for (let index = 0; index < eventCount; index++) {
+    const player = weightedRandom(players.map(candidate => ({
+      value: candidate,
+      weight: Math.max(1, Number(candidate._remainingFp || candidate._targetFp || 1))
+    })));
+    const remainingTotal = players.reduce((sum, candidate) => sum + Number(candidate._remainingFp || 0), 0);
+    const fpGain = index === eventCount - 1
+      ? remainingTotal
+      : Math.min(Number(player._remainingFp || 0), Math.max(0.4, Number(player._targetFp || 0) / 6 * rnd(0.65, 1.25)));
+    player._remainingFp = Math.max(0, Number(player._remainingFp || 0) - fpGain);
+    events.push({
+      player,
+      side,
+      fpGain,
+      scoreGain: scoreTarget * (fpGain / totalFp),
+      text: pick([
+        `${player.name} cashes in`,
+        `${player.name} creates separation`,
+        `${player.name} swings the matchup`,
+        `${player.name} adds a clean fantasy burst`
+      ])
+    });
+  }
+  return events;
+}
+
+function applyLiveRevealEvent(event) {
+  const player = event?.player;
+  if (!player) return;
+  const fpGain = Number(event.fpGain || 0);
+  player._fp += fpGain;
+  if (event.side === 'A') scoreA += Number(event.scoreGain || 0);
+  else scoreB += Number(event.scoreGain || 0);
+  addPBP(player, event.text, fpGain, clockSec, player._color, player._side);
+  updatePlayerFP(player);
+  updatePlayerEvent(player, `+${fmt(fpGain)} FPTS`);
+  showScorePopup(player, fpGain);
+  player._targetX = jitter(player._x || 300, 40);
+  player._targetY = jitter(player._y || 200, 35);
+}
+
+function commitLiveMatchupResult() {
+  if (liveCommitted || !liveMatchupAdapter || !liveMatchupPrepared) return;
+  liveCommitted = true;
+  try {
+    const nextState = liveMatchupAdapter.commitLiveMatchupResult(liveMatchupPrepared);
+    const slots = window.RosterBateHistoricalUniverseSlots;
+    if (slots && typeof slots.upsertFromState === 'function') {
+      slots.upsertFromState(nextState, { slotId: liveMatchupSlotId });
+    }
+    try { localStorage.setItem('rosterbateDraft', JSON.stringify(nextState)); } catch (error) {}
+  } catch (error) {
+    console.warn('Live matchup commit failed', error);
+    liveCommitted = false;
+  }
+}
+
+function bootLiveMatchupFromParams() {
+  const params = new URLSearchParams(window.location.search);
+  const slotId = String(params.get('historicalUniverse') || '').trim();
+  const day = Number(params.get('day') || 0) || 0;
+  const homeAbbr = String(params.get('homeAbbr') || '').trim().toUpperCase();
+  const awayAbbr = String(params.get('awayAbbr') || '').trim().toUpperCase();
+  if (!slotId || !day || !homeAbbr || !awayAbbr) return false;
+  const slots = window.RosterBateHistoricalUniverseSlots;
+  const adapterApi = window.RosterBateSimulationSeasonAdapter;
+  if (!slots || !adapterApi || typeof slots.getState !== 'function' || typeof adapterApi.createSimulationSeasonAdapter !== 'function') return false;
+  const state = slots.getState(slotId);
+  if (!state) return false;
+  liveMatchupMode = true;
+  liveMatchupSlotId = slotId;
+  liveMatchupReturnUrl = String(params.get('returnUrl') || '').trim() || 'rosterbate-season.html';
+  liveMatchupAdapter = adapterApi.createSimulationSeasonAdapter({ slotId, state });
+  liveMatchupPrepared = liveMatchupAdapter.prepareLiveMatchup({ day, homeAbbr, awayAbbr });
+  const game = liveMatchupPrepared?.gameLog || {};
+  if (!game) return false;
+
+  scoreA = 0; scoreB = 0;
+  quarter = 1; clockSec = 12*60;
+  paused = false; gameOver = false;
+  playCount = 0; liveRevealIndex = 0;
+  liveCommitted = liveMatchupPrepared.status === 'completed';
+  teamA = (Array.isArray(game.homeEntries) ? game.homeEntries : []).map(entry => normalizeLiveEntry(entry, 'A', '#9333ea', 'purple'));
+  teamB = (Array.isArray(game.awayEntries) ? game.awayEntries : []).map(entry => normalizeLiveEntry(entry, 'B', '#0284c7', 'cyan'));
+  document.getElementById('team-a-name').textContent = game.homeName || homeAbbr;
+  document.getElementById('team-b-name').textContent = game.awayName || awayAbbr;
+  document.getElementById('panel-a-header').textContent = game.homeName || homeAbbr;
+  document.getElementById('panel-b-header').textContent = game.awayName || awayAbbr;
+  buildRosterPanel(teamA, 'roster-a', 'purple');
+  buildRosterPanel(teamB, 'roster-b', 'cyan');
+  clearCourt();
+  createDots(teamA, 'A', '#9333ea', 'purple');
+  createDots(teamB, 'B', '#0284c7', 'cyan');
+  document.getElementById('pbp-body').innerHTML = '';
+  document.getElementById('pbp-count').textContent = '0 plays';
+  const homeScoreTarget = Number(game.homeScore ?? game.homeTotal ?? 0) || 0;
+  const awayScoreTarget = Number(game.awayScore ?? game.awayTotal ?? 0) || 0;
+  liveRevealEvents = buildLiveRevealEvents(teamA, 'A', homeScoreTarget)
+    .concat(buildLiveRevealEvents(teamB, 'B', awayScoreTarget))
+    .sort(() => Math.random() - 0.5);
+  if (liveMatchupPrepared.status === 'completed') {
+    scoreA = homeScoreTarget;
+    scoreB = awayScoreTarget;
+    teamA.forEach(player => { player._fp = player._targetFp; updatePlayerFP(player); });
+    teamB.forEach(player => { player._fp = player._targetFp; updatePlayerFP(player); });
+    gameOver = true;
+    showOverlay('FINAL', true, homeScoreTarget >= awayScoreTarget ? (game.homeName || homeAbbr) : (game.awayName || awayAbbr));
+  }
+  updateScoreboard();
+  return true;
+}
+
+// ── Main sim tick ──────────────────────────────────────────────────────────
+let ticksSincePossession = 0;
+
+function simTick() {
+  if (paused || gameOver) return;
+  animateDots();
+
+  const simStep = SIM_SECS * speed;
+  clockSec -= simStep;
+  ticksSincePossession += simStep;
+
+  if (liveMatchupMode) {
+    const revealInterval = 14;
+    if (ticksSincePossession >= revealInterval) {
+      ticksSincePossession = 0;
+      const event = liveRevealEvents[liveRevealIndex++];
+      if (event) applyLiveRevealEvent(event);
+    }
+    if (clockSec <= 0) endQuarter();
+    updateScoreboard();
+    return;
+  }
+
+  // Run a possession every ~18 sim seconds — gives dots time to visibly travel
+  const possessionInterval = 18;
+  if (ticksSincePossession >= possessionInterval) {
+    ticksSincePossession = 0;
+
+    const offTeam = possession === 'A' ? teamA : teamB;
+    const defTeam = possession === 'A' ? teamB : teamA;
+
+    // Pick ball-handler first so we can aim them at the paint during setup
+    const offWeightsSetup = offTeam.slice(0,5).map(p=>({value:p, weight:p.fp}));
+    const setupBallHandler = weightedRandom(offWeightsSetup);
+    setOffensePositions(offTeam, setupBallHandler._id);
+    setDefensePositions(defTeam);
+
+    runPossession(offTeam, defTeam);
+  }
+
+  // Occasional idle drift for off-ball players
+  if (Math.random() < 0.05) {
+    const all = [...teamA.slice(0,5), ...teamB.slice(0,5)];
+    setRandomTarget(pick(all));
+  }
+
+  if (clockSec <= 0) endQuarter();
+  updateScoreboard();
+}
+
+function jitter(val, spread) { return val + rnd(-spread, spread); }
+
+// Real NBA shot zones mapped to this SVG (600×400):
+// Right basket: x=545,y=200  Right key: x=460–580,y=130–270
+// Left  basket: x=55, y=200  Left  key: x=20–140, y=130–270
+// 3pt arc peaks: x≈400 (right), x≈200 (left)
+// Corners (baseline 3): right=(565,y=35 or y=365), left=(35,y=35 or y=365)
+// Wings (3pt arc):      right=(490,y=110 or y=290), left=(110,y=110 or y=290)
+// Top of key (3pt):     right=(390,y=200), left=(210,y=200)
+// Elbows (FT line ext): right=(460,y=150 or y=250), left=(140,y=150 or y=250)
+// Short mid-range:      right=(500,y=170 or y=230), left=(100,y=170 or y=230)
+// Paint / low post:     right=(530,y=175 or y=225), left=(70,y=175 or y=225)
+// Restricted area:      right=(548,y=195–205), left=(52,y=195–205)
+
+function snapPlayer(p, x, y) {
+  // Instantly place a player — used for off-ball repositioning
+  p._x = x; p._y = y;
+  p._targetX = x; p._targetY = y;
+  moveDot(p, x, y);
+}
+
+function setOffensePositions(offTeam, ballHandlerId) {
+  // ALL players snap instantly so the court looks right before the next possession fires.
+  // Ball-handler snaps to paint/post area; off-ball to perimeter spacing.
+  const paintSpotsR = [
+    {x:jitter(530,10), y:jitter(175,10)},  // low post hi
+    {x:jitter(530,10), y:jitter(225,10)},  // low post lo
+    {x:jitter(505,8),  y:jitter(200,12)},  // mid-paint
+    {x:jitter(490,8),  y:jitter(160,10)},  // elbow hi
+    {x:jitter(490,8),  y:jitter(240,10)},  // elbow lo
+  ];
+  const paintSpotsL = [
+    {x:jitter(70,10),  y:jitter(175,10)},
+    {x:jitter(70,10),  y:jitter(225,10)},
+    {x:jitter(95,8),   y:jitter(200,12)},
+    {x:jitter(110,8),  y:jitter(160,10)},
+    {x:jitter(110,8),  y:jitter(240,10)},
+  ];
+  const paintSpots = attackingRight ? paintSpotsR : paintSpotsL;
+  const ballSpot = paintSpots[Math.floor(Math.random() * paintSpots.length)];
+
+  const spacingR = [
+    {x:jitter(430,12), y:jitter(105,12)},  // wing hi (3pt arc)
+    {x:jitter(430,12), y:jitter(295,12)},  // wing lo (3pt arc)
+    {x:jitter(545,6),  y:jitter(65,12)},   // corner hi
+    {x:jitter(545,6),  y:jitter(335,12)},  // corner lo
+  ];
+  const spacingL = [
+    {x:jitter(170,12), y:jitter(105,12)},
+    {x:jitter(170,12), y:jitter(295,12)},
+    {x:jitter(55,6),   y:jitter(65,12)},
+    {x:jitter(55,6),   y:jitter(335,12)},
+  ];
+  const spacing = attackingRight ? spacingR : spacingL;
+  let si = 0;
+  offTeam.slice(0,5).forEach(p => {
+    if (p._id === ballHandlerId) {
+      snapPlayer(p, ballSpot.x, ballSpot.y);
+    } else {
+      const s = spacing[si++];
+      snapPlayer(p, s.x, s.y);
+    }
+  });
+}
+
+function setDefensePositions(defTeam) {
+  // Defenders SNAP into the paint in front of the basket immediately.
+  // Right basket: x=460-580, y=130-270  →  defenders pack x=465-530
+  // Left  basket: x=20-140,  y=130-270  →  defenders pack x=70-135
+  const spotsR = [
+    {x:jitter(528,6),  y:jitter(200,6)},   // C   — deepest in paint
+    {x:jitter(510,6),  y:jitter(163,8)},   // PF  — block hi
+    {x:jitter(510,6),  y:jitter(237,8)},   // SF  — block lo
+    {x:jitter(480,8),  y:jitter(145,10)},  // SG  — elbow hi
+    {x:jitter(480,8),  y:jitter(255,10)},  // PG  — elbow lo
+  ];
+  const spotsL = [
+    {x:jitter(72,6),   y:jitter(200,6)},
+    {x:jitter(90,6),   y:jitter(163,8)},
+    {x:jitter(90,6),   y:jitter(237,8)},
+    {x:jitter(120,8),  y:jitter(145,10)},
+    {x:jitter(120,8),  y:jitter(255,10)},
+  ];
+  const spots = attackingRight ? spotsR : spotsL;
+  defTeam.slice(0,5).forEach((p,i) => snapPlayer(p, spots[i].x, spots[i].y));
+}
+
+function endQuarter() {
+  if (quarter === 2) {
+    // Halftime
+    pauseSim();
+    showOverlay('HALFTIME', false);
+  } else if (quarter === 4) {
+    // Game over
+    pauseSim();
+    gameOver = true;
+    if (liveMatchupMode) finalizeLiveMatchupReveal();
+    const winner = scoreA > scoreB ? document.getElementById('team-a-name').textContent : document.getElementById('team-b-name').textContent;
+    showOverlay('FINAL', true, winner);
+  } else {
+    quarter++;
+    clockSec = 12 * 60;
+    addQuarterBreakPBP();
+  }
+}
+
+function finalizeLiveMatchupReveal() {
+  const game = liveMatchupPrepared?.gameLog || {};
+  scoreA = Number(game.homeScore ?? game.homeTotal ?? scoreA) || scoreA;
+  scoreB = Number(game.awayScore ?? game.awayTotal ?? scoreB) || scoreB;
+  teamA.forEach(player => { player._fp = Number(player._targetFp || player._fp || 0); updatePlayerFP(player); });
+  teamB.forEach(player => { player._fp = Number(player._targetFp || player._fp || 0); updatePlayerFP(player); });
+  updateScoreboard();
+  commitLiveMatchupResult();
+}
+
+function addQuarterBreakPBP() {
+  const body = document.getElementById('pbp-body');
+  const div = document.createElement('div');
+  div.style.cssText='text-align:center;padding:6px;font-size:9px;color:var(--yellow);letter-spacing:2px;border-bottom:1px solid var(--border)';
+  div.textContent = `── END OF Q${quarter-1} ──`;
+  body.prepend(div);
+}
+
+// ── Overlay ────────────────────────────────────────────────────────────────
+function showOverlay(title, isFinal, winner='') {
+  const ov = document.getElementById('overlay');
+  ov.classList.remove('hidden');
+  document.getElementById('overlay-title').textContent = title;
+  document.getElementById('ov-score-a').textContent = fmt(scoreA);
+  document.getElementById('ov-score-b').textContent = fmt(scoreB);
+  document.getElementById('ov-name-a').textContent = document.getElementById('team-a-name').textContent;
+  document.getElementById('ov-name-b').textContent = document.getElementById('team-b-name').textContent;
+
+  // Top scorer
+  const all = [...teamA,...teamB].sort((a,b)=>b._fp-a._fp);
+  const top = all[0];
+  document.getElementById('overlay-top-player').textContent =
+    top ? `🏆 Top scorer: ${top.name} — ${fmt(top._fp)} FPTS` : '';
+
+  const btn = document.getElementById('overlay-btn');
+  const sub = document.getElementById('overlay-sub');
+  if (isFinal) {
+    btn.textContent = liveMatchupMode ? 'Return to Season' : '↺ New Game';
+    btn.onclick = liveMatchupMode ? (() => { window.location.href = liveMatchupReturnUrl || 'rosterbate-season.html'; }) : startNewGame;
+    sub.textContent = winner ? `${winner} wins!` : '';
+  } else {
+    btn.textContent = '▶ 2nd Half';
+    btn.onclick = resumeSim;
+    sub.textContent = '';
+  }
+}
+
+function resumeSim() {
+  document.getElementById('overlay').classList.add('hidden');
+  if (!gameOver) {
+    quarter++;
+    clockSec = 12 * 60;
+    ticksSincePossession = 0;
+    paused = false;
+    document.getElementById('btn-pause').textContent = '⏸ Pause';
+  }
+}
+
+// ── Controls ───────────────────────────────────────────────────────────────
+function pauseSim() {
+  paused = true;
+  document.getElementById('btn-pause').textContent = '▶ Resume';
+}
+
+function togglePause() {
+  if (gameOver) return;
+  paused = !paused;
+  document.getElementById('btn-pause').textContent = paused ? '▶ Resume' : '⏸ Pause';
+}
+
+function setSpeed(s) {
+  speed = s;
+  document.getElementById('speed-1x').classList.toggle('active', s===1);
+  document.getElementById('speed-5x').classList.toggle('active', s===5);
+}
+
+// ── Start / reset ──────────────────────────────────────────────────────────
+let _idCounter = 0;
+function assignId(player) { player._id = ++_idCounter; player._fp = 0; return player; }
+
+function clearCourt() {
+  document.getElementById('player-dots').innerHTML = '';
+  Object.keys(dotEls).forEach(k => delete dotEls[k]);
+}
+
+function startNewGame() {
+  // Close overlay
+  document.getElementById('overlay').classList.add('hidden');
+
+  // Reset state
+  scoreA = 0; scoreB = 0;
+  quarter = 1; clockSec = 12*60;
+  paused = false; gameOver = false;
+  playCount = 0;
+  possession = Math.random() < 0.5 ? 'A' : 'B';
+  attackingRight = Math.random() < 0.5;  // random tip-off direction
+  ticksSincePossession = 0;
+
+  // Pick teams
+  const [a, b] = pickTeams();
+  teamA = a.map(p => assignId({...p}));
+  teamB = b.map(p => assignId({...p}));
+
+  // Names (use top player's team)
+  const nameA = ['Purple Rain','Slam Dunk City','The Buckets','Rim Rockers'][Math.floor(Math.random()*4)];
+  const nameB = ['Ice Cold','Net Ninjas','Fast Break FC','Hoop Dreams'][Math.floor(Math.random()*4)];
+  document.getElementById('team-a-name').textContent = nameA;
+  document.getElementById('team-b-name').textContent = nameB;
+  document.getElementById('panel-a-header').textContent = nameA;
+  document.getElementById('panel-b-header').textContent = nameB;
+
+  // Build rosters
+  buildRosterPanel(teamA, 'roster-a', 'purple');
+  buildRosterPanel(teamB, 'roster-b', 'cyan');
+
+  // Build court dots
+  clearCourt();
+  createDots(teamA, 'A', '#9333ea', 'purple');
+  createDots(teamB, 'B', '#0284c7', 'cyan');
+
+  // Clear PBP
+  document.getElementById('pbp-body').innerHTML = '';
+  document.getElementById('pbp-count').textContent = '0 plays';
+
+  // Reset scoreboard
+  updateScoreboard();
+
+  document.getElementById('btn-pause').textContent = '⏸ Pause';
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+if (!bootLiveMatchupFromParams()) startNewGame();
+simInterval = setInterval(simTick, TICK_MS);
+</script>
+</body>
+</html>
