@@ -3,7 +3,8 @@ const assert = require('node:assert/strict');
 const {
   runHistoricalPackSanityCheck,
   runAccuracyAudit,
-  runAccuracyAuditSuite
+  runAccuracyAuditSuite,
+  runSeasonRealismAuditSuite
 } = require('./simulation-accuracy-audit.js');
 
 const nbaAudit = runAccuracyAudit({ sport: 'nba' });
@@ -142,3 +143,28 @@ assert.deepStrictEqual(
   [],
   `historical pack sanity check failed: ${packSanity.failures.map((failure) => `${failure.packId}: ${failure.message}`).join('; ')}`
 );
+
+const seasonSuite = runSeasonRealismAuditSuite();
+assert.ok(
+  Array.isArray(seasonSuite.audits) && seasonSuite.audits.length >= 2,
+  'season realism suite should include nba and nfl audits'
+);
+assert.deepStrictEqual(
+  seasonSuite.failedSports,
+  [],
+  `season realism suite should not report failing sports: ${seasonSuite.failedSports.join(', ')}`
+);
+seasonSuite.audits.forEach((audit) => {
+  assert.ok(
+    Number.isFinite(audit.metrics.winPctSpread),
+    `${audit.sport} season audit should compute standings spread`
+  );
+  assert.ok(
+    Number.isFinite(audit.metrics.topBottomWinPctGap),
+    `${audit.sport} season audit should compute roster-strength separation`
+  );
+  assert.ok(
+    audit.metrics.topRosterWinPct > audit.metrics.bottomRosterWinPct,
+    `${audit.sport} stronger roster group should finish above weaker roster group`
+  );
+});

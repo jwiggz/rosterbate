@@ -22,6 +22,7 @@ const AUDIT_CONFIG = Object.freeze({
     sport: 'nba',
     controlledTeamAbbr: 'LAL',
     trialCount: 3,
+    seasonTrialCount: 2,
     maxDays: 14,
     sourcePackIds: [
       'nba_1987_full_season_v1',
@@ -49,6 +50,7 @@ const AUDIT_CONFIG = Object.freeze({
     sport: 'nfl',
     controlledTeamAbbr: 'DAL',
     trialCount: 4,
+    seasonTrialCount: 2,
     maxDays: 10,
     sourcePackIds: ['nfl_2014_full_season_v1'],
     sourceSeasonLabels: ['2014'],
@@ -533,6 +535,123 @@ function runTrial(config, trialIndex) {
   };
 }
 
+function average(values) {
+  return values.length > 0
+    ? values.reduce((sum, value) => sum + value, 0) / values.length
+    : 0;
+}
+
+function buildSeasonStandingsRows(state, strengthMap) {
+  const teamMeta = Array.isArray(state?.leagueShell?.teams) ? state.leagueShell.teams : [];
+  return (state?.seasonState?.standings || []).map((row) => {
+    const teamIdx = Number(row?.teamIdx);
+    const teamAbbr = String(row?.teamAbbr || teamMeta[teamIdx]?.abbr || '').trim().toUpperCase();
+    const wins = Number(row?.w || 0);
+    const losses = Number(row?.l || 0);
+    const games = wins + losses;
+    return {
+      teamAbbr,
+      wins,
+      losses,
+      games,
+      winPct: games > 0 ? wins / games : 0,
+      strength: Number(strengthMap?.[teamAbbr] || 0)
+    };
+  }).filter((row) => row.teamAbbr);
+}
+
+function buildSeasonGroupMetrics(rows, config) {
+  const orderedByStrength = rows.slice().sort((a, b) => b.strength - a.strength);
+  const groupSize = Math.max(1, Math.floor(rows.length / 4));
+  const topGroup = orderedByStrength.slice(0, groupSize);
+  const bottomGroup = orderedByStrength.slice(-groupSize);
+  const orderedByRecord = rows.slice().sort((a, b) => b.winPct - a.winPct);
+  const playoffSlots = config.sport === 'nfl' ? 14 : 16;
+  const playoffSet = new Set(orderedByRecord.slice(0, Math.min(playoffSlots, orderedByRecord.length)).map((row) => row.teamAbbr));
+  const topPlayoffRate = average(topGroup.map((row) => playoffSet.has(row.teamAbbr) ? 1 : 0));
+  const bottomPlayoffRate = average(bottomGroup.map((row) => playoffSet.has(row.teamAbbr) ? 1 : 0));
+  const winPcts = rows.map((row) => row.winPct);
+  return {
+    gamesPerTeamMean: roundStat(average(rows.map((row) => row.games))),
+    winPctSpread: roundStat(Math.max(...winPcts) - Math.min(...winPcts)),
+    winPctStdev: buildStats(winPcts).stdev,
+    topRosterWinPct: roundStat(average(topGroup.map((row) => row.winPct))),
+    bottomRosterWinPct: roundStat(average(bottomGroup.map((row) => row.winPct))),
+    topBottomWinPctGap: roundStat(average(topGroup.map((row) => row.winPct)) - average(bottomGroup.map((row) => row.winPct))),
+    topRosterPlayoffRate: roundStat(topPlayoffRate),
+    bottomRosterPlayoffRate: roundStat(bottomPlayoffRate),
+    playoffRateGap: roundStat(topPlayoffRate - bottomPlayoffRate)
+  };
+}
+
+function runSeasonTrial(config, trialIndex) {
+  let state = buildSeedState(config, trialIndex + 1000);
+  const schedule = buildSimulationSeasonSchedule(state.leagueShell);
+  const dayKeys = getDayKeys(schedule, Number.MAX_SAFE_INTEGER);
+  const strengthMap = buildStarterStrengthMap(state);
+
+  dayKeys.forEach((day) => {
+    const engineState = buildEngineState(state);
+    const result = simulateSimulationGameDay({
+      state: engineState,
+      schedule,
+      day
+    });
+    state = applyEngineResultsToState(state, applySimulationDayResults(engineState, result));
+  });
+
+  return buildSeasonGroupMetrics(buildSeasonStandingsRows(state, strengthMap), config);
+}
+
+function evaluateSeasonRealismGuardrails(config, metrics) {
+  const failures = [];
+  const minGap = config.sport === 'nfl' ? 0.03 : 0.08;
+  const minSpread = config.sport === 'nfl' ? 0.22 : 0.28;
+  const maxSpread = config.sport === 'nfl' ? 0.82 : 0.84;
+  if (metrics.topBottomWinPctGap < minGap) {
+    failures.push(`top-bottom win pct gap ${metrics.topBottomWinPctGap} below ${minGap}`);
+  }
+  if (metrics.winPctSpread < minSpread || metrics.winPctSpread > maxSpread) {
+    failures.push(`win pct spread ${metrics.winPctSpread} outside ${minSpread}-${maxSpread}`);
+  }
+  if (metrics.topRosterPlayoffRate < metrics.bottomRosterPlayoffRate) {
+    failures.push(
+      `top roster playoff rate ${metrics.topRosterPlayoffRate} below bottom roster playoff rate ${metrics.bottomRosterPlayoffRate}`
+    );
+  }
+  return failures;
+}
+
+function runSeasonRealismAudit(options = {}) {
+  const sport = String(options.sport || 'nba').trim().toLowerCase();
+  const config = AUDIT_CONFIG[sport];
+  if (!config) {
+    throw new Error(`Unsupported season audit sport: ${sport}`);
+  }
+  const trialCount = Number(options.trialCount || config.seasonTrialCount || 1);
+  const trials = [];
+  for (let trialIndex = 0; trialIndex < trialCount; trialIndex += 1) {
+    trials.push(runSeasonTrial(config, trialIndex));
+  }
+  const metrics = {
+    gamesPerTeamMean: roundStat(average(trials.map((trial) => trial.gamesPerTeamMean))),
+    winPctSpread: roundStat(average(trials.map((trial) => trial.winPctSpread))),
+    winPctStdev: roundStat(average(trials.map((trial) => trial.winPctStdev))),
+    topRosterWinPct: roundStat(average(trials.map((trial) => trial.topRosterWinPct))),
+    bottomRosterWinPct: roundStat(average(trials.map((trial) => trial.bottomRosterWinPct))),
+    topBottomWinPctGap: roundStat(average(trials.map((trial) => trial.topBottomWinPctGap))),
+    topRosterPlayoffRate: roundStat(average(trials.map((trial) => trial.topRosterPlayoffRate))),
+    bottomRosterPlayoffRate: roundStat(average(trials.map((trial) => trial.bottomRosterPlayoffRate))),
+    playoffRateGap: roundStat(average(trials.map((trial) => trial.playoffRateGap))),
+    trials: trialCount
+  };
+  return {
+    sport,
+    metrics,
+    failedGuardrails: evaluateSeasonRealismGuardrails(config, metrics)
+  };
+}
+
 function evaluateGuardrails(config, metrics) {
   const failures = [];
   if (
@@ -757,6 +876,14 @@ function runAccuracyAuditSuite() {
   };
 }
 
+function runSeasonRealismAuditSuite() {
+  const audits = ['nba', 'nfl'].map((sport) => runSeasonRealismAudit({ sport }));
+  return {
+    audits,
+    failedSports: audits.filter((audit) => audit.failedGuardrails.length).map((audit) => audit.sport)
+  };
+}
+
 if (require.main === module) {
   const suite = runAccuracyAuditSuite();
   process.stdout.write(`${JSON.stringify(suite, null, 2)}\n`);
@@ -768,5 +895,7 @@ if (require.main === module) {
 module.exports = {
   runHistoricalPackSanityCheck,
   runAccuracyAudit,
-  runAccuracyAuditSuite
+  runAccuracyAuditSuite,
+  runSeasonRealismAudit,
+  runSeasonRealismAuditSuite
 };
