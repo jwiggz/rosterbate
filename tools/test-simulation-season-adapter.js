@@ -475,6 +475,12 @@ const indexOnlyResultAdapter = createSimulationSeasonAdapter({
 const indexOnlyScheduleVm = indexOnlyResultAdapter.getScheduleViewModel();
 assert.equal(indexOnlyScheduleVm.recentResults[0]?.homeAbbr, 'LAL', 'schedule vm should backfill home abbreviations from team indexes when game logs omit them');
 assert.equal(indexOnlyScheduleVm.recentResults[0]?.awayAbbr, 'BOS', 'schedule vm should backfill away abbreviations from team indexes when game logs omit them');
+const indexOnlyRosterVm = indexOnlyResultAdapter.getRosterViewModel();
+assert.equal(
+  indexOnlyRosterVm.summaryCards.find((card) => card?.key === 'last-matchup')?.value,
+  '112-108 vs Boston Celtics',
+  'roster vm should backfill index-only completed logs for the last matchup summary'
+);
 
 const schedule = adapter.getScheduleViewModel();
 assert.equal(schedule.title, 'Matchup / Results', 'nba schedule vm should use matchup-first page framing');

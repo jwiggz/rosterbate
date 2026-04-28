@@ -439,7 +439,7 @@ function cleanSimulationSourceLabel(label){
     const teamAbbr = getControlledTeamAbbr(state);
     const completedGames = Array.isArray(state?.seasonState?.completedGameLogs) ? state.seasonState.completedGameLogs : [];
     for (let index = completedGames.length - 1; index >= 0; index -= 1) {
-      const game = completedGames[index];
+      const game = normalizeSimulationRecentResult(state, completedGames[index]);
       const homeAbbr = String(game?.homeAbbr || '').trim().toUpperCase();
       const awayAbbr = String(game?.awayAbbr || '').trim().toUpperCase();
       if (homeAbbr !== teamAbbr && awayAbbr !== teamAbbr) continue;

@@ -51,6 +51,7 @@ ${extractBetween('function setHubSummaryStatLabels(', 'function persistSimulatio
 ${extractBetween('function persistSimulationSeasonState(', 'function buildPowerupCardsHtml(')}
 ${extractBetween('function syncGameStateToD()', 'function queueSharedSeasonSave(')}
 ${extractBetween('function handleRosterAction(', 'function closeIlModal(')}
+${extractBetween('function teamName(', 'function logActivity(')}
 ${extractBetween('function getLatestRevealReportDay(', 'function buildSimulationDayRunnerSnapshot(')}
 ${extractBetween('function getSharedSimulationSport(', 'function renderSimulationHubInSharedShell(')}
 ${extractBetween('function renderSimulationHubInSharedShell(', 'function renderSimulationWaiverInSharedShell(')}
@@ -1732,18 +1733,45 @@ api.setSeasonModeAdapter({
       recentResults: [
         { awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112 }
       ],
+      actionCards: [
+        { id: 'review-schedule', label: 'Review Matchup', targetPage: 'matchup', body: 'Scout Boston Celtics.' }
+      ],
       scheduleByDay: {
         12: [{ awayAbbr: 'BOS', awayScore: 108, homeAbbr: 'LAL', homeScore: 112, home: true, opponentAbbr: 'BOS', opponentName: 'Boston Celtics' }],
-        13: [{ awayAbbr: 'NYK', awayScore: 101, homeAbbr: 'LAL', homeScore: 99, home: true, opponentAbbr: 'NYK', opponentName: 'New York Knicks' }]
+        13: [{ day: 13, away: 3, awayAbbr: 'NYK', home: 0, homeAbbr: 'LAL', opponentAbbr: 'NYK', opponentName: 'New York Knicks' }]
       }
     };
+  }
+});
+api.setData({
+  ...api.getData(),
+  leagueShell: {
+    teams: [
+      { abbr: 'LAL', name: 'Los Angeles Lakers' },
+      { abbr: 'BOS', name: 'Boston Celtics' },
+      { abbr: 'CHI', name: 'Chicago Bulls' },
+      { abbr: 'NYK', name: 'New York Knicks' }
+    ]
+  },
+  draftState: {
+    ...(api.getData().draftState || {}),
+    controlledTeamAbbr: 'LAL'
+  },
+  seasonState: {
+    ...(api.getData().seasonState || {}),
+    completedGameLogs: [
+      { day: 13, home: 0, away: 3, homeScore: 99, awayScore: 101, outcomeSource: 'simulation_engine' }
+    ]
   }
 });
 sandbox.setSimulationMatchupNavigationValue(13);
 api.renderSimulationScheduleInSharedShell();
 assert.match(elements.matchupContent.innerHTML, /New York Knicks|NYK/, 'simulation matchup navigation should swap the displayed opponent context when a new day is selected');
 assert.match(elements.matchupContent.innerHTML, /Day 13/, 'simulation matchup navigation should update the displayed navigation window');
-assert.match(elements.matchupContent.innerHTML, /vs New York Knicks|vs NYK/, 'simulation matchup navigation should keep the matchup detail cards in sync with the selected opponent');
+assert.match(elements.matchupContent.innerHTML, /(?:vs|@) New York Knicks|(?:vs|@) NYK/, 'simulation matchup navigation should keep the matchup detail cards in sync with the selected opponent');
+assert.match(elements.matchupContent.innerHTML, /NYK 101 at LAL 99/, 'simulation matchup navigation should show selected completed-game scores when the schedule shell has no score fields');
+assert.doesNotMatch(elements.matchupContent.innerHTML, /NYK -- at LAL --/, 'completed simulation matchups should not look like unrevealed scoreless schedule rows');
+assert.match(elements.matchupContent.innerHTML, /Review the completed result against New York Knicks\./, 'selected completed matchups should not keep stale scout copy for the next opponent');
 api.setSeasonModeAdapter(simulationAdapterStub);
 sandbox.setSimulationMatchupNavigationValue(12);
 
@@ -2620,7 +2648,6 @@ api.setGame({
 });
 sandbox.DAYS_PER_WEEK = 7;
 sandbox.TOTAL_DAYS = () => 17;
-sandbox.teamName = (teamIdx) => api.getData().leagueShell.teams[teamIdx]?.name || `Team ${teamIdx + 1}`;
 sandbox.weekGames = (week) => (api.getGame().schedule || []).filter((game) => Number(game?.week || 0) === Number(week || 0));
 
 assert.equal(api.isDayRevealed(12), true, 'unified simulation backends should treat completed engine logs as revealed days for the fantasy shell');
@@ -2656,6 +2683,26 @@ assert.equal(
   synthesizedRevealReport?.totalTransactions,
   0,
   'synthesized reveal reports should avoid inventing multi-day transaction windows when no cached legacy report boundary exists'
+);
+assert.match(
+  [
+    synthesizedRevealReport?.story?.headline,
+    synthesizedRevealReport?.story?.subheadline,
+    synthesizedRevealReport?.matchups?.[0]?.homeName,
+    synthesizedRevealReport?.matchups?.[0]?.awayName
+  ].join(' '),
+  /Los Angeles Lakers|Boston Celtics/,
+  'synthesized reveal reports should use simulation franchise names instead of generic Team labels'
+);
+assert.doesNotMatch(
+  [
+    synthesizedRevealReport?.story?.headline,
+    synthesizedRevealReport?.story?.subheadline,
+    synthesizedRevealReport?.matchups?.[0]?.homeName,
+    synthesizedRevealReport?.matchups?.[0]?.awayName
+  ].join(' '),
+  /\bTeam \d+\b/,
+  'synthesized reveal reports should not expose generic Team labels for simulation-backed leagues'
 );
 const originalRunHistoricalSimulationDay = sandbox.runHistoricalSimulationDay;
 let revealFallbackCalled = false;

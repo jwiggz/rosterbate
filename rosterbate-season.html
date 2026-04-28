@@ -1537,7 +1537,22 @@ function saveTeamSettings(){
   toast('Team settings updated.');
 }
 
-function teamName(ti){return D?.teams?.[ti]||('Team '+(ti+1));}
+function teamName(ti){
+  const teamIdx=Number(ti);
+  const fallbackIdx=Number.isFinite(teamIdx)?teamIdx:0;
+  if(getActiveSeasonBackend()==='simulation' && Number.isFinite(teamIdx)){
+    const shellTeam=Array.isArray(D?.leagueShell?.teams) ? D.leagueShell.teams[teamIdx] : null;
+    const shellName=String(shellTeam?.name || shellTeam?.displayName || shellTeam?.abbr || '').trim();
+    if(shellName) return shellName;
+  }
+  const legacyTeam=Number.isFinite(teamIdx) && Array.isArray(D?.teams) ? D.teams[teamIdx] : null;
+  if(legacyTeam && typeof legacyTeam==='object'){
+    const legacyName=String(legacyTeam?.name || legacyTeam?.displayName || legacyTeam?.abbr || '').trim();
+    if(legacyName) return legacyName;
+  }
+  const legacyName=String(legacyTeam || '').trim();
+  return legacyName || ('Team '+(fallbackIdx+1));
+}
 function logActivity(type,title,text,teamIdx,icon){
   if(!G.activityLog) G.activityLog=[];
   G.activityLog.unshift({id:'act_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),type,title,text,teamIdx,icon:icon||'??',ts:Date.now()});
@@ -10435,6 +10450,39 @@ function renderSimulationScheduleInSharedShell(){
     const homeAbbr = String(game?.homeAbbr || '').trim().toUpperCase();
     return awayAbbr === controlledTeamAbbr || homeAbbr === controlledTeamAbbr;
   }) || selectedScheduleGames[0] || null;
+  const normalizeCompletedDisplayGame = (game) => {
+    if(!game || typeof game !== 'object') return null;
+    const homeIdx = Number(game?.home);
+    const awayIdx = Number(game?.away);
+    const homeTeam = Number.isFinite(homeIdx) ? leagueTeams[homeIdx] || null : null;
+    const awayTeam = Number.isFinite(awayIdx) ? leagueTeams[awayIdx] || null : null;
+    const homeAbbr = String(game?.homeAbbr || homeTeam?.abbr || '').trim().toUpperCase();
+    const awayAbbr = String(game?.awayAbbr || awayTeam?.abbr || '').trim().toUpperCase();
+    return {
+      ...game,
+      home: homeAbbr === controlledTeamAbbr,
+      homeAbbr,
+      awayAbbr,
+      homeName: game?.homeName || homeTeam?.name || homeTeam?.displayName || '',
+      awayName: game?.awayName || awayTeam?.name || awayTeam?.displayName || '',
+      homeScore: game?.homeScore ?? game?.homeTotal,
+      awayScore: game?.awayScore ?? game?.awayTotal
+    };
+  };
+  const completedDisplayGames = (Array.isArray(D?.seasonState?.completedGameLogs) ? D.seasonState.completedGameLogs : [])
+    .map(normalizeCompletedDisplayGame)
+    .filter(Boolean);
+  const selectedCompletedGame = completedDisplayGames.concat(recentResults).find((game)=>{
+    const gameCycleValue = Number(game?.day ?? game?.week ?? 0);
+    if(selectedNavigationItem?.cycleValue != null && gameCycleValue !== Number(selectedNavigationItem.cycleValue)) return false;
+    const awayAbbr = String(game?.awayAbbr || '').trim().toUpperCase();
+    const homeAbbr = String(game?.homeAbbr || '').trim().toUpperCase();
+    const matchesControlledTeam = awayAbbr === controlledTeamAbbr || homeAbbr === controlledTeamAbbr;
+    const matchesSelectedSchedule = selectedScheduleGame
+      && Number(game?.home) === Number(selectedScheduleGame?.home)
+      && Number(game?.away) === Number(selectedScheduleGame?.away);
+    return matchesControlledTeam || matchesSelectedSchedule;
+  }) || null;
   const renderNavigation = () => {
     if(!navigation) return '';
     const items = navigationItems;
@@ -10445,7 +10493,7 @@ function renderSimulationScheduleInSharedShell(){
       return `<button type="button" onclick="setSimulationMatchupNavigationValue('${String(cycleValue).replace(/'/g,"\\'")}')" class="season-outline-btn" style="padding:10px 14px;border-color:${active?'#7c4a18':'#24324a'};color:${active?'#fdba74':'#dbe4f0'};background:${active?'#22180d':'#0f1724'};">${escapeHtml(item?.label || item?.selectedLabel || item?.id || '')}</button>`;
     }).join('')}</div>`;
   };
-  const displayedCurrentMatchup = selectedScheduleGame || vm?.currentMatchup || nextGame || null;
+  const displayedCurrentMatchup = selectedCompletedGame || selectedScheduleGame || vm?.currentMatchup || nextGame || null;
   const navigationCycleLabel = selectedNavigationItem?.label || vm?.cycleLabel || '';
   const selectedOpponentAbbr = displayedCurrentMatchup
     ? (() => {
@@ -10487,6 +10535,16 @@ function renderSimulationScheduleInSharedShell(){
         { label: 'Open Waivers', targetPage: 'waiver', body: 'Review the player pool if this matchup needs a roster move.' },
         { label: 'Review Matchup', targetPage: 'matchup', body: 'Review recent matchup history and the next slate.' }
       ];
+  const displayedActionCards = actionCards.map((card)=>{
+    if(String(card?.id || '').trim() !== 'review-schedule' || !displayedOpponentAbbr) return card;
+    const opponentName = displayedOpponentTeam?.name || displayedOpponentAbbr || 'the selected opponent';
+    return {
+      ...card,
+      body: selectedCompletedGame
+        ? `Review the completed result against ${opponentName}.`
+        : `Scout ${opponentName}.`
+    };
+  });
   const rawOpponentPanelVm = vm?.teamPanels?.opponent && typeof vm.teamPanels.opponent === 'object' ? vm.teamPanels.opponent : null;
   const activeOpponentPanelVm = rawOpponentPanelVm && displayedOpponentAbbr
     && String(rawOpponentPanelVm?.teamAbbr || '').trim().toUpperCase() !== displayedOpponentAbbr
@@ -10534,9 +10592,9 @@ function renderSimulationScheduleInSharedShell(){
         opponent: fallbackOpponentSections
       };
   const renderActionCards = () => {
-    if(!actionCards.length) return '';
+    if(!displayedActionCards.length) return '';
     const toneClass = (tone) => tone === 'alert' ? 'alert' : tone === 'live' ? 'live' : 'info';
-    return `<div class="season-now-band">${actionCards.map((card)=>{
+    return `<div class="season-now-band">${displayedActionCards.map((card)=>{
       const label = escapeHtml(card?.label || card?.title || 'Action');
       const body = escapeHtml(card?.body || card?.value || '');
       const targetPage = String(card?.targetPage || '').trim();
