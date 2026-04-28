@@ -515,4 +515,23 @@ assert.equal(
   'nfl rendered score tie-breaks should bump the displayed winner by one point when rounded totals would otherwise tie'
 );
 
+const renderedNbaExactTieBreakResult = resolveRenderedGameScores({
+  homeTotal: 57.2,
+  awayTotal: 57.2,
+  winner: 'away'
+}, {
+  sport: 'nba'
+});
+
+assert.equal(
+  renderedNbaExactTieBreakResult.homeScore,
+  88,
+  'nba rendered score tie-breaks should keep the loser on the rounded baseline when exact fantasy totals tie'
+);
+assert.equal(
+  renderedNbaExactTieBreakResult.awayScore,
+  89,
+  'nba rendered score tie-breaks should use the authoritative winner when exact fantasy totals would otherwise render tied'
+);
+
 console.log('simulation league engine test passed');

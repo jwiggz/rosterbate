@@ -1377,6 +1377,10 @@
             ? { homeScore:homeScore + 1, awayScore:awayScore }
             : { homeScore:homeScore, awayScore:awayScore + 1 };
         }
+        const winner=String(game?.winner || '').trim().toLowerCase();
+        return winner==='away'
+          ? { homeScore:homeScore, awayScore:awayScore + 1 }
+          : { homeScore:homeScore + 1, awayScore:awayScore };
       }
       return {
         homeScore:homeScore,
