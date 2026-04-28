@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {
   parseSimulationAccuracyAuditArgs,
   runHistoricalPackSanityCheck,
+  runHistoricalPackQualityReport,
   runAccuracyAudit,
   runAccuracyAuditSuite,
   runSeasonRealismAuditSuite,
@@ -145,6 +146,41 @@ assert.deepStrictEqual(
   [],
   `historical pack sanity check failed: ${packSanity.failures.map((failure) => `${failure.packId}: ${failure.message}`).join('; ')}`
 );
+const packQuality = runHistoricalPackQualityReport({ sport: 'nba' });
+assert.ok(packQuality.packs.length >= 5, 'nba pack quality report should include every configured nba source pack');
+packQuality.packs.forEach((pack) => {
+  assert.equal(pack.sport, 'nba', 'sport-filtered quality report should only include requested sport packs');
+  assert.ok(Number.isFinite(pack.zeroFantasyRate), `${pack.packId} should report zero-stat tail rate`);
+  assert.ok(Number.isFinite(pack.fantasyStats.mean), `${pack.packId} should report fantasy mean`);
+  assert.ok(Number.isFinite(pack.fantasyStats.stdev), `${pack.packId} should report fantasy stdev`);
+  assert.ok(Number.isFinite(pack.topPlayerConcentration), `${pack.packId} should report top-player concentration`);
+  assert.ok(Number.isFinite(pack.dominantPositionShare), `${pack.packId} should report position concentration`);
+  assert.ok(pack.positionMix && typeof pack.positionMix === 'object', `${pack.packId} should report position mix`);
+});
+assert.ok(
+  Array.isArray(packQuality.rankings.zeroFantasyTail) && packQuality.rankings.zeroFantasyTail.length === packQuality.packs.length,
+  'quality report should rank packs by zero-stat tail'
+);
+assert.ok(
+  Array.isArray(packQuality.rankings.topPlayerConcentration) && packQuality.rankings.topPlayerConcentration.length === packQuality.packs.length,
+  'quality report should rank packs by top-player concentration'
+);
+assert.ok(
+  Array.isArray(packQuality.rankings.positionConcentration) && packQuality.rankings.positionConcentration.length === packQuality.packs.length,
+  'quality report should rank packs by position concentration'
+);
+assert.ok(
+  packQuality.rankings.zeroFantasyTail.every((pack, index, list) => index === 0 || list[index - 1].zeroFantasyRate >= pack.zeroFantasyRate),
+  'zero-stat tail ranking should sort descending'
+);
+assert.ok(
+  packQuality.rankings.topPlayerConcentration.every((pack, index, list) => index === 0 || list[index - 1].topPlayerConcentration >= pack.topPlayerConcentration),
+  'top-player concentration ranking should sort descending'
+);
+assert.ok(
+  packQuality.rankings.positionConcentration.every((pack, index, list) => index === 0 || list[index - 1].dominantPositionShare >= pack.dominantPositionShare),
+  'position concentration ranking should sort descending'
+);
 
 const seasonSuite = runSeasonRealismAuditSuite();
 assert.ok(
@@ -184,6 +220,11 @@ assert.equal(nbaSummaryCli.payload.audits[0].sport, 'nba', 'sport-filtered cli s
 assert.equal(nbaSummaryCli.payload.seasonRealism.audits.length, 1, 'sport-filtered season audit should run one sport');
 assert.equal(nbaSummaryCli.payload.seasonRealism.audits[0].sport, 'nba', 'season audit should honor --sport');
 assert.ok(nbaSummaryCli.payload.packSanity.packsChecked > 0, '--packs should include pack sanity results');
+assert.ok(nbaSummaryCli.payload.packQuality.packs.length > 0, '--packs should include a non-failing quality report');
+assert.match(nbaSummaryCli.output, /Pack Quality/i, 'summary output should include the optional quality report section');
+assert.match(nbaSummaryCli.output, /zero tail/i, 'summary output should surface zero-stat tail rankings');
+assert.match(nbaSummaryCli.output, /position concentration/i, 'summary output should surface position-mix rankings');
+assert.match(nbaSummaryCli.output, /top concentration/i, 'summary output should surface top-player concentration rankings');
 assert.match(nbaSummaryCli.output, /Simulation Accuracy Audit/i, 'summary output should include a readable title');
 assert.match(nbaSummaryCli.output, /NBA\s+PASS/i, 'summary output should show the selected sport result');
 assert.match(nbaSummaryCli.output, /Season Realism/i, 'summary output should include the optional season section');

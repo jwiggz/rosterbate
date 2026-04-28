@@ -225,6 +225,117 @@ function runHistoricalPackSanityCheck(options = {}) {
   };
 }
 
+function getAuditPackIdsForSport(sport) {
+  const sportFilter = String(sport || 'all').trim().toLowerCase();
+  const allowedSports = new Set(getAuditSports(sportFilter));
+  return Array.from(new Set(
+    Object.values(AUDIT_CONFIG).flatMap((config) => config.sourcePackIds || [])
+  )).filter((packId) => allowedSports.has(getPackSport(packId)));
+}
+
+function countBy(values) {
+  return values.reduce((counts, value) => {
+    const key = String(value || '').trim().toUpperCase() || 'UNKNOWN';
+    counts[key] = Number(counts[key] || 0) + 1;
+    return counts;
+  }, {});
+}
+
+function buildPositionMix(players) {
+  const total = Math.max(1, players.length);
+  return Object.fromEntries(
+    Object.entries(countBy(players.map((player) => player?.pos || player?.primaryPosition || 'UNKNOWN')))
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([position, count]) => [position, {
+        count,
+        share: roundStat(count / total)
+      }])
+  );
+}
+
+function getDominantPosition(positionMix) {
+  return Object.entries(positionMix || {})
+    .sort(([, left], [, right]) => Number(right?.share || 0) - Number(left?.share || 0))[0] || ['UNKNOWN', { share: 0 }];
+}
+
+function buildTopConcentration(players, count) {
+  const values = players
+    .map((player) => Number(player?.fp || 0))
+    .filter((value) => Number.isFinite(value) && value > 0)
+    .sort((a, b) => b - a);
+  const total = values.reduce((sum, value) => sum + value, 0);
+  if (!(total > 0)) return 0;
+  return roundStat(values.slice(0, count).reduce((sum, value) => sum + value, 0) / total);
+}
+
+function buildPackQualityEntry(packId) {
+  const sport = getPackSport(packId);
+  const rawPlayers = readPackPlayers(packId);
+  const normalizedPlayers = Array.isArray(rawPlayers)
+    ? rawPlayers.map((player, index) => normalizeAuditPlayer(packId, player, index))
+    : [];
+  const activePlayers = normalizedPlayers.filter((player) => String(player?.designation || 'ACTIVE').trim().toUpperCase() !== 'OUT');
+  const activeFantasyValues = activePlayers.map((player) => Number(player?.fp || 0)).filter((value) => Number.isFinite(value) && value > 0);
+  const zeroFantasyCount = normalizedPlayers.filter((player) => !Number.isFinite(Number(player?.fp)) || Number(player?.fp) <= 0).length;
+  const positionMix = buildPositionMix(normalizedPlayers);
+  const [dominantPosition, dominantPositionStats] = getDominantPosition(positionMix);
+  return {
+    packId,
+    sport,
+    playerCount: normalizedPlayers.length,
+    activePlayerCount: activePlayers.length,
+    zeroFantasyCount,
+    zeroFantasyRate: roundStat(normalizedPlayers.length > 0 ? zeroFantasyCount / normalizedPlayers.length : 1),
+    positionMix,
+    dominantPosition,
+    dominantPositionShare: roundStat(Number(dominantPositionStats?.share || 0)),
+    fantasyStats: buildStats(activeFantasyValues),
+    topPlayerConcentration: buildTopConcentration(activePlayers, 1),
+    topFiveConcentration: buildTopConcentration(activePlayers, 5),
+    topTenConcentration: buildTopConcentration(activePlayers, 10)
+  };
+}
+
+function pickPackQualityFields(pack) {
+  return {
+    packId: pack.packId,
+    sport: pack.sport,
+    playerCount: pack.playerCount,
+    zeroFantasyRate: pack.zeroFantasyRate,
+    fantasyMean: pack.fantasyStats.mean,
+    fantasyStdev: pack.fantasyStats.stdev,
+    dominantPosition: pack.dominantPosition,
+    dominantPositionShare: pack.dominantPositionShare,
+    topPlayerConcentration: pack.topPlayerConcentration,
+    topFiveConcentration: pack.topFiveConcentration,
+    topTenConcentration: pack.topTenConcentration
+  };
+}
+
+function runHistoricalPackQualityReport(options = {}) {
+  const packs = getAuditPackIdsForSport(options.sport).map(buildPackQualityEntry);
+  return {
+    packs,
+    rankings: {
+      zeroFantasyTail: packs.slice()
+        .sort((a, b) => b.zeroFantasyRate - a.zeroFantasyRate || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
+      fantasyMean: packs.slice()
+        .sort((a, b) => b.fantasyStats.mean - a.fantasyStats.mean || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
+      fantasyStdev: packs.slice()
+        .sort((a, b) => b.fantasyStats.stdev - a.fantasyStats.stdev || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
+      positionConcentration: packs.slice()
+        .sort((a, b) => b.dominantPositionShare - a.dominantPositionShare || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
+      topPlayerConcentration: packs.slice()
+        .sort((a, b) => b.topPlayerConcentration - a.topPlayerConcentration || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields)
+    }
+  };
+}
+
 function roundStat(value) {
   const number = Number(value || 0);
   return Number.isFinite(number) ? Math.round(number * 100) / 100 : 0;
@@ -940,6 +1051,7 @@ function buildSimulationAccuracyAuditPayload(options = {}) {
   }
   if (options.includePacks) {
     payload.packSanity = runHistoricalPackSanityCheck({ sport });
+    payload.packQuality = runHistoricalPackQualityReport({ sport });
   }
   return payload;
 }
@@ -976,6 +1088,12 @@ function formatPackSanityLine(packSanity) {
   return `Pack Sanity ${status} | ${Number(packSanity?.packsChecked || 0)} packs checked`;
 }
 
+function formatPackQualityRanking(label, packs, valueKey) {
+  const topPacks = Array.isArray(packs) ? packs.slice(0, 3) : [];
+  if (!topPacks.length) return `- ${label}: no packs`;
+  return `- ${label}: ${topPacks.map((pack) => `${pack.packId} ${pack[valueKey]}`).join(', ')}`;
+}
+
 function formatSimulationAccuracySummary(payload) {
   const lines = ['Simulation Accuracy Audit', ''];
   lines.push('Accuracy');
@@ -1000,6 +1118,14 @@ function formatSimulationAccuracySummary(payload) {
       lines.push(`- ${failure.packId}: ${failure.message}`);
     });
   }
+  if (payload?.packQuality) {
+    lines.push('', 'Pack Quality');
+    lines.push(formatPackQualityRanking('zero tail', payload.packQuality.rankings?.zeroFantasyTail, 'zeroFantasyRate'));
+    lines.push(formatPackQualityRanking('fantasy mean', payload.packQuality.rankings?.fantasyMean, 'fantasyMean'));
+    lines.push(formatPackQualityRanking('fantasy stdev', payload.packQuality.rankings?.fantasyStdev, 'fantasyStdev'));
+    lines.push(formatPackQualityRanking('position concentration', payload.packQuality.rankings?.positionConcentration, 'dominantPositionShare'));
+    lines.push(formatPackQualityRanking('top concentration', payload.packQuality.rankings?.topPlayerConcentration, 'topPlayerConcentration'));
+  }
   return `${lines.join('\n')}\n`;
 }
 
@@ -1018,7 +1144,7 @@ function getSimulationAccuracyAuditHelp() {
     'Default: run NBA and NFL accuracy audits and print JSON.',
     '--sport    Limit audits to one sport.',
     '--season   Include season-long realism metrics.',
-    '--packs    Include historical pack sanity checks.',
+    '--packs    Include historical pack sanity checks and quality rankings.',
     '--summary  Print a compact human-readable report.',
     '--json     Print machine-readable JSON.'
   ].join('\n');
@@ -1059,6 +1185,7 @@ if (require.main === module) {
 module.exports = {
   parseSimulationAccuracyAuditArgs,
   runHistoricalPackSanityCheck,
+  runHistoricalPackQualityReport,
   runAccuracyAudit,
   runAccuracyAuditSuite,
   runSeasonRealismAudit,
