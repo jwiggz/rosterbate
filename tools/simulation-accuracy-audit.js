@@ -38,6 +38,12 @@ const AUDIT_CONFIG = Object.freeze({
     renderedTieRateCeiling: 0.05,
     zeroTeamTotalRateCeiling: 0.01,
     topStarShareMeanFloor: 0.26,
+    seasonRealism: {
+      playoffFieldStrengthEdgeFloor: 0.35,
+      eliteMedianWinPctGapFloor: 0.08,
+      bottomCollapseRateRange: [0.05, 0.55],
+      standingsDeterminismRateCeiling: 0.92
+    },
     nbaRoleShape: {
       topScorerPointShareMeanFloor: 0.27,
       assistLeaderAssistShareMeanFloor: 0.35,
@@ -60,11 +66,20 @@ const AUDIT_CONFIG = Object.freeze({
     renderedTieRateCeiling: 0.02,
     zeroTeamTotalRateCeiling: 0.01,
     qbShareMeanCeiling: 0.24,
+    seasonRealism: {
+      playoffFieldStrengthEdgeFloor: 0.1,
+      eliteMedianWinPctGapFloor: 0.08,
+      bottomCollapseRateRange: [0, 0.4],
+      standingsDeterminismRateCeiling: 0.92
+    },
     nflPositionShape: {
       qbMeanCeiling: 30,
       rbShareMeanFloor: 0.1,
       rbFloorRateFloor: 0.9,
-      wrStdevShouldExceedRb: true
+      wrStdevShouldExceedRb: true,
+      qbPassingYardsRange: [210, 310],
+      rbTouchMeanFloor: 13,
+      wrYardsPerTouchShouldExceedRb: true
     }
   }
 });
@@ -268,6 +283,32 @@ function buildTopConcentration(players, count) {
   return roundStat(values.slice(0, count).reduce((sum, value) => sum + value, 0) / total);
 }
 
+function hasPositiveFantasyBaseline(player) {
+  return Number.isFinite(Number(player?.fp)) && Number(player?.fp) > 0;
+}
+
+function getPlayerGameCount(player) {
+  return Number(player?.gp ?? player?.seasonStats?.games ?? 0);
+}
+
+function buildPackQualityFlags(pack) {
+  const flags = [];
+  if (pack.zeroDraftEligibleRate >= 0.05) {
+    flags.push('draft_eligible_zero_tail');
+  }
+  if (pack.zeroGameRate >= 0.05) {
+    flags.push('zero_game_tail');
+  }
+  if (
+    Number.isFinite(pack.dominantPositionShare) &&
+    Number.isFinite(pack.productiveDominantPositionShare) &&
+    pack.dominantPositionShare - pack.productiveDominantPositionShare >= 0.08
+  ) {
+    flags.push('position_concentration_inflated_by_zero_tail');
+  }
+  return flags;
+}
+
 function buildPackQualityEntry(packId) {
   const sport = getPackSport(packId);
   const rawPlayers = readPackPlayers(packId);
@@ -275,24 +316,48 @@ function buildPackQualityEntry(packId) {
     ? rawPlayers.map((player, index) => normalizeAuditPlayer(packId, player, index))
     : [];
   const activePlayers = normalizedPlayers.filter((player) => String(player?.designation || 'ACTIVE').trim().toUpperCase() !== 'OUT');
-  const activeFantasyValues = activePlayers.map((player) => Number(player?.fp || 0)).filter((value) => Number.isFinite(value) && value > 0);
-  const zeroFantasyCount = normalizedPlayers.filter((player) => !Number.isFinite(Number(player?.fp)) || Number(player?.fp) <= 0).length;
+  const productivePlayers = activePlayers.filter(hasPositiveFantasyBaseline);
+  const activeFantasyValues = productivePlayers.map((player) => Number(player?.fp || 0)).filter((value) => Number.isFinite(value) && value > 0);
+  const zeroFantasyPlayers = normalizedPlayers.filter((player) => !hasPositiveFantasyBaseline(player));
+  const zeroFantasyCount = zeroFantasyPlayers.length;
+  const zeroFantasyActiveCount = activePlayers.filter((player) => !hasPositiveFantasyBaseline(player)).length;
+  const zeroFantasyDraftEligibleCount = normalizedPlayers.filter((player) => !hasPositiveFantasyBaseline(player) && player?.draftEligible !== false).length;
+  const zeroGameCount = normalizedPlayers.filter((player) => getPlayerGameCount(player) <= 0).length;
+  const zeroGameDraftEligibleCount = normalizedPlayers.filter((player) => getPlayerGameCount(player) <= 0 && player?.draftEligible !== false).length;
   const positionMix = buildPositionMix(normalizedPlayers);
   const [dominantPosition, dominantPositionStats] = getDominantPosition(positionMix);
-  return {
+  const productivePositionMix = buildPositionMix(productivePlayers);
+  const [productiveDominantPosition, productiveDominantPositionStats] = getDominantPosition(productivePositionMix);
+  const entry = {
     packId,
     sport,
     playerCount: normalizedPlayers.length,
     activePlayerCount: activePlayers.length,
+    productivePlayerCount: productivePlayers.length,
     zeroFantasyCount,
+    zeroFantasyActiveCount,
+    zeroFantasyDraftEligibleCount,
+    zeroGameCount,
+    zeroGameDraftEligibleCount,
     zeroFantasyRate: roundStat(normalizedPlayers.length > 0 ? zeroFantasyCount / normalizedPlayers.length : 1),
+    activeZeroFantasyRate: roundStat(activePlayers.length > 0 ? zeroFantasyActiveCount / activePlayers.length : 1),
+    zeroDraftEligibleRate: roundStat(normalizedPlayers.length > 0 ? zeroFantasyDraftEligibleCount / normalizedPlayers.length : 1),
+    zeroGameRate: roundStat(normalizedPlayers.length > 0 ? zeroGameCount / normalizedPlayers.length : 1),
+    zeroGameDraftEligibleRate: roundStat(normalizedPlayers.length > 0 ? zeroGameDraftEligibleCount / normalizedPlayers.length : 1),
     positionMix,
     dominantPosition,
     dominantPositionShare: roundStat(Number(dominantPositionStats?.share || 0)),
+    productivePositionMix,
+    productiveDominantPosition,
+    productiveDominantPositionShare: roundStat(Number(productiveDominantPositionStats?.share || 0)),
     fantasyStats: buildStats(activeFantasyValues),
-    topPlayerConcentration: buildTopConcentration(activePlayers, 1),
-    topFiveConcentration: buildTopConcentration(activePlayers, 5),
-    topTenConcentration: buildTopConcentration(activePlayers, 10)
+    topPlayerConcentration: buildTopConcentration(productivePlayers, 1),
+    topFiveConcentration: buildTopConcentration(productivePlayers, 5),
+    topTenConcentration: buildTopConcentration(productivePlayers, 10)
+  };
+  return {
+    ...entry,
+    flags: buildPackQualityFlags(entry)
   };
 }
 
@@ -302,13 +367,18 @@ function pickPackQualityFields(pack) {
     sport: pack.sport,
     playerCount: pack.playerCount,
     zeroFantasyRate: pack.zeroFantasyRate,
+    zeroDraftEligibleRate: pack.zeroDraftEligibleRate,
+    zeroGameRate: pack.zeroGameRate,
     fantasyMean: pack.fantasyStats.mean,
     fantasyStdev: pack.fantasyStats.stdev,
     dominantPosition: pack.dominantPosition,
     dominantPositionShare: pack.dominantPositionShare,
+    productiveDominantPosition: pack.productiveDominantPosition,
+    productiveDominantPositionShare: pack.productiveDominantPositionShare,
     topPlayerConcentration: pack.topPlayerConcentration,
     topFiveConcentration: pack.topFiveConcentration,
-    topTenConcentration: pack.topTenConcentration
+    topTenConcentration: pack.topTenConcentration,
+    flags: pack.flags
   };
 }
 
@@ -320,6 +390,12 @@ function runHistoricalPackQualityReport(options = {}) {
       zeroFantasyTail: packs.slice()
         .sort((a, b) => b.zeroFantasyRate - a.zeroFantasyRate || a.packId.localeCompare(b.packId))
         .map(pickPackQualityFields),
+      draftEligibleZeroTail: packs.slice()
+        .sort((a, b) => b.zeroDraftEligibleRate - a.zeroDraftEligibleRate || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
+      zeroGameTail: packs.slice()
+        .sort((a, b) => b.zeroGameRate - a.zeroGameRate || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
       fantasyMean: packs.slice()
         .sort((a, b) => b.fantasyStats.mean - a.fantasyStats.mean || a.packId.localeCompare(b.packId))
         .map(pickPackQualityFields),
@@ -328,6 +404,9 @@ function runHistoricalPackQualityReport(options = {}) {
         .map(pickPackQualityFields),
       positionConcentration: packs.slice()
         .sort((a, b) => b.dominantPositionShare - a.dominantPositionShare || a.packId.localeCompare(b.packId))
+        .map(pickPackQualityFields),
+      productivePositionConcentration: packs.slice()
+        .sort((a, b) => b.productiveDominantPositionShare - a.productiveDominantPositionShare || a.packId.localeCompare(b.packId))
         .map(pickPackQualityFields),
       topPlayerConcentration: packs.slice()
         .sort((a, b) => b.topPlayerConcentration - a.topPlayerConcentration || a.packId.localeCompare(b.packId))
@@ -414,8 +493,26 @@ function buildNflPositionShapeMetrics(positionShape) {
     qbShareMean: buildMean(positionShape.qbShares),
     rbShareMean: buildMean(positionShape.rbShares),
     wrShareMean: buildMean(positionShape.wrShares),
-    teShareMean: buildMean(positionShape.teShares)
+    teShareMean: buildMean(positionShape.teShares),
+    qbPassingYardsMean: buildMean(positionShape.qbPassingYards),
+    qbPassingTdMean: buildMean(positionShape.qbPassingTd),
+    rbTouchMean: buildMean(positionShape.rbTouches),
+    rbRushingAttemptsMean: buildMean(positionShape.rbRushingAttempts),
+    wrReceptionMean: buildMean(positionShape.wrReceptions),
+    teReceptionMean: buildMean(positionShape.teReceptions),
+    rbYardsPerTouchMean: buildMean(positionShape.rbYardsPerTouch),
+    wrYardsPerTouchMean: buildMean(positionShape.wrYardsPerTouch),
+    teYardsPerTouchMean: buildMean(positionShape.teYardsPerTouch)
   };
+}
+
+function getSimStat(stats, keys) {
+  const source = stats && typeof stats === 'object' ? stats : {};
+  for (const key of keys) {
+    const value = Number(source[key]);
+    if (Number.isFinite(value)) return value;
+  }
+  return 0;
 }
 
 function recordNbaRoleShape(entries, roleShape) {
@@ -451,20 +548,39 @@ function recordNbaRoleShape(entries, roleShape) {
 function recordNflPositionShape(entries, total, positionShape) {
   entries.forEach((entry) => {
     const position = String(entry?.player?.pos || entry?.simulatedStats?.position || '').trim().toUpperCase();
+    const stats = entry?.simulatedStats || {};
     const score = Number(entry?.finalScore || 0);
     const share = total > 0 ? score / total : 0;
     if (position === 'QB') {
       positionShape.qbScores.push(score);
       positionShape.qbShares.push(share);
+      positionShape.qbPassingYards.push(getSimStat(stats, ['passingYards', 'passYds']));
+      positionShape.qbPassingTd.push(getSimStat(stats, ['passingTd', 'passTd']));
     } else if (position === 'RB') {
+      const rushAtt = getSimStat(stats, ['rushingAttempts', 'rushAtt']);
+      const rec = getSimStat(stats, ['receptions', 'rec']);
+      const rushYds = getSimStat(stats, ['rushingYards', 'rushYds']);
+      const recYds = getSimStat(stats, ['receivingYards', 'recYds']);
+      const touches = getSimStat(stats, ['touches']) || rushAtt + rec;
       positionShape.rbScores.push(score);
       positionShape.rbShares.push(share);
+      positionShape.rbTouches.push(touches);
+      positionShape.rbRushingAttempts.push(rushAtt);
+      if (touches > 0) positionShape.rbYardsPerTouch.push((rushYds + recYds) / touches);
     } else if (position === 'WR') {
+      const rec = getSimStat(stats, ['receptions', 'rec']);
+      const recYds = getSimStat(stats, ['receivingYards', 'recYds']);
       positionShape.wrScores.push(score);
       positionShape.wrShares.push(share);
+      positionShape.wrReceptions.push(rec);
+      if (rec > 0) positionShape.wrYardsPerTouch.push(recYds / rec);
     } else if (position === 'TE') {
+      const rec = getSimStat(stats, ['receptions', 'rec']);
+      const recYds = getSimStat(stats, ['receivingYards', 'recYds']);
       positionShape.teScores.push(score);
       positionShape.teShares.push(share);
+      positionShape.teReceptions.push(rec);
+      if (rec > 0) positionShape.teYardsPerTouch.push(recYds / rec);
     }
   });
 }
@@ -585,7 +701,16 @@ function runTrial(config, trialIndex) {
     qbShares: [],
     rbShares: [],
     wrShares: [],
-    teShares: []
+    teShares: [],
+    qbPassingYards: [],
+    qbPassingTd: [],
+    rbTouches: [],
+    rbRushingAttempts: [],
+    wrReceptions: [],
+    teReceptions: [],
+    rbYardsPerTouch: [],
+    wrYardsPerTouch: [],
+    teYardsPerTouch: []
   };
   let strongerTeamGames = 0;
   let strongerTeamWins = 0;
@@ -665,6 +790,39 @@ function average(values) {
     : 0;
 }
 
+function median(values) {
+  const sorted = (Array.isArray(values) ? values : [])
+    .map((value) => Number(value))
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2
+    ? sorted[middle]
+    : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function pearsonCorrelation(leftValues, rightValues) {
+  const pairs = (Array.isArray(leftValues) ? leftValues : [])
+    .map((left, index) => [Number(left), Number(rightValues?.[index])])
+    .filter(([left, right]) => Number.isFinite(left) && Number.isFinite(right));
+  if (pairs.length < 2) return 0;
+  const leftMean = average(pairs.map(([left]) => left));
+  const rightMean = average(pairs.map(([, right]) => right));
+  let numerator = 0;
+  let leftDenominator = 0;
+  let rightDenominator = 0;
+  pairs.forEach(([left, right]) => {
+    const leftDelta = left - leftMean;
+    const rightDelta = right - rightMean;
+    numerator += leftDelta * rightDelta;
+    leftDenominator += leftDelta * leftDelta;
+    rightDenominator += rightDelta * rightDelta;
+  });
+  const denominator = Math.sqrt(leftDenominator * rightDenominator);
+  return denominator > 0 ? numerator / denominator : 0;
+}
+
 function buildSeasonStandingsRows(state, strengthMap) {
   const teamMeta = Array.isArray(state?.leagueShell?.teams) ? state.leagueShell.teams : [];
   return (state?.seasonState?.standings || []).map((row) => {
@@ -687,24 +845,38 @@ function buildSeasonStandingsRows(state, strengthMap) {
 function buildSeasonGroupMetrics(rows, config) {
   const orderedByStrength = rows.slice().sort((a, b) => b.strength - a.strength);
   const groupSize = Math.max(1, Math.floor(rows.length / 4));
+  const eliteGroupSize = Math.max(1, Math.ceil(rows.length * 0.1));
   const topGroup = orderedByStrength.slice(0, groupSize);
   const bottomGroup = orderedByStrength.slice(-groupSize);
+  const eliteGroup = orderedByStrength.slice(0, eliteGroupSize);
   const orderedByRecord = rows.slice().sort((a, b) => b.winPct - a.winPct);
   const playoffSlots = config.sport === 'nfl' ? 14 : 16;
-  const playoffSet = new Set(orderedByRecord.slice(0, Math.min(playoffSlots, orderedByRecord.length)).map((row) => row.teamAbbr));
+  const playoffTeams = orderedByRecord.slice(0, Math.min(playoffSlots, orderedByRecord.length));
+  const playoffSet = new Set(playoffTeams.map((row) => row.teamAbbr));
   const topPlayoffRate = average(topGroup.map((row) => playoffSet.has(row.teamAbbr) ? 1 : 0));
   const bottomPlayoffRate = average(bottomGroup.map((row) => playoffSet.has(row.teamAbbr) ? 1 : 0));
   const winPcts = rows.map((row) => row.winPct);
+  const strengths = rows.map((row) => row.strength);
+  const bottomCollapseThreshold = config.sport === 'nfl' ? 0.24 : 0.26;
+  const medianWinPct = median(winPcts);
+  const standingsDeterminismRate = Math.max(0, pearsonCorrelation(strengths, winPcts));
   return {
     gamesPerTeamMean: roundStat(average(rows.map((row) => row.games))),
     winPctSpread: roundStat(Math.max(...winPcts) - Math.min(...winPcts)),
     winPctStdev: buildStats(winPcts).stdev,
+    leagueStrengthMean: roundStat(average(strengths)),
+    playoffFieldStrengthMean: roundStat(average(playoffTeams.map((row) => row.strength))),
+    playoffFieldStrengthEdge: roundStat(average(playoffTeams.map((row) => row.strength)) - average(strengths)),
     topRosterWinPct: roundStat(average(topGroup.map((row) => row.winPct))),
     bottomRosterWinPct: roundStat(average(bottomGroup.map((row) => row.winPct))),
     topBottomWinPctGap: roundStat(average(topGroup.map((row) => row.winPct)) - average(bottomGroup.map((row) => row.winPct))),
+    eliteRosterWinPct: roundStat(average(eliteGroup.map((row) => row.winPct))),
+    eliteMedianWinPctGap: roundStat(average(eliteGroup.map((row) => row.winPct)) - medianWinPct),
+    bottomCollapseRate: roundStat(average(bottomGroup.map((row) => row.winPct <= bottomCollapseThreshold ? 1 : 0))),
     topRosterPlayoffRate: roundStat(topPlayoffRate),
     bottomRosterPlayoffRate: roundStat(bottomPlayoffRate),
-    playoffRateGap: roundStat(topPlayoffRate - bottomPlayoffRate)
+    playoffRateGap: roundStat(topPlayoffRate - bottomPlayoffRate),
+    standingsDeterminismRate: roundStat(standingsDeterminismRate)
   };
 }
 
@@ -732,6 +904,7 @@ function evaluateSeasonRealismGuardrails(config, metrics) {
   const minGap = config.sport === 'nfl' ? 0.03 : 0.08;
   const minSpread = config.sport === 'nfl' ? 0.22 : 0.28;
   const maxSpread = config.sport === 'nfl' ? 0.82 : 0.84;
+  const seasonConfig = config.seasonRealism || {};
   if (metrics.topBottomWinPctGap < minGap) {
     failures.push(`top-bottom win pct gap ${metrics.topBottomWinPctGap} below ${minGap}`);
   }
@@ -742,6 +915,43 @@ function evaluateSeasonRealismGuardrails(config, metrics) {
     failures.push(
       `top roster playoff rate ${metrics.topRosterPlayoffRate} below bottom roster playoff rate ${metrics.bottomRosterPlayoffRate}`
     );
+  }
+  if (metrics.playoffFieldStrengthMean <= metrics.leagueStrengthMean) {
+    failures.push(
+      `playoff field strength ${metrics.playoffFieldStrengthMean} should exceed league strength ${metrics.leagueStrengthMean}`
+    );
+  }
+  if (
+    Number.isFinite(seasonConfig.playoffFieldStrengthEdgeFloor) &&
+    metrics.playoffFieldStrengthEdge < seasonConfig.playoffFieldStrengthEdgeFloor
+  ) {
+    failures.push(
+      `playoff field strength edge ${metrics.playoffFieldStrengthEdge} below ${seasonConfig.playoffFieldStrengthEdgeFloor}`
+    );
+  }
+  if (
+    Number.isFinite(seasonConfig.eliteMedianWinPctGapFloor) &&
+    metrics.eliteMedianWinPctGap < seasonConfig.eliteMedianWinPctGapFloor
+  ) {
+    failures.push(`elite-median win pct gap ${metrics.eliteMedianWinPctGap} below ${seasonConfig.eliteMedianWinPctGapFloor}`);
+  }
+  const bottomCollapseRange = Array.isArray(seasonConfig.bottomCollapseRateRange)
+    ? seasonConfig.bottomCollapseRateRange
+    : [];
+  if (
+    Number.isFinite(bottomCollapseRange[0]) &&
+    Number.isFinite(bottomCollapseRange[1]) &&
+    (metrics.bottomCollapseRate < bottomCollapseRange[0] || metrics.bottomCollapseRate > bottomCollapseRange[1])
+  ) {
+    failures.push(
+      `bottom collapse rate ${metrics.bottomCollapseRate} outside ${bottomCollapseRange[0]}-${bottomCollapseRange[1]}`
+    );
+  }
+  const determinismCeiling = Number.isFinite(seasonConfig.standingsDeterminismRateCeiling)
+    ? seasonConfig.standingsDeterminismRateCeiling
+    : 0.92;
+  if (metrics.standingsDeterminismRate >= determinismCeiling) {
+    failures.push(`standings determinism ${metrics.standingsDeterminismRate} above ${determinismCeiling}`);
   }
   return failures;
 }
@@ -761,12 +971,19 @@ function runSeasonRealismAudit(options = {}) {
     gamesPerTeamMean: roundStat(average(trials.map((trial) => trial.gamesPerTeamMean))),
     winPctSpread: roundStat(average(trials.map((trial) => trial.winPctSpread))),
     winPctStdev: roundStat(average(trials.map((trial) => trial.winPctStdev))),
+    leagueStrengthMean: roundStat(average(trials.map((trial) => trial.leagueStrengthMean))),
+    playoffFieldStrengthMean: roundStat(average(trials.map((trial) => trial.playoffFieldStrengthMean))),
+    playoffFieldStrengthEdge: roundStat(average(trials.map((trial) => trial.playoffFieldStrengthEdge))),
     topRosterWinPct: roundStat(average(trials.map((trial) => trial.topRosterWinPct))),
     bottomRosterWinPct: roundStat(average(trials.map((trial) => trial.bottomRosterWinPct))),
     topBottomWinPctGap: roundStat(average(trials.map((trial) => trial.topBottomWinPctGap))),
+    eliteRosterWinPct: roundStat(average(trials.map((trial) => trial.eliteRosterWinPct))),
+    eliteMedianWinPctGap: roundStat(average(trials.map((trial) => trial.eliteMedianWinPctGap))),
+    bottomCollapseRate: roundStat(average(trials.map((trial) => trial.bottomCollapseRate))),
     topRosterPlayoffRate: roundStat(average(trials.map((trial) => trial.topRosterPlayoffRate))),
     bottomRosterPlayoffRate: roundStat(average(trials.map((trial) => trial.bottomRosterPlayoffRate))),
     playoffRateGap: roundStat(average(trials.map((trial) => trial.playoffRateGap))),
+    standingsDeterminismRate: roundStat(average(trials.map((trial) => trial.standingsDeterminismRate))),
     trials: trialCount
   };
   return {
@@ -889,6 +1106,35 @@ function evaluateGuardrails(config, metrics) {
       `nfl rb floor rate ${metrics.nflPositionShape.rbFloorRate} below ${config.nflPositionShape.rbFloorRateFloor}`
     );
   }
+  const qbPassingYardsRange = config.nflPositionShape?.qbPassingYardsRange;
+  if (
+    Array.isArray(qbPassingYardsRange) &&
+    qbPassingYardsRange.length === 2 &&
+    (metrics.nflPositionShape.qbPassingYardsMean < qbPassingYardsRange[0] ||
+      metrics.nflPositionShape.qbPassingYardsMean > qbPassingYardsRange[1])
+  ) {
+    failures.push(
+      `nfl qb passing yards mean ${metrics.nflPositionShape.qbPassingYardsMean} outside ${qbPassingYardsRange[0]}-${qbPassingYardsRange[1]}`
+    );
+  }
+  if (
+    Number.isFinite(config.nflPositionShape?.rbTouchMeanFloor) &&
+    metrics.nflPositionShape.rbTouchMean < config.nflPositionShape.rbTouchMeanFloor
+  ) {
+    failures.push(
+      `nfl rb touch mean ${metrics.nflPositionShape.rbTouchMean} below ${config.nflPositionShape.rbTouchMeanFloor}`
+    );
+  }
+  if (
+    config.nflPositionShape?.wrYardsPerTouchShouldExceedRb &&
+    Number.isFinite(metrics.nflPositionShape?.wrYardsPerTouchMean) &&
+    Number.isFinite(metrics.nflPositionShape?.rbYardsPerTouchMean) &&
+    metrics.nflPositionShape.wrYardsPerTouchMean <= metrics.nflPositionShape.rbYardsPerTouchMean
+  ) {
+    failures.push(
+      `nfl wr yards per touch ${metrics.nflPositionShape.wrYardsPerTouchMean} should exceed rb yards per touch ${metrics.nflPositionShape.rbYardsPerTouchMean}`
+    );
+  }
   if (metrics.renderedTieRate > config.renderedTieRateCeiling) {
     failures.push(
       `rendered tie rate ${metrics.renderedTieRate} above ${config.renderedTieRateCeiling}`
@@ -927,7 +1173,16 @@ function runAccuracyAudit(options = {}) {
     qbShares: [],
     rbShares: [],
     wrShares: [],
-    teShares: []
+    teShares: [],
+    qbPassingYards: [],
+    qbPassingTd: [],
+    rbTouches: [],
+    rbRushingAttempts: [],
+    wrReceptions: [],
+    teReceptions: [],
+    rbYardsPerTouch: [],
+    wrYardsPerTouch: [],
+    teYardsPerTouch: []
   };
   let strongerTeamGames = 0;
   let strongerTeamWins = 0;
@@ -1062,13 +1317,22 @@ function formatAuditStatus(failures) {
 
 function formatAccuracyAuditLine(audit) {
   const metrics = audit?.metrics || {};
-  return [
+  const parts = [
     `${String(audit?.sport || '').toUpperCase()} ${formatAuditStatus(audit?.failedGuardrails)}`,
     `team mean ${metrics.teamTotals?.mean}`,
     `score mean ${metrics.renderedScores?.mean}`,
     `strength wins ${metrics.strengthWinRate}`,
     `${metrics.gamesAudited} games`
-  ].join(' | ');
+  ];
+  if (metrics.nflPositionShape) {
+    parts.push(
+      `qb pass ${metrics.nflPositionShape.qbPassingYardsMean}`,
+      `rb touches ${metrics.nflPositionShape.rbTouchMean}`,
+      `wr rec ${metrics.nflPositionShape.wrReceptionMean}`,
+      `wr y/t ${metrics.nflPositionShape.wrYardsPerTouchMean}`
+    );
+  }
+  return parts.join(' | ');
 }
 
 function formatSeasonAuditLine(audit) {
@@ -1077,6 +1341,10 @@ function formatSeasonAuditLine(audit) {
     `${String(audit?.sport || '').toUpperCase()} ${formatAuditStatus(audit?.failedGuardrails)}`,
     `spread ${metrics.winPctSpread}`,
     `top-bottom gap ${metrics.topBottomWinPctGap}`,
+    `playoff strength +${metrics.playoffFieldStrengthEdge}`,
+    `elite gap ${metrics.eliteMedianWinPctGap}`,
+    `bottom collapse ${metrics.bottomCollapseRate}`,
+    `determinism ${metrics.standingsDeterminismRate}`,
     `playoff gap ${metrics.playoffRateGap}`,
     `${metrics.trials} trials`
   ].join(' | ');
@@ -1091,7 +1359,10 @@ function formatPackSanityLine(packSanity) {
 function formatPackQualityRanking(label, packs, valueKey) {
   const topPacks = Array.isArray(packs) ? packs.slice(0, 3) : [];
   if (!topPacks.length) return `- ${label}: no packs`;
-  return `- ${label}: ${topPacks.map((pack) => `${pack.packId} ${pack[valueKey]}`).join(', ')}`;
+  return `- ${label}: ${topPacks.map((pack) => {
+    const flags = Array.isArray(pack.flags) && pack.flags.length ? ` [${pack.flags.join('|')}]` : '';
+    return `${pack.packId} ${pack[valueKey]}${flags}`;
+  }).join(', ')}`;
 }
 
 function formatSimulationAccuracySummary(payload) {
@@ -1121,9 +1392,12 @@ function formatSimulationAccuracySummary(payload) {
   if (payload?.packQuality) {
     lines.push('', 'Pack Quality');
     lines.push(formatPackQualityRanking('zero tail', payload.packQuality.rankings?.zeroFantasyTail, 'zeroFantasyRate'));
+    lines.push(formatPackQualityRanking('draft-eligible zero tail', payload.packQuality.rankings?.draftEligibleZeroTail, 'zeroDraftEligibleRate'));
+    lines.push(formatPackQualityRanking('zero-game tail', payload.packQuality.rankings?.zeroGameTail, 'zeroGameRate'));
     lines.push(formatPackQualityRanking('fantasy mean', payload.packQuality.rankings?.fantasyMean, 'fantasyMean'));
     lines.push(formatPackQualityRanking('fantasy stdev', payload.packQuality.rankings?.fantasyStdev, 'fantasyStdev'));
     lines.push(formatPackQualityRanking('position concentration', payload.packQuality.rankings?.positionConcentration, 'dominantPositionShare'));
+    lines.push(formatPackQualityRanking('productive position concentration', payload.packQuality.rankings?.productivePositionConcentration, 'productiveDominantPositionShare'));
     lines.push(formatPackQualityRanking('top concentration', payload.packQuality.rankings?.topPlayerConcentration, 'topPlayerConcentration'));
   }
   return `${lines.join('\n')}\n`;

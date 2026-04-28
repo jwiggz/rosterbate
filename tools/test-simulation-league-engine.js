@@ -110,6 +110,16 @@ assert.ok(
   'engine game logs should explicitly mark simulation_engine as the only outcome source'
 );
 assert.ok(
+  dayResult.gameLogs.every((game) =>
+    Array.isArray(game.homeEntries) &&
+    Array.isArray(game.awayEntries) &&
+    game.homeEntries.length === 5 &&
+    game.awayEntries.length === 5 &&
+    game.homeEntries.every((entry) => entry?.player?.name && Number(entry?.finalScore || 0) > 0)
+  ),
+  'engine game logs should persist lightweight starter box-score lines for UI recaps'
+);
+assert.ok(
   Object.values(dayResult.resultsByTeam).every((teamResult) =>
     String(teamResult?.statSource || '') === 'simulation_engine_generated' &&
     teamResult.entries.every((entry) => String(entry?.statSource || '') === 'simulation_engine_generated')
@@ -210,6 +220,22 @@ assert.ok(
     teamResult.entries.every((entry) => Number(entry?.finalScore || 0) > 0)
   ),
   'nfl simulation should generate non-zero fantasy totals for teams and starters instead of flattening football players to zero-score nba baselines'
+);
+const nflStarterEntries = Object.values(nflDayResult.resultsByTeam).flatMap((teamResult) => teamResult.entries);
+const nflQuarterbackLine = nflStarterEntries.find((entry) => String(entry?.player?.pos || '').toUpperCase() === 'QB')?.simulatedStats || {};
+const nflRunningBackLine = nflStarterEntries.find((entry) => String(entry?.player?.pos || '').toUpperCase() === 'RB')?.simulatedStats || {};
+const nflReceiverLine = nflStarterEntries.find((entry) => String(entry?.player?.pos || '').toUpperCase() === 'WR')?.simulatedStats || {};
+assert.ok(
+  Number(nflQuarterbackLine.passingYards || 0) > 0 && Number(nflQuarterbackLine.passingTd || 0) >= 0,
+  'nfl qb simulated stats should include football-native passing production'
+);
+assert.ok(
+  Number(nflRunningBackLine.rushingAttempts || 0) > 0 && Number(nflRunningBackLine.touches || 0) >= Number(nflRunningBackLine.rushingAttempts || 0),
+  'nfl rb simulated stats should include stable touch volume'
+);
+assert.ok(
+  Number(nflReceiverLine.receptions || 0) > 0 && Number(nflReceiverLine.receivingYards || 0) > 0,
+  'nfl wr simulated stats should include receiving production'
 );
 
 const realNflAutoDraftState = buildCompletedSimulationAutoDraftState({

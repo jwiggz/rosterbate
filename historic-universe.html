@@ -1179,6 +1179,22 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     }) || null;
   }
 
+  function normalizeArchiveBoxScoreEntries(entries){
+    return (Array.isArray(entries) ? entries : []).map(function(entry){
+      const player = entry?.player && typeof entry.player === 'object' ? entry.player : {};
+      return {
+        name: String(player.name || 'Player').trim() || 'Player',
+        team: String(player.team || '').trim(),
+        pos: String(player.pos || player.primaryPosition || '').trim(),
+        score: Number(entry?.finalScore ?? entry?.baseScore ?? 0)
+      };
+    }).filter(function(entry){
+      return Number.isFinite(entry.score);
+    }).sort(function(a, b){
+      return b.score - a.score;
+    });
+  }
+
   function buildSimulationArchiveWindowResult(slot, state, window){
     const fallbackTeamName = getControlledTeamName(slot, state) || 'Your Team';
     const game = getControlledSimulationArchiveGame(slot, state, window?.gameLogs || []);
@@ -1201,15 +1217,18 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
     const opponentName = teamIsHome ? (awayName || 'Unknown Opponent') : (homeName || 'Unknown Opponent');
     const myScore = Number(teamIsHome ? game?.homeScore : game?.awayScore);
     const opponentScore = Number(teamIsHome ? game?.awayScore : game?.homeScore);
+    const leaders = normalizeArchiveBoxScoreEntries(teamIsHome ? game?.homeEntries : game?.awayEntries).slice(0, 2);
     const verb = Number.isFinite(myScore) && Number.isFinite(opponentScore)
       ? (myScore === opponentScore ? 'tied' : (myScore > opponentScore ? 'beat' : 'fell to'))
       : 'faced';
-    return {
+    const result = {
       headline: teamName + ' ' + verb + ' ' + opponentName,
       subline: Number.isFinite(myScore) && Number.isFinite(opponentScore)
         ? myScore.toFixed(1) + ' - ' + opponentScore.toFixed(1)
         : 'Result still loading'
     };
+    if(leaders.length) result.leaders = leaders;
+    return result;
   }
 
   function buildSimulationArchiveWindowLeagueNote(window){
@@ -1690,7 +1709,12 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
       const resultHtml = item?.teamResult
         ? [
             '<strong>' + escapeHtml(String(item.teamResult.headline || 'Simulation day completed.').trim()) + '</strong>',
-            String(item.teamResult.subline || '').trim() ? '<span>' + escapeHtml(String(item.teamResult.subline || '').trim()) + '</span>' : ''
+            String(item.teamResult.subline || '').trim() ? '<span>' + escapeHtml(String(item.teamResult.subline || '').trim()) + '</span>' : '',
+            Array.isArray(item.teamResult.leaders) && item.teamResult.leaders.length
+              ? '<span class="sim-day-subline">Top lines: ' + item.teamResult.leaders.map(function(leader){
+                  return escapeHtml(leader.name + ' ' + leader.score.toFixed(1));
+                }).join(', ') + '</span>'
+              : ''
           ].join('')
         : '';
       const activityHtml = Array.isArray(item?.teamActivity) && item.teamActivity.length

@@ -120,6 +120,27 @@ assert.ok(
   nflAudit.metrics.nflPositionShape.rbFloorRate >= nflAudit.metrics.nflPositionShape.wrFloorRate,
   `nfl rb output should carry a steadier floor than wr output: RB ${nflAudit.metrics.nflPositionShape.rbFloorRate}, WR ${nflAudit.metrics.nflPositionShape.wrFloorRate}`
 );
+assert.ok(
+  Number.isFinite(nflAudit.metrics.nflPositionShape.qbPassingYardsMean),
+  'nfl audit should compute qb passing-yard shape'
+);
+assert.ok(
+  nflAudit.metrics.nflPositionShape.qbPassingYardsMean >= 210 &&
+    nflAudit.metrics.nflPositionShape.qbPassingYardsMean <= 310,
+  `nfl qb passing yards should land in a weekly starter range: ${nflAudit.metrics.nflPositionShape.qbPassingYardsMean}`
+);
+assert.ok(
+  nflAudit.metrics.nflPositionShape.rbTouchMean >= 13,
+  `nfl rb weekly shape should include visible rushing/receiving volume: ${nflAudit.metrics.nflPositionShape.rbTouchMean}`
+);
+assert.ok(
+  nflAudit.metrics.nflPositionShape.wrReceptionMean > nflAudit.metrics.nflPositionShape.teReceptionMean,
+  `nfl wrs should catch more passes than tes on average: WR ${nflAudit.metrics.nflPositionShape.wrReceptionMean}, TE ${nflAudit.metrics.nflPositionShape.teReceptionMean}`
+);
+assert.ok(
+  nflAudit.metrics.nflPositionShape.wrYardsPerTouchMean > nflAudit.metrics.nflPositionShape.rbYardsPerTouchMean,
+  `nfl wrs should be more explosive per touch than rbs: WR ${nflAudit.metrics.nflPositionShape.wrYardsPerTouchMean}, RB ${nflAudit.metrics.nflPositionShape.rbYardsPerTouchMean}`
+);
 assert.ok(Array.isArray(nflAudit.failedGuardrails), 'nfl audit should report guardrail failures as an array');
 assert.equal(
   Object.prototype.hasOwnProperty.call(nflAudit.metrics, 'nbaRoleShape'),
@@ -151,11 +172,16 @@ assert.ok(packQuality.packs.length >= 5, 'nba pack quality report should include
 packQuality.packs.forEach((pack) => {
   assert.equal(pack.sport, 'nba', 'sport-filtered quality report should only include requested sport packs');
   assert.ok(Number.isFinite(pack.zeroFantasyRate), `${pack.packId} should report zero-stat tail rate`);
+  assert.ok(Number.isFinite(pack.zeroDraftEligibleRate), `${pack.packId} should report draft-eligible zero-stat tail rate`);
+  assert.ok(Number.isFinite(pack.zeroGameRate), `${pack.packId} should report zero-game tail rate`);
   assert.ok(Number.isFinite(pack.fantasyStats.mean), `${pack.packId} should report fantasy mean`);
   assert.ok(Number.isFinite(pack.fantasyStats.stdev), `${pack.packId} should report fantasy stdev`);
   assert.ok(Number.isFinite(pack.topPlayerConcentration), `${pack.packId} should report top-player concentration`);
   assert.ok(Number.isFinite(pack.dominantPositionShare), `${pack.packId} should report position concentration`);
+  assert.ok(Number.isFinite(pack.productiveDominantPositionShare), `${pack.packId} should report productive-player position concentration`);
   assert.ok(pack.positionMix && typeof pack.positionMix === 'object', `${pack.packId} should report position mix`);
+  assert.ok(pack.productivePositionMix && typeof pack.productivePositionMix === 'object', `${pack.packId} should report productive-player position mix`);
+  assert.ok(Array.isArray(pack.flags), `${pack.packId} should report quality flags`);
 });
 assert.ok(
   Array.isArray(packQuality.rankings.zeroFantasyTail) && packQuality.rankings.zeroFantasyTail.length === packQuality.packs.length,
@@ -170,6 +196,18 @@ assert.ok(
   'quality report should rank packs by position concentration'
 );
 assert.ok(
+  Array.isArray(packQuality.rankings.draftEligibleZeroTail) && packQuality.rankings.draftEligibleZeroTail.length === packQuality.packs.length,
+  'quality report should rank packs by draft-eligible zero-stat tail'
+);
+assert.ok(
+  Array.isArray(packQuality.rankings.zeroGameTail) && packQuality.rankings.zeroGameTail.length === packQuality.packs.length,
+  'quality report should rank packs by zero-game tail'
+);
+assert.ok(
+  Array.isArray(packQuality.rankings.productivePositionConcentration) && packQuality.rankings.productivePositionConcentration.length === packQuality.packs.length,
+  'quality report should rank packs by productive-player position concentration'
+);
+assert.ok(
   packQuality.rankings.zeroFantasyTail.every((pack, index, list) => index === 0 || list[index - 1].zeroFantasyRate >= pack.zeroFantasyRate),
   'zero-stat tail ranking should sort descending'
 );
@@ -180,6 +218,20 @@ assert.ok(
 assert.ok(
   packQuality.rankings.positionConcentration.every((pack, index, list) => index === 0 || list[index - 1].dominantPositionShare >= pack.dominantPositionShare),
   'position concentration ranking should sort descending'
+);
+assert.ok(
+  packQuality.rankings.productivePositionConcentration.every((pack, index, list) => index === 0 || list[index - 1].productiveDominantPositionShare >= pack.productiveDominantPositionShare),
+  'productive position concentration ranking should sort descending'
+);
+const nba2016Quality = packQuality.packs.find((pack) => pack.packId === 'nba_2016_full_season_v1');
+assert.ok(nba2016Quality, 'quality report should include the 2016 NBA pack');
+assert.ok(
+  nba2016Quality.flags.includes('draft_eligible_zero_tail'),
+  '2016 NBA pack should flag draft-eligible zero-game players instead of hiding them as generic zero tail'
+);
+assert.ok(
+  nba2016Quality.flags.includes('position_concentration_inflated_by_zero_tail'),
+  '2016 NBA pack should flag position concentration that is inflated by zero-game rows'
 );
 
 const seasonSuite = runSeasonRealismAuditSuite();
@@ -198,12 +250,44 @@ seasonSuite.audits.forEach((audit) => {
     `${audit.sport} season audit should compute standings spread`
   );
   assert.ok(
+    Number.isFinite(audit.metrics.playoffFieldStrengthMean),
+    `${audit.sport} season audit should compute playoff field quality`
+  );
+  assert.ok(
+    Number.isFinite(audit.metrics.bottomCollapseRate),
+    `${audit.sport} season audit should compute bottom-team collapse rate`
+  );
+  assert.ok(
+    Number.isFinite(audit.metrics.eliteMedianWinPctGap),
+    `${audit.sport} season audit should compute elite-team separation`
+  );
+  assert.ok(
+    Number.isFinite(audit.metrics.standingsDeterminismRate),
+    `${audit.sport} season audit should compute deterministic standings rate`
+  );
+  assert.ok(
     Number.isFinite(audit.metrics.topBottomWinPctGap),
     `${audit.sport} season audit should compute roster-strength separation`
   );
   assert.ok(
     audit.metrics.topRosterWinPct > audit.metrics.bottomRosterWinPct,
     `${audit.sport} stronger roster group should finish above weaker roster group`
+  );
+  assert.ok(
+    audit.metrics.playoffFieldStrengthMean > audit.metrics.leagueStrengthMean,
+    `${audit.sport} playoff field should rate above league average strength`
+  );
+  assert.ok(
+    audit.metrics.playoffFieldStrengthEdge > 0,
+    `${audit.sport} playoff field should carry a positive strength edge`
+  );
+  assert.ok(
+    audit.metrics.eliteMedianWinPctGap > 0,
+    `${audit.sport} elite teams should separate from the median record`
+  );
+  assert.ok(
+    audit.metrics.standingsDeterminismRate < 0.92,
+    `${audit.sport} standings should not be fully deterministic: ${audit.metrics.standingsDeterminismRate}`
   );
 });
 
@@ -223,11 +307,18 @@ assert.ok(nbaSummaryCli.payload.packSanity.packsChecked > 0, '--packs should inc
 assert.ok(nbaSummaryCli.payload.packQuality.packs.length > 0, '--packs should include a non-failing quality report');
 assert.match(nbaSummaryCli.output, /Pack Quality/i, 'summary output should include the optional quality report section');
 assert.match(nbaSummaryCli.output, /zero tail/i, 'summary output should surface zero-stat tail rankings');
+assert.match(nbaSummaryCli.output, /draft-eligible zero tail/i, 'summary output should surface draft-eligible zero-stat tail rankings');
+assert.match(nbaSummaryCli.output, /zero-game tail/i, 'summary output should surface zero-game tail rankings');
 assert.match(nbaSummaryCli.output, /position concentration/i, 'summary output should surface position-mix rankings');
+assert.match(nbaSummaryCli.output, /productive position concentration/i, 'summary output should surface productive-player position rankings');
 assert.match(nbaSummaryCli.output, /top concentration/i, 'summary output should surface top-player concentration rankings');
 assert.match(nbaSummaryCli.output, /Simulation Accuracy Audit/i, 'summary output should include a readable title');
 assert.match(nbaSummaryCli.output, /NBA\s+PASS/i, 'summary output should show the selected sport result');
 assert.match(nbaSummaryCli.output, /Season Realism/i, 'summary output should include the optional season section');
+assert.match(nbaSummaryCli.output, /playoff strength/i, 'summary output should include playoff field quality');
+assert.match(nbaSummaryCli.output, /elite gap/i, 'summary output should include elite-team separation');
+assert.match(nbaSummaryCli.output, /bottom collapse/i, 'summary output should include bottom-team collapse');
+assert.match(nbaSummaryCli.output, /determinism/i, 'summary output should include standings determinism');
 assert.match(nbaSummaryCli.output, /Pack Sanity/i, 'summary output should include the optional pack section');
 assert.doesNotMatch(nbaSummaryCli.output, /"audits"/, 'summary output should not be raw JSON');
 

@@ -102,6 +102,27 @@
     }
   }
 
+  function serializeSimulationBoxScoreEntries(entries){
+    return (Array.isArray(entries) ? entries : []).map(function(entry){
+      const player=entry?.player || {};
+      return {
+        player:{
+          id:Number(player.id || 0) || null,
+          name:String(player.name || 'Player'),
+          team:String(player.team || ''),
+          pos:String(player.pos || player.primaryPosition || ''),
+          primaryPosition:String(player.primaryPosition || player.pos || '')
+        },
+        baseScore:roundStat(entry?.baseScore || 0),
+        finalScore:roundStat(entry?.finalScore || 0),
+        statSource:String(entry?.statSource || 'simulation_engine_generated'),
+        source:String(entry?.source || 'starter_sim'),
+        simulatedStats:safeClone(entry?.simulatedStats || null),
+        simSummary:safeClone(entry?.simSummary || null)
+      };
+    });
+  }
+
   function hashString(input){
     const text=String(input||'');
     let hash=2166136261;
@@ -703,6 +724,98 @@
     return fantasy;
   }
 
+  function clampRound(value, min, max){
+    return Math.round(clamp(Number(value || 0), min, max));
+  }
+
+  function buildNflSimulatedLine(position, fantasyPoints, talent, seedKey){
+    const normalized=String(position || '').trim().toUpperCase();
+    const score=Number(fantasyPoints || 0);
+    const talentTilt=clamp((Number(talent || 70) - 70) / 30, -1, 1);
+    const rng=mulberry32(hashString([
+      'nfl_box_line',
+      normalized,
+      seedKey,
+      roundHundredth(score),
+      roundHundredth(talent)
+    ].join('|')));
+    if(normalized==='QB'){
+      const passYds=clampRound(155 + score * 4.2 + talentTilt * 16 + normalish(rng) * 18, 165, 365);
+      const passTd=clampRound((score - 8) / 7 + talentTilt * 0.25 + normalish(rng) * 0.35, 0, 5);
+      const interceptions=clampRound(0.8 - talentTilt * 0.25 + normalish(rng) * 0.45, 0, 3);
+      const rushAtt=clampRound(2.4 + score / 18 + normalish(rng) * 1.1, 0, 9);
+      const rushYds=clampRound(rushAtt * (4.2 + talentTilt * 0.8) + normalish(rng) * 7, 0, 65);
+      const rushTd=score > 28 && rng() > 0.78 ? 1 : 0;
+      return {
+        passYds:passYds,
+        passingYards:passYds,
+        passTd:passTd,
+        passingTd:passTd,
+        interceptions:interceptions,
+        rushAtt:rushAtt,
+        rushingAttempts:rushAtt,
+        rushYds:rushYds,
+        rushingYards:rushYds,
+        rushTd:rushTd,
+        rushingTd:rushTd
+      };
+    }
+    if(normalized==='RB'){
+      const touches=clampRound(8 + score * 0.46 + talentTilt * 1.2 + normalish(rng) * 2, 7, 26);
+      const rec=clampRound(1.4 + score * 0.08 + talentTilt * 0.4 + normalish(rng) * 0.9, 0, 8);
+      const rushAtt=Math.max(5, touches - rec);
+      const rushYds=clampRound(rushAtt * (4.0 + talentTilt * 0.45) + normalish(rng) * 9, 12, 135);
+      const recYds=clampRound(rec * (6.8 + talentTilt * 0.8) + normalish(rng) * 6, 0, 85);
+      const td=score > 17 && rng() > 0.52 ? 1 : (score > 24 && rng() > 0.74 ? 2 : 0);
+      return {
+        rushAtt:rushAtt,
+        rushingAttempts:rushAtt,
+        rushYds:rushYds,
+        rushingYards:rushYds,
+        rushTd:td,
+        rushingTd:td,
+        rec:rec,
+        receptions:rec,
+        recYds:recYds,
+        receivingYards:recYds,
+        recTd:0,
+        receivingTd:0,
+        touches:rushAtt + rec
+      };
+    }
+    if(normalized==='WR'){
+      const rec=clampRound(2.2 + score * 0.18 + talentTilt * 0.7 + normalish(rng) * 1.15, 1, 11);
+      const recYds=clampRound(rec * (11.4 + talentTilt * 1.4) + score * 1.6 + normalish(rng) * 15, 16, 185);
+      const recTd=score > 16 && rng() > 0.5 ? 1 : (score > 28 && rng() > 0.78 ? 2 : 0);
+      return {
+        rec:rec,
+        receptions:rec,
+        recYds:recYds,
+        receivingYards:recYds,
+        recTd:recTd,
+        receivingTd:recTd,
+        targets:clampRound(rec + 2.1 + normalish(rng) * 1.4, rec, 15),
+        touches:rec
+      };
+    }
+    if(normalized==='TE'){
+      const rec=clampRound(1.6 + score * 0.15 + talentTilt * 0.45 + normalish(rng) * 0.85, 1, 8);
+      const recYds=clampRound(rec * (8.8 + talentTilt) + score * 1.1 + normalish(rng) * 9, 8, 110);
+      const recTd=score > 14 && rng() > 0.58 ? 1 : 0;
+      return {
+        rec:rec,
+        receptions:rec,
+        recYds:recYds,
+        receivingYards:recYds,
+        recTd:recTd,
+        receivingTd:recTd,
+        targets:clampRound(rec + 1.7 + normalish(rng), rec, 11),
+        touches:rec
+      };
+    }
+    return {};
+  }
+
   function simulateNflStarterEntries(teamProfile, opponentProfile, teamLabel, opponentLabel, sideKey, rng, gameContext){
     const starters=Array.isArray(teamProfile?.starters) ? teamProfile.starters : [];
     const offenseBoost=sideKey==='home' ? gameContext.homeBoost : gameContext.awayBoost;
@@ -727,6 +840,14 @@
         getNflFantasyFloorForPosition(position),
         shapeNflFantasyForPosition(rawFantasy, position)
       ));
+      const lineSeed=[
+        player?.id || player?.name || player?.playerName || 'player',
+        teamLabel,
+        opponentLabel,
+        sideKey,
+        gameContext?.sharedPace
+      ].join('|');
+      const positionLine=buildNflSimulatedLine(position, finalFantasy, talent, lineSeed);
       return {
         player:player,
         baseScore:roundStat(baseFantasy),
@@ -742,6 +863,7 @@
         unavailable:false,
         source:'starter_sim',
         simulatedStats:{
+          ...positionLine,
           fantasyPoints:finalFantasy,
           position:position,
           offenseBoost:roundHundredth(matchupBoost),
@@ -1349,6 +1471,8 @@
         awayName:awayName,
         homeTotal:resultsByTeam[homeIdx].total,
         awayTotal:resultsByTeam[awayIdx].total,
+        homeEntries:serializeSimulationBoxScoreEntries(homeEntries),
+        awayEntries:serializeSimulationBoxScoreEntries(awayEntries),
         outcomeSource:'simulation_engine',
         sharedPace:roundStat(gameContext.sharedPace),
         engineVersion:ENGINE_VERSION
