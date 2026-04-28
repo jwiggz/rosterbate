@@ -1,164 +1,131 @@
 # Simulation Accuracy Handoff - 2026-04-28
 
-## Current Goal
+## Reviewer Summary
 
-Continue tuning the local-league simulation experience, with emphasis on:
+This branch turns the local-league simulation pass into a tested, auditable baseline for NBA and NFL mixed-era leagues. It fixes NFL real-pack scoring collapse, tunes NBA/NFL output shape, adds role/position personality metrics, adds historical pack sanity checks, and verifies the season shell can persist and restore simulated league progress.
 
-- NBA should feel like modern ESPN points
-- Outcomes should be more skill-driven
-- Truly elite NBA stars should be able to carry hard
-- Elite NFL QBs should **not** dominate weekly team output
-- Variance preference is **low**
+## Explicit Exclusion
 
-## Important Constraint
-
-Do **not** touch, stage, commit, or push:
+Do not review, stage, commit, or push:
 
 - `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\sim-matchup.html`
 
-That file is a separate untracked prototype feature.
+That file is an untracked prototype outside this PR.
 
-## What Is Already Live
+## Main Changes
 
-Recent pushed checkpoints include:
+### Engine Accuracy
 
-- `637aec2` `Harden local league storage fallback`
-- `0a4be58` `Harden season handoff storage fallbacks`
+- Fixed NFL starters that previously collapsed to zero because football-shaped player data was routed through NBA stat derivation.
+- Tuned NBA fantasy totals and rendered basketball scores into a lower-variance, more believable range.
+- Preserved winner-aware score rendering so rounded NBA display scores do not create false ties.
+- Made elite NBA players a bit more takeover-prone without materially widening team-total variance.
+- Added NBA role personality for scorers, heliocentric creators, interior bigs, wings, and defensive anchors.
+- Added NFL position personality so QB/RB/WR/TE output reads more position-authentic while keeping weekly totals stable.
 
-The branch also contains earlier local-league shell, naming, archive, and parity work from prior checkpoints.
+### Audit Harness
 
-## Current Local-Only Changes
+- `tools/simulation-accuracy-audit.js` now supports:
+  - `--sport nba|nfl|all`
+  - `--season`
+  - `--packs`
+  - `--json`
+  - `--summary`
+- Default behavior remains machine-readable NBA+NFL accuracy JSON.
+- Sport-specific output avoids noisy zero-filled cross-sport metrics.
+- Pack sanity checks catch missing names, bad positions, zero fantasy baselines, and implausible pack means.
+- Season realism checks cover win spread, top-vs-bottom roster separation, and playoff-rate separation.
 
-Tracked local edits:
+### Season UX And Persistence
 
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\simulation-league-engine.js`
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\test-simulation-league-engine.js`
+- Reveal reports use real simulation franchise names instead of generic `Team N` labels.
+- My Team last-matchup summaries now handle completed logs that only contain team indexes.
+- Matchup navigation now shows selected completed-day scores instead of unrevealed `--` schedule rows.
+- Completed matchup action copy follows the selected opponent instead of the next scheduled opponent.
+- Browser regression verified local league creation, instant draft completion, day/week simulation, reload persistence, archive detail, and archive restore.
 
-Untracked local files:
+## Useful Commands
 
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\simulation-accuracy-audit.js`
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\test-simulation-accuracy-audit.js`
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\sim-matchup.html`
+Human-readable one-sport pass:
 
-Only the first four files above are part of the simulation-accuracy work.
+```powershell
+node tools/simulation-accuracy-audit.js --sport nba --season --packs --summary
+```
 
-## What Was Fixed In This Accuracy Pass
+Machine-readable default pass:
 
-### 1. NFL zero-total bug
+```powershell
+node tools/simulation-accuracy-audit.js
+```
 
-Root cause:
+Focused tests:
 
-- Real NFL pack players were going through an NBA-style stat derivation path
-- That meant real 2014 NFL players with football-shaped stats collapsed to zero fantasy totals
+```powershell
+node tools/test-simulation-league-engine.js
+node tools/test-simulation-season-adapter.js
+node tools/test-shared-season-shell-simulation.js
+node tools/test-simulation-accuracy-audit.js
+node tools/test-historical-universe-slot-storage.js
+node tools/test-simulation-draft-boot.js
+```
 
-Fix:
+Storage fallback checks:
 
-- Added an NFL-specific starter simulation path in `simulation-league-engine.js`
-- NFL starters now derive output from their explicit fantasy profile instead of fake basketball baselines
+```powershell
+node tools/test-draft-season-storage-fallback.js
+node tools/test-admin-league-storage-fallback.js
+node tools/test-local-league-storage-fallback.js
+```
 
-### 2. NBA fantasy total inflation
+## Latest Audit Snapshot
 
-Root cause:
-
-- NBA generated starter output was overshooting sane mixed-era fantasy baselines
-
-Fix:
-
-- Added a modest NBA-only production normalization in `simulation-league-engine.js`
-- Underlying fantasy totals now land in a healthier range while preserving low-variance, skill-driven behavior
-
-### 3. NBA visible score inflation
-
-Root cause:
-
-- Rendered NBA scores were mapped from fantasy totals too aggressively, producing unrealistic visible scoreboards
-
-Fix:
-
-- Tightened `convertFantasyTotalToNbaScore(...)`
-- Added winner-respecting visible tie-break logic for NBA when rounded displayed scores collide
-
-This preserves ESPN-style fantasy totals underneath while making the visible scoreboard look like real basketball.
-
-## New Audit Harness
-
-Added:
-
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\simulation-accuracy-audit.js`
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\test-simulation-accuracy-audit.js`
-
-Purpose:
-
-- Build real auto-drafted NBA and NFL league states from historical packs
-- Run repeated simulated league windows
-- Measure:
-  - team total bands
-  - rendered score bands
-  - stronger-roster win rate
-  - top-star share of team output
-  - QB share of NFL team output
-  - zero-total rate
-  - rendered tie rate
-
-## Current Audit Metrics
-
-Latest direct audit run:
+Latest `node tools/simulation-accuracy-audit.js` run:
 
 ### NBA
 
-- team total mean: `233.5`
-- rendered score mean: `112.77`
+- team total mean: `234.34`
+- rendered score mean: `112.86`
 - strength win rate: `0.67`
-- top-star share mean: `0.25`
+- top-star share mean: `0.26`
+- top scorer point share mean: `0.28`
+- assist leader assist share mean: `0.41`
+- rebound leader rebound share mean: `0.34`
 - zero-team-total rate: `0`
 - rendered tie rate: `0`
 
 ### NFL
 
-- team total mean: `137.93`
-- rendered score mean: `24.72`
-- strength win rate: `0.70`
+- team total mean: `137.34`
+- rendered score mean: `24.66`
+- strength win rate: `0.67`
 - top-star share mean: `0.20`
 - QB share mean: `0.20`
+- RB share mean: `0.11`
+- WR share mean: `0.11`
 - zero-team-total rate: `0`
 - rendered tie rate: `0`
 
-Both sports are currently passing the preference-aware audit.
+Both sports pass the current guardrails.
 
-## Verified Commands
+## Browser Regression Notes
 
-Latest successful verification commands:
+Verified in the local app at `http://localhost:8080`:
 
-```powershell
-node C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\test-simulation-league-engine.js
-node C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\test-simulation-accuracy-audit.js
-node C:\Users\jabro\Desktop\Fantasy Project\rosterbate\tools\simulation-accuracy-audit.js
-git -C "C:\Users\jabro\Desktop\Fantasy Project\rosterbate" diff --check
-```
+- New NBA simulation league boots from setup through instant draft.
+- Day 1 simulation advances standings and reveal reports.
+- Reload preserves the same universe URL, standings, PF/PA, and next reveal day.
+- Simulating through Day 7 rolls into Week 2 / Day 8.
+- Archive browser lists the saved universe as `Atlanta Hawks - Week 2 - Day 8`.
+- Archive detail shows the saved record, rank, timeline, and recent sim days.
+- Continue Universe reopens the same season state.
+- No browser console warnings/errors appeared during the pass.
 
-`git diff --check` only reported LF/CRLF warnings, not content problems.
+## Known Local Files Outside The PR
 
-## Suggested Next Priorities
+The worktree may contain untracked local files generated during validation:
 
-Best next tuning lanes:
+- `.server-8080.err.log`
+- `.server-8080.log`
+- `sim-matchup.html`
 
-1. Superstar carry tuning
-   - decide whether `topStarShareMean ~ 0.25` is enough or whether true megastars should carry harder
-
-2. NFL QB share tuning
-   - current `qbShareMean ~ 0.20`
-   - if desired, flatten QBs a bit more without making weekly output feel random
-
-3. Archetype realism
-   - make NBA stars feel more distinct by role
-   - make NFL weekly output reflect position personality more clearly
-
-## Suggested Prompt For The Next Chat
-
-Use something close to this:
-
-> We have a local simulation-accuracy pass in progress in `C:\Users\jabro\Desktop\Fantasy Project\rosterbate`. Please read `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\docs\simulation-accuracy-handoff-2026-04-28.md` first and continue from there. Do not touch `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\sim-matchup.html`. The current local accuracy work is in `simulation-league-engine.js`, `tools/test-simulation-league-engine.js`, `tools/simulation-accuracy-audit.js`, and `tools/test-simulation-accuracy-audit.js`. Start by checking git status, re-running the accuracy and engine tests, and then continue tuning superstar carry / realism from the current green audit baseline.
-
-## Suggested Prompt If You Want A More Specific Next Task
-
-> Read `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\docs\simulation-accuracy-handoff-2026-04-28.md`, do not touch `sim-matchup.html`, and continue the simulation-accuracy pass from the current green baseline. Focus next on making elite NBA stars feel a bit more takeover-prone without increasing variance too much, then re-run the audit harness and engine tests.
+They are intentionally not part of this PR.
