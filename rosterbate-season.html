@@ -10826,6 +10826,7 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
   const sections=vm?.sections && typeof vm.sections==='object' ? vm.sections : {};
   const starterRows=Array.isArray(sections?.starters?.rows) ? sections.starters.rows : [];
   const benchRows=Array.isArray(sections?.bench?.rows) ? sections.bench.rows : [];
+  const ilRows=Array.isArray(sections?.il?.rows) ? sections.il.rows : [];
   const filledStarters=starterRows.filter((entry)=>entry?.player).length || Object.values(lineupSlots).filter((entry)=>entry?.player).length;
   const starterSlotCount=Math.max(starterSlots.length, legacyStarterSlots.length, starterRows.length);
   const missingStarters=Math.max(0, starterSlotCount-filledStarters);
@@ -10977,9 +10978,15 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
               || entry?.recommendationHint
               || ((entry?.suggestedPlayerId!=null && entry.suggestedPlayerId!==entry.playerId)
                 ? 'Suggested change available'
-                : (player ? (sectionKey==='bench' ? 'Bench ready' : 'Starter set') : 'Awaiting assignment'))
+                : (player
+                  ? (sectionKey==='bench' ? 'Bench ready' : (sectionKey==='il' ? 'IR reserve' : 'Starter set'))
+                  : 'Awaiting assignment'))
           );
-          const actionHtml=sectionKey==='bench' ? renderBenchActions(entry) : renderStarterAction(entry);
+          const actionHtml=sectionKey==='bench'
+            ? renderBenchActions(entry)
+            : (sectionKey==='il'
+              ? `<span class="season-soft-muted" style="font-weight:700;">${escapeHtml(entry?.actionLabel || 'Reserve')}</span>`
+              : renderStarterAction(entry));
           return `<tr>
             <td>${escapeHtml(entry?.slot || entry?.positionSlot || '--')}</td>
             <td>
@@ -11007,6 +11014,7 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
         <div style="display:flex;flex-direction:column;gap:14px;">
           ${buildSectionTable('starters')}
           ${buildSectionTable('bench')}
+          ${ilRows.length ? buildSectionTable('il') : ''}
         </div>
       </div>`;
   const scheduleContent=`${tabButtons}

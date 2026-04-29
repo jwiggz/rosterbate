@@ -419,7 +419,9 @@ const expandedNbaAdapter = createSimulationSeasonAdapter({
           { id: 10, name: 'Utility Three', pos: 'C', team: 'LAL', fp: 31 },
           { id: 11, name: 'Bench One', pos: 'PG', team: 'LAL', fp: 30 },
           { id: 12, name: 'Bench Two', pos: 'SF', team: 'LAL', fp: 29 },
-          { id: 13, name: 'Bench Three', pos: 'C', team: 'LAL', fp: 28 }
+          { id: 13, name: 'Bench Three', pos: 'C', team: 'LAL', fp: 28 },
+          { id: 14, name: 'IR One', pos: 'PF', team: 'LAL', fp: 27 },
+          { id: 15, name: 'IR Two', pos: 'PG', team: 'LAL', fp: 26 }
         ]
       }
     },
@@ -442,7 +444,13 @@ assert.deepStrictEqual(
   'nba roster vm should preserve repeated utility assignments by lineup index'
 );
 assert.equal(expandedNbaRosterVm.filledStarters, 10, 'expanded nba roster vm should count all 10 filled starters');
-assert.equal(expandedNbaRosterVm.sections.bench.rows.length, 3, 'expanded nba roster vm should leave the remaining three players on the bench');
+assert.equal(expandedNbaRosterVm.sections.bench.rows.length, 3, 'expanded nba roster vm should leave three active reserves on the bench');
+assert.equal(expandedNbaRosterVm.sections.il.title, 'IR', 'expanded nba roster vm should label inactive reserve slots as IR');
+assert.deepStrictEqual(
+  expandedNbaRosterVm.sections.il.rows.map((row) => row.player?.id),
+  [14, 15],
+  'expanded nba roster vm should split the final two reserve players into IR rows'
+);
 
 const duplicateBenchAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-duplicate-bench',

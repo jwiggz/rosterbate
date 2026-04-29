@@ -244,6 +244,24 @@
     }));
   }
 
+  function buildSimulationIrRows(rosterState){
+    return (Array.isArray(rosterState?.ir) ? rosterState.ir : []).map((player, index) => ({
+      id: `ir-${Number(player?.id || index)}`,
+      slot: 'IR',
+      slotKey: 'IR',
+      positionSlot: String(player?.pos || player?.primaryPosition || 'IR').trim().toUpperCase() || 'IR',
+      lineupSlotKey: null,
+      player: clone(player),
+      playerId: Number.isFinite(Number(player?.id)) ? Number(player.id) : null,
+      playerVariantLabel: rosterState?.playerVariantLabelsById?.[Number(player?.id)] || null,
+      suggestedPlayerId: null,
+      recommendationHint: null,
+      warning: '',
+      warnings: [],
+      actionLabel: 'Reserve'
+    }));
+  }
+
   function buildSimulationRosterSections(rosterState){
     const sport = String(rosterState?.sport || '').trim().toLowerCase();
     return {
@@ -256,8 +274,8 @@
         rows: buildSimulationBenchRows(rosterState)
       },
       il: {
-        title: sport === 'nfl' ? 'Injured Reserve' : 'IL',
-        rows: []
+        title: sport === 'nfl' ? 'Injured Reserve' : 'IR',
+        rows: buildSimulationIrRows(rosterState)
       }
     };
   }
@@ -366,6 +384,29 @@ function cleanSimulationSourceLabel(label){
       return `${rosterCount}/${rosterSize} filled`;
     }
     return `${rosterCount} players rostered`;
+  }
+
+  function getSimulationBenchSlotCount(state){
+    const rawValue = Number(state?.leagueShell?.benchSlots);
+    return Number.isFinite(rawValue) && rawValue >= 0 ? rawValue : null;
+  }
+
+  function getSimulationIrSlotCount(state){
+    const rawValue = Number(state?.leagueShell?.irSlots);
+    return Number.isFinite(rawValue) && rawValue >= 0 ? rawValue : 0;
+  }
+
+  function splitSimulationReservePlayers(state, reservePlayers){
+    const reserves = Array.isArray(reservePlayers) ? reservePlayers.map((player) => clone(player)) : [];
+    const benchSlotCount = getSimulationBenchSlotCount(state);
+    const irSlotCount = getSimulationIrSlotCount(state);
+    if (benchSlotCount == null) {
+      return { bench: reserves, ir: [] };
+    }
+    return {
+      bench: reserves.slice(0, benchSlotCount),
+      ir: irSlotCount > 0 ? reserves.slice(benchSlotCount, benchSlotCount + irSlotCount) : []
+    };
   }
 
   function getSimulationRosterIdentityKey(player){
@@ -547,6 +588,7 @@ function cleanSimulationSourceLabel(label){
         }),
         playerVariantLabelsById,
         bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
+        ir: [],
         validation: normalizedTeamAbbr === getControlledTeamAbbr(state) && typeof runtimeApi.validateSimulationLineup === 'function'
           ? runtimeApi.validateSimulationLineup(clone(normalizedState), normalizedTeamAbbr)
           : { valid: true, issues: [] }
@@ -573,6 +615,10 @@ function cleanSimulationSourceLabel(label){
         player
       };
     });
+    const reserveSplit = splitSimulationReservePlayers(
+      state,
+      roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player))
+    );
     return {
       starterSlots: clone(starterSlots),
       legacyStarterSlots: clone(legacyStarterSlots),
@@ -580,7 +626,8 @@ function cleanSimulationSourceLabel(label){
       roster,
       lineup,
       playerVariantLabelsById,
-      bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
+      bench: reserveSplit.bench,
+      ir: reserveSplit.ir,
       validation: { valid: true, issues: [] }
     };
   }
@@ -799,9 +846,10 @@ function cleanSimulationSourceLabel(label){
     const assignedIds = new Set(lineup
       .map((player) => Number(player?.id))
       .filter((playerId) => Number.isFinite(playerId) && playerId > 0));
-    const bench = roster
+    const reserves = roster
       .filter((player) => !assignedIds.has(Number(player?.id)))
       .map((player) => clone(player));
+    const reserveSplit = splitSimulationReservePlayers(state, reserves);
     const filledStarters = lineup
       .slice(0, legacyStarterSlots.length)
       .reduce((count, player) => count + (player ? 1 : 0), 0);
@@ -819,7 +867,8 @@ function cleanSimulationSourceLabel(label){
       roster,
       playerVariantLabelsById,
       lineup,
-      bench,
+      bench: reserveSplit.bench,
+      ir: reserveSplit.ir,
       filledStarters,
       rosterSpaceLabel: buildSimulationRosterSpaceLabel(state, roster),
       lastMatchupLabel: buildSimulationLastMatchupLabel(state),
@@ -851,7 +900,8 @@ function cleanSimulationSourceLabel(label){
       filledStarters: Number(rosterState?.filledStarters || 0),
       roster: clone(rosterState?.roster || []),
       lineup: clone(rosterState?.lineup || []),
-      bench: clone(rosterState?.bench || [])
+      bench: clone(rosterState?.bench || []),
+      ir: clone(rosterState?.ir || [])
     };
   }
 
