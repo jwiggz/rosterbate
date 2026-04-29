@@ -28,6 +28,7 @@ const elements = {
 };
 const context = {
   console,
+  Date,
   localStorage,
   promptValue: 'Renamed Universe',
   confirmValue: true,
@@ -143,5 +144,67 @@ assert.equal(api.getSlot('slot_nba_continue_regression'), null, 'deleted slot sh
 assert.equal(api.getState('slot_nba_continue_regression'), null, 'deleted slot should remove saved state');
 assert.equal(localStorage.getItem('rosterbateDraft'), null, 'delete should clear a local resume pointer targeting the removed slot');
 assert.match(elements.savedLeaguesList.innerHTML, /No Saved Leagues Yet/, 'renderer should update to empty state after delete');
+
+const RealDate = Date;
+context.nowValue = 100000;
+context.Date = class TestDate extends RealDate {
+  constructor(...args) {
+    super(...args);
+  }
+  static now() {
+    return context.nowValue;
+  }
+};
+function seedSimulationSlot(slotId, label, day, nowValue) {
+  context.nowValue = nowValue;
+  return api.upsertFromState({
+    simulationMode: 'nba_mixed_era_single_player_v1',
+    sport: 'nba',
+    leagueShell: {
+      sport: 'nba',
+      anchorSeasonLabel: label,
+      teams: [
+        { abbr: 'LAL', name: 'Los Angeles Lakers' },
+        { abbr: 'BOS', name: 'Boston Celtics' }
+      ]
+    },
+    draftState: {
+      controlledTeamAbbr: 'LAL',
+      rostersByTeam: {
+        LAL: [{ id: 1, name: 'Magic Johnson' }],
+        BOS: [{ id: 2, name: 'Larry Bird' }]
+      },
+      freeAgents: []
+    },
+    seasonState: {
+      currentWeek: 1,
+      currentDay: day,
+      standings: [
+        { teamAbbr: 'LAL', w: day, l: 0, pf: 100 + day, pa: 90 },
+        { teamAbbr: 'BOS', w: 0, l: day, pf: 90, pa: 100 + day }
+      ]
+    },
+    postseasonState: { phase: 'regular_season' }
+  }, { slotId });
+}
+
+seedSimulationSlot('slot_nba_oldest_save', 'Oldest Universe', 1, 110000);
+seedSimulationSlot('slot_nba_newest_save', 'Newest Universe', 2, 120000);
+context.RosterBateSavedLeagues.renderSavedSimulationLeagues('savedLeaguesList', {
+  sport: 'nba',
+  maxCards: 8,
+  heading: 'Saved Leagues',
+  recoveryMode: true
+});
+assert.match(elements.savedLeaguesList.innerHTML, /Storage Recovery/, 'recovery mode should show storage cleanup copy');
+assert.match(elements.savedLeaguesList.innerHTML, /Delete Oldest Save/, 'recovery mode should expose one-click oldest-save cleanup');
+
+const deletedOldest = context.RosterBateSavedLeagues.deleteOldestSavedLeague('savedLeaguesList');
+assert.equal(deletedOldest, true, 'recovery cleanup should delete the oldest simulation save');
+assert.equal(api.getSlot('slot_nba_oldest_save'), null, 'oldest simulation save should be deleted');
+assert.ok(api.getSlot('slot_nba_newest_save'), 'newer simulation save should remain');
+assert.match(context.lastConfirm, /Oldest Universe/, 'oldest-save cleanup should confirm the target league name');
+assert.doesNotMatch(elements.savedLeaguesList.innerHTML, /Oldest Universe/, 'renderer should remove the deleted oldest save');
+assert.match(elements.savedLeaguesList.innerHTML, /Newest Universe/, 'renderer should keep the newer save visible');
 
 console.log('continue universe test passed');

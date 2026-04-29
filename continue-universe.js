@@ -98,7 +98,11 @@
 
   function getSavedSimulationStorageSummary(options){
     const api = global.RosterBateHistoricalUniverseSlots;
-    const slots = getSavedSimulationSlots(options);
+    const opts = options && typeof options === 'object' ? options : {};
+    const slots = getSavedSimulationSlots({
+      ...opts,
+      limit: Math.max(999, Number(opts.limit || 0) || 0)
+    });
     const statePrefix = String(api?.statePrefix || 'rbHistoricalUniverseState:');
     let bytes = 0;
     slots.forEach(function(slot){
@@ -113,6 +117,14 @@
       bytes,
       label: formatStorageSize(bytes)
     };
+  }
+
+  function shouldShowStorageRecovery(opts, storageSummary){
+    if(opts?.recoveryMode) return true;
+    const warningCount = Number(opts?.storageWarningCount || 8);
+    const warningBytes = Number(opts?.storageWarningBytes || 1024 * 1024);
+    return Number(storageSummary?.count || 0) >= warningCount
+      || Number(storageSummary?.bytes || 0) >= warningBytes;
   }
 
   function rerenderSavedLeagueMount(mountId){
@@ -180,6 +192,22 @@
     return !!deleted;
   }
 
+  function deleteOldestSavedLeague(mountId){
+    const id = String(mountId || '').trim();
+    const opts = savedLeagueRenderOptions.get(id) || {};
+    const slots = getSavedSimulationSlots({
+      ...opts,
+      limit: Math.max(999, Number(opts.limit || 0) || 0)
+    });
+    if(!slots.length) return false;
+    const oldest = slots.reduce(function(candidate, slot){
+      const candidateTime = Number(candidate?.updatedAt || 0);
+      const slotTime = Number(slot?.updatedAt || 0);
+      return slotTime < candidateTime ? slot : candidate;
+    }, slots[0]);
+    return deleteSavedLeague(oldest?.slotId, id);
+  }
+
   function renderSavedSimulationLeagues(mount, options){
     const target = typeof mount === 'string' ? global.document?.getElementById(mount) : mount;
     if(!target) return [];
@@ -187,7 +215,12 @@
     const opts = options && typeof options === 'object' ? options : {};
     const mountId = typeof mount === 'string' ? String(mount) : String(target?.id || '');
     if(mountId) savedLeagueRenderOptions.set(mountId, opts);
-    const slots = getSavedSimulationSlots(opts);
+    const renderLimit = Math.max(
+      Number(opts.limit || 0) || 0,
+      Number(opts.maxCards || 0) || 0,
+      12
+    );
+    const slots = getSavedSimulationSlots({ ...opts, limit: renderLimit });
     const emptyTitle = opts.emptyTitle || 'No Saved Leagues Yet';
     const emptyCopy = opts.emptyCopy || 'Start a simulation league and it will appear here for this browser profile.';
     const heading = opts.heading || 'Saved Leagues';
@@ -197,6 +230,8 @@
     const visibleSlots = slots.slice(0, maxCards);
     const enableManagement = opts.manage !== false;
     const storageSummary = getSavedSimulationStorageSummary(opts);
+    const showRecovery = enableManagement && shouldShowStorageRecovery(opts, storageSummary);
+    const safeRecoveryMountArg = escapeJsArg(mountId);
     target.innerHTML = [
       '<div class="saved-leagues-head">',
         '<div>',
@@ -206,11 +241,23 @@
         '</div>',
         slots.length ? [
           '<div class="saved-leagues-toolbar">',
-            '<span class="saved-leagues-count">' + slots.length + ' saved</span>',
+            '<span class="saved-leagues-count">' + storageSummary.count + ' saved</span>',
             '<span class="saved-leagues-count">' + escapeHtml(storageSummary.label) + ' local</span>',
           '</div>'
         ].join('') : '',
       '</div>',
+      showRecovery
+        ? [
+          '<div class="saved-leagues-recovery">',
+            '<div>',
+              '<div class="saved-leagues-recovery-kicker">Storage Recovery</div>',
+              '<div class="saved-leagues-recovery-title">Local saves are getting crowded.</div>',
+              '<div class="saved-leagues-recovery-copy">Browser-backed saves live in this profile. Delete an old universe here if saving gets blocked, then return to your season.</div>',
+            '</div>',
+            '<button type="button" class="saved-league-btn danger" onclick="window.RosterBateSavedLeagues.deleteOldestSavedLeague(' + safeRecoveryMountArg + ')">Delete Oldest Save</button>',
+          '</div>'
+        ].join('')
+        : '',
       visibleSlots.length
         ? '<div class="saved-leagues-grid">' + visibleSlots.map(function(slot){
             const title = String(slot?.leagueName || slot?.title || 'Simulation League').trim();
@@ -267,6 +314,7 @@
     getSavedSimulationStorageSummary,
     renderSavedSimulationLeagues,
     renameSavedLeague,
-    deleteSavedLeague
+    deleteSavedLeague,
+    deleteOldestSavedLeague
   };
 })(window);

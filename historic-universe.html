@@ -207,6 +207,15 @@
   .saved-leagues-copy{max-width:66ch;margin-top:8px;font-size:14px;line-height:1.66;color:#d2dfef}
   .saved-leagues-count{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(7,14,25,.66);font:700 11px/1 var(--plex);letter-spacing:.1em;text-transform:uppercase;color:#dbe8fb}
   .saved-leagues-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+  .saved-leagues-recovery{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 18px 18px;padding:16px 18px;
+    border-radius:20px;border:1px solid rgba(249,115,22,.32);
+    background:linear-gradient(135deg,rgba(67,35,15,.82),rgba(15,23,36,.92));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)
+  }
+  .saved-leagues-recovery-kicker{font:700 10px/1 var(--plex);letter-spacing:.16em;text-transform:uppercase;color:#fdba74}
+  .saved-leagues-recovery-title{margin-top:7px;font:700 24px/.92 var(--teko);text-transform:uppercase;color:#fff7ed}
+  .saved-leagues-recovery-copy{max-width:68ch;margin-top:5px;font-size:13px;line-height:1.5;color:#fed7aa}
   .saved-leagues-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;padding:18px}
   .saved-league-card{
     display:grid;gap:14px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.09);
@@ -247,6 +256,7 @@
     .wrap{padding:0 14px 36px}
     .hero-progress,.mini-grid,.action-grid{grid-template-columns:1fr}
     .universe-art-headline{font-size:48px}
+    .saved-leagues-recovery{align-items:stretch;flex-direction:column}
   }
 </style>
 </head>
@@ -1811,6 +1821,8 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
   }
 
   function renderSavedLeaguesScreen(sport){
+    const params = new URLSearchParams(window.location.search);
+    const recoveryMode = params.get('storage') === 'recovery' || params.get('recovery') === 'storage';
     document.getElementById('detailsShell').style.display = 'none';
     document.getElementById('missingState').style.display = 'none';
     const shell = document.getElementById('savedLeaguesShell');
@@ -1826,6 +1838,7 @@ const HISTORIC_UNIVERSE_1993_FALLBACK = {
         kicker: 'Continue Universe',
         heading: 'Saved Leagues',
         copy: 'Resume simulation universes saved in this browser profile. Localhost saves and rosterbate.net saves are separate.',
+        recoveryMode,
         emptyTitle: 'No Saved Leagues Yet',
         emptyCopy: 'Start a simulation league from setup and it will appear here with its current day, record, and last played time.'
       });

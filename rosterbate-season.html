@@ -809,6 +809,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-save-status.saved{color:#bbf7d0;border-color:rgba(34,197,94,.28);background:rgba(16,44,29,.78);}
 .season-save-status.saved .season-save-status-dot{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.16);}
 .season-save-status.warning{color:#fed7aa;border-color:rgba(249,115,22,.36);background:rgba(67,35,15,.82);}
+.season-save-status.warning{cursor:pointer;}
+.season-save-status.warning:hover,.season-save-status.warning:focus-visible{border-color:rgba(253,186,116,.64);box-shadow:0 0 0 3px rgba(249,115,22,.12),inset 0 1px 0 rgba(255,255,255,.07);outline:none;}
 .season-save-status.warning .season-save-status-dot{background:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.16);}
 @keyframes savePulse{50%{opacity:.45;transform:scale(.82);}}
 @media(max-width:560px){
@@ -821,7 +823,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 <nav class="rb-global-nav">
   <button class="rb-global-logo" type="button" onclick="window.location.href='index.html'"><img src="rosterbate-main-logo-final.png" alt="RosterBate"></button>
   <div class="rb-global-actions">
-    <div id="seasonSaveStatus" class="season-save-status" aria-live="polite" title="Local save status">
+    <div id="seasonSaveStatus" class="season-save-status" aria-live="polite" title="Local save status" onclick="openSeasonStorageRecovery()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSeasonStorageRecovery();}">
       <span class="season-save-status-dot" aria-hidden="true"></span>
       <span class="season-save-status-label">Saved</span>
     </div>
@@ -1453,10 +1455,24 @@ function setSeasonSaveStatus(status, label, detail){
   el.classList.toggle('saving', normalized==='saving');
   el.classList.toggle('saved', normalized==='saved');
   el.classList.toggle('warning', normalized==='warning');
+  if(normalized==='warning'){
+    el.setAttribute('role','button');
+    el.setAttribute('tabindex','0');
+  } else {
+    el.removeAttribute('role');
+    el.removeAttribute('tabindex');
+  }
   const textEl=el.querySelector('.season-save-status-label');
   if(textEl) textEl.textContent=String(label || '').trim() || (normalized==='saving' ? 'Saving...' : normalized==='warning' ? 'Save blocked' : 'Saved just now');
   const title=String(detail || label || '').trim();
   if(title) el.title=title;
+}
+function openSeasonStorageRecovery(){
+  const el=document.getElementById('seasonSaveStatus');
+  if(el && !el.classList.contains('warning')) return;
+  const seasonData = typeof D !== 'undefined' ? D : null;
+  const sport = String(seasonData?.sport || seasonData?.leagueShell?.sport || CURRENT_SPORT || 'nba').trim().toLowerCase() || 'nba';
+  window.location.href='historic-universe.html?sport=' + encodeURIComponent(sport) + '&storage=recovery';
 }
 function markSeasonSaving(reason){
   if(typeof getActiveSeasonBackend==='function' && getActiveSeasonBackend()!=='simulation') return;
@@ -1470,7 +1486,7 @@ function markSeasonSaved(persisted, reason){
   setSeasonSaveStatus('saved','Saved just now','Local universe saved at ' + timeLabel + (reason ? ' (' + String(reason).replace(/_/g,' ') + ')' : ''));
 }
 function markSeasonSaveWarning(message){
-  setSeasonSaveStatus('warning','Save blocked', message || 'Browser storage is full. Delete an old saved universe or clear storage before continuing.');
+  setSeasonSaveStatus('warning','Save blocked', (message || 'Browser storage is full. Delete an old saved universe or clear storage before continuing.') + ' Click to manage saved leagues.');
 }
 function getTeamAvatarUrl(teamIdx){
   if(teamIdx===undefined || teamIdx===null) return '';
