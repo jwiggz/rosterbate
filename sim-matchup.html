@@ -229,6 +229,73 @@ body {
 .pbp-text { flex: 1; color: #aab; }
 .pbp-fp { font-weight: 700; font-size: 11px; flex-shrink: 0; }
 
+@media (max-width: 760px) {
+  body { font-size: 12px; }
+  #header {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  #logo {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  #scoreboard {
+    order: 2;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .score-team {
+    min-width: 0;
+    flex: 1 1 0;
+    gap: 4px;
+    padding: 4px 6px;
+  }
+  .score-team-name {
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 9px;
+  }
+  .score-val {
+    font-size: 18px;
+    min-width: 34px;
+  }
+  #clock-block {
+    min-width: 58px;
+    padding: 4px 6px;
+  }
+  #clock-display { font-size: 16px; }
+  #controls {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .btn {
+    border-radius: 8px;
+    font-size: 9px;
+    padding: 5px 8px;
+    letter-spacing: .5px;
+  }
+  .btn-speed {
+    padding: 5px 7px;
+  }
+  #main {
+    grid-template-columns: minmax(96px, 28vw) minmax(120px, 1fr) minmax(96px, 28vw);
+    grid-template-rows: minmax(0, 1fr) 150px;
+  }
+  .player-row {
+    padding: 5px 6px;
+    gap: 4px;
+  }
+  .player-name { font-size: 10px; }
+  .player-pos-team { font-size: 8px; }
+  .player-fp-val { font-size: 12px; }
+}
+
 /* ── Score popup ──────────────────────────────────────────── */
 .score-popup {
   position: absolute;
@@ -318,6 +385,7 @@ body {
     <div id="live-badge"><div id="live-dot"></div>LIVE</div>
     <button class="btn btn-speed active" id="speed-1x" onclick="setSpeed(1)">1×</button>
     <button class="btn btn-speed" id="speed-5x" onclick="setSpeed(5)">5×</button>
+    <button class="btn btn-primary" id="btn-reveal-final" onclick="revealLiveFinal()" style="display:none">Reveal Final</button>
     <button class="btn btn-secondary" id="btn-pause" onclick="togglePause()">⏸ Pause</button>
     <button class="btn btn-primary" id="btn-new" onclick="startNewGame()">↺ New Game</button>
   </div>
@@ -427,6 +495,7 @@ let liveMatchupReturnUrl = 'rosterbate-season.html';
 let liveRevealEvents = [];
 let liveRevealIndex = 0;
 let liveCommitted = false;
+let liveRevealInterval = 40;
 // Which team currently has the ball
 let possession = 'A';
 // Which basket the offense is attacking this possession (flips on every turnover)
@@ -842,33 +911,65 @@ function showScorePopup(player, fpGain) {
 
 function normalizeLiveEntry(entry, side, color, shortColor) {
   const player = entry?.player || {};
+  const targetFp = Math.max(
+    0,
+    Number(entry?.finalScore || entry?.simulatedStats?.fantasyPoints || player.fp || entry?.baseScore || 0)
+  );
   return assignId({
     name: String(player.name || 'Player'),
     team: String(player.team || ''),
     pos: String(player.pos || player.primaryPosition || ''),
-    fp: Math.max(1, Number(entry?.finalScore || entry?.simulatedStats?.fantasyPoints || 1)),
+    fp: Math.max(1, targetFp || 1),
     statValues: entry?.simulatedStats || {},
-    _targetFp: Math.max(0, Number(entry?.finalScore || 0)),
-    _remainingFp: Math.max(0, Number(entry?.finalScore || 0)),
+    _targetFp: targetFp,
+    _remainingFp: targetFp,
     _color: color,
     _shortColor: shortColor,
     _side: side
   });
 }
 
+function getLiveTeamName(side) {
+  return side === 'A'
+    ? document.getElementById('team-a-name').textContent
+    : document.getElementById('team-b-name').textContent;
+}
+
+function describeLiveRevealEvent(event, fpGain, beforeA, beforeB, afterA, afterB) {
+  const player = event?.player || {};
+  const side = event?.side;
+  const name = player.name || 'Player';
+  const teamName = getLiveTeamName(side);
+  const beforeLeader = beforeA === beforeB ? 'tie' : beforeA > beforeB ? 'A' : 'B';
+  const afterLeader = afterA === afterB ? 'tie' : afterA > afterB ? 'A' : 'B';
+  if (afterLeader === side && beforeLeader !== side) return `${name} puts ${teamName} ahead`;
+  if (afterLeader === 'tie' && beforeLeader !== 'tie') return `${name} pulls it level`;
+  const beforeGap = Math.abs(beforeA - beforeB);
+  const afterGap = Math.abs(afterA - afterB);
+  const wasTrailing = side === 'A' ? beforeA < beforeB : beforeB < beforeA;
+  if (wasTrailing && afterGap < beforeGap) return `${name} closes the gap`;
+  if (fpGain >= Math.max(7, Number(player._targetFp || 0) * 0.18)) return `${name} delivers a top-line burst`;
+  if (afterLeader === side && beforeLeader === side) return `${name} answers back for ${teamName}`;
+  return event?.text || `${name} adds a clean fantasy burst`;
+}
+
 function buildLiveRevealEvents(players, side, scoreTarget) {
   const totalFp = players.reduce((sum, player) => sum + Number(player._targetFp || 0), 0) || 1;
-  const eventCount = Math.max(18, Math.min(42, players.length * 7));
+  const eventCount = Math.max(12, Math.min(30, Math.round(totalFp / 7)));
   const events = [];
   for (let index = 0; index < eventCount; index++) {
-    const player = weightedRandom(players.map(candidate => ({
+    const remainingPlayers = players.filter(candidate => Number(candidate._remainingFp || 0) > 0.05);
+    const remainingTotal = remainingPlayers.reduce((sum, candidate) => sum + Number(candidate._remainingFp || 0), 0);
+    if (!remainingPlayers.length || remainingTotal <= 0.05) break;
+    const player = weightedRandom(remainingPlayers.map(candidate => ({
       value: candidate,
       weight: Math.max(1, Number(candidate._remainingFp || candidate._targetFp || 1))
     })));
-    const remainingTotal = players.reduce((sum, candidate) => sum + Number(candidate._remainingFp || 0), 0);
-    const fpGain = index === eventCount - 1
+    const requestedGain = index === eventCount - 1 || remainingTotal <= 1.25
       ? remainingTotal
-      : Math.min(Number(player._remainingFp || 0), Math.max(0.4, Number(player._targetFp || 0) / 6 * rnd(0.65, 1.25)));
+      : Math.max(0.8, Number(player._targetFp || 0) / 5 * rnd(0.55, 1.15));
+    const fpGain = Math.min(Number(player._remainingFp || 0), requestedGain);
+    if (fpGain <= 0.05) continue;
     player._remainingFp = Math.max(0, Number(player._remainingFp || 0) - fpGain);
     events.push({
       player,
@@ -890,10 +991,19 @@ function applyLiveRevealEvent(event) {
   const player = event?.player;
   if (!player) return;
   const fpGain = Number(event.fpGain || 0);
+  const beforeA = scoreA;
+  const beforeB = scoreB;
   player._fp += fpGain;
   if (event.side === 'A') scoreA += Number(event.scoreGain || 0);
   else scoreB += Number(event.scoreGain || 0);
-  addPBP(player, event.text, fpGain, clockSec, player._color, player._side);
+  addPBP(
+    player,
+    liveMatchupMode ? describeLiveRevealEvent(event, fpGain, beforeA, beforeB, scoreA, scoreB) : event.text,
+    fpGain,
+    clockSec,
+    player._color,
+    player._side
+  );
   updatePlayerFP(player);
   updatePlayerEvent(player, `+${fmt(fpGain)} FPTS`);
   showScorePopup(player, fpGain);
@@ -948,6 +1058,7 @@ function bootLiveMatchupFromParams() {
   document.getElementById('team-b-name').textContent = game.awayName || awayAbbr;
   document.getElementById('panel-a-header').textContent = game.homeName || homeAbbr;
   document.getElementById('panel-b-header').textContent = game.awayName || awayAbbr;
+  document.getElementById('btn-reveal-final').style.display = 'inline-flex';
   buildRosterPanel(teamA, 'roster-a', 'purple');
   buildRosterPanel(teamB, 'roster-b', 'cyan');
   clearCourt();
@@ -960,6 +1071,7 @@ function bootLiveMatchupFromParams() {
   liveRevealEvents = buildLiveRevealEvents(teamA, 'A', homeScoreTarget)
     .concat(buildLiveRevealEvents(teamB, 'B', awayScoreTarget))
     .sort(() => Math.random() - 0.5);
+  liveRevealInterval = Math.max(18, Math.min(48, (48 * 60) / Math.max(1, liveRevealEvents.length + 4)));
   if (liveMatchupPrepared.status === 'completed') {
     scoreA = homeScoreTarget;
     scoreB = awayScoreTarget;
@@ -984,8 +1096,7 @@ function simTick() {
   ticksSincePossession += simStep;
 
   if (liveMatchupMode) {
-    const revealInterval = 14;
-    if (ticksSincePossession >= revealInterval) {
+    if (ticksSincePossession >= liveRevealInterval) {
       ticksSincePossession = 0;
       const event = liveRevealEvents[liveRevealIndex++];
       if (event) applyLiveRevealEvent(event);
@@ -1138,6 +1249,29 @@ function finalizeLiveMatchupReveal() {
   commitLiveMatchupResult();
 }
 
+function revealLiveFinal() {
+  if (!liveMatchupMode || gameOver) return;
+  pauseSim();
+  while (liveRevealIndex < liveRevealEvents.length) {
+    const event = liveRevealEvents[liveRevealIndex++];
+    if (event) applyLiveRevealEvent(event);
+  }
+  quarter = 4;
+  clockSec = 0;
+  gameOver = true;
+  finalizeLiveMatchupReveal();
+  const game = liveMatchupPrepared?.gameLog || {};
+  const winnerSide = String(game?.winner || '').trim().toLowerCase();
+  const winner = winnerSide === 'away'
+    ? document.getElementById('team-b-name').textContent
+    : winnerSide === 'home'
+      ? document.getElementById('team-a-name').textContent
+      : scoreA >= scoreB
+        ? document.getElementById('team-a-name').textContent
+        : document.getElementById('team-b-name').textContent;
+  showOverlay('FINAL', true, winner);
+}
+
 function addQuarterBreakPBP() {
   const body = document.getElementById('pbp-body');
   const div = document.createElement('div');
@@ -1165,13 +1299,16 @@ function showOverlay(title, isFinal, winner='') {
   const btn = document.getElementById('overlay-btn');
   const sub = document.getElementById('overlay-sub');
   if (isFinal) {
+    document.getElementById('btn-reveal-final').style.display = 'none';
     btn.textContent = liveMatchupMode ? 'Return to Season' : '↺ New Game';
     btn.onclick = liveMatchupMode ? (() => { window.location.href = liveMatchupReturnUrl || 'rosterbate-season.html'; }) : startNewGame;
-    sub.textContent = winner ? `${winner} wins!` : '';
+    sub.textContent = winner ? `${winner} win!` : '';
   } else {
-    btn.textContent = '▶ 2nd Half';
+    btn.textContent = liveMatchupMode ? 'Reveal 2nd Half' : '▶ 2nd Half';
     btn.onclick = resumeSim;
-    sub.textContent = '';
+    sub.textContent = liveMatchupMode
+      ? 'The official result is locked. Reveal the closing run.'
+      : '';
   }
 }
 
@@ -1216,6 +1353,7 @@ function clearCourt() {
 function startNewGame() {
   // Close overlay
   document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('btn-reveal-final').style.display = 'none';
 
   // Reset state
   scoreA = 0; scoreB = 0;

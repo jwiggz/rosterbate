@@ -572,6 +572,71 @@ assert.equal(
   'normal day reveal should not duplicate a matchup already completed through the live runner'
 );
 
+const multiGameLiveState = simulationSeasonAdapterApi.clone(slotState);
+multiGameLiveState.leagueShell.teams = [
+  ...multiGameLiveState.leagueShell.teams,
+  { abbr: 'ATL', name: 'Atlanta Hawks', conference: 'East', division: 'Southeast' },
+  { abbr: 'MIA', name: 'Miami Heat', conference: 'East', division: 'Southeast' }
+];
+multiGameLiveState.draftState.rostersByTeam.ATL = [
+  { id: 201, name: 'Dominique Wilkins', pos: 'SF', team: 'ATL', fp: 47.2 },
+  { id: 202, name: 'Dikembe Mutombo', pos: 'C', team: 'ATL', fp: 41.1 }
+];
+multiGameLiveState.draftState.rostersByTeam.MIA = [
+  { id: 301, name: 'Dwyane Wade', pos: 'SG', team: 'MIA', fp: 49.4 },
+  { id: 302, name: 'Bam Adebayo', pos: 'C', team: 'MIA', fp: 38.7 }
+];
+multiGameLiveState.seasonState.lineupIdsByTeam = {
+  ...multiGameLiveState.seasonState.lineupIdsByTeam,
+  BOS: [30],
+  ATL: [201, 202],
+  MIA: [301, 302]
+};
+multiGameLiveState.seasonState.standings = [
+  ...multiGameLiveState.seasonState.standings,
+  { teamAbbr: 'ATL', conference: 'East', division: 'Southeast', w: 6, l: 6, pf: 1270, pa: 1270, streak: 'W1' },
+  { teamAbbr: 'MIA', conference: 'East', division: 'Southeast', w: 6, l: 6, pf: 1260, pa: 1268, streak: 'L1' }
+];
+multiGameLiveState.seasonState.scheduleByDay = {
+  12: [
+    { homeAbbr: 'LAL', awayAbbr: 'BOS' },
+    { homeAbbr: 'ATL', awayAbbr: 'MIA' }
+  ],
+  13: [
+    { homeAbbr: 'BOS', awayAbbr: 'LAL' },
+    { homeAbbr: 'MIA', awayAbbr: 'ATL' }
+  ]
+};
+const multiGameLiveAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-live-multi-game-day',
+  state: multiGameLiveState
+});
+const multiGamePreparedLive = multiGameLiveAdapter.prepareLiveMatchup(liveMatchupPayload);
+assert.equal(multiGamePreparedLive.status, 'ready', 'multi-game day live prep should lock the selected matchup');
+const multiGameCommittedLive = multiGameLiveAdapter.commitLiveMatchupResult(multiGamePreparedLive);
+assert.equal(
+  multiGameCommittedLive.seasonState.completedGameLogs.filter((game) => Number(game?.day || 0) === 12).length,
+  1,
+  'multi-game live commit should write only the selected game before the rest of the day is simulated'
+);
+const multiGameAfterDayReveal = multiGameLiveAdapter.simulateNextDay();
+const dayTwelveLogs = multiGameAfterDayReveal.seasonState.completedGameLogs.filter((game) => Number(game?.day || 0) === 12);
+assert.equal(multiGameAfterDayReveal.seasonState.currentDay, 13, 'multi-game day reveal should advance after simming the remaining scheduled game');
+assert.equal(dayTwelveLogs.length, 2, 'multi-game day reveal should append the unsimulated game after a live matchup');
+assert.equal(
+  dayTwelveLogs.filter((game) =>
+    String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
+    String(game?.awayAbbr || '').toUpperCase() === 'BOS'
+  ).length,
+  1,
+  'multi-game day reveal should not duplicate the selected live matchup'
+);
+assert.equal(
+  dayTwelveLogs.filter((game) => Number(game?.home) === 2 && Number(game?.away) === 3).length,
+  1,
+  'multi-game day reveal should still simulate the other scheduled matchup'
+);
+
 const waivers = adapter.getWaiverViewModel();
 assert.ok(waivers.teamSummary, 'waiver vm should expose a teamSummary bridge object');
 assert.equal(waivers.teamSummary.watchListEnabled, true, 'simulation waiver vm should keep watch-list navigation live');

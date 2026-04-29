@@ -4,13 +4,9 @@
 
 This branch turns the local-league simulation pass into a tested, auditable baseline for NBA and NFL mixed-era leagues. It fixes NFL real-pack scoring collapse, tunes NBA/NFL output shape, adds role/position personality metrics, adds historical pack sanity checks, and verifies the season shell can persist and restore simulated league progress.
 
-## Explicit Exclusion
+## Reviewer Scope Note
 
-Do not review, stage, commit, or push:
-
-- `C:\Users\jabro\Desktop\Fantasy Project\rosterbate\sim-matchup.html`
-
-That file is an untracked prototype outside this PR.
+`sim-matchup.html` is now part of the branch. The earlier prototype exclusion no longer applies. Review it with the season integration changes because the live matchup flow now prepares one official result, reveals it theatrically, commits only the selected matchup, and returns to the season shell without advancing the rest of the day.
 
 ## Main Changes
 
@@ -42,9 +38,19 @@ That file is an untracked prototype outside this PR.
 - My Team last-matchup summaries now handle completed logs that only contain team indexes.
 - Matchup navigation now shows selected completed-day scores instead of unrevealed `--` schedule rows.
 - Completed matchup action copy follows the selected opponent instead of the next scheduled opponent.
+- `sim-matchup.html` now supports a season-launched live reveal for one selected matchup, including a precomputed official result, halftime/final reveal overlays, player fantasy point animation, mobile-safe controls, and writeback to the historical universe slot.
+- The season matchup screen now labels partial live results on multi-game days, for example `1 of 2 Day 1 matchups final`, so a selected final does not imply the whole day has advanced.
+- Partial-day matchup pages now expose a direct `Finish Day` action, which simulates the remaining slate and keeps the selected live result from duplicating.
+- Simulation league reports now regenerate if a cached report was created before the rest of a partial live day finished, so the modal reflects the full completed slate.
 - Browser regression verified local league creation, instant draft completion, day/week simulation, reload persistence, archive detail, and archive restore.
 
 ## Useful Commands
+
+Live matchup browser regression:
+
+```powershell
+npm.cmd run test:live-matchup
+```
 
 Human-readable one-sport pass:
 
@@ -118,7 +124,33 @@ Verified in the local app at `http://localhost:8080`:
 - Archive browser lists the saved universe as `Atlanta Hawks - Week 2 - Day 8`.
 - Archive detail shows the saved record, rank, timeline, and recent sim days.
 - Continue Universe reopens the same season state.
+- Selected matchup live reveal opens from the season matchup page, commits exactly that game even on a multi-game day, preserves the current day, updates standings for the two teams only, and returns to the season page with `LATEST FINAL` visible.
+- On a partial live day, the matchup page shows `Finish Day`, mobile layout stays within a 390px viewport, the remaining slate simulates without duplicating the live game, and the league report regenerates to include the full finished slate.
 - No browser console warnings/errors appeared during the pass.
+
+## PR Readiness Baseline
+
+Latest local-only broad pass:
+
+```powershell
+npm.cmd run test:live-matchup
+node tools/test-simulation-league-engine.js
+node tools/test-simulation-season-adapter.js
+node tools/test-simulation-season-page.js
+node tools/test-shared-season-shell-simulation.js
+node tools/test-historic-seasons-archive-browser.js
+node tools/test-simulation-accuracy-audit.js
+node tools/test-historical-universe-slot-storage.js
+node tools/test-simulation-draft-boot.js
+node tools/test-draft-season-storage-fallback.js
+node tools/test-admin-league-storage-fallback.js
+node tools/test-local-league-storage-fallback.js
+node tools/simulation-accuracy-audit.js --sport nba --season --packs --summary
+node tools/simulation-accuracy-audit.js --sport nfl --season --packs --summary
+git diff --check
+```
+
+All commands passed locally. `git diff --check` only reported normal Windows CRLF warnings.
 
 ## Known Local Files Outside The PR
 
@@ -126,6 +158,5 @@ The worktree may contain untracked local files generated during validation:
 
 - `.server-8080.err.log`
 - `.server-8080.log`
-- `sim-matchup.html`
 
-They are intentionally not part of this PR.
+They are intentionally not part of this PR. `sim-matchup.html` is tracked and should be reviewed.

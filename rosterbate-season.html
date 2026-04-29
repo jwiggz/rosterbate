@@ -1578,7 +1578,19 @@ function getLatestRevealReportDay(){
 function getDailyRevealReport(day){
   const key=String(Number(day)||0);
   const persisted=G?.dailyRevealReports?.[key] || null;
-  if(persisted) return persisted;
+  if(persisted){
+    if(getActiveSeasonBackend()==='simulation'){
+      const completedGameCount=getCompletedSimulationGameLogs().filter(game=>Number(game?.day||0)===Number(day||0)).length;
+      const reportGameCount=Number(persisted?.simulationMeta?.gameCount || 0);
+      if(completedGameCount > 0 && completedGameCount !== reportGameCount){
+        delete G.dailyRevealReports[key];
+      }else{
+        return persisted;
+      }
+    }else{
+      return persisted;
+    }
+  }
   if(getActiveSeasonBackend()==='simulation' && isDayRevealed(day)){
     if(!G.dailyRevealReports || typeof G.dailyRevealReports!=='object') G.dailyRevealReports={};
     const generatedReport=buildDailyRevealReport(day, Date.now());
@@ -10521,6 +10533,20 @@ function renderSimulationScheduleInSharedShell(){
       && Number(game?.away) === Number(selectedScheduleGame?.away);
     return matchesControlledTeam || matchesSelectedSchedule;
   }) || null;
+  const getPartialDayStatus = (day) => {
+    const targetDay = Number(day || 0) || 0;
+    if(!targetDay || isNflSimulation) return null;
+    const daySchedule = Array.isArray(vm?.scheduleByDay?.[targetDay]) ? vm.scheduleByDay[targetDay] : [];
+    if(daySchedule.length <= 1) return null;
+    const completedCount = completedDisplayGames.filter((game)=>Number(game?.day || 0) === targetDay).length;
+    if(completedCount <= 0 || completedCount >= daySchedule.length) return null;
+    return {
+      day: targetDay,
+      completedCount,
+      totalCount: daySchedule.length,
+      remainingCount: daySchedule.length - completedCount
+    };
+  };
   const renderNavigation = () => {
     if(!navigation) return '';
     const items = navigationItems;
@@ -10532,6 +10558,7 @@ function renderSimulationScheduleInSharedShell(){
     }).join('')}</div>`;
   };
   const displayedCurrentMatchup = selectedCompletedGame || selectedScheduleGame || vm?.currentMatchup || nextGame || null;
+  const selectedPartialDayStatus = getPartialDayStatus(selectedCompletedGame?.day || displayedCurrentMatchup?.day || selectedNavigationItem?.cycleValue);
   const navigationCycleLabel = selectedNavigationItem?.label || vm?.cycleLabel || '';
   const selectedOpponentAbbr = displayedCurrentMatchup
     ? (() => {
@@ -10583,6 +10610,15 @@ function renderSimulationScheduleInSharedShell(){
         : `Scout ${opponentName}.`
     };
   });
+  if(selectedPartialDayStatus){
+    displayedActionCards.unshift({
+      id: 'finish-partial-day',
+      label: 'Finish Day',
+      body: `${selectedPartialDayStatus.completedCount} of ${selectedPartialDayStatus.totalCount} Day ${selectedPartialDayStatus.day} matchups are final. Sim the remaining ${selectedPartialDayStatus.remainingCount} to advance the league.`,
+      tone: 'live',
+      action: 'advanceWeek()'
+    });
+  }
   const rawOpponentPanelVm = vm?.teamPanels?.opponent && typeof vm.teamPanels.opponent === 'object' ? vm.teamPanels.opponent : null;
   const activeOpponentPanelVm = rawOpponentPanelVm && displayedOpponentAbbr
     && String(rawOpponentPanelVm?.teamAbbr || '').trim().toUpperCase() !== displayedOpponentAbbr
@@ -10636,7 +10672,10 @@ function renderSimulationScheduleInSharedShell(){
       const label = escapeHtml(card?.label || card?.title || 'Action');
       const body = escapeHtml(card?.body || card?.value || '');
       const targetPage = String(card?.targetPage || '').trim();
-      const actionMarkup = targetPage
+      const action = String(card?.action || '').trim();
+      const actionMarkup = action
+        ? `<button type="button" onclick="${action.replace(/"/g,'&quot;')}" class="season-team-link-btn" style="margin-top:12px;">${label}</button>`
+        : targetPage
         ? `<button type="button" onclick="goPage('${targetPage.replace(/'/g,"\\'")}')" class="season-team-link-btn" style="margin-top:12px;">${label}</button>`
         : '';
       return `<div class="season-now-card ${toneClass(card?.tone)}"><div class="season-now-label">${label}</div><div class="season-now-copy" style="flex:initial;">${body}</div>${actionMarkup}</div>`;
@@ -10668,12 +10707,21 @@ function renderSimulationScheduleInSharedShell(){
     const awayScore = Number(game?.awayScore ?? game?.awayTotal);
     const day = Number(game?.day || 0);
     const cycle = Number.isFinite(day) && day > 0 ? `Day ${day}` : '';
+    const daySchedule = Number.isFinite(day) && day > 0 && Array.isArray(vm?.scheduleByDay?.[day])
+      ? vm.scheduleByDay[day]
+      : [];
+    const completedForDay = Number.isFinite(day) && day > 0
+      ? completedDisplayGames.filter((completedGame)=>Number(completedGame?.day || 0) === day).length
+      : 0;
+    const partialDayCycle = daySchedule.length > 1 && completedForDay > 0 && completedForDay < daySchedule.length
+      ? `${completedForDay} of ${daySchedule.length} Day ${day} matchups`
+      : cycle;
     if(Number.isFinite(homeScore) && Number.isFinite(awayScore)){
       const winner = homeScore >= awayScore
         ? (game?.homeName || game?.homeAbbr || 'Home')
         : (game?.awayName || game?.awayAbbr || 'Away');
       const margin = Math.abs(homeScore - awayScore).toFixed(Math.abs(homeScore - awayScore) % 1 === 0 ? 0 : 1);
-      return `${escapeHtml(cycle || 'Game')} final · ${escapeHtml(winner)} by ${escapeHtml(margin)}.`;
+      return `${escapeHtml(partialDayCycle || 'Game')} final · ${escapeHtml(winner)} by ${escapeHtml(margin)}.`;
     }
     return `${escapeHtml(cycle || 'Next matchup')} · Box score will appear after this league window is simulated.`;
   };
