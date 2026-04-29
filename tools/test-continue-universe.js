@@ -112,8 +112,11 @@ assert.match(elements.savedLeaguesList.innerHTML, /2025-26 NBA/, 'renderer shoul
 assert.match(elements.savedLeaguesList.innerHTML, /Los Angeles Lakers/, 'renderer should show the controlled team');
 assert.match(elements.savedLeaguesList.innerHTML, /Week 2 - Day 9/, 'renderer should show current day progress');
 assert.match(elements.savedLeaguesList.innerHTML, /6-3/, 'renderer should show the controlled team record');
+assert.match(elements.savedLeaguesList.innerHTML, /Next Up: Day 9/, 'renderer should summarize the next resume point');
+assert.match(elements.savedLeaguesList.innerHTML, /Resume Day 9/, 'primary action should name the exact day to resume');
+assert.match(elements.savedLeaguesList.innerHTML, /Rank #1 of 2/, 'renderer should show rank in league-size context');
 assert.match(elements.savedLeaguesList.innerHTML, /local/, 'renderer should show the local storage footprint');
-assert.match(elements.savedLeaguesList.innerHTML, /Continue Season/, 'renderer should expose the continue action');
+assert.match(elements.savedLeaguesList.innerHTML, /Resume Day 9/, 'renderer should expose the continue action');
 assert.match(elements.savedLeaguesList.innerHTML, /Rename/, 'renderer should expose rename management');
 assert.match(elements.savedLeaguesList.innerHTML, /Delete/, 'renderer should expose delete management');
 assert.match(

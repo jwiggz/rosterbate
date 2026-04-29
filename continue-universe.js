@@ -66,6 +66,21 @@
     return sport === 'nfl' ? ('Week ' + week) : ('Week ' + week + ' - Day ' + day);
   }
 
+  function getResumePoint(slot){
+    const sport = normalizeSport(slot?.sport || 'nba');
+    const week = Number(slot?.currentWeek || 1) || 1;
+    const day = Number(slot?.currentDay || 1) || 1;
+    const progress = String(slot?.progressLabel || '').trim();
+    if(/season complete/i.test(progress)) return 'Season complete';
+    if(sport === 'nfl') return 'Week ' + week;
+    return 'Day ' + day;
+  }
+
+  function getPrimaryActionLabel(slot){
+    const point = getResumePoint(slot);
+    return point === 'Season complete' ? 'View Season' : 'Resume ' + point;
+  }
+
   function buildResumeUrl(api, slot){
     if(!api || typeof api.buildSeasonUrl !== 'function') return '#';
     const state = typeof api.getState === 'function' ? api.getState(slot?.slotId) : null;
@@ -269,6 +284,9 @@
             const detailsUrl = buildDetailsUrl(api, slot);
             const pf = Number(slot?.pf);
             const rank = Number(slot?.teamRank);
+            const leagueSize = Number(slot?.leagueSize);
+            const resumePoint = getResumePoint(slot);
+            const primaryActionLabel = getPrimaryActionLabel(slot);
             const safeSlotArg = escapeJsArg(slot?.slotId || '');
             const safeMountArg = escapeJsArg(mountId);
             return [
@@ -281,14 +299,15 @@
                   '</div>',
                   '<div class="saved-league-record">' + escapeHtml(record) + '</div>',
                 '</div>',
+                '<div class="saved-league-resume-line">Next Up: ' + escapeHtml(resumePoint) + '</div>',
                 '<div class="saved-league-meta">',
                   '<span>' + escapeHtml(progress) + '</span>',
                   '<span>Last played ' + escapeHtml(updated) + '</span>',
-                  Number.isFinite(rank) ? '<span>Rank #' + rank + '</span>' : '',
+                  Number.isFinite(rank) ? '<span>Rank #' + rank + (Number.isFinite(leagueSize) && leagueSize > 0 ? ' of ' + leagueSize : '') + '</span>' : '',
                   Number.isFinite(pf) ? '<span>' + pf.toFixed(1) + ' PF</span>' : '',
                 '</div>',
                 '<div class="saved-league-actions">',
-                  '<a class="saved-league-btn primary" href="' + escapeHtml(resumeUrl) + '">Continue Season</a>',
+                  '<a class="saved-league-btn primary" href="' + escapeHtml(resumeUrl) + '">' + escapeHtml(primaryActionLabel) + '</a>',
                   '<a class="saved-league-btn secondary" href="' + escapeHtml(detailsUrl) + '">Open Details</a>',
                   enableManagement ? '<button type="button" class="saved-league-btn utility" onclick="window.RosterBateSavedLeagues.renameSavedLeague(' + safeSlotArg + ',' + safeMountArg + ')">Rename</button>' : '',
                   enableManagement ? '<button type="button" class="saved-league-btn danger" onclick="window.RosterBateSavedLeagues.deleteSavedLeague(' + safeSlotArg + ',' + safeMountArg + ')">Delete</button>' : '',

@@ -270,6 +270,22 @@ seasonSuite.audits.forEach((audit) => {
     `${audit.sport} season audit should compute roster-strength separation`
   );
   assert.ok(
+    Number.isFinite(audit.metrics.earlyPfRange),
+    `${audit.sport} season audit should compute early-season points-for spread`
+  );
+  assert.ok(
+    Number.isFinite(audit.metrics.earlyPfStdev),
+    `${audit.sport} season audit should compute early-season points-for stdev`
+  );
+  assert.ok(
+    Number.isFinite(audit.metrics.earlyTopBottomPfGap),
+    `${audit.sport} season audit should compute early-season top-bottom points-for separation`
+  );
+  assert.ok(
+    audit.metrics.earlyPfRange >= (audit.sport === 'nba' ? 100 : 60),
+    `${audit.sport} early-season PF range should avoid flat standings after a few windows: ${audit.metrics.earlyPfRange}`
+  );
+  assert.ok(
     audit.metrics.topRosterWinPct > audit.metrics.bottomRosterWinPct,
     `${audit.sport} stronger roster group should finish above weaker roster group`
   );
@@ -319,6 +335,7 @@ assert.match(nbaSummaryCli.output, /playoff strength/i, 'summary output should i
 assert.match(nbaSummaryCli.output, /elite gap/i, 'summary output should include elite-team separation');
 assert.match(nbaSummaryCli.output, /bottom collapse/i, 'summary output should include bottom-team collapse');
 assert.match(nbaSummaryCli.output, /determinism/i, 'summary output should include standings determinism');
+assert.match(nbaSummaryCli.output, /early PF range/i, 'summary output should include early-season PF spread');
 assert.match(nbaSummaryCli.output, /Pack Sanity/i, 'summary output should include the optional pack section');
 assert.doesNotMatch(nbaSummaryCli.output, /"audits"/, 'summary output should not be raw JSON');
 

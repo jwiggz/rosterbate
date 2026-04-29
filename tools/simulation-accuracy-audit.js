@@ -847,6 +847,8 @@ function buildSeasonStandingsRows(state, strengthMap) {
       wins,
       losses,
       games,
+      pf: Number(row?.pf || 0),
+      pa: Number(row?.pa || 0),
       winPct: games > 0 ? wins / games : 0,
       strength: Number(strengthMap?.[teamAbbr] || 0)
     };
@@ -868,6 +870,7 @@ function buildSeasonGroupMetrics(rows, config) {
   const bottomPlayoffRate = average(bottomGroup.map((row) => playoffSet.has(row.teamAbbr) ? 1 : 0));
   const winPcts = rows.map((row) => row.winPct);
   const strengths = rows.map((row) => row.strength);
+  const pointsFor = rows.map((row) => Number(row.pf || 0));
   const bottomCollapseThreshold = config.sport === 'nfl' ? 0.24 : 0.26;
   const medianWinPct = median(winPcts);
   const standingsDeterminismRate = Math.max(0, pearsonCorrelation(strengths, winPcts));
@@ -875,6 +878,9 @@ function buildSeasonGroupMetrics(rows, config) {
     gamesPerTeamMean: roundStat(average(rows.map((row) => row.games))),
     winPctSpread: roundStat(Math.max(...winPcts) - Math.min(...winPcts)),
     winPctStdev: buildStats(winPcts).stdev,
+    pfRange: roundStat(Math.max(...pointsFor) - Math.min(...pointsFor)),
+    pfStdev: buildStats(pointsFor).stdev,
+    topBottomPfGap: roundStat(average(topGroup.map((row) => row.pf)) - average(bottomGroup.map((row) => row.pf))),
     leagueStrengthMean: roundStat(average(strengths)),
     playoffFieldStrengthMean: roundStat(average(playoffTeams.map((row) => row.strength))),
     playoffFieldStrengthEdge: roundStat(average(playoffTeams.map((row) => row.strength)) - average(strengths)),
@@ -896,8 +902,10 @@ function runSeasonTrial(config, trialIndex) {
   const schedule = buildSimulationSeasonSchedule(state.leagueShell);
   const dayKeys = getDayKeys(schedule, Number.MAX_SAFE_INTEGER);
   const strengthMap = buildStarterStrengthMap(state);
+  const earlyDayCount = Math.max(1, Number(config?.seasonRealism?.earlyDayCount || (config.sport === 'nfl' ? 3 : 5)) || 1);
+  let earlyMetrics = null;
 
-  dayKeys.forEach((day) => {
+  dayKeys.forEach((day, index) => {
     const engineState = buildEngineState(state);
     const result = simulateSimulationGameDay({
       state: engineState,
@@ -905,9 +913,18 @@ function runSeasonTrial(config, trialIndex) {
       day
     });
     state = applyEngineResultsToState(state, applySimulationDayResults(engineState, result));
+    if (!earlyMetrics && index + 1 >= earlyDayCount) {
+      earlyMetrics = buildSeasonGroupMetrics(buildSeasonStandingsRows(state, strengthMap), config);
+    }
   });
 
-  return buildSeasonGroupMetrics(buildSeasonStandingsRows(state, strengthMap), config);
+  return {
+    ...buildSeasonGroupMetrics(buildSeasonStandingsRows(state, strengthMap), config),
+    earlyDayCount,
+    earlyPfRange: roundStat(Number(earlyMetrics?.pfRange || 0)),
+    earlyPfStdev: roundStat(Number(earlyMetrics?.pfStdev || 0)),
+    earlyTopBottomPfGap: roundStat(Number(earlyMetrics?.topBottomPfGap || 0))
+  };
 }
 
 function evaluateSeasonRealismGuardrails(config, metrics) {
@@ -982,6 +999,10 @@ function runSeasonRealismAudit(options = {}) {
     gamesPerTeamMean: roundStat(average(trials.map((trial) => trial.gamesPerTeamMean))),
     winPctSpread: roundStat(average(trials.map((trial) => trial.winPctSpread))),
     winPctStdev: roundStat(average(trials.map((trial) => trial.winPctStdev))),
+    earlyDayCount: roundStat(average(trials.map((trial) => trial.earlyDayCount))),
+    earlyPfRange: roundStat(average(trials.map((trial) => trial.earlyPfRange))),
+    earlyPfStdev: roundStat(average(trials.map((trial) => trial.earlyPfStdev))),
+    earlyTopBottomPfGap: roundStat(average(trials.map((trial) => trial.earlyTopBottomPfGap))),
     leagueStrengthMean: roundStat(average(trials.map((trial) => trial.leagueStrengthMean))),
     playoffFieldStrengthMean: roundStat(average(trials.map((trial) => trial.playoffFieldStrengthMean))),
     playoffFieldStrengthEdge: roundStat(average(trials.map((trial) => trial.playoffFieldStrengthEdge))),
@@ -1357,6 +1378,7 @@ function formatSeasonAuditLine(audit) {
     `bottom collapse ${metrics.bottomCollapseRate}`,
     `determinism ${metrics.standingsDeterminismRate}`,
     `playoff gap ${metrics.playoffRateGap}`,
+    `early PF range ${metrics.earlyPfRange}`,
     `${metrics.trials} trials`
   ].join(' | ');
 }
