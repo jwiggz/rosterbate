@@ -95,7 +95,7 @@
     const starterSlots = Array.isArray(shell?.starterSlots)
       ? shell.starterSlots.map((slot) => String(slot || '').trim().toUpperCase()).filter(Boolean)
       : [];
-    return starterSlots.length ? starterSlots.slice() : ['PG', 'SG', 'SF', 'PF', 'C'];
+    return starterSlots.length ? starterSlots.slice() : ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'];
   }
 
   function getSimulationStarterSlots(shell){

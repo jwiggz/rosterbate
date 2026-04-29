@@ -126,11 +126,11 @@
         defaultRounds: 15,
         defaultScoring: 'h2h_pts',
         defaultFormat: 'snake',
-        starterSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL'],
+        starterSlots: ['PG','SG','SF','PF','C','G','F','UTIL','UTIL','UTIL'],
         waiverPositions: ['ALL','PG','SG','SF','PF','C'],
         teamCodes: ['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'],
         filters: ['ALL','PG','SG','SF','PF','C'],
-        myTeamSlots: ['PG','SG','G','SF','PF','F','C','C','UTIL','UTIL','BN','BN','BN','IR','IR'],
+        myTeamSlots: ['PG','SG','SF','PF','C','G','F','UTIL','UTIL','UTIL','BN','BN','BN','IR','IR'],
         scoringInfo: {
           h2h_pts: 'Weekly head-to-head matchups. Win by scoring more total fantasy points than your opponent.',
           h2h_cat: 'Win/lose 9 stat categories weekly. PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',
@@ -189,8 +189,8 @@
   window.getRosterbateLeagueRuleDefaults = function(sport) {
     const rules = {
       nba: {
-        starters: 9,
-        benchSlots: 4,
+        starters: 10,
+        benchSlots: 3,
         irSlots: 2,
         positions: {
           PG: { starters: 1, max: 4 },
@@ -199,8 +199,8 @@
           SF: { starters: 1, max: 4 },
           PF: { starters: 1, max: 4 },
           F: { starters: 1, max: 'No Limit' },
-          C: { starters: 2, max: 4 },
-          UTIL: { starters: 2, max: 'No Limit' }
+          C: { starters: 1, max: 4 },
+          UTIL: { starters: 3, max: 'No Limit' }
         },
         scoring: {
           pts: 1,

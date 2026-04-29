@@ -3690,31 +3690,37 @@ function buildSimulationModeDraftRules(baseRules){
     rules.irSlots=0;
     return rules;
   }
+  const shell=SIMULATION_MODE_DRAFT_CONTEXT?.shell || {};
+  const starterSlots=Array.isArray(shell?.starterSlots) && shell.starterSlots.length
+    ? shell.starterSlots.map((slot)=>String(slot || '').trim().toUpperCase()).filter(Boolean)
+    : ['PG','SG','SF','PF','C','G','F','UTIL','UTIL','UTIL'];
   Object.keys(positions).forEach((key)=>{
     positions[key]=Object.assign({}, positions[key] || {}, { starters:0 });
   });
-  ['PG','SG','SF','PF','C'].forEach((key)=>{
+  starterSlots.forEach((key)=>{
     if(positions[key]){
-      positions[key]=Object.assign({}, positions[key], { starters:1 });
+      positions[key]=Object.assign({}, positions[key], { starters:Number(positions[key].starters || 0) + 1 });
     }
   });
   if(!positions.PG && positions.UTIL){
-    positions.UTIL=Object.assign({}, positions.UTIL, { starters:5 });
+    positions.UTIL=Object.assign({}, positions.UTIL, { starters:starterSlots.length });
   }
+  const irSlots=Math.max(0, Number(shell?.irSlots ?? rules.irSlots ?? 2) || 0);
+  const benchSlots=Math.max(0, Number(shell?.benchSlots ?? rules.benchSlots ?? Math.max(0, Number(shell?.rosterSize || 0) - starterSlots.length - irSlots)) || 0);
   if(positions.BN){
-    positions.BN=Object.assign({}, positions.BN, { starters:5 });
+    positions.BN=Object.assign({}, positions.BN, { starters:benchSlots });
   }
   if(positions.BE){
-    positions.BE=Object.assign({}, positions.BE, { starters:5 });
+    positions.BE=Object.assign({}, positions.BE, { starters:benchSlots });
   }
   const irKey=Object.keys(positions).find((key)=>String(key).toUpperCase()==='IR' || String(key).toUpperCase()==='IL');
   if(irKey){
-    positions[irKey]=Object.assign({}, positions[irKey], { starters:0 });
+    positions[irKey]=Object.assign({}, positions[irKey], { starters:irSlots });
   }
   rules.positions=positions;
-  rules.starters=5;
-  rules.benchSlots=5;
-  rules.irSlots=0;
+  rules.starters=starterSlots.length;
+  rules.benchSlots=benchSlots;
+  rules.irSlots=irSlots;
   return rules;
 }
 

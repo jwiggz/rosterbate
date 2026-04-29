@@ -188,6 +188,9 @@ const context = {
       postseasonState: { phase: 'regular_season' }
     };
   },
+  cloneSharedSimulationBootValue(value) {
+    return JSON.parse(JSON.stringify(value));
+  },
   buildSimulationSeasonAdapterFromState(slotId, state) {
     return {
       slotId,

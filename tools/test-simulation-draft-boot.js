@@ -85,6 +85,12 @@ assert.match(source, /function getSimulationLeagueSize\(simulationContext\)/, 'd
 assert.match(source, /function getSimulationRosterSize\(simulationContext\)/, 'draft page should define a simulation roster-size helper');
 assert.match(source, /function getSimulationTopPlayersPerPack\(simulationContext\)/, 'draft page should define a simulation player-pool cap helper');
 assert.match(source, /function getSimulationSeasonRedirect\(simulationMode\)/, 'draft page should define a simulation season redirect helper');
+const simulationDraftRulesSource = extractFunction(source, 'buildSimulationModeDraftRules');
+assert.match(
+  simulationDraftRulesSource,
+  /shell\?\.starterSlots[\s\S]*PG[\s\S]*SG[\s\S]*SF[\s\S]*PF[\s\S]*C[\s\S]*G[\s\S]*F[\s\S]*UTIL[\s\S]*rules\.starters\s*=\s*starterSlots\.length[\s\S]*rules\.benchSlots\s*=\s*benchSlots[\s\S]*rules\.irSlots\s*=\s*irSlots/,
+  'nba simulation draft rules should mirror the shell starter/bench/IR layout instead of forcing the old 5-starter setup'
+);
 assert.match(
   source,
   /const\s+simulationTopPlayersPerPack\s*=\s*getSimulationTopPlayersPerPack\(\s*\{\s*simulationMode\s*,\s*shell\s*\}\s*\)\s*;[\s\S]*topPlayersPerPack:\s*simulationTopPlayersPerPack/,

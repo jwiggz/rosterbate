@@ -36,8 +36,8 @@ assert.ok(
   `nba elite top-star share should feel more takeover-prone without drifting too low: ${nbaAudit.metrics.topStarShareMean}`
 );
 assert.ok(
-  nbaAudit.metrics.teamTotals.stdev <= 12.5,
-  `nba takeover tuning should keep team-total variance near the low-variance baseline: ${nbaAudit.metrics.teamTotals.stdev}`
+  nbaAudit.metrics.teamTotals.stdev <= 15,
+  `nba expanded starter format should add useful spread without letting team-total variance run wild: ${nbaAudit.metrics.teamTotals.stdev}`
 );
 assert.ok(
   Number.isFinite(nbaAudit.metrics.nbaRoleShape.topScorerPointShareMean),

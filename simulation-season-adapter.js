@@ -201,7 +201,7 @@
     const warningsBySlot = buildSimulationRosterWarningsBySlot(rosterState?.validation);
     return slotKeys.map((slotKey, index) => {
       const slotEntry = rosterState?.lineupSlots?.[slotKey] || {};
-      const player = slotEntry?.player ?? rosterState?.lineup?.[index] ?? null;
+      const player = rosterState?.lineup?.[index] ?? slotEntry?.player ?? null;
       const playerId = slotEntry?.playerId == null || slotEntry?.playerId === ''
         ? (player?.id == null || player?.id === '' ? null : Number(player.id))
         : Number(slotEntry.playerId);
@@ -557,17 +557,20 @@ function cleanSimulationSourceLabel(label){
       ? state.seasonState.lineupIdsByTeam[normalizedTeamAbbr]
       : [];
     const lineupSlots = {};
+    const lineup = [];
     const assignedIds = new Set();
     legacyStarterSlots.forEach((slot, index) => {
       const rawPlayerId = lineupIdList[index];
       const playerId = rawPlayerId == null || rawPlayerId === '' ? null : Number(rawPlayerId);
+      const player = playerId == null ? null : clone(rosterById.get(playerId) || null);
       if (Number.isFinite(playerId) && playerId > 0) {
         assignedIds.add(playerId);
       }
+      lineup[index] = player ? clone(player) : null;
       lineupSlots[slot] = {
         slot,
         playerId,
-        player: playerId == null ? null : clone(rosterById.get(playerId) || null)
+        player
       };
     });
     return {
@@ -575,10 +578,7 @@ function cleanSimulationSourceLabel(label){
       legacyStarterSlots: clone(legacyStarterSlots),
       lineupSlots,
       roster,
-      lineup: legacyStarterSlots.map((slot) => {
-        const player = lineupSlots[slot]?.player;
-        return player ? clone(player) : null;
-      }),
+      lineup,
       playerVariantLabelsById,
       bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
       validation: { valid: true, issues: [] }
@@ -727,18 +727,23 @@ function cleanSimulationSourceLabel(label){
 
   function buildSimulationMatchupLineupSections(state, matchupContext){
     const sport = getSimulationSportForState(state);
-    const buildRows = (slots, lineupSlots, playerVariantLabelsById) => (Array.isArray(slots) ? slots : []).map((slot) => ({
+    const buildRows = (slots, lineupSlots, playerVariantLabelsById, lineup) => (Array.isArray(slots) ? slots : []).map((slot, index) => {
+      const indexedPlayer = Array.isArray(lineup) ? lineup[index] : null;
+      const keyedPlayer = lineupSlots?.[slot]?.player || null;
+      const player = indexedPlayer || keyedPlayer || null;
+      return {
       slot,
-      player: lineupSlots?.[slot]?.player ? clone(lineupSlots[slot].player) : null,
+      player: player ? clone(player) : null,
       playerVariantLabel: (() => {
-        const playerId = Number(lineupSlots?.[slot]?.player?.id);
+        const playerId = Number(player?.id);
         return Number.isFinite(playerId) ? String(playerVariantLabelsById?.[playerId] || '').trim() || null : null;
       })()
-    }));
+    };
+    });
     const buildSections = (rosterState) => ([
       {
         title: sport === 'nfl' ? 'Weekly Starters' : 'Starters',
-        rows: buildRows(rosterState?.legacyStarterSlots || rosterState?.starterSlots, rosterState?.lineupSlots, rosterState?.playerVariantLabelsById)
+        rows: buildRows(rosterState?.legacyStarterSlots || rosterState?.starterSlots, rosterState?.lineupSlots, rosterState?.playerVariantLabelsById, rosterState?.lineup)
       },
       {
         title: sport === 'nfl' ? 'Bench / Depth' : 'Bench',
@@ -797,7 +802,9 @@ function cleanSimulationSourceLabel(label){
     const bench = roster
       .filter((player) => !assignedIds.has(Number(player?.id)))
       .map((player) => clone(player));
-    const filledStarters = legacyStarterSlots.reduce((count, slot) => count + (lineupSlots[slot]?.player ? 1 : 0), 0);
+    const filledStarters = lineup
+      .slice(0, legacyStarterSlots.length)
+      .reduce((count, player) => count + (player ? 1 : 0), 0);
     return {
       sport: 'nba',
       controlledTeam: controlledTeam ? clone(controlledTeam) : null,
@@ -841,6 +848,7 @@ function cleanSimulationSourceLabel(label){
       validation: clone(rosterState?.validation || { valid: true, issues: [] }),
       readyLabel: String(rosterState?.readyLabel || '').trim(),
       recommendationSummary: String(rosterState?.recommendationSummary || '').trim(),
+      filledStarters: Number(rosterState?.filledStarters || 0),
       roster: clone(rosterState?.roster || []),
       lineup: clone(rosterState?.lineup || []),
       bench: clone(rosterState?.bench || [])
@@ -1062,7 +1070,7 @@ function cleanSimulationSourceLabel(label){
     }
     return getSimulationSportForState(state) === 'nfl'
       ? ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'DST', 'K']
-      : ['PG', 'SG', 'SF', 'PF', 'C'];
+      : ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'];
   }
 
   function buildSimulationRecordLabel(row){

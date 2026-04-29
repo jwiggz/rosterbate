@@ -391,6 +391,59 @@ assert.equal(positionedNbaRosterVm.lineupSlots.SF.suggestedPlayerId, 31, 'nba ro
 assert.equal(positionedNbaRosterVm.lineupSlots.PF.suggestedPlayerId, 55, 'nba roster vm should expose the slot-aware suggested forward for PF');
 assert.equal(positionedNbaRosterVm.lineupSlots.C.suggestedPlayerId, 34, 'nba roster vm should expose the slot-aware suggested center for C');
 
+const expandedNbaAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-expanded-nba',
+  state: {
+    ...slotState,
+    leagueShell: {
+      ...slotState.leagueShell,
+      rosterSize: 15,
+      starterSlots: ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+      benchSlots: 3,
+      irSlots: 2
+    },
+    draftState: {
+      ...slotState.draftState,
+      rostersByTeam: {
+        ...slotState.draftState.rostersByTeam,
+        LAL: [
+          { id: 1, name: 'Point Guard', pos: 'PG', team: 'LAL', fp: 40 },
+          { id: 2, name: 'Shooting Guard', pos: 'SG', team: 'LAL', fp: 39 },
+          { id: 3, name: 'Small Forward', pos: 'SF', team: 'LAL', fp: 38 },
+          { id: 4, name: 'Power Forward', pos: 'PF', team: 'LAL', fp: 37 },
+          { id: 5, name: 'Center', pos: 'C', team: 'LAL', fp: 36 },
+          { id: 6, name: 'Guard Flex', pos: 'PG', team: 'LAL', fp: 35 },
+          { id: 7, name: 'Forward Flex', pos: 'SF', team: 'LAL', fp: 34 },
+          { id: 8, name: 'Utility One', pos: 'SG', team: 'LAL', fp: 33 },
+          { id: 9, name: 'Utility Two', pos: 'PF', team: 'LAL', fp: 32 },
+          { id: 10, name: 'Utility Three', pos: 'C', team: 'LAL', fp: 31 },
+          { id: 11, name: 'Bench One', pos: 'PG', team: 'LAL', fp: 30 },
+          { id: 12, name: 'Bench Two', pos: 'SF', team: 'LAL', fp: 29 },
+          { id: 13, name: 'Bench Three', pos: 'C', team: 'LAL', fp: 28 }
+        ]
+      }
+    },
+    seasonState: {
+      ...slotState.seasonState,
+      lineupIdsByTeam: { LAL: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+    }
+  }
+});
+
+const expandedNbaRosterVm = expandedNbaAdapter.getRosterViewModel();
+assert.deepStrictEqual(
+  expandedNbaRosterVm.sections.starters.rows.map((row) => row.slot),
+  ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+  'nba roster vm should render all ESPN-style starter rows, including repeated utility rows'
+);
+assert.deepStrictEqual(
+  expandedNbaRosterVm.sections.starters.rows.map((row) => row.player?.id ?? null),
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  'nba roster vm should preserve repeated utility assignments by lineup index'
+);
+assert.equal(expandedNbaRosterVm.filledStarters, 10, 'expanded nba roster vm should count all 10 filled starters');
+assert.equal(expandedNbaRosterVm.sections.bench.rows.length, 3, 'expanded nba roster vm should leave the remaining three players on the bench');
+
 const duplicateBenchAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-duplicate-bench',
   state: {
