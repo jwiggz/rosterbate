@@ -193,6 +193,89 @@
     }, {});
   }
 
+  function buildSimulationPlayerHealth(player, fallbackDesignation){
+    const rawDesignation = String(
+      fallbackDesignation ||
+      player?.designation ||
+      player?.injuryStatus ||
+      player?.status ||
+      ''
+    ).trim().toUpperCase();
+    const normalized = rawDesignation || 'ACTIVE';
+    const labelMap = {
+      ACTIVE: 'Active',
+      HEALTHY: 'Active',
+      DTD: 'Day-to-day',
+      DAY_TO_DAY: 'Day-to-day',
+      GTD: 'GTD',
+      QUESTIONABLE: 'Questionable',
+      DOUBTFUL: 'Doubtful',
+      OUT: 'Out',
+      IL: 'IR',
+      IR: 'IR',
+      INJURED_RESERVE: 'IR'
+    };
+    const label = labelMap[normalized] || normalized;
+    const tone = ['OUT', 'IL', 'IR', 'INJURED_RESERVE'].includes(normalized)
+      ? 'out'
+      : ['DTD', 'DAY_TO_DAY', 'GTD', 'QUESTIONABLE', 'DOUBTFUL'].includes(normalized)
+        ? 'warning'
+        : 'active';
+    return { healthLabel: label, healthTone: tone, healthDesignation: normalized };
+  }
+
+  function formatSimulationStatValue(value){
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return String(value ?? '').trim();
+    return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
+  }
+
+  function buildSimulationPlayerStatChips(player){
+    const explicitStats = Array.isArray(player?.detailStats)
+      ? player.detailStats
+      : [];
+    const chips = explicitStats
+      .map((stat) => ({
+        label: String(stat?.label || '').trim().toUpperCase(),
+        value: formatSimulationStatValue(stat?.value)
+      }))
+      .filter((stat) => stat.label && stat.value !== '')
+      .slice(0, 6);
+    if (chips.length) return chips;
+    const stats = player?.statValues && typeof player.statValues === 'object' ? player.statValues : {};
+    const keys = ['PTS', 'REB', 'AST', 'STL', 'BLK', '3PM', 'TFP'];
+    return keys
+      .map((key) => {
+        const value = stats[key];
+        if (value == null || value === '') return null;
+        return { label: key, value: formatSimulationStatValue(value) };
+      })
+      .filter(Boolean)
+      .slice(0, 6);
+  }
+
+  function buildSimulationPlayerStatSummary(player, statChips){
+    const explicit = String(player?.statSummary || '').trim();
+    if (explicit) return explicit;
+    const chips = Array.isArray(statChips) ? statChips : buildSimulationPlayerStatChips(player);
+    if (chips.length) {
+      return chips.slice(0, 4).map((chip) => `${chip.value} ${chip.label}`).join(' · ');
+    }
+    const fp = Number(player?.fp || 0);
+    return Number.isFinite(fp) && fp > 0 ? `${fp.toFixed(1)} FP/G` : '';
+  }
+
+  function attachSimulationRosterRowMeta(row, player, fallbackDesignation){
+    const health = buildSimulationPlayerHealth(player || {}, fallbackDesignation);
+    const statChips = player ? buildSimulationPlayerStatChips(player) : [];
+    return {
+      ...row,
+      ...health,
+      statChips,
+      statSummary: player ? buildSimulationPlayerStatSummary(player, statChips) : ''
+    };
+  }
+
   function buildSimulationStarterRows(rosterState){
     const slotKeys = Array.isArray(rosterState?.legacyStarterSlots)
       ? rosterState.legacyStarterSlots
@@ -208,12 +291,13 @@
       const suggestedPlayerId = slotEntry?.suggestedPlayerId == null || slotEntry?.suggestedPlayerId === ''
         ? null
         : Number(slotEntry.suggestedPlayerId);
-      return {
+      return attachSimulationRosterRowMeta({
         id: `starter-${slotKey}-${index}`,
         slot: displaySlots[index] || slotKey,
         slotKey,
         positionSlot: displaySlots[index] || slotKey,
         lineupSlotKey: slotKey,
+        lineupIndex: index,
         player: player ? clone(player) : null,
         playerId: Number.isFinite(playerId) ? playerId : null,
         playerVariantLabel: rosterState?.playerVariantLabelsById?.[Number(playerId)] || null,
@@ -222,7 +306,7 @@
         warning: Array.isArray(warningsBySlot[slotKey]) ? warningsBySlot[slotKey][0] || '' : '',
         warnings: clone(warningsBySlot[slotKey] || []),
         actionLabel: 'Move'
-      };
+      }, player);
     });
   }
 
@@ -241,7 +325,7 @@
       warning: '',
       warnings: [],
       actionLabel: 'Promote'
-    }));
+    })).map((row, index) => attachSimulationRosterRowMeta(row, rosterState?.bench?.[index]));
   }
 
   function buildSimulationIrRows(rosterState){
@@ -259,7 +343,7 @@
       warning: '',
       warnings: [],
       actionLabel: 'Reserve'
-    }));
+    })).map((row, index) => attachSimulationRosterRowMeta(row, rosterState?.ir?.[index], 'IR'));
   }
 
   function buildSimulationRosterSections(rosterState){
@@ -2736,6 +2820,35 @@ function cleanSimulationSourceLabel(label){
           lineupIds
         );
         state = clone(nextState || {});
+        return this.getState();
+      },
+      setControlledRosterOrder(playerIds){
+        const controlledAbbr = getControlledTeamAbbr(state);
+        const roster = Array.isArray(state?.draftState?.rostersByTeam?.[controlledAbbr])
+          ? state.draftState.rostersByTeam[controlledAbbr]
+          : [];
+        const requestedIds = Array.isArray(playerIds)
+          ? playerIds.map((playerId) => Number(playerId)).filter((playerId) => Number.isFinite(playerId) && playerId > 0)
+          : [];
+        const requestedSet = new Set(requestedIds);
+        const byId = new Map(roster.map((player) => [Number(player?.id), clone(player)]));
+        const ordered = requestedIds
+          .map((playerId) => byId.get(Number(playerId)))
+          .filter(Boolean);
+        roster.forEach((player) => {
+          const playerId = Number(player?.id);
+          if (!requestedSet.has(playerId)) ordered.push(clone(player));
+        });
+        state = clone({
+          ...state,
+          draftState: {
+            ...(state?.draftState || {}),
+            rostersByTeam: {
+              ...(state?.draftState?.rostersByTeam || {}),
+              [controlledAbbr]: ordered
+            }
+          }
+        });
         return this.getState();
       },
       claimFreeAgent(move){

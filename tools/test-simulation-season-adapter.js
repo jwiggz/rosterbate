@@ -407,7 +407,7 @@ const expandedNbaAdapter = createSimulationSeasonAdapter({
       rostersByTeam: {
         ...slotState.draftState.rostersByTeam,
         LAL: [
-          { id: 1, name: 'Point Guard', pos: 'PG', team: 'LAL', fp: 40 },
+          { id: 1, name: 'Point Guard', pos: 'PG', team: 'LAL', fp: 40, statValues: { PTS: 24.5, REB: 4.1, AST: 8.4, TFP: 3280 } },
           { id: 2, name: 'Shooting Guard', pos: 'SG', team: 'LAL', fp: 39 },
           { id: 3, name: 'Small Forward', pos: 'SF', team: 'LAL', fp: 38 },
           { id: 4, name: 'Power Forward', pos: 'PF', team: 'LAL', fp: 37 },
@@ -417,7 +417,7 @@ const expandedNbaAdapter = createSimulationSeasonAdapter({
           { id: 8, name: 'Utility One', pos: 'SG', team: 'LAL', fp: 33 },
           { id: 9, name: 'Utility Two', pos: 'PF', team: 'LAL', fp: 32 },
           { id: 10, name: 'Utility Three', pos: 'C', team: 'LAL', fp: 31 },
-          { id: 11, name: 'Bench One', pos: 'PG', team: 'LAL', fp: 30 },
+          { id: 11, name: 'Bench One', pos: 'PG', team: 'LAL', fp: 30, designation: 'GTD', statValues: { PTS: 14.2, REB: 3.1, AST: 6.8, TFP: 2460 } },
           { id: 12, name: 'Bench Two', pos: 'SF', team: 'LAL', fp: 29 },
           { id: 13, name: 'Bench Three', pos: 'C', team: 'LAL', fp: 28 },
           { id: 14, name: 'IR One', pos: 'PF', team: 'LAL', fp: 27 },
@@ -445,11 +445,34 @@ assert.deepStrictEqual(
 );
 assert.equal(expandedNbaRosterVm.filledStarters, 10, 'expanded nba roster vm should count all 10 filled starters');
 assert.equal(expandedNbaRosterVm.sections.bench.rows.length, 3, 'expanded nba roster vm should leave three active reserves on the bench');
+assert.equal(
+  expandedNbaRosterVm.sections.starters.rows[0]?.healthLabel,
+  'Active',
+  'expanded nba roster vm should show an active health label for healthy starters'
+);
+assert.equal(
+  expandedNbaRosterVm.sections.bench.rows[0]?.healthLabel,
+  'GTD',
+  'expanded nba roster vm should surface player health designations on bench rows'
+);
+assert.ok(
+  expandedNbaRosterVm.sections.starters.rows[0]?.statChips?.some((chip) => chip.label === 'PTS' && chip.value === '24.5'),
+  'expanded nba roster vm should expose player stat chips for My Team rows'
+);
+assert.ok(
+  expandedNbaRosterVm.sections.bench.rows[0]?.statSummary,
+  'expanded nba roster vm should expose a compact stat summary for bench rows'
+);
 assert.equal(expandedNbaRosterVm.sections.il.title, 'IR', 'expanded nba roster vm should label inactive reserve slots as IR');
 assert.deepStrictEqual(
   expandedNbaRosterVm.sections.il.rows.map((row) => row.player?.id),
   [14, 15],
   'expanded nba roster vm should split the final two reserve players into IR rows'
+);
+assert.equal(
+  expandedNbaRosterVm.sections.il.rows[0]?.healthLabel,
+  'IR',
+  'expanded nba roster vm should mark IR-section rows with an IR health label'
 );
 
 const duplicateBenchAdapter = createSimulationSeasonAdapter({

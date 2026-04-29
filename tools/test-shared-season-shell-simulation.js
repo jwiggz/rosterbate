@@ -6,6 +6,13 @@ const vm = require('node:vm');
 const html = fs.readFileSync(path.join(__dirname, '..', 'rosterbate-season.html'), 'utf8');
 const adapterSource = fs.readFileSync(path.join(__dirname, '..', 'simulation-season-adapter.js'), 'utf8');
 
+assert.match(html, /function assignSimulationNbaBenchPlayerToSlotFromShell\(/, 'shared shell should support moving NBA bench players into starter slots');
+assert.match(html, /function clearSimulationNbaSlotAssignmentFromShell\(/, 'shared shell should support clearing NBA starter slots');
+assert.match(html, /function startSimulationRosterMoveFromShell\(/, 'shared shell should expose simulation roster move mode');
+assert.match(html, /function applySimulationRosterMoveToSlotFromShell\(/, 'shared shell should expose simulation move-mode landing choices');
+assert.match(html, /healthLabel/, 'shared shell roster rows should render player health labels');
+assert.match(html, /statChips/, 'shared shell roster rows should render player stat chips');
+
 function toPlain(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -15,6 +22,8 @@ function assertSharedSinglePlayerRosterMarkers(markup, label) {
   assert.match(markup, /season-mini-tabs/, `${label} should render the shared single-player mini-tab rail`);
   assert.match(markup, /season-mini-tab[^>]*>\s*Stats\s*</, `${label} should render the shared Stats tab`);
   assert.match(markup, /season-mini-tab[^>]*>\s*Matchup\s*</, `${label} should render the shared Matchup tab`);
+  assert.match(markup, /<th>Action<\/th>[\s\S]*<th>Opp<\/th>[\s\S]*<th>Time<\/th>[\s\S]*<th>Status<\/th>[\s\S]*<th>FP<\/th>[\s\S]*<th>TFP<\/th>/, `${label} should keep the single-player roster table columns`);
+  assert.match(markup, /Reserves \/ IR|Bench \/ Depth/, `${label} should keep the single-player reserve and IR section label`);
   assert.doesNotMatch(markup, /Lineup Control/, `${label} should not keep the legacy simulation-only lineup-control card`);
 }
 
@@ -926,6 +935,9 @@ const sandbox = {
     return {};
   },
   queueSharedSeasonSave() {},
+  markSeasonSaving() {},
+  markSeasonSaved() {},
+  markSeasonSaveWarning() {},
   ensurePowerupState() {},
   ensureRosterbatePools() {
     return Promise.resolve();
@@ -1605,6 +1617,8 @@ assert.match(elements.rosterContent.innerHTML, /Starters/);
 assert.match(elements.rosterContent.innerHTML, /bench/i);
 assert.match(elements.rosterContent.innerHTML, /Bench ready/);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
+assert.match(elements.rosterContent.innerHTML, />Move</, 'simulation roster should use the original move-mode action instead of direct clear-only controls');
+assert.doesNotMatch(elements.rosterContent.innerHTML, />Clear</, 'simulation roster should avoid awkward clear-only starter controls');
 assert.match(elements.rosterContent.innerHTML, /openWatchList\(\)/, 'simulation roster should keep the watch-list action live');
 assert.match(elements.rosterContent.innerHTML, /openTeamSettings\(\)/, 'simulation roster should keep the team-settings action live');
 assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michael Jordan/);
