@@ -29,6 +29,16 @@ const elements = {
 const context = {
   console,
   localStorage,
+  promptValue: 'Renamed Universe',
+  confirmValue: true,
+  prompt(message, currentValue) {
+    context.lastPrompt = { message, currentValue };
+    return context.promptValue;
+  },
+  confirm(message) {
+    context.lastConfirm = message;
+    return context.confirmValue;
+  },
   document: {
     getElementById(id) {
       return elements[id] || null;
@@ -85,6 +95,10 @@ api.upsertFromState({
 const slots = context.RosterBateSavedLeagues.getSavedSimulationSlots({ sport: 'nba' });
 assert.equal(slots.length, 1, 'continue list should include simulation slots only');
 assert.equal(slots[0].slotId, 'slot_nba_continue_regression');
+const storageSummary = context.RosterBateSavedLeagues.getSavedSimulationStorageSummary({ sport: 'nba' });
+assert.equal(storageSummary.count, 1, 'storage summary should count saved simulation slots');
+assert.ok(storageSummary.bytes > 0, 'storage summary should measure saved slot state');
+assert.match(storageSummary.label, /B|KB|MB/, 'storage summary should expose a readable size label');
 
 context.RosterBateSavedLeagues.renderSavedSimulationLeagues('savedLeaguesList', {
   sport: 'nba',
@@ -97,12 +111,37 @@ assert.match(elements.savedLeaguesList.innerHTML, /2025-26 NBA/, 'renderer shoul
 assert.match(elements.savedLeaguesList.innerHTML, /Los Angeles Lakers/, 'renderer should show the controlled team');
 assert.match(elements.savedLeaguesList.innerHTML, /Week 2 - Day 9/, 'renderer should show current day progress');
 assert.match(elements.savedLeaguesList.innerHTML, /6-3/, 'renderer should show the controlled team record');
+assert.match(elements.savedLeaguesList.innerHTML, /local/, 'renderer should show the local storage footprint');
 assert.match(elements.savedLeaguesList.innerHTML, /Continue Season/, 'renderer should expose the continue action');
+assert.match(elements.savedLeaguesList.innerHTML, /Rename/, 'renderer should expose rename management');
+assert.match(elements.savedLeaguesList.innerHTML, /Delete/, 'renderer should expose delete management');
 assert.match(
   elements.savedLeaguesList.innerHTML,
   /rosterbate-season\.html\?sport=nba&amp;simulation=nba_mixed_era&amp;historicalUniverse=slot_nba_continue_regression/,
   'continue action should route to the canonical season URL'
 );
 assert.doesNotMatch(elements.savedLeaguesList.innerHTML, /Draft Archive/, 'renderer should not list historical draft slots');
+
+const renamed = context.RosterBateSavedLeagues.renameSavedLeague('slot_nba_continue_regression', 'savedLeaguesList');
+assert.equal(renamed, true, 'rename action should persist an updated slot');
+assert.equal(context.lastPrompt.currentValue, '2025-26 NBA', 'rename prompt should default to current league name');
+assert.match(elements.savedLeaguesList.innerHTML, /Renamed Universe/, 'renderer should update after rename');
+assert.equal(
+  api.getState('slot_nba_continue_regression').leagueShell.anchorSeasonLabel,
+  'Renamed Universe',
+  'rename should update the canonical simulation league label'
+);
+
+localStorage.setItem('rosterbateDraft', JSON.stringify({
+  localResumePointer: true,
+  resumeHistoricalUniverseSlotId: 'slot_nba_continue_regression'
+}));
+const deleted = context.RosterBateSavedLeagues.deleteSavedLeague('slot_nba_continue_regression', 'savedLeaguesList');
+assert.equal(deleted, true, 'delete action should remove the saved slot');
+assert.match(context.lastConfirm, /Renamed Universe/, 'delete confirmation should name the target league');
+assert.equal(api.getSlot('slot_nba_continue_regression'), null, 'deleted slot should leave the slot index');
+assert.equal(api.getState('slot_nba_continue_regression'), null, 'deleted slot should remove saved state');
+assert.equal(localStorage.getItem('rosterbateDraft'), null, 'delete should clear a local resume pointer targeting the removed slot');
+assert.match(elements.savedLeaguesList.innerHTML, /No Saved Leagues Yet/, 'renderer should update to empty state after delete');
 
 console.log('continue universe test passed');

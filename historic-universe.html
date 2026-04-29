@@ -206,6 +206,7 @@
   .saved-leagues-title{margin-top:8px;font:700 48px/.9 var(--teko);letter-spacing:.02em;text-transform:uppercase}
   .saved-leagues-copy{max-width:66ch;margin-top:8px;font-size:14px;line-height:1.66;color:#d2dfef}
   .saved-leagues-count{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(7,14,25,.66);font:700 11px/1 var(--plex);letter-spacing:.1em;text-transform:uppercase;color:#dbe8fb}
+  .saved-leagues-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
   .saved-leagues-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;padding:18px}
   .saved-league-card{
     display:grid;gap:14px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.09);
@@ -225,10 +226,14 @@
   .saved-league-actions{display:flex;gap:10px;flex-wrap:wrap}
   .saved-league-btn{
     display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 14px;border-radius:14px;
-    text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1)
+    text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1);
+    cursor:pointer
   }
+  button.saved-league-btn{font-family:var(--teko);appearance:none}
   .saved-league-btn.primary{background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);color:#082312;border-color:rgba(187,247,208,.34)}
   .saved-league-btn.secondary{background:linear-gradient(180deg,#3f4d64,#202b3f);color:#edf4ff}
+  .saved-league-btn.utility{background:rgba(15,23,36,.9);color:#dbe8fb;border-color:rgba(148,163,184,.22)}
+  .saved-league-btn.danger{background:rgba(69,10,10,.72);color:#fecaca;border-color:rgba(248,113,113,.34)}
   .saved-leagues-empty{margin:18px;padding:24px;border-radius:20px;border:1px dashed rgba(255,255,255,.16);background:rgba(7,14,25,.46);text-align:center}
   .saved-leagues-empty strong{display:block;font:700 28px/.92 var(--teko);text-transform:uppercase}
   .saved-leagues-empty span{display:block;max-width:54ch;margin:8px auto 0;font-size:14px;line-height:1.6;color:#d2dfef}

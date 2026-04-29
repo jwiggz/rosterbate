@@ -541,6 +541,7 @@
     .saved-leagues-title{margin-top:7px;font:700 30px/.92 var(--teko);text-transform:uppercase}
     .saved-leagues-copy{margin-top:7px;max-width:64ch;font-size:13px;line-height:1.58;color:#d2dfef}
     .saved-leagues-count,.saved-league-meta span,.saved-leagues-more{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(7,14,25,.66);font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb}
+    .saved-leagues-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
     .saved-leagues-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
     .saved-league-card{display:grid;gap:12px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(16,25,41,.94),rgba(8,12,22,.98))}
     .saved-league-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
@@ -549,9 +550,12 @@
     .saved-league-team{margin-top:4px;font-size:12px;color:#cbd9ec}
     .saved-league-record{font:700 30px/.9 var(--teko);color:var(--green);white-space:nowrap}
     .saved-league-meta,.saved-league-actions{display:flex;flex-wrap:wrap;gap:8px}
-    .saved-league-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 13px;border-radius:14px;text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1)}
+    .saved-league-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 13px;border-radius:14px;text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1);cursor:pointer}
+    button.saved-league-btn{font-family:var(--teko);appearance:none}
     .saved-league-btn.primary{background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);color:#082312;border-color:rgba(187,247,208,.34)}
     .saved-league-btn.secondary{background:linear-gradient(180deg,#3f4d64,#202b3f);color:#edf4ff}
+    .saved-league-btn.utility{background:rgba(15,23,36,.9);color:#dbe8fb;border-color:rgba(148,163,184,.22)}
+    .saved-league-btn.danger{background:rgba(69,10,10,.72);color:#fecaca;border-color:rgba(248,113,113,.34)}
     .saved-leagues-empty{padding:18px;border-radius:18px;border:1px dashed rgba(255,255,255,.16);background:rgba(7,14,25,.46)}
     .saved-leagues-empty strong{display:block;font:700 24px/.92 var(--teko);text-transform:uppercase}
     .saved-leagues-empty span{display:block;margin-top:7px;font-size:13px;line-height:1.55;color:#d2dfef}
