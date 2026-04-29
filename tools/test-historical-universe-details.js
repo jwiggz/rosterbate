@@ -216,6 +216,9 @@ const renderUniverseSource = extractFunctionSource('renderUniverse(slot, state, 
 
 expectMatch(/id="recentRosterMovesList"/, 'recent roster moves list node is missing');
 expectMatch(/id="recentLeagueTradesList"/, 'recent league trades list node is missing');
+expectMatch(/continue-universe\.js/, 'universe details page should load the saved-leagues renderer');
+expectMatch(/id="savedLeaguesShell"/, 'universe details page should expose the continue-universe screen shell');
+expectMatch(/function renderSavedLeaguesScreen\(sport\)/, 'universe details page should render the saved-leagues screen when no slot is selected');
 expectMatch(/Recent League Trades/, 'recent league trades heading is missing');
 expectMatch(/function isRosterChangingActivityEntry\(entry\)/, 'roster-changing activity helper is missing');
 expectMatch(/function buildRecentRosterMovesSummary\(slot, state\)/, 'recent roster moves summary helper is missing');

@@ -92,14 +92,20 @@
     if (getSimulationSport(shell) === 'nfl') {
       return ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'EDGE', 'LB', 'CB', 'S', 'K', 'DST'];
     }
-    return ['PG', 'SG', 'SF', 'PF', 'C'];
+    const starterSlots = Array.isArray(shell?.starterSlots)
+      ? shell.starterSlots.map((slot) => String(slot || '').trim().toUpperCase()).filter(Boolean)
+      : [];
+    return starterSlots.length ? starterSlots.slice() : ['PG', 'SG', 'SF', 'PF', 'C'];
   }
 
   function getSimulationStarterSlots(shell){
     if (getSimulationSport(shell) === 'nfl') {
       return ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST'];
     }
-    return ['PG', 'SG', 'SF', 'PF', 'C'];
+    const starterSlots = Array.isArray(shell?.starterSlots)
+      ? shell.starterSlots.map((slot) => String(slot || '').trim().toUpperCase()).filter(Boolean)
+      : [];
+    return starterSlots.length ? starterSlots.slice() : ['PG', 'SG', 'SF', 'PF', 'C'];
   }
 
   function getSimulationLineupSlotTemplate(shell){
@@ -737,12 +743,15 @@
       SG: ['SG', 'G'],
       SF: ['SF', 'F'],
       PF: ['PF', 'F'],
-      C: ['C']
+      C: ['C'],
+      G: ['PG', 'SG', 'G'],
+      F: ['SF', 'PF', 'F'],
+      UTIL: ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F']
     };
   }
 
   function isSimulationPlayerOut(player){
-    return String(player?.designation || '').trim().toUpperCase() === 'OUT';
+    return ['OUT', 'IR', 'IL'].includes(String(player?.designation || '').trim().toUpperCase());
   }
 
   function getNbaSlotFitScore(slot, player){
@@ -753,6 +762,15 @@
     }
     if (tags.has(normalizedSlot)) {
       return 2;
+    }
+    if (normalizedSlot === 'UTIL') {
+      return 1;
+    }
+    if (normalizedSlot === 'G' && (tags.has('PG') || tags.has('SG'))) {
+      return 1;
+    }
+    if (normalizedSlot === 'F' && (tags.has('SF') || tags.has('PF'))) {
+      return 1;
     }
     if ((normalizedSlot === 'PG' || normalizedSlot === 'SG') && tags.has('G')) {
       return 1;
@@ -766,12 +784,13 @@
   function buildSuggestedNbaLineupIds(roster, shell){
     const sortedRoster = sortPlayers(roster).filter((player) => !isSimulationPlayerOut(player));
     const starterSlots = getSimulationLineupSlotTemplate(shell);
-    const slotPriority = { C: 0, PG: 1, SG: 2, SF: 3, PF: 4 };
+    const slotPriority = { C: 0, PG: 1, SG: 2, SF: 3, PF: 4, G: 5, F: 6, UTIL: 7 };
     const usedIds = new Set();
-    const slotAssignments = {};
+    const slotAssignments = Array.from({ length: starterSlots.length }, () => null);
     const orderedSlots = starterSlots
-      .map((slot) => ({
+      .map((slot, index) => ({
         slot,
+        index,
         candidates: sortedRoster.filter((player) => Number.isFinite(getNbaSlotFitScore(slot, player)))
       }))
       .sort((a, b) => {
@@ -780,7 +799,7 @@
         return Number(slotPriority[a.slot] || 99) - Number(slotPriority[b.slot] || 99);
       });
 
-    orderedSlots.forEach(({ slot }) => {
+    orderedSlots.forEach(({ slot, index }) => {
       const player = sortedRoster.reduce((bestPlayer, entry) => {
         const playerId = Number(entry?.id);
         const fitScore = getNbaSlotFitScore(slot, entry);
@@ -794,17 +813,17 @@
         return fitScore > bestFitScore ? entry : bestPlayer;
       }, null) || null;
       if (!player) {
-        slotAssignments[slot] = null;
+        slotAssignments[index] = null;
         return;
       }
       usedIds.add(Number(player.id));
-      slotAssignments[slot] = Number(player.id);
+      slotAssignments[index] = Number(player.id);
     });
 
-    return starterSlots.map((slot) => (
-      slotAssignments[slot] == null || slotAssignments[slot] === ''
+    return slotAssignments.map((playerId) => (
+      playerId == null || playerId === ''
         ? null
-        : Number(slotAssignments[slot])
+        : Number(playerId)
     ));
   }
 

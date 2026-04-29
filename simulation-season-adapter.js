@@ -1789,10 +1789,12 @@ function cleanSimulationSourceLabel(label){
     if (home && away) {
       const homeScore = Number(normalizedGame.homeScore ?? normalizedGame.homeTotal ?? 0);
       const awayScore = Number(normalizedGame.awayScore ?? normalizedGame.awayTotal ?? 0);
-      home.pf = Number(home.pf || 0) + homeScore;
-      home.pa = Number(home.pa || 0) + awayScore;
-      away.pf = Number(away.pf || 0) + awayScore;
-      away.pa = Number(away.pa || 0) + homeScore;
+      const homeFantasyTotal = Number(normalizedGame.homeTotal ?? normalizedGame.homeScore ?? 0);
+      const awayFantasyTotal = Number(normalizedGame.awayTotal ?? normalizedGame.awayScore ?? 0);
+      home.pf = Number(home.pf || 0) + homeFantasyTotal;
+      home.pa = Number(home.pa || 0) + awayFantasyTotal;
+      away.pf = Number(away.pf || 0) + awayFantasyTotal;
+      away.pa = Number(away.pa || 0) + homeFantasyTotal;
       const winner = String(normalizedGame.winner || '').trim().toLowerCase();
       const homeWon = winner === 'home'
         ? true

@@ -7,8 +7,10 @@ async function main(){
   const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const setupHtml = fs.readFileSync(path.join(__dirname, '..', 'rosterbate-simulation-setup.html'), 'utf8');
 
-  assert.match(indexHtml, /Start Simulation League/, 'index should link to the simulation setup flow');
+  assert.match(indexHtml, /rosterbate-simulation-setup\.html\?sport=nba/, 'index should link to the simulation setup flow');
   assert.match(setupHtml, /id="simulationSourceSeasonList"/, 'setup page needs a season multi-select list');
+  assert.match(setupHtml, /continue-universe\.js/, 'setup page should load the saved-leagues renderer');
+  assert.match(setupHtml, /id="simulationSavedLeaguesList"/, 'setup page should expose a saved-leagues mount');
   assert.match(setupHtml, /id="simulationFranchiseSelect"/, 'setup page needs a franchise selector');
   assert.match(setupHtml, /id="simulationDraftSlotSelect"/, 'setup page needs a draft-slot selector');
 
@@ -28,11 +30,27 @@ async function main(){
     /topPlayersPerPack:\s*getSimulationTopPlayersPerPack\(shell\)/,
     'setup page should derive the preview cap from the shell helper instead of a fixed literal'
   );
+  assert.match(
+    inlineScript,
+    /function syncSimulationSourceSeasonSelectionState\(\)/,
+    'setup page should keep source-season card feedback in sync with checked inputs'
+  );
+  assert.match(
+    inlineScript,
+    /onchange="syncSimulationSourceSeasonSelectionState\(\)"/,
+    'source-season inputs should refresh visible selection feedback when toggled'
+  );
+  assert.match(
+    inlineScript,
+    /source season.*selected/i,
+    'setup page should show an immediate selected-source count before launch validation'
+  );
 
   let seasonNodes = [
     { value: 'nba_1987_full_season_v1', checked: true, disabled: false },
     { value: 'nba_1993_full_season_v1', checked: true, disabled: false },
-    { value: 'nba_1996_full_season_v1', checked: false, disabled: false }
+    { value: 'nba_1996_full_season_v1', checked: false, disabled: false },
+    { value: 'nba_2016_full_season_v1', checked: false, disabled: false }
   ];
   const franchiseSelect = { value: 'LAL', innerHTML: '' };
   const draftSlotSelect = { value: '4', innerHTML: '' };
@@ -68,7 +86,8 @@ async function main(){
   const mockCatalog = [
     { packId: 'nba_1987_full_season_v1', seasonLabel: '1986-87', sport: 'nba' },
     { packId: 'nba_1993_full_season_v1', seasonLabel: '1992-93', sport: 'nba' },
-    { packId: 'nba_1996_full_season_v1', seasonLabel: '1995-96', sport: 'nba' }
+    { packId: 'nba_1996_full_season_v1', seasonLabel: '1995-96', sport: 'nba' },
+    { packId: 'nba_2016_full_season_v1', seasonLabel: '2015-16', sport: 'nba' }
   ];
 
   const context = {
@@ -122,12 +141,12 @@ async function main(){
         draftState: {
           controlledTeamAbbr: input.controlledTeamAbbr,
           rostersByTeam: {
-            LAL: Array.from({ length: 10 }, (_, index) => ({ id: index + 1 }))
+            LAL: Array.from({ length: 15 }, (_, index) => ({ id: index + 1 }))
           },
           freeAgents: [],
           draftPool: [],
           teamCount: 1,
-          rosterSize: 10
+          rosterSize: 15
         },
         seasonState: {
           currentDay: 1
@@ -141,7 +160,7 @@ async function main(){
   context.window.RosterBateSimulationModeConfig = {
     getSimulationShell(){
       return {
-        rosterSize: 10,
+        rosterSize: 15,
         teams: Array.from({ length: 30 }, (_, index) => ({
           abbr: index === 3 ? 'LAL' : `T${String(index + 1).padStart(2, '0')}`,
           name: index === 3 ? 'Los Angeles Lakers' : `Team ${index + 1}`
@@ -191,10 +210,16 @@ async function main(){
   };
 
   vm.runInNewContext(inlineScript, context, { filename: 'rosterbate-simulation-setup.inline.js' });
-  await Promise.resolve();
-  await Promise.resolve();
+  for (let index = 0; index < 6; index += 1) {
+    await Promise.resolve();
+  }
 
   assert.equal(typeof context.enterSimulationDraft, 'function', 'setup page should expose the draft handoff function');
+  assert.equal(
+    (sourceSeasonList.innerHTML.match(/ checked/g) || []).length,
+    4,
+    'nba setup should preselect enough 120-player source seasons to fill a 15-player 30-team shell'
+  );
   let releaseUnderfilledLoad;
   context.window.RosterBateHistoricalPackLoader.loadPackById = function(packId){
     return new Promise((resolve) => {
@@ -225,7 +250,7 @@ async function main(){
   assert.equal(storageWrites.length, 0, 'setup page should block underfilled simulation pools before navigating');
   assert.match(
     statusNode.textContent,
-    /only yields 240 draftable players.*needs 300/i,
+    /only yields 240 draftable players.*needs 450/i,
     'setup page should explain when the selected eras cannot fill a 30-team simulation draft'
   );
   assert.equal(locationState.href, 'rosterbate-simulation-setup.html?sport=nba', 'setup page should stay put when the pool is too small');
@@ -254,7 +279,7 @@ async function main(){
   assert.equal(storageWrites[0].key, 'rbSimulationModeLocalState__fromRuntime', 'setup page should use the runtime storage key');
 
   const savedPayload = JSON.parse(storageWrites[0].value);
-  assert.deepStrictEqual(savedPayload.sourcePackIds, ['nba_1987_full_season_v1', 'nba_1993_full_season_v1', 'nba_1996_full_season_v1'], 'selected pack ids should be captured');
+  assert.deepStrictEqual(savedPayload.sourcePackIds, ['nba_1987_full_season_v1', 'nba_1993_full_season_v1', 'nba_1996_full_season_v1', 'nba_2016_full_season_v1'], 'selected pack ids should be captured');
   assert.equal(savedPayload.mode, 'nba_mixed_era_single_player_v1', 'payload should use the simulation mode id');
   assert.equal(savedPayload.controlledTeamAbbr, 'LAL', 'payload should store the controlled franchise');
   assert.equal(savedPayload.draftSlot, 4, 'payload should store the chosen draft slot');
@@ -269,7 +294,8 @@ async function main(){
   const autoDraftSeasonNodes = [
     { value: 'nba_1987_full_season_v1', checked: true, disabled: false },
     { value: 'nba_1993_full_season_v1', checked: true, disabled: false },
-    { value: 'nba_1996_full_season_v1', checked: true, disabled: false }
+    { value: 'nba_1996_full_season_v1', checked: true, disabled: false },
+    { value: 'nba_2016_full_season_v1', checked: true, disabled: false }
   ];
   const autoDraftLocationState = {
     href: 'rosterbate-simulation-setup.html?sport=nba',
@@ -341,7 +367,7 @@ async function main(){
         draftState: {
           controlledTeamAbbr: input.controlledTeamAbbr,
           rostersByTeam: {
-            LAL: Array.from({ length: 10 }, (_, index) => ({ id: index + 1 }))
+            LAL: Array.from({ length: 15 }, (_, index) => ({ id: index + 1 }))
           },
           freeAgents: [],
           seasonState: {},
@@ -398,11 +424,11 @@ async function main(){
   assert.equal(autoDraftHelperInput.controlledTeamAbbr, 'LAL', 'auto-draft path should forward the selected franchise');
   assert.deepStrictEqual(
     autoDraftHelperInput.mixedEraContext.sourcePackIds,
-    ['nba_1987_full_season_v1', 'nba_1993_full_season_v1', 'nba_1996_full_season_v1'],
+    ['nba_1987_full_season_v1', 'nba_1993_full_season_v1', 'nba_1996_full_season_v1', 'nba_2016_full_season_v1'],
     'auto-draft path should forward the selected source seasons'
   );
   assert.equal(autoDraftHelperInput.shell.teams.length, 30, 'auto-draft path should forward the configured 30-team shell');
-  assert.equal(autoDraftHelperInput.shell.rosterSize, 10, 'auto-draft path should forward the configured roster size');
+  assert.equal(autoDraftHelperInput.shell.rosterSize, 15, 'auto-draft path should forward the configured roster size');
   assert.strictEqual(completedWrites[0].state, autoDraftHelperResult, 'setup page should write the helper result unchanged');
   assert.equal(completedWrites[0].state.draftState.controlledTeamAbbr, 'LAL', 'auto-draft path should preserve the selected team');
   assert.equal(autoDraftStatusNode.textContent, 'Opening season manager...', 'auto path should announce the season handoff on success');
@@ -485,12 +511,12 @@ async function main(){
         draftState: {
           controlledTeamAbbr: input.controlledTeamAbbr,
           rostersByTeam: {
-            LAL: Array.from({ length: 10 }, (_, index) => ({ id: index + 1 }))
+            LAL: Array.from({ length: 15 }, (_, index) => ({ id: index + 1 }))
           },
           freeAgents: [],
           draftPool: [],
           teamCount: 1,
-          rosterSize: 10
+          rosterSize: 15
         },
         seasonState: {
           currentDay: 1

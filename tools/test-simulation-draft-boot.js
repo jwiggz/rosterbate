@@ -175,6 +175,27 @@ assert.match(seasonSource, /Football Local League[\s\S]*fallback view is still l
 }
 
 {
+  const rankContext = {};
+  vm.createContext(rankContext);
+  vm.runInContext(extractFunction(source, 'normalizeDraftPlayerRanks'), rankContext, { filename: 'draft:normalizeDraftPlayerRanks' });
+  const ranked = JSON.parse(JSON.stringify(rankContext.normalizeDraftPlayerRanks([
+    { id: 1, name: 'High FP Lower Total', fp: 60, totalFantasyPoints: 3900 },
+    { id: 2, name: 'Lower FP Higher Total', fp: 50, totalFantasyPoints: 4600 },
+    { id: 3, name: 'Stat Values Total', fp: 55, statValues: { TFP: 4200 } }
+  ])));
+  assert.deepStrictEqual(
+    ranked.map((player) => player.name),
+    ['Lower FP Higher Total', 'Stat Values Total', 'High FP Lower Total'],
+    'draft player ranks should default to total fantasy points, not FP/G'
+  );
+  assert.deepStrictEqual(
+    ranked.map((player) => player.adp),
+    [1, 2, 3],
+    'draft player ranks should be reassigned after TFP sorting'
+  );
+}
+
+{
   const normalizeContext = {};
   vm.createContext(normalizeContext);
   vm.runInContext(extractFunction(source, 'normalizeSeasonManagerDraftPayload'), normalizeContext, { filename: 'draft:normalizeSeasonManagerDraftPayload' });

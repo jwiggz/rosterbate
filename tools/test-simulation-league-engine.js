@@ -139,6 +139,46 @@ assert.equal(
   30
 );
 
+let balancedSpreadState = {
+  seasonId: 'balanced-short-window-spread',
+  currentDay: 1,
+  currentWeek: 1,
+  teams: shell.teams.map((team) => team.name),
+  teamMeta: shell.teams,
+  allRosters: shell.teams.map((team, teamIdx) => roster.slice(0, 8).map((player) => ({
+    ...player,
+    id: teamIdx * 100 + player.id,
+    team: team.abbr,
+    designation: 'ACTIVE'
+  }))),
+  standings: shell.teams.map((team, index) => ({
+    teamIdx: index,
+    teamAbbr: team.abbr,
+    conference: team.conference,
+    division: team.division,
+    w: 0,
+    l: 0,
+    pf: 0,
+    pa: 0
+  }))
+};
+
+for (let day = 1; day <= 5; day += 1) {
+  const spreadDayResult = simulateSimulationGameDay({
+    state: balancedSpreadState,
+    schedule,
+    day,
+    lineupIdsByTeam: Object.fromEntries(shell.teams.map((team) => [team.abbr, []]))
+  });
+  balancedSpreadState = applySimulationDayResults(balancedSpreadState, spreadDayResult);
+}
+
+const fiveDayPfValues = balancedSpreadState.standings.map((row) => Number(row.pf || 0));
+assert.ok(
+  Math.max(...fiveDayPfValues) - Math.min(...fiveDayPfValues) >= 35,
+  'five simulated days should create visible standings PF separation even for balanced rosters'
+);
+
 const nflShell = getSimulationShell({ sport: 'nfl', anchorSeasonId: 'nfl_2014' });
 const realNflPlayerPool = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'historical-packs', 'nfl_2014_full_season_v1', 'players.json'), 'utf8')

@@ -22,7 +22,10 @@
     playoffsStartDate: '2026-04-18',
     finalsStartDate: '2026-06-03',
     regularSeasonGamesPerTeam: 82,
-    rosterSize: 10,
+    rosterSize: 15,
+    starterSlots: ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+    benchSlots: 3,
+    irSlots: 2,
     playInSeeds: [7, 8, 9, 10],
     teams: [
       { abbr: 'ATL', name: 'Atlanta Hawks', conference: 'East', division: 'Southeast' },

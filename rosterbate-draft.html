@@ -4045,7 +4045,11 @@ function getStaticSoloDraftPlayers(){
 function normalizeDraftPlayerRanks(players){
   return (Array.isArray(players)?players:[])
     .slice()
-    .sort((a,b)=>(Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name))
+    .sort((a,b)=>{
+      const aTfp=Number(a?.totalFantasyPoints ?? a?.statValues?.TFP ?? 0);
+      const bTfp=Number(b?.totalFantasyPoints ?? b?.statValues?.TFP ?? 0);
+      return (bTfp-aTfp) || (Number(b?.fp||0)-Number(a?.fp||0)) || a.name.localeCompare(b.name);
+    })
     .map((player,index)=>({...player, adp:index+1}));
 }
 

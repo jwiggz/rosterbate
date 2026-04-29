@@ -342,6 +342,35 @@
       if((!Array.isArray(payload.waiver) || !payload.waiver.length) && Array.isArray(payload.freeAgents) && payload.freeAgents.length){
         payload.waiver = safeClone(payload.freeAgents) || [];
       }
+      const hasCanonicalSimulationRosterMap = payload?.draftState
+        && typeof payload.draftState === 'object'
+        && payload.draftState.rostersByTeam
+        && typeof payload.draftState.rostersByTeam === 'object';
+      if(hasCanonicalSimulationRosterMap){
+        payload.draftState.draftPool = [];
+        payload.draftState.completedPicks = [];
+        [
+          'allRosters',
+          'myRoster',
+          'waiver',
+          'teams',
+          'teamMeta',
+          'standings',
+          'starters',
+          'ilRosters',
+          'ilByTeam',
+          'dailyLineups',
+          'dailyLineupsByTeam',
+          'activityLog',
+          'processed',
+          'dayResults',
+          'revealedDays',
+          'settledWeeks',
+          'dailyRevealReports',
+          'simulationLogsByDay',
+          'lastRevealedDay'
+        ].forEach(function(key){ delete payload[key]; });
+      }
       delete payload.historicalPlayerPool;
       delete payload.freeAgents;
       return payload;

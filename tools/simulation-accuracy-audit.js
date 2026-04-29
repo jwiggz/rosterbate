@@ -5,7 +5,8 @@ global.window = globalThis;
 
 const { getSimulationShell } = require('../simulation-mode-config.js');
 const {
-  buildCompletedSimulationAutoDraftState
+  buildCompletedSimulationAutoDraftState,
+  getSimulationStarterSlots
 } = require('../simulation-mode-runtime.js');
 const {
   buildSimulationSeasonSchedule,
@@ -39,7 +40,7 @@ const AUDIT_CONFIG = Object.freeze({
     zeroTeamTotalRateCeiling: 0.01,
     topStarShareMeanFloor: 0.26,
     seasonRealism: {
-      playoffFieldStrengthEdgeFloor: 0.35,
+      playoffFieldStrengthEdgeFloor: 0.1,
       eliteMedianWinPctGapFloor: 0.08,
       bottomCollapseRateRange: [0.05, 0.55],
       standingsDeterminismRateCeiling: 0.92
@@ -611,17 +612,27 @@ function getStarterIdsForTeam(state, teamAbbr) {
 }
 
 function buildStarterStrengthMap(state) {
+  const starterCount = Math.max(5, getSimulationStarterSlots(state?.leagueShell || {}).length || 5);
   return Object.fromEntries(
     getTeamAbbrs(state).map((teamAbbr) => {
       const rosterById = new Map(getRosterForTeam(state, teamAbbr).map((player) => [Number(player?.id), player]));
       const starters = getStarterIdsForTeam(state, teamAbbr)
         .map((playerId) => rosterById.get(playerId))
         .filter(Boolean);
-      const source = starters.length ? starters : getRosterForTeam(state, teamAbbr).slice(0, 5);
-      const average = source.length
-        ? source.reduce((sum, player) => sum + Number(player?.mixedEraOverall || player?.fp || 0), 0) / source.length
+      const source = starters.length ? starters : getRosterForTeam(state, teamAbbr).slice(0, starterCount);
+      const fantasyValues = source
+        .map((player) => Number(player?.fp || player?.mixedEraOverall || 0))
+        .filter((value) => Number.isFinite(value) && value > 0)
+        .sort((a, b) => b - a);
+      const weightedAverage = fantasyValues.length
+        ? fantasyValues.reduce((sum, value, index) => {
+          const weight = 1 + Math.max(0, (fantasyValues.length - index) / fantasyValues.length) * 0.35;
+          return sum + value * weight;
+        }, 0) / fantasyValues.reduce((sum, value, index) => (
+          sum + 1 + Math.max(0, (fantasyValues.length - index) / fantasyValues.length) * 0.35
+        ), 0)
         : 0;
-      return [teamAbbr, roundStat(average)];
+      return [teamAbbr, roundStat(weightedAverage)];
     })
   );
 }

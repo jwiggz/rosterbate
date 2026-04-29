@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="global-nav.css">
   <script src="historical-pack-loader.js"></script>
   <script src="mixed-era-runtime.js"></script>
+  <script src="historical-universe-slots.js"></script>
+  <script src="continue-universe.js"></script>
   <script src="simulation-mode-config.js"></script>
   <script src="simulation-mode-runtime.js"></script>
   <script src="global-nav.js" defer></script>
@@ -363,6 +365,25 @@
       color:#dce8f7;
       white-space:nowrap;
     }
+    .season-option-selection{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(10,18,30,.76);
+      font:700 10px/1 var(--plex);
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:#dce8f7;
+      white-space:nowrap;
+    }
+    .season-option[data-selected="true"] .season-option-selection{
+      border-color:rgba(103,239,160,.35);
+      background:rgba(22,101,52,.34);
+      color:#c8f7d7;
+    }
     .season-option-title{
       font:700 24px/.92 var(--teko);
       text-transform:uppercase;
@@ -514,6 +535,27 @@
     .status[data-state="ready"]{color:#d8ebff}
     .status[data-state="warn"]{color:#ffd9a6}
     .status[data-state="error"]{color:var(--red-soft)}
+    .saved-leagues-panel{margin-top:14px}
+    .saved-leagues-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+    .saved-leagues-kicker{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-soft)}
+    .saved-leagues-title{margin-top:7px;font:700 30px/.92 var(--teko);text-transform:uppercase}
+    .saved-leagues-copy{margin-top:7px;max-width:64ch;font-size:13px;line-height:1.58;color:#d2dfef}
+    .saved-leagues-count,.saved-league-meta span,.saved-leagues-more{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(7,14,25,.66);font:700 10px/1 var(--plex);letter-spacing:.08em;text-transform:uppercase;color:#dbe8fb}
+    .saved-leagues-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+    .saved-league-card{display:grid;gap:12px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(16,25,41,.94),rgba(8,12,22,.98))}
+    .saved-league-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .saved-league-sport{font:700 10px/1 var(--plex);letter-spacing:.14em;text-transform:uppercase;color:#9ec8ff}
+    .saved-league-name{margin-top:7px;font:700 24px/.92 var(--teko);text-transform:uppercase}
+    .saved-league-team{margin-top:4px;font-size:12px;color:#cbd9ec}
+    .saved-league-record{font:700 30px/.9 var(--teko);color:var(--green);white-space:nowrap}
+    .saved-league-meta,.saved-league-actions{display:flex;flex-wrap:wrap;gap:8px}
+    .saved-league-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 13px;border-radius:14px;text-decoration:none;font:700 13px/1 var(--teko);letter-spacing:.05em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1)}
+    .saved-league-btn.primary{background:linear-gradient(180deg,#67efa0,#37d476 42%,#1eb55e 74%,#159a4d 100%);color:#082312;border-color:rgba(187,247,208,.34)}
+    .saved-league-btn.secondary{background:linear-gradient(180deg,#3f4d64,#202b3f);color:#edf4ff}
+    .saved-leagues-empty{padding:18px;border-radius:18px;border:1px dashed rgba(255,255,255,.16);background:rgba(7,14,25,.46)}
+    .saved-leagues-empty strong{display:block;font:700 24px/.92 var(--teko);text-transform:uppercase}
+    .saved-leagues-empty span{display:block;margin-top:7px;font-size:13px;line-height:1.55;color:#d2dfef}
+    .saved-leagues-more{margin-top:10px}
     @media (max-width: 1100px){
       .hero-grid,
       .workspace-grid{
@@ -565,7 +607,7 @@
         <p class="setup-copy" id="simulationHeroCopy">Choose the source seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.</p>
         <div class="hero-chip-row" aria-label="Simulation shell details">
           <span class="hero-chip" id="simulationShellChip">2025-26 NBA shell</span>
-          <span class="hero-chip" id="simulationRosterChip">10-player basketball roster</span>
+          <span class="hero-chip" id="simulationRosterChip">15-player basketball roster</span>
           <span class="hero-chip" id="simulationModeChip">Local simulation league</span>
           <span class="hero-chip" id="simulationLaunchChip">Draft or instant season start</span>
         </div>
@@ -607,6 +649,9 @@
           </div>
         </div>
       </aside>
+    </section>
+    <section class="panel workspace-card saved-leagues-panel">
+      <div id="simulationSavedLeaguesList"></div>
     </section>
     <section class="workspace-grid">
       <section class="panel workspace-card">
@@ -724,7 +769,7 @@
         heroBody: 'Choose the source seasons that feed your mixed-era draft pool, then claim a 2025-26 NBA franchise. This page is where the universe gets defined before the season shell takes over.',
         sourceBody: 'Pick one or more NBA source packs. These selections define the crossover player pool your local simulation league will draft from.',
         shellChip: '2025-26 NBA shell',
-        rosterChip: '10-player basketball roster',
+        rosterChip: '15-player basketball roster',
         modeChip: 'Local simulation league',
         launchChip: 'Draft or instant season start',
         teamLabel: 'Franchise',
@@ -851,6 +896,30 @@
       }).filter(Boolean);
     }
 
+    function syncSimulationSourceSeasonSelectionState(){
+      const inputs = Array.from(document.querySelectorAll('#simulationSourceSeasonList input'));
+      const selectedCount = inputs.filter(function(node){ return !!(node && node.checked); }).length;
+      inputs.forEach(function(node){
+        const option = node && typeof node.closest === 'function' ? node.closest('.season-option') : null;
+        if (option && option.dataset) {
+          option.dataset.selected = node.checked ? 'true' : 'false';
+        }
+        const label = option && typeof option.querySelector === 'function' ? option.querySelector('.season-option-selection') : null;
+        if (label) {
+          label.textContent = node.checked ? 'Selected' : 'Add';
+        }
+      });
+      if (inputs.length) {
+        const selectedLabel = selectedCount + ' source season' + (selectedCount === 1 ? '' : 's') + ' selected.';
+        const requiredPlayers = getSimulationRequiredDraftSlots(getSimulationShell());
+        const requiredSeasons = Math.max(1, Math.ceil(requiredPlayers / SIMULATION_TOP_PLAYERS_PER_PACK));
+        const guidance = selectedCount < requiredSeasons
+          ? ' Add more source seasons before launching the ' + String(requiredPlayers) + '-player NBA shell.'
+          : ' Ready to build the mixed-era pool.';
+        setSimulationSetupStatus(selectedLabel + guidance, selectedCount ? 'ready' : 'warn');
+      }
+    }
+
     function setSimulationSetupBusyState(isBusy){
       if (document.body && document.body.dataset) {
         document.body.dataset.setupBusy = isBusy ? 'true' : 'false';
@@ -869,6 +938,21 @@
         if (node) {
           node.disabled = !!isBusy;
         }
+      });
+    }
+
+    function renderSimulationSavedLeagues(){
+      if (!window.RosterBateSavedLeagues || typeof window.RosterBateSavedLeagues.renderSavedSimulationLeagues !== 'function') {
+        return;
+      }
+      window.RosterBateSavedLeagues.renderSavedSimulationLeagues('simulationSavedLeaguesList', {
+        sport: getSimulationSport(),
+        maxCards: 3,
+        kicker: 'Already Started',
+        heading: 'Continue A Saved League',
+        copy: 'Saved simulation universes from this browser appear here, with their current day, record, and last played time.',
+        emptyTitle: 'No Saved Leagues Yet',
+        emptyCopy: 'Once you start a simulation season, it will show up here so you can reopen it without saving the URL.'
       });
     }
 
@@ -892,7 +976,12 @@
         container.innerHTML = '<div class="season-empty">' + escapeSimulationHtml(emptyMessage || getSimulationCopy().emptyStatus || 'No source packs are available right now.') + '</div>';
         return;
       }
+      const shell = getSimulationShell();
+      const defaultSelectionCount = getSimulationSport() === 'nfl'
+        ? 1
+        : Math.max(1, Math.ceil(getSimulationRequiredDraftSlots(shell) / SIMULATION_TOP_PLAYERS_PER_PACK));
       container.innerHTML = entries.map(function(entry, index){
+        const isDefaultSelected = index < defaultSelectionCount;
         const seasonLabel = escapeSimulationHtml(entry && (entry.seasonLabel || entry.packId || 'Unknown Season'));
         const packId = escapeSimulationHtml(entry && entry.packId || '');
         const eraLabel = escapeSimulationHtml(entry && ((entry.art && entry.art.eyebrow) || entry.era || 'Historic Archive'));
@@ -902,12 +991,13 @@
         const shortLabel = escapeSimulationHtml(entry && (entry.shortLabel || entry.packId || ''));
         const tone = getSimulationSeasonTone(entry).replace(/[^a-z0-9_-]/g, '') || 'heritage';
         return (
-          '<label class="season-option">' +
-            '<input class="season-option-input" type="checkbox" value="' + packId + '"' + (index < 3 ? ' checked' : '') + '>' +
+          '<label class="season-option" data-selected="' + (isDefaultSelected ? 'true' : 'false') + '">' +
+            '<input class="season-option-input" type="checkbox" value="' + packId + '"' + (isDefaultSelected ? ' checked' : '') + ' onchange="syncSimulationSourceSeasonSelectionState()">' +
             '<span class="season-option-body tone-' + tone + '">' +
               '<span class="season-option-top">' +
                 '<span class="season-option-era">' + eraLabel + '</span>' +
                 '<span class="season-option-status">' + statusLabel + '</span>' +
+                '<span class="season-option-selection">' + (isDefaultSelected ? 'Selected' : 'Add') + '</span>' +
               '</span>' +
               '<span class="season-option-title">' + seasonLabel + '</span>' +
               '<span class="season-option-copy">' + summary + '</span>' +
@@ -970,6 +1060,7 @@
       const shell = getSimulationShell();
       const simulationCopy = getSimulationCopy();
       applySimulationCopy(simulationCopy, shell);
+      renderSimulationSavedLeagues();
       renderFranchiseOptions(shell);
       renderDraftSlotOptions(shell);
       setSimulationSetupStatus('Loading available source seasons...', 'working');
@@ -980,10 +1071,11 @@
             && String(entry && entry.syntheticType || '').trim().toLowerCase() !== 'mixed_era';
         });
         renderSeasonOptions(sportSeasons, simulationCopy.emptyStatus);
-        setSimulationSetupStatus(
-          sportSeasons.length ? (simulationCopy.readyStatus || 'Choose your eras and pick your opening lane.') : simulationCopy.emptyStatus,
-          sportSeasons.length ? 'ready' : 'warn'
-        );
+        if (sportSeasons.length) {
+          syncSimulationSourceSeasonSelectionState();
+        } else {
+          setSimulationSetupStatus(simulationCopy.emptyStatus, 'warn');
+        }
       }catch(error){
         console.error('[Simulation Setup] Failed to load historical catalog', error);
         renderSeasonOptions([], simulationCopy.emptyStatus);

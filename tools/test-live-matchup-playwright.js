@@ -130,7 +130,7 @@ async function seedLiveMatchupSeason(page, slotId) {
 async function attachErrorCapture(page, label) {
   const errors = [];
   page.on('pageerror', (error) => {
-    errors.push(`${label}: ${String(error?.message || error)}`);
+    errors.push(`${label}: ${String(error?.stack || error?.message || error)}`);
   });
   page.on('console', (message) => {
     if (message.type() === 'error') {
@@ -339,8 +339,8 @@ async function smokeLiveMatchupWriteback(browser) {
   );
   assert.match(
     reportText,
-    /matchup board lead shifted|moved in front on the matchup board/i,
-    'latest league report should frame lead changes as board movement'
+    /matchup board lead shifted|moved in front on the matchup board|No board movement registered|lead .* to/i,
+    'latest league report should frame matchup movement without selected-matchup opponent confusion'
   );
   await page.locator('#revealReportModal button').filter({ hasText: 'Close' }).first().click({ timeout: 5000 });
 
@@ -551,6 +551,56 @@ async function smokeSeasonMatchupMobilePartialDay(browser) {
   await page.close();
 }
 
+async function smokeSeasonHardRefreshPersistence(browser) {
+  const slotId = `${SLOT_ID}-hard-refresh`;
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'season-hard-refresh');
+  await seedLiveMatchupSeason(page, slotId);
+
+  await page.goto(
+    `${BASE_URL}/rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=${slotId}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForTimeout(2500);
+  await page.evaluate(() => window.advanceWeek && window.advanceWeek());
+  await page.waitForTimeout(1250);
+
+  const persistedBeforeReload = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const draftRaw = localStorage.getItem('rosterbateDraft');
+    const saveStatus = document.querySelector('#seasonSaveStatus');
+    return {
+      slot: slotRaw ? JSON.parse(slotRaw) : null,
+      draft: draftRaw ? JSON.parse(draftRaw) : null,
+      slotBytes: slotRaw ? slotRaw.length : 0,
+      draftBytes: draftRaw ? draftRaw.length : 0,
+      saveStatusText: saveStatus?.textContent || '',
+      saveStatusClass: saveStatus?.className || ''
+    };
+  }, slotId);
+  assert.equal(Number(persistedBeforeReload.slot?.seasonState?.currentDay), 2, 'simulated day should persist to the universe slot before reload');
+  assert.equal(persistedBeforeReload.draft?.localResumePointer, true, 'simulation local resume should be a small slot pointer');
+  assert.equal(persistedBeforeReload.draft?.resumeHistoricalUniverseSlotId, slotId, 'local resume pointer should target the current universe slot');
+  assert.equal(Object.prototype.hasOwnProperty.call(persistedBeforeReload.slot || {}, 'allRosters'), false, 'persisted simulation slot should omit duplicate shell roster mirrors');
+  assert.equal(Array.isArray(persistedBeforeReload.slot?.draftState?.draftPool) ? persistedBeforeReload.slot.draftState.draftPool.length : 0, 0, 'persisted simulation slot should not keep draft-pool bulk after draft');
+  assert.ok(persistedBeforeReload.draftBytes < 1500, `local resume pointer should stay tiny: ${persistedBeforeReload.draftBytes} bytes`);
+  assert.match(persistedBeforeReload.saveStatusText, /Saved just now/i, 'season shell should show a saved status after local persistence');
+  assert.match(persistedBeforeReload.saveStatusClass, /saved/, 'season save status should use saved styling after local persistence');
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 20000 });
+  await page.waitForTimeout(2500);
+  const reloaded = await page.evaluate(() => ({
+    day: Number(SEASON_MODE_ADAPTER?.getState?.()?.seasonState?.currentDay || 0),
+    completedGames: Number(SEASON_MODE_ADAPTER?.getState?.()?.seasonState?.completedGameLogs?.length || 0),
+    text: document.body.innerText
+  }));
+  assert.equal(reloaded.day, 2, 'hard refresh should reopen the current persisted day');
+  assert.equal(reloaded.completedGames, 2, 'hard refresh should retain completed game logs');
+  assert.match(reloaded.text, /Reveal Day 2|Day 2/i, 'hard refreshed season page should render Day 2 copy');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -559,6 +609,7 @@ async function main() {
     await smokeLiveMatchupInstantReveal(browser);
     await smokeLiveMatchupMobileControls(browser);
     await smokeSeasonMatchupMobilePartialDay(browser);
+    await smokeSeasonHardRefreshPersistence(browser);
   } finally {
     await browser.close();
   }

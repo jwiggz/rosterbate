@@ -56,9 +56,9 @@
 
   const SPORT_CONFIG = {
     nba:{
-      key:'nba',label:'Basketball',shortLabel:'BKB',icon:'\u{1F3C0}',leagueLabel:'Pro Basketball Season',defaultLeagueSize:10,defaultRounds:13,defaultScoring:'h2h_cat',defaultFormat:'snake',timer:90,playerCount:240,
+      key:'nba',label:'Basketball',shortLabel:'BKB',icon:'\u{1F3C0}',leagueLabel:'Pro Basketball Season',defaultLeagueSize:10,defaultRounds:15,defaultScoring:'h2h_cat',defaultFormat:'snake',timer:90,playerCount:240,
       filters:['ALL','PG','SG','SF','PF','C'],waiverPositions:['ALL','PG','SG','SF','PF','C'],
-      starterSlots:['PG','SG','SF','PF','C','G','F','UTIL'],myTeamSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','BN','BN','BN','BN','BN','BN','IR'],
+      starterSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','UTIL'],myTeamSlots:['PG','SG','SF','PF','C','G','F','UTIL','UTIL','UTIL','BN','BN','BN','IR','IR'],
       commissionerScoringType:'H2H Points',
 scoringInfo:{h2h_cat:'Win/lose 9 stat categories weekly: PTS, REB, AST, STL, BLK, TO, FG%, FT%, 3PM.',h2h_pts:'Weekly matchup by total fantasy pts. PTS=1, REB=1.2, AST=1.5, STL=3, BLK=3, TO=-1, 3PM=0.5.',money_ball:'Points scoring with one lockable game per starting position each week. If you do not lock a slot, its final game of the week counts.',roto:'Season-long ranking in each stat category. Best cumulative rank total wins.',points:'Pure accumulation. Best total fantasy points all season wins.'},
       teamCodes:['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS']
@@ -215,7 +215,7 @@ scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in 
     const key=normalizeSportKey(sport);
     if(key==='nfl') return {scoringType:'H2H Points',positions:{QB:{starters:1,max:4},RB:{starters:2,max:6},WR:{starters:2,max:6},TE:{starters:1,max:3},FLEX:{starters:1,max:3},K:{starters:1,max:2},DST:{starters:1,max:2},BN:{starters:6,max:'No Limit'},IR:{starters:1,max:2}},scoring:{PASS_YDS:0.04,PASS_TD:4,INT:-2,RUSH_YDS:0.1,RUSH_TD:6,REC:1,REC_YDS:0.1,REC_TD:6,FUM:-2,FG:3,XP:1,SACK:1,DEF_TO:2,DEF_TD:6}};
     if(key==='mlb') return {scoringType:'Points',positions:{C:{starters:1,max:2},'1B':{starters:1,max:2},'2B':{starters:1,max:2},'3B':{starters:1,max:2},SS:{starters:1,max:2},OF:{starters:3,max:6},UTIL:{starters:1,max:2},P:{starters:6,max:10},BN:{starters:3,max:'No Limit'},IL:{starters:3,max:3}},scoring:{SINGLE:1,DOUBLE:2,TRIPLE:3,HR:4,RBI:1,RUN:1,BB:1,SB:2,IP:3,SO:1,W:5,SV:5,ER:-2}};
-    return {scoringType:'H2H Points',positions:{PG:{starters:1,max:3},SG:{starters:1,max:3},SF:{starters:1,max:3},PF:{starters:1,max:3},C:{starters:1,max:3},G:{starters:1,max:3},F:{starters:1,max:3},UTIL:{starters:1,max:3},BE:{starters:5,max:'No Limit'},IR:{starters:1,max:3}},scoring:{FGM:2,FGA:-1,FTM:1,FTA:-1,'3PM':1,REB:1,AST:2,STL:4,BLK:4,TO:-2,PTS:1}};
+    return {scoringType:'H2H Points',positions:{PG:{starters:1,max:3},SG:{starters:1,max:3},SF:{starters:1,max:3},PF:{starters:1,max:3},C:{starters:1,max:3},G:{starters:1,max:3},F:{starters:1,max:3},UTIL:{starters:3,max:3},BE:{starters:3,max:'No Limit'},IR:{starters:2,max:2}},scoring:{FGM:2,FGA:-1,FTM:1,FTA:-1,'3PM':1,REB:1,AST:2,STL:4,BLK:4,TO:-2,PTS:1}};
   }
   function getLeagueRuleDefaults(sport){
     const key=normalizeSportKey(sport), cfg=getSportConfig(key), comm=getCommissionerDefaults(key), slots=cfg.myTeamSlots||[], irKey=key==='mlb'?'IL':'IR', starterCount=(cfg.starterSlots||[]).length, irCount=slots.filter(function(slot){ return slot===irKey; }).length || 1, benchCount=slots.length - starterCount - irCount;

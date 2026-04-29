@@ -1310,6 +1310,7 @@ assertSharedSinglePlayerRosterMarkers(
 assertSimulationParityMeta(elements.rosterContent.innerHTML, 'simulation roster');
 assert.match(elements.rosterContent.innerHTML, /Adapter League Label/, 'simulation roster header should prefer the adapter-provided league label');
 assert.match(elements.rosterContent.innerHTML, /Adapter Waiver Order/, 'simulation roster header should prefer the adapter-provided waiver-order label');
+assert.match(elements.rosterContent.innerHTML, /Customize Team/, 'simulation roster should preserve the old customize-team hero action');
 assert.doesNotMatch(elements.rosterContent.innerHTML, /Conflicting League Name/, 'simulation roster header should avoid falling back to unrelated page-global league copy when the VM provides it');
 
 const fixture = {
@@ -1596,6 +1597,9 @@ assertSharedSinglePlayerRosterMarkers(
 );
 assert.match(elements.rosterContent.innerHTML, /Use Suggested Starters/);
 assert.match(elements.rosterContent.innerHTML, /Set starters, tune your bench, and manage roster moves from one local-league room\./);
+assert.match(elements.rosterContent.innerHTML, /Customize Team/, 'simulation roster should keep the old avatar-led team-room affordance');
+assert.match(elements.rosterContent.innerHTML, /Roster Space/, 'simulation roster should keep the old roster-space command card');
+assert.match(elements.rosterContent.innerHTML, /Bench Desk|Depth Desk/, 'simulation roster should keep the old bench/depth command card');
 assert.match(elements.rosterContent.innerHTML, />Matchup</);
 assert.match(elements.rosterContent.innerHTML, /Starters/);
 assert.match(elements.rosterContent.innerHTML, /bench/i);
@@ -1691,6 +1695,8 @@ assert.deepStrictEqual(
 api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationWaiverInSharedShell();
+assert.match(elements.waiverContent.innerHTML, /Free Agents Control Room/i, 'simulation waiver desk should reuse the pre-simulation free-agent control room framing');
+assert.match(elements.waiverContent.innerHTML, /Waiver Radar/i, 'simulation waiver desk should keep the old waiver radar surface');
 assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'simulation waiver desk should render a pending-claims section');
 assert.match(elements.waiverContent.innerHTML, /Processing next reveal window|Processing next weekly window/i, 'simulation waiver desk should show delayed pending-claim timing');
 assert.match(elements.waiverContent.innerHTML, /Submit Claim/i, 'simulation waiver desk should expose an explicit submit-claim action');
@@ -1817,6 +1823,8 @@ assert.match(elements.playoffsContent.innerHTML, /Completed/i, 'active-screen re
 
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
+assert.match(elements.waiverContent.innerHTML, /Free Agents Control Room/i, 'simulation waiver desk should still use the control room shell after state advances');
+assert.match(elements.waiverContent.innerHTML, /Watch List Snapshot/i, 'simulation waiver desk should preserve the old watch-list snapshot area');
 assert.match(elements.waiverContent.innerHTML, /Submit Claim/i, 'simulation waiver desk should switch from immediate adds to claim submission copy');
 assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'simulation waiver desk should reserve space for pending claims instead of immediate roster mutation');
 assert.match(elements.waiverContent.innerHTML, /Recent Waiver Results/i, 'simulation waiver desk should surface recent claim outcomes alongside pending claims');

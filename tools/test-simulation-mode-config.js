@@ -19,6 +19,14 @@ assert.equal(defaultShell.anchorSeasonLabel, '2025-26 NBA');
 assert.equal(defaultShell.sport, 'nba');
 assert.equal(defaultShell.teams.length, 30);
 assert.equal(defaultShell.regularSeasonGamesPerTeam, 82);
+assert.equal(defaultShell.rosterSize, 15);
+assert.deepStrictEqual(
+  defaultShell.starterSlots,
+  ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+  'nba shell should use the expanded ESPN-style starter layout'
+);
+assert.equal(defaultShell.benchSlots, 3);
+assert.equal(defaultShell.irSlots, 2);
 assert.deepStrictEqual(defaultShell.playInSeeds, [7, 8, 9, 10]);
 assert.equal(defaultShell.finalsStartDate, '2026-06-03');
 assert.equal(findSimulationTeamByAbbr('LAL').conference, 'West');

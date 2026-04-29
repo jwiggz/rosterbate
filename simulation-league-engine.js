@@ -1010,6 +1010,11 @@
   }
 
   function buildGameContext(homeProfile, awayProfile, rng){
+    const homeSport=String(homeProfile?.sport || '').trim().toLowerCase();
+    const awaySport=String(awayProfile?.sport || '').trim().toLowerCase();
+    const isNflGame=(homeSport==='nfl' || awaySport==='nfl');
+    const teamFormVolatility=isNflGame ? 0.045 : 0.065;
+    const matchupSignalDivisor=isNflGame ? 250 : 200;
     const sharedPace=clamp(
       ((homeProfile.tempo + awayProfile.tempo) / 110) + normalish(rng) * 0.03,
       0.88,
@@ -1019,9 +1024,11 @@
     const reverseGap=(awayProfile.offense + awayProfile.playmaking * 0.35) - (homeProfile.defense * homeProfile.tuning.defenseTightness);
     return {
       sharedPace:sharedPace,
-      homeBoost:clamp(1 + offenseGap / 250 + 0.025, 0.84, 1.18),
-      awayBoost:clamp(1 + reverseGap / 250 - 0.01, 0.82, 1.16),
+      homeBoost:clamp(1 + offenseGap / matchupSignalDivisor + 0.025, 0.84, 1.18),
+      awayBoost:clamp(1 + reverseGap / matchupSignalDivisor - 0.01, 0.82, 1.16),
       reboundTilt:clamp((homeProfile.rebounding - awayProfile.rebounding) / 220, -0.08, 0.08),
+      homeForm:clamp(1 + normalish(rng) * teamFormVolatility, 0.88, 1.14),
+      awayForm:clamp(1 + normalish(rng) * teamFormVolatility, 0.88, 1.14),
       varianceScale:clamp(((homeProfile.variance + awayProfile.variance) / 140), 0.8, 1.35)
     };
   }
@@ -1031,7 +1038,7 @@
       return simulateNflStarterEntries(teamProfile, opponentProfile, teamLabel, opponentLabel, sideKey, rng, gameContext);
     }
     const starters=teamProfile.starters;
-    const nbaProductionScale=0.832;
+    const nbaProductionScale=0.831;
     const usageWeights=normalizeWeights(starters, function(player){
       const ratings=player?.simProfile?.ratings || {};
       return 0.7 + Number(ratings.usage || 0) / 90 + Number(ratings.scoring || 0) / 180 + Number(ratings.playmaking || 0) / 280;
@@ -1052,6 +1059,7 @@
       const volatility=clamp((Number(ratings.volatility || 50) / 100) * gameContext.varianceScale, 0.08, 0.32);
       const randomSwing=1 + normalish(rng) * volatility;
       const offenseBoost=sideKey==='home' ? gameContext.homeBoost : gameContext.awayBoost;
+      const teamForm=sideKey==='home' ? (gameContext.homeForm || 1) : (gameContext.awayForm || 1);
       const reboundShift=sideKey==='home' ? gameContext.reboundTilt : -gameContext.reboundTilt;
       const efficiencyBoost=clamp(0.92 + Number(ratings.shooting || 50) / 240, 0.78, 1.22);
       const archetype=String(profile?.archetype || '').trim().toLowerCase();
@@ -1113,17 +1121,17 @@
         14,
         42
       );
-      const pts=roundStat(Math.max(0, baseline.pts * gameContext.sharedPace * offenseBoost * (0.78 + usageWeight * 1.65) * randomSwing * nbaProductionScale * takeoverLift * scoringRoleLift));
-      const reb=roundStat(Math.max(0, baseline.reb * gameContext.sharedPace * (0.84 + reboundWeight * 1.2 + reboundShift) * nbaProductionScale * supportLift * reboundRoleLift));
-      const ast=roundStat(Math.max(0, baseline.ast * gameContext.sharedPace * (0.82 + playWeight * 1.45) * (0.94 + teamProfile.tuning.assistBoost * 0.08) * nbaProductionScale * takeoverLift * playmakingRoleLift));
+      const pts=roundStat(Math.max(0, baseline.pts * gameContext.sharedPace * offenseBoost * teamForm * (0.78 + usageWeight * 1.65) * randomSwing * nbaProductionScale * takeoverLift * scoringRoleLift));
+      const reb=roundStat(Math.max(0, baseline.reb * gameContext.sharedPace * teamForm * (0.84 + reboundWeight * 1.2 + reboundShift) * nbaProductionScale * supportLift * reboundRoleLift));
+      const ast=roundStat(Math.max(0, baseline.ast * gameContext.sharedPace * teamForm * (0.82 + playWeight * 1.45) * (0.94 + teamProfile.tuning.assistBoost * 0.08) * nbaProductionScale * takeoverLift * playmakingRoleLift));
       const stl=roundStat(Math.max(0, baseline.stl * clamp(0.9 + (Number(ratings.defense || 50) - Number(opponentProfile.playmaking || 50)) / 300, 0.62, 1.34) * (0.88 + rng() * 0.28) * nbaProductionScale * defenseEventLift));
       const blk=roundStat(Math.max(0, baseline.blk * clamp(0.92 + (Number(ratings.defense || 50) - Number(opponentProfile.offense || 50)) / 320, 0.6, 1.38) * (0.88 + rng() * 0.26) * nbaProductionScale * defenseEventLift));
       const turnovers=roundStat(Math.max(0, baseline.to * (0.86 + usageWeight * 0.9) * (0.88 + rng() * 0.22) * 0.93));
-      const threes=roundStat(Math.max(0, baseline.threes * gameContext.sharedPace * (0.82 + usageWeight * 1.28) * teamProfile.tuning.threeBoost * (0.9 + rng() * 0.22) * nbaProductionScale * takeoverLift * spacingRoleLift));
-      const fga=roundStat(Math.max(threes + 2, baseline.fga * gameContext.sharedPace * (0.8 + usageWeight * 1.6) * offenseBoost * nbaProductionScale * takeoverLift));
-      const fgm=roundStat(Math.min(fga, Math.max(0, baseline.fgm * gameContext.sharedPace * offenseBoost * efficiencyBoost * (0.88 + rng() * 0.18) * nbaProductionScale * takeoverLift)));
-      const fta=roundStat(Math.max(0, baseline.fta * (0.82 + usageWeight * 1.15) * offenseBoost * (0.88 + rng() * 0.16) * nbaProductionScale * takeoverLift));
-      const ftm=roundStat(Math.min(fta, Math.max(0, baseline.ftm * (0.9 + rng() * 0.14) * nbaProductionScale * takeoverLift)));
+      const threes=roundStat(Math.max(0, baseline.threes * gameContext.sharedPace * teamForm * (0.82 + usageWeight * 1.28) * teamProfile.tuning.threeBoost * (0.9 + rng() * 0.22) * nbaProductionScale * takeoverLift * spacingRoleLift));
+      const fga=roundStat(Math.max(threes + 2, baseline.fga * gameContext.sharedPace * teamForm * (0.8 + usageWeight * 1.6) * offenseBoost * nbaProductionScale * takeoverLift));
+      const fgm=roundStat(Math.min(fga, Math.max(0, baseline.fgm * gameContext.sharedPace * teamForm * offenseBoost * efficiencyBoost * (0.88 + rng() * 0.18) * nbaProductionScale * takeoverLift)));
+      const fta=roundStat(Math.max(0, baseline.fta * teamForm * (0.82 + usageWeight * 1.15) * offenseBoost * (0.88 + rng() * 0.16) * nbaProductionScale * takeoverLift));
+      const ftm=roundStat(Math.min(fta, Math.max(0, baseline.ftm * teamForm * (0.9 + rng() * 0.14) * nbaProductionScale * takeoverLift)));
       const stats={
         pts:pts,
         reb:reb,
@@ -1588,10 +1596,12 @@
         ? next.standings.find(function(row){ return Number(row.teamIdx) === Number(game.away); })
         : null;
       if(!(home && away)) return;
-      home.pf=Number(home.pf || 0) + Number(game.homeScore || 0);
-      home.pa=Number(home.pa || 0) + Number(game.awayScore || 0);
-      away.pf=Number(away.pf || 0) + Number(game.awayScore || 0);
-      away.pa=Number(away.pa || 0) + Number(game.homeScore || 0);
+      const homeFantasyTotal=Number(game.homeTotal ?? game.homeScore ?? 0);
+      const awayFantasyTotal=Number(game.awayTotal ?? game.awayScore ?? 0);
+      home.pf=Number(home.pf || 0) + homeFantasyTotal;
+      home.pa=Number(home.pa || 0) + awayFantasyTotal;
+      away.pf=Number(away.pf || 0) + awayFantasyTotal;
+      away.pa=Number(away.pa || 0) + homeFantasyTotal;
       const authoritativeWinner=String(game?.winner || '').trim().toLowerCase();
       const homeWon=authoritativeWinner==='home'
         ? true

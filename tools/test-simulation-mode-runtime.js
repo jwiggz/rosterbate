@@ -47,7 +47,7 @@ const playerPool = [
   { id: 3, name: 'Fp Lower', team: 'HIS', pos: 'SF', fp: 19, mixedEraOverall: 99, historicalPackId: 'nba_1993_full_season_v1' },
   { id: 4, name: 'Alpha', team: 'HIS', pos: 'PF', fp: 50, mixedEraOverall: 98, historicalPackId: 'nba_1993_full_season_v1' },
   { id: 5, name: 'Zulu', team: 'HIS', pos: 'C', fp: 50, mixedEraOverall: 98, historicalPackId: 'nba_1996_full_season_v1' },
-  ...Array.from({ length: 355 }, (_, index) => ({
+  ...Array.from({ length: 505 }, (_, index) => ({
     id: index + 6,
     name: `Filler ${String(index + 1).padStart(3, '0')}`,
     team: 'HIS',
@@ -118,7 +118,8 @@ const skewedNflMixedEraContext = {
 
 const positionedNbaShell = {
   sport: 'nba',
-  rosterSize: 5,
+  rosterSize: 15,
+  starterSlots: ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
   teams: [{ abbr: 'LAL', name: 'Los Angeles Lakers' }]
 };
 
@@ -131,7 +132,17 @@ const positionedNbaMixedEraContext = {
     { id: 55, name: 'Larry Nance', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 97, fp: 48, historicalPackId: 'nba_1996_full_season_v1' },
     { id: 9, name: 'Ron Harper', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 95, fp: 41, historicalPackId: 'nba_1996_full_season_v1' },
     { id: 13, name: 'Gerald Wilkins', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 94, fp: 39, historicalPackId: 'nba_1996_full_season_v1' },
-    { id: 31, name: 'Sean Elliott', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 96, fp: 44, historicalPackId: 'nba_1996_full_season_v1' }
+    { id: 31, name: 'Sean Elliott', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 96, fp: 44, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 23, name: 'Michael Jordan', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 100, fp: 62, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 33, name: 'Scottie Pippen', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 98, fp: 53, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 32, name: 'Magic Johnson', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 97, fp: 52, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 45, name: 'Clyde Drexler', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 96, fp: 46, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 21, name: 'Kevin Garnett', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 95, fp: 45, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 3, name: 'Allen Iverson', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 94, fp: 42, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 11, name: 'Reggie Miller', pos: 'SG', designation: 'IR', mixedEraOverall: 93, fp: 41, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 8, name: 'Steve Kerr', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 82, fp: 22, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 7, name: 'Toni Kukoc', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 81, fp: 21, historicalPackId: 'nba_1996_full_season_v1' },
+    { id: 2, name: 'Derek Fisher', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 80, fp: 20, historicalPackId: 'nba_1996_full_season_v1' }
   ]
 };
 
@@ -170,16 +181,20 @@ assert.deepStrictEqual(
 
 assert.deepStrictEqual(
   getSimulationStarterSlots(shell),
-  ['PG', 'SG', 'SF', 'PF', 'C'],
-  'nba simulation runtime should keep the basketball starter slots'
+  ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+  'nba simulation runtime should expose the expanded basketball starter slots'
 );
 
 assert.equal(getSimulationRequiredStarterCount(nflShell), 9);
-assert.equal(getSimulationRequiredStarterCount(shell), 5);
+assert.equal(getSimulationRequiredStarterCount(shell), 10);
 
 assert.deepStrictEqual(
   getSimulationLineupSlotTemplate(nflShell),
   ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE', 'FLEX', 'K', 'DST']
+);
+assert.deepStrictEqual(
+  getSimulationLineupSlotTemplate(shell),
+  ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL']
 );
 
 const positionedNbaLineupState = {
@@ -191,21 +206,28 @@ const positionedNbaLineupState = {
         { id: 55, name: 'Larry Nance', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 97, fp: 48 },
         { id: 9, name: 'Ron Harper', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 95, fp: 41 },
         { id: 13, name: 'Gerald Wilkins', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 94, fp: 39 },
-        { id: 31, name: 'Sean Elliott', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 96, fp: 44 }
+        { id: 31, name: 'Sean Elliott', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 96, fp: 44 },
+        { id: 23, name: 'Michael Jordan', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 100, fp: 62 },
+        { id: 33, name: 'Scottie Pippen', pos: 'SF', designation: 'ACTIVE', mixedEraOverall: 98, fp: 53 },
+        { id: 32, name: 'Magic Johnson', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 97, fp: 52 },
+        { id: 45, name: 'Clyde Drexler', pos: 'SG', designation: 'ACTIVE', mixedEraOverall: 96, fp: 46 },
+        { id: 21, name: 'Kevin Garnett', pos: 'PF', designation: 'ACTIVE', mixedEraOverall: 95, fp: 45 },
+        { id: 3, name: 'Allen Iverson', pos: 'PG', designation: 'ACTIVE', mixedEraOverall: 94, fp: 42 },
+        { id: 11, name: 'Reggie Miller', pos: 'SG', designation: 'IR', mixedEraOverall: 93, fp: 41 }
       ]
     }
   },
   seasonState: {
     lineupIdsByTeam: {
-      LAL: [34, 55, 9, 13, 31]
+      LAL: [34, 55, 9, 13, 31, 23, 33, 32, 45, 21]
     }
   }
 };
 
 assert.deepStrictEqual(
   buildSuggestedSimulationLineup(positionedNbaLineupState, 'LAL'),
-  [9, 13, 31, 55, 34],
-  'nba suggested lineups should assign players by slot fit instead of raw roster order'
+  [32, 23, 33, 55, 34, 45, 31, 21, 9, 3],
+  'nba suggested lineups should fill G/F/UTIL slots with distinct active players by slot fit'
 );
 
 assert.deepStrictEqual(
@@ -403,9 +425,9 @@ if (typeof buildUnifiedSimulationSeasonState === 'function') {
   );
 }
 
-assert.equal(pool.draftPool.length, 300);
+assert.equal(pool.draftPool.length, 450);
 assert.equal(pool.freeAgents.length, 60);
-assert.equal(pool.poolMeta.rosterSize, 10);
+assert.equal(pool.poolMeta.rosterSize, 15);
 assert.equal(pool.poolMeta.teamCount, 30);
 assert.deepStrictEqual(
   pool.draftPool.slice(0, 5).map((player) => player.name),
@@ -416,12 +438,12 @@ assert.deepStrictEqual(
   expectedRankedNames.slice(0, 5)
 );
 assert.deepStrictEqual(
-  pool.draftPool.slice(295, 300).map((player) => player.name),
-  expectedRankedNames.slice(295, 300)
+  pool.draftPool.slice(445, 450).map((player) => player.name),
+  expectedRankedNames.slice(445, 450)
 );
 assert.deepStrictEqual(
   pool.freeAgents.slice(0, 5).map((player) => player.name),
-  expectedRankedNames.slice(300, 305)
+  expectedRankedNames.slice(450, 455)
 );
 assert.ok(pool.draftPool.slice(0, 30).every((player) => player.simulationTier === 'franchise'));
 
@@ -439,7 +461,7 @@ assert.equal(bootstrap.leagueShell.teams.length, 30);
 assert.equal(bootstrap.sourceSeasons.sourcePackIds.length, 4);
 assert.equal(bootstrap.draftState.controlledTeamAbbr, 'LAL');
 assert.equal(bootstrap.draftState.draftSlot, 4);
-assert.equal(bootstrap.draftState.draftPool.length, 300);
+assert.equal(bootstrap.draftState.draftPool.length, 450);
 assert.equal(bootstrap.draftState.freeAgents.length, 60);
 assert.equal(bootstrap.seasonState.currentDay, 1);
 assert.equal(bootstrap.postseasonState.phase, 'regular_season');
@@ -1339,17 +1361,17 @@ assert.equal(autoDraftState.historicalEntryMode, 'simulation_season');
 assert.equal(autoDraftState.draftState.controlledTeamAbbr, 'LAL');
 assert.equal(Object.keys(autoDraftState.draftState.rostersByTeam).length, 30);
 assert.ok(
-  Object.values(autoDraftState.draftState.rostersByTeam).every((roster) => Array.isArray(roster) && roster.length === 10),
-  'every team roster should contain 10 drafted players'
+  Object.values(autoDraftState.draftState.rostersByTeam).every((roster) => Array.isArray(roster) && roster.length === 15),
+  'every team roster should contain 15 drafted players'
 );
 assert.equal(
   new Set(Object.values(autoDraftState.draftState.rostersByTeam).flat().map((player) => player.id)).size,
-  300
+  450
 );
 assert.equal(autoDraftState.draftState.freeAgents.length, 60);
 assert.deepStrictEqual(
   autoDraftState.draftState.freeAgents.map((player) => player.name),
-  expectedRankedNames.slice(300, 360)
+  expectedRankedNames.slice(450, 510)
 );
 assert.equal(autoDraftState.seasonState.currentDay, 1);
 assert.equal(autoDraftState.postseasonState.phase, 'regular_season');
@@ -1464,7 +1486,7 @@ const positionedNbaAutoDraftState = buildCompletedSimulationAutoDraftState({
 
 assert.deepStrictEqual(
   positionedNbaAutoDraftState.seasonState.lineupIdsByTeam.LAL,
-  [9, 13, 31, 55, 34],
+  [32, 23, 33, 55, 34, 45, 31, 21, 9, 3],
   'nba auto-draft seasons should seed position-aware starter lineups instead of raw roster-order starters'
 );
 
@@ -1472,7 +1494,7 @@ assert.throws(() => buildCompletedSimulationAutoDraftState({
   shell,
   mixedEraContext: {
     ...mixedEraContext,
-    playerPool: playerPool.slice(0, 299)
+    playerPool: playerPool.slice(0, 449)
   },
   controlledTeamAbbr: 'LAL'
 }), /Unable to auto-draft simulation league/i);
