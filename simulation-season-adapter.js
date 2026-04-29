@@ -992,6 +992,22 @@ function cleanSimulationSourceLabel(label){
     const postseasonPhase = String(state?.postseasonState?.phase || 'regular_season').trim().toLowerCase();
     if (sport !== 'nfl') {
       const currentDay = Number(state?.seasonState?.currentDay || 1);
+      const scheduleByDay = getCanonicalScheduleByDay(state, state?.leagueShell || {});
+      const daySchedule = Array.isArray(scheduleByDay?.[currentDay]) ? scheduleByDay[currentDay] : [];
+      const completedDayGames = (Array.isArray(state?.seasonState?.completedGameLogs) ? state.seasonState.completedGameLogs : [])
+        .filter((game) => Number(game?.day || 0) === currentDay);
+      if (daySchedule.length > 1 && completedDayGames.length > 0 && completedDayGames.length < daySchedule.length) {
+        return {
+          id: 'finish-partial-day',
+          label: `${completedDayGames.length} of ${daySchedule.length} Day ${currentDay} matchups final`,
+          shortLabel: 'Finish Day',
+          cadenceLabel: `Day ${currentDay}`,
+          shellTone: 'partial-day',
+          completedCount: completedDayGames.length,
+          totalCount: daySchedule.length,
+          remainingCount: daySchedule.length - completedDayGames.length
+        };
+      }
       return {
         id: 'sim-day',
         label: `Reveal Day ${currentDay} Results`,

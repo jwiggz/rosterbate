@@ -258,6 +258,25 @@ async function smokeLiveMatchupWriteback(browser) {
   await page.locator('#overlay-btn').click();
   await page.waitForURL(/rosterbate-season\.html/, { timeout: 10000 });
   await page.waitForTimeout(1500);
+  await page.evaluate(() => window.goPage && window.goPage('hub'));
+  await page.waitForTimeout(750);
+  const partialHubText = await page.evaluate(() => document.body.innerText);
+  assert.match(
+    partialHubText,
+    /1 of 2 Day 1 matchups final/i,
+    'hub should explain partial live day progress after selected-matchup writeback'
+  );
+  assert.match(
+    partialHubText,
+    /Finish Day/i,
+    'hub should offer Finish Day after selected-matchup writeback leaves the day partially complete'
+  );
+  assert.doesNotMatch(
+    partialHubText,
+    /Reveal Day 1 Results/i,
+    'hub should not keep offering Reveal Day Results once a selected live matchup is already final'
+  );
+
   await page.evaluate(() => window.goPage && window.goPage('matchup'));
   await page.waitForTimeout(500);
   const returnedText = await page.evaluate(() => document.body.innerText);
@@ -279,7 +298,7 @@ async function smokeLiveMatchupWriteback(browser) {
     'partial live matchup state should offer a direct finish-day action from the matchup page'
   );
 
-  await page.locator('button').filter({ hasText: 'Finish Day' }).first().click({ timeout: 8000 });
+  await page.locator('button:visible').filter({ hasText: 'Finish Day' }).click({ timeout: 8000 });
   await page.waitForTimeout(1500);
   const fullyPersisted = await page.evaluate((slotId) => (
     JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${slotId}`))
@@ -492,11 +511,15 @@ async function smokeSeasonMatchupMobilePartialDay(browser) {
   const mobileText = await page.evaluate(() => document.body.innerText);
   assert.match(mobileText, /1 of 2 Day 1 matchups final/i, 'mobile matchup page should show partial-day final copy');
   assert.match(mobileText, /Finish Day/i, 'mobile matchup page should expose Finish Day');
-  const finishButtonCount = await page.locator('button').filter({ hasText: 'Finish Day' }).count();
+  const finishButtonCount = await page.locator('button:visible').filter({ hasText: 'Finish Day' }).count();
   assert.ok(finishButtonCount >= 1, 'Finish Day should be a tappable button on mobile');
   const layout = await page.evaluate(() => {
     const viewportWidth = document.documentElement.clientWidth;
-    const finish = Array.from(document.querySelectorAll('button')).find((button) => /Finish Day/i.test(button.textContent || ''));
+    const finish = Array.from(document.querySelectorAll('button')).find((button) => {
+      if (!/Finish Day/i.test(button.textContent || '')) return false;
+      const rect = button.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
     const finishRect = finish?.getBoundingClientRect();
     const matchupContent = document.querySelector('#matchupContent');
     const matchupRect = matchupContent?.getBoundingClientRect();
