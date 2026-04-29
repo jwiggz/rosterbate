@@ -1726,7 +1726,7 @@ function buildRevealMatchupStories(week, day){
     } else if(isFinalDay){
       meta=`${leaderName} closes the week ${homeAfter.toFixed(1)} to ${awayAfter.toFixed(1)} over ${trailerName}.`;
     } else if(leadChanged){
-      meta=`The reveal flipped this matchup from ${teamName(beforeLeader)} to ${leaderName}.`;
+      meta=`${leaderName} moved in front on the matchup board after trailing ${teamName(beforeLeader)} before the reveal.`;
     } else {
       meta=`${leaderName} leads ${trailerName} ${homeAfter.toFixed(1)} to ${awayAfter.toFixed(1)}.`;
     }
@@ -1769,7 +1769,7 @@ function buildRevealNarrative(day, leader, movement, matchups, totalTransactions
     headline=`${topMatchup.leaderName} Closes The Week`;
     subheadline=`${topMatchup.meta}${riser?` ${riser.teamName} made the biggest climb, jumping ${Math.abs(riser.delta)} spot${Math.abs(riser.delta)===1?'':'s'} on the revealed board.`:''}`;
   } else if(topMatchup?.leadChanged && topMatchup.leaderName!=='Dead Heat'){
-    headline=`${topMatchup.leaderName} Flips The Matchup`;
+    headline=`${topMatchup.leaderName} Takes Matchup Board Lead`;
     subheadline=`${topMatchup.meta}${leader?` ${leader.teamName} still owned the day overall with ${leader.total.toFixed(1)} points.`:''}`;
   } else if(leader){
     headline=`${leader.teamName} Owns Day ${day}`;

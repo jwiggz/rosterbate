@@ -126,6 +126,8 @@ Verified in the local app at `http://localhost:8080`:
 - Continue Universe reopens the same season state.
 - Selected matchup live reveal opens from the season matchup page, commits exactly that game even on a multi-game day, preserves the current day, updates standings for the two teams only, and returns to the season page with `LATEST FINAL` visible.
 - On a partial live day, the matchup page shows `Finish Day`, mobile layout stays within a 390px viewport, the remaining slate simulates without duplicating the live game, and the league report regenerates to include the full finished slate.
+- Hub/dashboard partial-day state now mirrors the matchup room: after a selected live result, the hub shows `1 of N Day X matchups final`, offers `Finish Day`, and no longer keeps offering `Reveal Day X Results` until the slate is complete.
+- League report matchup-board copy now frames lead changes as board movement instead of saying the reveal "flipped this matchup from" one team to another, which was confusing beside selected matchup/archive results.
 - No browser console warnings/errors appeared during the pass.
 
 ## PR Readiness Baseline

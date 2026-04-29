@@ -332,6 +332,16 @@ async function smokeLiveMatchupWriteback(browser) {
   assert.match(reportText, /2 game|2 matchup|2 archived simulation matchups/i, 'latest league report should reflect the full finished slate');
   assert.match(reportText, /Top Performers/i, 'latest league report should include top performer context');
   assert.match(reportText, /Matchup Board/i, 'latest league report should include matchup board context');
+  assert.doesNotMatch(
+    reportText,
+    /flipped this matchup from/i,
+    'latest league report should describe board movement without implying the selected matchup changed opponents'
+  );
+  assert.match(
+    reportText,
+    /matchup board lead shifted|moved in front on the matchup board/i,
+    'latest league report should frame lead changes as board movement'
+  );
   await page.locator('#revealReportModal button').filter({ hasText: 'Close' }).first().click({ timeout: 5000 });
 
   await page.goto(`${BASE_URL}/historic-seasons.html?sport=nba`, {
