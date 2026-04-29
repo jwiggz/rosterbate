@@ -1101,8 +1101,7 @@
     }
 
     next.draftState.rostersByTeam[teamAbbr] = roster
-      .filter((player) => Number(player.id) !== dropId)
-      .concat(clone(addPlayer));
+      .map((player) => (Number(player.id) === dropId ? clone(addPlayer) : clone(player)));
     next.draftState.freeAgents = freeAgents
       .filter((player) => Number(player.id) !== addId)
       .concat(clone(droppedPlayer));

@@ -483,6 +483,91 @@ assert.equal(
   'expanded nba roster vm should mark IR-section rows with an IR health label'
 );
 
+const lineupWaiverQaAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-lineup-waiver-qa',
+  state: {
+    ...expandedNbaAdapter.getState(),
+    seasonState: {
+      ...expandedNbaAdapter.getState().seasonState,
+      currentDay: 1,
+      currentWeek: 1,
+      pendingWaiverClaims: [],
+      recentWaiverResults: [],
+      completedGameLogs: [],
+      activityLog: [],
+      scheduleByDay: { 1: [] }
+    }
+  }
+});
+lineupWaiverQaAdapter.setLineup([11, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+let lineupWaiverRosterVm = lineupWaiverQaAdapter.getRosterViewModel();
+assert.equal(
+  lineupWaiverRosterVm.sections.starters.rows[0]?.player?.id,
+  11,
+  'lineup/waiver QA should allow a bench player to persist after moving into a starter slot'
+);
+assert.ok(
+  lineupWaiverRosterVm.sections.bench.rows.some((row) => row.player?.id === 1),
+  'lineup/waiver QA should move the displaced starter into active reserves'
+);
+lineupWaiverQaAdapter.setControlledRosterOrder([11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 14, 13, 12, 15]);
+lineupWaiverRosterVm = lineupWaiverQaAdapter.getRosterViewModel();
+assert.ok(
+  lineupWaiverRosterVm.sections.bench.rows.some((row) => row.player?.id === 14),
+  'lineup/waiver QA should activate an IR player when roster order moves them into active reserves'
+);
+assert.ok(
+  lineupWaiverRosterVm.sections.il.rows.some((row) => row.player?.id === 12),
+  'lineup/waiver QA should stash the displaced reserve into an IR row'
+);
+lineupWaiverQaAdapter.submitWaiverClaim({ addPlayerId: 50, dropPlayerId: 1 });
+assert.equal(
+  lineupWaiverQaAdapter.getWaiverViewModel().sections.pending.rows[0]?.playerName,
+  'Scottie Pippen',
+  'lineup/waiver QA should keep a submitted add/drop claim pending before the next processing window'
+);
+const lineupWaiverAdvancedState = lineupWaiverQaAdapter.simulateNextDay();
+assert.deepStrictEqual(
+  lineupWaiverAdvancedState.seasonState.lineupIdsByTeam.LAL,
+  [11, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  'lineup/waiver QA should preserve starter movement after a waiver claim processes'
+);
+assert.equal(
+  lineupWaiverAdvancedState.seasonState.pendingWaiverClaims.length,
+  0,
+  'lineup/waiver QA should clear processed waiver claims after advancing'
+);
+assert.ok(
+  lineupWaiverAdvancedState.draftState.rostersByTeam.LAL.some((player) => player.id === 50),
+  'lineup/waiver QA should add the awarded waiver player to the controlled roster'
+);
+assert.ok(
+  lineupWaiverAdvancedState.draftState.freeAgents.some((player) => player.id === 1),
+  'lineup/waiver QA should return the selected drop to the free-agent pool'
+);
+const reopenedLineupWaiverQaAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-lineup-waiver-qa-reopen',
+  state: lineupWaiverAdvancedState
+});
+const reopenedLineupWaiverRosterVm = reopenedLineupWaiverQaAdapter.getRosterViewModel();
+assert.equal(
+  reopenedLineupWaiverRosterVm.sections.starters.rows[0]?.player?.id,
+  11,
+  'lineup/waiver QA should preserve moved starter assignment when the season adapter is reopened'
+);
+assert.ok(
+  reopenedLineupWaiverRosterVm.sections.bench.rows.some((row) => row.player?.id === 14),
+  'lineup/waiver QA should preserve activated IR placement when the season adapter is reopened'
+);
+assert.ok(
+  reopenedLineupWaiverRosterVm.sections.il.rows.some((row) => row.player?.id === 12),
+  'lineup/waiver QA should preserve stashed IR placement when the season adapter is reopened'
+);
+assert.ok(
+  reopenedLineupWaiverRosterVm.sections.bench.rows.concat(reopenedLineupWaiverRosterVm.sections.il.rows).some((row) => row.player?.id === 50),
+  'lineup/waiver QA should show the awarded waiver player on My Team after reopening'
+);
+
 const duplicateBenchAdapter = createSimulationSeasonAdapter({
   slotId: 'sim-slot-duplicate-bench',
   state: {
