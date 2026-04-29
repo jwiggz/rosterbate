@@ -34,7 +34,15 @@ const slotState = {
       ]
     },
     freeAgents: [
-      { id: 50, name: 'Scottie Pippen', pos: 'SF', team: 'CHI', fp: 46.4 }
+      {
+        id: 50,
+        name: 'Scottie Pippen',
+        pos: 'SF',
+        team: 'CHI',
+        fp: 46.4,
+        designation: 'GTD',
+        statValues: { PTS: 18.2, REB: 6.4, AST: 5.9, TFP: 2500 }
+      }
     ]
   },
   seasonState: {
@@ -735,6 +743,11 @@ assert.equal(waivers.availablePlayers.length, 1);
 assert.equal(waivers.availablePlayers[0].name, 'Scottie Pippen');
 assert.equal(waivers.claimTimingLabel, 'Processing next reveal window', 'nba waiver desks should expose reveal-based processing copy');
 assert.equal(waivers.sections.available.rows[0]?.actionLabel, 'Submit Claim', 'available waiver rows should surface the shared-shell submit action copy');
+assert.equal(waivers.sections.available.rows[0]?.healthLabel, 'GTD', 'available waiver rows should surface player health status for the shared waiver desk');
+assert.ok(
+  waivers.sections.available.rows[0]?.statChips?.some((chip) => chip.label === 'PTS' && chip.value === '18.2'),
+  'available waiver rows should expose player stat chips for the shared waiver desk'
+);
 assert.equal(waivers.sections.available.rows[0]?.dropNeeded, true, 'available waiver rows should flag when a drop is required');
 assert.equal(waivers.sections.available.rows[0]?.suggestedDropPlayerId, 23, 'available waiver rows should suggest the likely drop candidate when the roster is full');
 assert.match(waivers.sections.available.rows[0]?.consequenceLabel || '', /Drop required: Michael Jordan/, 'available waiver rows should explain the roster consequence with player context');

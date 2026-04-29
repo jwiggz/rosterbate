@@ -9991,8 +9991,15 @@ function renderSimulationWaiverInSharedShell(){
       {key:'tpm',label:'3PM'},
       {key:'fp',label:'Fantasy'}
     ];
-  const statValue=(player,key)=>{
+  const statValue=(player,key,row=null)=>{
     if(key==='name'||key==='pos'||key==='team') return String(player?.[key]||'');
+    const normalizedKey=String(key || '').trim().toUpperCase();
+    const rowChips=Array.isArray(row?.statChips) ? row.statChips : [];
+    const chip=rowChips.find((item)=>String(item?.label || '').trim().toUpperCase()===normalizedKey);
+    if(chip && chip.value!=null && chip.value!==''){
+      const chipNumeric=Number(chip.value);
+      return Number.isFinite(chipNumeric) ? chipNumeric : chip.value;
+    }
     const aliasMap={
       pts:['pts','PTS'],
       reb:['reb','REB'],
@@ -10010,6 +10017,8 @@ function renderSimulationWaiverInSharedShell(){
     for(const statKey of keys){
       const direct=Number(player?.[statKey]);
       if(Number.isFinite(direct)) return direct;
+      const explicitStat=Number(player?.statValues?.[statKey]);
+      if(Number.isFinite(explicitStat)) return explicitStat;
       const nested=Number(player?.stats?.[statKey]);
       if(Number.isFinite(nested)) return nested;
       const avg=Number(player?.averages?.[statKey]);
@@ -10033,12 +10042,12 @@ function renderSimulationWaiverInSharedShell(){
   }).sort((a,b)=>{
     const playerA=a?.player || a;
     const playerB=b?.player || b;
-    const av=statValue(playerA, activeSortKey);
-    const bv=statValue(playerB, activeSortKey);
+    const av=statValue(playerA, activeSortKey, a);
+    const bv=statValue(playerB, activeSortKey, b);
     let cmp=0;
     if(typeof av==='string' || typeof bv==='string') cmp=String(av).localeCompare(String(bv));
     else cmp=Number(av||0)-Number(bv||0);
-    if(cmp===0) cmp=Number(statValue(playerB,'fp')||0)-Number(statValue(playerA,'fp')||0);
+    if(cmp===0) cmp=Number(statValue(playerB,'fp',b)||0)-Number(statValue(playerA,'fp',a)||0);
     return activeSortDir==='asc' ? cmp : -cmp;
   });
   const renderDropSelector=(row, prefix='simulation-waiver-drop-select')=>{
@@ -10054,7 +10063,7 @@ function renderSimulationWaiverInSharedShell(){
       </select>
     </div>`;
   };
-  const topRows=[...filteredRows].sort((a,b)=>Number(statValue(b?.player || b,'fp')||0)-Number(statValue(a?.player || a,'fp')||0)).slice(0,6);
+  const topRows=[...filteredRows].sort((a,b)=>Number(statValue(b?.player || b,'fp',b)||0)-Number(statValue(a?.player || a,'fp',a)||0)).slice(0,6);
   const hasDropNeeded=availableRows.some(row=>Array.isArray(row?.dropOptions) && row.dropOptions.length);
   const leagueName=escapeHtml(D?.leagueName || vm?.leagueName || 'RosterBate League');
   const sortedLabel=columns.find(col=>col.key===activeSortKey)?.label || 'Fantasy';
@@ -10113,13 +10122,34 @@ function renderSimulationWaiverInSharedShell(){
     const arg=needsDrop ? `, '${selectId}'` : '';
     return `<button class="season-outline-btn" onclick="submitSimulationWaiverClaimFromShell(${playerId}${arg})">${escapeHtml(label || row?.submitLabel || row?.actionLabel || 'Submit Claim')}</button>`;
   };
+  const renderWaiverHealthPill=(row)=>{
+    const player=row?.player || row || {};
+    const label=String(row?.healthLabel || player?.healthLabel || player?.designation || player?.injuryStatus || player?.status || '').trim();
+    if(!label || /^active$/i.test(label)) return '';
+    const tone=String(row?.healthTone || '').toLowerCase();
+    const style=tone==='out'
+      ? 'border-color:rgba(248,113,113,.4);color:#fecaca;background:rgba(127,29,29,.22);'
+      : 'border-color:rgba(250,204,21,.35);color:#fde68a;background:rgba(250,204,21,.12);';
+    return `<span class="season-stat-pill" style="${style}">${escapeHtml(label)}</span>`;
+  };
+  const renderWaiverStatChips=(row, limit=4)=>{
+    const player=row?.player || row || {};
+    const chips=Array.isArray(row?.statChips) && row.statChips.length
+      ? row.statChips
+      : Object.entries(player?.statValues || {}).map(([label,value])=>({label,value}));
+    return chips
+      .filter((chip)=>chip?.label && chip?.value!=null && chip.value!=='')
+      .slice(0,limit)
+      .map((chip)=>`<span class="season-stat-pill">${escapeHtml(String(chip.label).toUpperCase())} ${escapeHtml(String(chip.value))}</span>`)
+      .join('');
+  };
   const renderRadarCard=(row)=>{
     const player=row?.player || row;
     const playerId=Number(row?.playerId || player?.id || row?.id || 0);
     const watched=localWatchIds.includes(playerId);
     const radarStats=columns
       .filter(col=>!['name','pos','team','fp'].includes(col.key))
-      .map(col=>[col.label, Number(statValue(player,col.key)||0)])
+      .map(col=>[col.label, Number(statValue(player,col.key,row)||0)])
       .filter(([,value])=>value>0)
       .slice(0,3)
       .map(([label,value])=>`${label} ${value.toFixed(1)}`)
@@ -10136,11 +10166,13 @@ function renderSimulationWaiverInSharedShell(){
         </div>
       </div>
       <div class="waiver-radar-stats">
-        <span class="season-stat-pill">${Number(statValue(player,'fp')||0).toFixed(1)} fantasy</span>
+        <span class="season-stat-pill">${Number(statValue(player,'fp',row)||0).toFixed(1)} fantasy</span>
+        ${renderWaiverHealthPill(row)}
+        ${renderWaiverStatChips(row,3)}
         ${watched?'<span class="season-stat-pill" style="border-color:rgba(250,204,21,.35);color:#fde68a;background:rgba(250,204,21,.12);">Watching</span>':''}
         ${row?.dropNeeded?'<span class="season-stat-pill" style="border-color:rgba(249,115,22,.35);color:#fdba74;background:rgba(249,115,22,.12);">Drop Needed</span>':''}
       </div>
-      <div class="waiver-radar-summary">${escapeHtml(radarStats || row?.consequenceLabel || 'Ready for a closer look on the full wire.')}</div>
+      <div class="waiver-radar-summary">${escapeHtml(row?.statSummary || radarStats || row?.consequenceLabel || 'Ready for a closer look on the full wire.')}</div>
       <div class="waiver-radar-reason">${escapeHtml(row?.consequenceLabel || 'Steady available value')}</div>
       ${renderDropSelector(row,'simulation-waiver-radar-drop-select')}
     </div>`;
@@ -10150,6 +10182,8 @@ function renderSimulationWaiverInSharedShell(){
     const playerId=Number(row?.playerId || player?.id || row?.id || 0);
     const watched=localWatchIds.includes(playerId);
     const tags=[];
+    const healthPill=renderWaiverHealthPill(row);
+    const statChipsMarkup=renderWaiverStatChips(row,4);
     if(watched) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(250,204,21,.34);background:rgba(250,204,21,.14);color:#fde68a;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Watching</span>');
     if(row?.dropNeeded) tags.push('<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;border:1px solid rgba(249,115,22,.34);background:rgba(154,52,18,.18);color:#fdba74;font-family:var(--fb);font-size:9px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;">Drop Needed</span>');
     return `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:260px;">
@@ -10157,7 +10191,8 @@ function renderSimulationWaiverInSharedShell(){
         ${renderAvatar(player)}
         <div style="min-width:0;display:flex;flex-direction:column;gap:7px;flex:1;">
           <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#bfdbfe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(player?.name || 'Player')}</div>
-          ${tags.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">${tags.join('')}</div>`:''}
+          ${(tags.length || healthPill)?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">${healthPill}${tags.join('')}</div>`:''}
+          ${statChipsMarkup?`<div style="display:flex;gap:6px;flex-wrap:wrap;">${statChipsMarkup}</div>`:''}
           ${renderDropSelector(row,'simulation-waiver-drop-select')}
         </div>
       </div>
@@ -10170,7 +10205,7 @@ function renderSimulationWaiverInSharedShell(){
   const renderTableCell=(row,col)=>{
     const player=row?.player || row;
     if(col.key==='name') return renderTableNameCell(row);
-    const value=statValue(player,col.key);
+    const value=statValue(player,col.key,row);
     if(col.key==='pos') return escapeHtml(String(player?.pos || row?.position || ''));
     if(col.key==='team') return escapeHtml(String(player?.team || row?.teamAbbr || 'FA').toUpperCase());
     return Number(value||0).toFixed(col.key==='fp' ? 1 : 0);
@@ -10291,7 +10326,7 @@ function renderSimulationWaiverInSharedShell(){
                   <div class="waiver-snapshot-meta">${escapeHtml(String(player?.team || row?.teamAbbr || 'FA').toUpperCase())} | ${escapeHtml(String(player?.pos || row?.position || '').toUpperCase())}</div>
                 </div>
                 <div class="waiver-snapshot-value">
-                  <div class="waiver-snapshot-value-main" style="color:#38bdf8;">${Number(statValue(player,'fp')||0).toFixed(1)}</div>
+                  <div class="waiver-snapshot-value-main" style="color:#38bdf8;">${Number(statValue(player,'fp',row)||0).toFixed(1)}</div>
                   <div class="waiver-snapshot-value-sub" style="color:#fde68a;">Watching</div>
                 </div>
               </div>`;

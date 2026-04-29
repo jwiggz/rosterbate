@@ -1420,7 +1420,7 @@ function cleanSimulationSourceLabel(label){
         label: dropPlayer ? buildSimulationPlayerChoiceLabel(dropPlayer, playerVariantLabelsById) : option?.label
       };
     });
-    return clone(state?.draftState?.freeAgents || []).slice(0, 40).map((player, index) => ({
+    return clone(state?.draftState?.freeAgents || []).slice(0, 40).map((player, index) => attachSimulationRosterRowMeta({
       id: `waiver-player-${Number(player?.id || index)}`,
       player: clone(player),
       playerId: Number.isFinite(Number(player?.id)) ? Number(player.id) : null,
@@ -1437,7 +1437,7 @@ function cleanSimulationSourceLabel(label){
           : 'Drop required to submit claim')
         : 'Open roster spot available',
       dropOptions: dropRequired ? clone(dropOptions) : []
-    }));
+    }, player));
   }
 
   function findSimulationPlayerById(state, playerId){

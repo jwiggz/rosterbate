@@ -770,7 +770,14 @@ const simulationAdapterStub = {
           rows: [
             {
               playerId: 33,
-              player: { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' },
+              player: {
+                id: 33,
+                name: 'Scottie Pippen',
+                team: 'CHI',
+                pos: 'SF',
+                designation: 'GTD',
+                statValues: { PTS: 18.2, REB: 6.4, AST: 5.9, TFP: 2500 }
+              },
               submitLabel: 'Submit Claim',
               consequenceLabel: 'Adds Scottie Pippen and drops Hakeem Olajuwon if awarded.',
               suggestedDropPlayerId: 34,
@@ -1712,6 +1719,8 @@ api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Free Agents Control Room/i, 'simulation waiver desk should reuse the pre-simulation free-agent control room framing');
 assert.match(elements.waiverContent.innerHTML, /Waiver Radar/i, 'simulation waiver desk should keep the old waiver radar surface');
 assert.match(elements.waiverContent.innerHTML, /Pending Claims/i, 'simulation waiver desk should render a pending-claims section');
+assert.match(elements.waiverContent.innerHTML, /GTD/i, 'simulation waiver desk should surface player health status on available-player rows');
+assert.match(elements.waiverContent.innerHTML, /PTS 18\.2|REB 6\.4|AST 5\.9|TFP 2500/i, 'simulation waiver desk should surface player stat chips on available-player rows');
 assert.match(elements.waiverContent.innerHTML, /Processing next reveal window|Processing next weekly window/i, 'simulation waiver desk should show delayed pending-claim timing');
 assert.match(elements.waiverContent.innerHTML, /Submit Claim/i, 'simulation waiver desk should expose an explicit submit-claim action');
 assert.doesNotMatch(elements.waiverContent.innerHTML, /claim resolves immediately/i, 'simulation waiver desk should not imply immediate claim resolution');
