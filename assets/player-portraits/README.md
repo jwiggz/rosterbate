@@ -8,6 +8,12 @@ Fast path: name files with a player slug and optional team code, then run:
 node tools/build-player-portrait-manifest.js --write
 ```
 
+Coverage check:
+
+```bash
+npm run portraits:coverage -- --limit 25 --missing-only
+```
+
 Filename examples:
 
 - `michael-jordan__CHI.png` maps to `Michael Jordan|CHI`
