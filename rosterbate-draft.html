@@ -4925,8 +4925,7 @@ function isLocalDraftTesting(){
 }
 
 function canUseDraftSimulator(){
-  const params=new URLSearchParams(window.location.search||'');
-  return isSoloTestDraft() || (isLocalDraftTesting() && !!params.get('lobby'));
+  return isLocalDraftTesting() || isSoloTestDraft();
 }
 
 function updateSoloSimButton(){
@@ -5722,7 +5721,7 @@ function chooseBestCpuPlayerForTeam(ti,av){
 
 function simulateDraftToFinish(){
   if(!canUseDraftSimulator()){
-    showToast('Local testing only');
+    showToast('Local draft rooms only');
     return;
   }
   if(S.cur>=S.total){
