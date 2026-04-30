@@ -9,6 +9,7 @@
   "scripts": {
     "portraits:manifest": "node tools/build-player-portrait-manifest.js --write",
     "portraits:check": "node tools/build-player-portrait-manifest.js --check",
+    "portraits:import": "node tools/import-player-portraits.js",
     "portraits:coverage": "node tools/report-player-portrait-coverage.js",
     "test:live-matchup": "node tools/test-live-matchup-playwright.js"
   },
