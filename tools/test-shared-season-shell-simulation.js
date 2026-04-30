@@ -28,6 +28,17 @@ assert.match(html, /\.hub-standings-row:hover/, 'league-home standings rows shou
 assert.match(html, /\.hub-standings-row\.is-viewing/, 'league-home standings rows should retain a selected state while the lineup viewer is open');
 assert.match(html, /id="vActions" class="viewer-actions viewer-actions-top"/, 'team lineup viewer actions should live in the popup header');
 assert.doesNotMatch(html, /View Standings<\/button>/, 'team lineup viewer should not include a redundant view-standings action');
+assert.match(html, /tradeTargetLabel/, 'team lineup viewer should surface top trade targets in the trade lane');
+assert.match(html, /bench=roster\.filter\(p=>!sIds\.includes\(p\.id\)\)\.sort/, 'team lineup viewer should sort bench depth by fantasy strength');
+assert.match(html, />GAME<\/span>/, 'team lineup viewer rows should make game-day players visually obvious');
+assert.match(html, />OFF<\/span>/, 'team lineup viewer rows should make off-day players visually obvious');
+assert.match(html, /playerDetailNameButton\(p\)/, 'team lineup viewer player names should open the player detail modal');
+assert.match(html, /id="tradeTargetCard-\$\{target\.ti\}"/, 'trade target cards should expose stable ids for viewer-triggered trade focus');
+assert.match(html, /tradeTargetCard-\$\{Number\(ti\)\}`\)\?\.classList\.add\('is-viewing'\)/, 'opening a trade from the viewer should visibly focus the selected trade partner');
+assert.match(html, /\[data-trade-team\]\.is-viewing/, 'trade target cards should have a visible focused state');
+assert.match(html, /const byFantasyValue=\(a,b\)=>Number\(b\?\.fp\|\|0\)-Number\(a\?\.fp\|\|0\)/, 'trade builder should sort both rosters by fantasy value');
+assert.match(html, /Building with \$\{teamName\}/, 'trade builder should echo the selected team context');
+assert.match(html, /Highest FP First/, 'trade builder column labels should explain the sorted order');
 assert.match(html, /id="playerDetailModal"/, 'season shell should expose a reusable player detail modal');
 assert.match(html, /function openPlayerDetailModal\(/, 'season shell should open player details from any player-name click');
 assert.match(html, /class="player-name-link"/, 'season shell should render player names as detail buttons');
