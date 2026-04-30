@@ -987,6 +987,11 @@
   .team-menu-roster{display:grid;gap:6px;}
   .team-menu-player{display:flex;align-items:center;gap:8px;background:rgba(9,13,20,.68);border:1px solid rgba(110,130,160,.18);border-radius:14px;padding:10px 11px;}
   .team-menu-player.empty{justify-content:center;color:var(--text3);font-size:11px;font-style:italic;}
+  .draft-player-inspect-row{cursor:pointer;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease;}
+  .draft-player-inspect-row:hover{background:rgba(126,200,255,.1);border-color:rgba(126,200,255,.34);box-shadow:inset 3px 0 0 rgba(126,200,255,.72),0 14px 26px rgba(0,0,0,.16);transform:translateY(-1px);}
+  .draft-player-inspect-row:focus-visible{outline:2px solid rgba(126,200,255,.76);outline-offset:2px;}
+  .inspect-hint{margin-left:auto;flex-shrink:0;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(126,200,255,.72);opacity:0;transition:opacity .16s ease;}
+  .draft-player-inspect-row:hover .inspect-hint,.draft-player-inspect-row:focus-visible .inspect-hint{opacity:1;}
   .rs{display:flex;align-items:center;gap:8px;background:rgba(9,13,20,.68);border:1px solid rgba(110,130,160,.18);border-radius:14px;padding:10px 12px;margin-bottom:8px;}
   .spos{width:34px;font-family:var(--fd);font-size:14px;font-weight:500;color:var(--text3);flex-shrink:0;letter-spacing:.08em;}
   .semp{font-size:11px;color:var(--text3);font-style:italic;}
@@ -6567,8 +6572,10 @@ function calcFP(p){
   // For category leagues, return the base fp from the data
   return p.fp || 0;
 }
-function openPModal(idx){
-  const p=PLAYERS[idx];if(!p||S.drafted.has(p.id))return;
+function openPModal(idx,options={}){
+  const p=PLAYERS[idx];if(!p)return;
+  const viewOnly=!!options.viewOnly || S.drafted.has(p.id);
+  if(S.drafted.has(p.id) && !viewOnly)return;
   S.selP=p;
   const scoringLabel=getDraftScoringLabel();
   const modalStats=getDraftModalStats(p);
@@ -6594,8 +6601,13 @@ function openPModal(idx){
   const canDraft=S.fmt!=='auction'&&S.order[S.cur]===S.myPos;
   const canNominate=S.fmt==='auction'&&S.order[S.cur]===S.myPos&&!(S.auc&&S.auc.playerId);
   document.getElementById('bDraft').textContent=canNominate?'Nominate Player':(canDraft?'Draft Player':'View Only');
+  document.getElementById('bDraft').disabled=!(canDraft||canNominate);
   updateFavModalBtn();
   document.getElementById('pModal').classList.add('open');
+}
+function openPModalById(playerId,options={}){
+  const idx=PLAYERS.findIndex(player=>Number(player?.id)===Number(playerId));
+  if(idx>=0) openPModal(idx,options);
 }
 function cModal(e){if(e.target===document.getElementById('pModal'))document.getElementById('pModal').classList.remove('open');}
 function confDraft(){
@@ -7036,13 +7048,14 @@ function rMyTeam(){
   } else {
     html+=slots.map(({slot,player:p},i)=>{
       const col=p?tcolor(p.team):'#334155';
-      return p?`<div class="rs">
+      return p?`<div class="rs draft-player-inspect-row" tabindex="0" role="button" onclick="openPModalById(${Number(p.id)},{viewOnly:true})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPModalById(${Number(p.id)},{viewOnly:true});}">
         <div class="spos">${slot}</div>
         <div class="pav" style="background:${col};width:30px;height:30px;font-size:11px;border:none">${initials(p.name)}</div>
         <div class="spl">
           <div class="pname" style="font-size:13px">${p.name}<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
           <div class="pdet">${p.team}</div>
         </div>
+        <div class="inspect-hint">Stats</div>
         <div class="srd">Rd ${roundByPlayerId.get(String(p.id)) || (i+1)}</div>
       </div>`:`<div class="rs">
         <div class="spos">${slot}</div>
@@ -7069,12 +7082,13 @@ function rOtherTeams(){
       .filter(entry=>entry.player);
     const nextPickIndex=nextPickForTeam(team.idx, S.cur);
     const nextPickLabel=nextPickIndex===-1?'Draft complete':`Next pick ${nextPickIndex+1}/${S.total}`;
-    const rosterHtml=roster.length?roster.map(({pick,player})=>`<div class="team-menu-player">
+    const rosterHtml=roster.length?roster.map(({pick,player})=>`<div class="team-menu-player draft-player-inspect-row" tabindex="0" role="button" onclick="openPModalById(${Number(player.id)},{viewOnly:true})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPModalById(${Number(player.id)},{viewOnly:true});}">
         <div class="pav" style="background:${tcolor(player.team)};width:28px;height:28px;font-size:10px;border:none">${initials(player.name)}</div>
         <div style="min-width:0;flex:1">
           <div class="pname" style="font-size:12px;display:flex;align-items:center;gap:4px;min-width:0"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${player.name}</span><span class="pos-badge pos-${player.pos}" style="flex-shrink:0">${player.pos}</span></div>
           <div class="pdet">${player.team} · Pick #${pick.ov}</div>
         </div>
+        <div class="inspect-hint">Stats</div>
       </div>`).join(''):`<div class="team-menu-player empty">No picks yet</div>`;
     return `<div class="team-menu-card">
       <div class="team-menu-head">
@@ -7353,8 +7367,7 @@ function getTopQueuedPlayer(){
   return null;
 }
 function openDraftPlayerById(id){
-  const idx=PLAYERS.findIndex(player=>player.id===id);
-  if(idx>=0) openPModal(idx);
+  openPModalById(id);
 }
 function handleDraftFocusCard(type){
   const snap=getDraftFocusSnapshot();
@@ -8344,6 +8357,7 @@ function updateTradeBtn(){
 // ─── SEASON MANAGEMENT ────────────────────────────────────
 let autoSeasonRedirectTimer = null;
 let completedDraftSeasonData = null;
+let completedSimulationSeasonUrl = null;
 const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';
 async function endDraft(){
   console.log('🏆 Draft ending, switching to completion screen...');
@@ -8709,6 +8723,7 @@ async function endDraft(){
 }
 
 async function resolveSeasonManagerUrl(){
+  if(completedSimulationSeasonUrl) return completedSimulationSeasonUrl;
   let seasonId = null;
   let draftData = null;
   const lobbyState=getSavedMultiplayerLobbyState();
@@ -8810,6 +8825,53 @@ function normalizeSeasonManagerDraftPayload(payload){
   return normalized;
 }
 
+function renderSimulationDraftCompleteSummary(finalState){
+  const simulationMode=getSimulationModeFromContext(finalState);
+  completedSimulationSeasonUrl=getSimulationSeasonRedirect(simulationMode);
+  const draftState=finalState?.draftState || {};
+  const shell=finalState?.leagueShell || finalState?.shell || SIMULATION_MODE_DRAFT_CONTEXT?.shell || {};
+  const controlledAbbr=String(draftState?.controlledTeamAbbr || SIMULATION_MODE_DRAFT_CONTEXT?.controlledTeamAbbr || '').trim().toUpperCase();
+  const teamMeta=(Array.isArray(shell?.teams) ? shell.teams : []).find(team=>String(team?.abbr||'').trim().toUpperCase()===controlledAbbr) || null;
+  const roster=(draftState?.rostersByTeam && Array.isArray(draftState.rostersByTeam[controlledAbbr]))
+    ? draftState.rostersByTeam[controlledAbbr]
+    : [];
+  const teamNameEl=document.getElementById('dcTeamName');
+  const picksEl=document.getElementById('dcPicks');
+  const topPickEl=document.getElementById('dcTopPick');
+  const projEl=document.getElementById('dcProjTotal');
+  const rosterEl=document.getElementById('dcRoster');
+  const startBtn=document.getElementById('startSeasonBtn');
+  if(teamNameEl) teamNameEl.textContent=teamMeta?.name || S.name || 'Simulation Team';
+  if(picksEl) picksEl.textContent=roster.length+' players drafted';
+  const topPick=roster[0] || null;
+  if(topPickEl) topPickEl.textContent=topPick ? topPick.name+' ('+topPick.pos+' · '+topPick.team+')' : '—';
+  const totalFantasyPoints=roster.reduce((sum,player)=>sum+(Number(getDraftTotalFantasyPoints(player))||Number(player?.totalFantasyPoints)||0),0);
+  if(projEl) projEl.textContent=totalFantasyPoints.toFixed(1)+' TFP';
+  if(rosterEl){
+    const slots=(Array.isArray(shell?.starterSlots) && shell.starterSlots.length ? shell.starterSlots : ['PG','SG','SF','PF','C','G','F','UTIL','UTIL','UTIL']).concat(
+      Array.from({length:Math.max(0, Number(shell?.benchSlots||0))},()=>'BN')
+    );
+    rosterEl.innerHTML=roster.length ? roster.map((player,index)=>{
+      const fpValue=Number.isFinite(Number(player?.fp)) ? Number(player.fp) : Number(calcFP(player))||0;
+      return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);">'
+        +'<div style="width:34px;font-family:var(--fd);font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0;">'+(slots[index]||'BN')+'</div>'
+        +'<div style="width:30px;height:30px;border-radius:50%;background:'+tcolor(player.team)+';display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">'+initials(player.name)+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+player.name+'</div>'
+        +'<div style="font-size:11px;color:var(--text2);">'+player.team+' · '+player.pos+' · '+fpValue.toFixed(1)+' fp</div>'
+        +'</div>'
+        +'<div style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;">Rd '+(index+1)+'</div>'
+        +'</div>';
+    }).join('') : '<div style="padding:10px 0;font-size:12px;color:var(--text2);text-align:center;">No players were drafted to this roster.</div>';
+  }
+  if(startBtn){
+    startBtn.disabled=false;
+    startBtn.textContent='Open League Page →';
+    startBtn.style.opacity='1';
+  }
+  showToast('Draft complete. Review your roster, then open your league.');
+}
+
 function completeSimulationModeDraft(finalState){
   const simulationMode=getSimulationModeFromContext(finalState);
   const payload = {
@@ -8825,14 +8887,14 @@ function completeSimulationModeDraft(finalState){
     }else{
       localStorage.setItem(RB_SIMULATION_MODE_COMPLETED_DRAFT_KEY, JSON.stringify(payload));
     }
-    window.location.href = getSimulationSeasonRedirect(payload.simulationMode);
+    renderSimulationDraftCompleteSummary(payload);
   }else if(payload.simulationMode==='nfl_mixed_era_single_player_v1'){
     if(window.RosterBateSimulationModeRuntime && typeof window.RosterBateSimulationModeRuntime.writeCompletedSimulationState==='function'){
       window.RosterBateSimulationModeRuntime.writeCompletedSimulationState(payload);
     }else{
       localStorage.setItem(RB_SIMULATION_MODE_COMPLETED_DRAFT_KEY, JSON.stringify(payload));
     }
-    window.location.href = getSimulationSeasonRedirect(payload.simulationMode);
+    renderSimulationDraftCompleteSummary(payload);
   }
 }
 
