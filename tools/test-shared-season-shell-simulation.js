@@ -4,7 +4,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'rosterbate-season.html'), 'utf8');
+const simMatchupHtml = fs.readFileSync(path.join(__dirname, '..', 'sim-matchup.html'), 'utf8');
 const adapterSource = fs.readFileSync(path.join(__dirname, '..', 'simulation-season-adapter.js'), 'utf8');
+const portraitSource = fs.readFileSync(path.join(__dirname, '..', 'player-portrait-assets.js'), 'utf8');
 
 assert.match(html, /function assignSimulationNbaBenchPlayerToSlotFromShell\(/, 'shared shell should support moving NBA bench players into starter slots');
 assert.match(html, /function clearSimulationNbaSlotAssignmentFromShell\(/, 'shared shell should support clearing NBA starter slots');
@@ -12,6 +14,40 @@ assert.match(html, /function startSimulationRosterMoveFromShell\(/, 'shared shel
 assert.match(html, /function applySimulationRosterMoveToSlotFromShell\(/, 'shared shell should expose simulation move-mode landing choices');
 assert.match(html, /healthLabel/, 'shared shell roster rows should render player health labels');
 assert.match(html, /statChips/, 'shared shell roster rows should render player stat chips');
+assert.doesNotMatch(html, /\$\{renderStatChips\(entry\)\}/, 'shared shell roster rows should keep stat chips out of the player-name cell when stat columns are visible');
+assert.doesNotMatch(html, /const statChipsMarkup=renderWaiverStatChips\(row,4\)/, 'shared shell waiver table rows should keep stat chips out of the player-name cell when stat columns are visible');
+assert.match(html, /id="teamSettingsInjuries"/, 'team settings should expose an AI injuries toggle for simulation leagues');
+assert.match(html, /injuriesEnabled:\s*injuriesEnabled/, 'team settings save should persist the AI injuries toggle through the simulation adapter');
+assert.match(html, /id="seasonLeagueHomeLink"/, 'season shell should expose a top-nav league home button');
+assert.match(html, /onclick="goPage\('hub'\)"/, 'league home button should return to the in-league hub instead of leaving the season manager');
+assert.match(html, /function updateSeasonLeagueHomeLink\(/, 'season shell should show the league home button once season data is loaded');
+assert.match(html, /function renderPlayerPortrait\(/, 'season shell should render player portraits from a shared helper instead of jersey-only avatars');
+assert.match(html, /class="pav player-portrait"/, 'season shell player avatars should use portrait markup');
+assert.match(html, /<script src="player-portrait-assets\.js"><\/script>/, 'season shell should load the shared portrait asset pipeline');
+assert.match(html, /RosterBatePlayerPortraits\.renderPortraitMarkup/, 'season shell should prefer shared portrait image markup when available');
+assert.match(html, /portrait-card-bg/, 'season shell player portraits should use illustrated card-style portrait panels');
+assert.match(html, /portrait-ink-outline/, 'season shell player portraits should include ink-outline illustration details');
+assert.match(html, /\.hub-shell\{[^}]*max-width:none/, 'league home shell should use the full available viewport width');
+assert.match(html, /\.hub-lower\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/, 'league home lower content should spread into a two-column desktop grid');
+assert.match(html, /function openSimulationRevealDayLiveMatchup\(/, 'simulation hub reveal CTA should launch the live matchup popup instead of only batch-simming the day');
+assert.match(html, /if\(actionId==='sim-day' && primaryAction\?\.shellTone==='reveal'\) return 'openSimulationRevealDayLiveMatchup\(\)'/, 'NBA reveal-day primary actions should route through the embedded live sim popup');
+assert.match(simMatchupHtml, /postMessage\(\{ type:'rosterbate-live-matchup-committed'/, 'embedded live matchup should notify the season shell after it writes back a result');
+assert.match(simMatchupHtml, /postMessage\(\{ type:'rosterbate-live-matchup-return'/, 'embedded live matchup should let the popup close back to the season shell');
+assert.match(simMatchupHtml, /id="speed-3x" onclick="setSpeed\(3\)">3×<\/button>/, 'live matchup controls should include a 3x speed option');
+assert.match(simMatchupHtml, /let speed = 3;/, 'live matchup should default to 3x speed');
+assert.match(simMatchupHtml, /function renderLivePlayerPortrait\(/, 'live matchup should render player portraits in roster rows');
+assert.match(simMatchupHtml, /class="live-player-portrait"/, 'live matchup roster rows should use portrait markup instead of dot-only players');
+assert.match(simMatchupHtml, /<script src="player-portrait-assets\.js"><\/script>/, 'live matchup should load the shared portrait asset pipeline');
+assert.match(simMatchupHtml, /RosterBatePlayerPortraits\.renderPortraitMarkup/, 'live matchup should prefer shared portrait image markup when available');
+assert.match(simMatchupHtml, /portrait-card-bg/, 'live matchup player portraits should use illustrated card-style portrait panels');
+assert.match(simMatchupHtml, /portrait-ink-outline/, 'live matchup player portraits should include ink-outline illustration details');
+assert.match(simMatchupHtml, /player-showcase-card/, 'live matchup rows should frame portraits as compact player showcase cards');
+assert.match(simMatchupHtml, /player-event-badge/, 'live matchup scoring events should surface as visible portrait-card badges');
+assert.match(simMatchupHtml, /portrait-pop/, 'live matchup portraits should animate when a player produces a scoring event');
+assert.match(portraitSource, /RosterBatePlayerPortraits/, 'shared portrait asset pipeline should expose the global API');
+assert.match(portraitSource, /rbPlayerPortraitOverrides/, 'shared portrait asset pipeline should support local real-image overrides');
+assert.match(portraitSource, /buildGeneratedPortraitSvg/, 'shared portrait asset pipeline should include generated SVG fallback art');
+assert.match(portraitSource, /player-portrait-img/, 'shared portrait asset pipeline should render image-backed portrait markup');
 
 function toPlain(value) {
   return JSON.parse(JSON.stringify(value));
@@ -102,6 +138,7 @@ module.exports = {
   persistHistoricalUniverseSlotSnapshot,
   persistSimulationSeasonState,
   syncGameStateToD,
+  findSimulationRevealLiveMatchup,
   renderSimulationHubInSharedShell,
   applySimulationPowerupFromShell,
   renderSimulationRosterInSharedShell,
@@ -646,15 +683,18 @@ const simulationAdapterStub = {
       nextGame: {
         day: 12,
         home: false,
-        awayAbbr: 'CHI',
+        awayAbbr: 'BOS',
         homeAbbr: 'LAL',
         opponentAbbr: 'LAL',
         opponentName: 'Los Angeles Lakers'
       },
       scheduleByDay: {
         12: [
-          { awayAbbr: 'CHI', homeAbbr: 'LAL' },
+          { awayAbbr: 'BOS', homeAbbr: 'LAL' },
           { awayAbbr: 'BOS', homeAbbr: 'DET' }
+        ],
+        13: [
+          { day: 13, awayAbbr: 'NYK', homeAbbr: 'LAL', opponentAbbr: 'NYK', opponentName: 'New York Knicks' }
         ]
       },
       recentResults: [
@@ -697,7 +737,14 @@ const simulationAdapterStub = {
       sections: {
         starters: {
           rows: [
-            { slot: 'SG', player: { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' } }
+            {
+              slot: 'SG',
+              player: { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' },
+              hasGame: true,
+              opponentLabel: 'vs BOS',
+              opponentName: 'Boston Celtics',
+              timeLabel: 'Day 12'
+            }
           ]
         },
         bench: {
@@ -707,6 +754,13 @@ const simulationAdapterStub = {
         }
       },
       starterSlots: ['PG', 'SG', 'SF', 'PF', 'C'],
+      lineupSlots: {
+        PG: { slot: 'PG', playerId: null, suggestedPlayerId: null },
+        SG: { slot: 'SG', playerId: 23, suggestedPlayerId: 23 },
+        SF: { slot: 'SF', playerId: null, suggestedPlayerId: null },
+        PF: { slot: 'PF', playerId: null, suggestedPlayerId: null },
+        C: { slot: 'C', playerId: null, suggestedPlayerId: 34 }
+      },
       roster: [
         { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
         { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
@@ -868,7 +922,28 @@ const simulationAdapterStub = {
   },
   applyTrade(trade) {
     this.lastTrade = trade;
-    return {};
+    const fromTeamAbbr = String(trade?.fromTeamAbbr || '').trim().toUpperCase();
+    const toTeamAbbr = String(trade?.toTeamAbbr || '').trim().toUpperCase();
+    const outgoingIds = new Set((trade?.outgoingPlayerIds || []).map(Number));
+    const incomingIds = new Set((trade?.incomingPlayerIds || []).map(Number));
+    const fromRoster = simulationStubState.draftState.rostersByTeam[fromTeamAbbr] || [];
+    const toRoster = simulationStubState.draftState.rostersByTeam[toTeamAbbr] || [];
+    const outgoing = fromRoster.filter((player) => outgoingIds.has(Number(player.id)));
+    const incoming = toRoster.filter((player) => incomingIds.has(Number(player.id)));
+    if (outgoing.length && incoming.length) {
+      simulationStubState = {
+        ...simulationStubState,
+        draftState: {
+          ...simulationStubState.draftState,
+          rostersByTeam: {
+            ...simulationStubState.draftState.rostersByTeam,
+            [fromTeamAbbr]: fromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(incoming),
+            [toTeamAbbr]: toRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(outgoing)
+          }
+        }
+      };
+    }
+    return this.getState();
   },
   activateSimulationPowerup(payload) {
     this.lastPowerup = payload;
@@ -1629,6 +1704,13 @@ assert.doesNotMatch(elements.rosterContent.innerHTML, />Clear</, 'simulation ros
 assert.match(elements.rosterContent.innerHTML, /openWatchList\(\)/, 'simulation roster should keep the watch-list action live');
 assert.match(elements.rosterContent.innerHTML, /openTeamSettings\(\)/, 'simulation roster should keep the team-settings action live');
 assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michael Jordan/);
+assert.match(elements.rosterContent.innerHTML, /vs BOS/, 'simulation roster rows should show the current opponent in the OPP column');
+assert.match(elements.rosterContent.innerHTML, /Day 12/, 'simulation roster rows should show the current matchup day in the time column');
+sandbox.setSimulationRosterNavigationValue(13);
+api.renderSimulationRosterInSharedShell();
+assert.match(elements.rosterContent.innerHTML, /Day 13/, 'simulation roster should expose future day navigation in My Team');
+assert.match(elements.rosterContent.innerHTML, /(?:vs|@) NYK|New York Knicks/, 'simulation roster rows should update the OPP column when a future day is selected');
+sandbox.setSimulationRosterNavigationValue(12);
 
 api.goPage('roster');
 demoToasts = [];
@@ -1651,8 +1733,8 @@ api.goPage('roster');
 api.handleRosterAction('set-lineup');
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastLineupIds),
-  [34, 23],
-  'simulation set-lineup actions should route through applySimulationSuggestedLineupFromShell'
+  [null, 23, null, null, 34],
+  'simulation set-lineup actions should route through slot-aware applySimulationSuggestedLineupFromShell'
 );
 demoToasts = [];
 api.handleRosterAction('il');
@@ -1670,8 +1752,8 @@ historicalSlotUpsertCalls = [];
 api.applySimulationSuggestedLineupFromShell();
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastLineupIds),
-  [34, 23],
-  'partial shared-shell simulation lineups should expand to the available roster cap instead of freezing at the saved lineup size'
+  [null, 23, null, null, 34],
+  'partial shared-shell simulation lineups should keep players in eligible starter slots'
 );
 
 const freshRosterAdapterStub = {
@@ -1844,6 +1926,56 @@ assert.match(elements.playoffsContent.innerHTML, /NBA Champions/i);
 assert.match(elements.playoffsContent.innerHTML, /Los Angeles Lakers/);
 assert.match(elements.playoffsContent.innerHTML, /Completed/i, 'active-screen rerender should surface the updated completed-phase playoffs state');
 
+api.setSeasonModeAdapter({
+  ...simulationAdapterStub,
+  getScheduleViewModel() {
+    return {
+      sport: 'nba',
+      hero: { controlledTeamAbbr: 'LAL' },
+      scheduleByDay: {
+        12: [
+          { day: 12, awayAbbr: 'SAS', homeAbbr: 'LAL' },
+          { day: 12, awayAbbr: 'BOS', homeAbbr: 'CHI' }
+        ]
+      }
+    };
+  },
+  prepareLiveMatchup({ homeAbbr, awayAbbr }) {
+    const key = `${String(awayAbbr || '').toUpperCase()}@${String(homeAbbr || '').toUpperCase()}`;
+    if (key === 'SAS@LAL') {
+      return {
+        gameLog: {
+          awayTotal: 89.2,
+          homeTotal: 0,
+          awayEntries: [{ finalScore: 48.5 }],
+          homeEntries: []
+        }
+      };
+    }
+    return {
+      gameLog: {
+        awayTotal: 104.4,
+        homeTotal: 99.8,
+        awayEntries: [{ finalScore: 54.1 }],
+        homeEntries: [{ finalScore: 46.6 }]
+      }
+    };
+  }
+});
+api.setData({
+  sport: 'nba',
+  activeSeasonBackend: 'simulation',
+  draftState: { controlledTeamAbbr: 'LAL' },
+  seasonState: { currentDay: 12, completedGameLogs: [] }
+});
+const liveRevealShowcase = api.findSimulationRevealLiveMatchup();
+assert.deepStrictEqual(
+  toPlain({ awayAbbr: liveRevealShowcase?.awayAbbr, homeAbbr: liveRevealShowcase?.homeAbbr }),
+  { awayAbbr: 'BOS', homeAbbr: 'CHI' },
+  'league-home live reveal should skip a controlled-team matchup when one side has no active fantasy scoring and pick a playable showcase instead'
+);
+api.setSeasonModeAdapter(simulationAdapterStub);
+
 api.renderSimulationWaiverInSharedShell();
 assert.match(elements.waiverContent.innerHTML, /Scottie Pippen/);
 assert.match(elements.waiverContent.innerHTML, /Free Agents Control Room/i, 'simulation waiver desk should still use the control room shell after state advances');
@@ -1947,11 +2079,18 @@ assert.match(elements.tradesContent.innerHTML, /Stephen Curry [^<]* GSW [^<]* PG
 
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];
+demoToasts = [];
 api.applySimulationTradeFromShell('BOS');
 assert.equal(simulationAdapterStub.lastTrade, null, 'trade helper should require explicit outgoing and incoming selections');
 assert.equal(historicalSlotUpsertCalls.length, 0, 'trade helper should not persist until both sides are chosen');
+assert.deepStrictEqual(
+  demoToasts,
+  ['Choose both the outgoing and incoming players before applying a trade.'],
+  'trade helper should give immediate feedback when a trade is incomplete'
+);
 elements['simulation-trade-outgoing-select-BOS'].value = '34';
 elements['simulation-trade-incoming-select-BOS'].value = '30';
+demoToasts = [];
 api.applySimulationTradeFromShell('BOS');
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastTrade),
@@ -1961,6 +2100,15 @@ assert.deepStrictEqual(
     outgoingPlayerIds: [34],
     incomingPlayerIds: [30]
   }
+);
+assert.deepStrictEqual(
+  demoToasts,
+  ['Trade applied: Hakeem Olajuwon for Stephen Curry.'],
+  'trade helper should confirm when a simulation trade actually changes rosters'
+);
+assert.ok(
+  simulationAdapterStub.getState().draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 30),
+  'trade helper should leave the acquired player on the controlled roster after success'
 );
 
 api.renderSimulationStandingsInSharedShell();

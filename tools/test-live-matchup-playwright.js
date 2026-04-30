@@ -177,16 +177,40 @@ async function smokeLiveMatchupWriteback(browser) {
         planned: Number(playerTotals.get(player._id)?.planned || 0) + Number(event.fpGain || 0)
       });
     }
-    return Array.from(playerTotals.values());
+    return {
+      playerTotals: Array.from(playerTotals.values()),
+      firstHalfCount: Array.isArray(liveRevealFirstHalfEvents) ? liveRevealFirstHalfEvents.length : 0,
+      secondHalfCount: Array.isArray(liveRevealSecondHalfEvents) ? liveRevealSecondHalfEvents.length : 0,
+      zeroEvents: (liveRevealEvents || []).filter((event) => Number(event?.fpGain || 0) < 0.1).length
+    };
   });
   assert.equal(
-    revealPlan.filter((entry) => entry.planned > entry.target + 0.05).length,
+    revealPlan.playerTotals.filter((entry) => entry.planned > entry.target + 0.05).length,
     0,
     'live reveal event plan should not temporarily assign a player more fantasy points than their final line'
   );
+  assert.ok(revealPlan.firstHalfCount > 0, 'live reveal should allocate first-half scoring events');
+  assert.ok(revealPlan.secondHalfCount > 0, 'live reveal should reserve scoring events for the second half');
+  assert.equal(revealPlan.zeroEvents, 0, 'live reveal event plan should not include rounded zero-value events');
 
   assert.equal(await page.locator('#team-a-name').textContent(), 'Los Angeles Lakers');
   assert.equal(await page.locator('#team-b-name').textContent(), 'Boston Celtics');
+  assert.ok(
+    await page.locator('.live-player-portrait').count() >= 10,
+    'live matchup roster rows should render player portraits'
+  );
+  assert.ok(
+    await page.locator('.live-player-portrait img.player-portrait-img').count() >= 10,
+    'live matchup roster rows should use image-backed generated portrait assets'
+  );
+  assert.ok(
+    await page.locator('.player-showcase-card').count() >= 10,
+    'live matchup roster rows should render compact player showcase cards'
+  );
+  assert.ok(
+    await page.locator('#speed-3x').evaluate((node) => node.classList.contains('active')),
+    'live matchup should default to 3x speed'
+  );
 
   await page.locator('#speed-5x').click();
   await page.waitForFunction(
@@ -229,9 +253,11 @@ async function smokeLiveMatchupWriteback(browser) {
     nodes.map((node) => Number(node.textContent || 0))
   ));
   assert.ok(
-    finalScores.some((score, index) => score > halftimeScores[index]),
-    'live reveal should save meaningful scoring for the second half'
+    finalScores.every((score, index) => score > halftimeScores[index] + 0.05),
+    `live reveal should save meaningful scoring for both teams after halftime: half=${halftimeScores.join(',')} final=${finalScores.join(',')}`
   );
+  const finalPbpText = await page.locator('#pbp-body').innerText();
+  assert.doesNotMatch(finalPbpText, /\+0\.0/, 'live reveal play-by-play should not include zero-value fantasy events');
 
   const persisted = await page.evaluate((slotId) => (
     JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${slotId}`))

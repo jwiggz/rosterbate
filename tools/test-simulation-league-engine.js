@@ -8,6 +8,7 @@ const { getSimulationShell } = require('../simulation-mode-config.js');
 const { buildCompletedSimulationAutoDraftState } = require('../simulation-mode-runtime.js');
 const {
   buildSimulationSeasonSchedule,
+  buildNbaTeamScheduleByDay,
   simulateSimulationGameDay,
   applySimulationDayResults,
   resolveRenderedGameScores
@@ -125,6 +126,78 @@ assert.ok(
     teamResult.entries.every((entry) => String(entry?.statSource || '') === 'simulation_engine_generated')
   ),
   'engine day results should explicitly mark generated team and player stats instead of relying on historical-source assumptions'
+);
+
+const nbaCalendarState = {
+  ...state,
+  seasonId: 'nba-team-calendar-state',
+  seasonState: {
+    nbaTeamScheduleByDay: {
+      1: [{ homeAbbr: 'CHI', awayAbbr: 'NYK', time: '7:00 PM' }]
+    }
+  },
+  allRosters: shell.teams.map((team, teamIdx) => ([
+    { ...roster[1], id: teamIdx * 100 + 1, name: `CHI Starter ${teamIdx}`, team: 'CHI', designation: 'ACTIVE' },
+    { ...roster[2], id: teamIdx * 100 + 2, name: `HOU Off Day ${teamIdx}`, team: 'HOU', designation: 'ACTIVE' },
+    { ...roster[3], id: teamIdx * 100 + 3, name: `NYK Starter ${teamIdx}`, team: 'NYK', designation: 'ACTIVE' },
+    { ...roster[4], id: teamIdx * 100 + 4, name: `BOS Off Day ${teamIdx}`, team: 'BOS', designation: 'ACTIVE' },
+    { ...roster[5], id: teamIdx * 100 + 5, name: `LAL Off Day ${teamIdx}`, team: 'LAL', designation: 'ACTIVE' }
+  ]))
+};
+const nbaCalendarDayResult = simulateSimulationGameDay({
+  state: nbaCalendarState,
+  schedule: { byDay: { 1: [{ homeAbbr: 'LAL', awayAbbr: 'BOS' }] } },
+  day: 1,
+  lineupIdsByTeam: Object.fromEntries(shell.teams.map((team, teamIdx) => [
+    team.abbr,
+    [teamIdx * 100 + 1, teamIdx * 100 + 2, teamIdx * 100 + 3, teamIdx * 100 + 4, teamIdx * 100 + 5]
+  ]))
+});
+const lakersTeamIdx = shell.teams.findIndex((team) => team.abbr === 'LAL');
+const calendarEntries = nbaCalendarDayResult.resultsByTeam[lakersTeamIdx].entries;
+assert.ok(
+  calendarEntries.find((entry) => String(entry?.player?.team) === 'CHI' && Number(entry?.finalScore || 0) > 0 && entry?.game?.opp === 'NYK'),
+  'NBA starters whose real team plays should receive a generated stat line with that NBA opponent'
+);
+assert.ok(
+  calendarEntries.find((entry) => String(entry?.player?.team) === 'HOU' && entry?.unavailable === true && Number(entry?.finalScore || 0) === 0 && entry?.source === 'nba_off_day'),
+  'NBA starters whose real team is off should be kept visible as zero-point off-day entries'
+);
+
+function NBA_TEAM_SAMPLE_ROSTER() {
+  return ['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS']
+    .map((team, index) => ({
+      id: 9000 + index,
+      name: `${team} Sample`,
+      team,
+      pos: index % 5 === 0 ? 'C' : index % 2 === 0 ? 'F' : 'G',
+      fp: 30
+    }));
+}
+
+const generatedNbaTeamSchedule = buildNbaTeamScheduleByDay({
+  leagueShell: { regularSeasonGamesPerTeam: 14 },
+  draftState: {
+    rostersByTeam: {
+      LAL: NBA_TEAM_SAMPLE_ROSTER()
+    }
+  }
+});
+const firstWeekTeamCounts = Object.fromEntries(
+  ['ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS']
+    .map((abbr) => [abbr, 0])
+);
+Object.entries(generatedNbaTeamSchedule)
+  .filter(([day]) => Number(day) >= 1 && Number(day) <= 7)
+  .forEach(([, games]) => {
+    games.forEach((game) => {
+      firstWeekTeamCounts[game.homeAbbr] += 1;
+      firstWeekTeamCounts[game.awayAbbr] += 1;
+    });
+  });
+assert.ok(
+  Object.values(firstWeekTeamCounts).every((count) => count >= 2 && count <= 4),
+  'generated NBA team schedule should create realistic weekly player availability instead of all teams playing every day'
 );
 
 const updated = applySimulationDayResults(state, dayResult);

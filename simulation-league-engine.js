@@ -117,6 +117,9 @@
         finalScore:roundStat(entry?.finalScore || 0),
         statSource:String(entry?.statSource || 'simulation_engine_generated'),
         source:String(entry?.source || 'starter_sim'),
+        game:safeClone(entry?.game || null),
+        injury:safeClone(entry?.injury || null),
+        unavailable:entry?.unavailable === true,
         simulatedStats:safeClone(entry?.simulatedStats || null),
         simSummary:safeClone(entry?.simSummary || null)
       };
@@ -161,6 +164,145 @@
     const explicitSport=String(state?.sport || state?.leagueShell?.sport || '').trim().toLowerCase();
     if(explicitSport) return explicitSport;
     return String(state?.simulationMode || '').trim().toLowerCase().indexOf('nfl_')===0 ? 'nfl' : 'nba';
+  }
+
+  function normalizeSimulationTeamAbbr(value){
+    return String(value || '').trim().toUpperCase();
+  }
+
+  function getNbaTeamScheduleByDay(state){
+    const schedule=state?.seasonState?.nbaTeamScheduleByDay || state?.nbaTeamScheduleByDay || state?.leagueShell?.nbaTeamScheduleByDay || null;
+    if(schedule && typeof schedule==='object' && !Array.isArray(schedule) && Object.keys(schedule).length) return schedule;
+    const generated=buildNbaTeamScheduleByDay(state);
+    return generated && Object.keys(generated).length ? generated : null;
+  }
+
+  const NBA_TEAM_ABBR_ORDER=[
+    'ATL','BOS','BKN','CHA','CHI','CLE','DAL','DEN','DET','GSW',
+    'HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK',
+    'OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'
+  ];
+
+  function collectNbaTeamAbbrsFromState(state){
+    const seen=new Set();
+    function add(value){
+      const abbr=normalizeSimulationTeamAbbr(value);
+      if(abbr && NBA_TEAM_ABBR_ORDER.includes(abbr)) seen.add(abbr);
+    }
+    (Array.isArray(state?.allRosters) ? state.allRosters : []).forEach(function(roster){
+      (Array.isArray(roster) ? roster : []).forEach(function(player){
+        add(player?.team || player?.nbaTeam || player?.teamAbbr);
+      });
+    });
+    const rostersByTeam=state?.draftState?.rostersByTeam && typeof state.draftState.rostersByTeam==='object'
+      ? state.draftState.rostersByTeam
+      : {};
+    Object.values(rostersByTeam).forEach(function(roster){
+      (Array.isArray(roster) ? roster : []).forEach(function(player){
+        add(player?.team || player?.nbaTeam || player?.teamAbbr);
+      });
+    });
+    (Array.isArray(state?.draftState?.freeAgents) ? state.draftState.freeAgents : []).forEach(function(player){
+      add(player?.team || player?.nbaTeam || player?.teamAbbr);
+    });
+    return NBA_TEAM_ABBR_ORDER.filter(function(abbr){ return seen.has(abbr); });
+  }
+
+  function buildNbaTeamScheduleByDay(state, options){
+    const opts=options && typeof options==='object' ? options : {};
+    const teams=Array.isArray(opts.teams) && opts.teams.length
+      ? opts.teams.map(normalizeSimulationTeamAbbr).filter(function(abbr){ return NBA_TEAM_ABBR_ORDER.includes(abbr); })
+      : collectNbaTeamAbbrsFromState(state);
+    const uniqueTeams=Array.from(new Set(teams));
+    if(uniqueTeams.length < 10) return {};
+    const orderedTeams=NBA_TEAM_ABBR_ORDER.filter(function(abbr){ return uniqueTeams.includes(abbr); });
+    const totalDays=Math.max(1, Number(opts.totalDays || state?.leagueShell?.regularSeasonGamesPerTeam || 82) || 82);
+    const byDay={};
+    for(let day=1; day<=totalDays; day+=1){
+      let active=orderedTeams.filter(function(_team, index){
+        const cadence=(day + index * 2) % 7;
+        return cadence===0 || cadence===2 || cadence===4 || (index % 5 === day % 5 && cadence===6);
+      });
+      if(active.length % 2 === 1){
+        active=active.filter(function(_team, index){
+          return index !== (day + active.length) % active.length;
+        });
+      }
+      const rotateBy=active.length ? day % active.length : 0;
+      const rotated=active.slice(rotateBy).concat(active.slice(0, rotateBy));
+      byDay[day]=[];
+      for(let index=0; index<rotated.length; index+=2){
+        const first=rotated[index];
+        const second=rotated[index + 1];
+        if(!(first && second)) continue;
+        const homeFirst=(day + index) % 2 === 0;
+        byDay[day].push({
+          homeAbbr:homeFirst ? first : second,
+          awayAbbr:homeFirst ? second : first,
+          time:index % 4 === 0 ? '7:00 PM' : index % 4 === 2 ? '8:30 PM' : '10:00 PM'
+        });
+      }
+    }
+    return byDay;
+  }
+
+  function getNbaPlayerGameForDay(nbaTeamScheduleByDay, player, day){
+    const schedule=nbaTeamScheduleByDay && typeof nbaTeamScheduleByDay==='object' ? nbaTeamScheduleByDay : null;
+    const teamAbbr=normalizeSimulationTeamAbbr(player?.team || player?.nbaTeam || player?.teamAbbr);
+    const dayGames=Array.isArray(schedule?.[Number(day)]) ? schedule[Number(day)] : [];
+    if(!schedule || !teamAbbr || !dayGames.length) return null;
+    const game=dayGames.find(function(entry){
+      return normalizeSimulationTeamAbbr(entry?.homeAbbr || entry?.home)===teamAbbr ||
+        normalizeSimulationTeamAbbr(entry?.awayAbbr || entry?.away)===teamAbbr;
+    });
+    if(!game) return null;
+    const homeAbbr=normalizeSimulationTeamAbbr(game?.homeAbbr || game?.home);
+    const awayAbbr=normalizeSimulationTeamAbbr(game?.awayAbbr || game?.away);
+    const isHome=homeAbbr===teamAbbr;
+    return {
+      teamAbbr:teamAbbr,
+      opponentAbbr:isHome ? awayAbbr : homeAbbr,
+      isHome:isHome,
+      time:String(game?.time || game?.timeLabel || 'Sim').trim() || 'Sim'
+    };
+  }
+
+  function buildNbaOffDayStarterEntry(player, day){
+    return {
+      player:player,
+      baseScore:0,
+      finalScore:0,
+      statSource:'nba_off_day',
+      game:{
+        opp:'OFF',
+        time:'Off',
+        isHome:false,
+        simulated:true,
+        day:Number(day || 0) || null
+      },
+      injury:null,
+      unavailable:true,
+      source:'nba_off_day',
+      simulatedStats:{
+        pts:0,
+        reb:0,
+        ast:0,
+        stl:0,
+        blk:0,
+        to:0,
+        min:0,
+        fgm:0,
+        fga:0,
+        ftm:0,
+        fta:0,
+        threes:0
+      },
+      simSummary:{
+        team:normalizeSimulationTeamAbbr(player?.team || ''),
+        opponent:'OFF',
+        side:'off'
+      }
+    };
   }
 
   function getSimulationStarterCount(state){
@@ -1050,6 +1192,21 @@
       return 0.35 + Number(player?.simProfile?.ratings?.rebounding || 0) / 110;
     });
     return starters.map(function(player, index){
+      let playerOpponentLabel=opponentLabel;
+      let playerSideKey=sideKey;
+      const nbaSchedule=gameContext?.nbaTeamScheduleByDay || null;
+      const nbaDay=Number(gameContext?.day || 0) || null;
+      if(nbaSchedule && nbaDay){
+        const nbaGame=getNbaPlayerGameForDay(nbaSchedule, player, nbaDay);
+        const playerTeam=normalizeSimulationTeamAbbr(player?.team || player?.nbaTeam || player?.teamAbbr);
+        if(playerTeam && !nbaGame){
+          return buildNbaOffDayStarterEntry(player, nbaDay);
+        }
+        if(nbaGame?.opponentAbbr){
+          playerOpponentLabel=nbaGame.opponentAbbr;
+          playerSideKey=nbaGame.isHome ? 'home' : 'away';
+        }
+      }
       const profile=player?.simProfile || buildPlayerSimulationProfile(player, { packId:player?.historicalPackId || null });
       const baseline=profile.baseline || deriveBaseline(player);
       const ratings=profile.ratings || {};
@@ -1058,9 +1215,9 @@
       const reboundWeight=reboundWeights[index] || usageWeight;
       const volatility=clamp((Number(ratings.volatility || 50) / 100) * gameContext.varianceScale, 0.08, 0.32);
       const randomSwing=1 + normalish(rng) * volatility;
-      const offenseBoost=sideKey==='home' ? gameContext.homeBoost : gameContext.awayBoost;
-      const teamForm=sideKey==='home' ? (gameContext.homeForm || 1) : (gameContext.awayForm || 1);
-      const reboundShift=sideKey==='home' ? gameContext.reboundTilt : -gameContext.reboundTilt;
+      const offenseBoost=playerSideKey==='home' ? gameContext.homeBoost : gameContext.awayBoost;
+      const teamForm=playerSideKey==='home' ? (gameContext.homeForm || 1) : (gameContext.awayForm || 1);
+      const reboundShift=playerSideKey==='home' ? gameContext.reboundTilt : -gameContext.reboundTilt;
       const efficiencyBoost=clamp(0.92 + Number(ratings.shooting || 50) / 240, 0.78, 1.22);
       const archetype=String(profile?.archetype || '').trim().toLowerCase();
       const position=String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
@@ -1153,9 +1310,9 @@
         finalScore:fantasyPoints,
         statSource:'simulation_engine_generated',
         game:{
-          opp:opponentLabel,
+          opp:playerOpponentLabel,
           time:'Sim',
-          isHome:sideKey==='home',
+          isHome:playerSideKey==='home',
           simulated:true
         },
         injury:null,
@@ -1164,8 +1321,8 @@
         simulatedStats:stats,
         simSummary:{
           team:teamLabel,
-          opponent:opponentLabel,
-          side:sideKey
+          opponent:playerOpponentLabel,
+          side:playerSideKey
         }
       };
     });
@@ -1446,6 +1603,10 @@
       ];
       const rng=mulberry32(hashString(seedParts.join('|')));
       const gameContext=buildGameContext(homeProfile, awayProfile, rng);
+      if(getSimulationSport(state)==='nba'){
+        gameContext.day=day;
+        gameContext.nbaTeamScheduleByDay=getNbaTeamScheduleByDay(state);
+      }
       const homeName=String(teamNames[homeIdx] || ('Team ' + (homeIdx + 1)));
       const awayName=String(teamNames[awayIdx] || ('Team ' + (awayIdx + 1)));
       const homeEntries=simulateStarterEntries(homeProfile, awayProfile, homeName, awayName, 'home', rng, gameContext);
@@ -1630,6 +1791,7 @@
     enrichLeagueState:enrichLeagueState,
     simulateLeagueDay:simulateLeagueDay,
     buildSimulationSeasonSchedule:buildSimulationSeasonSchedule,
+    buildNbaTeamScheduleByDay:buildNbaTeamScheduleByDay,
     buildSimulationPlayIn:buildSimulationPlayIn,
     resolveSimulationPlayIn:resolveSimulationPlayIn,
     buildSimulationPlayoffBracket:buildSimulationPlayoffBracket,

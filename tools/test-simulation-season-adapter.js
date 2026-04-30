@@ -328,6 +328,42 @@ assertSinglePlayerParityRosterVm(roster, 'nba simulation');
 assert.equal(roster.statSourceLabel, 'Generated', 'single-player replacement roster vm should label generated stats as generated');
 assert.equal(roster.lineup.length, 2);
 assert.equal(roster.bench.length, 0);
+assert.equal(
+  roster.sections.starters.rows[0]?.opponentLabel,
+  'vs BOS',
+  'nba simulation roster rows should show whether the player has a current matchup instead of leaving OPP blank'
+);
+assert.equal(
+  roster.sections.starters.rows[0]?.timeLabel,
+  'Day 12',
+  'nba simulation roster rows should show the current matchup day in the time column'
+);
+
+const nbaPlayerCalendarAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-nba-player-calendar',
+  state: {
+    ...slotState,
+    seasonState: {
+      ...slotState.seasonState,
+      nbaTeamScheduleByDay: {
+        12: [{ homeAbbr: 'CHI', awayAbbr: 'NYK', time: '7:00 PM' }]
+      }
+    }
+  }
+});
+const nbaPlayerCalendarRosterVm = nbaPlayerCalendarAdapter.getRosterViewModel();
+const jordanCalendarRow = nbaPlayerCalendarRosterVm.sections.starters.rows.find((row) => row.player?.id === 23);
+const hakeemCalendarRow = nbaPlayerCalendarRosterVm.sections.starters.rows.find((row) => row.player?.id === 34);
+assert.equal(
+  jordanCalendarRow?.opponentLabel,
+  'vs NYK',
+  'nba roster rows should show each player real-team opponent when an NBA team schedule is available'
+);
+assert.equal(
+  hakeemCalendarRow?.opponentLabel,
+  'No game',
+  'nba roster rows should show No game when that player real team is off'
+);
 assert.ok(roster.teamSummary, 'shared simulation roster vm should expose a teamSummary bridge object');
 assert.equal(roster.teamSummary.watchListEnabled, true, 'simulation roster vm should expose a live watch-list affordance');
 assert.equal(roster.teamSummary.settingsEnabled, true, 'simulation roster vm should expose live team-settings affordance');
@@ -452,7 +488,7 @@ assert.deepStrictEqual(
   'nba roster vm should preserve repeated utility assignments by lineup index'
 );
 assert.equal(expandedNbaRosterVm.filledStarters, 10, 'expanded nba roster vm should count all 10 filled starters');
-assert.equal(expandedNbaRosterVm.sections.bench.rows.length, 3, 'expanded nba roster vm should leave three active reserves on the bench');
+assert.equal(expandedNbaRosterVm.sections.bench.rows.length, 5, 'expanded nba roster vm should keep healthy reserve overflow on the bench instead of relabeling it as IR');
 assert.equal(
   expandedNbaRosterVm.sections.starters.rows[0]?.healthLabel,
   'Active',
@@ -474,13 +510,131 @@ assert.ok(
 assert.equal(expandedNbaRosterVm.sections.il.title, 'IR', 'expanded nba roster vm should label inactive reserve slots as IR');
 assert.deepStrictEqual(
   expandedNbaRosterVm.sections.il.rows.map((row) => row.player?.id),
-  [14, 15],
-  'expanded nba roster vm should split the final two reserve players into IR rows'
+  [],
+  'expanded nba roster vm should not place healthy reserve overflow into IR rows'
+);
+
+const currentSeasonStatsAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-current-season-stats',
+  state: {
+    ...slotState,
+    draftState: {
+      ...slotState.draftState,
+      rostersByTeam: {
+        ...slotState.draftState.rostersByTeam,
+        LAL: [
+          { id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI', fp: 60.2, statValues: { PTS: 37.1, REB: 5.2, AST: 4.6, TFP: 4939.5 } },
+          { id: 34, name: 'Hakeem Olajuwon', pos: 'C', team: 'HOU', fp: 61.8 }
+        ]
+      }
+    },
+    seasonState: {
+      ...slotState.seasonState,
+      completedGameLogs: [
+        {
+          day: 1,
+          home: 0,
+          away: 1,
+          homeEntries: [
+            { player: { id: 23, name: 'Michael Jordan' }, finalScore: 44.2, simulatedStats: { pts: 24, reb: 6, ast: 8, stl: 2, blk: 1, threes: 1 } }
+          ],
+          awayEntries: []
+        },
+        {
+          day: 2,
+          home: 0,
+          away: 1,
+          homeEntries: [
+            { player: { id: 23, name: 'Michael Jordan' }, finalScore: 51.8, simulatedStats: { pts: 32, reb: 8, ast: 6, stl: 3, blk: 0, threes: 2 } },
+            { player: { id: 34, name: 'Hakeem Olajuwon' }, finalScore: 0, unavailable: true, source: 'nba_off_day', statSource: 'nba_off_day', simulatedStats: { pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, threes: 0 } }
+          ],
+          awayEntries: []
+        }
+      ]
+    }
+  }
+});
+const currentSeasonStatsRosterVm = currentSeasonStatsAdapter.getRosterViewModel();
+const currentJordanRow = currentSeasonStatsRosterVm.sections.starters.rows.find((row) => row.player?.id === 23);
+assert.equal(
+  currentJordanRow.player.statValues.PTS,
+  28,
+  'simulation roster vm should show current simulated season scoring average instead of source-season points'
 );
 assert.equal(
-  expandedNbaRosterVm.sections.il.rows[0]?.healthLabel,
-  'IR',
-  'expanded nba roster vm should mark IR-section rows with an IR health label'
+  currentJordanRow.player.statValues.TFP,
+  96,
+  'simulation roster vm should show current simulated season total fantasy points instead of source-season TFP'
+);
+assert.equal(
+  currentJordanRow.player.fp,
+  48,
+  'simulation roster vm should show current simulated FP/G in the FP column'
+);
+assert.ok(
+  currentJordanRow.statSummary.includes('2 games'),
+  'simulation roster vm should label current season stat summaries by completed games'
+);
+const currentHakeemRow = currentSeasonStatsRosterVm.sections.starters.rows.find((row) => row.player?.id === 34);
+assert.equal(
+  currentHakeemRow.player.statValues.TFP,
+  0,
+  'simulation roster vm should not mix source-season TFP into current season rows for players without completed games'
+);
+assert.equal(
+  currentHakeemRow.player.statSummary,
+  'No simulated games yet',
+  'simulation roster vm should clearly label players with no current simulated games'
+);
+
+const outReserveState = {
+  ...expandedNbaAdapter.getState(),
+  draftState: {
+    ...expandedNbaAdapter.getState().draftState,
+    rostersByTeam: {
+      ...expandedNbaAdapter.getState().draftState.rostersByTeam,
+      LAL: expandedNbaAdapter.getState().draftState.rostersByTeam.LAL.map((player) => (
+        Number(player.id) === 12 ? { ...player, designation: 'OUT' } : player
+      ))
+    }
+  }
+};
+const outReserveRosterVm = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-out-reserve-ir',
+  state: outReserveState
+}).getRosterViewModel();
+assert.ok(
+  outReserveRosterVm.sections.il.rows.some((row) => row.player?.id === 12),
+  'nba roster vm should prioritize OUT reserve players into available IR rows'
+);
+assert.equal(
+  outReserveRosterVm.sections.il.rows.find((row) => row.player?.id === 12)?.healthLabel,
+  'Out',
+  'nba roster vm should keep the player health status visible inside an IR slot'
+);
+
+const injuriesOffRosterVm = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-injuries-off-reserve-order',
+  state: {
+    ...outReserveState,
+    leagueShell: {
+      ...outReserveState.leagueShell,
+      injuriesEnabled: false,
+      settings: {
+        ...(outReserveState.leagueShell.settings || {}),
+        injuriesEnabled: false
+      }
+    }
+  }
+}).getRosterViewModel();
+assert.ok(
+  injuriesOffRosterVm.sections.bench.rows.some((row) => row.player?.id === 12),
+  'nba roster vm should leave OUT-designated reserves in bench order when AI injuries are off'
+);
+assert.equal(
+  injuriesOffRosterVm.sections.il.rows.length,
+  0,
+  'nba roster vm should leave IR empty when injuries are disabled'
 );
 
 const lineupWaiverQaAdapter = createSimulationSeasonAdapter({
@@ -517,8 +671,8 @@ assert.ok(
   'lineup/waiver QA should activate an IR player when roster order moves them into active reserves'
 );
 assert.ok(
-  lineupWaiverRosterVm.sections.il.rows.some((row) => row.player?.id === 12),
-  'lineup/waiver QA should stash the displaced reserve into an IR row'
+  lineupWaiverRosterVm.sections.bench.rows.some((row) => row.player?.id === 12),
+  'lineup/waiver QA should keep healthy displaced reserves on the bench instead of stashing them into IR'
 );
 lineupWaiverQaAdapter.submitWaiverClaim({ addPlayerId: 50, dropPlayerId: 1 });
 assert.equal(
@@ -560,8 +714,8 @@ assert.ok(
   'lineup/waiver QA should preserve activated IR placement when the season adapter is reopened'
 );
 assert.ok(
-  reopenedLineupWaiverRosterVm.sections.il.rows.some((row) => row.player?.id === 12),
-  'lineup/waiver QA should preserve stashed IR placement when the season adapter is reopened'
+  reopenedLineupWaiverRosterVm.sections.bench.rows.some((row) => row.player?.id === 12),
+  'lineup/waiver QA should preserve healthy displaced reserves on the bench when the season adapter is reopened'
 );
 assert.ok(
   reopenedLineupWaiverRosterVm.sections.bench.rows.concat(reopenedLineupWaiverRosterVm.sections.il.rows).some((row) => row.player?.id === 50),
@@ -671,6 +825,28 @@ assert.equal(schedule.hero?.controlledTeamAbbr, 'LAL', 'schedule vm hero should 
 assert.equal(schedule.hero?.opponentAbbr, 'BOS', 'schedule vm hero should identify the current opponent');
 assert.equal(schedule.navigation?.mode, 'day', 'nba schedule vm should expose day-based matchup navigation');
 assert.ok(Array.isArray(schedule.navigation?.items), 'schedule vm should expose concrete matchup navigation items');
+const extendedFutureScheduleAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-future-days',
+  state: {
+    ...slotState,
+    seasonState: {
+      ...slotState.seasonState,
+      currentDay: 12,
+      scheduleByDay: {
+        12: [{ homeAbbr: 'LAL', awayAbbr: 'BOS' }],
+        13: [{ homeAbbr: 'BOS', awayAbbr: 'LAL' }],
+        14: [{ homeAbbr: 'LAL', awayAbbr: 'BOS' }],
+        15: [{ homeAbbr: 'BOS', awayAbbr: 'LAL' }],
+        16: [{ homeAbbr: 'LAL', awayAbbr: 'BOS' }],
+        17: [{ homeAbbr: 'BOS', awayAbbr: 'LAL' }]
+      }
+    }
+  }
+});
+assert.ok(
+  extendedFutureScheduleAdapter.getScheduleViewModel().navigation.items.some((item) => item.cycleValue === 17),
+  'nba schedule navigation should include future matchup days beyond the nearest five-day window'
+);
 assert.deepStrictEqual(
   Array.isArray(schedule.actionCards) ? schedule.actionCards.map((card) => card.label) : [],
   ['Open My Team', 'Open Waivers', 'Review Matchup'],

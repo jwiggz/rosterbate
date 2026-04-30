@@ -184,6 +184,11 @@ assert.deepStrictEqual(
   ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
   'nba simulation runtime should expose the expanded basketball starter slots'
 );
+assert.deepStrictEqual(
+  getSimulationStarterSlots({ sport: 'nba', rosterSize: 15 }),
+  ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+  'nba simulation runtime should use expanded basketball starter slots when reopening older shells without starterSlots'
+);
 
 assert.equal(getSimulationRequiredStarterCount(nflShell), 9);
 assert.equal(getSimulationRequiredStarterCount(shell), 10);
@@ -1375,6 +1380,72 @@ assert.deepStrictEqual(
 );
 assert.equal(autoDraftState.seasonState.currentDay, 1);
 assert.equal(autoDraftState.postseasonState.phase, 'regular_season');
+
+const healedNbaLineupState = buildUnifiedSimulationSeasonState({
+  leagueShell: shell,
+  draftState: {
+    controlledTeamAbbr: 'LAL',
+    rostersByTeam: {
+      LAL: [
+        { id: 1, name: 'Center Only', pos: 'C', team: 'LAL', fp: 60 },
+        { id: 2, name: 'Point Guard', pos: 'PG', team: 'LAL', fp: 55 },
+        { id: 3, name: 'Shooting Guard', pos: 'SG', team: 'LAL', fp: 54 },
+        { id: 4, name: 'Small Forward', pos: 'SF', team: 'LAL', fp: 53 },
+        { id: 5, name: 'Power Forward', pos: 'PF', team: 'LAL', fp: 52 },
+        { id: 6, name: 'Guard Flex', pos: 'PG', team: 'LAL', fp: 51 },
+        { id: 7, name: 'Forward Flex', pos: 'SF', team: 'LAL', fp: 50 },
+        { id: 8, name: 'Utility Guard', pos: 'SG', team: 'LAL', fp: 49 },
+        { id: 9, name: 'Utility Forward', pos: 'PF', team: 'LAL', fp: 48 },
+        { id: 10, name: 'Utility Center', pos: 'C', team: 'LAL', fp: 47 }
+      ]
+    }
+  },
+  seasonState: {
+    lineupIdsByTeam: {
+      LAL: [1, 2, 3, 4, 5]
+    }
+  }
+});
+assert.equal(
+  validateSimulationLineup(healedNbaLineupState, 'LAL').valid,
+  true,
+  'reopening an older NBA simulation save should heal invalid saved starter assignments'
+);
+assert.notEqual(
+  healedNbaLineupState.seasonState.lineupIdsByTeam.LAL[0],
+  1,
+  'reopening an older NBA simulation save should not leave a center-only player in PG'
+);
+
+const injuryDisabledState = updateSimulationTeamSettings(
+  {
+    leagueShell: {
+      ...shell,
+      teams: [{ abbr: 'LAL', name: 'Los Angeles Lakers', displayName: 'Los Angeles Lakers' }]
+    },
+    draftState: {
+      controlledTeamAbbr: 'LAL',
+      rostersByTeam: {
+        LAL: [{ id: 23, name: 'Injury Toggle Starter', pos: 'PG', team: 'LAL', designation: 'OUT' }]
+      }
+    },
+    seasonState: {
+      lineupIdsByTeam: { LAL: [23] }
+    },
+    teamAvatarUrls: ['']
+  },
+  {
+    teamAbbr: 'LAL',
+    name: 'Los Angeles Lakers',
+    injuriesEnabled: false
+  }
+);
+assert.equal(injuryDisabledState.leagueShell.injuriesEnabled, false, 'team settings should persist the simulation injuries toggle');
+assert.equal(
+  validateSimulationLineup(injuryDisabledState, 'LAL').issues.some((issue) => issue.code === 'player_out'),
+  false,
+  'turning injuries off should stop OUT designations from invalidating simulation lineups'
+);
 
 const nflAutoDraftState = buildCompletedSimulationAutoDraftState({
   shell: nflShell,

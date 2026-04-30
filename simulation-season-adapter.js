@@ -265,6 +265,128 @@
     return Number.isFinite(fp) && fp > 0 ? `${fp.toFixed(1)} FP/G` : '';
   }
 
+  function roundSimulationSeasonStat(value, decimals = 1){
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return 0;
+    const factor = 10 ** decimals;
+    return Math.round(numeric * factor) / factor;
+  }
+
+  function getSimulationEntryPlayerId(entry){
+    const playerId = Number(entry?.player?.id ?? entry?.playerId ?? entry?.id);
+    return Number.isFinite(playerId) && playerId > 0 ? playerId : null;
+  }
+
+  function addSimulationSeasonStat(total, key, value){
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return;
+    total[key] = Number(total[key] || 0) + numeric;
+  }
+
+  function buildSimulationSeasonStatsByPlayerId(state){
+    const statsById = new Map();
+    const completedGames = Array.isArray(state?.seasonState?.completedGameLogs)
+      ? state.seasonState.completedGameLogs
+      : [];
+    completedGames.forEach((game) => {
+      const entries = []
+        .concat(Array.isArray(game?.homeEntries) ? game.homeEntries : [])
+        .concat(Array.isArray(game?.awayEntries) ? game.awayEntries : []);
+      entries.forEach((entry) => {
+        if (entry?.unavailable === true || String(entry?.source || '').trim() === 'nba_off_day' || String(entry?.statSource || '').trim() === 'nba_off_day') return;
+        const playerId = getSimulationEntryPlayerId(entry);
+        if (!playerId) return;
+        const line = entry?.simulatedStats && typeof entry.simulatedStats === 'object'
+          ? entry.simulatedStats
+          : {};
+        const existing = statsById.get(playerId) || { gp: 0, fp: 0 };
+        existing.gp += 1;
+        addSimulationSeasonStat(existing, 'fp', entry?.finalScore ?? line?.fantasyPoints);
+        addSimulationSeasonStat(existing, 'pts', line?.pts);
+        addSimulationSeasonStat(existing, 'reb', line?.reb);
+        addSimulationSeasonStat(existing, 'ast', line?.ast);
+        addSimulationSeasonStat(existing, 'stl', line?.stl);
+        addSimulationSeasonStat(existing, 'blk', line?.blk);
+        addSimulationSeasonStat(existing, 'threes', line?.threes ?? line?.threePointersMade ?? line?.['3PM']);
+        addSimulationSeasonStat(existing, 'passYds', line?.passingYards);
+        addSimulationSeasonStat(existing, 'passTd', line?.passingTd);
+        addSimulationSeasonStat(existing, 'rushYds', line?.rushingYards);
+        addSimulationSeasonStat(existing, 'rec', line?.receptions);
+        addSimulationSeasonStat(existing, 'recYds', line?.receivingYards);
+        addSimulationSeasonStat(existing, 'td', Number(line?.passingTd || 0) + Number(line?.rushingTd || 0) + Number(line?.receivingTd || 0));
+        statsById.set(playerId, existing);
+      });
+    });
+    return statsById;
+  }
+
+  function buildSimulationCurrentSeasonPlayer(player, seasonStatsById, sport, hasCurrentSeasonResults){
+    const playerId = Number(player?.id);
+    const totals = Number.isFinite(playerId) ? seasonStatsById.get(playerId) : null;
+    const gp = Number(totals?.gp || 0);
+    if (!(gp > 0) && !hasCurrentSeasonResults) return clone(player);
+    const safeTotals = totals && typeof totals === 'object' ? totals : {};
+    const fpTotal = roundSimulationSeasonStat(safeTotals.fp || 0);
+    const fpAvg = gp > 0 ? roundSimulationSeasonStat(fpTotal / gp) : 0;
+    const statValues = String(sport || '').toLowerCase() === 'nfl'
+      ? {
+        GP: gp,
+        TFP: fpTotal,
+        PASS_YDS: roundSimulationSeasonStat(safeTotals.passYds || 0, 0),
+        PASS_TD: roundSimulationSeasonStat(safeTotals.passTd || 0, 0),
+        RUSH_YDS: roundSimulationSeasonStat(safeTotals.rushYds || 0, 0),
+        REC: roundSimulationSeasonStat(safeTotals.rec || 0, 0),
+        REC_YDS: roundSimulationSeasonStat(safeTotals.recYds || 0, 0),
+        TD: roundSimulationSeasonStat(safeTotals.td || 0, 0)
+      }
+      : {
+        GP: gp,
+        TFP: fpTotal,
+        PTS: gp > 0 ? roundSimulationSeasonStat((safeTotals.pts || 0) / gp) : 0,
+        REB: gp > 0 ? roundSimulationSeasonStat((safeTotals.reb || 0) / gp) : 0,
+        AST: gp > 0 ? roundSimulationSeasonStat((safeTotals.ast || 0) / gp) : 0,
+        STL: gp > 0 ? roundSimulationSeasonStat((safeTotals.stl || 0) / gp) : 0,
+        BLK: gp > 0 ? roundSimulationSeasonStat((safeTotals.blk || 0) / gp) : 0,
+        '3PM': gp > 0 ? roundSimulationSeasonStat((safeTotals.threes || 0) / gp) : 0
+      };
+    const detailStats = String(sport || '').toLowerCase() === 'nfl'
+      ? [
+        { label: 'TFP', value: fpTotal },
+        { label: 'PYD', value: statValues.PASS_YDS },
+        { label: 'PTD', value: statValues.PASS_TD },
+        { label: 'RYD', value: statValues.RUSH_YDS },
+        { label: 'REC', value: statValues.REC },
+        { label: 'REY', value: statValues.REC_YDS }
+      ]
+      : [
+        { label: 'PTS', value: statValues.PTS },
+        { label: 'REB', value: statValues.REB },
+        { label: 'AST', value: statValues.AST },
+        { label: 'STL', value: statValues.STL },
+        { label: 'BLK', value: statValues.BLK },
+        { label: '3PM', value: statValues['3PM'] }
+      ];
+    return {
+      ...clone(player),
+      fp: fpAvg,
+      fantasyPoints: fpAvg,
+      totalFantasyPoints: fpTotal,
+      statValues,
+      detailStats,
+      statSummary: gp === 0
+        ? 'No simulated games yet'
+        : gp === 1
+        ? `1 game - ${fpTotal.toFixed(1)} fantasy`
+        : `${gp} games - ${fpAvg.toFixed(1)} FP/G`
+    };
+  }
+
+  function enrichSimulationRosterWithCurrentSeasonStats(state, roster, sport){
+    const seasonStatsById = buildSimulationSeasonStatsByPlayerId(state);
+    if (!seasonStatsById.size) return clone(roster || []);
+    return (Array.isArray(roster) ? roster : []).map((player) => buildSimulationCurrentSeasonPlayer(player, seasonStatsById, sport, true));
+  }
+
   function attachSimulationRosterRowMeta(row, player, fallbackDesignation){
     const health = buildSimulationPlayerHealth(player || {}, fallbackDesignation);
     const statChips = player ? buildSimulationPlayerStatChips(player) : [];
@@ -305,7 +427,8 @@
         recommendationHint: slotEntry?.recommendationHint || null,
         warning: Array.isArray(warningsBySlot[slotKey]) ? warningsBySlot[slotKey][0] || '' : '',
         warnings: clone(warningsBySlot[slotKey] || []),
-        actionLabel: 'Move'
+        actionLabel: 'Move',
+        ...(buildSimulationRosterRowGameMeta(rosterState, player) || {})
       }, player);
     });
   }
@@ -324,7 +447,8 @@
       recommendationHint: null,
       warning: '',
       warnings: [],
-      actionLabel: 'Promote'
+      actionLabel: 'Promote',
+      ...(buildSimulationRosterRowGameMeta(rosterState, player) || {})
     })).map((row, index) => attachSimulationRosterRowMeta(row, rosterState?.bench?.[index]));
   }
 
@@ -342,8 +466,9 @@
       recommendationHint: null,
       warning: '',
       warnings: [],
-      actionLabel: 'Reserve'
-    })).map((row, index) => attachSimulationRosterRowMeta(row, rosterState?.ir?.[index], 'IR'));
+      actionLabel: 'Reserve',
+      ...(buildSimulationRosterRowGameMeta(rosterState, player) || {})
+    })).map((row, index) => attachSimulationRosterRowMeta(row, rosterState?.ir?.[index]));
   }
 
   function buildSimulationRosterSections(rosterState){
@@ -480,6 +605,18 @@ function cleanSimulationSourceLabel(label){
     return Number.isFinite(rawValue) && rawValue >= 0 ? rawValue : 0;
   }
 
+  function areSimulationInjuriesEnabledForState(state){
+    const shell = state?.leagueShell || {};
+    if (shell?.injuriesEnabled === false) return false;
+    if (shell?.settings && shell.settings.injuriesEnabled === false) return false;
+    return true;
+  }
+
+  function isSimulationPlayerOutForState(state, player){
+    if (!areSimulationInjuriesEnabledForState(state)) return false;
+    return ['OUT', 'IR', 'IL'].includes(String(player?.designation || '').trim().toUpperCase());
+  }
+
   function splitSimulationReservePlayers(state, reservePlayers){
     const reserves = Array.isArray(reservePlayers) ? reservePlayers.map((player) => clone(player)) : [];
     const benchSlotCount = getSimulationBenchSlotCount(state);
@@ -487,9 +624,19 @@ function cleanSimulationSourceLabel(label){
     if (benchSlotCount == null) {
       return { bench: reserves, ir: [] };
     }
+    if (irSlotCount > 0 && areSimulationInjuriesEnabledForState(state)) {
+      const outReserves = reserves.filter((player) => isSimulationPlayerOutForState(state, player));
+      const activeReserves = reserves.filter((player) => !isSimulationPlayerOutForState(state, player));
+      const ir = outReserves.slice(0, irSlotCount);
+      const remaining = activeReserves.concat(outReserves.slice(irSlotCount));
+      return {
+        bench: remaining,
+        ir
+      };
+    }
     return {
-      bench: reserves.slice(0, benchSlotCount),
-      ir: irSlotCount > 0 ? reserves.slice(benchSlotCount, benchSlotCount + irSlotCount) : []
+      bench: reserves,
+      ir: []
     };
   }
 
@@ -593,6 +740,124 @@ function cleanSimulationSourceLabel(label){
       ? `Week ${Number(nextGame?.day || state?.seasonState?.currentWeek || 1)}`
       : `Day ${Number(nextGame?.day || state?.seasonState?.currentDay || 1)}`;
     return `${cycleLabel} ${nextGame.home ? 'vs' : '@'} ${nextGame.opponentName || nextGame.opponentAbbr || 'Opponent'}`;
+  }
+
+  function isSimulationGameCompleted(state, game){
+    if (!game) return false;
+    const completedGames = Array.isArray(state?.seasonState?.completedGameLogs)
+      ? state.seasonState.completedGameLogs
+      : [];
+    const targetDay = Number(game?.day || 0);
+    const homeAbbr = normalizeTeamAbbr(game?.homeAbbr);
+    const awayAbbr = normalizeTeamAbbr(game?.awayAbbr);
+    return completedGames.some((entry) => (
+      Number(entry?.day || 0) === targetDay &&
+      normalizeTeamAbbr(entry?.homeAbbr) === homeAbbr &&
+      normalizeTeamAbbr(entry?.awayAbbr) === awayAbbr
+    ));
+  }
+
+  function buildSimulationRosterGameMeta(state){
+    const scheduleByDay = getCanonicalScheduleByDay(state, state?.leagueShell || {});
+    const nextGame = buildSimulationNextGame(state, scheduleByDay);
+    if (!nextGame) {
+      return {
+        hasGame: false,
+        opponentLabel: 'No game',
+        opponentAbbr: '',
+        opponentName: '',
+        timeLabel: 'Off',
+        matchupTone: 'off'
+      };
+    }
+    const sport = getSimulationSportForState(state);
+    const cycleLabel = sport === 'nfl'
+      ? `Week ${Number(nextGame?.day || state?.seasonState?.currentWeek || 1)}`
+      : `Day ${Number(nextGame?.day || state?.seasonState?.currentDay || 1)}`;
+    return {
+      hasGame: true,
+      opponentLabel: `${nextGame.home ? 'vs' : '@'} ${nextGame.opponentAbbr || nextGame.opponentName || 'OPP'}`,
+      opponentAbbr: nextGame.opponentAbbr || '',
+      opponentName: nextGame.opponentName || '',
+      timeLabel: isSimulationGameCompleted(state, nextGame) ? 'Final' : cycleLabel,
+      matchupTone: 'game'
+    };
+  }
+
+  function getSimulationNbaTeamScheduleByDay(state){
+    const schedule = state?.seasonState?.nbaTeamScheduleByDay || state?.nbaTeamScheduleByDay || state?.leagueShell?.nbaTeamScheduleByDay || null;
+    if (schedule && typeof schedule === 'object' && !Array.isArray(schedule) && Object.keys(schedule).length) return schedule;
+    const generated = typeof engineApi.buildNbaTeamScheduleByDay === 'function'
+      ? engineApi.buildNbaTeamScheduleByDay(clone(state || {}))
+      : null;
+    return generated && typeof generated === 'object' && Object.keys(generated).length ? generated : null;
+  }
+
+  function ensureSimulationNbaTeamSchedule(state){
+    if (getSimulationSportForState(state) !== 'nba') return clone(state || {});
+    const schedule = getSimulationNbaTeamScheduleByDay(state);
+    if (!schedule) return clone(state || {});
+    return {
+      ...clone(state || {}),
+      seasonState: {
+        ...clone(state?.seasonState || {}),
+        nbaTeamScheduleByDay: clone(schedule)
+      }
+    };
+  }
+
+  function buildSimulationNbaPlayerGameMeta(nbaTeamScheduleByDay, player, day){
+    const schedule = nbaTeamScheduleByDay && typeof nbaTeamScheduleByDay === 'object' ? nbaTeamScheduleByDay : null;
+    if (!schedule || !player) return null;
+    const teamAbbr = normalizeTeamAbbr(player?.team || player?.nbaTeam || player?.teamAbbr);
+    const games = Array.isArray(schedule?.[Number(day)]) ? schedule[Number(day)] : [];
+    if (!teamAbbr || !games.length) {
+      return {
+        hasGame: false,
+        opponentLabel: 'No game',
+        opponentAbbr: '',
+        opponentName: '',
+        timeLabel: 'Off',
+        matchupTone: 'off'
+      };
+    }
+    const game = games.find((entry) => (
+      normalizeTeamAbbr(entry?.homeAbbr || entry?.home) === teamAbbr ||
+      normalizeTeamAbbr(entry?.awayAbbr || entry?.away) === teamAbbr
+    ));
+    if (!game) {
+      return {
+        hasGame: false,
+        opponentLabel: 'No game',
+        opponentAbbr: '',
+        opponentName: '',
+        timeLabel: 'Off',
+        matchupTone: 'off'
+      };
+    }
+    const homeAbbr = normalizeTeamAbbr(game?.homeAbbr || game?.home);
+    const awayAbbr = normalizeTeamAbbr(game?.awayAbbr || game?.away);
+    const isHome = homeAbbr === teamAbbr;
+    const opponentAbbr = isHome ? awayAbbr : homeAbbr;
+    return {
+      hasGame: true,
+      opponentLabel: `${isHome ? 'vs' : '@'} ${opponentAbbr || 'OPP'}`,
+      opponentAbbr,
+      opponentName: opponentAbbr,
+      timeLabel: String(game?.time || game?.timeLabel || `Day ${Number(day || 0) || ''}`).trim(),
+      matchupTone: 'game'
+    };
+  }
+
+  function buildSimulationRosterRowGameMeta(rosterState, player){
+    if (String(rosterState?.sport || '').trim().toLowerCase() === 'nba' && rosterState?.nbaTeamScheduleByDay) {
+      return buildSimulationNbaPlayerGameMeta(
+        rosterState.nbaTeamScheduleByDay,
+        player,
+        Number(rosterState?.currentRosterDay || 0) || 1
+      );
+    }
+    return rosterState?.currentRosterGame || {};
   }
 
   function normalizeSimulationRecentResult(state, game){
@@ -783,16 +1048,31 @@ function cleanSimulationSourceLabel(label){
       };
     }
     const currentDay = Number(state?.seasonState?.currentDay || 1);
+    const teamAbbr = getControlledTeamAbbr(state);
     const availableDays = Object.keys(matchupContext?.scheduleByDay || {})
       .map((day) => Number(day))
       .filter((day) => Number.isFinite(day))
       .sort((a, b) => a - b);
+    const futureTeamGameDays = availableDays.filter((day) => {
+      if (day < currentDay) return false;
+      const games = Array.isArray(matchupContext?.scheduleByDay?.[day]) ? matchupContext.scheduleByDay[day] : [];
+      return games.some((game) => (
+        normalizeTeamAbbr(game?.homeAbbr) === teamAbbr ||
+        normalizeTeamAbbr(game?.awayAbbr) === teamAbbr
+      ));
+    });
+    const recentTeamGameDays = availableDays.filter((day) => {
+      if (day >= currentDay) return false;
+      const games = Array.isArray(matchupContext?.scheduleByDay?.[day]) ? matchupContext.scheduleByDay[day] : [];
+      return games.some((game) => (
+        normalizeTeamAbbr(game?.homeAbbr) === teamAbbr ||
+        normalizeTeamAbbr(game?.awayAbbr) === teamAbbr
+      ));
+    }).slice(-2);
     const nearbyDays = [currentDay - 2, currentDay - 1, currentDay, currentDay + 1, currentDay + 2]
       .filter((day) => day >= 1);
-    const dayPool = Array.from(new Set(nearbyDays.concat(availableDays)));
+    const dayPool = Array.from(new Set(recentTeamGameDays.concat(nearbyDays).concat(futureTeamGameDays.slice(0, 14))));
     const items = dayPool
-      .sort((a, b) => Math.abs(a - currentDay) - Math.abs(b - currentDay) || a - b)
-      .slice(0, 5)
       .sort((a, b) => a - b)
       .map((day) => ({
         id: `day-${day}`,
@@ -896,7 +1176,7 @@ function cleanSimulationSourceLabel(label){
     const teamAbbr = getControlledTeamAbbr(state);
     const legacyStarterSlots = getSimulationStarterSlotsForState(state);
     const starterSlots = getSharedStarterSlotsForState(state, legacyStarterSlots);
-    const roster = getControlledRoster(state);
+    const roster = enrichSimulationRosterWithCurrentSeasonStats(state, getControlledRoster(state), 'nba');
     const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(roster);
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
     const validation = (typeof runtimeApi.validateSimulationLineup === 'function')
@@ -948,6 +1228,7 @@ function cleanSimulationSourceLabel(label){
       recommendationSummary: validation.valid
         ? 'Starting lineup is ready.'
         : 'Suggested fixes are available below.',
+      suggestedLineup: clone(suggestedLineup),
       roster,
       playerVariantLabelsById,
       lineup,
@@ -956,7 +1237,10 @@ function cleanSimulationSourceLabel(label){
       filledStarters,
       rosterSpaceLabel: buildSimulationRosterSpaceLabel(state, roster),
       lastMatchupLabel: buildSimulationLastMatchupLabel(state),
-      currentMatchupLabel: buildSimulationCurrentMatchupLabel(state)
+      currentMatchupLabel: buildSimulationCurrentMatchupLabel(state),
+      currentRosterGame: buildSimulationRosterGameMeta(state),
+      currentRosterDay: Number(state?.seasonState?.currentDay || 1),
+      nbaTeamScheduleByDay: getSimulationNbaTeamScheduleByDay(state)
     };
   }
 
@@ -985,7 +1269,8 @@ function cleanSimulationSourceLabel(label){
       roster: clone(rosterState?.roster || []),
       lineup: clone(rosterState?.lineup || []),
       bench: clone(rosterState?.bench || []),
-      ir: clone(rosterState?.ir || [])
+      ir: clone(rosterState?.ir || []),
+      nbaTeamScheduleByDay: clone(rosterState?.nbaTeamScheduleByDay || null)
     };
   }
 
@@ -1034,7 +1319,7 @@ function cleanSimulationSourceLabel(label){
     const teamAbbr = getControlledTeamAbbr(normalizedState);
     const legacyStarterSlots = getSimulationStarterSlotsForState(state);
     const starterSlots = getSharedStarterSlotsForState(state, legacyStarterSlots);
-    const roster = getControlledRoster(normalizedState);
+    const roster = enrichSimulationRosterWithCurrentSeasonStats(normalizedState, getControlledRoster(normalizedState), 'nfl');
     const playerVariantLabelsById = buildSimulationPlayerVariantLabelsById(roster);
     const controlledTeam = getControlledTeam(normalizedState);
     const rosterById = new Map(roster.map((player) => [Number(player?.id), player]));
@@ -1091,6 +1376,7 @@ function cleanSimulationSourceLabel(label){
       rosterSpaceLabel: buildSimulationRosterSpaceLabel(normalizedState, roster),
       lastMatchupLabel: buildSimulationLastMatchupLabel(normalizedState),
       currentMatchupLabel: buildSimulationCurrentMatchupLabel(normalizedState),
+      currentRosterGame: buildSimulationRosterGameMeta(normalizedState),
       playerVariantLabelsById,
       bench: roster.filter((player) => !assignedIds.has(Number(player?.id))).map((player) => clone(player)),
       lineup: legacyStarterSlots
@@ -2793,7 +3079,7 @@ function cleanSimulationSourceLabel(label){
 
   function createSimulationSeasonAdapter(options){
     const slotId = String(options?.slotId || '').trim();
-    let state = clone(options?.state || {});
+    let state = ensureSimulationNbaTeamSchedule(clone(options?.state || {}));
 
     return {
       getModeId(){
@@ -2810,7 +3096,7 @@ function cleanSimulationSourceLabel(label){
         return clone(state);
       },
       replaceState(nextState){
-        state = clone(nextState || {});
+        state = ensureSimulationNbaTeamSchedule(clone(nextState || {}));
         return this.getState();
       },
       setLineup(lineupIds){
@@ -3050,7 +3336,7 @@ function cleanSimulationSourceLabel(label){
         return this.getState();
       },
       simulateNextDay(){
-        const normalizedState = normalizeLegacyNflLineupSlots(state);
+        const normalizedState = normalizeLegacyNflLineupSlots(ensureSimulationNbaTeamSchedule(state));
         state = clone(normalizedState);
         const shell = clone(state?.leagueShell || {});
         const sport = getSimulationSportForState(state);

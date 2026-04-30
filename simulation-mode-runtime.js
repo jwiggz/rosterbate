@@ -88,6 +88,13 @@
       : 'nba_mixed_era_single_player_v1';
   }
 
+  function areSimulationInjuriesEnabled(source){
+    const shell = source?.leagueShell || source?.shell || source || {};
+    if (shell?.injuriesEnabled === false) return false;
+    if (shell?.settings && shell.settings.injuriesEnabled === false) return false;
+    return true;
+  }
+
   function getSimulationRosterNeeds(shell){
     if (getSimulationSport(shell) === 'nfl') {
       return ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'EDGE', 'LB', 'CB', 'S', 'K', 'DST'];
@@ -105,7 +112,7 @@
     const starterSlots = Array.isArray(shell?.starterSlots)
       ? shell.starterSlots.map((slot) => String(slot || '').trim().toUpperCase()).filter(Boolean)
       : [];
-    return starterSlots.length ? starterSlots.slice() : ['PG', 'SG', 'SF', 'PF', 'C'];
+    return starterSlots.length ? starterSlots.slice() : ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'];
   }
 
   function getSimulationLineupSlotTemplate(shell){
@@ -222,7 +229,7 @@
           return;
         }
 
-        if (isSimulationPlayerOut(player)) {
+        if (isSimulationPlayerOut(player, details.shell)) {
           issues.push({ slot, code: 'player_out', message: `${slot} starter is OUT.` });
         }
 
@@ -273,7 +280,7 @@
         return;
       }
 
-      if (String(player?.designation || '').trim().toUpperCase() === 'OUT') {
+      if (isSimulationPlayerOut(player, details.shell)) {
         issues.push({ slot, code: 'player_out', message: `${slot} starter is OUT.` });
       }
 
@@ -321,7 +328,7 @@
         const playerId = Number(entry?.id);
         return !usedIds.has(playerId)
           && eligiblePositions.includes(getSimulationPlayerPosition(entry))
-          && String(entry?.designation || '').trim().toUpperCase() !== 'OUT';
+          && !isSimulationPlayerOut(entry, details.shell);
       }) || null;
       if (player) {
         usedIds.add(Number(player.id));
@@ -557,6 +564,7 @@
       };
     });
     const leagueShell = normalizeShell({
+      ...(source?.leagueShell && typeof source.leagueShell === 'object' ? source.leagueShell : {}),
       sport: source?.leagueShell?.sport || source?.sport || 'nba',
       anchorSeasonLabel: source?.leagueShell?.anchorSeasonLabel || source?.leagueName || '',
       rosterSize: Number(
@@ -606,7 +614,23 @@
           }
           return [teamAbbr, normalizedIds];
         }
-        return [teamAbbr, existingLineupIds.map((id) => Number(id)).filter(Number.isFinite)];
+        const normalizedIds = existingLineupIds
+          .slice(0, starterSlots.length)
+          .map((id) => (id == null || id === '' ? null : Number(id)));
+        while (normalizedIds.length < starterSlots.length) {
+          normalizedIds.push(null);
+        }
+        const candidateState = {
+          leagueShell,
+          draftState: { rostersByTeam: { [teamAbbr]: teamRoster } },
+          seasonState: { lineupIdsByTeam: { [teamAbbr]: normalizedIds } }
+        };
+        return [
+          teamAbbr,
+          validateSimulationLineup(candidateState, teamAbbr).valid
+            ? normalizedIds
+            : buildSuggestedNbaLineupIds(teamRoster, leagueShell)
+        ];
       }
       if (existingLineupSlots && typeof existingLineupSlots === 'object' && !Array.isArray(existingLineupSlots)) {
         return [teamAbbr, getSimulationLineupIdsFromSlots(leagueShell, existingLineupSlots)];
@@ -750,7 +774,8 @@
     };
   }
 
-  function isSimulationPlayerOut(player){
+  function isSimulationPlayerOut(player, source){
+    if (!areSimulationInjuriesEnabled(source)) return false;
     return ['OUT', 'IR', 'IL'].includes(String(player?.designation || '').trim().toUpperCase());
   }
 
@@ -782,7 +807,7 @@
   }
 
   function buildSuggestedNbaLineupIds(roster, shell){
-    const sortedRoster = sortPlayers(roster).filter((player) => !isSimulationPlayerOut(player));
+    const sortedRoster = sortPlayers(roster).filter((player) => !isSimulationPlayerOut(player, shell));
     const starterSlots = getSimulationLineupSlotTemplate(shell);
     const slotPriority = { C: 0, PG: 1, SG: 2, SF: 3, PF: 4, G: 5, F: 6, UTIL: 7 };
     const usedIds = new Set();
@@ -993,7 +1018,9 @@
       next.seasonState.lineupSlotsByTeam[key] = normalizedSlots;
       next.seasonState.lineupIdsByTeam[key] = getSimulationLineupIdsFromSlots({ sport: 'nfl' }, normalizedSlots);
     } else {
-      next.seasonState.lineupIdsByTeam[key] = (Array.isArray(lineupIds) ? lineupIds : []).map((id) => Number(id));
+      next.seasonState.lineupIdsByTeam[key] = (Array.isArray(lineupIds) ? lineupIds : []).map((id) => (
+        id == null || id === '' ? null : Number(id)
+      ));
     }
     next.seasonState.activityLog.unshift({
       type: 'lineup',
@@ -1335,6 +1362,17 @@
 
   function updateSimulationTeamSettings(state, payload){
     const next = clone(state);
+    if (Object.prototype.hasOwnProperty.call(payload || {}, 'injuriesEnabled')) {
+      const injuriesEnabled = payload?.injuriesEnabled !== false;
+      next.leagueShell = {
+        ...(next.leagueShell || {}),
+        injuriesEnabled,
+        settings: {
+          ...(next?.leagueShell?.settings || {}),
+          injuriesEnabled
+        }
+      };
+    }
     const teamAbbr = normalizeTeamAbbr(payload?.teamAbbr || next?.draftState?.controlledTeamAbbr);
     if (!teamAbbr) {
       return next;
@@ -1371,6 +1409,9 @@
 
   function applySimulationInjuryDesignations(state, injuries){
     const next = clone(state);
+    if (!areSimulationInjuriesEnabled(next)) {
+      return next;
+    }
     next.draftState = next.draftState || {};
     next.draftState.rostersByTeam = next.draftState.rostersByTeam || {};
 
