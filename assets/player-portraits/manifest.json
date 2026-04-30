@@ -1,0 +1,6 @@
+{
+  "$schema": "rosterbate-player-portrait-manifest-v1",
+  "players": {
+    "Luka Doncic|LAL": "assets/player-portraits/luka-doncic__LAL.webp"
+  }
+}

@@ -582,6 +582,11 @@ assert.equal(
   'simulation roster vm should not mix source-season TFP into current season rows for players without completed games'
 );
 assert.equal(
+  currentHakeemRow.player.projectedFantasyPoints,
+  61.8,
+  'simulation roster vm should preserve projected FP separately for scheduled-game lineup decisions'
+);
+assert.equal(
   currentHakeemRow.player.statSummary,
   'No simulated games yet',
   'simulation roster vm should clearly label players with no current simulated games'

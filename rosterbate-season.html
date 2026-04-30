@@ -174,7 +174,16 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .player-portrait .portrait-mouth{position:absolute;left:42%;right:42%;top:48%;height:5%;border-bottom:1.7px solid rgba(15,23,42,.8);border-radius:50%;z-index:7;}
 .player-portrait .portrait-ink-outline{position:absolute;inset:8%;border-radius:12px;box-shadow:inset 0 0 0 1.5px rgba(15,23,42,.16);z-index:8;pointer-events:none;}
 .player-portrait .portrait-initials{position:absolute;right:3px;bottom:2px;z-index:7;font-family:var(--fd);font-size:var(--portrait-font,10px);font-weight:800;letter-spacing:.02em;color:#0f172a;background:rgba(255,255,255,.78);border-radius:4px;padding:0 3px;line-height:1.2;}
-.player-portrait .player-portrait-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+.player-portrait .player-portrait-img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:inherit;background:#fff;}
+.player-portrait:after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .18s,box-shadow .18s;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent 42%);}
+.player-portrait.portrait-state-offday{filter:saturate(.45) brightness(.78);opacity:.72;}
+.player-portrait.portrait-state-injured{filter:saturate(.55) brightness(.72);box-shadow:0 0 0 1px rgba(239,68,68,.42),0 8px 18px rgba(127,29,29,.28) !important;}
+.player-portrait.portrait-state-injured:after{opacity:1;background:repeating-linear-gradient(135deg,rgba(239,68,68,.28) 0 4px,transparent 4px 10px);}
+.player-portrait.portrait-state-questionable{box-shadow:0 0 0 1px rgba(245,158,11,.42),0 8px 18px rgba(120,53,15,.24) !important;}
+.player-portrait.portrait-state-scoring{animation:portraitScoringPulse .75s cubic-bezier(.2,1.4,.24,1);}
+.player-portrait.portrait-state-takeover{box-shadow:0 0 0 1px rgba(251,191,36,.65),0 0 24px rgba(251,191,36,.28),0 8px 18px rgba(2,6,23,.28) !important;}
+.player-portrait.portrait-state-takeover:after{opacity:1;box-shadow:inset 0 0 18px rgba(251,191,36,.36);}
+@keyframes portraitScoringPulse{0%{transform:translateY(0) scale(1);}42%{transform:translateY(-3px) scale(1.08);}100%{transform:translateY(0) scale(1);}}
 .pn{font-family:var(--fd);font-size:14px;font-weight:700;}
 .pd{font-size:11px;color:var(--text2);margin-top:1px;}
 .pb2{display:inline-block;padding:1px 4px;border-radius:3px;font-family:var(--fd);font-size:10px;font-weight:700;margin-left:3px;background:rgba(249,115,22,.15);color:var(--accent);}
@@ -563,7 +572,11 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
     .hub-standings-table{display:flex;flex-direction:column;gap:0;border-top:1px solid #24324a;}
 .hub-standings-head,.hub-standings-row{display:grid;grid-template-columns:30px minmax(0,1fr) 26px 26px 50px 50px;gap:6px;align-items:center;padding:7px 0;}
 .hub-standings-head{font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.65px;}
-.hub-standings-row{border-top:1px solid #1d283b;background:transparent;color:inherit;font:inherit;appearance:none;-webkit-appearance:none;position:relative;z-index:6;pointer-events:auto;}
+.hub-standings-row{border-top:1px solid #1d283b;background:transparent;color:inherit;font:inherit;appearance:none;-webkit-appearance:none;position:relative;z-index:6;pointer-events:auto;border-radius:8px;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease;}
+.hub-standings-row:hover,.hub-standings-row:focus-visible{background:linear-gradient(90deg,rgba(37,99,235,.22),rgba(15,23,42,.2));border-color:rgba(96,165,250,.5);box-shadow:0 0 0 1px rgba(96,165,250,.3),0 10px 24px rgba(15,23,42,.22);outline:none;transform:translateX(2px);}
+.hub-standings-row:hover .hub-standings-name,.hub-standings-row:focus-visible .hub-standings-name{color:#bfdbfe;}
+.hub-standings-row.is-viewing{background:linear-gradient(90deg,rgba(249,115,22,.24),rgba(37,99,235,.16));border-color:rgba(249,115,22,.55);box-shadow:0 0 0 1px rgba(249,115,22,.28),inset 3px 0 0 rgba(249,115,22,.9);}
+.hub-standings-row.is-viewing .hub-standings-name{color:#fdba74;}
 .hub-standings-rank{font-family:var(--fd);font-size:12px;font-weight:700;color:#f8fafc;text-align:center;}
 .hub-standings-team{display:flex;align-items:center;gap:7px;min-width:0;}
 .hub-standings-name{font-size:12px;font-weight:600;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -617,6 +630,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .season-roster-table .season-soft-muted.compact-player-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .season-chip-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(126,200,255,.26);border-radius:999px;background:rgba(8,12,18,.68);color:#cfe6ff;padding:10px 18px;font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;}
 .season-chip-link.solid{background:linear-gradient(180deg,var(--accent),#cf5d10);border-color:rgba(255,196,136,.24);color:#fff;}
+.viewer-actions-top{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
 .season-mini-tabs{display:flex;gap:26px;border-bottom:1px solid #24324a;padding:0 18px;}
 .season-mini-tab{padding:14px 0;font-family:var(--fb);font-size:14px;font-weight:700;color:#94a3b8;border:0;border-bottom:3px solid transparent;background:transparent;cursor:pointer;}
 .season-mini-tab.on{color:#f8fafc;border-bottom-color:#f59e0b;}
@@ -881,6 +895,42 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 }
 .season-league-home-link:hover,.season-league-home-link:focus-visible{border-color:rgba(147,197,253,.6);background:rgba(20,44,78,.88);outline:none;}
 .season-league-home-link-dot{width:7px;height:7px;border-radius:50%;background:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.14);flex-shrink:0;}
+.player-name-link{appearance:none;background:none;border:none;padding:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer;text-decoration:none;}
+.player-name-link:hover,.player-name-link:focus-visible{color:#60a5fa;text-decoration:underline;outline:none;}
+.player-detail-card{max-width:640px;width:min(94vw,640px);background:linear-gradient(180deg,rgba(13,20,33,.98),rgba(6,10,18,.98));color:#f8fafc;border:1px solid rgba(148,163,184,.22);border-radius:18px;padding:12px;box-shadow:0 32px 90px rgba(2,6,23,.62),inset 0 1px 0 rgba(255,255,255,.08);max-height:94dvh;overflow-y:auto;}
+.player-detail-hero,.player-detail-section{background:linear-gradient(180deg,rgba(20,30,47,.95),rgba(12,18,29,.98));border-radius:14px;border:1px solid rgba(148,163,184,.18);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.player-detail-hero{display:grid;grid-template-columns:168px 1fr 168px;min-height:168px;position:relative;}
+.player-detail-hero:before{content:'PLAYER DOSSIER';position:absolute;left:16px;top:12px;z-index:4;font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.16em;color:#fdba74;text-transform:uppercase;}
+.player-detail-photo{position:relative;background:radial-gradient(circle at 50% 18%,rgba(96,165,250,.22),transparent 42%),linear-gradient(135deg,#172033,#08111f);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;border-right:1px solid rgba(148,163,184,.16);}
+.player-detail-photo:after{content:'';position:absolute;inset:auto 0 0;height:44%;background:linear-gradient(180deg,transparent,rgba(249,115,22,.16));pointer-events:none;}
+.player-detail-photo .player-portrait{width:150px !important;height:150px !important;border:1px solid rgba(255,255,255,.18) !important;border-radius:16px !important;box-shadow:0 18px 34px rgba(2,6,23,.42) !important;background:#fff !important;}
+.player-detail-photo .player-portrait-img{object-position:center top;}
+.player-detail-main{padding:38px 16px 14px;position:relative;}
+.player-detail-rank{position:absolute;right:14px;top:14px;font-family:var(--fd);font-size:42px;font-weight:900;color:rgba(96,165,250,.24);line-height:1;}
+.player-detail-name{font-family:var(--fd);font-size:32px;font-weight:800;line-height:.92;color:#fff;text-transform:uppercase;letter-spacing:.02em;max-width:260px;}
+.player-detail-team{font-size:12px;color:#93c5fd;margin-top:8px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
+.player-detail-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px;font-size:10px;text-transform:uppercase;color:#94a3b8;letter-spacing:.08em;}
+.player-detail-meta b{display:block;color:#f8fafc;font-size:12px;margin-top:3px;letter-spacing:0;text-transform:none;}
+.player-detail-side{padding:36px 14px 14px;border-left:1px solid rgba(148,163,184,.16);display:flex;flex-direction:column;gap:10px;}
+.player-detail-side-stat{font-size:10px;text-transform:uppercase;color:#94a3b8;letter-spacing:.1em;border:1px solid rgba(148,163,184,.16);border-radius:12px;padding:10px;background:rgba(2,6,23,.24);}
+.player-detail-side-stat b{display:block;font-family:var(--fd);font-size:25px;color:#4ade80;line-height:1;margin-top:3px;}
+.player-detail-status{grid-column:1/-1;background:linear-gradient(90deg,rgba(220,38,38,.92),rgba(249,115,22,.78));color:#fff;text-align:center;font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;padding:5px 8px;letter-spacing:.12em;}
+.player-detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:rgba(2,6,23,.45);padding:12px;border:1px solid rgba(148,163,184,.14);border-radius:14px;margin-top:10px;}
+.player-detail-drop{border:none;border-radius:999px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;padding:10px 18px;cursor:pointer;box-shadow:0 12px 22px rgba(127,29,29,.26);}
+.player-detail-select{border:1px solid rgba(148,163,184,.28);border-radius:999px;background:#0f172a;color:#f8fafc;padding:9px 14px;font-weight:800;}
+.player-detail-action-label{font-size:11px;color:#cbd5e1;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
+.player-detail-section{margin-top:10px;padding:14px 16px;}
+.player-detail-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.player-detail-section-title{font-family:var(--fd);font-size:20px;font-weight:800;color:#f8fafc;text-transform:uppercase;letter-spacing:.06em;}
+.player-detail-link{border:none;background:none;color:#60a5fa;font-size:12px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;}
+.player-detail-table{width:100%;border-collapse:collapse;font-size:12px;}
+.player-detail-table th,.player-detail-table td{padding:8px 6px;border-top:1px solid rgba(148,163,184,.13);text-align:right;white-space:nowrap;}
+.player-detail-table th{color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.08em;}
+.player-detail-table td{color:#e5edf8;}
+.player-detail-table th:first-child,.player-detail-table td:first-child{text-align:left;color:#93c5fd;}
+.player-detail-news-date{font-size:10px;text-transform:uppercase;color:#94a3b8;margin-bottom:10px;letter-spacing:.1em;}
+.player-detail-news-copy{font-size:12px;line-height:1.55;color:#dbeafe;}
+@media(max-width:620px){.player-detail-card{padding:8px;}.player-detail-hero{grid-template-columns:124px 1fr;}.player-detail-side{grid-column:1/-1;border-left:none;border-top:1px solid rgba(148,163,184,.16);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;}.player-detail-photo .player-portrait{width:116px !important;height:138px !important;}.player-detail-name{font-size:26px;}.player-detail-actions{grid-template-columns:1fr;}}
 @keyframes savePulse{50%{opacity:.45;transform:scale(.82);}}
 @media(max-width:560px){
   .season-save-status{font-size:10px;padding:5px 8px;}
@@ -926,6 +976,12 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   <div class="ms reveal-modal-card">
     <div class="mh"></div>
     <div id="revealReportContent"></div>
+  </div>
+</div>
+
+<div class="mo" id="playerDetailModal" onclick="if(event.target===this)closePlayerDetailModal()">
+  <div class="player-detail-card">
+    <div id="playerDetailContent"></div>
   </div>
 </div>
 
@@ -1304,6 +1360,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
             <div id="vRec" style="font-size:13px;color:#94a3b8;margin-top:5px;"></div>
           </div>
           <div id="vMe" style="display:none;background:#22180d;border:1px solid #7c4a18;border-radius:999px;padding:5px 10px;font-family:var(--fb);font-size:11px;font-weight:700;text-transform:uppercase;color:#fdba74;">Your Team</div>
+          <div id="vActions" class="viewer-actions viewer-actions-top"></div>
         </div>
         <div id="vStats" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;"></div>
         <div id="vNowBand" class="viewer-now-band"></div>
@@ -1325,7 +1382,6 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
           <div id="vBench" class="viewer-list"></div>
         </div>
       </div>
-      <div id="vActions" class="viewer-actions"></div>
     </div>
   </div>
 </div>
@@ -1509,12 +1565,12 @@ function playerPortraitSeed(name,teamCode=''){
   for(let i=0;i<source.length;i++) hash=((hash<<5)-hash)+source.charCodeAt(i), hash|=0;
   return Math.abs(hash);
 }
-function renderPlayerPortrait(name,teamCode,size,extraStyle=''){
+function renderPlayerPortrait(name,teamCode,size,extraStyle='',portraitOptions={}){
   if(window.RosterBatePlayerPortraits && typeof window.RosterBatePlayerPortraits.renderPortraitMarkup==='function'){
     const palette=tpalette(teamCode);
     return window.RosterBatePlayerPortraits.renderPortraitMarkup(
       {name,team:teamCode,primaryColor:palette.primary,secondaryColor:palette.secondary},
-      {size,className:'pav player-portrait',extraStyle,teamColor:palette.primary,teamColorTwo:palette.secondary}
+      {...portraitOptions,size,className:'pav player-portrait',extraStyle,teamColor:palette.primary,teamColorTwo:palette.secondary}
     );
   }
   const palette=tpalette(teamCode);
@@ -1536,8 +1592,139 @@ function renderPlayerPortrait(name,teamCode,size,extraStyle=''){
   const initials=escapeHtml(ini(name));
   return `<div class="pav player-portrait" style="${parts.join(';')}" aria-label="${escapeHtml(name||'Player')} portrait"><span class="portrait-card-bg portrait-backdrop" aria-hidden="true"></span><span class="portrait-ear" aria-hidden="true"></span><span class="portrait-neck" aria-hidden="true"></span><span class="portrait-body" aria-hidden="true"></span><span class="portrait-head" aria-hidden="true"></span><span class="portrait-hair" aria-hidden="true"></span><span class="portrait-face" aria-hidden="true"></span><span class="portrait-nose" aria-hidden="true"></span><span class="portrait-mouth" aria-hidden="true"></span><span class="portrait-ink-outline" aria-hidden="true"></span><span class="portrait-initials">${initials}</span></div>`;
 }
-function renderTeamInitialAvatar(name,teamCode,size,extraStyle=''){
-  return renderPlayerPortrait(name,teamCode,size,extraStyle);
+function renderTeamInitialAvatar(name,teamCode,size,extraStyle='',portraitOptions={}){
+  return renderPlayerPortrait(name,teamCode,size,extraStyle,portraitOptions);
+}
+function playerSearchPool(){
+  const pools=[
+    ...(Array.isArray(G?.rosters) ? G.rosters.flat() : []),
+    ...(Array.isArray(G?.ilByTeam) ? G.ilByTeam.flat() : []),
+    ...(Array.isArray(G?.waiver) ? G.waiver : [])
+  ];
+  return pools.filter(Boolean);
+}
+function findPlayerForDetail(playerId,name=''){
+  const id=Number(playerId);
+  const pool=playerSearchPool();
+  if(Number.isFinite(id)){
+    const byId=pool.find(p=>Number(p?.id)===id);
+    if(byId) return byId;
+  }
+  const normalized=String(name||'').trim().toLowerCase();
+  return normalized ? pool.find(p=>String(p?.name||'').trim().toLowerCase()===normalized) || null : null;
+}
+function getPlayerTeamIndexForDetail(playerId){
+  const id=Number(playerId);
+  if(!Number.isFinite(id)) return -1;
+  for(let ti=0;ti<(G?.rosters||[]).length;ti++){
+    if((G.rosters[ti]||[]).some(p=>Number(p?.id)===id)) return ti;
+  }
+  for(let ti=0;ti<(G?.ilByTeam||[]).length;ti++){
+    if((G.ilByTeam[ti]||[]).some(p=>Number(p?.id)===id)) return ti;
+  }
+  return -1;
+}
+function playerDetailNameButton(player,label){
+  const p=player || {};
+  const id=Number(p.id);
+  const safeName=escapeHtml(label || p.name || 'Player');
+  if(!Number.isFinite(id)) return safeName;
+  return `<button type="button" class="player-name-link" onclick="openPlayerDetailModal(${id});event.stopPropagation();">${safeName}</button>`;
+}
+function formatPlayerDetailStat(player,key,decimals=1){
+  const value=Number(player?.statValues?.[key] ?? player?.[String(key||'').toLowerCase()] ?? player?.[key] ?? 0);
+  return Number.isFinite(value) ? value.toFixed(decimals) : '--';
+}
+function playerDetailGameLog(player){
+  const today=Number(G?.day||1);
+  return Array.from({length:5},(_,idx)=>Math.max(1,today-idx)).map(day=>{
+    const game=typeof getGameInfo==='function' ? getGameInfo(player,day) : null;
+    const date=getSeasonDayDate(day);
+    const played=!!game && day < today;
+    return {
+      date:date.toLocaleDateString([],{month:'numeric',day:'numeric'}),
+      opp:game ? `${game.isHome?'vs':'@'} ${game.opp}` : 'OFF',
+      min:played ? formatPlayerDetailStat(player,'min',1) : '--',
+      pts:played ? formatPlayerDetailStat(player,'pts',1) : '--',
+      reb:played ? formatPlayerDetailStat(player,'reb',1) : '--',
+      ast:played ? formatPlayerDetailStat(player,'ast',1) : '--',
+      stl:played ? formatPlayerDetailStat(player,'stl',1) : '--',
+      blk:played ? formatPlayerDetailStat(player,'blk',1) : '--',
+      to:played ? formatPlayerDetailStat(player,'to',1) : '--',
+      fpts:played ? Number(player?.fp||0).toFixed(1) : '--'
+    };
+  });
+}
+function renderPlayerDetailModal(player){
+  const week=weekForDay(G?.day||1);
+  const injury=getInjuryStatus(player,week);
+  const status=injury?.label || player?.designation || player?.status || 'Active';
+  const pos=String(player?.pos||'').toUpperCase();
+  const rank=playerSearchPool().filter(p=>String(p?.pos||'').toUpperCase()===pos).sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0)).findIndex(p=>Number(p?.id)===Number(player?.id))+1;
+  const avg=Number(player?.fp||0);
+  const tfp=Number(player?.tfp || player?.totalFantasyPoints || player?.seasonFantasyPoints || (avg*82) || 0);
+  const rostered=Math.max(0,Math.min(99.9,45 + avg));
+  const last7=Math.max(0,avg * 0.92);
+  const gameLog=playerDetailGameLog(player);
+  const portrait=renderTeamInitialAvatar(player?.name,player?.team,150,'',{status,hasGame:!!getGameInfo(player,G?.day||1),state:avg>=55?'takeover':''});
+  return `
+    <div class="player-detail-hero">
+      <div class="player-detail-photo">${portrait}</div>
+      <div class="player-detail-main">
+        <div class="player-detail-rank">${rank>0?rank:'--'}</div>
+        <div class="player-detail-name">${escapeHtml(player?.name || 'Player')}</div>
+        <div class="player-detail-team">${escapeHtml(player?.team || 'Free Agent')}</div>
+        <div class="player-detail-meta">
+          <div>Elig <b>${escapeHtml(pos || '--')}</b></div>
+          <div>Team <b>${escapeHtml(player?.team || '--')}</b></div>
+          <div>Manager <b>${escapeHtml(getPlayerTeamIndexForDetail(player?.id)>=0 ? teamName(getPlayerTeamIndexForDetail(player?.id)) : 'Free Agent')}</b></div>
+          <div>Slot <b>${escapeHtml(getCurrentRosterSlot(player?.id,rosterViewDay||G.day)||'--')}</b></div>
+        </div>
+      </div>
+      <div class="player-detail-side">
+        <div class="player-detail-side-stat">Position Rank <b>${rank>0?rank:'--'}</b></div>
+        <div class="player-detail-side-stat">Average Points <b>${avg.toFixed(1)}</b></div>
+        <div class="player-detail-side-stat">% Rostered <b>${rostered.toFixed(1)}</b></div>
+      </div>
+      ${!/^active$/i.test(status)?`<div class="player-detail-status">${escapeHtml(status)}</div>`:''}
+    </div>
+    <div class="player-detail-actions">
+      <button class="player-detail-drop" onclick="closePlayerDetailModal();openDropPlayerModal();">Drop</button>
+      <label class="player-detail-action-label">Trade posture
+        <select class="player-detail-select" style="display:block;width:100%;margin-top:6px;"><option>Maybe</option><option>Yes</option><option>No</option></select>
+      </label>
+    </div>
+    <div class="player-detail-section">
+      <div class="player-detail-section-head"><div class="player-detail-section-title">Stats</div><button class="player-detail-link">Complete Stats</button></div>
+      <table class="player-detail-table"><thead><tr><th></th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>FPTS</th></tr></thead>
+      <tbody>
+        <tr><td>Season Stats</td><td>${formatPlayerDetailStat(player,'min')}</td><td>${formatPlayerDetailStat(player,'pts')}</td><td>${formatPlayerDetailStat(player,'reb')}</td><td>${formatPlayerDetailStat(player,'ast')}</td><td>${formatPlayerDetailStat(player,'stl')}</td><td>${formatPlayerDetailStat(player,'blk')}</td><td>${formatPlayerDetailStat(player,'to')}</td><td>${tfp.toFixed(0)}</td></tr>
+        <tr><td>Last Seven Days</td><td>--</td><td>${(Number(player?.pts||0)*.92).toFixed(1)}</td><td>${(Number(player?.reb||0)*.92).toFixed(1)}</td><td>${(Number(player?.ast||0)*.92).toFixed(1)}</td><td>${(Number(player?.stl||0)*.92).toFixed(1)}</td><td>${(Number(player?.blk||0)*.92).toFixed(1)}</td><td>${(Number(player?.to||0)*.92).toFixed(1)}</td><td>${last7.toFixed(1)}</td></tr>
+      </tbody></table>
+    </div>
+    <div class="player-detail-section">
+      <div class="player-detail-section-head"><div class="player-detail-section-title">Game Log</div></div>
+      <table class="player-detail-table"><thead><tr><th>Date</th><th>Opp</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>FPTS</th></tr></thead>
+      <tbody>${gameLog.map(row=>`<tr><td>${row.date}</td><td style="color:#2563eb;">${escapeHtml(row.opp)}</td><td>${row.min}</td><td>${row.pts}</td><td>${row.reb}</td><td>${row.ast}</td><td>${row.stl}</td><td>${row.blk}</td><td>${row.to}</td><td>${row.fpts}</td></tr>`).join('')}</tbody></table>
+      <button class="player-detail-link" style="display:block;margin:12px auto 0;">Show More</button>
+    </div>
+    <div class="player-detail-section">
+      <div class="player-detail-section-head"><div class="player-detail-section-title">Recent News</div></div>
+      <div class="player-detail-news-date">${new Date().toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+      <div class="player-detail-news-copy">${escapeHtml(player?.name || 'This player')} is averaging ${avg.toFixed(1)} fantasy points in the current simulation season. ${injury ? `${player?.name || 'He'} is currently marked ${injury.label}.` : 'No injury limitation is active for the current reveal window.'}</div>
+    </div>`;
+}
+function openPlayerDetailModal(playerId,name=''){
+  const player=findPlayerForDetail(playerId,name);
+  if(!player){toast('Player details are not available for that row yet.');return;}
+  const content=document.getElementById('playerDetailContent');
+  if(content) content.innerHTML=renderPlayerDetailModal(player);
+  const modal=document.getElementById('playerDetailModal');
+  if(modal) modal.classList.add('open');
+}
+function closePlayerDetailModal(){
+  const modal=document.getElementById('playerDetailModal');
+  if(modal) modal.classList.remove('open');
 }
 function escapeHtml(value){
   return String(value ?? '')
@@ -5044,7 +5231,7 @@ function bindHubStandingsInteractions(root=document){
       if(!Number.isFinite(teamIdx)) return;
       ev.preventDefault();
       ev.stopPropagation();
-      openStandingsTeam(teamIdx);
+      openViewer(teamIdx);
       return false;
     };
     el.dataset.viewerBound='1';
@@ -10074,6 +10261,14 @@ function renderSimulationWaiverInSharedShell(){
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
+  const detailNameButton=(player,label)=>{
+    if(typeof playerDetailNameButton==='function') return playerDetailNameButton(player,label);
+    const id=Number(player?.id || player?.playerId);
+    const safe=escapeHtml(label || player?.name || 'Player');
+    return Number.isFinite(id)
+      ? `<button type="button" class="player-name-link" onclick="openPlayerDetailModal(${id});event.stopPropagation();">${safe}</button>`
+      : safe;
+  };
   const availableRows=Array.isArray(vm?.sections?.available?.rows)
     ? vm.sections.available.rows
     : (Array.isArray(vm?.availablePlayers) ? vm.availablePlayers : []);
@@ -10319,7 +10514,7 @@ function renderSimulationWaiverInSharedShell(){
       <div style="display:flex;align-items:flex-start;gap:9px;min-width:0;flex:1;">
         ${renderAvatar(player)}
         <div style="min-width:0;display:flex;flex-direction:column;gap:7px;flex:1;">
-          <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#bfdbfe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(player?.name || 'Player')}</div>
+          <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#bfdbfe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${detailNameButton(player)}</div>
           ${(tags.length || healthPill)?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">${healthPill}${tags.join('')}</div>`:''}
           ${renderDropSelector(row,'simulation-waiver-drop-select')}
         </div>
@@ -11163,6 +11358,14 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
   const vm=rosterVm && typeof rosterVm==='object' ? rosterVm : {};
   const sport=String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase() || 'nba';
   const scheduleVm=SEASON_MODE_ADAPTER?.getScheduleViewModel?.() || {};
+  const detailNameButton=(player,label)=>{
+    if(typeof playerDetailNameButton==='function') return playerDetailNameButton(player,label);
+    const id=Number(player?.id || player?.playerId);
+    const safe=escapeHtml(label || player?.name || 'Player');
+    return Number.isFinite(id)
+      ? `<button type="button" class="player-name-link" onclick="openPlayerDetailModal(${id});event.stopPropagation();">${safe}</button>`
+      : safe;
+  };
   const scheduleChip=document.getElementById('rosterScheduleChip');
   if(scheduleChip) scheduleChip.textContent='Matchup';
   const rosterNote=document.querySelector ? document.querySelector('#roster .season-page-note') : null;
@@ -11461,7 +11664,14 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
     return Number.isFinite(numeric) ? (Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1)) : escapeHtml(raw);
   };
   const fantasyPointsForEntry=(entry)=>{
-    const fp=Number(entry?.player?.fp ?? entry?.player?.fantasyPoints ?? 0);
+    const hasExplicitGameState=entry?.hasGame===true || entry?.hasGame===false || String(entry?.opponentLabel || entry?.oppLabel || '').trim();
+    if(entry?.hasGame===false) return '--';
+    const projectedFp=Number(entry?.player?.projectedFantasyPoints ?? 0);
+    const currentFp=Number(entry?.player?.fp ?? entry?.player?.fantasyPoints ?? 0);
+    const fp=entry?.hasGame===true && Number.isFinite(projectedFp) && projectedFp>0
+      ? projectedFp
+      : currentFp;
+    if(hasExplicitGameState && entry?.hasGame!==true) return '--';
     return Number.isFinite(fp) && fp>0 ? fp.toFixed(1) : '--';
   };
   const renderRosterOpponentCell=(entry)=>{
@@ -11607,10 +11817,15 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
         ${statColumns.map(()=>'<td class="stat-col"><span class="season-soft-muted">--</span></td>').join('')}
           </tr>`;
     }
-    const avatar=typeof renderTeamInitialAvatar==='function'
-      ? renderTeamInitialAvatar(player.name,player.team,34)
-      : `<div class="pav" style="background:#24324a;width:34px;height:34px;font-size:12px;">${escapeHtml(String(player.name||'P').slice(0,2).toUpperCase())}</div>`;
     const healthLabel=String(entry?.healthLabel || 'Active').trim() || 'Active';
+    const portraitState={
+      status:healthLabel,
+      hasGame:entry?.game ? true : (entry?.game===null || entry?.hasGame===false ? false : undefined),
+      state:Number(entry?.fantasyPoints || entry?.fp || player?.fp || 0) >= 55 ? 'takeover' : ''
+    };
+    const avatar=typeof renderTeamInitialAvatar==='function'
+      ? renderTeamInitialAvatar(player.name,player.team,34,'',portraitState)
+      : `<div class="pav" style="background:#24324a;width:34px;height:34px;font-size:12px;">${escapeHtml(String(player.name||'P').slice(0,2).toUpperCase())}</div>`;
     return `<tr>
       <td>${escapeHtml(entry?.slot || entry?.positionSlot || '--')}</td>
       <td>
@@ -11618,7 +11833,7 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
           ${avatar}
           <div class="season-player-wrap" style="min-width:0;">
             <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-              <div class="season-player-name" style="font-weight:700;color:#2563eb;">${primaryText}</div>
+              <div class="season-player-name" style="font-weight:700;color:#2563eb;">${detailNameButton(player, primaryText)}</div>
               ${renderHealthPill(entry)}
             </div>
             <div class="season-soft-muted compact-player-meta">${secondaryText}${recommendationText ? ` · ${recommendationText}` : ''}</div>
@@ -13876,9 +14091,9 @@ function renderRoster(){
       <td${rowCellAttr}>${entry.slot}</td>
       <td${rowCellAttr}>
         <div style="display:flex;align-items:center;gap:10px;min-width:0;max-width:100%;">
-          ${renderTeamInitialAvatar(p.name,p.team,34)}
+          ${renderTeamInitialAvatar(p.name,p.team,34,'',{status:injury?.label,hasGame:!!getGameInfo(p,day),state:Number(p.fp||0)>=55?'takeover':''})}
           <div class="season-player-wrap" style="min-width:0;">
-            <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
+            <div class="season-player-name" style="font-weight:700;color:#2563eb;">${playerDetailNameButton(p)}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
             <div class="season-soft-muted compact-player-meta">${p.team} ${p.pos}</div>
           </div>
         </div>
@@ -13906,9 +14121,9 @@ function renderRoster(){
       <td>${entry.slot}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px;min-width:240px;">
-          ${renderTeamInitialAvatar(p.name,p.team,34)}
+          ${renderTeamInitialAvatar(p.name,p.team,34,'',{status:injury?.label,hasGame:!!getGameInfo(p,day)})}
           <div class="season-player-wrap" style="min-width:0;">
-            <div class="season-player-name" style="font-weight:700;color:#2563eb;">${p.name}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
+            <div class="season-player-name" style="font-weight:700;color:#2563eb;">${playerDetailNameButton(p)}${injury?` <span style="color:${injury.color};font-weight:800;">${injury.label}</span>`:''}</div>
             <div class="season-soft-muted">${entry.slot==='BN'?'Bench':entry.slot} · ${p.team} ${p.pos}</div>
           </div>
         </div>
@@ -15670,6 +15885,7 @@ function closeFullSchedule(){
 function closeViewerModal(){
   const modal=document.getElementById('viewerModal');
   if(!modal) return;
+  document.querySelectorAll('[data-open-viewer].is-viewing').forEach(row=>row.classList.remove('is-viewing'));
   modal.classList.remove('open');
   setTimeout(()=>{
     if(!modal.classList.contains('open')) modal.style.display='none';
@@ -15735,6 +15951,8 @@ function openFullSchedule(){
 function openViewer(ti){
   closePickerModal();
   const nm=D.teams[ti]||'Team '+(ti+1),im=ti===D.myPos;
+  document.querySelectorAll('[data-open-viewer].is-viewing').forEach(row=>row.classList.remove('is-viewing'));
+  document.querySelectorAll(`[data-open-viewer="${Number(ti)}"]`).forEach(row=>row.classList.add('is-viewing'));
   const col=TCOLORS[ti%TCOLORS.length],st=getLiveStandingsSnapshot().find(entry=>entry.teamIdx===ti)||G.standings[ti];
   const roster=G.rosters[ti]||[],sIds=getStarterIdsForTeamDay(ti,G.day);
   const starters=sIds.map(id=>roster.find(p=>p.id===id)).filter(Boolean);
@@ -15816,12 +16034,11 @@ function openViewer(ti){
   const act=document.getElementById('vActions');
   if(im){
     act.innerHTML=`<button onclick="closeViewerModal();goPage('roster');" class="season-chip-link solid">Edit My Lineup</button>
-      <button onclick="closeViewerModal();goPage('matchup');" class="season-chip-link">Inspect Matchup</button>`;
+      <button onclick="closeViewerModal()" class="season-chip-link">Close</button>`;
   } else {
     act.innerHTML=`<button onclick="closeViewerModal();goPage('trades');setTimeout(()=>openTrade(${ti}),120);" class="season-chip-link solid">Propose Trade</button>
-      <button onclick="closeViewerModal();goPage('standings');" class="season-chip-link">View Standings</button>`;
+      <button onclick="closeViewerModal()" class="season-chip-link">Close</button>`;
   }
-  act.innerHTML+=`<button onclick="closeViewerModal()" class="season-chip-link">Close</button>`;
   const modal=document.getElementById('viewerModal');
   if(modal){
     modal.style.display='flex';

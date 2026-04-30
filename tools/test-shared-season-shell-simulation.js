@@ -7,6 +7,8 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'rosterbate-season.html'
 const simMatchupHtml = fs.readFileSync(path.join(__dirname, '..', 'sim-matchup.html'), 'utf8');
 const adapterSource = fs.readFileSync(path.join(__dirname, '..', 'simulation-season-adapter.js'), 'utf8');
 const portraitSource = fs.readFileSync(path.join(__dirname, '..', 'player-portrait-assets.js'), 'utf8');
+const portraitManifest = fs.readFileSync(path.join(__dirname, '..', 'assets', 'player-portraits', 'manifest.json'), 'utf8');
+const portraitManifestBuilder = fs.readFileSync(path.join(__dirname, 'build-player-portrait-manifest.js'), 'utf8');
 
 assert.match(html, /function assignSimulationNbaBenchPlayerToSlotFromShell\(/, 'shared shell should support moving NBA bench players into starter slots');
 assert.match(html, /function clearSimulationNbaSlotAssignmentFromShell\(/, 'shared shell should support clearing NBA starter slots');
@@ -21,10 +23,25 @@ assert.match(html, /injuriesEnabled:\s*injuriesEnabled/, 'team settings save sho
 assert.match(html, /id="seasonLeagueHomeLink"/, 'season shell should expose a top-nav league home button');
 assert.match(html, /onclick="goPage\('hub'\)"/, 'league home button should return to the in-league hub instead of leaving the season manager');
 assert.match(html, /function updateSeasonLeagueHomeLink\(/, 'season shell should show the league home button once season data is loaded');
+assert.match(html, /function bindHubStandingsInteractions\([\s\S]*openViewer\(teamIdx\)/, 'league-home standings rows should open the team lineup viewer');
+assert.match(html, /\.hub-standings-row:hover/, 'league-home standings rows should show visible hover feedback');
+assert.match(html, /\.hub-standings-row\.is-viewing/, 'league-home standings rows should retain a selected state while the lineup viewer is open');
+assert.match(html, /id="vActions" class="viewer-actions viewer-actions-top"/, 'team lineup viewer actions should live in the popup header');
+assert.doesNotMatch(html, /View Standings<\/button>/, 'team lineup viewer should not include a redundant view-standings action');
+assert.match(html, /id="playerDetailModal"/, 'season shell should expose a reusable player detail modal');
+assert.match(html, /function openPlayerDetailModal\(/, 'season shell should open player details from any player-name click');
+assert.match(html, /class="player-name-link"/, 'season shell should render player names as detail buttons');
+assert.match(html, /PLAYER DOSSIER/, 'player detail modal should use native RosterBate dossier styling');
+assert.match(html, /Trade posture/, 'player detail modal should use RosterBate trade posture language');
+assert.match(html, /Game Log/, 'player detail modal should include game-log context');
+assert.match(html, /Recent News/, 'player detail modal should include recent-news context');
 assert.match(html, /function renderPlayerPortrait\(/, 'season shell should render player portraits from a shared helper instead of jersey-only avatars');
 assert.match(html, /class="pav player-portrait"/, 'season shell player avatars should use portrait markup');
 assert.match(html, /<script src="player-portrait-assets\.js"><\/script>/, 'season shell should load the shared portrait asset pipeline');
 assert.match(html, /RosterBatePlayerPortraits\.renderPortraitMarkup/, 'season shell should prefer shared portrait image markup when available');
+assert.match(html, /portrait-state-injured/, 'season shell should style injured portrait states');
+assert.match(html, /portrait-state-offday/, 'season shell should style off-day portrait states');
+assert.match(html, /portrait-state-takeover/, 'season shell should style takeover portrait states');
 assert.match(html, /portrait-card-bg/, 'season shell player portraits should use illustrated card-style portrait panels');
 assert.match(html, /portrait-ink-outline/, 'season shell player portraits should include ink-outline illustration details');
 assert.match(html, /\.hub-shell\{[^}]*max-width:none/, 'league home shell should use the full available viewport width');
@@ -39,6 +56,8 @@ assert.match(simMatchupHtml, /function renderLivePlayerPortrait\(/, 'live matchu
 assert.match(simMatchupHtml, /class="live-player-portrait"/, 'live matchup roster rows should use portrait markup instead of dot-only players');
 assert.match(simMatchupHtml, /<script src="player-portrait-assets\.js"><\/script>/, 'live matchup should load the shared portrait asset pipeline');
 assert.match(simMatchupHtml, /RosterBatePlayerPortraits\.renderPortraitMarkup/, 'live matchup should prefer shared portrait image markup when available');
+assert.match(simMatchupHtml, /portrait-state-scoring/, 'live matchup should animate scoring portrait states');
+assert.match(simMatchupHtml, /portrait-state-takeover/, 'live matchup should animate takeover portrait states');
 assert.match(simMatchupHtml, /portrait-card-bg/, 'live matchup player portraits should use illustrated card-style portrait panels');
 assert.match(simMatchupHtml, /portrait-ink-outline/, 'live matchup player portraits should include ink-outline illustration details');
 assert.match(simMatchupHtml, /player-showcase-card/, 'live matchup rows should frame portraits as compact player showcase cards');
@@ -46,8 +65,13 @@ assert.match(simMatchupHtml, /player-event-badge/, 'live matchup scoring events 
 assert.match(simMatchupHtml, /portrait-pop/, 'live matchup portraits should animate when a player produces a scoring event');
 assert.match(portraitSource, /RosterBatePlayerPortraits/, 'shared portrait asset pipeline should expose the global API');
 assert.match(portraitSource, /rbPlayerPortraitOverrides/, 'shared portrait asset pipeline should support local real-image overrides');
+assert.match(portraitSource, /loadManifest/, 'shared portrait asset pipeline should load a real-image manifest');
+assert.match(portraitSource, /stateClassList/, 'shared portrait asset pipeline should generate reusable animation state classes');
 assert.match(portraitSource, /buildGeneratedPortraitSvg/, 'shared portrait asset pipeline should include generated SVG fallback art');
 assert.match(portraitSource, /player-portrait-img/, 'shared portrait asset pipeline should render image-backed portrait markup');
+assert.doesNotThrow(() => JSON.parse(portraitManifest), 'portrait manifest should be valid JSON');
+assert.match(portraitManifestBuilder, /michael-jordan__CHI\.png/, 'portrait manifest builder should document the team-aware filename convention');
+assert.match(portraitManifestBuilder, /--check/, 'portrait manifest builder should support CI-safe manifest checks');
 
 function toPlain(value) {
   return JSON.parse(JSON.stringify(value));
@@ -744,6 +768,22 @@ const simulationAdapterStub = {
               opponentLabel: 'vs BOS',
               opponentName: 'Boston Celtics',
               timeLabel: 'Day 12'
+            },
+            {
+              slot: 'PF',
+              player: {
+                id: 35,
+                name: 'Charles Barkley',
+                team: 'PHX',
+                pos: 'PF',
+                fp: 0,
+                projectedFantasyPoints: 39.3,
+                statValues: { TFP: 0, PTS: 0, REB: 0, AST: 0, STL: 0, BLK: 0, '3PM': 0 }
+              },
+              hasGame: true,
+              opponentLabel: '@ MIL',
+              opponentName: 'Milwaukee Bucks',
+              timeLabel: '8:30 PM'
             }
           ]
         },
@@ -1699,6 +1739,8 @@ assert.match(elements.rosterContent.innerHTML, /Starters/);
 assert.match(elements.rosterContent.innerHTML, /bench/i);
 assert.match(elements.rosterContent.innerHTML, /Bench ready/);
 assert.match(elements.rosterContent.innerHTML, /Michael Jordan/);
+assert.match(elements.rosterContent.innerHTML, /Charles Barkley/);
+assert.match(elements.rosterContent.innerHTML, /39\.3/, 'simulation roster should show projected FP for a scheduled player with no completed season stat line');
 assert.match(elements.rosterContent.innerHTML, />Move</, 'simulation roster should use the original move-mode action instead of direct clear-only controls');
 assert.doesNotMatch(elements.rosterContent.innerHTML, />Clear</, 'simulation roster should avoid awkward clear-only starter controls');
 assert.match(elements.rosterContent.innerHTML, /openWatchList\(\)/, 'simulation roster should keep the watch-list action live');

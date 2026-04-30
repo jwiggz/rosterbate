@@ -7,6 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
+    "portraits:manifest": "node tools/build-player-portrait-manifest.js --write",
+    "portraits:check": "node tools/build-player-portrait-manifest.js --check",
     "test:live-matchup": "node tools/test-live-matchup-playwright.js"
   },
   "repository": {

@@ -325,6 +325,10 @@
     const totals = Number.isFinite(playerId) ? seasonStatsById.get(playerId) : null;
     const gp = Number(totals?.gp || 0);
     if (!(gp > 0) && !hasCurrentSeasonResults) return clone(player);
+    const projectedFantasyPoints = Number(player?.projectedFantasyPoints ?? player?.fp ?? player?.fantasyPoints ?? 0);
+    const projectedStatValues = player?.projectedStatValues && typeof player.projectedStatValues === 'object'
+      ? clone(player.projectedStatValues)
+      : clone(player?.statValues || {});
     const safeTotals = totals && typeof totals === 'object' ? totals : {};
     const fpTotal = roundSimulationSeasonStat(safeTotals.fp || 0);
     const fpAvg = gp > 0 ? roundSimulationSeasonStat(fpTotal / gp) : 0;
@@ -371,6 +375,8 @@
       fp: fpAvg,
       fantasyPoints: fpAvg,
       totalFantasyPoints: fpTotal,
+      projectedFantasyPoints: Number.isFinite(projectedFantasyPoints) ? projectedFantasyPoints : 0,
+      projectedStatValues,
       statValues,
       detailStats,
       statSummary: gp === 0

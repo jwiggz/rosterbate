@@ -205,7 +205,14 @@ body {
 .live-player-portrait .portrait-mouth{position:absolute;left:42%;right:42%;top:48%;height:5%;border-bottom:1.7px solid rgba(15,23,42,.8);border-radius:50%;z-index:7;}
 .live-player-portrait .portrait-ink-outline{position:absolute;inset:8%;border-radius:12px;box-shadow:inset 0 0 0 1.5px rgba(15,23,42,.16);z-index:8;pointer-events:none;}
 .live-player-portrait .portrait-initials{position:absolute;right:4px;bottom:3px;z-index:7;font-size:9px;font-weight:900;color:#0f172a;background:rgba(255,255,255,.78);border-radius:4px;padding:0 3px;line-height:1.2;}
-.live-player-portrait .player-portrait-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;}
+.live-player-portrait .player-portrait-img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:inherit;background:#fff;}
+.live-player-portrait:after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .18s,box-shadow .18s;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent 42%);}
+.live-player-portrait.portrait-state-offday{filter:saturate(.45) brightness(.78);opacity:.72;}
+.live-player-portrait.portrait-state-injured{filter:saturate(.55) brightness(.72);box-shadow:0 0 0 1px rgba(239,68,68,.42),0 10px 20px rgba(127,29,29,.28);}
+.live-player-portrait.portrait-state-injured:after{opacity:1;background:repeating-linear-gradient(135deg,rgba(239,68,68,.28) 0 4px,transparent 4px 10px);}
+.live-player-portrait.portrait-state-questionable{box-shadow:0 0 0 1px rgba(245,158,11,.42),0 10px 20px rgba(120,53,15,.24);}
+.live-player-portrait.portrait-state-takeover{box-shadow:0 0 0 1px rgba(251,191,36,.75),0 0 26px rgba(251,191,36,.3),0 10px 20px rgba(0,0,0,.22);}
+.live-player-portrait.portrait-state-takeover:after{opacity:1;box-shadow:inset 0 0 18px rgba(251,191,36,.38);}
 @keyframes portraitPop{
   0%{transform:translateY(0) scale(1);}
   36%{transform:translateY(-6px) scale(1.12);box-shadow:0 0 0 4px rgba(251,191,36,.18),0 16px 28px rgba(0,0,0,.3);}
@@ -736,6 +743,7 @@ function renderLivePlayerPortrait(player) {
       aspect: 68 / 58,
       className: 'live-player-portrait',
       id: `portrait-${player?._id || 'player'}`,
+      state: Number(player?.fp || player?._fp || 0) >= 55 ? 'takeover' : '',
       teamColor: player?._color || '#64748b',
       teamColorTwo: player?._side === 'A' ? '#c084fc' : '#38bdf8'
     });
@@ -764,9 +772,17 @@ function updatePlayerEvent(player, text) {
   if (row) {
     row.classList.add('active-player');
     row.classList.remove('portrait-pop');
+    const portrait = document.getElementById(`portrait-${player._id}`);
+    if (portrait) {
+      portrait.classList.add('portrait-state-scoring');
+      if (Number(player._fp || 0) >= 45) portrait.classList.add('portrait-state-takeover');
+    }
     void row.offsetWidth;
     row.classList.add('portrait-pop');
-    setTimeout(() => row.classList.remove('active-player','portrait-pop'), 1200);
+    setTimeout(() => {
+      row.classList.remove('active-player','portrait-pop');
+      if (portrait) portrait.classList.remove('portrait-state-scoring');
+    }, 1200);
   }
 }
 

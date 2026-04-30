@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+(async function main() {
 const source = fs.readFileSync(path.join(__dirname, '..', 'player-portrait-assets.js'), 'utf8');
 
 const storage = new Map();
@@ -25,6 +26,8 @@ const portraits = context.window.RosterBatePlayerPortraits;
 assert.ok(portraits, 'portrait API should attach to window');
 assert.equal(typeof portraits.getPortraitUrl, 'function', 'portrait API should expose getPortraitUrl');
 assert.equal(typeof portraits.renderPortraitMarkup, 'function', 'portrait API should expose renderPortraitMarkup');
+assert.equal(typeof portraits.applyManifest, 'function', 'portrait API should expose manifest registration');
+assert.equal(typeof portraits.loadManifest, 'function', 'portrait API should expose async manifest loading');
 
 const generatedUrl = portraits.getPortraitUrl({ name: 'Nikola Jokic', team: 'DEN' });
 assert.ok(generatedUrl.startsWith('data:image/svg+xml;charset=UTF-8,'), 'fallback portrait should be an SVG data URI');
@@ -64,9 +67,57 @@ assert.equal(
   'direct portrait fields should have highest priority'
 );
 
-const markup = portraits.renderPortraitMarkup({ name: 'Hakeem Olajuwon', team: 'HOU' }, { size: 64, className: 'player-portrait' });
-assert.match(markup, /class="player-portrait"/, 'rendered markup should keep requested wrapper class');
+portraits.applyManifest({
+  players: [
+    { name: 'Victor Wembanyama', team: 'SAS', url: 'assets/player-portraits/victor-wembanyama.png' },
+    { name: 'Luka Doncic', team: 'LAL', url: 'assets/player-portraits/luka-doncic__LAL.webp' }
+  ]
+});
+assert.equal(
+  portraits.getPortraitUrl({ name: 'Victor Wembanyama', team: 'SAS' }),
+  'assets/player-portraits/victor-wembanyama.png',
+  'array-based portrait manifests should register player image URLs'
+);
+assert.equal(
+  portraits.getPortraitUrl({ name: 'Luka Doncic', team: 'LAL' }),
+  'assets/player-portraits/luka-doncic__LAL.webp',
+  'manifest portraits should support team-specific illustrated player assets'
+);
+
+const markup = portraits.renderPortraitMarkup(
+  { name: 'Hakeem Olajuwon', team: 'HOU' },
+  { size: 64, className: 'player-portrait', state: 'takeover', status: 'OUT', hasGame: false }
+);
+assert.match(markup, /class="[^"]*player-portrait/, 'rendered markup should keep requested wrapper class');
 assert.match(markup, /player-portrait-img/, 'rendered markup should include an image element');
 assert.match(markup, /alt="Hakeem Olajuwon portrait"/, 'rendered markup should include accessible alt text');
+assert.match(markup, /portrait-state-takeover/, 'rendered markup should include takeover animation state');
+assert.match(markup, /portrait-state-injured/, 'rendered markup should include injured animation state');
+assert.match(markup, /portrait-state-offday/, 'rendered markup should include off-day animation state');
+
+const fetchContext = {
+  console,
+  globalThis: {},
+  window: {
+    fetch: async (url) => ({
+      ok: url === 'assets/player-portraits/manifest.json',
+      status: url === 'assets/player-portraits/manifest.json' ? 200 : 404,
+      json: async () => ({ players: { 'Stephen Curry|GSW': 'assets/player-portraits/stephen-curry.png' } })
+    })
+  }
+};
+fetchContext.globalThis = fetchContext.window;
+vm.createContext(fetchContext);
+vm.runInContext(source, fetchContext, { filename: 'player-portrait-assets.js' });
+await fetchContext.window.RosterBatePlayerPortraits.loadManifest();
+assert.equal(
+  fetchContext.window.RosterBatePlayerPortraits.getPortraitUrl({ name: 'Stephen Curry', team: 'GSW' }),
+  'assets/player-portraits/stephen-curry.png',
+  'loadManifest should fetch and register manifest image URLs'
+);
 
 console.log('test-player-portrait-assets passed');
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

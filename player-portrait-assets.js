@@ -116,6 +116,45 @@
     return '';
   }
 
+  function manifestEntries(manifest) {
+    if (!manifest || typeof manifest !== 'object') return {};
+    const players = manifest.players || manifest.portraits || manifest;
+    if (Array.isArray(players)) {
+      return players.reduce((acc, entry) => {
+        if (!entry || typeof entry !== 'object') return acc;
+        const url = entry.url || entry.src || entry.portraitUrl || entry.imageUrl;
+        if (typeof url !== 'string' || !url.trim()) return acc;
+        const name = entry.name || entry.playerName || entry.fullName;
+        const team = entry.team || entry.teamCode || entry.abbr;
+        const id = entry.id || entry.playerId || entry.slug;
+        if (id) acc[`id:${normalize(id)}`] = url.trim();
+        if (name && team) acc[`${name}|${team}`] = url.trim();
+        if (name) acc[name] = url.trim();
+        return acc;
+      }, {});
+    }
+    return players && typeof players === 'object' ? players : {};
+  }
+
+  function applyManifest(manifest) {
+    return register(manifestEntries(manifest));
+  }
+
+  function loadManifest(url = 'assets/player-portraits/manifest.json') {
+    if (typeof global.fetch !== 'function') {
+      return Promise.resolve({ loaded: false, reason: 'fetch-unavailable' });
+    }
+    return global.fetch(url, { cache: 'no-store' })
+      .then((response) => {
+        if (!response || !response.ok) return { loaded: false, status: response?.status || 0 };
+        return response.json().then((manifest) => {
+          applyManifest(manifest);
+          return { loaded: true, url };
+        });
+      })
+      .catch((error) => ({ loaded: false, error: String(error?.message || error) }));
+  }
+
   function choosePalette(player, options) {
     const seed = hashString(`${playerName(player)}|${playerTeam(player)}`);
     const trait = portraitTrait(player);
@@ -220,17 +259,39 @@
     return directPortraitUrl(player) || registeredPortraitUrl(player) || buildGeneratedPortraitDataUri(player || {}, options);
   }
 
+  function stateClassList(player, options = {}) {
+    const classes = [];
+    const addState = (state) => {
+      String(state || '')
+        .split(/\s+/)
+        .map((part) => part.trim().toLowerCase())
+        .filter(Boolean)
+        .forEach((part) => classes.push(`portrait-state-${part.replace(/[^a-z0-9_-]/g, '-')}`));
+    };
+    if (Array.isArray(options.states)) options.states.forEach(addState);
+    addState(options.state);
+    if (options.active || options.scoring) addState('scoring');
+    if (options.takeover || Number(player?.fp || player?.avgFp || player?._fp || 0) >= 55) addState('takeover');
+    if (options.offDay || options.hasGame === false || player?.hasGame === false) addState('offday');
+    const status = String(options.status || player?.status || player?.health || player?.availability || '').trim().toUpperCase();
+    if (['OUT', 'O', 'IR', 'IL', 'SUSP', 'SUSPENDED'].includes(status)) addState('injured');
+    if (['GTD', 'DTD', 'DAY-TO-DAY', 'DAY TO DAY'].includes(status)) addState('questionable');
+    return Array.from(new Set(classes)).join(' ');
+  }
+
   function renderPortraitMarkup(player, options = {}) {
     const size = Number(options.size || 44);
     const className = options.className || 'player-portrait';
     const extraClass = options.extraClass ? ` ${options.extraClass}` : '';
     const id = options.id ? ` id="${escapeAttr(options.id)}"` : '';
+    const stateClasses = stateClassList(player || {}, options);
+    const stateClassAttr = stateClasses ? ` ${stateClasses}` : '';
     const styleParts = [`width:${size}px`, `height:${Math.round(size * (options.aspect || 1.18))}px`];
     if (options.style) styleParts.push(options.style);
     if (options.extraStyle) styleParts.push(options.extraStyle);
     const url = getPortraitUrl(player || {}, options);
     const name = playerName(player);
-    return `<div${id} class="${escapeAttr(className + extraClass)}" style="${escapeAttr(styleParts.join(';'))}" aria-label="${escapeAttr(name)} portrait"><img class="player-portrait-img" src="${escapeAttr(url)}" alt="${escapeAttr(name)} portrait" loading="lazy" decoding="async"></div>`;
+    return `<div${id} class="${escapeAttr(className + extraClass + stateClassAttr)}" style="${escapeAttr(styleParts.join(';'))}" aria-label="${escapeAttr(name)} portrait"><img class="player-portrait-img" src="${escapeAttr(url)}" alt="${escapeAttr(name)} portrait" loading="lazy" decoding="async"></div>`;
   }
 
   function register(map) {
@@ -244,10 +305,16 @@
 
   global.RosterBatePlayerPortraits = {
     register,
+    applyManifest,
+    loadManifest,
     getPortraitUrl,
+    stateClassList,
     buildGeneratedPortraitSvg,
     buildGeneratedPortraitDataUri,
     renderPortraitMarkup,
     _keyCandidates: keyCandidates
   };
+  if (typeof global.fetch === 'function') {
+    global.RosterBatePlayerPortraits.loadManifest().catch(() => null);
+  }
 })(typeof window !== 'undefined' ? window : globalThis);
