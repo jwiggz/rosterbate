@@ -51,6 +51,7 @@ function usage() {
 
 function titleFromSlug(slug) {
   return String(slug || '')
+    .replace(/[-_]\d{5,}$/, '')
     .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()

@@ -1,6 +1,20 @@
 {
   "$schema": "rosterbate-player-portrait-manifest-v1",
   "players": {
-    "Luka Doncic|LAL": "assets/player-portraits/luka-doncic__LAL.webp"
+    "Alperen Sengun": "assets/player-portraits/alperen-sengun-1630578.jpg",
+    "Anthony Davis": "assets/player-portraits/anthony-davis-203076.jpg",
+    "Cade Cunningham": "assets/player-portraits/cade-cunningham-1630595.jpg",
+    "Donovan Mitchell": "assets/player-portraits/donovan-mitchell-1628378.jpg",
+    "Giannis Antetokounmpo": "assets/player-portraits/giannis-antetokounmpo-203507.jpg",
+    "Jalen Johnson": "assets/player-portraits/jalen-johnson-1630552.jpg",
+    "Jaylen Brown": "assets/player-portraits/jaylen-brown-1627759.jpg",
+    "Jayson Tatum": "assets/player-portraits/jayson-tatum-1628369.jpg",
+    "Joel Embiid": "assets/player-portraits/joel-embiid-203954.jpg",
+    "Kawhi Leonard": "assets/player-portraits/kawhi-leonard-202695.jpg",
+    "Luka Doncic|LAL": "assets/player-portraits/luka-doncic__LAL.webp",
+    "Nikola Jokic": "assets/player-portraits/nikola-jokic-203999.webp",
+    "Shai Gilgeous Alexander": "assets/player-portraits/shai-gilgeous-alexander-1628983.jpg",
+    "Tyrese Maxey": "assets/player-portraits/tyrese-maxey-1630178.jpg",
+    "Victor Wembanyama": "assets/player-portraits/victor-wembanyama-1641705.jpg"
   }
 }

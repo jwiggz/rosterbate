@@ -53,6 +53,12 @@ assert.equal(
   'assets/player-portraits/michael-jordan.png',
   'registered portrait URLs should win over generated fallbacks'
 );
+portraits.register({ 'Shai Gilgeous Alexander': 'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg' });
+assert.equal(
+  portraits.getPortraitUrl({ name: 'Shai Gilgeous-Alexander', team: 'OKC' }),
+  'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg',
+  'registered portrait lookup should tolerate filename-derived punctuation differences'
+);
 
 storage.set('rbPlayerPortraitOverrides', JSON.stringify({ 'larry bird|bos': 'assets/player-portraits/larry-bird.png' }));
 assert.equal(

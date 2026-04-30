@@ -14,6 +14,12 @@ Coverage check:
 npm run portraits:coverage -- --limit 25 --missing-only
 ```
 
+The coverage report prints the exact filename to use for each missing portrait. For example:
+
+```text
+MISS #  1 Shai Gilgeous-Alexander (OKC) -> shai-gilgeous-alexander__OKC.webp
+```
+
 Filename examples:
 
 - `michael-jordan__CHI.png` maps to `Michael Jordan|CHI`

@@ -47,6 +47,10 @@
     return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
+  function normalizeLoose(value) {
+    return normalize(value).replace(/[^a-z0-9|]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
   function hashString(value) {
     const source = String(value || 'Player');
     let hash = 0;
@@ -80,11 +84,15 @@
     const name = normalize(playerName(player));
     const team = normalize(playerTeam(player));
     const id = normalize(player?.id || player?.playerId || player?.slug);
-    return [
+    const looseName = normalizeLoose(playerName(player));
+    const looseTeam = normalizeLoose(playerTeam(player));
+    return Array.from(new Set([
       id && `id:${id}`,
       name && team && `${name}|${team}`,
-      name
-    ].filter(Boolean);
+      looseName && looseTeam && `${looseName}|${looseTeam}`,
+      name,
+      looseName
+    ].filter(Boolean)));
   }
 
   function readOverrideRegistry() {
@@ -298,7 +306,10 @@
     if (!map || typeof map !== 'object') return registry;
     Object.keys(map).forEach((key) => {
       const value = map[key];
-      if (typeof value === 'string' && value.trim()) registry[normalize(key)] = value.trim();
+      if (typeof value === 'string' && value.trim()) {
+        registry[normalize(key)] = value.trim();
+        registry[normalizeLoose(key)] = value.trim();
+      }
     });
     return registry;
   }

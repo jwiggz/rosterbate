@@ -105,9 +105,37 @@ function readManifest(manifestPath) {
   return players && typeof players === 'object' ? players : {};
 }
 
+function slugifyName(name) {
+  return String(name || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-')
+    .toLowerCase();
+}
+
+function suggestedFilename(player, extension = 'webp') {
+  const slug = slugifyName(player?.name);
+  if (!slug) return '';
+  const team = String(player?.team || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const ext = String(extension || 'webp').trim().replace(/^\./, '') || 'webp';
+  return `${slug}${team ? `__${team}` : ''}.${ext}`;
+}
+
+function normalizeCoverageKey(value) {
+  return String(value || '').trim().toLowerCase().replace(/[^a-z0-9|]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function hasPortrait(manifestPlayers, player) {
   const exactKey = `${player.name}|${player.team}`;
-  return Boolean(manifestPlayers[exactKey] || manifestPlayers[player.name]);
+  const normalizedManifest = new Set(Object.keys(manifestPlayers || {}).map(normalizeCoverageKey));
+  return Boolean(
+    manifestPlayers[exactKey] ||
+    manifestPlayers[player.name] ||
+    normalizedManifest.has(normalizeCoverageKey(exactKey)) ||
+    normalizedManifest.has(normalizeCoverageKey(player.name))
+  );
 }
 
 function buildCoverageReport(options = {}) {
@@ -119,7 +147,9 @@ function buildCoverageReport(options = {}) {
   const rows = rankedPlayers.map((player) => ({
     ...player,
     covered: hasPortrait(manifestPlayers, player),
-    key: `${player.name}|${player.team}`
+    key: `${player.name}|${player.team}`,
+    suggestedFilename: suggestedFilename(player),
+    suggestedPath: `assets/player-portraits/${suggestedFilename(player)}`
   }));
   const covered = rows.filter((row) => row.covered).length;
   return {
@@ -150,7 +180,8 @@ function main(argv = process.argv.slice(2)) {
   const rows = args.missingOnly ? report.rows.filter((row) => !row.covered) : report.rows;
   rows.forEach((row) => {
     const mark = row.covered ? 'OK ' : 'MISS';
-    console.log(`${mark} #${String(row.rank).padStart(3, ' ')} ${row.name} (${row.team || '--'})`);
+    const suggestion = row.covered ? '' : ` -> ${row.suggestedFilename}`;
+    console.log(`${mark} #${String(row.rank).padStart(3, ' ')} ${row.name} (${row.team || '--'})${suggestion}`);
   });
   return 0;
 }
@@ -167,6 +198,9 @@ if (require.main === module) {
 module.exports = {
   buildCoverageReport,
   hasPortrait,
+  normalizeCoverageKey,
   parseCsvLine,
-  readRankedPlayers
+  readRankedPlayers,
+  slugifyName,
+  suggestedFilename
 };

@@ -11,6 +11,7 @@ const {
 
 assert.equal(titleFromSlug('michael-jordan'), 'Michael Jordan');
 assert.equal(titleFromSlug('nikola_jokic'), 'Nikola Jokic');
+assert.equal(titleFromSlug('nikola-jokic-203999'), 'Nikola Jokic');
 assert.deepEqual(
   entryFromFilename('michael-jordan__CHI.png', 'assets/player-portraits/michael-jordan__CHI.png'),
   { key: 'Michael Jordan|CHI', url: 'assets/player-portraits/michael-jordan__CHI.png' }
@@ -18,6 +19,10 @@ assert.deepEqual(
 assert.deepEqual(
   entryFromFilename('larry-bird.webp', 'assets/player-portraits/larry-bird.webp'),
   { key: 'Larry Bird', url: 'assets/player-portraits/larry-bird.webp' }
+);
+assert.deepEqual(
+  entryFromFilename('shai-gilgeous-alexander-1628983.jpg', 'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg'),
+  { key: 'Shai Gilgeous Alexander', url: 'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg' }
 );
 assert.equal(entryFromFilename('README.md', 'assets/player-portraits/README.md'), null);
 
