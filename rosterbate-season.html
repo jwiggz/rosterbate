@@ -10875,14 +10875,79 @@ function getSimulationTradePlayerById(roster,playerId){
 }
 
 function getSimulationTradePackageValue(players){
-  return (Array.isArray(players)?players:[]).reduce((sum,player)=>sum+getSimulationTradePlayerValue(player),0);
+  return getTradePackageSideValue(players, getSimulationTradePlayerValue);
+}
+
+function normalizeTradePackageIds(ids){
+  const seen=new Set();
+  const normalized=[];
+  (Array.isArray(ids)?ids:[]).forEach(value=>{
+    const key=tradePlayerKey(value).trim();
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    normalized.push(key);
+  });
+  return normalized;
+}
+
+function resolveTradePackagePlayers(ids, roster){
+  return normalizeTradePackageIds(ids)
+    .map(id=>findRosterPlayerByTradeId(roster,id))
+    .filter(Boolean);
+}
+
+function getTradePackageSideValue(players, valueFn){
+  const readValue=typeof valueFn==='function' ? valueFn : player=>Number(player?.fp||0);
+  const total=(Array.isArray(players)?players:[]).reduce((sum,player)=>sum+Number(readValue(player)||0),0);
+  return +total.toFixed(1);
+}
+
+function buildTradePackagePreviewModel({
+  outgoingIds=[],
+  incomingIds=[],
+  outgoingRoster=[],
+  incomingRoster=[],
+  valueFn,
+  replacementRead,
+  maxPerSide=5
+}={}){
+  const normalizedOutgoing=normalizeTradePackageIds(outgoingIds);
+  const normalizedIncoming=normalizeTradePackageIds(incomingIds);
+  const outgoingPlayers=resolveTradePackagePlayers(normalizedOutgoing,outgoingRoster);
+  const incomingPlayers=resolveTradePackagePlayers(normalizedIncoming,incomingRoster);
+  const outgoingTotal=getTradePackageSideValue(outgoingPlayers,valueFn);
+  const incomingTotal=getTradePackageSideValue(incomingPlayers,valueFn);
+  const replacementNeeded=outgoingPlayers.length!==incomingPlayers.length;
+  const replacement=replacementNeeded && typeof replacementRead==='function'
+    ? replacementRead(normalizedOutgoing.concat(normalizedIncoming))
+    : null;
+  const replacementLabel=replacement?.label || replacement?.player?.name || 'best waiver fill-in';
+  const replacementValue=Number(replacement?.value||0);
+  const replacementContext=outgoingPlayers.length>incomingPlayers.length && replacement?.player
+    ? `Replacement context: ${replacementLabel} can fill the opened roster spot at ${replacementValue.toFixed(1)} FP.`
+    : incomingPlayers.length>outgoingPlayers.length
+      ? 'Drop context: this package adds roster pressure, so you may need to trim bench depth after the deal.'
+      : '';
+  return {
+    outgoingIds:normalizedOutgoing,
+    incomingIds:normalizedIncoming,
+    outgoingPlayers,
+    incomingPlayers,
+    outgoingTotal,
+    incomingTotal,
+    netValue:+(incomingTotal-outgoingTotal).toFixed(1),
+    maxPerSide,
+    isOverLimit:normalizedOutgoing.length>maxPerSide || normalizedIncoming.length>maxPerSide,
+    replacement,
+    replacementContext
+  };
 }
 
 function getSimulationTradeReplacementRead(state, excludedIds){
-  const excluded=new Set((Array.isArray(excludedIds)?excludedIds:[]).map(Number));
+  const excluded=new Set(normalizeTradePackageIds(excludedIds));
   const freeAgents=Array.isArray(state?.draftState?.freeAgents) ? state.draftState.freeAgents : [];
   const best=freeAgents
-    .filter((player)=>!excluded.has(Number(player?.id)))
+    .filter((player)=>!excluded.has(tradePlayerKey(player?.id)))
     .slice()
     .sort((a,b)=>getSimulationTradePlayerValue(b)-getSimulationTradePlayerValue(a))[0] || null;
   return {
@@ -10973,8 +11038,16 @@ function renderSimulationTradeReplacementPreview(replacement){
 }
 
 function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, state, partnerName }){
-  const outgoing=Array.isArray(outgoingPlayers) ? outgoingPlayers.filter(Boolean) : [];
-  const incoming=Array.isArray(incomingPlayers) ? incomingPlayers.filter(Boolean) : [];
+  const previewModel=buildTradePackagePreviewModel({
+    outgoingIds:(Array.isArray(outgoingPlayers)?outgoingPlayers:[]).map(player=>player?.id),
+    incomingIds:(Array.isArray(incomingPlayers)?incomingPlayers:[]).map(player=>player?.id),
+    outgoingRoster:Array.isArray(outgoingPlayers)?outgoingPlayers:[],
+    incomingRoster:Array.isArray(incomingPlayers)?incomingPlayers:[],
+    valueFn:getSimulationTradePlayerValue,
+    replacementRead:excludedIds=>getSimulationTradeReplacementRead(state,excludedIds)
+  });
+  const outgoing=previewModel.outgoingPlayers;
+  const incoming=previewModel.incomingPlayers;
   if(!outgoing.length && !incoming.length){
     return `<div style="border:1px solid rgba(96,165,250,.24);background:rgba(37,99,235,.1);border-radius:12px;padding:12px;margin-top:12px;">
       <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;">Trade Preview</div>
@@ -10982,17 +11055,8 @@ function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, 
     </div>`;
   }
   const fairness=evaluateSimulationTradeFairness({ outgoingPlayers:outgoing, incomingPlayers:incoming, state, partnerName });
-  const replacementNeeded=outgoing.length!==incoming.length;
-  const replacement=replacementNeeded
-    ? getSimulationTradeReplacementRead(state, outgoing.concat(incoming).map((player)=>player?.id))
-    : null;
-  const contextCopy=outgoing.length>incoming.length && replacement?.player
-    ? `Replacement context: ${replacement.label || replacement.player.name || 'best waiver fill-in'} can fill the opened roster spot at ${Number(replacement.value||0).toFixed(1)} FP.`
-    : incoming.length>outgoing.length
-      ? 'Drop context: this package adds roster pressure, so you may need to trim bench depth after the deal.'
-      : '';
-  const contextMarkup=contextCopy
-    ? `<div style="margin-top:10px;border:1px solid rgba(96,165,250,.18);background:rgba(15,23,42,.48);border-radius:10px;padding:9px 10px;color:#bfdbfe;font-size:12px;line-height:1.45;">${escapeSimulationShellHtml(contextCopy)}</div>`
+  const contextMarkup=previewModel.replacementContext
+    ? `<div style="margin-top:10px;border:1px solid rgba(96,165,250,.18);background:rgba(15,23,42,.48);border-radius:10px;padding:9px 10px;color:#bfdbfe;font-size:12px;line-height:1.45;">${escapeSimulationShellHtml(previewModel.replacementContext)}</div>`
     : '';
   const tone=String(fairness?.tone || '').toLowerCase();
   const color=tone==='error' ? '#fecaca' : tone==='success' ? '#bbf7d0' : '#bfdbfe';
@@ -11008,7 +11072,7 @@ function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, 
       ${renderSimulationTradePackagePreview('You give', outgoing)}
       ${renderSimulationTradePackagePreview('You get', incoming)}
     </div>
-    ${renderSimulationTradeReplacementPreview(replacement)}
+    ${renderSimulationTradeReplacementPreview(previewModel.replacement)}
     <div style="margin-top:10px;color:${color};font-size:12px;font-weight:800;line-height:1.4;">${escapeSimulationShellHtml(fairness.message || '')}</div>
     ${fairness.detail ? `<div style="margin-top:5px;color:${color};font-size:12px;line-height:1.4;opacity:.9;">${escapeSimulationShellHtml(fairness.detail)}</div>` : ''}
     ${contextMarkup}
@@ -11156,34 +11220,50 @@ function updateSimulationTradeBuilderPreview(partnerAbbr){
   if(!preview) return;
   const outgoingIds=getSimulationTradeBuilderSelectedIds(partnerAbbr, 'outgoing');
   const incomingIds=getSimulationTradeBuilderSelectedIds(partnerAbbr, 'incoming');
-  const tooMany=outgoingIds.length>5 || incomingIds.length>5;
-  const outgoingPlayers=outgoingIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
-  const incomingPlayers=incomingIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
+  const tradeVm=SEASON_MODE_ADAPTER.getTradeViewModel?.() || {};
+  const toTeamAbbr=String(partnerAbbr || '').trim().toUpperCase();
+  const partnerRow=(tradeVm?.sections?.partners?.rows || []).find(row=>String(row?.team?.abbr || row?.teamAbbr || '').trim().toUpperCase()===toTeamAbbr) || null;
+  const incomingRoster=Array.isArray(partnerRow?.incomingRoster)
+    ? partnerRow.incomingRoster
+    : (Array.isArray(tradeVm?.incomingRostersByTeam?.[toTeamAbbr]) ? tradeVm.incomingRostersByTeam[toTeamAbbr] : []);
+  const state=SEASON_MODE_ADAPTER.getState?.() || D;
+  const previewModel=buildTradePackagePreviewModel({
+    outgoingIds,
+    incomingIds,
+    outgoingRoster:Array.isArray(tradeVm?.outgoingRoster) ? tradeVm.outgoingRoster : [],
+    incomingRoster,
+    valueFn:getSimulationTradePlayerValue,
+    replacementRead:excludedIds=>getSimulationTradeReplacementRead(state,excludedIds)
+  });
   const setApplyEnabled=enabled=>{
     if(applyButton){
       applyButton.disabled=!enabled;
       applyButton.style.opacity=enabled ? '1' : '.55';
     }
   };
-  if(tooMany){
+  if(previewModel.isOverLimit){
     setApplyEnabled(false);
     preview.innerHTML='<div style="color:#fecaca;font-weight:900;">Package trades are capped at 5 players per side.</div>';
     return;
   }
-  if(!outgoingPlayers.length || !incomingPlayers.length){
+  if(!previewModel.outgoingPlayers.length || !previewModel.incomingPlayers.length){
     setApplyEnabled(false);
     preview.innerHTML='<div style="color:#bfdbfe;font-weight:900;">Choose at least one player on both sides to preview the trade.</div>';
     return;
   }
-  const state=SEASON_MODE_ADAPTER.getState?.() || D;
   const fairness=evaluateSimulationTradeFairness({
-    outgoingPlayers,
-    incomingPlayers,
+    outgoingPlayers:previewModel.outgoingPlayers,
+    incomingPlayers:previewModel.incomingPlayers,
     state,
     partnerName:partnerAbbr
   });
   setApplyEnabled(fairness?.allowed !== false);
-  preview.innerHTML=renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, state, partnerName:partnerAbbr });
+  preview.innerHTML=renderSimulationTradePreviewMarkup({
+    outgoingPlayers:previewModel.outgoingPlayers,
+    incomingPlayers:previewModel.incomingPlayers,
+    state,
+    partnerName:partnerAbbr
+  });
 }
 
 function applySimulationTradeBuilderPackage(partnerAbbr){
@@ -16374,12 +16454,19 @@ function renderLocalTradeBuilderModal(){
   const byFantasyValue=(a,b)=>Number(b?.fp||0)-Number(a?.fp||0);
   const myR=[...(G.rosters[D.myPos]||[])].sort(byFantasyValue);
   const thR=[...(G.rosters[trP.ti]||[])].sort(byFantasyValue);
-  const givePlayers=trP.give.map(id=>findRosterPlayerByTradeId(myR,id)).filter(Boolean);
-  const getPlayers=trP.get.map(id=>findRosterPlayerByTradeId(thR,id)).filter(Boolean);
+  const localTradePreview=buildTradePackagePreviewModel({
+    outgoingIds:trP.give,
+    incomingIds:trP.get,
+    outgoingRoster:myR,
+    incomingRoster:thR,
+    valueFn:player=>Number(player?.fp||0)
+  });
+  const givePlayers=localTradePreview.outgoingPlayers;
+  const getPlayers=localTradePreview.incomingPlayers;
   const starterSet=new Set((G.starters?.[D.myPos]||[]).filter(Boolean).map(tradePlayerKey));
   const startersTouched=givePlayers.filter(player=>starterSet.has(tradePlayerKey(player.id))).length;
-  const gv=trP.give.reduce((s,id)=>{const p=findRosterPlayerByTradeId(myR,id);return s+(p?p.fp:0);},0);
-  const gt=trP.get.reduce((s,id)=>{const p=findRosterPlayerByTradeId(thR,id);return s+(p?p.fp:0);},0);
+  const gv=localTradePreview.outgoingTotal;
+  const gt=localTradePreview.incomingTotal;
   const d=(gt-gv).toFixed(1);
   const giveTotalLabel=`${gv.toFixed(1)} FP outgoing total`;
   const getTotalLabel=`${gt.toFixed(1)} FP incoming total`;
@@ -16509,8 +16596,8 @@ function validateTradeOfferStillAvailable(offer){
 function submitTrade(){
   if(!trP.give.length||!trP.get.length){ toast('Choose players on both sides before sending an offer.'); return; }
   if(trP.give.length>5 || trP.get.length>5){ toast('Package limit is 5 players per side.'); return; }
-  const givePlayers=trP.give.map(id=>findRosterPlayerByTradeId(G.rosters[D.myPos]||[],id)).filter(Boolean);
-  const getPlayers=trP.get.map(id=>findRosterPlayerByTradeId(G.rosters[trP.ti]||[],id)).filter(Boolean);
+  const givePlayers=resolveTradePackagePlayers(trP.give,G.rosters[D.myPos]||[]);
+  const getPlayers=resolveTradePackagePlayers(trP.get,G.rosters[trP.ti]||[]);
   const fairness=getLocalTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
   if(fairness.allowed===false){ toast(fairness.message || 'This trade package is blocked.'); renderLocalTradeBuilderModal(); return; }
   const now=Date.now();

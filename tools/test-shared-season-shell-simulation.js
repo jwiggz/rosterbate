@@ -41,6 +41,9 @@ assert.match(html, /Build a package up to 5-for-5/, 'trade builder modal should 
 assert.match(html, /Highest FP First/, 'trade builder column labels should explain the sorted order');
 assert.match(html, /id="localTradeBuilderModal"/, 'local trade builder should render in a modal instead of the old inline builder');
 assert.match(html, /function tradePlayerKey\(value\)/, 'local trade builder should normalize player ids as stable string keys');
+assert.match(html, /function normalizeTradePackageIds\(ids\)/, 'trade modal internals should expose shared package id normalization');
+assert.match(html, /function buildTradePackagePreviewModel\(/, 'trade modal internals should expose a shared package preview model');
+assert.match(html, /const localTradePreview=buildTradePackagePreviewModel\(\{[\s\S]*outgoingIds:trP\.give[\s\S]*incomingIds:trP\.get/, 'local trade modal should use the shared package preview model for selected packages');
 assert.match(html, /Package limit is 5 players per side/, 'local trade builder should cap package size before sending');
 assert.match(html, /getLocalTradeBuilderFairness\(givePlayers,getPlayers,tradeTeamName\(trP\.ti\)\)/, 'local trade builder should use fairness gating before enabling send');
 assert.match(html, /id="playerDetailModal"/, 'season shell should expose a reusable player detail modal');
@@ -217,6 +220,10 @@ module.exports = {
   applySimulationTradeFromShell,
   tradePlayerKey,
   findRosterPlayerByTradeId,
+  normalizeTradePackageIds,
+  resolveTradePackagePlayers,
+  getTradePackageSideValue,
+  buildTradePackagePreviewModel,
   getLocalTradeBuilderFairness,
   renderTrades,
   openTrade,
@@ -1397,6 +1404,53 @@ vm.createContext(sandbox);
 vm.runInContext(harnessSource, sandbox, { filename: 'season-shared-simulation-helpers.vm.js' });
 
 const api = sandbox.module.exports;
+
+assert.deepStrictEqual(
+  toPlain(api.normalizeTradePackageIds(['34', 34, '', null, 'uuid-send-0', 'uuid-send-0', '  me-star  '])),
+  ['34', 'uuid-send-0', 'me-star'],
+  'shared trade package ids should preserve string ids while removing blanks and duplicate keys'
+);
+const sharedHelperRoster = [
+  { id: '34', name: 'String Center', fp: 21 },
+  { id: 'uuid-send-0', name: 'Stable Key Wing', fp: 18 },
+  { id: 'me-star', name: 'String Star', fp: 44 }
+];
+assert.deepStrictEqual(
+  toPlain(api.resolveTradePackagePlayers(['34', 34, 'missing', 'uuid-send-0'], sharedHelperRoster).map((player) => player.name)),
+  ['String Center', 'Stable Key Wing'],
+  'shared trade package resolution should use stable string-key matching against rosters'
+);
+const helperPreviewModel = api.buildTradePackagePreviewModel({
+  outgoingIds: ['34', 'uuid-send-0'],
+  incomingIds: ['me-star'],
+  outgoingRoster: sharedHelperRoster,
+  incomingRoster: sharedHelperRoster,
+  valueFn: (player) => Number(player?.fp || 0),
+  replacementRead: () => ({ player: { id: 'waiver-fill', name: 'Waiver Fill' }, label: 'Waiver Fill', value: 12 })
+});
+assert.deepStrictEqual(
+  {
+    outgoingIds: toPlain(helperPreviewModel.outgoingIds),
+    incomingIds: toPlain(helperPreviewModel.incomingIds),
+    outgoingTotal: helperPreviewModel.outgoingTotal,
+    incomingTotal: helperPreviewModel.incomingTotal,
+    netValue: helperPreviewModel.netValue,
+    isOverLimit: helperPreviewModel.isOverLimit,
+    replacementLabel: helperPreviewModel.replacement?.label,
+    context: helperPreviewModel.replacementContext
+  },
+  {
+    outgoingIds: ['34', 'uuid-send-0'],
+    incomingIds: ['me-star'],
+    outgoingTotal: 39,
+    incomingTotal: 44,
+    netValue: 5,
+    isOverLimit: false,
+    replacementLabel: 'Waiver Fill',
+    context: 'Replacement context: Waiver Fill can fill the opened roster spot at 12.0 FP.'
+  },
+  'shared trade package preview model should centralize totals, net value, limits, and replacement copy'
+);
 
 assert.match(html, /simulation-season-adapter\.js/, 'season shell should load the simulation adapter');
 assert.match(html, /function renderSimulationHubInSharedShell\(/, 'season shell should add a simulation hub renderer');
