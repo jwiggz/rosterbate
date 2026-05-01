@@ -3238,10 +3238,30 @@ function consumeCompletedSimulationDraftFallbackBoot(boot){
 }
 function resolveLocalSavedSeasonAutoLoad(parsed, requestedSport){
   if(!parsed || typeof parsed!=='object') return null;
+  function progressRank(state){
+    const seasonState=(state?.seasonState && typeof state.seasonState==='object') ? state.seasonState : {};
+    const completedLogs=Array.isArray(seasonState.completedGameLogs) ? seasonState.completedGameLogs.length : 0;
+    return {
+      day:Number(seasonState.currentDay || state?.currentDay || 0) || 0,
+      week:Number(seasonState.currentWeek || state?.currentWeek || 0) || 0,
+      completedLogs
+    };
+  }
+  function shouldUseSlotState(slotState, pendingState, forceSlot){
+    if(forceSlot) return true;
+    if(!slotState || typeof slotState!=='object') return false;
+    const slotProgress=progressRank(slotState);
+    const pendingProgress=progressRank(pendingState);
+    if(slotProgress.day!==pendingProgress.day) return slotProgress.day>pendingProgress.day;
+    if(slotProgress.week!==pendingProgress.week) return slotProgress.week>pendingProgress.week;
+    return slotProgress.completedLogs>pendingProgress.completedLogs;
+  }
   const resumeSlotId=String(parsed?.resumeHistoricalUniverseSlotId || '').trim();
-  if(resumeSlotId){
-    const slotState=loadHistoricalUniverseSlotState(resumeSlotId, requestedSport);
-    if(slotState && typeof slotState==='object'){
+  const directSlotId=String(parsed?.historicalUniverseSlotId || parsed?.sharedSimulationSlotId || parsed?.slotId || '').trim();
+  const slotIdToInspect=resumeSlotId || (isSimulationBackedSeasonState(parsed) ? directSlotId : '');
+  if(slotIdToInspect){
+    const slotState=loadHistoricalUniverseSlotState(slotIdToInspect, requestedSport);
+    if(slotState && typeof slotState==='object' && shouldUseSlotState(slotState, parsed, !!resumeSlotId)){
       parsed=slotState;
     }
   }
@@ -8859,24 +8879,24 @@ window.onload=async function(){
     console.log('?? Loading specific league from URL:', leagueId);
     const pendingSeasonLaunch = getPendingSeasonLaunch(leagueId);
     if (pendingSeasonLaunch?.data) {
-      console.log('🚀 Found pending fresh season handoff for this league. Using it before cloud restore.');
+      console.log('🚀 Found pending season handoff for this league. Using it before cloud restore.');
       D = pendingSeasonLaunch.data;
-      D.isFreshDraftLaunch = true;
-      console.log('🧭 Pending season handoff payload summary:', {
-        leagueId,
-        leagueSize: Number(D?.leagueSize || 0),
-        teams: Array.isArray(D?.teams) ? D.teams : [],
-        allRosters: Array.isArray(D?.allRosters) ? D.allRosters.length : 0,
-        currentWeek: Number(D?.currentWeek || 0),
-        currentDay: Number(D?.currentDay || 0),
-        isFreshDraftLaunch: !!D?.isFreshDraftLaunch
-      });
+      D.isFreshDraftLaunch = !isSimulationBackedSeasonState(D);
       if (!D.myPos && D.myPos !== 0) D.myPos = 0;
       applySportContext(D.sport || requestedSport);
       hydrateDraftUserContextFromLobby();
       refreshCommissionerAccess();
       D=writeLocalDraftSnapshot(D);
       applySeasonManagerLeagueDataLoad(D, requestedSport);
+      console.log('🧭 Pending season handoff payload summary:', {
+        leagueId,
+        leagueSize: Number(D?.leagueSize || 0),
+        teams: Array.isArray(D?.teams) ? D.teams : [],
+        allRosters: Array.isArray(D?.allRosters) ? D.allRosters.length : 0,
+        currentWeek: Number(D?.seasonState?.currentWeek || D?.currentWeek || 0),
+        currentDay: Number(D?.seasonState?.currentDay || D?.currentDay || 0),
+        isFreshDraftLaunch: !!D?.isFreshDraftLaunch
+      });
       let seasonLoaded = false;
       if (D.multiplayer) {
         try {

@@ -506,6 +506,45 @@ async function smokeHubRevealModalFinishesMultiGameDay(browser) {
   await page.close();
 }
 
+async function smokeHubRevealModalAdvancesSingleGameDay(browser) {
+  const slotId = `${SLOT_ID}-hub-reveal-single-game`;
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'hub-reveal-single-game');
+  await seedLiveMatchupSeason(page, slotId, { singleGameDay: true });
+
+  await page.goto(
+    `${BASE_URL}/rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=${slotId}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForTimeout(2500);
+  await page.evaluate(() => window.goPage && window.goPage('hub'));
+  await page.waitForTimeout(1000);
+  await page.locator('button:visible').filter({ hasText: 'Reveal Day 1 Results' }).last().click({ timeout: 8000 });
+
+  const liveFrame = page.frameLocator('iframe[title="Live matchup reveal"]');
+  await liveFrame.locator('#btn-reveal-final').click({ timeout: 8000 });
+  await liveFrame.locator('#overlay-title').filter({ hasText: 'FINAL' }).waitFor({ state: 'visible', timeout: 8000 });
+  await liveFrame.locator('#overlay-btn').click({ timeout: 8000 });
+  await page.locator('#simulationLiveMatchupModal').waitFor({ state: 'detached', timeout: 10000 });
+  await page.waitForTimeout(1500);
+
+  const persisted = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const slot = slotRaw ? JSON.parse(slotRaw) : null;
+    return {
+      currentDay: Number(slot?.seasonState?.currentDay || 0),
+      completedDayOneGames: (slot?.seasonState?.completedGameLogs || []).filter((game) => Number(game?.day || 0) === 1).length,
+      text: document.body.innerText
+    };
+  }, slotId);
+  assert.equal(persisted.currentDay, 2, 'Hub Reveal Day modal should advance a completed single-game Day 1 to Day 2');
+  assert.equal(persisted.completedDayOneGames, 1, 'Hub Reveal Day modal should persist the single completed Day 1 matchup once');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'returning from a single-game Hub Reveal Day modal should render Day 2 copy');
+  assert.doesNotMatch(persisted.text, /Reveal Day 1 Results/i, 'returning from a single-game Hub Reveal Day modal should not keep offering Day 1 reveal');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function smokeLiveMatchupInstantReveal(browser) {
   const slotId = `${SLOT_ID}-instant`;
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -835,6 +874,7 @@ async function main() {
     await smokeStandaloneFallback(browser);
     await smokeLiveMatchupWriteback(browser);
     await smokeHubRevealModalFinishesMultiGameDay(browser);
+    await smokeHubRevealModalAdvancesSingleGameDay(browser);
     await smokeLiveMatchupInstantReveal(browser);
     await smokeLiveMatchupMobileControls(browser);
     await smokeSeasonMatchupMobilePartialDay(browser);

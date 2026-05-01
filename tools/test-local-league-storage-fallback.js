@@ -126,6 +126,79 @@ api.clearPendingSeasonLaunch('league-123');
 assert.equal(sessionStorage.has('rbPendingSeasonLaunch'), false, 'clearing a pending handoff should remove the matching session-backed payload');
 assert.equal(localStorage.has('rbPendingSeasonLaunch'), false, 'clearing a pending handoff should remove the matching localStorage payload too');
 
+const resumeResolutionSource = `
+${extractBetween(seasonHtml, 'function resolveLocalSavedSeasonAutoLoad(', 'function resolveSeasonManagerLeagueDataLoad(')}
+module.exports = { resolveLocalSavedSeasonAutoLoad };
+`;
+
+const advancedSlotState = {
+  sport: 'nba',
+  simulationMode: 'nba_mixed_era_single_player_v1',
+  activeSeasonBackend: 'simulation',
+  historicalUniverseSlotId: 'slot-advanced',
+  sharedSimulationSlotId: 'slot-advanced',
+  seasonId: 'season_60',
+  leagueId: 'season_60',
+  seasonState: {
+    currentDay: 2,
+    currentWeek: 1,
+    completedGameLogs: [{ day: 1, homeAbbr: 'LAL', awayAbbr: 'BOS' }]
+  }
+};
+const stalePendingState = {
+  ...advancedSlotState,
+  seasonState: {
+    currentDay: 1,
+    currentWeek: 1,
+    completedGameLogs: []
+  }
+};
+const slotLookups = [];
+const resumeSandbox = {
+  module: { exports: {} },
+  exports: {},
+  console,
+  CURRENT_SPORT: 'nba',
+  normalizeRosterbateSport(value) {
+    return String(value || 'nba').trim().toLowerCase() || 'nba';
+  },
+  isSimulationBackedSeasonState(state) {
+    return String(state?.activeSeasonBackend || '').trim().toLowerCase() === 'simulation';
+  },
+  loadHistoricalUniverseSlotState(slotId) {
+    slotLookups.push(String(slotId || ''));
+    return slotId === 'slot-advanced' ? JSON.parse(JSON.stringify(advancedSlotState)) : null;
+  },
+  getResolvedSeasonBackend() {
+    return {
+      backend: 'simulation',
+      activeSeasonMode: 'fantasy',
+      sharedSimulationSeason: true,
+      useSimulationAdapter: false
+    };
+  },
+  cloneSharedSimulationBootValue(value) {
+    return JSON.parse(JSON.stringify(value));
+  },
+  buildUnifiedSimulationBootState() {
+    throw new Error('shared simulation test state should not need legacy boot conversion');
+  },
+  buildSimulationSeasonAdapterFromState() {
+    throw new Error('test backend disables adapter construction');
+  },
+  normalizeSharedSimulationSeasonBootState(state, slotId) {
+    return {
+      ...JSON.parse(JSON.stringify(state)),
+      historicalUniverseSlotId: slotId
+    };
+  }
+};
+vm.createContext(resumeSandbox);
+vm.runInContext(resumeResolutionSource, resumeSandbox);
+const resolvedResume = resumeSandbox.module.exports.resolveLocalSavedSeasonAutoLoad(stalePendingState, 'nba');
+assert.equal(resolvedResume.state.seasonState.currentDay, 2, 'simulation pending handoffs should prefer a newer local universe slot over stale Day 1 launch data');
+assert.deepEqual(slotLookups, ['slot-advanced'], 'simulation pending handoffs should inspect their historical universe slot before booting');
+
 async function runAsyncAssertions() {
   const firebaseWrites = [];
   Object.assign(sandbox, {
