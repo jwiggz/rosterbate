@@ -33,6 +33,19 @@ function buildRoster(team, startId, names) {
   return names.map((name, index) => makePlayer(startId + index, name, team, positions[index % positions.length], 48 - index * 1.8));
 }
 
+function buildFreeAgents() {
+  return buildRoster('FA', 500, [
+    'Free Agent Ace',
+    'Waiver Wing',
+    'Bench Streamer',
+    'Spot Starter',
+    'Depth Big',
+    'Utility Guard',
+    'Reserve Forward',
+    'Practice Center'
+  ]);
+}
+
 function buildSeedState(slotId = SLOT_ID) {
   const lakers = buildRoster('LAL', 100, [
     'Magic Johnson',
@@ -128,7 +141,7 @@ function buildSeedState(slotId = SLOT_ID) {
         ATL: hawks,
         MIA: heat
       },
-      freeAgents: []
+      freeAgents: buildFreeAgents()
     },
     seasonState: {
       currentDay: 1,
@@ -197,46 +210,77 @@ async function openSeason(page, slotId) {
   );
 }
 
-async function smokeTradeApplicationPersistence(browser) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-  const errors = await attachErrorCapture(page, 'trade-application');
-  await seedTradeSeason(page, SLOT_ID);
-  await openSeason(page, SLOT_ID);
-
+async function openTradeBuilderForBoston(page) {
   await page.evaluate(() => window.goPage && window.goPage('trades'));
   await page.waitForSelector('#tradesContent', { timeout: 8000 });
   await page.locator('#tradesContent button').filter({ hasText: 'Build Trade' }).first().click({ timeout: 8000 });
   await page.waitForSelector('#simulationTradeBuilderModal', { timeout: 5000 });
-  await page.getByRole('checkbox', { name: /LeBron James/ }).check({ timeout: 5000 });
-  await page.getByRole('checkbox', { name: /Larry Bird/ }).check({ timeout: 5000 });
+}
+
+async function selectTradePlayers(page, names) {
+  for (const name of names) {
+    await page.getByRole('checkbox', { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).check({ timeout: 5000 });
+  }
+}
+
+async function getTradeSmokeSnapshot(page, slotId) {
+  return page.evaluate((targetSlotId) => {
+    const state = SEASON_MODE_ADAPTER?.getState?.();
+    const persisted = JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`) || 'null');
+    const activityLog = Array.isArray(persisted?.seasonState?.activityLog) ? persisted.seasonState.activityLog : [];
+    const tradeEntry = activityLog.find((entry) => entry?.type === 'trade') || null;
+    return {
+      lakers: (state?.draftState?.rostersByTeam?.LAL || []).map((player) => player.name),
+      celtics: (state?.draftState?.rostersByTeam?.BOS || []).map((player) => player.name),
+      freeAgents: (state?.draftState?.freeAgents || []).map((player) => player.name),
+      lakersCount: state?.draftState?.rostersByTeam?.LAL?.length,
+      celticsCount: state?.draftState?.rostersByTeam?.BOS?.length,
+      activityTypes: activityLog.map((entry) => entry?.type).filter(Boolean),
+      persistedFeedback: tradeEntry?.tradeDeskFeedback || null
+    };
+  }, slotId);
+}
+
+function assertRosterState(snapshot, scenario, label) {
+  assert.equal(snapshot.lakersCount, 15, `${label}: controlled roster should keep 15 players`);
+  assert.equal(snapshot.celticsCount, 15, `${label}: partner roster should keep 15 players`);
+  scenario.incomingNames.forEach((name) => {
+    assert.ok(snapshot.lakers.includes(name), `${label}: controlled roster should receive ${name}`);
+    assert.ok(!snapshot.celtics.includes(name), `${label}: partner roster should send ${name}`);
+  });
+  scenario.outgoingNames.forEach((name) => {
+    assert.ok(!snapshot.lakers.includes(name), `${label}: controlled roster should send ${name}`);
+    assert.ok(snapshot.celtics.includes(name), `${label}: partner roster should receive ${name}`);
+  });
+  (scenario.expectedControlledAdds || []).forEach((name) => {
+    assert.ok(snapshot.lakers.includes(name), `${label}: controlled roster should add ${name} as replacement depth`);
+  });
+  assert.equal(snapshot.persistedFeedback?.message, scenario.expectedMessage, `${label}: persisted feedback should describe the applied package`);
+}
+
+async function runTradeApplicationScenario(browser, scenario) {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, scenario.label);
+  await seedTradeSeason(page, scenario.slotId);
+  await openSeason(page, scenario.slotId);
+
+  await openTradeBuilderForBoston(page);
+  await selectTradePlayers(page, scenario.outgoingNames.concat(scenario.incomingNames));
 
   const previewText = await page.locator('#simulationTradeBuilderModal').innerText();
   assert.match(previewText, /Looks fair/i, 'trade modal should mark the selected package fair');
   assert.match(previewText, /Fairness check:/i, 'trade modal should explain the fair package totals');
+  if (scenario.expectReplacementContext) {
+    assert.match(previewText, /Waiver replacement value uses|Replacement context:/i, 'uneven trade modal should explain waiver replacement context');
+  }
   await page.locator('#simulationTradeBuilderModal button').filter({ hasText: 'Apply Trade' }).click({ timeout: 5000 });
 
   await page.waitForFunction(
-    () => document.body.innerText.includes('Trade applied: LeBron James for Larry Bird.'),
-    null,
+    (message) => document.body.innerText.includes(message),
+    scenario.expectedMessage,
     { timeout: 8000 }
   );
-  const afterTrade = await page.evaluate((slotId) => {
-    const state = SEASON_MODE_ADAPTER?.getState?.();
-    const persisted = JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${slotId}`) || 'null');
-    return {
-      lakers: (state?.draftState?.rostersByTeam?.LAL || []).map((player) => player.name),
-      celtics: (state?.draftState?.rostersByTeam?.BOS || []).map((player) => player.name),
-      lakersCount: state?.draftState?.rostersByTeam?.LAL?.length,
-      celticsCount: state?.draftState?.rostersByTeam?.BOS?.length,
-      persistedFeedback: persisted?.seasonState?.activityLog?.[0]?.tradeDeskFeedback || null
-    };
-  }, SLOT_ID);
-  assert.equal(afterTrade.lakersCount, 15, 'controlled roster should keep 15 players after an even trade');
-  assert.equal(afterTrade.celticsCount, 15, 'partner roster should keep 15 players after an even trade');
-  assert.ok(afterTrade.lakers.includes('Larry Bird'), 'controlled roster should receive the incoming player');
-  assert.ok(!afterTrade.lakers.includes('LeBron James'), 'controlled roster should remove the outgoing player');
-  assert.ok(afterTrade.celtics.includes('LeBron James'), 'partner roster should receive the outgoing player');
-  assert.equal(afterTrade.persistedFeedback?.message, 'Trade applied: LeBron James for Larry Bird.');
+  assertRosterState(await getTradeSmokeSnapshot(page, scenario.slotId), scenario, `${scenario.label} immediate`);
 
   await page.reload({ waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForFunction(
@@ -247,29 +291,21 @@ async function smokeTradeApplicationPersistence(browser) {
   await page.evaluate(() => window.goPage && window.goPage('roster'));
   await page.waitForSelector('#rosterContent', { timeout: 8000 });
   const reloadedRosterText = await page.locator('#rosterContent').innerText();
-  assert.match(reloadedRosterText, /Larry Bird/, 'hard reloaded My Team should show the acquired player');
-  assert.doesNotMatch(reloadedRosterText, /LeBron James/, 'hard reloaded My Team roster rows should omit the sent player');
+  scenario.incomingNames.forEach((name) => {
+    assert.match(reloadedRosterText, new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `hard reloaded My Team should show ${name}`);
+  });
+  scenario.outgoingNames.forEach((name) => {
+    assert.doesNotMatch(reloadedRosterText, new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `hard reloaded My Team roster rows should omit ${name}`);
+  });
 
   await page.evaluate(() => window.goPage && window.goPage('trades'));
   await page.waitForSelector('#tradesContent', { timeout: 8000 });
   const reloadedTradeText = await page.locator('#tradesContent').innerText();
   assert.match(reloadedTradeText, /Boston Celtics[\s\S]*15 rostered/i);
-  assert.match(reloadedTradeText, /Trade applied: LeBron James for Larry Bird\./);
+  assert.match(reloadedTradeText, new RegExp(scenario.expectedMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(reloadedTradeText, /Fairness check:/);
 
-  const persistedAfterReload = await page.evaluate((slotId) => {
-    const state = SEASON_MODE_ADAPTER?.getState?.();
-    const persisted = JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${slotId}`) || 'null');
-    return {
-      controlledRoster: (state?.draftState?.rostersByTeam?.LAL || []).map((player) => player.name),
-      partnerRoster: (state?.draftState?.rostersByTeam?.BOS || []).map((player) => player.name),
-      persistedFeedback: persisted?.seasonState?.activityLog?.[0]?.tradeDeskFeedback || null
-    };
-  }, SLOT_ID);
-  assert.ok(persistedAfterReload.controlledRoster.includes('Larry Bird'));
-  assert.ok(!persistedAfterReload.controlledRoster.includes('LeBron James'));
-  assert.ok(persistedAfterReload.partnerRoster.includes('LeBron James'));
-  assert.equal(persistedAfterReload.persistedFeedback?.message, 'Trade applied: LeBron James for Larry Bird.');
+  assertRosterState(await getTradeSmokeSnapshot(page, scenario.slotId), scenario, `${scenario.label} reload`);
   assert.deepStrictEqual(errors, []);
   await page.close();
 }
@@ -277,7 +313,29 @@ async function smokeTradeApplicationPersistence(browser) {
 async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
-    await smokeTradeApplicationPersistence(browser);
+    await runTradeApplicationScenario(browser, {
+      label: 'trade-application-1-for-1',
+      slotId: `${SLOT_ID}-one-for-one`,
+      outgoingNames: ['LeBron James'],
+      incomingNames: ['Larry Bird'],
+      expectedMessage: 'Trade applied: LeBron James for Larry Bird.'
+    });
+    await runTradeApplicationScenario(browser, {
+      label: 'trade-application-2-for-1',
+      slotId: `${SLOT_ID}-two-for-one`,
+      outgoingNames: ['Robert Horry', 'Wilt Chamberlain'],
+      incomingNames: ['Larry Bird'],
+      expectedMessage: 'Trade applied: Robert Horry + Wilt Chamberlain for Larry Bird.',
+      expectedControlledAdds: ['Free Agent Ace'],
+      expectReplacementContext: true
+    });
+    await runTradeApplicationScenario(browser, {
+      label: 'trade-application-5-for-5',
+      slotId: `${SLOT_ID}-five-for-five`,
+      outgoingNames: ['Magic Johnson', 'Kobe Bryant', 'LeBron James', 'Pau Gasol', 'Shaquille ONeal'],
+      incomingNames: ['Larry Bird', 'Jayson Tatum', 'Paul Pierce', 'Kevin McHale', 'Bill Russell'],
+      expectedMessage: 'Trade applied: Magic Johnson + Kobe Bryant + LeBron James + Pau Gasol + Shaquille ONeal for Larry Bird + Jayson Tatum + Paul Pierce + Kevin McHale + Bill Russell.'
+    });
   } finally {
     await browser.close();
   }
