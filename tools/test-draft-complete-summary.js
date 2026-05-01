@@ -16,6 +16,16 @@ assert.match(
 );
 assert.match(
   source,
+  /function\s+showDraftCompleteScreen\(\)[\s\S]*draftEl\.style\.display='none'[\s\S]*completeEl\.style\.display='flex'/,
+  'draft completion should explicitly hide the draft board and show the summary screen'
+);
+assert.match(
+  source,
+  /function\s+showDraftBoardScreen\(\)[\s\S]*completeEl\.style\.display=''[\s\S]*draftEl\.style\.display=''/,
+  'returning to the draft board should clear explicit summary-screen display overrides'
+);
+assert.match(
+  source,
   /renderSimulationDraftCompleteSummary\(payload\)/,
   'simulation draft completion should populate the summary card'
 );

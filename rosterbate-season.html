@@ -10730,6 +10730,8 @@ function claimSimulationFreeAgentFromShell(playerId){
   return submitSimulationWaiverClaimFromShell(playerId);
 }
 
+let simulationTradeDeskFeedback = {};
+
 function renderSimulationTradesInSharedShell(){
   setSeasonSidePanelVisible('tradesPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
@@ -10764,6 +10766,16 @@ function renderSimulationTradesInSharedShell(){
   const partnerCards=partnerRows.map((row) => {
     const team=row?.team || row;
     const partnerAbbr=String(team?.abbr || row?.teamAbbr || '').trim();
+    const feedback=simulationTradeDeskFeedback?.[partnerAbbr] || null;
+    const feedbackTone=String(feedback?.tone || '').trim().toLowerCase();
+    const feedbackStyle=feedbackTone==='success'
+      ? 'border-color:rgba(34,197,94,.35);background:rgba(20,83,45,.16);color:#bbf7d0;'
+      : feedbackTone==='error'
+        ? 'border-color:rgba(248,113,113,.36);background:rgba(127,29,29,.18);color:#fecaca;'
+        : 'border-color:rgba(96,165,250,.32);background:rgba(37,99,235,.13);color:#bfdbfe;';
+    const feedbackMarkup=feedback?.message
+      ? `<div style="margin-top:12px;border:1px solid;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:800;line-height:1.35;${feedbackStyle}">${escapeSimulationShellHtml(feedback.message)}</div>`
+      : '';
     return (
     `<div class="season-table-card season-card-pad">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
@@ -10797,6 +10809,7 @@ function renderSimulationTradesInSharedShell(){
         </div>
       </div>
         <div class="season-subbar-copy" style="margin-top:10px;">One-for-one deals resolve immediately, so use this desk to test roster fit instead of sending blind packages.</div>
+      ${feedbackMarkup}
       <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${partnerAbbr}')">Apply Trade</button>
     </div>`
   );}).join('') || '<div class="card">No trade partners available.</div>';
@@ -10868,6 +10881,14 @@ function applySimulationTradeFromShell(partnerAbbr){
   const outgoingPlayerId=Number(outgoingPlayerValue);
   const incomingPlayerId=Number(incomingPlayerValue);
   if (!(outgoingPlayerValue && incomingPlayerValue && Number.isFinite(outgoingPlayerId) && Number.isFinite(incomingPlayerId))) {
+    simulationTradeDeskFeedback = {
+      ...simulationTradeDeskFeedback,
+      [partnerAbbr]: {
+        tone: 'error',
+        message: 'Choose both the outgoing and incoming players before applying a trade.'
+      }
+    };
+    renderSimulationTradesInSharedShell();
     if(typeof toast==='function') toast('Choose both the outgoing and incoming players before applying a trade.');
     return;
   }
@@ -10889,10 +10910,24 @@ function applySimulationTradeFromShell(partnerAbbr){
   const toHasOutgoing=toRoster.some(player=>Number(player?.id)===outgoingPlayerId);
   const toHasIncoming=toRoster.some(player=>Number(player?.id)===incomingPlayerId);
   if(!(fromHasIncoming && !fromHasOutgoing && toHasOutgoing && !toHasIncoming)){
+    simulationTradeDeskFeedback = {
+      ...simulationTradeDeskFeedback,
+      [partnerAbbr]: {
+        tone: 'error',
+        message: 'Trade could not be applied. Confirm both players are still on those rosters.'
+      }
+    };
     renderSimulationTradesInSharedShell();
     if(typeof toast==='function') toast('Trade could not be applied. Confirm both players are still on those rosters.');
     return;
   }
+  simulationTradeDeskFeedback = {
+    ...simulationTradeDeskFeedback,
+    [partnerAbbr]: {
+      tone: 'success',
+      message: `Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`
+    }
+  };
   persistSimulationSeasonState('simulation_trade');
   renderSimulationTradesInSharedShell();
   renderSimulationRosterInSharedShell();
@@ -11748,6 +11783,19 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
     const label=String(entry?.timeLabel || (sport==='nfl' ? 'Weekly' : 'Reveal')).trim();
     return escapeHtml(label || '--');
   };
+  const getRosterGameExplanation=(entry)=>{
+    if(sport!=='nba' || !entry?.player) return '';
+    if(entry?.hasGame===true){
+      const opponentLabel=String(entry?.opponentLabel || entry?.oppLabel || '').trim();
+      const timeLabel=String(entry?.timeLabel || '').trim();
+      const matchupCopy=opponentLabel && opponentLabel!=='--'
+        ? ` because ${String(entry?.player?.team || 'Team').trim() || 'team'} plays ${opponentLabel}${timeLabel && timeLabel!=='Off' ? ` at ${timeLabel}` : ''}`
+        : '';
+      return `Game today${matchupCopy}`;
+    }
+    if(entry?.hasGame===false) return 'No game today';
+    return '';
+  };
   const statColumns=sport==='nfl'
     ? [
         {key:'PASS_YDS',label:'PYD'},
@@ -11835,15 +11883,17 @@ function renderSharedSimulationRosterPageFromViewModel(rosterVm){
           const player=entry?.player || null;
     const primaryText=player ? escapeHtml(player?.name || 'Player') : `Open ${escapeHtml(entry?.slot || entry?.positionSlot || 'Slot')} Slot`;
     const secondaryText=escapeHtml(renderPlayerMeta(player, entry));
-          const recommendationText=escapeHtml(
-            entry?.warning
-              || entry?.recommendationHint
-              || ((entry?.suggestedPlayerId!=null && entry.suggestedPlayerId!==entry.playerId)
-                ? 'Suggested change available'
-                : (player
-                  ? (sectionKey==='bench' ? 'Bench ready' : (sectionKey==='il' ? 'IR reserve' : 'Starter set'))
-                  : 'Awaiting assignment'))
-          );
+    const baseRecommendationText=entry?.warning
+      || entry?.recommendationHint
+      || ((entry?.suggestedPlayerId!=null && entry.suggestedPlayerId!==entry.playerId)
+        ? 'Suggested change available'
+        : (player
+          ? (sectionKey==='bench' ? 'Bench ready' : (sectionKey==='il' ? 'IR reserve' : 'Starter set'))
+          : 'Awaiting assignment'));
+    const gameExplanationText=getRosterGameExplanation(entry);
+    const recommendationText=escapeHtml(
+      [baseRecommendationText, gameExplanationText].filter(Boolean).join(' · ')
+    );
     let actionHtml=effectiveSectionKey==='bench'
             ? renderBenchActions(entry)
             : (effectiveSectionKey==='il'
@@ -13252,6 +13302,7 @@ function renderHub(){
   applySeasonShellEnhancements();
   repairSeasonUiIcons();
   const isSimulationSeason=getActiveSeasonBackend()==='simulation';
+  const sport=normalizeRosterbateSport(D?.sport || CURRENT_SPORT || 'nba');
   const isDraftedHistoricalUniverse=isHistoricalDraftUniverse(D);
   const historicalSourcePackIds=getHistoricalUniverseSourcePackIds(D);
   const simSnapshot=isSimulationSeason ? buildSimulationDayRunnerSnapshot(G.day) : (isDraftedHistoricalUniverse ? buildDraftedUniverseSimulationBootSnapshot() : null);

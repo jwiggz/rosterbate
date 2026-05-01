@@ -18,8 +18,20 @@ assert.match(
 
 assert.match(
   draftHtml,
-  /localStorage\.setItem\('rosterbateDraft', JSON\.stringify\(draftData\)\);[\s\S]*persistPendingSeasonLaunch\(draftData\);/s,
+  /function ensureLocalDraftSeasonId\(draftData\)\{[\s\S]*local_draft_[\s\S]*draftData\.seasonId=localSeasonId[\s\S]*return localSeasonId;[\s\S]*\}/,
+  'ordinary local draft completion should mint a stable local season id when cloud save does not provide one'
+);
+
+assert.match(
+  draftHtml,
+  /ensureLocalDraftSeasonId\(draftData\);[\s\S]*localStorage\.setItem\('rosterbateDraft', JSON\.stringify\(draftData\)\);[\s\S]*persistPendingSeasonLaunch\(draftData\);/s,
   'draft completion should keep the best-effort localStorage snapshot while also staging the safer pending handoff'
+);
+
+assert.match(
+  draftHtml,
+  /if\(!seasonId && draftData && !draftData\.multiplayer\)\{[\s\S]*seasonId=ensureLocalDraftSeasonId\(draftData\);[\s\S]*persistPendingSeasonLaunch\(draftData\);[\s\S]*\}/,
+  'season URL resolution should fall back to the freshly drafted local season id instead of opening a generic season page'
 );
 
 console.log('draft season storage fallback test passed');

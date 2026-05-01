@@ -5144,7 +5144,7 @@ function startDraft(){
 
   // Go straight to draft room — everything is live, countdown is just a bar
   document.getElementById('lobby').classList.remove('active');
-  document.getElementById('draft').classList.add('active');
+  showDraftBoardScreen();
 document.getElementById('statHeader').style.display='grid';
   rPlayers();rMyTeam();rOtherTeams();rBoard();upHdr();updateTradeBtn();
   updateAutoDraftButton();
@@ -5719,13 +5719,13 @@ function chooseBestCpuPlayerForTeam(ti,av){
   return best;
 }
 
-function simulateDraftToFinish(){
+async function simulateDraftToFinish(){
   if(!canUseDraftSimulator()){
     showToast('Local draft rooms only');
     return;
   }
   if(S.cur>=S.total){
-    endDraft();
+    await endDraft();
     return;
   }
   clearInterval(S.timerInt);
@@ -5769,12 +5769,7 @@ function simulateDraftToFinish(){
   upHdr();
   updateSoloSimButton();
   if(S.cur>=S.total){
-    endDraft();
-    if(isLocalDraftTesting()){
-      setTimeout(()=>{
-        window.location.href='rosterbate-season.html?sport='+encodeURIComponent(SPORT);
-      },120);
-    }
+    await endDraft();
   }else{
     showToast('Simulation stopped early');
   }
@@ -8358,14 +8353,51 @@ let autoSeasonRedirectTimer = null;
 let completedDraftSeasonData = null;
 let completedSimulationSeasonUrl = null;
 const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';
+
+function ensureLocalDraftSeasonId(draftData){
+  if(!draftData || typeof draftData!=='object') return '';
+  const existingId=String(draftData.seasonId || draftData.sharedSeasonId || draftData.lobbyId || '').trim();
+  if(existingId){
+    draftData.seasonId=existingId;
+    return existingId;
+  }
+  const localSeasonId='local_draft_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+  draftData.seasonId=localSeasonId;
+  return localSeasonId;
+}
+
+function showDraftCompleteScreen(){
+  const draftEl=document.getElementById('draft');
+  const completeEl=document.getElementById('draftComplete');
+  if(draftEl){
+    draftEl.classList.remove('active');
+    draftEl.style.display='none';
+  }
+  if(completeEl){
+    completeEl.classList.add('active');
+    completeEl.style.display='flex';
+    try{ completeEl.scrollTop=0; }catch(e){}
+  }
+}
+
+function showDraftBoardScreen(){
+  const draftEl=document.getElementById('draft');
+  const completeEl=document.getElementById('draftComplete');
+  if(completeEl){
+    completeEl.classList.remove('active');
+    completeEl.style.display='';
+  }
+  if(draftEl){
+    draftEl.style.display='';
+    draftEl.classList.add('active');
+  }
+}
+
 async function endDraft(){
   console.log('🏆 Draft ending, switching to completion screen...');
   clearInterval(S.timerInt);
   updateSoloSimButton();
-  const draftEl=document.getElementById('draft');
-  const completeEl=document.getElementById('draftComplete');
-  if(draftEl) draftEl.classList.remove('active');
-  if(completeEl) completeEl.classList.add('active');
+  showDraftCompleteScreen();
   console.log('✓ Draft screen hidden, complete screen shown');
   try{
     const normalizedDraft=normalizeCompletedDraftContext();
@@ -8614,6 +8646,9 @@ async function endDraft(){
         playerCount:Array.isArray(draftData.historicalPlayerPool) ? draftData.historicalPlayerPool.length : 0
       });
     }
+    if(!draftData.multiplayer && !draftData.seasonId){
+      ensureLocalDraftSeasonId(draftData);
+    }
     
     if(isMultiplayer && lobbyState?.lobbyId && typeof db!=='undefined'){
       try{
@@ -8786,6 +8821,14 @@ async function resolveSeasonManagerUrl(){
     }
   }
 
+  if(!seasonId && draftData && !draftData.multiplayer){
+    seasonId=ensureLocalDraftSeasonId(draftData);
+    draftData=normalizeSeasonManagerDraftPayload(draftData);
+    try{ localStorage.setItem('rosterbateDraft', JSON.stringify(draftData)); } catch(e){}
+    try{ completedDraftSeasonData = JSON.parse(JSON.stringify(draftData)); }catch(e){ completedDraftSeasonData = draftData; }
+    persistPendingSeasonLaunch(draftData);
+  }
+
   return seasonId
     ? ('rosterbate-season.html?sport=' + encodeURIComponent(SPORT) + '&league=' + encodeURIComponent(seasonId))
     : '';
@@ -8869,6 +8912,7 @@ function renderSimulationDraftCompleteSummary(finalState){
     startBtn.style.opacity='1';
   }
   showToast('Draft complete. Review your roster, then open your league.');
+  showDraftCompleteScreen();
 }
 
 function completeSimulationModeDraft(finalState){
@@ -8989,7 +9033,7 @@ async function startYourSeason(){
       <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.5;">
         Jump straight into this league's season page with the exact link for your completed draft.
       </div>
-      <button onclick="document.getElementById('draftComplete').classList.remove('active');document.getElementById('draft').classList.add('active');" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">
+      <button onclick="showDraftBoardScreen()" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;">
         ← Back to Draft Board
       </button>
     </div>

@@ -19,5 +19,15 @@ assert.match(
   /btn\.classList\.toggle\('show',\s*canUseDraftSimulator\(\)\s*&&\s*S\.cur\s*<\s*S\.total\)/,
   'Sim Draft button should show while the local draft has picks remaining'
 );
+assert.match(
+  source,
+  /async function\s+simulateDraftToFinish\(\)/,
+  'Sim Draft should await the normal draft completion handoff'
+);
+assert.doesNotMatch(
+  source,
+  /window\.location\.href='rosterbate-season\.html\?sport='\+encodeURIComponent\(SPORT\)/,
+  'Sim Draft should not bypass the completed-draft summary with a generic season page redirect'
+);
 
 console.log('test-draft-sim-button-local passed');

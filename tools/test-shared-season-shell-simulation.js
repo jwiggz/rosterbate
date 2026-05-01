@@ -58,6 +58,7 @@ assert.match(html, /portrait-ink-outline/, 'season shell player portraits should
 assert.match(html, /\.hub-shell\{[^}]*max-width:none/, 'league home shell should use the full available viewport width');
 assert.match(html, /\.hub-lower\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/, 'league home lower content should spread into a two-column desktop grid');
 assert.match(html, /function openSimulationRevealDayLiveMatchup\(/, 'simulation hub reveal CTA should launch the live matchup popup instead of only batch-simming the day');
+assert.match(html, /function renderHub\(\)\{[\s\S]*const sport=/, 'regular league hub should derive sport context before rendering NBA/NFL-specific copy');
 assert.match(html, /if\(actionId==='sim-day' && primaryAction\?\.shellTone==='reveal'\) return 'openSimulationRevealDayLiveMatchup\(\)'/, 'NBA reveal-day primary actions should route through the embedded live sim popup');
 assert.match(simMatchupHtml, /postMessage\(\{ type:'rosterbate-live-matchup-committed'/, 'embedded live matchup should notify the season shell after it writes back a result');
 assert.match(simMatchupHtml, /postMessage\(\{ type:'rosterbate-live-matchup-return'/, 'embedded live matchup should let the popup close back to the season shell');
@@ -1759,6 +1760,7 @@ assert.match(elements.rosterContent.innerHTML, /openTeamSettings\(\)/, 'simulati
 assert.match(elements.rosterContent.innerHTML, /No starters locked in yet|Michael Jordan/);
 assert.match(elements.rosterContent.innerHTML, /vs BOS/, 'simulation roster rows should show the current opponent in the OPP column');
 assert.match(elements.rosterContent.innerHTML, /Day 12/, 'simulation roster rows should show the current matchup day in the time column');
+assert.match(elements.rosterContent.innerHTML, /Game today/i, 'simulation roster rows should explain when a starter has a game on the selected day');
 sandbox.setSimulationRosterNavigationValue(13);
 api.renderSimulationRosterInSharedShell();
 assert.match(elements.rosterContent.innerHTML, /Day 13/, 'simulation roster should expose future day navigation in My Team');
@@ -1893,6 +1895,95 @@ assert.deepStrictEqual(
   [102, 103, 104, 105, 106],
   'nba suggested starters should prefer players whose teams play on the selected lineup day'
 );
+
+const utilAwareRosterAdapterStub = {
+  ...freshRosterAdapterStub,
+  lastLineupIds: null,
+  getScheduleViewModel() {
+    return {
+      scheduleByDay: {
+        12: [
+          { day: 12, awayAbbr: 'ACT', homeAbbr: 'LIV', time: '9:00 PM' }
+        ]
+      },
+      nextGame: { day: 12 }
+    };
+  },
+  getRosterViewModel() {
+    return {
+      starterSlots: ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL'],
+      roster: [
+        { id: 201, name: 'Active PG', team: 'ACT', pos: 'PG', fp: 32 },
+        { id: 202, name: 'Active SG', team: 'ACT', pos: 'SG', fp: 31 },
+        { id: 203, name: 'Active SF', team: 'LIV', pos: 'SF', fp: 30 },
+        { id: 204, name: 'Active PF', team: 'LIV', pos: 'PF', fp: 29 },
+        { id: 205, name: 'Active C', team: 'ACT', pos: 'C', fp: 28 },
+        { id: 206, name: 'Active Bench Guard', team: 'ACT', pos: 'PG', fp: 27 },
+        { id: 207, name: 'Active Bench Forward', team: 'LIV', pos: 'SF', fp: 26 },
+        { id: 208, name: 'Active Utility One', team: 'ACT', pos: 'SG', fp: 25 },
+        { id: 209, name: 'Active Utility Two', team: 'LIV', pos: 'PF', fp: 24 },
+        { id: 210, name: 'Active Utility Three', team: 'ACT', pos: 'C', fp: 23 },
+        { id: 211, name: 'Off Day Superstar', team: 'OFF', pos: 'PG', fp: 99 }
+      ],
+      lineup: [],
+      bench: []
+    };
+  },
+  setLineup(lineupIds) {
+    this.lastLineupIds = lineupIds;
+    return this.getState();
+  }
+};
+
+historicalSlotUpsertCalls = [];
+api.setSeasonModeAdapter(utilAwareRosterAdapterStub);
+sandbox.setSimulationRosterNavigationValue(12);
+api.applySimulationSuggestedLineupFromShell();
+assert.deepStrictEqual(
+  toPlain(utilAwareRosterAdapterStub.lastLineupIds),
+  [201, 202, 203, 204, 205, 206, 207, 208, 209, 210],
+  'nba suggested starters should fill G/F/UTIL with remaining players who play on the selected day before off-day stars'
+);
+
+api.setSeasonModeAdapter({
+  ...utilAwareRosterAdapterStub,
+  getRosterViewModel() {
+    return {
+      layoutMode: 'local-league-parity',
+      starterSlots: ['PG'],
+      lineupSlots: {
+        PG: { slot: 'PG', playerId: 301, suggestedPlayerId: 302 }
+      },
+      sections: {
+        starters: {
+          rows: [
+            { slot: 'PG', playerId: 301, player: { id: 301, name: 'Off Day Guard', team: 'OFF', pos: 'PG' } }
+          ]
+        },
+        bench: {
+          rows: [
+            { slot: 'BENCH', playerId: 302, player: { id: 302, name: 'Active Guard', team: 'ACT', pos: 'PG' } }
+          ]
+        }
+      },
+      nbaTeamScheduleByDay: {
+        12: [
+          { day: 12, awayAbbr: 'ACT', homeAbbr: 'LIV', time: '9:00 PM' }
+        ]
+      },
+      roster: [
+        { id: 301, name: 'Off Day Guard', team: 'OFF', pos: 'PG' },
+        { id: 302, name: 'Active Guard', team: 'ACT', pos: 'PG' }
+      ],
+      lineup: [{ id: 301, name: 'Off Day Guard', team: 'OFF', pos: 'PG' }],
+      bench: [{ id: 302, name: 'Active Guard', team: 'ACT', pos: 'PG' }]
+    };
+  }
+});
+sandbox.setSimulationRosterNavigationValue(12);
+api.renderSimulationRosterInSharedShell();
+assert.match(elements.rosterContent.innerHTML, /No game today/i, 'simulation roster rows should explain off-day players on the selected day');
+assert.match(elements.rosterContent.innerHTML, /Game today/i, 'simulation roster rows should explain active bench options on the selected day');
 api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationWaiverInSharedShell();
@@ -2186,6 +2277,11 @@ assert.deepStrictEqual(
   ['Choose both the outgoing and incoming players before applying a trade.'],
   'trade helper should give immediate feedback when a trade is incomplete'
 );
+assert.match(
+  elements.tradesContent.innerHTML,
+  /Choose both the outgoing and incoming players before applying a trade\./,
+  'trade desk should leave inline feedback when an attempted trade is incomplete'
+);
 elements['simulation-trade-outgoing-select-BOS'].value = '34';
 elements['simulation-trade-incoming-select-BOS'].value = '30';
 demoToasts = [];
@@ -2203,6 +2299,11 @@ assert.deepStrictEqual(
   demoToasts,
   ['Trade applied: Hakeem Olajuwon for Stephen Curry.'],
   'trade helper should confirm when a simulation trade actually changes rosters'
+);
+assert.match(
+  elements.tradesContent.innerHTML,
+  /Trade applied: Hakeem Olajuwon for Stephen Curry\./,
+  'trade desk should leave inline success feedback after applying a trade'
 );
 assert.ok(
   simulationAdapterStub.getState().draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 30),
