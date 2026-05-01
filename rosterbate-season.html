@@ -7277,6 +7277,24 @@ function rehydrateFantasyShellFromSimulationState(rawState){
   G.isSeasonComplete=!!(D?.isSeasonComplete || D?.seasonState?.isSeasonComplete || String(D?.postseasonState?.phase || '').trim().toLowerCase()==='completed');
 }
 
+function shouldPersistSimulationSeasonToFirebase(){
+  if(D?.multiplayer || D?.isHistoricalPackDev || D?.devLocalOnly) return false;
+  const seasonId=String(
+    D?.seasonId
+    || D?.leagueId
+    || (typeof getRequestedLeagueId==='function' ? getRequestedLeagueId() : '')
+    || ''
+  ).trim();
+  return !!seasonId && seasonId!=='demo';
+}
+
+function persistSimulationSeasonFirebaseSnapshot(reason){
+  if(!shouldPersistSimulationSeasonToFirebase()) return false;
+  if(typeof saveSeasonToFirebase!=='function') return false;
+  saveSeasonToFirebase().catch(err=>console.log('Firebase simulation save skipped:', err?.message || err));
+  return true;
+}
+
 function persistSimulationSeasonState(reason){
   if (getActiveSeasonBackend() !== 'simulation' || !SEASON_MODE_ADAPTER) return;
   const adapterState=SEASON_MODE_ADAPTER.getState();
@@ -7299,6 +7317,7 @@ function persistSimulationSeasonState(reason){
     rehydrateFantasyShellFromSimulationState(adapterState);
   }
   persistHistoricalUniverseSlotSnapshot(reason || 'simulation_shared_shell');
+  persistSimulationSeasonFirebaseSnapshot(reason || 'simulation_shared_shell');
 }
 
 function buildPowerupCardsHtml(){
