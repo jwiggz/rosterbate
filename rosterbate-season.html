@@ -11025,6 +11025,87 @@ function updateSimulationTradePreviewFromShell(partnerAbbr){
   preview.innerHTML=renderSimulationTradePreviewMarkup(getSimulationTradeSelectionContext(partnerAbbr));
 }
 
+function closeSimulationTradeBuilderModal(){
+  document.getElementById('simulationTradeBuilderModal')?.remove();
+}
+
+function openSimulationTradeBuilderModal(partnerAbbr){
+  closeSimulationTradeBuilderModal();
+  const modalMarkup=renderSimulationTradeBuilderModal(partnerAbbr);
+  if(document.body && typeof document.body.insertAdjacentHTML==='function'){
+    document.body.insertAdjacentHTML('beforeend', modalMarkup);
+  }
+  updateSimulationTradeBuilderPreview(partnerAbbr);
+}
+
+function renderSimulationTradeBuilderPlayerOption(player, side, partnerAbbr){
+  const playerId=escapeSimulationShellHtml(player?.id || '');
+  const name=escapeSimulationShellHtml(player?.name || 'Player');
+  const label=escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player');
+  const value=getSimulationTradePlayerValue(player).toFixed(1);
+  return `<label style="display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(148,163,184,.2);background:rgba(15,23,42,.46);border-radius:12px;padding:10px;cursor:pointer;">
+    <input type="checkbox" data-simulation-trade-builder-side="${escapeSimulationShellHtml(side)}" data-simulation-trade-builder-partner="${escapeSimulationShellHtml(partnerAbbr)}" data-player-id="${playerId}" onchange="updateSimulationTradeBuilderPreview('${escapeSimulationShellHtml(partnerAbbr)}')" style="margin-top:3px;">
+    <span style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+      <span style="font-size:13px;font-weight:900;color:#f8fafc;">${name}</span>
+      <span style="font-size:11px;color:#94a3b8;line-height:1.35;">${label} · ${value} FP</span>
+    </span>
+  </label>`;
+}
+
+function renderSimulationTradeBuilderModal(partnerAbbr){
+  const tradeVm=SEASON_MODE_ADAPTER.getTradeViewModel?.() || {};
+  const toTeamAbbr=String(partnerAbbr || '').trim().toUpperCase();
+  const partnerRow=(tradeVm?.sections?.partners?.rows || []).find(row=>String(row?.team?.abbr || row?.teamAbbr || '').trim().toUpperCase()===toTeamAbbr) || null;
+  const team=partnerRow?.team || partnerRow || {};
+  const teamName=team?.name || partnerRow?.title || toTeamAbbr || 'Trade Partner';
+  const outgoingRoster=Array.isArray(tradeVm?.outgoingRoster) ? tradeVm.outgoingRoster : [];
+  const incomingRoster=Array.isArray(partnerRow?.incomingRoster)
+    ? partnerRow.incomingRoster
+    : (Array.isArray(tradeVm?.incomingRostersByTeam?.[toTeamAbbr]) ? tradeVm.incomingRostersByTeam[toTeamAbbr] : []);
+  const emptyOutgoing='<div style="color:#94a3b8;font-size:12px;">No outgoing roster options are available.</div>';
+  const emptyIncoming='<div style="color:#94a3b8;font-size:12px;">No incoming roster options are available.</div>';
+  return `<div id="simulationTradeBuilderModal" style="position:fixed;inset:0;z-index:9999;background:rgba(2,6,23,.78);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:18px;">
+    <div role="dialog" aria-modal="true" aria-labelledby="simulationTradeBuilderTitle" style="width:min(980px,100%);max-height:min(860px,92vh);overflow:hidden;border:1px solid rgba(148,163,184,.28);background:#0f172a;border-radius:18px;box-shadow:0 24px 90px rgba(0,0,0,.48);display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid rgba(148,163,184,.18);">
+        <div>
+          <div id="simulationTradeBuilderTitle" style="font-family:var(--fb);font-size:22px;font-weight:900;color:#f8fafc;">Trade With ${escapeSimulationShellHtml(teamName)}</div>
+          <div class="season-subbar-copy" style="margin-top:4px;">Build a package from both rosters, then preview the deal.</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+          <button type="button" id="simulationTradeBuilderApply" class="bp" disabled onclick="applySimulationTradeBuilderFromModal('${escapeSimulationShellHtml(partnerAbbr)}')" style="width:auto;padding:10px 14px;opacity:.55;">Apply Trade</button>
+          <button type="button" class="bs" onclick="closeSimulationTradeBuilderModal()" style="width:auto;padding:10px 14px;">Close</button>
+        </div>
+      </div>
+      <div style="overflow:auto;padding:18px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
+          <div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:#f8fafc;">You Send</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+              ${outgoingRoster.length ? outgoingRoster.map((player)=>renderSimulationTradeBuilderPlayerOption(player,'outgoing',partnerAbbr)).join('') : emptyOutgoing}
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:#f8fafc;">You Get</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+              ${incomingRoster.length ? incomingRoster.map((player)=>renderSimulationTradeBuilderPlayerOption(player,'incoming',partnerAbbr)).join('') : emptyIncoming}
+            </div>
+          </div>
+        </div>
+        <div id="simulationTradeBuilderPreview" style="margin-top:16px;"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateSimulationTradeBuilderPreview(partnerAbbr){
+  const preview=document.getElementById('simulationTradeBuilderPreview');
+  if(preview) preview.innerHTML='<div style="color:#bfdbfe;font-weight:900;">Choose at least one player on both sides to preview the trade.</div>';
+}
+
+function applySimulationTradeBuilderFromModal(partnerAbbr){
+  toast('Choose players on both sides before applying a trade.');
+}
+
 function renderSimulationTradesInSharedShell(){
   setSeasonSidePanelVisible('tradesPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
@@ -11076,7 +11157,7 @@ function renderSimulationTradesInSharedShell(){
     `<div class="season-table-card season-card-pad">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
-          <div style="font-family:var(--fd);font-size:16px;font-weight:800;">${team.name}</div>
+          <div style="font-family:var(--fd);font-size:16px;font-weight:800;">${escapeSimulationShellHtml(team.name || row?.title || partnerAbbr || 'Trade Partner')}</div>
           <div style="color:var(--text2);font-size:12px;margin-top:4px;">${escapeSimulationShellHtml(row?.recordLabel || '0-0')} · ${Number(row?.rosterCount || 0)} rostered · ${escapeSimulationShellHtml(row?.topPlayerName ? `Top asset: ${row.topPlayerName}` : 'Review the full roster before proposing a swap.')}</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -11084,41 +11165,9 @@ function renderSimulationTradesInSharedShell(){
           <span class="season-stat-pill">${escapeSimulationShellHtml(row?.teamAbbr || '')}</span>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;">
-        <div>
-          <label for="simulation-trade-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose outgoing player</label>
-          <select id="simulation-trade-outgoing-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
-            <option value="">Choose outgoing player</option>
-            ${(vm.outgoingRoster || []).map((player) => (
-              `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
-            )).join('')}
-          </select>
-        </div>
-        <div>
-          <label for="simulation-trade-extra-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Optional package player</label>
-          <select id="simulation-trade-extra-outgoing-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
-            <option value="">No second player</option>
-            ${(vm.outgoingRoster || []).map((player) => (
-              `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
-            )).join('')}
-          </select>
-        </div>
-        <div>
-          <label for="simulation-trade-incoming-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose incoming player</label>
-          <select id="simulation-trade-incoming-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
-            <option value="">Choose incoming player</option>
-            ${((row?.incomingRoster || vm.incomingRostersByTeam?.[partnerAbbr] || [])).map((player) => (
-              `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
-            )).join('')}
-          </select>
-        </div>
-      </div>
-        <div class="season-subbar-copy" style="margin-top:10px;">Replacement value is included for uneven offers, so 2-for-1 ideas are compared against the best waiver fill-in before they can go through.</div>
-      <div id="simulation-trade-preview-${partnerAbbr}">
-        ${renderSimulationTradePreviewMarkup({ outgoingPlayers: [], incomingPlayers: [], state: SEASON_MODE_ADAPTER.getState?.() || D, partnerName: team?.name || partnerAbbr })}
-      </div>
+      <div class="season-subbar-copy" style="margin-top:10px;">Replacement value is included for uneven offers, so package ideas are compared against the best waiver fill-in before they can go through.</div>
       ${feedbackMarkup}
-      <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${partnerAbbr}')">Apply Trade</button>
+      <button class="bp" style="margin-top:12px;" onclick="openSimulationTradeBuilderModal('${partnerAbbr}')">Build Trade</button>
     </div>`
   );}).join('') || '<div class="card">No trade partners available.</div>';
   document.getElementById('tradesContent').innerHTML = `
@@ -11168,7 +11217,7 @@ function renderSimulationTradesInSharedShell(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
           <div>
             <div style="font-family:var(--fb);font-size:20px;font-weight:800;color:#f8fafc;">Open A Conversation</div>
-            <div class="season-subbar-copy">Pick the roster you want to test for a one-for-one deal.</div>
+            <div class="season-subbar-copy">Pick a partner, then build anything from a quick one-for-one to a five-player package.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <span class="season-stat-pill">${(vm.outgoingRoster || []).length} outgoing options</span>
