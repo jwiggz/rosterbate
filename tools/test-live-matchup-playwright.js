@@ -952,6 +952,51 @@ async function smokeCompletedLiveMatchupRepairsStuckSingleGameDay(browser) {
   await page.close();
 }
 
+async function smokeLeagueUrlPartialLiveDayRepairsMissingReturnMarker(browser) {
+  const slotId = `${SLOT_ID}-league-partial-missing-marker`;
+  const leagueId = 'season_60';
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'league-partial-missing-marker');
+  await seedLiveMatchupSeason(page, slotId, {
+    leagueId,
+    completedSingleGameDay: true
+  });
+
+  await page.evaluate(() => {
+    sessionStorage.removeItem('rbSimulationLiveMatchupReturn');
+  });
+  await page.goto(
+    `${BASE_URL}/rosterbate-season.html?sport=nba&league=${leagueId}&qa=${Date.now()}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForTimeout(2500);
+
+  const persisted = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const draftRaw = localStorage.getItem('rosterbateDraft');
+    const slot = slotRaw ? JSON.parse(slotRaw) : null;
+    const draft = draftRaw ? JSON.parse(draftRaw) : null;
+    const dayOneLogs = (slot?.seasonState?.completedGameLogs || []).filter((game) => Number(game?.day || 0) === 1);
+    return {
+      slotDay: Number(slot?.seasonState?.currentDay || 0),
+      draftDay: Number(draft?.seasonState?.currentDay || draft?.currentDay || 0),
+      completedDayOneGames: dayOneLogs.length,
+      selectedGameCount: dayOneLogs.filter((game) =>
+        String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
+        String(game?.awayAbbr || '').toUpperCase() === 'BOS'
+      ).length,
+      text: document.body.innerText
+    };
+  }, slotId);
+  assert.equal(persisted.slotDay, 2, 'league URL should repair a saved partial live day to Day 2 even when the return marker is missing');
+  assert.equal(persisted.draftDay, 2, 'league URL partial live repair should update the local resume pointer to Day 2');
+  assert.equal(persisted.completedDayOneGames, 2, 'league URL partial live repair should settle every Day 1 matchup');
+  assert.equal(persisted.selectedGameCount, 1, 'league URL partial live repair should not duplicate the already saved live matchup');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'league URL partial live repair should render Day 2 copy');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -967,6 +1012,7 @@ async function main() {
     await smokeSeasonHardRefreshPersistence(browser);
     await smokeSingleGameLiveMatchupAdvancesDay(browser);
     await smokeCompletedLiveMatchupRepairsStuckSingleGameDay(browser);
+    await smokeLeagueUrlPartialLiveDayRepairsMissingReturnMarker(browser);
   } finally {
     await browser.close();
   }

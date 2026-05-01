@@ -8754,7 +8754,7 @@ function applyRequestedSeasonView(defaultPage='hub'){
     commissioner: 'commissioner',
     comm: 'commissioner'
   };
-  consumeSimulationLiveMatchupReturnIntent();
+  finishPendingSimulationLiveRevealDayOnBoot();
   goPage(pageMap[requestedPage] || defaultPage);
 }
 
@@ -12984,6 +12984,11 @@ function consumeSimulationLiveMatchupReturnIntent(){
   if(!markerSlotId || !currentSlotId || markerSlotId!==currentSlotId) return false;
   try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(e){}
   syncSimulationLiveMatchupStateFromStorage();
+  return finishSimulationRevealDayAfterLiveReturn(true);
+}
+
+function finishPendingSimulationLiveRevealDayOnBoot(){
+  if(consumeSimulationLiveMatchupReturnIntent()) return true;
   return finishSimulationRevealDayAfterLiveReturn(true);
 }
 
