@@ -2331,6 +2331,7 @@ assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilder
 assert.match(sandbox.document.body.lastInsertedHTML, /onclick="applySimulationTradeBuilderPackage\('BOS'\)"/, 'trade builder modal apply button should use the package helper contract');
 assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="outgoing"/, 'trade builder modal should render outgoing player checkboxes');
 assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="incoming"/, 'trade builder modal should render incoming player checkboxes');
+assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderPreview"/, 'trade builder modal should include the real preview mount in inserted markup');
 assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Choose at least one player on both sides/i, 'trade builder modal should render the stub preview state into the real preview mount');
 api.closeSimulationTradeBuilderModal();
 assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder modal closer should remove the inserted modal element');
