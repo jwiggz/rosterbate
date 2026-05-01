@@ -39,6 +39,9 @@ assert.match(html, /\[data-trade-team\]\.is-viewing/, 'trade target cards should
 assert.match(html, /const byFantasyValue=\(a,b\)=>Number\(b\?\.fp\|\|0\)-Number\(a\?\.fp\|\|0\)/, 'trade builder should sort both rosters by fantasy value');
 assert.match(html, /Building with \$\{teamName\}/, 'trade builder should echo the selected team context');
 assert.match(html, /Highest FP First/, 'trade builder column labels should explain the sorted order');
+assert.match(html, /function tradePlayerKey\(value\)/, 'inline trade builder should normalize player ids as stable string keys');
+assert.match(html, /Package limit is 5 players per side/, 'inline trade builder should cap package size before sending');
+assert.match(html, /getInlineTradeBuilderFairness\(givePlayers,getPlayers,tradeTeamName\(trP\.ti\)\)/, 'inline trade builder should use fairness gating before enabling send');
 assert.match(html, /id="playerDetailModal"/, 'season shell should expose a reusable player detail modal');
 assert.match(html, /function openPlayerDetailModal\(/, 'season shell should open player details from any player-name click');
 assert.match(html, /class="player-name-link"/, 'season shell should render player names as detail buttons');
@@ -123,6 +126,13 @@ function extractFrom(startMarker, endMarker) {
 
 const harnessSource = `
 let HISTORICAL_SLOT_QUOTA_BLOCKED = false;
+let currentRbUser = null;
+const TCOLORS = ['#2563eb', '#16a34a', '#f97316'];
+function escapeHtml(value){ return String(value ?? '').replace(/[&<>"']/g, (char)=>({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char])); }
+function renderTeamInitialAvatar(name, teamCode, size){ return '<span class="pav">'+String(name||teamCode||'P').slice(0,2)+'</span>'; }
+function renderSidePowerups(){}
+function buildSeasonNowCard(card){ return '<div class="season-now-card"><div>'+String(card?.label||'')+'</div><div>'+String(card?.value||'')+'</div></div>'; }
+function renderHub(){}
 ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
 ${extractBetween('function loadHistoricalUniverseSlotState(', 'function shouldBootHistoricalDevSeason(')}
@@ -141,6 +151,9 @@ ${extractBetween('function renderSimulationWaiverInSharedShell(', 'function clai
 ${extractBetween('function claimSimulationFreeAgentFromShell(', 'function renderSimulationTradesInSharedShell(')}
 ${extractBetween('function renderSimulationTradesInSharedShell(', 'function applySimulationTradeFromShell(')}
 ${extractBetween('function applySimulationTradeFromShell(', 'function renderSimulationStandingsInSharedShell(')}
+${extractBetween('function getTradeFairnessPlayerValue(', 'function getTradeConversationKey(')}
+${extractBetween('function getTradeConversationKey(', 'function renderTrades(')}
+${extractBetween('function renderTrades(', 'function renderStandingsTeamDetails(')}
 ${extractBetween('function renderSimulationStandingsInSharedShell(', 'function renderSimulationRosterInSharedShell(')}
 ${extractBetween('function applySimulationSuggestedLineupFromShell(', 'function renderSimulationRosterInSharedShell(')}
 ${extractBetween('function renderSimulationRosterInSharedShell(', 'function renderSimulationScheduleInSharedShell(')}
@@ -201,6 +214,14 @@ module.exports = {
   cancelSimulationWaiverClaimFromShell,
   claimSimulationFreeAgentFromShell,
   applySimulationTradeFromShell,
+  tradePlayerKey,
+  findRosterPlayerByTradeId,
+  getInlineTradeBuilderFairness,
+  openTrade,
+  toggleTr,
+  submitTrade,
+  validateTradeOfferStillAvailable,
+  acceptTrade,
   applySimulationSuggestedLineupFromShell,
   handleRosterAction,
   getActiveSeasonPageId,
@@ -257,6 +278,9 @@ function createElement(id) {
     getAttribute(name) {
       return this.attributes[name];
     },
+    querySelectorAll() {
+      return [];
+    },
     closest(selector) {
       return selector === '.season-screen-shell' ? shell : null;
     },
@@ -264,6 +288,7 @@ function createElement(id) {
       delete elements[id];
       this.removed = true;
     },
+    scrollIntoView() {},
     _shell: shell
   };
 }
@@ -2623,6 +2648,7 @@ assert.equal(
   null,
   'trade helper should block a lopsided 2-for-1 before mutating rosters'
 );
+
 assert.deepStrictEqual(
   demoToasts,
   ['Trade blocked: Boston Celtics would be giving up too much after replacement value.'],
@@ -2690,6 +2716,65 @@ assert.ok(
   simulationAdapterStub.getState().draftState.rostersByTeam.BOS.some((player) => Number(player.id) === 102),
   'fair 2-for-1 package should move the optional package player to the partner roster'
 );
+
+api.setData({
+  sport: 'nba',
+  leagueName: 'Inline Trade QA',
+  myPos: 0,
+  teams: ['QA Hawks', 'Rim Rockers'],
+  multiplayer: true,
+  isCommissioner: true,
+  tradeConversations: {}
+});
+api.setGame({
+  day: 1,
+  week: 1,
+  rosters: [
+    [
+      { id: 'me-star', name: 'String Star', team: 'ATL', pos: 'PG', fp: 44 },
+      { id: 'me-depth', name: 'String Depth', team: 'ATL', pos: 'SG', fp: 18 }
+    ],
+    [
+      { id: 'them-good', name: 'Partner Good', team: 'BOS', pos: 'SF', fp: 43 },
+      { id: 'them-low', name: 'Partner Low', team: 'BOS', pos: 'PF', fp: 8 }
+    ]
+  ],
+  starters: [['me-star'], ['them-good']],
+  tradeOffers: [],
+  waiver: [{ id: 'waiver-fill', name: 'Waiver Fill', team: 'FA', pos: 'G', fp: 20 }],
+  standings: [
+    { teamIdx: 0, teamAbbr: 'ATL', w: 0, l: 0, pf: 0, pa: 0 },
+    { teamIdx: 1, teamAbbr: 'BOS', w: 0, l: 0, pf: 0, pa: 0 }
+  ]
+});
+elements.tradeBuilderMount = createElement('tradeBuilderMount');
+demoToasts = [];
+api.openTrade(1);
+assert.match(elements.tradeBuilderMount.innerHTML, /Build Trade With Rim Rockers/, 'inline trade builder should open for the selected local partner');
+api.toggleTr('give', 'me-star');
+api.toggleTr('get', 'them-low');
+assert.match(elements.tradeBuilderMount.innerHTML, /Blocked/, 'inline trade builder should show blocked state for unfair packages');
+api.submitTrade();
+assert.equal(api.getGame().tradeOffers.length, 0, 'inline trade builder should not create offers for blocked packages');
+assert.match(demoToasts.at(-1), /Trade blocked|giving up too much|blocked/i, 'inline trade builder should explain blocked packages');
+
+demoToasts = [];
+api.toggleTr('get', 'them-low');
+api.toggleTr('get', 'them-good');
+assert.doesNotMatch(elements.tradeBuilderMount.innerHTML, /Blocked/, 'inline trade builder should clear blocked state after a fair string-id package');
+api.submitTrade();
+assert.equal(api.getGame().tradeOffers.length, 1, 'inline trade builder should create a pending offer for valid packages');
+assert.deepStrictEqual(
+  toPlain(api.getGame().tradeOffers[0].give),
+  ['me-star'],
+  'inline trade builder should preserve string outgoing ids when sending offers'
+);
+assert.deepStrictEqual(
+  toPlain(api.getGame().tradeOffers[0].get),
+  ['them-good'],
+  'inline trade builder should preserve string incoming ids when sending offers'
+);
+assert.match(demoToasts.at(-1), /Trade sent to Rim Rockers/, 'inline trade builder should show success feedback after sending');
 
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /(Los Angeles Lakers|LAL)/);

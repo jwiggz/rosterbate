@@ -16398,6 +16398,34 @@ function renderTrades(){
   });
 }
 
+function tradePlayerKey(value){
+  return String(value ?? '');
+}
+
+function findRosterPlayerByTradeId(roster, playerId){
+  const key=tradePlayerKey(playerId);
+  return (Array.isArray(roster)?roster:[]).find(player=>tradePlayerKey(player?.id)===key)||null;
+}
+
+function tradeTeamName(ti){
+  return D?.teams?.[ti] || (typeof teamName==='function' ? teamName(ti) : ('Team '+(Number(ti)+1)));
+}
+
+function getInlineTradeBuilderFairness(givePlayers, getPlayers, partnerName){
+  if(!givePlayers.length || !getPlayers.length){
+    return { allowed:false, tone:'error', message:'Choose players on both sides before sending an offer.' };
+  }
+  if(givePlayers.length>5 || getPlayers.length>5){
+    return { allowed:false, tone:'error', message:'Package limit is 5 players per side.' };
+  }
+  return evaluateSimulationTradeFairness({
+    outgoingPlayers:givePlayers,
+    incomingPlayers:getPlayers,
+    state:G,
+    partnerName
+  });
+}
+
 function closeInlineTradeBuilder(){
   const mount=document.getElementById('tradeBuilderMount');
   if(mount) mount.innerHTML='';
@@ -16410,20 +16438,25 @@ function renderInlineTradeBuilder(){
   const byFantasyValue=(a,b)=>Number(b?.fp||0)-Number(a?.fp||0);
   const myR=[...(G.rosters[D.myPos]||[])].sort(byFantasyValue);
   const thR=[...(G.rosters[trP.ti]||[])].sort(byFantasyValue);
-  const givePlayers=trP.give.map(id=>myR.find(x=>x.id===id)).filter(Boolean);
-  const getPlayers=trP.get.map(id=>thR.find(x=>x.id===id)).filter(Boolean);
-  const starterSet=new Set((G.starters?.[D.myPos]||[]).filter(Boolean));
-  const startersTouched=givePlayers.filter(player=>starterSet.has(player.id)).length;
-  const gv=trP.give.reduce((s,id)=>{const p=myR.find(x=>x.id===id);return s+(p?p.fp:0);},0);
-  const gt=trP.get.reduce((s,id)=>{const p=thR.find(x=>x.id===id);return s+(p?p.fp:0);},0);
+  const givePlayers=trP.give.map(id=>findRosterPlayerByTradeId(myR,id)).filter(Boolean);
+  const getPlayers=trP.get.map(id=>findRosterPlayerByTradeId(thR,id)).filter(Boolean);
+  const starterSet=new Set((G.starters?.[D.myPos]||[]).filter(Boolean).map(tradePlayerKey));
+  const startersTouched=givePlayers.filter(player=>starterSet.has(tradePlayerKey(player.id))).length;
+  const gv=trP.give.reduce((s,id)=>{const p=findRosterPlayerByTradeId(myR,id);return s+(p?p.fp:0);},0);
+  const gt=trP.get.reduce((s,id)=>{const p=findRosterPlayerByTradeId(thR,id);return s+(p?p.fp:0);},0);
   const d=(gt-gv).toFixed(1);
   const offerReady=trP.give.length&&trP.get.length;
+  const builderFairness=getInlineTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
+  const canSend=!!offerReady && builderFairness.allowed!==false;
   const fairnessCard=renderTradeFairnessCard({ fromTeam:D.myPos, toTeam:trP.ti, give:trP.give, get:trP.get }, { variant:'builder' });
-  const fairCopy=trP.give.length&&trP.get.length?(Math.abs(gt-gv)<10?'Fair trade range. Both sides are close on raw fantasy value.':gt>gv?'This package currently favors you by +'+d+' FP. Expect the other manager to push back unless the fit is better for them.':'This package currently favors them by '+d+' FP. You may want more back before you send it.'):'Select players to send and receive.';
+  const fairCopy=trP.give.length&&trP.get.length
+    ? `${builderFairness.message || (Math.abs(gt-gv)<10?'Fair trade range. Both sides are close on raw fantasy value.':gt>gv?'This package currently favors you by +'+d+' FP. Expect the other manager to push back unless the fit is better for them.':'This package currently favors them by '+d+' FP. You may want more back before you send it.')}${builderFairness.detail ? ' '+builderFairness.detail : ''}`
+    : 'Select players to send and receive.';
   const pr=(p,side)=>{
-    const sel=trP[side].includes(p.id);
+    const playerKey=tradePlayerKey(p.id);
+    const sel=trP[side].some(id=>tradePlayerKey(id)===playerKey);
     const stateClass=sel?(side==='give'?'selected-give':'selected-get'):'';
-    return `<button type="button" onclick="toggleTr('${side}',${p.id})" class="trade-builder-player ${stateClass}">
+    return `<button type="button" onclick="toggleTr('${side}',${JSON.stringify(playerKey).replace(/"/g,'&quot;')})" class="trade-builder-player ${stateClass}">
       ${renderTeamInitialAvatar(p.name,p.team,28)}
       <div class="trade-builder-player-copy">
         <div style="font-family:var(--fd);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
@@ -16466,6 +16499,7 @@ function renderInlineTradeBuilder(){
       <span class="season-stat-pill" style="border-color:#24324a;">${trP.give.length} out / ${trP.get.length} in</span>
       <span class="season-stat-pill" style="${gt>gv?'rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.32)':gt<gv?'rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.3)':'rgba(148,163,184,.10);color:#cbd5e1;border-color:rgba(148,163,184,.26)'}">Value ${gt-gv>=0?'+':''}${d} FP</span>
       <span class="season-stat-pill" style="border-color:${startersTouched?'rgba(249,115,22,.35)':'#24324a'};color:${startersTouched?'#fdba74':'#cbd5e1'};background:${startersTouched?'rgba(249,115,22,.12)':'#0f1724'};">${startersTouched?startersTouched+' starter'+(startersTouched===1?'':'s')+' touched':'Bench package'}</span>
+      ${offerReady?`<span class="season-stat-pill" style="border-color:${canSend?'rgba(34,197,94,.32)':'rgba(239,68,68,.34)'};color:${canSend?'#86efac':'#fca5a5'};background:${canSend?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)'};">${canSend?'Ready to send':'Blocked'}</span>`:''}
     </div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--text3);margin-bottom:14px;">${fairCopy}</div>
     <div class="trade-builder-grid">
@@ -16474,7 +16508,7 @@ function renderInlineTradeBuilder(){
     </div>
     <div class="trade-builder-actions" style="margin-top:14px;">
       <button type="button" onclick="closeInlineTradeBuilder()" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
-      <button type="button" onclick="submitTrade()" class="bg" ${!(trP.give.length&&trP.get.length)?'disabled':''}>Send Offer</button>
+      <button type="button" onclick="submitTrade()" class="bg" ${!canSend?'disabled':''}>Send Offer</button>
     </div>
     ${renderTradeConversation(trP.ti)}
   </div>`;
@@ -16492,9 +16526,13 @@ function openTrade(ti){
 }
 
 function toggleTr(side,pid){
-  const arr=trP[side],i=arr.indexOf(pid);
+  if(!trP || !Array.isArray(trP[side])) return;
+  const arr=trP[side],pidKey=tradePlayerKey(pid),i=arr.findIndex(id=>tradePlayerKey(id)===pidKey);
   if(i>=0) arr.splice(i,1);
-  else arr.push(pid);
+  else{
+    if(arr.length>=5){ toast('Package limit is 5 players per side.'); return; }
+    arr.push(pidKey);
+  }
   renderInlineTradeBuilder();
 }
 
@@ -16512,8 +16550,8 @@ function validateTradeOfferStillAvailable(offer){
   if(!offer) return { ok:false, message:'Trade offer not found.' };
   const fromRoster=G.rosters?.[offer.fromTeam]||[];
   const toRoster=G.rosters?.[offer.toTeam]||[];
-  const missingGive=offer.give.filter(pid=>!fromRoster.some(player=>Number(player?.id)===Number(pid)));
-  const missingGet=offer.get.filter(pid=>!toRoster.some(player=>Number(player?.id)===Number(pid)));
+  const missingGive=offer.give.filter(pid=>!findRosterPlayerByTradeId(fromRoster,pid));
+  const missingGet=offer.get.filter(pid=>!findRosterPlayerByTradeId(toRoster,pid));
   if(missingGive.length || missingGet.length){
     return { ok:false, message:'One or more players in this trade are no longer on the expected rosters.' };
   }
@@ -16521,7 +16559,12 @@ function validateTradeOfferStillAvailable(offer){
 }
 
 function submitTrade(){
-  if(!trP.give.length||!trP.get.length)return;
+  if(!trP.give.length||!trP.get.length){ toast('Choose players on both sides before sending an offer.'); return; }
+  if(trP.give.length>5 || trP.get.length>5){ toast('Package limit is 5 players per side.'); return; }
+  const givePlayers=trP.give.map(id=>findRosterPlayerByTradeId(G.rosters[D.myPos]||[],id)).filter(Boolean);
+  const getPlayers=trP.get.map(id=>findRosterPlayerByTradeId(G.rosters[trP.ti]||[],id)).filter(Boolean);
+  const fairness=getInlineTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
+  if(fairness.allowed===false){ toast(fairness.message || 'This trade package is blocked.'); renderInlineTradeBuilder(); return; }
   const now=Date.now();
   const o={
     id:'tr_'+now,
@@ -16532,14 +16575,14 @@ function submitTrade(){
     status:'pending',
     createdAt:now,
     updatedAt:now,
-    fromTeamName:teamName(D.myPos),
-    toTeamName:teamName(trP.ti),
+    fromTeamName:tradeTeamName(D.myPos),
+    toTeamName:tradeTeamName(trP.ti),
     actorUserId:currentRbUser?.uid||null
   };
   G.tradeOffers.push(o);
-  const giveNames=o.give.map(id=>G.rosters[o.fromTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
-  const getNames=o.get.map(id=>G.rosters[o.toTeam]?.find(p=>p.id===id)?.name||'?').join(', ');
-  logActivity('trade','Trade offer sent',teamName(o.fromTeam)+' offered '+giveNames+' to '+teamName(o.toTeam)+' for '+getNames+'.',o.fromTeam,'?');
+  const giveNames=o.give.map(id=>findRosterPlayerByTradeId(G.rosters[o.fromTeam],id)?.name||'?').join(', ');
+  const getNames=o.get.map(id=>findRosterPlayerByTradeId(G.rosters[o.toTeam],id)?.name||'?').join(', ');
+  logActivity('trade','Trade offer sent',tradeTeamName(o.fromTeam)+' offered '+giveNames+' to '+tradeTeamName(o.toTeam)+' for '+getNames+'.',o.fromTeam,'?');
   closeInlineTradeBuilder();
   toast('Trade sent to '+D.teams[trP.ti]+'!');
   queueSharedSeasonSave('submit_trade');
@@ -16549,8 +16592,8 @@ function submitTrade(){
 
 function cpuTrade(id){
   const o=G.tradeOffers.find(t=>t.id===id);if(!o||o.status!=='pending')return;
-  const gv=o.give.reduce((s,pid)=>{const p=G.rosters[o.fromTeam]?.find(x=>x.id===pid);return s+(p?p.fp:0);},0);
-  const gt=o.get.reduce((s,pid)=>{const p=G.rosters[o.toTeam]?.find(x=>x.id===pid);return s+(p?p.fp:0);},0);
+  const gv=o.give.reduce((s,pid)=>{const p=findRosterPlayerByTradeId(G.rosters[o.fromTeam],pid);return s+(p?p.fp:0);},0);
+  const gt=o.get.reduce((s,pid)=>{const p=findRosterPlayerByTradeId(G.rosters[o.toTeam],pid);return s+(p?p.fp:0);},0);
   if(gt>=gv*0.85){acceptTrade(id,true);toast(D.teams[o.toTeam]+' accepted your trade!');}
   else{
     o.status='rejected';
@@ -16578,8 +16621,8 @@ function acceptTrade(id,cpu=false){
   o.status='accepted';
   o.updatedAt=Date.now();
   const fr=G.rosters[o.fromTeam],tr=G.rosters[o.toTeam];
-  o.give.forEach(pid=>{const i=fr.findIndex(p=>p.id===pid);if(i>=0){const[p]=fr.splice(i,1);tr.push(p);}});
-  o.get.forEach(pid=>{const i=tr.findIndex(p=>p.id===pid);if(i>=0){const[p]=tr.splice(i,1);fr.push(p);}});
+  o.give.forEach(pid=>{const key=tradePlayerKey(pid);const i=fr.findIndex(p=>tradePlayerKey(p?.id)===key);if(i>=0){const[p]=fr.splice(i,1);tr.push(p);}});
+  o.get.forEach(pid=>{const key=tradePlayerKey(pid);const i=tr.findIndex(p=>tradePlayerKey(p?.id)===key);if(i>=0){const[p]=tr.splice(i,1);fr.push(p);}});
   [o.fromTeam,o.toTeam].forEach(ti=>{G.starters[ti]=buildBestLineupIdsForRoster(G.rosters[ti],G.day);});
   logActivity('trade','Trade completed',teamName(o.fromTeam)+' and '+teamName(o.toTeam)+' completed a trade.',o.toTeam,'??');
   queueSharedSeasonSave('accept_trade');
