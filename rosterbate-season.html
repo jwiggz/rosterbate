@@ -11166,6 +11166,42 @@ function renderSimulationTradesInSharedShell(){
         </div>
       </div>
       <div class="season-subbar-copy" style="margin-top:10px;">Replacement value is included for uneven offers, so package ideas are compared against the best waiver fill-in before they can go through.</div>
+      <details style="margin-top:12px;">
+        <summary style="cursor:pointer;font-family:var(--fd);font-size:14px;font-weight:800;color:#bfdbfe;text-transform:uppercase;">Quick Trade</summary>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;">
+          <div>
+            <label for="simulation-trade-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose outgoing player</label>
+            <select id="simulation-trade-outgoing-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+              <option value="">Choose outgoing player</option>
+              ${(vm.outgoingRoster || []).map((player) => (
+                `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
+              )).join('')}
+            </select>
+          </div>
+          <div>
+            <label for="simulation-trade-extra-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Optional package player</label>
+            <select id="simulation-trade-extra-outgoing-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+              <option value="">No second player</option>
+              ${(vm.outgoingRoster || []).map((player) => (
+                `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
+              )).join('')}
+            </select>
+          </div>
+          <div>
+            <label for="simulation-trade-incoming-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose incoming player</label>
+            <select id="simulation-trade-incoming-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+              <option value="">Choose incoming player</option>
+              ${((row?.incomingRoster || vm.incomingRostersByTeam?.[partnerAbbr] || [])).map((player) => (
+                `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
+              )).join('')}
+            </select>
+          </div>
+        </div>
+        <div id="simulation-trade-preview-${partnerAbbr}">
+          ${renderSimulationTradePreviewMarkup({ outgoingPlayers: [], incomingPlayers: [], state: SEASON_MODE_ADAPTER.getState?.() || D, partnerName: team?.name || partnerAbbr })}
+        </div>
+        <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${partnerAbbr}')">Apply Trade</button>
+      </details>
       ${feedbackMarkup}
       <button class="bp" style="margin-top:12px;" onclick="openSimulationTradeBuilderModal('${partnerAbbr}')">Build Trade</button>
     </div>`

@@ -189,6 +189,11 @@ module.exports = {
   renderSimulationWaiverInSharedShell,
   renderSimulationTradesInSharedShell,
   updateSimulationTradePreviewFromShell,
+  openSimulationTradeBuilderModal,
+  closeSimulationTradeBuilderModal,
+  renderSimulationTradeBuilderModal,
+  updateSimulationTradeBuilderPreview,
+  applySimulationTradeBuilderFromModal,
   renderSimulationStandingsInSharedShell,
   submitSimulationWaiverClaimFromShell,
   cancelSimulationWaiverClaimFromShell,
@@ -250,6 +255,10 @@ function createElement(id) {
     },
     closest(selector) {
       return selector === '.season-screen-shell' ? shell : null;
+    },
+    remove() {
+      delete elements[id];
+      this.removed = true;
     },
     _shell: shell
   };
@@ -1155,6 +1164,23 @@ const sandbox = {
     return typeof callback === 'function' ? callback() : 0;
   },
   document: {
+    body: {
+      lastInsertPosition: null,
+      lastInsertedHTML: '',
+      insertAdjacentHTML(position, markup) {
+        this.lastInsertPosition = position;
+        this.lastInsertedHTML = String(markup || '');
+        const idPattern = /id="([^"]+)"/g;
+        let match;
+        while ((match = idPattern.exec(this.lastInsertedHTML))) {
+          const id = match[1];
+          if (!elements[id]) elements[id] = createElement(id);
+        }
+        if (elements.simulationTradeBuilderModal) {
+          elements.simulationTradeBuilderModal.innerHTML = this.lastInsertedHTML;
+        }
+      }
+    },
     getElementById(id) {
       if (!elements[id]) {
         elements[id] = createElement(id);
@@ -2273,8 +2299,9 @@ api.renderSimulationTradesInSharedShell();
 assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
 assert.match(elements.tradesContent.innerHTML, /openSimulationTradeBuilderModal\('BOS'\)/);
 assert.match(elements.tradesContent.innerHTML, /Build Trade/i);
-assert.doesNotMatch(elements.tradesContent.innerHTML, /simulation-trade-outgoing-select-BOS/);
-assert.doesNotMatch(elements.tradesContent.innerHTML, /simulation-trade-incoming-select-BOS/);
+assert.match(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/, 'simulation trades should keep the legacy quick-trade apply path until modal apply is wired');
+assert.match(elements.tradesContent.innerHTML, /simulation-trade-outgoing-select-BOS/, 'simulation trades should keep the outgoing quick-trade select for the existing apply helper');
+assert.match(elements.tradesContent.innerHTML, /simulation-trade-incoming-select-BOS/, 'simulation trades should keep the incoming quick-trade select for the existing apply helper');
 assert.match(elements.tradesContent.innerHTML, /Trade Desk|Pending Offers/, 'simulation trades should feel like the single-player trade desk');
 assert.match(elements.tradesContent.innerHTML, /Incoming Offers/i, 'simulation trades should render an incoming-offers lane');
 assert.match(elements.tradesContent.innerHTML, /Sent Offers/i, 'simulation trades should render a sent-offers lane');
@@ -2284,8 +2311,28 @@ assert.match(elements.tradesContent.innerHTML, /Pick a partner, then build anyth
 assert.match(elements.tradesContent.innerHTML, /7-5/, 'simulation trades should surface partner record context');
 assert.match(elements.tradesContent.innerHTML, /Top asset: Stephen Curry/, 'simulation trades should surface partner top-player context');
 assert.match(elements.tradesContent.innerHTML, /13 players/, 'simulation trades should surface partner roster counts');
+assert.match(elements.tradesContent.innerHTML, /Hakeem Olajuwon [^<]* HOU [^<]* C/i, 'simulation trades should render outgoing quick-trade option labels with full player context');
+assert.match(elements.tradesContent.innerHTML, /Stephen Curry [^<]* GSW [^<]* PG/i, 'simulation trades should render incoming quick-trade option labels with full player context');
+assert.match(elements.tradesContent.innerHTML, /Optional package player/i, 'simulation trades should keep the second outgoing quick-trade select for existing 2-for-1 checks');
 assert.match(elements.tradesContent.innerHTML, /Replacement value/i, 'simulation trades should explain that uneven deals are judged against the waiver wire');
+assert.match(elements.tradesContent.innerHTML, /Trade Preview/i, 'simulation trades should keep the legacy quick-trade preview panel before modal apply is wired');
+assert.match(elements.tradesContent.innerHTML, /updateSimulationTradePreviewFromShell\('BOS'\)/, 'simulation quick-trade selections should refresh the legacy preview live');
+assert.match(elements.tradesContent.innerHTML, /Choose players to preview the deal/i, 'simulation quick-trade preview should have a clear empty state');
 assert.match(elements.tradesContent.innerHTML, /best waiver fill-in/i, 'simulation trade desk should tell managers uneven trades may require a waiver fill-in');
+
+delete elements.simulationTradeBuilderModal;
+delete elements.simulationTradeBuilderPreview;
+sandbox.document.body.lastInsertedHTML = '';
+api.openSimulationTradeBuilderModal('BOS');
+assert.equal(sandbox.document.body.lastInsertPosition, 'beforeend', 'trade builder modal opener should insert the shell into document body');
+assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderModal"/, 'trade builder modal opener should insert the modal backdrop');
+assert.match(sandbox.document.body.lastInsertedHTML, /Trade With Boston Celtics/, 'trade builder modal should include partner context');
+assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderApply"[^>]*disabled/, 'trade builder modal apply button should start disabled');
+assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="outgoing"/, 'trade builder modal should render outgoing player checkboxes');
+assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="incoming"/, 'trade builder modal should render incoming player checkboxes');
+assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Choose at least one player on both sides/i, 'trade builder modal should render the stub preview state into the real preview mount');
+api.closeSimulationTradeBuilderModal();
+assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder modal closer should remove the inserted modal element');
 
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];
