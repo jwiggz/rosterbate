@@ -1136,6 +1136,16 @@ assert.deepStrictEqual(
   'successful NFL trades should keep incoming compatibility lineup ids aligned with empty slot placeholders'
 );
 assert.equal(tradedState.seasonState.lineupSlotsByTeam.CHI.QB, null);
+assert.deepStrictEqual(
+  tradedState.seasonState.activityLog[0]?.tradeDeskFeedback || null,
+  {
+    partnerAbbr: 'CHI',
+    tone: 'success',
+    message: 'Trade applied: GB Original for CHI Original.',
+    detail: ''
+  },
+  'successful trades should persist trade desk feedback for reloads'
+);
 
 const stringKeyTradeState = {
   draftState: {

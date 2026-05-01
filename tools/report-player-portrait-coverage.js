@@ -11,7 +11,8 @@ function parseArgs(argv) {
     manifest: DEFAULT_MANIFEST,
     limit: 40,
     json: false,
-    missingOnly: false
+    missingOnly: false,
+    prompts: false
   };
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index];
@@ -23,6 +24,7 @@ function parseArgs(argv) {
     else if (arg.startsWith('--limit=')) args.limit = Math.max(1, Number(arg.slice('--limit='.length)) || args.limit);
     else if (arg === '--json') args.json = true;
     else if (arg === '--missing-only') args.missingOnly = true;
+    else if (arg === '--prompts' || arg === '--prompt') args.prompts = true;
     else if (arg === '--help' || arg === '-h') args.help = true;
   }
   return args;
@@ -39,6 +41,7 @@ function usage() {
     '  --manifest FILE     portrait manifest to inspect',
     '  --limit N           ranked players to inspect',
     '  --missing-only      only print players without real manifest art',
+    '  --prompts           print copyable image-generation prompts for missing players',
     '  --json              print machine-readable JSON'
   ].join('\n');
 }
@@ -123,6 +126,21 @@ function suggestedFilename(player, extension = 'webp') {
   return `${slug}${team ? `__${team}` : ''}.${ext}`;
 }
 
+function buildPortraitPrompt(player) {
+  const name = String(player?.name || '').trim() || 'the player';
+  const team = String(player?.team || '').trim().toUpperCase();
+  const jersey = team ? `a basketball jersey in ${team} team colors` : 'a team-color basketball jersey';
+  return `Create a 512x512 square illustrated bust portrait of ${name} wearing ${jersey}. Use a clean light or white background, chest-and-head framing with the face near the upper center, polished sports-card lighting, and no text or logos.`;
+}
+
+function formatPortraitPromptLine(row) {
+  const rank = String(row?.rank || '').padStart(3, ' ');
+  const name = String(row?.name || '').trim();
+  const team = String(row?.team || '--').trim().toUpperCase() || '--';
+  const filename = String(row?.suggestedFilename || suggestedFilename(row)).trim();
+  return `PROMPT #${rank} ${name} (${team}) -> ${filename}\n${buildPortraitPrompt(row)}`;
+}
+
 function normalizeCoverageKey(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9|]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -177,8 +195,12 @@ function main(argv = process.argv.slice(2)) {
   console.log(`Portrait coverage: ${report.covered}/${report.limit} (${report.coveragePct}%)`);
   console.log(`Source: ${path.relative(process.cwd(), report.source) || report.source}`);
   console.log(`Manifest: ${path.relative(process.cwd(), report.manifest) || report.manifest}`);
-  const rows = args.missingOnly ? report.rows.filter((row) => !row.covered) : report.rows;
+  const rows = args.prompts || args.missingOnly ? report.rows.filter((row) => !row.covered) : report.rows;
   rows.forEach((row) => {
+    if (args.prompts) {
+      console.log(formatPortraitPromptLine(row));
+      return;
+    }
     const mark = row.covered ? 'OK ' : 'MISS';
     const suggestion = row.covered ? '' : ` -> ${row.suggestedFilename}`;
     console.log(`${mark} #${String(row.rank).padStart(3, ' ')} ${row.name} (${row.team || '--'})${suggestion}`);
@@ -196,7 +218,9 @@ if (require.main === module) {
 }
 
 module.exports = {
+  buildPortraitPrompt,
   buildCoverageReport,
+  formatPortraitPromptLine,
   hasPortrait,
   normalizeCoverageKey,
   parseCsvLine,

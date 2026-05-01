@@ -5,6 +5,8 @@ const path = require('node:path');
 
 const {
   buildCoverageReport,
+  buildPortraitPrompt,
+  formatPortraitPromptLine,
   hasPortrait,
   normalizeCoverageKey,
   parseCsvLine,
@@ -21,6 +23,20 @@ assert.equal(hasPortrait({ 'Shai Gilgeous Alexander': 'shai.jpg' }, { name: 'Sha
 assert.equal(normalizeCoverageKey('Shai Gilgeous-Alexander|OKC'), 'shai gilgeous alexander|okc');
 assert.equal(slugifyName('Shai Gilgeous-Alexander'), 'shai-gilgeous-alexander');
 assert.equal(suggestedFilename({ name: 'Karl-Anthony Towns', team: 'NYK' }), 'karl-anthony-towns__NYK.webp');
+const devinBookerPrompt = buildPortraitPrompt({ name: 'Devin Booker', team: 'PHX' });
+assert.match(devinBookerPrompt, /square illustrated bust portrait/, 'portrait prompt helper should describe the framing');
+assert.match(devinBookerPrompt, /Devin Booker/, 'portrait prompt helper should name the player');
+assert.match(devinBookerPrompt, /PHX team colors/, 'portrait prompt helper should describe the team-color jersey');
+assert.equal(
+  formatPortraitPromptLine({
+    rank: 6,
+    name: 'Devin Booker',
+    team: 'PHX',
+    suggestedFilename: 'devin-booker__PHX.webp'
+  }),
+  'PROMPT #  6 Devin Booker (PHX) -> devin-booker__PHX.webp\nCreate a 512x512 square illustrated bust portrait of Devin Booker wearing a basketball jersey in PHX team colors. Use a clean light or white background, chest-and-head framing with the face near the upper center, polished sports-card lighting, and no text or logos.',
+  'portrait prompt lines should include the target filename and copyable image prompt'
+);
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rb-portrait-coverage-'));
 const source = path.join(dir, 'players.csv');

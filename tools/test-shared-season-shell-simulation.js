@@ -251,6 +251,7 @@ module.exports = {
   getActiveSeasonMode(){ return ACTIVE_SEASON_MODE; },
   setSeasonModeAdapter(value){ SEASON_MODE_ADAPTER = value; },
   getSeasonModeAdapter(){ return SEASON_MODE_ADAPTER; },
+  setSimulationTradeDeskFeedback(value){ simulationTradeDeskFeedback = value; },
   setData(value){ D = value; },
   getData(){ return D; },
   setGame(value){ G = value; },
@@ -2620,15 +2621,32 @@ demoToasts = [];
 historicalSlotUpsertCalls = [];
 simulationAdapterStub.lastTrade = null;
 api.applySimulationTradeBuilderPackage('BOS');
+const successfulPackageTrade = toPlain(simulationAdapterStub.lastTrade);
 assert.deepStrictEqual(
-  toPlain(simulationAdapterStub.lastTrade),
+  {
+    fromTeamAbbr: successfulPackageTrade.fromTeamAbbr,
+    toTeamAbbr: successfulPackageTrade.toTeamAbbr,
+    outgoingPlayerIds: successfulPackageTrade.outgoingPlayerIds,
+    incomingPlayerIds: successfulPackageTrade.incomingPlayerIds,
+    outgoingPlayerNames: successfulPackageTrade.outgoingPlayerNames,
+    incomingPlayerNames: successfulPackageTrade.incomingPlayerNames,
+    feedback: successfulPackageTrade.tradeDeskFeedback
+  },
   {
     fromTeamAbbr: 'LAL',
     toTeamAbbr: 'BOS',
     outgoingPlayerIds: [34],
-    incomingPlayerIds: [30]
+    incomingPlayerIds: [30],
+    outgoingPlayerNames: ['Hakeem Olajuwon'],
+    incomingPlayerNames: ['Stephen Curry'],
+    feedback: {
+      partnerAbbr: 'BOS',
+      tone: 'success',
+      message: 'Trade applied: Hakeem Olajuwon for Stephen Curry.',
+      detail: 'Fairness check: 58.0 FP for you vs 55.0 FP for them.'
+    }
   },
-  'trade builder apply should send the selected modal package through the adapter trade path'
+  'trade builder apply should send the selected modal package and persisted feedback through the adapter trade path'
 );
 assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder apply should close the modal after a successful package');
 assert.deepStrictEqual(
@@ -2648,6 +2666,30 @@ assert.ok(
 assert.ok(
   simulationAdapterStub.getState().draftState.rostersByTeam.BOS.some((player) => Number(player.id) === 34),
   'trade builder apply should move every outgoing player onto the partner roster'
+);
+simulationStubState = {
+  ...simulationStubState,
+  seasonState: {
+    ...(simulationStubState.seasonState || {}),
+    activityLog: [
+      {
+        type: 'trade',
+        tradeDeskFeedback: {
+          partnerAbbr: 'BOS',
+          tone: 'success',
+          message: 'Trade applied: Hakeem Olajuwon for Stephen Curry.',
+          detail: 'Fairness check: 58.0 FP for you vs 55.0 FP for them.'
+        }
+      }
+    ]
+  }
+};
+api.setSimulationTradeDeskFeedback({});
+api.renderSimulationTradesInSharedShell();
+assert.match(
+  elements.tradesContent.innerHTML,
+  /Trade applied: Hakeem Olajuwon for Stephen Curry\.[\s\S]*Fairness check: 58\.0 FP for you vs 55\.0 FP for them\./,
+  'trade desk should restore completed trade feedback from persisted activity after reload'
 );
 
 setSimulationStubPhase('regular_season');
@@ -2680,15 +2722,27 @@ assert.match(
   'trade builder preview should explain the uneven-package replacement context once'
 );
 api.applySimulationTradeBuilderPackage('BOS');
+const fairTwoForOneTrade = toPlain(simulationAdapterStub.lastTrade);
 assert.deepStrictEqual(
-  toPlain(simulationAdapterStub.lastTrade),
+  {
+    fromTeamAbbr: fairTwoForOneTrade.fromTeamAbbr,
+    toTeamAbbr: fairTwoForOneTrade.toTeamAbbr,
+    outgoingPlayerIds: fairTwoForOneTrade.outgoingPlayerIds,
+    incomingPlayerIds: fairTwoForOneTrade.incomingPlayerIds,
+    outgoingPlayerNames: fairTwoForOneTrade.outgoingPlayerNames,
+    incomingPlayerNames: fairTwoForOneTrade.incomingPlayerNames,
+    feedbackMessage: fairTwoForOneTrade.tradeDeskFeedback?.message
+  },
   {
     fromTeamAbbr: 'LAL',
     toTeamAbbr: 'BOS',
     outgoingPlayerIds: [34, 102],
-    incomingPlayerIds: [30]
+    incomingPlayerIds: [30],
+    outgoingPlayerNames: ['Hakeem Olajuwon', 'Bench Wing'],
+    incomingPlayerNames: ['Stephen Curry'],
+    feedbackMessage: 'Trade applied: Hakeem Olajuwon + Bench Wing for Stephen Curry.'
   },
-  'trade builder apply should send both selected outgoing players for a fair 2-for-1 package'
+  'trade builder apply should send both selected outgoing players and persisted feedback for a fair 2-for-1 package'
 );
 assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder apply should close the modal after a fair 2-for-1 package');
 assert.deepStrictEqual(
@@ -2925,7 +2979,18 @@ const updatedAdapterState = {
     lineupIdsByTeam: {
       LAL: [33, 34],
       BOS: [30]
-    }
+    },
+    activityLog: [
+      {
+        type: 'trade',
+        tradeDeskFeedback: {
+          partnerAbbr: 'BOS',
+          tone: 'success',
+          message: 'Trade applied: Adapter Star for Persisted Star.',
+          detail: 'Fairness check: persisted adapter state.'
+        }
+      }
+    ]
   },
   processed: ['legacy-processed-flag'],
   dayResults: { 21: { stale: true } },
@@ -2944,7 +3009,8 @@ const staleLegacyShell = {
     { teamIdx: 0, teamAbbr: 'LAL', conference: 'West', division: 'Pacific', w: 10, l: 4, pf: 1500, pa: 1410 },
     { teamIdx: 1, teamAbbr: 'BOS', conference: 'East', division: 'Atlantic', w: 8, l: 6, pf: 1450, pa: 1480 }
   ],
-  freeAgents: [{ id: 99, name: 'Tim Duncan', pos: 'PF' }]
+  freeAgents: [{ id: 99, name: 'Tim Duncan', pos: 'PF' }],
+  activityLog: [{ type: 'sim_day', summary: 'Stale shell activity' }]
 };
 
 const staleLegacyGame = {
@@ -2964,7 +3030,8 @@ const staleLegacyGame = {
   dayResults: { 18: { stale: true } },
   revealedDays: { 18: true },
   settledWeeks: { 3: true },
-  dailyRevealReports: { 18: { headline: 'Stale reveal report' } }
+  dailyRevealReports: { 18: { headline: 'Stale reveal report' } },
+  activityLog: [{ type: 'sim_day', summary: 'Stale game activity' }]
 };
 
 const rawPreferredPersistenceState = toPlain(
@@ -3003,6 +3070,11 @@ assert.deepEqual(
     BOS: [30]
   },
   'simulation persistence should prefer adapter lineup ids over stale legacy starters'
+);
+assert.equal(
+  rawPreferredPersistenceState.seasonState.activityLog[0]?.tradeDeskFeedback?.message,
+  'Trade applied: Adapter Star for Persisted Star.',
+  'simulation persistence should prefer adapter trade activity over stale shell/game activity'
 );
 assert.equal(
   Object.prototype.hasOwnProperty.call(rawPreferredPersistenceState, 'processed'),

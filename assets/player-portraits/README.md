@@ -26,11 +26,19 @@ Coverage check:
 npm run portraits:coverage -- --limit 25 --missing-only
 ```
 
+Generate copyable prompts for the missing portraits:
+
+```bash
+npm run portraits:prompts -- --limit 25
+```
+
 The coverage report prints the exact filename to use for each missing portrait. For example:
 
 ```text
 MISS #  1 Shai Gilgeous-Alexander (OKC) -> shai-gilgeous-alexander__OKC.webp
 ```
+
+Prompt output includes the same target filename plus a ready-to-use image prompt.
 
 Filename examples:
 

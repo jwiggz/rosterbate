@@ -12,6 +12,7 @@
     "portraits:check": "node tools/build-player-portrait-manifest.js --check",
     "portraits:import": "node tools/import-player-portraits.js",
     "portraits:coverage": "node tools/report-player-portrait-coverage.js",
+    "portraits:prompts": "node tools/report-player-portrait-coverage.js --prompts",
     "test:live-matchup": "node tools/test-live-matchup-playwright.js"
   },
   "repository": {

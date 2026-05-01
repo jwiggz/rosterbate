@@ -4150,7 +4150,9 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
     standings,
     lineupIdsByTeam
   };
-  if(Array.isArray(shell?.activityLog)){
+  if(preferRawSimulationState && Array.isArray(baseStateWithoutLegacyShellCaches?.seasonState?.activityLog)){
+    seasonState.activityLog=baseStateWithoutLegacyShellCaches.seasonState.activityLog.map(entry=>cloneSharedSimulationBootValue(entry));
+  }else if(Array.isArray(shell?.activityLog)){
     seasonState.activityLog=shell.activityLog.map(entry=>cloneSharedSimulationBootValue(entry));
   }else if(Array.isArray(game?.activityLog)){
     seasonState.activityLog=game.activityLog.map(entry=>cloneSharedSimulationBootValue(entry));
@@ -10847,6 +10849,38 @@ function claimSimulationFreeAgentFromShell(playerId){
 
 let simulationTradeDeskFeedback = {};
 
+function getPersistedSimulationTradeDeskFeedback(partnerAbbr, tradeVm){
+  const partnerKey=String(partnerAbbr || '').trim().toUpperCase();
+  if(!partnerKey) return null;
+  const state=SEASON_MODE_ADAPTER?.getState?.() || D || {};
+  const controlledKey=String(D?.draftState?.controlledTeamAbbr || tradeVm?.userTeamAbbr || state?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  const entries=Array.isArray(state?.seasonState?.activityLog) ? state.seasonState.activityLog : [];
+  for(const entry of entries){
+    if(String(entry?.type || '').trim().toLowerCase()!=='trade') continue;
+    const feedback=entry?.tradeDeskFeedback || {};
+    const directPartner=String(feedback?.partnerAbbr || '').trim().toUpperCase();
+    const fromKey=String(entry?.fromTeamAbbr || '').trim().toUpperCase();
+    const toKey=String(entry?.toTeamAbbr || '').trim().toUpperCase();
+    const inferredPartner=directPartner || (controlledKey && fromKey===controlledKey ? toKey : controlledKey && toKey===controlledKey ? fromKey : '');
+    if(inferredPartner!==partnerKey) continue;
+    const message=String(feedback?.message || entry?.message || entry?.text || '').trim();
+    if(!message) continue;
+    return {
+      tone:String(feedback?.tone || 'success').trim().toLowerCase() || 'success',
+      message,
+      detail:String(feedback?.detail || entry?.detail || '').trim()
+    };
+  }
+  return null;
+}
+
+function getSimulationTradeDeskFeedbackForPartner(partnerAbbr, tradeVm){
+  const key=String(partnerAbbr || '').trim();
+  const liveFeedback=simulationTradeDeskFeedback?.[key] || simulationTradeDeskFeedback?.[key.toUpperCase()] || null;
+  if(liveFeedback?.message) return liveFeedback;
+  return getPersistedSimulationTradeDeskFeedback(partnerAbbr, tradeVm);
+}
+
 function getSimulationTradePlayerValue(player){
   const candidates=[
     player?.fp,
@@ -11325,11 +11359,21 @@ function applySimulationTradeBuilderPackage(partnerAbbr){
   const incomingPlayerIds=incomingSelectionIds.map(toTradePayloadId);
   const outgoingPlayerName=outgoingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
   const incomingPlayerName=incomingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
+  const tradeAppliedMessage=`Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`;
+  const tradeAppliedDetail=fairness.message || '';
   const nextState=SEASON_MODE_ADAPTER.applyTrade({
     fromTeamAbbr: fromTeamAbbr,
     toTeamAbbr: toTeamAbbr,
     outgoingPlayerIds,
-    incomingPlayerIds
+    incomingPlayerIds,
+    outgoingPlayerNames: outgoingPlayers.map((player)=>player?.name).filter(Boolean),
+    incomingPlayerNames: incomingPlayers.map((player)=>player?.name).filter(Boolean),
+    tradeDeskFeedback: {
+      partnerAbbr: toTeamAbbr,
+      tone: 'success',
+      message: tradeAppliedMessage,
+      detail: tradeAppliedDetail
+    }
   });
   const resolvedState=nextState || SEASON_MODE_ADAPTER.getState?.() || D;
   const fromRoster=resolvedState?.draftState?.rostersByTeam?.[fromTeamAbbr] || [];
@@ -11349,8 +11393,8 @@ function applySimulationTradeBuilderPackage(partnerAbbr){
     ...simulationTradeDeskFeedback,
     [partnerAbbr]: {
       tone: 'success',
-      message: `Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`,
-      detail: fairness.message || ''
+      message: tradeAppliedMessage,
+      detail: tradeAppliedDetail
     }
   };
   closeSimulationTradeBuilderModal();
@@ -11358,7 +11402,7 @@ function applySimulationTradeBuilderPackage(partnerAbbr){
   renderSimulationTradesInSharedShell();
   renderSimulationRosterInSharedShell();
   renderSimulationHubInSharedShell();
-  if(typeof toast==='function') toast(`Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`);
+  if(typeof toast==='function') toast(tradeAppliedMessage);
 }
 
 function renderSimulationTradesInSharedShell(){
@@ -11395,7 +11439,7 @@ function renderSimulationTradesInSharedShell(){
   const partnerCards=partnerRows.map((row) => {
     const team=row?.team || row;
     const partnerAbbr=String(team?.abbr || row?.teamAbbr || '').trim();
-    const feedback=simulationTradeDeskFeedback?.[partnerAbbr] || null;
+    const feedback=getSimulationTradeDeskFeedbackForPartner(partnerAbbr, vm);
     const feedbackTone=String(feedback?.tone || '').trim().toLowerCase();
     const feedbackStyle=feedbackTone==='success'
       ? 'border-color:rgba(34,197,94,.35);background:rgba(20,83,45,.16);color:#bbf7d0;'
@@ -11538,11 +11582,21 @@ function applySimulationTradeFromShell(partnerAbbr){
   }
   const outgoingPlayerName=outgoingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
   const incomingPlayerName=incomingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
+  const tradeAppliedMessage=`Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`;
+  const tradeAppliedDetail=fairness.message || '';
   const nextState=SEASON_MODE_ADAPTER.applyTrade({
     fromTeamAbbr: fromTeamAbbr,
     toTeamAbbr: toTeamAbbr,
     outgoingPlayerIds,
-    incomingPlayerIds
+    incomingPlayerIds,
+    outgoingPlayerNames: outgoingPlayers.map((player)=>player?.name).filter(Boolean),
+    incomingPlayerNames: incomingPlayers.map((player)=>player?.name).filter(Boolean),
+    tradeDeskFeedback: {
+      partnerAbbr: toTeamAbbr,
+      tone: 'success',
+      message: tradeAppliedMessage,
+      detail: tradeAppliedDetail
+    }
   });
   const resolvedState=nextState || SEASON_MODE_ADAPTER.getState?.() || D;
   const fromRoster=resolvedState?.draftState?.rostersByTeam?.[fromTeamAbbr] || [];
@@ -11567,15 +11621,15 @@ function applySimulationTradeFromShell(partnerAbbr){
     ...simulationTradeDeskFeedback,
     [partnerAbbr]: {
       tone: 'success',
-      message: `Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`,
-      detail: fairness.message || ''
+      message: tradeAppliedMessage,
+      detail: tradeAppliedDetail
     }
   };
   persistSimulationSeasonState('simulation_trade');
   renderSimulationTradesInSharedShell();
   renderSimulationRosterInSharedShell();
   renderSimulationHubInSharedShell();
-  if(typeof toast==='function') toast(`Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`);
+  if(typeof toast==='function') toast(tradeAppliedMessage);
 }
 
 function renderSimulationStandingsInSharedShell(){

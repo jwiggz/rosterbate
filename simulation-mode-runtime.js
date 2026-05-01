@@ -72,6 +72,16 @@
     return String(playerId ?? '').trim();
   }
 
+  function normalizeTradePlayerNames(players, fallbackNames){
+    const explicitNames = Array.isArray(fallbackNames)
+      ? fallbackNames.map((name) => String(name || '').trim()).filter(Boolean)
+      : [];
+    if (explicitNames.length) return explicitNames;
+    return (Array.isArray(players) ? players : [])
+      .map((player) => String(player?.name || '').trim())
+      .filter(Boolean);
+  }
+
   function normalizeLineupPlayerIdValue(playerId){
     const key = normalizePlayerIdKey(playerId);
     if (!key) return null;
@@ -1393,9 +1403,32 @@
     pruneLineupState(next, toTeamAbbr, Array.from(incomingIds));
     const fromBalance = balanceSimulationTradeRosterSize(next, fromTeamAbbr, fromRoster.length, Array.from(incomingIds));
     const toBalance = balanceSimulationTradeRosterSize(next, toTeamAbbr, toRoster.length, Array.from(outgoingIds));
+    const outgoingNames = normalizeTradePlayerNames(outgoing, trade?.outgoingPlayerNames);
+    const incomingNames = normalizeTradePlayerNames(incoming, trade?.incomingPlayerNames);
+    const outgoingLabel = outgoingNames.join(' + ') || 'player';
+    const incomingLabel = incomingNames.join(' + ') || 'player';
+    const persistedFeedback = trade?.tradeDeskFeedback || {};
+    const feedbackMessage = String(persistedFeedback?.message || trade?.feedbackMessage || '').trim()
+      || `Trade applied: ${outgoingLabel} for ${incomingLabel}.`;
+    const feedbackDetail = String(persistedFeedback?.detail || trade?.feedbackDetail || '').trim();
     next.seasonState.activityLog.unshift({
       type: 'trade',
       title: `${fromTeamAbbr} traded with ${toTeamAbbr}`,
+      text: feedbackMessage,
+      message: feedbackMessage,
+      detail: feedbackDetail,
+      fromTeamAbbr,
+      toTeamAbbr,
+      outgoingPlayerIds: Array.from(outgoingIds),
+      incomingPlayerIds: Array.from(incomingIds),
+      outgoingPlayerNames: clone(outgoingNames),
+      incomingPlayerNames: clone(incomingNames),
+      tradeDeskFeedback: {
+        partnerAbbr: String(persistedFeedback?.partnerAbbr || toTeamAbbr).trim().toUpperCase(),
+        tone: String(persistedFeedback?.tone || 'success').trim().toLowerCase() || 'success',
+        message: feedbackMessage,
+        detail: feedbackDetail
+      },
       ts: Date.now()
     });
     if (fromBalance.added.length || fromBalance.dropped.length || toBalance.added.length || toBalance.dropped.length) {
