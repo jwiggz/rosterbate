@@ -28,7 +28,33 @@ function makePlayer(id, name, team, pos, fp) {
   };
 }
 
-function buildSeedState(slotId = SLOT_ID) {
+function buildSeedState(slotId = SLOT_ID, options = {}) {
+  const scheduleByDay = options.singleGameDay
+    ? {
+      1: [{ homeAbbr: 'LAL', awayAbbr: 'BOS' }],
+      2: [{ homeAbbr: 'BOS', awayAbbr: 'LAL' }]
+    }
+    : {
+      1: [
+        { homeAbbr: 'LAL', awayAbbr: 'BOS' },
+        { homeAbbr: 'ATL', awayAbbr: 'MIA' }
+      ],
+      2: [
+        { homeAbbr: 'BOS', awayAbbr: 'LAL' },
+        { homeAbbr: 'MIA', awayAbbr: 'ATL' }
+      ]
+    };
+  const pendingWaiverClaim = options.pendingWaiverClaim
+    ? {
+      claimId: 'single-game-live-waiver',
+      teamAbbr: 'LAL',
+      addPlayerId: 99,
+      dropPlayerId: 5,
+      status: 'pending',
+      processOnAdvance: 'day',
+      submittedAt: 1
+    }
+    : null;
   return {
     sport: 'nba',
     simulationMode: 'nba_mixed_era_single_player_v1',
@@ -79,7 +105,9 @@ function buildSeedState(slotId = SLOT_ID) {
           makePlayer(35, 'Tim Hardaway', 'MIA', 'PG', 35)
         ]
       },
-      freeAgents: []
+      freeAgents: pendingWaiverClaim
+        ? [makePlayer(99, 'James Worthy', 'LAL', 'SF', 37)]
+        : []
     },
     seasonState: {
       currentDay: 1,
@@ -97,24 +125,17 @@ function buildSeedState(slotId = SLOT_ID) {
         { teamIdx: 3, teamAbbr: 'MIA', conference: 'East', division: 'Southeast', w: 0, l: 0, pf: 0, pa: 0 }
       ],
       completedGameLogs: [],
-      scheduleByDay: {
-        1: [
-          { homeAbbr: 'LAL', awayAbbr: 'BOS' },
-          { homeAbbr: 'ATL', awayAbbr: 'MIA' }
-        ],
-        2: [
-          { homeAbbr: 'BOS', awayAbbr: 'LAL' },
-          { homeAbbr: 'MIA', awayAbbr: 'ATL' }
-        ]
-      },
+      scheduleByDay,
+      pendingWaiverClaims: pendingWaiverClaim ? [pendingWaiverClaim] : [],
+      recentWaiverResults: [],
       activityLog: []
     },
     postseasonState: { phase: 'regular_season' }
   };
 }
 
-async function seedLiveMatchupSeason(page, slotId) {
-  const seedState = buildSeedState(slotId);
+async function seedLiveMatchupSeason(page, slotId, options = {}) {
+  const seedState = buildSeedState(slotId, options);
   await page.goto(`${BASE_URL}/historic-universe.html?seed=${Date.now()}`, {
     waitUntil: 'domcontentloaded',
     timeout: 20000
@@ -627,6 +648,59 @@ async function smokeSeasonHardRefreshPersistence(browser) {
   await page.close();
 }
 
+async function smokeSingleGameLiveMatchupAdvancesDay(browser) {
+  const slotId = `${SLOT_ID}-single-game-day`;
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'single-game-live-advance');
+  await seedLiveMatchupSeason(page, slotId, { singleGameDay: true, pendingWaiverClaim: true });
+
+  await page.goto(
+    `${BASE_URL}/rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=${slotId}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForTimeout(2500);
+  await page.evaluate(() => window.goPage && window.goPage('matchup'));
+  await page.waitForTimeout(1000);
+  await page.locator('button').filter({ hasText: 'Watch Live' }).first().click({ timeout: 8000 });
+  await page.waitForURL(/sim-matchup\.html/, { timeout: 10000 });
+  await page.locator('#btn-reveal-final').click({ timeout: 5000 });
+  await page.waitForFunction(
+    () => (
+      !document.querySelector('#overlay')?.classList.contains('hidden') &&
+      document.querySelector('#overlay-title')?.textContent === 'FINAL'
+    ),
+    null,
+    { timeout: 5000 }
+  );
+  await page.locator('#overlay-btn').click();
+  await page.waitForURL(/rosterbate-season\.html/, { timeout: 10000 });
+  await page.waitForTimeout(1500);
+
+  const persisted = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const slot = slotRaw ? JSON.parse(slotRaw) : null;
+    return {
+      day: Number(SEASON_MODE_ADAPTER?.getState?.()?.seasonState?.currentDay || 0),
+      completedGames: Number(SEASON_MODE_ADAPTER?.getState?.()?.seasonState?.completedGameLogs?.length || 0),
+      persistedDay: Number(slot?.seasonState?.currentDay || 0),
+      pendingWaivers: Number(slot?.seasonState?.pendingWaiverClaims?.length || 0),
+      rosterIds: (slot?.draftState?.rostersByTeam?.LAL || []).map((player) => Number(player?.id || 0)),
+      freeAgentIds: (slot?.draftState?.freeAgents || []).map((player) => Number(player?.id || 0)),
+      text: document.body.innerText
+    };
+  }, slotId);
+  assert.equal(persisted.day, 2, 'single-game live reveal should advance the in-memory season to Day 2');
+  assert.equal(persisted.persistedDay, 2, 'single-game live reveal should persist Day 2 to the universe slot');
+  assert.equal(persisted.completedGames, 1, 'single-game live reveal should persist the completed Day 1 matchup once');
+  assert.equal(persisted.pendingWaivers, 0, 'single-game live reveal should process day waivers through the browser runtime');
+  assert.ok(persisted.rosterIds.includes(99), 'single-game live reveal should persist the awarded waiver player');
+  assert.ok(persisted.freeAgentIds.includes(5), 'single-game live reveal should persist the dropped waiver player as a free agent');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'returning from a single-game live reveal should render Day 2 copy');
+  assert.doesNotMatch(persisted.text, /1 of 1 Day 1 matchups final/i, 'single-game live reveal should not leave the shell in a partial-day state');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -636,6 +710,7 @@ async function main() {
     await smokeLiveMatchupMobileControls(browser);
     await smokeSeasonMatchupMobilePartialDay(browser);
     await smokeSeasonHardRefreshPersistence(browser);
+    await smokeSingleGameLiveMatchupAdvancesDay(browser);
   } finally {
     await browser.close();
   }

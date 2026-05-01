@@ -897,9 +897,18 @@ assert.ok(Array.isArray(preparedLiveMatchup.gameLog.homeEntries), 'live matchup 
 assert.ok(Array.isArray(preparedLiveMatchup.gameLog.awayEntries), 'live matchup prep should expose away starter box-score entries');
 assert.equal(liveMatchupAdapter.getState().seasonState.completedGameLogs.length, 1, 'preparing a live matchup should not mutate season results');
 const liveCommittedState = liveMatchupAdapter.commitLiveMatchupResult(preparedLiveMatchup);
-assert.equal(liveCommittedState.seasonState.currentDay, 12, 'committing one live matchup should not advance the season day');
+assert.equal(liveCommittedState.seasonState.currentDay, 13, 'committing the only scheduled live matchup should advance to the next day');
 assert.equal(liveCommittedState.seasonState.currentWeek, 2, 'committing one live matchup should not advance the season week');
 assert.equal(liveCommittedState.seasonState.completedGameLogs.length, 2, 'committing one live matchup should append only that selected game');
+assert.equal(liveCommittedState.seasonState.pendingWaiverClaims.length, 0, 'single-game live commit should resolve pending day waivers when it advances the day');
+assert.ok(
+  liveCommittedState.draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 50),
+  'single-game live commit should apply awarded day-waiver additions when it advances the day'
+);
+assert.ok(
+  liveCommittedState.draftState.freeAgents.some((player) => Number(player.id) === 23),
+  'single-game live commit should return the dropped day-waiver player to free agency when it advances the day'
+);
 assert.ok(
   liveCommittedState.seasonState.completedGameLogs.some((game) =>
     String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
@@ -918,10 +927,8 @@ assert.equal(
   liveCommittedState.seasonState.completedGameLogs.length,
   'committing an already completed live matchup should not duplicate game logs'
 );
-const liveThenRevealState = liveMatchupAdapter.simulateNextDay();
-assert.equal(liveThenRevealState.seasonState.currentDay, 13, 'normal day reveal should advance after a live matchup has already completed the selected game');
 assert.equal(
-  liveThenRevealState.seasonState.completedGameLogs.filter((game) =>
+  duplicateLiveCommitState.seasonState.completedGameLogs.filter((game) =>
     String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
     String(game?.awayAbbr || '').toUpperCase() === 'BOS' &&
     Number(game?.day || 0) === 12
@@ -973,14 +980,29 @@ const multiGamePreparedLive = multiGameLiveAdapter.prepareLiveMatchup(liveMatchu
 assert.equal(multiGamePreparedLive.status, 'ready', 'multi-game day live prep should lock the selected matchup');
 const multiGameCommittedLive = multiGameLiveAdapter.commitLiveMatchupResult(multiGamePreparedLive);
 assert.equal(
+  multiGameCommittedLive.seasonState.currentDay,
+  12,
+  'multi-game live commit should stay on the current day until the remaining matchups are finished'
+);
+assert.equal(
   multiGameCommittedLive.seasonState.completedGameLogs.filter((game) => Number(game?.day || 0) === 12).length,
   1,
   'multi-game live commit should write only the selected game before the rest of the day is simulated'
+);
+assert.equal(
+  multiGameCommittedLive.seasonState.pendingWaiverClaims.length,
+  1,
+  'multi-game live commit should leave day waivers pending until the whole day is finished'
 );
 const multiGameAfterDayReveal = multiGameLiveAdapter.simulateNextDay();
 const dayTwelveLogs = multiGameAfterDayReveal.seasonState.completedGameLogs.filter((game) => Number(game?.day || 0) === 12);
 assert.equal(multiGameAfterDayReveal.seasonState.currentDay, 13, 'multi-game day reveal should advance after simming the remaining scheduled game');
 assert.equal(dayTwelveLogs.length, 2, 'multi-game day reveal should append the unsimulated game after a live matchup');
+assert.equal(
+  multiGameAfterDayReveal.seasonState.pendingWaiverClaims.length,
+  0,
+  'multi-game day reveal should resolve day waivers after finishing the remaining matchups'
+);
 assert.equal(
   dayTwelveLogs.filter((game) =>
     String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
