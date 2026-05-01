@@ -4926,12 +4926,68 @@ function getLeagueFreshnessTs(data){
   );
 }
 
+function getLeagueRevealedDayCursor(data){
+  if(!data || typeof data!=='object') return 0;
+  const seasonState=(data.seasonState && typeof data.seasonState==='object') ? data.seasonState : {};
+  const directCursor=Math.max(
+    Number(data.lastRevealedDay || 0) || 0,
+    Number(seasonState.lastRevealedDay || 0) || 0
+  );
+  const revealMaps=[data.revealedDays, seasonState.revealedDays].filter(map=>map && typeof map==='object');
+  return Math.max(directCursor, ...revealMaps.flatMap(map=>
+    Object.entries(map)
+      .filter(([, revealed])=>!!revealed)
+      .map(([day])=>Number(day || 0) || 0)
+  ));
+}
+
+function getLeagueStandingsGameCount(data){
+  if(!data || typeof data!=='object') return 0;
+  const seasonState=(data.seasonState && typeof data.seasonState==='object') ? data.seasonState : {};
+  const standingSets=[data.standings, seasonState.standings].filter(Array.isArray);
+  return standingSets.reduce((best, standings)=>{
+    const total=standings.reduce((sum, row)=>sum + (Number(row?.w || 0) || 0) + (Number(row?.l || 0) || 0), 0);
+    return Math.max(best, total);
+  }, 0);
+}
+
+function getLeagueProgressRank(data){
+  if(!data || typeof data!=='object') return {currentWeek:1,currentDay:1,completedGameLogs:0,lastRevealedDay:0,standingsGames:0};
+  const seasonState=(data.seasonState && typeof data.seasonState==='object') ? data.seasonState : {};
+  const completedGameLogs=[
+    data.completedGameLogs,
+    seasonState.completedGameLogs
+  ].filter(Array.isArray).reduce((best, logs)=>Math.max(best, logs.length), 0);
+  return {
+    currentWeek:Math.max(1, Number(data.currentWeek || 0) || 0, Number(seasonState.currentWeek || 0) || 0),
+    currentDay:Math.max(1, Number(data.currentDay || 0) || 0, Number(seasonState.currentDay || 0) || 0),
+    completedGameLogs,
+    lastRevealedDay:getLeagueRevealedDayCursor(data),
+    standingsGames:getLeagueStandingsGameCount(data)
+  };
+}
+
+function compareLeagueProgressRank(leftData, rightData){
+  const left=getLeagueProgressRank(leftData);
+  const right=getLeagueProgressRank(rightData);
+  const fields=['currentWeek','currentDay','completedGameLogs','lastRevealedDay','standingsGames'];
+  for(const field of fields){
+    if(left[field]!==right[field]) return left[field] > right[field] ? 1 : -1;
+  }
+  return 0;
+}
+
 function isFreshDayOneLeagueState(data){
   if(!data || typeof data!=='object') return false;
+  const progress=getLeagueProgressRank(data);
   return (
-    Number(data.currentWeek || 1) <= 1 &&
-    Number(data.currentDay || 1) <= 1 &&
-    !data.isSeasonComplete
+    progress.currentWeek <= 1 &&
+    progress.currentDay <= 1 &&
+    progress.completedGameLogs <= 0 &&
+    progress.lastRevealedDay <= 0 &&
+    progress.standingsGames <= 0 &&
+    !data.isSeasonComplete &&
+    !data?.seasonState?.isSeasonComplete
   );
 }
 
@@ -4939,6 +4995,9 @@ function shouldPreferLocalLeagueData(localData, remoteData, requestedLeagueId){
   const target=String(requestedLeagueId || '').trim();
   if(!target || !localData || String(localData.seasonId || '').trim()!==target) return false;
   if(!remoteData) return true;
+  const progressComparison=compareLeagueProgressRank(localData, remoteData);
+  if(progressComparison < 0) return false;
+  if(progressComparison > 0) return true;
   const localTeams=getLeagueTeamCount(localData);
   const remoteTeams=getLeagueTeamCount(remoteData);
   if(localTeams > remoteTeams) return true;

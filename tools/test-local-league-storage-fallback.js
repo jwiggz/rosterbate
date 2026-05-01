@@ -131,6 +131,13 @@ ${extractBetween(seasonHtml, 'function resolveLocalSavedSeasonAutoLoad(', 'funct
 module.exports = { resolveLocalSavedSeasonAutoLoad };
 `;
 
+const localLeaguePreferenceSource = `
+${extractBetween(seasonHtml, 'function getLeagueTeamCount(data){', 'function getSharedSeasonActorId()')}
+module.exports = {
+  shouldPreferLocalLeagueData
+};
+`;
+
 const advancedSlotState = {
   sport: 'nba',
   simulationMode: 'nba_mixed_era_single_player_v1',
@@ -198,6 +205,62 @@ vm.runInContext(resumeResolutionSource, resumeSandbox);
 const resolvedResume = resumeSandbox.module.exports.resolveLocalSavedSeasonAutoLoad(stalePendingState, 'nba');
 assert.equal(resolvedResume.state.seasonState.currentDay, 2, 'simulation pending handoffs should prefer a newer local universe slot over stale Day 1 launch data');
 assert.deepEqual(slotLookups, ['slot-advanced'], 'simulation pending handoffs should inspect their historical universe slot before booting');
+
+const preferenceSandbox = {
+  module: { exports: {} },
+  exports: {}
+};
+vm.createContext(preferenceSandbox);
+vm.runInContext(localLeaguePreferenceSource, preferenceSandbox);
+const localPreferenceApi = preferenceSandbox.module.exports;
+const richerStaleLocalLeague = {
+  seasonId: 'season_60',
+  sport: 'nba',
+  activeSeasonBackend: 'simulation',
+  currentDay: 1,
+  currentWeek: 1,
+  updatedAt: 999999,
+  teams: Array.from({ length: 10 }, (_, index) => `Team ${index + 1}`),
+  allRosters: Array.from({ length: 10 }, (_, teamIdx) =>
+    Array.from({ length: 14 }, (_, playerIdx) => ({ id: `${teamIdx}-${playerIdx}` }))
+  ),
+  seasonState: {
+    currentDay: 1,
+    currentWeek: 1,
+    completedGameLogs: [],
+    standings: []
+  }
+};
+const advancedCloudLeague = {
+  seasonId: 'season_60',
+  sport: 'nba',
+  activeSeasonBackend: 'simulation',
+  currentDay: 2,
+  currentWeek: 1,
+  updatedAt: 1000,
+  leagueShell: {
+    teams: Array.from({ length: 10 }, (_, index) => ({ abbr: `T${index + 1}` }))
+  },
+  draftState: {
+    rostersByTeam: Object.fromEntries(
+      Array.from({ length: 10 }, (_, teamIdx) => [
+        `T${teamIdx + 1}`,
+        Array.from({ length: 5 }, (_, playerIdx) => ({ id: `cloud-${teamIdx}-${playerIdx}` }))
+      ])
+    )
+  },
+  seasonState: {
+    currentDay: 2,
+    currentWeek: 1,
+    completedGameLogs: [{ day: 1, homeAbbr: 'SH', awayAbbr: 'P' }],
+    standings: [{ teamAbbr: 'P', w: 1, l: 0 }, { teamAbbr: 'SH', w: 0, l: 1 }]
+  }
+};
+assert.equal(
+  localPreferenceApi.shouldPreferLocalLeagueData(richerStaleLocalLeague, advancedCloudLeague, 'season_60'),
+  false,
+  'a stale Day 1 browser draft must not overwrite a cloud season that has advanced to Day 2'
+);
 
 async function runAsyncAssertions() {
   const firebaseWrites = [];
