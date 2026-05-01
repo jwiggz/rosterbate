@@ -39,6 +39,32 @@ assert.match(
   'My Leagues local reopen should keep a pending handoff alongside the best-effort localStorage snapshot'
 );
 
+assert.match(
+  seasonHtml,
+  /if \(leagueId && leagueId !== 'demo'\) setSeasonEmptyState\('loading'\);/,
+  'requested league routes should show a loading state instead of a blank shell while booting'
+);
+
+assert.match(
+  seasonHtml,
+  /function persistPendingSeasonLaunchToFirebase\(leagueId, pendingSeasonLaunch\)\{/,
+  'pending local league handoff should save to Firebase through an async helper'
+);
+
+const pendingSeasonBranch = extractBetween(
+  seasonHtml,
+  "if (pendingSeasonLaunch?.data) {",
+  "    // Wait for auth to be ready"
+);
+assert.ok(
+  pendingSeasonBranch.indexOf('initSeason();') >= 0,
+  'pending local league handoff should initialize the season before falling through to cloud restore'
+);
+assert.ok(
+  pendingSeasonBranch.indexOf('persistPendingSeasonLaunchToFirebase(leagueId, pendingSeasonLaunch)') > pendingSeasonBranch.indexOf('applyRequestedSeasonView();'),
+  'pending local league handoff should queue Firebase refresh after first render'
+);
+
 const pendingLaunchSource = `
 ${extractBetween(seasonHtml, "const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';", 'function getMatchingLocalLeagueData(')}
 module.exports = {

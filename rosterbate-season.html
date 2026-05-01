@@ -4803,6 +4803,41 @@ function clearPendingSeasonLaunch(requestedLeagueId){
   }
 }
 
+async function persistPendingSeasonLaunchToFirebase(leagueId, pendingSeasonLaunch){
+  const targetLeagueId=String(leagueId || pendingSeasonLaunch?.seasonId || '').trim();
+  const pendingData=(pendingSeasonLaunch?.data && typeof pendingSeasonLaunch.data==='object') ? pendingSeasonLaunch.data : null;
+  if(!targetLeagueId || !pendingData) return false;
+  await authReady;
+  if(!currentRbUser) return false;
+  const userId = currentRbUser.uid;
+  const canonicalSeasonState = normalizeLocalLeagueDraftSnapshot(pendingData) || pendingData;
+  const saveData = {
+    ...canonicalSeasonState,
+    seasonId: targetLeagueId,
+    userId: userId,
+    userEmail: currentRbUser.email || 'unknown',
+    createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
+    updatedAt: Date.now()
+  };
+  await db.ref(`userSeasons/${userId}/${targetLeagueId}`).set(removeUndefined(saveData));
+  await db.ref(`allSeasons/${targetLeagueId}`).set(removeUndefined({
+    seasonId: targetLeagueId,
+    userId: userId,
+    userEmail: currentRbUser.email || 'unknown',
+    sport: canonicalSeasonState.sport || 'nba',
+    leagueName: canonicalSeasonState.leagueName || 'RosterBate League',
+    teamName: canonicalSeasonState.teamName || 'My Team',
+    isMultiplayer: !!canonicalSeasonState.multiplayer,
+    leagueSize: getLeagueTeamCount(canonicalSeasonState),
+    scoringFormat: canonicalSeasonState.scoringFormat || 'h2h_pts',
+    draftFormat: canonicalSeasonState.draftFormat || 'snake',
+    currentWeek: Number(canonicalSeasonState.currentWeek || 1),
+    createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
+    updatedAt: Date.now()
+  }));
+  return true;
+}
+
 function getMatchingLocalLeagueData(requestedLeagueId){
   const target=String(requestedLeagueId || '').trim();
   if(!target) return null;
@@ -8713,7 +8748,7 @@ window.onload=async function(){
   const completedSimulationDraftBoot = resolveCompletedSimulationDraftSeasonBoot(urlParams, requestedSport);
   ACTIVE_SEASON_MODE = 'fantasy';
   SEASON_MODE_ADAPTER = null;
-  if (leagueId && leagueId !== 'demo') hideSeasonEmptyState();
+  if (leagueId && leagueId !== 'demo') setSeasonEmptyState('loading');
   else setSeasonEmptyState('idle');
 
   if (completedSimulationDraftBoot?.redirected && completedSimulationDraftBoot.redirectUrl) {
@@ -8841,39 +8876,6 @@ window.onload=async function(){
       refreshCommissionerAccess();
       D=writeLocalDraftSnapshot(D);
       applySeasonManagerLeagueDataLoad(D, requestedSport);
-      await authReady;
-      if (currentRbUser) {
-        try {
-          const userId = currentRbUser.uid;
-          const canonicalSeasonState = normalizeLocalLeagueDraftSnapshot(D) || D;
-          const saveData = {
-            ...canonicalSeasonState,
-            seasonId: leagueId,
-            userId: userId,
-            userEmail: currentRbUser.email || 'unknown',
-            createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
-            updatedAt: Date.now()
-          };
-          await db.ref(`userSeasons/${userId}/${leagueId}`).set(removeUndefined(saveData));
-          await db.ref(`allSeasons/${leagueId}`).set(removeUndefined({
-            seasonId: leagueId,
-            userId: userId,
-            userEmail: currentRbUser.email || 'unknown',
-            sport: canonicalSeasonState.sport || 'nba',
-            leagueName: canonicalSeasonState.leagueName || 'RosterBate League',
-            teamName: canonicalSeasonState.teamName || 'My Team',
-            isMultiplayer: !!canonicalSeasonState.multiplayer,
-            leagueSize: getLeagueTeamCount(canonicalSeasonState),
-            scoringFormat: canonicalSeasonState.scoringFormat || 'h2h_pts',
-            draftFormat: canonicalSeasonState.draftFormat || 'snake',
-            currentWeek: Number(canonicalSeasonState.currentWeek || 1),
-            createdAt: canonicalSeasonState.createdAt || canonicalSeasonState.savedAt || pendingSeasonLaunch.savedAt || Date.now(),
-            updatedAt: Date.now()
-          }));
-        } catch(saveErr) {
-          console.warn('Pending season handoff could not refresh Firebase before opening:', saveErr);
-        }
-      }
       let seasonLoaded = false;
       if (D.multiplayer) {
         try {
@@ -8892,8 +8894,11 @@ window.onload=async function(){
           return;
         }
       }
+      hideSeasonEmptyState();
       clearPendingSeasonLaunch(leagueId);
       applyRequestedSeasonView();
+      persistPendingSeasonLaunchToFirebase(leagueId, pendingSeasonLaunch)
+        .catch(saveErr => console.warn('Pending season handoff could not refresh Firebase after opening:', saveErr));
       return;
     }
     
