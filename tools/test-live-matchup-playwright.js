@@ -85,6 +85,9 @@ function buildSeedState(slotId = SLOT_ID, options = {}) {
     : null;
   return {
     sport: 'nba',
+    seasonId: options.leagueId || undefined,
+    leagueId: options.leagueId || undefined,
+    localLeagueId: options.leagueId || undefined,
     simulationMode: 'nba_mixed_era_single_player_v1',
     historicalEntryMode: 'simulation_season',
     activeSeasonBackend: 'simulation',
@@ -158,7 +161,8 @@ function buildSeedState(slotId = SLOT_ID, options = {}) {
       recentWaiverResults: [],
       activityLog: []
     },
-    postseasonState: { phase: 'regular_season' }
+    postseasonState: { phase: 'regular_season' },
+    isFreshDraftLaunch: options.freshDraftLaunch === true
   };
 }
 
@@ -174,6 +178,13 @@ async function seedLiveMatchupSeason(page, slotId, options = {}) {
     return window.RosterBateHistoricalUniverseSlots.upsertFromState(state, { slotId });
   }, { slotId, state: seedState });
   assert.equal(seeded?.slotId, slotId, 'test seed should persist through the real slot storage API');
+  if (options.leagueId) {
+    await page.evaluate(({ leagueId, state }) => {
+      const pendingPayload = JSON.stringify({ seasonId: leagueId, savedAt: Date.now(), data: state });
+      localStorage.setItem('rbPendingSeasonLaunch', pendingPayload);
+      sessionStorage.setItem('rbPendingSeasonLaunch', pendingPayload);
+    }, { leagueId: options.leagueId, state: seedState });
+  }
 }
 
 async function attachErrorCapture(page, label) {
@@ -335,62 +346,44 @@ async function smokeLiveMatchupWriteback(browser) {
   await page.waitForTimeout(1500);
   await page.evaluate(() => window.goPage && window.goPage('hub'));
   await page.waitForTimeout(750);
-  const partialHubText = await page.evaluate(() => document.body.innerText);
+  const returnedHubText = await page.evaluate(() => document.body.innerText);
   assert.match(
-    partialHubText,
-    /1 of 2 Day 1 matchups final/i,
-    'hub should explain partial live day progress after selected-matchup writeback'
-  );
-  assert.match(
-    partialHubText,
-    /Finish Day/i,
-    'hub should offer Finish Day after selected-matchup writeback leaves the day partially complete'
+    returnedHubText,
+    /Reveal Day 2|Day 2/i,
+    'hub should advance to Day 2 after returning from a full-page live reveal'
   );
   assert.doesNotMatch(
-    partialHubText,
+    returnedHubText,
     /Reveal Day 1 Results/i,
-    'hub should not keep offering Reveal Day Results once a selected live matchup is already final'
+    'hub should not keep offering Reveal Day 1 after a full-page live reveal return'
   );
 
   await page.evaluate(() => window.goPage && window.goPage('matchup'));
   await page.waitForTimeout(500);
   const returnedText = await page.evaluate(() => document.body.innerText);
-  assert.match(returnedText, /LATEST FINAL[\s\S]*BOS \d+ at LAL \d+/);
-  assert.match(returnedText, /Day 1[\s\S]{0,40}final/i);
+  assert.match(returnedText, /LATEST FINAL[\s\S]*Day 1 final/i);
+  assert.match(returnedText, /RECENT RESULTS[\s\S]*2 logged/i, 'matchup UI should show that the full Day 1 slate has been logged');
   assert.match(
     returnedText,
-    /1 of 2 Day 1 matchups final/i,
-    'season matchup UI should clarify that one live result is final while the rest of a multi-game day is still open'
+    /Reveal Day 2|Day 2/i,
+    'season matchup UI should show the next day after auto-finishing the live reveal return'
   );
-  assert.equal(
-    await page.locator('button').filter({ hasText: 'Watch Live' }).count(),
-    0,
-    'returning from a completed live matchup should not offer Watch Live for the same game again'
-  );
-  assert.match(
-    returnedText,
-    /Finish Day/i,
-    'partial live matchup state should offer a direct finish-day action from the matchup page'
-  );
-
-  await page.locator('button:visible').filter({ hasText: 'Finish Day' }).click({ timeout: 8000 });
-  await page.waitForTimeout(1500);
   const fullyPersisted = await page.evaluate((slotId) => (
     JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${slotId}`))
   ), SLOT_ID);
   const fullyCompletedGames = fullyPersisted?.seasonState?.completedGameLogs || [];
   const dayOneLogs = fullyCompletedGames.filter((game) => Number(game?.day || 0) === 1);
-  assert.equal(Number(fullyPersisted?.seasonState?.currentDay), 2, 'finishing the rest of a partial live day should advance to Day 2');
-  assert.equal(dayOneLogs.length, 2, 'finishing the rest of a partial live day should leave two completed Day 1 games');
+  assert.equal(Number(fullyPersisted?.seasonState?.currentDay), 2, 'full-page live reveal return should advance to Day 2');
+  assert.equal(dayOneLogs.length, 2, 'full-page live reveal return should leave two completed Day 1 games');
   assert.equal(
     dayOneLogs.filter((game) => String(game?.homeAbbr || '').toUpperCase() === 'LAL' && String(game?.awayAbbr || '').toUpperCase() === 'BOS').length,
     1,
-    'finishing the day should not duplicate the selected live matchup'
+    'full-page live reveal return should not duplicate the selected live matchup'
   );
   assert.equal(
     dayOneLogs.filter((game) => Number(game?.home) === 2 && Number(game?.away) === 3).length,
     1,
-    'finishing the day should simulate the other scheduled matchup'
+    'full-page live reveal return should simulate the other scheduled matchup'
   );
   await page.evaluate(() => window.goPage && window.goPage('hub'));
   await page.waitForTimeout(750);
@@ -545,6 +538,65 @@ async function smokeHubRevealModalAdvancesSingleGameDay(browser) {
   await page.close();
 }
 
+async function smokeLeagueUrlLiveReturnAdvancesDay(browser) {
+  const slotId = `${SLOT_ID}-league-url-return`;
+  const leagueId = 'season_60';
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'league-url-live-return');
+  await seedLiveMatchupSeason(page, slotId, { leagueId, freshDraftLaunch: true });
+
+  await page.goto(
+    `${BASE_URL}/rosterbate-season.html?sport=nba&league=${leagueId}&qa=${Date.now()}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForTimeout(2500);
+  await page.evaluate(() => window.goPage && window.goPage('matchup'));
+  await page.waitForTimeout(1000);
+  await page.locator('button').filter({ hasText: 'Watch Live' }).first().click({ timeout: 8000 });
+  await page.waitForURL(/sim-matchup\.html/, { timeout: 10000 });
+  await page.locator('#btn-reveal-final').click({ timeout: 5000 });
+  await page.waitForFunction(
+    () => (
+      !document.querySelector('#overlay')?.classList.contains('hidden') &&
+      document.querySelector('#overlay-title')?.textContent === 'FINAL'
+    ),
+    null,
+    { timeout: 5000 }
+  );
+  await page.locator('#overlay-btn').click();
+  await page.waitForURL(/rosterbate-season\.html/, { timeout: 10000 });
+  await page.waitForTimeout(1500);
+
+  const persisted = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const draftRaw = localStorage.getItem('rosterbateDraft');
+    const slot = slotRaw ? JSON.parse(slotRaw) : null;
+    const draft = draftRaw ? JSON.parse(draftRaw) : null;
+    return {
+      slotDay: Number(slot?.seasonState?.currentDay || 0),
+      completedDayOneGames: (slot?.seasonState?.completedGameLogs || []).filter((game) => Number(game?.day || 0) === 1).length,
+      draftDay: Number(draft?.seasonState?.currentDay || draft?.currentDay || 0),
+      draftSeasonId: draft?.seasonId,
+      draftLocalLeagueId: draft?.localLeagueId,
+      draftPointer: Boolean(draft?.localResumePointer),
+      pendingSession: Boolean(sessionStorage.getItem('rbPendingSeasonLaunch')),
+      pendingLocal: Boolean(localStorage.getItem('rbPendingSeasonLaunch')),
+      text: document.body.innerText
+    };
+  }, slotId);
+  assert.equal(persisted.slotDay, 2, 'league URL live return should persist Day 2 to the universe slot');
+  assert.equal(persisted.completedDayOneGames, 2, 'league URL live return should settle every Day 1 matchup');
+  assert.equal(persisted.draftDay, 2, 'league URL live return should update the local resume pointer to Day 2');
+  assert.equal(persisted.draftSeasonId, leagueId, 'league URL local resume pointer should keep the requested league id');
+  assert.equal(persisted.draftLocalLeagueId, leagueId, 'league URL local resume pointer should keep the local league id');
+  assert.equal(persisted.draftPointer, true, 'league URL simulation progress should persist through a compact slot pointer');
+  assert.equal(persisted.pendingSession, false, 'league URL boot should consume stale session handoffs');
+  assert.equal(persisted.pendingLocal, false, 'league URL boot should consume stale local handoffs');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'league URL live return should render Day 2 copy');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function smokeLiveMatchupInstantReveal(browser) {
   const slotId = `${SLOT_ID}-instant`;
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -604,10 +656,14 @@ async function smokeLiveMatchupInstantReveal(browser) {
   await page.waitForTimeout(1500);
 
   const persisted = await page.evaluate((targetSlotId) => (
-    JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`))
+    {
+      slot: JSON.parse(localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`)),
+      text: document.body.innerText
+    }
   ), slotId);
-  assert.equal(persisted?.seasonState?.completedGameLogs?.length, 1);
-  assert.equal(Number(persisted?.seasonState?.currentDay), 1);
+  assert.equal(persisted.slot?.seasonState?.completedGameLogs?.length, 2, 'full-page live reveal return should settle every Day 1 matchup');
+  assert.equal(Number(persisted.slot?.seasonState?.currentDay), 2, 'full-page live reveal return should advance the league to Day 2');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'full-page live reveal return should render Day 2 copy');
   assert.deepStrictEqual(errors, []);
   await page.close();
 }
@@ -684,33 +740,21 @@ async function smokeSeasonMatchupMobilePartialDay(browser) {
   await page.waitForTimeout(750);
 
   const mobileText = await page.evaluate(() => document.body.innerText);
-  assert.match(mobileText, /1 of 2 Day 1 matchups final/i, 'mobile matchup page should show partial-day final copy');
-  assert.match(mobileText, /Finish Day/i, 'mobile matchup page should expose Finish Day');
-  const finishButtonCount = await page.locator('button:visible').filter({ hasText: 'Finish Day' }).count();
-  assert.ok(finishButtonCount >= 1, 'Finish Day should be a tappable button on mobile');
+  assert.match(mobileText, /Reveal Day 2|Day 2/i, 'mobile matchup page should advance after returning from a full-page live reveal');
+  assert.doesNotMatch(mobileText, /1 of 2 Day 1 matchups final/i, 'mobile matchup page should not stay in partial-day state after live reveal return');
   const layout = await page.evaluate(() => {
     const viewportWidth = document.documentElement.clientWidth;
-    const finish = Array.from(document.querySelectorAll('button')).find((button) => {
-      if (!/Finish Day/i.test(button.textContent || '')) return false;
-      const rect = button.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    });
-    const finishRect = finish?.getBoundingClientRect();
     const matchupContent = document.querySelector('#matchupContent');
     const matchupRect = matchupContent?.getBoundingClientRect();
     return {
       bodyOverflow: document.documentElement.scrollWidth - viewportWidth,
       matchupOverflow: matchupContent ? matchupContent.scrollWidth - matchupContent.clientWidth : 0,
-      finishWidth: finishRect?.width || 0,
-      finishRight: finishRect?.right || 0,
       matchupRight: matchupRect?.right || 0,
       viewportWidth
     };
   });
   assert.ok(layout.bodyOverflow <= 2, `mobile matchup page should not create horizontal body overflow: ${JSON.stringify(layout)}`);
   assert.ok(layout.matchupOverflow <= 2, `mobile matchup content should not overflow its container: ${JSON.stringify(layout)}`);
-  assert.ok(layout.finishWidth > 0, 'Finish Day button should have visible width on mobile');
-  assert.ok(layout.finishRight <= layout.viewportWidth + 2, `Finish Day button should stay inside viewport: ${JSON.stringify(layout)}`);
   assert.ok(layout.matchupRight <= layout.viewportWidth + 2, `matchup content should stay inside viewport: ${JSON.stringify(layout)}`);
   assert.deepStrictEqual(errors, []);
   await page.close();
@@ -875,6 +919,7 @@ async function main() {
     await smokeLiveMatchupWriteback(browser);
     await smokeHubRevealModalFinishesMultiGameDay(browser);
     await smokeHubRevealModalAdvancesSingleGameDay(browser);
+    await smokeLeagueUrlLiveReturnAdvancesDay(browser);
     await smokeLiveMatchupInstantReveal(browser);
     await smokeLiveMatchupMobileControls(browser);
     await smokeSeasonMatchupMobilePartialDay(browser);

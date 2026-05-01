@@ -8754,6 +8754,7 @@ function applyRequestedSeasonView(defaultPage='hub'){
     commissioner: 'commissioner',
     comm: 'commissioner'
   };
+  consumeSimulationLiveMatchupReturnIntent();
   goPage(pageMap[requestedPage] || defaultPage);
 }
 
@@ -12834,6 +12835,7 @@ function setSimulationMatchupNavigationValue(value){
 
 let simulationRosterNavigationValue = null;
 let simulationLiveMatchupAutoFinishDayOnReturn = false;
+const RB_SIM_LIVE_RETURN_KEY = 'rbSimulationLiveMatchupReturn';
 
 function setSimulationRosterNavigationValue(value){
   const numericValue = Number(value);
@@ -12843,7 +12845,7 @@ function setSimulationRosterNavigationValue(value){
   }
 }
 
-function buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, returnHash){
+function buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, returnHash, options){
   const slotId=String(D?.historicalUniverseSlotId || D?.sharedSimulationSlotId || '').trim();
   if(!slotId) return '';
   const targetDay=Number(day || D?.seasonState?.currentDay || D?.currentDay || 1) || 1;
@@ -12854,11 +12856,12 @@ function buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, returnHash){
   params.set('homeAbbr', String(homeAbbr || '').trim().toUpperCase());
   params.set('awayAbbr', String(awayAbbr || '').trim().toUpperCase());
   params.set('returnUrl', window.location.pathname + window.location.search + (returnHash || '#matchup'));
+  if(options?.autoFinishDayOnReturn) params.set('autoFinishDayOnReturn', '1');
   return 'sim-matchup.html?' + params.toString();
 }
 
 function openSimulationLiveMatchup(day, homeAbbr, awayAbbr){
-  const url=buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, '#matchup');
+  const url=buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, '#matchup', { autoFinishDayOnReturn:true });
   if(!url){
     toast('Save this simulation universe before launching a live matchup.');
     return;
@@ -12957,6 +12960,33 @@ function finishSimulationRevealDayAfterLiveReturn(shouldAutoFinish){
   return true;
 }
 
+function consumeSimulationLiveMatchupReturnIntent(){
+  let parsed=null;
+  try{
+    const raw=sessionStorage.getItem(RB_SIM_LIVE_RETURN_KEY);
+    if(!raw) return false;
+    parsed=JSON.parse(raw);
+  }catch(e){
+    try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(removeErr){}
+    return false;
+  }
+  if(!parsed || typeof parsed!=='object' || !parsed.autoFinishDayOnReturn) {
+    try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(e){}
+    return false;
+  }
+  const markerSlotId=String(parsed.slotId || '').trim();
+  const currentSlotId=String(D?.historicalUniverseSlotId || D?.sharedSimulationSlotId || '').trim();
+  const markerAge=Date.now() - Number(parsed.savedAt || 0);
+  if(markerAge > 10 * 60 * 1000){
+    try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(e){}
+    return false;
+  }
+  if(!markerSlotId || !currentSlotId || markerSlotId!==currentSlotId) return false;
+  try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(e){}
+  syncSimulationLiveMatchupStateFromStorage();
+  return finishSimulationRevealDayAfterLiveReturn(true);
+}
+
 function closeSimulationLiveMatchupModal(syncState=true){
   const shouldAutoFinish=simulationLiveMatchupAutoFinishDayOnReturn;
   simulationLiveMatchupAutoFinishDayOnReturn=false;
@@ -12971,7 +13001,7 @@ function closeSimulationLiveMatchupModal(syncState=true){
 }
 
 function openSimulationLiveMatchupModal(day, homeAbbr, awayAbbr, options){
-  const url=buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, '#hub');
+  const url=buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, '#hub', options);
   if(!url){
     toast('Save this simulation universe before launching a live matchup.');
     return false;

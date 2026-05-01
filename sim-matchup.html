@@ -581,6 +581,8 @@ let liveRevealInterval = 40;
 let liveRevealFirstHalfInterval = 40;
 let liveRevealSecondHalfInterval = 40;
 let liveMatchupEmbedded = false;
+let liveMatchupAutoFinishDayOnReturn = false;
+const RB_SIM_LIVE_RETURN_KEY = 'rbSimulationLiveMatchupReturn';
 // Which team currently has the ball
 let possession = 'A';
 // Which basket the offense is attacking this possession (flips on every turnover)
@@ -1202,6 +1204,18 @@ function commitLiveMatchupResult() {
   }
 }
 
+function stageLiveMatchupReturnIntent() {
+  if (!liveMatchupMode || liveMatchupEmbedded || !liveMatchupAutoFinishDayOnReturn || !liveMatchupSlotId) return;
+  try {
+    sessionStorage.setItem(RB_SIM_LIVE_RETURN_KEY, JSON.stringify({
+      slotId: liveMatchupSlotId,
+      day: Number(liveMatchupPrepared?.gameLog?.day || 0) || null,
+      autoFinishDayOnReturn: true,
+      savedAt: Date.now()
+    }));
+  } catch (error) {}
+}
+
 function bootLiveMatchupFromParams() {
   const params = new URLSearchParams(window.location.search);
   const slotId = String(params.get('historicalUniverse') || '').trim();
@@ -1218,6 +1232,7 @@ function bootLiveMatchupFromParams() {
   liveMatchupSlotId = slotId;
   liveMatchupReturnUrl = String(params.get('returnUrl') || '').trim() || 'rosterbate-season.html';
   liveMatchupEmbedded = params.get('embedded') === '1';
+  liveMatchupAutoFinishDayOnReturn = params.get('autoFinishDayOnReturn') === '1';
   liveMatchupAdapter = adapterApi.createSimulationSeasonAdapter({ slotId, state });
   liveMatchupPrepared = liveMatchupAdapter.prepareLiveMatchup({ day, homeAbbr, awayAbbr });
   const game = liveMatchupPrepared?.gameLog || {};
@@ -1494,6 +1509,7 @@ function showOverlay(title, isFinal, winner='') {
         window.parent.postMessage({ type:'rosterbate-live-matchup-return', slotId:liveMatchupSlotId }, window.location.origin);
         return;
       }
+      stageLiveMatchupReturnIntent();
       window.location.href = liveMatchupReturnUrl || 'rosterbate-season.html';
     }) : startNewGame;
     sub.textContent = winner ? `${winner} win!` : '';
