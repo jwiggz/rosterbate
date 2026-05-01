@@ -3268,6 +3268,36 @@ function resolveLocalSavedSeasonAutoLoad(parsed, requestedSport){
     state:parsed
   };
 }
+
+function resolveSeasonManagerLeagueDataLoad(leagueData, requestedSport){
+  if(!leagueData || typeof leagueData!=='object') return null;
+  const normalizedLeagueData=normalizeLocalLeagueDraftSnapshot(leagueData) || leagueData;
+  const resolvedLoad=resolveLocalSavedSeasonAutoLoad(normalizedLeagueData, requestedSport);
+  if(resolvedLoad) return resolvedLoad;
+  const savedSport=normalizeRosterbateSport(normalizedLeagueData?.sport || normalizedLeagueData?.leagueShell?.sport || requestedSport || CURRENT_SPORT);
+  return {
+    sport:savedSport,
+    backend:'fantasy',
+    activeSeasonMode:'fantasy',
+    slotId:null,
+    rawState:null,
+    adapter:null,
+    state:normalizedLeagueData
+  };
+}
+
+function applySeasonManagerLeagueDataLoad(leagueData, requestedSport){
+  const resolvedLoad=resolveSeasonManagerLeagueDataLoad(leagueData, requestedSport);
+  if(!resolvedLoad) return null;
+  ACTIVE_SEASON_MODE=resolvedLoad.activeSeasonMode || 'fantasy';
+  SEASON_MODE_ADAPTER=resolvedLoad.adapter || null;
+  D=resolvedLoad.state || leagueData;
+  if(resolvedLoad.slotId && D && !D.historicalUniverseSlotId){
+    D.historicalUniverseSlotId=resolvedLoad.slotId;
+  }
+  applySportContext(resolvedLoad.sport || D?.sport || requestedSport || CURRENT_SPORT);
+  return resolvedLoad;
+}
 function loadHistoricalUniverseSlotState(slotId, requestedSport){
   const api=window.RosterBateHistoricalUniverseSlots;
   const targetSlotId=String(slotId||'').trim();
@@ -4773,13 +4803,44 @@ function getMatchingLocalLeagueData(requestedLeagueId){
   }
 }
 
+function doesSavedSeasonMatchRequestedLeague(data, requestedLeagueId){
+  const target=String(requestedLeagueId || '').trim();
+  if(!target || target==='demo') return true;
+  if(!data || typeof data!=='object') return false;
+  const normalized=normalizeLocalLeagueDraftSnapshot(data) || data;
+  const ids=[
+    normalized.seasonId,
+    normalized.leagueId,
+    normalized.historicalUniverseSlotId,
+    normalized.slotId,
+    normalized.resumeHistoricalUniverseSlotId
+  ].map(value=>String(value || '').trim()).filter(Boolean);
+  return ids.includes(target);
+}
+
 function getLeagueTeamCount(data){
   if(!data || typeof data!=='object') return 0;
   return Math.max(
     Number(data.leagueSize || 0),
     Array.isArray(data.teams) ? data.teams.length : 0,
-    Array.isArray(data.allRosters) ? data.allRosters.length : 0
+    Array.isArray(data.allRosters) ? data.allRosters.length : 0,
+    Array.isArray(data?.leagueShell?.teams) ? data.leagueShell.teams.length : 0,
+    data?.draftState?.rostersByTeam && typeof data.draftState.rostersByTeam === 'object'
+      ? Object.keys(data.draftState.rostersByTeam).length
+      : 0
   );
+}
+
+function getLeagueRosteredPlayerCount(data){
+  if(!data || typeof data!=='object') return 0;
+  const allRostersCount=Array.isArray(data.allRosters)
+    ? data.allRosters.reduce((sum, roster)=>sum + (Array.isArray(roster) ? roster.length : 0), 0)
+    : 0;
+  const draftRosters=data?.draftState?.rostersByTeam;
+  const draftRostersCount=draftRosters && typeof draftRosters==='object'
+    ? Object.values(draftRosters).reduce((sum, roster)=>sum + (Array.isArray(roster) ? roster.length : 0), 0)
+    : 0;
+  return Math.max(allRostersCount, draftRostersCount);
 }
 
 function getLeagueFreshnessTs(data){
@@ -4807,6 +4868,9 @@ function shouldPreferLocalLeagueData(localData, remoteData, requestedLeagueId){
   const localTeams=getLeagueTeamCount(localData);
   const remoteTeams=getLeagueTeamCount(remoteData);
   if(localTeams > remoteTeams) return true;
+  const localRostered=getLeagueRosteredPlayerCount(localData);
+  const remoteRostered=getLeagueRosteredPlayerCount(remoteData);
+  if(localRostered > remoteRostered) return true;
   if(isFreshDayOneLeagueState(localData) && !isFreshDayOneLeagueState(remoteData)) return true;
   const localTs=getLeagueFreshnessTs(localData);
   const remoteTs=getLeagueFreshnessTs(remoteData);
@@ -8739,6 +8803,7 @@ window.onload=async function(){
       hydrateDraftUserContextFromLobby();
       refreshCommissionerAccess();
       D=writeLocalDraftSnapshot(D);
+      applySeasonManagerLeagueDataLoad(D, requestedSport);
       await authReady;
       if (currentRbUser) {
         try {
@@ -8856,12 +8921,11 @@ window.onload=async function(){
                   console.warn('Failed to save to Firebase, continuing with localStorage data:', saveErr);
                 }
                 
-                // Continue with the league data
-                D = leagueData;
+                // Continue with the league data through the same simulation-aware hydration path used by saved universes.
+                applySeasonManagerLeagueDataLoad(leagueData, requestedSport);
                 
                 if (!D.myPos && D.myPos !== 0) D.myPos = 0;
                 
-                applySportContext(leagueData.sport || requestedSport);
                 hydrateDraftUserContextFromLobby();
                 refreshCommissionerAccess();
                 
@@ -8952,13 +9016,6 @@ window.onload=async function(){
           console.log('? Loaded league from Firebase:', leagueId);
           console.log('?? League data structure:', Object.keys(leagueData));
           
-          // Check if this is valid league data
-          if (!leagueData.allRosters || !Array.isArray(leagueData.allRosters)) {
-            console.error('? Invalid league data - missing allRosters');
-            toast('League data is corrupted. Please try loading from My Leagues page.');
-            return;
-          }
-          
           const normalizedOfflineLeagueData = (
             !leagueData?.multiplayer
             && (isSimulationBackedSeasonState(leagueData) || isLegacySinglePlayerSeasonState(leagueData))
@@ -8978,13 +9035,19 @@ window.onload=async function(){
             console.warn('Failed to save to localStorage:', e);
           }
           
-          // Set as current data
-          D = normalizedOfflineLeagueData;
+          // Set as current data through the same simulation-aware hydration path used by saved universes.
+          applySeasonManagerLeagueDataLoad(normalizedOfflineLeagueData, requestedSport);
+          
+          // Check if this is valid league data after compact simulation saves have been expanded.
+          if (!D.allRosters || !Array.isArray(D.allRosters)) {
+            console.error('? Invalid league data - missing allRosters');
+            toast('League data is corrupted. Please try loading from My Leagues page.');
+            return;
+          }
           
           // Ensure D has required properties
           if (!D.myPos && D.myPos !== 0) D.myPos = 0;
           
-          applySportContext(leagueData.sport || requestedSport);
           hydrateDraftUserContextFromLobby();
           refreshCommissionerAccess();
           
@@ -9023,7 +9086,36 @@ window.onload=async function(){
       }
     } else {
       console.warn('?? Not logged in, cannot load league from Firebase');
-      toast('Sign in to load your league from the cloud.');
+      const localLeagueData = getMatchingLocalLeagueData(leagueId);
+      if (localLeagueData) {
+        console.log('?? Not logged in, loading matching local league from browser storage:', leagueId);
+        hideSeasonEmptyState();
+        applySeasonManagerLeagueDataLoad(localLeagueData, requestedSport);
+        if (!D.myPos && D.myPos !== 0) D.myPos = 0;
+        hydrateDraftUserContextFromLobby();
+        refreshCommissionerAccess();
+        let seasonLoaded = false;
+        if (D.multiplayer) {
+          try {
+            seasonLoaded = await loadOrCreateSharedSeason();
+          } catch(e) {
+            console.error('Shared season load failed:', e);
+            seasonLoaded = false;
+          }
+        }
+        if (!seasonLoaded) {
+          try {
+            initSeason();
+          } catch(initErr) {
+            console.error('? Local season init failed:', initErr);
+            toast('Could not open the league: ' + initErr.message);
+            return;
+          }
+        }
+        applyRequestedSeasonView();
+        return;
+      }
+      toast('Sign in to load this league from the cloud, or open a locally saved league from Continue Universe.');
     }
   }
   
@@ -9037,6 +9129,13 @@ window.onload=async function(){
     try{
       const rawParsed=JSON.parse(raw);
       const parsed=normalizeLocalLeagueDraftSnapshot(rawParsed) || rawParsed;
+      if(leagueId && leagueId !== 'demo' && !doesSavedSeasonMatchRequestedLeague(parsed, leagueId)){
+        console.warn('?? Saved local season does not match requested league. Skipping generic auto-load.', {
+          requestedLeagueId: leagueId,
+          savedSeasonId: parsed?.seasonId || parsed?.leagueId || parsed?.historicalUniverseSlotId || parsed?.slotId || null
+        });
+        return;
+      }
       const localAutoLoad=resolveLocalSavedSeasonAutoLoad(parsed, requestedSport);
       if(localAutoLoad){
         hideSeasonEmptyState();
@@ -10842,6 +10941,21 @@ function renderSimulationTradePackagePreview(label, players){
   </div>`;
 }
 
+function renderSimulationTradeReplacementPreview(replacement){
+  if(!replacement?.player) return '';
+  const player=replacement.player;
+  const team=player?.team || player?.teamAbbr || player?.nbaTeam || '--';
+  const pos=player?.pos || player?.position || player?.primaryPosition || 'UTIL';
+  return `<div style="margin-top:12px;border:1px solid rgba(96,165,250,.24);background:rgba(15,23,42,.58);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <div>
+      <div style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;">Waiver Fill-In</div>
+      <div style="font-size:12px;color:#f8fafc;font-weight:800;margin-top:3px;">${escapeSimulationShellHtml(player?.name || replacement.label || 'Best waiver player')}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${escapeSimulationShellHtml(team)} · ${escapeSimulationShellHtml(pos)}</div>
+    </div>
+    <div style="font-family:var(--fb);font-size:13px;font-weight:800;color:#38bdf8;white-space:nowrap;">${Number(replacement.value||0).toFixed(1)} FP</div>
+  </div>`;
+}
+
 function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, state, partnerName }){
   const outgoing=Array.isArray(outgoingPlayers) ? outgoingPlayers.filter(Boolean) : [];
   const incoming=Array.isArray(incomingPlayers) ? incomingPlayers.filter(Boolean) : [];
@@ -10852,6 +10966,10 @@ function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, 
     </div>`;
   }
   const fairness=evaluateSimulationTradeFairness({ outgoingPlayers:outgoing, incomingPlayers:incoming, state, partnerName });
+  const replacementNeeded=outgoing.length!==incoming.length;
+  const replacement=replacementNeeded
+    ? getSimulationTradeReplacementRead(state, outgoing.concat(incoming).map((player)=>player?.id))
+    : null;
   const tone=String(fairness?.tone || '').toLowerCase();
   const color=tone==='error' ? '#fecaca' : tone==='success' ? '#bbf7d0' : '#bfdbfe';
   const border=tone==='error' ? 'rgba(248,113,113,.36)' : tone==='success' ? 'rgba(34,197,94,.35)' : 'rgba(96,165,250,.32)';
@@ -10866,6 +10984,7 @@ function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, 
       ${renderSimulationTradePackagePreview('You give', outgoing)}
       ${renderSimulationTradePackagePreview('You get', incoming)}
     </div>
+    ${renderSimulationTradeReplacementPreview(replacement)}
     <div style="margin-top:10px;color:${color};font-size:12px;font-weight:800;line-height:1.4;">${escapeSimulationShellHtml(fairness.message || '')}</div>
     ${fairness.detail ? `<div style="margin-top:5px;color:${color};font-size:12px;line-height:1.4;opacity:.9;">${escapeSimulationShellHtml(fairness.detail)}</div>` : ''}
   </div>`;
@@ -15179,6 +15298,37 @@ function getTradeFairnessPlayerValue(player){
   return +Number(player?.fp||0).toFixed(1);
 }
 
+function getTradeFairnessReplacementRead(offer){
+  const selectedIds=new Set([
+    ...(Array.isArray(offer?.give)?offer.give:[]),
+    ...(Array.isArray(offer?.get)?offer.get:[])
+  ].map(Number).filter(Number.isFinite));
+  const data=typeof D!=='undefined' ? D : {};
+  const pools=[
+    ...(Array.isArray(G?.waiver)?G.waiver:[]),
+    ...(Array.isArray(G?.freeAgents)?G.freeAgents:[]),
+    ...(Array.isArray(data?.waiver)?data.waiver:[]),
+    ...(Array.isArray(data?.freeAgents)?data.freeAgents:[])
+  ];
+  const seen=new Set();
+  const candidates=pools.map(entry=>{
+    const player=entry && typeof entry==='object' ? entry : (typeof P==='function' ? P(entry) : null);
+    return player || null;
+  }).filter(player=>{
+    const id=Number(player?.id);
+    if(!Number.isFinite(id) || selectedIds.has(id) || seen.has(id)) return false;
+    seen.add(id);
+    return getTradeFairnessPlayerValue(player)>0;
+  }).sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a));
+  const player=candidates[0] || null;
+  const value=player ? getTradeFairnessPlayerValue(player) : 0;
+  return {
+    player,
+    value,
+    label:player?.name || 'best waiver player'
+  };
+}
+
 function getTradeFairnessPositionKey(player){
   const pos=String(player?.pos||'').trim().toUpperCase();
   if(!pos) return 'util';
@@ -15289,11 +15439,43 @@ function getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid){
 function evaluateOneForOneTradeFairness(offer){
   const give=Array.isArray(offer?.give) ? offer.give.filter(value=>value!=null) : [];
   const get=Array.isArray(offer?.get) ? offer.get.filter(value=>value!=null) : [];
-  if(give.length!==1 || get.length!==1){
+  if(!give.length || !get.length){
     return {
       supported:false,
       rating:'unsupported',
-      message:'Fairness insights are available for 1-for-1 deals first.'
+      message:'Choose players on both sides to get a fairness read.'
+    };
+  }
+  if(give.length!==1 || get.length!==1){
+    const resolvePlayer=id=>typeof P==='function' ? P(id)||null : null;
+    const givePlayers=give.map(resolvePlayer).filter(Boolean);
+    const getPlayers=get.map(resolvePlayer).filter(Boolean);
+    const giveValue=givePlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
+    const getValue=getPlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
+    const replacement=getTradeFairnessReplacementRead(offer);
+    const fromOpenSlots=Math.max(0,give.length-get.length);
+    const toOpenSlots=Math.max(0,get.length-give.length);
+    const fromReceiveValue=+(getValue + (fromOpenSlots * replacement.value)).toFixed(1);
+    const toReceiveValue=+(giveValue + (toOpenSlots * replacement.value)).toFixed(1);
+    const adjustedGap=+Math.abs(fromReceiveValue-toReceiveValue).toFixed(1);
+    let rating='high_risk';
+    if(adjustedGap<=4) rating='fair';
+    else if(adjustedGap<=9) rating='slight_lean';
+    else if(adjustedGap<=16) rating='uneven';
+    return {
+      supported:true,
+      rating,
+      rawDelta:+(getValue-giveValue).toFixed(1),
+      adjustedGap,
+      contextOffset:0,
+      favoredTeam:fromReceiveValue>toReceiveValue ? Number(offer?.fromTeam) : fromReceiveValue<toReceiveValue ? Number(offer?.toTeam) : null,
+      replacement,
+      fromOpenSlots,
+      toOpenSlots,
+      fromReceiveValue,
+      toReceiveValue,
+      packageRead:true,
+      message:`Package read: Team ${Number(offer?.fromTeam)+1} receives ${fromReceiveValue.toFixed(1)} FP after replacement vs Team ${Number(offer?.toTeam)+1} receiving ${toReceiveValue.toFixed(1)} FP. Waiver replacement uses ${replacement.label} (${replacement.value.toFixed(1)} FP).`
     };
   }
   const fromProfile=getTradeFairnessRosterProfile(Number(offer?.fromTeam), give[0], get[0]);
@@ -15328,6 +15510,21 @@ function getTradeFairnessBadgeMeta(rating){
 
 function buildTradeFairnessReasons(result){
   if(!result?.supported) return [];
+  if(result.packageRead){
+    const reasons=[];
+    const gap=Number(result.adjustedGap||0);
+    const favoredLabel=result.favoredTeam==null ? 'Neither side' : `Team ${Number(result.favoredTeam)+1}`;
+    if(gap<=4){
+      reasons.push('Package value is close after counting the waiver replacement slot.');
+    }else{
+      reasons.push(`${favoredLabel} still has the stronger adjusted package by ${gap.toFixed(1)} FP.`);
+    }
+    if(Number(result.fromOpenSlots||0)>0 || Number(result.toOpenSlots||0)>0){
+      reasons.push(`Waiver replacement adds ${result.replacement?.label || 'the best waiver player'} at ${Number(result.replacement?.value||0).toFixed(1)} FP for the team taking fewer players.`);
+    }
+    reasons.push('Use this as a package read, then sanity-check roster fit before sending.');
+    return reasons.filter(Boolean).slice(0,4);
+  }
   const reasons=[];
   const delta=Math.abs(Number(result.rawDelta||0));
   if(delta<=4){
@@ -15380,8 +15577,9 @@ function getTradeFairnessViewModel(offer){
     rating:result.rating,
     badgeLabel:badge.label,
     badgeTone:badge.tone,
-    message:'',
+    message:result.message || '',
     reasons,
+    replacement:result.replacement || null,
     result
   };
 }
@@ -15437,12 +15635,21 @@ function renderTradeFairnessCard(offer, options={}){
     risk:'border-color:rgba(239,68,68,.34);color:#fca5a5;background:rgba(239,68,68,.12);',
     neutral:'border-color:#24324a;color:#cbd5e1;background:rgba(15,23,42,.7);'
   };
+  const replacement=vm.replacement?.player ? `<div style="margin-top:9px;border:1px solid rgba(96,165,250,.22);background:rgba(15,23,42,.62);border-radius:10px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+    <div>
+      <div style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;">Waiver Fill-In</div>
+      <div style="font-size:12px;color:#f8fafc;font-weight:800;margin-top:3px;">${vm.replacement.player.name}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${vm.replacement.player.team || '--'} · ${vm.replacement.player.pos || vm.replacement.player.position || 'UTIL'}</div>
+    </div>
+    <div style="font-family:var(--fb);font-size:13px;font-weight:800;color:#38bdf8;">${Number(vm.replacement.value||0).toFixed(1)} FP</div>
+  </div>` : '';
   const reasonList=(vm.reasons||[]).slice(0,4).map(reason=>`<li style="font-size:11px;color:#cbd5e1;line-height:1.45;">${reason}</li>`).join('');
   return `<div style="margin-top:10px;border:1px solid ${config.border};background:${config.background};border-radius:10px;padding:10px 11px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
       <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f8fafc;">${config.title}</div>
       <span class="season-stat-pill" style="${toneStyles[vm.badgeTone]||toneStyles.neutral}">${vm.badgeLabel}</span>
     </div>
+    ${replacement}
     <ul style="margin:8px 0 0 16px;padding:0;display:grid;gap:5px;">${reasonList}</ul>
     <div style="margin-top:8px;font-size:10px;color:#94a3b8;line-height:1.45;">${config.note}</div>
   </div>`;

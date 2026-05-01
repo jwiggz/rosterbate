@@ -126,6 +126,7 @@ let HISTORICAL_SLOT_QUOTA_BLOCKED = false;
 ${extractBetween('const DEFAULT_PAGES=', 'let CURRENT_SPORT =')}
 ${extractBetween('function getRequestedSimulationMode(', 'function loadHistoricalUniverseSlotState(')}
 ${extractBetween('function loadHistoricalUniverseSlotState(', 'function shouldBootHistoricalDevSeason(')}
+${extractBetween('function getMatchingLocalLeagueData(', 'function getSharedSeasonActorId(')}
 ${extractBetween('function isHistoricalSimulationUniverse(', 'function isHistoricalDraftUniverse(')}
 ${extractBetween('function setSeasonSidePanelVisible(', 'function buildPowerupCardsHtml(')}
 ${extractBetween('function setHubSummaryStatLabels(', 'function persistSimulationSeasonState(')}
@@ -158,6 +159,11 @@ module.exports = {
   getResolvedSeasonBackend,
   getActiveSeasonBackend,
   normalizeLocalLeagueDraftSnapshot,
+  doesSavedSeasonMatchRequestedLeague,
+  getLeagueTeamCount,
+  getLeagueRosteredPlayerCount,
+  shouldPreferLocalLeagueData,
+  resolveSeasonManagerLeagueDataLoad,
   getLatestRevealReportDay,
   getDailyRevealReport,
   getSimulationDayLog,
@@ -2317,6 +2323,11 @@ assert.match(
   /Block[\s\S]*waiver replacement/i,
   'trade preview should warn before a lopsided replacement-value trade is applied'
 );
+assert.match(
+  elements['simulation-trade-preview-BOS'].innerHTML,
+  /Waiver Fill-In[\s\S]*Scottie Pippen[\s\S]*CHI[\s\S]*SF[\s\S]*28\.0 FP/i,
+  'trade preview should show the best waiver fill-in row for uneven packages'
+);
 demoToasts = [];
 api.applySimulationTradeFromShell('BOS');
 assert.equal(
@@ -2789,6 +2800,82 @@ assert.equal(
   createdSimulationAdapters[0].state.draftState.controlledTeamAbbr,
   'LAL',
   'local auto-load should rebuild the adapter from the raw simulation payload'
+);
+
+createdSimulationAdapters = [];
+const compactLocalDraftResume = toPlain(api.resolveSeasonManagerLeagueDataLoad({
+  sport: 'nba',
+  seasonId: 'local_draft_reload',
+  leagueName: 'Compact Reload League',
+  activeSeasonBackend: 'simulation',
+  historicalEntryMode: 'simulation_season',
+  simulationMode: 'nba_mixed_era_single_player_v1',
+  leagueShell: {
+    sport: 'nba',
+    teams: [
+      { abbr: 'LAL', name: 'Los Angeles Lakers' },
+      { abbr: 'BOS', name: 'Boston Celtics' }
+    ]
+  },
+  draftState: {
+    controlledTeamAbbr: 'LAL',
+    rostersByTeam: {
+      LAL: [{ id: 23, name: 'Michael Jordan', pos: 'SG', team: 'CHI', fp: 54 }],
+      BOS: [{ id: 30, name: 'Stephen Curry', pos: 'PG', team: 'GSW', fp: 48 }]
+    },
+    freeAgents: [{ id: 34, name: 'Hakeem Olajuwon', pos: 'C', team: 'HOU', fp: 47 }]
+  },
+  seasonState: {
+    currentDay: 1,
+    currentWeek: 1,
+    standings: [
+      { teamAbbr: 'LAL', teamName: 'Los Angeles Lakers', wins: 0, losses: 0, pointsFor: 0, pointsAgainst: 0 },
+      { teamAbbr: 'BOS', teamName: 'Boston Celtics', wins: 0, losses: 0, pointsFor: 0, pointsAgainst: 0 }
+    ]
+  }
+}, 'nba'));
+
+assert.equal(compactLocalDraftResume.activeSeasonMode, 'simulation', 'league URL reloads should resolve compact simulation draft saves into simulation mode');
+assert.equal(compactLocalDraftResume.backend, 'simulation', 'league URL reloads should keep compact simulation drafts on the simulation backend');
+assert.equal(compactLocalDraftResume.state.allRosters.length, 2, 'league URL reloads should hydrate top-level rosters from compact draftState rosters');
+assert.equal(compactLocalDraftResume.state.allRosters[0][0].name, 'Michael Jordan', 'league URL reloads should keep roster players during hydration');
+assert.equal(createdSimulationAdapters.length, 1, 'league URL reloads should rebuild a simulation adapter for compact draft saves');
+
+const compactCompleteLocalLeague = {
+  seasonId: 'local_draft_reload',
+  leagueSize: 10,
+  draftState: {
+    rostersByTeam: {
+      ATL: [{ id: 1 }],
+      BOS: [{ id: 2 }],
+      CHI: [{ id: 3 }]
+    }
+  },
+  updatedAt: 1000
+};
+const staleCloudLeague = {
+  seasonId: 'local_draft_reload',
+  leagueSize: 10,
+  teams: Array.from({ length: 10 }, (_, idx) => `Team ${idx + 1}`),
+  allRosters: Array.from({ length: 10 }, () => []),
+  updatedAt: 5000
+};
+assert.equal(api.getLeagueTeamCount(compactCompleteLocalLeague), 10, 'league team count should include compact local league size');
+assert.equal(api.getLeagueRosteredPlayerCount(compactCompleteLocalLeague), 3, 'league roster count should include compact draftState rosters');
+assert.equal(
+  api.doesSavedSeasonMatchRequestedLeague({ seasonId: 'season_53' }, 'local_draft_reload'),
+  false,
+  'league URL fallback should not auto-load a different saved league id'
+);
+assert.equal(
+  api.doesSavedSeasonMatchRequestedLeague({ leagueId: 'local_draft_reload' }, 'local_draft_reload'),
+  true,
+  'league URL fallback should auto-load matching local league ids'
+);
+assert.equal(
+  api.shouldPreferLocalLeagueData(compactCompleteLocalLeague, staleCloudLeague, 'local_draft_reload'),
+  true,
+  'reload should prefer complete local draft rosters over a newer but empty cloud snapshot'
 );
 
 createdSimulationAdapters = [];

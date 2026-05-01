@@ -351,6 +351,7 @@ expectSourceMatch(/function buildTradeFairnessReasons\(result\)/, 'missing fairn
 expectSourceMatch(/function getTradeFairnessViewModel\(offer\)/, 'missing fairness view-model helper');
 expectSourceMatch(/function renderTradeFairnessCard\(offer,\s*options=\{\}\)/, 'missing fairness card renderer');
 expectSourceMatch(/function getTradeFairnessPlayerValue\(player\)/, 'missing fairness player value helper');
+expectSourceMatch(/function getTradeFairnessReplacementRead\(offer\)/, 'missing trade replacement read helper');
 expectSourceMatch(/function getTradeFairnessPositionKey\(player\)/, 'missing fairness position key helper');
 expectSourceMatch(/function getTradeFairnessRosterProfile\(teamIdx, outgoingPid, incomingPid\)/, 'missing fairness roster profile helper');
 expectSourceMatch(/renderTradeFairnessCard\(\{\s*fromTeam:D\.myPos,\s*toTeam:trP\.ti,\s*give:trP\.give,\s*get:trP\.get\s*\}/, 'inline trade builder should render fairness card');
@@ -361,6 +362,7 @@ expectSourceMatch(/Fairness insights are available for 1-for-1 deals first/i, 'u
 
 const script = [
   extractFunctionSource('getTradeFairnessPlayerValue(player)'),
+  extractFunctionSource('getTradeFairnessReplacementRead(offer)'),
   extractFunctionSource('getTradeFairnessPositionKey(player)'),
   extractFunctionSource('getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid)'),
   extractFunctionSource('evaluateOneForOneTradeFairness(offer)'),
@@ -376,7 +378,8 @@ const players = {
   21: { id: 21, name: 'Star Guard', fp: 45, pos: 'PG', g: 1, pg: 1, util: 1 },
   22: { id: 22, name: 'Bench Big', fp: 20, pos: 'C', c: 1, util: 1 },
   31: { id: 31, name: 'Need Big', fp: 31, pos: 'C', c: 1, util: 1 },
-  32: { id: 32, name: 'Extra Guard', fp: 30, pos: 'SG', g: 1, sg: 1, util: 1 }
+  32: { id: 32, name: 'Extra Guard', fp: 30, pos: 'SG', g: 1, sg: 1, util: 1 },
+  41: { id: 41, name: 'Waiver Starter', team: 'CHI', fp: 28, pos: 'SF', f: 1, sf: 1, util: 1 }
 };
 
 const rosters = {
@@ -387,7 +390,7 @@ const rosters = {
 const context = {
   console,
   STARTERS: 2,
-  G: { rosters },
+  G: { rosters, waiver: [players[41]] },
   P(id) {
     return players[id];
   }
@@ -487,10 +490,12 @@ const unsupported = context.getTradeFairnessViewModel({
   give: [11, 12],
   get: [21]
 });
-assert.equal(unsupported.supported, false);
-assert.match(unsupported.message, /1-for-1/i);
+assert.equal(unsupported.supported, true);
+assert.equal(unsupported.replacement.player.name, 'Waiver Starter');
+assert.match(unsupported.message, /Waiver Starter/i);
+assert.match(unsupported.message, /28\.0 FP/i);
 assert.ok(Array.isArray(unsupported.reasons));
-assert.equal(unsupported.reasons.length, 0);
+assert.ok(unsupported.reasons.some(reason => /waiver replacement/i.test(reason)));
 
 const supportedCard = context.renderTradeFairnessCard({
   fromTeam: 0,
@@ -507,6 +512,10 @@ const unsupportedCard = context.renderTradeFairnessCard({
   give: [11, 12],
   get: [21]
 });
-assert.match(unsupportedCard, /1-for-1/i);
+assert.match(unsupportedCard, /Waiver Fill-In/i);
+assert.match(unsupportedCard, /Waiver Starter/i);
+assert.match(unsupportedCard, /CHI/i);
+assert.match(unsupportedCard, /SF/i);
+assert.match(unsupportedCard, /28\.0 FP/i);
 
 console.log('trade fairness evaluator test passed');
