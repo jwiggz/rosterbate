@@ -4807,6 +4807,7 @@ async function persistPendingSeasonLaunchToFirebase(leagueId, pendingSeasonLaunc
   const targetLeagueId=String(leagueId || pendingSeasonLaunch?.seasonId || '').trim();
   const pendingData=(pendingSeasonLaunch?.data && typeof pendingSeasonLaunch.data==='object') ? pendingSeasonLaunch.data : null;
   if(!targetLeagueId || !pendingData) return false;
+  if(isSimulationBackedSeasonState(pendingData)) return false;
   await authReady;
   if(!currentRbUser) return false;
   const userId = currentRbUser.uid;

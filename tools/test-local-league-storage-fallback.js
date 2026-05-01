@@ -69,7 +69,8 @@ const pendingLaunchSource = `
 ${extractBetween(seasonHtml, "const RB_PENDING_SEASON_KEY = 'rbPendingSeasonLaunch';", 'function getMatchingLocalLeagueData(')}
 module.exports = {
   getPendingSeasonLaunch,
-  clearPendingSeasonLaunch
+  clearPendingSeasonLaunch,
+  persistPendingSeasonLaunchToFirebase
 };
 `;
 
@@ -125,4 +126,54 @@ api.clearPendingSeasonLaunch('league-123');
 assert.equal(sessionStorage.has('rbPendingSeasonLaunch'), false, 'clearing a pending handoff should remove the matching session-backed payload');
 assert.equal(localStorage.has('rbPendingSeasonLaunch'), false, 'clearing a pending handoff should remove the matching localStorage payload too');
 
-console.log('local league storage fallback test passed');
+async function runAsyncAssertions() {
+  const firebaseWrites = [];
+  Object.assign(sandbox, {
+    authReady: Promise.resolve(),
+    currentRbUser: { uid: 'user-123', email: 'coach@example.com' },
+    isSimulationBackedSeasonState(state) {
+      return String(state?.activeSeasonBackend || '').trim().toLowerCase() === 'simulation';
+    },
+    normalizeLocalLeagueDraftSnapshot(value) {
+      return value;
+    },
+    removeUndefined(value) {
+      return JSON.parse(JSON.stringify(value));
+    },
+    getLeagueTeamCount() {
+      return 2;
+    },
+    db: {
+      ref(refPath) {
+        return {
+          set(value) {
+            firebaseWrites.push({ path: refPath, value });
+            return Promise.resolve();
+          }
+        };
+      }
+    }
+  });
+
+  const persisted = await api.persistPendingSeasonLaunchToFirebase('season_60', {
+    seasonId: 'season_60',
+    savedAt: 1000,
+    data: {
+      seasonId: 'season_60',
+      activeSeasonBackend: 'simulation',
+      seasonState: { currentDay: 1, completedGameLogs: [] }
+    }
+  });
+
+  assert.equal(persisted, false, 'simulation pending launches should not perform stale Firebase refresh writes');
+  assert.deepEqual(firebaseWrites, [], 'simulation pending launches should not write Day 1 handoff data over newer persisted progress');
+}
+
+runAsyncAssertions()
+  .then(() => {
+    console.log('local league storage fallback test passed');
+  })
+  .catch(err => {
+    console.error(err);
+    process.exitCode = 1;
+  });
