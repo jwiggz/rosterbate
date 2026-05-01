@@ -8,6 +8,12 @@ Fast path: name files with a player slug and optional team code, then run:
 node tools/build-player-portrait-manifest.js --write
 ```
 
+Preview the exact manifest mappings before writing:
+
+```bash
+npm run portraits:preview
+```
+
 Import from Downloads or a batch folder:
 
 ```bash

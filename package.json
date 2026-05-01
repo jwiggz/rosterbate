@@ -7,6 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "portraits:preview": "node tools/build-player-portrait-manifest.js --details",
     "portraits:manifest": "node tools/build-player-portrait-manifest.js --write",
     "portraits:check": "node tools/build-player-portrait-manifest.js --check",
     "portraits:import": "node tools/import-player-portraits.js",

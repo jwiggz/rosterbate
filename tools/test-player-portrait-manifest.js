@@ -6,6 +6,7 @@ const path = require('node:path');
 const {
   buildManifest,
   entryFromFilename,
+  formatManifestChange,
   titleFromSlug
 } = require('./build-player-portrait-manifest');
 
@@ -21,10 +22,18 @@ assert.deepEqual(
   { key: 'Larry Bird', url: 'assets/player-portraits/larry-bird.webp' }
 );
 assert.deepEqual(
+  entryFromFilename('anthony edwards.png', 'assets/player-portraits/anthony edwards.png'),
+  { key: 'Anthony Edwards', url: 'assets/player-portraits/anthony edwards.png' }
+);
+assert.deepEqual(
   entryFromFilename('shai-gilgeous-alexander-1628983.jpg', 'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg'),
   { key: 'Shai Gilgeous Alexander', url: 'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg' }
 );
 assert.equal(entryFromFilename('README.md', 'assets/player-portraits/README.md'), null);
+assert.equal(
+  formatManifestChange({ action: 'add', key: 'Anthony Edwards', url: 'assets/player-portraits/anthony edwards.png' }),
+  'ADD     Anthony Edwards -> assets/player-portraits/anthony edwards.png'
+);
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rb-portraits-'));
 const manifestPath = path.join(dir, 'manifest.json');
@@ -56,12 +65,40 @@ assert.equal(
   'assets/player-portraits/manual-player.png',
   'manifest builder should keep unrelated manual entries'
 );
+assert.deepEqual(
+  result.changes.map(({ action, key, url, existingUrl }) => ({ action, key, url, existingUrl })),
+  [
+    {
+      action: 'keep',
+      key: 'Michael Jordan|CHI',
+      url: 'assets/player-portraits/michael-jordan__CHI.png',
+      existingUrl: 'assets/player-portraits/manual-jordan.png'
+    },
+    {
+      action: 'add',
+      key: 'Nikola Jokic|DEN',
+      url: 'assets/player-portraits/nikola-jokic__DEN.webp',
+      existingUrl: undefined
+    }
+  ],
+  'manifest builder should expose a reviewable per-file change plan'
+);
 
 const forced = buildManifest({ dir, manifest: manifestPath, force: true });
 assert.equal(
   forced.manifest.players['Michael Jordan|CHI'],
   'assets/player-portraits/michael-jordan__CHI.png',
   'manifest builder should replace colliding entries with --force'
+);
+assert.deepEqual(
+  forced.changes.find((change) => change.key === 'Michael Jordan|CHI'),
+  {
+    action: 'replace',
+    key: 'Michael Jordan|CHI',
+    url: 'assets/player-portraits/michael-jordan__CHI.png',
+    existingUrl: 'assets/player-portraits/manual-jordan.png'
+  },
+  'manifest builder should mark forced collisions as replacements'
 );
 
 console.log('test-player-portrait-manifest passed');

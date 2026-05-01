@@ -13,7 +13,8 @@ function parseArgs(argv) {
     write: false,
     check: false,
     force: false,
-    json: false
+    json: false,
+    details: false
   };
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index];
@@ -21,6 +22,7 @@ function parseArgs(argv) {
     else if (arg === '--check') args.check = true;
     else if (arg === '--force') args.force = true;
     else if (arg === '--json') args.json = true;
+    else if (arg === '--details' || arg === '--plan') args.details = true;
     else if (arg === '--dir') args.dir = path.resolve(argv[++index]);
     else if (arg.startsWith('--dir=')) args.dir = path.resolve(arg.slice('--dir='.length));
     else if (arg === '--manifest') args.manifest = path.resolve(argv[++index]);
@@ -45,7 +47,8 @@ function usage() {
     '  --write   Update manifest.json',
     '  --check   Exit non-zero if the manifest is missing discovered images',
     '  --force   Replace existing entries when discovered filenames collide',
-    '  --json    Print summary as JSON'
+    '  --json    Print summary as JSON',
+    '  --details Print a per-file manifest action plan'
   ].join('\n');
 }
 
@@ -104,6 +107,20 @@ function discoverPortraits(dir) {
     .sort((a, b) => a.key.localeCompare(b.key));
 }
 
+function formatManifestChange(change) {
+  const action = String(change?.action || '').toUpperCase().padEnd(7, ' ');
+  const key = String(change?.key || '').trim();
+  const url = String(change?.url || '').trim();
+  const existingUrl = String(change?.existingUrl || '').trim();
+  let line = `${action} ${key} -> ${url || existingUrl}`;
+  if (change?.action === 'keep' && existingUrl && existingUrl !== url) {
+    line += ` (keeps existing ${existingUrl})`;
+  } else if (change?.action === 'replace' && existingUrl) {
+    line += ` (replaces ${existingUrl})`;
+  }
+  return line;
+}
+
 function buildManifest(options = {}) {
   const dir = options.dir || DEFAULT_DIR;
   const manifestPath = options.manifest || path.join(dir, 'manifest.json');
@@ -113,20 +130,28 @@ function buildManifest(options = {}) {
   const added = [];
   const kept = [];
   const replaced = [];
+  const changes = [];
   const players = { ...(manifest.players || {}) };
   for (const entry of discovered) {
+    const existingUrl = players[entry.key];
     if (players[entry.key] && !options.force) {
       kept.push(entry.key);
+      changes.push({ action: 'keep', key: entry.key, url: entry.url, existingUrl });
       continue;
     }
-    if (players[entry.key] && options.force) replaced.push(entry.key);
-    else added.push(entry.key);
+    if (players[entry.key] && options.force) {
+      replaced.push(entry.key);
+      changes.push({ action: 'replace', key: entry.key, url: entry.url, existingUrl });
+    } else {
+      added.push(entry.key);
+      changes.push({ action: 'add', key: entry.key, url: entry.url });
+    }
     players[entry.key] = entry.url;
   }
   manifest.players = Object.fromEntries(Object.entries(players).sort(([a], [b]) => a.localeCompare(b)));
   const content = `${JSON.stringify(manifest, null, 2)}\n`;
   const changed = before !== JSON.stringify(manifest.players || {});
-  return { manifest, content, changed, discovered, added, kept, replaced, manifestPath };
+  return { manifest, content, changed, discovered, added, kept, replaced, changes, manifestPath };
 }
 
 function main(argv = process.argv.slice(2)) {
@@ -149,10 +174,12 @@ function main(argv = process.argv.slice(2)) {
     changed: result.changed,
     written: !!(args.write && result.changed)
   };
+  if (args.details) summary.changes = result.changes;
   if (args.json) console.log(JSON.stringify(summary, null, 2));
   else {
     console.log(`Portrait manifest: ${summary.manifest}`);
     console.log(`Discovered ${summary.discovered} image(s), added ${summary.added}, kept ${summary.kept}, replaced ${summary.replaced}.`);
+    if (args.details) result.changes.forEach((change) => console.log(formatManifestChange(change)));
     console.log(summary.changed ? (summary.written ? 'Manifest updated.' : 'Manifest would change. Run with --write to update.') : 'Manifest is already current.');
   }
   if (args.check && result.changed) return 1;
@@ -167,5 +194,6 @@ module.exports = {
   buildManifest,
   discoverPortraits,
   entryFromFilename,
+  formatManifestChange,
   titleFromSlug
 };
