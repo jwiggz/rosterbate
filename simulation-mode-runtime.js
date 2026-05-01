@@ -1277,6 +1277,72 @@
     return next;
   }
 
+  function getSimulationTradeRuntimeValue(player){
+    const candidates = [
+      player?.fp,
+      player?.avgFp,
+      player?.averageFantasyPoints,
+      player?.fantasyPointsPerGame,
+      player?.fantasyPoints,
+      player?.statValues?.FP,
+      player?.statValues?.fp
+    ];
+    for (const value of candidates) {
+      const numeric = Number(value);
+      if (Number.isFinite(numeric) && numeric > 0) return numeric;
+    }
+    const total = Number(player?.tfp ?? player?.TFP ?? player?.totalFantasyPoints);
+    if (Number.isFinite(total) && total > 0) {
+      const games = Number(player?.gamesPlayed ?? player?.gp ?? player?.GP);
+      if (Number.isFinite(games) && games > 0) return total / games;
+      return total > 120 ? total / 82 : total;
+    }
+    return 0;
+  }
+
+  function balanceSimulationTradeRosterSize(next, teamAbbr, targetSize, protectedIds){
+    next.draftState.freeAgents = Array.isArray(next.draftState.freeAgents) ? next.draftState.freeAgents : [];
+    const protectedSet = new Set((Array.isArray(protectedIds) ? protectedIds : []).map(Number));
+    let roster = Array.isArray(next.draftState.rostersByTeam?.[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
+    if (!Number.isFinite(Number(targetSize)) || Number(targetSize) <= 0) {
+      return { added: [], dropped: [] };
+    }
+    const added = [];
+    const dropped = [];
+    while (roster.length < Number(targetSize) && next.draftState.freeAgents.length) {
+      const bestFreeAgent = next.draftState.freeAgents
+        .slice()
+        .sort((a, b) => {
+          const valueDiff = getSimulationTradeRuntimeValue(b) - getSimulationTradeRuntimeValue(a);
+          if (valueDiff) return valueDiff;
+          return String(a?.name || '').localeCompare(String(b?.name || ''));
+        })[0];
+      if (!bestFreeAgent) break;
+      next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player?.id) !== Number(bestFreeAgent.id));
+      roster = roster.concat(clone(bestFreeAgent));
+      added.push(clone(bestFreeAgent));
+    }
+    while (roster.length > Number(targetSize)) {
+      const dropCandidate = roster
+        .filter((player) => !protectedSet.has(Number(player?.id)))
+        .slice()
+        .sort((a, b) => {
+          const valueDiff = getSimulationTradeRuntimeValue(a) - getSimulationTradeRuntimeValue(b);
+          if (valueDiff) return valueDiff;
+          return String(a?.name || '').localeCompare(String(b?.name || ''));
+        })[0] || roster
+          .slice()
+          .sort((a, b) => getSimulationTradeRuntimeValue(a) - getSimulationTradeRuntimeValue(b))[0];
+      if (!dropCandidate) break;
+      roster = roster.filter((player) => Number(player?.id) !== Number(dropCandidate.id));
+      next.draftState.freeAgents = next.draftState.freeAgents.concat(clone(dropCandidate));
+      dropped.push(clone(dropCandidate));
+      pruneLineupState(next, teamAbbr, [Number(dropCandidate.id)]);
+    }
+    next.draftState.rostersByTeam[teamAbbr] = roster;
+    return { added, dropped };
+  }
+
   function applySimulationTrade(state, trade){
     const fromTeamAbbr = normalizeTeamAbbr(trade?.fromTeamAbbr);
     const toTeamAbbr = normalizeTeamAbbr(trade?.toTeamAbbr);
@@ -1314,11 +1380,22 @@
     next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(clonedOutgoing);
     pruneLineupState(next, fromTeamAbbr, Array.from(outgoingIds));
     pruneLineupState(next, toTeamAbbr, Array.from(incomingIds));
+    const fromBalance = balanceSimulationTradeRosterSize(next, fromTeamAbbr, fromRoster.length, Array.from(incomingIds));
+    const toBalance = balanceSimulationTradeRosterSize(next, toTeamAbbr, toRoster.length, Array.from(outgoingIds));
     next.seasonState.activityLog.unshift({
       type: 'trade',
       title: `${fromTeamAbbr} traded with ${toTeamAbbr}`,
       ts: Date.now()
     });
+    if (fromBalance.added.length || fromBalance.dropped.length || toBalance.added.length || toBalance.dropped.length) {
+      const addedNames = fromBalance.added.concat(toBalance.added).map((player) => player?.name).filter(Boolean);
+      const droppedNames = fromBalance.dropped.concat(toBalance.dropped).map((player) => player?.name).filter(Boolean);
+      next.seasonState.activityLog.unshift({
+        type: 'trade_roster_balance',
+        title: `Trade roster balance: ${addedNames.length ? `added ${addedNames.join(', ')}` : 'no adds'}${droppedNames.length ? `; dropped ${droppedNames.join(', ')}` : ''}`,
+        ts: Date.now()
+      });
+    }
     return next;
   }
 

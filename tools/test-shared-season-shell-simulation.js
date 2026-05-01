@@ -182,6 +182,7 @@ module.exports = {
   renderSimulationPlayoffsInSharedShell,
   renderSimulationWaiverInSharedShell,
   renderSimulationTradesInSharedShell,
+  updateSimulationTradePreviewFromShell,
   renderSimulationStandingsInSharedShell,
   submitSimulationWaiverClaimFromShell,
   cancelSimulationWaiverClaimFromShell,
@@ -583,17 +584,20 @@ function buildSimulationStubState(phase = 'regular_season') {
       controlledTeamAbbr: 'LAL',
       rostersByTeam: {
         LAL: [
-          { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C' },
-          { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG' }
+          { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C', fp: 55 },
+          { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG', fp: 52 },
+          { id: 101, name: 'Bench Guard', team: 'LAL', pos: 'PG', fp: 8 },
+          { id: 102, name: 'Bench Wing', team: 'LAL', pos: 'SF', fp: 7 }
         ],
         BOS: [
-          { id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG' }
+          { id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG', fp: 58 },
+          { id: 99, name: 'Franchise Superstar', team: 'BOS', pos: 'SF', fp: 70 }
         ],
         CHI: []
       },
       freeAgents: [
-        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF' },
-        { id: 91, name: 'Dennis Rodman', team: 'CHI', pos: 'PF' }
+        { id: 33, name: 'Scottie Pippen', team: 'CHI', pos: 'SF', fp: 28 },
+        { id: 91, name: 'Dennis Rodman', team: 'CHI', pos: 'PF', fp: 18 }
       ]
     },
     seasonState: {
@@ -915,7 +919,8 @@ const simulationAdapterStub = {
             {
               team: { abbr: 'BOS', name: 'Boston Celtics' },
               incomingRoster: [
-                { id: 30, name: 'Stephen Curry', choiceLabel: 'Stephen Curry Â· GSW Â· PG' }
+                { id: 30, name: 'Stephen Curry', choiceLabel: 'Stephen Curry - GSW - PG', fp: 58 },
+                { id: 99, name: 'Franchise Superstar', choiceLabel: 'Franchise Superstar - BOS - SF', fp: 70 }
               ],
               recordLabel: '7-5',
               topPlayerName: 'Stephen Curry',
@@ -928,7 +933,9 @@ const simulationAdapterStub = {
         { abbr: 'LEG', name: 'Legacy Trade Fallback' }
       ],
       outgoingRoster: [
-        { id: 34, name: 'Hakeem Olajuwon', choiceLabel: 'Hakeem Olajuwon Â· HOU Â· C' }
+        { id: 34, name: 'Hakeem Olajuwon', choiceLabel: 'Hakeem Olajuwon - HOU - C', fp: 55 },
+        { id: 101, name: 'Bench Guard', choiceLabel: 'Bench Guard - LAL - PG', fp: 8 },
+        { id: 102, name: 'Bench Wing', choiceLabel: 'Bench Wing - LAL - SF', fp: 7 }
       ],
       incomingRostersByTeam: {
         LEG: [
@@ -2265,6 +2272,12 @@ assert.match(elements.tradesContent.innerHTML, /Top asset: Stephen Curry/, 'simu
 assert.match(elements.tradesContent.innerHTML, /13 players/, 'simulation trades should surface partner roster counts');
 assert.match(elements.tradesContent.innerHTML, /Hakeem Olajuwon [^<]* HOU [^<]* C/i, 'simulation trades should render outgoing option labels with full player context');
 assert.match(elements.tradesContent.innerHTML, /Stephen Curry [^<]* GSW [^<]* PG/i, 'simulation trades should render incoming option labels with full player context');
+assert.match(elements.tradesContent.innerHTML, /Optional package player/i, 'simulation trades should allow a second outgoing player for 2-for-1 checks');
+assert.match(elements.tradesContent.innerHTML, /Replacement value/i, 'simulation trades should explain that uneven deals are judged against the waiver wire');
+assert.match(elements.tradesContent.innerHTML, /Trade Preview/i, 'simulation trades should show a preview panel before applying');
+assert.match(elements.tradesContent.innerHTML, /updateSimulationTradePreviewFromShell\('BOS'\)/, 'simulation trade selections should refresh the preview live');
+assert.match(elements.tradesContent.innerHTML, /Choose players to preview the deal/i, 'simulation trade preview should have a clear empty state');
+assert.match(elements.tradesContent.innerHTML, /best waiver fill-in/i, 'simulation trade desk should tell managers uneven trades may require a waiver fill-in');
 
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];
@@ -2283,6 +2296,46 @@ assert.match(
   'trade desk should leave inline feedback when an attempted trade is incomplete'
 );
 elements['simulation-trade-outgoing-select-BOS'].value = '34';
+elements['simulation-trade-incoming-select-BOS'].value = '30';
+api.updateSimulationTradePreviewFromShell('BOS');
+assert.match(
+  elements['simulation-trade-preview-BOS'].innerHTML,
+  /You give[\s\S]*Hakeem Olajuwon[\s\S]*You get[\s\S]*Stephen Curry[\s\S]*Fairness check/i,
+  'trade preview should show both packages and the fairness verdict before apply'
+);
+assert.match(
+  elements['simulation-trade-preview-BOS'].innerHTML,
+  /55\.0 FP[\s\S]*58\.0 FP/i,
+  'trade preview should include player value context for selected packages'
+);
+elements['simulation-trade-outgoing-select-BOS'].value = '101';
+elements['simulation-trade-extra-outgoing-select-BOS'].value = '102';
+elements['simulation-trade-incoming-select-BOS'].value = '99';
+api.updateSimulationTradePreviewFromShell('BOS');
+assert.match(
+  elements['simulation-trade-preview-BOS'].innerHTML,
+  /Block[\s\S]*waiver replacement/i,
+  'trade preview should warn before a lopsided replacement-value trade is applied'
+);
+demoToasts = [];
+api.applySimulationTradeFromShell('BOS');
+assert.equal(
+  simulationAdapterStub.lastTrade,
+  null,
+  'trade helper should block a lopsided 2-for-1 before mutating rosters'
+);
+assert.deepStrictEqual(
+  demoToasts,
+  ['Trade blocked: Boston Celtics would be giving up too much after replacement value.'],
+  'trade helper should explain why a lopsided 2-for-1 is blocked'
+);
+assert.match(
+  elements.tradesContent.innerHTML,
+  /waiver replacement/i,
+  'trade desk should mention waiver replacement value when blocking an uneven trade'
+);
+elements['simulation-trade-outgoing-select-BOS'].value = '34';
+elements['simulation-trade-extra-outgoing-select-BOS'].value = '';
 elements['simulation-trade-incoming-select-BOS'].value = '30';
 demoToasts = [];
 api.applySimulationTradeFromShell('BOS');
@@ -2308,6 +2361,35 @@ assert.match(
 assert.ok(
   simulationAdapterStub.getState().draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 30),
   'trade helper should leave the acquired player on the controlled roster after success'
+);
+
+setSimulationStubPhase('regular_season');
+api.setSeasonModeAdapter(simulationAdapterStub);
+api.renderSimulationTradesInSharedShell();
+elements['simulation-trade-outgoing-select-BOS'].value = '34';
+elements['simulation-trade-extra-outgoing-select-BOS'].value = '102';
+elements['simulation-trade-incoming-select-BOS'].value = '30';
+demoToasts = [];
+historicalSlotUpsertCalls = [];
+api.applySimulationTradeFromShell('BOS');
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastTrade),
+  {
+    fromTeamAbbr: 'LAL',
+    toTeamAbbr: 'BOS',
+    outgoingPlayerIds: [34, 102],
+    incomingPlayerIds: [30]
+  },
+  'trade helper should send both selected outgoing players for a fair 2-for-1 package'
+);
+assert.deepStrictEqual(
+  demoToasts,
+  ['Trade applied: Hakeem Olajuwon + Bench Wing for Stephen Curry.'],
+  'trade helper should name both outgoing players when a fair 2-for-1 package applies'
+);
+assert.ok(
+  simulationAdapterStub.getState().draftState.rostersByTeam.BOS.some((player) => Number(player.id) === 102),
+  'fair 2-for-1 package should move the optional package player to the partner roster'
 );
 
 api.renderSimulationStandingsInSharedShell();

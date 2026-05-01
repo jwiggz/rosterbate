@@ -10732,6 +10732,171 @@ function claimSimulationFreeAgentFromShell(playerId){
 
 let simulationTradeDeskFeedback = {};
 
+function getSimulationTradePlayerValue(player){
+  const candidates=[
+    player?.fp,
+    player?.avgFp,
+    player?.averageFantasyPoints,
+    player?.fantasyPointsPerGame,
+    player?.fantasyPoints,
+    player?.statValues?.FP,
+    player?.statValues?.fp
+  ];
+  for(const value of candidates){
+    const numeric=Number(value);
+    if(Number.isFinite(numeric) && numeric>0) return numeric;
+  }
+  const total=Number(player?.tfp ?? player?.TFP ?? player?.totalFantasyPoints);
+  if(Number.isFinite(total) && total>0){
+    const games=Number(player?.gamesPlayed ?? player?.gp ?? player?.GP);
+    if(Number.isFinite(games) && games>0) return total/games;
+    return total>120 ? total/82 : total;
+  }
+  return 0;
+}
+
+function getSimulationTradePlayerById(roster,playerId){
+  return (Array.isArray(roster)?roster:[]).find((player)=>Number(player?.id)===Number(playerId)) || null;
+}
+
+function getSimulationTradePackageValue(players){
+  return (Array.isArray(players)?players:[]).reduce((sum,player)=>sum+getSimulationTradePlayerValue(player),0);
+}
+
+function getSimulationTradeReplacementRead(state, excludedIds){
+  const excluded=new Set((Array.isArray(excludedIds)?excludedIds:[]).map(Number));
+  const freeAgents=Array.isArray(state?.draftState?.freeAgents) ? state.draftState.freeAgents : [];
+  const best=freeAgents
+    .filter((player)=>!excluded.has(Number(player?.id)))
+    .slice()
+    .sort((a,b)=>getSimulationTradePlayerValue(b)-getSimulationTradePlayerValue(a))[0] || null;
+  return {
+    player: best,
+    value: best ? getSimulationTradePlayerValue(best) : 0,
+    label: best?.name || 'best waiver player'
+  };
+}
+
+function evaluateSimulationTradeFairness({ outgoingPlayers, incomingPlayers, state, partnerName }){
+  const outgoing=Array.isArray(outgoingPlayers) ? outgoingPlayers.filter(Boolean) : [];
+  const incoming=Array.isArray(incomingPlayers) ? incomingPlayers.filter(Boolean) : [];
+  const outgoingValue=getSimulationTradePackageValue(outgoing);
+  const incomingValue=getSimulationTradePackageValue(incoming);
+  const replacement=getSimulationTradeReplacementRead(state, outgoing.concat(incoming).map((player)=>player?.id));
+  const myReplacementSlots=Math.max(0,outgoing.length-incoming.length);
+  const partnerReplacementSlots=Math.max(0,incoming.length-outgoing.length);
+  const myAdjustedValue=Number((incomingValue + (myReplacementSlots * replacement.value)).toFixed(1));
+  const partnerAdjustedValue=Number((outgoingValue + (partnerReplacementSlots * replacement.value)).toFixed(1));
+  const myRatio=outgoingValue>0 ? myAdjustedValue/outgoingValue : 1;
+  const partnerRatio=incomingValue>0 ? partnerAdjustedValue/incomingValue : 1;
+  const minRatio=Math.min(myRatio,partnerRatio);
+  const replacementCopy=myReplacementSlots || partnerReplacementSlots
+    ? ` Waiver replacement value uses ${replacement.label} (${replacement.value.toFixed(1)} FP) as the best fill-in.`
+    : '';
+  if(!outgoing.length || !incoming.length){
+    return { allowed:false, tone:'error', message:'Choose both the outgoing and incoming players before applying a trade.' };
+  }
+  if(outgoingValue===0 && incomingValue===0){
+    return { allowed:true, tone:'info', message:'Trade value check is limited because these players do not have fantasy point baselines yet.' };
+  }
+  if(minRatio < 0.78){
+    const teamName=partnerName || 'that team';
+    const message=partnerRatio < myRatio
+      ? `Trade blocked: ${teamName} would be giving up too much after replacement value.`
+      : 'Trade blocked: your side would be giving up too much after replacement value.';
+    return {
+      allowed:false,
+      tone:'error',
+      message,
+      detail:`Your adjusted side: ${myAdjustedValue.toFixed(1)} FP. Partner adjusted side: ${partnerAdjustedValue.toFixed(1)} FP.${replacementCopy}`
+    };
+  }
+  const tone=minRatio < 0.9 ? 'info' : 'success';
+  return {
+    allowed:true,
+    tone,
+    message:`Fairness check: ${myAdjustedValue.toFixed(1)} FP for you vs ${partnerAdjustedValue.toFixed(1)} FP for them.${replacementCopy}`
+  };
+}
+
+function renderSimulationTradePackagePreview(label, players){
+  const rows=(Array.isArray(players)?players:[]).filter(Boolean);
+  if(!rows.length){
+    return `<div>
+      <div style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;">${escapeSimulationShellHtml(label)}</div>
+      <div style="margin-top:6px;color:#64748b;font-size:12px;">No player selected</div>
+    </div>`;
+  }
+  const total=getSimulationTradePackageValue(rows);
+  return `<div>
+    <div style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;">${escapeSimulationShellHtml(label)}</div>
+    <div style="margin-top:6px;display:flex;flex-direction:column;gap:5px;">
+      ${rows.map((player)=>`<div style="display:flex;justify-content:space-between;gap:10px;color:#dbe4f0;font-size:12px;">
+        <span style="font-weight:800;color:#f8fafc;">${escapeSimulationShellHtml(player?.name || 'Player')}</span>
+        <span>${getSimulationTradePlayerValue(player).toFixed(1)} FP</span>
+      </div>`).join('')}
+      <div style="border-top:1px solid rgba(148,163,184,.18);padding-top:5px;display:flex;justify-content:space-between;gap:10px;color:#93c5fd;font-size:12px;font-weight:800;">
+        <span>Total</span><span>${total.toFixed(1)} FP</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, state, partnerName }){
+  const outgoing=Array.isArray(outgoingPlayers) ? outgoingPlayers.filter(Boolean) : [];
+  const incoming=Array.isArray(incomingPlayers) ? incomingPlayers.filter(Boolean) : [];
+  if(!outgoing.length && !incoming.length){
+    return `<div style="border:1px solid rgba(96,165,250,.24);background:rgba(37,99,235,.1);border-radius:12px;padding:12px;margin-top:12px;">
+      <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd;">Trade Preview</div>
+      <div style="margin-top:6px;color:#cbd5e1;font-size:12px;line-height:1.45;">Choose players to preview the deal before applying it.</div>
+    </div>`;
+  }
+  const fairness=evaluateSimulationTradeFairness({ outgoingPlayers:outgoing, incomingPlayers:incoming, state, partnerName });
+  const tone=String(fairness?.tone || '').toLowerCase();
+  const color=tone==='error' ? '#fecaca' : tone==='success' ? '#bbf7d0' : '#bfdbfe';
+  const border=tone==='error' ? 'rgba(248,113,113,.36)' : tone==='success' ? 'rgba(34,197,94,.35)' : 'rgba(96,165,250,.32)';
+  const bg=tone==='error' ? 'rgba(127,29,29,.18)' : tone==='success' ? 'rgba(20,83,45,.16)' : 'rgba(37,99,235,.13)';
+  const verdict=tone==='error' ? 'Block' : tone==='success' ? 'Looks fair' : 'Review';
+  return `<div style="border:1px solid ${border};background:${bg};border-radius:12px;padding:12px;margin-top:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${color};">Trade Preview</div>
+      <span class="season-stat-pill" style="color:${color};border-color:${border};">${verdict}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px;">
+      ${renderSimulationTradePackagePreview('You give', outgoing)}
+      ${renderSimulationTradePackagePreview('You get', incoming)}
+    </div>
+    <div style="margin-top:10px;color:${color};font-size:12px;font-weight:800;line-height:1.4;">${escapeSimulationShellHtml(fairness.message || '')}</div>
+    ${fairness.detail ? `<div style="margin-top:5px;color:${color};font-size:12px;line-height:1.4;opacity:.9;">${escapeSimulationShellHtml(fairness.detail)}</div>` : ''}
+  </div>`;
+}
+
+function getSimulationTradeSelectionContext(partnerAbbr){
+  const tradeVm=SEASON_MODE_ADAPTER.getTradeViewModel?.() || {};
+  const toTeamAbbr=String(partnerAbbr || '').trim().toUpperCase();
+  const selectedIds=Array.from(new Set([
+    document.getElementById(`simulation-trade-outgoing-select-${partnerAbbr}`)?.value,
+    document.getElementById(`simulation-trade-extra-outgoing-select-${partnerAbbr}`)?.value
+  ].map((value)=>Number(value)).filter((value)=>Number.isFinite(value) && value>0)));
+  const incomingIds=Array.from(new Set([
+    document.getElementById(`simulation-trade-incoming-select-${partnerAbbr}`)?.value
+  ].map((value)=>Number(value)).filter((value)=>Number.isFinite(value) && value>0)));
+  const partnerRow=(tradeVm?.sections?.partners?.rows || []).find(row=>String(row?.team?.abbr || row?.teamAbbr || '').trim().toUpperCase()===toTeamAbbr) || null;
+  const incomingRoster=partnerRow?.incomingRoster || tradeVm?.incomingRostersByTeam?.[toTeamAbbr] || [];
+  return {
+    partnerName: partnerRow?.team?.name || partnerRow?.title || toTeamAbbr || 'that team',
+    outgoingPlayers: selectedIds.map((playerId)=>getSimulationTradePlayerById(tradeVm?.outgoingRoster,playerId)).filter(Boolean),
+    incomingPlayers: incomingIds.map((playerId)=>getSimulationTradePlayerById(incomingRoster,playerId)).filter(Boolean),
+    state: SEASON_MODE_ADAPTER.getState?.() || D
+  };
+}
+
+function updateSimulationTradePreviewFromShell(partnerAbbr){
+  const preview=document.getElementById(`simulation-trade-preview-${partnerAbbr}`);
+  if(!preview) return;
+  preview.innerHTML=renderSimulationTradePreviewMarkup(getSimulationTradeSelectionContext(partnerAbbr));
+}
+
 function renderSimulationTradesInSharedShell(){
   setSeasonSidePanelVisible('tradesPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
@@ -10774,7 +10939,10 @@ function renderSimulationTradesInSharedShell(){
         ? 'border-color:rgba(248,113,113,.36);background:rgba(127,29,29,.18);color:#fecaca;'
         : 'border-color:rgba(96,165,250,.32);background:rgba(37,99,235,.13);color:#bfdbfe;';
     const feedbackMarkup=feedback?.message
-      ? `<div style="margin-top:12px;border:1px solid;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:800;line-height:1.35;${feedbackStyle}">${escapeSimulationShellHtml(feedback.message)}</div>`
+      ? `<div style="margin-top:12px;border:1px solid;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:800;line-height:1.35;${feedbackStyle}">
+          <div>${escapeSimulationShellHtml(feedback.message)}</div>
+          ${feedback.detail ? `<div style="margin-top:5px;font-weight:700;opacity:.9;">${escapeSimulationShellHtml(feedback.detail)}</div>` : ''}
+        </div>`
       : '';
     return (
     `<div class="season-table-card season-card-pad">
@@ -10791,7 +10959,7 @@ function renderSimulationTradesInSharedShell(){
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;">
         <div>
           <label for="simulation-trade-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose outgoing player</label>
-          <select id="simulation-trade-outgoing-select-${partnerAbbr}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+          <select id="simulation-trade-outgoing-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
             <option value="">Choose outgoing player</option>
             ${(vm.outgoingRoster || []).map((player) => (
               `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
@@ -10799,8 +10967,17 @@ function renderSimulationTradesInSharedShell(){
           </select>
         </div>
         <div>
+          <label for="simulation-trade-extra-outgoing-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Optional package player</label>
+          <select id="simulation-trade-extra-outgoing-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+            <option value="">No second player</option>
+            ${(vm.outgoingRoster || []).map((player) => (
+              `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
+            )).join('')}
+          </select>
+        </div>
+        <div>
           <label for="simulation-trade-incoming-select-${partnerAbbr}" style="display:block;font-family:var(--fd);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Choose incoming player</label>
-          <select id="simulation-trade-incoming-select-${partnerAbbr}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
+          <select id="simulation-trade-incoming-select-${partnerAbbr}" onchange="updateSimulationTradePreviewFromShell('${partnerAbbr}')" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);">
             <option value="">Choose incoming player</option>
             ${((row?.incomingRoster || vm.incomingRostersByTeam?.[partnerAbbr] || [])).map((player) => (
               `<option value="${player.id}">${escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player')}</option>`
@@ -10808,7 +10985,10 @@ function renderSimulationTradesInSharedShell(){
           </select>
         </div>
       </div>
-        <div class="season-subbar-copy" style="margin-top:10px;">One-for-one deals resolve immediately, so use this desk to test roster fit instead of sending blind packages.</div>
+        <div class="season-subbar-copy" style="margin-top:10px;">Replacement value is included for uneven offers, so 2-for-1 ideas are compared against the best waiver fill-in before they can go through.</div>
+      <div id="simulation-trade-preview-${partnerAbbr}">
+        ${renderSimulationTradePreviewMarkup({ outgoingPlayers: [], incomingPlayers: [], state: SEASON_MODE_ADAPTER.getState?.() || D, partnerName: team?.name || partnerAbbr })}
+      </div>
       ${feedbackMarkup}
       <button class="bp" style="margin-top:12px;" onclick="applySimulationTradeFromShell('${partnerAbbr}')">Apply Trade</button>
     </div>`
@@ -10877,10 +11057,15 @@ function applySimulationTradeFromShell(partnerAbbr){
   const fromTeamAbbr=String(D?.draftState?.controlledTeamAbbr || tradeVm?.userTeamAbbr || '').trim().toUpperCase();
   const toTeamAbbr=String(partnerAbbr || '').trim().toUpperCase();
   const outgoingPlayerValue=String(document.getElementById(`simulation-trade-outgoing-select-${partnerAbbr}`)?.value || '').trim();
+  const extraOutgoingPlayerValue=String(document.getElementById(`simulation-trade-extra-outgoing-select-${partnerAbbr}`)?.value || '').trim();
   const incomingPlayerValue=String(document.getElementById(`simulation-trade-incoming-select-${partnerAbbr}`)?.value || '').trim();
-  const outgoingPlayerId=Number(outgoingPlayerValue);
-  const incomingPlayerId=Number(incomingPlayerValue);
-  if (!(outgoingPlayerValue && incomingPlayerValue && Number.isFinite(outgoingPlayerId) && Number.isFinite(incomingPlayerId))) {
+  const outgoingPlayerIds=Array.from(new Set([outgoingPlayerValue,extraOutgoingPlayerValue]
+    .map((value)=>Number(value))
+    .filter((value)=>Number.isFinite(value) && value>0)));
+  const incomingPlayerIds=Array.from(new Set([incomingPlayerValue]
+    .map((value)=>Number(value))
+    .filter((value)=>Number.isFinite(value) && value>0)));
+  if (!(outgoingPlayerIds.length && incomingPlayerIds.length)) {
     simulationTradeDeskFeedback = {
       ...simulationTradeDeskFeedback,
       [partnerAbbr]: {
@@ -10892,24 +11077,46 @@ function applySimulationTradeFromShell(partnerAbbr){
     if(typeof toast==='function') toast('Choose both the outgoing and incoming players before applying a trade.');
     return;
   }
-  const findTradePlayerName=(roster,playerId)=>((Array.isArray(roster)?roster:[]).find(player=>Number(player?.id)===Number(playerId))||{})?.name || 'player';
   const partnerRow=(tradeVm?.sections?.partners?.rows || []).find(row=>String(row?.team?.abbr || row?.teamAbbr || '').trim().toUpperCase()===toTeamAbbr) || null;
-  const outgoingPlayerName=findTradePlayerName(tradeVm?.outgoingRoster,outgoingPlayerId);
-  const incomingPlayerName=findTradePlayerName(partnerRow?.incomingRoster || tradeVm?.incomingRostersByTeam?.[toTeamAbbr],incomingPlayerId);
+  const partnerName=partnerRow?.team?.name || partnerRow?.title || toTeamAbbr || 'that team';
+  const incomingRoster=partnerRow?.incomingRoster || tradeVm?.incomingRostersByTeam?.[toTeamAbbr] || [];
+  const outgoingPlayers=outgoingPlayerIds.map((playerId)=>getSimulationTradePlayerById(tradeVm?.outgoingRoster,playerId)).filter(Boolean);
+  const incomingPlayers=incomingPlayerIds.map((playerId)=>getSimulationTradePlayerById(incomingRoster,playerId)).filter(Boolean);
+  const fairness=evaluateSimulationTradeFairness({
+    outgoingPlayers,
+    incomingPlayers,
+    state: SEASON_MODE_ADAPTER.getState?.() || D,
+    partnerName
+  });
+  if(!fairness.allowed){
+    simulationTradeDeskFeedback = {
+      ...simulationTradeDeskFeedback,
+      [partnerAbbr]: {
+        tone: fairness.tone || 'error',
+        message: fairness.message,
+        detail: fairness.detail || ''
+      }
+    };
+    renderSimulationTradesInSharedShell();
+    if(typeof toast==='function') toast(fairness.message);
+    return;
+  }
+  const outgoingPlayerName=outgoingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
+  const incomingPlayerName=incomingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
   const nextState=SEASON_MODE_ADAPTER.applyTrade({
     fromTeamAbbr: fromTeamAbbr,
     toTeamAbbr: toTeamAbbr,
-    outgoingPlayerIds: [outgoingPlayerId],
-    incomingPlayerIds: [incomingPlayerId]
+    outgoingPlayerIds,
+    incomingPlayerIds
   });
   const resolvedState=nextState || SEASON_MODE_ADAPTER.getState?.() || D;
   const fromRoster=resolvedState?.draftState?.rostersByTeam?.[fromTeamAbbr] || [];
   const toRoster=resolvedState?.draftState?.rostersByTeam?.[toTeamAbbr] || [];
-  const fromHasIncoming=fromRoster.some(player=>Number(player?.id)===incomingPlayerId);
-  const fromHasOutgoing=fromRoster.some(player=>Number(player?.id)===outgoingPlayerId);
-  const toHasOutgoing=toRoster.some(player=>Number(player?.id)===outgoingPlayerId);
-  const toHasIncoming=toRoster.some(player=>Number(player?.id)===incomingPlayerId);
-  if(!(fromHasIncoming && !fromHasOutgoing && toHasOutgoing && !toHasIncoming)){
+  const fromHasAllIncoming=incomingPlayerIds.every((playerId)=>fromRoster.some(player=>Number(player?.id)===Number(playerId)));
+  const fromHasAnyOutgoing=outgoingPlayerIds.some((playerId)=>fromRoster.some(player=>Number(player?.id)===Number(playerId)));
+  const toHasAllOutgoing=outgoingPlayerIds.every((playerId)=>toRoster.some(player=>Number(player?.id)===Number(playerId)));
+  const toHasAnyIncoming=incomingPlayerIds.some((playerId)=>toRoster.some(player=>Number(player?.id)===Number(playerId)));
+  if(!(fromHasAllIncoming && !fromHasAnyOutgoing && toHasAllOutgoing && !toHasAnyIncoming)){
     simulationTradeDeskFeedback = {
       ...simulationTradeDeskFeedback,
       [partnerAbbr]: {
@@ -10925,7 +11132,8 @@ function applySimulationTradeFromShell(partnerAbbr){
     ...simulationTradeDeskFeedback,
     [partnerAbbr]: {
       tone: 'success',
-      message: `Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`
+      message: `Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`,
+      detail: fairness.message || ''
     }
   };
   persistSimulationSeasonState('simulation_trade');

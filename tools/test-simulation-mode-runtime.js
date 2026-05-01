@@ -1137,6 +1137,72 @@ assert.deepStrictEqual(
 );
 assert.equal(tradedState.seasonState.lineupSlotsByTeam.CHI.QB, null);
 
+const unevenTradeState = {
+  draftState: {
+    freeAgents: [
+      { id: 90, name: 'Replacement Starter', fp: 31 },
+      { id: 91, name: 'Replacement Bench', fp: 12 }
+    ],
+    rostersByTeam: {
+      GB: [
+        { id: 10, name: 'GB Keeper', fp: 44 },
+        { id: 11, name: 'GB Package One', fp: 38 },
+        { id: 12, name: 'GB Package Two', fp: 33 }
+      ],
+      CHI: [
+        { id: 20, name: 'CHI Star', fp: 65 },
+        { id: 21, name: 'CHI Drop Candidate', fp: 9 },
+        { id: 22, name: 'CHI Rotation', fp: 24 }
+      ]
+    }
+  },
+  seasonState: {
+    lineupIdsByTeam: {
+      GB: [10, 11, 12],
+      CHI: [20, 21, 22]
+    },
+    activityLog: []
+  }
+};
+
+const unevenTradedState = applySimulationTrade(unevenTradeState, {
+  fromTeamAbbr: 'GB',
+  toTeamAbbr: 'CHI',
+  outgoingPlayerIds: [11, 12],
+  incomingPlayerIds: [20]
+});
+
+assert.equal(
+  unevenTradedState.draftState.rostersByTeam.GB.length,
+  unevenTradeState.draftState.rostersByTeam.GB.length,
+  '2-for-1 trades should auto-fill the open roster slot with the top waiver player'
+);
+assert.ok(
+  unevenTradedState.draftState.rostersByTeam.GB.some((player) => Number(player.id) === 90),
+  'team sending two players should receive the best waiver replacement into the opened slot'
+);
+assert.equal(
+  unevenTradedState.draftState.rostersByTeam.CHI.length,
+  unevenTradeState.draftState.rostersByTeam.CHI.length,
+  'team receiving two players should drop one player to stay at the original roster size'
+);
+assert.ok(
+  !unevenTradedState.draftState.rostersByTeam.CHI.some((player) => Number(player.id) === 21),
+  'team receiving an extra player should drop its lowest-value existing player'
+);
+assert.ok(
+  unevenTradedState.draftState.freeAgents.some((player) => Number(player.id) === 21),
+  'forced trade drop should move back to the free agent pool'
+);
+assert.ok(
+  !unevenTradedState.draftState.freeAgents.some((player) => Number(player.id) === 90),
+  'auto-filled waiver replacement should leave the free agent pool'
+);
+assert.ok(
+  unevenTradedState.seasonState.activityLog.some((entry) => /Replacement Starter/.test(entry?.title || '') && /CHI Drop Candidate/.test(entry?.title || '')),
+  'uneven trade roster balancing should leave an activity note naming the replacement and forced drop'
+);
+
 assert.equal(
   typeof activateSimulationPowerup,
   'function',
