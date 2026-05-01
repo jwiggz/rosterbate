@@ -193,7 +193,7 @@ module.exports = {
   closeSimulationTradeBuilderModal,
   renderSimulationTradeBuilderModal,
   updateSimulationTradeBuilderPreview,
-  applySimulationTradeBuilderFromModal,
+  applySimulationTradeBuilderPackage,
   renderSimulationStandingsInSharedShell,
   submitSimulationWaiverClaimFromShell,
   cancelSimulationWaiverClaimFromShell,
@@ -1319,7 +1319,7 @@ assert.match(html, /function openSimulationTradeBuilderModal\(partnerAbbr\)/, 's
 assert.match(html, /function closeSimulationTradeBuilderModal\(\)/, 'simulation Trade Desk should expose a trade builder modal closer');
 assert.match(html, /function renderSimulationTradeBuilderModal\(partnerAbbr\)/, 'simulation Trade Desk should render a package trade modal');
 assert.match(html, /function updateSimulationTradeBuilderPreview\(partnerAbbr\)/, 'simulation Trade Desk should update package preview from modal selections');
-assert.match(html, /function applySimulationTradeBuilderFromModal\(partnerAbbr\)/, 'simulation Trade Desk should apply package trades from the modal');
+assert.match(html, /function applySimulationTradeBuilderPackage\(partnerAbbr\)/, 'simulation Trade Desk should apply package trades from the modal');
 assert.match(html, /Build Trade/i, 'simulation Trade Desk partner cards should expose Build Trade instead of inline-only selectors');
 assert.match(html, /function renderSimulationStandingsInSharedShell\(/, 'season shell should add a simulation standings renderer');
 assert.match(html, /season-subbar-title">Waivers<\/div>[\s\S]*season-subbar-copy">Claim targets, watch list, and pending waiver moves<\/div>/, 'waiver page chrome should keep waiver-first page framing');
@@ -2328,6 +2328,7 @@ assert.equal(sandbox.document.body.lastInsertPosition, 'beforeend', 'trade build
 assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderModal"/, 'trade builder modal opener should insert the modal backdrop');
 assert.match(sandbox.document.body.lastInsertedHTML, /Trade With Boston Celtics/, 'trade builder modal should include partner context');
 assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderApply"[^>]*disabled/, 'trade builder modal apply button should start disabled');
+assert.match(sandbox.document.body.lastInsertedHTML, /onclick="applySimulationTradeBuilderPackage\('BOS'\)"/, 'trade builder modal apply button should use the package helper contract');
 assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="outgoing"/, 'trade builder modal should render outgoing player checkboxes');
 assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="incoming"/, 'trade builder modal should render incoming player checkboxes');
 assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Choose at least one player on both sides/i, 'trade builder modal should render the stub preview state into the real preview mount');

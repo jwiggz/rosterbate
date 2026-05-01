@@ -11072,7 +11072,7 @@ function renderSimulationTradeBuilderModal(partnerAbbr){
           <div class="season-subbar-copy" style="margin-top:4px;">Build a package from both rosters, then preview the deal.</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-          <button type="button" id="simulationTradeBuilderApply" class="bp" disabled onclick="applySimulationTradeBuilderFromModal('${escapeSimulationShellHtml(partnerAbbr)}')" style="width:auto;padding:10px 14px;opacity:.55;">Apply Trade</button>
+          <button type="button" id="simulationTradeBuilderApply" class="bp" disabled onclick="applySimulationTradeBuilderPackage('${escapeSimulationShellHtml(partnerAbbr)}')" style="width:auto;padding:10px 14px;opacity:.55;">Apply Trade</button>
           <button type="button" class="bs" onclick="closeSimulationTradeBuilderModal()" style="width:auto;padding:10px 14px;">Close</button>
         </div>
       </div>
@@ -11102,7 +11102,7 @@ function updateSimulationTradeBuilderPreview(partnerAbbr){
   if(preview) preview.innerHTML='<div style="color:#bfdbfe;font-weight:900;">Choose at least one player on both sides to preview the trade.</div>';
 }
 
-function applySimulationTradeBuilderFromModal(partnerAbbr){
+function applySimulationTradeBuilderPackage(partnerAbbr){
   toast('Choose players on both sides before applying a trade.');
 }
 
