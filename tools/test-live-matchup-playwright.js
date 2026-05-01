@@ -997,6 +997,71 @@ async function smokeLeagueUrlPartialLiveDayRepairsMissingReturnMarker(browser) {
   await page.close();
 }
 
+async function smokeLeagueUrlLiveReturnUsesMarkerSlotWhenLeagueLoadsStaleSlot(browser) {
+  const liveSlotId = `${SLOT_ID}-league-marker-live-slot`;
+  const staleSlotId = `${SLOT_ID}-league-marker-stale-slot`;
+  const leagueId = 'season_60';
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'league-marker-slot-mismatch');
+  const liveState = buildSeedState(liveSlotId, { leagueId, completedSingleGameDay: true });
+  const staleState = buildSeedState(staleSlotId, { leagueId, freshDraftLaunch: true });
+
+  await page.goto(`${BASE_URL}/historic-universe.html?seed=${Date.now()}`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 20000
+  });
+  await page.evaluate(({ liveSlotId, liveState, staleSlotId, staleState, leagueId }) => {
+    const slots = window.RosterBateHistoricalUniverseSlots;
+    if (!slots?.upsertFromState) throw new Error('slot storage API unavailable');
+    slots.upsertFromState(liveState, { slotId: liveSlotId });
+    slots.upsertFromState(staleState, { slotId: staleSlotId });
+    localStorage.setItem('rosterbateDraft', JSON.stringify(staleState));
+    const pendingPayload = JSON.stringify({ seasonId: leagueId, savedAt: Date.now(), data: staleState });
+    localStorage.setItem('rbPendingSeasonLaunch', pendingPayload);
+    sessionStorage.setItem('rbPendingSeasonLaunch', pendingPayload);
+    sessionStorage.setItem('rbSimulationLiveMatchupReturn', JSON.stringify({
+      slotId: liveSlotId,
+      day: 1,
+      autoFinishDayOnReturn: true,
+      savedAt: Date.now()
+    }));
+  }, { liveSlotId, liveState, staleSlotId, staleState, leagueId });
+
+  await page.goto(
+    `${BASE_URL}/rosterbate-season.html?sport=nba&league=${leagueId}&qa=${Date.now()}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForTimeout(2500);
+
+  const persisted = await page.evaluate(({ liveSlotId, staleSlotId }) => {
+    const liveSlotRaw = localStorage.getItem(`rbHistoricalUniverseState:${liveSlotId}`);
+    const staleSlotRaw = localStorage.getItem(`rbHistoricalUniverseState:${staleSlotId}`);
+    const draftRaw = localStorage.getItem('rosterbateDraft');
+    const liveSlot = liveSlotRaw ? JSON.parse(liveSlotRaw) : null;
+    const staleSlot = staleSlotRaw ? JSON.parse(staleSlotRaw) : null;
+    const draft = draftRaw ? JSON.parse(draftRaw) : null;
+    const liveDayOneLogs = (liveSlot?.seasonState?.completedGameLogs || []).filter((game) => Number(game?.day || 0) === 1);
+    return {
+      liveSlotDay: Number(liveSlot?.seasonState?.currentDay || 0),
+      staleSlotDay: Number(staleSlot?.seasonState?.currentDay || 0),
+      liveCompletedDayOneGames: liveDayOneLogs.length,
+      draftDay: Number(draft?.seasonState?.currentDay || draft?.currentDay || 0),
+      draftResumeSlot: String(draft?.resumeHistoricalUniverseSlotId || draft?.historicalUniverseSlotId || ''),
+      returnMarker: sessionStorage.getItem('rbSimulationLiveMatchupReturn'),
+      text: document.body.innerText
+    };
+  }, { liveSlotId, staleSlotId });
+  assert.equal(persisted.liveSlotDay, 2, 'league URL live return should finish the marker slot even when the league initially loads a stale slot');
+  assert.equal(persisted.staleSlotDay, 1, 'stale league slot should remain stale instead of being mistaken for the live return slot');
+  assert.equal(persisted.liveCompletedDayOneGames, 2, 'marker-slot repair should settle every Day 1 matchup');
+  assert.equal(persisted.draftDay, 2, 'marker-slot repair should update the local resume pointer to Day 2');
+  assert.equal(persisted.draftResumeSlot, liveSlotId, 'marker-slot repair should point future league resumes at the live slot');
+  assert.equal(persisted.returnMarker, null, 'marker-slot repair should consume the live return marker');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'marker-slot repair should render Day 2 copy');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -1013,6 +1078,7 @@ async function main() {
     await smokeSingleGameLiveMatchupAdvancesDay(browser);
     await smokeCompletedLiveMatchupRepairsStuckSingleGameDay(browser);
     await smokeLeagueUrlPartialLiveDayRepairsMissingReturnMarker(browser);
+    await smokeLeagueUrlLiveReturnUsesMarkerSlotWhenLeagueLoadsStaleSlot(browser);
   } finally {
     await browser.close();
   }

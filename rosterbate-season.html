@@ -12960,6 +12960,27 @@ function finishSimulationRevealDayAfterLiveReturn(shouldAutoFinish){
   return true;
 }
 
+function adoptSimulationLiveReturnMarkerSlot(markerSlotId){
+  const targetSlotId=String(markerSlotId || '').trim();
+  if(!targetSlotId) return false;
+  const requestedLeagueId=typeof getRequestedLeagueId==='function' ? getRequestedLeagueId() : null;
+  const markerState=loadHistoricalUniverseSlotState(targetSlotId, D?.sport || CURRENT_SPORT);
+  if(!markerState || !isSimulationBackedSeasonState(markerState)) return false;
+  if(requestedLeagueId && !doesSavedSeasonMatchRequestedLeague(markerState, requestedLeagueId)) return false;
+  const resolvedLoad=resolveSeasonManagerLeagueDataLoad(markerState, markerState?.sport || D?.sport || CURRENT_SPORT);
+  if(!resolvedLoad || resolvedLoad.backend!=='simulation' || !resolvedLoad.adapter) return false;
+  ACTIVE_SEASON_MODE=resolvedLoad.activeSeasonMode || 'simulation';
+  SEASON_MODE_ADAPTER=resolvedLoad.adapter;
+  D=resolvedLoad.state || markerState;
+  D.historicalUniverseSlotId=targetSlotId;
+  D.sharedSimulationSlotId=targetSlotId;
+  applySportContext(D.sport || markerState?.sport || CURRENT_SPORT);
+  hydrateDraftUserContextFromLobby();
+  refreshCommissionerAccess();
+  D=writeLocalDraftSnapshot(D);
+  return true;
+}
+
 function consumeSimulationLiveMatchupReturnIntent(){
   let parsed=null;
   try{
@@ -12981,10 +13002,14 @@ function consumeSimulationLiveMatchupReturnIntent(){
     try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(e){}
     return false;
   }
-  if(!markerSlotId || !currentSlotId || markerSlotId!==currentSlotId) return false;
+  if(!markerSlotId) return false;
+  if(!currentSlotId || markerSlotId!==currentSlotId) {
+    if(!adoptSimulationLiveReturnMarkerSlot(markerSlotId)) return false;
+  }
   try{ sessionStorage.removeItem(RB_SIM_LIVE_RETURN_KEY); }catch(e){}
   syncSimulationLiveMatchupStateFromStorage();
-  return finishSimulationRevealDayAfterLiveReturn(true);
+  const finished=finishSimulationRevealDayAfterLiveReturn(true);
+  return finished || String(D?.historicalUniverseSlotId || D?.sharedSimulationSlotId || '').trim()===markerSlotId;
 }
 
 function finishPendingSimulationLiveRevealDayOnBoot(){
