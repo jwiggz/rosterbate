@@ -218,6 +218,7 @@ module.exports = {
   tradePlayerKey,
   findRosterPlayerByTradeId,
   getLocalTradeBuilderFairness,
+  renderTrades,
   openTrade,
   toggleTr,
   submitTrade,
@@ -2391,9 +2392,9 @@ api.renderSimulationTradesInSharedShell();
 assert.match(elements.tradesContent.innerHTML, /Boston Celtics/);
 assert.match(elements.tradesContent.innerHTML, /openSimulationTradeBuilderModal\('BOS'\)/);
 assert.match(elements.tradesContent.innerHTML, /Build Trade/i);
-assert.match(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/, 'simulation trades should keep the legacy quick-trade apply path until modal apply is wired');
-assert.match(elements.tradesContent.innerHTML, /simulation-trade-outgoing-select-BOS/, 'simulation trades should keep the outgoing quick-trade select for the existing apply helper');
-assert.match(elements.tradesContent.innerHTML, /simulation-trade-incoming-select-BOS/, 'simulation trades should keep the incoming quick-trade select for the existing apply helper');
+assert.doesNotMatch(elements.tradesContent.innerHTML, /applySimulationTradeFromShell\('BOS'\)/, 'simulation trades should retire the legacy quick-trade apply path now that modal apply is wired');
+assert.doesNotMatch(elements.tradesContent.innerHTML, /simulation-trade-outgoing-select-BOS/, 'simulation trades should not render the old outgoing quick-trade select');
+assert.doesNotMatch(elements.tradesContent.innerHTML, /simulation-trade-incoming-select-BOS/, 'simulation trades should not render the old incoming quick-trade select');
 assert.match(elements.tradesContent.innerHTML, /Trade Desk|Pending Offers/, 'simulation trades should feel like the single-player trade desk');
 assert.match(elements.tradesContent.innerHTML, /Incoming Offers/i, 'simulation trades should render an incoming-offers lane');
 assert.match(elements.tradesContent.innerHTML, /Sent Offers/i, 'simulation trades should render a sent-offers lane');
@@ -2403,13 +2404,10 @@ assert.match(elements.tradesContent.innerHTML, /Pick a partner, then build anyth
 assert.match(elements.tradesContent.innerHTML, /7-5/, 'simulation trades should surface partner record context');
 assert.match(elements.tradesContent.innerHTML, /Top asset: Stephen Curry/, 'simulation trades should surface partner top-player context');
 assert.match(elements.tradesContent.innerHTML, /13 players/, 'simulation trades should surface partner roster counts');
-assert.match(elements.tradesContent.innerHTML, /Hakeem Olajuwon [^<]* HOU [^<]* C/i, 'simulation trades should render outgoing quick-trade option labels with full player context');
-assert.match(elements.tradesContent.innerHTML, /Stephen Curry [^<]* GSW [^<]* PG/i, 'simulation trades should render incoming quick-trade option labels with full player context');
-assert.match(elements.tradesContent.innerHTML, /Optional package player/i, 'simulation trades should keep the second outgoing quick-trade select for existing 2-for-1 checks');
+assert.doesNotMatch(elements.tradesContent.innerHTML, /Optional package player/i, 'simulation trades should keep package player selection inside the modal');
 assert.match(elements.tradesContent.innerHTML, /Replacement value/i, 'simulation trades should explain that uneven deals are judged against the waiver wire');
-assert.match(elements.tradesContent.innerHTML, /Trade Preview/i, 'simulation trades should keep the legacy quick-trade preview panel before modal apply is wired');
-assert.match(elements.tradesContent.innerHTML, /updateSimulationTradePreviewFromShell\('BOS'\)/, 'simulation quick-trade selections should refresh the legacy preview live');
-assert.match(elements.tradesContent.innerHTML, /Choose players to preview the deal/i, 'simulation quick-trade preview should have a clear empty state');
+assert.doesNotMatch(elements.tradesContent.innerHTML, /simulation-trade-preview-BOS/, 'simulation trades should not render the legacy inline preview panel');
+assert.doesNotMatch(elements.tradesContent.innerHTML, /updateSimulationTradePreviewFromShell\('BOS'\)/, 'simulation trades should move live preview updates into the modal builder');
 assert.match(elements.tradesContent.innerHTML, /best waiver fill-in/i, 'simulation trade desk should tell managers uneven trades may require a waiver fill-in');
 
 delete elements.simulationTradeBuilderModal;
@@ -2593,114 +2591,34 @@ assert.ok(
 
 setSimulationStubPhase('regular_season');
 api.setSeasonModeAdapter(simulationAdapterStub);
-api.setData({
-  ...(api.getData() || {}),
-  draftState: {
-    ...((api.getData() || {}).draftState || {}),
-    controlledTeamAbbr: 'LAL'
-  }
-});
 api.renderSimulationTradesInSharedShell();
-
+api.openSimulationTradeBuilderModal('BOS');
+const fairTwoForOneInputs = sandbox.document.querySelectorAll('[data-simulation-trade-builder-side]');
+fairTwoForOneInputs.forEach((input) => { input.checked = false; });
+fairTwoForOneInputs.find((input) => input.getAttribute('data-player-id') === '34').checked = true;
+fairTwoForOneInputs.find((input) => input.getAttribute('data-player-id') === '102').checked = true;
+fairTwoForOneInputs.find((input) => input.getAttribute('data-player-id') === '30').checked = true;
+demoToasts = [];
+historicalSlotUpsertCalls = [];
 simulationAdapterStub.lastTrade = null;
-historicalSlotUpsertCalls = [];
-demoToasts = [];
-api.applySimulationTradeFromShell('BOS');
-assert.equal(simulationAdapterStub.lastTrade, null, 'trade helper should require explicit outgoing and incoming selections');
-assert.equal(historicalSlotUpsertCalls.length, 0, 'trade helper should not persist until both sides are chosen');
-assert.deepStrictEqual(
-  demoToasts,
-  ['Choose both the outgoing and incoming players before applying a trade.'],
-  'trade helper should give immediate feedback when a trade is incomplete'
+api.updateSimulationTradeBuilderPreview('BOS');
+assert.equal(elements.simulationTradeBuilderApply.disabled, false, 'trade builder apply button should enable for a fair 2-for-1 package');
+assert.match(
+  elements.simulationTradeBuilderPreview.innerHTML,
+  /62\.0 FP[\s\S]*58\.0 FP/i,
+  'trade builder preview should total a selected 2-for-1 package inside the modal'
+);
+assert.doesNotMatch(
+  elements.simulationTradeBuilderPreview.innerHTML,
+  /Package Fairness/i,
+  'trade builder preview should not stack a second conflicting fairness model under the main preview'
 );
 assert.match(
-  elements.tradesContent.innerHTML,
-  /Choose both the outgoing and incoming players before applying a trade\./,
-  'trade desk should leave inline feedback when an attempted trade is incomplete'
+  elements.simulationTradeBuilderPreview.innerHTML,
+  /Replacement context/i,
+  'trade builder preview should explain the uneven-package replacement context once'
 );
-elements['simulation-trade-outgoing-select-BOS'].value = '34';
-elements['simulation-trade-incoming-select-BOS'].value = '30';
-api.updateSimulationTradePreviewFromShell('BOS');
-assert.match(
-  elements['simulation-trade-preview-BOS'].innerHTML,
-  /You give[\s\S]*Hakeem Olajuwon[\s\S]*You get[\s\S]*Stephen Curry[\s\S]*Fairness check/i,
-  'trade preview should show both packages and the fairness verdict before apply'
-);
-assert.match(
-  elements['simulation-trade-preview-BOS'].innerHTML,
-  /55\.0 FP[\s\S]*58\.0 FP/i,
-  'trade preview should include player value context for selected packages'
-);
-elements['simulation-trade-outgoing-select-BOS'].value = '101';
-elements['simulation-trade-extra-outgoing-select-BOS'].value = '102';
-elements['simulation-trade-incoming-select-BOS'].value = '99';
-api.updateSimulationTradePreviewFromShell('BOS');
-assert.match(
-  elements['simulation-trade-preview-BOS'].innerHTML,
-  /Block[\s\S]*waiver replacement/i,
-  'trade preview should warn before a lopsided replacement-value trade is applied'
-);
-assert.match(
-  elements['simulation-trade-preview-BOS'].innerHTML,
-  /Waiver Fill-In[\s\S]*Scottie Pippen[\s\S]*CHI[\s\S]*SF[\s\S]*28\.0 FP/i,
-  'trade preview should show the best waiver fill-in row for uneven packages'
-);
-demoToasts = [];
-api.applySimulationTradeFromShell('BOS');
-assert.equal(
-  simulationAdapterStub.lastTrade,
-  null,
-  'trade helper should block a lopsided 2-for-1 before mutating rosters'
-);
-
-assert.deepStrictEqual(
-  demoToasts,
-  ['Trade blocked: Boston Celtics would be giving up too much after replacement value.'],
-  'trade helper should explain why a lopsided 2-for-1 is blocked'
-);
-assert.match(
-  elements.tradesContent.innerHTML,
-  /waiver replacement/i,
-  'trade desk should mention waiver replacement value when blocking an uneven trade'
-);
-elements['simulation-trade-outgoing-select-BOS'].value = '34';
-elements['simulation-trade-extra-outgoing-select-BOS'].value = '';
-elements['simulation-trade-incoming-select-BOS'].value = '30';
-demoToasts = [];
-api.applySimulationTradeFromShell('BOS');
-assert.deepStrictEqual(
-  toPlain(simulationAdapterStub.lastTrade),
-  {
-    fromTeamAbbr: 'LAL',
-    toTeamAbbr: 'BOS',
-    outgoingPlayerIds: [34],
-    incomingPlayerIds: [30]
-  }
-);
-assert.deepStrictEqual(
-  demoToasts,
-  ['Trade applied: Hakeem Olajuwon for Stephen Curry.'],
-  'trade helper should confirm when a simulation trade actually changes rosters'
-);
-assert.match(
-  elements.tradesContent.innerHTML,
-  /Trade applied: Hakeem Olajuwon for Stephen Curry\./,
-  'trade desk should leave inline success feedback after applying a trade'
-);
-assert.ok(
-  simulationAdapterStub.getState().draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 30),
-  'trade helper should leave the acquired player on the controlled roster after success'
-);
-
-setSimulationStubPhase('regular_season');
-api.setSeasonModeAdapter(simulationAdapterStub);
-api.renderSimulationTradesInSharedShell();
-elements['simulation-trade-outgoing-select-BOS'].value = '34';
-elements['simulation-trade-extra-outgoing-select-BOS'].value = '102';
-elements['simulation-trade-incoming-select-BOS'].value = '30';
-demoToasts = [];
-historicalSlotUpsertCalls = [];
-api.applySimulationTradeFromShell('BOS');
+api.applySimulationTradeBuilderPackage('BOS');
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastTrade),
   {
@@ -2709,12 +2627,13 @@ assert.deepStrictEqual(
     outgoingPlayerIds: [34, 102],
     incomingPlayerIds: [30]
   },
-  'trade helper should send both selected outgoing players for a fair 2-for-1 package'
+  'trade builder apply should send both selected outgoing players for a fair 2-for-1 package'
 );
+assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder apply should close the modal after a fair 2-for-1 package');
 assert.deepStrictEqual(
   demoToasts,
   ['Trade applied: Hakeem Olajuwon + Bench Wing for Stephen Curry.'],
-  'trade helper should name both outgoing players when a fair 2-for-1 package applies'
+  'trade builder apply should name both outgoing players when a fair 2-for-1 package applies'
 );
 assert.ok(
   simulationAdapterStub.getState().draftState.rostersByTeam.BOS.some((player) => Number(player.id) === 102),
@@ -2754,12 +2673,17 @@ api.setGame({
 elements.tradeBuilderMount = createElement('tradeBuilderMount');
 demoToasts = [];
 sandbox.document.body.lastInsertedHTML = '';
+api.renderTrades();
+assert.match(elements.tradesContent.innerHTML, /data-trade-team="1"/, 'local trade desk should render partner cards for modal entry');
+assert.match(elements.tradesContent.innerHTML, /onclick="openTrade\(1\)"/, 'local trade partner cards should directly open the canonical modal builder');
 api.openTrade(1);
 assert.ok(elements.localTradeBuilderModal, 'local trade builder should open in a modal for the selected partner');
 assert.match(elementsBodyHtml(), /Build Trade With Rim Rockers/, 'local trade builder modal should name the selected partner');
 assert.equal(elements.tradeBuilderMount.innerHTML, '', 'local trade builder should not render the old inline builder');
 api.toggleTr('give', 'me-star');
 api.toggleTr('get', 'them-low');
+assert.match(elements.localTradeBuilderModal.innerHTML, /44\.0 FP outgoing total/i, 'local trade builder summary should show the outgoing side total');
+assert.match(elements.localTradeBuilderModal.innerHTML, /8\.0 FP incoming total/i, 'local trade builder summary should show the incoming side total');
 assert.match(elements.localTradeBuilderModal.innerHTML, /Blocked/, 'local trade builder modal should show blocked state for unfair packages');
 api.submitTrade();
 assert.ok(elements.localTradeBuilderModal, 'blocked local trade package should leave the modal open for edits');
