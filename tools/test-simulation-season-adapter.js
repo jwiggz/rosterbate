@@ -937,6 +937,35 @@ assert.equal(
   'normal day reveal should not duplicate a matchup already completed through the live runner'
 );
 
+const stuckCompletedLiveState = simulationSeasonAdapterApi.clone(slotState);
+stuckCompletedLiveState.seasonState.completedGameLogs = stuckCompletedLiveState.seasonState.completedGameLogs.concat([
+  preparedLiveMatchup.gameLog
+]);
+const stuckCompletedLiveAdapter = createSimulationSeasonAdapter({
+  slotId: 'sim-slot-stuck-completed-live-matchup',
+  state: stuckCompletedLiveState
+});
+const repairedCompletedLiveState = stuckCompletedLiveAdapter.commitLiveMatchupResult(preparedLiveMatchup);
+assert.equal(
+  repairedCompletedLiveState.seasonState.currentDay,
+  13,
+  'committing an already completed current-day live matchup should repair a stuck unadvanced day'
+);
+assert.equal(
+  repairedCompletedLiveState.seasonState.completedGameLogs.filter((game) =>
+    String(game?.homeAbbr || '').toUpperCase() === 'LAL' &&
+    String(game?.awayAbbr || '').toUpperCase() === 'BOS' &&
+    Number(game?.day || 0) === 12
+  ).length,
+  1,
+  'repairing a stuck completed live matchup should not duplicate the completed game'
+);
+assert.equal(
+  repairedCompletedLiveState.seasonState.pendingWaiverClaims.length,
+  0,
+  'repairing a stuck completed live matchup should run day-end waiver processing'
+);
+
 const multiGameLiveState = simulationSeasonAdapterApi.clone(slotState);
 multiGameLiveState.leagueShell.teams = [
   ...multiGameLiveState.leagueShell.teams,

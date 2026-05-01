@@ -55,6 +55,34 @@ function buildSeedState(slotId = SLOT_ID, options = {}) {
       submittedAt: 1
     }
     : null;
+  const completedSingleGameLog = options.completedSingleGameDay
+    ? {
+      day: 1,
+      homeAbbr: 'LAL',
+      awayAbbr: 'BOS',
+      homeName: 'Los Angeles Lakers',
+      awayName: 'Boston Celtics',
+      homeScore: 243,
+      awayScore: 225,
+      homeTotal: 243,
+      awayTotal: 225,
+      winner: 'home',
+      homeEntries: [
+        { player: makePlayer(1, 'Magic Johnson', 'LAL', 'PG', 52), finalScore: 52 },
+        { player: makePlayer(2, 'Kobe Bryant', 'LAL', 'SG', 49), finalScore: 49 },
+        { player: makePlayer(3, 'LeBron James', 'LAL', 'SF', 50), finalScore: 50 },
+        { player: makePlayer(4, 'Pau Gasol', 'LAL', 'PF', 36), finalScore: 36 },
+        { player: makePlayer(5, 'Shaquille ONeal', 'LAL', 'C', 56), finalScore: 56 }
+      ],
+      awayEntries: [
+        { player: makePlayer(11, 'Larry Bird', 'BOS', 'SF', 51), finalScore: 51 },
+        { player: makePlayer(12, 'Paul Pierce', 'BOS', 'SG', 39), finalScore: 39 },
+        { player: makePlayer(13, 'Kevin McHale', 'BOS', 'PF', 38), finalScore: 38 },
+        { player: makePlayer(14, 'Bill Russell', 'BOS', 'C', 43), finalScore: 43 },
+        { player: makePlayer(15, 'Bob Cousy', 'BOS', 'PG', 35), finalScore: 35 }
+      ]
+    }
+    : null;
   return {
     sport: 'nba',
     simulationMode: 'nba_mixed_era_single_player_v1',
@@ -124,7 +152,7 @@ function buildSeedState(slotId = SLOT_ID, options = {}) {
         { teamIdx: 2, teamAbbr: 'ATL', conference: 'East', division: 'Southeast', w: 0, l: 0, pf: 0, pa: 0 },
         { teamIdx: 3, teamAbbr: 'MIA', conference: 'East', division: 'Southeast', w: 0, l: 0, pf: 0, pa: 0 }
       ],
-      completedGameLogs: [],
+      completedGameLogs: completedSingleGameLog ? [completedSingleGameLog] : [],
       scheduleByDay,
       pendingWaiverClaims: pendingWaiverClaim ? [pendingWaiverClaim] : [],
       recentWaiverResults: [],
@@ -701,6 +729,55 @@ async function smokeSingleGameLiveMatchupAdvancesDay(browser) {
   await page.close();
 }
 
+async function smokeCompletedLiveMatchupRepairsStuckSingleGameDay(browser) {
+  const slotId = `${SLOT_ID}-stuck-completed-day`;
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'stuck-completed-live-advance');
+  await seedLiveMatchupSeason(page, slotId, {
+    singleGameDay: true,
+    pendingWaiverClaim: true,
+    completedSingleGameDay: true
+  });
+
+  const returnUrl = `/rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=${encodeURIComponent(slotId)}`;
+  await page.goto(
+    `${BASE_URL}/sim-matchup.html?sport=nba&historicalUniverse=${encodeURIComponent(slotId)}&day=1&homeAbbr=LAL&awayAbbr=BOS&returnUrl=${encodeURIComponent(returnUrl)}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.waitForFunction(
+    () => (
+      !document.querySelector('#overlay')?.classList.contains('hidden') &&
+      document.querySelector('#overlay-title')?.textContent === 'FINAL'
+    ),
+    null,
+    { timeout: 8000 }
+  );
+  await page.locator('#overlay-btn').click();
+  await page.waitForURL(/rosterbate-season\.html/, { timeout: 10000 });
+  await page.waitForTimeout(1500);
+
+  const persisted = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const slot = slotRaw ? JSON.parse(slotRaw) : null;
+    return {
+      persistedDay: Number(slot?.seasonState?.currentDay || 0),
+      completedGames: Number(slot?.seasonState?.completedGameLogs?.length || 0),
+      pendingWaivers: Number(slot?.seasonState?.pendingWaiverClaims?.length || 0),
+      rosterIds: (slot?.draftState?.rostersByTeam?.LAL || []).map((player) => Number(player?.id || 0)),
+      freeAgentIds: (slot?.draftState?.freeAgents || []).map((player) => Number(player?.id || 0)),
+      text: document.body.innerText
+    };
+  }, slotId);
+  assert.equal(persisted.persistedDay, 2, 'completed live matchup reload should repair a stuck single-game day to Day 2');
+  assert.equal(persisted.completedGames, 1, 'completed live matchup repair should not duplicate the already saved game');
+  assert.equal(persisted.pendingWaivers, 0, 'completed live matchup repair should process pending day waivers');
+  assert.ok(persisted.rosterIds.includes(99), 'completed live matchup repair should persist the awarded waiver player');
+  assert.ok(persisted.freeAgentIds.includes(5), 'completed live matchup repair should persist the dropped waiver player as a free agent');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'completed live matchup repair should return to Day 2 season copy');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -711,6 +788,7 @@ async function main() {
     await smokeSeasonMatchupMobilePartialDay(browser);
     await smokeSeasonHardRefreshPersistence(browser);
     await smokeSingleGameLiveMatchupAdvancesDay(browser);
+    await smokeCompletedLiveMatchupRepairsStuckSingleGameDay(browser);
   } finally {
     await browser.close();
   }

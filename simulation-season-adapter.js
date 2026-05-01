@@ -2212,15 +2212,47 @@ function cleanSimulationSourceLabel(label){
     };
   }
 
+  function applyCompletedSimulationDaySideEffects(state, gameDay, scheduleByDayOverride){
+    const nextState = clone(state || {});
+    const seasonState = clone(nextState.seasonState || {});
+    const resolvedGameDay = Number(gameDay || seasonState.currentDay || nextState.currentDay || 1) || 1;
+    const scheduleByDay = scheduleByDayOverride || getCanonicalScheduleByDay(nextState, nextState?.leagueShell || {});
+    const daySchedule = Array.isArray(scheduleByDay?.[resolvedGameDay]) ? scheduleByDay[resolvedGameDay] : [];
+    const completedDayGames = (Array.isArray(seasonState.completedGameLogs) ? seasonState.completedGameLogs : [])
+      .filter((game) => Number(game?.day || 0) === resolvedGameDay);
+    const currentDay = Number(seasonState.currentDay || nextState.currentDay || resolvedGameDay || 1) || 1;
+    const completedCurrentDay = daySchedule.length > 0 && completedDayGames.length >= daySchedule.length && currentDay === resolvedGameDay;
+    if (!completedCurrentDay) return nextState;
+    seasonState.currentDay = resolvedGameDay + 1;
+    seasonState.currentWeek = Math.max(1, Math.ceil(Number(seasonState.currentDay || 1) / 7));
+    let resolvedState = {
+      ...nextState,
+      currentDay: Number(seasonState.currentDay || nextState.currentDay || 1),
+      currentWeek: Number(seasonState.currentWeek || nextState.currentWeek || 1),
+      seasonState
+    };
+    const sport = getSimulationSportForState(resolvedState);
+    const waiverCadence = typeof runtimeApi.getSimulationWaiverCadence === 'function'
+      ? runtimeApi.getSimulationWaiverCadence(clone(resolvedState))
+      : (sport === 'nfl' ? 'week' : 'day');
+    resolvedState = typeof runtimeApi.processSimulationWaiverClaims === 'function'
+      ? clone(runtimeApi.processSimulationWaiverClaims(resolvedState, { cadence: waiverCadence }))
+      : resolvedState;
+    return ensurePostseasonSnapshot(resolvedState, getScheduleDayCount(scheduleByDay));
+  }
+
   function applySingleSimulationGameResult(state, liveResult){
     const result = liveResult && typeof liveResult === 'object' ? liveResult : {};
     const gameLog = clone(result.gameLog || result.dayResult?.gameLogs?.[0] || null);
     if (!gameLog) return clone(state || {});
-    if (findCompletedLiveMatchup(state, gameLog)) return clone(state || {});
+    const normalizedGame = normalizeSimulationRecentResult(state, gameLog);
+    if (findCompletedLiveMatchup(state, normalizedGame)) {
+      const gameDay = Number(normalizedGame.day || result.day || state?.seasonState?.currentDay || state?.currentDay || 1) || 1;
+      return applyCompletedSimulationDaySideEffects(state, gameDay);
+    }
     const nextState = clone(state || {});
     const seasonState = clone(nextState.seasonState || {});
     const teamMeta = clone(nextState?.leagueShell?.teams || []);
-    const normalizedGame = normalizeSimulationRecentResult(nextState, gameLog);
     const standings = normalizeSimulationStandingsRows(nextState, teamMeta);
     const home = standings.find((row) => String(row?.teamAbbr || '').trim().toUpperCase() === normalizedGame.homeAbbr) ||
       standings.find((row) => Number(row?.teamIdx) === Number(normalizedGame.home));
@@ -2262,32 +2294,13 @@ function cleanSimulationSourceLabel(label){
     }
     const gameDay = Number(normalizedGame.day || result.day || seasonState.currentDay || nextState.currentDay || 1) || 1;
     const scheduleByDay = getCanonicalScheduleByDay(nextState, nextState?.leagueShell || {});
-    const daySchedule = Array.isArray(scheduleByDay?.[gameDay]) ? scheduleByDay[gameDay] : [];
-    const completedDayGames = seasonState.completedGameLogs
-      .filter((game) => Number(game?.day || 0) === gameDay);
-    const currentDay = Number(seasonState.currentDay || nextState.currentDay || gameDay || 1) || 1;
-    const completedCurrentDay = daySchedule.length > 0 && completedDayGames.length >= daySchedule.length && currentDay === gameDay;
-    if (completedCurrentDay) {
-      seasonState.currentDay = gameDay + 1;
-      seasonState.currentWeek = Math.max(1, Math.ceil(Number(seasonState.currentDay || 1) / 7));
-    }
-    let resolvedState = {
+    const resolvedState = {
       ...nextState,
       currentDay: Number(seasonState.currentDay || nextState.currentDay || 1),
       currentWeek: Number(seasonState.currentWeek || nextState.currentWeek || 1),
       seasonState
     };
-    if (completedCurrentDay) {
-      const sport = getSimulationSportForState(resolvedState);
-      const waiverCadence = typeof runtimeApi.getSimulationWaiverCadence === 'function'
-        ? runtimeApi.getSimulationWaiverCadence(clone(resolvedState))
-        : (sport === 'nfl' ? 'week' : 'day');
-      resolvedState = typeof runtimeApi.processSimulationWaiverClaims === 'function'
-        ? clone(runtimeApi.processSimulationWaiverClaims(resolvedState, { cadence: waiverCadence }))
-        : resolvedState;
-      resolvedState = ensurePostseasonSnapshot(resolvedState, getScheduleDayCount(scheduleByDay));
-    }
-    return resolvedState;
+    return applyCompletedSimulationDaySideEffects(resolvedState, gameDay, scheduleByDay);
   }
 
   function getSeriesTeam(series, teamAbbr){
