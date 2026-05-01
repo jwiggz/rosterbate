@@ -729,6 +729,30 @@ function buildRosterPanel(players, panelId, fpClass) {
   });
 }
 
+function refreshLivePortraitPanels() {
+  if (!teamA.length && !teamB.length) return;
+  buildRosterPanel(teamA, 'roster-a', 'purple');
+  buildRosterPanel(teamB, 'roster-b', 'cyan');
+  [...teamA, ...teamB].forEach(player => updatePlayerFP(player));
+}
+
+let livePortraitManifestPromise = null;
+function loadLivePortraitManifest() {
+  const portraits = window.RosterBatePlayerPortraits;
+  if (!portraits || typeof portraits.loadManifest !== 'function') {
+    return Promise.resolve({ loaded: false, reason: 'portrait-manifest-unavailable' });
+  }
+  if (!livePortraitManifestPromise) {
+    livePortraitManifestPromise = portraits.loadManifest()
+      .then((result) => {
+        if (result && result.loaded) refreshLivePortraitPanels();
+        return result;
+      })
+      .catch((error) => ({ loaded: false, error: String(error?.message || error) }));
+  }
+  return livePortraitManifestPromise;
+}
+
 function livePortraitSeed(player) {
   const source = `${player?.name || 'Player'}|${player?.team || ''}`;
   let hash = 0;
@@ -1570,6 +1594,7 @@ function startNewGame() {
 
 // ── Init ───────────────────────────────────────────────────────────────────
 if (!bootLiveMatchupFromParams()) startNewGame();
+loadLivePortraitManifest();
 simInterval = setInterval(simTick, TICK_MS);
 </script>
 </body>

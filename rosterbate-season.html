@@ -11123,8 +11123,10 @@ function renderSimulationTradeBuilderPlayerOption(player, side, partnerAbbr){
   const name=escapeSimulationShellHtml(player?.name || 'Player');
   const label=escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player');
   const value=getSimulationTradePlayerValue(player).toFixed(1);
+  const portrait=renderTeamInitialAvatar(player?.name || 'Player', player?.team || '', 42, '', {status:player?.status || player?.injuryStatus || ''});
   return `<label style="display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(148,163,184,.2);background:rgba(15,23,42,.46);border-radius:12px;padding:10px;cursor:pointer;">
     <input type="checkbox" data-simulation-trade-builder-side="${escapeSimulationShellHtml(side)}" data-simulation-trade-builder-partner="${escapeSimulationShellHtml(partnerAbbr)}" data-player-id="${playerId}" onchange="updateSimulationTradeBuilderPreview('${escapeSimulationShellHtml(partnerAbbr)}')" style="margin-top:3px;">
+    <span style="flex:0 0 auto;line-height:0;">${portrait}</span>
     <span style="display:flex;flex-direction:column;gap:3px;min-width:0;">
       <span style="font-size:13px;font-weight:900;color:#f8fafc;">${name}</span>
       <span style="font-size:11px;color:#94a3b8;line-height:1.35;">${label} · ${value} FP</span>

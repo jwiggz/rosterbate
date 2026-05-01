@@ -75,6 +75,8 @@ assert.match(simMatchupHtml, /function renderLivePlayerPortrait\(/, 'live matchu
 assert.match(simMatchupHtml, /class="live-player-portrait"/, 'live matchup roster rows should use portrait markup instead of dot-only players');
 assert.match(simMatchupHtml, /<script src="player-portrait-assets\.js"><\/script>/, 'live matchup should load the shared portrait asset pipeline');
 assert.match(simMatchupHtml, /RosterBatePlayerPortraits\.renderPortraitMarkup/, 'live matchup should prefer shared portrait image markup when available');
+assert.match(simMatchupHtml, /function refreshLivePortraitPanels\(/, 'live matchup should refresh roster rows after portrait manifest load');
+assert.match(simMatchupHtml, /loadLivePortraitManifest\(\)/, 'live matchup should trigger an explicit portrait manifest refresh after boot');
 assert.match(simMatchupHtml, /portrait-state-scoring/, 'live matchup should animate scoring portrait states');
 assert.match(simMatchupHtml, /portrait-state-takeover/, 'live matchup should animate takeover portrait states');
 assert.match(simMatchupHtml, /portrait-card-bg/, 'live matchup player portraits should use illustrated card-style portrait panels');
@@ -1462,6 +1464,11 @@ assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season she
 assert.match(html, /function openSimulationTradeBuilderModal\(partnerAbbr\)/, 'simulation Trade Desk should expose a trade builder modal opener');
 assert.match(html, /function closeSimulationTradeBuilderModal\(\)/, 'simulation Trade Desk should expose a trade builder modal closer');
 assert.match(html, /function renderSimulationTradeBuilderPlayerOption\(player, side, partnerAbbr\)/, 'simulation Trade Desk should render modal player checkbox options');
+const simulationTradeBuilderOptionBody = html.slice(
+  html.indexOf('function renderSimulationTradeBuilderPlayerOption(player, side, partnerAbbr)'),
+  html.indexOf('function renderSimulationTradeBuilderModal(partnerAbbr)')
+);
+assert.match(simulationTradeBuilderOptionBody, /renderTeamInitialAvatar\(/, 'simulation trade builder options should render shared player portraits');
 assert.match(html, /function renderSimulationTradeBuilderModal\(partnerAbbr\)/, 'simulation Trade Desk should render a package trade modal');
 assert.match(html, /function getSimulationTradeBuilderSelectedIds\(partnerAbbr, side\)/, 'simulation Trade Desk should read selected package players from the modal');
 assert.match(html, /function getSimulationTradeBuilderPlayerById\(id\)/, 'simulation Trade Desk should safely resolve package preview players');
