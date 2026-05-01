@@ -167,7 +167,8 @@ function buildCoverageReport(options = {}) {
     covered: hasPortrait(manifestPlayers, player),
     key: `${player.name}|${player.team}`,
     suggestedFilename: suggestedFilename(player),
-    suggestedPath: `assets/player-portraits/${suggestedFilename(player)}`
+    suggestedPath: `assets/player-portraits/${suggestedFilename(player)}`,
+    prompt: buildPortraitPrompt(player)
   }));
   const covered = rows.filter((row) => row.covered).length;
   return {

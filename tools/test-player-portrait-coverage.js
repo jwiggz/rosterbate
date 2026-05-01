@@ -67,5 +67,10 @@ assert.equal(report.rows[1].covered, true);
 assert.equal(report.rows[0].covered, false);
 assert.equal(report.rows[0].suggestedFilename, 'nikola-jokic__DEN.webp');
 assert.equal(report.rows[0].suggestedPath, 'assets/player-portraits/nikola-jokic__DEN.webp');
+assert.match(
+  report.rows[0].prompt,
+  /Nikola Jokic[\s\S]*DEN team colors/,
+  'coverage rows should include a machine-readable portrait prompt for batch generation'
+);
 
 console.log('test-player-portrait-coverage passed');

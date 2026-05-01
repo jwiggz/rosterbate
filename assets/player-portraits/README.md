@@ -39,6 +39,7 @@ MISS #  1 Shai Gilgeous-Alexander (OKC) -> shai-gilgeous-alexander__OKC.webp
 ```
 
 Prompt output includes the same target filename plus a ready-to-use image prompt.
+The JSON coverage report also includes each row's `prompt` field for batch tools.
 
 Filename examples:
 
