@@ -10967,6 +10967,9 @@ function applySimulationSuggestedLineupFromShell(){
   const vm = SEASON_MODE_ADAPTER.getRosterViewModel();
   const sport = String(vm?.sport || getSharedSimulationSport()).trim().toLowerCase();
   const starterSlots = Array.isArray(vm?.starterSlots) ? vm.starterSlots : [];
+  const scheduleVm = typeof SEASON_MODE_ADAPTER?.getScheduleViewModel === 'function'
+    ? (SEASON_MODE_ADAPTER.getScheduleViewModel() || {})
+    : {};
   if (sport === 'nfl') {
     const legacyStarterSlots = Array.isArray(vm?.legacyStarterSlots) && vm.legacyStarterSlots.length
       ? vm.legacyStarterSlots
@@ -11028,27 +11031,6 @@ function applySimulationSuggestedLineupFromShell(){
     const playerId = value == null || value === '' ? null : Number(value);
     return Number.isFinite(playerId) && playerId > 0 ? playerId : null;
   };
-  const adapterSuggestedLineup = Array.isArray(vm?.suggestedLineup)
-    ? vm.suggestedLineup.slice(0, starterSlots.length).map(normalizeSuggestedId)
-    : [];
-  if(adapterSuggestedLineup.some(playerId=>playerId!=null)){
-    SEASON_MODE_ADAPTER.setLineup(adapterSuggestedLineup);
-    persistSimulationSeasonState('simulation_lineup');
-    renderSimulationRosterInSharedShell();
-    renderSimulationHubInSharedShell();
-    renderSimulationScheduleInSharedShell();
-    return;
-  }
-  const slotSuggestedLineup = starterSlots.map((slot)=>normalizeSuggestedId(vm?.lineupSlots?.[slot]?.suggestedPlayerId));
-  if(slotSuggestedLineup.some(playerId=>playerId!=null)){
-    SEASON_MODE_ADAPTER.setLineup(slotSuggestedLineup);
-    persistSimulationSeasonState('simulation_lineup');
-    renderSimulationRosterInSharedShell();
-    renderSimulationHubInSharedShell();
-    renderSimulationScheduleInSharedShell();
-    return;
-  }
-  const targetLineupSize = starterSlots.length || Math.min(5, Number((vm.roster || []).length || 0));
   const normalizePosition = (player) => {
     const position = String(player?.pos || player?.primaryPosition || '').trim().toUpperCase();
     if (position === 'DEF') return 'DST';
@@ -11081,7 +11063,43 @@ function applySimulationSuggestedLineupFromShell(){
     }
     return position === normalizedSlot;
   };
-  const rankPlayers = (players) => (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
+  const getSelectedSuggestionDay = () => {
+    const explicitDay = Number(simulationRosterNavigationValue);
+    if (Number.isFinite(explicitDay) && explicitDay > 0) return explicitDay;
+    const navItems = Array.isArray(scheduleVm?.navigation?.items) ? scheduleVm.navigation.items : [];
+    const activeItem = navItems.find((item)=>item?.active) || null;
+    const activeDay = Number(activeItem?.cycleValue);
+    if (Number.isFinite(activeDay) && activeDay > 0) return activeDay;
+    const nextGameDay = Number(scheduleVm?.nextGame?.day);
+    if (Number.isFinite(nextGameDay) && nextGameDay > 0) return nextGameDay;
+    const stateDay = Number(D?.seasonState?.currentDay);
+    return Number.isFinite(stateDay) && stateDay > 0 ? stateDay : 1;
+  };
+  const getScheduleForSuggestionDay = (day) => {
+    const dayKey = String(Number(day || 0));
+    const teamSchedule = vm?.nbaTeamScheduleByDay && typeof vm.nbaTeamScheduleByDay === 'object'
+      ? vm.nbaTeamScheduleByDay
+      : null;
+    const scheduleByDay = scheduleVm?.scheduleByDay && typeof scheduleVm.scheduleByDay === 'object'
+      ? scheduleVm.scheduleByDay
+      : null;
+    const teamGames = Array.isArray(teamSchedule?.[dayKey]) ? teamSchedule[dayKey] : null;
+    const matchupGames = Array.isArray(scheduleByDay?.[dayKey]) ? scheduleByDay[dayKey] : null;
+    return teamGames || matchupGames || [];
+  };
+  const playerHasSuggestionDayGame = (player, day, games) => {
+    const teamAbbr = String(player?.team || player?.nbaTeam || player?.teamAbbr || '').trim().toUpperCase();
+    if (!teamAbbr || !Array.isArray(games) || !games.length) return false;
+    return games.some((game)=>{
+      const homeAbbr = String(game?.homeAbbr || game?.home || '').trim().toUpperCase();
+      const awayAbbr = String(game?.awayAbbr || game?.away || '').trim().toUpperCase();
+      return homeAbbr === teamAbbr || awayAbbr === teamAbbr;
+    });
+  };
+  const rankPlayers = (players, options={}) => (Array.isArray(players) ? players.slice() : []).sort((a, b) => {
+    const playingA = options.day ? playerHasSuggestionDayGame(a, options.day, options.games) : false;
+    const playingB = options.day ? playerHasSuggestionDayGame(b, options.day, options.games) : false;
+    if (playingA !== playingB) return playingA ? -1 : 1;
     const overallDiff = Number(b?.mixedEraOverall || 0) - Number(a?.mixedEraOverall || 0);
     if (overallDiff) return overallDiff;
     const fpDiff = Number(b?.fp || 0) - Number(a?.fp || 0);
@@ -11093,6 +11111,48 @@ function applySimulationSuggestedLineupFromShell(){
     if (index < 0) return null;
     return players.splice(index, 1)[0] || null;
   };
+  if(sport==='nba' && starterSlots.length && Array.isArray(vm?.roster) && vm.roster.length){
+    const selectedDay = getSelectedSuggestionDay();
+    const selectedGames = getScheduleForSuggestionDay(selectedDay);
+    if(Array.isArray(selectedGames) && selectedGames.length){
+      const targetLineupSize = starterSlots.length || Math.min(5, Number((vm.roster || []).length || 0));
+      const sortedRoster = rankPlayers(vm.roster || [], {day:selectedDay,games:selectedGames});
+      const suggestedLineupIds = [];
+      starterSlots.slice(0, targetLineupSize).forEach((slot) => {
+        const player = takeEligiblePlayer(sortedRoster, slot);
+        suggestedLineupIds.push(player ? Number(player?.id) : null);
+      });
+      if(suggestedLineupIds.some(playerId=>playerId!=null)){
+        SEASON_MODE_ADAPTER.setLineup(suggestedLineupIds);
+        persistSimulationSeasonState('simulation_lineup');
+        renderSimulationRosterInSharedShell();
+        renderSimulationHubInSharedShell();
+        renderSimulationScheduleInSharedShell();
+        return;
+      }
+    }
+  }
+  const adapterSuggestedLineup = Array.isArray(vm?.suggestedLineup)
+    ? vm.suggestedLineup.slice(0, starterSlots.length).map(normalizeSuggestedId)
+    : [];
+  if(adapterSuggestedLineup.some(playerId=>playerId!=null)){
+    SEASON_MODE_ADAPTER.setLineup(adapterSuggestedLineup);
+    persistSimulationSeasonState('simulation_lineup');
+    renderSimulationRosterInSharedShell();
+    renderSimulationHubInSharedShell();
+    renderSimulationScheduleInSharedShell();
+    return;
+  }
+  const slotSuggestedLineup = starterSlots.map((slot)=>normalizeSuggestedId(vm?.lineupSlots?.[slot]?.suggestedPlayerId));
+  if(slotSuggestedLineup.some(playerId=>playerId!=null)){
+    SEASON_MODE_ADAPTER.setLineup(slotSuggestedLineup);
+    persistSimulationSeasonState('simulation_lineup');
+    renderSimulationRosterInSharedShell();
+    renderSimulationHubInSharedShell();
+    renderSimulationScheduleInSharedShell();
+    return;
+  }
+  const targetLineupSize = starterSlots.length || Math.min(5, Number((vm.roster || []).length || 0));
   const sortedRoster = rankPlayers(vm?.roster || []);
   const suggestedLineupIds = [];
   starterSlots.slice(0, targetLineupSize).forEach((slot) => {

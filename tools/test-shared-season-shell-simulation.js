@@ -1848,6 +1848,51 @@ assert.deepStrictEqual(
   [1, 2, 3, 4, 5],
   'fresh shared-shell simulation teams should get a five-player suggested lineup'
 );
+
+const gameAwareRosterAdapterStub = {
+  ...freshRosterAdapterStub,
+  lastLineupIds: null,
+  getScheduleViewModel() {
+    return {
+      scheduleByDay: {
+        12: [
+          { day: 12, awayAbbr: 'BBB', homeAbbr: 'CCC', time: '7:00 PM' },
+          { day: 12, awayAbbr: 'DDD', homeAbbr: 'EEE', time: '8:30 PM' }
+        ]
+      },
+      nextGame: { day: 12 }
+    };
+  },
+  getRosterViewModel() {
+    return {
+      starterSlots: ['PG', 'SG', 'SF', 'PF', 'C'],
+      roster: [
+        { id: 101, name: 'Off Day Point God', team: 'AAA', pos: 'PG', fp: 80 },
+        { id: 102, name: 'Playing Point Guard', team: 'BBB', pos: 'PG', fp: 30 },
+        { id: 103, name: 'Playing Shooting Guard', team: 'DDD', pos: 'SG', fp: 28 },
+        { id: 104, name: 'Playing Small Forward', team: 'EEE', pos: 'SF', fp: 27 },
+        { id: 105, name: 'Playing Power Forward', team: 'CCC', pos: 'PF', fp: 26 },
+        { id: 106, name: 'Playing Center', team: 'BBB', pos: 'C', fp: 25 }
+      ],
+      lineup: [],
+      bench: []
+    };
+  },
+  setLineup(lineupIds) {
+    this.lastLineupIds = lineupIds;
+    return this.getState();
+  }
+};
+
+historicalSlotUpsertCalls = [];
+api.setSeasonModeAdapter(gameAwareRosterAdapterStub);
+sandbox.setSimulationRosterNavigationValue(12);
+api.applySimulationSuggestedLineupFromShell();
+assert.deepStrictEqual(
+  toPlain(gameAwareRosterAdapterStub.lastLineupIds),
+  [102, 103, 104, 105, 106],
+  'nba suggested starters should prefer players whose teams play on the selected lineup day'
+);
 api.setSeasonModeAdapter(simulationAdapterStub);
 
 api.renderSimulationWaiverInSharedShell();
