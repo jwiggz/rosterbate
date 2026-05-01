@@ -11097,9 +11097,111 @@ function renderSimulationTradeBuilderModal(partnerAbbr){
   </div>`;
 }
 
+function getSimulationTradeBuilderSelectedIds(partnerAbbr, side){
+  const targetPartner=String(partnerAbbr || '').trim();
+  const targetSide=String(side || '').trim();
+  return Array.from(document.querySelectorAll('[data-simulation-trade-builder-side]')).filter(input=>{
+    if(!input || !input.checked) return false;
+    return String(input.getAttribute?.('data-simulation-trade-builder-partner') || '').trim()===targetPartner
+      && String(input.getAttribute?.('data-simulation-trade-builder-side') || '').trim()===targetSide;
+  }).map(input=>Number(input.getAttribute?.('data-player-id') || input.value))
+    .filter(value=>Number.isFinite(value) && value>0)
+    .filter((value,index,values)=>values.indexOf(value)===index);
+}
+
+function getSimulationTradeBuilderPlayerById(id){
+  const numericId=Number(id);
+  if(!Number.isFinite(numericId)) return null;
+  const tradeVm=SEASON_MODE_ADAPTER.getTradeViewModel?.() || {};
+  const state=SEASON_MODE_ADAPTER.getState?.() || D || {};
+  const rosterMap=state?.draftState?.rostersByTeam || D?.draftState?.rostersByTeam || {};
+  const partnerRows=Array.isArray(tradeVm?.sections?.partners?.rows) ? tradeVm.sections.partners.rows : [];
+  const incomingRosters=tradeVm?.incomingRostersByTeam && typeof tradeVm.incomingRostersByTeam==='object'
+    ? Object.values(tradeVm.incomingRostersByTeam).flat()
+    : [];
+  const pools=[
+    ...(Array.isArray(tradeVm?.outgoingRoster) ? tradeVm.outgoingRoster : []),
+    ...partnerRows.flatMap(row=>Array.isArray(row?.incomingRoster) ? row.incomingRoster : []),
+    ...incomingRosters,
+    ...(rosterMap && typeof rosterMap==='object' ? Object.values(rosterMap).flat() : []),
+    ...(Array.isArray(G?.rosters) ? G.rosters.flat() : []),
+    ...(Array.isArray(G?.waiver) ? G.waiver : []),
+    ...(Array.isArray(G?.freeAgents) ? G.freeAgents : []),
+    ...(Array.isArray(state?.draftState?.freeAgents) ? state.draftState.freeAgents : []),
+    ...(Array.isArray(D?.freeAgents) ? D.freeAgents : []),
+    ...(Array.isArray(D?.waiver) ? D.waiver : [])
+  ];
+  return pools.find(player=>Number(player?.id)===numericId) || null;
+}
+
 function updateSimulationTradeBuilderPreview(partnerAbbr){
   const preview=document.getElementById('simulationTradeBuilderPreview');
-  if(preview) preview.innerHTML='<div style="color:#bfdbfe;font-weight:900;">Choose at least one player on both sides to preview the trade.</div>';
+  const applyButton=document.getElementById('simulationTradeBuilderApply');
+  if(!preview) return;
+  const outgoingIds=getSimulationTradeBuilderSelectedIds(partnerAbbr, 'outgoing');
+  const incomingIds=getSimulationTradeBuilderSelectedIds(partnerAbbr, 'incoming');
+  const tooMany=outgoingIds.length>5 || incomingIds.length>5;
+  const outgoingPlayers=outgoingIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
+  const incomingPlayers=incomingIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
+  const valid=outgoingPlayers.length>0 && incomingPlayers.length>0 && !tooMany;
+  if(applyButton){
+    applyButton.disabled=!valid;
+    applyButton.style.opacity=valid ? '1' : '.55';
+  }
+  if(tooMany){
+    preview.innerHTML='<div style="color:#fecaca;font-weight:900;">Package trades are capped at 5 players per side.</div>';
+    return;
+  }
+  if(!outgoingPlayers.length || !incomingPlayers.length){
+    preview.innerHTML='<div style="color:#bfdbfe;font-weight:900;">Choose at least one player on both sides to preview the trade.</div>';
+    return;
+  }
+  const state=SEASON_MODE_ADAPTER.getState?.() || D;
+  const outgoingValue=getSimulationTradePackageValue(outgoingPlayers);
+  const incomingValue=getSimulationTradePackageValue(incomingPlayers);
+  const netValue=+(incomingValue-outgoingValue).toFixed(1);
+  const fromTeam=Number.isFinite(Number(D?.myPos)) ? Number(D.myPos) : 0;
+  const toTeam=(Array.isArray(G?.rosters) ? G.rosters : []).findIndex(roster=>
+    (roster || []).some(player=>incomingIds.includes(Number(player?.id)))
+  );
+  const packageFairness=typeof evaluateTradePackageFairness==='function'
+    ? evaluateTradePackageFairness({
+        fromTeam,
+        toTeam:toTeam>=0 ? toTeam : 1,
+        give:outgoingIds,
+        get:incomingIds,
+        givePlayers:outgoingPlayers,
+        getPlayers:incomingPlayers
+      })
+    : null;
+  const fairness=evaluateSimulationTradeFairness({
+    outgoingPlayers,
+    incomingPlayers,
+    state,
+    partnerName:partnerAbbr
+  });
+  const replacementNeeded=outgoingPlayers.length!==incomingPlayers.length;
+  const replacement=replacementNeeded
+    ? getSimulationTradeReplacementRead(state, outgoingPlayers.concat(incomingPlayers).map(player=>player?.id))
+    : null;
+  const contextCopy=outgoingPlayers.length>incomingPlayers.length && replacement?.player
+    ? `Replacement context: ${replacement.label || replacement.player.name || 'best waiver fill-in'} can fill the opened roster spot at ${Number(replacement.value||0).toFixed(1)} FP.`
+    : incomingPlayers.length>outgoingPlayers.length
+      ? 'Drop context: this package adds roster pressure, so you may need to trim bench depth after the deal.'
+      : 'Replacement/drop context: roster counts stay even for this package.';
+  preview.innerHTML=`
+    ${renderSimulationTradePreviewMarkup({ outgoingPlayers, incomingPlayers, state, partnerName:partnerAbbr })}
+    <div style="border:1px solid rgba(148,163,184,.2);background:rgba(15,23,42,.62);border-radius:12px;padding:12px;margin-top:10px;">
+      <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#bfdbfe;">Package Fairness</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;">
+        <div><div style="color:#94a3b8;font-size:11px;">Outgoing value</div><div style="color:#f8fafc;font-weight:900;">${outgoingValue.toFixed(1)} FP</div></div>
+        <div><div style="color:#94a3b8;font-size:11px;">Incoming value</div><div style="color:#f8fafc;font-weight:900;">${incomingValue.toFixed(1)} FP</div></div>
+        <div><div style="color:#94a3b8;font-size:11px;">Net value</div><div style="color:${netValue>=0 ? '#bbf7d0' : '#fecaca'};font-weight:900;">${netValue>=0?'+':''}${netValue.toFixed(1)} FP</div></div>
+      </div>
+      <div style="margin-top:10px;color:#cbd5e1;font-size:12px;line-height:1.45;">Fairness status: ${escapeSimulationShellHtml(packageFairness?.message || fairness?.message || 'Package fairness is ready for review.')}</div>
+      ${fairness?.message ? `<div style="margin-top:6px;color:#94a3b8;font-size:12px;line-height:1.45;">${escapeSimulationShellHtml(fairness.message)}</div>` : ''}
+      <div style="margin-top:6px;color:#94a3b8;font-size:12px;line-height:1.45;">${escapeSimulationShellHtml(contextCopy)}</div>
+    </div>`;
 }
 
 function applySimulationTradeBuilderPackage(partnerAbbr){
@@ -15500,8 +15602,12 @@ function evaluateTradePackageFairness(offer){
     };
   }
   const resolvePlayer=id=>typeof P==='function' ? P(id)||null : null;
-  const givePlayers=give.map(resolvePlayer).filter(Boolean);
-  const getPlayers=get.map(resolvePlayer).filter(Boolean);
+  const givePlayers=Array.isArray(offer?.givePlayers) && offer.givePlayers.length
+    ? offer.givePlayers.filter(Boolean)
+    : give.map(resolvePlayer).filter(Boolean);
+  const getPlayers=Array.isArray(offer?.getPlayers) && offer.getPlayers.length
+    ? offer.getPlayers.filter(Boolean)
+    : get.map(resolvePlayer).filter(Boolean);
   const giveValue=givePlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
   const getValue=getPlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
   const openSlotsForFrom=Math.max(0,give.length-get.length);

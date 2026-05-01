@@ -192,6 +192,8 @@ module.exports = {
   openSimulationTradeBuilderModal,
   closeSimulationTradeBuilderModal,
   renderSimulationTradeBuilderModal,
+  getSimulationTradeBuilderSelectedIds,
+  getSimulationTradeBuilderPlayerById,
   updateSimulationTradeBuilderPreview,
   applySimulationTradeBuilderPackage,
   renderSimulationStandingsInSharedShell,
@@ -234,6 +236,8 @@ function createElement(id) {
     innerHTML: '',
     style: {},
     value: '',
+    checked: false,
+    disabled: false,
     attributes: {},
     classList: {
       add(...tokens) {
@@ -262,6 +266,58 @@ function createElement(id) {
     },
     _shell: shell
   };
+}
+
+function parseAttributes(markup) {
+  const attrs = {};
+  const attrPattern = /([A-Za-z_:][-A-Za-z0-9_:.]*)=(?:"([^"]*)"|'([^']*)')/g;
+  let match;
+  while ((match = attrPattern.exec(String(markup || '')))) {
+    attrs[match[1]] = match[2] ?? match[3] ?? '';
+  }
+  return attrs;
+}
+
+function registerMarkupElements(markup) {
+  const source = String(markup || '');
+  const idPattern = /id="([^"]+)"/g;
+  let match;
+  while ((match = idPattern.exec(source))) {
+    const id = match[1];
+    if (!elements[id]) elements[id] = createElement(id);
+  }
+  const inputPattern = /<input\b[^>]*>/gi;
+  let inputIndex = 0;
+  while ((match = inputPattern.exec(source))) {
+    const attrs = parseAttributes(match[0]);
+    const id = attrs.id || `__input_${inputIndex++}_${attrs['data-player-id'] || attrs.value || 'field'}`;
+    const element = elements[id] || createElement(id);
+    element.tagName = 'INPUT';
+    element.type = attrs.type || 'text';
+    element.value = attrs.value || attrs['data-player-id'] || '';
+    element.checked = Boolean(attrs.checked);
+    element.disabled = /\sdisabled(?:\s|>|=)/i.test(match[0]);
+    Object.entries(attrs).forEach(([name, value]) => element.setAttribute(name, value));
+    elements[id] = element;
+  }
+  const buttonPattern = /<button\b[^>]*>/gi;
+  while ((match = buttonPattern.exec(source))) {
+    const attrs = parseAttributes(match[0]);
+    if (!attrs.id) continue;
+    const element = elements[attrs.id] || createElement(attrs.id);
+    element.tagName = 'BUTTON';
+    element.disabled = /\sdisabled(?:\s|>|=)/i.test(match[0]);
+    Object.entries(attrs).forEach(([name, value]) => element.setAttribute(name, value));
+    elements[attrs.id] = element;
+  }
+}
+
+function elementsBodyHtml() {
+  return Object.values(elements).map((element) => String(element.innerHTML || '')).join('\n')
+    + '\n'
+    + String(sandbox.document?.body?.innerHTML || '')
+    + '\n'
+    + String(sandbox.document?.body?.lastInsertedHTML || '');
 }
 
 const SCREEN_IDS = new Set(['hub', 'roster', 'matchup', 'waiver', 'trades', 'standings', 'playoffs', 'commissioner']);
@@ -1167,15 +1223,12 @@ const sandbox = {
     body: {
       lastInsertPosition: null,
       lastInsertedHTML: '',
+      innerHTML: '',
       insertAdjacentHTML(position, markup) {
         this.lastInsertPosition = position;
         this.lastInsertedHTML = String(markup || '');
-        const idPattern = /id="([^"]+)"/g;
-        let match;
-        while ((match = idPattern.exec(this.lastInsertedHTML))) {
-          const id = match[1];
-          if (!elements[id]) elements[id] = createElement(id);
-        }
+        this.innerHTML += this.lastInsertedHTML;
+        registerMarkupElements(this.lastInsertedHTML);
         if (elements.simulationTradeBuilderModal) {
           elements.simulationTradeBuilderModal.innerHTML = this.lastInsertedHTML;
         }
@@ -1193,6 +1246,9 @@ const sandbox = {
       }
       if (selector === '.screen.active') {
         return Object.values(elements).filter((element) => element?.classList?.contains('screen') && element.classList.contains('active'));
+      }
+      if (selector === '[data-simulation-trade-builder-side]') {
+        return Object.values(elements).filter((element) => element?.attributes?.['data-simulation-trade-builder-side']);
       }
       return [];
     }
@@ -1319,6 +1375,8 @@ assert.match(html, /function openSimulationTradeBuilderModal\(partnerAbbr\)/, 's
 assert.match(html, /function closeSimulationTradeBuilderModal\(\)/, 'simulation Trade Desk should expose a trade builder modal closer');
 assert.match(html, /function renderSimulationTradeBuilderPlayerOption\(player, side, partnerAbbr\)/, 'simulation Trade Desk should render modal player checkbox options');
 assert.match(html, /function renderSimulationTradeBuilderModal\(partnerAbbr\)/, 'simulation Trade Desk should render a package trade modal');
+assert.match(html, /function getSimulationTradeBuilderSelectedIds\(partnerAbbr, side\)/, 'simulation Trade Desk should read selected package players from the modal');
+assert.match(html, /function getSimulationTradeBuilderPlayerById\(id\)/, 'simulation Trade Desk should safely resolve package preview players');
 assert.match(html, /function updateSimulationTradeBuilderPreview\(partnerAbbr\)/, 'simulation Trade Desk should update package preview from modal selections');
 assert.match(html, /function applySimulationTradeBuilderPackage\(partnerAbbr\)/, 'simulation Trade Desk should apply package trades from the modal');
 assert.match(html, /Build Trade/i, 'simulation Trade Desk partner cards should expose Build Trade instead of inline-only selectors');
@@ -2328,12 +2386,47 @@ api.openSimulationTradeBuilderModal('BOS');
 assert.equal(sandbox.document.body.lastInsertPosition, 'beforeend', 'trade builder modal opener should insert the shell into document body');
 assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderModal"/, 'trade builder modal opener should insert the modal backdrop');
 assert.match(sandbox.document.body.lastInsertedHTML, /Trade With Boston Celtics/, 'trade builder modal should include partner context');
+assert.match(elementsBodyHtml(), /Trade With Boston/i, 'trade builder modal should open for the selected partner');
+assert.match(elementsBodyHtml(), /You Send/i, 'trade builder modal should render outgoing side');
+assert.match(elementsBodyHtml(), /You Get/i, 'trade builder modal should render incoming side');
 assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderApply"[^>]*disabled/, 'trade builder modal apply button should start disabled');
 assert.match(sandbox.document.body.lastInsertedHTML, /onclick="applySimulationTradeBuilderPackage\('BOS'\)"/, 'trade builder modal apply button should use the package helper contract');
 assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="outgoing"/, 'trade builder modal should render outgoing player checkboxes');
 assert.match(sandbox.document.body.lastInsertedHTML, /data-simulation-trade-builder-side="incoming"/, 'trade builder modal should render incoming player checkboxes');
 assert.match(sandbox.document.body.lastInsertedHTML, /id="simulationTradeBuilderPreview"/, 'trade builder modal should include the real preview mount in inserted markup');
 assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Choose at least one player on both sides/i, 'trade builder modal should render the stub preview state into the real preview mount');
+assert.match(elementsBodyHtml(), /Choose at least one player on both sides/i, 'trade builder preview should explain empty selections');
+const tradeBuilderInputs = sandbox.document.querySelectorAll('[data-simulation-trade-builder-side]');
+const outgoingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'outgoing'
+    && input.getAttribute('data-player-id') === '34'
+));
+const incomingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'incoming'
+    && input.getAttribute('data-player-id') === '30'
+));
+assert.ok(outgoingTradeBuilderInput, 'trade builder modal should expose a real outgoing checkbox in inserted markup');
+assert.ok(incomingTradeBuilderInput, 'trade builder modal should expose a real incoming checkbox in inserted markup');
+outgoingTradeBuilderInput.checked = true;
+incomingTradeBuilderInput.checked = true;
+api.updateSimulationTradeBuilderPreview('BOS');
+assert.equal(elements.simulationTradeBuilderApply.disabled, false, 'trade builder apply button should enable after both sides are selected');
+assert.match(
+  elements.simulationTradeBuilderPreview.innerHTML,
+  /You give[\s\S]*Hakeem Olajuwon[\s\S]*You get[\s\S]*Stephen Curry[\s\S]*(Package read|Fairness check)/i,
+  'trade builder preview should show selected packages and fairness language'
+);
+assert.match(
+  elements.simulationTradeBuilderPreview.innerHTML,
+  /55\.0 FP[\s\S]*58\.0 FP/i,
+  'trade builder preview should show total outgoing and incoming value'
+);
+incomingTradeBuilderInput.checked = false;
+api.updateSimulationTradeBuilderPreview('BOS');
+assert.equal(elements.simulationTradeBuilderApply.disabled, true, 'trade builder apply button should disable again when one side is empty');
+assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Choose at least one player on both sides/i, 'trade builder preview should return to validation copy when one side is empty');
 api.closeSimulationTradeBuilderModal();
 assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder modal closer should remove the inserted modal element');
 
