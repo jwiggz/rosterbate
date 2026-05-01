@@ -1174,6 +1174,13 @@ const sandbox = {
   buildCpuManagedStarterIdsForDay(teamIdx, roster) {
     return Array.isArray(roster) ? roster.slice(0, 1).map((player) => player.id) : [];
   },
+  buildBestLineupIdsForRoster(roster) {
+    return (Array.isArray(roster) ? roster : [])
+      .slice()
+      .sort((left, right) => Number(right?.fp || 0) - Number(left?.fp || 0))
+      .slice(0, 5)
+      .map((player) => player.id);
+  },
   getSeasonPlayerPool() {
     return [];
   },
@@ -2823,6 +2830,27 @@ assert.deepStrictEqual(
 );
 assert.ok(!elements.localTradeBuilderModal, 'successful local trade send should close the modal');
 assert.match(demoToasts.at(-1), /Trade sent to Rim Rockers/, 'local trade builder should show success feedback after sending');
+const acceptedStringIdOffer = api.getGame().tradeOffers[0];
+api.acceptTrade(acceptedStringIdOffer.id, true);
+assert.equal(
+  api.getGame().tradeOffers[0].status,
+  'accepted',
+  'accepted local trade offers should move out of pending state'
+);
+assert.deepStrictEqual(
+  toPlain(api.getGame().rosters[0].map((player) => player.id).sort()),
+  ['me-depth', 'them-good'],
+  'accepted local string-id trades should move the incoming player onto my roster'
+);
+assert.deepStrictEqual(
+  toPlain(api.getGame().rosters[1].map((player) => player.id).sort()),
+  ['me-star', 'them-low'],
+  'accepted local string-id trades should move the outgoing player onto the partner roster'
+);
+assert.ok(
+  api.getGame().starters[0].some((playerId) => String(playerId) === 'them-good'),
+  'accepted local string-id trades should rebuild my starters from the updated roster'
+);
 
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /(Los Angeles Lakers|LAL)/);
