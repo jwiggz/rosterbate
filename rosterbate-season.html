@@ -15338,6 +15338,139 @@ function getTradeFairnessReplacementRead(offer){
   };
 }
 
+function getTradeFairnessWaiverFillIns(offer, count){
+  const needed=Math.max(0, Number(count)||0);
+  if(!needed) return [];
+  const selectedIds=new Set([
+    ...(Array.isArray(offer?.give)?offer.give:[]),
+    ...(Array.isArray(offer?.get)?offer.get:[])
+  ].map(Number).filter(Number.isFinite));
+  const data=typeof D!=='undefined' ? D : {};
+  const pools=[
+    ...(Array.isArray(G?.waiver)?G.waiver:[]),
+    ...(Array.isArray(G?.freeAgents)?G.freeAgents:[]),
+    ...(Array.isArray(data?.waiver)?data.waiver:[]),
+    ...(Array.isArray(data?.freeAgents)?data.freeAgents:[])
+  ];
+  const seen=new Set();
+  return pools.map(entry=>{
+    const player=entry && typeof entry==='object' ? entry : (typeof P==='function' ? P(entry) : null);
+    return player || null;
+  }).filter(player=>{
+    const id=Number(player?.id);
+    if(!Number.isFinite(id) || selectedIds.has(id) || seen.has(id)) return false;
+    seen.add(id);
+    return getTradeFairnessPlayerValue(player)>0;
+  }).sort((a,b)=>getTradeFairnessPlayerValue(b)-getTradeFairnessPlayerValue(a))
+    .slice(0, needed)
+    .map(player=>({
+      player,
+      value:getTradeFairnessPlayerValue(player),
+      label:player?.name || 'waiver fill-in'
+    }));
+}
+
+function getTradeFairnessLikelyDrops(offer, count){
+  const needed=Math.max(0, Number(count)||0);
+  if(!needed) return [];
+  const teamIdx=Number(offer?.fromTeam);
+  const rosterSource=Array.isArray(G?.rosters?.[teamIdx]) ? G.rosters[teamIdx] : [];
+  const outgoingIds=new Set((Array.isArray(offer?.give)?offer.give:[]).map(Number).filter(Number.isFinite));
+  const incomingIds=(Array.isArray(offer?.get)?offer.get:[]).map(Number).filter(Number.isFinite);
+  const seen=new Set();
+  const players=rosterSource.map(entry=>{
+    const player=entry && typeof entry==='object' ? entry : (typeof P==='function' ? P(entry) : null);
+    return player || null;
+  }).filter(player=>{
+    const id=Number(player?.id);
+    if(!Number.isFinite(id) || outgoingIds.has(id) || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+  incomingIds.forEach(id=>{
+    if(seen.has(id)) return;
+    const player=typeof P==='function' ? P(id)||null : null;
+    if(player){
+      seen.add(id);
+      players.push(player);
+    }
+  });
+  return players.sort((a,b)=>getTradeFairnessPlayerValue(a)-getTradeFairnessPlayerValue(b))
+    .slice(0, needed)
+    .map(player=>({
+      player,
+      value:getTradeFairnessPlayerValue(player),
+      label:player?.name || 'likely drop'
+    }));
+}
+
+function evaluateTradePackageFairness(offer){
+  const give=Array.isArray(offer?.give) ? offer.give.filter(value=>value!=null) : [];
+  const get=Array.isArray(offer?.get) ? offer.get.filter(value=>value!=null) : [];
+  if(!give.length || !get.length){
+    return {
+      supported:false,
+      rating:'unsupported',
+      message:'Choose players on both sides to get a fairness read.'
+    };
+  }
+  const resolvePlayer=id=>typeof P==='function' ? P(id)||null : null;
+  const givePlayers=give.map(resolvePlayer).filter(Boolean);
+  const getPlayers=get.map(resolvePlayer).filter(Boolean);
+  const giveValue=givePlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
+  const getValue=getPlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
+  const openSlotsForFrom=Math.max(0,give.length-get.length);
+  const openSlotsForTo=Math.max(0,get.length-give.length);
+  const dropPressureForFrom=Math.max(0,get.length-give.length);
+  const dropPressureForTo=Math.max(0,give.length-get.length);
+  const fillInsForFrom=getTradeFairnessWaiverFillIns(offer, openSlotsForFrom);
+  const fillInsForTo=getTradeFairnessWaiverFillIns(offer, openSlotsForTo);
+  const likelyDropsForFrom=getTradeFairnessLikelyDrops(offer, dropPressureForFrom);
+  const reverseOffer={ ...offer, fromTeam:offer?.toTeam, toTeam:offer?.fromTeam, give:get, get:give };
+  const likelyDropsForTo=getTradeFairnessLikelyDrops(reverseOffer, dropPressureForTo);
+  const sumReads=reads=>reads.reduce((sum,read)=>sum+Number(read?.value||0),0);
+  const fromReceiveValue=+(getValue + sumReads(fillInsForFrom) - sumReads(likelyDropsForFrom)).toFixed(1);
+  const toReceiveValue=+(giveValue + sumReads(fillInsForTo) - sumReads(likelyDropsForTo)).toFixed(1);
+  const adjustedGap=+Math.abs(fromReceiveValue-toReceiveValue).toFixed(1);
+  let rating='high_risk';
+  if(adjustedGap<=4) rating='fair';
+  else if(adjustedGap<=9) rating='slight_lean';
+  else if(adjustedGap<=16) rating='uneven';
+  const replacement=fillInsForFrom[0] || fillInsForTo[0] || getTradeFairnessReplacementRead(offer);
+  const describeRead=read=>`${read?.label || 'player'} (${Number(read?.value||0).toFixed(1)} FP)`;
+  const fillInNames=fillInsForFrom.concat(fillInsForTo).map(describeRead).filter(Boolean).join(', ');
+  const dropNames=likelyDropsForFrom.concat(likelyDropsForTo).map(describeRead).filter(Boolean).join(', ');
+  const fillInCount=fillInsForFrom.length+fillInsForTo.length;
+  const dropCount=likelyDropsForFrom.length+likelyDropsForTo.length;
+  const detailParts=[];
+  if(fillInCount) detailParts.push(`${fillInCount} waiver fill-ins${fillInNames ? ` (${fillInNames})` : ''}`);
+  if(dropCount) detailParts.push(`${dropCount} likely drop${dropCount===1?'':'s'}${dropNames ? ` (${dropNames})` : ''}`);
+  const detail=detailParts.length ? ` ${detailParts.join('; ')} included.` : '';
+  return {
+    supported:true,
+    rating,
+    rawDelta:+(getValue-giveValue).toFixed(1),
+    adjustedGap,
+    contextOffset:0,
+    favoredTeam:fromReceiveValue>toReceiveValue ? Number(offer?.fromTeam) : fromReceiveValue<toReceiveValue ? Number(offer?.toTeam) : null,
+    replacement,
+    fromOpenSlots:openSlotsForFrom,
+    toOpenSlots:openSlotsForTo,
+    openSlotsForFrom,
+    openSlotsForTo,
+    dropPressureForFrom,
+    dropPressureForTo,
+    fillInsForFrom,
+    fillInsForTo,
+    likelyDropsForFrom,
+    likelyDropsForTo,
+    fromReceiveValue,
+    toReceiveValue,
+    packageRead:true,
+    message:`Package read: Team ${Number(offer?.fromTeam)+1} receives ${fromReceiveValue.toFixed(1)} FP vs Team ${Number(offer?.toTeam)+1} receiving ${toReceiveValue.toFixed(1)} FP.${detail}`
+  };
+}
+
 function getTradeFairnessPositionKey(player){
   const pos=String(player?.pos||'').trim().toUpperCase();
   if(!pos) return 'util';
@@ -15448,44 +15581,8 @@ function getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid){
 function evaluateOneForOneTradeFairness(offer){
   const give=Array.isArray(offer?.give) ? offer.give.filter(value=>value!=null) : [];
   const get=Array.isArray(offer?.get) ? offer.get.filter(value=>value!=null) : [];
-  if(!give.length || !get.length){
-    return {
-      supported:false,
-      rating:'unsupported',
-      message:'Choose players on both sides to get a fairness read.'
-    };
-  }
   if(give.length!==1 || get.length!==1){
-    const resolvePlayer=id=>typeof P==='function' ? P(id)||null : null;
-    const givePlayers=give.map(resolvePlayer).filter(Boolean);
-    const getPlayers=get.map(resolvePlayer).filter(Boolean);
-    const giveValue=givePlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
-    const getValue=getPlayers.reduce((sum,player)=>sum+getTradeFairnessPlayerValue(player),0);
-    const replacement=getTradeFairnessReplacementRead(offer);
-    const fromOpenSlots=Math.max(0,give.length-get.length);
-    const toOpenSlots=Math.max(0,get.length-give.length);
-    const fromReceiveValue=+(getValue + (fromOpenSlots * replacement.value)).toFixed(1);
-    const toReceiveValue=+(giveValue + (toOpenSlots * replacement.value)).toFixed(1);
-    const adjustedGap=+Math.abs(fromReceiveValue-toReceiveValue).toFixed(1);
-    let rating='high_risk';
-    if(adjustedGap<=4) rating='fair';
-    else if(adjustedGap<=9) rating='slight_lean';
-    else if(adjustedGap<=16) rating='uneven';
-    return {
-      supported:true,
-      rating,
-      rawDelta:+(getValue-giveValue).toFixed(1),
-      adjustedGap,
-      contextOffset:0,
-      favoredTeam:fromReceiveValue>toReceiveValue ? Number(offer?.fromTeam) : fromReceiveValue<toReceiveValue ? Number(offer?.toTeam) : null,
-      replacement,
-      fromOpenSlots,
-      toOpenSlots,
-      fromReceiveValue,
-      toReceiveValue,
-      packageRead:true,
-      message:`Package read: Team ${Number(offer?.fromTeam)+1} receives ${fromReceiveValue.toFixed(1)} FP after replacement vs Team ${Number(offer?.toTeam)+1} receiving ${toReceiveValue.toFixed(1)} FP. Waiver replacement uses ${replacement.label} (${replacement.value.toFixed(1)} FP).`
-    };
+    return evaluateTradePackageFairness(offer);
   }
   const fromProfile=getTradeFairnessRosterProfile(Number(offer?.fromTeam), give[0], get[0]);
   const toProfile=getTradeFairnessRosterProfile(Number(offer?.toTeam), get[0], give[0]);

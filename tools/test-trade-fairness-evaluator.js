@@ -352,6 +352,9 @@ expectSourceMatch(/function getTradeFairnessViewModel\(offer\)/, 'missing fairne
 expectSourceMatch(/function renderTradeFairnessCard\(offer,\s*options=\{\}\)/, 'missing fairness card renderer');
 expectSourceMatch(/function getTradeFairnessPlayerValue\(player\)/, 'missing fairness player value helper');
 expectSourceMatch(/function getTradeFairnessReplacementRead\(offer\)/, 'missing trade replacement read helper');
+expectSourceMatch(/function evaluateTradePackageFairness\(offer\)/, 'missing package fairness helper');
+expectSourceMatch(/function getTradeFairnessWaiverFillIns\(offer,\s*count\)/, 'missing package waiver fill-in helper');
+expectSourceMatch(/function getTradeFairnessLikelyDrops\(offer,\s*count\)/, 'missing package likely-drop helper');
 expectSourceMatch(/function getTradeFairnessPositionKey\(player\)/, 'missing fairness position key helper');
 expectSourceMatch(/function getTradeFairnessRosterProfile\(teamIdx, outgoingPid, incomingPid\)/, 'missing fairness roster profile helper');
 expectSourceMatch(/renderTradeFairnessCard\(\{\s*fromTeam:D\.myPos,\s*toTeam:trP\.ti,\s*give:trP\.give,\s*get:trP\.get\s*\}/, 'inline trade builder should render fairness card');
@@ -363,6 +366,9 @@ expectSourceMatch(/Fairness insights are available for 1-for-1 deals first/i, 'u
 const script = [
   extractFunctionSource('getTradeFairnessPlayerValue(player)'),
   extractFunctionSource('getTradeFairnessReplacementRead(offer)'),
+  extractFunctionSource('getTradeFairnessWaiverFillIns(offer, count)'),
+  extractFunctionSource('getTradeFairnessLikelyDrops(offer, count)'),
+  extractFunctionSource('evaluateTradePackageFairness(offer)'),
   extractFunctionSource('getTradeFairnessPositionKey(player)'),
   extractFunctionSource('getTradeFairnessRosterProfile(teamIdx, outgoingPid, incomingPid)'),
   extractFunctionSource('evaluateOneForOneTradeFairness(offer)'),
@@ -379,7 +385,11 @@ const players = {
   22: { id: 22, name: 'Bench Big', fp: 20, pos: 'C', c: 1, util: 1 },
   31: { id: 31, name: 'Need Big', fp: 31, pos: 'C', c: 1, util: 1 },
   32: { id: 32, name: 'Extra Guard', fp: 30, pos: 'SG', g: 1, sg: 1, util: 1 },
-  41: { id: 41, name: 'Waiver Starter', team: 'CHI', fp: 28, pos: 'SF', f: 1, sf: 1, util: 1 }
+  41: { id: 41, name: 'Waiver Starter', team: 'CHI', fp: 28, pos: 'SF', f: 1, sf: 1, util: 1 },
+  42: { id: 42, name: 'Waiver Guard', team: 'NYK', fp: 24, pos: 'PG', pg: 1, g: 1, util: 1 },
+  43: { id: 43, name: 'Waiver Big', team: 'DEN', fp: 22, pos: 'C', c: 1, util: 1 },
+  13: { id: 13, name: 'Low Bench Wing', fp: 11, pos: 'SF', sf: 1, f: 1, util: 1 },
+  14: { id: 14, name: 'Deep Bench Guard', fp: 8, pos: 'PG', pg: 1, g: 1, util: 1 }
 };
 
 const rosters = {
@@ -390,7 +400,7 @@ const rosters = {
 const context = {
   console,
   STARTERS: 2,
-  G: { rosters, waiver: [players[41]] },
+  G: { rosters, waiver: [players[41], players[42], players[43]] },
   P(id) {
     return players[id];
   }
@@ -496,6 +506,41 @@ assert.match(unsupported.message, /Waiver Starter/i);
 assert.match(unsupported.message, /28\.0 FP/i);
 assert.ok(Array.isArray(unsupported.reasons));
 assert.ok(unsupported.reasons.some(reason => /waiver replacement/i.test(reason)));
+
+const threeForOne = context.evaluateTradePackageFairness({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [11, 12, 13],
+  get: [21]
+});
+assert.equal(threeForOne.supported, true);
+assert.equal(threeForOne.openSlotsForFrom, 2);
+assert.equal(threeForOne.fillInsForFrom.length, 2);
+assert.match(threeForOne.message, /2 waiver fill-ins/i);
+assert.match(threeForOne.message, /Waiver Starter/i);
+
+const oneForThree = context.evaluateTradePackageFairness({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [21],
+  get: [11, 12, 13]
+});
+assert.equal(oneForThree.supported, true);
+assert.equal(oneForThree.dropPressureForFrom, 2);
+assert.equal(oneForThree.likelyDropsForFrom.length, 2);
+assert.match(oneForThree.message, /likely drop/i);
+
+const fiveForFive = context.evaluateTradePackageFairness({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [11, 12, 13, 14, 41],
+  get: [21, 22, 31, 32, 42]
+});
+assert.equal(fiveForFive.supported, true);
+assert.equal(fiveForFive.openSlotsForFrom, 0);
+assert.equal(fiveForFive.dropPressureForFrom, 0);
+assert.equal(fiveForFive.fillInsForFrom.length, 0);
+assert.equal(fiveForFive.likelyDropsForFrom.length, 0);
 
 const supportedCard = context.renderTradeFairnessCard({
   fromTeam: 0,
