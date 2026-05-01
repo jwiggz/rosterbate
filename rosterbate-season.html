@@ -11210,7 +11210,96 @@ function updateSimulationTradeBuilderPreview(partnerAbbr){
 }
 
 function applySimulationTradeBuilderPackage(partnerAbbr){
-  toast('Choose players on both sides before applying a trade.');
+  const tradeVm=SEASON_MODE_ADAPTER.getTradeViewModel?.() || {};
+  const fromTeamAbbr=String(D?.draftState?.controlledTeamAbbr || tradeVm?.userTeamAbbr || '').trim().toUpperCase();
+  const toTeamAbbr=String(partnerAbbr || '').trim().toUpperCase();
+  const outgoingSelectionIds=getSimulationTradeBuilderSelectedIds(partnerAbbr, 'outgoing');
+  const incomingSelectionIds=getSimulationTradeBuilderSelectedIds(partnerAbbr, 'incoming');
+  const partnerRow=(tradeVm?.sections?.partners?.rows || []).find(row=>String(row?.team?.abbr || row?.teamAbbr || '').trim().toUpperCase()===toTeamAbbr) || null;
+  const partnerName=partnerRow?.team?.name || partnerRow?.title || toTeamAbbr || 'that team';
+  const reportTradeBuilderFeedback=(tone,message,detail)=>{
+    simulationTradeDeskFeedback = {
+      ...simulationTradeDeskFeedback,
+      [partnerAbbr]: {
+        tone: tone || 'error',
+        message,
+        detail: detail || ''
+      }
+    };
+    renderSimulationTradesInSharedShell();
+    if(typeof toast==='function') toast(message);
+  };
+  const toTradePayloadId=(value)=>{
+    const raw=String(value ?? '').trim();
+    const numeric=Number(raw);
+    return Number.isFinite(numeric) && numeric>0 ? numeric : raw;
+  };
+  if(outgoingSelectionIds.length>5 || incomingSelectionIds.length>5){
+    reportTradeBuilderFeedback('error','Package trades are capped at 5 players per side.');
+    updateSimulationTradeBuilderPreview(partnerAbbr);
+    return;
+  }
+  if(!(outgoingSelectionIds.length && incomingSelectionIds.length)){
+    reportTradeBuilderFeedback('error','Choose both the outgoing and incoming players before applying a trade.');
+    updateSimulationTradeBuilderPreview(partnerAbbr);
+    return;
+  }
+  const outgoingPlayers=outgoingSelectionIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
+  const incomingPlayers=incomingSelectionIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
+  if(outgoingPlayers.length!==outgoingSelectionIds.length || incomingPlayers.length!==incomingSelectionIds.length){
+    reportTradeBuilderFeedback('error','Trade could not be applied. Confirm both players are still on those rosters.');
+    updateSimulationTradeBuilderPreview(partnerAbbr);
+    return;
+  }
+  const fairness=evaluateSimulationTradeFairness({
+    outgoingPlayers,
+    incomingPlayers,
+    state: SEASON_MODE_ADAPTER.getState?.() || D,
+    partnerName
+  });
+  if(!fairness.allowed){
+    reportTradeBuilderFeedback(fairness.tone || 'error', fairness.message, fairness.detail || '');
+    updateSimulationTradeBuilderPreview(partnerAbbr);
+    return;
+  }
+  const outgoingPlayerIds=outgoingSelectionIds.map(toTradePayloadId);
+  const incomingPlayerIds=incomingSelectionIds.map(toTradePayloadId);
+  const outgoingPlayerName=outgoingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
+  const incomingPlayerName=incomingPlayers.map((player)=>player?.name).filter(Boolean).join(' + ') || 'player';
+  const nextState=SEASON_MODE_ADAPTER.applyTrade({
+    fromTeamAbbr: fromTeamAbbr,
+    toTeamAbbr: toTeamAbbr,
+    outgoingPlayerIds,
+    incomingPlayerIds
+  });
+  const resolvedState=nextState || SEASON_MODE_ADAPTER.getState?.() || D;
+  const fromRoster=resolvedState?.draftState?.rostersByTeam?.[fromTeamAbbr] || [];
+  const toRoster=resolvedState?.draftState?.rostersByTeam?.[toTeamAbbr] || [];
+  const outgoingKeySet=new Set(outgoingSelectionIds.map((playerId)=>String(playerId ?? '').trim()));
+  const incomingKeySet=new Set(incomingSelectionIds.map((playerId)=>String(playerId ?? '').trim()));
+  const fromHasAllIncoming=incomingSelectionIds.every((playerId)=>fromRoster.some(player=>String(player?.id ?? '').trim()===String(playerId ?? '').trim()));
+  const fromHasAnyOutgoing=fromRoster.some(player=>outgoingKeySet.has(String(player?.id ?? '').trim()));
+  const toHasAllOutgoing=outgoingSelectionIds.every((playerId)=>toRoster.some(player=>String(player?.id ?? '').trim()===String(playerId ?? '').trim()));
+  const toHasAnyIncoming=toRoster.some(player=>incomingKeySet.has(String(player?.id ?? '').trim()));
+  if(!(fromHasAllIncoming && !fromHasAnyOutgoing && toHasAllOutgoing && !toHasAnyIncoming)){
+    reportTradeBuilderFeedback('error','Trade could not be applied. Confirm both players are still on those rosters.');
+    updateSimulationTradeBuilderPreview(partnerAbbr);
+    return;
+  }
+  simulationTradeDeskFeedback = {
+    ...simulationTradeDeskFeedback,
+    [partnerAbbr]: {
+      tone: 'success',
+      message: `Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`,
+      detail: fairness.message || ''
+    }
+  };
+  closeSimulationTradeBuilderModal();
+  persistSimulationSeasonState('simulation_trade');
+  renderSimulationTradesInSharedShell();
+  renderSimulationRosterInSharedShell();
+  renderSimulationHubInSharedShell();
+  if(typeof toast==='function') toast(`Trade applied: ${outgoingPlayerName} for ${incomingPlayerName}.`);
 }
 
 function renderSimulationTradesInSharedShell(){

@@ -2488,6 +2488,91 @@ assert.match(
 api.closeSimulationTradeBuilderModal();
 assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder modal closer should remove the inserted modal element');
 
+api.openSimulationTradeBuilderModal('BOS');
+const blockedTradeBuilderInputs = sandbox.document.querySelectorAll('[data-simulation-trade-builder-side]');
+blockedTradeBuilderInputs.forEach((input) => { input.checked = false; });
+blockedTradeBuilderInputs.find((input) => input.getAttribute('data-player-id') === '101').checked = true;
+blockedTradeBuilderInputs.find((input) => input.getAttribute('data-player-id') === '102').checked = true;
+blockedTradeBuilderInputs.find((input) => input.getAttribute('data-player-id') === '99').checked = true;
+demoToasts = [];
+simulationAdapterStub.lastTrade = null;
+const blockedRosterSnapshot = toPlain(simulationAdapterStub.getState().draftState.rostersByTeam);
+api.applySimulationTradeBuilderPackage('BOS');
+assert.equal(simulationAdapterStub.lastTrade, null, 'trade builder apply should not call the adapter when fairness blocks the package');
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.getState().draftState.rostersByTeam),
+  blockedRosterSnapshot,
+  'blocked trade builder package should not mutate either roster'
+);
+assert.deepStrictEqual(
+  demoToasts,
+  ['Trade blocked: Boston Celtics would be giving up too much after replacement value.'],
+  'blocked trade builder package should explain the fairness rejection'
+);
+assert.ok(elements.simulationTradeBuilderModal, 'blocked trade builder package should leave the modal open for editing');
+assert.match(elements.tradesContent.innerHTML, /waiver replacement/i, 'blocked trade builder package should refresh Trade Desk feedback');
+api.closeSimulationTradeBuilderModal();
+
+setSimulationStubPhase('regular_season');
+api.setSeasonModeAdapter(simulationAdapterStub);
+api.setData({
+  ...(api.getData() || {}),
+  draftState: {
+    ...((api.getData() || {}).draftState || {}),
+    controlledTeamAbbr: 'LAL'
+  }
+});
+api.renderSimulationTradesInSharedShell();
+api.openSimulationTradeBuilderModal('BOS');
+const validTradeBuilderInputs = sandbox.document.querySelectorAll('[data-simulation-trade-builder-side]');
+validTradeBuilderInputs.forEach((input) => { input.checked = false; });
+validTradeBuilderInputs.find((input) => input.getAttribute('data-player-id') === '34').checked = true;
+validTradeBuilderInputs.find((input) => input.getAttribute('data-player-id') === '30').checked = true;
+demoToasts = [];
+historicalSlotUpsertCalls = [];
+simulationAdapterStub.lastTrade = null;
+api.applySimulationTradeBuilderPackage('BOS');
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastTrade),
+  {
+    fromTeamAbbr: 'LAL',
+    toTeamAbbr: 'BOS',
+    outgoingPlayerIds: [34],
+    incomingPlayerIds: [30]
+  },
+  'trade builder apply should send the selected modal package through the adapter trade path'
+);
+assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder apply should close the modal after a successful package');
+assert.deepStrictEqual(
+  demoToasts,
+  ['Trade applied: Hakeem Olajuwon for Stephen Curry.'],
+  'trade builder apply should confirm a successful package trade'
+);
+assert.match(
+  elements.tradesContent.innerHTML,
+  /Trade applied: Hakeem Olajuwon for Stephen Curry\./,
+  'trade builder apply should refresh Trade Desk content with success feedback'
+);
+assert.ok(
+  simulationAdapterStub.getState().draftState.rostersByTeam.LAL.some((player) => Number(player.id) === 30),
+  'trade builder apply should move the incoming player onto the controlled roster'
+);
+assert.ok(
+  simulationAdapterStub.getState().draftState.rostersByTeam.BOS.some((player) => Number(player.id) === 34),
+  'trade builder apply should move every outgoing player onto the partner roster'
+);
+
+setSimulationStubPhase('regular_season');
+api.setSeasonModeAdapter(simulationAdapterStub);
+api.setData({
+  ...(api.getData() || {}),
+  draftState: {
+    ...((api.getData() || {}).draftState || {}),
+    controlledTeamAbbr: 'LAL'
+  }
+});
+api.renderSimulationTradesInSharedShell();
+
 simulationAdapterStub.lastTrade = null;
 historicalSlotUpsertCalls = [];
 demoToasts = [];
