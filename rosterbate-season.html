@@ -11039,7 +11039,7 @@ function openSimulationTradeBuilderModal(partnerAbbr){
 }
 
 function renderSimulationTradeBuilderPlayerOption(player, side, partnerAbbr){
-  const playerId=escapeSimulationShellHtml(player?.id || '');
+  const playerId=escapeSimulationShellHtml(player?.id ?? '');
   const name=escapeSimulationShellHtml(player?.name || 'Player');
   const label=escapeSimulationShellHtml(player?.choiceLabel || player?.name || 'Player');
   const value=getSimulationTradePlayerValue(player).toFixed(1);
@@ -11104,14 +11104,14 @@ function getSimulationTradeBuilderSelectedIds(partnerAbbr, side){
     if(!input || !input.checked) return false;
     return String(input.getAttribute?.('data-simulation-trade-builder-partner') || '').trim()===targetPartner
       && String(input.getAttribute?.('data-simulation-trade-builder-side') || '').trim()===targetSide;
-  }).map(input=>Number(input.getAttribute?.('data-player-id') || input.value))
-    .filter(value=>Number.isFinite(value) && value>0)
+  }).map(input=>String(input.getAttribute?.('data-player-id') ?? input.value ?? '').trim())
+    .filter(value=>value!=='')
     .filter((value,index,values)=>values.indexOf(value)===index);
 }
 
 function getSimulationTradeBuilderPlayerById(id){
-  const numericId=Number(id);
-  if(!Number.isFinite(numericId)) return null;
+  const key=String(id ?? '').trim();
+  if(!key) return null;
   const tradeVm=SEASON_MODE_ADAPTER.getTradeViewModel?.() || {};
   const state=SEASON_MODE_ADAPTER.getState?.() || D || {};
   const rosterMap=state?.draftState?.rostersByTeam || D?.draftState?.rostersByTeam || {};
@@ -11131,7 +11131,7 @@ function getSimulationTradeBuilderPlayerById(id){
     ...(Array.isArray(D?.freeAgents) ? D.freeAgents : []),
     ...(Array.isArray(D?.waiver) ? D.waiver : [])
   ];
-  return pools.find(player=>Number(player?.id)===numericId) || null;
+  return pools.find(player=>String(player?.id ?? '').trim()===key) || null;
 }
 
 function updateSimulationTradeBuilderPreview(partnerAbbr){
@@ -11143,16 +11143,19 @@ function updateSimulationTradeBuilderPreview(partnerAbbr){
   const tooMany=outgoingIds.length>5 || incomingIds.length>5;
   const outgoingPlayers=outgoingIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
   const incomingPlayers=incomingIds.map(getSimulationTradeBuilderPlayerById).filter(Boolean);
-  const valid=outgoingPlayers.length>0 && incomingPlayers.length>0 && !tooMany;
-  if(applyButton){
-    applyButton.disabled=!valid;
-    applyButton.style.opacity=valid ? '1' : '.55';
-  }
+  const setApplyEnabled=enabled=>{
+    if(applyButton){
+      applyButton.disabled=!enabled;
+      applyButton.style.opacity=enabled ? '1' : '.55';
+    }
+  };
   if(tooMany){
+    setApplyEnabled(false);
     preview.innerHTML='<div style="color:#fecaca;font-weight:900;">Package trades are capped at 5 players per side.</div>';
     return;
   }
   if(!outgoingPlayers.length || !incomingPlayers.length){
+    setApplyEnabled(false);
     preview.innerHTML='<div style="color:#bfdbfe;font-weight:900;">Choose at least one player on both sides to preview the trade.</div>';
     return;
   }
@@ -11161,8 +11164,9 @@ function updateSimulationTradeBuilderPreview(partnerAbbr){
   const incomingValue=getSimulationTradePackageValue(incomingPlayers);
   const netValue=+(incomingValue-outgoingValue).toFixed(1);
   const fromTeam=Number.isFinite(Number(D?.myPos)) ? Number(D.myPos) : 0;
+  const incomingIdSet=new Set(incomingIds.map(id=>String(id ?? '').trim()));
   const toTeam=(Array.isArray(G?.rosters) ? G.rosters : []).findIndex(roster=>
-    (roster || []).some(player=>incomingIds.includes(Number(player?.id)))
+    (roster || []).some(player=>incomingIdSet.has(String(player?.id ?? '').trim()))
   );
   const packageFairness=typeof evaluateTradePackageFairness==='function'
     ? evaluateTradePackageFairness({
@@ -11180,6 +11184,7 @@ function updateSimulationTradeBuilderPreview(partnerAbbr){
     state,
     partnerName:partnerAbbr
   });
+  setApplyEnabled(fairness?.allowed !== false);
   const replacementNeeded=outgoingPlayers.length!==incomingPlayers.length;
   const replacement=replacementNeeded
     ? getSimulationTradeReplacementRead(state, outgoingPlayers.concat(incomingPlayers).map(player=>player?.id))

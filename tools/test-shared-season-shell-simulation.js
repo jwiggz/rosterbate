@@ -658,11 +658,13 @@ function buildSimulationStubState(phase = 'regular_season') {
           { id: 34, name: 'Hakeem Olajuwon', team: 'HOU', pos: 'C', fp: 55 },
           { id: 23, name: 'Michael Jordan', team: 'CHI', pos: 'SG', fp: 52 },
           { id: 101, name: 'Bench Guard', team: 'LAL', pos: 'PG', fp: 8 },
-          { id: 102, name: 'Bench Wing', team: 'LAL', pos: 'SF', fp: 7 }
+          { id: 102, name: 'Bench Wing', team: 'LAL', pos: 'SF', fp: 7 },
+          { id: 'uuid-send-0', name: 'String Key Send', team: 'LAL', pos: 'G', fp: 20 }
         ],
         BOS: [
           { id: 30, name: 'Stephen Curry', team: 'GSW', pos: 'PG', fp: 58 },
-          { id: 99, name: 'Franchise Superstar', team: 'BOS', pos: 'SF', fp: 70 }
+          { id: 99, name: 'Franchise Superstar', team: 'BOS', pos: 'SF', fp: 70 },
+          { id: 'uuid-get-0', name: 'String Key Get', team: 'BOS', pos: 'F', fp: 21 }
         ],
         CHI: []
       },
@@ -991,7 +993,8 @@ const simulationAdapterStub = {
               team: { abbr: 'BOS', name: 'Boston Celtics' },
               incomingRoster: [
                 { id: 30, name: 'Stephen Curry', choiceLabel: 'Stephen Curry - GSW - PG', fp: 58 },
-                { id: 99, name: 'Franchise Superstar', choiceLabel: 'Franchise Superstar - BOS - SF', fp: 70 }
+                { id: 99, name: 'Franchise Superstar', choiceLabel: 'Franchise Superstar - BOS - SF', fp: 70 },
+                { id: 'uuid-get-0', name: 'String Key Get', choiceLabel: 'String Key Get - BOS - F', fp: 21 }
               ],
               recordLabel: '7-5',
               topPlayerName: 'Stephen Curry',
@@ -1006,7 +1009,8 @@ const simulationAdapterStub = {
       outgoingRoster: [
         { id: 34, name: 'Hakeem Olajuwon', choiceLabel: 'Hakeem Olajuwon - HOU - C', fp: 55 },
         { id: 101, name: 'Bench Guard', choiceLabel: 'Bench Guard - LAL - PG', fp: 8 },
-        { id: 102, name: 'Bench Wing', choiceLabel: 'Bench Wing - LAL - SF', fp: 7 }
+        { id: 102, name: 'Bench Wing', choiceLabel: 'Bench Wing - LAL - SF', fp: 7 },
+        { id: 'uuid-send-0', name: 'String Key Send', choiceLabel: 'String Key Send - LAL - G', fp: 20 }
       ],
       incomingRostersByTeam: {
         LEG: [
@@ -2407,8 +2411,38 @@ const incomingTradeBuilderInput = tradeBuilderInputs.find((input) => (
     && input.getAttribute('data-simulation-trade-builder-side') === 'incoming'
     && input.getAttribute('data-player-id') === '30'
 ));
+const lowOutgoingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'outgoing'
+    && input.getAttribute('data-player-id') === '101'
+));
+const extraLowOutgoingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'outgoing'
+    && input.getAttribute('data-player-id') === '102'
+));
+const superstarIncomingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'incoming'
+    && input.getAttribute('data-player-id') === '99'
+));
+const stringOutgoingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'outgoing'
+    && input.getAttribute('data-player-id') === 'uuid-send-0'
+));
+const stringIncomingTradeBuilderInput = tradeBuilderInputs.find((input) => (
+  input.getAttribute('data-simulation-trade-builder-partner') === 'BOS'
+    && input.getAttribute('data-simulation-trade-builder-side') === 'incoming'
+    && input.getAttribute('data-player-id') === 'uuid-get-0'
+));
 assert.ok(outgoingTradeBuilderInput, 'trade builder modal should expose a real outgoing checkbox in inserted markup');
 assert.ok(incomingTradeBuilderInput, 'trade builder modal should expose a real incoming checkbox in inserted markup');
+assert.ok(lowOutgoingTradeBuilderInput, 'trade builder modal should expose bench outgoing checkbox in inserted markup');
+assert.ok(extraLowOutgoingTradeBuilderInput, 'trade builder modal should expose second bench outgoing checkbox in inserted markup');
+assert.ok(superstarIncomingTradeBuilderInput, 'trade builder modal should expose superstar incoming checkbox in inserted markup');
+assert.ok(stringOutgoingTradeBuilderInput, 'trade builder modal should expose string-id outgoing checkbox in inserted markup');
+assert.ok(stringIncomingTradeBuilderInput, 'trade builder modal should expose string-id incoming checkbox in inserted markup');
 outgoingTradeBuilderInput.checked = true;
 incomingTradeBuilderInput.checked = true;
 api.updateSimulationTradeBuilderPreview('BOS');
@@ -2427,6 +2461,30 @@ incomingTradeBuilderInput.checked = false;
 api.updateSimulationTradeBuilderPreview('BOS');
 assert.equal(elements.simulationTradeBuilderApply.disabled, true, 'trade builder apply button should disable again when one side is empty');
 assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Choose at least one player on both sides/i, 'trade builder preview should return to validation copy when one side is empty');
+outgoingTradeBuilderInput.checked = false;
+lowOutgoingTradeBuilderInput.checked = true;
+extraLowOutgoingTradeBuilderInput.checked = true;
+superstarIncomingTradeBuilderInput.checked = true;
+api.updateSimulationTradeBuilderPreview('BOS');
+assert.equal(elements.simulationTradeBuilderApply.disabled, true, 'trade builder apply button should stay disabled when fairness blocks the selected package');
+assert.match(elements.simulationTradeBuilderPreview.innerHTML, /Block[\s\S]*giving up too much|giving up too much[\s\S]*Block/i, 'trade builder preview should show the blocked fairness verdict for lopsided packages');
+lowOutgoingTradeBuilderInput.checked = false;
+extraLowOutgoingTradeBuilderInput.checked = false;
+superstarIncomingTradeBuilderInput.checked = false;
+stringOutgoingTradeBuilderInput.checked = true;
+stringIncomingTradeBuilderInput.checked = true;
+api.updateSimulationTradeBuilderPreview('BOS');
+assert.deepStrictEqual(
+  toPlain(api.getSimulationTradeBuilderSelectedIds('BOS', 'outgoing')),
+  ['uuid-send-0'],
+  'trade builder selected ids should preserve stable string keys'
+);
+assert.equal(elements.simulationTradeBuilderApply.disabled, false, 'trade builder apply button should enable for valid string-id selections');
+assert.match(
+  elements.simulationTradeBuilderPreview.innerHTML,
+  /String Key Send[\s\S]*String Key Get[\s\S]*(Package read|Fairness check)/i,
+  'trade builder preview should resolve and render non-numeric player ids'
+);
 api.closeSimulationTradeBuilderModal();
 assert.equal(elements.simulationTradeBuilderModal, undefined, 'trade builder modal closer should remove the inserted modal element');
 
