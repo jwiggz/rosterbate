@@ -7,3 +7,8 @@
   port = 8888
   targetPort = 8080
   autoLaunch = false
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"

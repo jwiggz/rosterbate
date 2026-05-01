@@ -262,6 +262,24 @@ assert.equal(
   'a stale Day 1 browser draft must not overwrite a cloud season that has advanced to Day 2'
 );
 
+const richerEqualProgressLocalLeague = {
+  ...richerStaleLocalLeague,
+  currentDay: 2,
+  currentWeek: 1,
+  updatedAt: 999999,
+  seasonState: {
+    currentDay: 2,
+    currentWeek: 1,
+    completedGameLogs: [{ day: 1, homeAbbr: 'SH', awayAbbr: 'P' }],
+    standings: [{ teamAbbr: 'P', w: 1, l: 0 }, { teamAbbr: 'SH', w: 0, l: 1 }]
+  }
+};
+assert.equal(
+  localPreferenceApi.shouldPreferLocalLeagueData(richerEqualProgressLocalLeague, advancedCloudLeague, 'season_60'),
+  false,
+  'a richer browser draft must not overwrite a cloud simulation season at the same progressed day'
+);
+
 async function runAsyncAssertions() {
   const firebaseWrites = [];
   Object.assign(sandbox, {
