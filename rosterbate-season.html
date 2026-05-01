@@ -274,6 +274,10 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .trade-builder-player-flag{font-family:var(--fb);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 8px;border:1px solid currentColor;}
 .trade-builder-player-flag.send{color:#86efac;background:rgba(34,197,94,.14);}
 .trade-builder-player-flag.get{color:#fdba74;background:rgba(249,115,22,.14);}
+.local-trade-modal{position:fixed;inset:0;z-index:9998;background:rgba(2,6,23,.78);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:22px;}
+.local-trade-modal-card{width:min(1180px,calc(100vw - 36px));max-height:90vh;overflow:auto;border:1px solid rgba(148,163,184,.24);border-radius:22px;background:linear-gradient(180deg,rgba(20,31,48,.98),rgba(8,13,23,.99));box-shadow:0 30px 90px rgba(0,0,0,.55);}
+.local-trade-modal .trade-builder-shell{margin:0;border:0;border-radius:22px;background:transparent;}
+.local-trade-modal .trade-builder-roster{max-height:360px;}
 [data-trade-team].is-viewing{border-color:rgba(249,115,22,.65) !important;box-shadow:0 0 0 1px rgba(249,115,22,.3),0 14px 32px rgba(249,115,22,.12),inset 3px 0 0 rgba(249,115,22,.92) !important;background:linear-gradient(180deg,rgba(48,31,18,.98),rgba(15,23,42,.98)) !important;}
 .trade-dialog-shell{margin-top:14px;border-radius:14px;border:1px solid rgba(56,189,248,.24);background:linear-gradient(180deg,rgba(15,33,56,.92),rgba(12,18,29,.98));overflow:hidden;}
 .trade-dialog-head{padding:14px 16px 12px;border-bottom:1px solid rgba(56,189,248,.14);}
@@ -367,6 +371,9 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
   .trade-builder-actions{flex-direction:column;}
   .trade-builder-actions .bs,.trade-builder-actions .bg,.trade-builder-head .season-outline-btn{width:100% !important;}
   .trade-builder-roster{max-height:none;}
+  .local-trade-modal{align-items:flex-start;padding:10px;}
+  .local-trade-modal-card{width:100%;max-height:calc(100vh - 20px);border-radius:16px;}
+  .local-trade-modal .trade-builder-roster{max-height:none;}
 }
 .hub-actions{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:8px;}
 .hub-action{display:flex;align-items:flex-start;gap:8px;text-align:left;cursor:pointer;min-height:82px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(16,24,39,.92),rgba(10,15,24,.98));color:#f8fafc;width:100%;border-radius:16px;padding:11px 12px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease,background .14s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 22px rgba(2,6,23,.2);}
@@ -16190,7 +16197,7 @@ function sendTradeConversation(teamIdx){
     ts:Date.now()
   });
   saveTradeConversation();
-  renderInlineTradeBuilder();
+  renderLocalTradeBuilderModal();
   setTimeout(()=>{
     const refreshed=document.getElementById('tradeDialogInput');
     if(refreshed){
@@ -16336,7 +16343,6 @@ function renderTrades(){
       </div>`;
     });
   }
-  h+=`<div id="tradeBuilderMount"></div>`;
   if(sent.length){
     h+=`<div id="sentTradeSection" class="sl">Sent Offers</div>`;
     sent.forEach(o=>{
@@ -16411,7 +16417,7 @@ function tradeTeamName(ti){
   return D?.teams?.[ti] || (typeof teamName==='function' ? teamName(ti) : ('Team '+(Number(ti)+1)));
 }
 
-function getInlineTradeBuilderFairness(givePlayers, getPlayers, partnerName){
+function getLocalTradeBuilderFairness(givePlayers, getPlayers, partnerName){
   if(!givePlayers.length || !getPlayers.length){
     return { allowed:false, tone:'error', message:'Choose players on both sides before sending an offer.' };
   }
@@ -16426,14 +16432,14 @@ function getInlineTradeBuilderFairness(givePlayers, getPlayers, partnerName){
   });
 }
 
-function closeInlineTradeBuilder(){
+function closeLocalTradeBuilderModal(){
+  document.getElementById('localTradeBuilderModal')?.remove();
   const mount=document.getElementById('tradeBuilderMount');
   if(mount) mount.innerHTML='';
 }
 
-function renderInlineTradeBuilder(){
-  const mount=document.getElementById('tradeBuilderMount');
-  if(!mount || !Number.isFinite(Number(trP?.ti)) || trP.ti<0) return;
+function renderLocalTradeBuilderModal(){
+  if(!Number.isFinite(Number(trP?.ti)) || trP.ti<0) return;
   const teamName=D?.teams?.[trP.ti]||('Team '+(Number(trP.ti)+1));
   const byFantasyValue=(a,b)=>Number(b?.fp||0)-Number(a?.fp||0);
   const myR=[...(G.rosters[D.myPos]||[])].sort(byFantasyValue);
@@ -16446,7 +16452,7 @@ function renderInlineTradeBuilder(){
   const gt=trP.get.reduce((s,id)=>{const p=findRosterPlayerByTradeId(thR,id);return s+(p?p.fp:0);},0);
   const d=(gt-gv).toFixed(1);
   const offerReady=trP.give.length&&trP.get.length;
-  const builderFairness=getInlineTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
+  const builderFairness=getLocalTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
   const canSend=!!offerReady && builderFairness.allowed!==false;
   const fairnessCard=renderTradeFairnessCard({ fromTeam:D.myPos, toTeam:trP.ti, give:trP.give, get:trP.get }, { variant:'builder' });
   const fairCopy=trP.give.length&&trP.get.length
@@ -16465,18 +16471,25 @@ function renderInlineTradeBuilder(){
       ${sel?`<span class="trade-builder-player-flag ${side==='give'?'send':'get'}">${side==='give'?'Sending':'Receiving'}</span>`:''}
     </button>`;
   };
-  mount.innerHTML=`<div class="season-table-card season-card-pad trade-builder-shell">
+  closeLocalTradeBuilderModal();
+  const builderMarkup=`<div id="localTradeBuilderModal" class="local-trade-modal" onclick="if(event.target===this)closeLocalTradeBuilderModal()">
+  <div class="local-trade-modal-card" onclick="event.stopPropagation()">
+  <div class="season-table-card season-card-pad trade-builder-shell">
     <div class="trade-builder-head">
       <div>
         <div style="font-family:var(--fb);font-size:22px;font-weight:800;color:#f8fafc;">Build Trade With ${teamName}</div>
-        <div style="font-size:12px;color:#94a3b8;margin-top:4px;">Building with ${teamName}. Players are sorted by fantasy value so the real targets stay near the top.</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:4px;">Build a package up to 5-for-5. Players are sorted by fantasy value so the real targets stay near the top.</div>
       </div>
-      <button type="button" onclick="closeInlineTradeBuilder()" class="season-outline-btn">Close Builder</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <button type="button" onclick="submitTrade()" class="bg" style="width:auto;padding:12px 18px;" ${!canSend?'disabled':''}>Send Offer</button>
+        <button type="button" onclick="closeLocalTradeBuilderModal()" class="season-outline-btn">Close</button>
+      </div>
     </div>
     <div class="trade-builder-badges" style="margin-bottom:12px;">
       <span class="season-stat-pill">${myR.length} on your roster</span>
       <span class="season-stat-pill">${thR.length} on their roster</span>
-      <span class="season-stat-pill">Live trade builder</span>
+      <span class="season-stat-pill">Modal trade builder</span>
+      <span class="season-stat-pill">5 per side max</span>
     </div>
     <div class="trade-builder-summary" style="margin-bottom:12px;">
       <div class="trade-builder-summary-card send">
@@ -16507,22 +16520,23 @@ function renderInlineTradeBuilder(){
       <div><div style="font-family:var(--fd);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">You Get · Highest FP First</div><div class="trade-builder-roster">${thR.map(p=>pr(p,'get')).join('')}</div></div>
     </div>
     <div class="trade-builder-actions" style="margin-top:14px;">
-      <button type="button" onclick="closeInlineTradeBuilder()" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
+      <button type="button" onclick="closeLocalTradeBuilderModal()" class="bs" style="width:auto;padding:13px 16px;">Cancel</button>
       <button type="button" onclick="submitTrade()" class="bg" ${!canSend?'disabled':''}>Send Offer</button>
     </div>
     ${renderTradeConversation(trP.ti)}
-  </div>`;
+  </div>
+  </div>
+</div>`;
+  document.body.insertAdjacentHTML('beforeend',builderMarkup);
   updateTradeConversationSendBtn();
   setTimeout(()=>scrollTradeConversationBottom(),30);
 }
 
 function openTrade(ti){
-  if(!document.getElementById('tradeBuilderMount')) return;
   trP={ti,give:[],get:[]};
   document.querySelectorAll('[data-trade-team].is-viewing').forEach(card=>card.classList.remove('is-viewing'));
   document.getElementById(`tradeTargetCard-${Number(ti)}`)?.classList.add('is-viewing');
-  renderInlineTradeBuilder();
-  setTimeout(()=>document.getElementById('tradeBuilderMount')?.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  renderLocalTradeBuilderModal();
 }
 
 function toggleTr(side,pid){
@@ -16533,7 +16547,7 @@ function toggleTr(side,pid){
     if(arr.length>=5){ toast('Package limit is 5 players per side.'); return; }
     arr.push(pidKey);
   }
-  renderInlineTradeBuilder();
+  renderLocalTradeBuilderModal();
 }
 
 function findTradeOffer(id){
@@ -16563,8 +16577,8 @@ function submitTrade(){
   if(trP.give.length>5 || trP.get.length>5){ toast('Package limit is 5 players per side.'); return; }
   const givePlayers=trP.give.map(id=>findRosterPlayerByTradeId(G.rosters[D.myPos]||[],id)).filter(Boolean);
   const getPlayers=trP.get.map(id=>findRosterPlayerByTradeId(G.rosters[trP.ti]||[],id)).filter(Boolean);
-  const fairness=getInlineTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
-  if(fairness.allowed===false){ toast(fairness.message || 'This trade package is blocked.'); renderInlineTradeBuilder(); return; }
+  const fairness=getLocalTradeBuilderFairness(givePlayers,getPlayers,tradeTeamName(trP.ti));
+  if(fairness.allowed===false){ toast(fairness.message || 'This trade package is blocked.'); renderLocalTradeBuilderModal(); return; }
   const now=Date.now();
   const o={
     id:'tr_'+now,
@@ -16583,7 +16597,7 @@ function submitTrade(){
   const giveNames=o.give.map(id=>findRosterPlayerByTradeId(G.rosters[o.fromTeam],id)?.name||'?').join(', ');
   const getNames=o.get.map(id=>findRosterPlayerByTradeId(G.rosters[o.toTeam],id)?.name||'?').join(', ');
   logActivity('trade','Trade offer sent',tradeTeamName(o.fromTeam)+' offered '+giveNames+' to '+tradeTeamName(o.toTeam)+' for '+getNames+'.',o.fromTeam,'?');
-  closeInlineTradeBuilder();
+  closeLocalTradeBuilderModal();
   toast('Trade sent to '+D.teams[trP.ti]+'!');
   queueSharedSeasonSave('submit_trade');
   if(!D?.multiplayer) setTimeout(()=>cpuTrade(o.id),2500);

@@ -37,11 +37,12 @@ assert.match(html, /id="tradeTargetCard-\$\{target\.ti\}"/, 'trade target cards 
 assert.match(html, /tradeTargetCard-\$\{Number\(ti\)\}`\)\?\.classList\.add\('is-viewing'\)/, 'opening a trade from the viewer should visibly focus the selected trade partner');
 assert.match(html, /\[data-trade-team\]\.is-viewing/, 'trade target cards should have a visible focused state');
 assert.match(html, /const byFantasyValue=\(a,b\)=>Number\(b\?\.fp\|\|0\)-Number\(a\?\.fp\|\|0\)/, 'trade builder should sort both rosters by fantasy value');
-assert.match(html, /Building with \$\{teamName\}/, 'trade builder should echo the selected team context');
+assert.match(html, /Build a package up to 5-for-5/, 'trade builder modal should explain package depth');
 assert.match(html, /Highest FP First/, 'trade builder column labels should explain the sorted order');
-assert.match(html, /function tradePlayerKey\(value\)/, 'inline trade builder should normalize player ids as stable string keys');
-assert.match(html, /Package limit is 5 players per side/, 'inline trade builder should cap package size before sending');
-assert.match(html, /getInlineTradeBuilderFairness\(givePlayers,getPlayers,tradeTeamName\(trP\.ti\)\)/, 'inline trade builder should use fairness gating before enabling send');
+assert.match(html, /id="localTradeBuilderModal"/, 'local trade builder should render in a modal instead of the old inline builder');
+assert.match(html, /function tradePlayerKey\(value\)/, 'local trade builder should normalize player ids as stable string keys');
+assert.match(html, /Package limit is 5 players per side/, 'local trade builder should cap package size before sending');
+assert.match(html, /getLocalTradeBuilderFairness\(givePlayers,getPlayers,tradeTeamName\(trP\.ti\)\)/, 'local trade builder should use fairness gating before enabling send');
 assert.match(html, /id="playerDetailModal"/, 'season shell should expose a reusable player detail modal');
 assert.match(html, /function openPlayerDetailModal\(/, 'season shell should open player details from any player-name click');
 assert.match(html, /class="player-name-link"/, 'season shell should render player names as detail buttons');
@@ -216,7 +217,7 @@ module.exports = {
   applySimulationTradeFromShell,
   tradePlayerKey,
   findRosterPlayerByTradeId,
-  getInlineTradeBuilderFairness,
+  getLocalTradeBuilderFairness,
   openTrade,
   toggleTr,
   submitTrade,
@@ -1260,6 +1261,9 @@ const sandbox = {
         registerMarkupElements(this.lastInsertedHTML);
         if (elements.simulationTradeBuilderModal) {
           elements.simulationTradeBuilderModal.innerHTML = this.lastInsertedHTML;
+        }
+        if (elements.localTradeBuilderModal) {
+          elements.localTradeBuilderModal.innerHTML = this.lastInsertedHTML;
         }
       }
     },
@@ -2719,7 +2723,7 @@ assert.ok(
 
 api.setData({
   sport: 'nba',
-  leagueName: 'Inline Trade QA',
+  leagueName: 'Local Trade Modal QA',
   myPos: 0,
   teams: ['QA Hawks', 'Rim Rockers'],
   multiplayer: true,
@@ -2749,32 +2753,37 @@ api.setGame({
 });
 elements.tradeBuilderMount = createElement('tradeBuilderMount');
 demoToasts = [];
+sandbox.document.body.lastInsertedHTML = '';
 api.openTrade(1);
-assert.match(elements.tradeBuilderMount.innerHTML, /Build Trade With Rim Rockers/, 'inline trade builder should open for the selected local partner');
+assert.ok(elements.localTradeBuilderModal, 'local trade builder should open in a modal for the selected partner');
+assert.match(elementsBodyHtml(), /Build Trade With Rim Rockers/, 'local trade builder modal should name the selected partner');
+assert.equal(elements.tradeBuilderMount.innerHTML, '', 'local trade builder should not render the old inline builder');
 api.toggleTr('give', 'me-star');
 api.toggleTr('get', 'them-low');
-assert.match(elements.tradeBuilderMount.innerHTML, /Blocked/, 'inline trade builder should show blocked state for unfair packages');
+assert.match(elements.localTradeBuilderModal.innerHTML, /Blocked/, 'local trade builder modal should show blocked state for unfair packages');
 api.submitTrade();
-assert.equal(api.getGame().tradeOffers.length, 0, 'inline trade builder should not create offers for blocked packages');
-assert.match(demoToasts.at(-1), /Trade blocked|giving up too much|blocked/i, 'inline trade builder should explain blocked packages');
+assert.ok(elements.localTradeBuilderModal, 'blocked local trade package should leave the modal open for edits');
+assert.equal(api.getGame().tradeOffers.length, 0, 'local trade builder should not create offers for blocked packages');
+assert.match(demoToasts.at(-1), /Trade blocked|giving up too much|blocked/i, 'local trade builder should explain blocked packages');
 
 demoToasts = [];
 api.toggleTr('get', 'them-low');
 api.toggleTr('get', 'them-good');
-assert.doesNotMatch(elements.tradeBuilderMount.innerHTML, /Blocked/, 'inline trade builder should clear blocked state after a fair string-id package');
+assert.doesNotMatch(elements.localTradeBuilderModal.innerHTML, /Blocked/, 'local trade builder should clear blocked state after a fair string-id package');
 api.submitTrade();
-assert.equal(api.getGame().tradeOffers.length, 1, 'inline trade builder should create a pending offer for valid packages');
+assert.equal(api.getGame().tradeOffers.length, 1, 'local trade builder should create a pending offer for valid packages');
 assert.deepStrictEqual(
   toPlain(api.getGame().tradeOffers[0].give),
   ['me-star'],
-  'inline trade builder should preserve string outgoing ids when sending offers'
+  'local trade builder should preserve string outgoing ids when sending offers'
 );
 assert.deepStrictEqual(
   toPlain(api.getGame().tradeOffers[0].get),
   ['them-good'],
-  'inline trade builder should preserve string incoming ids when sending offers'
+  'local trade builder should preserve string incoming ids when sending offers'
 );
-assert.match(demoToasts.at(-1), /Trade sent to Rim Rockers/, 'inline trade builder should show success feedback after sending');
+assert.ok(!elements.localTradeBuilderModal, 'successful local trade send should close the modal');
+assert.match(demoToasts.at(-1), /Trade sent to Rim Rockers/, 'local trade builder should show success feedback after sending');
 
 api.renderSimulationStandingsInSharedShell();
 assert.match(elements.standingsContent.innerHTML, /(Los Angeles Lakers|LAL)/);
