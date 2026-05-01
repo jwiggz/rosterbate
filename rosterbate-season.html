@@ -12786,6 +12786,7 @@ function setSimulationMatchupNavigationValue(value){
 }
 
 let simulationRosterNavigationValue = null;
+let simulationLiveMatchupAutoFinishDayOnReturn = false;
 
 function setSimulationRosterNavigationValue(value){
   const numericValue = Number(value);
@@ -12893,20 +12894,42 @@ function syncSimulationLiveMatchupStateFromStorage(){
   D=writeLocalDraftSnapshot(D);
 }
 
+function finishSimulationRevealDayAfterLiveReturn(shouldAutoFinish){
+  if(!shouldAutoFinish || getActiveSeasonBackend() !== 'simulation' || !SEASON_MODE_ADAPTER) return false;
+  const primaryAction=SEASON_MODE_ADAPTER.getHubViewModel?.()?.primaryAction || null;
+  if(String(primaryAction?.id || '') !== 'finish-partial-day') return false;
+  const finishedDay=Number(D?.seasonState?.currentDay || D?.currentDay || G?.day || 1) || 1;
+  SEASON_MODE_ADAPTER.simulateNextDay();
+  persistSimulationSeasonState('simulation_live_reveal_finish_day');
+  if(G && typeof G==='object'){
+    const nextState=SEASON_MODE_ADAPTER.getState?.() || D || {};
+    G.day=Number(nextState?.seasonState?.currentDay || nextState?.currentDay || G.day || 1) || 1;
+    G.week=Number(nextState?.seasonState?.currentWeek || nextState?.currentWeek || G.week || 1) || 1;
+  }
+  toast(`Day ${finishedDay} results are in.`);
+  return true;
+}
+
 function closeSimulationLiveMatchupModal(syncState=true){
+  const shouldAutoFinish=simulationLiveMatchupAutoFinishDayOnReturn;
+  simulationLiveMatchupAutoFinishDayOnReturn=false;
   const modal=document.getElementById('simulationLiveMatchupModal');
   if(modal) modal.remove();
   document.body.style.overflow='';
-  if(syncState) syncSimulationLiveMatchupStateFromStorage();
+  if(syncState){
+    syncSimulationLiveMatchupStateFromStorage();
+    finishSimulationRevealDayAfterLiveReturn(shouldAutoFinish);
+  }
   renderActiveSeasonScreen(getActiveSeasonPageId());
 }
 
-function openSimulationLiveMatchupModal(day, homeAbbr, awayAbbr){
+function openSimulationLiveMatchupModal(day, homeAbbr, awayAbbr, options){
   const url=buildSimulationLiveMatchupUrl(day, homeAbbr, awayAbbr, '#hub');
   if(!url){
     toast('Save this simulation universe before launching a live matchup.');
     return false;
   }
+  simulationLiveMatchupAutoFinishDayOnReturn=Boolean(options?.autoFinishDayOnReturn);
   let modal=document.getElementById('simulationLiveMatchupModal');
   if(modal) modal.remove();
   modal=document.createElement('div');
@@ -12938,7 +12961,8 @@ function openSimulationRevealDayLiveMatchup(){
   return openSimulationLiveMatchupModal(
     Number(matchup?.day || D?.seasonState?.currentDay || D?.currentDay || 1),
     matchup?.homeAbbr,
-    matchup?.awayAbbr
+    matchup?.awayAbbr,
+    { autoFinishDayOnReturn:true }
   );
 }
 
