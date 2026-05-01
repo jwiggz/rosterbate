@@ -1137,6 +1137,68 @@ assert.deepStrictEqual(
 );
 assert.equal(tradedState.seasonState.lineupSlotsByTeam.CHI.QB, null);
 
+const stringKeyTradeState = {
+  draftState: {
+    rostersByTeam: {
+      GB: [
+        { id: 'gb-alpha', name: 'GB String Alpha', designation: 'ACTIVE' },
+        { id: 'gb-beta', name: 'GB String Beta', designation: 'ACTIVE' },
+        { id: 'gb-keeper', name: 'GB Keeper', designation: 'ACTIVE' }
+      ],
+      CHI: [
+        { id: 'chi-alpha', name: 'CHI String Alpha', designation: 'ACTIVE' },
+        { id: 'chi-beta', name: 'CHI String Beta', designation: 'ACTIVE' },
+        { id: 'chi-keeper', name: 'CHI Keeper', designation: 'ACTIVE' }
+      ]
+    }
+  },
+  seasonState: {
+    lineupIdsByTeam: {
+      GB: ['gb-alpha', 'gb-beta', 'gb-keeper'],
+      CHI: ['chi-alpha', 'chi-beta', 'chi-keeper']
+    },
+    lineupSlotsByTeam: {
+      GB: { QB: 'gb-alpha', RB1: 'gb-beta', RB2: 'gb-keeper' },
+      CHI: { QB: 'chi-alpha', RB1: 'chi-beta', RB2: 'chi-keeper' }
+    },
+    activityLog: []
+  }
+};
+
+const stringKeyTradedState = applySimulationTrade(stringKeyTradeState, {
+  fromTeamAbbr: 'GB',
+  toTeamAbbr: 'CHI',
+  outgoingPlayerIds: ['gb-alpha', 'gb-beta'],
+  incomingPlayerIds: ['chi-alpha', 'chi-beta']
+});
+
+assert.deepStrictEqual(
+  stringKeyTradedState.draftState.rostersByTeam.GB.map((player) => player.id),
+  ['gb-keeper', 'chi-alpha', 'chi-beta'],
+  'string-key package trades should move only the selected incoming players onto the sending roster'
+);
+assert.deepStrictEqual(
+  stringKeyTradedState.draftState.rostersByTeam.CHI.map((player) => player.id),
+  ['chi-keeper', 'gb-alpha', 'gb-beta'],
+  'string-key package trades should move only the selected outgoing players onto the receiving roster'
+);
+assert.deepStrictEqual(
+  stringKeyTradedState.seasonState.lineupIdsByTeam.GB,
+  [null, null, 'gb-keeper', null, null, null, null, null, null],
+  'string-key package trades should prune outgoing string ids from lineup ids without touching keepers'
+);
+assert.deepStrictEqual(
+  stringKeyTradedState.seasonState.lineupIdsByTeam.CHI,
+  [null, null, 'chi-keeper', null, null, null, null, null, null],
+  'string-key package trades should prune incoming string ids from partner lineup ids without touching keepers'
+);
+assert.equal(stringKeyTradedState.seasonState.lineupSlotsByTeam.GB.QB, null);
+assert.equal(stringKeyTradedState.seasonState.lineupSlotsByTeam.GB.RB1, null);
+assert.equal(stringKeyTradedState.seasonState.lineupSlotsByTeam.GB.RB2, 'gb-keeper');
+assert.equal(stringKeyTradedState.seasonState.lineupSlotsByTeam.CHI.QB, null);
+assert.equal(stringKeyTradedState.seasonState.lineupSlotsByTeam.CHI.RB1, null);
+assert.equal(stringKeyTradedState.seasonState.lineupSlotsByTeam.CHI.RB2, 'chi-keeper');
+
 const unevenTradeState = {
   draftState: {
     freeAgents: [

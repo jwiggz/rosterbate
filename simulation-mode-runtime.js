@@ -68,6 +68,17 @@
     return String(teamAbbr || '').trim().toUpperCase();
   }
 
+  function normalizePlayerIdKey(playerId){
+    return String(playerId ?? '').trim();
+  }
+
+  function normalizeLineupPlayerIdValue(playerId){
+    const key = normalizePlayerIdKey(playerId);
+    if (!key) return null;
+    const numeric = Number(key);
+    return Number.isFinite(numeric) ? numeric : key;
+  }
+
   function normalizeShell(shell){
     if (!shell || typeof shell !== 'object') {
       return { teams: [] };
@@ -136,7 +147,7 @@
   function normalizeSimulationLineupSlots(shell, lineupValue){
     const sport = getSimulationSport(shell);
     if (sport !== 'nfl') {
-      return (Array.isArray(lineupValue) ? lineupValue : []).map((id) => Number(id));
+      return (Array.isArray(lineupValue) ? lineupValue : []).map(normalizeLineupPlayerIdValue);
     }
 
     const template = getSimulationLineupSlotTemplate(shell);
@@ -146,7 +157,7 @@
 
     return template.reduce((slots, slot) => {
       const value = source[slot];
-      slots[slot] = value == null || value === '' ? null : Number(value);
+      slots[slot] = normalizeLineupPlayerIdValue(value);
       return slots;
     }, {});
   }
@@ -157,7 +168,7 @@
       if (value == null || value === '') {
         return null;
       }
-      return Number(value);
+      return normalizeLineupPlayerIdValue(value);
     });
   }
 
@@ -1035,13 +1046,13 @@
     const seasonState = next.seasonState || {};
     const lineupIdsByTeam = seasonState.lineupIdsByTeam || {};
     const lineupSlotsByTeam = seasonState.lineupSlotsByTeam || {};
-    const removedIds = new Set((Array.isArray(removedPlayerIds) ? removedPlayerIds : []).map(Number));
+    const removedIds = new Set((Array.isArray(removedPlayerIds) ? removedPlayerIds : []).map(normalizePlayerIdKey).filter(Boolean));
     const currentSlots = lineupSlotsByTeam[teamAbbr];
 
     if (currentSlots && typeof currentSlots === 'object' && !Array.isArray(currentSlots)) {
       const normalizedSlots = normalizeSimulationLineupSlots({ sport: 'nfl' }, currentSlots);
       Object.keys(normalizedSlots).forEach((slot) => {
-        if (removedIds.has(Number(normalizedSlots[slot]))) {
+        if (removedIds.has(normalizePlayerIdKey(normalizedSlots[slot]))) {
           normalizedSlots[slot] = null;
         }
       });
@@ -1054,12 +1065,12 @@
         const slotCount = getSimulationLineupSlotTemplate({ sport: 'nfl' }).length;
         lineupIdsByTeam[teamAbbr] = currentLineup
           .slice(0, slotCount)
-          .map((id) => (removedIds.has(Number(id)) ? null : id == null || id === '' ? null : Number(id)));
+          .map((id) => (removedIds.has(normalizePlayerIdKey(id)) ? null : normalizeLineupPlayerIdValue(id)));
         while (lineupIdsByTeam[teamAbbr].length < slotCount) {
           lineupIdsByTeam[teamAbbr].push(null);
         }
       } else {
-        lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(Number(id)));
+        lineupIdsByTeam[teamAbbr] = currentLineup.filter((id) => !removedIds.has(normalizePlayerIdKey(id)));
       }
     }
 
@@ -1302,7 +1313,7 @@
 
   function balanceSimulationTradeRosterSize(next, teamAbbr, targetSize, protectedIds){
     next.draftState.freeAgents = Array.isArray(next.draftState.freeAgents) ? next.draftState.freeAgents : [];
-    const protectedSet = new Set((Array.isArray(protectedIds) ? protectedIds : []).map(Number));
+    const protectedSet = new Set((Array.isArray(protectedIds) ? protectedIds : []).map(normalizePlayerIdKey).filter(Boolean));
     let roster = Array.isArray(next.draftState.rostersByTeam?.[teamAbbr]) ? next.draftState.rostersByTeam[teamAbbr] : [];
     if (!Number.isFinite(Number(targetSize)) || Number(targetSize) <= 0) {
       return { added: [], dropped: [] };
@@ -1318,13 +1329,13 @@
           return String(a?.name || '').localeCompare(String(b?.name || ''));
         })[0];
       if (!bestFreeAgent) break;
-      next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => Number(player?.id) !== Number(bestFreeAgent.id));
+      next.draftState.freeAgents = next.draftState.freeAgents.filter((player) => normalizePlayerIdKey(player?.id) !== normalizePlayerIdKey(bestFreeAgent.id));
       roster = roster.concat(clone(bestFreeAgent));
       added.push(clone(bestFreeAgent));
     }
     while (roster.length > Number(targetSize)) {
       const dropCandidate = roster
-        .filter((player) => !protectedSet.has(Number(player?.id)))
+        .filter((player) => !protectedSet.has(normalizePlayerIdKey(player?.id)))
         .slice()
         .sort((a, b) => {
           const valueDiff = getSimulationTradeRuntimeValue(a) - getSimulationTradeRuntimeValue(b);
@@ -1334,10 +1345,10 @@
           .slice()
           .sort((a, b) => getSimulationTradeRuntimeValue(a) - getSimulationTradeRuntimeValue(b))[0];
       if (!dropCandidate) break;
-      roster = roster.filter((player) => Number(player?.id) !== Number(dropCandidate.id));
+      roster = roster.filter((player) => normalizePlayerIdKey(player?.id) !== normalizePlayerIdKey(dropCandidate.id));
       next.draftState.freeAgents = next.draftState.freeAgents.concat(clone(dropCandidate));
       dropped.push(clone(dropCandidate));
-      pruneLineupState(next, teamAbbr, [Number(dropCandidate.id)]);
+      pruneLineupState(next, teamAbbr, [dropCandidate.id]);
     }
     next.draftState.rostersByTeam[teamAbbr] = roster;
     return { added, dropped };
@@ -1349,8 +1360,8 @@
     if (!fromTeamAbbr || !toTeamAbbr || fromTeamAbbr === toTeamAbbr) {
       return clone(state);
     }
-    const outgoingIds = new Set((Array.isArray(trade?.outgoingPlayerIds) ? trade.outgoingPlayerIds : []).map(Number));
-    const incomingIds = new Set((Array.isArray(trade?.incomingPlayerIds) ? trade.incomingPlayerIds : []).map(Number));
+    const outgoingIds = new Set((Array.isArray(trade?.outgoingPlayerIds) ? trade.outgoingPlayerIds : []).map(normalizePlayerIdKey).filter(Boolean));
+    const incomingIds = new Set((Array.isArray(trade?.incomingPlayerIds) ? trade.incomingPlayerIds : []).map(normalizePlayerIdKey).filter(Boolean));
     if (!outgoingIds.size || !incomingIds.size) {
       return clone(state);
     }
@@ -1358,8 +1369,8 @@
     const draftState = state?.draftState || {};
     const fromRoster = Array.isArray(draftState.rostersByTeam?.[fromTeamAbbr]) ? draftState.rostersByTeam[fromTeamAbbr] : [];
     const toRoster = Array.isArray(draftState.rostersByTeam?.[toTeamAbbr]) ? draftState.rostersByTeam[toTeamAbbr] : [];
-    const outgoing = fromRoster.filter((player) => outgoingIds.has(Number(player.id)));
-    const incoming = toRoster.filter((player) => incomingIds.has(Number(player.id)));
+    const outgoing = fromRoster.filter((player) => outgoingIds.has(normalizePlayerIdKey(player.id)));
+    const incoming = toRoster.filter((player) => incomingIds.has(normalizePlayerIdKey(player.id)));
 
     if (outgoing.length !== outgoingIds.size || incoming.length !== incomingIds.size) {
       return clone(state);
@@ -1376,8 +1387,8 @@
     const clonedIncoming = clone(incoming);
     const clonedOutgoing = clone(outgoing);
 
-    next.draftState.rostersByTeam[fromTeamAbbr] = nextFromRoster.filter((player) => !outgoingIds.has(Number(player.id))).concat(clonedIncoming);
-    next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(Number(player.id))).concat(clonedOutgoing);
+    next.draftState.rostersByTeam[fromTeamAbbr] = nextFromRoster.filter((player) => !outgoingIds.has(normalizePlayerIdKey(player.id))).concat(clonedIncoming);
+    next.draftState.rostersByTeam[toTeamAbbr] = nextToRoster.filter((player) => !incomingIds.has(normalizePlayerIdKey(player.id))).concat(clonedOutgoing);
     pruneLineupState(next, fromTeamAbbr, Array.from(outgoingIds));
     pruneLineupState(next, toTeamAbbr, Array.from(incomingIds));
     const fromBalance = balanceSimulationTradeRosterSize(next, fromTeamAbbr, fromRoster.length, Array.from(incomingIds));
