@@ -3350,6 +3350,34 @@ assert.equal(
   true,
   'reload should prefer complete local draft rosters over a newer but empty cloud snapshot'
 );
+assert.equal(
+  api.shouldPreferLocalLeagueData(
+    {
+      seasonId: 'local_draft_reload',
+      leagueSize: 10,
+      teams: Array.from({ length: 10 }, (_, idx) => `Team ${idx + 1}`),
+      allRosters: Array.from({ length: 10 }, (_, idx) => [{ id: idx + 1 }]),
+      standings: Array.from({ length: 10 }, (_, idx) => ({ teamIdx: idx, w: 0, l: 0 })),
+      currentWeek: 1,
+      currentDay: 1,
+      isFreshDraftLaunch: true,
+      updatedAt: 1000
+    },
+    {
+      seasonId: 'local_draft_reload',
+      leagueSize: 10,
+      teams: Array.from({ length: 10 }, (_, idx) => `Team ${idx + 1}`),
+      allRosters: Array.from({ length: 10 }, (_, idx) => [{ id: idx + 1 }]),
+      standings: Array.from({ length: 10 }, (_, idx) => ({ teamIdx: idx, w: idx === 0 ? 1 : 0, l: idx === 1 ? 1 : 0 })),
+      currentWeek: 1,
+      currentDay: 2,
+      updatedAt: 2000
+    },
+    'local_draft_reload'
+  ),
+  false,
+  'reload should not prefer a stale fresh Day 1 local handoff over advanced cloud progress'
+);
 
 createdSimulationAdapters = [];
 const legacySinglePlayerResume = toPlain(api.resolveLocalSavedSeasonAutoLoad({
@@ -3409,6 +3437,7 @@ api.setSeasonModeAdapter(simulationAdapterStub);
 api.setData({
   activeSeasonBackend: 'simulation',
   historicalUniverseSlotId: 'legacy-unified-slot',
+  isFreshDraftLaunch: true,
   leagueShell: {
     sport: 'nba',
     teams: [{ abbr: 'LAL' }, { abbr: 'BOS' }, { abbr: 'CHI' }]
@@ -3466,6 +3495,7 @@ assert.equal(api.getGame().day, 13, 'adapter-backed unified progression should r
 assert.equal(api.getData().seasonState?.currentDay, 13, 'adapter-backed unified progression should keep D synchronized with the advanced simulation state');
 assert.equal(api.getData().activeSeasonBackend, 'simulation', 'adapter-backed unified progression should keep D explicitly marked as simulation-backed');
 assert.equal(api.getData().legacyHistoricalStatMode, false, 'adapter-backed unified progression should keep replay-era legacy flags cleared on persisted simulation state');
+assert.equal(api.getData().isFreshDraftLaunch, false, 'adapter-backed unified progression should stop treating saved progress as a fresh draft handoff');
 assert.equal(Object.prototype.toString.call(api.getGame().processed), '[object Set]', 'adapter-backed unified progression should preserve the legacy processed tracker as a Set');
 assert.deepStrictEqual(Array.from(api.getGame().processed), [], 'adapter-backed unified progression should clear stale legacy processed markers when the adapter state does not carry them forward');
 assert.deepStrictEqual(toPlain(api.getGame().dayResults), {}, 'adapter-backed unified progression should clear stale legacy reveal-day caches');

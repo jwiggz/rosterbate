@@ -4945,7 +4945,8 @@ function shouldPreferLocalLeagueData(localData, remoteData, requestedLeagueId){
   const localRostered=getLeagueRosteredPlayerCount(localData);
   const remoteRostered=getLeagueRosteredPlayerCount(remoteData);
   if(localRostered > remoteRostered) return true;
-  if(isFreshDayOneLeagueState(localData) && !isFreshDayOneLeagueState(remoteData)) return true;
+  if(!isFreshDayOneLeagueState(localData) && isFreshDayOneLeagueState(remoteData)) return true;
+  if(isFreshDayOneLeagueState(localData) && !isFreshDayOneLeagueState(remoteData)) return false;
   const localTs=getLeagueFreshnessTs(localData);
   const remoteTs=getLeagueFreshnessTs(remoteData);
   if(localTs && remoteTs && localTs > remoteTs + 1000) return true;
@@ -5448,6 +5449,7 @@ async function saveSharedSeason(force, reason){
 function syncGameStateToD() {
   if (!G || !D) return;
   const isSimulationBackendSeason = getActiveSeasonBackend()==='simulation';
+  if (D.isFreshDraftLaunch) D.isFreshDraftLaunch = false;
   
   // Sync current game state
   D.currentWeek = G.week;
