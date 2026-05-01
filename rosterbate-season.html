@@ -2983,6 +2983,7 @@ function buildUnifiedSimulationBootState(rawState, slotId, requestedSport){
     activeSeasonBackend:'simulation',
     legacyHistoricalStatMode:false,
     sport:targetSport,
+    localLeagueId:String(baseState?.localLeagueId || baseState?.sourceLeagueId || baseState?.seasonId || baseState?.leagueId || '').trim() || null,
     historicalUniverseSlotId:String(slotId || baseState?.historicalUniverseSlotId || baseState?.slotId || '').trim() || null
   };
   if(typeof runtimeApi?.buildUnifiedSimulationSeasonState==='function'){
@@ -4005,6 +4006,9 @@ function buildLocalSimulationResumePointer(state){
     sharedSimulationSlotId:slotId,
     resumeHistoricalUniverseSlotId:slotId,
     localResumePointer:true,
+    seasonId:String(state?.seasonId || state?.localLeagueId || '').trim() || undefined,
+    leagueId:String(state?.leagueId || state?.localLeagueId || state?.seasonId || '').trim() || undefined,
+    localLeagueId:String(state?.localLeagueId || state?.sourceLeagueId || state?.seasonId || state?.leagueId || '').trim() || undefined,
     leagueName:String(state?.leagueName || state?.leagueShell?.anchorSeasonLabel || 'Local League').trim(),
     teamName:String(state?.teamName || '').trim(),
     currentWeek:Number(seasonState.currentWeek || state?.currentWeek || 1) || 1,
@@ -4149,6 +4153,7 @@ function buildSharedSimulationPersistenceState(rawState, shellState, gameState){
     ...baseStateWithoutLegacyShellCaches,
     activeSeasonBackend: 'simulation',
     legacyHistoricalStatMode: false,
+    localLeagueId: String(baseState?.localLeagueId || baseState?.sourceLeagueId || shell?.localLeagueId || shell?.sourceLeagueId || shell?.seasonId || shell?.leagueId || '').trim() || null,
     draftState,
     seasonState,
     currentWeek: shellWeek,
@@ -4209,6 +4214,7 @@ function normalizeSharedSimulationSeasonBootState(state, slotId){
   const currentDay=Math.max(1, Number(rawState?.seasonState?.currentDay || rawState?.currentDay || 1) || 1);
   const currentWeek=Math.max(1, Number(rawState?.seasonState?.currentWeek || rawState?.currentWeek || 1) || 1);
   const seasonId=String(rawState?.seasonId || rawState?.leagueId || (stableSlotId ? ('simulation:' + stableSlotId) : 'simulation:shared-season')).trim();
+  const localLeagueId=String(rawState?.localLeagueId || rawState?.sourceLeagueId || rawState?.seasonId || rawState?.leagueId || '').trim() || null;
   const runtimeApi=window.RosterBateSimulationModeRuntime;
   const starterSlots=(function(){
     try{
@@ -4314,6 +4320,7 @@ function normalizeSharedSimulationSeasonBootState(state, slotId){
     historicalEntryMode: String(rawState?.historicalEntryMode || 'simulation_season').trim() || 'simulation_season',
     seasonId,
     leagueId: seasonId,
+    localLeagueId,
     historicalUniverseSlotId: stableSlotId || null,
     sharedSimulationSlotId: stableSlotId || null,
     leagueName: String(rawState?.leagueName || rawState?.leagueShell?.anchorSeasonLabel || (sport==='nfl' ? 'NFL Local League' : 'NBA Local League')).trim() || (sport==='nfl' ? 'NFL Local League' : 'NBA Local League'),
@@ -4811,6 +4818,8 @@ function doesSavedSeasonMatchRequestedLeague(data, requestedLeagueId){
   const ids=[
     normalized.seasonId,
     normalized.leagueId,
+    normalized.localLeagueId,
+    normalized.sourceLeagueId,
     normalized.historicalUniverseSlotId,
     normalized.slotId,
     normalized.resumeHistoricalUniverseSlotId

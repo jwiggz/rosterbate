@@ -2839,6 +2839,7 @@ assert.equal(compactLocalDraftResume.activeSeasonMode, 'simulation', 'league URL
 assert.equal(compactLocalDraftResume.backend, 'simulation', 'league URL reloads should keep compact simulation drafts on the simulation backend');
 assert.equal(compactLocalDraftResume.state.allRosters.length, 2, 'league URL reloads should hydrate top-level rosters from compact draftState rosters');
 assert.equal(compactLocalDraftResume.state.allRosters[0][0].name, 'Michael Jordan', 'league URL reloads should keep roster players during hydration');
+assert.equal(compactLocalDraftResume.state.localLeagueId, 'local_draft_reload', 'league URL reloads should preserve the original local draft league id as a resume alias');
 assert.equal(createdSimulationAdapters.length, 1, 'league URL reloads should rebuild a simulation adapter for compact draft saves');
 
 const compactCompleteLocalLeague = {
@@ -2871,6 +2872,11 @@ assert.equal(
   api.doesSavedSeasonMatchRequestedLeague({ leagueId: 'local_draft_reload' }, 'local_draft_reload'),
   true,
   'league URL fallback should auto-load matching local league ids'
+);
+assert.equal(
+  api.doesSavedSeasonMatchRequestedLeague({ seasonId: 'simulation:shared-season', localLeagueId: 'local_draft_reload' }, 'local_draft_reload'),
+  true,
+  'league URL fallback should accept simulation-normalized states that preserve the original local draft id'
 );
 assert.equal(
   api.shouldPreferLocalLeagueData(compactCompleteLocalLeague, staleCloudLeague, 'local_draft_reload'),
