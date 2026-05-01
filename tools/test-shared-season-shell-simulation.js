@@ -1317,6 +1317,7 @@ assert.match(html, /function renderSimulationWaiverInSharedShell\(/, 'season she
 assert.match(html, /function renderSimulationTradesInSharedShell\(/, 'season shell should add a simulation trade renderer');
 assert.match(html, /function openSimulationTradeBuilderModal\(partnerAbbr\)/, 'simulation Trade Desk should expose a trade builder modal opener');
 assert.match(html, /function closeSimulationTradeBuilderModal\(\)/, 'simulation Trade Desk should expose a trade builder modal closer');
+assert.match(html, /function renderSimulationTradeBuilderPlayerOption\(player, side, partnerAbbr\)/, 'simulation Trade Desk should render modal player checkbox options');
 assert.match(html, /function renderSimulationTradeBuilderModal\(partnerAbbr\)/, 'simulation Trade Desk should render a package trade modal');
 assert.match(html, /function updateSimulationTradeBuilderPreview\(partnerAbbr\)/, 'simulation Trade Desk should update package preview from modal selections');
 assert.match(html, /function applySimulationTradeBuilderPackage\(partnerAbbr\)/, 'simulation Trade Desk should apply package trades from the modal');
