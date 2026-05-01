@@ -1205,7 +1205,8 @@ function commitLiveMatchupResult() {
 }
 
 function stageLiveMatchupReturnIntent() {
-  if (!liveMatchupMode || liveMatchupEmbedded || !liveMatchupAutoFinishDayOnReturn || !liveMatchupSlotId) return;
+  const returnsToSeason = /(?:^|\/)rosterbate-season\.html(?:[?#]|$)/i.test(String(liveMatchupReturnUrl || ''));
+  if (!liveMatchupMode || liveMatchupEmbedded || !liveMatchupSlotId || (!liveMatchupAutoFinishDayOnReturn && !returnsToSeason)) return;
   try {
     sessionStorage.setItem(RB_SIM_LIVE_RETURN_KEY, JSON.stringify({
       slotId: liveMatchupSlotId,

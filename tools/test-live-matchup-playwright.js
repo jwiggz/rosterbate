@@ -597,6 +597,46 @@ async function smokeLeagueUrlLiveReturnAdvancesDay(browser) {
   await page.close();
 }
 
+async function smokeLegacyFullPageLiveReturnAdvancesDay(browser) {
+  const slotId = `${SLOT_ID}-legacy-full-page-return`;
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = await attachErrorCapture(page, 'legacy-full-page-live-return');
+  await seedLiveMatchupSeason(page, slotId);
+
+  const returnUrl = `/rosterbate-season.html?sport=nba&simulation=nba_mixed_era&historicalUniverse=${encodeURIComponent(slotId)}`;
+  await page.goto(
+    `${BASE_URL}/sim-matchup.html?sport=nba&historicalUniverse=${encodeURIComponent(slotId)}&day=1&homeAbbr=LAL&awayAbbr=BOS&returnUrl=${encodeURIComponent(returnUrl)}`,
+    { waitUntil: 'domcontentloaded', timeout: 20000 }
+  );
+  await page.locator('#btn-reveal-final').click({ timeout: 5000 });
+  await page.waitForFunction(
+    () => (
+      !document.querySelector('#overlay')?.classList.contains('hidden') &&
+      document.querySelector('#overlay-title')?.textContent === 'FINAL'
+    ),
+    null,
+    { timeout: 5000 }
+  );
+  await page.locator('#overlay-btn').click();
+  await page.waitForURL(/rosterbate-season\.html/, { timeout: 10000 });
+  await page.waitForTimeout(1500);
+
+  const persisted = await page.evaluate((targetSlotId) => {
+    const slotRaw = localStorage.getItem(`rbHistoricalUniverseState:${targetSlotId}`);
+    const slot = slotRaw ? JSON.parse(slotRaw) : null;
+    return {
+      currentDay: Number(slot?.seasonState?.currentDay || 0),
+      completedDayOneGames: (slot?.seasonState?.completedGameLogs || []).filter((game) => Number(game?.day || 0) === 1).length,
+      text: document.body.innerText
+    };
+  }, slotId);
+  assert.equal(persisted.currentDay, 2, 'legacy full-page live return URLs should advance to Day 2 even without an auto-finish query flag');
+  assert.equal(persisted.completedDayOneGames, 2, 'legacy full-page live return URLs should settle every Day 1 matchup');
+  assert.match(persisted.text, /Reveal Day 2|Day 2/i, 'legacy full-page live return URLs should render Day 2 copy');
+  assert.deepStrictEqual(errors, []);
+  await page.close();
+}
+
 async function smokeLiveMatchupInstantReveal(browser) {
   const slotId = `${SLOT_ID}-instant`;
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -920,6 +960,7 @@ async function main() {
     await smokeHubRevealModalFinishesMultiGameDay(browser);
     await smokeHubRevealModalAdvancesSingleGameDay(browser);
     await smokeLeagueUrlLiveReturnAdvancesDay(browser);
+    await smokeLegacyFullPageLiveReturnAdvancesDay(browser);
     await smokeLiveMatchupInstantReveal(browser);
     await smokeLiveMatchupMobileControls(browser);
     await smokeSeasonMatchupMobilePartialDay(browser);
