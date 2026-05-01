@@ -393,7 +393,7 @@ const players = {
 };
 
 const rosters = {
-  0: [11, 12, 32],
+  0: [11, 12, 32, 14],
   1: [21, 22, 31]
 };
 
@@ -528,6 +528,8 @@ const oneForThree = context.evaluateTradePackageFairness({
 assert.equal(oneForThree.supported, true);
 assert.equal(oneForThree.dropPressureForFrom, 2);
 assert.equal(oneForThree.likelyDropsForFrom.length, 2);
+assert.equal(oneForThree.likelyDropsForFrom[0].player.name, 'Deep Bench Guard');
+assert.equal(oneForThree.likelyDropsForFrom[1].player.name, 'Low Bench Wing');
 assert.match(oneForThree.message, /likely drop/i);
 
 const fiveForFive = context.evaluateTradePackageFairness({
@@ -541,6 +543,28 @@ assert.equal(fiveForFive.openSlotsForFrom, 0);
 assert.equal(fiveForFive.dropPressureForFrom, 0);
 assert.equal(fiveForFive.fillInsForFrom.length, 0);
 assert.equal(fiveForFive.likelyDropsForFrom.length, 0);
+
+const threeForOneCard = context.renderTradeFairnessCard({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [11, 12, 13],
+  get: [21]
+});
+assert.match(threeForOneCard, /Waiver Starter/i);
+assert.match(threeForOneCard, /Waiver Guard/i);
+assert.match(threeForOneCard, /2 waiver fill-ins/i);
+assert.match(threeForOneCard, /Team 1 receives/i);
+
+const oneForThreeCard = context.renderTradeFairnessCard({
+  fromTeam: 0,
+  toTeam: 1,
+  give: [21],
+  get: [11, 12, 13]
+});
+assert.match(oneForThreeCard, /Likely Drops/i);
+assert.match(oneForThreeCard, /Deep Bench Guard/i);
+assert.match(oneForThreeCard, /Low Bench Wing/i);
+assert.match(oneForThreeCard, /likely drop/i);
 
 const supportedCard = context.renderTradeFairnessCard({
   fromTeam: 0,

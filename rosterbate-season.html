@@ -15620,13 +15620,19 @@ function buildTradeFairnessReasons(result){
     const reasons=[];
     const gap=Number(result.adjustedGap||0);
     const favoredLabel=result.favoredTeam==null ? 'Neither side' : `Team ${Number(result.favoredTeam)+1}`;
+    const fillIns=(result.fillInsForFrom||[]).concat(result.fillInsForTo||[]);
+    const drops=(result.likelyDropsForFrom||[]).concat(result.likelyDropsForTo||[]);
+    const describeRead=read=>`${read?.label || 'player'} (${Number(read?.value||0).toFixed(1)} FP)`;
     if(gap<=4){
-      reasons.push('Package value is close after counting the waiver replacement slot.');
+      reasons.push('Package value is close after counting roster slot adjustments.');
     }else{
       reasons.push(`${favoredLabel} still has the stronger adjusted package by ${gap.toFixed(1)} FP.`);
     }
-    if(Number(result.fromOpenSlots||0)>0 || Number(result.toOpenSlots||0)>0){
-      reasons.push(`Waiver replacement adds ${result.replacement?.label || 'the best waiver player'} at ${Number(result.replacement?.value||0).toFixed(1)} FP for the team taking fewer players.`);
+    if(fillIns.length){
+      reasons.push(`Waiver replacement fill-ins counted: ${fillIns.map(describeRead).join(', ')}.`);
+    }
+    if(drops.length){
+      reasons.push(`Likely drops counted: ${drops.map(describeRead).join(', ')}.`);
     }
     reasons.push('Use this as a package read, then sanity-check roster fit before sending.');
     return reasons.filter(Boolean).slice(0,4);
@@ -15686,6 +15692,8 @@ function getTradeFairnessViewModel(offer){
     message:result.message || '',
     reasons,
     replacement:result.replacement || null,
+    fillIns:(result.fillInsForFrom||[]).concat(result.fillInsForTo||[]),
+    likelyDrops:(result.likelyDropsForFrom||[]).concat(result.likelyDropsForTo||[]),
     result
   };
 }
@@ -15749,13 +15757,33 @@ function renderTradeFairnessCard(offer, options={}){
     </div>
     <div style="font-family:var(--fb);font-size:13px;font-weight:800;color:#38bdf8;">${Number(vm.replacement.value||0).toFixed(1)} FP</div>
   </div>` : '';
+  const renderAdjustmentSection=(label, reads, color)=>Array.isArray(reads) && reads.length ? `<div style="margin-top:9px;border:1px solid rgba(96,165,250,.22);background:rgba(15,23,42,.62);border-radius:10px;padding:9px 10px;">
+    <div style="font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${color};">${label}</div>
+    <div style="margin-top:7px;display:grid;gap:6px;">
+      ${reads.map(read=>{
+        const player=read?.player || {};
+        return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div>
+            <div style="font-size:12px;color:#f8fafc;font-weight:800;">${read?.label || player.name || 'Player'}</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${player.team || '--'} · ${player.pos || player.position || 'UTIL'}</div>
+          </div>
+          <div style="font-family:var(--fb);font-size:13px;font-weight:800;color:${color};white-space:nowrap;">${Number(read?.value||0).toFixed(1)} FP</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>` : '';
+  const packageAdjustments=vm.result?.packageRead
+    ? renderAdjustmentSection('Waiver Fill-Ins', vm.fillIns, '#38bdf8') + renderAdjustmentSection('Likely Drops', vm.likelyDrops, '#fbbf24')
+    : replacement;
+  const packageMessage=vm.message ? `<div style="margin-top:8px;font-size:11px;color:#cbd5e1;line-height:1.5;">${vm.message}</div>` : '';
   const reasonList=(vm.reasons||[]).slice(0,4).map(reason=>`<li style="font-size:11px;color:#cbd5e1;line-height:1.45;">${reason}</li>`).join('');
   return `<div style="margin-top:10px;border:1px solid ${config.border};background:${config.background};border-radius:10px;padding:10px 11px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
       <div style="font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f8fafc;">${config.title}</div>
       <span class="season-stat-pill" style="${toneStyles[vm.badgeTone]||toneStyles.neutral}">${vm.badgeLabel}</span>
     </div>
-    ${replacement}
+    ${packageMessage}
+    ${packageAdjustments}
     <ul style="margin:8px 0 0 16px;padding:0;display:grid;gap:5px;">${reasonList}</ul>
     <div style="margin-top:8px;font-size:10px;color:#94a3b8;line-height:1.45;">${config.note}</div>
   </div>`;
