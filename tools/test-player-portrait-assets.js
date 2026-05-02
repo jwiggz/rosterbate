@@ -53,6 +53,12 @@ assert.equal(
   'assets/player-portraits/michael-jordan.png',
   'registered portrait URLs should win over generated fallbacks'
 );
+storage.set('rbPlayerPortraitOverrides', JSON.stringify({ 'michael jordan|chi': 'assets/player-portraits/michael-jordan-override.png' }));
+assert.equal(
+  portraits.getPortraitUrl({ name: 'Michael Jordan', team: 'CHI' }),
+  'assets/player-portraits/michael-jordan-override.png',
+  'localStorage portrait overrides should win over registered manifest URLs'
+);
 portraits.register({ 'Shai Gilgeous Alexander': 'assets/player-portraits/shai-gilgeous-alexander-1628983.jpg' });
 assert.equal(
   portraits.getPortraitUrl({ name: 'Shai Gilgeous-Alexander', team: 'OKC' }),

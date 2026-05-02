@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RosterBate Portrait Manifest Lab</title>
+<script src="player-portrait-assets.js"></script>
+<style>
+  :root {
+    --bg: #070a12;
+    --panel: #101621;
+    --panel-strong: #151d2b;
+    --line: #2a3445;
+    --text: #f7f3e8;
+    --muted: #a9b4c4;
+    --accent: #19c28c;
+    --accent-2: #f6a344;
+    --danger: #ef6351;
+    --field: #0b111b;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .28);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 18% 10%, rgba(246, 163, 68, .16), transparent 26%),
+      radial-gradient(circle at 82% 20%, rgba(25, 194, 140, .12), transparent 24%),
+      linear-gradient(135deg, #070a12 0%, #11151b 52%, #15100b 100%);
+    color: var(--text);
+    font-family: "Arial Narrow", "Bahnschrift", "Segoe UI", sans-serif;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    border: 1px solid var(--line);
+    background: #162033;
+    color: var(--text);
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button:hover,
+  button:focus-visible {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  button.primary {
+    background: linear-gradient(135deg, #0c7357, #129b72);
+    border-color: #2dd4a3;
+  }
+
+  button.warn {
+    border-color: rgba(239, 99, 81, .55);
+    color: #ffd8d1;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--field);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 10px 11px;
+  }
+
+  textarea {
+    min-height: 260px;
+    resize: vertical;
+    font-family: Consolas, "Courier New", monospace;
+    line-height: 1.4;
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .page-shell {
+    width: min(1500px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 28px 0 40px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 16px 0 22px;
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #ef7d27, #ffd064);
+    color: #15100b;
+    font-weight: 900;
+    box-shadow: var(--shadow);
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(24px, 3vw, 42px);
+    line-height: 1;
+    font-weight: 900;
+  }
+
+  h2 {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .status-pill {
+    flex: 0 0 auto;
+    border: 1px solid rgba(25, 194, 140, .45);
+    border-radius: 999px;
+    padding: 8px 12px;
+    color: #b9f8de;
+    background: rgba(25, 194, 140, .08);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .tool-grid {
+    display: grid;
+    grid-template-columns: minmax(310px, .78fr) minmax(440px, 1.2fr) minmax(330px, .82fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .panel {
+    border: 1px solid var(--line);
+    background: rgba(16, 22, 33, .88);
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0));
+  }
+
+  .panel-body {
+    padding: 16px;
+  }
+
+  .field-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .inline-grid {
+    display: grid;
+    grid-template-columns: 1fr 110px;
+    gap: 10px;
+  }
+
+  .action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .preview-box {
+    display: grid;
+    grid-template-columns: 116px 1fr;
+    gap: 14px;
+    align-items: center;
+    min-height: 158px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(0, 0, 0, .18);
+    border-radius: 8px;
+  }
+
+  .preview-frame {
+    width: 108px;
+    height: 128px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #f6f7fb;
+    overflow: hidden;
+  }
+
+  .preview-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-meta {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .preview-meta code,
+  .candidate-list code,
+  .manifest-card code {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #d8fce9;
+    background: rgba(25, 194, 140, .08);
+    border: 1px solid rgba(25, 194, 140, .18);
+    border-radius: 5px;
+    padding: 5px 7px;
+  }
+
+  .candidate-list {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .manifest-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .manifest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+    max-height: 690px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .manifest-card {
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    background: rgba(255, 255, 255, .045);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: left;
+  }
+
+  .manifest-card button {
+    width: 100%;
+  }
+
+  .manifest-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    background: #f5f6f9;
+    object-fit: cover;
+  }
+
+  .small-muted {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .count {
+    color: var(--accent-2);
+    font-weight: 900;
+  }
+
+  @media (max-width: 1120px) {
+    .tool-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .manifest-panel {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .page-shell {
+      width: min(100% - 18px, 720px);
+      padding-top: 12px;
+    }
+
+    .topbar,
+    .preview-box,
+    .manifest-toolbar,
+    .inline-grid,
+    .tool-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .topbar {
+      display: grid;
+      align-items: start;
+    }
+
+    .status-pill {
+      width: max-content;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="page-shell">
+  <header class="topbar">
+    <div class="brand-lockup">
+      <div class="brand-mark">RB</div>
+      <div>
+        <h1>Portrait Manifest Lab</h1>
+        <p class="small-muted">assets/player-portraits/manifest.json</p>
+      </div>
+    </div>
+    <div id="status" class="status-pill">Booting</div>
+  </header>
+
+  <section class="tool-grid" aria-label="Portrait manifest helper">
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Lookup</h2>
+        <span id="candidate-count" class="small-muted">0 keys</span>
+      </div>
+      <div class="panel-body">
+        <div class="field-grid">
+          <label>
+            Player
+            <input id="portrait-player-name" type="text" value="Shai Gilgeous-Alexander" autocomplete="off">
+          </label>
+          <div class="inline-grid">
+            <label>
+              Team
+              <input id="portrait-team" type="text" value="OKC" maxlength="5" autocomplete="off">
+            </label>
+            <label>
+              ID
+              <input id="portrait-id" type="text" autocomplete="off">
+            </label>
+          </div>
+          <label>
+            Mapping Key
+            <select id="portrait-key"></select>
+          </label>
+          <label>
+            Portrait URL
+            <input id="portrait-url" type="text" value="assets/player-portraits/shai-gilgeous-alexander-1628983.jpg" autocomplete="off">
+          </label>
+        </div>
+        <div class="action-row">
+          <button id="add-override" class="primary" type="button">Save Override</button>
+          <button id="copy-entry" type="button">Copy Entry</button>
+        </div>
+        <div class="preview-box">
+          <div id="portrait-preview" class="preview-frame"></div>
+          <div class="preview-meta">
+            <h3 id="preview-title">Shai Gilgeous-Alexander</h3>
+            <p id="preview-subtitle" class="small-muted">Resolved portrait</p>
+            <code id="resolved-url"></code>
+          </div>
+        </div>
+        <div id="candidate-list" class="candidate-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel manifest-panel">
+      <div class="panel-header">
+        <h2>Manifest Preview</h2>
+        <span id="manifest-count" class="count">0</span>
+      </div>
+      <div class="panel-body">
+        <div class="manifest-toolbar">
+          <input id="manifest-search" type="search" placeholder="Search manifest keys or URLs" autocomplete="off">
+          <button id="reload-manifest" type="button">Reload</button>
+        </div>
+        <div id="manifest-grid" class="manifest-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Overrides</h2>
+        <span id="override-count" class="count">0</span>
+      </div>
+      <div class="panel-body">
+        <label>
+          JSON
+          <textarea id="override-json" spellcheck="false">{}</textarea>
+        </label>
+        <div class="action-row">
+          <button id="save-json" class="primary" type="button">Save JSON</button>
+          <button id="format-json" type="button">Format</button>
+          <button id="copy-json" type="button">Copy JSON</button>
+          <button id="clear-overrides" class="warn" type="button">Clear</button>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script>
+(function initPortraitManifestDevHelper() {
+  'use strict';
+
+  const MANIFEST_URL = 'assets/player-portraits/manifest.json';
+  const STORAGE_KEY = 'rbPlayerPortraitOverrides';
+  const portraits = window.RosterBatePlayerPortraits;
+  let manifestPlayers = {};
+
+  const $ = (id) => document.getElementById(id);
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function setStatus(message, tone) {
+    const status = $('status');
+    status.textContent = message;
+    status.style.borderColor = tone === 'bad' ? 'rgba(239, 99, 81, .65)' : 'rgba(25, 194, 140, .45)';
+    status.style.color = tone === 'bad' ? '#ffd8d1' : '#b9f8de';
+  }
+
+  function readOverrides() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function writeOverrides(overrides) {
+    const clean = Object.fromEntries(Object.entries(overrides || {})
+      .filter(([key, value]) => key && typeof value === 'string' && value.trim())
+      .sort(([a], [b]) => a.localeCompare(b)));
+    if (Object.keys(clean).length) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(clean, null, 2));
+    } else {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+    renderOverrides();
+    refreshLookup();
+    return clean;
+  }
+
+  function normalizeManifest(manifest) {
+    if (!manifest || typeof manifest !== 'object') return {};
+    const source = manifest.players || manifest.portraits || manifest;
+    if (Array.isArray(source)) {
+      return source.reduce((acc, entry) => {
+        if (!entry || typeof entry !== 'object') return acc;
+        const url = entry.url || entry.src || entry.portraitUrl || entry.imageUrl;
+        const name = entry.name || entry.playerName || entry.fullName;
+        const team = entry.team || entry.teamCode || entry.abbr;
+        const id = entry.id || entry.playerId || entry.slug;
+        if (typeof url !== 'string' || !url.trim()) return acc;
+        if (id) acc[`id:${String(id).trim().toLowerCase()}`] = url.trim();
+        if (name && team) acc[`${name}|${team}`] = url.trim();
+        else if (name) acc[name] = url.trim();
+        return acc;
+      }, {});
+    }
+    return Object.fromEntries(Object.entries(source)
+      .filter(([key, value]) => key && typeof value === 'string' && value.trim()));
+  }
+
+  function keyToPlayer(key) {
+    if (String(key).startsWith('id:')) return { name: '', team: '', id: String(key).slice(3) };
+    const parts = String(key || '').split('|');
+    return { name: parts[0] || '', team: parts[1] || '', id: '' };
+  }
+
+  function buildPlayer() {
+    return {
+      name: $('portrait-player-name').value.trim() || 'Player',
+      team: $('portrait-team').value.trim().toUpperCase(),
+      id: $('portrait-id').value.trim()
+    };
+  }
+
+  function updateKeySelect(candidates) {
+    const select = $('portrait-key');
+    const previous = select.value;
+    select.innerHTML = candidates
+      .map((candidate) => `<option value="${escapeHtml(candidate)}">${escapeHtml(candidate)}</option>`)
+      .join('');
+    if (previous && candidates.includes(previous)) select.value = previous;
+  }
+
+  function refreshLookup() {
+    const player = buildPlayer();
+    const candidates = portraits && typeof portraits._keyCandidates === 'function'
+      ? portraits._keyCandidates(player)
+      : [];
+    updateKeySelect(candidates);
+    $('candidate-count').textContent = `${candidates.length} keys`;
+    $('candidate-list').innerHTML = candidates.map((candidate) => `<code>${escapeHtml(candidate)}</code>`).join('');
+
+    const resolved = portraits && typeof portraits.getPortraitUrl === 'function'
+      ? portraits.getPortraitUrl(player)
+      : '';
+    $('preview-title').textContent = player.name;
+    $('preview-subtitle').textContent = player.team ? `${player.team} lookup` : 'Name-only lookup';
+    $('resolved-url').textContent = resolved;
+    $('portrait-preview').innerHTML = resolved
+      ? `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(player.name)} portrait">`
+      : '';
+  }
+
+  function renderOverrides() {
+    const overrides = readOverrides();
+    const count = Object.keys(overrides).length;
+    $('override-count').textContent = String(count);
+    $('override-json').value = JSON.stringify(overrides, null, 2);
+  }
+
+  function renderManifest() {
+    const query = $('manifest-search').value.trim().toLowerCase();
+    const rows = Object.entries(manifestPlayers)
+      .filter(([key, url]) => !query || `${key} ${url}`.toLowerCase().includes(query))
+      .sort(([a], [b]) => a.localeCompare(b));
+    $('manifest-count').textContent = String(rows.length);
+    $('manifest-grid').innerHTML = rows.map(([key, url]) => `
+      <article class="manifest-card">
+        <img class="manifest-thumb" src="${escapeHtml(url)}" alt="${escapeHtml(key)} portrait" loading="lazy" decoding="async">
+        <h3>${escapeHtml(key)}</h3>
+        <code>${escapeHtml(url)}</code>
+        <button type="button" data-manifest-key="${escapeHtml(key)}">Use</button>
+      </article>
+    `).join('');
+  }
+
+  async function loadManifest() {
+    try {
+      const response = await fetch(MANIFEST_URL, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const manifest = await response.json();
+      manifestPlayers = normalizeManifest(manifest);
+      if (portraits && typeof portraits.applyManifest === 'function') portraits.applyManifest(manifest);
+      renderManifest();
+      refreshLookup();
+      setStatus(`Loaded ${Object.keys(manifestPlayers).length} portraits`);
+    } catch (error) {
+      manifestPlayers = {};
+      renderManifest();
+      setStatus(`Manifest unavailable: ${error.message}`, 'bad');
+    }
+  }
+
+  function saveCurrentOverride() {
+    const key = $('portrait-key').value.trim();
+    const url = $('portrait-url').value.trim();
+    const overrides = readOverrides();
+    if (key && url) overrides[key] = url;
+    const clean = writeOverrides(overrides);
+    setStatus(`Saved ${Object.keys(clean).length} override(s)`);
+  }
+
+  function copyText(value) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(value);
+    }
+    const area = document.createElement('textarea');
+    area.value = value;
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand('copy');
+    area.remove();
+    return Promise.resolve();
+  }
+
+  function bindEvents() {
+    ['portrait-player-name', 'portrait-team', 'portrait-id'].forEach((id) => {
+      $(id).addEventListener('input', refreshLookup);
+    });
+    $('portrait-key').addEventListener('change', refreshLookup);
+    $('add-override').addEventListener('click', saveCurrentOverride);
+    $('reload-manifest').addEventListener('click', loadManifest);
+    $('manifest-search').addEventListener('input', renderManifest);
+    $('save-json').addEventListener('click', () => {
+      try {
+        writeOverrides(JSON.parse($('override-json').value || '{}'));
+        setStatus('Override JSON saved');
+      } catch (error) {
+        setStatus(`Invalid JSON: ${error.message}`, 'bad');
+      }
+    });
+    $('format-json').addEventListener('click', renderOverrides);
+    $('copy-json').addEventListener('click', () => {
+      copyText($('override-json').value).then(() => setStatus('Override JSON copied'));
+    });
+    $('copy-entry').addEventListener('click', () => {
+      const key = $('portrait-key').value.trim();
+      const url = $('portrait-url').value.trim();
+      copyText(JSON.stringify({ [key]: url }, null, 2)).then(() => setStatus('Entry copied'));
+    });
+    $('clear-overrides').addEventListener('click', () => {
+      writeOverrides({});
+      setStatus('Overrides cleared');
+    });
+    $('manifest-grid').addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-manifest-key]');
+      if (!button) return;
+      const key = button.getAttribute('data-manifest-key');
+      const player = keyToPlayer(key);
+      $('portrait-player-name').value = player.name;
+      $('portrait-team').value = player.team;
+      $('portrait-id').value = player.id;
+      $('portrait-url').value = manifestPlayers[key] || '';
+      refreshLookup();
+    });
+  }
+
+  bindEvents();
+  renderOverrides();
+  refreshLookup();
+  loadManifest();
+})();
+</script>
+</body>
+</html>

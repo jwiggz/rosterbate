@@ -118,8 +118,10 @@
     const keys = keyCandidates(player);
     const overrides = readOverrideRegistry();
     for (const key of keys) {
-      if (registry[key]) return registry[key];
       if (overrides && typeof overrides[key] === 'string' && overrides[key].trim()) return overrides[key].trim();
+    }
+    for (const key of keys) {
+      if (registry[key]) return registry[key];
     }
     return '';
   }

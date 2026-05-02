@@ -32,6 +32,18 @@ Generate copyable prompts for the missing portraits:
 npm run portraits:prompts -- --limit 25
 ```
 
+Open the manifest helper:
+
+```bash
+npm run portraits:dev
+```
+
+Smoke-test the helper:
+
+```bash
+npm run test:portraits-dev
+```
+
 The coverage report prints the exact filename to use for each missing portrait. For example:
 
 ```text
