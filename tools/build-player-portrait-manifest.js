@@ -14,7 +14,8 @@ function parseArgs(argv) {
     check: false,
     force: false,
     json: false,
-    details: false
+    details: false,
+    mappings: []
   };
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index];
@@ -23,6 +24,9 @@ function parseArgs(argv) {
     else if (arg === '--force') args.force = true;
     else if (arg === '--json') args.json = true;
     else if (arg === '--details' || arg === '--plan') args.details = true;
+    else if (arg === '--set' || arg === '--map') args.mappings.push(parseManifestMapping(argv[++index]));
+    else if (arg.startsWith('--set=')) args.mappings.push(parseManifestMapping(arg.slice('--set='.length)));
+    else if (arg.startsWith('--map=')) args.mappings.push(parseManifestMapping(arg.slice('--map='.length)));
     else if (arg === '--dir') args.dir = path.resolve(argv[++index]);
     else if (arg.startsWith('--dir=')) args.dir = path.resolve(arg.slice('--dir='.length));
     else if (arg === '--manifest') args.manifest = path.resolve(argv[++index]);
@@ -47,9 +51,24 @@ function usage() {
     '  --write   Update manifest.json',
     '  --check   Exit non-zero if the manifest is missing discovered images',
     '  --force   Replace existing entries when discovered filenames collide',
+    '  --set     Add or update an explicit KEY=URL mapping',
     '  --json    Print summary as JSON',
     '  --details Print a per-file manifest action plan'
   ].join('\n');
+}
+
+function parseManifestMapping(value) {
+  const raw = String(value || '').trim();
+  const divider = raw.indexOf('=');
+  if (divider <= 0 || divider === raw.length - 1) {
+    throw new Error('Expected portrait mapping in KEY=URL form, such as "Michael Jordan|CHI=assets/player-portraits/michael-jordan.png"');
+  }
+  const key = raw.slice(0, divider).trim();
+  const url = raw.slice(divider + 1).trim().replace(/\\/g, '/');
+  if (!key || !url) {
+    throw new Error('Expected portrait mapping in KEY=URL form with a non-empty key and URL');
+  }
+  return { key, url };
 }
 
 function titleFromSlug(slug) {
@@ -117,6 +136,8 @@ function formatManifestChange(change) {
     line += ` (keeps existing ${existingUrl})`;
   } else if (change?.action === 'replace' && existingUrl) {
     line += ` (replaces ${existingUrl})`;
+  } else if (change?.action === 'set' && existingUrl) {
+    line += ` (updates ${existingUrl})`;
   }
   return line;
 }
@@ -147,6 +168,20 @@ function buildManifest(options = {}) {
       changes.push({ action: 'add', key: entry.key, url: entry.url });
     }
     players[entry.key] = entry.url;
+  }
+  const mappings = (options.mappings || [])
+    .map((mapping) => (typeof mapping === 'string' ? parseManifestMapping(mapping) : mapping))
+    .filter((mapping) => mapping && mapping.key && mapping.url)
+    .sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  for (const mapping of mappings) {
+    const key = String(mapping.key).trim();
+    const url = String(mapping.url).trim().replace(/\\/g, '/');
+    const existingUrl = players[key];
+    if (!key || !url || existingUrl === url) continue;
+    changes.push({ action: 'set', key, url, existingUrl });
+    if (existingUrl) replaced.push(key);
+    else added.push(key);
+    players[key] = url;
   }
   manifest.players = Object.fromEntries(Object.entries(players).sort(([a], [b]) => a.localeCompare(b)));
   const content = `${JSON.stringify(manifest, null, 2)}\n`;
@@ -195,5 +230,6 @@ module.exports = {
   discoverPortraits,
   entryFromFilename,
   formatManifestChange,
+  parseManifestMapping,
   titleFromSlug
 };

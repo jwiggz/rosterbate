@@ -14,6 +14,12 @@ Preview the exact manifest mappings before writing:
 npm run portraits:preview
 ```
 
+Add or update one explicit mapping without renaming the file:
+
+```bash
+node tools/build-player-portrait-manifest.js --set "Shai Gilgeous-Alexander|OKC=assets/player-portraits/shai-custom.png" --write
+```
+
 Import from Downloads or a batch folder:
 
 ```bash
