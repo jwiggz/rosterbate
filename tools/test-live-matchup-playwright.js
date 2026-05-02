@@ -241,7 +241,16 @@ async function smokeLiveMatchupWriteback(browser) {
       playerTotals: Array.from(playerTotals.values()),
       firstHalfCount: Array.isArray(liveRevealFirstHalfEvents) ? liveRevealFirstHalfEvents.length : 0,
       secondHalfCount: Array.isArray(liveRevealSecondHalfEvents) ? liveRevealSecondHalfEvents.length : 0,
-      zeroEvents: (liveRevealEvents || []).filter((event) => Number(event?.fpGain || 0) < 0.1).length
+      zeroEvents: (liveRevealEvents || []).filter((event) => Math.abs(Number(event?.fpGain || 0)) < 0.1).length,
+      courtTargetCount: window.RosterBateLiveCourtMotion?.buildLiveCourtTargets?.({
+        event: liveRevealEvents?.[0],
+        teamA,
+        teamB,
+        quarter: 1
+      })?.length || 0,
+      ballVisible: Boolean(document.querySelector('#ball-dot')) &&
+        getComputedStyle(document.querySelector('#ball-dot')).display !== 'none',
+      shotMarkerLayerExists: Boolean(document.querySelector('#shot-markers'))
     };
   });
   assert.equal(
@@ -252,6 +261,9 @@ async function smokeLiveMatchupWriteback(browser) {
   assert.ok(revealPlan.firstHalfCount > 0, 'live reveal should allocate first-half scoring events');
   assert.ok(revealPlan.secondHalfCount > 0, 'live reveal should reserve scoring events for the second half');
   assert.equal(revealPlan.zeroEvents, 0, 'live reveal event plan should not include rounded zero-value events');
+  assert.equal(revealPlan.courtTargetCount, 10, 'live reveal should choreograph all ten player dots for each event');
+  assert.equal(revealPlan.ballVisible, true, 'live reveal should render a visible ball target on the court');
+  assert.equal(revealPlan.shotMarkerLayerExists, true, 'live reveal court should include a shot marker layer');
 
   assert.equal(await page.locator('#team-a-name').textContent(), 'Los Angeles Lakers');
   assert.equal(await page.locator('#team-b-name').textContent(), 'Boston Celtics');

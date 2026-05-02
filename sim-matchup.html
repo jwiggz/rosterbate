@@ -505,8 +505,13 @@ body {
       <path d="M 580 80 Q 400 200 580 320" fill="none" stroke="#2d6b2d" stroke-width="1.5"/>
       <!-- Center dot -->
       <circle cx="300" cy="200" r="4" fill="#2d6b2d"/>
+      <g id="shot-markers"></g>
       <!-- Player dots group -->
       <g id="player-dots"></g>
+      <g id="ball-dot" transform="translate(300,200)">
+        <circle r="5" fill="#f97316" stroke="#7c2d12" stroke-width="1.5"/>
+        <path d="M -4 0 H 4 M 0 -4 V 4" stroke="#7c2d12" stroke-width="0.8" opacity="0.85"/>
+      </g>
     </svg>
   </div>
 
@@ -532,6 +537,8 @@ body {
 <script src="simulation-nfl-2014-schedule.js"></script>
 <script src="simulation-league-engine.js"></script>
 <script src="simulation-season-adapter.js"></script>
+<script src="live-matchup-reveal-engine.js"></script>
+<script src="live-matchup-court-motion.js"></script>
 <script>
 // ── Player data (embedded from sport-data-live.json top players) ──────────
 const PLAYER_POOL = [
@@ -582,6 +589,9 @@ let liveRevealFirstHalfInterval = 40;
 let liveRevealSecondHalfInterval = 40;
 let liveMatchupEmbedded = false;
 let liveMatchupAutoFinishDayOnReturn = false;
+let liveCourtPossessionSide = 'A';
+let liveCourtMotionState = null;
+let liveCourtTicksSinceFrame = 0;
 const RB_SIM_LIVE_RETURN_KEY = 'rbSimulationLiveMatchupReturn';
 // Which team currently has the ball
 let possession = 'A';
@@ -590,6 +600,7 @@ let possession = 'A';
 let attackingRight = true;
 const TICK_MS  = 80;   // real ms per sim tick
 const SIM_SECS = 4;    // sim seconds per tick (at 1x)
+const liveBall = { _x:300, _y:200, _targetX:300, _targetY:200, _motionSpeed:12 };
 
 // ── Full-court coordinate system (SVG 600×400) ────────────────────────────
 // Left basket:  x=55, y=200  — TeamB attacks this (TeamA defends)
@@ -645,6 +656,7 @@ function createDots(players, side, color, shortColor) {
     const pos = positions[i];
     p._x = pos.x; p._y = pos.y;
     p._targetX = pos.x; p._targetY = pos.y;
+    p._motionSpeed = 9;
     p._color = color;
     p._shortColor = shortColor;
     p._side = side;
@@ -681,6 +693,45 @@ function moveDot(player, x, y) {
   el.g.setAttribute("transform", `translate(${x},${y})`);
 }
 
+function moveBall(x, y) {
+  const el = document.getElementById('ball-dot');
+  if (!el) return;
+  el.setAttribute('transform', `translate(${x},${y})`);
+}
+
+function setCourtTarget(player, x, y, motionSpeed = 10) {
+  if (!player) return;
+  player._targetX = Math.max(25, Math.min(575, Number(x) || 300));
+  player._targetY = Math.max(35, Math.min(365, Number(y) || 200));
+  player._motionSpeed = Math.max(4, Math.min(18, Number(motionSpeed || 10)));
+}
+
+function setBallTarget(x, y, motionSpeed = 12) {
+  liveBall._targetX = Math.max(25, Math.min(575, Number(x) || 300));
+  liveBall._targetY = Math.max(35, Math.min(365, Number(y) || 200));
+  liveBall._motionSpeed = Math.max(6, Math.min(22, Number(motionSpeed || 12)));
+}
+
+function setBallVisible(visible) {
+  const el = document.getElementById('ball-dot');
+  if (el) el.style.display = visible ? '' : 'none';
+}
+
+function animateBall() {
+  const dx = liveBall._targetX - liveBall._x;
+  const dy = liveBall._targetY - liveBall._y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist < 2) {
+    liveBall._x = liveBall._targetX;
+    liveBall._y = liveBall._targetY;
+  } else {
+    const speed = Math.min(Math.max(6, Math.min(22, Number(liveBall._motionSpeed || 12))), dist);
+    liveBall._x += (dx / dist) * speed;
+    liveBall._y += (dy / dist) * speed;
+  }
+  moveBall(liveBall._x, liveBall._y);
+}
+
 function animateDots() {
   [...teamA, ...teamB].forEach(p => {
     if (!p._x) return;
@@ -692,17 +743,18 @@ function animateDots() {
       p._y = p._targetY;
     } else {
       // Move at up to 18px per tick — fast enough to cross the court in ~1.5s
-      const speed = Math.min(18, dist);
+      const maxSpeed = Math.max(4, Math.min(18, Number(p._motionSpeed || (liveMatchupMode ? 9 : 18))));
+      const speed = Math.min(maxSpeed, dist);
       p._x += (dx / dist) * speed;
       p._y += (dy / dist) * speed;
     }
     moveDot(p, p._x, p._y);
   });
+  animateBall();
 }
 
 function setRandomTarget(player) {
-  player._targetX = Math.max(25, Math.min(575, player._x + rnd(-25, 25)));
-  player._targetY = Math.max(25, Math.min(375, player._y + rnd(-20, 20)));
+  setCourtTarget(player, player._x + rnd(-25, 25), player._y + rnd(-20, 20), 6);
 }
 
 // ── Roster panels ─────────────────────────────────────────────────────────
@@ -1069,6 +1121,30 @@ function showScorePopup(player, fpGain) {
   setTimeout(()=>popup.remove(), 950);
 }
 
+function showLiveShotMarker(event, frame) {
+  const shot = frame?.shotTarget;
+  if (!shot || !event || Number(event?.fpGain || 0) < -0.05) return;
+  const layer = document.getElementById('shot-markers');
+  if (!layer) return;
+  const made = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  made.setAttribute("transform", `translate(${shot.x},${shot.y})`);
+  made.setAttribute("class", "shot-marker");
+  const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  ring.setAttribute("r", String(/three/i.test(String(shot.role || '')) ? 7 : 6));
+  ring.setAttribute("fill", "none");
+  ring.setAttribute("stroke", "#60a5fa");
+  ring.setAttribute("stroke-width", "2");
+  ring.setAttribute("opacity", "0.95");
+  const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  pulse.setAttribute("r", "2.5");
+  pulse.setAttribute("fill", "#bfdbfe");
+  pulse.setAttribute("opacity", "0.95");
+  made.appendChild(ring);
+  made.appendChild(pulse);
+  layer.appendChild(made);
+  setTimeout(() => made.remove(), 2600);
+}
+
 function normalizeLiveEntry(entry, side, color, shortColor) {
   const player = entry?.player || {};
   const targetFp = Math.max(
@@ -1100,6 +1176,7 @@ function describeLiveRevealEvent(event, fpGain, beforeA, beforeB, afterA, afterB
   const side = event?.side;
   const name = player.name || 'Player';
   const teamName = getLiveTeamName(side);
+  if (fpGain < 0) return event?.text || `${name} gives one back`;
   const beforeLeader = beforeA === beforeB ? 'tie' : beforeA > beforeB ? 'A' : 'B';
   const afterLeader = afterA === afterB ? 'tie' : afterA > afterB ? 'A' : 'B';
   if (afterLeader === side && beforeLeader !== side) return `${name} puts ${teamName} ahead`;
@@ -1114,6 +1191,10 @@ function describeLiveRevealEvent(event, fpGain, beforeA, beforeB, afterA, afterB
 }
 
 function buildLiveRevealEvents(players, side, scoreTarget) {
+  const engine = window.RosterBateLiveRevealEngine;
+  if (engine && typeof engine.buildLiveRevealEvents === 'function') {
+    return engine.buildLiveRevealEvents(players, side, scoreTarget);
+  }
   const totalFp = players.reduce((sum, player) => sum + Number(player._targetFp || 0), 0) || 1;
   const eventCount = Math.max(12, Math.min(30, Math.round(totalFp / 7)));
   const events = [];
@@ -1151,6 +1232,10 @@ function buildLiveRevealEvents(players, side, scoreTarget) {
 }
 
 function splitLiveRevealEventsByHalf(events) {
+  const engine = window.RosterBateLiveRevealEngine;
+  if (engine && typeof engine.splitLiveRevealEventsByHalf === 'function') {
+    return engine.splitLiveRevealEventsByHalf(events);
+  }
   const cleanEvents = (Array.isArray(events) ? events : []).filter(event => Number(event?.fpGain || 0) >= 0.1);
   if (cleanEvents.length <= 1) return { first: cleanEvents, second: [] };
   const firstCount = Math.min(cleanEvents.length - 1, Math.max(1, Math.floor(cleanEvents.length * 0.48)));
@@ -1160,11 +1245,35 @@ function splitLiveRevealEventsByHalf(events) {
   };
 }
 
+function applyLiveCourtMotionForEvent(event) {
+  const motion = window.RosterBateLiveCourtMotion;
+  if (!motion || typeof motion.buildLiveMotionFrame !== 'function') {
+    const player = event?.player;
+    if (player) setCourtTarget(player, (player._x || 300) + rnd(-40, 40), (player._y || 200) + rnd(-35, 35), 8);
+    return;
+  }
+  if (!liveCourtMotionState || typeof liveCourtMotionState !== 'object') {
+    liveCourtMotionState = typeof motion.createLiveMotionState === 'function'
+      ? motion.createLiveMotionState({ possessionSide: liveCourtPossessionSide || 'A' })
+      : { possessionSide: liveCourtPossessionSide || 'A', phase: 'transition', sequence: 0 };
+  }
+  const frame = motion.buildLiveMotionFrame({ state: liveCourtMotionState, event, teamA, teamB, quarter });
+  (frame.targets || []).forEach(target => {
+    const player = target?.player || [...teamA, ...teamB].find(candidate => candidate?._id === target?.playerId);
+    if (!player) return;
+    setCourtTarget(player, target.x, target.y, target.motionSpeed || 9);
+  });
+  if (frame.ballTarget) setBallTarget(frame.ballTarget.x, frame.ballTarget.y, frame.ballTarget.motionSpeed || 12);
+  showLiveShotMarker(event, frame);
+  liveCourtMotionState = frame.nextState || liveCourtMotionState;
+  liveCourtPossessionSide = String(liveCourtMotionState?.possessionSide || liveCourtPossessionSide || 'A').toUpperCase() === 'B' ? 'B' : 'A';
+}
+
 function applyLiveRevealEvent(event) {
   const player = event?.player;
   if (!player) return;
   const fpGain = Number(event.fpGain || 0);
-  if (fpGain < 0.1) return;
+  if (Math.abs(fpGain) < 0.05) return;
   const beforeA = scoreA;
   const beforeB = scoreB;
   player._fp += fpGain;
@@ -1179,10 +1288,9 @@ function applyLiveRevealEvent(event) {
     player._side
   );
   updatePlayerFP(player);
-  updatePlayerEvent(player, `+${fmt(fpGain)} FPTS`);
+  updatePlayerEvent(player, fpGain >= 0 ? `+${fmt(fpGain)} FPTS` : `${fmt(fpGain)} FPTS`);
   showScorePopup(player, fpGain);
-  player._targetX = jitter(player._x || 300, 40);
-  player._targetY = jitter(player._y || 200, 35);
+  applyLiveCourtMotionForEvent(event);
 }
 
 function commitLiveMatchupResult() {
@@ -1244,6 +1352,14 @@ function bootLiveMatchupFromParams() {
   paused = false; gameOver = false;
   playCount = 0; liveRevealIndex = 0; liveRevealSecondHalfIndex = 0;
   liveCommitted = false;
+  liveCourtPossessionSide = 'A';
+  liveCourtMotionState = window.RosterBateLiveCourtMotion?.createLiveMotionState
+    ? window.RosterBateLiveCourtMotion.createLiveMotionState({ possessionSide: 'A' })
+    : { possessionSide: 'A', phase: 'transition', sequence: 0 };
+  liveCourtTicksSinceFrame = 0;
+  liveBall._x = 300; liveBall._y = 200; liveBall._targetX = 300; liveBall._targetY = 200;
+  moveBall(300, 200);
+  setBallVisible(true);
   teamA = (Array.isArray(game.homeEntries) ? game.homeEntries : []).map(entry => normalizeLiveEntry(entry, 'A', '#9333ea', 'purple'));
   teamB = (Array.isArray(game.awayEntries) ? game.awayEntries : []).map(entry => normalizeLiveEntry(entry, 'B', '#0284c7', 'cyan'));
   document.getElementById('team-a-name').textContent = game.homeName || homeAbbr;
@@ -1262,8 +1378,13 @@ function bootLiveMatchupFromParams() {
   const awayScoreTarget = Number(game.awayScore ?? game.awayTotal ?? 0) || 0;
   const homeReveal = splitLiveRevealEventsByHalf(buildLiveRevealEvents(teamA, 'A', homeScoreTarget));
   const awayReveal = splitLiveRevealEventsByHalf(buildLiveRevealEvents(teamB, 'B', awayScoreTarget));
-  liveRevealFirstHalfEvents = homeReveal.first.concat(awayReveal.first).sort(() => Math.random() - 0.5);
-  liveRevealSecondHalfEvents = homeReveal.second.concat(awayReveal.second).sort(() => Math.random() - 0.5);
+  if (window.RosterBateLiveRevealEngine && typeof window.RosterBateLiveRevealEngine.interleaveLiveRevealHalfEvents === 'function') {
+    liveRevealFirstHalfEvents = window.RosterBateLiveRevealEngine.interleaveLiveRevealHalfEvents(homeReveal.first, awayReveal.first);
+    liveRevealSecondHalfEvents = window.RosterBateLiveRevealEngine.interleaveLiveRevealHalfEvents(homeReveal.second, awayReveal.second);
+  } else {
+    liveRevealFirstHalfEvents = homeReveal.first.concat(awayReveal.first).sort(() => Math.random() - 0.5);
+    liveRevealSecondHalfEvents = homeReveal.second.concat(awayReveal.second).sort(() => Math.random() - 0.5);
+  }
   liveRevealEvents = liveRevealFirstHalfEvents.concat(liveRevealSecondHalfEvents);
   liveRevealFirstHalfInterval = Math.max(16, Math.min(42, (24 * 60) / Math.max(1, liveRevealFirstHalfEvents.length + 2)));
   liveRevealSecondHalfInterval = Math.max(16, Math.min(42, (24 * 60) / Math.max(1, liveRevealSecondHalfEvents.length + 2)));
@@ -1291,11 +1412,17 @@ function simTick() {
   const simStep = SIM_SECS * speed;
   clockSec -= simStep;
   ticksSincePossession += simStep;
+  liveCourtTicksSinceFrame += 1;
 
   if (liveMatchupMode) {
+    if (liveCourtTicksSinceFrame >= 7) {
+      liveCourtTicksSinceFrame = 0;
+      applyLiveCourtMotionForEvent(null);
+    }
     liveRevealInterval = quarter <= 2 ? liveRevealFirstHalfInterval : liveRevealSecondHalfInterval;
     if (ticksSincePossession >= liveRevealInterval) {
       ticksSincePossession = 0;
+      liveCourtTicksSinceFrame = 0;
       const event = quarter <= 2
         ? liveRevealFirstHalfEvents[liveRevealIndex++]
         : liveRevealSecondHalfEvents[liveRevealSecondHalfIndex++];
@@ -1348,10 +1475,8 @@ function jitter(val, spread) { return val + rnd(-spread, spread); }
 // Restricted area:      right=(548,y=195–205), left=(52,y=195–205)
 
 function snapPlayer(p, x, y) {
-  // Instantly place a player — used for off-ball repositioning
-  p._x = x; p._y = y;
-  p._targetX = x; p._targetY = y;
-  moveDot(p, x, y);
+  // Set a glide target for off-ball repositioning.
+  setCourtTarget(p, x, y, 13);
 }
 
 function setOffensePositions(offTeam, ballHandlerId) {
@@ -1559,6 +1684,8 @@ function assignId(player) { player._id = ++_idCounter; player._fp = 0; return pl
 
 function clearCourt() {
   document.getElementById('player-dots').innerHTML = '';
+  const shotMarkers = document.getElementById('shot-markers');
+  if (shotMarkers) shotMarkers.innerHTML = '';
   Object.keys(dotEls).forEach(k => delete dotEls[k]);
 }
 
@@ -1577,6 +1704,11 @@ function startNewGame() {
   possession = Math.random() < 0.5 ? 'A' : 'B';
   attackingRight = Math.random() < 0.5;  // random tip-off direction
   ticksSincePossession = 0;
+  liveCourtMotionState = null;
+  liveCourtTicksSinceFrame = 0;
+  liveBall._x = 300; liveBall._y = 200; liveBall._targetX = 300; liveBall._targetY = 200;
+  moveBall(300, 200);
+  setBallVisible(false);
 
   // Pick teams
   const [a, b] = pickTeams();
