@@ -258,6 +258,22 @@ function assertRosterState(snapshot, scenario, label) {
   assert.equal(snapshot.persistedFeedback?.message, scenario.expectedMessage, `${label}: persisted feedback should describe the applied package`);
 }
 
+async function assertPlayerTimelineAfterTrade(page, scenario) {
+  const acquiredName = scenario.incomingNames[0];
+  await page.locator('#rosterContent .player-name-link').filter({ hasText: acquiredName }).click({ timeout: 8000 });
+  await page.waitForSelector('#playerDetailModal.open', { timeout: 5000 });
+  const modalText = await page.locator('#playerDetailModal').innerText();
+  assert.match(modalText, /PLAYER TIMELINE/i, `${scenario.label}: player detail should show transaction timeline`);
+  assert.match(modalText, /Traded with Boston Celtics/i, `${scenario.label}: acquired player should show trade partner`);
+  assert.match(
+    modalText,
+    new RegExp(`${acquiredName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} was traded from Boston Celtics to Los Angeles Lakers\\.`, 'i'),
+    `${scenario.label}: acquired player timeline should explain the roster move`
+  );
+  assert.doesNotMatch(modalText, /moved from Boston Celtics to Los Angeles Lakers/i, `${scenario.label}: player timeline should use trade wording`);
+  await page.evaluate(() => window.closePlayerDetailModal && window.closePlayerDetailModal());
+}
+
 async function runTradeApplicationScenario(browser, scenario) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const errors = await attachErrorCapture(page, scenario.label);
@@ -280,6 +296,11 @@ async function runTradeApplicationScenario(browser, scenario) {
     scenario.expectedMessage,
     { timeout: 8000 }
   );
+  const immediateTradeDeskText = await page.locator('#tradesContent').innerText();
+  assert.match(immediateTradeDeskText, /1 completed/i, `${scenario.label}: trade desk should count the direct-applied completed trade`);
+  assert.match(immediateTradeDeskText, /Completed Trades/i, `${scenario.label}: trade desk should show the completed-trades lane`);
+  assert.match(immediateTradeDeskText, /Completed instantly/i, `${scenario.label}: completed trade should explain that no sent offer is pending`);
+  assert.match(immediateTradeDeskText, /Open My Team/i, `${scenario.label}: completed trade should expose an obvious roster-review action`);
   assertRosterState(await getTradeSmokeSnapshot(page, scenario.slotId), scenario, `${scenario.label} immediate`);
 
   await page.reload({ waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -297,6 +318,7 @@ async function runTradeApplicationScenario(browser, scenario) {
   scenario.outgoingNames.forEach((name) => {
     assert.doesNotMatch(reloadedRosterText, new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `hard reloaded My Team roster rows should omit ${name}`);
   });
+  await assertPlayerTimelineAfterTrade(page, scenario);
 
   await page.evaluate(() => window.goPage && window.goPage('trades'));
   await page.waitForSelector('#tradesContent', { timeout: 8000 });
@@ -304,6 +326,8 @@ async function runTradeApplicationScenario(browser, scenario) {
   assert.match(reloadedTradeText, /Boston Celtics[\s\S]*15 rostered/i);
   assert.match(reloadedTradeText, new RegExp(scenario.expectedMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(reloadedTradeText, /Fairness check:/);
+  assert.match(reloadedTradeText, /Completed Trades/i);
+  assert.match(reloadedTradeText, /Completed instantly/i);
 
   assertRosterState(await getTradeSmokeSnapshot(page, scenario.slotId), scenario, `${scenario.label} reload`);
   assert.deepStrictEqual(errors, []);

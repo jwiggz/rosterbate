@@ -15,6 +15,7 @@
     "portraits:prompts": "node tools/report-player-portrait-coverage.js --prompts",
     "portraits:dev": "node tools/open-static-page.js portrait-manifest-dev.html",
     "test:portraits-dev": "node tools/test-player-portrait-dev-helper.js && node tools/test-player-portrait-dev-helper-playwright.js",
+    "test:player-detail": "node tools/test-player-detail-history.js && node tools/test-player-detail-click-paths-playwright.js && node tools/test-player-detail-post-action-flow-playwright.js",
     "test:trade-application": "node tools/test-trade-application-playwright.js",
     "test:live-matchup": "node tools/test-live-matchup-playwright.js"
   },
