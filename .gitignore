@@ -1,4 +1,7 @@
 .worktrees/
 node_modules/
 .server-*.log
+.portrait-function-*.log
+.env
+.env.local
 test-results/
