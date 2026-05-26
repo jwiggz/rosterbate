@@ -15,9 +15,24 @@ assert.match(html, /assets\/player-portraits\/manifest\.json/, 'helper should lo
 assert.match(html, /id="portrait-player-name"/, 'helper should expose a player-name lookup field');
 assert.match(html, /id="portrait-team"/, 'helper should expose a team-code lookup field');
 assert.match(html, /id="portrait-url"/, 'helper should expose a portrait URL override field');
+assert.match(html, /id="portrait-state"/, 'helper should expose a portrait state preview selector');
+assert.match(html, /value="final"/, 'helper should include a final spotlight preview state');
+assert.match(html, /id="photo-lab-file"/, 'helper should accept a local source photo for portrait styling');
+assert.match(html, /id="photo-lab-canvas"/, 'helper should render an exportable photo-lab canvas');
+assert.match(html, /id="photo-lab-export-path"/, 'helper should show the manifest-ready export path');
+assert.match(html, /id="photo-lab-use-path"/, 'helper should let generated portrait paths feed the override URL field');
+assert.match(html, /id="league-player-search"/, 'helper should search players from saved leagues');
+assert.match(html, /id="league-player-grid"/, 'helper should render saved league players that need portraits');
+assert.match(html, /id="load-league-players"/, 'helper should reload players from browser season storage');
+assert.match(html, /id="league-player-json"/, 'helper should accept pasted league/player JSON as a fallback');
 assert.match(html, /id="manifest-grid"/, 'helper should render a manifest preview grid');
 assert.match(html, /_keyCandidates/, 'helper should display runtime lookup candidates');
 assert.match(html, /getPortraitUrl/, 'helper should preview the resolved portrait image');
+assert.match(html, /renderPortraitMarkup/, 'helper should preview states through shared portrait markup');
+assert.match(html, /buildPhotoLabExportPath/, 'helper should derive stable generated portrait filenames');
+assert.match(html, /renderPhotoLabCanvas/, 'helper should draw uploaded photos into the RosterBate portrait style');
+assert.match(html, /collectLeaguePlayersFromStorage/, 'helper should discover players from saved league storage');
+assert.match(html, /isGenericPortraitPlayer/, 'helper should flag players still using generated avatars');
 
 const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 assert.equal(

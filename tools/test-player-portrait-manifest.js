@@ -12,6 +12,7 @@ const {
 } = require('./build-player-portrait-manifest');
 
 assert.equal(titleFromSlug('michael-jordan'), 'Michael Jordan');
+assert.equal(titleFromSlug('lebron-james'), 'LeBron James');
 assert.equal(titleFromSlug('nikola_jokic'), 'Nikola Jokic');
 assert.equal(titleFromSlug('nikola-jokic-203999'), 'Nikola Jokic');
 assert.deepEqual(
