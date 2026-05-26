@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RosterBate 3-Point Contest</title>
+  <link rel="modulepreload" href="assets/vendor/three/three.module.js">
+  <style>
+    :root {
+      --bg: #050914;
+      --panel: rgba(8, 17, 31, .86);
+      --line: rgba(148, 163, 184, .22);
+      --text: #f8fafc;
+      --muted: #a9b6c8;
+      --orange: #f6a344;
+      --cyan: #38bdf8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --magenta: #d946ef;
+      --meter-blue: #0f6f95;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Arial, sans-serif; }
+    body { overflow: hidden; }
+    #three-point-contest-app { position: fixed; inset: 0; display: grid; background: radial-gradient(circle at 50% 20%, rgba(56,189,248,.16), transparent 30%), #050914; }
+    .contest-scene { position: absolute; inset: 0; }
+    .contest-scene canvas { width: 100%; height: 100%; display: block; }
+    .contest-hud { position: absolute; inset: 0; pointer-events: none; display: grid; grid-template-rows: auto 1fr auto; padding: 18px; gap: 14px; }
+    .contest-topbar, .contest-meter-wrap { pointer-events: auto; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(14px); border-radius: 8px; }
+    .contest-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; }
+    .contest-title { display: grid; gap: 2px; }
+    .contest-title strong { font-size: 22px; line-height: 1; }
+    .contest-title span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+    .contest-score { display: flex; gap: 14px; align-items: center; font-weight: 800; }
+    .contest-score b { color: var(--orange); font-size: 28px; }
+    .contest-balls { display: flex; gap: 6px; align-items: center; }
+    .contest-ball-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(148,163,184,.45); border: 1px solid rgba(255,255,255,.18); }
+    .contest-ball-dot.money { background: #f8fafc; border-color: #f6a344; }
+    .contest-ball-dot.made { background: var(--green); }
+    .contest-ball-dot.missed { background: var(--red); }
+    .contest-feedback { align-self: start; justify-self: center; margin-top: 72px; padding: 10px 14px; border-radius: 999px; background: rgba(8,17,31,.78); border: 1px solid var(--line); font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
+    .contest-meter-wrap { padding: 14px; display: grid; gap: 10px; }
+    .contest-meter-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; }
+    .contest-meter-row { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 10px; align-items: center; }
+    .contest-aim-dial { position: relative; aspect-ratio: 1; border-radius: 50%; border: 3px solid rgba(226,232,240,.9); background: radial-gradient(circle at 50% 50%, #111827 0 16%, #dbeafe 18% 32%, #f8fafc 34% 100%); box-shadow: inset 0 0 0 5px rgba(15,23,42,.42), 0 0 16px rgba(56,189,248,.28); overflow: hidden; }
+    .contest-aim-dial::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; height: 3px; transform: translateY(-50%); background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,.8); }
+    .contest-aim-dial::after { content: ""; position: absolute; width: 12px; height: 12px; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); background: #38bdf8; border: 2px solid #082f49; box-shadow: 0 0 10px rgba(56,189,248,.8); }
+    .contest-meter { position: relative; height: 38px; border-radius: 6px; overflow: hidden; background: linear-gradient(180deg, #f8fafc 0%, #dbeafe 50%, #f8fafc 100%); border: 2px solid rgba(248,250,252,.92); box-shadow: inset 0 0 0 1px rgba(15,23,42,.32), 0 0 18px rgba(56,189,248,.18); }
+    .contest-meter::before { content: ""; position: absolute; inset: 6px 8px; border-radius: 3px; background: linear-gradient(180deg, rgba(8,47,73,.92), rgba(14,116,144,.92)), repeating-linear-gradient(90deg, transparent 0 9.5%, rgba(248,250,252,.74) 9.5% 10%); background-blend-mode: normal, screen; }
+    .contest-fill { position: absolute; z-index: 1; left: 8px; top: 6px; bottom: 6px; width: 0; border-radius: 3px; background: linear-gradient(90deg, #06b6d4, var(--meter-blue)); box-shadow: inset 0 0 12px rgba(255,255,255,.25); transition: width .04s linear; }
+    .contest-zone { position: absolute; z-index: 3; top: 6px; bottom: 6px; border-radius: 3px; }
+    .contest-zone.distance { left: 88%; width: 9%; background: linear-gradient(90deg, rgba(34,197,94,.9), rgba(246,163,68,.96)); box-shadow: 0 0 16px rgba(246,163,68,.45); }
+    .contest-zone.aim { left: 8%; width: 11%; display: grid; grid-template-columns: 1fr 4px 1fr; gap: 5px; align-items: stretch; background: transparent; box-shadow: 0 0 16px rgba(217,70,239,.5); }
+    .contest-aim-bar { border-radius: 2px; background: linear-gradient(180deg, #f0abfc, var(--magenta)); box-shadow: inset 0 0 8px rgba(255,255,255,.28); }
+    .contest-aim-center { border-radius: 999px; background: #f8fafc; box-shadow: 0 0 10px #fff, 0 0 14px rgba(34,197,94,.75); }
+    .contest-cursor { position: absolute; z-index: 5; top: 2px; width: 5px; height: calc(100% - 4px); background: #fff; border: 1px solid rgba(15,23,42,.82); box-shadow: 0 0 12px #fff, 0 0 20px rgba(56,189,248,.72); transform: translateX(-2px); }
+    [data-meter-phase="distance"] .contest-zone.distance,
+    [data-meter-phase="aim"] .contest-zone.aim { filter: saturate(1.25) brightness(1.15); }
+    .contest-actions { display: flex; gap: 10px; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12px; }
+    .contest-actions button { pointer-events: auto; border: 1px solid rgba(246,163,68,.55); background: rgba(246,163,68,.13); color: #ffe0b0; border-radius: 6px; padding: 9px 12px; font-weight: 900; cursor: pointer; }
+    @media (orientation: landscape) and (max-height: 420px) {
+      .contest-hud { grid-template-rows: auto minmax(0, 1fr) auto; padding: 10px; gap: 8px; }
+      .contest-topbar { padding: 8px 10px; }
+      .contest-title strong { font-size: 18px; }
+      .contest-title span { font-size: 10px; }
+      .contest-score { gap: 8px; font-size: 12px; }
+      .contest-score b { font-size: 20px; }
+      .contest-balls { gap: 4px; }
+      .contest-ball-dot { width: 10px; height: 10px; }
+      .contest-feedback { margin-top: 6px; padding: 7px 10px; font-size: 11px; }
+      .contest-meter-wrap { padding: 10px; gap: 7px; }
+      .contest-meter-labels { font-size: 10px; }
+      .contest-meter-row { grid-template-columns: 42px minmax(0, 1fr); gap: 7px; }
+      .contest-aim-dial { border-width: 2px; }
+      .contest-meter { height: 28px; }
+      .contest-meter::before,
+      .contest-fill,
+      .contest-zone { top: 5px; bottom: 5px; }
+      .contest-actions { font-size: 11px; }
+      .contest-actions button { padding: 7px 9px; }
+    }
+  </style>
+</head>
+<body>
+  <main id="three-point-contest-app" data-contest-status="booting">
+    <section class="contest-scene" id="contest-scene" aria-label="3-point contest court"></section>
+    <section class="contest-hud" aria-label="3-point contest controls">
+      <div class="contest-topbar">
+        <div class="contest-title"><strong>3-Point Contest</strong><span id="contest-shooter">Tyrese Maxey - PHI</span></div>
+        <div class="contest-score"><span>Score <b id="contest-score">0</b></span><div id="contest-balls" class="contest-balls" aria-label="Rack balls"></div><span id="contest-rack">Rack 1 / 1</span><span id="contest-clock">70.0</span></div>
+      </div>
+      <div class="contest-feedback" id="contest-feedback">Press Space</div>
+      <div class="contest-meter-wrap">
+        <div class="contest-meter-labels"><span>Aim</span><span>Distance</span></div>
+        <div class="contest-meter-row">
+          <div class="contest-aim-dial" aria-hidden="true"></div>
+          <div class="contest-meter" id="contest-meter"><span class="contest-fill" id="contest-fill"></span><span class="contest-zone aim"><span class="contest-aim-bar left"></span><span class="contest-aim-center"></span><span class="contest-aim-bar right"></span></span><span class="contest-zone distance"></span><span class="contest-cursor" id="contest-cursor"></span></div>
+        </div>
+        <div class="contest-actions"><span id="contest-phase">Ready</span><button id="contest-action" type="button">Press Space / Click</button></div>
+      </div>
+    </section>
+  </main>
+  <script src="three-point-contest-core.js"></script>
+  <script type="module" src="three-point-contest-renderer.js"></script>
+  <script type="module" src="three-point-contest.js"></script>
+</body>
+</html>
