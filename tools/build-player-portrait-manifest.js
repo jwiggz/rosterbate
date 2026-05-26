@@ -81,6 +81,7 @@ function titleFromSlug(slug) {
     .filter(Boolean)
     .map((part) => {
       const lower = part.toLowerCase();
+      if (lower === 'lebron') return 'LeBron';
       if (['ii', 'iii', 'iv', 'jr', 'sr'].includes(lower)) return lower.toUpperCase().replace(/^JR$/, 'Jr.').replace(/^SR$/, 'Sr.');
       if (lower === 'mc') return 'Mc';
       return lower.charAt(0).toUpperCase() + lower.slice(1);

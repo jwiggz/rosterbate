@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RosterBate Offline Avatar Studio</title>
+<style>
+  :root {
+    --bg: #070a12;
+    --panel: #111824;
+    --panel-strong: #172235;
+    --field: #0b111b;
+    --line: #2b3648;
+    --text: #f7f3e8;
+    --muted: #aab5c5;
+    --accent: #19c28c;
+    --accent-2: #f6a344;
+    --blue: #2f7df6;
+    --shadow: 0 24px 70px rgba(0, 0, 0, .34);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 15% 12%, rgba(246, 163, 68, .2), transparent 30%),
+      radial-gradient(circle at 82% 18%, rgba(47, 125, 246, .16), transparent 26%),
+      linear-gradient(135deg, #070a12 0%, #111923 54%, #17100a 100%);
+    font-family: "Arial Narrow", "Bahnschrift", "Segoe UI", sans-serif;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    min-height: 38px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 6px;
+    padding: 9px 13px;
+    background: #162033;
+    color: var(--text);
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  button:hover,
+  button:focus-visible {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--field);
+    color: var(--text);
+    padding: 10px 11px;
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .page-shell {
+    width: min(100% - 32px, 1320px);
+    margin: 0 auto;
+    padding: 28px 0 42px;
+  }
+
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+    padding-bottom: 18px;
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .brand-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #f97316, #ffd166);
+    color: #140d07;
+    font-weight: 900;
+    box-shadow: var(--shadow);
+  }
+
+  h1,
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(26px, 4vw, 48px);
+    line-height: .98;
+    font-weight: 900;
+  }
+
+  .small-muted {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .link-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    border: 1px solid rgba(246, 163, 68, .42);
+    border-radius: 999px;
+    padding: 9px 14px;
+    color: #ffe0b0;
+    text-decoration: none;
+    background: rgba(246, 163, 68, .09);
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .status-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .status-strip span {
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: rgba(17, 24, 36, .78);
+    color: #c8d2e2;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  #offline-portrait-studio {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(12, 18, 29, .92);
+    box-shadow: var(--shadow);
+  }
+
+  .rb-portrait-studio {
+    display: grid;
+  }
+
+  .studio-copy {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(135deg, rgba(246, 163, 68, .14), rgba(25, 194, 140, .07));
+  }
+
+  .studio-copy h2 {
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 900;
+  }
+
+  .studio-copy p {
+    max-width: 560px;
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .studio-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, .92fr) minmax(300px, .58fr);
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .studio-controls {
+    display: grid;
+    gap: 13px;
+    align-self: start;
+  }
+
+  .studio-inline {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .studio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .studio-batch-panel,
+  .studio-save-panel {
+    display: grid;
+    gap: 13px;
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    padding-top: 16px;
+  }
+
+  .studio-batch-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .studio-batch-header h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .studio-batch-header span {
+    border: 1px solid rgba(246, 163, 68, .35);
+    border-radius: 999px;
+    padding: 5px 9px;
+    color: #ffe0b0;
+    background: rgba(246, 163, 68, .08);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .studio-batch-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .studio-batch-card {
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 6px;
+    padding: 10px;
+    background: rgba(255, 255, 255, .035);
+  }
+
+  .studio-batch-card div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .studio-batch-card strong {
+    color: var(--text);
+  }
+
+  .studio-batch-card span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .studio-batch-card code {
+    color: #b9f8de;
+    font-size: 12px;
+  }
+
+  .studio-batch-card textarea {
+    min-height: 98px;
+  }
+
+  #studio-render {
+    border-color: #27d8a2;
+    background: linear-gradient(135deg, #0d7d5e, #16a77a);
+  }
+
+  .studio-preview {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 8px;
+    padding: 14px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.06), transparent),
+      rgba(0, 0, 0, .18);
+  }
+
+  .studio-preview canvas {
+    width: min(100%, 384px);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .4);
+  }
+
+  #studio-status {
+    margin: 0;
+    color: #b9f8de;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  @media (max-width: 860px) {
+    .topbar,
+    .studio-copy,
+    .studio-grid,
+    .status-strip {
+      grid-template-columns: 1fr;
+    }
+
+    .studio-copy {
+      display: grid;
+      align-items: start;
+    }
+
+    .studio-inline {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="page-shell">
+  <header class="topbar">
+    <div class="brand-lockup">
+      <div class="brand-mark">RB</div>
+      <div>
+        <h1>Offline Avatar Studio</h1>
+        <p class="small-muted">Create Tyrese-style square player avatars for generic NBA portraits, use Codex Imagegen v2 for the finished art, then paste the manifest entry into the portrait manifest.</p>
+      </div>
+    </div>
+    <a class="link-button" href="portrait-manifest-dev.html">Back to Manifest Lab</a>
+  </header>
+
+  <section class="status-strip" aria-label="Offline portrait studio guarantees">
+    <span>No API key</span>
+    <span>Codex Imagegen v2 prompt</span>
+    <span>Exports manifest JSON</span>
+  </section>
+
+  <section id="offline-portrait-studio" aria-label="Offline portrait creator"></section>
+</main>
+
+<script src="rosterbate-portrait-studio.js"></script>
+<script>
+  window.RosterBatePortraitStudio.createPortraitStudio('#offline-portrait-studio');
+</script>
+</body>
+</html>

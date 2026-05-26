@@ -161,6 +161,35 @@
     font-weight: 800;
   }
 
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    border: 1px solid rgba(246, 163, 68, .42);
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: rgba(246, 163, 68, .09);
+    color: #ffe0b0;
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  .link-pill:hover,
+  .link-pill:focus-visible {
+    border-color: var(--accent-2);
+    outline: none;
+  }
+
   .tool-grid {
     display: grid;
     grid-template-columns: minmax(310px, .78fr) minmax(440px, 1.2fr) minmax(330px, .82fr);
@@ -228,13 +257,85 @@
     place-items: center;
     border-radius: 8px;
     background: #f6f7fb;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .preview-frame img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .helper-player-portrait {
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, .32);
+    background: #f8fafc;
+    box-shadow: 0 10px 22px rgba(2, 6, 23, .28);
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+  }
+
+  .helper-player-portrait .player-portrait-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: inherit;
+    background: #fff;
+  }
+
+  .helper-player-portrait::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .helper-player-portrait.portrait-state-scoring {
+    animation: helperPortraitPop .75s cubic-bezier(.2, 1.4, .24, 1);
+  }
+
+  .helper-player-portrait.portrait-state-takeover {
+    box-shadow: 0 0 0 1px rgba(251, 191, 36, .7), 0 0 24px rgba(251, 191, 36, .32), 0 10px 22px rgba(2, 6, 23, .28);
+  }
+
+  .helper-player-portrait.portrait-state-final {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 4px rgba(246, 163, 68, .24), 0 0 34px rgba(246, 163, 68, .42);
+    transform: translateY(-2px);
+  }
+
+  .helper-player-portrait.portrait-state-final::after {
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .32), transparent 42%), radial-gradient(circle at 50% 9%, rgba(255, 255, 255, .42), transparent 28%);
+  }
+
+  .helper-player-portrait.portrait-state-offday {
+    filter: saturate(.45) brightness(.78);
+    opacity: .72;
+  }
+
+  .helper-player-portrait.portrait-state-injured {
+    filter: saturate(.55) brightness(.72);
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, .48), 0 10px 22px rgba(127, 29, 29, .3);
+  }
+
+  .helper-player-portrait.portrait-state-injured::after {
+    opacity: 1;
+    background: repeating-linear-gradient(135deg, rgba(239, 68, 68, .28) 0 4px, transparent 4px 10px);
+  }
+
+  .helper-player-portrait.portrait-state-questionable {
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, .5), 0 10px 22px rgba(120, 53, 15, .28);
+  }
+
+  @keyframes helperPortraitPop {
+    0% { transform: translateY(0) scale(1); }
+    42% { transform: translateY(-4px) scale(1.07); }
+    100% { transform: translateY(0) scale(1); }
   }
 
   .preview-meta {
@@ -294,6 +395,186 @@
     width: 100%;
   }
 
+  .league-player-panel {
+    grid-column: 1 / -1;
+  }
+
+  .league-player-toolbar {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .league-player-import {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: end;
+    margin-top: 12px;
+  }
+
+  .league-player-import textarea {
+    min-height: 86px;
+  }
+
+  .league-player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+    max-height: 360px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .league-player-card {
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 10px;
+    align-items: center;
+    text-align: left;
+    padding: 10px;
+    border-color: rgba(246, 163, 68, .22);
+    background: linear-gradient(135deg, rgba(246, 163, 68, .1), rgba(15, 23, 42, .68));
+  }
+
+  .league-player-card:hover,
+  .league-player-card:focus-visible {
+    background: linear-gradient(135deg, rgba(246, 163, 68, .18), rgba(25, 194, 140, .08));
+  }
+
+  .league-player-card.is-selected {
+    border-color: rgba(25, 194, 140, .65);
+    box-shadow: inset 0 0 0 1px rgba(25, 194, 140, .22);
+  }
+
+  .league-player-avatar {
+    width: 42px;
+    height: 52px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+
+  .league-player-avatar .helper-player-portrait {
+    border: 0;
+    box-shadow: none;
+    border-radius: 7px;
+  }
+
+  .league-player-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1.15;
+  }
+
+  .league-player-meta {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .league-player-badge {
+    display: inline-flex;
+    width: max-content;
+    margin-top: 6px;
+    border: 1px solid rgba(246, 163, 68, .32);
+    border-radius: 999px;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 900;
+    color: #ffd79f;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .photo-lab-panel {
+    grid-column: 1 / -1;
+  }
+
+  .ai-portrait-panel {
+    grid-column: 1 / -1;
+  }
+
+  .photo-lab-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, .8fr) minmax(300px, 512px) minmax(260px, .72fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .ai-portrait-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, .9fr) minmax(260px, .72fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .photo-lab-controls,
+  .photo-lab-output,
+  .ai-portrait-controls,
+  .ai-portrait-result {
+    display: grid;
+    gap: 12px;
+  }
+
+  .ai-portrait-result-frame {
+    min-height: 360px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(246, 163, 68, .28);
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(246, 163, 68, .1), rgba(15, 23, 42, .72));
+    overflow: hidden;
+  }
+
+  .ai-portrait-result-frame img {
+    display: none;
+    width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+  }
+
+  .photo-lab-stage {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+  }
+
+  .photo-lab-canvas-wrap {
+    width: min(100%, 360px);
+    aspect-ratio: 4 / 5;
+    border: 1px solid rgba(246, 163, 68, .28);
+    border-radius: 10px;
+    padding: 10px;
+    background:
+      linear-gradient(135deg, rgba(246, 163, 68, .12), transparent 38%),
+      rgba(0, 0, 0, .2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 18px 38px rgba(0, 0, 0, .24);
+  }
+
+  #photo-lab-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background: #111827;
+  }
+
+  .range-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  input[type="range"] {
+    padding: 0;
+    accent-color: var(--accent-2);
+  }
+
   .manifest-thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -321,6 +602,15 @@
     .manifest-panel {
       grid-column: 1 / -1;
     }
+
+    .photo-lab-layout {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .photo-lab-output,
+    .ai-portrait-layout {
+      grid-column: 1 / -1;
+    }
   }
 
   @media (max-width: 760px) {
@@ -332,7 +622,12 @@
     .topbar,
     .preview-box,
     .manifest-toolbar,
+    .league-player-toolbar,
+    .league-player-import,
     .inline-grid,
+    .range-grid,
+    .photo-lab-layout,
+    .ai-portrait-layout,
     .tool-grid {
       grid-template-columns: 1fr;
     }
@@ -344,6 +639,10 @@
 
     .status-pill {
       width: max-content;
+    }
+
+    .topbar-actions {
+      justify-content: flex-start;
     }
   }
 </style>
@@ -358,7 +657,10 @@
         <p class="small-muted">assets/player-portraits/manifest.json</p>
       </div>
     </div>
-    <div id="status" class="status-pill">Booting</div>
+    <div class="topbar-actions">
+      <a class="link-pill" href="portrait-studio.html">No-API Portrait Studio</a>
+      <div id="status" class="status-pill">Booting</div>
+    </div>
   </header>
 
   <section class="tool-grid" aria-label="Portrait manifest helper">
@@ -391,6 +693,18 @@
             Portrait URL
             <input id="portrait-url" type="text" value="assets/player-portraits/shai-gilgeous-alexander-1628983.jpg" autocomplete="off">
           </label>
+          <label>
+            State Preview
+            <select id="portrait-state">
+              <option value="">Idle</option>
+              <option value="scoring">Scoring Pop</option>
+              <option value="takeover">Takeover Glow</option>
+              <option value="final">Final Spotlight</option>
+              <option value="offday">Off-Day Dim</option>
+              <option value="injured">Injured / IR</option>
+              <option value="questionable">Questionable</option>
+            </select>
+          </label>
         </div>
         <div class="action-row">
           <button id="add-override" class="primary" type="button">Save Override</button>
@@ -422,6 +736,153 @@
       </div>
     </section>
 
+    <section class="panel league-player-panel">
+      <div class="panel-header">
+        <h2>League Players Needing Portraits</h2>
+        <span id="league-player-count" class="count">0</span>
+      </div>
+      <div class="panel-body">
+        <div class="league-player-toolbar">
+          <input id="league-player-search" type="search" placeholder="Search saved league players" autocomplete="off">
+          <button id="load-league-players" type="button">Reload Players</button>
+        </div>
+        <div class="league-player-import">
+          <label>
+            League JSON
+            <textarea id="league-player-json" spellcheck="false" placeholder="Paste a season, draft, roster, waiver pool, or player array"></textarea>
+          </label>
+          <button id="import-league-players" type="button">Import JSON</button>
+        </div>
+        <div id="league-player-grid" class="league-player-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel photo-lab-panel">
+      <div class="panel-header">
+        <h2>Photo Lab</h2>
+        <span id="photo-lab-status" class="small-muted">No source photo</span>
+      </div>
+      <div class="panel-body">
+        <div class="photo-lab-layout">
+          <div class="photo-lab-controls">
+            <label>
+              Source Photo
+              <input id="photo-lab-file" type="file" accept="image/*">
+            </label>
+            <label>
+              Style
+              <select id="photo-lab-style">
+                <option value="showtime">Showtime Card</option>
+                <option value="spotlight">Final Spotlight</option>
+                <option value="clean">Clean Cutout</option>
+              </select>
+            </label>
+            <div class="range-grid">
+              <label>
+                Scale
+                <input id="photo-lab-scale" type="range" min="80" max="160" value="112">
+              </label>
+              <label>
+                X
+                <input id="photo-lab-x" type="range" min="-60" max="60" value="0">
+              </label>
+              <label>
+                Y
+                <input id="photo-lab-y" type="range" min="-80" max="80" value="-14">
+              </label>
+            </div>
+            <div class="range-grid">
+              <label>
+                Bright
+                <input id="photo-lab-brightness" type="range" min="82" max="125" value="104">
+              </label>
+              <label>
+                Contrast
+                <input id="photo-lab-contrast" type="range" min="90" max="150" value="118">
+              </label>
+              <label>
+                Color
+                <input id="photo-lab-saturation" type="range" min="70" max="150" value="118">
+              </label>
+            </div>
+            <div class="action-row">
+              <button id="photo-lab-render" class="primary" type="button">Render Portrait</button>
+              <button id="photo-lab-download" type="button">Download PNG</button>
+              <button id="photo-lab-use-path" type="button">Use Path</button>
+            </div>
+          </div>
+          <div class="photo-lab-stage">
+            <div class="photo-lab-canvas-wrap">
+              <canvas id="photo-lab-canvas" width="512" height="640"></canvas>
+            </div>
+            <p class="small-muted">512 x 640 PNG</p>
+          </div>
+          <div class="photo-lab-output">
+            <label>
+              Suggested Asset Path
+              <input id="photo-lab-export-path" type="text" readonly>
+            </label>
+            <label>
+              Manifest Entry
+              <textarea id="photo-lab-entry" spellcheck="false" style="min-height:132px;"></textarea>
+            </label>
+            <div class="action-row">
+              <button id="photo-lab-copy-entry" type="button">Copy Entry</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel ai-portrait-panel">
+      <div class="panel-header">
+        <h2>AI Portrait Generator</h2>
+        <span id="ai-portrait-status" class="small-muted">Server-side endpoint required</span>
+      </div>
+      <div class="panel-body">
+        <div class="ai-portrait-layout">
+          <div class="ai-portrait-controls">
+            <div class="inline-grid">
+              <label>
+                Endpoint
+                <input id="ai-portrait-endpoint" type="text" autocomplete="off">
+              </label>
+              <label>
+                Admin Token
+                <input id="ai-portrait-admin-token" type="password" autocomplete="off" placeholder="Optional">
+              </label>
+            </div>
+            <label>
+              Prompt
+              <textarea id="ai-portrait-prompt" spellcheck="false" style="min-height:220px;"></textarea>
+            </label>
+            <div class="action-row">
+              <button id="build-ai-portrait-prompt" type="button">Build Prompt</button>
+              <button id="generate-ai-portrait" class="primary" type="button">Generate Portrait</button>
+              <button id="download-ai-portrait" type="button">Download PNG</button>
+              <button id="use-ai-portrait" type="button">Use Generated Image</button>
+              <button id="copy-ai-portrait-entry" type="button">Copy Entry</button>
+            </div>
+            <p class="small-muted">Calls the local or Netlify function so secrets stay off the page. For local use from port 8080, run npm run portraits:imagegen-dev in another terminal or adjust the endpoint.</p>
+          </div>
+          <div class="ai-portrait-result">
+            <div class="ai-portrait-result-frame">
+              <img id="ai-portrait-output" alt="Generated portrait preview">
+              <span id="ai-portrait-placeholder" class="small-muted">Generated portrait preview</span>
+            </div>
+            <label>
+              Generated Data URL
+              <textarea id="ai-portrait-data-url" readonly spellcheck="false" style="min-height:90px;"></textarea>
+            </label>
+            <label>
+              Manifest Entry
+              <textarea id="ai-portrait-entry" readonly spellcheck="false" style="min-height:90px;"></textarea>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="panel">
       <div class="panel-header">
         <h2>Overrides</h2>
@@ -449,8 +910,22 @@
 
   const MANIFEST_URL = 'assets/player-portraits/manifest.json';
   const STORAGE_KEY = 'rbPlayerPortraitOverrides';
+  const LEAGUE_STORAGE_KEYS = [
+    'rosterbateDraft',
+    'rbSimulationModeCompletedDraft',
+    'rbSimulationModeLocalState',
+    'rbPendingSeasonLaunch',
+    'rbHistoricalPackDevLocalState'
+  ];
+  const PHOTO_LAB_WIDTH = 512;
+  const PHOTO_LAB_HEIGHT = 640;
   const portraits = window.RosterBatePlayerPortraits;
   let manifestPlayers = {};
+  let photoLabImage = null;
+  let photoLabSourceName = '';
+  let leaguePlayers = [];
+  let selectedLeaguePlayerKey = '';
+  let aiPortraitResult = null;
 
   const $ = (id) => document.getElementById(id);
 
@@ -491,6 +966,7 @@
     }
     renderOverrides();
     refreshLookup();
+    refreshLeaguePlayers();
     return clean;
   }
 
@@ -522,11 +998,641 @@
   }
 
   function buildPlayer() {
+    const state = $('portrait-state')?.value || '';
     return {
       name: $('portrait-player-name').value.trim() || 'Player',
       team: $('portrait-team').value.trim().toUpperCase(),
-      id: $('portrait-id').value.trim()
+      id: $('portrait-id').value.trim(),
+      status: state === 'injured' ? 'OUT' : state === 'questionable' ? 'GTD' : '',
+      hasGame: state === 'offday' ? false : true
     };
+  }
+
+  function currentPreviewState() {
+    const state = $('portrait-state')?.value || '';
+    if (state === 'injured' || state === 'questionable' || state === 'offday') return '';
+    return state;
+  }
+
+  function slugifyPhotoLabName(value) {
+    return String(value || 'player')
+      .trim()
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'player';
+  }
+
+  function buildPhotoLabExportPath(player) {
+    const source = player || buildPlayer();
+    return `assets/player-portraits/${slugifyPhotoLabName(source.name)}.png`;
+  }
+
+  function setPhotoLabStatus(message) {
+    const status = $('photo-lab-status');
+    if (status) status.textContent = message;
+  }
+
+  function updatePhotoLabPath() {
+    const player = buildPlayer();
+    const path = buildPhotoLabExportPath(player);
+    const key = $('portrait-key')?.value || (portraits && typeof portraits._keyCandidates === 'function'
+      ? portraits._keyCandidates(player)[0]
+      : player.name.toLowerCase());
+    if ($('photo-lab-export-path')) $('photo-lab-export-path').value = path;
+    if ($('photo-lab-entry')) $('photo-lab-entry').value = JSON.stringify({ [key]: path }, null, 2);
+    return path;
+  }
+
+  function drawRoundRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function drawPhotoLabPlaceholder(ctx, player) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, .14)';
+    ctx.beginPath();
+    ctx.arc(PHOTO_LAB_WIDTH / 2, 216, 72, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 255, 255, .1)';
+    drawRoundRect(ctx, 136, 288, 240, 190, 100);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 255, 255, .72)';
+    ctx.font = '900 56px "Arial Narrow", "Bahnschrift", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(player.name || 'P').trim().slice(0, 2).toUpperCase(), PHOTO_LAB_WIDTH / 2, 236);
+    ctx.restore();
+  }
+
+  function getPhotoLabSettings() {
+    const readNumber = (id, fallback) => {
+      const value = Number($(id)?.value);
+      return Number.isFinite(value) ? value : fallback;
+    };
+    return {
+      style: $('photo-lab-style')?.value || 'showtime',
+      scale: readNumber('photo-lab-scale', 112) / 100,
+      offsetX: readNumber('photo-lab-x', 0),
+      offsetY: readNumber('photo-lab-y', -14),
+      brightness: readNumber('photo-lab-brightness', 104),
+      contrast: readNumber('photo-lab-contrast', 118),
+      saturation: readNumber('photo-lab-saturation', 118)
+    };
+  }
+
+  function renderPhotoLabCanvas(options) {
+    const canvas = $('photo-lab-canvas');
+    if (!canvas) return null;
+    const ctx = canvas.getContext('2d');
+    const player = buildPlayer();
+    const settings = getPhotoLabSettings();
+    const team = player.team || 'RB';
+    canvas.width = PHOTO_LAB_WIDTH;
+    canvas.height = PHOTO_LAB_HEIGHT;
+    canvas.dataset.rendered = 'false';
+
+    const bg = ctx.createLinearGradient(0, 0, PHOTO_LAB_WIDTH, PHOTO_LAB_HEIGHT);
+    if (settings.style === 'clean') {
+      bg.addColorStop(0, '#eef2f7');
+      bg.addColorStop(1, '#d9e2ee');
+    } else {
+      bg.addColorStop(0, '#0a0f1a');
+      bg.addColorStop(.48, settings.style === 'spotlight' ? '#21170d' : '#142034');
+      bg.addColorStop(1, '#05070c');
+    }
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, PHOTO_LAB_WIDTH, PHOTO_LAB_HEIGHT);
+
+    ctx.save();
+    ctx.globalAlpha = settings.style === 'clean' ? .18 : .34;
+    ctx.strokeStyle = settings.style === 'clean' ? '#94a3b8' : '#f6a344';
+    ctx.lineWidth = 2;
+    for (let y = 80; y < PHOTO_LAB_HEIGHT; y += 82) {
+      ctx.beginPath();
+      ctx.moveTo(46, y);
+      ctx.lineTo(PHOTO_LAB_WIDTH - 46, y - 34);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    const imageX = 42;
+    const imageY = 34;
+    const imageW = PHOTO_LAB_WIDTH - 84;
+    const imageH = PHOTO_LAB_HEIGHT - 118;
+    ctx.save();
+    drawRoundRect(ctx, imageX, imageY, imageW, imageH, 34);
+    ctx.clip();
+    if (photoLabImage) {
+      const coverScale = Math.max(imageW / photoLabImage.width, imageH / photoLabImage.height) * settings.scale;
+      const drawW = photoLabImage.width * coverScale;
+      const drawH = photoLabImage.height * coverScale;
+      const drawX = imageX + (imageW - drawW) / 2 + settings.offsetX * 1.8;
+      const drawY = imageY + (imageH - drawH) / 2 + settings.offsetY * 1.8;
+      ctx.filter = `brightness(${settings.brightness}%) contrast(${settings.contrast}%) saturate(${settings.saturation}%)`;
+      ctx.drawImage(photoLabImage, drawX, drawY, drawW, drawH);
+      ctx.filter = 'none';
+    } else {
+      drawPhotoLabPlaceholder(ctx, player);
+    }
+    const shine = ctx.createLinearGradient(imageX, imageY, imageX + imageW, imageY + imageH);
+    shine.addColorStop(0, 'rgba(255,255,255,.22)');
+    shine.addColorStop(.38, 'rgba(255,255,255,0)');
+    shine.addColorStop(1, settings.style === 'clean' ? 'rgba(15,23,42,.08)' : 'rgba(249,115,22,.16)');
+    ctx.fillStyle = shine;
+    ctx.fillRect(imageX, imageY, imageW, imageH);
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = settings.style === 'clean' ? 'rgba(15,23,42,.35)' : 'rgba(246,163,68,.72)';
+    ctx.lineWidth = 8;
+    drawRoundRect(ctx, 22, 22, PHOTO_LAB_WIDTH - 44, PHOTO_LAB_HEIGHT - 44, 38);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.78)';
+    ctx.lineWidth = 2;
+    drawRoundRect(ctx, 34, 34, PHOTO_LAB_WIDTH - 68, PHOTO_LAB_HEIGHT - 68, 30);
+    ctx.stroke();
+    ctx.restore();
+
+    const plate = ctx.createLinearGradient(0, PHOTO_LAB_HEIGHT - 148, 0, PHOTO_LAB_HEIGHT);
+    plate.addColorStop(0, 'rgba(5,7,12,0)');
+    plate.addColorStop(.34, settings.style === 'clean' ? 'rgba(15,23,42,.72)' : 'rgba(5,7,12,.78)');
+    plate.addColorStop(1, settings.style === 'spotlight' ? 'rgba(124,74,18,.92)' : 'rgba(5,7,12,.94)');
+    ctx.fillStyle = plate;
+    ctx.fillRect(0, PHOTO_LAB_HEIGHT - 170, PHOTO_LAB_WIDTH, 170);
+
+    ctx.fillStyle = settings.style === 'clean' ? '#e5edf8' : '#f7f3e8';
+    ctx.font = '900 42px "Arial Narrow", "Bahnschrift", sans-serif';
+    ctx.textAlign = 'left';
+    const displayName = String(player.name || 'Player').toUpperCase();
+    const words = displayName.split(/\s+/);
+    const firstLine = words.length > 2 ? words.slice(0, -1).join(' ') : displayName;
+    const secondLine = words.length > 2 ? words[words.length - 1] : '';
+    ctx.fillText(firstLine.slice(0, 20), 48, PHOTO_LAB_HEIGHT - 88);
+    if (secondLine) ctx.fillText(secondLine.slice(0, 16), 48, PHOTO_LAB_HEIGHT - 46);
+
+    ctx.fillStyle = '#f6a344';
+    ctx.font = '900 24px "Arial Narrow", "Bahnschrift", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(team.toUpperCase().slice(0, 5), PHOTO_LAB_WIDTH - 48, PHOTO_LAB_HEIGHT - 54);
+    ctx.fillStyle = 'rgba(25,194,140,.95)';
+    ctx.fillRect(48, PHOTO_LAB_HEIGHT - 34, PHOTO_LAB_WIDTH - 96, 5);
+
+    canvas.dataset.rendered = 'true';
+    updatePhotoLabPath();
+    if (!options || !options.silent) setPhotoLabStatus(photoLabImage ? `Rendered ${photoLabSourceName || 'source photo'}` : 'Rendered placeholder');
+    return canvas;
+  }
+
+  function getPhotoLabDataUrl() {
+    const canvas = $('photo-lab-canvas');
+    return canvas ? canvas.toDataURL('image/png') : '';
+  }
+
+  function loadPhotoLabFile(file) {
+    if (!file) return;
+    if (!/^image\//i.test(file.type || '')) {
+      setPhotoLabStatus('Choose an image file');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        photoLabImage = image;
+        photoLabSourceName = file.name || 'source photo';
+        renderPhotoLabCanvas({ silent: true });
+        setPhotoLabStatus(`Loaded ${photoLabSourceName}`);
+      };
+      image.onerror = () => setPhotoLabStatus('Photo could not be decoded');
+      image.src = String(reader.result || '');
+    };
+    reader.onerror = () => setPhotoLabStatus('Photo could not be read');
+    reader.readAsDataURL(file);
+  }
+
+  function downloadPhotoLabPortrait() {
+    renderPhotoLabCanvas({ silent: true });
+    const link = document.createElement('a');
+    const filename = buildPhotoLabExportPath(buildPlayer()).split('/').pop() || 'player-portrait.png';
+    link.href = getPhotoLabDataUrl();
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setPhotoLabStatus(`Downloaded ${filename}`);
+  }
+
+  function usePhotoLabPath() {
+    $('portrait-url').value = updatePhotoLabPath();
+    setPhotoLabStatus('Asset path applied to override URL');
+  }
+
+  function defaultAiPortraitEndpoint() {
+    const host = String(window.location.hostname || '').toLowerCase();
+    if ((host === '127.0.0.1' || host === 'localhost') && window.location.port === '8080') {
+      return 'http://127.0.0.1:8888/.netlify/functions/generate-player-portrait';
+    }
+    return '/.netlify/functions/generate-player-portrait';
+  }
+
+  function setAiPortraitStatus(message, tone) {
+    const status = $('ai-portrait-status');
+    if (!status) return;
+    status.textContent = message;
+    status.style.color = tone === 'bad' ? '#ffd8d1' : tone === 'good' ? '#b9f8de' : '';
+  }
+
+  function buildAiPortraitPrompt(player) {
+    const source = player || buildPlayer();
+    return [
+      'Use case: stylized-concept',
+      'Asset type: RosterBate player portrait card for assets/player-portraits/',
+      `Primary request: Create an original stylized basketball portrait card for ${source.name}.`,
+      `Subject: one fictionalized basketball player inspired by the roster entry ${source.name}${source.team ? `, team code ${source.team}` : ''}${source.id ? `, roster id ${source.id}` : ''}.`,
+      'Style/medium: polished sports-card portrait, crisp digital illustration with premium arena lighting.',
+      'Composition/framing: single upper-body player, centered, strong silhouette, generous edge padding for a 512 x 640 crop.',
+      'Lighting/mood: dramatic but clean, energetic, professional fantasy sports presentation.',
+      'Color palette: RosterBate dark court backdrop with warm orange and green accent energy.',
+      'Text: none.',
+      'Constraints: original stylized player, not an exact celebrity likeness; no real team logos; no sponsor marks; no watermark; no jersey number text.'
+    ].join('\n');
+  }
+
+  function refreshAiPortraitPrompt(force) {
+    const prompt = $('ai-portrait-prompt');
+    if (!prompt) return;
+    if (force || !prompt.value.trim() || prompt.dataset.generated === 'true') {
+      prompt.value = buildAiPortraitPrompt(buildPlayer());
+      prompt.dataset.generated = 'true';
+    }
+  }
+
+  function renderAiPortraitResult(result) {
+    const image = $('ai-portrait-output');
+    const placeholder = $('ai-portrait-placeholder');
+    if (image && result?.imageDataUrl) {
+      image.src = result.imageDataUrl;
+      image.style.display = 'block';
+    }
+    if (placeholder) placeholder.style.display = result?.imageDataUrl ? 'none' : '';
+    if ($('ai-portrait-data-url')) $('ai-portrait-data-url').value = result?.imageDataUrl || '';
+    if ($('ai-portrait-entry')) $('ai-portrait-entry').value = result?.manifestEntry ? JSON.stringify(result.manifestEntry, null, 2) : '';
+    if (result?.assetPath && $('photo-lab-export-path')) $('photo-lab-export-path').value = result.assetPath;
+    if (result?.manifestEntry && $('photo-lab-entry')) $('photo-lab-entry').value = JSON.stringify(result.manifestEntry, null, 2);
+  }
+
+  async function requestAiPortrait() {
+    const endpoint = $('ai-portrait-endpoint').value.trim();
+    const prompt = $('ai-portrait-prompt').value.trim();
+    if (!endpoint) {
+      setAiPortraitStatus('Add a generation endpoint', 'bad');
+      return null;
+    }
+    if (!prompt) {
+      setAiPortraitStatus('Build or write a prompt first', 'bad');
+      return null;
+    }
+    const player = buildPlayer();
+    const headers = { 'Content-Type': 'application/json' };
+    const token = $('ai-portrait-admin-token').value.trim();
+    if (token) headers['X-RosterBate-Admin-Token'] = token;
+    setAiPortraitStatus('Generating portrait...');
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          player,
+          prompt,
+          assetPath: buildPhotoLabExportPath(player)
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result?.error || `HTTP ${response.status}`);
+      aiPortraitResult = result;
+      renderAiPortraitResult(result);
+      setAiPortraitStatus('Generated portrait ready', 'good');
+      return result;
+    } catch (error) {
+      const message = String(error?.message || error);
+      const isLocalFunctionEndpoint = /127\.0\.0\.1:8888|localhost:8888/.test(endpoint);
+      const recovery = isLocalFunctionEndpoint && /fetch|network|load failed|failed/i.test(message)
+        ? 'Local function server is not running. Start npm run portraits:imagegen-dev, then try again.'
+        : `Generation unavailable: ${message}`;
+      setAiPortraitStatus(recovery, 'bad');
+      return null;
+    }
+  }
+
+  function downloadAiPortrait() {
+    if (!aiPortraitResult?.imageDataUrl) {
+      setAiPortraitStatus('Generate a portrait first', 'bad');
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = aiPortraitResult.imageDataUrl;
+    link.download = (aiPortraitResult.assetPath || buildPhotoLabExportPath(buildPlayer())).split('/').pop() || 'player-portrait.png';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setAiPortraitStatus('Generated PNG downloaded', 'good');
+  }
+
+  function useAiPortrait() {
+    if (!aiPortraitResult?.imageDataUrl) {
+      setAiPortraitStatus('Generate a portrait first', 'bad');
+      return;
+    }
+    $('portrait-url').value = aiPortraitResult.imageDataUrl;
+    refreshLookup();
+    $('resolved-url').textContent = aiPortraitResult.imageDataUrl;
+    $('portrait-preview').innerHTML = `<img src="${escapeHtml(aiPortraitResult.imageDataUrl)}" alt="${escapeHtml(buildPlayer().name)} generated portrait">`;
+    setAiPortraitStatus('Generated image applied to lookup field', 'good');
+  }
+
+  function readJsonStorage(storage, key) {
+    if (!storage || !key) return null;
+    try {
+      const raw = storage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function firstFilledValue() {
+    for (const value of arguments) {
+      if (typeof value === 'string' && value.trim()) return value.trim();
+      if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+    }
+    return '';
+  }
+
+  function teamLabelFromEntry(entry, fallback) {
+    if (!entry || typeof entry !== 'object') return fallback || '';
+    return firstFilledValue(
+      entry.abbr,
+      entry.teamAbbr,
+      entry.teamCode,
+      entry.code,
+      entry.shortName,
+      entry.name,
+      entry.teamName,
+      fallback
+    );
+  }
+
+  function playerDisplayName(player) {
+    if (!player || typeof player !== 'object') return '';
+    const combined = [player.firstName, player.lastName].filter(Boolean).join(' ').trim();
+    return firstFilledValue(
+      player.name,
+      player.playerName,
+      player.fullName,
+      player.displayName,
+      player.commonName,
+      combined
+    );
+  }
+
+  function isPlayerLike(value) {
+    return !!(value && typeof value === 'object' && !Array.isArray(value) && playerDisplayName(value));
+  }
+
+  function normalizePlayerIdentity(player, sourceLabel, rosterLabel) {
+    if (!player || typeof player !== 'object' || Array.isArray(player)) return null;
+    const name = playerDisplayName(player);
+    if (!name) return null;
+    const rosterTeam = /^[A-Z0-9]{2,5}$/.test(String(rosterLabel || '').trim())
+      ? String(rosterLabel).trim().toUpperCase()
+      : '';
+    return {
+      id: firstFilledValue(player.id, player.playerId, player.nbaId, player.slug),
+      name,
+      team: firstFilledValue(
+        player.team,
+        player.teamCode,
+        player.nbaTeam,
+        player.currentTeam,
+        player.abbr,
+        player.franchise,
+        rosterTeam
+      ).toUpperCase(),
+      pos: firstFilledValue(player.pos, player.position, player.primaryPosition, player.slot),
+      source: sourceLabel || 'Saved league',
+      roster: rosterLabel || '',
+      raw: player
+    };
+  }
+
+  function playerDedupKey(player) {
+    const id = String(player?.id || '').trim().toLowerCase();
+    if (id) return `id:${id}`;
+    return `${String(player?.name || '').trim().toLowerCase()}|${String(player?.team || '').trim().toLowerCase()}`;
+  }
+
+  function pushPlayerCandidate(list, seen, player, sourceLabel, rosterLabel) {
+    const normalized = normalizePlayerIdentity(player, sourceLabel, rosterLabel);
+    if (!normalized) return;
+    const key = playerDedupKey(normalized);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    list.push(normalized);
+  }
+
+  function collectPlayersFromRoster(list, seen, roster, sourceLabel, rosterLabel) {
+    if (!Array.isArray(roster)) return;
+    roster.forEach((player) => pushPlayerCandidate(list, seen, player, sourceLabel, rosterLabel));
+  }
+
+  function collectPlayersFromRosterCollection(list, seen, rosters, teams, sourceLabel) {
+    if (!Array.isArray(rosters)) return;
+    if (rosters.some(isPlayerLike)) {
+      collectPlayersFromRoster(list, seen, rosters, sourceLabel, 'Players');
+      return;
+    }
+    rosters.forEach((roster, index) => {
+      const rosterLabel = teamLabelFromEntry(Array.isArray(teams) ? teams[index] : null, `Roster ${index + 1}`);
+      collectPlayersFromRoster(list, seen, roster, sourceLabel, rosterLabel);
+    });
+  }
+
+  function collectPlayersFromRosterMap(list, seen, rosterMap, sourceLabel) {
+    if (!rosterMap || typeof rosterMap !== 'object' || Array.isArray(rosterMap)) return;
+    Object.entries(rosterMap).forEach(([rosterLabel, roster]) => {
+      collectPlayersFromRoster(list, seen, roster, sourceLabel, rosterLabel);
+    });
+  }
+
+  function collectPlayersFromLeagueData(data, sourceLabel) {
+    const list = [];
+    const seen = new Set();
+    const visit = (value, label) => {
+      if (!value) return;
+      if (Array.isArray(value)) {
+        collectPlayersFromRosterCollection(list, seen, value, null, label);
+        return;
+      }
+      if (typeof value !== 'object') return;
+      if (isPlayerLike(value)) {
+        pushPlayerCandidate(list, seen, value, label, '');
+        return;
+      }
+      collectPlayersFromRosterCollection(list, seen, value.allRosters, value.teams, label);
+      collectPlayersFromRosterCollection(list, seen, value.rosters, value.teams, label);
+      collectPlayersFromRoster(list, seen, value.players, label, 'Players');
+      collectPlayersFromRoster(list, seen, value.waiver, label, 'Waivers');
+      collectPlayersFromRoster(list, seen, value.freeAgents, label, 'Free agents');
+      collectPlayersFromRosterMap(list, seen, value?.draftState?.rostersByTeam, label);
+      collectPlayersFromRoster(list, seen, value?.draftState?.freeAgents, label, 'Free agents');
+      collectPlayersFromRoster(list, seen, value?.draftState?.waiver, label, 'Waivers');
+      collectPlayersFromRoster(list, seen, value?.draftState?.players, label, 'Players');
+      [
+        ['state', 'State'],
+        ['payload', 'Payload'],
+        ['draft', 'Draft'],
+        ['draftData', 'Draft'],
+        ['season', 'Season'],
+        ['gameState', 'Game state'],
+        ['localState', 'Local state']
+      ].forEach(([key, fallback]) => {
+        if (value[key] && value[key] !== value) visit(value[key], `${label} ${fallback}`);
+      });
+    };
+    visit(data, sourceLabel || 'Imported data');
+    return list;
+  }
+
+  function collectLeaguePlayersFromStorage() {
+    const players = [];
+    const seen = new Set();
+    const storages = [
+      ['localStorage', window.localStorage],
+      ['sessionStorage', window.sessionStorage]
+    ];
+    storages.forEach(([storageName, storage]) => {
+      LEAGUE_STORAGE_KEYS.forEach((key) => {
+        const data = readJsonStorage(storage, key);
+        collectPlayersFromLeagueData(data, `${storageName}:${key}`).forEach((player) => {
+          const dedupKey = playerDedupKey(player);
+          if (!dedupKey || seen.has(dedupKey)) return;
+          seen.add(dedupKey);
+          players.push(player);
+        });
+      });
+    });
+    return players;
+  }
+
+  function isGenericPortraitPlayer(player) {
+    if (!portraits || typeof portraits.getPortraitUrl !== 'function') return false;
+    const url = portraits.getPortraitUrl(player || {});
+    return /^data:image\/svg\+xml/i.test(String(url || ''));
+  }
+
+  function refreshLeaguePlayers(sourcePlayers) {
+    const source = Array.isArray(sourcePlayers) ? sourcePlayers : collectLeaguePlayersFromStorage();
+    leaguePlayers = source
+      .filter(isGenericPortraitPlayer)
+      .sort((a, b) => `${a.name}|${a.team}`.localeCompare(`${b.name}|${b.team}`));
+    renderLeaguePlayers();
+    return leaguePlayers;
+  }
+
+  function renderLeaguePlayers() {
+    const grid = $('league-player-grid');
+    const count = $('league-player-count');
+    if (!grid || !count) return;
+    const query = $('league-player-search')?.value.trim().toLowerCase() || '';
+    const visible = leaguePlayers
+      .map((player, index) => ({ player, index }))
+      .filter(({ player }) => {
+        const haystack = `${player.name} ${player.team} ${player.pos} ${player.source} ${player.roster}`.toLowerCase();
+        return !query || haystack.includes(query);
+      });
+    count.textContent = String(visible.length);
+    if (!visible.length) {
+      grid.innerHTML = '<p class="small-muted">No saved league players are using generic portraits right now.</p>';
+      return;
+    }
+    grid.innerHTML = visible.map(({ player, index }) => {
+      const key = playerDedupKey(player);
+      const portraitMarkup = portraits && typeof portraits.renderPortraitMarkup === 'function'
+        ? portraits.renderPortraitMarkup(player, {
+          size: 42,
+          aspect: 52 / 42,
+          className: 'helper-player-portrait'
+        })
+        : '';
+      const meta = [player.team, player.pos, player.roster].filter(Boolean).join(' - ');
+      return `
+        <button class="league-player-card${key === selectedLeaguePlayerKey ? ' is-selected' : ''}" type="button" data-player-index="${index}" data-player-name="${escapeHtml(player.name)}" data-player-team="${escapeHtml(player.team)}">
+          <span class="league-player-avatar">${portraitMarkup}</span>
+          <span>
+            <span class="league-player-name">${escapeHtml(player.name)}</span>
+            <span class="league-player-meta">${escapeHtml(meta || player.source)}</span>
+            <span class="league-player-badge">Generic avatar</span>
+          </span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  function selectLeaguePlayer(index) {
+    const player = leaguePlayers[Number(index)];
+    if (!player) return;
+    selectedLeaguePlayerKey = playerDedupKey(player);
+    $('portrait-player-name').value = player.name;
+    $('portrait-team').value = player.team;
+    $('portrait-id').value = player.id;
+    $('portrait-url').value = '';
+    refreshLookup();
+    const idKey = player.id ? `id:${String(player.id).trim().toLowerCase()}` : '';
+    const keySelect = $('portrait-key');
+    if (idKey && Array.from(keySelect.options).some((option) => option.value === idKey)) {
+      keySelect.value = idKey;
+    }
+    updatePhotoLabPath();
+    renderPhotoLabCanvas({ silent: true });
+    refreshAiPortraitPrompt(true);
+    renderLeaguePlayers();
+    setPhotoLabStatus(`Selected ${player.name}`);
+  }
+
+  function importLeaguePlayersFromJson() {
+    try {
+      const parsed = JSON.parse($('league-player-json').value || 'null');
+      const players = refreshLeaguePlayers(collectPlayersFromLeagueData(parsed, 'Imported JSON'));
+      setStatus(`Imported ${players.length} player(s) needing portraits`);
+    } catch (error) {
+      setStatus(`Invalid league JSON: ${error.message}`, 'bad');
+    }
+  }
+
+  function clearSelectedLeaguePlayerIfEdited() {
+    if (!selectedLeaguePlayerKey) return;
+    const selected = leaguePlayers.find((player) => playerDedupKey(player) === selectedLeaguePlayerKey);
+    if (!selected) return;
+    const name = $('portrait-player-name').value.trim();
+    const team = $('portrait-team').value.trim().toUpperCase();
+    if (name === selected.name && team === selected.team) return;
+    selectedLeaguePlayerKey = '';
+    if (String($('portrait-id').value || '') === String(selected.id || '')) {
+      $('portrait-id').value = '';
+    }
+    renderLeaguePlayers();
   }
 
   function updateKeySelect(candidates) {
@@ -551,11 +1657,21 @@
       ? portraits.getPortraitUrl(player)
       : '';
     $('preview-title').textContent = player.name;
-    $('preview-subtitle').textContent = player.team ? `${player.team} lookup` : 'Name-only lookup';
+    const state = $('portrait-state')?.value || '';
+    $('preview-subtitle').textContent = [player.team ? `${player.team} lookup` : 'Name-only lookup', state ? state.replace(/-/g, ' ') : 'idle'].join(' - ');
     $('resolved-url').textContent = resolved;
-    $('portrait-preview').innerHTML = resolved
-      ? `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(player.name)} portrait">`
-      : '';
+    $('portrait-preview').innerHTML = portraits && typeof portraits.renderPortraitMarkup === 'function'
+      ? portraits.renderPortraitMarkup(player, {
+        size: 108,
+        aspect: 128 / 108,
+        className: 'helper-player-portrait',
+        state: currentPreviewState()
+      })
+      : resolved
+        ? `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(player.name)} portrait">`
+        : '';
+    updatePhotoLabPath();
+    refreshAiPortraitPrompt(false);
   }
 
   function renderOverrides() {
@@ -590,6 +1706,7 @@
       if (portraits && typeof portraits.applyManifest === 'function') portraits.applyManifest(manifest);
       renderManifest();
       refreshLookup();
+      refreshLeaguePlayers();
       setStatus(`Loaded ${Object.keys(manifestPlayers).length} portraits`);
     } catch (error) {
       manifestPlayers = {};
@@ -621,10 +1738,62 @@
   }
 
   function bindEvents() {
-    ['portrait-player-name', 'portrait-team', 'portrait-id'].forEach((id) => {
+    ['portrait-player-name', 'portrait-team'].forEach((id) => {
+      $(id).addEventListener('input', () => {
+        clearSelectedLeaguePlayerIfEdited();
+        refreshLookup();
+      });
+    });
+    ['portrait-id', 'portrait-state'].forEach((id) => {
       $(id).addEventListener('input', refreshLookup);
     });
+    $('portrait-state').addEventListener('change', refreshLookup);
     $('portrait-key').addEventListener('change', refreshLookup);
+    $('photo-lab-file').addEventListener('change', (event) => {
+      loadPhotoLabFile(event.target.files && event.target.files[0]);
+    });
+    [
+      'photo-lab-style',
+      'photo-lab-scale',
+      'photo-lab-x',
+      'photo-lab-y',
+      'photo-lab-brightness',
+      'photo-lab-contrast',
+      'photo-lab-saturation'
+    ].forEach((id) => {
+      $(id).addEventListener('input', () => renderPhotoLabCanvas({ silent: true }));
+      $(id).addEventListener('change', () => renderPhotoLabCanvas({ silent: true }));
+    });
+    $('photo-lab-render').addEventListener('click', () => renderPhotoLabCanvas());
+    $('photo-lab-download').addEventListener('click', downloadPhotoLabPortrait);
+    $('photo-lab-use-path').addEventListener('click', usePhotoLabPath);
+    $('photo-lab-copy-entry').addEventListener('click', () => {
+      copyText($('photo-lab-entry').value).then(() => setPhotoLabStatus('Entry copied'));
+    });
+    $('ai-portrait-prompt').addEventListener('input', () => {
+      $('ai-portrait-prompt').dataset.generated = 'false';
+    });
+    $('build-ai-portrait-prompt').addEventListener('click', () => {
+      refreshAiPortraitPrompt(true);
+      setAiPortraitStatus('Prompt rebuilt');
+    });
+    $('generate-ai-portrait').addEventListener('click', requestAiPortrait);
+    $('download-ai-portrait').addEventListener('click', downloadAiPortrait);
+    $('use-ai-portrait').addEventListener('click', useAiPortrait);
+    $('copy-ai-portrait-entry').addEventListener('click', () => {
+      copyText($('ai-portrait-entry').value).then(() => setAiPortraitStatus('Entry copied', 'good'));
+    });
+    $('league-player-search').addEventListener('input', renderLeaguePlayers);
+    $('load-league-players').addEventListener('click', () => {
+      const players = refreshLeaguePlayers();
+      setStatus(`Found ${players.length} player(s) needing portraits`);
+    });
+    $('import-league-players').addEventListener('click', importLeaguePlayersFromJson);
+    $('league-player-grid').addEventListener('click', (event) => {
+      const card = event.target.closest('[data-player-index]');
+      if (!card) return;
+      selectLeaguePlayer(card.getAttribute('data-player-index'));
+    });
     $('add-override').addEventListener('click', saveCurrentOverride);
     $('reload-manifest').addEventListener('click', loadManifest);
     $('manifest-search').addEventListener('input', renderManifest);
@@ -662,9 +1831,22 @@
     });
   }
 
+  $('ai-portrait-endpoint').value = defaultAiPortraitEndpoint();
+  refreshAiPortraitPrompt(true);
   bindEvents();
   renderOverrides();
   refreshLookup();
+  renderPhotoLabCanvas({ silent: true });
+  window.rbPortraitManifestDev = {
+    buildPhotoLabExportPath,
+    getPhotoLabDataUrl,
+    renderPhotoLabCanvas,
+    collectLeaguePlayersFromStorage,
+    isGenericPortraitPlayer,
+    refreshLeaguePlayers,
+    buildAiPortraitPrompt,
+    requestAiPortrait
+  };
   loadManifest();
 })();
 </script>
