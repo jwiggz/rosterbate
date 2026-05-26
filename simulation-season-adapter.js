@@ -25,6 +25,12 @@
       claimSimulationFreeAgent(...args){
         return root.RosterBateSimulationModeRuntime.claimSimulationFreeAgent(...args);
       },
+      submitSimulationWaiverClaim(...args){
+        return root.RosterBateSimulationModeRuntime.submitSimulationWaiverClaim(...args);
+      },
+      cancelSimulationWaiverClaim(...args){
+        return root.RosterBateSimulationModeRuntime.cancelSimulationWaiverClaim(...args);
+      },
       applySimulationTrade(...args){
         return root.RosterBateSimulationModeRuntime.applySimulationTrade(...args);
       },

@@ -183,6 +183,8 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .player-portrait.portrait-state-scoring{animation:portraitScoringPulse .75s cubic-bezier(.2,1.4,.24,1);}
 .player-portrait.portrait-state-takeover{box-shadow:0 0 0 1px rgba(251,191,36,.65),0 0 24px rgba(251,191,36,.28),0 8px 18px rgba(2,6,23,.28) !important;}
 .player-portrait.portrait-state-takeover:after{opacity:1;box-shadow:inset 0 0 18px rgba(251,191,36,.36);}
+.player-portrait.portrait-state-final{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(249,115,22,.24),0 0 32px rgba(249,115,22,.42),0 8px 18px rgba(2,6,23,.28) !important;transform:translateY(-2px);}
+.player-portrait.portrait-state-final:after{opacity:1;background:linear-gradient(135deg,rgba(255,255,255,.32),transparent 42%),radial-gradient(circle at 50% 9%,rgba(255,255,255,.42),transparent 28%);}
 @keyframes portraitScoringPulse{0%{transform:translateY(0) scale(1);}42%{transform:translateY(-3px) scale(1.08);}100%{transform:translateY(0) scale(1);}}
 .pn{font-family:var(--fd);font-size:14px;font-weight:700;}
 .pd{font-size:11px;color:var(--text2);margin-top:1px;}
@@ -192,6 +194,7 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center;}
 .mo.open{display:flex;}
+#playerDetailModal{z-index:260;}
 .ms{background:var(--bg2);border-radius:18px 18px 0 0;padding:16px 16px 40px;width:100%;max-width:500px;border-top:1px solid var(--border);max-height:90dvh;overflow-y:auto;}
 .mh{width:36px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 14px;}
 .sgrid{display:grid;grid-template-columns:26px 1fr 58px 52px 50px;align-items:center;}
@@ -925,6 +928,10 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .player-detail-status{grid-column:1/-1;background:linear-gradient(90deg,rgba(220,38,38,.92),rgba(249,115,22,.78));color:#fff;text-align:center;font-family:var(--fd);font-size:14px;font-weight:900;text-transform:uppercase;padding:5px 8px;letter-spacing:.12em;}
 .player-detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:rgba(2,6,23,.45);padding:12px;border:1px solid rgba(148,163,184,.14);border-radius:14px;margin-top:10px;}
 .player-detail-drop{border:none;border-radius:999px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;padding:10px 18px;cursor:pointer;box-shadow:0 12px 22px rgba(127,29,29,.26);}
+.player-detail-actions.single{grid-template-columns:minmax(180px,260px) 1fr;align-items:center;}
+.player-detail-primary{border:none;border-radius:999px;background:linear-gradient(135deg,#2563eb,#0f766e);color:#fff;font-family:var(--fd);font-size:17px;font-weight:900;text-transform:uppercase;padding:11px 18px;cursor:pointer;box-shadow:0 12px 22px rgba(15,118,110,.24);}
+.player-detail-primary.add{background:linear-gradient(135deg,#22c55e,#15803d);box-shadow:0 12px 22px rgba(21,128,61,.24);}
+.player-detail-action-copy{font-size:12px;line-height:1.45;color:#cbd5e1;}
 .player-detail-select{border:1px solid rgba(148,163,184,.28);border-radius:999px;background:#0f172a;color:#f8fafc;padding:9px 14px;font-weight:800;}
 .player-detail-action-label{font-size:11px;color:#cbd5e1;font-weight:800;text-transform:uppercase;letter-spacing:.08em;}
 .player-detail-section{margin-top:10px;padding:14px 16px;}
@@ -938,6 +945,18 @@ body[data-season-boot="loading"] #seasonEmptyActions{display:none;}
 .player-detail-table th:first-child,.player-detail-table td:first-child{text-align:left;color:#93c5fd;}
 .player-detail-news-date{font-size:10px;text-transform:uppercase;color:#94a3b8;margin-bottom:10px;letter-spacing:.1em;}
 .player-detail-news-copy{font-size:12px;line-height:1.55;color:#dbeafe;}
+.player-detail-timeline-list{display:flex;flex-direction:column;gap:9px;}
+.player-detail-timeline-row{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid rgba(148,163,184,.12);}
+.player-detail-timeline-row:first-child{border-top:0;padding-top:0;}
+.player-detail-timeline-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;background:#60a5fa;box-shadow:0 0 0 4px rgba(96,165,250,.12);}
+.player-detail-timeline-dot.trade{background:#fb923c;box-shadow:0 0 0 4px rgba(251,146,60,.13);}
+.player-detail-timeline-dot.waiver{background:#4ade80;box-shadow:0 0 0 4px rgba(74,222,128,.13);}
+.player-detail-timeline-dot.pending{background:#facc15;box-shadow:0 0 0 4px rgba(250,204,21,.13);}
+.player-detail-timeline-dot.status{background:#94a3b8;box-shadow:0 0 0 4px rgba(148,163,184,.12);}
+.player-detail-timeline-main{min-width:0;}
+.player-detail-timeline-title{font-family:var(--fb);font-size:13px;font-weight:900;color:#f8fafc;line-height:1.25;}
+.player-detail-timeline-meta{margin-top:3px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#93c5fd;}
+.player-detail-timeline-detail{margin-top:5px;font-size:12px;line-height:1.45;color:#cbd5e1;}
 @media(max-width:620px){.player-detail-card{padding:8px;}.player-detail-hero{grid-template-columns:124px 1fr;}.player-detail-side{grid-column:1/-1;border-left:none;border-top:1px solid rgba(148,163,184,.16);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;}.player-detail-photo .player-portrait{width:116px !important;height:138px !important;}.player-detail-name{font-size:26px;}.player-detail-actions{grid-template-columns:1fr;}}
 @keyframes savePulse{50%{opacity:.45;transform:scale(.82);}}
 @media(max-width:560px){
@@ -1604,40 +1623,380 @@ function renderTeamInitialAvatar(name,teamCode,size,extraStyle='',portraitOption
   return renderPlayerPortrait(name,teamCode,size,extraStyle,portraitOptions);
 }
 function playerSearchPool(){
+  const game=(typeof G!=='undefined' && G) ? G : {};
+  const data=(typeof D!=='undefined' && D) ? D : {};
+  const adapter=(typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER) ? SEASON_MODE_ADAPTER : null;
+  let adapterState={};
+  try{
+    adapterState=adapter?.getState ? (adapter.getState() || {}) : {};
+  }catch(_err){
+    adapterState={};
+  }
+  const flattenRosterMap=(rosterMap)=>(
+    rosterMap && typeof rosterMap==='object'
+      ? Object.values(rosterMap).flatMap(roster=>Array.isArray(roster) ? roster : [])
+      : []
+  );
   const pools=[
-    ...(Array.isArray(G?.rosters) ? G.rosters.flat() : []),
-    ...(Array.isArray(G?.ilByTeam) ? G.ilByTeam.flat() : []),
-    ...(Array.isArray(G?.waiver) ? G.waiver : [])
+    ...(Array.isArray(game?.rosters) ? game.rosters.flat() : []),
+    ...(Array.isArray(game?.ilByTeam) ? game.ilByTeam.flat() : []),
+    ...(Array.isArray(game?.waiver) ? game.waiver : []),
+    ...(Array.isArray(game?.freeAgents) ? game.freeAgents : []),
+    ...flattenRosterMap(adapterState?.draftState?.rostersByTeam),
+    ...(Array.isArray(adapterState?.draftState?.freeAgents) ? adapterState.draftState.freeAgents : []),
+    ...flattenRosterMap(data?.draftState?.rostersByTeam),
+    ...(Array.isArray(data?.draftState?.freeAgents) ? data.draftState.freeAgents : []),
+    ...(Array.isArray(data?.freeAgents) ? data.freeAgents : [])
   ];
   return pools.filter(Boolean);
 }
-function findPlayerForDetail(playerId,name=''){
-  const id=Number(playerId);
+function normalizePlayerHistoryId(value){
+  return String(value ?? '').trim();
+}
+function doesPlayerHistoryIdMatch(candidate, player){
+  const candidateValue=(candidate && typeof candidate==='object')
+    ? (candidate.id ?? candidate.playerId ?? candidate.pid ?? candidate.key)
+    : candidate;
+  const candidateKey=normalizePlayerHistoryId(candidateValue);
+  if(!candidateKey || !player) return false;
+  return [player.id,player.playerId,player.pid,player.key]
+    .map(normalizePlayerHistoryId)
+    .filter(Boolean)
+    .some(key=>key===candidateKey);
+}
+function formatPlayerHistoryTimestamp(ts){
+  const numeric=Number(ts);
+  if(!Number.isFinite(numeric) || numeric<=0) return '';
+  const date=new Date(numeric);
+  if(Number.isNaN(date.getTime())) return '';
+  const month=date.getMonth()+1;
+  const day=date.getDate();
+  const year=date.getFullYear();
+  let hours=date.getHours();
+  const minutes=String(date.getMinutes()).padStart(2,'0');
+  const suffix=hours>=12?'PM':'AM';
+  hours=hours%12 || 12;
+  return `${month}/${day}/${year} at ${hours}:${minutes} ${suffix}`;
+}
+function buildPlayerDetailTeamLookup(context){
+  context=context || {};
+  const adapterState=context.adapterState || (
+    typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER?.getState
+      ? SEASON_MODE_ADAPTER.getState()
+      : null
+  ) || {};
+  const data=context.data || (typeof D!=='undefined' ? D : {}) || {};
+  const game=context.game || (typeof G!=='undefined' ? G : {}) || {};
+  const nameByIdx=new Map();
+  const nameByAbbr=new Map();
+  const abbrByIdx=new Map();
+  const addTeam=(team,idx)=>{
+    let name='';
+    let abbr='';
+    if(typeof team==='string'){
+      name=team.trim();
+    }else if(team && typeof team==='object'){
+      name=String(team.name || team.displayName || team.nickname || team.title || team.abbr || '').trim();
+      abbr=String(team.abbr || team.teamAbbr || team.code || team.shortName || '').trim().toUpperCase();
+    }
+    if(!name && abbr) name=abbr;
+    const teamIdx=Number(idx);
+    if(Number.isFinite(teamIdx)){
+      if(name && !nameByIdx.has(teamIdx)) nameByIdx.set(teamIdx,name);
+      if(abbr && !abbrByIdx.has(teamIdx)) abbrByIdx.set(teamIdx,abbr);
+    }
+    if(abbr && !nameByAbbr.has(abbr)) nameByAbbr.set(abbr,name || abbr);
+  };
+  [
+    adapterState?.leagueShell?.teams,
+    adapterState?.teams,
+    data?.leagueShell?.teams,
+    data?.teamMeta,
+    data?.teams,
+    game?.teams
+  ].filter(Array.isArray).forEach(teams=>teams.forEach(addTeam));
+  Object.keys(adapterState?.draftState?.rostersByTeam || {}).forEach(abbr=>{
+    const key=String(abbr || '').trim().toUpperCase();
+    if(key && !nameByAbbr.has(key)) nameByAbbr.set(key,key);
+  });
+  const nameForIndex=(idx)=>{
+    const teamIdx=Number(idx);
+    if(Number.isFinite(teamIdx) && nameByIdx.has(teamIdx)) return nameByIdx.get(teamIdx);
+    if(typeof teamName==='function' && Number.isFinite(teamIdx)){
+      try{
+        const named=String(teamName(teamIdx) || '').trim();
+        if(named) return named;
+      }catch(_err){}
+    }
+    return Number.isFinite(teamIdx) ? `Team ${teamIdx+1}` : 'Team';
+  };
+  const nameForAbbr=(abbr)=>{
+    const key=String(abbr || '').trim().toUpperCase();
+    return (key && nameByAbbr.get(key)) || key || 'Team';
+  };
+  return {nameByIdx,nameByAbbr,abbrByIdx,nameForIndex,nameForAbbr};
+}
+function getPlayerDetailTeamIndexByAbbr(lookup, abbr, adapterState){
+  const key=String(abbr || '').trim().toUpperCase();
+  if(!key) return -1;
+  for(const [idx,teamAbbr] of lookup.abbrByIdx.entries()){
+    if(String(teamAbbr || '').trim().toUpperCase()===key) return Number(idx);
+  }
+  const teams=Array.isArray(adapterState?.leagueShell?.teams) ? adapterState.leagueShell.teams : [];
+  const idx=teams.findIndex(team=>String(team?.abbr || team?.teamAbbr || team?.code || '').trim().toUpperCase()===key);
+  return idx>=0 ? idx : -1;
+}
+function getControlledTeamIndexForPlayerDetail(context){
+  context=context || {};
+  const adapterState=context.adapterState || (
+    typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER?.getState
+      ? SEASON_MODE_ADAPTER.getState()
+      : null
+  ) || {};
+  const data=context.data || (typeof D!=='undefined' ? D : {}) || {};
+  const game=context.game || (typeof G!=='undefined' ? G : {}) || {};
+  const lookup=context.lookup || buildPlayerDetailTeamLookup({adapterState,data,game});
+  const controlledAbbr=String(
+    adapterState?.draftState?.controlledTeamAbbr
+    || data?.draftState?.controlledTeamAbbr
+    || ''
+  ).trim().toUpperCase();
+  if(controlledAbbr){
+    const idx=getPlayerDetailTeamIndexByAbbr(lookup, controlledAbbr, adapterState);
+    if(idx>=0) return idx;
+  }
+  const explicit=Number(data?.myPos ?? game?.myPos);
+  return Number.isFinite(explicit) ? explicit : 0;
+}
+function getPlayerDetailRosterOwner(playerId, context){
+  context=context || {};
+  const idKey=normalizePlayerHistoryId(playerId);
+  if(!idKey) return null;
+  const adapterState=context.adapterState || (
+    typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER?.getState
+      ? SEASON_MODE_ADAPTER.getState()
+      : null
+  ) || {};
+  const data=context.data || (typeof D!=='undefined' ? D : {}) || {};
+  const game=context.game || (typeof G!=='undefined' ? G : {}) || {};
+  const lookup=context.lookup || buildPlayerDetailTeamLookup({adapterState,data,game});
+  const adapterRosterEntry=Object.entries(adapterState?.draftState?.rostersByTeam || {})
+    .find(([,roster])=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(idKey,candidate)));
+  if(adapterRosterEntry){
+    const abbr=String(adapterRosterEntry[0] || '').trim().toUpperCase();
+    const idx=getPlayerDetailTeamIndexByAbbr(lookup, abbr, adapterState);
+    return {idx,abbr,name:lookup.nameForAbbr(abbr),source:'adapter-roster',slot:'Roster'};
+  }
+  const adapterFreeAgents=Array.isArray(adapterState?.draftState?.freeAgents) ? adapterState.draftState.freeAgents : [];
+  if(adapterFreeAgents.some(candidate=>doesPlayerHistoryIdMatch(idKey,candidate))){
+    return null;
+  }
+  const gameRosterIndex=(Array.isArray(game?.rosters) ? game.rosters : [])
+    .findIndex(roster=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(idKey,candidate)));
+  if(gameRosterIndex>=0){
+    return {
+      idx:gameRosterIndex,
+      abbr:lookup.abbrByIdx.get(gameRosterIndex) || '',
+      name:lookup.nameForIndex(gameRosterIndex),
+      source:'roster',
+      slot:'Roster'
+    };
+  }
+  const gameIlIndex=(Array.isArray(game?.ilByTeam) ? game.ilByTeam : [])
+    .findIndex(roster=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(idKey,candidate)));
+  if(gameIlIndex>=0){
+    return {
+      idx:gameIlIndex,
+      abbr:lookup.abbrByIdx.get(gameIlIndex) || '',
+      name:lookup.nameForIndex(gameIlIndex),
+      source:'injured-list',
+      slot:'IL'
+    };
+  }
+  return null;
+}
+function findPlayerForDetail(playerId,name='',source=''){
+  const idKey=normalizePlayerHistoryId(playerId);
+  const sourceKey=String(source || '').trim().toLowerCase();
+  const adapter=(typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER) ? SEASON_MODE_ADAPTER : null;
+  let adapterState={};
+  try{
+    adapterState=adapter?.getState ? (adapter.getState() || {}) : {};
+  }catch(_err){
+    adapterState={};
+  }
+  const data=(typeof D!=='undefined' && D) ? D : {};
+  const game=(typeof G!=='undefined' && G) ? G : {};
+  const freeAgentPool=[
+    ...(Array.isArray(game?.waiver) ? game.waiver : []),
+    ...(Array.isArray(game?.freeAgents) ? game.freeAgents : []),
+    ...(Array.isArray(adapterState?.draftState?.freeAgents) ? adapterState.draftState.freeAgents : []),
+    ...(Array.isArray(data?.draftState?.freeAgents) ? data.draftState.freeAgents : []),
+    ...(Array.isArray(data?.freeAgents) ? data.freeAgents : [])
+  ].filter(Boolean);
+  const normalized=String(name||'').trim().toLowerCase();
+  const findInPool=(pool)=>{
+    if(idKey){
+      const byId=pool.find(p=>doesPlayerHistoryIdMatch(idKey,p));
+      if(byId) return byId;
+    }
+    return normalized ? pool.find(p=>String(p?.name||'').trim().toLowerCase()===normalized) || null : null;
+  };
+  if(sourceKey==='waiver' || sourceKey==='free-agent'){
+    const freeAgent= findInPool(freeAgentPool);
+    if(freeAgent) return freeAgent;
+  }
   const pool=playerSearchPool();
-  if(Number.isFinite(id)){
-    const byId=pool.find(p=>Number(p?.id)===id);
+  if(idKey){
+    const byId=pool.find(p=>doesPlayerHistoryIdMatch(idKey,p));
     if(byId) return byId;
   }
-  const normalized=String(name||'').trim().toLowerCase();
   return normalized ? pool.find(p=>String(p?.name||'').trim().toLowerCase()===normalized) || null : null;
 }
 function getPlayerTeamIndexForDetail(playerId){
-  const id=Number(playerId);
-  if(!Number.isFinite(id)) return -1;
-  for(let ti=0;ti<(G?.rosters||[]).length;ti++){
-    if((G.rosters[ti]||[]).some(p=>Number(p?.id)===id)) return ti;
-  }
-  for(let ti=0;ti<(G?.ilByTeam||[]).length;ti++){
-    if((G.ilByTeam[ti]||[]).some(p=>Number(p?.id)===id)) return ti;
-  }
-  return -1;
+  const owner=getPlayerDetailRosterOwner(playerId);
+  return Number.isFinite(Number(owner?.idx)) ? Number(owner.idx) : -1;
 }
-function playerDetailNameButton(player,label){
+function playerDetailNameButton(player,label,source=''){
   const p=player || {};
-  const id=Number(p.id);
+  const idKey=normalizePlayerHistoryId(p.id ?? p.playerId ?? p.pid ?? p.key);
   const safeName=escapeHtml(label || p.name || 'Player');
-  if(!Number.isFinite(id)) return safeName;
-  return `<button type="button" class="player-name-link" onclick="openPlayerDetailModal(${id});event.stopPropagation();">${safeName}</button>`;
+  if(!idKey) return safeName;
+  const safeIdArg=playerDetailJsStringArg(idKey);
+  const safeNameArg=playerDetailJsStringArg(label || p.name || '');
+  const safeSourceArg=playerDetailJsStringArg(source);
+  return `<button type="button" class="player-name-link" onclick="openPlayerDetailModal('${safeIdArg}','${safeNameArg}','${safeSourceArg}');event.stopPropagation();">${safeName}</button>`;
+}
+function playerDetailJsStringArg(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/\\/g,'\\\\')
+    .replace(/'/g,"\\'")
+    .replace(/\r/g,'\\r')
+    .replace(/\n/g,'\\n')
+    .replace(/</g,'\\u003c')
+    .replace(/"/g,'&quot;');
+}
+function buildPlayerDetailActionModel(player, context){
+  context=context || {};
+  const sourceKey=String(context.source || '').trim().toLowerCase();
+  const adapterState=context.adapterState || (
+    typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER?.getState
+      ? SEASON_MODE_ADAPTER.getState()
+      : null
+  ) || {};
+  const data=context.data || (typeof D!=='undefined' ? D : {}) || {};
+  const game=context.game || (typeof G!=='undefined' ? G : {}) || {};
+  const lookup=buildPlayerDetailTeamLookup({adapterState,data,game});
+  const playerId=normalizePlayerHistoryId(player?.id ?? player?.playerId ?? player?.pid ?? player?.key);
+  const myPos=getControlledTeamIndexForPlayerDetail({adapterState,data,game,lookup});
+  const owner=getPlayerDetailRosterOwner(playerId,{adapterState,data,game,lookup});
+  const ownerIdx=Number(owner?.idx);
+  const ownerName=String(owner?.name || '').trim();
+  const isFreeAgent=[
+    ...(Array.isArray(game?.waiver) ? game.waiver : []),
+    ...(Array.isArray(game?.freeAgents) ? game.freeAgents : []),
+    ...(Array.isArray(adapterState?.draftState?.freeAgents) ? adapterState.draftState.freeAgents : []),
+    ...(Array.isArray(data?.draftState?.freeAgents) ? data.draftState.freeAgents : []),
+    ...(Array.isArray(data?.freeAgents) ? data.freeAgents : [])
+  ].some(candidate=>doesPlayerHistoryIdMatch(playerId,candidate));
+  if((sourceKey==='waiver' || sourceKey==='free-agent') && isFreeAgent){
+    return {
+      kind:'free-agent',
+      primaryLabel:'Add Player',
+      copy:'Start an add from waivers. If your roster is full, you will pick the drop player next.'
+    };
+  }
+  if(Number.isFinite(ownerIdx) && ownerIdx>=0 && ownerIdx===myPos){
+    return {
+      kind:'own-roster',
+      primaryLabel:'Drop Player',
+      copy:'Manage this player from your roster. Trade posture is a private note for future trade shopping.'
+    };
+  }
+  if(Number.isFinite(ownerIdx) && ownerIdx>=0){
+    return {
+      kind:'opponent-roster',
+      primaryLabel:'Propose Trade',
+      partnerTeamIdx:ownerIdx,
+      partnerTeamName:ownerName || lookup.nameForIndex(ownerIdx),
+      copy:`Open Trade Desk with ${ownerName || lookup.nameForIndex(ownerIdx)} and build a package around this player.`
+    };
+  }
+  if(isFreeAgent){
+    return {
+      kind:'free-agent',
+      primaryLabel:'Add Player',
+      copy:'Start an add from waivers. If your roster is full, you will pick the drop player next.'
+    };
+  }
+  return {
+    kind:'tracked',
+    primaryLabel:'Open Waivers',
+    copy:'This player is tracked in the player pool. Review Waivers for available roster actions.'
+  };
+}
+function isPlayerDetailSimulationShellMode(){
+  if(typeof getActiveSeasonBackend==='function') return getActiveSeasonBackend()==='simulation' && !!SEASON_MODE_ADAPTER;
+  return ACTIVE_SEASON_MODE==='simulation' && !!SEASON_MODE_ADAPTER;
+}
+function openPlayerDetailSimulationAction(pageId, partnerTeamIdx){
+  const targetPage=String(pageId || '').trim()==='trades' ? 'trades' : 'waiver';
+  const resolvePartnerAbbr=()=>{
+    const teamIdx=Number(partnerTeamIdx);
+    if(!Number.isFinite(teamIdx) || teamIdx<0) return '';
+    const adapterState=SEASON_MODE_ADAPTER?.getState?.() || D || {};
+    const teams=Array.isArray(adapterState?.leagueShell?.teams)
+      ? adapterState.leagueShell.teams
+      : (Array.isArray(D?.teamMeta) ? D.teamMeta : (Array.isArray(D?.teams) ? D.teams : []));
+    const team=teams[teamIdx];
+    return String(team?.abbr || team?.teamAbbr || team?.code || '').trim().toUpperCase();
+  };
+  const partnerAbbr=targetPage==='trades' ? resolvePartnerAbbr() : '';
+  closePlayerDetailModal();
+  if(typeof closeViewerModal==='function') closeViewerModal();
+  goPage(targetPage);
+  setTimeout(()=>{
+    if(targetPage==='waiver'){
+      document.getElementById('waiverContent')?.scrollIntoView({behavior:'smooth',block:'start'});
+      return;
+    }
+    if(partnerAbbr && typeof openSimulationTradeBuilderModal==='function'){
+      openSimulationTradeBuilderModal(partnerAbbr);
+      return;
+    }
+    if(Number.isFinite(Number(partnerTeamIdx)) && Number(partnerTeamIdx)>=0){
+      const legacyCard=document.getElementById(`tradeTargetCard-${Number(partnerTeamIdx)}`);
+      if(legacyCard) legacyCard.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  },0);
+}
+function renderPlayerDetailActions(player, context){
+  const action=buildPlayerDetailActionModel(player,context);
+  const playerIdArg=playerDetailJsStringArg(player?.id ?? player?.playerId ?? player?.pid ?? player?.key);
+  if(action.kind==='own-roster'){
+    return `<div class="player-detail-actions">
+      <button class="player-detail-drop" onclick="closePlayerDetailModal();openDropPlayerModal();">${escapeHtml(action.primaryLabel)}</button>
+      <label class="player-detail-action-label">Trade posture
+        <select class="player-detail-select" style="display:block;width:100%;margin-top:6px;"><option>Maybe</option><option>Yes</option><option>No</option></select>
+      </label>
+    </div>`;
+  }
+  const useSimulationShell=isPlayerDetailSimulationShellMode();
+  const onClick=useSimulationShell && action.kind==='free-agent'
+    ? `openPlayerDetailSimulationAction('waiver');`
+    : useSimulationShell && action.kind==='opponent-roster' && Number.isFinite(Number(action.partnerTeamIdx)) && Number(action.partnerTeamIdx)>=0
+      ? `openPlayerDetailSimulationAction('trades',${Number(action.partnerTeamIdx)});`
+      : action.kind==='free-agent'
+        ? `closePlayerDetailModal();openWaiver('${playerIdArg}');`
+        : action.kind==='opponent-roster' && Number.isFinite(Number(action.partnerTeamIdx)) && Number(action.partnerTeamIdx)>=0
+          ? `closePlayerDetailModal();goPage('trades');setTimeout(()=>openTrade(${Number(action.partnerTeamIdx)}),120);`
+          : `closePlayerDetailModal();goPage('waiver');`;
+  const primaryClass=action.kind==='free-agent' ? 'player-detail-primary add' : 'player-detail-primary';
+  return `<div class="player-detail-actions single">
+    <button class="${primaryClass}" onclick="${onClick}">${escapeHtml(action.primaryLabel)}</button>
+    <div class="player-detail-action-copy">${escapeHtml(action.copy || '')}</div>
+  </div>`;
 }
 function formatPlayerDetailStat(player,key,decimals=1){
   const value=Number(player?.statValues?.[key] ?? player?.[String(key||'').toLowerCase()] ?? player?.[key] ?? 0);
@@ -1663,11 +2022,310 @@ function playerDetailGameLog(player){
     };
   });
 }
-function renderPlayerDetailModal(player){
+function buildPlayerTransactionHistory(player, context){
+  context=context || {};
+  const adapterState=context.adapterState || (
+    typeof SEASON_MODE_ADAPTER!=='undefined' && SEASON_MODE_ADAPTER?.getState
+      ? SEASON_MODE_ADAPTER.getState()
+      : null
+  ) || {};
+  const data=context.data || (typeof D!=='undefined' ? D : {}) || {};
+  const game=context.game || (typeof G!=='undefined' ? G : {}) || {};
+  const lookup=buildPlayerDetailTeamLookup({adapterState,data,game});
+  const playerName=String(player?.name || '').trim();
+  const playerNameKey=playerName.toLowerCase();
+  const events=[];
+  const seen=new Set();
+  const playerNameById=new Map();
+  const rememberPlayer=(candidate)=>{
+    if(!candidate || typeof candidate!=='object') return;
+    const id=normalizePlayerHistoryId(candidate.id ?? candidate.playerId ?? candidate.pid ?? candidate.key);
+    const name=String(candidate.name || '').trim();
+    if(id && name && !playerNameById.has(id)) playerNameById.set(id,name);
+  };
+  const rememberRoster=(roster)=>Array.isArray(roster) && roster.forEach(rememberPlayer);
+  rememberPlayer(player);
+  (Array.isArray(game?.rosters) ? game.rosters : []).forEach(rememberRoster);
+  (Array.isArray(game?.ilByTeam) ? game.ilByTeam : []).forEach(rememberRoster);
+  rememberRoster(game?.waiver);
+  (Array.isArray(data?.allRosters) ? data.allRosters : []).forEach(rememberRoster);
+  Object.values(adapterState?.draftState?.rostersByTeam || {}).forEach(rememberRoster);
+  rememberRoster(adapterState?.draftState?.freeAgents);
+  const rememberParallelNames=(ids,names)=>{
+    (Array.isArray(ids) ? ids : []).forEach((id,index)=>{
+      const key=normalizePlayerHistoryId(id);
+      const name=String((Array.isArray(names) ? names[index] : '') || '').trim();
+      if(key && name && !playerNameById.has(key)) playerNameById.set(key,name);
+    });
+  };
+  const nameForId=(id,fallback='Player')=>playerNameById.get(normalizePlayerHistoryId(id)) || playerName || fallback;
+  const namesMatch=(name)=>!!playerNameKey && String(name || '').trim().toLowerCase()===playerNameKey;
+  const hasHistoryValue=(entry,key)=>entry && Object.prototype.hasOwnProperty.call(entry,key) && normalizePlayerHistoryId(entry[key])!=='';
+  const findCurrentRosterOwner=()=>{
+    const adapterRosterEntry=Object.entries(adapterState?.draftState?.rostersByTeam || {})
+      .find(([,roster])=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)));
+    if(adapterRosterEntry){
+      const abbr=String(adapterRosterEntry[0] || '').trim().toUpperCase();
+      return {abbr,name:lookup.nameForAbbr(abbr)};
+    }
+    const gameRosterIndex=(Array.isArray(game?.rosters) ? game.rosters : [])
+      .findIndex(roster=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)));
+    if(gameRosterIndex>=0){
+      return {abbr:lookup.abbrByIdx.get(gameRosterIndex) || '',name:lookup.nameForIndex(gameRosterIndex)};
+    }
+    const gameIlIndex=(Array.isArray(game?.ilByTeam) ? game.ilByTeam : [])
+      .findIndex(roster=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)));
+    if(gameIlIndex>=0){
+      return {abbr:lookup.abbrByIdx.get(gameIlIndex) || '',name:lookup.nameForIndex(gameIlIndex)};
+    }
+    return null;
+  };
+  const addEvent=(event)=>{
+    const title=String(event?.title || '').trim();
+    const detail=String(event?.detail || '').trim();
+    if(!title || !detail) return;
+    const timestamp=Number(event?.timestamp || 0);
+    const timestampLabel=formatPlayerHistoryTimestamp(timestamp);
+    const source=String(event?.source || '').trim();
+    const key=[title,detail,source,timestampLabel || (Number.isFinite(timestamp)?timestamp:0)].join('|');
+    if(seen.has(key)) return;
+    seen.add(key);
+    events.push({
+      title,
+      detail,
+      tone:String(event?.tone || 'status').trim().toLowerCase() || 'status',
+      source,
+      timestamp:Number.isFinite(timestamp) ? timestamp : 0,
+      timestampLabel
+    });
+  };
+  const possessiveTeamName=(teamName)=>{
+    const name=String(teamName || 'Team').trim() || 'Team';
+    return /s$/i.test(name) ? `${name}'` : `${name}'s`;
+  };
+  const describeMove=(tradeName,sourceName,targetName)=>`${tradeName} was traded from ${sourceName} to ${targetName}.`;
+  const resolveTradeMovement=(fromName,toName,fromAbbr,toAbbr,isOutgoing)=>{
+    const currentOwner=findCurrentRosterOwner();
+    const currentAbbr=String(currentOwner?.abbr || '').trim().toUpperCase();
+    const currentName=String(currentOwner?.name || '').trim();
+    const fromKey=String(fromAbbr || '').trim().toUpperCase();
+    const toKey=String(toAbbr || '').trim().toUpperCase();
+    const ownerIsFrom=(currentAbbr && currentAbbr===fromKey) || (!!currentName && currentName===fromName);
+    const ownerIsTo=(currentAbbr && currentAbbr===toKey) || (!!currentName && currentName===toName);
+    if(ownerIsFrom || ownerIsTo){
+      const targetName=ownerIsFrom ? fromName : toName;
+      const sourceName=ownerIsFrom ? toName : fromName;
+      return {sourceName,targetName,partnerName:sourceName};
+    }
+    const sourceName=isOutgoing ? fromName : toName;
+    const targetName=isOutgoing ? toName : fromName;
+    return {sourceName,targetName,partnerName:targetName};
+  };
+  const collectTradeActivity=(entry)=>{
+    const outgoingIds=Array.isArray(entry?.outgoingPlayerIds) ? entry.outgoingPlayerIds : [];
+    const incomingIds=Array.isArray(entry?.incomingPlayerIds) ? entry.incomingPlayerIds : [];
+    rememberParallelNames(outgoingIds,entry?.outgoingPlayerNames);
+    rememberParallelNames(incomingIds,entry?.incomingPlayerNames);
+    const isOutgoing=outgoingIds.some(id=>doesPlayerHistoryIdMatch(id,player));
+    const isIncoming=incomingIds.some(id=>doesPlayerHistoryIdMatch(id,player));
+    if(!isOutgoing && !isIncoming) return;
+    const fromAbbr=String(entry?.fromTeamAbbr || '').trim().toUpperCase();
+    const toAbbr=String(entry?.toTeamAbbr || '').trim().toUpperCase();
+    const fromName=lookup.nameForAbbr(fromAbbr);
+    const toName=lookup.nameForAbbr(toAbbr);
+    const {sourceName,targetName,partnerName}=resolveTradeMovement(fromName,toName,fromAbbr,toAbbr,isOutgoing);
+    const matchedId=(isOutgoing ? outgoingIds : incomingIds).find(id=>doesPlayerHistoryIdMatch(id,player));
+    const tradeName=nameForId(matchedId,playerName || 'Player');
+    addEvent({
+      title:`Traded with ${partnerName}`,
+      detail:describeMove(tradeName,sourceName,targetName),
+      timestamp:entry?.ts || entry?.updatedAt || entry?.createdAt,
+      tone:'trade',
+      source:'Trade Desk'
+    });
+  };
+  (Array.isArray(adapterState?.seasonState?.activityLog) ? adapterState.seasonState.activityLog : [])
+    .filter(entry=>String(entry?.type || '').trim().toLowerCase()==='trade')
+    .forEach(collectTradeActivity);
+  (Array.isArray(game?.activityLog) ? game.activityLog : [])
+    .filter(entry=>String(entry?.type || '').trim().toLowerCase()==='trade' && (entry?.outgoingPlayerIds || entry?.incomingPlayerIds))
+    .forEach(collectTradeActivity);
+  (Array.isArray(game?.tradeOffers) ? game.tradeOffers : []).forEach(offer=>{
+    const give=Array.isArray(offer?.give) ? offer.give : [];
+    const get=Array.isArray(offer?.get) ? offer.get : [];
+    const inGive=give.some(id=>doesPlayerHistoryIdMatch(id,player));
+    const inGet=get.some(id=>doesPlayerHistoryIdMatch(id,player));
+    if(!inGive && !inGet) return;
+    const fromName=String(offer?.fromTeamName || lookup.nameForIndex(offer?.fromTeam)).trim();
+    const toName=String(offer?.toTeamName || lookup.nameForIndex(offer?.toTeam)).trim();
+    const sourceName=inGive ? fromName : toName;
+    const targetName=inGive ? toName : fromName;
+    const partnerName=toName || (inGive ? targetName : sourceName);
+    const status=String(offer?.status || 'pending').trim().toLowerCase();
+    const matchedId=(inGive ? give : get).find(id=>doesPlayerHistoryIdMatch(id,player));
+    const tradeName=nameForId(matchedId,playerName || 'Player');
+    if(status==='accepted'){
+      addEvent({
+        title:`Traded with ${partnerName}`,
+        detail:describeMove(tradeName,sourceName,targetName),
+        timestamp:offer?.updatedAt || offer?.createdAt,
+        tone:'trade',
+        source:'Trade Desk'
+      });
+    }else{
+      const statusLabel=status==='rejected' ? 'rejected' : status==='cancelled' ? 'cancelled' : 'pending';
+      addEvent({
+        title:`Trade offer ${statusLabel} with ${partnerName}`,
+        detail:`${tradeName} was included in a ${statusLabel} trade package between ${fromName} and ${toName}.`,
+        timestamp:offer?.updatedAt || offer?.createdAt,
+        tone:statusLabel==='pending' ? 'pending' : 'status',
+        source:'Trade Desk'
+      });
+    }
+  });
+  const collectWaiverResult=(entry,isPending=false)=>{
+    const status=String(entry?.status || (isPending ? 'pending' : 'approved')).trim().toLowerCase();
+    const addMatch=doesPlayerHistoryIdMatch(entry?.addPlayerId,player);
+    const dropMatch=doesPlayerHistoryIdMatch(entry?.dropPlayerId,player);
+    if(!addMatch && !dropMatch) return;
+    const team=entry?.teamName
+      || (entry?.teamAbbr ? lookup.nameForAbbr(entry.teamAbbr) : '')
+      || (entry?.teamIdx!==undefined && entry?.teamIdx!==null ? lookup.nameForIndex(entry.teamIdx) : 'Team');
+    const addName=nameForId(entry?.addPlayerId,playerName || 'Player');
+    const dropName=entry?.dropPlayerName || nameForId(entry?.dropPlayerId,'the drop player');
+    const hasDropPlayer=hasHistoryValue(entry,'dropPlayerId');
+    const timestamp=entry?.processedAt || entry?.submittedAt || entry?.ts || entry?.createdAt;
+    if(addMatch){
+      if(isPending || status==='pending'){
+        addEvent({
+          title:'Waiver claim pending',
+          detail:`${team} has a pending waiver claim for ${addName}${dropMatch || hasDropPlayer ? ` with ${dropName} marked as the drop` : ''}.`,
+          timestamp,
+          tone:'pending',
+          source:'Waivers'
+        });
+      }else if(status==='approved'){
+        addEvent({
+          title:`Added by ${team}`,
+          detail:`${addName} was added from waivers.${hasDropPlayer ? ` ${dropName} was dropped.` : ''}`,
+          timestamp,
+          tone:'waiver',
+          source:'Waivers'
+        });
+      }else{
+        addEvent({
+          title:'Waiver claim failed',
+          detail:`${team}'s waiver claim for ${addName} did not process.`,
+          timestamp,
+          tone:'status',
+          source:'Waivers'
+        });
+      }
+    }
+    if(dropMatch && !addMatch){
+      addEvent({
+        title:isPending || status==='pending' ? 'Drop pending for waiver claim' : `Dropped by ${team}`,
+        detail:isPending || status==='pending'
+          ? `${team} has ${dropName} marked as the drop player for a pending waiver claim.`
+          : `${dropName} was dropped to make room for ${addName}.`,
+        timestamp,
+        tone:isPending || status==='pending' ? 'pending' : 'waiver',
+        source:'Waivers'
+      });
+    }
+  };
+  (Array.isArray(adapterState?.seasonState?.recentWaiverResults) ? adapterState.seasonState.recentWaiverResults : []).forEach(entry=>collectWaiverResult(entry,false));
+  (Array.isArray(adapterState?.seasonState?.pendingWaiverClaims) ? adapterState.seasonState.pendingWaiverClaims : []).forEach(entry=>collectWaiverResult(entry,true));
+  (Array.isArray(game?.activityLog) ? game.activityLog : [])
+    .filter(entry=>hasHistoryValue(entry,'addPlayerId') || hasHistoryValue(entry,'dropPlayerId'))
+    .forEach(entry=>collectWaiverResult(entry,false));
+  (Array.isArray(game?.recentDrops) ? game.recentDrops : []).forEach(drop=>{
+    const droppedPlayer=drop?.player || {};
+    if(!doesPlayerHistoryIdMatch(droppedPlayer,player) && !namesMatch(droppedPlayer?.name)) return;
+    const team=drop?.teamName || lookup.nameForIndex(drop?.teamIdx);
+    const slot=String(drop?.slot || 'a roster slot').trim();
+    const droppedName=String(droppedPlayer?.name || playerName || 'Player').trim();
+    addEvent({
+      title:drop?.undone ? 'Restored by commissioner' : `Dropped by ${team}`,
+      detail:drop?.undone
+        ? `${team} restored ${droppedName} to the roster.`
+        : `${droppedName} was dropped from ${slot} and moved to waivers.`,
+      timestamp:drop?.undone ? drop?.undoneAt || drop?.droppedAt : drop?.droppedAt,
+      tone:drop?.undone ? 'status' : 'waiver',
+      source:'Waivers'
+    });
+  });
+  const activityEntries=[
+    ...(Array.isArray(adapterState?.seasonState?.activityLog) ? adapterState.seasonState.activityLog : []),
+    ...(Array.isArray(game?.activityLog) ? game.activityLog : []),
+    ...(Array.isArray(data?.activityLog) ? data.activityLog : [])
+  ];
+  activityEntries.forEach(entry=>{
+    if(!playerNameKey) return;
+    if(entry?.outgoingPlayerIds || entry?.incomingPlayerIds || entry?.addPlayerId || entry?.dropPlayerId) return;
+    const haystack=[entry?.title,entry?.text,entry?.message,entry?.detail].map(value=>String(value || '').toLowerCase()).join(' ');
+    if(!haystack.includes(playerNameKey)) return;
+    const type=String(entry?.type || '').trim().toLowerCase();
+    addEvent({
+      title:entry?.title || 'League activity',
+      detail:entry?.text || entry?.message || entry?.detail || entry?.title || `${playerName} appeared in league activity.`,
+      timestamp:entry?.ts || entry?.updatedAt || entry?.createdAt,
+      tone:type.includes('trade') ? 'trade' : type.includes('waiver') ? 'waiver' : 'status',
+      source:'League Activity'
+    });
+  });
+  if(!events.length){
+    const gameRosterIndex=(Array.isArray(game?.rosters) ? game.rosters : []).findIndex(roster=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)));
+    const gameIlIndex=(Array.isArray(game?.ilByTeam) ? game.ilByTeam : []).findIndex(roster=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)));
+    const adapterRosterEntry=Object.entries(adapterState?.draftState?.rostersByTeam || {}).find(([,roster])=>(roster || []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)));
+    if(gameRosterIndex>=0){
+      const team=lookup.nameForIndex(gameRosterIndex);
+      addEvent({title:`Rostered by ${team}`,detail:`${playerName || 'This player'} is currently on ${possessiveTeamName(team)} active roster.`,tone:'status',source:'Roster'});
+    }else if(gameIlIndex>=0){
+      const team=lookup.nameForIndex(gameIlIndex);
+      addEvent({title:`Injured list with ${team}`,detail:`${playerName || 'This player'} is currently on ${possessiveTeamName(team)} injury slot.`,tone:'status',source:'Roster'});
+    }else if(adapterRosterEntry){
+      const team=lookup.nameForAbbr(adapterRosterEntry[0]);
+      addEvent({title:`Rostered by ${team}`,detail:`${playerName || 'This player'} is currently on ${possessiveTeamName(team)} active roster.`,tone:'status',source:'Roster'});
+    }else if((Array.isArray(game?.waiver) ? game.waiver : []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player)) || (Array.isArray(adapterState?.draftState?.freeAgents) ? adapterState.draftState.freeAgents : []).some(candidate=>doesPlayerHistoryIdMatch(candidate,player))){
+      addEvent({title:'Available on waivers',detail:`${playerName || 'This player'} is currently in the free-agent pool.`,tone:'waiver',source:'Waivers'});
+    }else{
+      addEvent({title:'Tracked in player pool',detail:`${playerName || 'This player'} is available in the season player pool.`,tone:'status',source:'Player Pool'});
+    }
+  }
+  return events.sort((a,b)=>{
+    const left=Number(a.timestamp || 0);
+    const right=Number(b.timestamp || 0);
+    return right-left;
+  }).slice(0,7);
+}
+function renderPlayerTransactionTimeline(player, context){
+  context=context || {};
+  const events=buildPlayerTransactionHistory(player,context);
+  return `<div class="player-detail-section">
+    <div class="player-detail-section-head"><div class="player-detail-section-title">Player Timeline</div></div>
+    <div class="player-detail-timeline-list">
+      ${events.map(event=>{
+        const meta=[event.timestampLabel,event.source].filter(Boolean).join(' - ');
+        return `<div class="player-detail-timeline-row">
+          <span class="player-detail-timeline-dot ${escapeHtml(event.tone || 'status')}" aria-hidden="true"></span>
+          <div class="player-detail-timeline-main">
+            <div class="player-detail-timeline-title">${escapeHtml(event.title)}</div>
+            ${meta ? `<div class="player-detail-timeline-meta">${escapeHtml(meta)}</div>` : ''}
+            <div class="player-detail-timeline-detail">${escapeHtml(event.detail)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+function renderPlayerDetailModal(player, context){
+  context=context || {};
   const week=weekForDay(G?.day||1);
   const injury=getInjuryStatus(player,week);
   const status=injury?.label || player?.designation || player?.status || 'Active';
   const pos=String(player?.pos||'').toUpperCase();
+  const playerId=normalizePlayerHistoryId(player?.id ?? player?.playerId ?? player?.pid ?? player?.key);
   const rank=playerSearchPool().filter(p=>String(p?.pos||'').toUpperCase()===pos).sort((a,b)=>Number(b?.fp||0)-Number(a?.fp||0)).findIndex(p=>Number(p?.id)===Number(player?.id))+1;
   const avg=Number(player?.fp||0);
   const tfp=Number(player?.tfp || player?.totalFantasyPoints || player?.seasonFantasyPoints || (avg*82) || 0);
@@ -1675,6 +2333,10 @@ function renderPlayerDetailModal(player){
   const last7=Math.max(0,avg * 0.92);
   const gameLog=playerDetailGameLog(player);
   const portrait=renderTeamInitialAvatar(player?.name,player?.team,150,'',{status,hasGame:!!getGameInfo(player,G?.day||1),state:avg>=55?'takeover':''});
+  const owner=getPlayerDetailRosterOwner(playerId,context);
+  const ownerLabel=owner?.name || 'Free Agent';
+  const legacySlot=getCurrentRosterSlot(playerId,rosterViewDay||G.day);
+  const slotLabel=owner ? (legacySlot || owner?.slot || '--') : '--';
   return `
     <div class="player-detail-hero">
       <div class="player-detail-photo">${portrait}</div>
@@ -1685,8 +2347,8 @@ function renderPlayerDetailModal(player){
         <div class="player-detail-meta">
           <div>Elig <b>${escapeHtml(pos || '--')}</b></div>
           <div>Team <b>${escapeHtml(player?.team || '--')}</b></div>
-          <div>Manager <b>${escapeHtml(getPlayerTeamIndexForDetail(player?.id)>=0 ? teamName(getPlayerTeamIndexForDetail(player?.id)) : 'Free Agent')}</b></div>
-          <div>Slot <b>${escapeHtml(getCurrentRosterSlot(player?.id,rosterViewDay||G.day)||'--')}</b></div>
+          <div>Manager <b>${escapeHtml(ownerLabel)}</b></div>
+          <div>Slot <b>${escapeHtml(slotLabel)}</b></div>
         </div>
       </div>
       <div class="player-detail-side">
@@ -1696,12 +2358,8 @@ function renderPlayerDetailModal(player){
       </div>
       ${!/^active$/i.test(status)?`<div class="player-detail-status">${escapeHtml(status)}</div>`:''}
     </div>
-    <div class="player-detail-actions">
-      <button class="player-detail-drop" onclick="closePlayerDetailModal();openDropPlayerModal();">Drop</button>
-      <label class="player-detail-action-label">Trade posture
-        <select class="player-detail-select" style="display:block;width:100%;margin-top:6px;"><option>Maybe</option><option>Yes</option><option>No</option></select>
-      </label>
-    </div>
+    ${renderPlayerDetailActions(player,context)}
+    ${renderPlayerTransactionTimeline(player,context)}
     <div class="player-detail-section">
       <div class="player-detail-section-head"><div class="player-detail-section-title">Stats</div><button class="player-detail-link">Complete Stats</button></div>
       <table class="player-detail-table"><thead><tr><th></th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>FPTS</th></tr></thead>
@@ -1722,11 +2380,11 @@ function renderPlayerDetailModal(player){
       <div class="player-detail-news-copy">${escapeHtml(player?.name || 'This player')} is averaging ${avg.toFixed(1)} fantasy points in the current simulation season. ${injury ? `${player?.name || 'He'} is currently marked ${injury.label}.` : 'No injury limitation is active for the current reveal window.'}</div>
     </div>`;
 }
-function openPlayerDetailModal(playerId,name=''){
-  const player=findPlayerForDetail(playerId,name);
+function openPlayerDetailModal(playerId,name='',source=''){
+  const player=findPlayerForDetail(playerId,name,source);
   if(!player){toast('Player details are not available for that row yet.');return;}
   const content=document.getElementById('playerDetailContent');
-  if(content) content.innerHTML=renderPlayerDetailModal(player);
+  if(content) content.innerHTML=renderPlayerDetailModal(player,{source});
   const modal=document.getElementById('playerDetailModal');
   if(modal) modal.classList.add('open');
 }
@@ -1963,9 +2621,10 @@ function teamName(ti){
   const legacyName=String(legacyTeam || '').trim();
   return legacyName || ('Team '+(fallbackIdx+1));
 }
-function logActivity(type,title,text,teamIdx,icon){
+function logActivity(type,title,text,teamIdx,icon,meta){
   if(!G.activityLog) G.activityLog=[];
-  G.activityLog.unshift({id:'act_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),type,title,text,teamIdx,icon:icon||'??',ts:Date.now()});
+  const extra=(meta && typeof meta==='object' && !Array.isArray(meta)) ? meta : {};
+  G.activityLog.unshift({...extra,id:'act_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),type,title,text,teamIdx,icon:icon||'??',ts:Date.now()});
   if(G.activityLog.length>40) G.activityLog.length=40;
 }
 function activityAge(ts){
@@ -7027,12 +7686,13 @@ function rebuildLineupsAfterRosterChange(teamIdx){
 function getCurrentRosterSlot(pid,day){
   const teamIdx=D?.myPos??0;
   const ilRoster=getIlRoster(teamIdx);
-  if(ilRoster.some(p=>p.id===pid)) return getIlSlotKey();
+  if(ilRoster.some(p=>doesPlayerHistoryIdMatch(pid,p))) return getIlSlotKey();
   const starterIds=getLineupForDay(day);
-  const starterIndex=starterIds.indexOf(pid);
+  const playerKey=normalizePlayerHistoryId(pid);
+  const starterIndex=starterIds.map(normalizePlayerHistoryId).indexOf(playerKey);
   if(starterIndex>=0) return SLOT_LABELS[starterIndex]||'UTIL';
   const roster=G.rosters[teamIdx]||[];
-  if(roster.some(p=>p.id===pid)) return 'BN';
+  if(roster.some(p=>doesPlayerHistoryIdMatch(pid,p))) return 'BN';
   return '';
 }
 
@@ -8626,7 +9286,14 @@ function claimWaiverPlayerForTeam(teamIdx, playerToAdd, droppedPlayer=null, opti
       ? (teamName(targetTeam)+' added '+playerToAdd.name+' and dropped '+removedPlayer.name+'.')
       : (teamName(targetTeam)+' added '+playerToAdd.name+' into an open roster spot.'),
     targetTeam,
-    opts.activityIcon || '📥'
+    opts.activityIcon || '📥',
+    {
+      addPlayerId:playerToAdd.id,
+      addPlayerName:playerToAdd.name,
+      dropPlayerId:removedPlayer?.id ?? null,
+      dropPlayerName:removedPlayer?.name || '',
+      teamName:teamName(targetTeam)
+    }
   );
   if(opts.save!==false) queueSharedSeasonSave(opts.saveReason || 'waiver_move');
   if(opts.toast!==false) toast(removedPlayer?('Claimed '+playerToAdd.name+', dropped '+removedPlayer.name):('Claimed '+playerToAdd.name));
@@ -8721,7 +9388,7 @@ function waiverCell(player,key,signals){
       <div style="display:flex;align-items:flex-start;gap:9px;min-width:0;flex:1;">
       ${renderTeamInitialAvatar(player.name,player.team,34,'flex-shrink:0;')}
       <div style="min-width:0;display:flex;flex-direction:column;gap:7px;flex:1;">
-        <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${player.name}</div>
+        <div style="font-family:var(--fb);font-size:14px;font-weight:700;color:#2563eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${playerDetailNameButton(player,player.name,'waiver')}</div>
         ${tags.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${tags.join('')}</div>`:''}
       </div>
       </div>
@@ -10490,7 +11157,7 @@ function renderSimulationWaiverInSharedShell(){
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
   const detailNameButton=(player,label)=>{
-    if(typeof playerDetailNameButton==='function') return playerDetailNameButton(player,label);
+    if(typeof playerDetailNameButton==='function') return playerDetailNameButton(player,label,'waiver');
     const id=Number(player?.id || player?.playerId);
     const safe=escapeHtml(label || player?.name || 'Player');
     return Number.isFinite(id)
@@ -10922,6 +11589,7 @@ function submitSimulationWaiverClaimFromShell(playerId, dropSelectId){
     if(typeof toast==='function') toast('That player is no longer available.');
     return;
   }
+  const resolvedPlayerId=Number(row?.playerId || player?.id || row?.id || playerId);
   const resolvedDropSelectId=String(dropSelectId || `simulation-waiver-drop-select-${playerId}`);
   const dropPlayerValue=String(document.getElementById(resolvedDropSelectId)?.value || '').trim();
   const needsDrop = Array.isArray(row?.dropOptions) && row.dropOptions.length > 0;
@@ -10933,7 +11601,7 @@ function submitSimulationWaiverClaimFromShell(playerId, dropSelectId){
   if(typeof SEASON_MODE_ADAPTER?.submitWaiverClaim === 'function'){
     SEASON_MODE_ADAPTER.submitWaiverClaim({
       teamAbbr: D?.draftState?.controlledTeamAbbr,
-      addPlayerId: Number(player?.id),
+      addPlayerId: resolvedPlayerId,
       dropPlayerId
     });
   }
@@ -10971,7 +11639,15 @@ function getPersistedSimulationTradeDeskFeedback(partnerAbbr, tradeVm){
     const directPartner=String(feedback?.partnerAbbr || '').trim().toUpperCase();
     const fromKey=String(entry?.fromTeamAbbr || '').trim().toUpperCase();
     const toKey=String(entry?.toTeamAbbr || '').trim().toUpperCase();
-    const inferredPartner=directPartner || (controlledKey && fromKey===controlledKey ? toKey : controlledKey && toKey===controlledKey ? fromKey : '');
+    let inferredPartner='';
+    if(fromKey || toKey){
+      if(!controlledKey) continue;
+      if(fromKey===controlledKey) inferredPartner=toKey;
+      else if(toKey===controlledKey) inferredPartner=fromKey;
+      else continue;
+    }else{
+      inferredPartner=directPartner;
+    }
     if(inferredPartner!==partnerKey) continue;
     const message=String(feedback?.message || entry?.message || entry?.text || '').trim();
     if(!message) continue;
@@ -11518,6 +12194,7 @@ function applySimulationTradeBuilderPackage(partnerAbbr){
 function renderSimulationTradesInSharedShell(){
   setSeasonSidePanelVisible('tradesPowerups', false);
   const vm = SEASON_MODE_ADAPTER.getTradeViewModel();
+  const adapterState=SEASON_MODE_ADAPTER?.getState?.() || D || {};
   const teamSummary=SEASON_MODE_ADAPTER.getRosterViewModel?.()?.teamSummary || {};
   const heroMeta=buildSimulationHeroMetaLinks(teamSummary);
   const pendingIncoming=(Array.isArray(G?.tradeOffers) ? G.tradeOffers : []).filter((trade)=>Number(trade?.toTeam)===Number(D?.myPos) && trade?.status==='pending');
@@ -11546,6 +12223,71 @@ function renderSimulationTradesInSharedShell(){
   const partnerRows=Array.isArray(vm?.sections?.partners?.rows)
     ? vm.sections.partners.rows
     : (Array.isArray(vm?.tradePartners) ? vm.tradePartners : []);
+  const controlledAbbr=String(D?.draftState?.controlledTeamAbbr || vm?.userTeamAbbr || adapterState?.draftState?.controlledTeamAbbr || '').trim().toUpperCase();
+  const partnerNameByAbbr=new Map(
+    partnerRows.map(row=>{
+      const team=row?.team || row || {};
+      const abbr=String(team?.abbr || row?.teamAbbr || '').trim().toUpperCase();
+      const name=String(team?.name || row?.title || abbr || 'Trade Partner').trim();
+      return abbr ? [abbr, name] : null;
+    }).filter(Boolean)
+  );
+  const teamIndexByAbbr=new Map(
+    (Array.isArray(adapterState?.leagueShell?.teams) ? adapterState.leagueShell.teams : (Array.isArray(D?.teamMeta) ? D.teamMeta : []))
+      .map((team, teamIdx)=>[String(team?.abbr || '').trim().toUpperCase(), teamIdx])
+      .filter(entry=>entry[0])
+  );
+  const tradeActivityLog=Array.isArray(adapterState?.seasonState?.activityLog) ? adapterState.seasonState.activityLog : [];
+  const getCompletedTradePartnerAbbr=(entry)=>{
+    const feedback=entry?.tradeDeskFeedback || {};
+    const directPartner=String(feedback?.partnerAbbr || '').trim().toUpperCase();
+    if(directPartner) return directPartner;
+    const fromKey=String(entry?.fromTeamAbbr || '').trim().toUpperCase();
+    const toKey=String(entry?.toTeamAbbr || '').trim().toUpperCase();
+    if(controlledAbbr && fromKey===controlledAbbr) return toKey;
+    if(controlledAbbr && toKey===controlledAbbr) return fromKey;
+    return '';
+  };
+  const completedTradeEntries=tradeActivityLog
+    .filter(entry=>{
+      if(String(entry?.type || '').trim().toLowerCase()!=='trade') return false;
+      const feedback=entry?.tradeDeskFeedback || {};
+      const message=String(feedback?.message || entry?.message || entry?.text || '').trim();
+      if(!message) return false;
+      const fromKey=String(entry?.fromTeamAbbr || '').trim().toUpperCase();
+      const toKey=String(entry?.toTeamAbbr || '').trim().toUpperCase();
+      if(fromKey || toKey){
+        return !!controlledAbbr && (fromKey===controlledAbbr || toKey===controlledAbbr);
+      }
+      const legacyPartner=String(feedback?.partnerAbbr || '').trim().toUpperCase();
+      return !!legacyPartner && partnerNameByAbbr.has(legacyPartner);
+    })
+    .slice(0,4);
+  const renderCompletedTradeRows=(rows)=>rows.map((entry)=>{
+    const feedback=entry?.tradeDeskFeedback || {};
+    const partnerAbbr=getCompletedTradePartnerAbbr(entry);
+    const partnerName=partnerNameByAbbr.get(partnerAbbr) || partnerAbbr || 'Trade partner';
+    const message=String(feedback?.message || entry?.message || entry?.text || '').trim() || 'Trade applied.';
+    const detail=String(feedback?.detail || entry?.detail || '').trim();
+    const partnerTeamIdx=teamIndexByAbbr.has(partnerAbbr) ? Number(teamIndexByAbbr.get(partnerAbbr)) : -1;
+    const partnerAction=Number.isFinite(partnerTeamIdx) && partnerTeamIdx>=0
+      ? `<button type="button" class="season-chip-link" onclick="openViewer(${partnerTeamIdx})">View ${escapeSimulationShellHtml(partnerName)}</button>`
+      : '';
+    return `<div class="season-table-card season-card-pad" style="border-color:rgba(34,197,94,.28);background:linear-gradient(180deg,rgba(16,44,29,.72),rgba(15,23,36,.98));">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--fd);font-weight:800;color:#f8fafc;">Completed with ${escapeSimulationShellHtml(partnerName)}</div>
+          <div class="season-subbar-copy" style="margin-top:6px;">${escapeSimulationShellHtml(message)}</div>
+          ${detail ? `<div class="season-subbar-copy" style="margin-top:5px;color:#bbf7d0;">${escapeSimulationShellHtml(detail)}</div>` : ''}
+        </div>
+        <span class="season-stat-pill" style="border-color:rgba(34,197,94,.36);color:#bbf7d0;background:rgba(20,83,45,.18);">Completed instantly</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <button type="button" class="season-chip-link solid" onclick="goPage('roster')">Open My Team</button>
+        ${partnerAction}
+      </div>
+    </div>`;
+  }).join('') || `<div class="season-table-card season-card-pad">No completed trade yet.</div>`;
   const partnerCards=partnerRows.map((row) => {
     const team=row?.team || row;
     const partnerAbbr=String(team?.abbr || row?.teamAbbr || '').trim();
@@ -11594,6 +12336,7 @@ function renderSimulationTradesInSharedShell(){
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <span class="season-stat-pill">${pendingIncoming.length} incoming</span>
             <span class="season-stat-pill">${pendingOutgoing.length} sent pending</span>
+            <span class="season-stat-pill">${completedTradeEntries.length} completed</span>
             <span class="season-stat-pill">${partnerRows.length} Partners</span>
           </div>
         </div>
@@ -11604,10 +12347,10 @@ function renderSimulationTradesInSharedShell(){
           <div class="season-now-value">${pendingIncoming.length ? `${pendingIncoming.length} waiting` : 'Quiet now'}</div>
           <div class="season-now-copy">${pendingIncoming.length ? 'Another manager is waiting on your response. Review the pending section before you shop a new move.' : 'No one is waiting on your answer right now.'}</div>
         </div>
-        <div class="season-now-card ${pendingOutgoing.length ? 'live' : 'info'}">
+        <div class="season-now-card ${(pendingOutgoing.length || completedTradeEntries.length) ? 'live' : 'info'}">
           <div class="season-now-label">Sent Offers</div>
-          <div class="season-now-value">${pendingOutgoing.length ? `${pendingOutgoing.length} pending` : 'No pressure'}</div>
-          <div class="season-now-copy">${pendingOutgoing.length ? 'Your existing outbound offers are still live. You may want to wait before sending another swap.' : 'You can shop for a clean one-for-one deal from a stable position.'}</div>
+          <div class="season-now-value">${pendingOutgoing.length ? `${pendingOutgoing.length} pending` : completedTradeEntries.length ? `${completedTradeEntries.length} completed` : 'No pressure'}</div>
+          <div class="season-now-copy">${pendingOutgoing.length ? 'Your existing outbound offers are still live. You may want to wait before sending another swap.' : completedTradeEntries.length ? 'Completed trades apply instantly in this local league, and roster pages update right away.' : 'You can shop for a clean one-for-one deal from a stable position.'}</div>
         </div>
         <div class="season-now-card info">
           <div class="season-now-label">Trade Lane</div>
@@ -11624,6 +12367,10 @@ function renderSimulationTradesInSharedShell(){
           <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;margin-bottom:8px;">Sent Offers</div>
           <div style="display:flex;flex-direction:column;gap:12px;">${renderPendingTradeRows(pendingOutgoing, 'Sent Offer')}</div>
         </div>
+      </div>
+      <div>
+        <div class="season-soft-muted" style="font-size:11px;text-transform:uppercase;margin-bottom:8px;">Completed Trades (${completedTradeEntries.length})</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">${renderCompletedTradeRows(completedTradeEntries)}</div>
       </div>
       <div class="season-table-card season-card-pad">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
@@ -15805,7 +16552,7 @@ function renderWaiver(){
 }
 
 function openWaiver(pid){
-  wAdd=(G.waiver||[]).filter(Boolean).find(x=>x && x.id===pid);if(!wAdd)return;
+  wAdd=(G.waiver||[]).filter(Boolean).find(x=>x && doesPlayerHistoryIdMatch(pid,x));if(!wAdd)return;
   const targetId=Number(wAdd.id);
   const alreadyRostered=(G.rosters||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId))
     || (G.ilByTeam||[]).some(team=>(team||[]).some(p=>Number(p.id)===targetId));

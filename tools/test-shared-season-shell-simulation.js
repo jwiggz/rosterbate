@@ -1012,6 +1012,16 @@ const simulationAdapterStub = {
               submitLabel: 'Submit Claim',
               consequenceLabel: 'Open roster spot available',
               dropOptions: []
+            },
+            {
+              playerId: 303,
+              player: { id: 909, name: 'Scottie Row Id Precedence', team: 'CHI', pos: 'SF' },
+              submitLabel: 'Submit Claim',
+              consequenceLabel: 'Adds Scottie Row Id Precedence and drops Hakeem Olajuwon if awarded.',
+              suggestedDropPlayerId: 34,
+              dropOptions: [
+                { value: 34, label: 'Hakeem Olajuwon Â· C' }
+              ]
             }
           ]
         }
@@ -1036,6 +1046,15 @@ const simulationAdapterStub = {
               recordLabel: '7-5',
               topPlayerName: 'Stephen Curry',
               rosterCount: 13
+            },
+            {
+              team: { abbr: 'NYK', name: 'New York Knicks' },
+              incomingRoster: [
+                { id: 40, name: 'Walt Frazier', choiceLabel: 'Walt Frazier - NYK - PG', fp: 45 }
+              ],
+              recordLabel: '6-6',
+              topPlayerName: 'Walt Frazier',
+              rosterCount: 12
             }
           ]
         }
@@ -2401,6 +2420,19 @@ assert.deepStrictEqual(
   },
   'simulation waiver submit helper should pass add/drop claim details through the adapter'
 );
+simulationAdapterStub.lastSubmittedWaiverClaim = null;
+const rowIdPrecedenceDropSelect = sandbox.document.getElementById('simulation-waiver-drop-select-303');
+rowIdPrecedenceDropSelect.value = '34';
+api.submitSimulationWaiverClaimFromShell(303);
+assert.deepStrictEqual(
+  toPlain(simulationAdapterStub.lastSubmittedWaiverClaim),
+  {
+    teamAbbr: 'LAL',
+    addPlayerId: 303,
+    dropPlayerId: 34
+  },
+  'simulation waiver submit helper should prefer row playerId over nested player.id when submitting a claim'
+);
 api.cancelSimulationWaiverClaimFromShell('pending-1');
 assert.deepStrictEqual(
   toPlain(simulationAdapterStub.lastCancelledWaiverClaim),
@@ -2681,11 +2713,24 @@ simulationStubState = {
     activityLog: [
       {
         type: 'trade',
+        fromTeamAbbr: 'LAL',
+        toTeamAbbr: 'BOS',
         tradeDeskFeedback: {
           partnerAbbr: 'BOS',
           tone: 'success',
           message: 'Trade applied: Hakeem Olajuwon for Stephen Curry.',
           detail: 'Fairness check: 58.0 FP for you vs 55.0 FP for them.'
+        }
+      },
+      {
+        type: 'trade',
+        fromTeamAbbr: 'BOS',
+        toTeamAbbr: 'NYK',
+        tradeDeskFeedback: {
+          partnerAbbr: 'NYK',
+          tone: 'success',
+          message: 'Trade applied: Larry Bird for Patrick Ewing.',
+          detail: 'CPU trade should stay out of the controlled trade desk.'
         }
       }
     ]
@@ -2695,8 +2740,28 @@ api.setSimulationTradeDeskFeedback({});
 api.renderSimulationTradesInSharedShell();
 assert.match(
   elements.tradesContent.innerHTML,
+  /New York Knicks/,
+  'simulation trade desk fixture should render the NYK partner lane'
+);
+assert.match(
+  elements.tradesContent.innerHTML,
   /Trade applied: Hakeem Olajuwon for Stephen Curry\.[\s\S]*Fairness check: 58\.0 FP for you vs 55\.0 FP for them\./,
   'trade desk should restore completed trade feedback from persisted activity after reload'
+);
+assert.match(
+  elements.tradesContent.innerHTML,
+  /Completed Trades[\s\S]*Completed instantly[\s\S]*Trade applied: Hakeem Olajuwon for Stephen Curry\./,
+  'simulation trade desk should make direct-applied trades visible as completed trades'
+);
+assert.doesNotMatch(
+  elements.tradesContent.innerHTML,
+  /Larry Bird for Patrick Ewing/,
+  'simulation trade desk should exclude completed trades between non-controlled teams'
+);
+assert.doesNotMatch(
+  elements.tradesContent.innerHTML,
+  /New York Knicks[\s\S]*Larry Bird for Patrick Ewing|Larry Bird for Patrick Ewing[\s\S]*New York Knicks/,
+  'simulation trade desk should not leak unrelated BOS-to-NYK feedback into the NYK partner card'
 );
 
 setSimulationStubPhase('regular_season');
