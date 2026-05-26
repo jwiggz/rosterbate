@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Basketball Mini Golf</title>
+  <link rel="modulepreload" href="assets/vendor/three/three.module.js">
+  <style>
+    :root {
+      color-scheme: dark;
+      --court: #161616;
+      --court-line: #f3b35a;
+      --paint: #2b564b;
+      --ink: #f7f1e4;
+      --muted: #a8b3ad;
+      --panel: rgba(18, 22, 22, 0.88);
+      --glass: rgba(255, 255, 255, 0.08);
+      --rim: #d44d28;
+      --meter: #f4c95d;
+      --good: #63d297;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(43, 86, 75, 0.42), transparent 30%),
+        linear-gradient(135deg, #101312 0%, #1b1a17 46%, #101312 100%);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    .golf-app {
+      position: relative;
+      min-height: 100vh;
+      isolation: isolate;
+      background:
+        linear-gradient(90deg, rgba(243, 179, 90, 0.1) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(243, 179, 90, 0.08) 1px, transparent 1px);
+      background-size: 72px 72px;
+    }
+
+    .golf-scene {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+    }
+
+    .golf-scene canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background:
+        linear-gradient(160deg, rgba(43, 86, 75, 0.72), rgba(22, 22, 22, 0.95)),
+        repeating-linear-gradient(90deg, transparent 0 88px, rgba(243, 179, 90, 0.16) 88px 90px);
+    }
+
+    .golf-topbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) repeat(3, auto);
+      gap: 12px;
+      align-items: center;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(8, 10, 10, 0.82), rgba(8, 10, 10, 0));
+    }
+
+    .golf-hole-title {
+      min-width: 0;
+      font-size: clamp(1.25rem, 3vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .golf-stat {
+      min-width: 86px;
+      padding: 10px 12px;
+      border: 1px solid rgba(247, 241, 228, 0.18);
+      border-radius: 6px;
+      background: var(--panel);
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+    }
+
+    .golf-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+    }
+
+    .golf-stat strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 1rem;
+    }
+
+    .golf-feedback {
+      position: absolute;
+      left: 18px;
+      bottom: 172px;
+      width: min(460px, calc(100vw - 36px));
+      padding: 14px 16px;
+      border-left: 4px solid var(--rim);
+      background: rgba(8, 10, 10, 0.74);
+      color: var(--ink);
+      font-weight: 700;
+      text-shadow: 0 1px 0 #000;
+    }
+
+    .golf-mini-map {
+      position: absolute;
+      right: 18px;
+      bottom: 156px;
+      width: 170px;
+      height: 116px;
+      border: 1px solid rgba(247, 241, 228, 0.26);
+      border-radius: 6px;
+      background: rgba(13, 34, 31, 0.9);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    }
+
+    .golf-controls {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: minmax(352px, 0.9fr) minmax(300px, 1.2fr) auto;
+      gap: 16px;
+      align-items: end;
+      padding: 18px;
+      background: linear-gradient(0deg, rgba(8, 10, 10, 0.94), rgba(8, 10, 10, 0.25));
+    }
+
+    .golf-shot-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(74px, 1fr));
+      gap: 10px;
+    }
+
+    .golf-shot-card {
+      min-height: 54px;
+      border: 1px solid rgba(247, 241, 228, 0.22);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .golf-shot-card.is-selected {
+      border-color: var(--meter);
+      background: rgba(244, 201, 93, 0.18);
+    }
+
+    .golf-shot-card.is-recommended {
+      box-shadow: inset 0 -3px 0 var(--good);
+    }
+
+    .golf-shot-cards:empty::before {
+      content: "Shot cards loading";
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .golf-meter-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .golf-phase {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .golf-meter {
+      position: relative;
+      height: 34px;
+      overflow: hidden;
+      border: 2px solid rgba(247, 241, 228, 0.28);
+      border-radius: 6px;
+      background:
+        linear-gradient(90deg, rgba(212, 77, 40, 0.84), rgba(244, 201, 93, 0.96) 72%, rgba(99, 210, 151, 0.98) 92%, rgba(244, 201, 93, 0.9));
+      box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .golf-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .golf-zone.aim {
+      left: 10%;
+      width: 7%;
+      background: rgba(99, 210, 151, 0.22);
+    }
+
+    .golf-zone.distance {
+      left: 88%;
+      width: 8%;
+      background: rgba(99, 210, 151, 0.28);
+    }
+
+    .golf-meter-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0%;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .golf-cursor {
+      position: absolute;
+      top: -8px;
+      bottom: -8px;
+      left: 0%;
+      width: 4px;
+      background: #ffffff;
+      box-shadow: 0 0 16px #ffffff;
+      transform: translateX(-2px);
+    }
+
+    .golf-action {
+      min-width: 132px;
+      min-height: 54px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--rim);
+      color: #fff9ef;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.94rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      box-shadow: 0 12px 0 #85331f, 0 22px 32px rgba(0, 0, 0, 0.38);
+    }
+
+    .golf-action:active {
+      transform: translateY(4px);
+      box-shadow: 0 8px 0 #85331f, 0 16px 24px rgba(0, 0, 0, 0.32);
+    }
+
+    @media (max-width: 760px) {
+      body {
+        overflow: auto;
+      }
+
+      .golf-app {
+        min-height: 100dvh;
+      }
+
+      .golf-topbar,
+      .golf-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .golf-scene {
+        min-height: 58dvh;
+      }
+
+      .golf-feedback,
+      .golf-mini-map {
+        position: relative;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        margin: 12px 18px;
+      }
+
+      .golf-controls {
+        position: relative;
+        margin-top: 44dvh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="basketball-golf-app" class="golf-app" data-golf-status="booting">
+    <section id="golf-scene" class="golf-scene" aria-label="Basketball mini golf course"></section>
+
+    <header class="golf-topbar" aria-label="Hole status">
+      <div id="golf-hole-title" class="golf-hole-title">Hole 1 - Starter Arc</div>
+      <div class="golf-stat"><span>Strokes</span><strong id="golf-strokes">0</strong></div>
+      <div class="golf-stat"><span>Par</span><strong id="golf-par">Par 2</strong></div>
+      <div class="golf-stat"><span>Progress</span><strong id="golf-course-progress">1 / 3</strong></div>
+    </header>
+
+    <div id="golf-feedback" class="golf-feedback" role="status">Choose a shot card, then time distance and aim.</div>
+    <canvas id="golf-mini-map" class="golf-mini-map" width="340" height="232" aria-label="Course mini map"></canvas>
+
+    <section class="golf-controls" aria-label="Shot controls">
+      <div id="golf-shot-cards" class="golf-shot-cards" aria-label="Shot cards"></div>
+      <div class="golf-meter-wrap">
+        <div id="golf-phase" class="golf-phase">Ready</div>
+        <div id="golf-meter" class="golf-meter" aria-label="Shot timing meter">
+          <div class="golf-zone aim" aria-hidden="true"></div>
+          <div class="golf-zone distance" aria-hidden="true"></div>
+          <div id="golf-meter-fill" class="golf-meter-fill"></div>
+          <div id="golf-cursor" class="golf-cursor"></div>
+        </div>
+      </div>
+      <button id="golf-action" class="golf-action" type="button">Press</button>
+    </section>
+  </main>
+
+  <script src="basketball-golf-courses.js" defer></script>
+  <script src="basketball-golf-core.js" defer></script>
+  <script src="basketball-golf-renderer.js" type="module"></script>
+  <script src="basketball-golf.js" type="module"></script>
+</body>
+</html>
