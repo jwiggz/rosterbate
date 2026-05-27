@@ -98,12 +98,13 @@ assert.equal(
 
 const markup = portraits.renderPortraitMarkup(
   { name: 'Hakeem Olajuwon', team: 'HOU' },
-  { size: 64, className: 'player-portrait', state: 'takeover', status: 'OUT', hasGame: false }
+  { size: 64, className: 'player-portrait', state: 'takeover final', status: 'OUT', hasGame: false }
 );
 assert.match(markup, /class="[^"]*player-portrait/, 'rendered markup should keep requested wrapper class');
 assert.match(markup, /player-portrait-img/, 'rendered markup should include an image element');
 assert.match(markup, /alt="Hakeem Olajuwon portrait"/, 'rendered markup should include accessible alt text');
 assert.match(markup, /portrait-state-takeover/, 'rendered markup should include takeover animation state');
+assert.match(markup, /portrait-state-final/, 'rendered markup should include final spotlight animation state');
 assert.match(markup, /portrait-state-injured/, 'rendered markup should include injured animation state');
 assert.match(markup, /portrait-state-offday/, 'rendered markup should include off-day animation state');
 
