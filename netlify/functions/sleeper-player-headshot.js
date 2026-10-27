@@ -37,11 +37,57 @@ async function fetchImage(url){
 
 async function fetchJson(url){
   const r=await fetch(url,{
-    headers:{Accept:'application/json','User-Agent':'RosterBate/1.0'},
+    headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 RosterBate/1.0'},
     cache:'no-store'
   });
   if(!r.ok) return null;
   return r.json().catch(()=>null);
+}
+
+function normalizeName(value){
+  return String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function findEspnId(payload,targetName){
+  const target=normalizeName(targetName);
+  if(!payload||!target) return '';
+  const seen=new Set();
+  let loose='';
+  function walk(node,depth=0){
+    if(depth>10||node==null) return '';
+    if(typeof node!=='object') return '';
+    if(seen.has(node)) return '';
+    seen.add(node);
+    const name=normalizeName(node.displayName||node.fullName||node.name||node.shortName||node.text||'');
+    const id=String(node.id||node.athleteId||node.athlete_id||'').trim();
+    if(/^\d{3,12}$/.test(id)){
+      if(name===target) return id;
+      if(!loose&&name&&(name.includes(target)||target.includes(name))) loose=id;
+    }
+    if(Array.isArray(node)){
+      for(const item of node){const found=walk(item,depth+1);if(found)return found;}
+    }else{
+      for(const value of Object.values(node)){const found=walk(value,depth+1);if(found)return found;}
+    }
+    return '';
+  }
+  return walk(payload)||loose;
+}
+
+async function searchEspnId(name){
+  if(!name) return '';
+  const urls=[
+    `https://site.api.espn.com/apis/common/v3/search?query=${encodeURIComponent(name)}&limit=20`,
+    `https://site.web.api.espn.com/apis/common/v3/search?query=${encodeURIComponent(name)}&limit=20`
+  ];
+  for(const url of urls){
+    try{
+      const data=await fetchJson(url);
+      const id=findEspnId(data,name);
+      if(id) return id;
+    }catch{}
+  }
+  return '';
 }
 
 function svgPlaceholder(name){
@@ -65,30 +111,26 @@ exports.handler=async function(event){
   let playerName='NBA';
 
   try{
-    // Most callers only know the Sleeper player id. Resolve Sleeper -> ESPN here so
-    // the browser never needs to make a third-party image request.
+    let sleeperPlayer=null;
     if(player){
       const players=await fetchJson('https://api.sleeper.app/v1/players/nba');
-      const p=players&&players[player];
-      if(p){
-        playerName=p.full_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||playerName;
+      sleeperPlayer=players&&players[player];
+      if(sleeperPlayer){
+        playerName=sleeperPlayer.full_name||[sleeperPlayer.first_name,sleeperPlayer.last_name].filter(Boolean).join(' ')||playerName;
         if(!espn){
-          espn=String(p.espn_id||p.espn||p.metadata?.espn_id||'').trim();
+          espn=String(sleeperPlayer.espn_id||sleeperPlayer.espn||sleeperPlayer.metadata?.espn_id||'').trim();
           if(!/^\d{1,12}$/.test(espn)) espn='';
         }
       }
     }
 
-    const urls=[];
-    if(espn){
-      urls.push(`https://a.espncdn.com/i/headshots/nba/players/full/${encodeURIComponent(espn)}.png`);
-    }
+    // Sleeper's NBA player map does not consistently carry ESPN ids. When it is
+    // missing, resolve the exact player by name through ESPN's public search API.
+    if(!espn&&playerName&&playerName!=='NBA') espn=await searchEspnId(playerName);
 
-    // Keep these as fallbacks only. Firefox never sees these hosts directly because
-    // the Netlify function proxies the bytes back from the RosterBate origin.
-    if(player){
-      urls.push(`https://sleepercdn.com/content/nba/players/thumb/${encodeURIComponent(player)}`);
-    }
+    const urls=[];
+    if(espn) urls.push(`https://a.espncdn.com/i/headshots/nba/players/full/${encodeURIComponent(espn)}.png`);
+    if(player) urls.push(`https://sleepercdn.com/content/nba/players/thumb/${encodeURIComponent(player)}`);
 
     for(const url of urls){
       const image=await fetchImage(url);
@@ -96,13 +138,12 @@ exports.handler=async function(event){
         return binary(200,image.body,{
           'Content-Type':image.type,
           'Access-Control-Allow-Origin':'*',
-          'X-RosterBate-Headshot-Source':url.includes('espncdn.com')?'espn':'sleeper'
+          'X-RosterBate-Headshot-Source':url.includes('espncdn.com')?'espn':'sleeper',
+          ...(espn?{'X-RosterBate-ESPN-Id':espn}:{})
         });
       }
     }
 
-    // Return a stable same-origin placeholder instead of 404. This prevents the
-    // frontend MutationObserver from repeatedly removing/re-requesting the image.
     return binary(200,svgPlaceholder(playerName),{
       'Content-Type':'image/svg+xml; charset=utf-8',
       'Access-Control-Allow-Origin':'*',
