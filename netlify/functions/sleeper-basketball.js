@@ -33,6 +33,22 @@ async function fetchJson(url){
   return response.json().catch(()=>null);
 }
 
+function scheduleStart(g){
+  const raw=g.start_time||g.start||g.game_time||g.start_time_utc||g.datetime||g.date_time||'';
+  return raw==null?'':String(raw);
+}
+
+function scheduleVenue(g){
+  const venue=g.venue;
+  if(typeof venue==='string') return venue;
+  return String(venue?.name||g.arena||g.stadium||g.venue_name||'');
+}
+
+function scheduleCity(g){
+  const venue=g.venue;
+  return String(venue?.city||g.city||g.venue_city||'');
+}
+
 async function nbaSchedule(season,week){
   const urls=[
     `${SLEEPER_ROOT}/schedule/nba/regular/${encodeURIComponent(season)}`,
@@ -42,14 +58,20 @@ async function nbaSchedule(season,week){
     try{
       const rows=await fetchJson(url);
       if(!Array.isArray(rows)) continue;
-      return rows.filter(g=>Number(g.week)===Number(week)).map(g=>({
-        game_id:String(g.game_id||g.id||''),
-        date:String(g.date||g.start_time?.slice?.(0,10)||''),
-        home:String(g.home||g.home_team||''),
-        away:String(g.away||g.away_team||''),
-        week:Number(g.week)||Number(week),
-        status:String(g.status||'pre_game')
-      })).filter(g=>g.date&&g.home&&g.away);
+      return rows.filter(g=>Number(g.week)===Number(week)).map(g=>{
+        const start_time=scheduleStart(g);
+        return {
+          game_id:String(g.game_id||g.id||''),
+          date:String(g.date||(start_time&&start_time.slice(0,10))||''),
+          start_time,
+          home:String(g.home||g.home_team||''),
+          away:String(g.away||g.away_team||''),
+          week:Number(g.week)||Number(week),
+          status:String(g.status||'pre_game'),
+          venue:scheduleVenue(g),
+          city:scheduleCity(g)
+        };
+      }).filter(g=>g.date&&g.home&&g.away);
     }catch(error){/* try fallback */}
   }
   return [];
@@ -111,9 +133,6 @@ async function nbaProjections(season,week,schedule,scoring,playerIds){
   const validDates=new Set((schedule||[]).map(g=>g.date).filter(Boolean));
   const result={};
 
-  // NBA daily projections are best sourced from the season feed because it can
-  // carry one row per game. We only admit rows that map to this fantasy week's
-  // exact schedule, so a weekly aggregate can never masquerade as a daily value.
   try{
     const seasonRaw=await fetchJson(`${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}?season_type=regular`);
     for(const rawRow of rowsFrom(seasonRaw)){
@@ -129,15 +148,12 @@ async function nbaProjections(season,week,schedule,scoring,playerIds){
     }
   }catch(error){/* weekly fallback still available */}
 
-  // Sum only true game-level rows for the weekly projection when available.
   for(const item of Object.values(result)){
     if(item.games.length){
       item.week_points=Math.round(item.games.reduce((sum,g)=>sum+Number(g.points||0),0)*100)/100;
     }
   }
 
-  // Weekly feed is fallback for All Week only. It is deliberately never copied
-  // into games[], preventing the same weekly number from appearing on each day.
   try{
     const weeklyRaw=await fetchJson(`${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}/${encodeURIComponent(week)}?season_type=regular`);
     for(const rawRow of rowsFrom(weeklyRaw)){
