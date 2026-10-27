@@ -33,6 +33,36 @@ async function fetchJson(url){
   return response.json().catch(()=>null);
 }
 
+function normalizeTeam(value){
+  if(value==null) return '';
+  let raw=value;
+  if(typeof value==='object'){
+    raw=value.abbr||value.alias||value.team||value.team_abbr||value.team_abbreviation||value.code||value.key||value.name||'';
+  }
+  let team=String(raw).trim().toUpperCase();
+  const aliases={
+    BRK:'BKN',BRO:'BKN',BK:'BKN',
+    CHO:'CHA',CHH:'CHA',
+    GSW:'GS',GS:'GSW',
+    NO:'NOP',NOK:'NOP',NOH:'NOP',
+    NY:'NYK',
+    PHO:'PHX',
+    SA:'SAS'
+  };
+  return aliases[team]||team;
+}
+
+function scheduleTeam(g,side){
+  const candidates=side==='home'
+    ? [g.home_team_abbr,g.home_abbr,g.home_team_alias,g.home?.abbr,g.home?.alias,g.home?.team,g.home?.code,g.home_team?.abbr,g.home_team?.alias,g.home_team?.team,g.home_team?.code,g.home,g.home_team]
+    : [g.away_team_abbr,g.away_abbr,g.away_team_alias,g.away?.abbr,g.away?.alias,g.away?.team,g.away?.code,g.away_team?.abbr,g.away_team?.alias,g.away_team?.team,g.away_team?.code,g.away,g.away_team];
+  for(const candidate of candidates){
+    const team=normalizeTeam(candidate);
+    if(team && team!=='[OBJECT OBJECT]') return team;
+  }
+  return '';
+}
+
 function scheduleStart(g){
   const raw=g.start_time||g.start||g.game_time||g.start_time_utc||g.datetime||g.date_time||'';
   return raw==null?'':String(raw);
@@ -58,20 +88,21 @@ async function nbaSchedule(season,week){
     try{
       const rows=await fetchJson(url);
       if(!Array.isArray(rows)) continue;
-      return rows.filter(g=>Number(g.week)===Number(week)).map(g=>{
+      const games=rows.filter(g=>Number(g.week)===Number(week)).map(g=>{
         const start_time=scheduleStart(g);
         return {
           game_id:String(g.game_id||g.id||''),
           date:String(g.date||(start_time&&start_time.slice(0,10))||''),
           start_time,
-          home:String(g.home||g.home_team||''),
-          away:String(g.away||g.away_team||''),
+          home:scheduleTeam(g,'home'),
+          away:scheduleTeam(g,'away'),
           week:Number(g.week)||Number(week),
           status:String(g.status||'pre_game'),
           venue:scheduleVenue(g),
           city:scheduleCity(g)
         };
       }).filter(g=>g.date&&g.home&&g.away);
+      if(games.length) return games;
     }catch(error){/* try fallback */}
   }
   return [];
@@ -214,7 +245,7 @@ exports.handler=async function(event){
           full_name:p.full_name || [p.first_name,p.last_name].filter(Boolean).join(' ') || `Player ${id}`,
           first_name:p.first_name || '',
           last_name:p.last_name || '',
-          team:p.team || '',
+          team:normalizeTeam(p.team||p.team_abbr||p.team_abbreviation||''),
           position:p.position || '',
           fantasy_positions:p.fantasy_positions || [],
           number:p.number || null,
