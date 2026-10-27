@@ -6,6 +6,9 @@ const css=`
 #teamView .rb-inline-head-grid button{pointer-events:none!important;cursor:default!important;background:transparent!important;color:#8e9aae!important}
 #teamView .rb-stat-sort-mark{display:none!important}
 #teamView .player-row.rb-slot-pinned{cursor:not-allowed!important}
+#teamView .day-btn.rb-has-plan{box-shadow:inset 0 -2px 0 #f3c75b!important}
+#teamView .day-btn.rb-has-plan::after{content:'PLAN';display:block;margin-top:2px;color:#f3c75b;font-size:6px;font-weight:900;letter-spacing:.05em}
+#teamView #rbApplyDailyPlan{margin-left:6px;background:#0a8e93;border-color:#0db4ba;color:#ecffff}
 `;
 function addStyle(){if(document.getElementById('rbRosterOrderStyle'))return;const s=document.createElement('style');s.id='rbRosterOrderStyle';s.textContent=css;document.head.appendChild(s)}
 function n(v,f=9999){const x=Number(v);return Number.isFinite(x)?x:f}
@@ -97,8 +100,60 @@ function enforce(){
     if(ir.parentElement===card) card.appendChild(ir);
   }
 }
+function todayKey(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`}
+function dayMode(day){if(!day||day==='all')return'week';const today=todayKey();if(day<today)return'past';if(day>today)return'future';return'today'}
+function planKey(day){try{return`rbDailyPlan:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}:${String(day)}`}catch{return''}}
+function readPlan(day){try{const raw=localStorage.getItem(planKey(day));const p=raw?JSON.parse(raw):null;return p&&Array.isArray(p.starters)?p:null}catch{return null}}
+function writePlan(day,plan){try{localStorage.setItem(planKey(day),JSON.stringify(plan));return true}catch{return false}}
+function removePlan(day){try{localStorage.removeItem(planKey(day))}catch{}}
+function selectedDayValue(){try{return String(selectedDay||'all')}catch{return'all'}}
+function planSummary(){try{if(!pendingSwap)return'';const out=pendingSwap.outId==='0'?'Empty slot':player(pendingSwap.outId).full_name,inn=player(pendingSwap.inId).full_name;return`${out} → ${inn}`}catch{return'Planned lineup change'}}
+function saveFuturePlan(){
+  const day=selectedDayValue();if(dayMode(day)!=='future'||!pendingSwap)return false;
+  const ok=writePlan(day,{starters:pendingSwap.after.map(String),summary:planSummary(),savedAt:Date.now()});
+  try{closeModal();clearSelection();renderTeam();renderActivity();setStatus(ok?`Planned for ${day}: ${planSummary()}. Sleeper will not be changed until you apply it that day.`:'Unable to save planned lineup.','success')}catch{}
+  setTimeout(refreshPlannerUi,0);return ok;
+}
+async function applyTodayPlan(){
+  const day=selectedDayValue();if(dayMode(day)!=='today')return;const plan=readPlan(day);if(!plan)return;
+  const btn=document.getElementById('rbApplyDailyPlan');if(btn){btn.disabled=true;btn.textContent='Applying…'}
+  try{
+    if(typeof setStatus==='function')setStatus(`Applying planned ${day} lineup to Sleeper…`);
+    if(typeof writeLineup!=='function')throw new Error('Sleeper lineup writer is unavailable.');
+    await writeLineup(plan.starters,plan.summary||`Planned lineup for ${day}`);
+    removePlan(day);
+    if(typeof clearSelection==='function')clearSelection();
+    if(typeof load==='function')await load(true);
+    if(typeof setStatus==='function')setStatus(`Applied planned lineup on Sleeper for ${day}.`,'success');
+  }catch(e){if(typeof setStatus==='function')setStatus(e?.message||String(e),'error');if(btn){btn.disabled=false;btn.textContent='Apply Planned Lineup'}}
+  setTimeout(refreshPlannerUi,0);
+}
+function decorateSwapModal(){
+  const btn=document.getElementById('commitSwap');if(!btn)return;
+  const mode=dayMode(selectedDayValue());
+  const modal=btn.closest('.modal');const p=modal?.querySelector('.modal-body p');const warning=modal?.querySelector('.warning');
+  if(mode==='future'){
+    btn.textContent='Save Plan';
+    if(p)p.innerHTML=`This saves a <strong>RosterBate plan</strong> for ${selectedDayValue()}. Sleeper has no future daily lineup, so nothing is sent yet.`;
+    if(warning)warning.textContent='Open RosterBate on that date and apply the planned lineup before the relevant games begin.';
+  }else if(mode==='past'){
+    btn.textContent='Past Day';btn.disabled=true;
+    if(p)p.textContent='Past-day starter changes cannot be sent to Sleeper.';
+  }
+}
+function markPlans(){
+  document.querySelectorAll('#teamView .day-btn[data-day]').forEach(btn=>btn.classList.toggle('rb-has-plan',!!readPlan(btn.dataset.day)));
+}
+function refreshPlannerUi(){
+  markPlans();
+  document.getElementById('rbApplyDailyPlan')?.remove();
+  const day=selectedDayValue(),plan=readPlan(day);if(dayMode(day)!=='today'||!plan)return;
+  const bar=document.querySelector('#teamView .editor-bar');if(!bar)return;
+  const b=document.createElement('button');b.id='rbApplyDailyPlan';b.className='mini-btn';b.textContent='Apply Planned Lineup';b.title=plan.summary||'Apply saved lineup plan to Sleeper';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();applyTodayPlan()});
+  const spacer=bar.querySelector('.spacer');spacer?bar.insertBefore(b,spacer):bar.appendChild(b);
+}
 addStyle();
-let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(enforce,30)};
+let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>{enforce();refreshPlannerUi()},30)};
 const root=document.getElementById('teamView');
 if(root){
   new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
@@ -109,5 +164,13 @@ if(root){
     e.stopPropagation();
   },true);
 }
-setTimeout(enforce,120);setTimeout(enforce,650);window.addEventListener('focus',enforce);
+document.addEventListener('click',e=>{
+  const commit=e.target.closest?.('#commitSwap');
+  if(commit&&dayMode(selectedDayValue())==='future'){
+    e.preventDefault();e.stopImmediatePropagation();saveFuturePlan();return;
+  }
+  if(e.target.closest?.('[data-bench-id]'))setTimeout(decorateSwapModal,0);
+  if(e.target.closest?.('.day-btn[data-day]'))setTimeout(refreshPlannerUi,0);
+},true);
+setTimeout(()=>{enforce();refreshPlannerUi()},120);setTimeout(()=>{enforce();refreshPlannerUi()},650);window.addEventListener('focus',()=>{enforce();refreshPlannerUi()});
 })();
