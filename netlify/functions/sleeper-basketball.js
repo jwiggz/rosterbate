@@ -1,4 +1,5 @@
 const SLEEPER_API='https://api.sleeper.app/v1';
+const SLEEPER_ROOT='https://api.sleeper.app';
 
 function json(statusCode, body, extraHeaders={}){
   return {
@@ -23,6 +24,30 @@ async function sleeper(path){
     throw new Error(`Sleeper ${response.status}: ${text.slice(0,180)}`);
   }
   return response.json();
+}
+
+async function nbaSchedule(season,week){
+  const urls=[
+    `${SLEEPER_ROOT}/schedule/nba/regular/${encodeURIComponent(season)}`,
+    `https://api.sleeper.com/schedule/nba/regular/${encodeURIComponent(season)}`
+  ];
+  for(const url of urls){
+    try{
+      const response=await fetch(url,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});
+      if(!response.ok) continue;
+      const rows=await response.json();
+      if(!Array.isArray(rows)) continue;
+      return rows.filter(g=>Number(g.week)===Number(week)).map(g=>({
+        game_id:String(g.game_id||''),
+        date:String(g.date||''),
+        home:String(g.home||g.home_team||''),
+        away:String(g.away||g.away_team||''),
+        week:Number(g.week)||Number(week),
+        status:String(g.status||'pre_game')
+      })).filter(g=>g.date&&g.home&&g.away);
+    }catch(error){/* try fallback */}
+  }
+  return [];
 }
 
 exports.handler=async function(event){
@@ -50,7 +75,10 @@ exports.handler=async function(event){
 
     const fallbackWeek=Number(state && state.week) || Number(league.settings && league.settings.leg) || 1;
     const requestedWeek=Math.max(1,Math.min(40,Number(params.week) || fallbackWeek));
-    const matchups=await sleeper(`/league/${leagueId}/matchups/${requestedWeek}`);
+    const [matchups,schedule]=await Promise.all([
+      sleeper(`/league/${leagueId}/matchups/${requestedWeek}`),
+      nbaSchedule(league.season||state.season||new Date().getFullYear(),requestedWeek)
+    ]);
 
     const playerIds=new Set();
     for(const roster of rosters || []){
@@ -118,6 +146,7 @@ exports.handler=async function(event){
       },
       state,
       week:requestedWeek,
+      schedule,
       teams,
       matchups:matchups || [],
       players
