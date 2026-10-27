@@ -5,7 +5,8 @@ function json(statusCode, body, extraHeaders={}){
     statusCode,
     headers:{
       'Content-Type':'application/json; charset=utf-8',
-      'Cache-Control':'public, max-age=30, s-maxage=30, stale-while-revalidate=120',
+      'Cache-Control':'no-store, max-age=0',
+      'Pragma':'no-cache',
       ...extraHeaders
     },
     body:JSON.stringify(body)
@@ -14,7 +15,8 @@ function json(statusCode, body, extraHeaders={}){
 
 async function sleeper(path){
   const response=await fetch(`${SLEEPER_API}${path}`,{
-    headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'}
+    headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},
+    cache:'no-store'
   });
   if(!response.ok){
     const text=await response.text().catch(()=> '');
