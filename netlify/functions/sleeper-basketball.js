@@ -27,6 +27,12 @@ async function sleeper(path){
   return response.json();
 }
 
+async function fetchJson(url){
+  const response=await fetch(url,{headers:{'Accept':'application/json','User-Agent':'Mozilla/5.0 RosterBate/1.0'},cache:'no-store'});
+  if(!response.ok) return null;
+  return response.json().catch(()=>null);
+}
+
 async function nbaSchedule(season,week){
   const urls=[
     `${SLEEPER_ROOT}/schedule/nba/regular/${encodeURIComponent(season)}`,
@@ -34,9 +40,7 @@ async function nbaSchedule(season,week){
   ];
   for(const url of urls){
     try{
-      const response=await fetch(url,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});
-      if(!response.ok) continue;
-      const rows=await response.json();
+      const rows=await fetchJson(url);
       if(!Array.isArray(rows)) continue;
       return rows.filter(g=>Number(g.week)===Number(week)).map(g=>({
         game_id:String(g.game_id||g.id||''),
@@ -84,48 +88,75 @@ function scoreProjection(stats,scoring){
   return used?Math.round(total*100)/100:null;
 }
 
+function rowsFrom(raw){
+  if(Array.isArray(raw)) return raw;
+  if(raw&&typeof raw==='object') return Object.values(raw);
+  return [];
+}
+
+function projectionRow(row,scoring,gameDate){
+  const id=String(row?.player_id||row?.player?.player_id||row?.player?.id||'');
+  if(!id) return null;
+  const stats=row.stats||row.projection||row.projected_stats||{};
+  const points=scoreProjection(stats,scoring);
+  if(points===null) return null;
+  const gameId=String(row.game_id||row.game?.game_id||row.game?.id||'');
+  const date=String(row.date||row.game?.date||gameDate.get(gameId)||'');
+  return {id,game_id:gameId,date,points,stats,week:Number(row.week)||null};
+}
+
 async function nbaProjections(season,week,schedule,scoring,playerIds){
-  const urls=[
-    `${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}/${encodeURIComponent(week)}?season_type=regular`,
-    `${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}?season_type=regular&week=${encodeURIComponent(week)}`
-  ];
   const gameDate=new Map((schedule||[]).map(g=>[String(g.game_id),g.date]));
-  for(const url of urls){
-    try{
-      const response=await fetch(url,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});
-      if(!response.ok) continue;
-      const raw=await response.json();
-      const rows=Array.isArray(raw)?raw:Object.values(raw||{});
-      if(!rows.length) continue;
-      const result={};
-      for(const row of rows){
-        const id=String(row.player_id||row.player?.player_id||row.player?.id||'');
-        if(!id||!playerIds.has(id)) continue;
-        const stats=row.stats||row.projection||row.projected_stats||{};
-        const points=scoreProjection(stats,scoring);
-        if(points===null) continue;
-        const gameId=String(row.game_id||row.game?.game_id||row.game?.id||'');
-        const date=String(row.date||row.game?.date||gameDate.get(gameId)||'');
-        if(!result[id]) result[id]={week_points:0,games:[]};
-        result[id].week_points=Math.round((result[id].week_points+points)*100)/100;
-        result[id].games.push({game_id:gameId,date,points,stats});
-      }
-      return result;
-    }catch(error){/* try fallback */}
+  const validGameIds=new Set((schedule||[]).map(g=>String(g.game_id)).filter(Boolean));
+  const validDates=new Set((schedule||[]).map(g=>g.date).filter(Boolean));
+  const result={};
+
+  // NBA daily projections are best sourced from the season feed because it can
+  // carry one row per game. We only admit rows that map to this fantasy week's
+  // exact schedule, so a weekly aggregate can never masquerade as a daily value.
+  try{
+    const seasonRaw=await fetchJson(`${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}?season_type=regular`);
+    for(const rawRow of rowsFrom(seasonRaw)){
+      const row=projectionRow(rawRow,scoring,gameDate);
+      if(!row||!playerIds.has(row.id)) continue;
+      const inWeek=(row.game_id&&validGameIds.has(row.game_id))||(row.date&&validDates.has(row.date));
+      if(!inWeek) continue;
+      if(!row.date&&row.game_id) row.date=gameDate.get(row.game_id)||'';
+      if(!row.date) continue;
+      if(!result[row.id]) result[row.id]={week_points:null,games:[],source:'game'};
+      const duplicate=result[row.id].games.some(g=>(row.game_id&&g.game_id===row.game_id)||(!row.game_id&&g.date===row.date));
+      if(!duplicate) result[row.id].games.push({game_id:row.game_id,date:row.date,points:row.points,stats:row.stats});
+    }
+  }catch(error){/* weekly fallback still available */}
+
+  // Sum only true game-level rows for the weekly projection when available.
+  for(const item of Object.values(result)){
+    if(item.games.length){
+      item.week_points=Math.round(item.games.reduce((sum,g)=>sum+Number(g.points||0),0)*100)/100;
+    }
   }
-  return {};
+
+  // Weekly feed is fallback for All Week only. It is deliberately never copied
+  // into games[], preventing the same weekly number from appearing on each day.
+  try{
+    const weeklyRaw=await fetchJson(`${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}/${encodeURIComponent(week)}?season_type=regular`);
+    for(const rawRow of rowsFrom(weeklyRaw)){
+      const row=projectionRow(rawRow,scoring,gameDate);
+      if(!row||!playerIds.has(row.id)) continue;
+      if(!result[row.id]) result[row.id]={week_points:row.points,games:[],source:'week'};
+      else if(result[row.id].week_points===null) result[row.id].week_points=row.points;
+    }
+  }catch(error){/* projections remain partial */}
+
+  return result;
 }
 
 exports.handler=async function(event){
-  if(event.httpMethod && event.httpMethod!=='GET'){
-    return json(405,{error:'Method not allowed'},{Allow:'GET'});
-  }
+  if(event.httpMethod && event.httpMethod!=='GET') return json(405,{error:'Method not allowed'},{Allow:'GET'});
 
   const params=event.queryStringParameters || {};
   const leagueId=String(params.league || '').trim();
-  if(!/^\d{10,25}$/.test(leagueId)){
-    return json(400,{error:'A valid Sleeper league id is required.'});
-  }
+  if(!/^\d{10,25}$/.test(leagueId)) return json(400,{error:'A valid Sleeper league id is required.'});
 
   try{
     const [league,rosters,users,state]=await Promise.all([
@@ -135,9 +166,7 @@ exports.handler=async function(event){
       sleeper('/state/nba').catch(()=>({}))
     ]);
 
-    if(!league || String(league.sport || '').toLowerCase()!=='nba'){
-      return json(400,{error:'This dashboard currently supports Sleeper NBA leagues only.'});
-    }
+    if(!league || String(league.sport || '').toLowerCase()!=='nba') return json(400,{error:'This dashboard currently supports Sleeper NBA leagues only.'});
 
     const fallbackWeek=Number(state && state.week) || Number(league.settings && league.settings.leg) || 1;
     const requestedWeek=Math.max(1,Math.min(40,Number(params.week) || fallbackWeek));
@@ -148,9 +177,7 @@ exports.handler=async function(event){
     ]);
 
     const playerIds=new Set();
-    for(const roster of rosters || []){
-      for(const id of roster.players || []) playerIds.add(String(id));
-    }
+    for(const roster of rosters || []) for(const id of roster.players || []) playerIds.add(String(id));
     for(const matchup of matchups || []){
       for(const id of matchup.players || []) playerIds.add(String(id));
       for(const id of matchup.starters || []) if(String(id)!=='0') playerIds.add(String(id));
@@ -179,48 +206,19 @@ exports.handler=async function(event){
           active:p.active !== false
         };
       }
-    }catch(error){
-      players={};
-    }
+    }catch(error){players={};}
 
     const projections=await projectionsPromise.catch(()=>({}));
     const userMap={};
     for(const user of users || []) userMap[String(user.user_id)]=user;
-
     const teams=(rosters || []).map(roster=>{
-      const user=userMap[String(roster.owner_id)] || {};
-      const metadata=user.metadata || {};
-      return {
-        roster_id:roster.roster_id,
-        owner_id:roster.owner_id,
-        display_name:user.display_name || `Roster ${roster.roster_id}`,
-        team_name:metadata.team_name || user.display_name || `Roster ${roster.roster_id}`,
-        avatar:metadata.avatar || user.avatar || null,
-        players:roster.players || [],
-        starters:roster.starters || [],
-        reserve:roster.reserve || [],
-        settings:roster.settings || {}
-      };
+      const user=userMap[String(roster.owner_id)] || {},metadata=user.metadata || {};
+      return {roster_id:roster.roster_id,owner_id:roster.owner_id,display_name:user.display_name || `Roster ${roster.roster_id}`,team_name:metadata.team_name || user.display_name || `Roster ${roster.roster_id}`,avatar:metadata.avatar || user.avatar || null,players:roster.players || [],starters:roster.starters || [],reserve:roster.reserve || [],settings:roster.settings || {}};
     });
 
     return json(200,{
-      league:{
-        league_id:league.league_id,
-        name:league.name,
-        sport:league.sport,
-        season:league.season,
-        status:league.status,
-        settings:league.settings || {},
-        scoring_settings:league.scoring_settings || {},
-        roster_positions:league.roster_positions || []
-      },
-      state,
-      week:requestedWeek,
-      schedule,
-      projections,
-      teams,
-      matchups:matchups || [],
-      players
+      league:{league_id:league.league_id,name:league.name,sport:league.sport,season:league.season,status:league.status,settings:league.settings || {},scoring_settings:league.scoring_settings || {},roster_positions:league.roster_positions || []},
+      state,week:requestedWeek,schedule,projections,teams,matchups:matchups || [],players
     });
   }catch(error){
     console.error('Sleeper basketball proxy error',error);
