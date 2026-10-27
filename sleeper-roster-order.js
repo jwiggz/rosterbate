@@ -6,6 +6,7 @@ const css=`
 #teamView .rb-inline-head-grid button{pointer-events:none!important;cursor:default!important;background:transparent!important;color:#8e9aae!important}
 #teamView .rb-stat-sort-mark{display:none!important}
 #teamView .player-row.rb-slot-pinned{cursor:not-allowed!important}
+#teamView .player-row.rb-bench-selected{outline:1px solid #08c7c9!important;outline-offset:-1px!important;background:#203d47!important;opacity:1!important}
 #teamView .day-btn.rb-has-plan{box-shadow:inset 0 -2px 0 #f3c75b!important}
 #teamView .day-btn.rb-has-plan::after{content:'PLAN';display:block;margin-top:2px;color:#f3c75b;font-size:6px;font-weight:900;letter-spacing:.05em}
 #teamView #rbApplyDailyPlan{margin-left:6px;background:#0a8e93;border-color:#0db4ba;color:#ecffff}
@@ -152,8 +153,63 @@ function refreshPlannerUi(){
   const b=document.createElement('button');b.id='rbApplyDailyPlan';b.className='mini-btn';b.textContent='Apply Planned Lineup';b.title=plan.summary||'Apply saved lineup plan to Sleeper';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();applyTodayPlan()});
   const spacer=bar.querySelector('.spacer');spacer?bar.insertBefore(b,spacer):bar.appendChild(b);
 }
+
+let benchFirstId=null;
+let optimistic=null;
+function clearBenchFirst(){
+  benchFirstId=null;
+  document.querySelectorAll('#teamView .player-row.rb-bench-selected').forEach(r=>r.classList.remove('rb-bench-selected'));
+}
+function selectBenchFirst(id,row){
+  benchFirstId=String(id||'');
+  document.querySelectorAll('#teamView .player-row.rb-bench-selected').forEach(r=>r.classList.remove('rb-bench-selected'));
+  row?.classList.add('rb-bench-selected');
+  try{const p=player(benchFirstId);setStatus(`Selected ${p.full_name||'bench player'} — choose the starter slot to replace.`)}catch{}
+}
+function applyLocalStarters(starters){
+  try{
+    const m=matchup(selectedRoster);
+    if(m&&Array.isArray(starters)){m.starters=starters.map(String)}
+    optimistic={leagueId:String(leagueId),rosterId:Number(selectedRoster),week:Number(selectedWeek),starters:(starters||[]).map(String),until:Date.now()+12000};
+    if(typeof renderTeam==='function')renderTeam();
+    if(typeof renderActivity==='function')renderActivity();
+  }catch{}
+}
+function reapplyOptimistic(){
+  try{
+    if(!optimistic||Date.now()>optimistic.until){optimistic=null;return}
+    if(String(leagueId)!==optimistic.leagueId||Number(selectedRoster)!==optimistic.rosterId||Number(selectedWeek)!==optimistic.week)return;
+    const m=matchup(selectedRoster);if(!m)return;
+    const now=(m.starters||[]).map(String),want=optimistic.starters;
+    if(JSON.stringify(now)!==JSON.stringify(want)){
+      m.starters=want.slice();
+      if(typeof renderTeam==='function')renderTeam();
+      if(typeof renderActivity==='function')renderActivity();
+    }
+  }catch{}
+}
+
+try{
+  if(typeof writeLineup==='function'){
+    const rbOriginalWriteLineup=writeLineup;
+    writeLineup=async function(starters,...args){
+      const data=await rbOriginalWriteLineup.call(this,starters,...args);
+      applyLocalStarters(starters);
+      return data;
+    };
+  }
+  if(typeof load==='function'){
+    const rbOriginalLoad=load;
+    load=async function(...args){
+      const out=await rbOriginalLoad.apply(this,args);
+      reapplyOptimistic();
+      return out;
+    };
+  }
+}catch{}
+
 addStyle();
-let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>{enforce();refreshPlannerUi()},30)};
+let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},30)};
 const root=document.getElementById('teamView');
 if(root){
   new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
@@ -167,10 +223,44 @@ if(root){
 document.addEventListener('click',e=>{
   const commit=e.target.closest?.('#commitSwap');
   if(commit&&dayMode(selectedDayValue())==='future'){
-    e.preventDefault();e.stopImmediatePropagation();saveFuturePlan();return;
+    e.preventDefault();e.stopImmediatePropagation();saveFuturePlan();clearBenchFirst();return;
   }
-  if(e.target.closest?.('[data-bench-id]'))setTimeout(decorateSwapModal,0);
-  if(e.target.closest?.('.day-btn[data-day]'))setTimeout(refreshPlannerUi,0);
+
+  const benchRow=e.target.closest?.('#teamView [data-bench-id]');
+  if(benchRow){
+    const id=benchRow.dataset.benchId;
+    if(typeof selectedStarterIndex!=='undefined'&&selectedStarterIndex==null){
+      if(dayMode(selectedDayValue())==='past')return;
+      e.preventDefault();e.stopImmediatePropagation();
+      selectBenchFirst(id,benchRow);
+      return;
+    }
+    setTimeout(decorateSwapModal,0);
+  }
+
+  const starterRow=e.target.closest?.('#teamView [data-starter-index]');
+  if(starterRow&&benchFirstId){
+    if(starterRow.classList.contains('rb-slot-pinned')||starterRow.classList.contains('locked-in')){
+      e.preventDefault();e.stopImmediatePropagation();
+      try{setStatus('That starter slot is locked for the week.','error')}catch{}
+      return;
+    }
+    const idx=Number(starterRow.dataset.starterIndex);
+    if(Number.isInteger(idx)){
+      e.preventDefault();e.stopImmediatePropagation();
+      try{
+        selectedStarterIndex=idx;
+        const id=benchFirstId;
+        clearBenchFirst();
+        prepareSwap(id);
+        setTimeout(decorateSwapModal,0);
+      }catch(err){try{setStatus(err?.message||String(err),'error')}catch{}}
+      return;
+    }
+  }
+
+  if(e.target.closest?.('.day-btn[data-day]')){clearBenchFirst();setTimeout(refreshPlannerUi,0)}
+  if(e.target.closest?.('#cancelSelect'))clearBenchFirst();
 },true);
-setTimeout(()=>{enforce();refreshPlannerUi()},120);setTimeout(()=>{enforce();refreshPlannerUi()},650);window.addEventListener('focus',()=>{enforce();refreshPlannerUi()});
+setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},120);setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},650);window.addEventListener('focus',()=>{enforce();refreshPlannerUi();reapplyOptimistic()});
 })();
