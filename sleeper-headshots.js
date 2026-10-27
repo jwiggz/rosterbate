@@ -1,0 +1,8 @@
+(()=>{
+const style=document.createElement('style');style.textContent=`.player-head img.rb-proxied-headshot{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center top!important;z-index:4!important;background:#e9eef5!important}`;document.head.appendChild(style);
+function playerObj(id){return window.currentData?.players?.[String(id)]||{} }
+function proxiedUrl(id){const p=playerObj(id),params=new URLSearchParams();if(p.espn_id)params.set('espn',String(p.espn_id));params.set('player',String(id));return `/.netlify/functions/sleeper-player-headshot?${params.toString()}`}
+function apply(){document.querySelectorAll('#teamView .player-row').forEach(row=>{const img=row.querySelector('.player-head img'),id=img?.dataset?.playerId||row.dataset.rbPlayerId;if(!id)return;const head=row.querySelector('.player-head');if(!head)return;let target=head.querySelector('img.rb-proxied-headshot');const url=proxiedUrl(id);if(target&&target.dataset.proxyUrl===url)return;if(!target){target=document.createElement('img');target.className='rb-proxied-headshot';target.alt=playerObj(id).full_name||'Player';target.loading='lazy';target.referrerPolicy='no-referrer';head.appendChild(target)}target.dataset.proxyUrl=url;target.src=url;target.addEventListener('error',()=>{target.remove()}, {once:true})})}
+let timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,50)}
+const root=document.getElementById('teamView')||document.body;new MutationObserver(schedule).observe(root,{childList:true,subtree:true});setTimeout(apply,100);window.addEventListener('focus',apply);
+})();
