@@ -79,6 +79,36 @@ function scheduleCity(g){
   return String(venue?.city||g.city||g.venue_city||'');
 }
 
+function fillFantasyWeekDays(games,week){
+  if(!games.length) return games;
+  const realDates=[...new Set(games.map(g=>g.date).filter(Boolean))].sort();
+  const first=new Date(`${realDates[0]}T12:00:00Z`);
+  const offset=(first.getUTCDay()+6)%7;
+  const monday=new Date(first);
+  monday.setUTCDate(monday.getUTCDate()-offset);
+  const known=new Set(realDates);
+  const fillers=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);
+    d.setUTCDate(monday.getUTCDate()+i);
+    const date=d.toISOString().slice(0,10);
+    if(known.has(date)) continue;
+    fillers.push({
+      game_id:`calendar-${date}`,
+      date,
+      start_time:'',
+      home:`__CAL_HOME_${i}`,
+      away:`__CAL_AWAY_${i}`,
+      week:Number(week),
+      status:'calendar_only',
+      venue:'',
+      city:'',
+      calendar_only:true
+    });
+  }
+  return games.concat(fillers).sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.start_time||'').localeCompare(String(b.start_time||'')));
+}
+
 async function nbaSchedule(season,week){
   const urls=[
     `${SLEEPER_ROOT}/schedule/nba/regular/${encodeURIComponent(season)}`,
@@ -102,7 +132,7 @@ async function nbaSchedule(season,week){
           city:scheduleCity(g)
         };
       }).filter(g=>g.date&&g.home&&g.away);
-      if(games.length) return games;
+      if(games.length) return fillFantasyWeekDays(games,week);
     }catch(error){/* try fallback */}
   }
   return [];
@@ -170,9 +200,10 @@ function addProjectionGame(result,row,game,source){
 }
 
 async function nbaProjections(season,week,schedule,scoring,playerIds){
-  const gameDate=new Map((schedule||[]).map(g=>[String(g.game_id),g.date]));
-  const validGameIds=new Set((schedule||[]).map(g=>String(g.game_id)).filter(Boolean));
-  const validDates=new Set((schedule||[]).map(g=>g.date).filter(Boolean));
+  const realSchedule=(schedule||[]).filter(g=>!g.calendar_only);
+  const gameDate=new Map(realSchedule.map(g=>[String(g.game_id),g.date]));
+  const validGameIds=new Set(realSchedule.map(g=>String(g.game_id)).filter(Boolean));
+  const validDates=new Set(realSchedule.map(g=>g.date).filter(Boolean));
   const result={};
 
   // Prefer rows that explicitly identify a particular NBA game/date.
@@ -183,7 +214,7 @@ async function nbaProjections(season,week,schedule,scoring,playerIds){
       if(!row||!playerIds.has(row.id)) continue;
       const inWeek=(row.game_id&&validGameIds.has(row.game_id))||(row.date&&validDates.has(row.date));
       if(!inWeek) continue;
-      const game=(schedule||[]).find(g=>(row.game_id&&String(g.game_id)===row.game_id)||(!row.game_id&&row.date&&g.date===row.date&&(row.team?g.home===row.team||g.away===row.team:true)));
+      const game=realSchedule.find(g=>(row.game_id&&String(g.game_id)===row.game_id)||(!row.game_id&&row.date&&g.date===row.date&&(row.team?g.home===row.team||g.away===row.team:true)));
       if(game) addProjectionGame(result,row,game,'game');
     }
   }catch(error){/* weekly/per-game fallback still available */}
@@ -197,20 +228,17 @@ async function nbaProjections(season,week,schedule,scoring,playerIds){
       const row=projectionRow(rawRow,scoring,gameDate);
       if(!row||!playerIds.has(row.id)) continue;
 
-      // If this row identifies one exact game, use it only for that game.
       let games=[];
-      if(row.game_id&&validGameIds.has(row.game_id)) games=(schedule||[]).filter(g=>String(g.game_id)===row.game_id);
-      else if(row.date&&validDates.has(row.date)) games=(schedule||[]).filter(g=>g.date===row.date&&(!row.team||g.home===row.team||g.away===row.team));
-      else if(row.team) games=(schedule||[]).filter(g=>g.home===row.team||g.away===row.team);
+      if(row.game_id&&validGameIds.has(row.game_id)) games=realSchedule.filter(g=>String(g.game_id)===row.game_id);
+      else if(row.date&&validDates.has(row.date)) games=realSchedule.filter(g=>g.date===row.date&&(!row.team||g.home===row.team||g.away===row.team));
+      else if(row.team) games=realSchedule.filter(g=>g.home===row.team||g.away===row.team);
 
       if(games.length){
         for(const game of games){
-          // Do not overwrite a true game-specific projection already found above.
           const existing=result[row.id]?.games?.some(g=>(game.game_id&&g.game_id===String(game.game_id))||(!game.game_id&&g.date===game.date));
           if(!existing) addProjectionGame(result,row,game,'scheduled-per-game');
         }
       }else if(!result[row.id]){
-        // Preserve a projection even if the team/game mapping is unavailable.
         result[row.id]={week_points:row.points,games:[],source:'week'};
       }
     }
