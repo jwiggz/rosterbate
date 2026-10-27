@@ -12,6 +12,8 @@ exports.handler=async function(){
     // Stability guard must load first so optional decorators cannot reset lineup state.
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js"></script>');
+    // Enforce Sleeper roster-slot order and remove stat sorting; retain only Per Game/Totals.
+    if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js"></script>');
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js"></script>');
     // Safe avatar painter only changes styles/attributes on existing avatar circles.
     // It never inserts/removes roster child nodes, so lineup selection stays intact.
