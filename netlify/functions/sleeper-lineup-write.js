@@ -14,6 +14,14 @@ function validId(value){
   return /^\d{1,25}$/.test(String(value||''));
 }
 
+function normalizeToken(value){
+  let token=String(value||'').trim();
+  token=token.replace(/^authorization\s*:\s*/i,'').trim();
+  token=token.replace(/^bearer\s+/i,'').trim();
+  if((token.startsWith('"')&&token.endsWith('"'))||(token.startsWith("'")&&token.endsWith("'"))) token=token.slice(1,-1).trim();
+  return token;
+}
+
 function validToken(value){
   return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(String(value||''));
 }
@@ -43,7 +51,7 @@ exports.handler=async function(event){
   try{ body=JSON.parse(event.body||'{}'); }
   catch{ return json(400,{error:'Invalid JSON body'}); }
 
-  const token=String(body.token||'').trim();
+  const token=normalizeToken(body.token);
   const leagueId=String(body.leagueId||'').trim();
   const rosterId=Number(body.rosterId);
   const leg=Number(body.leg);
@@ -51,7 +59,7 @@ exports.handler=async function(event){
   const starters=Array.isArray(body.starters)?body.starters.map(String):[];
   const startersGames=(body.startersGames && typeof body.startersGames==='object' && !Array.isArray(body.startersGames))?body.startersGames:{};
 
-  if(!validToken(token)) return json(400,{error:'A valid Sleeper session token is required.'});
+  if(!validToken(token)) return json(400,{error:'A valid Sleeper session token is required. Copy the Authorization value from Sleeper; both bare JWT and Bearer-prefixed values are accepted.'});
   if(!validId(leagueId)) return json(400,{error:'Invalid league id.'});
   if(!Number.isInteger(rosterId)||rosterId<1) return json(400,{error:'Invalid roster id.'});
   if(!Number.isInteger(leg)||leg<1||leg>40||!Number.isInteger(round)||round<1||round>40) return json(400,{error:'Invalid scoring period.'});
