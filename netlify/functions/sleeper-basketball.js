@@ -39,15 +39,15 @@ function normalizeTeam(value){
   if(typeof value==='object'){
     raw=value.abbr||value.alias||value.team||value.team_abbr||value.team_abbreviation||value.code||value.key||value.name||'';
   }
-  let team=String(raw).trim().toUpperCase();
+  const team=String(raw).trim().toUpperCase();
   const aliases={
-    BRK:'BKN',BRO:'BKN',BK:'BKN',
-    CHO:'CHA',CHH:'CHA',
-    GSW:'GS',GS:'GSW',
-    NO:'NOP',NOK:'NOP',NOH:'NOP',
-    NY:'NYK',
-    PHO:'PHX',
-    SA:'SAS'
+    BRK:'BKN',BRO:'BKN',BK:'BKN',BKN:'BKN',
+    CHO:'CHA',CHH:'CHA',CHA:'CHA',
+    GS:'GSW',GSW:'GSW',
+    NO:'NOP',NOK:'NOP',NOH:'NOP',NOP:'NOP',
+    NY:'NYK',NYK:'NYK',
+    PHO:'PHX',PHX:'PHX',
+    SA:'SAS',SAS:'SAS'
   };
   return aliases[team]||team;
 }
