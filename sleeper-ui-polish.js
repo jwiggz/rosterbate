@@ -4,18 +4,20 @@ const css=`
 #teamView .columns-head.rb-stats-cols,#teamView .player-row.rb-stats-row{grid-template-columns:42px minmax(215px,.72fr) minmax(690px,1.78fr) 70px 70px!important}
 #teamView .rb-inline-head-grid,#teamView .rb-inline-stats{column-gap:7px!important}
 
-/* Available lock buttons: subtle animated edge only. Locked chips remain static below. */
-@keyframes rbLockReadyEdge{0%{background-position:0 0,0% 50%;box-shadow:0 0 0 1px rgba(47,157,121,.10),0 0 5px rgba(48,216,160,.10)}50%{background-position:0 0,100% 50%;box-shadow:0 0 0 1px rgba(143,242,207,.24),0 0 10px rgba(48,216,160,.23)}100%{background-position:0 0,200% 50%;box-shadow:0 0 0 1px rgba(47,157,121,.10),0 0 5px rgba(48,216,160,.10)}}
+/* Available lock buttons: yellow/gold decision state with animated edge. */
+@keyframes rbLockReadyEdge{0%{background-position:0 0,0% 50%;box-shadow:0 0 0 1px rgba(207,160,44,.10),0 0 5px rgba(255,198,61,.10)}50%{background-position:0 0,100% 50%;box-shadow:0 0 0 1px rgba(255,228,132,.34),0 0 11px rgba(255,198,61,.30)}100%{background-position:0 0,200% 50%;box-shadow:0 0 0 1px rgba(207,160,44,.10),0 0 5px rgba(255,198,61,.10)}}
 #teamView .player-row:not(.locked-in) .lock-btn{
   position:relative!important;
   border:1px solid transparent!important;
-  background:linear-gradient(#174d40,#174d40) padding-box,linear-gradient(110deg,#2f9d79 0%,#2f9d79 25%,#baffea 46%,#58e7b6 55%,#2f9d79 72%,#2f9d79 100%) border-box!important;
+  color:#ffe9a6!important;
+  background:linear-gradient(#4a3b16,#4a3b16) padding-box,linear-gradient(110deg,#b88716 0%,#d7a72f 25%,#fff1a8 46%,#ffd95d 55%,#c9941e 72%,#b88716 100%) border-box!important;
   background-size:100% 100%,220% 100%!important;
   animation:rbLockReadyEdge 1.9s linear infinite!important;
   transform:none!important;
 }
-#teamView .player-row:not(.locked-in) .lock-btn:hover{box-shadow:0 0 0 1px rgba(143,242,207,.30),0 0 13px rgba(48,216,160,.30)!important}
+#teamView .player-row:not(.locked-in) .lock-btn:hover{color:#fff4c7!important;background:linear-gradient(#594718,#594718) padding-box,linear-gradient(110deg,#c8941d 0%,#edbe43 25%,#fff7c8 46%,#ffe26f 55%,#d9a52a 72%,#c8941d 100%) border-box!important;box-shadow:0 0 0 1px rgba(255,234,157,.38),0 0 14px rgba(255,198,61,.34)!important}
 
+/* Actual locked state stays exactly green/static. */
 #teamView .lock-chip{margin-left:8px!important;min-height:28px!important;padding:6px 10px!important;border:1px solid #2f9d79!important;border-radius:7px!important;background:#174d40!important;color:#8ff2cf!important;font-size:9px!important;line-height:1!important;font-weight:900!important;letter-spacing:.03em!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;box-shadow:0 2px 8px rgba(0,0,0,.18)!important;white-space:nowrap!important;animation:none!important;transform:none!important;transition:none!important}
 #teamView .lock-chip::before{content:'🔒';font-size:10px;line-height:1;animation:none!important}
 #teamView .player-row.locked-in .player-copy::before,#teamView .player-row.locked-in .player-copy::after,#teamView .player-row.locked-in .matchup-meta::before,#teamView .player-row.locked-in .matchup-meta::after{content:none!important;display:none!important;animation:none!important}
