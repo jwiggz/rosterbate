@@ -15,15 +15,16 @@ function addStyle(){
   document.head.appendChild(s);
 }
 
+function players(){return (typeof currentData!=='undefined'&&currentData?.players)||{}}
 function playerMap(){
   const map=new Map();
-  const players=(typeof currentData!=='undefined'&&currentData?.players)||{};
-  for(const [id,p] of Object.entries(players)){
+  for(const [id,p] of Object.entries(players())){
     const name=String(p?.full_name||'').trim().toLowerCase();
     if(name&&!map.has(name)) map.set(name,String(id));
   }
   return map;
 }
+function playerObj(id){return players()?.[String(id)]||{}}
 
 function rowPlayerId(row,map){
   if(row.dataset.rbPlayerId) return String(row.dataset.rbPlayerId);
@@ -36,37 +37,43 @@ function rowPlayerId(row,map){
 }
 
 function proxyUrl(id){
-  return `/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}`;
+  const p=playerObj(id);
+  const params=new URLSearchParams({player:String(id)});
+  const espn=String(p?.espn_id||'').trim();
+  if(/^\d{1,12}$/.test(espn)) params.set('espn',espn);
+  return `/.netlify/functions/sleeper-player-headshot?${params.toString()}`;
 }
 
 function loadHeadshot(id){
   id=String(id);
-  if(loaded.has(id)) return Promise.resolve(loaded.get(id));
-  if(pending.has(id)) return pending.get(id);
+  const url=proxyUrl(id);
+  const key=`${id}|${url}`;
+  if(loaded.has(key)) return Promise.resolve(loaded.get(key));
+  if(pending.has(key)) return pending.get(key);
   const promise=new Promise(resolve=>{
     const img=new Image();
-    const url=proxyUrl(id);
     img.onload=()=>{
-      // The proxy always returns an image. Keep the URL cached and let the browser cache bytes.
-      loaded.set(id,url);
-      pending.delete(id);
+      loaded.set(key,url);
+      pending.delete(key);
       resolve(url);
     };
     img.onerror=()=>{
-      pending.delete(id);
+      pending.delete(key);
       resolve('');
     };
     img.src=url;
   });
-  pending.set(id,promise);
+  pending.set(key,promise);
   return promise;
 }
 
 async function paintRow(row,id){
   const head=row.querySelector('.player-head');
   if(!head||!id) return;
-  if(head.dataset.rbPhotoPlayer===String(id)&&head.classList.contains('rb-photo-ready')) return;
+  const signature=proxyUrl(id);
+  if(head.dataset.rbPhotoSignature===signature&&head.classList.contains('rb-photo-ready')) return;
   head.dataset.rbPhotoPlayer=String(id);
+  head.dataset.rbPhotoSignature=signature;
   const url=await loadHeadshot(id);
   if(!url||!head.isConnected||head.dataset.rbPhotoPlayer!==String(id)) return;
   head.style.backgroundImage=`url("${url}")`;
@@ -85,17 +92,8 @@ function apply(){
 
 addStyle();
 let timer=null;
-function schedule(){
-  clearTimeout(timer);
-  timer=setTimeout(apply,60);
-}
-
+function schedule(){clearTimeout(timer);timer=setTimeout(apply,60)}
 const root=document.getElementById('teamView');
-if(root){
-  // Observe only structural changes from the base lineup renderer. This script itself
-  // changes only attributes/styles, so it cannot recursively trigger this observer.
-  new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
-}
-setTimeout(apply,120);
-window.addEventListener('focus',apply);
+if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
+setTimeout(apply,120);setTimeout(apply,800);window.addEventListener('focus',apply);
 })();
