@@ -13,8 +13,9 @@ exports.handler=async function(){
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js"></script>');
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js"></script>');
-    // Headshot enhancement is intentionally disabled until avatars are served from a
-    // stable local/static cache. The live proxy/CDN experiment caused DOM flashing.
+    // Safe avatar painter only changes styles/attributes on existing avatar circles.
+    // It never inserts/removes roster child nodes, so lineup selection stays intact.
+    if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js"></script>');
     if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
