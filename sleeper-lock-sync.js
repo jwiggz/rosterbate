@@ -1,0 +1,23 @@
+(()=>{
+const state={busy:false,lastKey:'',data:null,timer:null};
+const css=`.rb-lock-debug{margin-top:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);color:#8fa0b8;font-size:9px;line-height:1.45}.rb-lock-debug strong{color:#e8eef7}.rb-lock-debug code{color:#f3c75b;font-family:inherit}`;
+function addStyle(){if(document.getElementById('rbLockSyncStyle'))return;const s=document.createElement('style');s.id='rbLockSyncStyle';s.textContent=css;document.head.appendChild(s)}
+function auth(){try{return sessionStorage.getItem('rbSleeperToken')||sessionStorage.getItem('rbSleeperAuth')||''}catch{return''}}
+function scalar(v){return v==null?'':String(v)}
+function ownObj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}
+function deepPair(node,pid,gid,depth=0){if(depth>5||node==null)return false;if(Array.isArray(node))return node.some(v=>deepPair(v,pid,gid,depth+1));if(typeof node!=='object')return false;const p=scalar(node.player_id??node.playerId??node.player??node.pid),g=scalar(node.game_id??node.gameId??node.game??node.gid);if(p===pid&&g===gid)return true;for(const [k,v] of Object.entries(node)){if(k===pid&&scalar(v)===gid)return true;if(k===gid&&scalar(v)===pid)return true;if(typeof v==='object'&&deepPair(v,pid,gid,depth+1))return true}return false}
+function mapMatch(map,pid,gid){map=ownObj(map);if(scalar(map[pid])===gid)return true;if(scalar(map[gid])===pid)return true;const direct=map[pid];if(direct&&typeof direct==='object'&&deepPair(direct,pid,gid))return true;const reverse=map[gid];if(reverse&&typeof reverse==='object'&&deepPair(reverse,pid,gid))return true;return deepPair(map,pid,gid)}
+function starterIndexMatch(map,pid,gid){map=ownObj(map);const starters=(state.data?.starters||[]).map(String);const idx=starters.indexOf(pid);if(idx<0)return false;for(const key of [String(idx),String(idx+1)]){const v=map[key];if(scalar(v)===gid)return true;if(v&&typeof v==='object'&&deepPair(v,pid,gid))return true}return false}
+function isLocked(pid,gid){pid=scalar(pid);gid=scalar(gid);if(!pid||!gid||!state.data)return false;const sources=[state.data.startersGames,state.data.playerMap,state.data.subs];for(const src of sources){if(mapMatch(src,pid,gid)||starterIndexMatch(src,pid,gid))return true}return false}
+function reconcile(){document.querySelectorAll('#teamView [data-lock-player][data-lock-game]').forEach(btn=>{const pid=btn.dataset.lockPlayer,gid=btn.dataset.lockGame;if(!isLocked(pid,gid))return;const chip=document.createElement('span');chip.className='lock-chip';chip.textContent='LOCKED';btn.replaceWith(chip);const row=chip.closest('.player-row');if(row){row.classList.remove('lockable');row.classList.add('locked-in')}})}
+function count(v){return v&&typeof v==='object'?Object.keys(v).length:0}
+function diagnosticText(){const d=state.data;if(!d)return'';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
+function showDiagnostic(){const host=document.getElementById('activityBody');if(!host||!state.data)return;let el=document.getElementById('rbLockDebug');if(!el){el=document.createElement('div');el.id='rbLockDebug';el.className='rb-lock-debug';host.appendChild(el)}el.innerHTML=`<strong>Lock sync</strong><br><code>${diagnosticText()}</code>`}
+async function sync(force=false){const token=auth();if(!token||state.busy||typeof leagueId==='undefined'||typeof selectedRoster==='undefined'||typeof selectedWeek==='undefined')return;const key=`${leagueId}:${selectedRoster}:${selectedWeek}`;if(!force&&state.lastKey===key&&state.data){reconcile();showDiagnostic();return}state.busy=true;try{const r=await fetch('/.netlify/functions/sleeper-lock-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,leagueId,rosterId:selectedRoster,leg:selectedWeek,round:selectedWeek})});const d=await r.json();if(r.ok&&d.ok){state.data=d;state.lastKey=key;if(typeof lockedGames!=='undefined'&&d.startersGames&&typeof d.startersGames==='object')lockedGames=d.startersGames;reconcile();showDiagnostic()}}catch{}finally{state.busy=false}}
+function schedule(){clearTimeout(state.timer);state.timer=setTimeout(()=>sync(false),120)}
+addStyle();
+const tv=document.getElementById('teamView');if(tv)new MutationObserver(schedule).observe(tv,{childList:true,subtree:true});
+const activity=document.getElementById('activityBody');if(activity)new MutationObserver(()=>{if(state.data)showDiagnostic()}).observe(activity,{childList:true});
+setTimeout(()=>sync(true),250);
+window.addEventListener('focus',()=>sync(true));
+})();
