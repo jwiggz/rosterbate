@@ -1,5 +1,8 @@
 exports.handler=async function(){
-  const ref=process.env.COMMIT_REF||process.env.BRANCH||'main';
+  // Deploy Preview branch names (for example "deploy-preview-6") are Netlify-only
+  // and are not valid GitHub refs. Always read the dashboard from the feature branch
+  // that backs this preview so the stats script can be injected reliably.
+  const ref='feature/sleeper-basketball-dashboard';
   const url=`https://raw.githubusercontent.com/jwiggz/rosterbate/${encodeURIComponent(ref)}/sleeper-basketball.html`;
   try{
     const r=await fetch(url,{headers:{Accept:'text/html','User-Agent':'RosterBate/1.0'},cache:'no-store'});
