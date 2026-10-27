@@ -25,55 +25,58 @@ function playerMap(){
   return map;
 }
 function playerObj(id){return players()?.[String(id)]||{}}
-
 function rowPlayerId(row,map){
   if(row.dataset.rbPlayerId) return String(row.dataset.rbPlayerId);
-  const name=String(row.querySelector('.pname')?.textContent||'')
-    .replace(/\s*\(locked\)\s*$/i,'')
-    .trim().toLowerCase();
+  const name=String(row.querySelector('.pname')?.textContent||'').replace(/\s*\(locked\)\s*$/i,'').trim().toLowerCase();
   const id=map.get(name)||'';
   if(id) row.dataset.rbPlayerId=id;
   return id;
 }
 
-function proxyUrl(id){
+function sourceUrls(id){
   const p=playerObj(id);
-  const params=new URLSearchParams({player:String(id)});
   const espn=String(p?.espn_id||'').trim();
-  if(/^\d{1,12}$/.test(espn)) params.set('espn',espn);
-  return `/.netlify/functions/sleeper-player-headshot?${params.toString()}`;
+  const urls=[];
+  if(/^\d{1,12}$/.test(espn)){
+    const remote=`https://a.espncdn.com/i/headshots/nba/players/full/${encodeURIComponent(espn)}.png`;
+    urls.push(`https://statdunk.com/_vercel/image?url=${encodeURIComponent(remote)}&w=96&q=85`);
+    urls.push(`/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}&espn=${encodeURIComponent(espn)}`);
+  }else{
+    urls.push(`/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}`);
+  }
+  return urls;
 }
 
-function loadHeadshot(id){
-  id=String(id);
-  const url=proxyUrl(id);
-  const key=`${id}|${url}`;
-  if(loaded.has(key)) return Promise.resolve(loaded.get(key));
-  if(pending.has(key)) return pending.get(key);
-  const promise=new Promise(resolve=>{
+function probe(url){
+  return new Promise(resolve=>{
     const img=new Image();
-    img.onload=()=>{
-      loaded.set(key,url);
-      pending.delete(key);
-      resolve(url);
-    };
-    img.onerror=()=>{
-      pending.delete(key);
-      resolve('');
-    };
+    img.onload=()=>resolve(url);
+    img.onerror=()=>resolve('');
+    img.decoding='async';
     img.src=url;
   });
-  pending.set(key,promise);
+}
+
+async function loadHeadshot(id){
+  id=String(id);
+  if(loaded.has(id)) return loaded.get(id);
+  if(pending.has(id)) return pending.get(id);
+  const promise=(async()=>{
+    for(const url of sourceUrls(id)){
+      const ok=await probe(url);
+      if(ok){loaded.set(id,ok);pending.delete(id);return ok}
+    }
+    pending.delete(id);return'';
+  })();
+  pending.set(id,promise);
   return promise;
 }
 
 async function paintRow(row,id){
   const head=row.querySelector('.player-head');
   if(!head||!id) return;
-  const signature=proxyUrl(id);
-  if(head.dataset.rbPhotoSignature===signature&&head.classList.contains('rb-photo-ready')) return;
+  if(head.dataset.rbPhotoPlayer===String(id)&&head.classList.contains('rb-photo-ready')) return;
   head.dataset.rbPhotoPlayer=String(id);
-  head.dataset.rbPhotoSignature=signature;
   const url=await loadHeadshot(id);
   if(!url||!head.isConnected||head.dataset.rbPhotoPlayer!==String(id)) return;
   head.style.backgroundImage=`url("${url}")`;
@@ -84,16 +87,14 @@ function apply(){
   const root=document.getElementById('teamView');
   if(!root) return;
   const map=playerMap();
-  root.querySelectorAll('.player-row').forEach(row=>{
-    const id=rowPlayerId(row,map);
-    if(id) paintRow(row,id);
-  });
+  const rows=[...root.querySelectorAll('.player-row')];
+  for(const row of rows){const id=rowPlayerId(row,map);if(id) paintRow(row,id)}
 }
 
 addStyle();
 let timer=null;
-function schedule(){clearTimeout(timer);timer=setTimeout(apply,60)}
+function schedule(){clearTimeout(timer);timer=setTimeout(apply,25)}
 const root=document.getElementById('teamView');
 if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
-setTimeout(apply,120);setTimeout(apply,800);window.addEventListener('focus',apply);
+setTimeout(apply,40);window.addEventListener('focus',apply);
 })();
