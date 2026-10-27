@@ -26,6 +26,15 @@ function validToken(value){
   return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(String(value||''));
 }
 
+function tokenUserId(token){
+  try{
+    const part=String(token||'').split('.')[1]||'';
+    const b64=part.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-part.length%4)%4);
+    const payload=JSON.parse(Buffer.from(b64,'base64').toString('utf8'));
+    return String(payload?.user_id||'');
+  }catch{return ''}
+}
+
 function sameStarters(a,b){
   return JSON.stringify((a||[]).map(String))===JSON.stringify((b||[]).map(String));
 }
@@ -60,6 +69,8 @@ exports.handler=async function(event){
   const startersGames=(body.startersGames && typeof body.startersGames==='object' && !Array.isArray(body.startersGames))?body.startersGames:{};
 
   if(!validToken(token)) return json(400,{error:'A valid Sleeper session token is required. Copy the Authorization value from Sleeper; both bare JWT and Bearer-prefixed values are accepted.'});
+  const userId=tokenUserId(token);
+  if(!/^\d+$/.test(userId)) return json(401,{error:'Unable to identify the Sleeper account from this session token.'});
   if(!validId(leagueId)) return json(400,{error:'Invalid league id.'});
   if(!Number.isInteger(rosterId)||rosterId<1) return json(400,{error:'Invalid roster id.'});
   if(!Number.isInteger(leg)||leg<1||leg>40||!Number.isInteger(round)||round<1||round>40) return json(400,{error:'Invalid scoring period.'});
@@ -68,14 +79,19 @@ exports.handler=async function(event){
   if(new Set(nonZero).size!==nonZero.length) return json(400,{error:'Duplicate starter ids are not allowed.'});
 
   try{
-    const [leagueResponse,matchupResponse]=await Promise.all([
+    const [leagueResponse,matchupResponse,rostersResponse]=await Promise.all([
       fetch(`https://api.sleeper.app/v1/league/${leagueId}`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'}),
-      fetch(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${leg}`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'})
+      fetch(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${leg}`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'}),
+      fetch(`https://api.sleeper.app/v1/league/${leagueId}/rosters`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'})
     ]);
-    if(!leagueResponse.ok||!matchupResponse.ok) return json(400,{error:'Unable to validate the target Sleeper NBA roster.'});
+    if(!leagueResponse.ok||!matchupResponse.ok||!rostersResponse.ok) return json(400,{error:'Unable to validate the target Sleeper NBA roster.'});
     const league=await leagueResponse.json();
     const matchups=await matchupResponse.json();
+    const rosters=await rostersResponse.json();
     if(String(league?.sport||'').toLowerCase()!=='nba') return json(400,{error:'Lineup writes are enabled for Sleeper NBA leagues only.'});
+    const targetRoster=Array.isArray(rosters)?rosters.find(row=>Number(row.roster_id)===rosterId):null;
+    if(!targetRoster) return json(404,{error:'Roster not found.'});
+    if(String(targetRoster.owner_id||'')!==userId) return json(403,{error:'You can only edit the Sleeper roster owned by the connected account.'});
     const current=Array.isArray(matchups)?matchups.find(row=>Number(row.roster_id)===rosterId):null;
     if(!current) return json(400,{error:'That roster does not exist in this scoring period.'});
     const currentStarters=Array.isArray(current.starters)?current.starters.map(String):[];
