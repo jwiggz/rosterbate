@@ -208,6 +208,7 @@ exports.handler=async function(event){
       for(const id of playerIds){
         const p=allPlayers && allPlayers[id];
         if(!p) continue;
+        const espnId=String(p.espn_id||p.espn||p.metadata?.espn_id||'').trim();
         players[id]={
           player_id:String(p.player_id || id),
           full_name:p.full_name || [p.first_name,p.last_name].filter(Boolean).join(' ') || `Player ${id}`,
@@ -219,7 +220,9 @@ exports.handler=async function(event){
           number:p.number || null,
           injury_status:p.injury_status || null,
           status:p.status || null,
-          active:p.active !== false
+          active:p.active !== false,
+          espn_id:espnId || null,
+          headshot_url:espnId?`https://a.espncdn.com/i/headshots/nba/players/full/${encodeURIComponent(espnId)}.png`:null
         };
       }
     }catch(error){players={};}
