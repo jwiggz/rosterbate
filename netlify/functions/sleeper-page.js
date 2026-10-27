@@ -9,9 +9,12 @@ exports.handler=async function(){
     if(!r.ok) throw new Error(`GitHub ${r.status}`);
     let html=await r.text();
     const scripts=[];
+    // Stability guard must load first so optional decorators cannot reset lineup state.
+    if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js"></script>');
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js"></script>');
-    if(!html.includes('sleeper-headshots.js')) scripts.push('<script src="/sleeper-headshots.js"></script>');
+    // Headshot enhancement is intentionally disabled until avatars are served from a
+    // stable local/static cache. The live proxy/CDN experiment caused DOM flashing.
     if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
