@@ -155,7 +155,18 @@ function projectionRow(row,scoring,gameDate){
   if(points===null) return null;
   const gameId=String(row.game_id||row.game?.game_id||row.game?.id||'');
   const date=String(row.date||row.game?.date||gameDate.get(gameId)||'');
-  return {id,game_id:gameId,date,points,stats,week:Number(row.week)||null};
+  const team=normalizeTeam(row.team||row.player?.team||row.player?.team_abbr||row.player?.team_abbreviation||'');
+  return {id,game_id:gameId,date,team,points,stats,week:Number(row.week)||null};
+}
+
+function addProjectionGame(result,row,game,source){
+  if(!result[row.id]) result[row.id]={week_points:null,games:[],source};
+  const item=result[row.id];
+  const gameId=String(game.game_id||row.game_id||'');
+  const date=String(game.date||row.date||'');
+  const duplicate=item.games.some(g=>(gameId&&g.game_id===gameId)||(!gameId&&date&&g.date===date));
+  if(!duplicate) item.games.push({game_id:gameId,date,points:row.points,stats:row.stats});
+  if(item.source!=='game') item.source=source;
 }
 
 async function nbaProjections(season,week,schedule,scoring,playerIds){
@@ -164,6 +175,7 @@ async function nbaProjections(season,week,schedule,scoring,playerIds){
   const validDates=new Set((schedule||[]).map(g=>g.date).filter(Boolean));
   const result={};
 
+  // Prefer rows that explicitly identify a particular NBA game/date.
   try{
     const seasonRaw=await fetchJson(`${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}?season_type=regular`);
     for(const rawRow of rowsFrom(seasonRaw)){
@@ -171,29 +183,46 @@ async function nbaProjections(season,week,schedule,scoring,playerIds){
       if(!row||!playerIds.has(row.id)) continue;
       const inWeek=(row.game_id&&validGameIds.has(row.game_id))||(row.date&&validDates.has(row.date));
       if(!inWeek) continue;
-      if(!row.date&&row.game_id) row.date=gameDate.get(row.game_id)||'';
-      if(!row.date) continue;
-      if(!result[row.id]) result[row.id]={week_points:null,games:[],source:'game'};
-      const duplicate=result[row.id].games.some(g=>(row.game_id&&g.game_id===row.game_id)||(!row.game_id&&g.date===row.date));
-      if(!duplicate) result[row.id].games.push({game_id:row.game_id,date:row.date,points:row.points,stats:row.stats});
+      const game=(schedule||[]).find(g=>(row.game_id&&String(g.game_id)===row.game_id)||(!row.game_id&&row.date&&g.date===row.date&&(row.team?g.home===row.team||g.away===row.team:true)));
+      if(game) addProjectionGame(result,row,game,'game');
     }
-  }catch(error){/* weekly fallback still available */}
+  }catch(error){/* weekly/per-game fallback still available */}
 
-  for(const item of Object.values(result)){
-    if(item.games.length){
-      item.week_points=Math.round(item.games.reduce((sum,g)=>sum+Number(g.points||0),0)*100)/100;
-    }
-  }
-
+  // Sleeper's NBA week feed commonly supplies one projected stat line per player,
+  // rather than a separate row for every game. Treat that as a per-game projection,
+  // then attach it only to that player's actual scheduled games in this fantasy week.
   try{
     const weeklyRaw=await fetchJson(`${SLEEPER_DATA}/projections/nba/${encodeURIComponent(season)}/${encodeURIComponent(week)}?season_type=regular`);
     for(const rawRow of rowsFrom(weeklyRaw)){
       const row=projectionRow(rawRow,scoring,gameDate);
       if(!row||!playerIds.has(row.id)) continue;
-      if(!result[row.id]) result[row.id]={week_points:row.points,games:[],source:'week'};
-      else if(result[row.id].week_points===null) result[row.id].week_points=row.points;
+
+      // If this row identifies one exact game, use it only for that game.
+      let games=[];
+      if(row.game_id&&validGameIds.has(row.game_id)) games=(schedule||[]).filter(g=>String(g.game_id)===row.game_id);
+      else if(row.date&&validDates.has(row.date)) games=(schedule||[]).filter(g=>g.date===row.date&&(!row.team||g.home===row.team||g.away===row.team));
+      else if(row.team) games=(schedule||[]).filter(g=>g.home===row.team||g.away===row.team);
+
+      if(games.length){
+        for(const game of games){
+          // Do not overwrite a true game-specific projection already found above.
+          const existing=result[row.id]?.games?.some(g=>(game.game_id&&g.game_id===String(game.game_id))||(!game.game_id&&g.date===game.date));
+          if(!existing) addProjectionGame(result,row,game,'scheduled-per-game');
+        }
+      }else if(!result[row.id]){
+        // Preserve a projection even if the team/game mapping is unavailable.
+        result[row.id]={week_points:row.points,games:[],source:'week'};
+      }
     }
   }catch(error){/* projections remain partial */}
+
+  // All Week should be the sum of the projections for that player's scheduled games.
+  for(const item of Object.values(result)){
+    if(item.games.length){
+      item.week_points=Math.round(item.games.reduce((sum,g)=>sum+Number(g.points||0),0)*100)/100;
+      item.games.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    }
+  }
 
   return result;
 }
