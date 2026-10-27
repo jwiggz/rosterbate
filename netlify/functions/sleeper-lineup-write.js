@@ -1,5 +1,3 @@
-const PUBLIC_API='https://api.sleeper.app/v1';
-
 function json(statusCode, body){
   return {
     statusCode,
@@ -20,13 +18,22 @@ function validToken(value){
   return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(String(value||''));
 }
 
-async function publicJson(path){
-  const response=await fetch(`${PUBLIC_API}${path}`,{
+function sameStarters(a,b){
+  return JSON.stringify((a||[]).map(String))===JSON.stringify((b||[]).map(String));
+}
+
+function sleep(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function publicMatchup(leagueId,leg,rosterId){
+  const response=await fetch(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${leg}`,{
     headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},
     cache:'no-store'
   });
-  if(!response.ok) throw new Error(`Sleeper public API ${response.status}`);
-  return response.json();
+  if(!response.ok) return null;
+  const rows=await response.json();
+  return Array.isArray(rows)?rows.find(row=>Number(row.roster_id)===Number(rosterId))||null:null;
 }
 
 exports.handler=async function(event){
@@ -49,21 +56,24 @@ exports.handler=async function(event){
   if(!Number.isInteger(rosterId)||rosterId<1) return json(400,{error:'Invalid roster id.'});
   if(!Number.isInteger(leg)||leg<1||leg>40||!Number.isInteger(round)||round<1||round>40) return json(400,{error:'Invalid scoring period.'});
   if(!starters.length||starters.length>40||starters.some(id=>id!=='0'&&!/^[A-Za-z0-9_-]{1,40}$/.test(id))) return json(400,{error:'Invalid starters array.'});
-  const nonEmpty=starters.filter(id=>id!=='0');
-  if(new Set(nonEmpty).size!==nonEmpty.length) return json(400,{error:'A player cannot occupy multiple starter slots.'});
+  const nonZero=starters.filter(id=>id!=='0');
+  if(new Set(nonZero).size!==nonZero.length) return json(400,{error:'Duplicate starter ids are not allowed.'});
 
   try{
-    const [league,matchups]=await Promise.all([
-      publicJson(`/league/${leagueId}`),
-      publicJson(`/league/${leagueId}/matchups/${leg}`)
+    const [leagueResponse,matchupResponse]=await Promise.all([
+      fetch(`https://api.sleeper.app/v1/league/${leagueId}`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'}),
+      fetch(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${leg}`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'})
     ]);
-    if(String(league?.sport||'').toLowerCase()!=='nba') return json(400,{error:'RosterBate lineup writes are restricted to Sleeper NBA leagues.'});
-    const current=(matchups||[]).find(m=>Number(m.roster_id)===rosterId);
-    if(!current) return json(400,{error:'That roster does not exist in this NBA scoring period.'});
-    const currentStarters=(current.starters||[]).map(String);
-    if(starters.length!==currentStarters.length) return json(400,{error:'Starter-slot count does not match the current Sleeper matchup.'});
-    const allowed=new Set((current.players||[]).map(String));
-    if(nonEmpty.some(id=>!allowed.has(id))) return json(400,{error:'Every proposed starter must already be on this Sleeper roster.'});
+    if(!leagueResponse.ok||!matchupResponse.ok) return json(400,{error:'Unable to validate the target Sleeper NBA roster.'});
+    const league=await leagueResponse.json();
+    const matchups=await matchupResponse.json();
+    if(String(league?.sport||'').toLowerCase()!=='nba') return json(400,{error:'Lineup writes are enabled for Sleeper NBA leagues only.'});
+    const current=Array.isArray(matchups)?matchups.find(row=>Number(row.roster_id)===rosterId):null;
+    if(!current) return json(400,{error:'That roster does not exist in this scoring period.'});
+    const currentStarters=Array.isArray(current.starters)?current.starters.map(String):[];
+    if(starters.length!==currentStarters.length) return json(400,{error:'Starter slot count does not match Sleeper.'});
+    const rosterPlayers=new Set((current.players||[]).map(String));
+    if(nonZero.some(id=>!rosterPlayers.has(id))) return json(400,{error:'One or more proposed starters are not on this Sleeper roster.'});
 
     const query=`mutation update_matchup_leg($starters_games: Map) {\n  update_matchup_leg(league_id: \"${leagueId}\",roster_id: ${rosterId},leg: ${leg},round: ${round},starters: ${JSON.stringify(starters)},starters_games: $starters_games){\n    league_id\n    leg\n    matchup_id\n    roster_id\n    round\n    starters\n    players\n    points\n    starters_games\n    custom_points\n    proj_points\n    max_points\n    subs\n  }\n}`;
 
@@ -85,8 +95,21 @@ exports.handler=async function(event){
     if(data && Array.isArray(data.errors) && data.errors.length) return json(400,{error:data.errors[0]?.message||'Sleeper rejected the lineup update.',sleeper:data});
     const updated=data?.data?.update_matchup_leg;
     if(!updated) return json(502,{error:'Sleeper did not return an updated matchup.',sleeper:data});
-    return json(200,{ok:true,matchup:updated});
+    if(!sameStarters(updated.starters,starters)) return json(409,{error:'Sleeper returned a different starter array than requested.',matchup:updated});
+
+    let publicSynced=false;
+    let publicStarters=null;
+    for(const delay of [0,250,500,900,1400]){
+      if(delay) await sleep(delay);
+      const publicRow=await publicMatchup(leagueId,leg,rosterId);
+      if(publicRow){
+        publicStarters=(publicRow.starters||[]).map(String);
+        if(sameStarters(publicStarters,starters)){publicSynced=true;break;}
+      }
+    }
+
+    return json(200,{ok:true,matchup:updated,publicSynced,publicStarters});
   }catch(error){
-    return json(502,{error:'Unable to complete Sleeper lineup update.',detail:String(error?.message||error)});
+    return json(502,{error:'Unable to reach Sleeper.',detail:String(error?.message||error)});
   }
 };
