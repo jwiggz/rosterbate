@@ -14,7 +14,11 @@ function day(){try{return String(selectedDay||'')}catch{return''}}
 function statusKind(g){const s=String(g?.status||'').toLowerCase();if(/in_game|live|in progress|inprogress/.test(s))return'live';if(/complete|final|closed|post/.test(s))return'final';return'pre'}
 function periodLabel(p){if(p==null||p==='')return'';const n=Number(p);if(Number.isFinite(n)){if(n<=4)return`Q${n}`;return n===5?'OT':`${n-4}OT`}return String(p).toUpperCase()}
 function rowTeam(row){const meta=row.querySelector('.pmeta');if(!meta)return'';return normalize(String(meta.textContent||'').split('·')[0].trim())}
-function gameFor(team){const d=day();if(!team||!d||d==='all')return null;return games.find(g=>g.date===d&&(normalize(g.home)===team||normalize(g.away)===team))||null}
+function gameFor(team){
+  const d=day();if(!team||!d||d==='all')return null;
+  const candidates=games.filter(g=>(normalize(g.home)===team||normalize(g.away)===team));
+  return candidates.find(g=>g.scoreboard_date===d)||candidates.find(g=>g.date===d)||candidates.find(g=>statusKind(g)==='live')||null;
+}
 function stateText(g){
   const kind=statusKind(g),hs=Number(g.home_score),as=Number(g.away_score),hasScore=Number.isFinite(hs)&&Number.isFinite(as);
   if(kind==='pre'||!hasScore)return null;
