@@ -6,9 +6,6 @@ const RETRY_AFTER=5*60*1000;
 const css=`
 #teamView .player-head.rb-photo-ready{background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#1f2c3d!important}
 #teamView .player-head.rb-photo-ready .player-fallback{opacity:0!important;visibility:hidden!important}
-/* The legacy stats decorator still injects Sleeper <img> headshots on stat changes.
-   Safe headshots use the player-head background instead, so never let that legacy
-   image cover/repaint the stable background avatar. */
 #teamView .player-head img.rb-sleeper-headshot{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 `;
 
@@ -59,12 +56,10 @@ function trySource(head,id,urls,index=0){
     failedUntil.set(String(id),Date.now()+RETRY_AFTER);
     return;
   }
-
   const url=urls[index];
   const img=new Image();
   img.decoding='async';
   img.fetchPriority='high';
-
   let settled=false;
   const cleanup=()=>{img.onload=null;img.onerror=null};
   const fail=()=>{
@@ -73,7 +68,6 @@ function trySource(head,id,urls,index=0){
     cleanup();
     trySource(head,id,urls,index+1);
   };
-
   head.style.backgroundImage=`url("${url}")`;
   img.onload=()=>{
     if(settled)return;
@@ -95,7 +89,6 @@ function paintRow(row,id){
   id=String(id);
   if(head.dataset.rbPhotoPlayer===id&&head.classList.contains('rb-photo-ready')) return;
   head.dataset.rbPhotoPlayer=id;
-
   const cached=loaded.get(id);
   if(cached){
     head.style.backgroundImage=`url("${cached}")`;
@@ -103,7 +96,6 @@ function paintRow(row,id){
     return;
   }
   if((failedUntil.get(id)||0)>Date.now()) return;
-
   trySource(head,id,sourceUrls(id));
 }
 
@@ -149,9 +141,49 @@ function hookRenderTeam(){
   }catch{return false}
 }
 
-// Starter-first swaps can lose selection when later decorators rerender the Team DOM.
-// Capture the intended starter slot one event earlier than click so the existing
-// symmetric swap layer sees the correct selectedStarterIndex when bench is clicked.
+function installLockInProjectionFix(){
+  try{
+    if(typeof projectionFor!=='function'||projectionFor.__rbLockIn)return false;
+    const fixed=function(id,date=selectedDay){
+      id=String(id);
+      const p=currentData?.projections?.[id];
+      if(date==='all'){
+        try{
+          if(lockedGames&&lockedGames[id]!==undefined&&lockedGames[id]!==null&&String(lockedGames[id])!==''){
+            const m=typeof matchup==='function'?matchup(selectedRoster):null;
+            const actual=Number(typeof pointsFor==='function'?pointsFor(m,id):NaN);
+            if(Number.isFinite(actual))return actual;
+          }
+        }catch{}
+        const games=Array.isArray(p?.games)?p.games:[];
+        const vals=games.map(g=>Number(g?.points)).filter(Number.isFinite);
+        if(vals.length)return Math.max(...vals);
+        const teamGames=typeof gamesForTeam==='function'?gamesForTeam(playerObj(id)?.team):[];
+        const week=Number(p?.week_points);
+        if((teamGames?.length||0)<=1&&Number.isFinite(week))return week;
+        return null;
+      }
+      if(!p)return null;
+      const g=(p.games||[]).find(x=>x.date===date);
+      return g&&Number.isFinite(Number(g.points))?Number(g.points):null;
+    };
+    fixed.__rbLockIn=true;
+    projectionFor=fixed;
+    projectionText=function(id,date=selectedDay){const v=projectionFor(id,date);return v===null?'—':num(v)};
+    teamProjection=function(m,date='all'){
+      if(!m)return null;
+      let total=0,used=0;
+      for(const id of (m.starters||[])){
+        if(String(id)==='0')continue;
+        const v=projectionFor(id,date);
+        if(v!==null){total+=v;used++}
+      }
+      return used?total:null;
+    };
+    return true;
+  }catch{return false}
+}
+
 document.addEventListener('pointerdown',e=>{
   try{
     const row=e.target.closest?.('#teamView [data-starter-index]');
@@ -167,24 +199,29 @@ document.addEventListener('pointerdown',e=>{
 },true);
 
 addStyle();
+installLockInProjectionFix();
 hookRenderTeam();
 paintBurst();
 
 let hookAttempts=0;
 const hookTimer=setInterval(()=>{
   hookAttempts++;
+  installLockInProjectionFix();
   if(hookRenderTeam()||hookAttempts>=20) clearInterval(hookTimer);
 },50);
 
 let timer=null;
 function schedule(){clearTimeout(timer);timer=setTimeout(paintBurst,0)}
+function isLegacyHeadshotMutation(m){
+  const nodes=[...m.addedNodes,...m.removedNodes].filter(n=>n?.nodeType===1);
+  return nodes.length>0&&nodes.every(n=>n.matches?.('img.rb-sleeper-headshot'));
+}
 const root=document.getElementById('teamView');
 if(root)new MutationObserver(mutations=>{
-  // Per Game/Totals only mutates the stats toolbar/cells. Those changes should
-  // never restart avatar work. Only react when actual roster/player rows change.
   const relevant=mutations.some(m=>{
     const target=m.target?.nodeType===1?m.target:m.target?.parentElement;
     if(target?.closest?.('.rb-inline-stats,.rb-inline-toolbar,.rb-inline-head-grid'))return false;
+    if(isLegacyHeadshotMutation(m))return false;
     const nodes=[...m.addedNodes,...m.removedNodes];
     return nodes.some(n=>n?.nodeType===1&&(
       n.matches?.('.player-row,.team-card')||
@@ -193,5 +230,5 @@ if(root)new MutationObserver(mutations=>{
   });
   if(relevant)schedule();
 }).observe(root,{childList:true,subtree:true});
-window.addEventListener('focus',paintBurst);
+window.addEventListener('focus',()=>{installLockInProjectionFix();paintBurst()});
 })();
