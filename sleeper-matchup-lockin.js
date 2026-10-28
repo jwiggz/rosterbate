@@ -57,15 +57,18 @@
     const v=Number(m?.players_points?.[String(pid)]);return Number.isFinite(v)?v:0;
   }
   function lockedTotal(m,ids){let n=0;for(const id of ids)n+=actualFor(m,id);return n}
-  function labelFor(m,pid){const ids=(m?.starters||[]).map(String),labels=typeof starterLabels==='function'?starterLabels(ids.length):[];const i=ids.indexOf(String(pid));return labels[i]||'UTIL'}
-  function lockedRow(id,m){
-    const p=player(id),label=labelFor(m,id),body=playerBlock(p,matchupDetail(id,'all')),pts=actualFor(m,id);
+  function slotLabelsFor(count){return typeof starterLabels==='function'?starterLabels(count):Array.from({length:count},()=> 'UTIL')}
+  function lockedRow(id,m,label){
+    const p=player(id),body=playerBlock(p,matchupDetail(id,'all')),pts=actualFor(m,id);
     return `<div class="player-row locked-in"><div class="slot ${slotClass(label)}">${esc(label)}</div>${body}<div class="proj">${projectionText(id,'all')}</div><div class="pts"><span class="rb-match-lock-label">LOCKED IN</span>${num(pts)}</div></div>`;
+  }
+  function emptySlotRow(label){
+    return `<div class="player-row rb-match-empty-slot"><div class="slot ${slotClass(label)}">${esc(label)}</div><div class="player-info"><div class="player-head"><span class="player-fallback">—</span></div><div class="player-copy"><div class="pname">Not locked yet</div><div class="pmeta">Waiting for a locked player in this slot</div></div></div><div class="proj">—</div><div class="pts">—</div></div>`;
   }
   function rosterHtml(m,exact){
     if(!m)return'<div class="match-roster"><div class="empty">Bye</div></div>';
-    const locked=lockedIds(exact,m),ids=(m.starters||[]).map(String).filter(id=>locked.has(id));
-    return `<div class="match-roster">${ids.length?ids.map(id=>lockedRow(id,m)).join(''):'<div class="empty">No locked-in players yet</div>'}</div>`;
+    const starters=(exact?.starters?.length?exact.starters:m.starters||[]).map(String),labels=slotLabelsFor(starters.length),locked=lockedIds(exact,m);
+    return `<div class="match-roster">${starters.map((id,i)=>locked.has(id)?lockedRow(id,m,labels[i]||'UTIL'):emptySlotRow(labels[i]||'UTIL')).join('')}</div>`;
   }
   function teamNameFor(m){const t=team(m?.roster_id);return t?.team_name||'Team'}
   function selectorHtml(ps){return `<div class="rb-match-nav"><button type="button" id="rbPrevMatch" ${state.pairIndex<=0?'disabled':''}>‹</button><select id="rbMatchSelect">${ps.map((p,i)=>{const a=p.rows[0],b=p.rows[1];return `<option value="${i}" ${i===state.pairIndex?'selected':''}>${esc(teamNameFor(a))} vs ${esc(teamNameFor(b))}</option>`}).join('')}</select><button type="button" id="rbNextMatch" ${state.pairIndex>=ps.length-1?'disabled':''}>›</button></div>`}
@@ -97,6 +100,11 @@
     #matchupView .rb-match-lock-label{display:block;font-size:6px;letter-spacing:.06em;color:#78efd3;margin-bottom:2px;font-weight:950}
     #matchupView .match-roster .player-row.locked-in{opacity:1!important;background:linear-gradient(90deg,rgba(48,216,160,.11),rgba(48,216,160,.025) 65%,transparent)!important}
     #matchupView .match-roster .pts{color:#49e7b1!important}
+    #matchupView .rb-match-empty-slot{opacity:.56!important;background:rgba(255,255,255,.012)!important}
+    #matchupView .rb-match-empty-slot .pname{color:#aab5c5!important}
+    #matchupView .rb-match-empty-slot .pmeta{color:#66758a!important}
+    #matchupView .rb-match-empty-slot .player-head{background:#1a2432!important;border-style:dashed!important;color:#6d7b8f!important}
+    #matchupView .rb-match-empty-slot .pts,#matchupView .rb-match-empty-slot .proj{color:#66758a!important}
   `;document.head.appendChild(style);
   async function renderExact(){const cached=readCache();paint(cached);const fresh=await fetchExact(false);if(fresh)paint(fresh)}
   try{renderMatchup=renderExact;window.renderMatchup=renderExact}catch{}
