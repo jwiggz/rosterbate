@@ -30,8 +30,6 @@
       return parsed?.data||null;
     }catch{return null}
   }
-  // V2 intentionally ignores invalidations created by the earlier, incorrect
-  // rule that treated starter-slot-to-starter-slot moves as destructive.
   function invalidationKey(){return `rbLockInvalidatedV2:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`}
   function readInvalidated(){
     try{const raw=localStorage.getItem(invalidationKey());const v=raw?JSON.parse(raw):{};return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch{return{}}
@@ -64,10 +62,8 @@
   }
   function sleeperStarterHistory(pid){
     const d=lockState();if(!d)return false;
-    // player_map is the private weekly lineup-history signal. For carry-forward
-    // eligibility we only need proof that the player was represented as a starter;
-    // game IDs are not stored in the simple pid->slot shapes Sleeper also returns.
-    return containsPlayer(d.playerMap,String(pid));
+    pid=String(pid);
+    return containsPlayer(d.playerMap,pid)||containsPlayer(d.subs,pid);
   }
   function txKey(){return `${String(leagueId)}:${String(selectedWeek)}:${String(selectedRoster)}`}
   async function ensureTransactions(){
@@ -136,6 +132,7 @@
           if(!row.querySelector('.lock-btn'))row.classList.remove('lockable');
           return;
         }
+        row.querySelector('.rb-lock-unavailable')?.remove();
         row.classList.add('lockable');
         let btn=existing;
         if(!btn){
@@ -154,13 +151,10 @@
     const out=[];
     before=(Array.isArray(before)?before:[]).map(String);after=(Array.isArray(after)?after:[]).map(String);
     const beforeSet=new Set(before.filter(x=>x&&x!=='0')),afterSet=new Set(after.filter(x=>x&&x!=='0'));
-    // Starter -> starter is explicitly allowed by Sleeper and must NOT invalidate.
-    // Only leaving the starter array destroys an already-earned carry-forward game.
     for(const pid of beforeSet){
       if(afterSet.has(pid))continue;
       const g=priorCompletedGame(pid);if(g?.game_id)out.push([pid,String(g.game_id)]);
     }
-    // Bench -> starter after a completed game cannot retroactively make that game eligible.
     for(const pid of afterSet){
       if(beforeSet.has(pid))continue;
       const g=candidateCompletedGames(pid)[0];if(g?.game_id)out.push([pid,String(g.game_id)]);
@@ -187,5 +181,6 @@
   document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab'))queueMicrotask(()=>decorate())},true);
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')queueMicrotask(()=>decorate())},true);
   window.addEventListener('focus',()=>queueMicrotask(()=>decorate()));
+  let attempts=0;const retry=setInterval(()=>{decorate();attempts++;if(attempts>=16)clearInterval(retry)},500);
   setTimeout(()=>decorate(),0);
 })();
