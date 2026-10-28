@@ -24,6 +24,7 @@ exports.handler=async function(){
     if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261028c"></script>');
     if(!html.includes('sleeper-matchup-header-polish.js')) scripts.push('<script src="/sleeper-matchup-header-polish.js?v=20261028a"></script>');
     if(!html.includes('sleeper-matchup-score-layout.js')) scripts.push('<script src="/sleeper-matchup-score-layout.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-matchup-projection-sync.js')) scripts.push('<script src="/sleeper-matchup-projection-sync.js?v=20261028a"></script>');
     if(!html.includes('sleeper-team-header-polish.js')) scripts.push('<script src="/sleeper-team-header-polish.js?v=20261028a"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
