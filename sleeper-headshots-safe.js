@@ -6,6 +6,10 @@ const RETRY_AFTER=5*60*1000;
 const css=`
 #teamView .player-head.rb-photo-ready{background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#1f2c3d!important}
 #teamView .player-head.rb-photo-ready .player-fallback{opacity:0!important;visibility:hidden!important}
+/* The legacy stats decorator still injects Sleeper <img> headshots on stat changes.
+   Safe headshots use the player-head background instead, so never let that legacy
+   image cover/repaint the stable background avatar. */
+#teamView .player-head img.rb-sleeper-headshot{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 `;
 
 function addStyle(){
@@ -175,6 +179,19 @@ const hookTimer=setInterval(()=>{
 let timer=null;
 function schedule(){clearTimeout(timer);timer=setTimeout(paintBurst,0)}
 const root=document.getElementById('teamView');
-if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
+if(root)new MutationObserver(mutations=>{
+  // Per Game/Totals only mutates the stats toolbar/cells. Those changes should
+  // never restart avatar work. Only react when actual roster/player rows change.
+  const relevant=mutations.some(m=>{
+    const target=m.target?.nodeType===1?m.target:m.target?.parentElement;
+    if(target?.closest?.('.rb-inline-stats,.rb-inline-toolbar,.rb-inline-head-grid'))return false;
+    const nodes=[...m.addedNodes,...m.removedNodes];
+    return nodes.some(n=>n?.nodeType===1&&(
+      n.matches?.('.player-row,.team-card')||
+      n.querySelector?.('.player-row')
+    ));
+  });
+  if(relevant)schedule();
+}).observe(root,{childList:true,subtree:true});
 window.addEventListener('focus',paintBurst);
 })();
