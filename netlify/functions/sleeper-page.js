@@ -9,7 +9,7 @@ exports.handler=async function(){
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js?v=20261028b"></script>');
-    if(!html.includes('sleeper-stats-toolbar-label.js')) scripts.push('<script src="/sleeper-stats-toolbar-label.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-stats-toolbar-label.js')) scripts.push('<script src="/sleeper-stats-toolbar-label.js?v=20261028b"></script>');
     if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js"></script>');
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js"></script>');
     if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028f"></script>');
