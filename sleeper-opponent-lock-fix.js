@@ -30,6 +30,19 @@
     }
     return out;
   }
+  function countedLocks(m){
+    const explicit=explicitLocks(m);
+    if(explicit.size)return{locked:explicit,source:'starters_games'};
+    const starters=(m?.starters||[]).map(String),sp=Array.isArray(m?.starters_points)?m.starters_points:[];
+    if(!starters.length||sp.length!==starters.length)return{locked:new Set(),source:'unavailable'};
+    const vals=sp.map(v=>Number(v));
+    if(vals.some(v=>!Number.isFinite(v)))return{locked:new Set(),source:'unavailable'};
+    const total=Number(m?.points),sum=vals.reduce((a,b)=>a+b,0);
+    if(!Number.isFinite(total)||Math.abs(sum-total)>.11)return{locked:new Set(),source:'unavailable'};
+    const locked=new Set();
+    starters.forEach((pid,i)=>{if(pid&&pid!=='0'&&Math.abs(vals[i])>.0001)locked.add(pid)});
+    return{locked,source:'starters_points'};
+  }
   function playerNameMap(){
     const map=new Map();
     try{for(const [id,p] of Object.entries(currentData?.players||{})){const n=String(p?.full_name||'').trim().toLowerCase();if(n&&!map.has(n))map.set(n,String(id))}}catch{}
@@ -54,7 +67,7 @@
       delete pts.dataset.rbLockBound;
     }
   }
-  function markExplicitLock(row){
+  function markLock(row){
     row.classList.remove('lockable','editable');
     row.classList.add('locked-in');
     row.setAttribute('aria-disabled','true');
@@ -64,20 +77,24 @@
     try{
       if(typeof currentData==='undefined'||!currentData||selectedIsOwned())return;
       const m=(currentData.matchups||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));if(!m)return;
-      const locked=explicitLocks(m),starters=new Set((m.starters||[]).map(String)),names=playerNameMap();
+      const state=countedLocks(m),locked=state.locked,starters=new Set((m.starters||[]).map(String)),names=playerNameMap();
       const card=document.querySelector('#teamView .team-card');if(!card)return;
       const bench=card.querySelector('.bench');
       card.querySelectorAll('.player-row').forEach(row=>{
         if(bench?.contains(row)||row.closest('.ir-list'))return;
         const pid=rowPlayerId(row,names);if(!pid||!starters.has(pid))return;
         clearOpponentState(row);
-        if(locked.has(pid))markExplicitLock(row);
+        if(locked.has(pid))markLock(row);
       });
       const totalBox=card.querySelector('.rb-lock-total.locked');
       if(totalBox){
         const total=Number(m.points),b=totalBox.querySelector('b'),small=totalBox.querySelector('small');
         if(b&&Number.isFinite(total))b.textContent=total.toFixed(1);
-        if(small)small.textContent=locked.size?`${locked.size} confirmed locks`:(Number.isFinite(total)&&total>0?'individual locks unavailable':'0 confirmed locks');
+        if(small){
+          if(state.source==='starters_games')small.textContent=`${locked.size} confirmed locks`;
+          else if(state.source==='starters_points')small.textContent=`${locked.size} counted starters`;
+          else small.textContent=Number.isFinite(total)&&total>0?'individual locks unavailable':'0 confirmed locks';
+        }
       }
     }catch{}
   }
@@ -86,8 +103,6 @@
     schedule.pending=true;
     queueMicrotask(()=>{schedule.pending=false;apply()});
   }
-
-  // Run exactly once after every normal team render. No retry bursts or inference loops.
   try{
     if(typeof renderTeam==='function'&&!renderTeam.__rbOpponentExplicit){
       const base=renderTeam;
@@ -97,7 +112,6 @@
       try{window.renderTeam=wrapped}catch{}
     }
   }catch{}
-
   document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab,#teamPicker'))schedule()},true);
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')schedule()},true);
   window.addEventListener('focus',schedule);
