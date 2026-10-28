@@ -1,13 +1,12 @@
 (()=>{
-  function apply(){
+  function ensureLabel(){
     const bar=document.querySelector('#teamView .rb-inline-toolbar');
-    if(!bar)return;
+    if(!bar)return null;
     const title=bar.querySelector('strong');
     const old=bar.querySelector('.rb-mode-label');
     if(title)title.style.display='none';
     if(old)old.style.display='none';
     let label=bar.querySelector('.rb-mode-label-right');
-    const mode=bar.querySelector('[data-rb-mode].active')?.dataset?.rbMode||'avg';
     if(!label){
       label=document.createElement('span');
       label.className='rb-mode-label-right';
@@ -15,15 +14,23 @@
       const modeWrap=bar.querySelector('.rb-inline-mode');
       if(modeWrap)bar.insertBefore(label,modeWrap);else bar.appendChild(label);
     }
-    label.textContent=mode==='total'?'Season Stats':'Per Game Averages';
+    return label;
+  }
+  function apply(mode){
+    const label=ensureLabel();
+    if(!label)return;
+    const resolved=mode||document.querySelector('#teamView [data-rb-mode].active')?.dataset?.rbMode||'avg';
+    label.textContent=resolved==='total'?'Season Totals':'Per Game Averages';
   }
   document.addEventListener('click',e=>{
-    if(e.target.closest?.('#teamView [data-rb-mode]'))queueMicrotask(apply);
-  },true);
+    const btn=e.target.closest?.('#teamView [data-rb-mode]');
+    if(!btn)return;
+    apply(btn.dataset.rbMode);
+  });
   const root=document.getElementById('teamView');
   if(root)new MutationObserver(muts=>{
-    if(muts.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.rb-inline-toolbar')||n.querySelector?.('.rb-inline-toolbar')))))queueMicrotask(apply);
+    if(muts.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.rb-inline-toolbar')||n.querySelector?.('.rb-inline-toolbar')))))queueMicrotask(()=>apply());
   }).observe(root,{childList:true,subtree:true});
-  setTimeout(apply,0);
-  setTimeout(apply,150);
+  setTimeout(()=>apply(),0);
+  setTimeout(()=>apply(),150);
 })();
