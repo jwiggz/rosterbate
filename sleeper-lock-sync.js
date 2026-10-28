@@ -1,5 +1,5 @@
 (()=>{
-const state={busy:false,lastKey:'',data:null,status:'idle',message:''};
+const state={busy:false,lastKey:'',data:null,status:'idle',message:'',privateDenied:new Set()};
 const css=`
 .rb-lock-debug{margin-top:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);color:#8fa0b8;font-size:9px;line-height:1.45}.rb-lock-debug strong{color:#e8eef7}.rb-lock-debug code{color:#f3c75b;font-family:inherit}.rb-lock-debug.error code{color:#ff9aa9}.rb-lock-debug.ok code{color:#78efd3}
 #teamView .lock-btn{margin-left:8px!important;min-height:32px!important;padding:8px 13px!important;border-radius:8px!important;font-size:10px!important;line-height:1!important;letter-spacing:.04em!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;box-shadow:0 3px 10px rgba(0,0,0,.22)!important}
@@ -49,7 +49,7 @@ function reconcileMatchup(){
   const root=document.getElementById('matchupView');if(!root)return;
   const rosters=[...root.querySelectorAll('.match-roster')];if(!rosters.length)return;
   let me=null,opp=null;try{me=publicMatchupForRoster(selectedRoster);opp=(currentData?.matchups||[]).find(x=>me&&x.matchup_id===me.matchup_id&&Number(x.roster_id)!==Number(selectedRoster))||null}catch{}
-  const matchupRows=[me,opp];const names=playerNameMap();
+  const matchupRows=[me,opp],names=playerNameMap();
   rosters.forEach((container,index)=>{
     const m=matchupRows[index];if(!m)return;const locked=publicLockedPlayersForRoster(m.roster_id);if(!locked.size)return;
     container.querySelectorAll('.player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)});
@@ -57,14 +57,37 @@ function reconcileMatchup(){
 }
 function reconcile(){reconcileTeam();reconcileMatchup()}
 function count(v){return v&&typeof v==='object'?Object.keys(v).length:0}
-function diagnosticText(){if(state.status==='missing-token')return'No Sleeper session token found in this tab.';if(state.status==='error')return state.message||'Unknown lock sync error.';const d=state.data;if(!d)return state.message||'Waiting for private Sleeper lock state…';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
-function showDiagnostic(){const host=document.getElementById('activityBody');if(!host)return;let el=document.getElementById('rbLockDebug');if(!el){el=document.createElement('div');el.id='rbLockDebug';el.className='rb-lock-debug';host.appendChild(el)}el.classList.toggle('error',state.status==='error'||state.status==='missing-token');el.classList.toggle('ok',state.status==='ok'||state.status==='cached');const html=`<strong>Lock sync${state.status==='ok'?' OK':state.status==='cached'?' CACHED':state.status==='error'?' ERROR':''}</strong><br><code>${diagnosticText()}</code>`;if(el.innerHTML!==html)el.innerHTML=html}
+function diagnosticText(){if(state.status==='public')return'Viewing public lock state for this roster.';if(state.status==='missing-token')return'No Sleeper session token found in this tab.';if(state.status==='error')return state.message||'Unknown lock sync error.';const d=state.data;if(!d)return state.message||'Waiting for private Sleeper lock state…';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
+function showDiagnostic(){const host=document.getElementById('activityBody');if(!host)return;let el=document.getElementById('rbLockDebug');if(!el){el=document.createElement('div');el.id='rbLockDebug';el.className='rb-lock-debug';host.appendChild(el)}el.classList.toggle('error',state.status==='error'||state.status==='missing-token');el.classList.toggle('ok',state.status==='ok'||state.status==='cached'||state.status==='public');const html=`<strong>Lock sync${state.status==='ok'?' OK':state.status==='cached'?' CACHED':state.status==='public'?' PUBLIC':state.status==='error'?' ERROR':''}</strong><br><code>${diagnosticText()}</code>`;if(el.innerHTML!==html)el.innerHTML=html}
 function hydrateCache(){const cached=readCache();if(!cached?.data)return false;state.data=cached.data;state.lastKey=currentKey();state.status='cached';if(typeof lockedGames!=='undefined'&&state.data.startersGames&&typeof state.data.startersGames==='object')lockedGames=state.data.startersGames;reconcile();showDiagnostic();return true}
-async function sync(force=false){const token=auth();if(!token){state.status='missing-token';reconcile();showDiagnostic();return}const key=currentKey();if(!key||state.busy)return;if(!force&&state.lastKey===key&&state.data){reconcile();return}state.busy=true;try{const r=await fetch('/.netlify/functions/sleeper-lock-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,leagueId,rosterId:selectedRoster,leg:selectedWeek,round:selectedWeek})});let d={};try{d=await r.json()}catch{}if(r.ok&&d.ok){state.data=d;state.lastKey=key;state.status='ok';state.message='';writeCache(d);if(typeof lockedGames!=='undefined'&&d.startersGames&&typeof d.startersGames==='object')lockedGames=d.startersGames;reconcile()}else{state.status='error';state.message=`HTTP ${r.status}: ${d.error||d.detail||'Sleeper lock-state request failed.'}`;reconcile()}}catch(e){state.status='error';state.message=`Request failed: ${String(e?.message||e)}`;reconcile()}finally{state.busy=false;showDiagnostic()}}
+async function sync(force=false){
+  const token=auth(),key=currentKey();if(!key||state.busy)return;
+  if(state.privateDenied.has(key)){
+    state.data=null;state.lastKey=key;state.status='public';state.message='';reconcile();showDiagnostic();return;
+  }
+  if(!token){state.data=null;state.status='missing-token';reconcile();showDiagnostic();return}
+  if(!force&&state.lastKey===key&&state.data){reconcile();return}
+  state.busy=true;
+  try{
+    const r=await fetch('/.netlify/functions/sleeper-lock-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,leagueId,rosterId:selectedRoster,leg:selectedWeek,round:selectedWeek})});
+    let d={};try{d=await r.json()}catch{}
+    if(r.ok&&d.ok){
+      state.data=d;state.lastKey=key;state.status='ok';state.message='';writeCache(d);
+      if(typeof lockedGames!=='undefined'&&d.startersGames&&typeof d.startersGames==='object')lockedGames=d.startersGames;
+      reconcile();
+    }else if(r.status===403){
+      /* Normal read-only case: this roster belongs to another manager. Never retry private sync for this roster during this page session. */
+      state.privateDenied.add(key);state.data=null;state.lastKey=key;state.status='public';state.message='';reconcile();
+    }else{
+      state.status='error';state.message=`HTTP ${r.status}: ${d.error||d.detail||'Sleeper lock-state request failed.'}`;reconcile();
+    }
+  }catch(e){state.status='error';state.message=`Request failed: ${String(e?.message||e)}`;reconcile()}
+  finally{state.busy=false;showDiagnostic()}
+}
 function applyBurst(){reconcile();requestAnimationFrame(reconcile);setTimeout(reconcile,60);setTimeout(reconcile,180)}
 function boot(){hydrateCache();applyBurst();sync(true)}
 addStyle();
-document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab')){setTimeout(applyBurst,0);setTimeout(applyBurst,120)}},true);
+document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab,#teamPicker')){setTimeout(applyBurst,0);setTimeout(()=>sync(true),80);setTimeout(applyBurst,160)}},true);
 window.addEventListener('focus',()=>{hydrateCache();applyBurst();sync(true)});
 let tries=0;const starter=setInterval(()=>{tries++;if(document.querySelector('#teamView .player-row')||document.querySelector('#matchupView .player-row')){clearInterval(starter);boot()}else if(tries>=30){clearInterval(starter);sync(true)}},100);
 })();
