@@ -9,9 +9,10 @@ async function gql(token,query,operationName='LockInspect'){
   if(Array.isArray(body?.errors)&&body.errors.length)throw Object.assign(new Error(body.errors.map(x=>x?.message||'GraphQL error').join('; ')),{status:400,body});
   return body?.data||{};
 }
-function unwrap(t){let cur=t,depth=0;while(cur&&cur.ofType&&depth++<8)cur=cur.ofType;return cur||{}}
-function renderType(t){if(!t)return'';if(t.kind==='NON_NULL')return `${renderType(t.ofType)}!`;if(t.kind==='LIST')return `[${renderType(t.ofType)}]`;return t.name||t.kind||''}
-function typeSelection(){return 'kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } }'}
+function nextType(t){return t?.of_type||t?.ofType||null}
+function unwrap(t){let cur=t,depth=0;while(cur&&nextType(cur)&&depth++<8)cur=nextType(cur);return cur||{}}
+function renderType(t){if(!t)return'';if(t.kind==='NON_NULL')return `${renderType(nextType(t))}!`;if(t.kind==='LIST')return `[${renderType(nextType(t))}]`;return t.name||t.kind||''}
+function typeSelection(){return 'kind name of_type { kind name of_type { kind name of_type { kind name of_type { kind name } } } }'}
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
   let body;try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
@@ -21,7 +22,6 @@ exports.handler=async function(event){
   const uid=tokenUserId(token);if(!uid)return json(401,{error:'Unable to identify Sleeper user.'});
   try{
     const rr=await fetch(`https://api.sleeper.app/v1/league/${leagueId}/rosters`,{headers:{Accept:'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});const rosters=rr.ok?await rr.json():[];const target=Array.isArray(rosters)?rosters.find(x=>Number(x.roster_id)===rosterId):null;if(!target)return json(404,{error:'Roster not found.'});if(String(target.owner_id||'')!==uid)return json(403,{error:'You can only inspect private lock state for your connected Sleeper roster.'});
-    // Sleeper's GraphQL introspection schema uses snake_case for __Schema fields.
     const q1=`query LockInspect { __schema { query_type { fields { name type { ${typeSelection()} } } } } }`;
     const d1=await gql(token,q1);const mf=(d1?.__schema?.query_type?.fields||[]).find(f=>f.name==='matchup_legs');if(!mf)return json(404,{error:'matchup_legs was not found in Sleeper schema.',schema:d1?.__schema||null});const base=unwrap(mf.type);if(!base.name)return json(500,{error:'Unable to resolve matchup_legs return type.',type:mf.type});
     const q2=`query LockInspect { __type(name: \"${base.name}\") { name fields { name type { ${typeSelection()} } } } }`;
