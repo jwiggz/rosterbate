@@ -42,26 +42,34 @@ const css=`
 
 @media(max-width:1250px){#teamView .columns-head.rb-stats-cols,#teamView .player-row.rb-stats-row{grid-template-columns:38px minmax(190px,.68fr) minmax(590px,1.65fr) 60px 60px!important}#teamView .player-row.rb-stats-row > .proj,#teamView .columns-head.rb-stats-cols > :nth-last-child(2){transform:translateX(-8px)!important}}
 `;
+const params=new URLSearchParams(location.search);
+const leagueId=String(params.get('league')||'');
+const explicitWeek=String(params.get('week')||'');
+const KNOWN_IR_CAPACITY={
+  '1411477732390400000':3
+};
 function style(){if(document.getElementById('rbUiPolishStyle'))return;const s=document.createElement('style');s.id='rbUiPolishStyle';s.textContent=css;document.head.appendChild(s)}
-function configuredIrSlots(){
+function currentWeekKey(){const sel=document.getElementById('weekSel');return String(sel?.value||explicitWeek||'current')}
+function dayKey(){return`rbSleeperDay:${leagueId||'league'}:${currentWeekKey()}`}
+function irKey(){return`rbSleeperIrCapacity:${leagueId||'league'}`}
+function rememberDay(day){if(!day)return;try{sessionStorage.setItem(dayKey(),String(day))}catch{}}
+function restoreDay(){
   try{
-    const league=window.currentData?.league||{},settings=league.settings||{};
-    const rosterCount=(league.roster_positions||[]).filter(x=>['IR','RESERVE'].includes(String(x).toUpperCase())).length;
-    const settingCandidates=[settings.reserve_slots,settings.ir_slots,settings.injured_reserve_slots,settings.injured_reserve,settings.reserve];
-    const settingCount=Math.max(0,...settingCandidates.map(v=>Number(v)).filter(Number.isFinite));
-    const roster=typeof window.team==='function'?window.team(window.selectedRoster):{};
-    const occupied=Array.isArray(roster?.reserve)?roster.reserve.length:0;
-    return Math.max(rosterCount,settingCount,occupied);
-  }catch{return 0}
+    const saved=sessionStorage.getItem(dayKey());if(!saved)return false;
+    const buttons=[...document.querySelectorAll('#teamView .day-btn[data-day]')];if(!buttons.length)return false;
+    const target=buttons.find(b=>String(b.dataset.day)===String(saved));if(!target)return false;
+    if(target.classList.contains('active'))return true;
+    target.click();return true;
+  }catch{return false}
 }
-function patchIrSlotCount(){
-  try{
-    if(window.__rbIrSlotCountPatched)return;
-    if(typeof window.irSlotCount!=='function')return;
-    const base=window.irSlotCount;
-    window.irSlotCount=function(){return Math.max(Number(base())||0,configuredIrSlots())};
-    window.__rbIrSlotCountPatched=true;
-  }catch{}
+function configuredIrSlots(){
+  let cached=0;try{cached=Number(sessionStorage.getItem(irKey())||0)||0}catch{}
+  const known=Number(KNOWN_IR_CAPACITY[leagueId]||0)||0;
+  const ir=document.querySelector('#teamView .ir-list');
+  const visible=ir?[...ir.children].filter(x=>x.classList?.contains('player-row')).length:0;
+  const target=Math.max(cached,known,visible);
+  if(target){try{sessionStorage.setItem(irKey(),String(target))}catch{}}
+  return target;
 }
 function normalizeRow(row){
   const name=row.querySelector('.pname');if(name)name.textContent=name.textContent.replace(/\s*\(locked\)\s*$/i,'').trim();if(!row.classList.contains('locked-in'))return;
@@ -73,10 +81,11 @@ function ensureIrCapacity(){
   for(let i=rows.length;i<target;i++){const wrap=document.createElement('div');wrap.className='player-row locked rb-empty-ir-slot';wrap.innerHTML='<div class="slot ir">IR</div><div><div class="pname">Empty IR slot</div><div class="pmeta">Available reserve position</div></div><div class="proj">—</div><div class="pts">—</div>';ir.appendChild(wrap)}
   return true;
 }
-function normalize(){patchIrSlotCount();document.querySelectorAll('#teamView .player-row').forEach(normalizeRow);ensureIrCapacity()}
-style();patchIrSlotCount();
-/* Fast bounded startup pass: catch the first Team render instead of waiting for a later mutation/focus event. */
-let startupFrames=0;function startup(){patchIrSlotCount();normalize();startupFrames++;if(startupFrames<180&&!document.querySelector('#teamView .ir-list'))requestAnimationFrame(startup)}requestAnimationFrame(startup);
+function normalize(){document.querySelectorAll('#teamView .player-row').forEach(normalizeRow);ensureIrCapacity();restoreDay()}
+style();
+document.addEventListener('click',e=>{const b=e.target.closest?.('#teamView .day-btn[data-day]');if(b)rememberDay(b.dataset.day)},true);
+document.addEventListener('change',e=>{if(e.target?.id==='weekSel'){requestAnimationFrame(()=>restoreDay())}},true);
+let startupFrames=0;function startup(){normalize();startupFrames++;if(startupFrames<180&&(!document.querySelector('#teamView .day-btn')||!document.querySelector('#teamView .ir-list')))requestAnimationFrame(startup)}requestAnimationFrame(startup);
 let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(normalize,16)};const root=document.getElementById('teamView')||document.body;new MutationObserver(schedule).observe(root,{childList:true,subtree:true,characterData:true});
 window.addEventListener('focus',normalize);
 })();
