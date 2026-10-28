@@ -36,6 +36,13 @@ const css=`
 #teamView .player-row.locked-in.rb-stats-row > .pts{width:68px!important;min-width:68px!important;height:42px!important;min-height:42px!important;padding:14px 7px 3px!important;border:2px solid #30d8a0!important;background:linear-gradient(180deg,rgba(20,95,73,.72),rgba(9,48,38,.62))!important;color:#7ff0ca!important;box-shadow:0 0 0 1px rgba(48,216,160,.18),0 0 14px rgba(48,216,160,.34),inset 0 0 12px rgba(48,216,160,.1)!important}
 #teamView .player-row.locked-in.rb-stats-row > .pts::before{content:'LOCKED IN';position:absolute;top:4px;left:0;right:0;text-align:center;color:#b9ffe9;font-size:6px;font-weight:950;letter-spacing:.08em;line-height:1;text-shadow:0 0 5px rgba(48,216,160,.42)}
 
+/* ALL / Week is a read-only Lock-In summary rather than a normal lineup-editing view. */
+#teamView .team-card.rb-all-lock-summary .player-row:not(.locked-in){display:none!important}
+#teamView .team-card.rb-all-lock-summary .bench,#teamView .team-card.rb-all-lock-summary .ir-list{display:none!important}
+#teamView .team-card.rb-all-lock-summary .rb-hide-all-summary{display:none!important}
+#teamView .team-card.rb-all-lock-summary .editor-bar{display:none!important}
+#teamView .team-card.rb-all-lock-summary .section-label.rb-starters-label{color:#7ff0ca!important}
+
 /* Empty IR capacity should look usable, not like a phantom player. */
 #teamView .ir-list .rb-empty-ir-slot{opacity:.72!important;border-top:1px dashed rgba(239,102,128,.28)!important;background:linear-gradient(90deg,rgba(239,102,128,.055),rgba(39,39,53,.65))!important}
 #teamView .ir-list .rb-empty-ir-slot .pname{color:#cfd8e5!important}
@@ -51,14 +58,19 @@ const KNOWN_IR_CAPACITY={
 };
 function style(){if(document.getElementById('rbUiPolishStyle'))return;const s=document.createElement('style');s.id='rbUiPolishStyle';s.textContent=css;document.head.appendChild(s)}
 function currentWeekKey(){const sel=document.getElementById('weekSel');return String(sel?.value||explicitWeek||'current')}
-function dayKey(){return`rbSleeperDay:${leagueId||'league'}:${currentWeekKey()}`}
+/* V2 intentionally ignores the old saved ALL default once, then resumes normal persistence. */
+function dayKey(){return`rbSleeperDayV2:${leagueId||'league'}:${currentWeekKey()}`}
 function irKey(){return`rbSleeperIrCapacity:${leagueId||'league'}`}
+function localToday(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`}
 function rememberDay(day){if(!day)return;try{sessionStorage.setItem(dayKey(),String(day))}catch{}}
+function arrangeDayStrip(){const strip=document.querySelector('#teamView .day-strip');if(!strip)return false;const all=strip.querySelector('.day-btn[data-day="all"]');if(all&&all!==strip.lastElementChild)strip.appendChild(all);return true}
 function restoreDay(){
   try{
-    const saved=sessionStorage.getItem(dayKey());if(!saved)return false;
     const buttons=[...document.querySelectorAll('#teamView .day-btn[data-day]')];if(!buttons.length)return false;
-    const target=buttons.find(b=>String(b.dataset.day)===String(saved));if(!target)return false;
+    const saved=sessionStorage.getItem(dayKey());
+    const wanted=saved||localToday();
+    const target=buttons.find(b=>String(b.dataset.day)===String(wanted))||buttons.find(b=>String(b.dataset.day)===localToday())||buttons[0];
+    if(!target)return false;
     if(target.classList.contains('active'))return true;
     target.click();return true;
   }catch{return false}
@@ -80,16 +92,32 @@ function normalizeRow(row){
   const pts=row.querySelector(':scope > .pts');
   if(pts){pts.setAttribute('aria-label',`Locked in fantasy points ${pts.textContent.trim()}`);pts.title='LOCKED IN'}
 }
+function markSummarySections(){
+  document.querySelectorAll('#teamView .section-label').forEach(label=>{
+    const text=String(label.textContent||'').trim().toLowerCase();
+    label.classList.toggle('rb-starters-label',text==='starters');
+    label.classList.toggle('rb-hide-all-summary',text==='bench'||text.includes('injured reserve'));
+  });
+}
+function applyAllWeekMode(){
+  const card=document.querySelector('#teamView .team-card');if(!card)return;
+  const active=document.querySelector('#teamView .day-btn.active[data-day]');
+  const all=String(active?.dataset.day||'')==='all';
+  card.classList.toggle('rb-all-lock-summary',all);
+  markSummarySections();
+  const startersLabel=[...card.querySelectorAll('.section-label')].find(x=>String(x.textContent||'').trim().toLowerCase()==='starters');
+  if(startersLabel)startersLabel.textContent=all?'Locked In This Week':'Starters';
+}
 function ensureIrCapacity(){
   const ir=document.querySelector('#teamView .ir-list');if(!ir)return false;const target=configuredIrSlots();if(!target)return false;
   const rows=[...ir.children].filter(x=>x.classList?.contains('player-row'));const existingEmpty=rows.filter(r=>r.classList.contains('rb-empty-ir-slot')||/empty ir slot/i.test(r.querySelector('.pname')?.textContent||''));existingEmpty.forEach(r=>r.classList.add('rb-empty-ir-slot'));
   for(let i=rows.length;i<target;i++){const wrap=document.createElement('div');wrap.className='player-row locked rb-empty-ir-slot';wrap.innerHTML='<div class="slot ir">IR</div><div><div class="pname">Empty IR slot</div><div class="pmeta">Available reserve position</div></div><div class="proj">—</div><div class="pts">—</div>';ir.appendChild(wrap)}
   return true;
 }
-function normalize(){document.querySelectorAll('#teamView .player-row').forEach(normalizeRow);ensureIrCapacity();restoreDay()}
+function normalize(){arrangeDayStrip();document.querySelectorAll('#teamView .player-row').forEach(normalizeRow);ensureIrCapacity();restoreDay();applyAllWeekMode()}
 style();
-document.addEventListener('click',e=>{const b=e.target.closest?.('#teamView .day-btn[data-day]');if(b)rememberDay(b.dataset.day)},true);
-document.addEventListener('change',e=>{if(e.target?.id==='weekSel'){requestAnimationFrame(()=>restoreDay())}},true);
+document.addEventListener('click',e=>{const b=e.target.closest?.('#teamView .day-btn[data-day]');if(b){rememberDay(b.dataset.day);requestAnimationFrame(applyAllWeekMode)}},true);
+document.addEventListener('change',e=>{if(e.target?.id==='weekSel'){requestAnimationFrame(()=>{arrangeDayStrip();restoreDay();applyAllWeekMode()})}},true);
 let startupFrames=0;function startup(){normalize();startupFrames++;if(startupFrames<180&&(!document.querySelector('#teamView .day-btn')||!document.querySelector('#teamView .ir-list')))requestAnimationFrame(startup)}requestAnimationFrame(startup);
 let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(normalize,16)};const root=document.getElementById('teamView')||document.body;new MutationObserver(mutations=>{
   const relevant=mutations.some(m=>{
