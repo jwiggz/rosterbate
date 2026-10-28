@@ -1,5 +1,5 @@
 (()=>{
-const state={busy:false,lastKey:'',data:null,status:'idle',message:'',privateDenied:new Set()};
+const state={busy:false,lastKey:'',data:null,status:'idle',message:'',privateDenied:new Set(),fallbackStats:new Map(),fallbackLoading:new Set()};
 const css=`
 .rb-lock-debug{margin-top:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.05);color:#8fa0b8;font-size:9px;line-height:1.45}.rb-lock-debug strong{color:#e8eef7}.rb-lock-debug code{color:#f3c75b;font-family:inherit}.rb-lock-debug.error code{color:#ff9aa9}.rb-lock-debug.ok code{color:#78efd3}
 #teamView .lock-btn{margin-left:8px!important;min-height:32px!important;padding:8px 13px!important;border-radius:8px!important;font-size:10px!important;line-height:1!important;letter-spacing:.04em!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;box-shadow:0 3px 10px rgba(0,0,0,.22)!important}
@@ -19,6 +19,8 @@ const css=`
 #teamView .rb-lock-total.projected{border-color:rgba(243,199,91,.24);background:linear-gradient(180deg,rgba(87,68,25,.45),rgba(53,43,22,.36))}
 #teamView .rb-lock-total.projected b{color:#f3c75b;text-shadow:0 0 8px rgba(243,199,91,.18)}
 #teamView .rb-lock-total small{margin-top:3px;font-size:6px;color:#7f8da2;font-weight:800;white-space:nowrap}
+#teamView .proj.rb-fallback-proj{color:#e6b95a!important;position:relative}
+#teamView .proj.rb-fallback-proj::after{content:'~';font-size:7px;margin-left:2px;color:#9b8a61;vertical-align:top}
 @media(max-width:1050px){#teamView .rb-lock-totals{display:none}}
 `;
 function addStyle(){if(document.getElementById('rbLockSyncStyle'))return;const s=document.createElement('style');s.id='rbLockSyncStyle';s.textContent=css;document.head.appendChild(s)}
@@ -28,6 +30,7 @@ function ownObj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}
 function num1(v){const n=Number(v);return Number.isFinite(n)?n.toFixed(1):'0.0'}
 function currentKey(){try{return `${leagueId}:${selectedRoster}:${selectedWeek}`}catch{return''}}
 function cacheKey(){const k=currentKey();return k?`rbLockState:${k}`:''}
+function statsKey(rid){return `${String(leagueId)}:${String(rid)}`}
 function readCache(){try{const raw=sessionStorage.getItem(cacheKey());if(!raw)return null;const x=JSON.parse(raw);return x&&x.data?x:null}catch{return null}}
 function writeCache(data){try{const k=cacheKey();if(k)sessionStorage.setItem(k,JSON.stringify({ts:Date.now(),data}))}catch{}}
 function playerNameMap(){const map=new Map();try{for(const [id,p] of Object.entries(currentData?.players||{})){const n=String(p?.full_name||'').trim().toLowerCase();if(n&&!map.has(n))map.set(n,String(id))}}catch{}return map}
@@ -64,7 +67,15 @@ function scheduleGameForProjection(pg,pid){
   const team=String(currentData?.players?.[String(pid)]?.team||'');
   return schedule.find(g=>String(g.date||'')===date&&(!team||g.home===team||g.away===team))||null;
 }
-function bestRemainingProjection(pid){
+function hasFutureLockableGame(pid){
+  const team=String(currentData?.players?.[String(pid)]?.team||'');
+  return (currentData?.schedule||[]).some(g=>!g.calendar_only&&String(g.status||'pre_game')==='pre_game'&&(!team||g.home===team||g.away===team));
+}
+function fallbackProjection(pid,rid=selectedRoster){
+  const d=state.fallbackStats.get(statsKey(rid));const p=d?.players?.[String(pid)];
+  const v=Number(p?.fantasy_points_avg);return Number.isFinite(v)&&v>0?v:null;
+}
+function bestRemainingProjection(pid,rid=selectedRoster){
   let best=null;
   for(const pg of projectionGamesFor(pid)){
     const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;
@@ -72,7 +83,26 @@ function bestRemainingProjection(pid){
     if(sg&&String(sg.status||'pre_game')!=='pre_game')continue;
     if(best===null||pts>best)best=pts;
   }
-  return best;
+  if(best!==null)return best;
+  return hasFutureLockableGame(pid)?fallbackProjection(pid,rid):null;
+}
+async function ensureFallbackStats(rid){
+  const key=statsKey(rid);if(state.fallbackStats.has(key)||state.fallbackLoading.has(key))return;
+  state.fallbackLoading.add(key);
+  try{
+    const r=await fetch(`/.netlify/functions/sleeper-player-stats?league=${encodeURIComponent(leagueId)}&roster=${encodeURIComponent(rid)}&_=${Date.now()}`,{cache:'no-store'});const d=await r.json();
+    if(r.ok&&d?.ok)state.fallbackStats.set(key,d);
+  }catch{}finally{state.fallbackLoading.delete(key);decorateFallbackProjections(rid);renderLockTotals()}
+}
+function decorateFallbackProjections(rid=selectedRoster){
+  const names=playerNameMap();
+  document.querySelectorAll('#teamView .player-row').forEach(row=>{
+    const pid=rowPlayerId(row,names),cell=row.querySelector('.proj');if(!pid||!cell)return;
+    const native=String(cell.textContent||'').trim();
+    if(native&&native!=='—'&&native!=='-'){cell.classList.remove('rb-fallback-proj');cell.removeAttribute('title');return}
+    const v=fallbackProjection(pid,rid);if(v===null)return;
+    cell.textContent=num1(v);cell.classList.add('rb-fallback-proj');cell.title='Estimated from season per-game fantasy average because Sleeper has no projection for this player.';
+  });
 }
 function lockTotalsForRoster(rid){
   const m=publicMatchupForRoster(rid);if(!m)return{locked:0,projected:0,remaining:0,totalStarters:0};
@@ -82,7 +112,7 @@ function lockTotalsForRoster(rid){
   let projected=locked,remaining=0;
   for(const pid of starters){
     if(lockedPlayers.has(pid))continue;
-    const best=bestRemainingProjection(pid);
+    const best=bestRemainingProjection(pid,rid);
     if(best!==null){projected+=best;remaining++}
   }
   return{locked,projected,remaining,totalStarters:starters.length};
@@ -98,7 +128,7 @@ function reconcileTeam(){
   document.querySelectorAll('#teamView [data-lock-player][data-lock-game]').forEach(btn=>{if(!isLocked(btn.dataset.lockPlayer,btn.dataset.lockGame))return;const row=btn.closest('.player-row');btn.remove();ensureLockedChip(row)});
   const locked=lockedPlayersForRoster(selectedRoster);
   if(locked.size){const names=playerNameMap();document.querySelectorAll('#teamView .player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)})}
-  renderLockTotals();
+  decorateFallbackProjections(selectedRoster);renderLockTotals();ensureFallbackStats(selectedRoster);
 }
 function reconcileMatchup(){
   const root=document.getElementById('matchupView');if(!root)return;
