@@ -10,11 +10,22 @@ const css=`
 #teamView .player-row.locked-in .pname,#matchupView .player-row.locked-in .pname{color:#aaffdf!important;font-weight:900!important}
 #teamView .player-row.locked-in .matchup-meta,#matchupView .player-row.locked-in .matchup-meta{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important}
 #teamView .player-row.locked-in .matchup-meta::after,#matchupView .player-row.locked-in .matchup-meta::after{content:none!important;display:none!important}
+#teamView .rb-lock-totals{margin-left:auto;display:flex;align-items:center;gap:8px;margin-right:10px}
+#teamView .rb-lock-total{min-width:94px;padding:7px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:#192434;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.05}
+#teamView .rb-lock-total span{font-size:7px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#8190a5}
+#teamView .rb-lock-total b{margin-top:4px;font-size:14px;font-weight:950;color:#e9eef7}
+#teamView .rb-lock-total.locked{border-color:rgba(48,216,160,.24);background:linear-gradient(180deg,rgba(23,77,64,.55),rgba(16,50,43,.42))}
+#teamView .rb-lock-total.locked b{color:#49e7b1;text-shadow:0 0 8px rgba(48,216,160,.24)}
+#teamView .rb-lock-total.projected{border-color:rgba(243,199,91,.24);background:linear-gradient(180deg,rgba(87,68,25,.45),rgba(53,43,22,.36))}
+#teamView .rb-lock-total.projected b{color:#f3c75b;text-shadow:0 0 8px rgba(243,199,91,.18)}
+#teamView .rb-lock-total small{margin-top:3px;font-size:6px;color:#7f8da2;font-weight:800;white-space:nowrap}
+@media(max-width:1050px){#teamView .rb-lock-totals{display:none}}
 `;
 function addStyle(){if(document.getElementById('rbLockSyncStyle'))return;const s=document.createElement('style');s.id='rbLockSyncStyle';s.textContent=css;document.head.appendChild(s)}
 function auth(){try{return sessionStorage.getItem('rbSleeperToken')||sessionStorage.getItem('rbSleeperAuth')||''}catch{return''}}
 function scalar(v){return v==null?'':String(v)}
 function ownObj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}
+function num1(v){const n=Number(v);return Number.isFinite(n)?n.toFixed(1):'0.0'}
 function currentKey(){try{return `${leagueId}:${selectedRoster}:${selectedWeek}`}catch{return''}}
 function cacheKey(){const k=currentKey();return k?`rbLockState:${k}`:''}
 function readCache(){try{const raw=sessionStorage.getItem(cacheKey());if(!raw)return null;const x=JSON.parse(raw);return x&&x.data?x:null}catch{return null}}
@@ -37,18 +48,57 @@ function publicLockedPlayersForRoster(rid){
       if(pid&&starters.includes(pid))out.add(pid);
     }
   }
-  /* Sleeper's public matchup rows expose starters_points index-aligned with starters.
-     In Lock-In leagues these are the counted starter scores, so non-zero counted scores
-     provide a read-only opponent lock signal even when starters_games is omitted. */
   const starterPoints=Array.isArray(m.starters_points)?m.starters_points:[];
   starters.forEach((pid,i)=>{const pts=Number(starterPoints[i]);if(pid!=='0'&&Number.isFinite(pts)&&Math.abs(pts)>0.0001)out.add(pid)});
   return out;
 }
+function lockedPlayersForRoster(rid){
+  const out=publicLockedPlayersForRoster(rid);
+  if(Number(rid)===Number(selectedRoster))for(const pid of weekLockedPlayers())out.add(pid);
+  return out;
+}
+function projectionGamesFor(pid){const p=currentData?.projections?.[String(pid)];return Array.isArray(p?.games)?p.games:[]}
+function scheduleGameForProjection(pg,pid){
+  const schedule=currentData?.schedule||[];const gid=String(pg?.game_id||'');const date=String(pg?.date||'');
+  if(gid){const byId=schedule.find(g=>String(g.game_id||'')===gid);if(byId)return byId}
+  const team=String(currentData?.players?.[String(pid)]?.team||'');
+  return schedule.find(g=>String(g.date||'')===date&&(!team||g.home===team||g.away===team))||null;
+}
+function bestRemainingProjection(pid){
+  let best=null;
+  for(const pg of projectionGamesFor(pid)){
+    const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;
+    const sg=scheduleGameForProjection(pg,pid);
+    if(sg&&String(sg.status||'pre_game')!=='pre_game')continue;
+    if(best===null||pts>best)best=pts;
+  }
+  return best;
+}
+function lockTotalsForRoster(rid){
+  const m=publicMatchupForRoster(rid);if(!m)return{locked:0,projected:0,remaining:0,totalStarters:0};
+  const starters=(m.starters||[]).map(String).filter(id=>id&&id!=='0');
+  const lockedPlayers=lockedPlayersForRoster(rid);
+  const locked=Number(m.points)||0;
+  let projected=locked,remaining=0;
+  for(const pid of starters){
+    if(lockedPlayers.has(pid))continue;
+    const best=bestRemainingProjection(pid);
+    if(best!==null){projected+=best;remaining++}
+  }
+  return{locked,projected,remaining,totalStarters:starters.length};
+}
+function renderLockTotals(){
+  const top=document.querySelector('#teamView .team-top');if(!top)return;
+  let box=top.querySelector('.rb-lock-totals');if(!box){box=document.createElement('div');box.className='rb-lock-totals';const weekNav=top.querySelector('.week-nav');if(weekNav)top.insertBefore(box,weekNav);else top.appendChild(box)}
+  const totals=lockTotalsForRoster(selectedRoster);
+  box.innerHTML=`<div class="rb-lock-total locked"><span>Locked Points</span><b>${num1(totals.locked)}</b><small>${totals.totalStarters-totals.remaining} of ${totals.totalStarters} counted</small></div><div class="rb-lock-total projected"><span>Projected Lock-In</span><b>${num1(totals.projected)}</b><small>best remaining game / player</small></div>`;
+}
 function ensureLockedChip(row){if(!row)return;row.classList.remove('lockable','editable');row.classList.add('locked-in');row.setAttribute('aria-disabled','true');const copy=row.querySelector('.player-copy')||row.querySelector('.player-info')||row;const chips=[...row.querySelectorAll('.lock-chip')];let chip=chips[0];if(!chip){chip=document.createElement('span');chip.className='lock-chip'}chip.textContent='LOCKED IN';chip.setAttribute('aria-label','Locked in on Sleeper');chips.slice(1).forEach(x=>x.remove());row.querySelectorAll('.lock-btn').forEach(x=>x.remove());const meta=row.querySelector('.matchup-meta');if(meta&&chip.parentElement!==meta)meta.appendChild(chip);else if(!meta&&chip.parentElement!==copy)copy.appendChild(chip)}
 function reconcileTeam(){
   document.querySelectorAll('#teamView [data-lock-player][data-lock-game]').forEach(btn=>{if(!isLocked(btn.dataset.lockPlayer,btn.dataset.lockGame))return;const row=btn.closest('.player-row');btn.remove();ensureLockedChip(row)});
-  const locked=new Set([...publicLockedPlayersForRoster(selectedRoster),...weekLockedPlayers()]);if(!locked.size)return;
-  const names=playerNameMap();document.querySelectorAll('#teamView .player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)});
+  const locked=lockedPlayersForRoster(selectedRoster);
+  if(locked.size){const names=playerNameMap();document.querySelectorAll('#teamView .player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)})}
+  renderLockTotals();
 }
 function reconcileMatchup(){
   const root=document.getElementById('matchupView');if(!root)return;
@@ -56,7 +106,7 @@ function reconcileMatchup(){
   let me=null,opp=null;try{me=publicMatchupForRoster(selectedRoster);opp=(currentData?.matchups||[]).find(x=>me&&x.matchup_id===me.matchup_id&&Number(x.roster_id)!==Number(selectedRoster))||null}catch{}
   const matchupRows=[me,opp],names=playerNameMap();
   rosters.forEach((container,index)=>{
-    const m=matchupRows[index];if(!m)return;const locked=publicLockedPlayersForRoster(m.roster_id);if(!locked.size)return;
+    const m=matchupRows[index];if(!m)return;const locked=lockedPlayersForRoster(m.roster_id);if(!locked.size)return;
     container.querySelectorAll('.player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)});
   });
 }
