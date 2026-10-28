@@ -17,7 +17,9 @@ function argSelection(){return `name default_value type { ${typeSelection()} }`}
 function valueForArg(name,type,leagueId,rosterId,round,uid){
   const n=String(name||'').toLowerCase(),base=unwrap(type),kind=String(base?.kind||''),baseName=String(base?.name||'');
   let v;
-  if(n.includes('league'))v=leagueId;
+  if(n==='start_round')v=1;
+  else if(n==='end_round')v=round;
+  else if(n.includes('league'))v=leagueId;
   else if(n.includes('roster'))v=rosterId;
   else if(n==='round'||n==='leg'||n.includes('week'))v=round;
   else if(n.includes('user')||n.includes('owner'))v=uid;
