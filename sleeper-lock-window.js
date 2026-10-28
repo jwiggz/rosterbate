@@ -22,6 +22,35 @@
     const t=Date.parse(String(g?.start_time||''));if(Number.isFinite(t))return t;
     const d=Date.parse(`${String(g?.date||'')}T12:00:00`);return Number.isFinite(d)?d:0;
   }
+  function lockState(){
+    try{
+      const raw=sessionStorage.getItem(`rbLockState:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`);
+      const parsed=raw?JSON.parse(raw):null;
+      return parsed?.data||null;
+    }catch{return null}
+  }
+  function scalar(v){return v==null?'':String(v)}
+  function deepPair(node,pid,gid,depth=0){
+    if(depth>6||node==null)return false;
+    if(Array.isArray(node))return node.some(v=>deepPair(v,pid,gid,depth+1));
+    if(typeof node!=='object')return false;
+    const p=scalar(node.player_id??node.playerId??node.player??node.pid),g=scalar(node.game_id??node.gameId??node.game??node.gid);
+    if(p===pid&&g===gid)return true;
+    for(const [k,v] of Object.entries(node)){
+      if(k===pid&&scalar(v)===gid)return true;
+      if(k===gid&&scalar(v)===pid)return true;
+      if(typeof v==='object'&&deepPair(v,pid,gid,depth+1))return true;
+    }
+    return false;
+  }
+  function sleeperEligible(pid,gid){
+    const d=lockState();if(!d)return false;
+    pid=String(pid);gid=String(gid);
+    // Carry-forward lockability must be explicitly represented by Sleeper.
+    // Do not infer eligibility from schedule history alone; newly added or
+    // previously benched players can have completed games that are not lockable.
+    return deepPair(d.playerMap,pid,gid)||deepPair(d.subs,pid,gid)||deepPair(d.customPoints,pid,gid);
+  }
   function priorCompletedGame(pid){
     try{
       if(selectedDay==='all'||String(selectedDay)!==fantasyDay())return null;
@@ -33,7 +62,7 @@
         if(g.home!==p.team&&g.away!==p.team)return false;
         const t=gameTime(g);return !nextT||!t||t<nextT;
       }).sort((a,b)=>gameTime(b)-gameTime(a));
-      const g=games[0];return g?.game_id?g:null;
+      return games.find(g=>g?.game_id&&sleeperEligible(pid,String(g.game_id)))||null;
     }catch{return null}
   }
   function showCarryReview(pid,g){
@@ -50,13 +79,23 @@
       root.querySelectorAll('.player-row[data-starter-index]').forEach(row=>{
         if(row.classList.contains('locked-in')||row.querySelector('.lock-chip'))return;
         const pid=rowPlayerId(row);if(!pid)return;
-        const g=priorCompletedGame(pid);if(!g)return;
+        const existing=row.querySelector('.lock-btn[data-rb-carry-lock="1"]');
+        const g=priorCompletedGame(pid);
+        if(!g){
+          existing?.remove();
+          if(!row.querySelector('.lock-btn'))row.classList.remove('lockable');
+          return;
+        }
         row.classList.add('lockable');
-        let btn=row.querySelector('.lock-btn[data-rb-carry-lock="1"]');
+        let btn=existing;
         if(!btn){
-          btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbCarryLock='1';btn.dataset.lockPlayer=pid;btn.dataset.lockGame=String(g.game_id);
+          btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbCarryLock='1';
           const meta=row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info');meta?.appendChild(btn);
-          btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();showCarryReview(pid,g)});
+        }
+        btn.dataset.lockPlayer=pid;btn.dataset.lockGame=String(g.game_id);
+        if(btn.dataset.rbCarryBound!=='1'){
+          btn.dataset.rbCarryBound='1';
+          btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const current=priorCompletedGame(pid);if(current)showCarryReview(pid,current)});
         }
       });
     }catch{}
