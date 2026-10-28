@@ -13,6 +13,23 @@ function nextType(t){return t?.of_type||t?.ofType||null}
 function unwrap(t){let cur=t,depth=0;while(cur&&nextType(cur)&&depth++<8)cur=nextType(cur);return cur||{}}
 function renderType(t){if(!t)return'';if(t.kind==='NON_NULL')return `${renderType(nextType(t))}!`;if(t.kind==='LIST')return `[${renderType(nextType(t))}]`;return t.name||t.kind||''}
 function typeSelection(){return 'kind name of_type { kind name of_type { kind name of_type { kind name of_type { kind name } } } }'}
+function argSelection(){return `name default_value type { ${typeSelection()} }`}
+function valueForArg(name,type,leagueId,rosterId,round,uid){
+  const n=String(name||'').toLowerCase(),base=unwrap(type),kind=String(base?.kind||''),baseName=String(base?.name||'');
+  let v;
+  if(n.includes('league'))v=leagueId;
+  else if(n.includes('roster'))v=rosterId;
+  else if(n==='round'||n==='leg'||n.includes('week'))v=round;
+  else if(n.includes('user')||n.includes('owner'))v=uid;
+  else return null;
+  if(kind==='SCALAR'&&['Int','Float'].includes(baseName))return String(Number(v));
+  return JSON.stringify(String(v));
+}
+function buildCall(field,leagueId,rosterId,round,uid){
+  const args=[];
+  for(const a of field?.args||[]){const val=valueForArg(a.name,a.type,leagueId,rosterId,round,uid);if(val!=null)args.push(`${a.name}:${val}`);else if(a.default_value==null&&String(a.type?.kind||'')==='NON_NULL')return null}
+  return `${field.name}${args.length?`(${args.join(',')})`:''}`;
+}
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
   let body;try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
@@ -22,7 +39,7 @@ exports.handler=async function(event){
   const uid=tokenUserId(token);if(!uid)return json(401,{error:'Unable to identify Sleeper user.'});
   try{
     const rr=await fetch(`https://api.sleeper.app/v1/league/${leagueId}/rosters`,{headers:{Accept:'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});const rosters=rr.ok?await rr.json():[];const target=Array.isArray(rosters)?rosters.find(x=>Number(x.roster_id)===rosterId):null;if(!target)return json(404,{error:'Roster not found.'});if(String(target.owner_id||'')!==uid)return json(403,{error:'You can only inspect private lock state for your connected Sleeper roster.'});
-    const q1=`query LockInspect { __schema { query_type { fields { name type { ${typeSelection()} } } } mutation_type { fields { name } } } }`;
+    const q1=`query LockInspect { __schema { query_type { fields { name args { ${argSelection()} } type { ${typeSelection()} } } } mutation_type { fields { name } } } }`;
     const d1=await gql(token,q1);const queryFields=d1?.__schema?.query_type?.fields||[],mutationFields=d1?.__schema?.mutation_type?.fields||[];
     const mf=queryFields.find(f=>f.name==='matchup_legs');if(!mf)return json(404,{error:'matchup_legs was not found in Sleeper schema.',schema:d1?.__schema||null});const base=unwrap(mf.type);if(!base.name)return json(500,{error:'Unable to resolve matchup_legs return type.',type:mf.type});
     const q2=`query LockInspect { __type(name: \"${base.name}\") { name fields { name type { ${typeSelection()} } } } }`;
@@ -35,10 +52,22 @@ exports.handler=async function(event){
     const leaf=candidates.filter(f=>['SCALAR','ENUM'].includes(f.base?.kind)).map(f=>f.name);
     for(const required of ['roster_id','matchup_id','starters','starters_games'])if(fields.some(f=>f.name===required)&&!leaf.includes(required))leaf.push(required);
     let row=null,queryError=null;
-    if(leaf.length){
-      const q3=`query LockInspect { matchup_legs(league_id: \"${leagueId}\", round: ${round}) { ${leaf.join(' ')} } }`;
-      try{const d3=await gql(token,q3);row=(Array.isArray(d3?.matchup_legs)?d3.matchup_legs:[]).find(x=>Number(x.roster_id)===rosterId)||null}catch(e){queryError={message:e.message,body:e.body||null}}
+    if(leaf.length){const q3=`query LockInspect { matchup_legs(league_id: \"${leagueId}\", round: ${round}) { ${leaf.join(' ')} } }`;try{const d3=await gql(token,q3);row=(Array.isArray(d3?.matchup_legs)?d3.matchup_legs:[]).find(x=>Number(x.roster_id)===rosterId)||null}catch(e){queryError={message:e.message,body:e.body||null}}}
+    const probes={};
+    for(const name of ['matchup_legs_raw','matchup_legs_related_to_roster']){
+      const f=queryFields.find(x=>x.name===name);if(!f){probes[name]={available:false};continue}
+      const signature={name,args:(f.args||[]).map(a=>({name:a.name,type:renderType(a.type),defaultValue:a.default_value??null})),returnType:renderType(f.type)};
+      const call=buildCall(f,leagueId,rosterId,round,uid);if(!call){probes[name]={available:true,signature,error:'Required arguments could not be inferred safely.'};continue}
+      const ret=unwrap(f.type);let result=null,error=null;
+      if(['SCALAR','ENUM'].includes(ret?.kind)){
+        try{const q=`query LockInspect { ${call} }`;const d=await gql(token,q);result=d?.[name]??null}catch(e){error={message:e.message,body:e.body||null}}
+      }else if(ret?.name===base.name){
+        try{const q=`query LockInspect { ${call} { ${leaf.join(' ')} } }`;const d=await gql(token,q);result=d?.[name]??null}catch(e){error={message:e.message,body:e.body||null}}
+      }else{
+        probes[name]={available:true,signature,call,returnBase:{kind:ret?.kind||null,name:ret?.name||null},note:'Return type requires separate type inspection.'};continue
+      }
+      probes[name]={available:true,signature,call,result,error};
     }
-    return json(200,{ok:true,matchupLegType:base.name,allFields:fields.map(f=>({name:f.name,type:renderType(f.type),baseKind:unwrap(f.type)?.kind||null,baseName:unwrap(f.type)?.name||null})),candidateFields:candidates.map(f=>({name:f.name,type:f.type,baseKind:f.base?.kind||null,baseName:f.base?.name||null})),candidateQueries,candidateMutations,queriedFields:leaf,row,queryError});
+    return json(200,{ok:true,matchupLegType:base.name,allFields:fields.map(f=>({name:f.name,type:renderType(f.type),baseKind:unwrap(f.type)?.kind||null,baseName:unwrap(f.type)?.name||null})),candidateFields:candidates.map(f=>({name:f.name,type:f.type,baseKind:f.base?.kind||null,baseName:f.base?.name||null})),candidateQueries,candidateMutations,queriedFields:leaf,row,queryError,probes});
   }catch(error){return json(Number(error?.status)||502,{error:error?.message||'Unable to inspect Sleeper.',sleeper:error?.body||null})}
 };
