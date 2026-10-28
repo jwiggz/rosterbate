@@ -34,6 +34,7 @@
 #teamView .player-row.rb-stats-row.lockable > .pts.rb-lock-ready-pts::before{content:'LOCK IN';position:absolute;top:4px;left:0;right:0;text-align:center;color:#ffe5ae;font-size:6px;font-weight:950;letter-spacing:.08em;line-height:1;text-shadow:0 0 5px rgba(255,179,69,.45)}
 #teamView .player-row.rb-stats-row.lockable > .pts.rb-lock-ready-pts:hover{border-color:#30d8a0!important;background:linear-gradient(180deg,rgba(20,95,73,.76),rgba(9,48,38,.66))!important;color:#7ff0ca!important;animation:rbPtsLockHover .55s linear infinite!important}
 #teamView .player-row.rb-stats-row.lockable > .pts.rb-lock-ready-pts:hover::before{color:#b9ffe9!important;text-shadow:0 0 5px rgba(48,216,160,.5)!important}
+#teamView .player-row.rb-stats-row > .pts.rb-unlocked-pts{border:1px solid rgba(234,179,54,.44)!important;background:linear-gradient(180deg,rgba(88,67,16,.48),rgba(56,43,11,.4))!important;color:#ffd45f!important;box-shadow:inset 0 0 10px rgba(234,179,54,.06),0 0 8px rgba(234,179,54,.08)!important}
 `;
       document.head.appendChild(style);
     }
@@ -44,6 +45,7 @@
         const pts=row.querySelector(':scope > .pts');
         if(!btn||!pts)return;
         pts.classList.add('rb-lock-ready-pts');
+        pts.classList.remove('rb-unlocked-pts');
         if(pts.dataset.rbLockBound==='1')return;
         pts.dataset.rbLockBound='1';
         pts.setAttribute('role','button');
