@@ -1,8 +1,13 @@
 (()=>{
   const nativeRAF=window.requestAnimationFrame.bind(window);
-  const today=()=>{const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`};
+  const fantasyDay=()=>{
+    const d=new Date();
+    if(d.getHours()<6)d.setDate(d.getDate()-1);
+    const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  };
   const savedDay=()=>{try{const lid=String(typeof leagueId!=='undefined'?leagueId:new URLSearchParams(location.search).get('league')||'league');const wk=String(typeof selectedWeek!=='undefined'?selectedWeek:new URLSearchParams(location.search).get('week')||'current');const v=sessionStorage.getItem(`rbSleeperDayV2:${lid}:${wk}`);return v&&v!=='all'?v:''}catch{return''}};
-  try{selectedDay=savedDay()||today()}catch{}
+  try{selectedDay=savedDay()||fantasyDay()}catch{}
   try{
     dayStrip=function(){
       const ds=days();
