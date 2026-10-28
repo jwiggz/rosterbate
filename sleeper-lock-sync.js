@@ -37,6 +37,11 @@ function publicLockedPlayersForRoster(rid){
       if(pid&&starters.includes(pid))out.add(pid);
     }
   }
+  /* Sleeper's public matchup rows expose starters_points index-aligned with starters.
+     In Lock-In leagues these are the counted starter scores, so non-zero counted scores
+     provide a read-only opponent lock signal even when starters_games is omitted. */
+  const starterPoints=Array.isArray(m.starters_points)?m.starters_points:[];
+  starters.forEach((pid,i)=>{const pts=Number(starterPoints[i]);if(pid!=='0'&&Number.isFinite(pts)&&Math.abs(pts)>0.0001)out.add(pid)});
   return out;
 }
 function ensureLockedChip(row){if(!row)return;row.classList.remove('lockable','editable');row.classList.add('locked-in');row.setAttribute('aria-disabled','true');const copy=row.querySelector('.player-copy')||row.querySelector('.player-info')||row;const chips=[...row.querySelectorAll('.lock-chip')];let chip=chips[0];if(!chip){chip=document.createElement('span');chip.className='lock-chip'}chip.textContent='LOCKED IN';chip.setAttribute('aria-label','Locked in on Sleeper');chips.slice(1).forEach(x=>x.remove());row.querySelectorAll('.lock-btn').forEach(x=>x.remove());const meta=row.querySelector('.matchup-meta');if(meta&&chip.parentElement!==meta)meta.appendChild(chip);else if(!meta&&chip.parentElement!==copy)copy.appendChild(chip)}
@@ -57,7 +62,7 @@ function reconcileMatchup(){
 }
 function reconcile(){reconcileTeam();reconcileMatchup()}
 function count(v){return v&&typeof v==='object'?Object.keys(v).length:0}
-function diagnosticText(){if(state.status==='public')return'Viewing public lock state for this roster.';if(state.status==='missing-token')return'No Sleeper session token found in this tab.';if(state.status==='error')return state.message||'Unknown lock sync error.';const d=state.data;if(!d)return state.message||'Waiting for private Sleeper lock state…';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
+function diagnosticText(){if(state.status==='public')return'Viewing public counted starter lock state for this roster.';if(state.status==='missing-token')return'No Sleeper session token found in this tab.';if(state.status==='error')return state.message||'Unknown lock sync error.';const d=state.data;if(!d)return state.message||'Waiting for private Sleeper lock state…';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
 function showDiagnostic(){const host=document.getElementById('activityBody');if(!host)return;let el=document.getElementById('rbLockDebug');if(!el){el=document.createElement('div');el.id='rbLockDebug';el.className='rb-lock-debug';host.appendChild(el)}el.classList.toggle('error',state.status==='error'||state.status==='missing-token');el.classList.toggle('ok',state.status==='ok'||state.status==='cached'||state.status==='public');const html=`<strong>Lock sync${state.status==='ok'?' OK':state.status==='cached'?' CACHED':state.status==='public'?' PUBLIC':state.status==='error'?' ERROR':''}</strong><br><code>${diagnosticText()}</code>`;if(el.innerHTML!==html)el.innerHTML=html}
 function hydrateCache(){const cached=readCache();if(!cached?.data)return false;state.data=cached.data;state.lastKey=currentKey();state.status='cached';if(typeof lockedGames!=='undefined'&&state.data.startersGames&&typeof state.data.startersGames==='object')lockedGames=state.data.startersGames;reconcile();showDiagnostic();return true}
 async function sync(force=false){
@@ -76,7 +81,6 @@ async function sync(force=false){
       if(typeof lockedGames!=='undefined'&&d.startersGames&&typeof d.startersGames==='object')lockedGames=d.startersGames;
       reconcile();
     }else if(r.status===403){
-      /* Normal read-only case: this roster belongs to another manager. Never retry private sync for this roster during this page session. */
       state.privateDenied.add(key);state.data=null;state.lastKey=key;state.status='public';state.message='';reconcile();
     }else{
       state.status='error';state.message=`HTTP ${r.status}: ${d.error||d.detail||'Sleeper lock-state request failed.'}`;reconcile();
