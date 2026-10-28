@@ -21,6 +21,10 @@ const css=`
 #teamView .rb-lock-total small{margin-top:3px;font-size:6px;color:#7f8da2;font-weight:800;white-space:nowrap}
 #teamView .proj.rb-fallback-proj{color:#e6b95a!important;position:relative}
 #teamView .proj.rb-fallback-proj::after{content:'~';font-size:7px;margin-left:2px;color:#9b8a61;vertical-align:top}
+#teamView .rb-injury-badge,#matchupView .rb-injury-badge{display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-left:5px!important;padding:1px 5px!important;border-radius:4px!important;font-size:7px!important;font-weight:950!important;line-height:1.3!important;letter-spacing:.03em!important;vertical-align:middle!important}
+#teamView .rb-injury-badge.out,#matchupView .rb-injury-badge.out{background:rgba(239,102,128,.16)!important;color:#ff8fa7!important;border:1px solid rgba(239,102,128,.35)!important}
+#teamView .rb-injury-badge.questionable,#matchupView .rb-injury-badge.questionable{background:rgba(243,199,91,.13)!important;color:#ffd86f!important;border:1px solid rgba(243,199,91,.28)!important}
+#teamView .rb-injury-badge.ir,#matchupView .rb-injury-badge.ir{background:rgba(169,106,255,.14)!important;color:#c79aff!important;border:1px solid rgba(169,106,255,.3)!important}
 @media(max-width:1050px){#teamView .rb-lock-totals{display:none}}
 `;
 function addStyle(){if(document.getElementById('rbLockSyncStyle'))return;const s=document.createElement('style');s.id='rbLockSyncStyle';s.textContent=css;document.head.appendChild(s)}
@@ -51,14 +55,32 @@ function publicLockedPlayersForRoster(rid){
       if(pid&&starters.includes(pid))out.add(pid);
     }
   }
-  const starterPoints=Array.isArray(m.starters_points)?m.starters_points:[];
-  starters.forEach((pid,i)=>{const pts=Number(starterPoints[i]);if(pid!=='0'&&Number.isFinite(pts)&&Math.abs(pts)>0.0001)out.add(pid)});
   return out;
 }
 function lockedPlayersForRoster(rid){
   const out=publicLockedPlayersForRoster(rid);
   if(Number(rid)===Number(selectedRoster))for(const pid of weekLockedPlayers())out.add(pid);
   return out;
+}
+function normalizeInjuryStatus(p){
+  const raw=String(p?.injury_status||p?.injuryStatus||'').trim().toUpperCase();
+  const status=String(p?.status||'').trim().toUpperCase();
+  const candidate=raw||(['OUT','DTD','GTD','Q','QUESTIONABLE','DOUBTFUL','IR','INJURED_RESERVE','OFS','SUSPENDED','INACTIVE'].includes(status)?status:'');
+  const aliases={QUESTIONABLE:'Q',DOUBTFUL:'DTD',INJURED_RESERVE:'IR',DAY_TO_DAY:'DTD',GAME_TIME_DECISION:'GTD'};
+  return aliases[candidate]||candidate;
+}
+function injuryClass(status){if(['OUT','OFS','SUSPENDED','INACTIVE'].includes(status))return'out';if(['DTD','GTD','Q'].includes(status))return'questionable';if(status==='IR')return'ir';return''}
+function isUnavailable(pid){const s=normalizeInjuryStatus(currentData?.players?.[String(pid)]);return ['OUT','IR','OFS','SUSPENDED','INACTIVE'].includes(s)}
+function decorateInjuries(root=document){
+  const names=playerNameMap();
+  root.querySelectorAll?.('.player-row').forEach(row=>{
+    const pid=rowPlayerId(row,names);if(!pid)return;
+    const p=currentData?.players?.[String(pid)]||{};const status=normalizeInjuryStatus(p);const name=row.querySelector('.pname');if(!name)return;
+    let badge=row.querySelector('.rb-injury-badge');
+    if(!status){badge?.remove();return}
+    if(!badge){badge=document.createElement('span');badge.className='rb-injury-badge';name.insertAdjacentElement('afterend',badge)}
+    badge.className=`rb-injury-badge ${injuryClass(status)}`;badge.textContent=status;badge.title=`Sleeper injury status: ${status}`;
+  });
 }
 function projectionGamesFor(pid){const p=currentData?.projections?.[String(pid)];return Array.isArray(p?.games)?p.games:[]}
 function scheduleGameForProjection(pg,pid){
@@ -68,14 +90,17 @@ function scheduleGameForProjection(pg,pid){
   return schedule.find(g=>String(g.date||'')===date&&(!team||g.home===team||g.away===team))||null;
 }
 function hasFutureLockableGame(pid){
+  if(isUnavailable(pid))return false;
   const team=String(currentData?.players?.[String(pid)]?.team||'');
   return (currentData?.schedule||[]).some(g=>!g.calendar_only&&String(g.status||'pre_game')==='pre_game'&&(!team||g.home===team||g.away===team));
 }
 function fallbackProjection(pid,rid=selectedRoster){
+  if(isUnavailable(pid))return null;
   const d=state.fallbackStats.get(statsKey(rid));const p=d?.players?.[String(pid)];
   const v=Number(p?.fantasy_points_avg);return Number.isFinite(v)&&v>0?v:null;
 }
 function bestRemainingProjection(pid,rid=selectedRoster){
+  if(isUnavailable(pid))return null;
   let best=null;
   for(const pg of projectionGamesFor(pid)){
     const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;
@@ -98,51 +123,63 @@ function decorateFallbackProjections(rid=selectedRoster){
   const names=playerNameMap();
   document.querySelectorAll('#teamView .player-row').forEach(row=>{
     const pid=rowPlayerId(row,names),cell=row.querySelector('.proj');if(!pid||!cell)return;
+    if(isUnavailable(pid)){
+      if(cell.classList.contains('rb-fallback-proj')){cell.textContent='—';cell.classList.remove('rb-fallback-proj');cell.removeAttribute('title')}
+      return;
+    }
     const native=String(cell.textContent||'').trim();
     if(native&&native!=='—'&&native!=='-'){cell.classList.remove('rb-fallback-proj');cell.removeAttribute('title');return}
     const v=fallbackProjection(pid,rid);if(v===null)return;
     cell.textContent=num1(v);cell.classList.add('rb-fallback-proj');cell.title='Estimated from season per-game fantasy average because Sleeper has no projection for this player.';
   });
 }
+function verifiedLockedTotal(rid){
+  const m=publicMatchupForRoster(rid);if(!m)return null;
+  const locked=lockedPlayersForRoster(rid);if(!locked.size)return null;
+  const starters=(m.starters||[]).map(String),pts=Array.isArray(m.starters_points)?m.starters_points:[];
+  let total=0,used=0;starters.forEach((pid,i)=>{if(!locked.has(pid))return;const v=Number(pts[i]);if(Number.isFinite(v)){total+=v;used++}});
+  return used?total:null;
+}
 function lockTotalsForRoster(rid){
-  const m=publicMatchupForRoster(rid);if(!m)return{locked:0,projected:0,remaining:0,totalStarters:0};
+  const m=publicMatchupForRoster(rid);if(!m)return{locked:null,projected:null,remaining:0,totalStarters:0,knownLocks:0};
   const starters=(m.starters||[]).map(String).filter(id=>id&&id!=='0');
   const lockedPlayers=lockedPlayersForRoster(rid);
-  const locked=Number(m.points)||0;
-  let projected=locked,remaining=0;
+  const locked=verifiedLockedTotal(rid);
+  let projected=locked===null?0:locked,remaining=0;
   for(const pid of starters){
     if(lockedPlayers.has(pid))continue;
     const best=bestRemainingProjection(pid,rid);
     if(best!==null){projected+=best;remaining++}
   }
-  return{locked,projected,remaining,totalStarters:starters.length};
+  return{locked,projected:projected||null,remaining,totalStarters:starters.length,knownLocks:lockedPlayers.size};
 }
 function renderLockTotals(){
   const top=document.querySelector('#teamView .team-top');if(!top)return;
   let box=top.querySelector('.rb-lock-totals');if(!box){box=document.createElement('div');box.className='rb-lock-totals';const weekNav=top.querySelector('.week-nav');if(weekNav)top.insertBefore(box,weekNav);else top.appendChild(box)}
-  const totals=lockTotalsForRoster(selectedRoster);
-  box.innerHTML=`<div class="rb-lock-total locked"><span>Locked Points</span><b>${num1(totals.locked)}</b><small>${totals.totalStarters-totals.remaining} of ${totals.totalStarters} counted</small></div><div class="rb-lock-total projected"><span>Projected Lock-In</span><b>${num1(totals.projected)}</b><small>best remaining game / player</small></div>`;
+  const totals=lockTotalsForRoster(selectedRoster),lockedText=totals.locked===null?'—':num1(totals.locked),projectedText=totals.projected===null?'—':num1(totals.projected);
+  box.innerHTML=`<div class="rb-lock-total locked"><span>Locked Points</span><b>${lockedText}</b><small>${totals.knownLocks} verified locks</small></div><div class="rb-lock-total projected"><span>Projected Lock-In</span><b>${projectedText}</b><small>best remaining game / player</small></div>`;
 }
 function ensureLockedChip(row){if(!row)return;row.classList.remove('lockable','editable');row.classList.add('locked-in');row.setAttribute('aria-disabled','true');const copy=row.querySelector('.player-copy')||row.querySelector('.player-info')||row;const chips=[...row.querySelectorAll('.lock-chip')];let chip=chips[0];if(!chip){chip=document.createElement('span');chip.className='lock-chip'}chip.textContent='LOCKED IN';chip.setAttribute('aria-label','Locked in on Sleeper');chips.slice(1).forEach(x=>x.remove());row.querySelectorAll('.lock-btn').forEach(x=>x.remove());const meta=row.querySelector('.matchup-meta');if(meta&&chip.parentElement!==meta)meta.appendChild(chip);else if(!meta&&chip.parentElement!==copy)copy.appendChild(chip)}
 function reconcileTeam(){
   document.querySelectorAll('#teamView [data-lock-player][data-lock-game]').forEach(btn=>{if(!isLocked(btn.dataset.lockPlayer,btn.dataset.lockGame))return;const row=btn.closest('.player-row');btn.remove();ensureLockedChip(row)});
   const locked=lockedPlayersForRoster(selectedRoster);
   if(locked.size){const names=playerNameMap();document.querySelectorAll('#teamView .player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)})}
-  decorateFallbackProjections(selectedRoster);renderLockTotals();ensureFallbackStats(selectedRoster);
+  decorateInjuries(document.getElementById('teamView')||document);decorateFallbackProjections(selectedRoster);renderLockTotals();ensureFallbackStats(selectedRoster);
 }
 function reconcileMatchup(){
   const root=document.getElementById('matchupView');if(!root)return;
-  const rosters=[...root.querySelectorAll('.match-roster')];if(!rosters.length)return;
+  const rosters=[...root.querySelectorAll('.match-roster')];if(!rosters.length){decorateInjuries(root);return}
   let me=null,opp=null;try{me=publicMatchupForRoster(selectedRoster);opp=(currentData?.matchups||[]).find(x=>me&&x.matchup_id===me.matchup_id&&Number(x.roster_id)!==Number(selectedRoster))||null}catch{}
   const matchupRows=[me,opp],names=playerNameMap();
   rosters.forEach((container,index)=>{
     const m=matchupRows[index];if(!m)return;const locked=lockedPlayersForRoster(m.roster_id);if(!locked.size)return;
     container.querySelectorAll('.player-row').forEach(row=>{const pid=rowPlayerId(row,names);if(pid&&locked.has(pid))ensureLockedChip(row)});
   });
+  decorateInjuries(root);
 }
 function reconcile(){reconcileTeam();reconcileMatchup()}
 function count(v){return v&&typeof v==='object'?Object.keys(v).length:0}
-function diagnosticText(){if(state.status==='public')return'Viewing public counted starter lock state for this roster.';if(state.status==='missing-token')return'No Sleeper session token found in this tab.';if(state.status==='error')return state.message||'Unknown lock sync error.';const d=state.data;if(!d)return state.message||'Waiting for private Sleeper lock state…';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
+function diagnosticText(){if(state.status==='public')return'Viewing public lock fields for this roster; no private opponent lock inference.';if(state.status==='missing-token')return'No Sleeper session token found in this tab.';if(state.status==='error')return state.message||'Unknown lock sync error.';const d=state.data;if(!d)return state.message||'Waiting for private Sleeper lock state…';return `round ${d.chosenRound??selectedWeek} · starters_games ${count(d.startersGames)} · player_map ${count(d.playerMap)} · custom_points ${count(d.customPoints)} · subs ${count(d.subs)}`}
 function showDiagnostic(){const host=document.getElementById('activityBody');if(!host)return;let el=document.getElementById('rbLockDebug');if(!el){el=document.createElement('div');el.id='rbLockDebug';el.className='rb-lock-debug';host.appendChild(el)}el.classList.toggle('error',state.status==='error'||state.status==='missing-token');el.classList.toggle('ok',state.status==='ok'||state.status==='cached'||state.status==='public');const html=`<strong>Lock sync${state.status==='ok'?' OK':state.status==='cached'?' CACHED':state.status==='public'?' PUBLIC':state.status==='error'?' ERROR':''}</strong><br><code>${diagnosticText()}</code>`;if(el.innerHTML!==html)el.innerHTML=html}
 function hydrateCache(){const cached=readCache();if(!cached?.data)return false;state.data=cached.data;state.lastKey=currentKey();state.status='cached';if(typeof lockedGames!=='undefined'&&state.data.startersGames&&typeof state.data.startersGames==='object')lockedGames=state.data.startersGames;reconcile();showDiagnostic();return true}
 async function sync(force=false){
