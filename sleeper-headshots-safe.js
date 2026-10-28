@@ -70,7 +70,6 @@ function trySource(head,id,urls,index=0){
     trySource(head,id,urls,index+1);
   };
 
-  // Start the visible request immediately instead of waiting for a probe cycle.
   head.style.backgroundImage=`url("${url}")`;
   img.onload=()=>{
     if(settled)return;
@@ -116,9 +115,6 @@ function apply(){
   return painted;
 }
 
-// Async Sleeper data and several UI decorators can finish on adjacent frames.
-// Run a small bounded burst so avatar loading starts with the roster render,
-// rather than waiting for a user click or unrelated mutation.
 let burstToken=0;
 function paintBurst(){
   const token=++burstToken;
@@ -142,7 +138,6 @@ function hookRenderTeam(){
       return out;
     };
     hooked.__rbAvatarHook=true;
-    // Preserve flags used by the stability wrapper when present.
     if(base.__rbStable) hooked.__rbStable=true;
     renderTeam=hooked;
     try{window.renderTeam=hooked}catch{}
@@ -150,19 +145,33 @@ function hookRenderTeam(){
   }catch{return false}
 }
 
+// Starter-first swaps can lose selection when later decorators rerender the Team DOM.
+// Capture the intended starter slot one event earlier than click so the existing
+// symmetric swap layer sees the correct selectedStarterIndex when bench is clicked.
+document.addEventListener('pointerdown',e=>{
+  try{
+    const row=e.target.closest?.('#teamView [data-starter-index]');
+    if(!row)return;
+    if(row.classList.contains('rb-slot-pinned')||row.classList.contains('locked-in')||row.classList.contains('locked'))return;
+    if(!row.classList.contains('editable'))return;
+    const idx=Number(row.dataset.starterIndex);
+    if(!Number.isInteger(idx))return;
+    selectedStarterIndex=idx;
+    document.querySelectorAll('#teamView [data-starter-index].selected').forEach(r=>r.classList.remove('selected'));
+    row.classList.add('selected');
+  }catch{}
+},true);
+
 addStyle();
 hookRenderTeam();
 paintBurst();
 
-// If this enhancement script executes before the base page defines renderTeam,
-// retry briefly and then stop. No permanent polling loop.
 let hookAttempts=0;
 const hookTimer=setInterval(()=>{
   hookAttempts++;
   if(hookRenderTeam()||hookAttempts>=20) clearInterval(hookTimer);
 },50);
 
-// Keep the observer only as a safety net for third-party decorators.
 let timer=null;
 function schedule(){clearTimeout(timer);timer=setTimeout(paintBurst,0)}
 const root=document.getElementById('teamView');
