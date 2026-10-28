@@ -1,6 +1,9 @@
 (()=>{
 const pending=new Map();
 const loaded=new Map();
+const failedUntil=new Map();
+const PROBE_TIMEOUT=1200;
+const RETRY_AFTER=5*60*1000;
 
 const css=`
 #teamView .player-head.rb-photo-ready{background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#1f2c3d!important}
@@ -39,20 +42,35 @@ function sourceUrls(id){
   const urls=[];
   if(/^\d{1,12}$/.test(espn)){
     const remote=`https://a.espncdn.com/i/headshots/nba/players/full/${encodeURIComponent(espn)}.png`;
-    urls.push(`https://statdunk.com/_vercel/image?url=${encodeURIComponent(remote)}&w=96&q=85`);
+    // ESPN's CDN is normally the fastest path and is browser-cache friendly.
+    urls.push(remote);
+    // Same-origin fallback avoids a slow/blocked third-party request path.
     urls.push(`/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}&espn=${encodeURIComponent(espn)}`);
+    // Keep StatDunk only as a last resort rather than blocking every avatar on it.
+    urls.push(`https://statdunk.com/_vercel/image?url=${encodeURIComponent(remote)}&w=96&q=80`);
   }else{
     urls.push(`/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}`);
   }
   return urls;
 }
 
-function probe(url){
+function probe(url,timeout=PROBE_TIMEOUT){
   return new Promise(resolve=>{
     const img=new Image();
-    img.onload=()=>resolve(url);
-    img.onerror=()=>resolve('');
+    let done=false;
+    const finish=value=>{
+      if(done)return;
+      done=true;
+      clearTimeout(timer);
+      img.onload=null;
+      img.onerror=null;
+      resolve(value);
+    };
+    const timer=setTimeout(()=>finish(''),timeout);
+    img.onload=()=>finish(url);
+    img.onerror=()=>finish('');
     img.decoding='async';
+    img.fetchPriority='high';
     img.src=url;
   });
 }
@@ -60,13 +78,19 @@ function probe(url){
 async function loadHeadshot(id){
   id=String(id);
   if(loaded.has(id)) return loaded.get(id);
+  if((failedUntil.get(id)||0)>Date.now()) return'';
   if(pending.has(id)) return pending.get(id);
   const promise=(async()=>{
-    for(const url of sourceUrls(id)){
-      const ok=await probe(url);
-      if(ok){loaded.set(id,ok);pending.delete(id);return ok}
+    try{
+      for(const url of sourceUrls(id)){
+        const ok=await probe(url);
+        if(ok){loaded.set(id,ok);failedUntil.delete(id);return ok}
+      }
+      failedUntil.set(id,Date.now()+RETRY_AFTER);
+      return'';
+    }finally{
+      pending.delete(id);
     }
-    pending.delete(id);return'';
   })();
   pending.set(id,promise);
   return promise;
@@ -83,6 +107,22 @@ async function paintRow(row,id){
   head.classList.add('rb-photo-ready');
 }
 
+function visibleIds(){
+  const root=document.getElementById('teamView');
+  if(!root)return[];
+  const map=playerMap(),ids=[];
+  for(const row of root.querySelectorAll('.player-row')){
+    const id=rowPlayerId(row,map);
+    if(id&&!ids.includes(id))ids.push(id);
+  }
+  return ids;
+}
+
+function preloadVisible(){
+  // Start requests immediately but don't wait for them before the page is usable.
+  for(const id of visibleIds()) loadHeadshot(id);
+}
+
 function apply(){
   const root=document.getElementById('teamView');
   if(!root) return;
@@ -93,8 +133,10 @@ function apply(){
 
 addStyle();
 let timer=null;
-function schedule(){clearTimeout(timer);timer=setTimeout(apply,25)}
+function schedule(){clearTimeout(timer);timer=setTimeout(()=>{preloadVisible();apply()},20)}
 const root=document.getElementById('teamView');
 if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
-setTimeout(apply,40);window.addEventListener('focus',apply);
+setTimeout(()=>{preloadVisible();apply()},20);
+setTimeout(()=>{preloadVisible();apply()},250);
+window.addEventListener('focus',()=>{preloadVisible();apply()});
 })();
