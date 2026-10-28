@@ -14,8 +14,7 @@
   }
   function chooseDefault(ps){
     if(!ps.length){state.pairIndex=0;return}
-    const wanted=Number(selectedRoster);
-    const i=ps.findIndex(p=>p.rows.some(r=>Number(r.roster_id)===wanted));
+    const wanted=Number(selectedRoster),i=ps.findIndex(p=>p.rows.some(r=>Number(r.roster_id)===wanted));
     if(i>=0)state.pairIndex=i;else state.pairIndex=Math.min(state.pairIndex,ps.length-1);
   }
   function readCache(){
@@ -45,9 +44,7 @@
     if(!games||typeof games!=='object'||Array.isArray(games))return out;
     for(const [k,v] of Object.entries(games)){
       if(valid.has(String(k)))out.add(String(k));
-      if(v&&typeof v==='object'){
-        const pid=String(v.player_id??v.playerId??v.player??v.pid??'');if(valid.has(pid))out.add(pid);
-      }
+      if(v&&typeof v==='object'){const pid=String(v.player_id??v.playerId??v.player??v.pid??'');if(valid.has(pid))out.add(pid)}
     }
     return out;
   }
@@ -71,6 +68,18 @@
     return `<div class="match-roster">${starters.map((id,i)=>locked.has(id)?lockedRow(id,m,labels[i]||'UTIL'):emptySlotRow(labels[i]||'UTIL')).join('')}</div>`;
   }
   function teamNameFor(m){const t=team(m?.roster_id);return t?.team_name||'Team'}
+  function avatarUrl(t){
+    const raw=t?.avatar_url??t?.avatar??t?.metadata?.avatar_url??t?.metadata?.avatar??'';
+    if(!raw)return'';
+    const s=String(raw);return /^https?:\/\//i.test(s)?s:`https://sleepercdn.com/avatars/thumbs/${encodeURIComponent(s)}`;
+  }
+  function teamAvatar(t){
+    const url=avatarUrl(t),initial=esc(String(t?.team_name||t?.display_name||'T').trim().charAt(0).toUpperCase()||'T');
+    return `<div class="rb-match-team-avatar">${url?`<img src="${esc(url)}" alt="" onerror="this.remove()">`:''}<span>${initial}</span></div>`;
+  }
+  function teamHeader(t,score,side){
+    return `<div class="rb-match-team-block ${side==='right'?'rb-match-team-block--right':''}">${teamAvatar(t)}<div class="rb-match-team-copy"><div class="match-team">${esc(t?.team_name||'Team')}</div><div class="match-owner">${esc(t?.display_name||'')}</div><div class="rb-team-locked-score">${score==null?'—':num(score)} <span>locked</span></div></div></div>`;
+  }
   function selectorHtml(ps){return `<div class="rb-match-nav"><button type="button" id="rbPrevMatch" ${state.pairIndex<=0?'disabled':''}>‹</button><select id="rbMatchSelect">${ps.map((p,i)=>{const a=p.rows[0],b=p.rows[1];return `<option value="${i}" ${i===state.pairIndex?'selected':''}>${esc(teamNameFor(a))} vs ${esc(teamNameFor(b))}</option>`}).join('')}</select><button type="button" id="rbNextMatch" ${state.pairIndex>=ps.length-1?'disabled':''}>›</button></div>`}
   function bindNav(ps){
     document.getElementById('rbPrevMatch')?.addEventListener('click',()=>{state.pairIndex=Math.max(0,state.pairIndex-1);paint(readCache())});
@@ -85,14 +94,26 @@
     const pair=ps[Math.min(state.pairIndex,ps.length-1)],aM=pair.rows[0],bM=pair.rows[1],aT=team(aM?.roster_id),bT=team(bM?.roster_id);
     const aExact=exactState?.byRoster?.[String(aM?.roster_id)],bExact=exactState?.byRoster?.[String(bM?.roster_id)];
     if(!exactState){
-      root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser"><div><div class="match-team">${esc(aT?.team_name||'Team')}</div><div class="match-owner">${esc(aT?.display_name||'')}</div></div><div class="score"><div>— · —</div><div class="vs">LOCKED POINTS</div><div class="score-proj">Loading exact Lock-In data…</div></div><div class="right"><div class="match-team">${esc(bT?.team_name||'Opponent')}</div><div class="match-owner">${esc(bT?.display_name||'')}</div></div></div>${selectorHtml(ps)}<div class="match-columns"><div class="match-roster"><div class="empty">Loading locks…</div></div><div class="match-roster"><div class="empty">Loading locks…</div></div></div></div>`;bindNav(ps);return;
+      root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,null,'left')}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Loading exact Lock-In data…</div></div>${teamHeader(bT,null,'right')}</div>${selectorHtml(ps)}<div class="match-columns"><div class="match-roster"><div class="empty">Loading locks…</div></div><div class="match-roster"><div class="empty">Loading locks…</div></div></div></div>`;bindNav(ps);return;
     }
-    const aLocked=lockedIds(aExact,aM),bLocked=lockedIds(bExact,bM),aScore=lockedTotal(aM,aLocked),bScore=lockedTotal(bM,bLocked);
-    const aProj=teamProjection(aM,'all'),bProj=teamProjection(bM,'all');
-    root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser"><div><div class="match-team">${esc(aT?.team_name||'Team')}</div><div class="match-owner">${esc(aT?.display_name||'')}</div></div><div class="score"><div>${num(aScore)} · ${num(bScore)}</div><div class="vs">LOCKED POINTS</div><div class="score-proj">Proj ${aProj===null?'—':num(aProj)} · ${bProj===null?'—':num(bProj)}</div></div><div class="right"><div class="match-team">${esc(bT?.team_name||'Opponent')}</div><div class="match-owner">${esc(bT?.display_name||'')}</div></div></div>${selectorHtml(ps)}<div class="match-columns">${rosterHtml(aM,aExact)}${rosterHtml(bM,bExact)}</div></div>`;
+    const aLocked=lockedIds(aExact,aM),bLocked=lockedIds(bExact,bM),aScore=lockedTotal(aM,aLocked),bScore=lockedTotal(bM,bLocked),aProj=teamProjection(aM,'all'),bProj=teamProjection(bM,'all');
+    root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,aScore,'left')}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Proj ${aProj===null?'—':num(aProj)} · ${bProj===null?'—':num(bProj)}</div></div>${teamHeader(bT,bScore,'right')}</div>${selectorHtml(ps)}<div class="match-columns">${rosterHtml(aM,aExact)}${rosterHtml(bM,bExact)}</div></div>`;
     bindNav(ps);
   }
   const style=document.createElement('style');style.textContent=`
+    #matchupView .match-top.rb-match-browser{grid-template-columns:minmax(0,1fr) 190px minmax(0,1fr);gap:14px;padding:14px 16px}
+    #matchupView .rb-match-team-block{display:flex;align-items:center;gap:10px;min-width:0}
+    #matchupView .rb-match-team-block--right{justify-content:flex-end;text-align:right;flex-direction:row-reverse}
+    #matchupView .rb-match-team-avatar{width:42px;height:42px;border-radius:10px;overflow:hidden;position:relative;flex:0 0 42px;background:#192332;border:1px solid #42516a;display:grid;place-items:center;color:#dce5f1;font-size:14px;font-weight:900}
+    #matchupView .rb-match-team-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#202a3a}
+    #matchupView .rb-match-team-avatar span{position:relative;z-index:1}
+    #matchupView .rb-match-team-copy{min-width:0}
+    #matchupView .rb-match-team-block .match-team{font-size:12px}
+    #matchupView .rb-team-locked-score{margin-top:5px;color:#43e3b0;font-size:18px;font-weight:950;line-height:1}
+    #matchupView .rb-team-locked-score span{font-size:7px;color:#81a79d;text-transform:uppercase;letter-spacing:.07em;margin-left:3px;vertical-align:middle}
+    #matchupView .rb-match-center{text-align:center;align-self:center}
+    #matchupView .rb-match-center .vs{font-size:8px;font-weight:900;letter-spacing:.08em;color:#93a1b5;margin:0 0 5px}
+    #matchupView .rb-match-center .score-proj{font-size:8px}
     #matchupView .rb-match-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;background:#182231;border-top:1px solid #2d3a4d;border-bottom:1px solid #2d3a4d}
     #matchupView .rb-match-nav button,#matchupView .rb-match-nav select{height:28px;border:1px solid #3a4a61;background:#243146;color:#dce5f1;border-radius:6px;font-size:9px;font-weight:800}
     #matchupView .rb-match-nav button{width:30px;font-size:16px}#matchupView .rb-match-nav button:disabled{opacity:.35;cursor:default}
@@ -105,6 +126,7 @@
     #matchupView .rb-match-empty-slot .pmeta{color:#66758a!important}
     #matchupView .rb-match-empty-slot .player-head{background:#1a2432!important;border-style:dashed!important;color:#6d7b8f!important}
     #matchupView .rb-match-empty-slot .pts,#matchupView .rb-match-empty-slot .proj{color:#66758a!important}
+    @media(max-width:760px){#matchupView .match-top.rb-match-browser{grid-template-columns:1fr 1fr}#matchupView .rb-match-center{grid-column:1/-1;grid-row:2}#matchupView .rb-match-team-avatar{width:36px;height:36px;flex-basis:36px}#matchupView .rb-team-locked-score{font-size:15px}}
   `;document.head.appendChild(style);
   async function renderExact(){const cached=readCache();paint(cached);const fresh=await fetchExact(false);if(fresh)paint(fresh)}
   try{renderMatchup=renderExact;window.renderMatchup=renderExact}catch{}
