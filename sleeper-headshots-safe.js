@@ -6,7 +6,10 @@ const RETRY_AFTER=5*60*1000;
 const css=`
 #teamView .player-head.rb-photo-ready{background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#1f2c3d!important}
 #teamView .player-head.rb-photo-ready .player-fallback{opacity:0!important;visibility:hidden!important}
-#teamView .player-head img.rb-sleeper-headshot{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+/* All visible roster avatars are owned by the stable background painter. Legacy/base
+   inline img nodes may still be added/removed by older decorators, but they must never
+   affect what the user sees. */
+#teamView .player-head > img{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 `;
 
 function addStyle(){
