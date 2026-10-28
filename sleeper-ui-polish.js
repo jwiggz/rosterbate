@@ -25,22 +25,23 @@ const css=`
 }
 #teamView .player-row:not(.locked-in) .lock-btn:hover{color:#eafff7!important;border-color:transparent!important;background:linear-gradient(#17634e,#17634e) padding-box,linear-gradient(110deg,#238d69 0%,#30d8a0 22%,#d8fff0 43%,#9cf6d7 50%,#45e1ac 58%,#2aaa80 76%,#238d69 100%) border-box!important;background-size:100% 100%,240% 100%!important;animation:rbLockReadyHover .55s linear infinite!important}
 
-/* Actual locked state stays green/static, but uses the exact same box as LOCK IN. */
-#teamView .lock-chip{box-sizing:border-box!important;margin-left:8px!important;margin-top:-1px!important;margin-bottom:-1px!important;width:82px!important;min-width:82px!important;height:28px!important;min-height:28px!important;padding:0 8px!important;border:1px solid #2f9d79!important;border-radius:7px!important;background:#174d40!important;color:#8ff2cf!important;font-size:9px!important;line-height:26px!important;font-weight:900!important;letter-spacing:.03em!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;vertical-align:middle!important;gap:5px!important;box-shadow:0 2px 8px rgba(0,0,0,.18)!important;white-space:nowrap!important;animation:none!important;transform:none!important;transition:none!important}
-#teamView .lock-chip::before{content:'🔒';font-size:10px;line-height:1;animation:none!important}
+/* Locked rows remain static; lock status now lives in the PTS pill instead of beside the player name. */
+#teamView .lock-chip{display:none!important}
 #teamView .player-row.locked-in .player-copy::before,#teamView .player-row.locked-in .player-copy::after,#teamView .player-row.locked-in .matchup-meta::before,#teamView .player-row.locked-in .matchup-meta::after{content:none!important;display:none!important;animation:none!important}
 #teamView .player-row.locked-in{opacity:1!important;background:linear-gradient(90deg,rgba(48,216,160,.12),rgba(48,216,160,.025) 55%,transparent)!important;box-shadow:inset 3px 0 0 rgba(48,216,160,.7)!important;animation:none!important;transform:none!important}
-#teamView .player-row.locked-in .lock-btn{animation:none!important}
+#teamView .player-row.locked-in .lock-btn{display:none!important;animation:none!important}
 
 /* Make the far-right fantasy-point result read as the outcome of the row. */
-#teamView .player-row.rb-stats-row > .pts{justify-self:center!important;align-self:center!important;box-sizing:border-box!important;width:54px!important;min-width:54px!important;height:34px!important;min-height:34px!important;padding:0 8px!important;border-radius:8px!important;border:1px solid rgba(48,216,160,.18)!important;background:linear-gradient(180deg,rgba(19,78,62,.42),rgba(9,43,35,.34))!important;color:#37efb2!important;font-size:13px!important;font-weight:950!important;line-height:1!important;text-align:center!important;text-shadow:0 0 8px rgba(55,239,178,.32)!important;box-shadow:inset 0 0 10px rgba(48,216,160,.045),0 1px 5px rgba(0,0,0,.14)!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#teamView .player-row.rb-stats-row > .pts{justify-self:center!important;align-self:center!important;box-sizing:border-box!important;width:54px!important;min-width:54px!important;height:34px!important;min-height:34px!important;padding:0 8px!important;border-radius:8px!important;border:1px solid rgba(48,216,160,.18)!important;background:linear-gradient(180deg,rgba(19,78,62,.42),rgba(9,43,35,.34))!important;color:#37efb2!important;font-size:13px!important;font-weight:950!important;line-height:1!important;text-align:center!important;text-shadow:0 0 8px rgba(55,239,178,.32)!important;box-shadow:inset 0 0 10px rgba(48,216,160,.045),0 1px 5px rgba(0,0,0,.14)!important;display:flex!important;align-items:center!important;justify-content:center!important;position:relative!important;overflow:visible!important}
+#teamView .player-row.locked-in.rb-stats-row > .pts{width:68px!important;min-width:68px!important;height:42px!important;min-height:42px!important;padding:14px 7px 3px!important;border:2px solid #30d8a0!important;background:linear-gradient(180deg,rgba(20,95,73,.72),rgba(9,48,38,.62))!important;color:#7ff0ca!important;box-shadow:0 0 0 1px rgba(48,216,160,.18),0 0 14px rgba(48,216,160,.34),inset 0 0 12px rgba(48,216,160,.1)!important}
+#teamView .player-row.locked-in.rb-stats-row > .pts::before{content:'LOCKED IN';position:absolute;top:4px;left:0;right:0;text-align:center;color:#b9ffe9;font-size:6px;font-weight:950;letter-spacing:.08em;line-height:1;text-shadow:0 0 5px rgba(48,216,160,.42)}
 
 /* Empty IR capacity should look usable, not like a phantom player. */
 #teamView .ir-list .rb-empty-ir-slot{opacity:.72!important;border-top:1px dashed rgba(239,102,128,.28)!important;background:linear-gradient(90deg,rgba(239,102,128,.055),rgba(39,39,53,.65))!important}
 #teamView .ir-list .rb-empty-ir-slot .pname{color:#cfd8e5!important}
 #teamView .ir-list .rb-empty-ir-slot .pmeta{color:#8693a7!important}
 
-@media(max-width:1250px){#teamView .columns-head.rb-stats-cols,#teamView .player-row.rb-stats-row{grid-template-columns:38px minmax(190px,.68fr) minmax(590px,1.65fr) 60px 60px!important}#teamView .player-row.rb-stats-row > .proj,#teamView .columns-head.rb-stats-cols > :nth-last-child(2){transform:translateX(-8px)!important}}
+@media(max-width:1250px){#teamView .columns-head.rb-stats-cols,#teamView .player-row.rb-stats-row{grid-template-columns:38px minmax(190px,.68fr) minmax(590px,1.65fr) 60px 60px!important}#teamView .player-row.rb-stats-row > .proj,#teamView .columns-head.rb-stats-cols > :nth-last-child(2){transform:translateX(-8px)!important}#teamView .player-row.locked-in.rb-stats-row > .pts{width:60px!important;min-width:60px!important}}
 `;
 const params=new URLSearchParams(location.search);
 const leagueId=String(params.get('league')||'');
@@ -72,8 +73,12 @@ function configuredIrSlots(){
   return target;
 }
 function normalizeRow(row){
-  const name=row.querySelector('.pname');if(name)name.textContent=name.textContent.replace(/\s*\(locked\)\s*$/i,'').trim();if(!row.classList.contains('locked-in'))return;
-  const copy=row.querySelector('.player-copy');if(!copy)return;const chips=[...row.querySelectorAll('.lock-chip')];let chip=chips[0]||null;if(!chip){chip=document.createElement('span');chip.className='lock-chip'}chip.textContent='LOCKED IN';chip.setAttribute('aria-label','Locked in on Sleeper');chip.style.animation='none';chip.style.transform='none';chips.slice(1).forEach(x=>x.remove());row.querySelectorAll('.lock-btn').forEach(x=>x.remove());const meta=copy.querySelector('.matchup-meta');if(meta){if(chip.parentElement!==meta)meta.appendChild(chip)}else if(chip.parentElement!==copy){copy.appendChild(chip)}
+  const name=row.querySelector('.pname');if(name)name.textContent=name.textContent.replace(/\s*\(locked\)\s*$/i,'').trim();
+  if(!row.classList.contains('locked-in'))return;
+  row.querySelectorAll('.lock-chip').forEach(x=>x.remove());
+  row.querySelectorAll('.lock-btn').forEach(x=>x.remove());
+  const pts=row.querySelector(':scope > .pts');
+  if(pts){pts.setAttribute('aria-label',`Locked in fantasy points ${pts.textContent.trim()}`);pts.title='LOCKED IN'}
 }
 function ensureIrCapacity(){
   const ir=document.querySelector('#teamView .ir-list');if(!ir)return false;const target=configuredIrSlots();if(!target)return false;
