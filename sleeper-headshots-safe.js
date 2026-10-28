@@ -70,6 +70,8 @@ function trySource(head,id,urls,index=0){
     trySource(head,id,urls,index+1);
   };
 
+  // Start the visible request immediately instead of waiting for a probe cycle.
+  head.style.backgroundImage=`url("${url}")`;
   img.onload=()=>{
     if(settled)return;
     settled=true;
@@ -104,20 +106,66 @@ function paintRow(row,id){
 
 function apply(){
   const root=document.getElementById('teamView');
-  if(!root) return;
+  if(!root) return 0;
   const map=playerMap();
+  let painted=0;
   for(const row of root.querySelectorAll('.player-row')){
     const id=rowPlayerId(row,map);
-    if(id) paintRow(row,id);
+    if(id){paintRow(row,id);painted++}
   }
+  return painted;
+}
+
+// Async Sleeper data and several UI decorators can finish on adjacent frames.
+// Run a small bounded burst so avatar loading starts with the roster render,
+// rather than waiting for a user click or unrelated mutation.
+let burstToken=0;
+function paintBurst(){
+  const token=++burstToken;
+  let pass=0;
+  const tick=()=>{
+    if(token!==burstToken)return;
+    apply();
+    pass++;
+    if(pass<10) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function hookRenderTeam(){
+  try{
+    if(typeof renderTeam!=='function'||renderTeam.__rbAvatarHook)return false;
+    const base=renderTeam;
+    const hooked=function(...args){
+      const out=base.apply(this,args);
+      paintBurst();
+      return out;
+    };
+    hooked.__rbAvatarHook=true;
+    // Preserve flags used by the stability wrapper when present.
+    if(base.__rbStable) hooked.__rbStable=true;
+    renderTeam=hooked;
+    try{window.renderTeam=hooked}catch{}
+    return true;
+  }catch{return false}
 }
 
 addStyle();
+hookRenderTeam();
+paintBurst();
+
+// If this enhancement script executes before the base page defines renderTeam,
+// retry briefly and then stop. No permanent polling loop.
+let hookAttempts=0;
+const hookTimer=setInterval(()=>{
+  hookAttempts++;
+  if(hookRenderTeam()||hookAttempts>=20) clearInterval(hookTimer);
+},50);
+
+// Keep the observer only as a safety net for third-party decorators.
 let timer=null;
-function schedule(){clearTimeout(timer);timer=setTimeout(apply,10)}
+function schedule(){clearTimeout(timer);timer=setTimeout(paintBurst,0)}
 const root=document.getElementById('teamView');
 if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
-setTimeout(apply,0);
-setTimeout(apply,100);
-window.addEventListener('focus',apply);
+window.addEventListener('focus',paintBurst);
 })();
