@@ -21,7 +21,8 @@
     const out=new Set(),starters=(m?.starters||[]).map(String),sg=m?.starters_games||m?.startersGames;
     if(!sg||typeof sg!=='object'||Array.isArray(sg))return out;
     for(const [k,v] of Object.entries(sg)){
-      if(starters.includes(String(k)))out.add(String(k));
+      const key=String(k);
+      if(starters.includes(key))out.add(key);
       if(v&&typeof v==='object'){
         const pid=String(v.player_id??v.playerId??v.player??v.pid??'');
         if(pid&&starters.includes(pid))out.add(pid);
@@ -39,7 +40,7 @@
     const name=String(row?.querySelector('.pname')?.textContent||'').replace(/\s*\(locked\)\s*$/i,'').trim().toLowerCase();
     const id=names.get(name)||'';if(id)row.dataset.rbPlayerId=id;return id;
   }
-  function clearFalseLock(row){
+  function clearOpponentState(row){
     row.classList.remove('locked-in','lockable','editable');
     row.removeAttribute('aria-disabled');
     row.querySelectorAll('.lock-chip,.lock-btn').forEach(x=>x.remove());
@@ -50,13 +51,14 @@
       pts.removeAttribute('aria-label');
       pts.removeAttribute('role');
       pts.removeAttribute('tabindex');
+      delete pts.dataset.rbLockBound;
     }
   }
   function markExplicitLock(row){
     row.classList.remove('lockable','editable');
     row.classList.add('locked-in');
     row.setAttribute('aria-disabled','true');
-    row.querySelectorAll('.lock-btn').forEach(x=>x.remove());
+    row.querySelectorAll('.lock-chip,.lock-btn').forEach(x=>x.remove());
   }
   function apply(){
     try{
@@ -68,7 +70,8 @@
       card.querySelectorAll('.player-row').forEach(row=>{
         if(bench?.contains(row)||row.closest('.ir-list'))return;
         const pid=rowPlayerId(row,names);if(!pid||!starters.has(pid))return;
-        if(locked.has(pid))markExplicitLock(row);else clearFalseLock(row);
+        clearOpponentState(row);
+        if(locked.has(pid))markExplicitLock(row);
       });
       const totalBox=card.querySelector('.rb-lock-total.locked');
       if(totalBox){
@@ -78,9 +81,25 @@
       }
     }catch{}
   }
-  function burst(){[0,60,180,500,1000].forEach(ms=>setTimeout(apply,ms))}
-  document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab,#teamPicker'))burst()},true);
-  document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')burst()},true);
-  window.addEventListener('focus',burst);
-  let tries=0;const boot=setInterval(()=>{tries++;apply();if((typeof currentData!=='undefined'&&currentData&&document.querySelector('#teamView .team-card'))||tries>=40)clearInterval(boot)},100);
+  function schedule(){
+    if(schedule.pending)return;
+    schedule.pending=true;
+    queueMicrotask(()=>{schedule.pending=false;apply()});
+  }
+
+  // Run exactly once after every normal team render. No retry bursts or inference loops.
+  try{
+    if(typeof renderTeam==='function'&&!renderTeam.__rbOpponentExplicit){
+      const base=renderTeam;
+      const wrapped=function(...args){const out=base.apply(this,args);schedule();return out};
+      wrapped.__rbOpponentExplicit=true;
+      renderTeam=wrapped;
+      try{window.renderTeam=wrapped}catch{}
+    }
+  }catch{}
+
+  document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab,#teamPicker'))schedule()},true);
+  document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')schedule()},true);
+  window.addEventListener('focus',schedule);
+  schedule();
 })();
