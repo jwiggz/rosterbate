@@ -11,43 +11,26 @@
     }catch{return false}
   }
   function exactState(){
-    try{
-      const key=`${String(leagueId)}:${Number(selectedWeek)}:${Number(selectedRoster)}`;
-      const raw=sessionStorage.getItem(`rbOpponentExact:${key}`);return raw?JSON.parse(raw):null;
-    }catch{return null}
+    try{const key=`${String(leagueId)}:${Number(selectedWeek)}:${Number(selectedRoster)}`;const raw=sessionStorage.getItem(`rbOpponentExact:${key}`);return raw?JSON.parse(raw):null}catch{return null}
   }
   function lockedIds(state,m){
-    const out=new Set(),valid=new Set((state?.starters?.length?state.starters:m?.starters||[]).map(String));
-    const games=state?.startersGames;
+    const out=new Set(),valid=new Set((state?.starters?.length?state.starters:m?.starters||[]).map(String)),games=state?.startersGames;
     if(!games||typeof games!=='object'||Array.isArray(games))return out;
-    for(const [k,v] of Object.entries(games)){
-      if(valid.has(String(k)))out.add(String(k));
-      if(v&&typeof v==='object'){
-        const pid=String(v.player_id??v.playerId??v.player??v.pid??'');
-        if(valid.has(pid))out.add(pid);
-      }
-    }
+    for(const [k,v] of Object.entries(games)){if(valid.has(String(k)))out.add(String(k));if(v&&typeof v==='object'){const pid=String(v.player_id??v.playerId??v.player??v.pid??'');if(valid.has(pid))out.add(pid)}}
     return out;
   }
   function actualFor(m,pid){
     const starters=(m?.starters||[]).map(String),i=starters.indexOf(String(pid));
-    if(i>=0&&Array.isArray(m?.starters_points)){
-      const v=Number(m.starters_points[i]);if(Number.isFinite(v))return v;
-    }
+    if(i>=0&&Array.isArray(m?.starters_points)){const v=Number(m.starters_points[i]);if(Number.isFinite(v))return v}
     const v=Number(m?.players_points?.[pid]??m?.players_points?.[String(pid)]);return Number.isFinite(v)?v:0;
   }
   function futureProjection(pid){
     const p=currentData?.projections?.[String(pid)];if(!p||!Array.isArray(p.games))return null;
     const team=currentData?.players?.[String(pid)]?.team;let best=null;
-    for(const pg of p.games){
-      const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;
-      const gid=String(pg?.game_id||''),date=String(pg?.date||'');
-      const sg=(currentData?.schedule||[]).find(g=>(gid&&String(g.game_id||'')===gid)||(!gid&&String(g.date||'')===date&&(!team||g.home===team||g.away===team)));
-      if(sg&&String(sg.status||'pre_game')!=='pre_game')continue;
-      if(best===null||pts>best)best=pts;
-    }
+    for(const pg of p.games){const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;const gid=String(pg?.game_id||''),date=String(pg?.date||'');const sg=(currentData?.schedule||[]).find(g=>(gid&&String(g.game_id||'')===gid)||(!gid&&String(g.date||'')===date&&(!team||g.home===team||g.away===team)));if(sg&&String(sg.status||'pre_game')!=='pre_game')continue;if(best===null||pts>best)best=pts}
     return best;
   }
+  function setText(el,value){if(el&&el.textContent!==value)el.textContent=value}
   function paint(){
     try{
       if(typeof currentData==='undefined'||!currentData||selectedIsOwned())return;
@@ -55,22 +38,20 @@
       const m=(currentData.matchups||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));if(!m)return;
       const locked=lockedIds(state,m),starters=(m.starters||[]).map(String).filter(x=>x&&x!=='0');
       let lockedTotal=0;for(const pid of locked)lockedTotal+=actualFor(m,pid);
-      let projected=lockedTotal,remaining=0;
-      for(const pid of starters){if(locked.has(pid))continue;const v=futureProjection(pid);if(v!==null){projected+=v;remaining++}}
+      let projected=lockedTotal,remaining=0;for(const pid of starters){if(locked.has(pid))continue;const v=futureProjection(pid);if(v!==null){projected+=v;remaining++}}
       const box=document.querySelector('#teamView .rb-lock-totals');if(!box)return;
       const lockedBox=box.querySelector('.rb-lock-total.locked'),projBox=box.querySelector('.rb-lock-total.projected');
-      const lb=lockedBox?.querySelector('b'),ls=lockedBox?.querySelector('small'),pb=projBox?.querySelector('b'),ps=projBox?.querySelector('small');
-      if(lb)lb.textContent=lockedTotal.toFixed(1);
-      if(ls)ls.textContent=`${locked.size} verified locks`;
-      if(pb)pb.textContent=projected.toFixed(1);
-      if(ps)ps.textContent=remaining?`best remaining game / ${remaining} player${remaining===1?'':'s'}`:'all starters locked';
+      setText(lockedBox?.querySelector('b'),lockedTotal.toFixed(1));
+      setText(lockedBox?.querySelector('small'),`${locked.size} verified locks`);
+      setText(projBox?.querySelector('b'),projected.toFixed(1));
+      setText(projBox?.querySelector('small'),remaining?`best remaining game / ${remaining} player${remaining===1?'':'s'}`:'all starters locked');
     }catch{}
   }
-  function run(){queueMicrotask(paint);setTimeout(paint,0)}
+  function run(){queueMicrotask(paint)}
   try{if(typeof renderTeam==='function'&&!renderTeam.__rbLockSummaryExact){const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);run();return out};wrapped.__rbLockSummaryExact=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}}catch{}
   document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab,#teamPicker'))run()},true);
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')run()},true);
   window.addEventListener('focus',run);
-  const root=document.getElementById('teamView');if(root)new MutationObserver(()=>run()).observe(root,{childList:true,subtree:true});
+  window.addEventListener('rb:opponent-locks-exact',run);
   run();
 })();
