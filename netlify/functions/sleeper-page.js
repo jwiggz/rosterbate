@@ -21,7 +21,7 @@ exports.handler=async function(){
     if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261028a"></script>');
     if(!html.includes('sleeper-hashtag-import.js')) scripts.push('<script src="/sleeper-hashtag-import.js?v=20261028a"></script>');
     if(!html.includes('sleeper-hashtag-import-flex.js')) scripts.push('<script src="/sleeper-hashtag-import-flex.js?v=20261028a"></script>');
-    if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261028b"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
   }catch(e){return{statusCode:502,headers:{'Content-Type':'text/plain; charset=utf-8'},body:`Unable to load basketball dashboard: ${String(e?.message||e)}`}}
