@@ -35,6 +35,36 @@ function validSnowflake(value){
   return /^\d{10,25}$/.test(String(value||''));
 }
 
+function scalar(v){return v==null?'':String(v)}
+function ownObj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}
+function deepPair(node,pid,gid,depth=0){
+  if(depth>7||node==null)return false;
+  if(Array.isArray(node))return node.some(v=>deepPair(v,pid,gid,depth+1));
+  if(typeof node!=='object')return false;
+  const p=scalar(node.player_id??node.playerId??node.player??node.pid);
+  const g=scalar(node.game_id??node.gameId??node.game??node.gid);
+  if(p===pid&&g===gid)return true;
+  for(const [k,v] of Object.entries(node)){
+    if(String(k)===pid&&scalar(v)===gid)return true;
+    if(String(k)===gid&&scalar(v)===pid)return true;
+    if(typeof v==='object'&&deepPair(v,pid,gid,depth+1))return true;
+  }
+  return false;
+}
+function lockPresent(map,starters,pid,gid){
+  map=ownObj(map);starters=Array.isArray(starters)?starters.map(String):[];pid=String(pid);gid=String(gid);
+  if(scalar(map[pid])===gid||deepPair(map,pid,gid))return true;
+  const idx=starters.indexOf(pid);
+  if(idx>=0){
+    for(const key of [String(idx),String(idx+1)]){
+      const v=map[key];
+      if(scalar(v)===gid)return true;
+      if(v&&typeof v==='object'&&(scalar(v.game_id??v.gameId??v.game??v.gid)===gid||deepPair(v,pid,gid)))return true;
+    }
+  }
+  return false;
+}
+
 async function gql(token,opName,query,variables={}){
   const response=await fetch('https://sleeper.com/graphql',{
     method:'POST',
@@ -104,9 +134,9 @@ exports.handler=async function(event){
     const starters=Array.isArray(current.starters)?current.starters.map(String):[];
     if(!starters.includes(playerId)) return json(400,{error:'Sleeper only allows a completed game to be locked if that player was in the starting lineup.'});
 
-    const existing=(current.starters_games&&typeof current.starters_games==='object'&&!Array.isArray(current.starters_games))?current.starters_games:{};
-    if(existing[playerId]){
-      return json(409,{error:'This player already has a locked game for the week.',startersGames:existing});
+    const existing=ownObj(current.starters_games);
+    if(lockPresent(existing,starters,playerId,gameId)){
+      return json(409,{error:'This exact game is already locked for the player.',startersGames:existing});
     }
 
     const startersGames={...existing,[playerId]:gameId};
@@ -115,10 +145,23 @@ exports.handler=async function(event){
     const data=await gql(token,'update_matchup_leg',mutation,{starters_games:startersGames});
     const updated=data?.update_matchup_leg;
     if(!updated) return json(502,{error:'Sleeper did not return an updated matchup.'});
-    const returned=updated.starters_games&&typeof updated.starters_games==='object'?updated.starters_games:{};
-    if(String(returned[playerId]||'')!==gameId) return json(409,{error:'Sleeper responded, but the requested game was not present in starters_games.',matchup:updated});
 
-    return json(200,{ok:true,playerId,gameId,matchup:updated,startersGames:returned});
+    // Sleeper has returned starters_games in more than one shape over time.
+    // Verify from a fresh authenticated matchup_legs read rather than assuming
+    // the mutation payload must be keyed directly by player id.
+    let verified=lockPresent(updated.starters_games,updated.starters||starters,playerId,gameId);
+    let confirmed=updated;
+    if(!verified){
+      try{
+        const reread=await readLeg(token,leagueId,round,rosterId);
+        if(reread){confirmed=reread;verified=lockPresent(reread.starters_games,reread.starters||starters,playerId,gameId)}
+      }catch{}
+    }
+    if(!verified){
+      return json(409,{error:'Sleeper responded to the lock request, but the requested game could not be verified in the refreshed lock state.',matchup:confirmed,requested:{playerId,gameId},returnedStartersGames:confirmed?.starters_games||updated.starters_games||{}});
+    }
+
+    return json(200,{ok:true,playerId,gameId,matchup:confirmed,startersGames:ownObj(confirmed?.starters_games||updated.starters_games)});
   }catch(error){
     return json(Number(error?.status)||502,{error:error?.message||'Unable to reach Sleeper.',sleeper:error?.body||null});
   }
