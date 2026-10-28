@@ -23,6 +23,8 @@ function valueForArg(name,type,leagueId,rosterId,round,uid){
   else if(n.includes('roster'))v=rosterId;
   else if(n==='round'||n==='leg'||n.includes('week'))v=round;
   else if(n.includes('user')||n.includes('owner'))v=uid;
+  else if(n==='limit')v=100;
+  else if(n==='offset')v=0;
   else return null;
   if(kind==='SCALAR'&&['Int','Float'].includes(baseName))return String(Number(v));
   return JSON.stringify(String(v));
@@ -31,6 +33,14 @@ function buildCall(field,leagueId,rosterId,round,uid){
   const args=[];
   for(const a of field?.args||[]){const val=valueForArg(a.name,a.type,leagueId,rosterId,round,uid);if(val!=null)args.push(`${a.name}:${val}`);else if(a.default_value==null&&String(a.type?.kind||'')==='NON_NULL')return null}
   return `${field.name}${args.length?`(${args.join(',')})`:''}`;
+}
+async function objectLeafFields(token,typeName){
+  if(!typeName)return[];
+  try{
+    const q=`query LockInspect { __type(name: \"${typeName}\") { fields { name type { ${typeSelection()} } } } }`;
+    const d=await gql(token,q);const fs=d?.__type?.fields||[];
+    return fs.filter(f=>['SCALAR','ENUM'].includes(unwrap(f.type)?.kind)).map(f=>f.name);
+  }catch{return[]}
 }
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
@@ -56,19 +66,19 @@ exports.handler=async function(event){
     let row=null,queryError=null;
     if(leaf.length){const q3=`query LockInspect { matchup_legs(league_id: \"${leagueId}\", round: ${round}) { ${leaf.join(' ')} } }`;try{const d3=await gql(token,q3);row=(Array.isArray(d3?.matchup_legs)?d3.matchup_legs:[]).find(x=>Number(x.roster_id)===rosterId)||null}catch(e){queryError={message:e.message,body:e.body||null}}}
     const probes={};
-    for(const name of ['matchup_legs_raw','matchup_legs_related_to_roster']){
+    for(const name of ['matchup_legs_raw','matchup_legs_related_to_roster','league_event_logs','events','my_events']){
       const f=queryFields.find(x=>x.name===name);if(!f){probes[name]={available:false};continue}
       const signature={name,args:(f.args||[]).map(a=>({name:a.name,type:renderType(a.type),defaultValue:a.default_value??null})),returnType:renderType(f.type)};
       const call=buildCall(f,leagueId,rosterId,round,uid);if(!call){probes[name]={available:true,signature,error:'Required arguments could not be inferred safely.'};continue}
-      const ret=unwrap(f.type);let result=null,error=null;
+      const ret=unwrap(f.type);let result=null,error=null,selectedFields=[];
       if(['SCALAR','ENUM'].includes(ret?.kind)){
         try{const q=`query LockInspect { ${call} }`;const d=await gql(token,q);result=d?.[name]??null}catch(e){error={message:e.message,body:e.body||null}}
-      }else if(ret?.name===base.name){
-        try{const q=`query LockInspect { ${call} { ${leaf.join(' ')} } }`;const d=await gql(token,q);result=d?.[name]??null}catch(e){error={message:e.message,body:e.body||null}}
       }else{
-        probes[name]={available:true,signature,call,returnBase:{kind:ret?.kind||null,name:ret?.name||null},note:'Return type requires separate type inspection.'};continue
+        selectedFields=ret?.name===base.name?leaf:await objectLeafFields(token,ret?.name);
+        if(!selectedFields.length){probes[name]={available:true,signature,call,returnBase:{kind:ret?.kind||null,name:ret?.name||null},note:'No scalar/enum fields could be selected automatically.'};continue}
+        try{const q=`query LockInspect { ${call} { ${selectedFields.join(' ')} } }`;const d=await gql(token,q);result=d?.[name]??null}catch(e){error={message:e.message,body:e.body||null}}
       }
-      probes[name]={available:true,signature,call,result,error};
+      probes[name]={available:true,signature,call,selectedFields,result,error};
     }
     return json(200,{ok:true,matchupLegType:base.name,allFields:fields.map(f=>({name:f.name,type:renderType(f.type),baseKind:unwrap(f.type)?.kind||null,baseName:unwrap(f.type)?.name||null})),candidateFields:candidates.map(f=>({name:f.name,type:f.type,baseKind:f.base?.kind||null,baseName:f.base?.name||null})),candidateQueries,candidateMutations,queriedFields:leaf,row,queryError,probes});
   }catch(error){return json(Number(error?.status)||502,{error:error?.message||'Unable to inspect Sleeper.',sleeper:error?.body||null})}
