@@ -11,7 +11,7 @@ async function gql(token,query,operationName='LockInspect'){
 }
 function unwrap(t){let cur=t,depth=0;while(cur&&cur.ofType&&depth++<8)cur=cur.ofType;return cur||{}}
 function renderType(t){if(!t)return'';if(t.kind==='NON_NULL')return `${renderType(t.ofType)}!`;if(t.kind==='LIST')return `[${renderType(t.ofType)}]`;return t.name||t.kind||''}
-function typeSelection(){return 'kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } }'}
+function typeSelection(){return 'kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } }'}
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
   let body;try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
