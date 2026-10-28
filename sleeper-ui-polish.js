@@ -91,6 +91,17 @@ style();
 document.addEventListener('click',e=>{const b=e.target.closest?.('#teamView .day-btn[data-day]');if(b)rememberDay(b.dataset.day)},true);
 document.addEventListener('change',e=>{if(e.target?.id==='weekSel'){requestAnimationFrame(()=>restoreDay())}},true);
 let startupFrames=0;function startup(){normalize();startupFrames++;if(startupFrames<180&&(!document.querySelector('#teamView .day-btn')||!document.querySelector('#teamView .ir-list')))requestAnimationFrame(startup)}requestAnimationFrame(startup);
-let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(normalize,16)};const root=document.getElementById('teamView')||document.body;new MutationObserver(schedule).observe(root,{childList:true,subtree:true,characterData:true});
+let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(normalize,16)};const root=document.getElementById('teamView')||document.body;new MutationObserver(mutations=>{
+  const relevant=mutations.some(m=>{
+    const target=m.target?.nodeType===1?m.target:m.target?.parentElement;
+    if(target?.closest?.('.rb-inline-stats,.rb-inline-toolbar,.rb-inline-head-grid'))return false;
+    const nodes=[...m.addedNodes,...m.removedNodes];
+    if(nodes.length&&nodes.every(n=>n?.nodeType===1&&(
+      n.matches?.('.rb-sleeper-headshot')||n.closest?.('.player-head')
+    )))return false;
+    return true;
+  });
+  if(relevant)schedule();
+}).observe(root,{childList:true,subtree:true,characterData:true});
 window.addEventListener('focus',normalize);
 })();
