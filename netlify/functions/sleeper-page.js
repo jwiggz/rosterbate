@@ -11,9 +11,9 @@ exports.handler=async function(){
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js"></script>');
     if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js"></script>');
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js"></script>');
-    if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028d"></script>');
+    if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028e"></script>');
     if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js"></script>');
-    if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js"></script>');
+    if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261028b"></script>');
     if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js"></script>');
     if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
