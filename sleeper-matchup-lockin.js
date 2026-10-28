@@ -54,6 +54,31 @@
     const v=Number(m?.players_points?.[String(pid)]);return Number.isFinite(v)?v:0;
   }
   function lockedTotal(m,ids){let n=0;for(const id of ids)n+=actualFor(m,id);return n}
+  function scheduleGameForProjection(pg,pid){
+    const schedule=currentData?.schedule||[],gid=String(pg?.game_id||''),date=String(pg?.date||''),teamCode=String(currentData?.players?.[String(pid)]?.team||'');
+    if(gid){const byId=schedule.find(g=>String(g.game_id||'')===gid);if(byId)return byId}
+    return schedule.find(g=>String(g.date||'')===date&&(!teamCode||g.home===teamCode||g.away===teamCode))||null;
+  }
+  function futureProjection(pid){
+    const p=currentData?.projections?.[String(pid)];if(!p||!Array.isArray(p.games))return null;
+    let best=null;
+    for(const pg of p.games){
+      const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;
+      const sg=scheduleGameForProjection(pg,pid);if(sg&&String(sg.status||'pre_game')!=='pre_game')continue;
+      if(best===null||pts>best)best=pts;
+    }
+    return best;
+  }
+  function projectedLockIn(m,locked){
+    if(!m)return null;
+    let total=lockedTotal(m,locked);
+    const starters=(m.starters||[]).map(String).filter(x=>x&&x!=='0');
+    for(const pid of starters){
+      if(locked.has(pid))continue;
+      const v=futureProjection(pid);if(v!==null)total+=v;
+    }
+    return total;
+  }
   function slotLabelsFor(count){return typeof starterLabels==='function'?starterLabels(count):Array.from({length:count},()=> 'UTIL')}
   function lockedRow(id,m,label){
     const p=player(id),body=playerBlock(p,matchupDetail(id,'all')),pts=actualFor(m,id);
@@ -96,7 +121,7 @@
     if(!exactState){
       root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,null,'left')}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Loading exact Lock-In data…</div></div>${teamHeader(bT,null,'right')}</div>${selectorHtml(ps)}<div class="match-columns"><div class="match-roster"><div class="empty">Loading locks…</div></div><div class="match-roster"><div class="empty">Loading locks…</div></div></div></div>`;bindNav(ps);return;
     }
-    const aLocked=lockedIds(aExact,aM),bLocked=lockedIds(bExact,bM),aScore=lockedTotal(aM,aLocked),bScore=lockedTotal(bM,bLocked),aProj=teamProjection(aM,'all'),bProj=teamProjection(bM,'all');
+    const aLocked=lockedIds(aExact,aM),bLocked=lockedIds(bExact,bM),aScore=lockedTotal(aM,aLocked),bScore=lockedTotal(bM,bLocked),aProj=projectedLockIn(aM,aLocked),bProj=projectedLockIn(bM,bLocked);
     root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,aScore,'left')}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Proj ${aProj===null?'—':num(aProj)} · ${bProj===null?'—':num(bProj)}</div></div>${teamHeader(bT,bScore,'right')}</div>${selectorHtml(ps)}<div class="match-columns">${rosterHtml(aM,aExact)}${rosterHtml(bM,bExact)}</div></div>`;
     bindNav(ps);
   }
