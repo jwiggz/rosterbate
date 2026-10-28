@@ -8,12 +8,10 @@ style.textContent=`
 #teamView .rb-game-state .clock{color:#f3c75b;font-weight:950}
 `;
 document.head.appendChild(style);
-let games=[],lastKey='',fetching=false;
+let games=[],fetching=false;
 const normalize=t=>String(t||'').trim().toUpperCase().replace(/^BRK$/,'BKN').replace(/^CHO$/,'CHA').replace(/^GS$/,'GSW').replace(/^NO$/,'NOP').replace(/^NY$/,'NYK').replace(/^PHO$/,'PHX').replace(/^SA$/,'SAS');
-function season(){try{return String(currentData?.league?.season||new Date().getFullYear())}catch{return String(new Date().getFullYear())}}
-function week(){try{return Number(selectedWeek||currentData?.week||0)}catch{return 0}}
 function day(){try{return String(selectedDay||'')}catch{return''}}
-function statusKind(g){const s=String(g?.status||'').toLowerCase();if(/in_game|live|in progress|inprogress/.test(s))return'live';if(/complete|final|closed/.test(s))return'final';return'pre'}
+function statusKind(g){const s=String(g?.status||'').toLowerCase();if(/in_game|live|in progress|inprogress/.test(s))return'live';if(/complete|final|closed|post/.test(s))return'final';return'pre'}
 function periodLabel(p){if(p==null||p==='')return'';const n=Number(p);if(Number.isFinite(n)){if(n<=4)return`Q${n}`;return n===5?'OT':`${n-4}OT`}return String(p).toUpperCase()}
 function rowTeam(row){const meta=row.querySelector('.pmeta');if(!meta)return'';return normalize(String(meta.textContent||'').split('·')[0].trim())}
 function gameFor(team){const d=day();if(!team||!d||d==='all')return null;return games.find(g=>g.date===d&&(normalize(g.home)===team||normalize(g.away)===team))||null}
@@ -22,8 +20,9 @@ function stateText(g){
   if(kind==='pre'||!hasScore)return null;
   const score=`${g.away} ${as}–${hs} ${g.home}`;
   if(kind==='final')return{kind,text:`FINAL · ${score}`};
-  const bits=[score],p=periodLabel(g.period),c=String(g.clock||'').trim();if(p||c)bits.push([p,c].filter(Boolean).join(' '));
-  return{kind,text:bits.join(' · ')};
+  const p=periodLabel(g.period),c=String(g.clock||'').trim();
+  const gameClock=[p,c].filter(Boolean).join(' ');
+  return{kind,text:gameClock?`${score} · ${gameClock}`:score};
 }
 function decorate(){
   document.querySelectorAll('#teamView .player-row').forEach(row=>{
@@ -37,13 +36,18 @@ function decorate(){
   });
 }
 async function refresh(){
-  const s=season(),w=week();if(!w||fetching)return;const key=`${s}:${w}`;fetching=true;
-  try{const r=await fetch(`/.netlify/functions/sleeper-live-games?season=${encodeURIComponent(s)}&week=${w}&_=${Date.now()}`,{cache:'no-store'});const data=await r.json();if(r.ok&&data?.ok&&Array.isArray(data.games)){games=data.games;lastKey=key;decorate()}}catch{}finally{fetching=false}
+  const d=day();if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||fetching){decorate();return}
+  fetching=true;
+  try{
+    const r=await fetch(`/.netlify/functions/sleeper-live-games?date=${encodeURIComponent(d)}&_=${Date.now()}`,{cache:'no-store'});
+    const data=await r.json();
+    if(r.ok&&data?.ok&&Array.isArray(data.games)){games=data.games;decorate()}
+  }catch{}finally{fetching=false}
 }
 let timer;const scheduleDecorate=()=>{clearTimeout(timer);timer=setTimeout(decorate,0)};
 new MutationObserver(muts=>{if(muts.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&!n.matches?.('.rb-game-state'))))scheduleDecorate()}).observe(document.getElementById('teamView')||document.body,{childList:true,subtree:true});
-document.addEventListener('click',e=>{if(e.target.closest?.('#teamView .day-btn[data-day]'))requestAnimationFrame(()=>{decorate();refresh()})},true);
-document.addEventListener('change',e=>{if(e.target?.id==='weekSel')setTimeout(refresh,50)},true);
+document.addEventListener('click',e=>{if(e.target.closest?.('#teamView .day-btn[data-day]'))requestAnimationFrame(()=>{games=[];decorate();refresh()})},true);
+document.addEventListener('change',e=>{if(e.target?.id==='weekSel')setTimeout(()=>{games=[];refresh()},50)},true);
 window.addEventListener('focus',refresh);
 setTimeout(refresh,0);
 setInterval(refresh,20000);
