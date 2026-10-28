@@ -10,6 +10,9 @@ const css=`
 #teamView .day-btn.rb-has-plan{box-shadow:inset 0 -2px 0 #f3c75b!important}
 #teamView .day-btn.rb-has-plan::after{content:'PLAN';display:block;margin-top:2px;color:#f3c75b;font-size:6px;font-weight:900;letter-spacing:.05em}
 #teamView #rbApplyDailyPlan{margin-left:6px;background:#0a8e93;border-color:#0db4ba;color:#ecffff}
+/* Never paint Sleeper's raw starter ordering. The direct starter rows are revealed
+   only after the canonical order pass has run, preventing the UTIL-first snap. */
+#teamView .team-card:not(.rb-order-ready) > .player-row{visibility:hidden!important}
 `;
 function addStyle(){if(document.getElementById('rbRosterOrderStyle'))return;const s=document.createElement('style');s.id='rbRosterOrderStyle';s.textContent=css;document.head.appendChild(s)}
 function n(v,f=9999){const x=Number(v);return Number.isFinite(x)?x:f}
@@ -80,6 +83,7 @@ function neutralizeStatsHeader(){
 }
 function enforce(){
   const card=document.querySelector('#teamView .team-card');if(!card)return;
+  card.classList.remove('rb-order-ready');
   neutralizeStatsHeader();
   const {map:starters,pins}=starterOrder();
   const bench=card.querySelector('.bench');
@@ -100,6 +104,7 @@ function enforce(){
     if(irLabel&&irLabel.parentElement===card) card.appendChild(irLabel);
     if(ir.parentElement===card) card.appendChild(ir);
   }
+  card.classList.add('rb-order-ready');
 }
 function todayKey(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`}
 function dayMode(day){if(!day||day==='all')return'week';const today=todayKey();if(day<today)return'past';if(day>today)return'future';return'today'}
@@ -209,7 +214,7 @@ try{
 }catch{}
 
 addStyle();
-let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},30)};
+let timer;const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},0)};
 const root=document.getElementById('teamView');
 if(root){
   new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
@@ -262,5 +267,5 @@ document.addEventListener('click',e=>{
   if(e.target.closest?.('.day-btn[data-day]')){clearBenchFirst();setTimeout(refreshPlannerUi,0)}
   if(e.target.closest?.('#cancelSelect'))clearBenchFirst();
 },true);
-setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},120);setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},650);window.addEventListener('focus',()=>{enforce();refreshPlannerUi();reapplyOptimistic()});
+setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},0);setTimeout(()=>{enforce();refreshPlannerUi();reapplyOptimistic()},120);window.addEventListener('focus',()=>{enforce();refreshPlannerUi();reapplyOptimistic()});
 })();
