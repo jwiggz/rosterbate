@@ -30,7 +30,7 @@ exports.handler=async function(){
     if(!html.includes('sleeper-matchup-header-polish.js')) scripts.push('<script src="/sleeper-matchup-header-polish.js?v=20261028a"></script>');
     if(!html.includes('sleeper-matchup-score-layout.js')) scripts.push('<script src="/sleeper-matchup-score-layout.js?v=20261028a"></script>');
     if(!html.includes('sleeper-team-header-polish.js')) scripts.push('<script src="/sleeper-team-header-polish.js?v=20261028a"></script>');
-    if(!html.includes('sleeper-players-waiver.js')) scripts.push('<script src="/sleeper-players-waiver.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-players-waiver.js')) scripts.push('<script src="/sleeper-players-waiver.js?v=20261028b"></script>');
     if(!html.includes('sleeper-lock-inspector-ui.js')) scripts.push('<script src="/sleeper-lock-inspector-ui.js?v=20261028d"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
