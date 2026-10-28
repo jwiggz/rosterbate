@@ -1,8 +1,6 @@
 (()=>{
-const pending=new Map();
 const loaded=new Map();
 const failedUntil=new Map();
-const PROBE_TIMEOUT=1200;
 const RETRY_AFTER=5*60*1000;
 
 const css=`
@@ -42,11 +40,8 @@ function sourceUrls(id){
   const urls=[];
   if(/^\d{1,12}$/.test(espn)){
     const remote=`https://a.espncdn.com/i/headshots/nba/players/full/${encodeURIComponent(espn)}.png`;
-    // ESPN's CDN is normally the fastest path and is browser-cache friendly.
     urls.push(remote);
-    // Same-origin fallback avoids a slow/blocked third-party request path.
     urls.push(`/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}&espn=${encodeURIComponent(espn)}`);
-    // Keep StatDunk only as a last resort rather than blocking every avatar on it.
     urls.push(`https://statdunk.com/_vercel/image?url=${encodeURIComponent(remote)}&w=96&q=80`);
   }else{
     urls.push(`/.netlify/functions/sleeper-player-headshot?player=${encodeURIComponent(String(id))}`);
@@ -54,89 +49,75 @@ function sourceUrls(id){
   return urls;
 }
 
-function probe(url,timeout=PROBE_TIMEOUT){
-  return new Promise(resolve=>{
-    const img=new Image();
-    let done=false;
-    const finish=value=>{
-      if(done)return;
-      done=true;
-      clearTimeout(timer);
-      img.onload=null;
-      img.onerror=null;
-      resolve(value);
-    };
-    const timer=setTimeout(()=>finish(''),timeout);
-    img.onload=()=>finish(url);
-    img.onerror=()=>finish('');
-    img.decoding='async';
-    img.fetchPriority='high';
-    img.src=url;
-  });
+function trySource(head,id,urls,index=0){
+  if(!head?.isConnected||head.dataset.rbPhotoPlayer!==String(id)) return;
+  if(index>=urls.length){
+    failedUntil.set(String(id),Date.now()+RETRY_AFTER);
+    return;
+  }
+
+  const url=urls[index];
+  const img=new Image();
+  img.decoding='async';
+  img.fetchPriority='high';
+
+  let settled=false;
+  const cleanup=()=>{img.onload=null;img.onerror=null};
+  const fail=()=>{
+    if(settled)return;
+    settled=true;
+    cleanup();
+    trySource(head,id,urls,index+1);
+  };
+
+  img.onload=()=>{
+    if(settled)return;
+    settled=true;
+    cleanup();
+    if(!head.isConnected||head.dataset.rbPhotoPlayer!==String(id)) return;
+    loaded.set(String(id),url);
+    failedUntil.delete(String(id));
+    head.style.backgroundImage=`url("${url}")`;
+    head.classList.add('rb-photo-ready');
+  };
+  img.onerror=fail;
+  img.src=url;
 }
 
-async function loadHeadshot(id){
-  id=String(id);
-  if(loaded.has(id)) return loaded.get(id);
-  if((failedUntil.get(id)||0)>Date.now()) return'';
-  if(pending.has(id)) return pending.get(id);
-  const promise=(async()=>{
-    try{
-      for(const url of sourceUrls(id)){
-        const ok=await probe(url);
-        if(ok){loaded.set(id,ok);failedUntil.delete(id);return ok}
-      }
-      failedUntil.set(id,Date.now()+RETRY_AFTER);
-      return'';
-    }finally{
-      pending.delete(id);
-    }
-  })();
-  pending.set(id,promise);
-  return promise;
-}
-
-async function paintRow(row,id){
+function paintRow(row,id){
   const head=row.querySelector('.player-head');
   if(!head||!id) return;
-  if(head.dataset.rbPhotoPlayer===String(id)&&head.classList.contains('rb-photo-ready')) return;
-  head.dataset.rbPhotoPlayer=String(id);
-  const url=await loadHeadshot(id);
-  if(!url||!head.isConnected||head.dataset.rbPhotoPlayer!==String(id)) return;
-  head.style.backgroundImage=`url("${url}")`;
-  head.classList.add('rb-photo-ready');
-}
+  id=String(id);
+  if(head.dataset.rbPhotoPlayer===id&&head.classList.contains('rb-photo-ready')) return;
+  head.dataset.rbPhotoPlayer=id;
 
-function visibleIds(){
-  const root=document.getElementById('teamView');
-  if(!root)return[];
-  const map=playerMap(),ids=[];
-  for(const row of root.querySelectorAll('.player-row')){
-    const id=rowPlayerId(row,map);
-    if(id&&!ids.includes(id))ids.push(id);
+  const cached=loaded.get(id);
+  if(cached){
+    head.style.backgroundImage=`url("${cached}")`;
+    head.classList.add('rb-photo-ready');
+    return;
   }
-  return ids;
-}
+  if((failedUntil.get(id)||0)>Date.now()) return;
 
-function preloadVisible(){
-  // Start requests immediately but don't wait for them before the page is usable.
-  for(const id of visibleIds()) loadHeadshot(id);
+  trySource(head,id,sourceUrls(id));
 }
 
 function apply(){
   const root=document.getElementById('teamView');
   if(!root) return;
   const map=playerMap();
-  const rows=[...root.querySelectorAll('.player-row')];
-  for(const row of rows){const id=rowPlayerId(row,map);if(id) paintRow(row,id)}
+  for(const row of root.querySelectorAll('.player-row')){
+    const id=rowPlayerId(row,map);
+    if(id) paintRow(row,id);
+  }
 }
 
 addStyle();
 let timer=null;
-function schedule(){clearTimeout(timer);timer=setTimeout(()=>{preloadVisible();apply()},20)}
+function schedule(){clearTimeout(timer);timer=setTimeout(apply,10)}
 const root=document.getElementById('teamView');
 if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});
-setTimeout(()=>{preloadVisible();apply()},20);
-setTimeout(()=>{preloadVisible();apply()},250);
-window.addEventListener('focus',()=>{preloadVisible();apply()});
+setTimeout(apply,0);
+setTimeout(apply,100);
+window.addEventListener('focus',apply);
 })();
