@@ -53,6 +53,13 @@
     decorateLockablePts();
     const root=document.getElementById('teamView');
     if(root)new MutationObserver(()=>decorateLockablePts()).observe(root,{childList:true,subtree:true});
+
+    if(!document.querySelector('script[data-rb-game-state]')){
+      const gs=document.createElement('script');
+      gs.src='sleeper-game-state.js?v=20261028b';
+      gs.dataset.rbGameState='1';
+      document.head.appendChild(gs);
+    }
   };
   s.onload=done;s.onerror=done;
   document.head.appendChild(s);
