@@ -7,7 +7,15 @@ function validToken(value){return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-
 async function fetchJson(url){const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}
 async function nbaPlayers(){if(playerCache&&Date.now()-playerCacheAt<30*60*1000)return playerCache;playerCache=await fetchJson(`${API}/players/nba`);playerCacheAt=Date.now();return playerCache||{}}
 function playerInfo(P,id){const p=P?.[String(id)]||{};return{id:String(id),name:p.full_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||`Player ${id}`,position:p.position||'',team:String(p.team||'').toUpperCase()}}
-async function readChat(token,leagueId){if(!validToken(token))return{items:[],auth:false};const query='query($lg:Snowflake!){messages(parent_id:$lg){message_id created author_display_name text pinned}}';const r=await fetch('https://sleeper.com/graphql',{method:'POST',headers:{Accept:'application/json','Content-Type':'application/json',Authorization:token,'X-Sleeper-GraphQL-Op':'messages','User-Agent':'RosterBate/1.0'},body:JSON.stringify({operationName:'messages',variables:{lg:leagueId},query})});let d={};try{d=await r.json()}catch{}if(!r.ok||Array.isArray(d?.errors))return{items:[],auth:false,error:d?.errors?.[0]?.message||`HTTP ${r.status}`};const rows=Array.isArray(d?.data?.messages)?d.data.messages:[];return{auth:true,items:rows.map(m=>({kind:'chat',id:String(m.message_id||''),created:Number(m.created)||0,author:String(m.author_display_name||'Sleeper user'),text:String(m.text||''),pinned:!!m.pinned})).filter(x=>x.created&&x.text)}}
+async function readChat(token,leagueId){
+  if(!validToken(token))return{items:[],auth:false};
+  const query='query($lg:Snowflake!){messages(parent_id:$lg){message_id created author_display_name author_id text text_map attachment pinned}}';
+  const r=await fetch('https://sleeper.com/graphql',{method:'POST',headers:{Accept:'application/json','Content-Type':'application/json',Authorization:token,'X-Sleeper-GraphQL-Op':'messages','User-Agent':'RosterBate/1.0'},body:JSON.stringify({operationName:'messages',variables:{lg:leagueId},query})});
+  let d={};try{d=await r.json()}catch{}
+  if(!r.ok||Array.isArray(d?.errors))return{items:[],auth:false,error:d?.errors?.[0]?.message||`HTTP ${r.status}`};
+  const rows=Array.isArray(d?.data?.messages)?d.data.messages:[];
+  return{auth:true,items:rows.map(m=>({kind:'chat',id:String(m.message_id||''),created:Number(m.created)||0,author:String(m.author_display_name||'Sleeper user'),author_id:String(m.author_id||''),text:String(m.text||''),text_map:m.text_map||null,attachment:m.attachment||null,pinned:!!m.pinned})).filter(x=>x.created&&(x.text||x.attachment||x.text_map))};
+}
 
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
