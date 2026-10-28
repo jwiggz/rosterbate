@@ -6,7 +6,7 @@ exports.handler=async function(){
     if(!r.ok) throw new Error(`GitHub ${r.status}`);
     let html=await r.text();
     const scripts=[];
-    if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js"></script>');
     if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js"></script>');
