@@ -29,6 +29,21 @@
       return parsed?.data||null;
     }catch{return null}
   }
+  function invalidationKey(){return `rbLockInvalidated:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`}
+  function readInvalidated(){
+    try{const raw=localStorage.getItem(invalidationKey());const v=raw?JSON.parse(raw):{};return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch{return{}}
+  }
+  function isInvalidated(pid,gid){
+    const v=readInvalidated(),games=Array.isArray(v[String(pid)])?v[String(pid)]:[];
+    return games.map(String).includes(String(gid));
+  }
+  function invalidate(pid,gid){
+    if(!pid||!gid)return;
+    try{
+      const v=readInvalidated(),key=String(pid),games=new Set(Array.isArray(v[key])?v[key].map(String):[]);
+      games.add(String(gid));v[key]=[...games];localStorage.setItem(invalidationKey(),JSON.stringify(v));
+    }catch{}
+  }
   function scalar(v){return v==null?'':String(v)}
   function deepPair(node,pid,gid,depth=0){
     if(depth>6||node==null)return false;
@@ -46,9 +61,7 @@
   function sleeperEligible(pid,gid){
     const d=lockState();if(!d)return false;
     pid=String(pid);gid=String(gid);
-    // Carry-forward lockability must be explicitly represented by Sleeper.
-    // Do not infer eligibility from schedule history alone; newly added or
-    // previously benched players can have completed games that are not lockable.
+    if(isInvalidated(pid,gid))return false;
     return deepPair(d.playerMap,pid,gid)||deepPair(d.subs,pid,gid)||deepPair(d.customPoints,pid,gid);
   }
   function priorCompletedGame(pid){
@@ -68,7 +81,7 @@
   function showCarryReview(pid,g){
     try{
       const p=player(pid),m=matchup(selectedRoster),pts=pointsFor(m,pid),opp=opponent(g,p.team),when=gameWhen(g);
-      showModal('Lock In Previous Completed Game',`<p><strong>${esc(p.full_name)}</strong>'s previous completed game is still available to lock because today's game has not started.</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${esc(p.full_name)}</div><div class="change-meta">${esc(when)} ${esc(opp)} · ${num(pts)} pts</div></div></div><div class="warning">This lock window closes when ${esc(p.team||'the player')}'s next game begins. Sleeper Lock-In selections are irreversible once submitted.</div>`,`<button data-close>Cancel</button><button id="commitCarryLock" class="primary">Lock In</button>`);
+      showModal('Lock In Previous Completed Game',`<p><strong>${esc(p.full_name)}</strong>'s previous completed game is still available to lock because today's game has not started.</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${esc(p.full_name)}</div><div class="change-meta">${esc(when)} ${esc(opp)} · ${num(pts)} pts</div></div></div><div class="warning">Moving this player out of the starter slot that produced this score makes the score permanently ineligible to lock. This lock window also closes when ${esc(p.team||'the player')}'s next game begins.</div>`,`<button data-close>Cancel</button><button id="commitCarryLock" class="primary">Lock In</button>`);
       setTimeout(()=>document.getElementById('commitCarryLock')?.addEventListener('click',()=>commitLock(pid,String(g.game_id))),0);
     }catch{}
   }
@@ -100,6 +113,29 @@
       });
     }catch{}
   }
+  function movementCandidates(before,after){
+    const out=[];
+    before=(Array.isArray(before)?before:[]).map(String);after=(Array.isArray(after)?after:[]).map(String);
+    before.forEach((pid,i)=>{
+      if(!pid||pid==='0'||after.indexOf(pid)===i)return;
+      const g=priorCompletedGame(pid);if(g?.game_id)out.push([pid,String(g.game_id)]);
+    });
+    return out;
+  }
+  try{
+    if(typeof writeLineup==='function'&&!writeLineup.__rbInvalidateMovedLocks){
+      const base=writeLineup;
+      const wrapped=async function(starters,...rest){
+        let before=[];try{before=(matchup(selectedRoster)?.starters||[]).map(String)}catch{}
+        const candidates=movementCandidates(before,starters);
+        const result=await base.call(this,starters,...rest);
+        candidates.forEach(([pid,gid])=>invalidate(pid,gid));
+        queueMicrotask(decorate);
+        return result;
+      };
+      wrapped.__rbInvalidateMovedLocks=true;writeLineup=wrapped;try{window.writeLineup=wrapped}catch{}
+    }
+  }catch{}
   try{
     if(typeof renderTeam==='function'&&!renderTeam.__rbCarryLockWindow){const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);queueMicrotask(decorate);return out};wrapped.__rbCarryLockWindow=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}
   }catch{}
