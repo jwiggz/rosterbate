@@ -4,6 +4,11 @@
   }
   function verified(btn){
     try{
+      // Carry-forward buttons are only created by sleeper-lock-window after all of its
+      // current eligibility checks pass (starter evidence/fallback, invalidation,
+      // acquisition timing, already-locked state, and next-game window). Do not
+      // second-guess that result with the older strict starter-history-only rule.
+      if(String(btn?.dataset?.rbHistoryVerified||'')==='1')return true;
       const pid=String(btn?.dataset?.lockPlayer||''),gid=String(btn?.dataset?.lockGame||'');
       if(!pid||!gid||!window.rbStarterHistory?.eligible)return false;
       const g=gameById(gid);if(!g)return false;
@@ -15,7 +20,7 @@
       document.querySelectorAll('#teamView .lock-btn[data-rb-carry-lock="1"]').forEach(btn=>{
         if(verified(btn)){
           btn.dataset.rbHistoryVerified='1';
-          btn.title='Verified from RosterBate starter history at game start';
+          btn.title=btn.title||'Verified by RosterBate carry-forward lock checks';
           return;
         }
         const row=btn.closest('.player-row');btn.remove();
