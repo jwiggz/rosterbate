@@ -8,30 +8,55 @@
     for(const [id,p] of Object.entries(window.currentData?.players||{}))if(String(p?.full_name||'').trim().toLowerCase()===name)return String(id);
     return'';
   }
-  function cleanProjections(card){
-    const box=card.querySelector('.projs');if(!box)return;
-    box.querySelectorAll('.proj').forEach(x=>{
-      const opp=String(x.querySelector('.projopp')?.textContent||'').trim().toLowerCase();
-      if(opp==='scheduled game')x.remove();
-    });
-    if(!box.querySelector('.proj'))box.innerHTML='<div class="empty">No projections for scheduled games.</div>';
-  }
-  async function fillAverages(card){
-    const id=playerId(card),stats=card.querySelector('.stats');if(!id||!stats)return;
+  function selectedRosterId(){try{return typeof selectedRoster!=='undefined'?String(selectedRoster):''}catch{return''}}
+  function fmtDate(v){const d=new Date(v);return Number.isNaN(d.getTime())?String(v||''):d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}
+  function fmtTime(v){const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}
+  function projectionGames(id){const p=window.currentData?.projections?.[String(id)]||{};return Array.isArray(p.games)?p.games:[]}
+  function dateKey(v){const d=new Date(v);if(Number.isNaN(d.getTime()))return String(v||'').slice(0,10);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+  function matchProjection(id,game){const pg=projectionGames(id),key=dateKey(game.date);return pg.find(x=>dateKey(x.date)===key)||null}
+  async function fillAverages(card,id){
+    const stats=card.querySelector('.stats');if(!id||!stats)return;
+    let row=null;
     try{
-      const r=await fetch(`/.netlify/functions/sleeper-player-season-summary?league=${encodeURIComponent(window.leagueId||'')}&player=${encodeURIComponent(id)}&_=${Date.now()}`,{cache:'no-store'}),d=await r.json();
-      if(!r.ok||!d?.ok||!d.gp)return;
+      const roster=selectedRosterId();
+      if(roster){
+        const r=await fetch(`/.netlify/functions/sleeper-player-stats?league=${encodeURIComponent(window.leagueId||'')}&roster=${encodeURIComponent(roster)}&_=${Date.now()}`,{cache:'no-store'}),d=await r.json();
+        if(r.ok&&d?.ok)row=d.players?.[String(id)]||null;
+      }
+      if(!row){
+        const r=await fetch(`/.netlify/functions/sleeper-player-season-summary?league=${encodeURIComponent(window.leagueId||'')}&player=${encodeURIComponent(id)}&_=${Date.now()}`,{cache:'no-store'}),d=await r.json();
+        if(r.ok&&d?.ok&&d.gp)row={gp:d.gp,averages:d.averages};
+      }
+      if(!row)return;
       stats.innerHTML=labels.map(([k,label])=>{
-        const v=k==='gp'?d.gp:d.averages?.[k];
-        const text=k==='gp'?String(v??'—'):Number.isFinite(Number(v))?Number(v).toFixed(1):'—';
-        return `<div class="stat"><b>${text}</b><small>${label}</small></div>`;
+        const v=k==='gp'?(row.gp??row.averages?.gp):row.averages?.[k];
+        const out=k==='gp'?String(v??'—'):Number.isFinite(Number(v))?Number(v).toFixed(1):'—';
+        return `<div class="stat"><b>${out}</b><small>${label}</small></div>`;
+      }).join('');
+    }catch{}
+  }
+  async function rebuildProjections(card,id){
+    const box=card.querySelector('.projs');if(!box||!id)return;
+    try{
+      const q=new URLSearchParams({player:id,league:String(window.leagueId||'')});
+      if(window.currentData?.league?.season)q.set('season',String(window.currentData.league.season));
+      const p=window.currentData?.players?.[String(id)]||{};
+      if(/^\d+$/.test(String(p.espn_id||'')))q.set('espnId',String(p.espn_id));
+      const r=await fetch(`/.netlify/functions/sleeper-player-detail?${q}&_=${Date.now()}`,{cache:'no-store'}),d=await r.json();
+      if(!r.ok||!d?.ok)return;
+      const now=Date.now();
+      const future=(d.gameLog||[]).filter(g=>!g.completed&&Date.parse(g.date)>now).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date)).slice(0,6);
+      if(!future.length){box.innerHTML='<div class="empty">No upcoming games.</div>';return}
+      box.innerHTML=future.map(g=>{
+        const proj=matchProjection(id,g),points=Number(proj?.points),has=Number.isFinite(points),opp=`${g.homeAway==='away'?'@':'vs'} ${g.opponent||''}`;
+        return `<div class="proj"><div class="projtop"><span>${fmtDate(g.date)}</span><span>Proj</span></div><div class="projopp">${opp}</div>${has?`<b>${points.toFixed(1)} proj</b>`:'<b style="color:#91a2b8;font-size:12px">Projection pending</b>'}<div class="projsmall">${fmtTime(g.date)}</div></div>`;
       }).join('');
     }catch{}
   }
   function run(card){
     if(!card)return;
-    cleanProjections(card);
-    if(!done.has(card)){done.add(card);fillAverages(card)}
+    const id=playerId(card);if(!id)return;
+    if(!done.has(card)){done.add(card);fillAverages(card,id);rebuildProjections(card,id)}
   }
   const mo=new MutationObserver(()=>{const card=document.getElementById('rbPlayerCard');if(card)requestAnimationFrame(()=>run(card))});
   mo.observe(document.documentElement,{subtree:true,childList:true});
