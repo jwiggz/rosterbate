@@ -19,11 +19,35 @@
     const rows=read().filter(x=>Number(x?.ts)>0&&Number(x.ts)<=t).sort((a,b)=>Number(a.ts)-Number(b.ts));
     return rows.length?rows[rows.length-1]:null;
   }
+  function after(time){
+    const t=Number(time)||0;if(!t)return null;
+    const rows=read().filter(x=>Number(x?.ts)>t).sort((a,b)=>Number(a.ts)-Number(b.ts));
+    return rows.length?rows[0]:null;
+  }
+  function continuity(pid,time){
+    pid=String(pid);const rows=read().filter(x=>Number(x?.ts)>Number(time||0)).sort((a,b)=>Number(a.ts)-Number(b.ts));
+    if(!rows.length)return null;
+    const first=rows[0];
+    if(!cleanStarters(first.starters).includes(pid))return false;
+    for(const row of rows){if(!cleanStarters(row.starters).includes(pid))return false}
+    return cleanStarters(current()).includes(pid);
+  }
   function eligible(pid,game){
-    try{const t=Date.parse(String(game?.start_time||''));if(!Number.isFinite(t))return false;const s=at(t);return !!s&&cleanStarters(s.starters).includes(String(pid))}catch{return false}
+    try{
+      const t=Date.parse(String(game?.start_time||''));if(!Number.isFinite(t))return false;
+      const s=at(t);if(s)return cleanStarters(s.starters).includes(String(pid));
+      return continuity(pid,t)===true;
+    }catch{return false}
   }
   function evidence(pid,game){
-    try{const t=Date.parse(String(game?.start_time||''));const s=Number.isFinite(t)?at(t):null;return{eligible:!!s&&cleanStarters(s.starters).includes(String(pid)),gameStart:Number.isFinite(t)?t:null,snapshot:s}}catch{return{eligible:false,gameStart:null,snapshot:null}}
+    try{
+      const t=Date.parse(String(game?.start_time||''));
+      if(!Number.isFinite(t))return{eligible:false,gameStart:null,snapshot:null,mode:'none'};
+      const s=at(t);
+      if(s)return{eligible:cleanStarters(s.starters).includes(String(pid)),gameStart:t,snapshot:s,mode:'pre-tipoff'};
+      const first=after(t),ok=continuity(pid,t)===true;
+      return{eligible:ok,gameStart:t,snapshot:first,mode:ok?'post-tipoff-continuity':'none'};
+    }catch{return{eligible:false,gameStart:null,snapshot:null,mode:'none'}}
   }
   function hookWriteLineup(){
     try{
@@ -39,7 +63,7 @@
     }catch{return false}
   }
   function observe(){snapshot(current(),Date.now(),'observe');hookWriteLineup()}
-  window.rbStarterHistory={read,snapshot,at,eligible,evidence};
+  window.rbStarterHistory={read,snapshot,at,after,eligible,evidence};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',observe,{once:true});else observe();
   window.addEventListener('focus',observe);
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')setTimeout(observe,0)},true);
