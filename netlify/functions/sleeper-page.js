@@ -25,6 +25,7 @@ exports.handler=async function(){
     if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js"></script>');
     if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261029b"></script>');
     if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-player-summary-fix.js')) scripts.push('<script src="/sleeper-player-summary-fix.js?v=20261029a"></script>');
     if(!html.includes('sleeper-hashtag-import.js')) scripts.push('<script src="/sleeper-hashtag-import.js?v=20261028a"></script>');
     if(!html.includes('sleeper-hashtag-import-flex.js')) scripts.push('<script src="/sleeper-hashtag-import-flex.js?v=20261028a"></script>');
     if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261028d"></script>');
