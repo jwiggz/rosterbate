@@ -1,20 +1,5 @@
 (()=>{
   const txState={key:'',ready:false,loading:null,acquired:new Map()};
-  function scalar(v){return v==null?'':String(v)}
-  function cacheKey(){try{return `rbLockState:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`}catch{return''}}
-  function lockState(){try{const raw=sessionStorage.getItem(cacheKey());const parsed=raw?JSON.parse(raw):null;return parsed?.data||null}catch{return null}}
-  function containsPlayer(node,pid,depth=0){
-    if(depth>7||node==null)return false;pid=String(pid);
-    if(Array.isArray(node))return node.some(v=>containsPlayer(v,pid,depth+1));
-    if(typeof node!=='object')return scalar(node)===pid;
-    const direct=scalar(node.player_id??node.playerId??node.player??node.pid);if(direct===pid)return true;
-    for(const [k,v] of Object.entries(node)){
-      if(String(k)===pid)return true;
-      if(typeof v==='object'){if(containsPlayer(v,pid,depth+1))return true}
-      else if(scalar(v)===pid)return true;
-    }
-    return false;
-  }
   function invalidationKey(){try{return `rbLockInvalidatedV2:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`}catch{return''}}
   function isInvalidated(pid,gid){
     try{const raw=localStorage.getItem(invalidationKey()),v=raw?JSON.parse(raw):{},games=Array.isArray(v?.[String(pid)])?v[String(pid)]:[];return games.map(String).includes(String(gid))}catch{return false}
@@ -43,11 +28,11 @@
   }
   function acquiredAfterGame(pid,g){const at=Number(txState.acquired.get(String(pid))||0),gt=gameTime(g);return !!at&&!!gt&&at>gt}
   function eligible(pid,gid){
-    const d=lockState();if(!d)return null;
-    const g=gameById(gid,pid);
-    if(!containsPlayer(d.playerMap,String(pid)))return false;
+    const g=gameById(gid,pid);if(!g)return null;
+    if(!window.rbStarterHistory?.eligible)return null;
+    if(!window.rbStarterHistory.eligible(String(pid),g))return false;
     if(isInvalidated(pid,gid))return false;
-    if(g&&acquiredAfterGame(pid,g))return false;
+    if(acquiredAfterGame(pid,g))return false;
     return true;
   }
   function markUnavailable(row,btn){
