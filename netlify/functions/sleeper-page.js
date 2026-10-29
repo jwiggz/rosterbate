@@ -39,7 +39,7 @@ exports.handler=async function(){
     if(!html.includes('sleeper-lock-inspector-ui.js')) scripts.push('<script src="/sleeper-lock-inspector-ui.js?v=20261028d"></script>');
     if(!html.includes('sleeper-lock-qa.js')) scripts.push('<script src="/sleeper-lock-qa.js?v=20261029a"></script>');
     if(!html.includes('sleeper-lock-pulse-scroll-fix.js')) scripts.push('<script src="/sleeper-lock-pulse-scroll-fix.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-future-day-points.js')) scripts.push('<script src="/sleeper-future-day-points.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-future-day-points.js')) scripts.push('<script src="/sleeper-future-day-points.js?v=20261029b"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
   }catch(e){return{statusCode:502,headers:{'Content-Type':'text/plain; charset=utf-8'},body:`Unable to load basketball dashboard: ${String(e?.message||e)}`}}
