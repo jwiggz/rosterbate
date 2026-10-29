@@ -23,13 +23,6 @@
     const t=Date.parse(String(g?.start_time||''));if(Number.isFinite(t))return t;
     const d=Date.parse(`${String(g?.date||'')}T12:00:00`);return Number.isFinite(d)?d:0;
   }
-  function lockState(){
-    try{
-      const raw=sessionStorage.getItem(`rbLockState:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`);
-      const parsed=raw?JSON.parse(raw):null;
-      return parsed?.data||null;
-    }catch{return null}
-  }
   function invalidationKey(){return `rbLockInvalidatedV2:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}`}
   function readInvalidated(){
     try{const raw=localStorage.getItem(invalidationKey());const v=raw?JSON.parse(raw):{};return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch{return{}}
@@ -45,25 +38,8 @@
       games.add(String(gid));v[key]=[...games];localStorage.setItem(invalidationKey(),JSON.stringify(v));
     }catch{}
   }
-  function scalar(v){return v==null?'':String(v)}
-  function containsPlayer(node,pid,depth=0){
-    if(depth>7||node==null)return false;
-    pid=String(pid);
-    if(Array.isArray(node))return node.some(v=>containsPlayer(v,pid,depth+1));
-    if(typeof node!=='object')return scalar(node)===pid;
-    const direct=scalar(node.player_id??node.playerId??node.player??node.pid);
-    if(direct===pid)return true;
-    for(const [k,v] of Object.entries(node)){
-      if(String(k)===pid)return true;
-      if(typeof v==='object'){if(containsPlayer(v,pid,depth+1))return true}
-      else if(scalar(v)===pid)return true;
-    }
-    return false;
-  }
-  function sleeperStarterHistory(pid){
-    const d=lockState();if(!d)return false;
-    pid=String(pid);
-    return containsPlayer(d.playerMap,pid)||containsPlayer(d.subs,pid);
+  function historyEligible(pid,g){
+    try{return !!window.rbStarterHistory?.eligible?.(String(pid),g)}catch{return false}
   }
   function txKey(){return `${String(leagueId)}:${String(selectedWeek)}:${String(selectedRoster)}`}
   async function ensureTransactions(){
@@ -106,14 +82,13 @@
     try{
       if(selectedDay==='all'||String(selectedDay)!==fantasyDay())return null;
       if(lockedGames&&lockedGames[String(pid)])return null;
-      if(!sleeperStarterHistory(pid))return null;
-      return candidateCompletedGames(pid).find(g=>g?.game_id&&!isInvalidated(pid,String(g.game_id))&&!acquiredAfterGame(pid,g))||null;
+      return candidateCompletedGames(pid).find(g=>g?.game_id&&historyEligible(pid,g)&&!isInvalidated(pid,String(g.game_id))&&!acquiredAfterGame(pid,g))||null;
     }catch{return null}
   }
   function showCarryReview(pid,g){
     try{
       const p=player(pid),m=matchup(selectedRoster),pts=pointsFor(m,pid),opp=opponent(g,p.team),when=gameWhen(g);
-      showModal('Lock In Previous Completed Game',`<p><strong>${esc(p.full_name)}</strong>'s previous completed game is still available to lock because the next game has not started.</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${esc(p.full_name)}</div><div class="change-meta">${esc(when)} ${esc(opp)} · ${num(pts)} pts</div></div></div><div class="warning">Sleeper requires the player to have been in a starting slot when this game was played. Moving between starting positions preserves eligibility; moving the player to the bench does not. The window also closes when the next game begins.</div>`,`<button data-close>Cancel</button><button id="commitCarryLock" class="primary">Lock In</button>`);
+      showModal('Lock In Previous Completed Game',`<p><strong>${esc(p.full_name)}</strong>'s previous completed game is verified as lockable from RosterBate's starter-at-tipoff history.</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${esc(p.full_name)}</div><div class="change-meta">${esc(when)} ${esc(opp)} · ${num(pts)} pts</div></div></div><div class="warning">This game is shown because RosterBate recorded the player in a starting slot before tipoff. The lock window closes when the player's next NBA game begins.</div>`,`<button data-close>Cancel</button><button id="commitCarryLock" class="primary">Lock In</button>`);
       setTimeout(()=>document.getElementById('commitCarryLock')?.addEventListener('click',()=>commitLock(pid,String(g.game_id))),0);
     }catch{}
   }
@@ -139,7 +114,8 @@
           btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbCarryLock='1';
           const meta=row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info');meta?.appendChild(btn);
         }
-        btn.dataset.lockPlayer=pid;btn.dataset.lockGame=String(g.game_id);
+        btn.dataset.lockPlayer=pid;btn.dataset.lockGame=String(g.game_id);btn.dataset.rbHistoryVerified='1';
+        btn.title='Verified from RosterBate starter history at game start';
         if(btn.dataset.rbCarryBound!=='1'){
           btn.dataset.rbCarryBound='1';
           btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const current=priorCompletedGame(pid);if(current)showCarryReview(pid,current)});
@@ -162,7 +138,7 @@
     return out;
   }
   try{
-    if(typeof writeLineup==='function'&&!writeLineup.__rbInvalidateMovedLocksV2){
+    if(typeof writeLineup==='function'&&!writeLineup.__rbInvalidateMovedLocksV3){
       const base=writeLineup;
       const wrapped=async function(starters,...rest){
         let before=[];try{before=(matchup(selectedRoster)?.starters||[]).map(String)}catch{}
@@ -172,15 +148,15 @@
         queueMicrotask(()=>decorate());
         return result;
       };
-      wrapped.__rbInvalidateMovedLocksV2=true;writeLineup=wrapped;try{window.writeLineup=wrapped}catch{}
+      wrapped.__rbInvalidateMovedLocksV3=true;writeLineup=wrapped;try{window.writeLineup=wrapped}catch{}
     }
   }catch{}
   try{
-    if(typeof renderTeam==='function'&&!renderTeam.__rbCarryLockWindowV2){const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);queueMicrotask(()=>decorate());return out};wrapped.__rbCarryLockWindowV2=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}
+    if(typeof renderTeam==='function'&&!renderTeam.__rbCarryLockWindowV3){const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);queueMicrotask(()=>decorate());return out};wrapped.__rbCarryLockWindowV3=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}
   }catch{}
   document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab'))queueMicrotask(()=>decorate())},true);
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')queueMicrotask(()=>decorate())},true);
   window.addEventListener('focus',()=>queueMicrotask(()=>decorate()));
-  let attempts=0;const retry=setInterval(()=>{decorate();attempts++;if(attempts>=16)clearInterval(retry)},500);
+  let attempts=0;const retry=setInterval(()=>{decorate();attempts++;if(attempts>=20)clearInterval(retry)},500);
   setTimeout(()=>decorate(),0);
 })();
