@@ -67,14 +67,22 @@
     const at=Number(txState.acquired.get(String(pid))||0),gt=gameTime(g);
     return !!at&&!!gt&&at>gt;
   }
+  function teamGames(team){
+    try{return (currentData?.schedule||[]).filter(g=>!g?.calendar_only&&(g.home===team||g.away===team)).slice().sort((a,b)=>gameTime(a)-gameTime(b))}catch{return[]}
+  }
+  function nextGameAfter(team,game){
+    const t=gameTime(game);if(!t)return null;
+    return teamGames(team).find(g=>gameTime(g)>t&&String(g?.game_id||'')!==String(game?.game_id||''))||null;
+  }
   function candidateCompletedGames(pid){
     try{
-      const p=player(pid),next=gameForTeam(p.team);if(!next||String(next.status||'pre_game')!=='pre_game')return[];
-      const nextT=gameTime(next);
-      return (currentData?.schedule||[]).filter(g=>{
+      const p=player(pid),team=String(p?.team||''),now=Date.now();if(!team)return[];
+      return teamGames(team).filter(g=>{
         if(String(g.status||'')!=='complete')return false;
-        if(g.home!==p.team&&g.away!==p.team)return false;
-        const t=gameTime(g);return !nextT||!t||t<nextT;
+        const next=nextGameAfter(team,g);
+        if(!next)return true;
+        const nt=gameTime(next);
+        return !nt||nt>now;
       }).sort((a,b)=>gameTime(b)-gameTime(a));
     }catch{return[]}
   }
@@ -88,7 +96,7 @@
   function showCarryReview(pid,g){
     try{
       const p=player(pid),m=matchup(selectedRoster),pts=pointsFor(m,pid),opp=opponent(g,p.team),when=gameWhen(g);
-      showModal('Lock In Previous Completed Game',`<p><strong>${esc(p.full_name)}</strong>'s previous completed game is verified as lockable from RosterBate's starter-at-tipoff history.</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${esc(p.full_name)}</div><div class="change-meta">${esc(when)} ${esc(opp)} · ${num(pts)} pts</div></div></div><div class="warning">This game is shown because RosterBate recorded the player in a starting slot before tipoff. The lock window closes when the player's next NBA game begins.</div>`,`<button data-close>Cancel</button><button id="commitCarryLock" class="primary">Lock In</button>`);
+      showModal('Lock In Previous Completed Game',`<p><strong>${esc(p.full_name)}</strong>'s previous completed game is verified as lockable from RosterBate's starter history.</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${esc(p.full_name)}</div><div class="change-meta">${esc(when)} ${esc(opp)} · ${num(pts)} pts</div></div></div><div class="warning">The lock window stays open until this player's next actual NBA game begins.</div>`,`<button data-close>Cancel</button><button id="commitCarryLock" class="primary">Lock In</button>`);
       setTimeout(()=>document.getElementById('commitCarryLock')?.addEventListener('click',()=>commitLock(pid,String(g.game_id))),0);
     }catch{}
   }
@@ -115,7 +123,7 @@
           const meta=row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info');meta?.appendChild(btn);
         }
         btn.dataset.lockPlayer=pid;btn.dataset.lockGame=String(g.game_id);btn.dataset.rbHistoryVerified='1';
-        btn.title='Verified from RosterBate starter history at game start';
+        btn.title='Verified from RosterBate starter history; open until next scheduled NBA game';
         if(btn.dataset.rbCarryBound!=='1'){
           btn.dataset.rbCarryBound='1';
           btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const current=priorCompletedGame(pid);if(current)showCarryReview(pid,current)});
@@ -138,7 +146,7 @@
     return out;
   }
   try{
-    if(typeof writeLineup==='function'&&!writeLineup.__rbInvalidateMovedLocksV3){
+    if(typeof writeLineup==='function'&&!writeLineup.__rbInvalidateMovedLocksV4){
       const base=writeLineup;
       const wrapped=async function(starters,...rest){
         let before=[];try{before=(matchup(selectedRoster)?.starters||[]).map(String)}catch{}
@@ -148,11 +156,11 @@
         queueMicrotask(()=>decorate());
         return result;
       };
-      wrapped.__rbInvalidateMovedLocksV3=true;writeLineup=wrapped;try{window.writeLineup=wrapped}catch{}
+      wrapped.__rbInvalidateMovedLocksV4=true;writeLineup=wrapped;try{window.writeLineup=wrapped}catch{}
     }
   }catch{}
   try{
-    if(typeof renderTeam==='function'&&!renderTeam.__rbCarryLockWindowV3){const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);queueMicrotask(()=>decorate());return out};wrapped.__rbCarryLockWindowV3=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}
+    if(typeof renderTeam==='function'&&!renderTeam.__rbCarryLockWindowV4){const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);queueMicrotask(()=>decorate());return out};wrapped.__rbCarryLockWindowV4=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}
   }catch{}
   document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab'))queueMicrotask(()=>decorate())},true);
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')queueMicrotask(()=>decorate())},true);
