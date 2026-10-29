@@ -6,6 +6,7 @@
   function data(){return getGlobal('currentData')||null}
   function league(){return getGlobal('leagueId')||''}
   function roster(){return getGlobal('selectedRoster')||''}
+  function ensureStyle(){if(document.getElementById('rbSummaryStatsV3'))return;const s=document.createElement('style');s.id='rbSummaryStatsV3';s.textContent=`#rbPlayerCard .stats{display:flex!important;gap:7px!important;overflow-x:auto!important;overflow-y:hidden!important;flex-wrap:nowrap!important;padding-bottom:3px}#rbPlayerCard .stats .stat{flex:0 0 72px!important;min-width:72px!important}#rbPlayerCard .stats .stat.fantasy b{color:#30d8a0!important}#rbPlayerCard .stats .stat.fantasy{border-color:#2b6d5c!important;background:#213a3a!important}`;document.head.appendChild(s)}
   function playerId(card){
     const img=card?.querySelector('.rbphoto img');
     if(img){try{const u=new URL(img.src,location.href),v=u.searchParams.get('player');if(v)return String(v)}catch{}}
@@ -31,10 +32,20 @@
     const r=await fetch(`/.netlify/functions/sleeper-player-detail?${q}&_=${Date.now()}`,{cache:'no-store'}),d=await r.json().catch(()=>null);
     return r.ok&&d?d:null;
   }
-  function renderStats(card,row){
+  function rollingAvg(detail,days){
+    const cutoff=Date.now()-days*86400000;
+    const vals=(detail?.gameLog||[]).filter(g=>g.completed&&Date.parse(g.date)>=cutoff&&Number.isFinite(Number(g.fpts))).map(g=>Number(g.fpts));
+    if(!vals.length)return null;
+    return vals.reduce((a,b)=>a+b,0)/vals.length;
+  }
+  function f(v){return Number.isFinite(Number(v))?Number(v).toFixed(1):'—'}
+  function renderStats(card,row,detail){
+    ensureStyle();
     const box=card.querySelector('.stats');if(!box)return;
     if(!row){box.innerHTML='<div class="empty">Season stats unavailable.</div>';return}
-    box.innerHTML=labels.map(([k,label])=>{const v=k==='gp'?(row.gp??row.averages?.gp):row.averages?.[k];const text=k==='gp'?String(v??'—'):Number.isFinite(Number(v))?Number(v).toFixed(1):'—';return `<div class="stat"><b>${esc(text)}</b><small>${label}</small></div>`}).join('');
+    const basic=labels.map(([k,label])=>{const v=k==='gp'?(row.gp??row.averages?.gp):row.averages?.[k];const text=k==='gp'?String(v??'—'):f(v);return `<div class="stat"><b>${esc(text)}</b><small>${label}</small></div>`}).join('');
+    const fantasy=[['Season',row.fantasy_points_avg],['L7',rollingAvg(detail,7)],['L14',rollingAvg(detail,14)],['L30',rollingAvg(detail,30)]].map(([label,v])=>`<div class="stat fantasy"><b>${esc(f(v))}</b><small>${label} FPTS/G</small></div>`).join('');
+    box.innerHTML=basic+fantasy;
   }
   function renderFuture(card,id,detail){
     const box=card.querySelector('.projs');if(!box)return;
@@ -51,7 +62,7 @@
     const sig=`${id}:${String(league())}:${String(roster())}`;if(patched.get(card)===sig)return;patched.set(card,sig);
     const [avg,detail]=await Promise.all([getAverages(id).catch(()=>null),getDetail(id).catch(()=>null)]);
     if(!document.body.contains(card))return;
-    renderStats(card,avg);renderFuture(card,id,detail);
+    renderStats(card,avg,detail);renderFuture(card,id,detail);
   }
   setInterval(()=>{const card=document.getElementById('rbPlayerCard');if(card)patch(card)},250);
   document.addEventListener('click',e=>{if(e.target.closest?.('.rbtab[data-t="s"]'))setTimeout(()=>{const card=document.getElementById('rbPlayerCard');if(card){patched.delete(card);patch(card)}},50)},true);
