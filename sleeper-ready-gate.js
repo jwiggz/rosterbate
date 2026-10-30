@@ -32,33 +32,36 @@
       return false;
     }catch{return false}
   }
-  function lockCacheReady(){
+  function lockCache(){
     try{
       const lg=league(),rid=rosterId(),wk=week();
-      if(!lg||!rid||!wk)return false;
+      if(!lg||!rid||!wk)return null;
       const raw=sessionStorage.getItem(`rbLockState:${lg}:${rid}:${wk}`);
-      if(!raw)return false;
+      if(!raw)return null;
       const x=JSON.parse(raw);
-      return !!x?.data;
-    }catch{return false}
+      return x?.data?x:null;
+    }catch{return null}
+  }
+  function freshLockCacheReady(){
+    const x=lockCache();
+    if(!x)return false;
+    return Number(x.ts||0)>=START-500;
   }
   function lockUiApplied(){
     try{
       const d=data();
       const m=(d?.matchups||[]).find(x=>Number(x.roster_id)===rosterId());
       const sg=m?.starters_games||m?.startersGames||{};
-      const privateRaw=sessionStorage.getItem(`rbLockState:${league()}:${rosterId()}:${week()}`);
-      let privateSg={};
-      if(privateRaw){const parsed=JSON.parse(privateRaw);privateSg=parsed?.data?.startersGames||{}}
+      const privateSg=lockCache()?.data?.startersGames||{};
       const expected=Math.max(Object.keys(sg||{}).length,Object.keys(privateSg||{}).length);
       if(expected===0)return true;
-      const chips=document.querySelectorAll('#teamView .lock-chip,.player-row.locked-in').length;
-      return chips>=expected;
+      const lockedRows=document.querySelectorAll('#teamView .player-row.locked-in').length;
+      return lockedRows>=expected;
     }catch{return false}
   }
   function lockReady(){
     if(!hasPrivateSync())return true;
-    return verified()&&lockCacheReady()&&lockUiApplied();
+    return verified()&&freshLockCacheReady()&&lockUiApplied();
   }
   function linkedRosterReady(){
     try{
