@@ -17,7 +17,7 @@
   gate.innerHTML='<div style="text-align:center"><div style="font-weight:900;font-size:16px">RosterBate</div><div style="color:#8e9bb0;font-size:10px;margin-top:8px">Checking your account…</div></div>';
   (document.body||document.documentElement).appendChild(gate);
 
-  let auth=null,db=null;
+  let auth=null,db=null,loginPrompted=false;
   function hideGate(){gate.remove()}
   function setActive(user){
     try{
@@ -57,6 +57,7 @@
     }
   }
   function showLogin(){
+    loginPrompted=true;
     gate.innerHTML=`<form id="rbInlineLogin" style="width:min(410px,calc(100% - 24px));background:#202a3a;border:1px solid #334258;border-radius:14px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.35)" autocomplete="on">
       <div style="font-weight:900;font-size:19px;text-align:center">Sign in to RosterBate</div>
       <div style="color:#9aa8ba;font-size:10px;line-height:1.55;margin:9px 0 18px;text-align:center">Use the same existing RosterBate username/email and password. This signs you into this preview domain.</div>
@@ -101,6 +102,7 @@
         }
         setActive(user);
         window.rbAccountStorage?.setActiveUser?.(String(user.uid||''));
+        if(loginPrompted){location.reload();return}
         let username='';
         try{const snap=await db.ref('users/'+user.uid+'/username').once('value');username=String(snap.val()||'')}catch{}
         showAccount(user,username);
