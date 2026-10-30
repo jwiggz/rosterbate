@@ -8,7 +8,7 @@
   function shouldScope(storage,key){
     key=String(key||'');
     if(key===ACTIVE||key===OWNER||key.startsWith(PREFIX)||key.startsWith('rbActiveFirebase'))return false;
-    if(storage===localStorage)return key==='rbSleeperTokenPersistent'||key.startsWith('rbDailyPlan:');
+    if(storage===localStorage)return key==='rbSleeperTokenPersistent'||key==='rbSleeperRecentLeagues'||key.startsWith('rbDailyPlan:');
     if(storage===sessionStorage)return key==='rbSleeperToken'||key==='rbSleeperAuth'||key.startsWith('rbPlanDismiss:')||key.startsWith('rbLockedSlots:');
     return false;
   }
@@ -28,6 +28,12 @@
       const keys=[];
       for(let i=0;i<localStorage.length;i++){const k=native.key.call(localStorage,i);if(k&&k.startsWith('rbDailyPlan:'))keys.push(k)}
       keys.forEach(k=>{const dest=`${PREFIX}${id}:${k}`,v=native.get.call(localStorage,k);if(v!=null&&!native.get.call(localStorage,dest))native.set.call(localStorage,dest,v);native.remove.call(localStorage,k)});
+    }catch{}
+    try{
+      const old=native.get.call(localStorage,'rbSleeperRecentLeagues');
+      const dest=`${PREFIX}${id}:rbSleeperRecentLeagues`;
+      if(old&&!native.get.call(localStorage,dest))native.set.call(localStorage,dest,old);
+      if(old)native.remove.call(localStorage,'rbSleeperRecentLeagues');
     }catch{}
   }
   function clearSecrets(id=active()){
