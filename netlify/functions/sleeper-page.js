@@ -6,8 +6,11 @@ exports.handler=async function(){
     if(!r.ok) throw new Error(`GitHub ${r.status}`);
     let html=await r.text();
     const scripts=[];
-    if(!html.includes('rosterbate-auth.js')) scripts.push('<script src="/rosterbate-auth.js?v=20261029a"></script>');
-    if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261029a"></script>');
+    if(!html.includes('firebase-app-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>');
+    if(!html.includes('firebase-auth-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>');
+    if(!html.includes('firebase-database-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>');
+    if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261029b"></script>');
+    if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js?v=20261028b"></script>');
