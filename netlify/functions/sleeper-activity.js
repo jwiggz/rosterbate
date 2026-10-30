@@ -18,8 +18,9 @@ async function sleeperTokenFrom(body,event){
 }
 async function readChat(token,leagueId){
   if(!validToken(token))return{items:[],auth:false};
-  const query='query($lg:Snowflake!){messages(parent_id:$lg){message_id created author_display_name author_id author_is_bot text text_map attachment pinned reactions user_reactions}}';
-  const r=await fetch('https://sleeper.com/graphql',{method:'POST',headers:{Accept:'application/json','Content-Type':'application/json',Authorization:token,'X-Sleeper-GraphQL-Op':'messages','User-Agent':'RosterBate/1.0'},body:JSON.stringify({operationName:'messages',variables:{lg:leagueId},query})});
+  if(!/^\d{10,25}$/.test(String(leagueId)))return{items:[],auth:false};
+  const query='query messages{messages(parent_id:"'+String(leagueId)+'"){message_id created author_display_name author_id author_is_bot text text_map attachment pinned reactions user_reactions}}';
+  const r=await fetch('https://sleeper.com/graphql',{method:'POST',headers:{Accept:'application/json','Content-Type':'application/json',Authorization:token,'X-Sleeper-GraphQL-Op':'messages','User-Agent':'RosterBate/1.0'},body:JSON.stringify({operationName:'messages',variables:{},query})});
   let d={};try{d=await r.json()}catch{}
   if(!r.ok||Array.isArray(d?.errors))return{items:[],auth:false,error:d?.errors?.[0]?.message||`HTTP ${r.status}`};
   const rows=Array.isArray(d?.data?.messages)?d.data.messages:[];
