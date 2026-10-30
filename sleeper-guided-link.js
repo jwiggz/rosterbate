@@ -77,18 +77,17 @@
       <div class="panel"><h3>Public Sleeper link complete</h3><p><strong>${esc(user?.display_name||user?.username||'Your Sleeper account')}</strong> is linked to this RosterBate account.</p>
         <div class="feature"><span>League, roster & matchup data</span><span class="on">READY</span></div>
         <div class="feature"><span>Player stats, projections & waiver tools</span><span class="on">READY</span></div>
-        <div class="feature"><span>Private Sleeper Lock-In/write sync</span><span class="${active?'on':'off'}">${active?'ACTIVE':'OPTIONAL'}</span></div>
+        <div class="feature"><span>Private Sleeper Lock-In/write sync</span><span class="${active?'on':'off'}">${active?'ACTIVE':'REQUIRED'}</span></div>
       </div>
       <div class="sync-card ${active?'active':''}">
-        <div class="sync-title"><span>🔒 Lock Sync</span><span class="sync-pill">${active?'ACTIVE':'RECOMMENDED'}</span></div>
+        <div class="sync-title"><span>🔒 Lock Sync</span><span class="sync-pill">${active?'ACTIVE':'REQUIRED'}</span></div>
         ${active
           ?`<p class="good">Authoritative locked points and private lineup actions are enabled on this browser.</p>`
-          :`<p>Enable Lock Sync if you want RosterBate to show Sleeper's authoritative locked points and support private lineup/Lock-In actions.</p>
+          :`<p>Enable Lock Sync to finish connecting RosterBate to your Sleeper team for authoritative locked points and private lineup/Lock-In actions.</p>
              <p class="muted">This is separate from your Sleeper username. Do <strong>not</strong> enter your Sleeper password. RosterBate will verify the connection before saving anything.</p>
              <button id="rbGuideEnableSync" class="sync-btn" type="button">Enable Lock Sync →</button>`}
-      </div>
-      ${active?'':'<p class="muted">You can also find this later by clicking the Sleeper button or the connection gear at the top of the league page.</p>'}`,
-      `<button id="rbGuideDone" class="primary">${active?'Done':'Continue Without Lock Sync'}</button>`);
+      </div>`,
+      active?`<button id="rbGuideDone" class="primary">Done</button>`:'');
     setTimeout(()=>{
       document.getElementById('rbGuideDone')?.addEventListener('click',close);
       document.getElementById('rbGuideEnableSync')?.addEventListener('click',()=>{
