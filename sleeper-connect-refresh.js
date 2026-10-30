@@ -1,78 +1,131 @@
 (()=>{
   const SESSION_KEY='rbSleeperToken';
   const PERSIST_KEY='rbSleeperTokenPersistent';
+  const LINKED_USERNAME='rbSleeperLinkedUsername';
+  const LINKED_USER_ID='rbSleeperLinkedUserId';
 
-  function sessionToken(){
-    try{return sessionStorage.getItem(SESSION_KEY)||sessionStorage.getItem('rbSleeperAuth')||''}catch{return''}
-  }
-  function persistentToken(){
-    try{return localStorage.getItem(PERSIST_KEY)||''}catch{return''}
-  }
-  function remember(token){
+  function sessionToken(){try{return sessionStorage.getItem(SESSION_KEY)||sessionStorage.getItem('rbSleeperAuth')||''}catch{return''}}
+  function persistentToken(){try{return localStorage.getItem(PERSIST_KEY)||''}catch{return''}}
+  function linkedUsername(){try{return localStorage.getItem(LINKED_USERNAME)||''}catch{return''}}
+  function linkedUserId(){try{return localStorage.getItem(LINKED_USER_ID)||''}catch{return''}}
+  function rememberToken(token){
     try{
-      if(token){
-        sessionStorage.setItem(SESSION_KEY,token);
-        localStorage.setItem(PERSIST_KEY,token);
-      }else{
-        sessionStorage.removeItem(SESSION_KEY);
-        sessionStorage.removeItem('rbSleeperAuth');
-        localStorage.removeItem(PERSIST_KEY);
-      }
+      if(token){sessionStorage.setItem(SESSION_KEY,token);localStorage.setItem(PERSIST_KEY,token)}
+      else{sessionStorage.removeItem(SESSION_KEY);sessionStorage.removeItem('rbSleeperAuth');localStorage.removeItem(PERSIST_KEY)}
     }catch{}
   }
+  function rememberLink(user,rosterId){
+    try{
+      localStorage.setItem(LINKED_USERNAME,String(user?.username||user?.display_name||''));
+      localStorage.setItem(LINKED_USER_ID,String(user?.user_id||''));
+      if(rosterId!=null)localStorage.setItem('rbSleeperRoster',String(rosterId));
+    }catch{}
+  }
+  function clearLink(){try{localStorage.removeItem(LINKED_USERNAME);localStorage.removeItem(LINKED_USER_ID)}catch{}}
 
-  // Restore the remembered device connection immediately. This script is injected
-  // while the base league request is still in flight, so loadLockState() sees the
-  // token before the first completed roster render in normal conditions.
   if(!sessionToken()){
     const saved=persistentToken();
-    if(saved){
-      try{sessionStorage.setItem(SESSION_KEY,saved)}catch{}
-    }
-  }else if(!persistentToken()){
-    // Migrate an existing tab-only connection to remembered-on-this-device.
-    remember(sessionToken());
+    if(saved){try{sessionStorage.setItem(SESSION_KEY,saved)}catch{}}
+  }else if(!persistentToken())rememberToken(sessionToken());
+
+  function rosterForSleeperUser(userId){
+    userId=String(userId||'');
+    return (window.currentData?.teams||currentData?.teams||[]).find(t=>String(t.owner_id||'')===userId)||null;
   }
 
   function refreshConnectionUi(){
-    try{if(typeof updateConnect==='function')updateConnect()}catch{}
+    const b=document.getElementById('connectBtn');
+    if(!b)return;
+    const privateConnected=!!sessionToken();
+    const linked=!!linkedUserId();
+    b.textContent=privateConnected?'Sleeper Connected':linked?'Sleeper Linked':'Link Sleeper';
+    b.classList.toggle('connected',privateConnected||linked);
+    b.title=privateConnected?'Private Sleeper session connected':linked?`Linked as ${linkedUsername()||'Sleeper user'}`:'Link your Sleeper username';
   }
 
-  function applyAuthenticatedState(){
-    refreshConnectionUi();
+  async function selectLinkedRoster(userId){
+    const roster=rosterForSleeperUser(userId);
+    if(!roster)throw new Error('That Sleeper account does not own a roster in this league.');
     try{
-      if(typeof loadLockState==='function'){
-        Promise.resolve(loadLockState()).then(()=>{
-          try{if(typeof renderTeam==='function')renderTeam()}catch{}
-          try{if(typeof renderActivity==='function')renderActivity()}catch{}
-        });
-      }
-    }catch{}
+      selectedRoster=Number(roster.roster_id);
+      localStorage.setItem('rbSleeperRoster',String(selectedRoster));
+      if(typeof clearSelection==='function')clearSelection();
+      if(typeof loadLockState==='function')await loadLockState();
+      if(typeof render==='function')render();
+      else if(typeof renderTeam==='function')renderTeam();
+    }catch(e){throw e}
+    return roster;
   }
 
-  function showPersistentConnect(){
+  async function linkByUsername(username){
+    username=String(username||'').trim();
+    if(!username)throw new Error('Enter your Sleeper username.');
+    const r=await fetch(`/.netlify/functions/sleeper-user?username=${encodeURIComponent(username)}`,{cache:'no-store'});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok||!data?.ok)throw new Error(data?.error||'Unable to find that Sleeper username.');
+    const roster=rosterForSleeperUser(data.user.user_id);
+    if(!roster)throw new Error(`${data.user.display_name||data.user.username} does not own a roster in this league.`);
+    rememberLink(data.user,roster.roster_id);
+    await selectLinkedRoster(data.user.user_id);
+    return {user:data.user,roster};
+  }
+
+  function showPublicLink(){
+    if(typeof showModal!=='function')return;
+    const current=linkedUsername();
+    showModal('Link Sleeper Account',
+      `<p>Enter your <strong>Sleeper username</strong>. RosterBate will find your Sleeper account and automatically open your roster in this league.</p>
+       <label>Sleeper username</label>
+       <input id="rbSleeperUsername" autocomplete="username" value="${typeof esc==='function'?esc(current):''}" placeholder="ArmandoMsports">
+       <div style="margin-top:10px;color:#8fa0b6;font-size:9px;line-height:1.5">No Sleeper password or session code is needed for public league data. Private lineup writes and Lock-In syncing require an authorized Sleeper connection.</div>
+       <button id="rbAdvancedSleeper" type="button" style="margin-top:12px;border:0;background:transparent;color:#8394ac;font-size:8px;text-decoration:underline;padding:0">Advanced / admin connection</button>`,
+      `<button data-close>Cancel</button><button id="rbLinkSleeper" class="primary">Link My Sleeper</button>`
+    );
+    setTimeout(()=>{
+      const input=document.getElementById('rbSleeperUsername'),btn=document.getElementById('rbLinkSleeper');
+      btn?.addEventListener('click',async()=>{
+        const old=btn.textContent;btn.disabled=true;btn.textContent='Finding roster…';
+        try{
+          const result=await linkByUsername(input?.value);
+          try{if(typeof closeModal==='function')closeModal()}catch{}
+          refreshConnectionUi();
+          try{if(typeof setStatus==='function')setStatus(`Sleeper linked: ${result.user.display_name||result.user.username}. Showing your roster.`,'success')}catch{}
+        }catch(e){
+          const error=document.createElement('div');
+          error.className='error';error.style.marginTop='10px';error.textContent=String(e?.message||e);
+          document.querySelector('.modal-body')?.appendChild(error);
+        }finally{btn.disabled=false;btn.textContent=old}
+      });
+      input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();btn?.click()}});
+      document.getElementById('rbAdvancedSleeper')?.addEventListener('click',()=>{try{closeModal()}catch{};showAdvancedConnect()});
+      input?.focus();
+    },0);
+  }
+
+  function showAdvancedConnect(){
     if(typeof showModal!=='function')return;
     const current=sessionToken()||persistentToken();
-    showModal(
-      'Connect Sleeper',
-      `<p>Paste the Authorization value from your logged-in Sleeper browser. RosterBate will remember it on this browser so you do not need to reconnect every visit.</p><label>Sleeper token</label><input id="tokenInput" type="password" autocomplete="off" value="${typeof esc==='function'?esc(current):''}" placeholder="eyJ... or Bearer eyJ..."><div class="warning">This is a Sleeper session credential. It is stored only in this browser's local storage, not in the RosterBate database. Do not paste it into chat or share it.</div>`,
+    showModal('Advanced Sleeper Connection',
+      `<p>This is an advanced development/admin connection for RosterBate's private Sleeper write features.</p>
+       <label>Sleeper session credential</label>
+       <input id="tokenInput" type="password" autocomplete="off" value="${typeof esc==='function'?esc(current):''}" placeholder="Session credential">
+       <div class="warning">A Sleeper session credential is sensitive. Only use your own credential, never share it with another person, and never paste it into chat.</div>`,
       `<button data-close>Cancel</button><button id="saveTokenPersistent" class="primary">Remember On This Device</button>`
     );
     setTimeout(()=>{
       document.getElementById('saveTokenPersistent')?.addEventListener('click',async()=>{
         const v=String(document.getElementById('tokenInput')?.value||'').trim();
-        remember(v);
+        rememberToken(v);
         try{if(typeof closeModal==='function')closeModal()}catch{}
         refreshConnectionUi();
         if(v){
           try{if(typeof loadLockState==='function')await loadLockState()}catch{}
           try{if(typeof renderTeam==='function')renderTeam()}catch{}
           try{if(typeof renderActivity==='function')renderActivity()}catch{}
-          try{if(typeof setStatus==='function')setStatus('Sleeper connected and remembered on this device.','success')}catch{}
+          try{if(typeof setStatus==='function')setStatus('Advanced Sleeper connection enabled on this device.','success')}catch{}
         }else{
           try{lockedGames={}}catch{}
           try{if(typeof renderTeam==='function')renderTeam()}catch{}
-          try{if(typeof setStatus==='function')setStatus('Sleeper connection cleared.','success')}catch{}
         }
       });
     },0);
@@ -80,54 +133,47 @@
 
   function showConnectionSettings(){
     if(typeof showModal!=='function')return;
-    const connected=!!(sessionToken()||persistentToken());
-    const body=connected
-      ? `<p><strong>Sleeper is connected on this device.</strong></p><p>Your saved session credential is restored automatically when you open this league.</p><div class="warning">Use Forget This Device if this is a shared computer or if you want to replace the Sleeper connection.</div>`
-      : `<p>No Sleeper account is currently connected on this device.</p>`;
-    const actions=connected
-      ? `<button data-close>Close</button><button id="reconnectSleeper">Replace Connection</button><button id="forgetSleeper" class="danger">Forget This Device</button>`
-      : `<button data-close>Close</button><button id="settingsConnectSleeper" class="primary">Connect Sleeper</button>`;
-    showModal('Sleeper Connection Settings',body,actions);
+    const linked=!!linkedUserId(),privateConnected=!!sessionToken();
+    const linkedText=linked?`<p><strong>Linked Sleeper:</strong> ${typeof esc==='function'?esc(linkedUsername()||linkedUserId()):linkedUsername()}</p>`:'<p>No Sleeper username is linked yet.</p>';
+    const privateText=privateConnected?'<p style="color:#75e7bf"><strong>Advanced write connection:</strong> active on this device.</p>':'<p style="color:#93a3b8">Advanced write connection is not active.</p>';
+    showModal('Sleeper Connection Settings',linkedText+privateText,
+      `<button data-close>Close</button><button id="changeSleeperLink" class="primary">${linked?'Change Linked Account':'Link Sleeper'}</button>${linked?'<button id="unlinkSleeper">Unlink</button>':''}${privateConnected?'<button id="forgetSleeper" class="danger">Forget Advanced Connection</button>':''}`
+    );
     setTimeout(()=>{
-      document.getElementById('settingsConnectSleeper')?.addEventListener('click',()=>{try{closeModal()}catch{};showPersistentConnect()});
-      document.getElementById('reconnectSleeper')?.addEventListener('click',()=>{try{closeModal()}catch{};showPersistentConnect()});
+      document.getElementById('changeSleeperLink')?.addEventListener('click',()=>{try{closeModal()}catch{};showPublicLink()});
+      document.getElementById('unlinkSleeper')?.addEventListener('click',()=>{
+        clearLink();try{closeModal()}catch{};refreshConnectionUi();
+        try{if(typeof setStatus==='function')setStatus('Sleeper username unlinked.','success')}catch{}
+      });
       document.getElementById('forgetSleeper')?.addEventListener('click',()=>{
-        remember('');
-        try{lockedGames={}}catch{}
-        try{sessionStorage.removeItem('rbSleeperConnectedReload')}catch{}
-        try{if(typeof closeModal==='function')closeModal()}catch{}
-        refreshConnectionUi();
+        rememberToken('');try{lockedGames={}}catch{};try{closeModal()}catch{};refreshConnectionUi();
         try{if(typeof renderTeam==='function')renderTeam()}catch{}
-        try{if(typeof renderActivity==='function')renderActivity()}catch{}
-        try{if(typeof setStatus==='function')setStatus('Sleeper connection forgotten on this device.','success')}catch{}
+        try{if(typeof setStatus==='function')setStatus('Advanced Sleeper connection forgotten on this device.','success')}catch{}
       });
     },0);
   }
 
-  // Replace the original button node so its old tab-only click listener is removed.
   const connect=document.getElementById('connectBtn');
-  if(connect){
-    const replacement=connect.cloneNode(true);
-    connect.replaceWith(replacement);
-    replacement.addEventListener('click',showPersistentConnect);
-  }
-
+  if(connect){const replacement=connect.cloneNode(true);connect.replaceWith(replacement);replacement.addEventListener('click',showPublicLink)}
   const gear=document.querySelector('.head-actions .gear');
-  if(gear){
-    gear.title='Sleeper connection settings';
-    gear.setAttribute('aria-label','Sleeper connection settings');
-    gear.addEventListener('click',showConnectionSettings);
-  }
+  if(gear){gear.title='Sleeper connection settings';gear.setAttribute('aria-label','Sleeper connection settings');gear.addEventListener('click',showConnectionSettings)}
 
   refreshConnectionUi();
-  if(sessionToken())applyAuthenticatedState();
+  if(linkedUserId()){
+    const trySelect=()=>selectLinkedRoster(linkedUserId()).catch(()=>{});
+    if(window.currentData||typeof currentData!=='undefined'&&currentData)trySelect();
+    else window.addEventListener('rb:sleeper-data-ready',trySelect,{once:true});
+  }
+  if(sessionToken()){
+    try{if(typeof loadLockState==='function')Promise.resolve(loadLockState()).then(()=>{try{renderTeam()}catch{}})}catch{}
+  }
 
-  // If the old Connect modal is still used anywhere else, detect a newly saved
-  // session token and migrate it into persistent device storage automatically.
   let last=sessionToken();
   setInterval(()=>{
     const now=sessionToken();
-    if(now&&now!==last){remember(now);last=now;refreshConnectionUi()}
+    if(now&&now!==last){rememberToken(now);last=now;refreshConnectionUi()}
     if(!now&&last&&!persistentToken())last='';
-  },250);
+  },1000);
+
+  window.rbSleeperLink={show:showPublicLink,advanced:showAdvancedConnect,linkedUsername,linkedUserId,linkByUsername};
 })();
