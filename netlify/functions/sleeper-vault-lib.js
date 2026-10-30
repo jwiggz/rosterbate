@@ -15,7 +15,12 @@ function sleeperUserId(token){
   try{
     const part=String(token||'').split('.')[1]||'';
     const b64=part.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-part.length%4)%4);
-    const payload=JSON.parse(Buffer.from(b64,'base64').toString('utf8'));
+    const json=Buffer.from(b64,'base64').toString('utf8');
+    const quoted=json.match(/"user_id"\s*:\s*"(\d+)"/);
+    if(quoted)return quoted[1];
+    const numeric=json.match(/"user_id"\s*:\s*(\d+)/);
+    if(numeric)return numeric[1];
+    const payload=JSON.parse(json);
     return String(payload?.user_id||'');
   }catch{return''}
 }
