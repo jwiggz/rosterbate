@@ -7,7 +7,12 @@ async function verifySleeper(token,leagueId,rosterId,round){
   const rosters=await fetchJson(`https://api.sleeper.app/v1/league/${leagueId}/rosters`);
   const roster=Array.isArray(rosters)?rosters.find(x=>Number(x.roster_id)===Number(rosterId)):null;
   if(!roster)throw Object.assign(new Error('Roster not found.'),{status:404});
-  if(String(roster.owner_id||'')!==sid)throw Object.assign(new Error('This Sleeper session does not own the linked roster.'),{status:403});
+  const ownerId=String(roster.owner_id||'');
+  if(ownerId!==sid){
+    const err=Object.assign(new Error('This Sleeper session does not own the linked roster.'),{status:403});
+    err.safeDetails={sessionUserId:sid,rosterOwnerId:ownerId,rosterId:Number(rosterId)};
+    throw err;
+  }
   const query=`query matchup_legs { matchup_legs(league_id: \"${leagueId}\", round: ${round}) { roster_id starters_games } }`;
   const r=await fetch('https://sleeper.com/graphql',{method:'POST',headers:{Accept:'application/json','Content-Type':'application/json',Authorization:token,'X-Sleeper-GraphQL-Op':'matchup_legs','User-Agent':'RosterBate/1.0'},body:JSON.stringify({operationName:'matchup_legs',variables:{},query})});
   const data=await r.json().catch(()=>({}));
@@ -38,9 +43,9 @@ exports.handler=async function(event){
     if(!/^\d{10,25}$/.test(leagueId)||!Number.isInteger(rosterId)||rosterId<1||!Number.isInteger(round)||round<1||round>40)return json(400,{error:'Invalid Sleeper target.'});
     const verified=await verifySleeper(token,leagueId,rosterId,round);
     const linked=String(body.linkedSleeperUserId||'').trim();
-    if(linked&&linked!==verified.sleeperUserId)return json(403,{error:'The Sleeper session belongs to a different Sleeper account than the one linked to RosterBate.'});
+    if(linked&&linked!==verified.sleeperUserId)return json(403,{error:'The Sleeper session belongs to a different Sleeper account than the one linked to RosterBate.',details:{sessionUserId:verified.sleeperUserId,linkedSleeperUserId:linked,rosterId}});
     const existing=await loadRecord(auth.uid).catch(()=>null);
     await saveEncrypted(auth.uid,token,{sleeperUserId:verified.sleeperUserId,leagueId,rosterId,createdAt:existing?.createdAt});
     return json(200,{ok:true,connected:true,sleeperUserId:verified.sleeperUserId,lockCount:verified.lockCount});
-  }catch(e){return json(Number(e?.status)||500,{error:e?.message||'Unable to update Lock Sync vault.',code:e?.code||null})}
+  }catch(e){return json(Number(e?.status)||500,{error:e?.message||'Unable to update Lock Sync vault.',code:e?.code||null,details:e?.safeDetails||null})}
 };
