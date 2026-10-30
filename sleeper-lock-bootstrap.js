@@ -17,7 +17,10 @@
   }
   function selectedIsOwned(){
     try{
-      const uid=tokenUserId();
+      // The vault removes the raw Sleeper JWT from browser storage, so the linked
+      // Sleeper user id (restored from the vault status) is the primary identity.
+      let uid='';try{uid=String(localStorage.getItem('rbSleeperLinkedUserId')||'')}catch{}
+      if(!uid)uid=tokenUserId();
       if(!uid)return false;
       const t=(currentData?.teams||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));
       return String(t?.owner_id||'')===uid;

@@ -2,6 +2,8 @@
   let totalsObserver=null,observedBox=null;
   function selectedIsOwned(){
     try{
+      let linked='';try{linked=String(localStorage.getItem('rbSleeperLinkedUserId')||'')}catch{}
+      if(linked){const lt=(currentData?.teams||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));return String(lt?.owner_id||'')===linked}
       const raw=String(sessionStorage.getItem('rbSleeperToken')||localStorage.getItem('rbSleeperTokenPersistent')||sessionStorage.getItem('rbSleeperAuth')||'').trim().replace(/^Bearer\s+/i,'');
       const part=raw.split('.')[1]||'';if(!part)return false;
       const b64=part.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(part.length/4)*4,'=');
