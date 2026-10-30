@@ -9,6 +9,7 @@ function obj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}
 function summary(v){if(Array.isArray(v))return{type:'array',length:v.length};if(v&&typeof v==='object')return{type:'object',keys:Object.keys(v).slice(0,30),count:Object.keys(v).length};return{type:typeof v,value:v==null?null:String(v).slice(0,120)}}
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
+  try{const {connectLambda}=await import('@netlify/blobs');connectLambda(event)}catch(e){return json(500,{error:e?.message||'Unable to initialize encrypted vault storage.',code:'BLOBS_INIT_FAILED'})}
   let body;try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
   const leagueId=String(body.leagueId||'').trim(),rosterId=Number(body.rosterId),leg=Number(body.leg??body.round),round=Number(body.round??body.leg);
   if(!/^\d{10,25}$/.test(leagueId)||!Number.isInteger(rosterId)||rosterId<1||!Number.isInteger(round)||round<1||round>40||!Number.isInteger(leg)||leg<1||leg>40)return json(400,{error:'Invalid Sleeper target.'});
