@@ -6,6 +6,7 @@ const css=`
 #activityBody .rb-react button:focus-visible{outline:2px solid #08c7c9;outline-offset:1px}
 #activityBody .rb-react button.mine{background:#123d34;border-color:#2f9d79;color:#9ff6d7}
 #activityBody .rb-react .em{font-size:12px;line-height:1}
+#activityBody .rb-react .rx-word{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;color:#aab6c8}
 #activityBody .rb-react .add{opacity:.75}
 #activityBody .rb-react-pop{position:absolute;left:0;bottom:28px;z-index:30;display:grid;grid-template-columns:repeat(6,30px);gap:4px;padding:8px;border-radius:10px;background:#141c28;border:1px solid #3b4b63;box-shadow:0 10px 26px rgba(0,0,0,.45)}
 #activityBody .rb-react-pop button{all:unset;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:16px}
@@ -53,11 +54,27 @@ function render(){const host=document.getElementById('activityBody');if(!host)re
 async function refresh(force=false){if(busy)return;if(!force&&Date.now()-lastFetch<15000){render();return}busy=true;try{const body={leagueId:String(typeof leagueId!=='undefined'?leagueId:''),week:Number(typeof selectedWeek!=='undefined'?selectedWeek:1),token:auth()};const r=await fetch('/.netlify/functions/sleeper-activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});const d=await r.json();if(r.ok&&d?.ok){data=mergeServerData(d);lastFetch=Date.now();render()}}catch{}finally{busy=false}}
 async function sendChat(override=''){if(sending)return;ensureComposer();const input=document.getElementById('rbLeagueChatInput'),err=document.getElementById('rbLeagueChatError');const text=String(override||input?.value||'').trim();if(err)err.textContent='';if(!text)return;if(!auth()){if(err)err.textContent='Connect Sleeper before sending chat.';return}sending=true;setComposerState();try{const r=await fetch('/.netlify/functions/sleeper-chat-send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leagueId:String(typeof leagueId!=='undefined'?leagueId:''),token:auth(),text}),cache:'no-store'});const d=await r.json();if(!r.ok||!d?.ok)throw new Error(d?.error||'Unable to send chat message.');const item=confirmedItem(d.message);if(item.id){pendingChat.set(item.id,item);if(!data)data={items:[],chat_authenticated:true};data.chat_authenticated=true;data.items=[...(data.items||[]).filter(x=>String(x.id||'')!==item.id),item];render()}if(!override&&input){input.value='';input.style.height='auto'}if(override){document.getElementById('rbGifPanel')?.classList.remove('open');document.getElementById('rbLeagueGif')?.classList.remove('active')}requestAnimationFrame(()=>{const host=document.getElementById('activityBody');if(host)host.scrollTop=host.scrollHeight});lastFetch=0;setTimeout(()=>refresh(true),1800);setTimeout(()=>refresh(true),6000)}catch(e){if(err)err.textContent=e?.message||String(e)}finally{sending=false;setComposerState()}}
 // ---- Sleeper reactions (names like "eyes", "skull", "crying", "meme_..."; never free text) ----
-const RX_EMOJI={eyes:'👀',skull:'💀',crying:'😭',fire:'🔥',heart:'❤️',laughing:'😆',joy:'😂',rofl:'🤣',thinking:'🤔',thumbsup:'👍',thumbs_up:'👍',thumbsdown:'👎',poop:'💩',clown:'🤡',angry:'😡',rage:'😡',shocked:'😲',scream:'😱',hundred:'💯',clap:'👏',pray:'🙏',goat:'🐐',trophy:'🏆',money:'💰',basketball:'🏀',football:'🏈',wave:'👋',party:'🥳',cool:'😎',grimace:'😬',facepalm:'🤦',salute:'🫡',nerd:'🤓',sleeping:'😴',vomit:'🤮',cry:'😢',smile:'😄',wink:'😉',ok:'👌',muscle:'💪',crown:'👑',rocket:'🚀',moneybag:'💰',cap:'🧢'};
+const RX_EMOJI={
+  // names seen in this league / documented by Sleeper
+  like:'👍',happy:'😆',sad:'😢',smart:'🎓',eyes:'👀',skull:'💀',crying:'😭',fire:'🔥',goat:'🐐',heart:'❤️',
+  // other common Sleeper / chat reaction names
+  love:'❤️',laugh:'😂',laughing:'😆',lol:'😂',joy:'😂',rofl:'🤣',haha:'😂',funny:'😂',
+  wow:'😲',shocked:'😲',shock:'😲',surprised:'😮',omg:'😱',scream:'😱',
+  thinking:'🤔',think:'🤔',hmm:'🤔',confused:'😕',
+  angry:'😡',mad:'😡',rage:'😡',
+  poop:'💩',trash:'🗑️',clown:'🤡',dead:'💀',
+  thumbsup:'👍',thumbs_up:'👍',thumbsdown:'👎',thumbs_down:'👎',dislike:'👎',ok:'👌',
+  cool:'😎',nerd:'🤓',grimace:'😬',cringe:'😬',facepalm:'🤦',shrug:'🤷',salute:'🫡',pray:'🙏',clap:'👏',muscle:'💪',
+  cry:'😢',tears:'😭',sweat:'😅',sick:'🤢',vomit:'🤮',sleeping:'😴',sleepy:'😴',sleep:'😴',
+  hundred:'💯',100:'💯',money:'💰',moneybag:'💰',cash:'💵',trophy:'🏆',crown:'👑',rocket:'🚀',star:'⭐',
+  basketball:'🏀',ball:'🏀',football:'🏈',party:'🥳',celebrate:'🎉',wave:'👋',wink:'😉',smile:'😄',
+  cold:'🥶',hot:'🥵',ice:'🧊',snake:'🐍',rat:'🐀',cap:'🧢',devil:'😈',angel:'😇',kiss:'😘',
+  check:'✅',x:'❌',question:'❓'
+};
 const RX_VERIFIED=['eyes','crying','skull'];let rxOpen='',rxErr={};
 function rxTarget(x){if(x.kind==='chat')return String(x.id||'');if(x.kind==='transaction')return String(x.message_id||'');if(x.kind==='waiver_group'){const ids=[...new Set((x.claims||[]).map(c=>String(c.message_id||'')).filter(Boolean))];return ids.length===1?ids[0]:''}return''}
 function rxState(x){if(x.kind==='waiver_group'){const c=(x.claims||[]).find(c=>c.message_id);return{r:c?.reactions||{},mine:c?.my_reactions||[]}}return{r:x.reactions||{},mine:x.my_reactions||[]}}
-function rxLabel(k){return RX_EMOJI[k]?`<span class="em">${RX_EMOJI[k]}</span>`:`<span>${esc2(k.replace(/^meme_/,'').replace(/_/g,' '))}</span>`}
+function rxLabel(k){return RX_EMOJI[k]?`<span class="em">${RX_EMOJI[k]}</span>`:`<span class="rx-word">${esc2(k.replace(/^meme_/,'').replace(/_/g,' '))}</span>`}
 function rxOptions(){const seen=new Set(RX_VERIFIED);for(const x of data?.items||[]){for(const k of Object.keys(x.reactions||{}))seen.add(k);for(const k of x.my_reactions||[])seen.add(k)}return[...seen].sort((a,b)=>(RX_EMOJI[b]?1:0)-(RX_EMOJI[a]?1:0)||a.localeCompare(b)).slice(0,30)}
 function reactBar(x){
   const id=rxTarget(x);if(!id||!data?.chat_authenticated)return'';
