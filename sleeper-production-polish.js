@@ -83,7 +83,29 @@
     }catch{}
   }
   function start(){observeTeam();refresh()}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+
+  let initialReconcileStarted=false;
+  async function finalInitialReconcile(){
+    if(initialReconcileStarted)return;
+    initialReconcileStarted=true;
+    try{if(window.rbAuthReady)await window.rbAuthReady}catch{}
+    try{if(window.rbSleeperVault?.status)await window.rbSleeperVault.status()}catch{}
+    for(let i=0;i<120;i++){
+      let ready=false;
+      try{ready=!!(window.currentData||currentData)&&!!document.querySelector('#teamView .player-row')}catch{}
+      if(ready)break;
+      await new Promise(r=>setTimeout(r,25));
+    }
+    try{if(typeof load==='function')await load(true)}catch{}
+    try{if(typeof loadLockState==='function')await loadLockState()}catch{}
+    try{if(typeof renderTeam==='function')renderTeam()}catch{}
+    try{window.rbLockWindowRefresh?.()}catch{}
+    refresh();
+    try{window.dispatchEvent(new CustomEvent('rb:initial-reconcile-complete'))}catch{}
+  }
+
+  function boot(){start();setTimeout(finalInitialReconcile,0)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
   window.addEventListener('rb:sleeper-lock-state',refresh);
   window.addEventListener('rb:sleeper-vault',refresh);
   document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn')){refresh();setTimeout(refresh,0);setTimeout(refresh,32)}},true);
