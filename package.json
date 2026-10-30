@@ -31,6 +31,9 @@
     "url": "https://github.com/jwiggz/rosterbate/issues"
   },
   "homepage": "https://github.com/jwiggz/rosterbate#readme",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.7"
+  },
   "devDependencies": {
     "playwright": "^1.59.1"
   }
