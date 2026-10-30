@@ -36,7 +36,7 @@ exports.handler=async function(event){
     if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261030a"></script>');
     if(!html.includes('sleeper-token-sanity.js')) scripts.push('<script src="/sleeper-token-sanity.js?v=20261030a"></script>');
     if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-vault-client.js')) scripts.push('<script src="/sleeper-vault-client.js?v=20261030e"></script>');
+    if(!html.includes('sleeper-vault-client.js')) scripts.push('<script src="/sleeper-vault-client.js?v=20261030f"></script>');
     if(!html.includes('sleeper-ready-gate.js')) scripts.push('<script src="/sleeper-ready-gate.js?v=20261030d"></script>');
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
@@ -57,7 +57,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js?v=20261030f"></script>');
     if(!html.includes('sleeper-guided-link.js')) scripts.push('<script src="/sleeper-guided-link.js?v=20261030c"></script>');
     if(!html.includes('sleeper-lock-sync-guidance.js')) scripts.push('<script src="/sleeper-lock-sync-guidance.js?v=20261030b"></script>');
-    if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js?v=20261030b"></script>');
     if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261030a"></script>');
     if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
     if(!html.includes('sleeper-player-summary-fix.js')) scripts.push('<script src="/sleeper-player-summary-fix.js?v=20261029c"></script>');
@@ -76,7 +76,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-scores-tab.js')) scripts.push('<script src="/sleeper-scores-tab.js?v=20261030b"></script>');
     if(!html.includes('sleeper-selection-ux.js')) scripts.push('<script src="/sleeper-selection-ux.js?v=20261030a"></script>');
     if(!html.includes('sleeper-header-status.js')) scripts.push('<script src="/sleeper-header-status.js?v=20261030a"></script>');
-    if(!html.includes('sleeper-trades-tab.js')) scripts.push('<script src="/sleeper-trades-tab.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-trades-tab.js')) scripts.push('<script src="/sleeper-trades-tab.js?v=20261030b"></script>');
     if(!html.includes('sleeper-past-lineup.js')) scripts.push('<script src="/sleeper-past-lineup.js?v=20261030a"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};

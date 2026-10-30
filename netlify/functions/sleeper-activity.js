@@ -18,12 +18,16 @@ async function sleeperTokenFrom(body,event){
 }
 async function readChat(token,leagueId){
   if(!validToken(token))return{items:[],auth:false};
-  const query='query($lg:Snowflake!){messages(parent_id:$lg){message_id created author_display_name author_id text text_map attachment pinned}}';
+  const query='query($lg:Snowflake!){messages(parent_id:$lg){message_id created author_display_name author_id author_is_bot text text_map attachment pinned reactions user_reactions}}';
   const r=await fetch('https://sleeper.com/graphql',{method:'POST',headers:{Accept:'application/json','Content-Type':'application/json',Authorization:token,'X-Sleeper-GraphQL-Op':'messages','User-Agent':'RosterBate/1.0'},body:JSON.stringify({operationName:'messages',variables:{lg:leagueId},query})});
   let d={};try{d=await r.json()}catch{}
   if(!r.ok||Array.isArray(d?.errors))return{items:[],auth:false,error:d?.errors?.[0]?.message||`HTTP ${r.status}`};
   const rows=Array.isArray(d?.data?.messages)?d.data.messages:[];
-  return{auth:true,items:rows.map(m=>({kind:'chat',id:String(m.message_id||''),created:Number(m.created)||0,author:String(m.author_display_name||'Sleeper user'),author_id:String(m.author_id||''),text:String(m.text||''),text_map:m.text_map||null,attachment:m.attachment||null,pinned:!!m.pinned})).filter(x=>x.created&&(x.text||x.attachment||x.text_map))};
+  // Sleeper posts transactions into league chat too; remember which transaction each post is about.
+  const txIdsOf=a=>{try{return[...new Set([...JSON.stringify(a||'').matchAll(/"transaction_id"\s*:\s*"?(\d{5,25})/g)].map(x=>x[1]))]}catch{return[]}};
+  const reactionMap=v=>{const o={};if(v&&typeof v==='object')for(const [k,n] of Object.entries(v)){const c=Number(n);if(/^[a-z0-9_]{1,48}$/.test(k)&&c>0)o[k]=c}return o};
+  const mineOf=v=>(Array.isArray(v)?v:[]).map(x=>typeof x==='string'?x:String(x?.reaction||'')).filter(x=>/^[a-z0-9_]{1,48}$/.test(x));
+  return{auth:true,items:rows.map(m=>({kind:'chat',id:String(m.message_id||''),created:Number(m.created)||0,author:String(m.author_display_name||'Sleeper user'),author_id:String(m.author_id||''),bot:!!m.author_is_bot,text:String(m.text||''),text_map:m.text_map||null,attachment:m.attachment||null,pinned:!!m.pinned,reactions:reactionMap(m.reactions),my_reactions:mineOf(m.user_reactions),tx_ids:txIdsOf(m.attachment)})).filter(x=>x.created&&(x.text||x.attachment||x.text_map))};
 }
 
 exports.handler=async function(event){
@@ -52,7 +56,12 @@ exports.handler=async function(event){
       const bid=Number((t.settings||{}).waiver_bid);
       return{kind:'transaction',id:String(t.transaction_id||''),created:Number(t.status_updated||t.created)||0,type:String(t.type||'transaction'),status:String(t.status||''),roster_ids:rosterIds,roster_names:names,adds,drops,bid:Number.isFinite(bid)?bid:null};
     }).filter(x=>x.created);
-    const items=[...chat.items,...txItems].sort((a,b)=>b.created-a.created).slice(0,60);
+    // Attach the chat post (and its reactions) to each transaction card; hide the duplicate post.
+    const byTx=new Map();for(const c of chat.items)for(const id of c.tx_ids||[])byTx.set(id,c);
+    const used=new Set();
+    for(const t of txItems){const c=byTx.get(String(t.id));if(!c)continue;t.message_id=c.id;t.reactions=c.reactions;t.my_reactions=c.my_reactions;used.add(c.id)}
+    const chatItems=chat.items.filter(c=>!used.has(c.id));
+    const items=[...chatItems,...txItems].sort((a,b)=>b.created-a.created).slice(0,60);
     return json(200,{ok:true,leagueId,week,chat_authenticated:!!chat.auth,chat_error:chat.error||null,items});
   }catch(error){return json(502,{error:'Unable to load Sleeper activity.',detail:String(error?.message||error)})}
 };

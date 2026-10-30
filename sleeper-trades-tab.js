@@ -52,7 +52,7 @@
 #teamView .rb-trade-lock-tag{margin-left:6px;padding:1px 6px;border-radius:4px;font-size:7px;font-weight:900;letter-spacing:.03em;background:rgba(239,102,128,.14);color:#ff9aa9;border:1px solid rgba(239,102,128,.3)}
 `;
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const st={tab:'propose',teams:[],picks:{},faab:[],drops:[],history:null,histKey:'',locks:null,locksKey:'',locksLoading:null};
+  const st={pending:null,pendingErr:'',sending:false,sendErr:'',flash:'',tab:'propose',teams:[],picks:{},faab:[],drops:[],history:null,histKey:'',locks:null,locksKey:'',locksLoading:null};
 
   // ---------- league helpers ----------
   const teams=()=>currentData?.teams||[];
@@ -160,20 +160,53 @@
     const me=myRoster();
     if(!me){el.innerHTML=`<div class="tr-card"><h3>Trades</h3><div class="empty">Link your Sleeper account (top right) to build trades for your team.</div></div>`;return}
     const locks=st.locks;
-    const seg=`<div class="seg" role="group" aria-label="Trades view"><button type="button" data-tab="propose" aria-pressed="${st.tab==='propose'}">Propose Trade</button><button type="button" data-tab="history" aria-pressed="${st.tab==='history'}">Trade History</button></div>`;
+    const seg=`<div class="seg" role="group" aria-label="Trades view"><button type="button" data-tab="propose" aria-pressed="${st.tab==='propose'}">Propose Trade</button><button type="button" data-tab="pending" aria-pressed="${st.tab==='pending'}">Pending${st.pending?.length?` (${st.pending.length})`:''}</button><button type="button" data-tab="history" aria-pressed="${st.tab==='history'}">Trade History</button></div>`;
+    if(st.tab==='pending'){el.innerHTML=`<div class="tr-card">${seg}<h3>Pending Trades</h3><div class="sub">Proposals in Sleeper for Week ${selectedWeek} that include your team.</div>${st.flash?`<div class="warn" style="background:rgba(48,216,160,.1);border-color:rgba(48,216,160,.35);color:#9ff6d7">${esc(st.flash)}</div>`:''}${pendingHtml()}</div>`;return}
     if(st.tab==='history'){el.innerHTML=`<div class="tr-card">${seg}<h3>Trade History</h3><div class="sub">Completed and pending trades from Week ${Math.max(1,selectedWeek-1)}–${selectedWeek}, including FAAB.</div>${historyHtml()}</div>`;return}
     const chips=teams().map(t=>{const rid=Number(t.roster_id);if(rid===me)return`<span class="chip me">${avatar(t)}${esc(t.team_name)} (you)</span>`;return`<button type="button" class="chip" data-team="${rid}" aria-pressed="${st.teams.includes(rid)}">${avatar(t)}${esc(t.team_name)}</button>`}).join('');
     const {out,warn}=problems(locks);const ready=!out.length;
     el.innerHTML=`<div class="tr-card">${seg}<h3>Propose a Trade</h3><div class="sub">Pick one or more teams — Sleeper supports trades between several teams at once. Then check the players and FAAB each team sends.</div><div class="chips" aria-label="Trade partners">${chips}</div></div>
       ${st.teams.length>=2?`<div class="teams">${st.teams.map(rid=>teamColumn(rid,locks)).join('')}</div>`:''}
       ${st.teams.length>=2?`<div class="tr-card"><h3>Summary</h3><div class="sub">${st.teams.length}-team trade · Week ${selectedWeek}</div>${summaryHtml()}${out.map(x=>`<div class="warn err">${esc(x)}</div>`).join('')}${warn.map(x=>`<div class="warn">${esc(x)}</div>`).join('')}
-        <div class="actions"><span class="btn primary" role="button" tabindex="0" aria-disabled="true" title="Sending to Sleeper is being connected">Send to Sleeper</span><button type="button" class="btn" data-copy ${ready?'':'aria-disabled="true"'}>Copy summary</button><button type="button" class="btn" data-reset>Reset</button><span class="note">${ready?'Trade looks valid. Sending to Sleeper turns on once the proposal format is confirmed.':'Fix the items above to continue.'}</span></div></div>`:''}`;
+        <div class="actions"><button type="button" class="btn primary" data-send ${ready&&!st.sending?'':'aria-disabled="true"'}>${st.sending?'Sending…':'Send to Sleeper'}</button><button type="button" class="btn" data-copy ${ready?'':'aria-disabled="true"'}>Copy summary</button><button type="button" class="btn" data-reset>Reset</button><span class="note">${ready?'Trade looks valid. You will confirm before anything is sent.':'Fix the items above to continue.'}</span>${st.sendErr?`<div class="warn err" style="width:100%">${esc(st.sendErr)}</div>`:''}</div></div>`:''}`;
+  }
+  function payload(){const adds={},drops={};for(const [pid,p] of Object.entries(st.picks)){adds[pid]=p.to;drops[pid]=p.from}for(const pid of st.drops)drops[pid]=myRoster();return{adds,drops,faab:st.faab.filter(f=>Number(f.amount)>0&&f.to).map(f=>({from:f.from,to:f.to,amount:Math.floor(Number(f.amount))}))}}
+  async function api(body){const r=await fetch('/.netlify/functions/sleeper-trade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:'__RB_SLEEPER_VAULT__',leagueId:String(leagueId),leg:Number(selectedWeek),...body})});const d=await r.json().catch(()=>({}));if(!r.ok||!d?.ok)throw new Error(d?.error||`Request failed (HTTP ${r.status}).`);return d}
+  async function loadPending(){try{const d=await api({action:'pending'});const me=Number(d.myRosterId||myRoster());st.pending=(d.trades||[]).filter(t=>(t.roster_ids||[]).map(Number).includes(me));st.pendingErr=''}catch(e){st.pending=st.pending||[];st.pendingErr=e.message}if(currentView==='trades')draw()}
+  function tradeSides(t){const rids=(t.roster_ids||[]).map(Number);return rids.map(rid=>{const got=Object.entries(t.adds||{}).filter(([,r])=>Number(r)===rid).map(([pid])=>esc(pname(pid)));const faab=(t.waiver_budget||[]).filter(x=>Number(x.receiver)===rid).map(x=>`$${Number(x.amount)} FAAB`);return`<div class="side"><b>${esc(team(rid)?.team_name||`Roster ${rid}`)}</b><span><span style="color:#78efd3">gets</span> ${[...got,...faab].join(', ')||'<span class="note">nothing</span>'}</span></div>`}).join('')}
+  function pendingHtml(){
+    if(st.pendingErr)return`<div class="warn err">${esc(st.pendingErr)}</div>`;if(!st.pending)return'<div class="empty">Loading pending trades…</div>';if(!st.pending.length)return'<div class="empty">No pending trades involving your team.</div>';
+    const me=myRoster(),uid=String(localStorage.getItem('rbSleeperLinkedUserId')||'');
+    return st.pending.map(t=>{const mineCreated=String(t.creator||'')===uid;const agreed=(t.consenter_ids||[]).map(Number).includes(me);const when=new Date(Number(t.created||0)).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+      const btns=mineCreated?`<button type="button" class="btn" data-trade-act="reject" data-trade-id="${esc(t.transaction_id)}">Withdraw</button>`:agreed?'<span class="note">You accepted — waiting on the other team(s).</span>':`<button type="button" class="btn primary" data-trade-act="accept" data-trade-id="${esc(t.transaction_id)}">Accept</button><button type="button" class="btn" data-trade-act="reject" data-trade-id="${esc(t.transaction_id)}">Decline</button>`;
+      return`<div class="hist"><div class="when">${esc(when)} · ${(t.roster_ids||[]).length}-team trade · ${mineCreated?'proposed by you':`from ${esc(team((t.roster_ids||[]).map(Number).find(r=>r!==me))?.team_name||'a leaguemate')}`}</div>${tradeSides(t)}<div class="actions">${btns}</div></div>`}).join('');
+  }
+  function confirmSend(){
+    if(typeof showModal!=='function')return send();
+    const names=st.teams.filter(r=>r!==myRoster()).map(r=>esc(team(r)?.team_name||''));
+    const review=Number(currentData?.league?.settings?.trade_review_days);
+    showModal('Send Trade Proposal',`<p>This sends a real trade proposal in Sleeper to <strong>${names.join(', ')}</strong>.</p>${summaryHtml()}<p class="note" style="margin-top:8px">${Number.isFinite(review)&&review===0?'This league has no trade review period, so once everyone accepts, the trade goes through immediately.':'Once everyone accepts, it follows your league\'s trade review rules.'}</p>`,`<button data-close>Cancel</button><button id="rbConfirmTrade" class="primary">Send Proposal</button>`);
+    setTimeout(()=>document.getElementById('rbConfirmTrade')?.addEventListener('click',()=>{try{closeModal()}catch{}send()}),0);
+  }
+  async function send(){
+    if(st.sending)return;st.sending=true;st.sendErr='';draw();
+    try{await api({action:'propose',...payload()});reset();st.flash='Trade proposal sent. Your leaguemates will see it in Sleeper.';st.tab='pending';st.pending=null;loadPending()}
+    catch(e){st.sendErr=e.message}finally{st.sending=false;draw()}
+  }
+  function confirmAct(act,id){
+    const t=(st.pending||[]).find(x=>String(x.transaction_id)===String(id));const label=act==='accept'?'Accept Trade':(String(t?.creator||'')===String(localStorage.getItem('rbSleeperLinkedUserId')||'')?'Withdraw Proposal':'Decline Trade');
+    const go=async()=>{try{await api({action:act,transactionId:id});st.flash=act==='accept'?'Trade accepted in Sleeper.':'Done — the trade was removed in Sleeper.';st.pending=null;loadPending()}catch(e){st.pendingErr=e.message;draw()}};
+    if(typeof showModal!=='function')return go();
+    showModal(label,`<p>${act==='accept'?'Accept this trade in Sleeper?':'Remove this trade proposal in Sleeper?'}</p>${t?`<div class="tr-card" style="margin-top:8px">${tradeSides(t)}</div>`:''}`,`<button data-close>Cancel</button><button id="rbConfirmTradeAct" class="${act==='accept'?'primary':'danger'}">${label}</button>`);
+    setTimeout(()=>document.getElementById('rbConfirmTradeAct')?.addEventListener('click',()=>{try{closeModal()}catch{}go()}),0);
   }
   function textSummary(){const by=summary();return st.teams.map(rid=>{const s=by[rid];return`${team(rid)?.team_name}: gets ${[...s.in.map(pname),s.faabIn?`$${s.faabIn} FAAB`:''].filter(Boolean).join(', ')||'nothing'}; gives ${[...s.out.map(pname),s.faabOut?`$${s.faabOut} FAAB`:''].filter(Boolean).join(', ')||'nothing'}`}).join('\n')}
   function bind(){
     const el=host();if(!el||el.dataset.rbBound==='1')return;el.dataset.rbBound='1';
     el.addEventListener('click',e=>{
-      const tb=e.target.closest?.('[data-tab]');if(tb){st.tab=tb.dataset.tab;if(st.tab==='history')loadHistory().then(()=>draw());draw();return}
+      const tb=e.target.closest?.('[data-tab]');if(tb){st.tab=tb.dataset.tab;st.flash='';if(st.tab==='history')loadHistory().then(()=>draw());if(st.tab==='pending')loadPending();draw();return}
+      const sd=e.target.closest?.('[data-send]');if(sd){if(sd.getAttribute('aria-disabled')!=='true')confirmSend();return}
+      const ta=e.target.closest?.('[data-trade-act]');if(ta){confirmAct(ta.dataset.tradeAct,ta.dataset.tradeId);return}
       const tm=e.target.closest?.('[data-team]');if(tm){toggleTeam(tm.dataset.team);draw();return}
       if(e.target.closest?.('[data-reset]')){reset();draw();return}
       const cp=e.target.closest?.('[data-copy]');if(cp&&cp.getAttribute('aria-disabled')!=='true'){navigator.clipboard?.writeText(textSummary()).catch(()=>{});cp.textContent='Copied';setTimeout(()=>{cp.textContent='Copy summary'},1200)}
@@ -190,7 +223,7 @@
   async function show(){
     const el=host();if(!el)return;bind();
     document.getElementById('placeholderView')?.classList.add('hidden');el.classList.remove('hidden');
-    draw();loadLocks().then(()=>{if(currentView==='trades')draw()});loadHistory().then(()=>{if(currentView==='trades')draw()});
+    draw();loadPending();loadLocks().then(()=>{if(currentView==='trades')draw()});loadHistory().then(()=>{if(currentView==='trades')draw()});
   }
 
   // ---------- Team view: traded-after-lock rule ----------
