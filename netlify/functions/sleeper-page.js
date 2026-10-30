@@ -33,7 +33,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-lock-eligibility-guard.js')) scripts.push('<script src="/sleeper-lock-eligibility-guard.js?v=20261029b"></script>');
     if(!html.includes('sleeper-lock-authoritative-only.js')) scripts.push('<script src="/sleeper-lock-authoritative-only.js?v=20261029a"></script>');
     if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261028b"></script>');
-    if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js?v=20261030b"></script>');
+    if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js?v=20261030c"></script>');
     if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js"></script>');
     if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261029b"></script>');
     if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
