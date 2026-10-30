@@ -15,6 +15,8 @@
 #leagueView .rb-standings tbody tr:focus-visible{outline:1px solid #08c7c9;outline-offset:-1px}
 #leagueView .rb-standings tbody tr.mine td:first-child{box-shadow:inset 3px 0 0 #08c7c9}
 #leagueView .rb-standings .rank{color:#8e9aae;font-weight:900;width:28px}
+#leagueView .rb-standings .tcell{display:flex;align-items:center;gap:10px}
+#leagueView .rb-standings .tav{width:30px;height:30px;flex:0 0 30px;border-radius:50%;object-fit:cover;background:#2a3648;display:inline-flex;align-items:center;justify-content:center;color:#c7d2e2;font-size:12px;font-weight:900;overflow:hidden}
 #leagueView .rb-standings .tname{font-weight:900;color:#eef4ff}
 #leagueView .rb-standings .owner{color:#8190a5;font-size:9px;margin-top:2px}
 `;
@@ -40,12 +42,14 @@
     const val={rank:r=>r.rank,team:r=>String(r.t.team_name||'').toLowerCase(),record:r=>pct(r)*1000+r.w,pf:r=>r.pf,pa:r=>r.pa}[sort.key]||(r=>r.rank);
     return list.slice().sort((a,b)=>{const x=val(a),y=val(b);return (x<y?-1:x>y?1:0)*dir||a.rank-b.rank});
   }
+  function avatarUrl(t){const raw=t?.avatar_url??t?.avatar??t?.metadata?.avatar_url??t?.metadata?.avatar??'';if(!raw)return'';const s=String(raw);return /^https?:\/\//i.test(s)?s:`https://sleepercdn.com/avatars/thumbs/${encodeURIComponent(s)}`}
+  function avatarHtml(t){const url=avatarUrl(t),initial=esc3(String(t?.team_name||t?.display_name||'?').trim().charAt(0).toUpperCase());return url?`<img class="tav" src="${esc3(url)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;tav&quot;>${initial}</span>'">`:`<span class="tav">${initial}</span>`}
   function linkedRoster(){try{const uid=String(localStorage.getItem('rbSleeperLinkedUserId')||'');return Number((currentData?.teams||[]).find(t=>String(t.owner_id||'')===uid)?.roster_id||0)}catch{return 0}}
   function render(){
     const host=document.getElementById('leagueView');if(!host||!currentData)return;
     const mine=linkedRoster();
     const head=COLS.map(c=>{const active=sort.key===c.key;const aria=active?(sort.dir==='asc'?'ascending':'descending'):'none';return`<th class="${c.num?'num':''}" aria-sort="${aria}" title="${esc3(c.title)}"><button type="button" data-sort="${c.key}">${c.label}${active?`<span class="arrow">${sort.dir==='asc'?'▲':'▼'}</span>`:''}</button></th>`}).join('');
-    const body=rows().map(r=>`<tr tabindex="0" data-roster="${r.rid}" class="${r.rid===mine?'mine':''}" title="Open ${esc3(r.t.team_name)}"><td class="rank">${r.rank}</td><td><div class="tname">${esc3(r.t.team_name)}</div><div class="owner">${esc3(r.t.display_name)}</div></td><td class="num">${r.w}-${r.l}${r.tie?`-${r.tie}`:''}</td><td class="num">${r.pf.toFixed(1)}</td><td class="num">${r.pa.toFixed(1)}</td></tr>`).join('');
+    const body=rows().map(r=>`<tr tabindex="0" data-roster="${r.rid}" class="${r.rid===mine?'mine':''}" title="Open ${esc3(r.t.team_name)}"><td class="rank">${r.rank}</td><td><div class="tcell">${avatarHtml(r.t)}<div><div class="tname">${esc3(r.t.team_name)}</div><div class="owner">${esc3(r.t.display_name)}</div></div></div></td><td class="num">${r.w}-${r.l}${r.tie?`-${r.tie}`:''}</td><td class="num">${r.pf.toFixed(1)}</td><td class="num">${r.pa.toFixed(1)}</td></tr>`).join('');
     host.innerHTML=`<div class="league-card"><h3>League Standings</h3><table class="rb-standings"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
   function openTeam(rid){

@@ -4,10 +4,19 @@ function json(statusCode,body){return{statusCode,headers:{'Content-Type':'applic
 function normalizeToken(value){let token=String(value||'').trim();token=token.replace(/^authorization\s*:\s*/i,'').trim();token=token.replace(/^bearer\s+/i,'').trim();if((token.startsWith('"')&&token.endsWith('"'))||(token.startsWith("'")&&token.endsWith("'")))token=token.slice(1,-1).trim();return token}
 function validToken(value){return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(String(value||''))}
 
+async function sleeperTokenFrom(body,event){
+  // Vault-backed when the browser sent a Firebase ID token; otherwise a raw token (legacy).
+  if(body&&body.firebaseIdToken){
+    try{const {connectLambda}=await import('@netlify/blobs');connectLambda(event)}catch{}
+    const {resolveSleeperToken}=require('./sleeper-vault-lib');
+    return (await resolveSleeperToken(body,{allowRaw:false})).token;
+  }
+  return normalizeToken(body&&body.token);
+}
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
   let body={};try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
-  const token=normalizeToken(body.token),leagueId=String(body.leagueId||'').trim(),text=String(body.text||'').trim();
+  let token='';try{token=await sleeperTokenFrom(body,event)}catch(e){return json(Number(e?.status)||401,{error:e?.message||'Connect Sleeper to chat.'})}const leagueId=String(body.leagueId||'').trim(),text=String(body.text||'').trim();
   if(!validToken(token))return json(401,{error:'A valid Sleeper session token is required.'});
   if(!/^\d{10,25}$/.test(leagueId))return json(400,{error:'A valid Sleeper league id is required.'});
   if(!text||text.length>2000)return json(400,{error:'Chat message must be between 1 and 2000 characters.'});

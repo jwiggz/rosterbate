@@ -7,6 +7,15 @@ function validToken(value){return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-
 async function fetchJson(url){const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}
 async function nbaPlayers(){if(playerCache&&Date.now()-playerCacheAt<30*60*1000)return playerCache;playerCache=await fetchJson(`${API}/players/nba`);playerCacheAt=Date.now();return playerCache||{}}
 function playerInfo(P,id){const p=P?.[String(id)]||{};return{id:String(id),name:p.full_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||`Player ${id}`,position:p.position||'',team:String(p.team||'').toUpperCase()}}
+async function sleeperTokenFrom(body,event){
+  // Vault-backed when the browser sent a Firebase ID token; otherwise a raw token (legacy).
+  if(body&&body.firebaseIdToken){
+    try{const {connectLambda}=await import('@netlify/blobs');connectLambda(event)}catch{}
+    const {resolveSleeperToken}=require('./sleeper-vault-lib');
+    return (await resolveSleeperToken(body,{allowRaw:false})).token;
+  }
+  return normalizeToken(body&&body.token);
+}
 async function readChat(token,leagueId){
   if(!validToken(token))return{items:[],auth:false};
   const query='query($lg:Snowflake!){messages(parent_id:$lg){message_id created author_display_name author_id text text_map attachment pinned}}';
@@ -20,14 +29,14 @@ async function readChat(token,leagueId){
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
   let body={};try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
-  const leagueId=String(body.leagueId||'').trim(),week=Math.max(1,Math.min(40,Number(body.week)||1)),token=normalizeToken(body.token);
+  const leagueId=String(body.leagueId||'').trim(),week=Math.max(1,Math.min(40,Number(body.week)||1));let token='',tokenError='';try{token=await sleeperTokenFrom(body,event)}catch(e){tokenError=e?.message||'Lock Sync is not available.'}
   if(!/^\d{10,25}$/.test(leagueId))return json(400,{error:'A valid Sleeper league id is required.'});
   try{
     const rounds=[...new Set([week,Math.max(1,week-1)])];
     const [users,rosters,chat,...txLists]=await Promise.all([
       fetchJson(`${API}/league/${leagueId}/users`).catch(()=>[]),
       fetchJson(`${API}/league/${leagueId}/rosters`).catch(()=>[]),
-      readChat(token,leagueId).catch(()=>({items:[],auth:false})),
+      readChat(token,leagueId).then(c=>tokenError&&!c.auth?{...c,error:tokenError}:c).catch(()=>({items:[],auth:false})),
       ...rounds.map(r=>fetchJson(`${API}/league/${leagueId}/transactions/${r}`).catch(()=>[]))
     ]);
     const userById=new Map((users||[]).map(u=>[String(u.user_id),u]));

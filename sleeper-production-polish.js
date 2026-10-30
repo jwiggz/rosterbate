@@ -158,3 +158,11 @@
   document.addEventListener('change',e=>{if(e.target?.id==='weekSel'||e.target?.id==='teamPicker')refresh()},true);
   [0,100,250,500,1000].forEach(ms=>setTimeout(start,ms));
 })();
+
+// One-time diagnostic: describe Sleeper's reaction/trade GraphQL operations (read-only).
+window.rbSleeperSchemaReport=async function(){
+  const r=await fetch('/.netlify/functions/sleeper-graphql-schema',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:'__RB_SLEEPER_VAULT__'})});
+  const d=await r.json().catch(()=>({error:`HTTP ${r.status}`}));const text=JSON.stringify(d,null,1);
+  try{await navigator.clipboard.writeText(text);console.log('Sleeper schema report copied to clipboard. Paste it into the chat with Claude.')}catch{console.log(text)}
+  return d;
+};

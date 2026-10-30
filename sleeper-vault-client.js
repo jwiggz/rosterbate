@@ -3,7 +3,8 @@
   const VERIFIED='rbSleeperLockSyncVerified';
   const PLACEHOLDER='__RB_SLEEPER_VAULT__';
   const LEGACY_KEYS=[['sessionStorage','rbSleeperToken'],['sessionStorage','rbSleeperAuth'],['localStorage','rbSleeperTokenPersistent']];
-  const PRIVATE_ENDPOINTS=['sleeper-lock-state','sleeper-lineup-preserve','sleeper-lineup-write','sleeper-lock-in','sleeper-lock-inspect'];
+  const PRIVATE_ENDPOINTS=['sleeper-lock-state','sleeper-lineup-preserve','sleeper-lineup-write','sleeper-lock-in','sleeper-lock-inspect','sleeper-activity','sleeper-chat-send','sleeper-graphql-schema','sleeper-reaction','sleeper-trade'];
+  const OPTIONAL_PRIVATE=['sleeper-activity'];
   const validJwt=v=>/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(String(v||'').trim());
   const originalFetch=window.fetch.bind(window);
   let connected=false,statusPromise=null,statusStarted=false;
@@ -34,6 +35,7 @@
     if(!PRIVATE_ENDPOINTS.some(name=>url.includes('/.netlify/functions/'+name)))return originalFetch(input,init);
     let body={};if(typeof init.body==='string'){try{body=JSON.parse(init.body)}catch{return originalFetch(input,init)}}
     if(!isConnected()&&validJwt(body.token))return originalFetch(input,init);
+    if(!isConnected()&&OPTIONAL_PRIVATE.some(name=>url.includes('/.netlify/functions/'+name))){delete body.token;init.body=JSON.stringify(body);return originalFetch(input,init)}
     const firebaseIdToken=await firebaseToken();delete body.token;body.firebaseIdToken=firebaseIdToken;init.headers={...(init.headers||{}),'Content-Type':'application/json'};init.body=JSON.stringify(body);return originalFetch(input,init);
   };
   function installMarker(){if(hasMarker())setConnected(true)}

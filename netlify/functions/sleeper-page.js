@@ -36,7 +36,7 @@ exports.handler=async function(event){
     if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261030a"></script>');
     if(!html.includes('sleeper-token-sanity.js')) scripts.push('<script src="/sleeper-token-sanity.js?v=20261030a"></script>');
     if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-vault-client.js')) scripts.push('<script src="/sleeper-vault-client.js?v=20261030d"></script>');
+    if(!html.includes('sleeper-vault-client.js')) scripts.push('<script src="/sleeper-vault-client.js?v=20261030e"></script>');
     if(!html.includes('sleeper-ready-gate.js')) scripts.push('<script src="/sleeper-ready-gate.js?v=20261030d"></script>');
     if(!html.includes('sleeper-league-switcher.js')) scripts.push('<script src="/sleeper-league-switcher.js?v=20261029a"></script>');
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
@@ -72,8 +72,8 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-lock-pulse-scroll-fix.js')) scripts.push('<script src="/sleeper-lock-pulse-scroll-fix.js?v=20261029a"></script>');
     if(!html.includes('sleeper-future-day-points.js')) scripts.push('<script src="/sleeper-future-day-points.js?v=20261029b"></script>');
     if(!html.includes('sleeper-plan-ux.js')) scripts.push('<script src="/sleeper-plan-ux.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-production-polish.js')) scripts.push('<script src="/sleeper-production-polish.js?v=20261030d"></script>');
-    if(!html.includes('sleeper-league-standings.js')) scripts.push('<script src="/sleeper-league-standings.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-production-polish.js')) scripts.push('<script src="/sleeper-production-polish.js?v=20261030e"></script>');
+    if(!html.includes('sleeper-league-standings.js')) scripts.push('<script src="/sleeper-league-standings.js?v=20261030b"></script>');
     if(!html.includes('sleeper-scores-tab.js')) scripts.push('<script src="/sleeper-scores-tab.js?v=20261030b"></script>');
     if(!html.includes('sleeper-past-lineup.js')) scripts.push('<script src="/sleeper-past-lineup.js?v=20261030a"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
