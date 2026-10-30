@@ -18,7 +18,7 @@
   }catch{}
   window.requestAnimationFrame=function(cb){if(cb&&cb.name==='startup')return 0;return nativeRAF(cb)};
   const s=document.createElement('script');
-  s.src='sleeper-ui-polish-core.js?v=20261030a';
+  s.src='sleeper-ui-polish-core.js?v=20261030b';
   const done=()=>{
     window.requestAnimationFrame=nativeRAF;
     document.documentElement.classList.remove('rb-day-init-pending');

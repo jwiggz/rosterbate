@@ -53,7 +53,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-lock-window-vault.js')) scripts.push('<script src="/sleeper-lock-window-vault.js?v=20261030d"></script>');
     if(!html.includes('sleeper-lock-eligibility-guard.js')) scripts.push('<script src="/sleeper-lock-eligibility-guard.js?v=20261029b"></script>');
     if(!html.includes('sleeper-lock-authoritative-only.js')) scripts.push('<script src="/sleeper-lock-authoritative-only.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261030b"></script>');
     if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js?v=20261030f"></script>');
     if(!html.includes('sleeper-guided-link.js')) scripts.push('<script src="/sleeper-guided-link.js?v=20261030c"></script>');
     if(!html.includes('sleeper-lock-sync-guidance.js')) scripts.push('<script src="/sleeper-lock-sync-guidance.js?v=20261030b"></script>');
