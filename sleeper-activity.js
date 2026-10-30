@@ -17,6 +17,8 @@ const css=`
 #activityBody .rb-lock-debug{display:none!important}
 .rb-activity-feed{display:flex;flex-direction:column;gap:8px;min-height:100%}
 .rb-activity-item{border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(18,27,40,.56);padding:9px 10px;color:#c7d2e1;font-size:9px;line-height:1.4}
+/* The page's panel container also uses a .chat class (full-screen height, flex column); chat messages must not inherit it. */
+.rb-activity-item.chat{height:auto!important;max-height:none;display:block!important;overflow:visible!important;flex:0 0 auto!important}
 .rb-activity-item.chat{background:linear-gradient(135deg,rgba(62,72,143,.28),rgba(37,48,88,.34));border-color:rgba(131,145,255,.3);box-shadow:inset 3px 0 0 rgba(135,147,255,.58)}
 .rb-activity-item.chat .rb-activity-kind{color:#aeb8ff}.rb-activity-item.chat .rb-activity-author{color:#d9ddff}.rb-activity-item.chat .rb-activity-text{color:#f0f2ff;font-size:9.5px}
 .rb-chat-media{margin-top:7px;overflow:hidden;border-radius:8px;background:#0e1522;border:1px solid rgba(255,255,255,.08)}.rb-chat-media img{display:block;width:100%;max-height:220px;object-fit:contain;background:#0b111c}.rb-chat-media a{display:block}
