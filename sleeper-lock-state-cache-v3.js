@@ -1,0 +1,1 @@
+(()=>{try{const marker='rbLockStateCacheVersion';const version='3';if(sessionStorage.getItem(marker)!==version){for(let i=sessionStorage.length-1;i>=0;i--){const k=sessionStorage.key(i);if(k&&k.startsWith('rbLockState:'))sessionStorage.removeItem(k)}sessionStorage.setItem(marker,version)}}catch{}})();

@@ -1,0 +1,57 @@
+exports.handler=async function(event){
+  const league=String(event?.queryStringParameters?.league||'').trim();
+  if(!/^\d{10,}$/.test(league)){
+    return{statusCode:302,headers:{Location:'/sleeper-leagues.html','Cache-Control':'no-store'},body:''};
+  }
+  const ref='feature/sleeper-basketball-dashboard';
+  const url=`https://raw.githubusercontent.com/jwiggz/rosterbate/${encodeURIComponent(ref)}/sleeper-basketball.html`;
+  try{
+    const r=await fetch(url,{headers:{Accept:'text/html','User-Agent':'RosterBate/1.0'},cache:'no-store'});
+    if(!r.ok) throw new Error(`GitHub ${r.status}`);
+    let html=await r.text();
+    const scripts=[];
+    if(!html.includes('firebase-app-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>');
+    if(!html.includes('firebase-auth-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>');
+    if(!html.includes('firebase-database-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>');
+    if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261030a"></script>');
+    if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-league-switcher.js')) scripts.push('<script src="/sleeper-league-switcher.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
+    if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
+    if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js?v=20261028b"></script>');
+    if(!html.includes('sleeper-stats-toolbar-label.js')) scripts.push('<script src="/sleeper-stats-toolbar-label.js?v=20261028b"></script>');
+    if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js"></script>');
+    if(!html.includes('sleeper-lock-state-cache-v3.js')) scripts.push('<script src="/sleeper-lock-state-cache-v3.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js?v=20261028g"></script>');
+    if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028f"></script>');
+    if(!html.includes('sleeper-lock-summary-fix.js')) scripts.push('<script src="/sleeper-lock-summary-fix.js?v=20261028c"></script>');
+    if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js"></script>');
+    if(!html.includes('sleeper-schedule-time-backfill.js')) scripts.push('<script src="/sleeper-schedule-time-backfill.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-starter-history.js')) scripts.push('<script src="/sleeper-starter-history.js?v=20261029d"></script>');
+    if(!html.includes('sleeper-lock-window.js')) scripts.push('<script src="/sleeper-lock-window.js?v=20261029g"></script>');
+    if(!html.includes('sleeper-lock-eligibility-guard.js')) scripts.push('<script src="/sleeper-lock-eligibility-guard.js?v=20261029b"></script>');
+    if(!html.includes('sleeper-lock-authoritative-only.js')) scripts.push('<script src="/sleeper-lock-authoritative-only.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261028b"></script>');
+    if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js"></script>');
+    if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261029b"></script>');
+    if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-player-summary-fix.js')) scripts.push('<script src="/sleeper-player-summary-fix.js?v=20261029c"></script>');
+    if(!html.includes('sleeper-player-summary-v2.js')) scripts.push('<script src="/sleeper-player-summary-v2.js?v=20261029d"></script>');
+    if(!html.includes('sleeper-hashtag-import.js')) scripts.push('<script src="/sleeper-hashtag-import.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-hashtag-import-flex.js')) scripts.push('<script src="/sleeper-hashtag-import-flex.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261028d"></script>');
+    if(!html.includes('sleeper-matchup-header-polish.js')) scripts.push('<script src="/sleeper-matchup-header-polish.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-matchup-score-layout.js')) scripts.push('<script src="/sleeper-matchup-score-layout.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-team-header-polish.js')) scripts.push('<script src="/sleeper-team-header-polish.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-players-waiver.js')) scripts.push('<script src="/sleeper-players-waiver.js?v=20261028d"></script>');
+    if(!html.includes('sleeper-waiver-ownership-colors.js')) scripts.push('<script src="/sleeper-waiver-ownership-colors.js?v=20261028a"></script>');
+    if(!html.includes('sleeper-lock-inspector-ui.js')) scripts.push('<script src="/sleeper-lock-inspector-ui.js?v=20261028d"></script>');
+    if(!html.includes('sleeper-lock-qa.js')) scripts.push('<script src="/sleeper-lock-qa.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-lock-pulse-scroll-fix.js')) scripts.push('<script src="/sleeper-lock-pulse-scroll-fix.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-future-day-points.js')) scripts.push('<script src="/sleeper-future-day-points.js?v=20261029b"></script>');
+    if(!html.includes('sleeper-plan-ux.js')) scripts.push('<script src="/sleeper-plan-ux.js?v=20261029a"></script>');
+    if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
+    return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
+  }catch(e){return{statusCode:502,headers:{'Content-Type':'text/plain; charset=utf-8'},body:`Unable to load basketball dashboard: ${String(e?.message||e)}`}}
+};

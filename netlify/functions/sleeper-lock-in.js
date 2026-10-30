@@ -1,0 +1,168 @@
+function json(statusCode, body){
+  return {
+    statusCode,
+    headers:{
+      'Content-Type':'application/json; charset=utf-8',
+      'Cache-Control':'no-store, max-age=0',
+      'Pragma':'no-cache'
+    },
+    body:JSON.stringify(body)
+  };
+}
+
+function normalizeToken(value){
+  let token=String(value||'').trim();
+  token=token.replace(/^authorization\s*:\s*/i,'').trim();
+  token=token.replace(/^bearer\s+/i,'').trim();
+  if((token.startsWith('"')&&token.endsWith('"'))||(token.startsWith("'")&&token.endsWith("'"))) token=token.slice(1,-1).trim();
+  return token;
+}
+
+function validToken(value){
+  return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(String(value||''));
+}
+
+function tokenUserId(token){
+  try{
+    const part=String(token||'').split('.')[1]||'';
+    const b64=part.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-part.length%4)%4);
+    const payload=JSON.parse(Buffer.from(b64,'base64').toString('utf8'));
+    return String(payload?.user_id||'');
+  }catch{return ''}
+}
+
+function validSnowflake(value){
+  return /^\d{10,25}$/.test(String(value||''));
+}
+
+function scalar(v){return v==null?'':String(v)}
+function ownObj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}
+function deepPair(node,pid,gid,depth=0){
+  if(depth>7||node==null)return false;
+  if(Array.isArray(node))return node.some(v=>deepPair(v,pid,gid,depth+1));
+  if(typeof node!=='object')return false;
+  const p=scalar(node.player_id??node.playerId??node.player??node.pid);
+  const g=scalar(node.game_id??node.gameId??node.game??node.gid);
+  if(p===pid&&g===gid)return true;
+  for(const [k,v] of Object.entries(node)){
+    if(String(k)===pid&&scalar(v)===gid)return true;
+    if(String(k)===gid&&scalar(v)===pid)return true;
+    if(typeof v==='object'&&deepPair(v,pid,gid,depth+1))return true;
+  }
+  return false;
+}
+function lockPresent(map,starters,pid,gid){
+  map=ownObj(map);starters=Array.isArray(starters)?starters.map(String):[];pid=String(pid);gid=String(gid);
+  if(scalar(map[pid])===gid||deepPair(map,pid,gid))return true;
+  const idx=starters.indexOf(pid);
+  if(idx>=0){
+    for(const key of [String(idx),String(idx+1)]){
+      const v=map[key];
+      if(scalar(v)===gid)return true;
+      if(v&&typeof v==='object'&&(scalar(v.game_id??v.gameId??v.game??v.gid)===gid||deepPair(v,pid,gid)))return true;
+    }
+  }
+  return false;
+}
+
+async function gql(token,opName,query,variables={}){
+  const response=await fetch('https://sleeper.com/graphql',{
+    method:'POST',
+    headers:{
+      'Accept':'application/json',
+      'Content-Type':'application/json',
+      'Authorization':token,
+      'X-Sleeper-GraphQL-Op':opName,
+      'User-Agent':'RosterBate/1.0'
+    },
+    body:JSON.stringify({operationName:opName,query,variables})
+  });
+  const text=await response.text();
+  let body;
+  try{body=JSON.parse(text)}catch{body={raw:text.slice(0,1000)}}
+  if(!response.ok) throw Object.assign(new Error(`Sleeper HTTP ${response.status}`),{status:response.status,body});
+  if(Array.isArray(body?.errors)&&body.errors.length) throw Object.assign(new Error(body.errors[0]?.message||'Sleeper GraphQL error'),{status:400,body});
+  return body?.data||{};
+}
+
+async function readLeg(token,leagueId,round,rosterId){
+  const query=`query matchup_legs {\n  matchup_legs(league_id: \"${leagueId}\", round: ${round}) {\n    roster_id\n    matchup_id\n    starters\n    starters_games\n    points\n  }\n}`;
+  const data=await gql(token,'matchup_legs',query,{});
+  const rows=Array.isArray(data?.matchup_legs)?data.matchup_legs:[];
+  return rows.find(row=>Number(row.roster_id)===Number(rosterId))||null;
+}
+
+exports.handler=async function(event){
+  if(event.httpMethod!=='POST') return json(405,{error:'Method not allowed'});
+
+  let body;
+  try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
+
+  const token=normalizeToken(body.token);
+  const leagueId=String(body.leagueId||'').trim();
+  const rosterId=Number(body.rosterId);
+  const leg=Number(body.leg);
+  const round=Number(body.round??body.leg);
+  const playerId=String(body.playerId||'').trim();
+  const gameId=String(body.gameId||'').trim();
+
+  if(!validToken(token)) return json(400,{error:'A valid Sleeper session token is required.'});
+  const userId=tokenUserId(token);
+  if(!/^\d+$/.test(userId)) return json(401,{error:'Unable to identify the Sleeper account from this session token.'});
+  if(!validSnowflake(leagueId)) return json(400,{error:'Invalid league id.'});
+  if(!Number.isInteger(rosterId)||rosterId<1) return json(400,{error:'Invalid roster id.'});
+  if(!Number.isInteger(leg)||leg<1||leg>40||!Number.isInteger(round)||round<1||round>40) return json(400,{error:'Invalid scoring period.'});
+  if(!/^[A-Za-z0-9_-]{1,40}$/.test(playerId)) return json(400,{error:'Invalid player id.'});
+  if(!/^\d{6,25}$/.test(gameId)) return json(400,{error:'Invalid NBA game id.'});
+
+  try{
+    const [leagueResponse,rostersResponse]=await Promise.all([
+      fetch(`https://api.sleeper.app/v1/league/${leagueId}`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'}),
+      fetch(`https://api.sleeper.app/v1/league/${leagueId}/rosters`,{headers:{'Accept':'application/json','User-Agent':'RosterBate/1.0'},cache:'no-store'})
+    ]);
+    if(!leagueResponse.ok||!rostersResponse.ok) return json(400,{error:'Unable to validate Sleeper league.'});
+    const league=await leagueResponse.json();
+    const rosters=await rostersResponse.json();
+    if(String(league?.sport||'').toLowerCase()!=='nba') return json(400,{error:'Lock-In writes are enabled for Sleeper NBA leagues only.'});
+    const targetRoster=Array.isArray(rosters)?rosters.find(row=>Number(row.roster_id)===rosterId):null;
+    if(!targetRoster) return json(404,{error:'Roster not found.'});
+    if(String(targetRoster.owner_id||'')!==userId) return json(403,{error:'You can only lock games for the Sleeper roster owned by the connected account.'});
+
+    const current=await readLeg(token,leagueId,round,rosterId);
+    if(!current) return json(404,{error:'Unable to load the private Sleeper matchup leg for this roster.'});
+
+    const starters=Array.isArray(current.starters)?current.starters.map(String):[];
+    if(!starters.includes(playerId)) return json(400,{error:'Sleeper only allows a completed game to be locked if that player was in the starting lineup.'});
+
+    const existing=ownObj(current.starters_games);
+    if(lockPresent(existing,starters,playerId,gameId)){
+      return json(409,{error:'This exact game is already locked for the player.',startersGames:existing});
+    }
+
+    const startersGames={...existing,[playerId]:gameId};
+    const mutation=`mutation update_matchup_leg($starters_games: Map) {\n  update_matchup_leg(league_id: \"${leagueId}\",roster_id: ${rosterId},leg: ${leg},round: ${round},starters: ${JSON.stringify(starters)},starters_games: $starters_games){\n    league_id\n    leg\n    matchup_id\n    roster_id\n    round\n    starters\n    starters_games\n    points\n  }\n}`;
+
+    const data=await gql(token,'update_matchup_leg',mutation,{starters_games:startersGames});
+    const updated=data?.update_matchup_leg;
+    if(!updated) return json(502,{error:'Sleeper did not return an updated matchup.'});
+
+    // Sleeper has returned starters_games in more than one shape over time.
+    // Verify from a fresh authenticated matchup_legs read rather than assuming
+    // the mutation payload must be keyed directly by player id.
+    let verified=lockPresent(updated.starters_games,updated.starters||starters,playerId,gameId);
+    let confirmed=updated;
+    if(!verified){
+      try{
+        const reread=await readLeg(token,leagueId,round,rosterId);
+        if(reread){confirmed=reread;verified=lockPresent(reread.starters_games,reread.starters||starters,playerId,gameId)}
+      }catch{}
+    }
+    if(!verified){
+      return json(409,{error:'Sleeper responded to the lock request, but the requested game could not be verified in the refreshed lock state.',matchup:confirmed,requested:{playerId,gameId},returnedStartersGames:confirmed?.starters_games||updated.starters_games||{}});
+    }
+
+    return json(200,{ok:true,playerId,gameId,matchup:confirmed,startersGames:ownObj(confirmed?.starters_games||updated.starters_games)});
+  }catch(error){
+    return json(Number(error?.status)||502,{error:error?.message||'Unable to reach Sleeper.',sleeper:error?.body||null});
+  }
+};

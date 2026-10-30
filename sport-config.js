@@ -250,3 +250,12 @@ scoringInfo:{h2h_cat:'MLB defaults to points here. Categories can be layered in 
   window.getRosterbatePositionLabels = getPositionLabels;
   window.RB_SAFE_NBA_TEAM_PALETTES = NBA_SAFE_INSPIRED_TEAM_PALETTES;
 })();
+(function loadSleeperHomeIntegration(){
+  try{
+    if(!/\/(?:index\.html)?$/.test(window.location.pathname||'/')) return;
+    const script=document.createElement('script');
+    script.src='sleeper-home-integration.js';
+    script.defer=true;
+    document.head.appendChild(script);
+  }catch(e){}
+})();
