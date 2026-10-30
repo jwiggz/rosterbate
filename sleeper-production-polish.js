@@ -31,6 +31,8 @@
       const b=box.querySelector('b'),s=box.querySelector('small');
       if(b)b.textContent=total.toFixed(1);
       if(s)s.textContent=`${count} verified locks`;
+      box.dataset.rbCachedLockedTotal=total.toFixed(1);
+      box.dataset.rbCachedLockedCount=String(count);
     }catch{}
   }
   function fmtDate(date,includeYear=false){
@@ -64,9 +66,17 @@
       wrapped.__rbProductionPolish=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}
     }
   }catch{}
+  try{
+    if(typeof renderLockTotals==='function'&&!renderLockTotals.__rbProductionPolish){
+      const baseTotals=renderLockTotals;
+      const wrappedTotals=function(...args){const out=baseTotals.apply(this,args);hydrateLockedSummary();return out};
+      wrappedTotals.__rbProductionPolish=true;renderLockTotals=wrappedTotals;try{window.renderLockTotals=wrappedTotals}catch{}
+    }
+  }catch{}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});else refresh();
   window.addEventListener('rb:sleeper-lock-state',refresh);
   window.addEventListener('rb:sleeper-vault',refresh);
+  document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn')){setTimeout(hydrateLockedSummary,0);setTimeout(hydrateLockedSummary,32)}},true);
   document.addEventListener('change',e=>{if(e.target?.id==='weekSel'||e.target?.id==='teamPicker')refresh()},true);
   [0,100,250,500,1000].forEach(ms=>setTimeout(refresh,ms));
 })();
