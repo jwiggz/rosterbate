@@ -18,7 +18,7 @@ exports.handler=async function(event){
     if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261030a"></script>');
     if(!html.includes('sleeper-token-sanity.js')) scripts.push('<script src="/sleeper-token-sanity.js?v=20261030a"></script>');
     if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-ready-gate.js')) scripts.push('<script src="/sleeper-ready-gate.js?v=20261030b"></script>');
+    if(!html.includes('sleeper-ready-gate.js')) scripts.push('<script src="/sleeper-ready-gate.js?v=20261030c"></script>');
     if(!html.includes('sleeper-league-switcher.js')) scripts.push('<script src="/sleeper-league-switcher.js?v=20261029a"></script>');
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
