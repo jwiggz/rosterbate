@@ -6,11 +6,9 @@
   .rb-lock-guide p{margin:7px 0}
   .rb-lock-guide .warn{border:1px solid rgba(243,199,91,.35);background:rgba(91,70,24,.24);border-radius:8px;padding:10px;color:#f4d27a}
   .rb-lock-guide .muted{font-size:9px;color:#8da0b8}
-  .rb-lock-guide .choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-  .rb-lock-guide .choice button{border-radius:8px;padding:10px 12px;font-size:9px;font-weight:900;cursor:pointer}
+  .rb-lock-guide .choice{display:block;margin-top:12px}
+  .rb-lock-guide .choice button{width:100%;border-radius:8px;padding:10px 12px;font-size:9px;font-weight:900;cursor:pointer}
   .rb-lock-guide .continue{border:1px solid #15c8cd;background:#09aeb2;color:#062e30}
-  .rb-lock-guide .public{border:1px solid #3a4b63;background:#1a2639;color:#c9d6e7}
-  @media(max-width:640px){.rb-lock-guide .choice{grid-template-columns:1fr}}
   `;
   const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
@@ -32,17 +30,15 @@
           <p>RosterBate's private Lock Sync currently uses an <strong>advanced Sleeper session token</strong>. This is different from your Sleeper username and password.</p>
           <div class="warn"><strong>Important:</strong> never enter your Sleeper password here. A session token is a sensitive credential and should be treated like a logged-in session.</div>
           <p class="muted">RosterBate cannot automatically read a private session from sleeper.com because browsers isolate one website's login data from another website.</p>
-          <p class="muted">If you already have your own Sleeper session token, continue and RosterBate will verify it before saving anything. If you do not, you can keep using the public Sleeper link without Lock Sync.</p>
+          <p class="muted">If you already have your own Sleeper session token, continue and RosterBate will verify it before saving anything.</p>
         </div>
         <div class="choice">
-          <button id="rbLockGuidePublic" class="public" type="button">Continue Without Lock Sync</button>
           <button id="rbLockGuideHaveToken" class="continue" type="button">I Already Have My Session Token →</button>
         </div>
       </div>`,
       `<button data-close>Close</button>`
     );
     setTimeout(()=>{
-      document.getElementById('rbLockGuidePublic')?.addEventListener('click',close);
       document.getElementById('rbLockGuideHaveToken')?.addEventListener('click',()=>{close();setTimeout(originalAdvanced,0)});
     },0);
   }
