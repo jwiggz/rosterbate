@@ -33,4 +33,7 @@
   }).observe(root,{childList:true,subtree:true});
   setTimeout(()=>apply(),0);
   setTimeout(()=>apply(),150);
+  if(!document.querySelector('script[data-rb-authoritative-score-fix]')){
+    const s=document.createElement('script');s.src='/sleeper-authoritative-score-fix.js?v=20261030a';s.dataset.rbAuthoritativeScoreFix='1';document.head.appendChild(s);
+  }
 })();
