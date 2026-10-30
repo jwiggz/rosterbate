@@ -1,7 +1,8 @@
 (()=>{
   const txState={key:'',ready:false,loading:null,acquired:new Map()};
   const tokenUserId=()=>{try{const raw=String(sessionStorage.getItem('rbSleeperToken')||localStorage.getItem('rbSleeperTokenPersistent')||sessionStorage.getItem('rbSleeperAuth')||'').trim().replace(/^Bearer\s+/i,'');const part=raw.split('.')[1]||'';if(!part)return'';const b64=part.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(part.length/4)*4,'=');const text=decodeURIComponent(Array.from(atob(b64),c=>'%'+c.charCodeAt(0).toString(16).padStart(2,'0')).join(''));const m=text.match(/"user_id"\s*:\s*(?:"(\d+)"|(\d+))/);return String(m?.[1]||m?.[2]||'')}catch{return''}};
-  function selectedIsOwned(){try{const uid=tokenUserId(),t=(currentData?.teams||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));return !!uid&&String(t?.owner_id||'')===uid}catch{return false}}
+  const linkedUserId=()=>{try{return String(localStorage.getItem('rbSleeperLinkedUserId')||'')}catch{return''}};
+  function selectedIsOwned(){try{const uid=linkedUserId()||tokenUserId(),t=(currentData?.teams||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));return !!uid&&String(t?.owner_id||'')===uid}catch{return false}}
   function fantasyDay(){const d=new Date();if(d.getHours()<6)d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
   function rowPlayerId(row){const existing=String(row?.dataset?.rbPlayerId||'');if(existing)return existing;const name=String(row?.querySelector('.pname')?.textContent||'').trim().toLowerCase();if(!name)return'';for(const [id,p] of Object.entries(currentData?.players||{}))if(String(p?.full_name||'').trim().toLowerCase()===name)return String(id);return''}
   function currentStarters(){try{return new Set((matchup(selectedRoster)?.starters||[]).map(String).filter(x=>x&&x!=='0'))}catch{return new Set()}}
