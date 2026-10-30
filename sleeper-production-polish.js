@@ -1,4 +1,5 @@
 (()=>{
+  const PLACEHOLDER='__RB_SLEEPER_VAULT__';
   function stateCache(){
     try{
       const key=`rbLockState:${String(leagueId)}:${Number(selectedRoster)}:${Number(selectedWeek)}`;
@@ -89,19 +90,27 @@
     if(initialReconcileStarted)return;
     initialReconcileStarted=true;
     try{if(window.rbAuthReady)await window.rbAuthReady}catch{}
-    try{if(window.rbSleeperVault?.status)await window.rbSleeperVault.status()}catch{}
-    for(let i=0;i<120;i++){
+    for(let i=0;i<200&&!window.rbSleeperVault;i++)await new Promise(r=>setTimeout(r,20));
+    for(let i=0;i<200;i++){
       let ready=false;
-      try{ready=!!(window.currentData||currentData)&&!!document.querySelector('#teamView .player-row')}catch{}
+      try{ready=!!currentData&&Array.isArray(currentData.matchups)&&Number(selectedRoster)>0&&Number(selectedWeek)>0}catch{}
       if(ready)break;
-      await new Promise(r=>setTimeout(r,25));
+      await new Promise(r=>setTimeout(r,20));
     }
-    try{if(typeof load==='function')await load(true)}catch{}
-    try{if(typeof loadLockState==='function')await loadLockState()}catch{}
-    try{if(typeof renderTeam==='function')renderTeam()}catch{}
-    try{window.rbLockWindowRefresh?.()}catch{}
-    refresh();
-    try{window.dispatchEvent(new CustomEvent('rb:initial-reconcile-complete'))}catch{}
+    try{
+      const body={token:PLACEHOLDER,leagueId:String(leagueId),rosterId:Number(selectedRoster),leg:Number(selectedWeek),round:Number(selectedWeek)};
+      const res=await fetch('/.netlify/functions/sleeper-lock-state',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(body)});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data?.ok)throw new Error(data?.error||`lock-state HTTP ${res.status}`);
+      lockedGames=data.startersGames||{};
+      try{sessionStorage.setItem(`rbLockState:${String(leagueId)}:${Number(selectedRoster)}:${Number(selectedWeek)}`,JSON.stringify({ts:Date.now(),data}))}catch{}
+      try{window.dispatchEvent(new CustomEvent('rb:sleeper-lock-state',{detail:{ok:true,source:'direct-initial-reconcile',data}}))}catch{}
+      try{if(typeof renderTeam==='function')renderTeam()}catch{}
+      try{window.rbLockWindowRefresh?.()}catch{}
+      refresh();
+    }catch(e){
+      try{const s=document.getElementById('status');if(s){s.className='status error';s.textContent=`Testing Lock Sync: ${e?.message||String(e)}`}}catch{}
+    }
   }
 
   function boot(){start();setTimeout(finalInitialReconcile,0)}
