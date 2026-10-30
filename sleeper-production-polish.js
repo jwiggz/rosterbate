@@ -1,3 +1,5 @@
+// Hashtag projection import was removed; drop any saved imports so nothing stale lingers.
+(()=>{try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.includes('rbHashtagProjV1'))localStorage.removeItem(k)}}catch{}})();
 (()=>{
   const PLACEHOLDER='__RB_SLEEPER_VAULT__';
   async function restoreVaultIdentity(){
