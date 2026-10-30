@@ -2,8 +2,6 @@
   const START=Date.now();
   const MAX_WAIT=10000;
   const JWT=/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
-  let lockSettled=false;
-  let lockStatus='';
   let released=false;
 
   function token(){
@@ -11,34 +9,64 @@
   }
   function hasPrivateSync(){return JWT.test(String(token()||'').trim())}
   function verified(){try{return sessionStorage.getItem('rbSleeperLockSyncVerified')==='1'}catch{return false}}
+  function data(){try{return typeof currentData!=='undefined'?currentData:null}catch{return null}}
+  function rosterId(){try{return Number(typeof selectedRoster!=='undefined'?selectedRoster:0)}catch{return 0}}
+  function week(){try{return Number(typeof selectedWeek!=='undefined'?selectedWeek:0)}catch{return 0}}
+  function league(){try{return String(typeof leagueId!=='undefined'?leagueId:'')}catch{return''}}
   function baseReady(){
     try{
-      if(!window.currentData)return false;
-      if(!Array.isArray(currentData?.teams)||!currentData.teams.length)return false;
-      if(!currentData?.players||!Object.keys(currentData.players).length)return false;
+      const d=data();
+      if(!d)return false;
+      if(!Array.isArray(d?.teams)||!d.teams.length)return false;
+      if(!d?.players||!Object.keys(d.players).length)return false;
       if(!document.querySelector('#teamView .player-row'))return false;
       return true;
     }catch{return false}
   }
   function projectionsReady(){
     try{
+      const d=data();
       const status=String(document.querySelector('.status')?.textContent||'').toLowerCase();
       if(status.includes('projections loaded'))return true;
-      if(currentData?.projections&&Object.keys(currentData.projections).length)return true;
+      if(d?.projections&&Object.keys(d.projections).length)return true;
       return false;
+    }catch{return false}
+  }
+  function lockCacheReady(){
+    try{
+      const lg=league(),rid=rosterId(),wk=week();
+      if(!lg||!rid||!wk)return false;
+      const raw=sessionStorage.getItem(`rbLockState:${lg}:${rid}:${wk}`);
+      if(!raw)return false;
+      const x=JSON.parse(raw);
+      return !!x?.data;
+    }catch{return false}
+  }
+  function lockUiApplied(){
+    try{
+      const d=data();
+      const m=(d?.matchups||[]).find(x=>Number(x.roster_id)===rosterId());
+      const sg=m?.starters_games||m?.startersGames||{};
+      const privateRaw=sessionStorage.getItem(`rbLockState:${league()}:${rosterId()}:${week()}`);
+      let privateSg={};
+      if(privateRaw){const parsed=JSON.parse(privateRaw);privateSg=parsed?.data?.startersGames||{}}
+      const expected=Math.max(Object.keys(sg||{}).length,Object.keys(privateSg||{}).length);
+      if(expected===0)return true;
+      const chips=document.querySelectorAll('#teamView .lock-chip,.player-row.locked-in').length;
+      return chips>=expected;
     }catch{return false}
   }
   function lockReady(){
     if(!hasPrivateSync())return true;
-    if(verified()&&lockSettled&&['ok','cached'].includes(lockStatus))return true;
-    return false;
+    return verified()&&lockCacheReady()&&lockUiApplied();
   }
   function linkedRosterReady(){
     try{
+      const d=data();
       const uid=localStorage.getItem('rbSleeperLinkedUserId')||'';
       if(!uid)return true;
-      const roster=(currentData?.teams||[]).find(t=>String(t.owner_id||'')===String(uid));
-      return !!roster&&Number(window.selectedRoster)===Number(roster.roster_id);
+      const roster=(d?.teams||[]).find(t=>String(t.owner_id||'')===String(uid));
+      return !!roster&&rosterId()===Number(roster.roster_id);
     }catch{return true}
   }
   function progress(){
@@ -69,7 +97,7 @@
     if(released)return;
     if(progress())return release('ready');
     if(Date.now()-START>=MAX_WAIT)return release('timeout');
-    requestAnimationFrame(()=>setTimeout(tick,80));
+    setTimeout(tick,80);
   }
   function makeCover(){
     if(document.getElementById('rbReadyCover'))return;
@@ -79,10 +107,6 @@
     document.body.appendChild(el);
   }
 
-  window.addEventListener('rb:lock-sync-settled',e=>{
-    lockSettled=true;lockStatus=String(e?.detail?.status||'');
-    progress();
-  });
   document.addEventListener('DOMContentLoaded',()=>{makeCover();tick()},{once:true});
   if(document.readyState!=='loading'){makeCover();tick()}
 })();
