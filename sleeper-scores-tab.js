@@ -8,6 +8,7 @@
 #rbScoresView h3{margin:0;font-size:14px;font-weight:950;color:var(--text,#f4f7fb)}
 #rbScoresView .sc-sub{color:var(--muted,#8e9bb0);font-size:9px;font-weight:700}
 #rbScoresView .sc-spacer{flex:1}
+#rbScoresView .sc-seg+.sc-seg{margin-left:-2px}
 #rbScoresView .sc-seg{display:inline-flex;border:1px solid var(--border,#334258);border-radius:8px;overflow:hidden}
 #rbScoresView .sc-seg button{all:unset;cursor:pointer;padding:7px 11px;font-size:9px;font-weight:900;letter-spacing:.04em;color:#aab6c8;background:#192434;border-left:1px solid var(--border,#334258)}
 #rbScoresView .sc-seg button:first-child{border-left:0}
@@ -42,9 +43,9 @@
 `;
   const RANGES=[['today','Today'],['last','Last Game'],['l3','Last 3'],['l7','Last 7'],['l14','Last 14']];
   const COLS=[['fpts','FPTS'],['pts','PTS'],['reb','REB'],['ast','AST'],['stl','STL'],['blk','BLK'],['tpm','3PM'],['to','TO'],['fg','FG']];
-  const st={range:'today',owner:'all',pos:'ALL',sort:'fpts',dir:-1,data:null,loading:null,error:'',key:'',timer:null};
-  try{const s=JSON.parse(sessionStorage.getItem('rbScoresPrefs')||'null');if(s)Object.assign(st,{range:s.range||st.range,owner:s.owner||st.owner,pos:s.pos||st.pos,sort:s.sort||st.sort,dir:s.dir||st.dir})}catch{}
-  const save=()=>{try{sessionStorage.setItem('rbScoresPrefs',JSON.stringify({range:st.range,owner:st.owner,pos:st.pos,sort:st.sort,dir:st.dir}))}catch{}};
+  const st={mode:'total',range:'today',owner:'all',pos:'ALL',sort:'fpts',dir:-1,data:null,loading:null,error:'',key:'',timer:null};
+  try{const s=JSON.parse(sessionStorage.getItem('rbScoresPrefs')||'null');if(s)Object.assign(st,{mode:s.mode||st.mode,range:s.range||st.range,owner:s.owner||st.owner,pos:s.pos||st.pos,sort:s.sort||st.sort,dir:s.dir||st.dir})}catch{}
+  const save=()=>{try{sessionStorage.setItem('rbScoresPrefs',JSON.stringify({mode:st.mode,range:st.range,owner:st.owner,pos:st.pos,sort:st.sort,dir:st.dir}))}catch{}};
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const f1=v=>Number.isFinite(Number(v))?Number(v).toFixed(1):'—';
   const fantasyDay=()=>{const d=new Date();if(d.getHours()<6)d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
@@ -70,7 +71,7 @@
   function lineFor(p){
     if(st.range==='today')return p.today?{fpts:p.today.fpts,s:p.today.s,gp:1,note:`${p.today.home?'vs':'@'} ${p.today.opp}`,live:p.today.live}:null;
     if(st.range==='last')return p.last?{fpts:p.last.fpts,s:p.last.s,gp:1,note:`${dlabel(p.last.date)} ${p.last.home?'vs':'@'} ${p.last.opp}`}:null;
-    const a=p[st.range];return a?{fpts:a.fpts,s:a.s,gp:a.gp,note:`${a.gp} game${a.gp===1?'':'s'}`}:null;
+    const a=p[st.range];if(!a)return null;const tot=st.mode==='total'&&a.ts;return{fpts:tot?a.tfpts:a.fpts,s:tot?a.ts:a.s,gp:a.gp,note:`${a.gp} game${a.gp===1?'':'s'}`,avg:!tot};
   }
   function rows(){
     const {map,mine}=owners();
@@ -96,7 +97,7 @@
   function draw(){
     const el=host();if(!el)return;
     const seg=RANGES.map(([k,l])=>`<button type="button" data-range="${k}" aria-pressed="${st.range===k}">${l}</button>`).join('');
-    const top=`<div class="sc-top"><div><h3>Top Scorers</h3><div class="sc-sub">${st.range==='today'?`${dlabel(fantasyDay())} · your league's scoring`:st.range==='last'?'Most recent game played':`Average over each player's last ${st.range.slice(1)} games`}</div></div><span class="sc-spacer"></span><div class="sc-seg" role="group" aria-label="Time range">${seg}</div><select id="rbScOwner" aria-label="Owner filter"><option value="all">All players</option><option value="mine">My team</option><option value="rostered">Rostered</option><option value="fa">Free agents</option></select><select id="rbScPos" aria-label="Position filter">${['ALL','PG','SG','SF','PF','C'].map(p=>`<option value="${p}">${p==='ALL'?'All positions':p}</option>`).join('')}</select></div>`;
+    const top=`<div class="sc-top"><div><h3>Top Scorers</h3><div class="sc-sub">${st.range==='today'?`${dlabel(fantasyDay())} · your league's scoring`:st.range==='last'?'Most recent game played':`${st.mode==='total'?'Totals':'Per-game averages'} over each player's last ${st.range.slice(1)} games`}</div></div><span class="sc-spacer"></span><div class="sc-seg" role="group" aria-label="Time range">${seg}</div>${['l3','l7','l14'].includes(st.range)?`<div class="sc-seg" role="group" aria-label="Totals or per game"><button type="button" data-mode="total" aria-pressed="${st.mode==='total'}">Totals</button><button type="button" data-mode="avg" aria-pressed="${st.mode==='avg'}">Per Game</button></div>`:''}<select id="rbScOwner" aria-label="Owner filter"><option value="all">All players</option><option value="mine">My team</option><option value="rostered">Rostered</option><option value="fa">Free agents</option></select><select id="rbScPos" aria-label="Position filter">${['ALL','PG','SG','SF','PF','C'].map(p=>`<option value="${p}">${p==='ALL'?'All positions':p}</option>`).join('')}</select></div>`;
     let body='';
     if(!st.data&&st.loading)body='<div class="sc-load">Loading box scores…</div>';
     else if(!st.data&&st.error)body=`<div class="sc-empty sc-err">Couldn't load scores: ${esc(st.error)}</div>`;
@@ -104,11 +105,11 @@
       const {list,mine}=rows();
       if(!list.length)body=`<div class="sc-empty">${esc(emptyMessage())}</div>`;
       else{
-        const avg=!['today','last'].includes(st.range);
-        const head=`<tr><th class="l">#</th><th class="l">Player</th><th class="l">${avg?'GP':'Game'}</th>${COLS.map(([k,l])=>`<th aria-sort="${st.sort===k?(st.dir<0?'descending':'ascending'):'none'}"><button type="button" data-sort="${k}">${l}${st.sort===k?(st.dir<0?' ▼':' ▲'):''}</button></th>`).join('')}</tr>`;
+        const multi=!['today','last'].includes(st.range),avg=multi&&st.mode==='avg';
+        const head=`<tr><th class="l">#</th><th class="l">Player</th><th class="l">${multi?'GP':'Game'}</th>${COLS.map(([k,l])=>`<th aria-sort="${st.sort===k?(st.dir<0?'descending':'ascending'):'none'}"><button type="button" data-sort="${k}">${l}${st.sort===k?(st.dir<0?' ▼':' ▲'):''}</button></th>`).join('')}</tr>`;
         const fmt=v=>avg?f1(v):String(Math.round(Number(v)||0));
         const tr=list.slice(0,150).map((x,i)=>{const s=x.l.s,t=x.t,me=t&&Number(t.roster_id)===mine;const own=!t?'<span class="own fa">FA</span>':me?'<span class="own me">MY TEAM</span>':`<span class="own">${esc(t.team_name||t.display_name||'Rostered')}</span>`;
-          return`<tr class="${me?'mine':''}"><td class="l rk">${i+1}</td><td class="l"><div class="nm">${esc(x.p.name)}${own}</div><div class="meta">${esc(x.p.team)} · ${esc(x.p.pos||'—')}${x.p.injury?` · ${esc(x.p.injury)}`:''}</div></td><td class="l">${esc(x.l.note)}${x.l.live?'<span class="live">LIVE</span>':''}</td><td class="fp">${f1(x.l.fpts)}</td><td>${fmt(s.pts)}</td><td>${fmt(s.reb)}</td><td>${fmt(s.ast)}</td><td>${fmt(s.stl)}</td><td>${fmt(s.blk)}</td><td>${fmt(s.tpm)}</td><td>${fmt(s.to)}</td><td>${avg?`${f1(s.fgm)}-${f1(s.fga)}`:`${s.fgm}-${s.fga}`}</td></tr>`}).join('');
+          return`<tr class="${me?'mine':''}"><td class="l rk">${i+1}</td><td class="l"><div class="nm">${esc(x.p.name)}${own}</div><div class="meta">${esc(x.p.team)} · ${esc(x.p.pos||'—')}${x.p.injury?` · ${esc(x.p.injury)}`:''}</div></td><td class="l">${esc(x.l.note)}${x.l.live?'<span class="live">LIVE</span>':''}</td><td class="fp">${f1(x.l.fpts)}</td><td>${fmt(s.pts)}</td><td>${fmt(s.reb)}</td><td>${fmt(s.ast)}</td><td>${fmt(s.stl)}</td><td>${fmt(s.blk)}</td><td>${fmt(s.tpm)}</td><td>${fmt(s.to)}</td><td>${avg?`${f1(s.fgm)}-${f1(s.fga)}`:`${Math.round(s.fgm)}-${Math.round(s.fga)}`}</td></tr>`}).join('');
         body=`${gamesStrip()}<div class="sc-wrap"><table><thead>${head}</thead><tbody>${tr}</tbody></table></div>`;
       }
       if(st.data&&st.range==='today'&&!list.length)body=gamesStrip()+body;
@@ -119,6 +120,7 @@
   function bind(){
     const el=host();if(!el||el.dataset.rbBound==='1')return;el.dataset.rbBound='1';
     el.addEventListener('click',e=>{
+      const md=e.target.closest?.('button[data-mode]');if(md){st.mode=md.dataset.mode;save();draw();el.querySelector(`button[data-mode="${st.mode}"]`)?.focus();return}
       const r=e.target.closest?.('button[data-range]');if(r){st.range=r.dataset.range;save();draw();el.querySelector(`button[data-range="${st.range}"]`)?.focus();return}
       const s=e.target.closest?.('button[data-sort]');if(s){const k=s.dataset.sort;if(st.sort===k)st.dir*=-1;else{st.sort=k;st.dir=k==='to'?1:-1}save();draw();el.querySelector(`button[data-sort="${k}"]`)?.focus()}
     });

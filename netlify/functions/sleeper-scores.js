@@ -79,7 +79,7 @@ function fantasy(s,scoring){
   return Math.round(total*10)/10;
 }
 const KEEP=['pts','reb','ast','stl','blk','tpm','to','fgm','fga','ftm','fta','min'];
-function avg(games){const n=games.length;if(!n)return null;const s={};for(const k of KEEP)s[k]=Math.round(games.reduce((t,g)=>t+Number(g.s[k]||0),0)/n*10)/10;return{gp:n,fpts:Math.round(games.reduce((t,g)=>t+g.fpts,0)/n*10)/10,s}}
+function avg(games){const n=games.length;if(!n)return null;const s={},ts={};for(const k of KEEP){const sum=games.reduce((t,g)=>t+Number(g.s[k]||0),0);ts[k]=Math.round(sum*10)/10;s[k]=Math.round(sum/n*10)/10}const tf=games.reduce((t,g)=>t+g.fpts,0);return{gp:n,fpts:Math.round(tf/n*10)/10,s,tfpts:Math.round(tf*10)/10,ts}}
 const pickStats=s=>Object.fromEntries(KEEP.map(k=>[k,s[k]]));
 
 exports.handler=async function(event){
