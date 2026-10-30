@@ -11,6 +11,22 @@ exports.handler=async function(event){
     let html=await r.text();
     if(!html.includes('sleeper-ready-gate.css')) html=html.replace('</head>','<link rel="stylesheet" href="/sleeper-ready-gate.css?v=20261030a">\n</head>');
     html=html.replace('<body>','<body class="rb-initializing">');
+
+    // The base dashboard's inline script normally calls load() immediately, before
+    // the injected Firebase/vault scripts at the end of <body> have executed.
+    // Hold only the very first load until auth + vault bootstrap are available so
+    // initial lock-state rendering matches a manual refresh.
+    const eagerBoot='updateConnect();load();';
+    if(html.includes(eagerBoot)){
+      const gatedBoot=`updateConnect();(async function rbInitialDashboardBoot(){
+        for(let i=0;i<150&&!window.rbSleeperVault;i++)await new Promise(r=>setTimeout(r,20));
+        try{if(window.rbAuthReady)await window.rbAuthReady}catch{}
+        try{if(window.rbSleeperVault?.isConnected?.())await window.rbSleeperVault.status()}catch{}
+        await load();
+      })();`;
+      html=html.replace(eagerBoot,gatedBoot);
+    }
+
     const scripts=[];
     if(!html.includes('firebase-app-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>');
     if(!html.includes('firebase-auth-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>');
