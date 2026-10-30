@@ -40,9 +40,9 @@
     if(!b)return;
     const privateConnected=!!sessionToken();
     const linked=!!linkedUserId();
-    b.textContent=privateConnected?'Sleeper Connected':linked?'Sleeper Linked':'Link Sleeper';
-    b.classList.toggle('connected',privateConnected||linked);
-    b.title=privateConnected?'Private Sleeper session connected':linked?`Linked as ${linkedUsername()||'Sleeper user'}`:'Link your Sleeper username';
+    b.textContent=privateConnected?'Sleeper Connected':linked?'Sleeper Linked · Lock Sync Off':'Link Sleeper';
+    b.classList.toggle('connected',privateConnected);
+    b.title=privateConnected?'Private Sleeper lock/write sync connected':linked?`Linked as ${linkedUsername()||'Sleeper user'}; private Lock-In sync is not connected on this domain`:'Link your Sleeper username';
   }
 
   async function selectLinkedRoster(userId){
@@ -77,7 +77,7 @@
       `<p>Enter your <strong>Sleeper username</strong>. RosterBate will find your Sleeper account and automatically open your roster in this league.</p>
        <label>Sleeper username</label>
        <input id="rbSleeperUsername" autocomplete="username" value="${typeof esc==='function'?esc(current):''}" placeholder="ArmandoMsports">
-       <div style="margin-top:10px;color:#8fa0b6;font-size:9px;line-height:1.5">No Sleeper password or session code is needed for public league data. Private lineup writes and Lock-In syncing require an authorized Sleeper connection.</div>
+       <div style="margin-top:10px;color:#8fa0b6;font-size:9px;line-height:1.5">No Sleeper password or session code is needed for public league data. Private lineup writes and Lock-In syncing require an advanced Sleeper connection on this browser/domain.</div>
        <button id="rbAdvancedSleeper" type="button" style="margin-top:12px;border:0;background:transparent;color:#8394ac;font-size:8px;text-decoration:underline;padding:0">Advanced / admin connection</button>`,
       `<button data-close>Cancel</button><button id="rbLinkSleeper" class="primary">Link My Sleeper</button>`
     );
@@ -105,11 +105,11 @@
     if(typeof showModal!=='function')return;
     const current=sessionToken()||persistentToken();
     showModal('Advanced Sleeper Connection',
-      `<p>This is an advanced development/admin connection for RosterBate's private Sleeper write features.</p>
+      `<p>This enables the private Sleeper state used for authoritative Lock-In totals and lineup writes on this browser/domain.</p>
        <label>Sleeper session credential</label>
        <input id="tokenInput" type="password" autocomplete="off" value="${typeof esc==='function'?esc(current):''}" placeholder="Session credential">
        <div class="warning">A Sleeper session credential is sensitive. Only use your own credential, never share it with another person, and never paste it into chat.</div>`,
-      `<button data-close>Cancel</button><button id="saveTokenPersistent" class="primary">Remember On This Device</button>`
+      `<button data-close>Cancel</button><button id="saveTokenPersistent" class="primary">Enable Lock Sync</button>`
     );
     setTimeout(()=>{
       document.getElementById('saveTokenPersistent')?.addEventListener('click',async()=>{
@@ -121,7 +121,7 @@
           try{if(typeof loadLockState==='function')await loadLockState()}catch{}
           try{if(typeof renderTeam==='function')renderTeam()}catch{}
           try{if(typeof renderActivity==='function')renderActivity()}catch{}
-          try{if(typeof setStatus==='function')setStatus('Advanced Sleeper connection enabled on this device.','success')}catch{}
+          try{if(typeof setStatus==='function')setStatus('Sleeper Lock-In sync enabled on this device.','success')}catch{}
         }else{
           try{lockedGames={}}catch{}
           try{if(typeof renderTeam==='function')renderTeam()}catch{}
@@ -135,14 +135,15 @@
     if(typeof showModal!=='function')return;
     const linked=!!linkedUserId(),privateConnected=!!sessionToken();
     const linkedText=linked?`<p><strong>Linked Sleeper:</strong> ${typeof esc==='function'?esc(linkedUsername()||linkedUserId()):linkedUsername()}</p>`:'<p>No Sleeper username is linked yet.</p>';
-    const privateText=privateConnected?'<p style="color:#75e7bf"><strong>Advanced write connection:</strong> active on this device.</p>':'<p style="color:#93a3b8">Advanced write connection is not active.</p>';
+    const privateText=privateConnected?'<p style="color:#75e7bf"><strong>Lock-In sync:</strong> active on this device/domain.</p>':'<p style="color:#f0b84b"><strong>Lock-In sync:</strong> OFF on this device/domain. Public roster data will work, but authoritative locked points and private lineup writes will not.</p>';
     showModal('Sleeper Connection Settings',linkedText+privateText,
-      `<button data-close>Close</button><button id="changeSleeperLink" class="primary">${linked?'Change Linked Account':'Link Sleeper'}</button>${linked?'<button id="unlinkSleeper">Unlink</button>':''}${privateConnected?'<button id="forgetSleeper" class="danger">Forget Advanced Connection</button>':''}`
+      `<button data-close>Close</button><button id="changeSleeperLink">${linked?'Change Linked Account':'Link Sleeper'}</button>${linked?'<button id="unlinkSleeper">Unlink</button>':''}${privateConnected?'<button id="forgetSleeper" class="danger">Forget Lock Sync</button>':'<button id="enableLockSync" class="primary">Enable Lock Sync</button>'}`
     );
     setTimeout(()=>{
       document.getElementById('changeSleeperLink')?.addEventListener('click',()=>{try{closeModal()}catch{};showPublicLink()});
       document.getElementById('unlinkSleeper')?.addEventListener('click',()=>{clearLink();try{closeModal()}catch{};refreshConnectionUi();try{if(typeof setStatus==='function')setStatus('Sleeper username unlinked.','success')}catch{}});
-      document.getElementById('forgetSleeper')?.addEventListener('click',()=>{rememberToken('');try{lockedGames={}}catch{};try{closeModal()}catch{};refreshConnectionUi();try{if(typeof renderTeam==='function')renderTeam()}catch{};try{if(typeof setStatus==='function')setStatus('Advanced Sleeper connection forgotten on this device.','success')}catch{}});
+      document.getElementById('enableLockSync')?.addEventListener('click',()=>{try{closeModal()}catch{};showAdvancedConnect()});
+      document.getElementById('forgetSleeper')?.addEventListener('click',()=>{rememberToken('');try{lockedGames={}}catch{};try{closeModal()}catch{};refreshConnectionUi();try{if(typeof renderTeam==='function')renderTeam()}catch{};try{if(typeof setStatus==='function')setStatus('Sleeper Lock-In sync forgotten on this device.','success')}catch{}});
     },0);
   }
 
@@ -172,5 +173,5 @@
     refreshConnectionUi();
   },1000);
 
-  window.rbSleeperLink={show:showPublicLink,advanced:showAdvancedConnect,linkedUsername,linkedUserId,linkByUsername};
+  window.rbSleeperLink={show:showPublicLink,advanced:showAdvancedConnect,settings:showConnectionSettings,linkedUsername,linkedUserId,linkByUsername};
 })();
