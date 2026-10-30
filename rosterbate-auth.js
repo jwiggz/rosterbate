@@ -27,16 +27,18 @@
   function activeId(){try{return localStorage.getItem(ACTIVE)||''}catch{return''}}
   function setActive(user){try{localStorage.setItem(ACTIVE,String(user?.id||''));localStorage.setItem(EMAIL,String(user?.email||''))}catch{}}
   function clearActive(){try{localStorage.removeItem(ACTIVE);localStorage.removeItem(EMAIL)}catch{}}
+  function metadata(user){return user?.userMetadata||user?.user_metadata||{}}
   function renderAccount(user,identity){
     const host=document.querySelector('.head-actions');if(!host||document.getElementById('rbAccountChip'))return;
     const chip=document.createElement('div');chip.id='rbAccountChip';chip.className='rb-account-chip';chip.innerHTML=`<span class="rb-account-email" title="${esc(user.email||'')}">${esc(user.email||'Account')}</span><button type="button" class="rb-account-logout">Log out</button>`;
     host.appendChild(chip);
     chip.querySelector('button')?.addEventListener('click',async()=>{
-      try{chip.querySelector('button').disabled=true;window.rbAccountStorage?.clearAccount?.(String(user.id||activeId()));await identity.logout()}catch(e){}finally{clearActive();location.reload()}
+      try{chip.querySelector('button').disabled=true;window.rbAccountStorage?.clearSecrets?.(String(user.id||activeId()));await identity.logout()}catch(e){}finally{clearActive();location.reload()}
     });
     const box=document.querySelector('.userbox');if(box){
-      const initials=String(user.user_metadata?.full_name||user.email||'RB').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
-      box.innerHTML=`<div class="avatar">${esc(initials||'RB')}</div><div><div>${esc(user.user_metadata?.full_name||user.email||'RosterBate User')}</div><div style="font-size:8px;color:#78879b;margin-top:2px">Signed in</div></div>`;
+      const meta=metadata(user);const display=meta.full_name||meta.fullName||user.email||'RosterBate User';
+      const initials=String(display).trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+      box.innerHTML=`<div class="avatar">${esc(initials||'RB')}</div><div><div>${esc(display)}</div><div style="font-size:8px;color:#78879b;margin-top:2px">Signed in</div></div>`;
     }
   }
   function ready(enabled,user=null){window.rbAuthState={status:'ready',enabled,user};window.dispatchEvent(new CustomEvent('rb:auth-ready',{detail:window.rbAuthState}));try{if(typeof renderTeam==='function')renderTeam()}catch{}}
@@ -54,7 +56,7 @@
     try{
       const identity=await import('https://esm.sh/@netlify/identity@2.0.0');
       try{await identity.handleAuthCallback()}catch{}
-      let user=await identity.getUser();
+      const user=await identity.getUser();
       const g=gate();
       g.querySelectorAll('.rb-auth-tab').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
       const submit=document.getElementById('rbAuthSubmit');
@@ -82,7 +84,7 @@
         if(prior&&prior!==String(user.id)){location.reload();return user}
         g.classList.add('hidden');renderAccount(user,identity);ready(true,user);return user;
       }
-      if(activeId()){window.rbAccountStorage?.clearAccount?.(activeId());clearActive()}
+      if(activeId()){window.rbAccountStorage?.clearSecrets?.(activeId());clearActive()}
       setMode('login');ready(true,null);return null;
     }catch(e){failOpen(e);return null}
   })();
