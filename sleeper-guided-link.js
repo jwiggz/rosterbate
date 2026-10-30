@@ -19,6 +19,12 @@
   .rb-link-guide .feature{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #2d3d53}
   .rb-link-guide .feature:last-child{border-bottom:0}
   .rb-link-guide .on{color:#73e7b9;font-weight:900}.rb-link-guide .off{color:#f0b45b;font-weight:900}
+  .rb-link-guide .sync-card{margin-top:12px;border:1px solid rgba(243,199,91,.35);background:linear-gradient(180deg,rgba(91,70,24,.28),rgba(40,34,24,.3));border-radius:10px;padding:12px}
+  .rb-link-guide .sync-card.active{border-color:rgba(48,216,160,.38);background:linear-gradient(180deg,rgba(24,87,70,.28),rgba(22,49,42,.3))}
+  .rb-link-guide .sync-title{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;font-weight:900;font-size:12px}
+  .rb-link-guide .sync-pill{font-size:8px;border-radius:999px;padding:3px 7px;background:#5b451c;color:#ffd76b;border:1px solid #8b6924}
+  .rb-link-guide .sync-card.active .sync-pill{background:#174c3d;color:#8ff1c7;border-color:#2b8065}
+  .rb-link-guide .sync-btn{margin-top:10px;width:100%;border:1px solid #16c9ce;background:#08aeb2;color:#052d2e;border-radius:7px;padding:9px 11px;font-size:9px;font-weight:900;cursor:pointer}
   @media(max-width:640px){.rb-link-guide .steps{display:grid;grid-template-columns:1fr 1fr}.rb-link-guide .summary{grid-template-columns:1fr}}
   `;
   const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
@@ -27,6 +33,7 @@
   function close(){try{if(typeof closeModal==='function')closeModal()}catch{}}
   function show(title,body,footer){if(typeof showModal==='function')showModal(title,`<div class="rb-link-guide">${body}</div>`,footer)}
   function steps(n){return `<div class="steps"><div class="step ${n===1?'active':n>1?'done':''}">1 · Username</div><div class="step ${n===2?'active':n>2?'done':''}">2 · Confirm</div><div class="step ${n===3?'active':''}">3 · Ready</div></div>`}
+  function lockSyncActive(){try{return sessionStorage.getItem('rbSleeperLockSyncVerified')==='1'}catch{return false}}
 
   function start(){
     const current=window.rbSleeperLink?.linkedUsername?.()||'';
@@ -65,16 +72,32 @@
   }
 
   function ready(user){
+    const active=lockSyncActive();
     show('Sleeper Linked',`${steps(3)}
-      <div class="panel"><h3>You're ready to use RosterBate</h3><p><strong>${esc(user?.display_name||user?.username||'Your Sleeper account')}</strong> is linked to this RosterBate account.</p>
+      <div class="panel"><h3>Public Sleeper link complete</h3><p><strong>${esc(user?.display_name||user?.username||'Your Sleeper account')}</strong> is linked to this RosterBate account.</p>
         <div class="feature"><span>League, roster & matchup data</span><span class="on">READY</span></div>
         <div class="feature"><span>Player stats, projections & waiver tools</span><span class="on">READY</span></div>
-        <div class="feature"><span>Private Sleeper Lock-In/write sync</span><span class="off">NOT AUTHORIZED</span></div>
+        <div class="feature"><span>Private Sleeper Lock-In/write sync</span><span class="${active?'on':'off'}">${active?'ACTIVE':'OPTIONAL'}</span></div>
       </div>
-      <p class="warn">Sleeper's documented public API does not provide an official third-party sign-in/write authorization flow. RosterBate will not ask normal users to extract or share private session credentials.</p>
-      <p class="muted">If Sleeper provides RosterBate with an official OAuth/partner integration later, this last feature can become a normal one-click approval.</p>`,
-      `<button id="rbGuideDone" class="primary">Done</button>`);
-    setTimeout(()=>document.getElementById('rbGuideDone')?.addEventListener('click',close),0);
+      <div class="sync-card ${active?'active':''}">
+        <div class="sync-title"><span>🔒 Lock Sync</span><span class="sync-pill">${active?'ACTIVE':'RECOMMENDED'}</span></div>
+        ${active
+          ?`<p class="good">Authoritative locked points and private lineup actions are enabled on this browser.</p>`
+          :`<p>Enable Lock Sync if you want RosterBate to show Sleeper's authoritative locked points and support private lineup/Lock-In actions.</p>
+             <p class="muted">This is separate from your Sleeper username. Do <strong>not</strong> enter your Sleeper password. RosterBate will verify the connection before saving anything.</p>
+             <button id="rbGuideEnableSync" class="sync-btn" type="button">Enable Lock Sync →</button>`}
+      </div>
+      ${active?'':'<p class="muted">You can also find this later by clicking the Sleeper button or the connection gear at the top of the league page.</p>'}`,
+      `<button id="rbGuideDone" class="primary">${active?'Done':'Continue Without Lock Sync'}</button>`);
+    setTimeout(()=>{
+      document.getElementById('rbGuideDone')?.addEventListener('click',close);
+      document.getElementById('rbGuideEnableSync')?.addEventListener('click',()=>{
+        close();
+        const fn=window.rbSleeperLink?.advanced;
+        if(typeof fn==='function')fn();
+        else window.rbSleeperLink?.settings?.();
+      });
+    },0);
   }
 
   document.addEventListener('click',e=>{
