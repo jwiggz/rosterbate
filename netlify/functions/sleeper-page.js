@@ -9,6 +9,8 @@ exports.handler=async function(event){
     const r=await fetch(url,{headers:{Accept:'text/html','User-Agent':'RosterBate/1.0'},cache:'no-store'});
     if(!r.ok) throw new Error(`GitHub ${r.status}`);
     let html=await r.text();
+    if(!html.includes('sleeper-ready-gate.css')) html=html.replace('</head>','<link rel="stylesheet" href="/sleeper-ready-gate.css?v=20261030a">\n</head>');
+    html=html.replace('<body>','<body class="rb-initializing">');
     const scripts=[];
     if(!html.includes('firebase-app-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>');
     if(!html.includes('firebase-auth-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>');
@@ -16,6 +18,7 @@ exports.handler=async function(event){
     if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261030a"></script>');
     if(!html.includes('sleeper-token-sanity.js')) scripts.push('<script src="/sleeper-token-sanity.js?v=20261030a"></script>');
     if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
+    if(!html.includes('sleeper-ready-gate.js')) scripts.push('<script src="/sleeper-ready-gate.js?v=20261030b"></script>');
     if(!html.includes('sleeper-league-switcher.js')) scripts.push('<script src="/sleeper-league-switcher.js?v=20261029a"></script>');
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
