@@ -43,12 +43,12 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stats-toolbar-label.js')) scripts.push('<script src="/sleeper-stats-toolbar-label.js?v=20261028b"></script>');
-    if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js"></script>');
+    if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js?v=20261030a"></script>');
     if(!html.includes('sleeper-lock-state-cache-v3.js')) scripts.push('<script src="/sleeper-lock-state-cache-v3.js?v=20261028a"></script>');
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js?v=20261028g"></script>');
     if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028f"></script>');
     if(!html.includes('sleeper-lock-summary-fix.js')) scripts.push('<script src="/sleeper-lock-summary-fix.js?v=20261028c"></script>');
-    if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js"></script>');
+    if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js?v=20261030a"></script>');
     if(!html.includes('sleeper-schedule-time-backfill.js')) scripts.push('<script src="/sleeper-schedule-time-backfill.js?v=20261029a"></script>');
     if(!html.includes('sleeper-starter-history.js')) scripts.push('<script src="/sleeper-starter-history.js?v=20261030a"></script>');
     if(!html.includes('sleeper-lock-window-vault.js')) scripts.push('<script src="/sleeper-lock-window-vault.js?v=20261030d"></script>');
@@ -59,7 +59,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-guided-link.js')) scripts.push('<script src="/sleeper-guided-link.js?v=20261030c"></script>');
     if(!html.includes('sleeper-lock-sync-guidance.js')) scripts.push('<script src="/sleeper-lock-sync-guidance.js?v=20261030b"></script>');
     if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js?v=20261030a"></script>');
-    if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261029b"></script>');
+    if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261030a"></script>');
     if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
     if(!html.includes('sleeper-player-summary-fix.js')) scripts.push('<script src="/sleeper-player-summary-fix.js?v=20261029c"></script>');
     if(!html.includes('sleeper-player-summary-v2.js')) scripts.push('<script src="/sleeper-player-summary-v2.js?v=20261029d"></script>');
@@ -75,6 +75,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-production-polish.js')) scripts.push('<script src="/sleeper-production-polish.js?v=20261030e"></script>');
     if(!html.includes('sleeper-league-standings.js')) scripts.push('<script src="/sleeper-league-standings.js?v=20261030b"></script>');
     if(!html.includes('sleeper-scores-tab.js')) scripts.push('<script src="/sleeper-scores-tab.js?v=20261030b"></script>');
+    if(!html.includes('sleeper-selection-ux.js')) scripts.push('<script src="/sleeper-selection-ux.js?v=20261030a"></script>');
     if(!html.includes('sleeper-past-lineup.js')) scripts.push('<script src="/sleeper-past-lineup.js?v=20261030a"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};

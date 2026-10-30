@@ -69,7 +69,10 @@ function orderRows(container,orderMap=null){
       return ai-bi;
     }
     return n(a.dataset.rbOriginalOrder)-n(b.dataset.rbOriginalOrder);
-  }).forEach(r=>container.appendChild(r));
+  });
+  const current=[...container.children].filter(x=>x.classList?.contains('player-row'));
+  if(rows.every((r,i)=>r===current[i]))return;
+  rows.forEach(r=>container.appendChild(r));
 }
 function neutralizeStatsHeader(){
   document.querySelectorAll('#teamView .rb-inline-head-grid button').forEach(btn=>{
@@ -83,7 +86,6 @@ function neutralizeStatsHeader(){
 }
 function enforce(){
   const card=document.querySelector('#teamView .team-card');if(!card)return;
-  card.classList.remove('rb-order-ready');
   neutralizeStatsHeader();
   const {map:starters,pins}=starterOrder();
   const bench=card.querySelector('.bench');
@@ -91,20 +93,25 @@ function enforce(){
   const benchLabel=bench?.previousElementSibling||null;
   const irLabel=ir?.previousElementSibling||null;
   const starterRows=[...card.children].filter(x=>x.classList?.contains('player-row'));
-  starterRows.forEach(row=>row.classList.toggle('rb-slot-pinned',pins[rowPlayerId(row)]!==undefined));
+  starterRows.forEach(row=>{const want=pins[rowPlayerId(row)]!==undefined;if(row.classList.contains('rb-slot-pinned')!==want)row.classList.toggle('rb-slot-pinned',want)});
+  const domStarters=starterRows.slice();
   starterRows.sort((a,b)=>{
     const ai=starters.has(rowPlayerId(a))?starters.get(rowPlayerId(a)):n(a.dataset.rbOriginalOrder);
     const bi=starters.has(rowPlayerId(b))?starters.get(rowPlayerId(b)):n(b.dataset.rbOriginalOrder);
     return ai-bi;
   });
-  if(benchLabel) starterRows.forEach(r=>card.insertBefore(r,benchLabel));
+  // Only move rows when they are out of order, and only if they sit directly before the bench.
+  const inOrder=starterRows.every((r,i)=>r===domStarters[i])&&(!benchLabel||!starterRows.length||starterRows[starterRows.length-1].nextElementSibling===benchLabel);
+  if(benchLabel&&!inOrder) starterRows.forEach(r=>card.insertBefore(r,benchLabel));
   orderRows(bench);
   orderRows(ir);
   if(ir){
-    if(irLabel&&irLabel.parentElement===card) card.appendChild(irLabel);
-    if(ir.parentElement===card) card.appendChild(ir);
+    if(ir.parentElement===card&&card.lastElementChild!==ir){
+      if(irLabel&&irLabel.parentElement===card) card.appendChild(irLabel);
+      card.appendChild(ir);
+    }
   }
-  card.classList.add('rb-order-ready');
+  if(!card.classList.contains('rb-order-ready'))card.classList.add('rb-order-ready');
 }
 function todayKey(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`}
 function dayMode(day){if(!day||day==='all')return'week';const today=todayKey();if(day<today)return'past';if(day>today)return'future';return'today'}
@@ -165,10 +172,12 @@ function clearBenchFirst(){
   benchFirstId=null;
   document.querySelectorAll('#teamView .player-row.rb-bench-selected').forEach(r=>r.classList.remove('rb-bench-selected'));
 }
+window.rbBenchFirst=()=>benchFirstId;window.rbClearBenchFirst=()=>clearBenchFirst();
 function selectBenchFirst(id,row){
   benchFirstId=String(id||'');
   document.querySelectorAll('#teamView .player-row.rb-bench-selected').forEach(r=>r.classList.remove('rb-bench-selected'));
   row?.classList.add('rb-bench-selected');
+  try{window.dispatchEvent(new CustomEvent('rb:lineup-selection'))}catch{}
   try{const p=player(benchFirstId);setStatus(`Selected ${p.full_name||'bench player'} — choose the starter slot to replace.`)}catch{}
 }
 function applyLocalStarters(starters){

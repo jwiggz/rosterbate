@@ -191,6 +191,7 @@ document.addEventListener('pointerdown',e=>{
   try{
     const row=e.target.closest?.('#teamView [data-starter-index]');
     if(!row)return;
+    if(e.target.closest?.('.player-info,.player-head,.player-copy,button,a,.lock-btn,.lock-chip'))return;
     if(row.classList.contains('rb-slot-pinned')||row.classList.contains('locked-in')||row.classList.contains('locked'))return;
     if(!row.classList.contains('editable'))return;
     const idx=Number(row.dataset.starterIndex);
