@@ -1,5 +1,27 @@
 (()=>{
   const PLACEHOLDER='__RB_SLEEPER_VAULT__';
+  async function restoreVaultIdentity(){
+    try{
+      if(window.rbAuthReady)await window.rbAuthReady;
+      if(!window.rbSleeperVault?.status)return null;
+      const d=await window.rbSleeperVault.status();
+      if(!d?.connected||!d?.sleeperUserId)return d||null;
+      const sid=String(d.sleeperUserId),rid=Number(d.rosterId||0);
+      try{
+        localStorage.setItem('rbSleeperLinkedUserId',sid);
+        if(rid>0)localStorage.setItem('rbSleeperRoster',String(rid));
+        sessionStorage.setItem('rbSleeperLockSyncVerified','1');
+      }catch{}
+      try{if(rid>0)selectedRoster=rid}catch{}
+      try{
+        const t=(currentData?.teams||[]).find(x=>String(x?.owner_id||'')===sid);
+        const name=String(t?.display_name||t?.team_name||'').trim();
+        if(name)localStorage.setItem('rbSleeperLinkedUsername',name);
+      }catch{}
+      try{window.dispatchEvent(new CustomEvent('rb:sleeper-vault',{detail:{connected:true,restoredIdentity:true,sleeperUserId:sid,rosterId:rid}}))}catch{}
+      return d;
+    }catch{return null}
+  }
   function stateCache(){
     try{
       const key=`rbLockState:${String(leagueId)}:${Number(selectedRoster)}:${Number(selectedWeek)}`;
@@ -93,10 +115,11 @@
     for(let i=0;i<200&&!window.rbSleeperVault;i++)await new Promise(r=>setTimeout(r,20));
     for(let i=0;i<200;i++){
       let ready=false;
-      try{ready=!!currentData&&Array.isArray(currentData.matchups)&&Number(selectedRoster)>0&&Number(selectedWeek)>0}catch{}
+      try{ready=!!currentData&&Array.isArray(currentData.matchups)&&Number(selectedWeek)>0}catch{}
       if(ready)break;
       await new Promise(r=>setTimeout(r,20));
     }
+    await restoreVaultIdentity();
     try{
       const body={token:PLACEHOLDER,leagueId:String(leagueId),rosterId:Number(selectedRoster),leg:Number(selectedWeek),round:Number(selectedWeek)};
       const res=await fetch('/.netlify/functions/sleeper-lock-state',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(body)});
