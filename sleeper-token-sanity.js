@@ -15,4 +15,17 @@
   if(cleared){
     try{sessionStorage.setItem('rbSleeperTokenRejected','1')}catch{}
   }
+
+  // Load the safe, username-based Sleeper connection wizard. It relies only
+  // on public account/roster lookup and does not collect Sleeper passwords or
+  // private browser-session credentials from normal users.
+  try{
+    if(!document.querySelector('script[data-rb-guided-link]')){
+      const s=document.createElement('script');
+      s.src='/sleeper-guided-link.js?v=20261030a';
+      s.async=false;
+      s.dataset.rbGuidedLink='1';
+      document.head.appendChild(s);
+    }
+  }catch{}
 })();
