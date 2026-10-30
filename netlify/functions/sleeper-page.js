@@ -41,10 +41,10 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
     if(!html.includes('sleeper-stability.js')) scripts.push('<script src="/sleeper-stability.js?v=20261028c"></script>');
     if(!html.includes('sleeper-team-stats.js')) scripts.push('<script src="/sleeper-team-stats.js?v=20261028b"></script>');
-    if(!html.includes('sleeper-stats-toolbar-label.js')) scripts.push('<script src="/sleeper-stats-toolbar-label.js?v=20261028b"></script>');
+    if(!html.includes('sleeper-stats-toolbar-label.js')) scripts.push('<script src="/sleeper-stats-toolbar-label.js?v=20261030a"></script>');
     if(!html.includes('sleeper-roster-order.js')) scripts.push('<script src="/sleeper-roster-order.js?v=20261030a"></script>');
     if(!html.includes('sleeper-lock-state-cache-v3.js')) scripts.push('<script src="/sleeper-lock-state-cache-v3.js?v=20261028a"></script>');
-    if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js?v=20261028g"></script>');
+    if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js?v=20261030b"></script>');
     if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028f"></script>');
     if(!html.includes('sleeper-lock-summary-fix.js')) scripts.push('<script src="/sleeper-lock-summary-fix.js?v=20261028c"></script>');
     if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js?v=20261030a"></script>');
@@ -71,7 +71,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-lock-pulse-scroll-fix.js')) scripts.push('<script src="/sleeper-lock-pulse-scroll-fix.js?v=20261029a"></script>');
     if(!html.includes('sleeper-future-day-points.js')) scripts.push('<script src="/sleeper-future-day-points.js?v=20261029b"></script>');
     if(!html.includes('sleeper-plan-ux.js')) scripts.push('<script src="/sleeper-plan-ux.js?v=20261029a"></script>');
-    if(!html.includes('sleeper-production-polish.js')) scripts.push('<script src="/sleeper-production-polish.js?v=20261030e"></script>');
+    if(!html.includes('sleeper-production-polish.js')) scripts.push('<script src="/sleeper-production-polish.js?v=20261030f"></script>');
     if(!html.includes('sleeper-league-standings.js')) scripts.push('<script src="/sleeper-league-standings.js?v=20261030b"></script>');
     if(!html.includes('sleeper-scores-tab.js')) scripts.push('<script src="/sleeper-scores-tab.js?v=20261030b"></script>');
     if(!html.includes('sleeper-selection-ux.js')) scripts.push('<script src="/sleeper-selection-ux.js?v=20261030a"></script>');

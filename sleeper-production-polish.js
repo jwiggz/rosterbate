@@ -53,6 +53,8 @@
       let total=0,count=0;
       starters.forEach((pid,i)=>{if(!locked.has(pid))return;const v=Number(pts[i]);if(Number.isFinite(v)){total+=v;count++}});
       if(!count)return;
+      // Prefer Sleeper's private locked scores; public starters_points can differ for frozen Lock-In games.
+      try{const a=window.rbAuthoritativeLockedTotal?.();if(Number.isFinite(a)&&a>0)total=a}catch{}
       const expectedTotal=total.toFixed(1),expectedCount=`${count} verified locks`;
       const b=box.querySelector('b'),s=box.querySelector('small');
       if(b&&b.textContent!==expectedTotal)b.textContent=expectedTotal;
