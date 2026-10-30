@@ -24,8 +24,24 @@
   async function ensureTx(){const k=txKey();if(!k)return;if(tx.key!==k){tx.key=k;tx.ready=false;tx.loading=null;tx.acquired=new Map()}if(tx.ready)return;if(tx.loading)return tx.loading;tx.loading=(async()=>{try{const r=await fetch(`https://api.sleeper.app/v1/league/${encodeURIComponent(leagueId)}/transactions/${encodeURIComponent(selectedWeek)}`,{cache:'no-store'});const rows=r.ok?await r.json():[];for(const x of Array.isArray(rows)?rows:[]){const created=Number(x?.created||0),adds=x?.adds&&typeof x.adds==='object'?x.adds:{};for(const [pid,rid] of Object.entries(adds)){if(Number(rid)!==Number(selectedRoster)||!created)continue;const old=tx.acquired.get(String(pid));if(!old||created<old)tx.acquired.set(String(pid),created)}}}catch{}finally{tx.ready=true;tx.loading=null}})();return tx.loading}
   function acquiredAfter(pid,g){const at=Number(tx.acquired.get(String(pid))||0),gt=gameTime(g);return !!at&&!!gt&&at>gt}
   function locked(pid){try{return !!(lockedGames&&lockedGames[String(pid)])}catch{return false}}
-  function setPoints(row,ok){try{const el=row.querySelector('.pts');if(!el)return;if(el.dataset.rbVaultOriginal==null)el.dataset.rbVaultOriginal=String(el.textContent||'').trim();if(ok)el.textContent=el.dataset.rbVaultOriginal||'0.0'}catch{}}
-  function addButton(row,pid,g){row.querySelector('.rb-lock-unavailable')?.remove();row.classList.add('lockable');let btn=row.querySelector('.lock-btn[data-rb-vault-carry="1"]');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbVaultCarry='1';(row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info'))?.appendChild(btn)}btn.dataset.lockPlayer=String(pid);btn.dataset.lockGame=String(g.game_id||'');btn.title='Completed starter game is still inside Sleeper’s lock window';if(btn.dataset.rbBound!=='1'){btn.dataset.rbBound='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();try{commitLock(String(pid),String(g.game_id||''))}catch{}})}setPoints(row,true)}
+  function completedPoints(pid){
+    try{
+      const m=matchup(selectedRoster);
+      if(typeof pointsFor==='function'){
+        const v=Number(pointsFor(m,String(pid)));
+        if(Number.isFinite(v))return v;
+      }
+      const starters=(m?.starters||[]).map(String),i=starters.indexOf(String(pid));
+      if(i>=0&&Array.isArray(m?.starters_points)){
+        const v=Number(m.starters_points[i]);
+        if(Number.isFinite(v))return v;
+      }
+      const v=Number(m?.players_points?.[String(pid)]);
+      return Number.isFinite(v)?v:null;
+    }catch{return null}
+  }
+  function setPoints(row,pid){try{const el=row.querySelector('.pts');if(!el)return;const actual=completedPoints(pid);if(actual!==null){el.textContent=actual.toFixed(1);el.dataset.rbVaultActual=actual.toFixed(1);return}if(el.dataset.rbVaultOriginal==null)el.dataset.rbVaultOriginal=String(el.textContent||'').trim();if(el.dataset.rbVaultOriginal)el.textContent=el.dataset.rbVaultOriginal}catch{}}
+  function addButton(row,pid,g){row.querySelector('.rb-lock-unavailable')?.remove();row.classList.add('lockable');let btn=row.querySelector('.lock-btn[data-rb-vault-carry="1"]');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbVaultCarry='1';(row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info'))?.appendChild(btn)}btn.dataset.lockPlayer=String(pid);btn.dataset.lockGame=String(g.game_id||'');btn.title='Completed starter game is still inside Sleeper’s lock window';if(btn.dataset.rbBound!=='1'){btn.dataset.rbBound='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();try{commitLock(String(pid),String(g.game_id||''))}catch{}})}setPoints(row,pid)}
   async function decorate(){try{if(!owned()||String(selectedDay)==='all'||String(selectedDay)!==fantasyDay())return;await ensureTx();const root=document.getElementById('teamView');if(!root)return;for(const row of root.querySelectorAll('.player-row[data-starter-index]')){if(row.classList.contains('locked-in')||row.querySelector('.lock-chip'))continue;const pid=playerId(row);if(!pid||locked(pid)||!starters().has(pid))continue;const g=candidate(pid);if(!g||!g.game_id||acquiredAfter(pid,g)||!historyOkay(pid,g))continue;addButton(row,pid,g)}refreshTotal()}catch{}}
   function refreshTotal(){try{const root=document.getElementById('teamView');if(!root)return;const rows=[...root.querySelectorAll('.player-row.locked-in')];if(!rows.length)return;let total=0,count=0;for(const row of rows){const v=Number(String(row.querySelector('.pts')?.textContent||'').replace(/[^0-9.-]/g,''));if(Number.isFinite(v)){total+=v;count++}}const box=root.querySelector('.rb-lock-total.locked');if(box&&count){const b=box.querySelector('b'),s=box.querySelector('small');if(b&&b.textContent!==total.toFixed(1))b.textContent=total.toFixed(1);if(s&&s.textContent!==`${count} verified locks`)s.textContent=`${count} verified locks`}}catch{}}
   let queued=false;function run(){if(queued)return;queued=true;setTimeout(()=>{queued=false;decorate();refreshTotal()},0)}
