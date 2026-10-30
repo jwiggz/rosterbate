@@ -166,7 +166,8 @@
     const chips=teams().map(t=>{const rid=Number(t.roster_id);if(rid===me)return`<span class="chip me">${avatar(t)}${esc(t.team_name)} (you)</span>`;return`<button type="button" class="chip" data-team="${rid}" aria-pressed="${st.teams.includes(rid)}">${avatar(t)}${esc(t.team_name)}</button>`}).join('');
     const {out,warn}=problems(locks);const ready=!out.length;
     el.innerHTML=`<div class="tr-card">${seg}<h3>Propose a Trade</h3><div class="sub">Pick one or more teams — Sleeper supports trades between several teams at once. Then check the players and FAAB each team sends.</div><div class="chips" aria-label="Trade partners">${chips}</div></div>
-      ${st.teams.length>=2?`<div class="teams">${st.teams.map(rid=>teamColumn(rid,locks)).join('')}</div>`:''}
+      ${st.teams.length<2&&Object.keys(st.picks).length?`<div class="tr-card"><div class="note">${esc(Object.keys(st.picks).map(pname).join(', '))} added from your team. Pick who you're trading with above.</div></div>`:''}
+    ${st.teams.length>=2?`<div class="teams">${st.teams.map(rid=>teamColumn(rid,locks)).join('')}</div>`:''}
       ${st.teams.length>=2?`<div class="tr-card"><h3>Summary</h3><div class="sub">${st.teams.length}-team trade · Week ${selectedWeek}</div>${summaryHtml()}${out.map(x=>`<div class="warn err">${esc(x)}</div>`).join('')}${warn.map(x=>`<div class="warn">${esc(x)}</div>`).join('')}
         <div class="actions"><button type="button" class="btn primary" data-send ${ready&&!st.sending?'':'aria-disabled="true"'}>${st.sending?'Sending…':'Send to Sleeper'}</button><button type="button" class="btn" data-copy ${ready?'':'aria-disabled="true"'}>Copy summary</button><button type="button" class="btn" data-reset>Reset</button><span class="note">${ready?'Trade looks valid. You will confirm before anything is sent.':'Fix the items above to continue.'}</span>${st.sendErr?`<div class="warn err" style="width:100%">${esc(st.sendErr)}</div>`:''}</div></div>`:''}`;
   }
@@ -252,6 +253,17 @@
     try{if(currentView==='trades')window.render()}catch{}
     setTimeout(refreshBlocked,1500);
   }
-  window.rbTrades={state:st,summary,textSummary,blockedByTrade};
+  // Start a trade from a player (used by the player card's Trade button).
+  function startWith(pid){
+    pid=String(pid||'');const me=myRoster();reset();
+    const owner=teams().find(t=>(t.players||[]).map(String).includes(pid));const rid=Number(owner?.roster_id||0);
+    if(rid&&rid!==me){st.teams=[me,rid];st.picks[pid]={from:rid,to:me}}
+    else if(rid===me){st.picks[pid]={from:me,to:0}}
+    st.tab='propose';st.flash='';st.sendErr='';
+    try{currentView='trades';window.render()}catch{}
+    try{window.scrollTo({top:0,behavior:'smooth'})}catch{}
+    return !!rid;
+  }
+  window.rbTrades={state:st,summary,textSummary,blockedByTrade,startWith};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
