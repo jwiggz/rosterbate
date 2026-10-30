@@ -16,13 +16,22 @@
   async function save(sleeperToken,target={}){sleeperToken=String(sleeperToken||'').trim();if(!validJwt(sleeperToken))throw new Error('That is not a valid Sleeper session token.');const linkedSleeperUserId=String(target.linkedSleeperUserId||localStorage.getItem('rbSleeperLinkedUserId')||'');const d=await request('save',{sleeperToken,linkedSleeperUserId,leagueId:String(target.leagueId||window.leagueId||''),rosterId:Number(target.rosterId||window.selectedRoster||0),round:Number(target.round||window.selectedWeek||0)});clearRaw();setConnected(true);return d}
   async function forget(){const d=await request('delete');clearRaw();setConnected(false);return d}
   function isConnected(){try{return connected||localStorage.getItem(MARK)==='1'}catch{return connected}}
+  function headerValue(headers,name){try{if(headers instanceof Headers)return headers.get(name)||'';if(Array.isArray(headers)){const hit=headers.find(([k])=>String(k).toLowerCase()===String(name).toLowerCase());return hit?String(hit[1]||''):''}for(const [k,v] of Object.entries(headers||{}))if(String(k).toLowerCase()===String(name).toLowerCase())return String(v||'')}catch{}return''}
   window.fetch=async function(input,init){
     const url=typeof input==='string'?input:String(input?.url||'');
+    init={...(init||{})};
+    const headers=init.headers||input?.headers||{};
+    const authHeader=headerValue(headers,'Authorization');
+    if(isConnected()&&url.includes('sleeper.com/graphql')&&authHeader===PLACEHOLDER){
+      let gqlBody={};if(typeof init.body==='string'){try{gqlBody=JSON.parse(init.body)}catch{}}
+      if(String(gqlBody?.operationName||'')==='matchup_legs'){
+        const firebaseIdToken=await firebaseToken();
+        return originalFetch('/.netlify/functions/sleeper-graphql-read',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({firebaseIdToken,operationName:'matchup_legs',variables:gqlBody.variables||{},query:String(gqlBody.query||'')})});
+      }
+      return new Response(JSON.stringify({errors:[{message:'This private Sleeper request must use a vault-backed RosterBate endpoint.'}]}),{status:403,headers:{'Content-Type':'application/json'}});
+    }
     if(!PRIVATE_ENDPOINTS.some(name=>url.includes('/.netlify/functions/'+name)))return originalFetch(input,init);
-    init={...(init||{})};let body={};if(typeof init.body==='string'){try{body=JSON.parse(init.body)}catch{return originalFetch(input,init)}}
-    // Compatibility during rollout: if the vault is not active yet and the
-    // request already contains a real legacy Sleeper JWT, leave the request
-    // untouched so existing Lock Sync continues to work.
+    let body={};if(typeof init.body==='string'){try{body=JSON.parse(init.body)}catch{return originalFetch(input,init)}}
     if(!isConnected()&&validJwt(body.token))return originalFetch(input,init);
     const firebaseIdToken=await firebaseToken();delete body.token;body.firebaseIdToken=firebaseIdToken;init.headers={...(init.headers||{}),'Content-Type':'application/json'};init.body=JSON.stringify(body);return originalFetch(input,init);
   };
