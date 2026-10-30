@@ -24,6 +24,7 @@ async function verifySleeper(token,leagueId,rosterId,round){
 }
 exports.handler=async function(event){
   if(event.httpMethod!=='POST')return json(405,{error:'Method not allowed'});
+  try{const {connectLambda}=await import('@netlify/blobs');connectLambda(event)}catch(e){return json(500,{error:e?.message||'Unable to initialize encrypted vault storage.',code:'BLOBS_INIT_FAILED'})}
   let body;try{body=JSON.parse(event.body||'{}')}catch{return json(400,{error:'Invalid JSON body'})}
   const action=String(body.action||'status');
   try{
