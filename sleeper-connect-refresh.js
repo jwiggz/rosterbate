@@ -12,10 +12,11 @@
   function rosterForSleeperUser(userId){userId=String(userId||'');let teams=[];try{teams=currentData?.teams||[]}catch{}return teams.find(t=>String(t.owner_id||'')===userId)||null}
   function refreshConnectionUi(){const b=document.getElementById('connectBtn');if(!b)return;const privateConnected=vaultConnected()&&isVerified(),linked=!!linkedUserId();b.textContent=privateConnected?'Sleeper Connected':linked?'Sleeper Linked · Lock Sync Off':'Link Sleeper';b.classList.toggle('connected',privateConnected);b.title=privateConnected?'Encrypted private Sleeper Lock-In sync verified':linked?`Linked as ${linkedUsername()||'Sleeper user'}; Lock Sync is not enabled`:'Link your Sleeper username'}
   async function verifyLockSync(rawToken){
-    let lg='',rid=0,wk=0;try{lg=String(leagueId||'');rid=Number(selectedRoster);wk=Number(selectedWeek)}catch{}
+    let lg='',rid=0,wk=0;try{lg=String(leagueId||'');const linkedRoster=rosterForSleeperUser(linkedUserId());rid=Number(linkedRoster?.roster_id||selectedRoster);wk=Number(selectedWeek)}catch{}
     if(!lg||!rid||!wk)throw new Error('RosterBate is still loading the league. Try again in a moment.');
     if(!window.rbSleeperVault?.save)throw new Error('Encrypted Lock Sync vault is still loading. Refresh and try again.');
     const d=await window.rbSleeperVault.save(rawToken,{leagueId:lg,rosterId:rid,round:wk,linkedSleeperUserId:linkedUserId()});
+    try{selectedRoster=rid;localStorage.setItem('rbSleeperRoster',String(rid))}catch{}
     setVerified(true);refreshConnectionUi();return d;
   }
   async function selectLinkedRoster(userId){const roster=rosterForSleeperUser(userId);if(!roster)throw new Error('That Sleeper account does not own a roster in this league.');selectedRoster=Number(roster.roster_id);localStorage.setItem('rbSleeperRoster',String(selectedRoster));try{if(typeof clearSelection==='function')clearSelection()}catch{}try{if(typeof render==='function')render();else if(typeof renderTeam==='function')renderTeam()}catch{}if(vaultConnected()){try{setVerified(true);if(typeof loadLockState==='function')await loadLockState()}catch{setVerified(false)}}refreshConnectionUi();return roster}
