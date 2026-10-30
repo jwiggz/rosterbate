@@ -1,0 +1,14 @@
+html,body{background:#171d29}
+body.rb-initializing{overflow:hidden}
+body.rb-initializing>.app{visibility:hidden;pointer-events:none}
+body.rb-initializing::before{content:'RB';position:fixed;left:50%;top:calc(50% - 52px);transform:translate(-50%,-50%);z-index:9997;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#164c46,#1f3146);border:1px solid #3a5169;color:#fff;font:900 15px/1 Inter,system-ui,sans-serif;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+body.rb-initializing::after{content:'Preparing your league…';position:fixed;left:50%;top:calc(50% + 4px);transform:translate(-50%,-50%);z-index:9997;color:#8fa0b8;font:800 10px/1 Inter,system-ui,sans-serif;letter-spacing:.02em}
+#rbReadyCover{position:fixed;inset:0;z-index:9998;background:#171d29;display:grid;place-items:center;opacity:1;transition:opacity .2s ease}
+#rbReadyCover.rb-ready{opacity:0;pointer-events:none}
+.rb-ready-card{width:min(360px,calc(100vw - 40px));padding:24px;border-radius:16px;border:1px solid #334258;background:#202a3a;box-shadow:0 28px 80px rgba(0,0,0,.42);text-align:center;font-family:Inter,system-ui,sans-serif}
+.rb-ready-mark{width:50px;height:50px;margin:0 auto 15px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#164c46,#1f3146);border:1px solid #3a5169;color:#fff;font-size:16px;font-weight:950}
+.rb-ready-title{color:#f4f7fb;font-size:14px;font-weight:900}
+.rb-ready-sub{margin-top:8px;color:#8fa0b8;font-size:10px;font-weight:700}
+.rb-ready-track{height:5px;margin-top:18px;overflow:hidden;border-radius:999px;background:#151d2a}
+.rb-ready-track span{display:block;width:12%;height:100%;border-radius:inherit;background:#30d8a0;transition:width .18s ease}
+@media(prefers-reduced-motion:reduce){#rbReadyCover,.rb-ready-track span{transition:none}}
