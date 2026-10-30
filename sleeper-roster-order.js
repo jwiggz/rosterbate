@@ -113,33 +113,84 @@ function enforce(){
   }
   if(!card.classList.contains('rb-order-ready'))card.classList.add('rb-order-ready');
 }
-function todayKey(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`}
+function todayKey(){const d=new Date();if(d.getHours()<6)d.setDate(d.getDate()-1);const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`}
 function dayMode(day){if(!day||day==='all')return'week';const today=todayKey();if(day<today)return'past';if(day>today)return'future';return'today'}
 function planKey(day){try{return`rbDailyPlan:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}:${String(day)}`}catch{return''}}
-function readPlan(day){try{const raw=localStorage.getItem(planKey(day));const p=raw?JSON.parse(raw):null;return p&&Array.isArray(p.starters)?p:null}catch{return null}}
+function readPlan(day){try{const raw=localStorage.getItem(planKey(day));const p=raw?JSON.parse(raw):null;return p&&(Array.isArray(p.swaps)||Array.isArray(p.starters))?p:null}catch{return null}}
+function currentStarters(){try{const m=matchup(selectedRoster);return(m?.starters||[]).map(String)}catch{return[]}}
+// Older plans saved a whole starter array; convert to the swaps it implies.
+function planSwaps(p){if(!p)return[];if(Array.isArray(p.swaps))return p.swaps.map(s=>({index:Number(s.index),outId:String(s.outId),inId:String(s.inId),summary:s.summary||''}));const cur=currentStarters(),want=(p.starters||[]).map(String),out=[];want.forEach((id,i)=>{if(String(cur[i]??'0')!==id)out.push({index:i,outId:String(cur[i]??'0'),inId:id,summary:''})});return out}
+// Apply swaps to a lineup by player id (not slot position) so other changes since planning survive.
+function applySwaps(starters,swaps){const arr=starters.slice(),applied=[],skipped=[];for(const s of swaps){let idx=s.outId!=='0'?arr.indexOf(s.outId):(String(arr[s.index]??'')==='0'?s.index:-1);if(idx<0){skipped.push({...s,why:'out-moved'});continue}if(arr.includes(s.inId)){skipped.push({...s,why:'in-starting'});continue}arr[idx]=s.inId;applied.push({...s,index:idx})}return{starters:arr,applied,skipped}}
+window.rbPlannedLineup=day=>{const p=readPlan(day);if(!p)return null;const swaps=planSwaps(p);return{plan:p,swaps,...applySwaps(currentStarters(),swaps)}};
 function writePlan(day,plan){try{localStorage.setItem(planKey(day),JSON.stringify(plan));return true}catch{return false}}
 function removePlan(day){try{localStorage.removeItem(planKey(day))}catch{}}
 function selectedDayValue(){try{return String(selectedDay||'all')}catch{return'all'}}
 function planSummary(){try{if(!pendingSwap)return'';const out=pendingSwap.outId==='0'?'Empty slot':player(pendingSwap.outId).full_name,inn=player(pendingSwap.inId).full_name;return`${out} → ${inn}`}catch{return'Planned lineup change'}}
 function saveFuturePlan(){
   const day=selectedDayValue();if(dayMode(day)!=='future'||!pendingSwap)return false;
-  const ok=writePlan(day,{starters:pendingSwap.after.map(String),summary:planSummary(),savedAt:Date.now()});
+  // Add this swap to any swaps already planned for the day (planning never touches Sleeper).
+  const swaps=planSwaps(readPlan(day)).filter(s=>s.outId!==String(pendingSwap.outId)&&s.inId!==String(pendingSwap.inId));
+  swaps.push({index:Number(pendingSwap.index),outId:String(pendingSwap.outId),inId:String(pendingSwap.inId),summary:planSummary()});
+  const ok=writePlan(day,{version:2,swaps,summary:swaps.map(s=>s.summary).filter(Boolean).join(', '),savedAt:Date.now()});
   try{closeModal();clearSelection();renderTeam();renderActivity();setStatus(ok?`Planned for ${day}: ${planSummary()}. Sleeper will not be changed until you apply it that day.`:'Unable to save planned lineup.','success')}catch{}
   setTimeout(refreshPlannerUi,0);return ok;
 }
-async function applyTodayPlan(){
-  const day=selectedDayValue();if(dayMode(day)!=='today')return;const plan=readPlan(day);if(!plan)return;
-  const btn=document.getElementById('rbApplyDailyPlan');if(btn){btn.disabled=true;btn.textContent='Applying…'}
+function swapChecks(sw,today){
+  // Why a planned swap can't (or shouldn't) be applied right now.
+  const p=id=>{try{return player(id)}catch{return{}}};const outP=p(sw.outId),inP=p(sw.inId);
+  const gameOn=(id)=>{try{return gameForTeam(p(id).team,today)}catch{return null}};
+  const started=g=>!!g&&String(g.status||'pre_game')!=='pre_game';
+  const out={block:'',warn:'',lockable:null};
+  const t=(()=>{try{return team(selectedRoster)}catch{return null}})();
+  if(sw.inId!=='0'&&!(t?.players||[]).map(String).includes(sw.inId))out.block=`${inP.full_name||'That player'} is no longer on your roster.`;
+  else if(sw.outId!=='0'&&!currentStarters().includes(sw.outId))out.block=`${outP.full_name||'That player'} is no longer in your starting lineup.`;
+  else if(currentStarters().includes(sw.inId))out.block=`${inP.full_name||'That player'} is already starting.`;
+  else if(sw.outId!=='0'&&(()=>{try{return !!lockedGames?.[sw.outId]}catch{return false}})())out.block=`${outP.full_name} is locked in for this week and can't be moved.`;
+  else if(sw.outId!=='0'&&started(gameOn(sw.outId)))out.block=`${outP.full_name}'s game today has already started.`;
+  else if(started(gameOn(sw.inId)))out.block=`${inP.full_name}'s game today has already started.`;
+  if(out.block||sw.outId==='0')return out;
+  // Benching a starter gives up locking his latest completed game if it's still lockable.
   try{
-    if(typeof setStatus==='function')setStatus(`Applying planned ${day} lineup to Sleeper…`);
-    if(typeof writeLineup!=='function')throw new Error('Sleeper lineup writer is unavailable.');
-    await writeLineup(plan.starters,plan.summary||`Planned lineup for ${day}`);
-    removePlan(day);
-    if(typeof clearSelection==='function')clearSelection();
-    if(typeof load==='function')await load(true);
-    if(typeof setStatus==='function')setStatus(`Applied planned lineup on Sleeper for ${day}.`,'success');
-  }catch(e){if(typeof setStatus==='function')setStatus(e?.message||String(e),'error');if(btn){btn.disabled=false;btn.textContent='Apply Planned Lineup'}}
-  setTimeout(refreshPlannerUi,0);
+    const games=(currentData?.schedule||[]).filter(g=>!g.calendar_only&&(g.home===outP.team||g.away===outP.team)).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    const done=games.filter(g=>String(g.status)==='complete');const last=done[done.length-1];
+    if(last){const next=games.find(g=>String(g.date)>String(last.date));const nextStarted=!!next&&started(next);
+      if(!nextStarted){const v=window.rbLockedGameScore?.(sw.outId,last.game_id);out.lockable={date:last.date,score:Number.isFinite(v)?v:null};
+        out.warn=`${outP.full_name} scored ${Number.isFinite(v)?v.toFixed(1)+' FPTS':'(score loading…)'} in his last game (${last.date}) and that game can still be locked in. Benching him now gives up that lock.`}}
+  }catch{}
+  return out;
+}
+function reviewHtml(day,plan){
+  const rows=plan.swaps.map((sw,i)=>{const c=swapChecks(sw,day);const nm=id=>id==='0'?'Empty slot':esc(player(id).full_name||id);const proj=id=>id==='0'?'—':projectionText(id,day);
+    const checked=!c.block&&!c.lockable;
+    return`<label class="rb-plan-review-row ${c.block?'blocked':''}" style="display:grid;grid-template-columns:20px 1fr;gap:8px;padding:9px 0;border-top:1px solid rgba(255,255,255,.07)"><input type="checkbox" data-plan-swap="${i}" ${checked?'checked':''} ${c.block?'disabled':''}><span><strong>${nm(sw.outId)}</strong> <span style="color:#ff9aa9">OUT</span> (proj ${proj(sw.outId)}) → <strong>${nm(sw.inId)}</strong> <span style="color:#78efd3">IN</span> (proj ${proj(sw.inId)})${c.block?`<div style="color:#ff9aa9;font-size:10px;margin-top:3px">Can't apply: ${esc(c.block)}</div>`:''}${c.warn?`<div style="color:#f3d589;font-size:10px;margin-top:3px">⚠ ${esc(c.warn)}</div>`:''}</span></label>`}).join('');
+  return`<p>Review the lineup you planned for <strong>${esc(day)}</strong>. Nothing is sent to Sleeper until you confirm. Swaps are applied to your <strong>current</strong> lineup.</p><div>${rows}</div>`;
+}
+function applyTodayPlan(){
+  const day=selectedDayValue();if(dayMode(day)!=='today')return;const plan=window.rbPlannedLineup(day);if(!plan||!plan.swaps.length){removePlan(day);setTimeout(refreshPlannerUi,0);return}
+  const open=()=>{showModal('Review Planned Lineup',reviewHtml(day,plan),`<button data-close>Keep Current Lineup</button><button id="rbDiscardPlan" class="danger">Discard Plan</button><button id="rbConfirmPlan" class="primary">Apply Selected</button>`);
+    setTimeout(()=>{
+      const sync=()=>{const n=document.querySelectorAll('[data-plan-swap]:checked').length;const b=document.getElementById('rbConfirmPlan');if(b){b.disabled=!n;b.textContent=n?`Apply ${n} Change${n===1?'':'s'}`:'Nothing Selected'}};
+      document.querySelectorAll('[data-plan-swap]').forEach(x=>x.addEventListener('change',sync));sync();
+      document.getElementById('rbDiscardPlan')?.addEventListener('click',()=>{removePlan(day);try{closeModal()}catch{}setStatus('Planned lineup discarded. Your Sleeper lineup is unchanged.','success');setTimeout(refreshPlannerUi,0);try{renderTeam()}catch{}});
+      document.getElementById('rbConfirmPlan')?.addEventListener('click',async e=>{
+        const btn=e.currentTarget;const pick=[...document.querySelectorAll('[data-plan-swap]:checked')].map(x=>plan.swaps[Number(x.dataset.planSwap)]).filter(sw=>!swapChecks(sw,day).block);
+        if(!pick.length)return;btn.disabled=true;btn.textContent='Applying…';
+        try{const {starters,applied}=applySwaps(currentStarters(),pick);if(!applied.length)throw new Error('Nothing left to apply — your lineup already changed.');
+          setStatus(`Applying planned ${day} lineup to Sleeper…`);await writeLineup(starters,applied.map(s=>s.summary||`${player(s.outId).full_name} → ${player(s.inId).full_name}`).join(', '));
+          const left=plan.swaps.filter(sw=>!applied.some(a=>a.outId===sw.outId&&a.inId===sw.inId));
+          if(left.length)writePlan(day,{version:2,swaps:left,summary:left.map(s=>s.summary).filter(Boolean).join(', '),savedAt:Date.now()});else removePlan(day);
+          try{closeModal()}catch{}if(typeof clearSelection==='function')clearSelection();if(typeof load==='function')await load(true);
+          setStatus(`Applied ${applied.length} planned change${applied.length===1?'':'s'} on Sleeper.${left.length?` ${left.length} still planned.`:''}`,'success');
+        }catch(err){setStatus(err?.message||String(err),'error');btn.disabled=false;sync()}
+        setTimeout(refreshPlannerUi,0);
+      });
+    },0)};
+  try{window.rbRequestLockedScores?.(plan.swaps.map(s=>s.outId).filter(x=>x!=='0'))}catch{}
+  open();
+  // Refresh the review (keeping your checkbox choices) as last-game scores arrive.
+  const again=()=>{const modal=document.getElementById('rbConfirmPlan');if(!modal){window.removeEventListener('rb:locked-scores',again);return}const keep=new Map([...document.querySelectorAll('[data-plan-swap]')].map(x=>[x.dataset.planSwap,x.checked]));open();setTimeout(()=>{for(const [i,v] of keep){const x=document.querySelector(`[data-plan-swap="${i}"]`);if(x&&!x.disabled){x.checked=v;x.dispatchEvent(new Event('change',{bubbles:true}))}}},0)};
+  window.addEventListener('rb:locked-scores',again);
 }
 function decorateSwapModal(){
   const btn=document.getElementById('commitSwap');if(!btn)return;
@@ -162,7 +213,7 @@ function refreshPlannerUi(){
   document.getElementById('rbApplyDailyPlan')?.remove();
   const day=selectedDayValue(),plan=readPlan(day);if(dayMode(day)!=='today'||!plan)return;
   const bar=document.querySelector('#teamView .editor-bar');if(!bar)return;
-  const b=document.createElement('button');b.id='rbApplyDailyPlan';b.className='mini-btn';b.textContent='Apply Planned Lineup';b.title=plan.summary||'Apply saved lineup plan to Sleeper';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();applyTodayPlan()});
+  const b=document.createElement('button');b.id='rbApplyDailyPlan';b.className='mini-btn';b.textContent='Review Planned Lineup';b.title=plan.summary||'Review your planned lineup before anything is sent to Sleeper';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();applyTodayPlan()});
   const spacer=bar.querySelector('.spacer');spacer?bar.insertBefore(b,spacer):bar.appendChild(b);
 }
 

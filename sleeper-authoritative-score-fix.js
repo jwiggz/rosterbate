@@ -12,11 +12,13 @@ function gameDate(g){try{const x=(currentData?.schedule||[]).find(s=>String(s.ga
 function lockedGameScore(p,g){const date=gameDate(g);if(!date)return null;const list=lockedFp.map[String(p)];if(!list)return null;const hit=list.find(x=>x.date===date&&!x.live);return hit?fin(hit.fpts):null}
 function requestLockedScores(pids){
   const need=[...new Set(pids.map(String))].filter(p=>/^\d+$/.test(p)&&!lockedFp.loaded.has(`${leagueId}:${selectedWeek}:${p}`));
-  if(!need.length||lockedFp.pending)return;
+  if(!need.length)return;
+  if(lockedFp.pending){lockedFp.queue=[...new Set([...(lockedFp.queue||[]),...need])];return}
   lockedFp.pending=fetch(`/.netlify/functions/sleeper-scores?league=${encodeURIComponent(leagueId)}&games=${need.join(',')}&days=10`,{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
     for(const p of need){lockedFp.loaded.add(`${leagueId}:${selectedWeek}:${p}`);if(d?.games_by_player?.[p])lockedFp.map[p]=d.games_by_player[p]}
-  }).catch(()=>{}).finally(()=>{lockedFp.pending=null;try{apply()}catch{}try{renderLockTotals()}catch{}try{window.dispatchEvent(new CustomEvent('rb:locked-scores'))}catch{}});
+  }).catch(()=>{}).finally(()=>{lockedFp.pending=null;const q=lockedFp.queue||[];lockedFp.queue=[];if(q.length)setTimeout(()=>requestLockedScores(q),0);try{apply()}catch{}try{renderLockTotals()}catch{}try{window.dispatchEvent(new CustomEvent('rb:locked-scores'))}catch{}});
 }
+window.rbRequestLockedScores=pids=>requestLockedScores(pids||[]);
 window.rbLockedGameScore=(p,g)=>{const v=lockedGameScore(p,g);if(v===null)requestLockedScores([p]);return v};
 function restoreLockedGames(){try{const d=cache();if(d?.startersGames&&typeof d.startersGames==='object')lockedGames=d.startersGames}catch{}}
 function apply(){try{const d=cache();if(!d)return;restoreLockedGames();try{requestLockedScores(Object.keys(d.startersGames||{}))}catch{}const sg=d.startersGames||{},cp=d.customPoints||{},st=(d.starters||[]).map(String);let c=0;for(const p of st){if(!locked(sg,p))continue;c++;const name=String(currentData?.players?.[p]?.full_name||'').toLowerCase();const row=[...document.querySelectorAll('#teamView .player-row')].find(r=>String(r.querySelector('.pname')?.textContent||'').toLowerCase().includes(name));let v=score(cp,p,gid(sg,p));if(v===null)v=lockedGameScore(p,gid(sg,p));if(row&&v!==null){const cell=row.querySelector('.pts');if(cell)cell.textContent=v.toFixed(1)}}const at=window.rbAuthoritativeLockedTotal?.();const t=at??fin(d.lockedTotal??d.points),box=document.querySelector('#teamView .rb-lock-total.locked');if(box&&t!==null){const b=box.querySelector('b'),s=box.querySelector('small');if(b)b.textContent=t.toFixed(1);if(s)s.textContent=`${c} verified locks`}}catch{}}

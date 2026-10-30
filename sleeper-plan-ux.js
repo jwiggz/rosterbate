@@ -27,7 +27,7 @@
   function day(){try{return String(selectedDay||'all')}catch{return'all'}}
   function mode(v){if(!v||v==='all')return'week';const t=todayKey();return v<t?'past':v>t?'future':'today'}
   function planKey(v){try{return`rbDailyPlan:${String(leagueId)}:${String(selectedRoster)}:${String(selectedWeek)}:${String(v)}`}catch{return''}}
-  function plan(v){try{const raw=localStorage.getItem(planKey(v));const p=raw?JSON.parse(raw):null;return p&&Array.isArray(p.starters)?p:null}catch{return null}}
+  function plan(v){try{const x=window.rbPlannedLineup?.(v);if(x)return{...x.plan,starters:x.starters};const raw=localStorage.getItem(planKey(v));const p=raw?JSON.parse(raw):null;return p&&Array.isArray(p.starters)?p:null}catch{return null}}
   function actual(){try{const m=typeof matchup==='function'?matchup(selectedRoster):null;return Array.isArray(m?.starters)?m.starters.map(String):[]}catch{return[]}}
   function pname(id){try{return String((typeof player==='function'?player(id):currentData?.players?.[String(id)])?.full_name||id)}catch{return String(id)}}
   function row(id){if(!id||id==='0')return null;try{return document.querySelector(`#teamView .player-row[data-rb-player-id="${CSS.escape(String(id))}"]`)}catch{return null}}
@@ -67,7 +67,7 @@
     const host=document.querySelector('#teamView .editor-bar')?.parentElement||document.querySelector('#teamView .team-card')||document.getElementById('teamView');if(!host)return;
     const el=document.createElement('div');el.id='rbPlanBanner';if(m==='today')el.classList.add('rb-plan-ready');
     const summary=p.summary||out.map(c=>`${pname(c.outId)} → ${pname(c.inId)}`).join(', ');
-    el.innerHTML=`<div class="rb-plan-copy"><div class="rb-plan-kicker">${m==='today'?'PLAN READY — NOT APPLIED':'PLAN SAVED'}</div><div class="rb-plan-title">${m==='today'?`Planned lineup changes for today are waiting for you`:`Planned lineup for ${fmt(v)}`}</div><div class="rb-plan-sub">${summary}. ${m==='today'?'Your current Sleeper lineup is still active so existing lock opportunities are preserved until you choose Apply Plan.':'Sleeper lineup is unchanged. This plan will never auto-apply.'}</div></div><div class="rb-plan-actions">${m==='today'?'<button type="button" class="rb-plan-keep">Keep Current Lineup</button><button type="button" class="rb-plan-apply">Apply Plan</button>':'<button type="button" class="rb-plan-keep">Keep Current Lineup</button>'}</div>`;
+    el.innerHTML=`<div class="rb-plan-copy"><div class="rb-plan-kicker">${m==='today'?'PLAN READY — NOT APPLIED':'PLAN SAVED'}</div><div class="rb-plan-title">${m==='today'?`Planned lineup changes for today are waiting for you`:`Planned lineup for ${fmt(v)}`}</div><div class="rb-plan-sub">${summary}. ${m==='today'?'Your current Sleeper lineup is still active so existing lock opportunities are preserved until you choose Apply Plan.':'Sleeper lineup is unchanged. This plan will never auto-apply.'}</div></div><div class="rb-plan-actions">${m==='today'?'<button type="button" class="rb-plan-keep">Keep Current Lineup</button><button type="button" class="rb-plan-apply">Review Plan</button>':'<button type="button" class="rb-plan-keep">Keep Current Lineup</button>'}</div>`;
     const editor=document.querySelector('#teamView .editor-bar');if(editor&&editor.parentElement)editor.insertAdjacentElement('afterend',el);else host.prepend(el);
     const tiny=document.getElementById('rbApplyDailyPlan');if(tiny&&m==='today')tiny.style.display='none';
     el.querySelector('.rb-plan-keep')?.addEventListener('click',()=>{
