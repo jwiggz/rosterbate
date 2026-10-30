@@ -24,10 +24,10 @@ async function readChat(token,leagueId){
   if(!r.ok||Array.isArray(d?.errors))return{items:[],auth:false,error:d?.errors?.[0]?.message||`HTTP ${r.status}`};
   const rows=Array.isArray(d?.data?.messages)?d.data.messages:[];
   // Sleeper posts transactions into league chat too; remember which transaction each post is about.
-  const txIdsOf=a=>{try{return[...new Set([...JSON.stringify(a||'').matchAll(/"transaction_id"\s*:\s*"?(\d{5,25})/g)].map(x=>x[1]))]}catch{return[]}};
+  const txIdsOf=(...parts)=>{try{return[...new Set(parts.flatMap(a=>[...JSON.stringify(a??'').matchAll(/(\d{12,25})/g)].map(x=>x[1])))]}catch{return[]}};
   const reactionMap=v=>{const o={};if(v&&typeof v==='object')for(const [k,n] of Object.entries(v)){const c=Number(n);if(/^[a-z0-9_]{1,48}$/.test(k)&&c>0)o[k]=c}return o};
   const mineOf=v=>(Array.isArray(v)?v:[]).map(x=>typeof x==='string'?x:String(x?.reaction||'')).filter(x=>/^[a-z0-9_]{1,48}$/.test(x));
-  return{auth:true,items:rows.map(m=>({kind:'chat',id:String(m.message_id||''),created:Number(m.created)||0,author:String(m.author_display_name||'Sleeper user'),author_id:String(m.author_id||''),bot:!!m.author_is_bot,text:String(m.text||''),text_map:m.text_map||null,attachment:m.attachment||null,pinned:!!m.pinned,reactions:reactionMap(m.reactions),my_reactions:mineOf(m.user_reactions),tx_ids:txIdsOf(m.attachment)})).filter(x=>x.created&&(x.text||x.attachment||x.text_map))};
+  return{auth:true,items:rows.map(m=>({kind:'chat',id:String(m.message_id||''),created:Number(m.created)||0,author:String(m.author_display_name||'Sleeper user'),author_id:String(m.author_id||''),bot:!!m.author_is_bot,text:String(m.text||''),text_map:m.text_map||null,attachment:m.attachment||null,pinned:!!m.pinned,reactions:reactionMap(m.reactions),my_reactions:mineOf(m.user_reactions),tx_ids:txIdsOf(m.attachment,m.text_map)})).filter(x=>x.created&&(x.text||x.attachment||x.text_map))};
 }
 
 exports.handler=async function(event){
@@ -62,6 +62,7 @@ exports.handler=async function(event){
     for(const t of txItems){const c=byTx.get(String(t.id));if(!c)continue;t.message_id=c.id;t.reactions=c.reactions;t.my_reactions=c.my_reactions;used.add(c.id)}
     const chatItems=chat.items.filter(c=>!used.has(c.id));
     const items=[...chatItems,...txItems].sort((a,b)=>b.created-a.created).slice(0,60);
-    return json(200,{ok:true,leagueId,week,chat_authenticated:!!chat.auth,chat_error:chat.error||null,items});
+    const debug=body.debug?{chat_messages:chat.items.length,bot_messages:chat.items.filter(c=>c.bot||c.attachment).length,linked_transactions:txItems.filter(t=>t.message_id).length,transactions:txItems.length,attachment_samples:chat.items.filter(c=>c.attachment).slice(0,4).map(c=>({keys:c.attachment&&typeof c.attachment==='object'?Object.keys(c.attachment):typeof c.attachment,type:c.attachment?.type||null,ids_found:(c.tx_ids||[]).slice(0,4)})),transaction_ids:txItems.slice(0,6).map(t=>t.id)}:undefined;
+    return json(200,{ok:true,leagueId,week,chat_authenticated:!!chat.auth,chat_error:chat.error||null,items,debug});
   }catch(error){return json(502,{error:'Unable to load Sleeper activity.',detail:String(error?.message||error)})}
 };

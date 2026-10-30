@@ -168,3 +168,11 @@ window.rbSleeperSchemaReport=async function(){
   try{await navigator.clipboard.writeText(text);console.log('Sleeper schema report copied to clipboard. Paste it into the chat with Claude.')}catch{console.log(text)}
   return d;
 };
+
+// One-time diagnostic: why League Activity items do / don't support reactions (no message text).
+window.rbActivityDebug=async function(){
+  const r=await fetch('/.netlify/functions/sleeper-activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:'__RB_SLEEPER_VAULT__',leagueId:String(leagueId),week:Number(selectedWeek),debug:true})});
+  const d=await r.json().catch(()=>({error:`HTTP ${r.status}`}));const out={chat_authenticated:d.chat_authenticated,chat_error:d.chat_error,...(d.debug||{}),error:d.error};
+  try{await navigator.clipboard.writeText(JSON.stringify(out,null,1));console.log('Activity diagnostic copied to clipboard. Paste it into the chat with Claude.')}catch{}
+  return out;
+};
