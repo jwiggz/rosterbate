@@ -69,13 +69,24 @@
       return `${fmtDate(dates[0])}–${fmtDate(dates[dates.length-1],dates[0].slice(0,4)!==dates[dates.length-1].slice(0,4))}`;
     }catch{return''}
   }
+  function rangeFor(wk){
+    try{
+      const r=currentData?.week_ranges?.[String(wk)];
+      if(r?.start&&r?.end){const yr=r.start.slice(0,4)!==r.end.slice(0,4),end=r.start.slice(0,7)===r.end.slice(0,7)&&!yr?String(Number(r.end.slice(8,10))):fmtDate(r.end,yr);return `${fmtDate(r.start)}–${end}`}
+    }catch{}
+    return Number(wk)===Number(selectedWeek)?weekRange():'';
+  }
   function labelWeek(){
     try{
       const sel=document.getElementById('weekSel');if(!sel)return;
-      const opt=sel.options?.[sel.selectedIndex];if(!opt)return;
-      const range=weekRange();
-      opt.textContent=range?`Week ${Number(selectedWeek)} · ${range}`:`Week ${Number(selectedWeek)}`;
-      sel.style.minWidth=range?'150px':'86px';
+      let any=false;
+      for(const opt of sel.options||[]){
+        const wk=Number(opt.value);if(!wk)continue;
+        const range=rangeFor(wk);if(range)any=true;
+        const text=range?`Week ${wk} · ${range}`:`Week ${wk}`;
+        if(opt.textContent!==text)opt.textContent=text;
+      }
+      sel.style.minWidth=any?'150px':'86px';
     }catch{}
   }
   let pending=false;

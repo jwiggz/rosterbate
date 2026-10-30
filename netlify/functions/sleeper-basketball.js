@@ -109,6 +109,24 @@ function fillFantasyWeekDays(games,week){
   return games.concat(fillers).sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.start_time||'').localeCompare(String(b.start_time||'')));
 }
 
+function weekRangesFrom(rows){
+  const byWeek={};
+  for(const g of rows||[]){
+    const wk=Number(g.week);if(!wk)continue;
+    const start=scheduleStart(g);const date=String(g.date||(start&&start.slice(0,10))||'');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date))continue;
+    const r=byWeek[wk]||(byWeek[wk]={min:date,max:date});
+    if(date<r.min)r.min=date;if(date>r.max)r.max=date;
+  }
+  const shift=(date,days)=>{const d=new Date(`${date}T12:00:00Z`);d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10)};
+  const out={};
+  for(const [wk,r] of Object.entries(byWeek)){
+    const minDow=(new Date(`${r.min}T12:00:00Z`).getUTCDay()+6)%7,maxDow=(new Date(`${r.max}T12:00:00Z`).getUTCDay()+6)%7;
+    out[wk]={start:shift(r.min,-minDow),end:shift(r.max,6-maxDow)};
+  }
+  return out;
+}
+
 async function nbaSchedule(season,week){
   const urls=[
     `${SLEEPER_ROOT}/schedule/nba/regular/${encodeURIComponent(season)}`,
@@ -132,7 +150,7 @@ async function nbaSchedule(season,week){
           city:scheduleCity(g)
         };
       }).filter(g=>g.date&&g.home&&g.away);
-      if(games.length) return fillFantasyWeekDays(games,week);
+      if(games.length){const out=fillFantasyWeekDays(games,week);out.weekRanges=weekRangesFrom(rows);return out}
     }catch(error){/* try fallback */}
   }
   return [];
@@ -325,7 +343,7 @@ exports.handler=async function(event){
 
     return json(200,{
       league:{league_id:league.league_id,name:league.name,sport:league.sport,season:league.season,status:league.status,settings:league.settings || {},scoring_settings:league.scoring_settings || {},roster_positions:league.roster_positions || []},
-      state,week:requestedWeek,schedule,projections,teams,matchups:matchups || [],players
+      state,week:requestedWeek,schedule,week_ranges:(schedule&&schedule.weekRanges)||{},projections,teams,matchups:matchups || [],players
     });
   }catch(error){
     console.error('Sleeper basketball proxy error',error);
