@@ -70,7 +70,15 @@ async function saveEncrypted(uid,token,meta={}){
 }
 async function loadRecord(uid){
   const s=await store();
-  return await s.get(String(uid),{type:'json',consistency:'strong'});
+  // Lambda-compatible Netlify Functions do not expose the uncached edge URL
+  // required by @netlify/blobs strong-consistency reads. Use the normal read
+  // path and retry briefly to cover propagation immediately after a save.
+  for(let attempt=0;attempt<5;attempt++){
+    const record=await s.get(String(uid),{type:'json'});
+    if(record)return record;
+    if(attempt<4)await new Promise(resolve=>setTimeout(resolve,150*(attempt+1)));
+  }
+  return null;
 }
 async function deleteRecord(uid){const s=await store();await s.delete(String(uid))}
 async function resolveSleeperToken(body,{allowRaw=true}={}){
