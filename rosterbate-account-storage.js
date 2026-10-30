@@ -3,52 +3,43 @@
   const OWNER='rbLegacyOwnerId';
   const PREFIX='rbAcct:';
   const native={
-    lGet:Storage.prototype.getItem,
-    lSet:Storage.prototype.setItem,
-    lRemove:Storage.prototype.removeItem,
-    lKey:Storage.prototype.key
+    get:Storage.prototype.getItem,
+    set:Storage.prototype.setItem,
+    remove:Storage.prototype.removeItem,
+    key:Storage.prototype.key
   };
-  function active(){try{return native.lGet.call(localStorage,ACTIVE)||''}catch{return''}}
+  function active(){try{return native.get.call(localStorage,ACTIVE)||''}catch{return''}}
   function account(){return active()||'anonymous'}
   function shouldScope(storage,key){
     key=String(key||'');
     if(key===ACTIVE||key===OWNER||key.startsWith(PREFIX)||key.startsWith('rbAuth'))return false;
-    if(storage===localStorage){
-      return key==='rbSleeperTokenPersistent'||key.startsWith('rbDailyPlan:');
-    }
-    if(storage===sessionStorage){
-      return key==='rbSleeperToken'||key==='rbSleeperAuth'||key.startsWith('rbPlanDismiss:')||key.startsWith('rbLockedSlots:');
-    }
+    if(storage===localStorage)return key==='rbSleeperTokenPersistent'||key.startsWith('rbDailyPlan:');
+    if(storage===sessionStorage)return key==='rbSleeperToken'||key==='rbSleeperAuth'||key.startsWith('rbPlanDismiss:')||key.startsWith('rbLockedSlots:');
     return false;
   }
   function scoped(key){return `${PREFIX}${account()}:${String(key)}`}
-  function patch(storage){
-    storage.getItem=function(key){return native.lGet.call(storage,shouldScope(storage,key)?scoped(key):key)};
-    storage.setItem=function(key,value){return native.lSet.call(storage,shouldScope(storage,key)?scoped(key):key,value)};
-    storage.removeItem=function(key){return native.lRemove.call(storage,shouldScope(storage,key)?scoped(key):key)};
-  }
   function migrateLegacy(){
     const id=active();if(!id)return;
-    let owner='';try{owner=native.lGet.call(localStorage,OWNER)||''}catch{}
+    let owner='';try{owner=native.get.call(localStorage,OWNER)||''}catch{}
     if(owner&&owner!==id)return;
-    if(!owner){try{native.lSet.call(localStorage,OWNER,id)}catch{}}
+    if(!owner){try{native.set.call(localStorage,OWNER,id)}catch{}}
     try{
-      const old=native.lGet.call(localStorage,'rbSleeperTokenPersistent');
+      const old=native.get.call(localStorage,'rbSleeperTokenPersistent');
       const dest=`${PREFIX}${id}:rbSleeperTokenPersistent`;
-      if(old&&!native.lGet.call(localStorage,dest))native.lSet.call(localStorage,dest,old);
-      if(old)native.lRemove.call(localStorage,'rbSleeperTokenPersistent');
+      if(old&&!native.get.call(localStorage,dest))native.set.call(localStorage,dest,old);
+      if(old)native.remove.call(localStorage,'rbSleeperTokenPersistent');
     }catch{}
     try{
       const keys=[];
       for(let i=0;i<localStorage.length;i++){
-        const k=native.lKey.call(localStorage,i);
+        const k=native.key.call(localStorage,i);
         if(k&&k.startsWith('rbDailyPlan:'))keys.push(k);
       }
       keys.forEach(k=>{
         const dest=`${PREFIX}${id}:${k}`;
-        const v=native.lGet.call(localStorage,k);
-        if(v!=null&&!native.lGet.call(localStorage,dest))native.lSet.call(localStorage,dest,v);
-        native.lRemove.call(localStorage,k);
+        const v=native.get.call(localStorage,k);
+        if(v!=null&&!native.get.call(localStorage,dest))native.set.call(localStorage,dest,v);
+        native.remove.call(localStorage,k);
       });
     }catch{}
   }
@@ -59,18 +50,19 @@
       try{
         const keys=[];
         for(let i=0;i<storage.length;i++){
-          const k=native.lKey.call(storage,i);
+          const k=native.key.call(storage,i);
           if(k&&k.startsWith(p))keys.push(k);
         }
-        keys.forEach(k=>native.lRemove.call(storage,k));
+        keys.forEach(k=>native.remove.call(storage,k));
       }catch{}
     }
-    try{
-      native.lRemove.call(sessionStorage,'rbSleeperToken');
-      native.lRemove.call(sessionStorage,'rbSleeperAuth');
-    }catch{}
+    try{native.remove.call(sessionStorage,'rbSleeperToken');native.remove.call(sessionStorage,'rbSleeperAuth')}catch{}
   }
+
   migrateLegacy();
-  patch(localStorage);patch(sessionStorage);
+  Storage.prototype.getItem=function(key){return native.get.call(this,shouldScope(this,key)?scoped(key):key)};
+  Storage.prototype.setItem=function(key,value){return native.set.call(this,shouldScope(this,key)?scoped(key):key,value)};
+  Storage.prototype.removeItem=function(key){return native.remove.call(this,shouldScope(this,key)?scoped(key):key)};
+
   window.rbAccountStorage={activeUserId:active,clearAccount,migrateLegacy};
 })();
