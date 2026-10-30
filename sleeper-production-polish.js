@@ -28,10 +28,11 @@
       let total=0,count=0;
       starters.forEach((pid,i)=>{if(!locked.has(pid))return;const v=Number(pts[i]);if(Number.isFinite(v)){total+=v;count++}});
       if(!count)return;
+      const expectedTotal=total.toFixed(1),expectedCount=`${count} verified locks`;
       const b=box.querySelector('b'),s=box.querySelector('small');
-      if(b)b.textContent=total.toFixed(1);
-      if(s)s.textContent=`${count} verified locks`;
-      box.dataset.rbCachedLockedTotal=total.toFixed(1);
+      if(b&&b.textContent!==expectedTotal)b.textContent=expectedTotal;
+      if(s&&s.textContent!==expectedCount)s.textContent=expectedCount;
+      box.dataset.rbCachedLockedTotal=expectedTotal;
       box.dataset.rbCachedLockedCount=String(count);
     }catch{}
   }
@@ -73,10 +74,19 @@
       wrappedTotals.__rbProductionPolish=true;renderLockTotals=wrappedTotals;try{window.renderLockTotals=wrappedTotals}catch{}
     }
   }catch{}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});else refresh();
+  let teamObserver=null;
+  function observeTeam(){
+    try{
+      const root=document.getElementById('teamView');if(!root||teamObserver)return;
+      teamObserver=new MutationObserver(()=>refresh());
+      teamObserver.observe(root,{childList:true,subtree:true});
+    }catch{}
+  }
+  function start(){observeTeam();refresh()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   window.addEventListener('rb:sleeper-lock-state',refresh);
   window.addEventListener('rb:sleeper-vault',refresh);
-  document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn')){setTimeout(hydrateLockedSummary,0);setTimeout(hydrateLockedSummary,32)}},true);
+  document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn')){refresh();setTimeout(refresh,0);setTimeout(refresh,32)}},true);
   document.addEventListener('change',e=>{if(e.target?.id==='weekSel'||e.target?.id==='teamPicker')refresh()},true);
-  [0,100,250,500,1000].forEach(ms=>setTimeout(refresh,ms));
+  [0,100,250,500,1000].forEach(ms=>setTimeout(start,ms));
 })();
