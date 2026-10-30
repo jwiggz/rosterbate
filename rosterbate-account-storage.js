@@ -43,6 +43,16 @@
       });
     }catch{}
   }
+  function clearSecrets(id=active()){
+    if(!id)return;
+    try{native.remove.call(localStorage,`${PREFIX}${id}:rbSleeperTokenPersistent`)}catch{}
+    try{
+      native.remove.call(sessionStorage,`${PREFIX}${id}:rbSleeperToken`);
+      native.remove.call(sessionStorage,`${PREFIX}${id}:rbSleeperAuth`);
+      native.remove.call(sessionStorage,'rbSleeperToken');
+      native.remove.call(sessionStorage,'rbSleeperAuth');
+    }catch{}
+  }
   function clearAccount(id=active()){
     if(!id)return;
     const p=`${PREFIX}${id}:`;
@@ -56,7 +66,7 @@
         keys.forEach(k=>native.remove.call(storage,k));
       }catch{}
     }
-    try{native.remove.call(sessionStorage,'rbSleeperToken');native.remove.call(sessionStorage,'rbSleeperAuth')}catch{}
+    clearSecrets(id);
   }
 
   migrateLegacy();
@@ -64,5 +74,5 @@
   Storage.prototype.setItem=function(key,value){return native.set.call(this,shouldScope(this,key)?scoped(key):key,value)};
   Storage.prototype.removeItem=function(key){return native.remove.call(this,shouldScope(this,key)?scoped(key):key)};
 
-  window.rbAccountStorage={activeUserId:active,clearAccount,migrateLegacy};
+  window.rbAccountStorage={activeUserId:active,clearSecrets,clearAccount,migrateLegacy};
 })();
