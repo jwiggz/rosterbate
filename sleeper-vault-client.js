@@ -8,7 +8,7 @@
   const originalFetch=window.fetch.bind(window);
   let connected=false,statusPromise=null,statusStarted=false;
   function rawLegacyToken(){for(const [storeName,key] of LEGACY_KEYS){try{const v=window[storeName]?.getItem(key)||'';if(validJwt(v))return v}catch{}}return''}
-  function clearRaw(){for(const [storeName,key] of LEGACY_KEYS){try{window[storeName]?.removeItem(key)}catch{}}}
+  function clearRaw(){for(const [storeName,key] of LEGACY_KEYS){try{const v=window[storeName]?.getItem(key)||'';if(v&&v!==PLACEHOLDER)window[storeName]?.removeItem(key)}catch{}}}
   function hasMarker(){try{return localStorage.getItem(MARK)==='1'}catch{return false}}
   function setConnected(v){connected=!!v;try{if(v)localStorage.setItem(MARK,'1');else localStorage.removeItem(MARK)}catch{}try{if(v){sessionStorage.setItem(VERIFIED,'1');sessionStorage.setItem('rbSleeperToken',PLACEHOLDER);sessionStorage.setItem('rbSleeperAuth',PLACEHOLDER)}else{sessionStorage.removeItem(VERIFIED);if(!rawLegacyToken()){sessionStorage.removeItem('rbSleeperToken');sessionStorage.removeItem('rbSleeperAuth')}}}catch{}try{window.dispatchEvent(new CustomEvent('rb:sleeper-vault',{detail:{connected}}))}catch{}}
   async function firebaseToken(force=false){try{await window.rbAuthReady}catch{}const user=window.firebase?.auth?.()?.currentUser;if(!user)throw new Error('Sign in to RosterBate first.');return user.getIdToken(!!force)}
