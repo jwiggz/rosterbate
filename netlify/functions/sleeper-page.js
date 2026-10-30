@@ -50,7 +50,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js?v=20261030b"></script>');
     if(!html.includes('sleeper-schedule-time-backfill.js')) scripts.push('<script src="/sleeper-schedule-time-backfill.js?v=20261029a"></script>');
     if(!html.includes('sleeper-starter-history.js')) scripts.push('<script src="/sleeper-starter-history.js?v=20261030a"></script>');
-    if(!html.includes('sleeper-lock-window-vault.js')) scripts.push('<script src="/sleeper-lock-window-vault.js?v=20261030d"></script>');
+    if(!html.includes('sleeper-lock-window-vault.js')) scripts.push('<script src="/sleeper-lock-window-vault.js?v=20261030e"></script>');
     if(!html.includes('sleeper-lock-eligibility-guard.js')) scripts.push('<script src="/sleeper-lock-eligibility-guard.js?v=20261029b"></script>');
     if(!html.includes('sleeper-lock-authoritative-only.js')) scripts.push('<script src="/sleeper-lock-authoritative-only.js?v=20261029a"></script>');
     if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261030b"></script>');
@@ -78,7 +78,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-header-status.js')) scripts.push('<script src="/sleeper-header-status.js?v=20261030a"></script>');
     if(!html.includes('sleeper-trades-tab.js')) scripts.push('<script src="/sleeper-trades-tab.js?v=20261030c"></script>');
     if(!html.includes('sleeper-past-lineup.js')) scripts.push('<script src="/sleeper-past-lineup.js?v=20261030a"></script>');
-    if(!html.includes('sleeper-view-only.js')) scripts.push('<script src="/sleeper-view-only.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-view-only.js')) scripts.push('<script src="/sleeper-view-only.js?v=20261030b"></script>');
     if(scripts.length) html=html.replace('</body>',`${scripts.join('\n')}\n</body>`);
     return{statusCode:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'},body:html};
   }catch(e){return{statusCode:502,headers:{'Content-Type':'text/plain; charset=utf-8'},body:`Unable to load basketball dashboard: ${String(e?.message||e)}`}}

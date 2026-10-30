@@ -9,6 +9,8 @@
 #teamView .rb-view-banner b{color:#eef4ff}
 #teamView .rb-view-banner button{all:unset;cursor:pointer;margin-left:auto;padding:5px 10px;border-radius:6px;background:#27354a;border:1px solid #40516b;color:#cfd8e6;font-size:9px;font-weight:900}
 #teamView .rb-view-banner button:focus-visible{outline:2px solid #08c7c9;outline-offset:2px}
+#teamView.rb-view-only .team-card .player-row.rb-stats-row > .pts.rb-other-lockable.rb-other-lockable{position:relative!important;width:68px!important;min-width:68px!important;height:42px!important;min-height:42px!important;padding:14px 7px 3px!important;border:2px dashed #e69a24!important;background:linear-gradient(180deg,rgba(104,65,10,.42),rgba(60,38,8,.36))!important;color:#ffd27a!important;text-shadow:none!important;cursor:default!important;animation:none!important}
+#teamView.rb-view-only .team-card .player-row.rb-stats-row > .pts.rb-other-lockable.rb-other-lockable::before{content:'LOCKABLE'!important;display:block!important;position:absolute;top:4px;left:0;right:0;text-align:center;color:#ffe5ae;font-size:6px;font-weight:950;letter-spacing:.08em;line-height:1}
 #rbPlayerCard .rb-card-trade{margin-left:auto;margin-right:10px;align-self:center;cursor:pointer;padding:9px 16px;border-radius:8px;border:1px solid #11c3c6;background:#0a8e93;color:#ecffff;font-size:11px;font-weight:950;letter-spacing:.03em}
 #rbPlayerCard .rb-card-trade:hover{background:#0ba8ad}
 #rbPlayerCard .rb-card-trade:focus-visible{outline:2px solid #fff;outline-offset:2px}
@@ -29,6 +31,15 @@
       row.classList.remove('editable','selected','rb-bench-selected','lockable');
       row.querySelectorAll('.lock-btn').forEach(b=>b.remove());
       const pts=row.querySelector(':scope > .pts');if(pts){pts.classList.remove('rb-lock-ready-pts');pts.removeAttribute('role');pts.removeAttribute('tabindex');pts.removeAttribute('title')}
+    });
+    // Show (not offer) which of their starters the owner could lock right now, like Sleeper's app.
+    const ids=new Map();try{for(const [id,p] of Object.entries(currentData?.players||{}))ids.set(String(p?.full_name||'').trim().toLowerCase(),String(id))}catch{}
+    const starterIds=(()=>{try{return new Set((matchup(selectedRoster)?.starters||[]).map(String))}catch{return new Set()}})();
+    card.querySelectorAll(':scope > .player-row').forEach(row=>{
+      const pts=row.querySelector(':scope > .pts');if(!pts)return;
+      const pid=String(row.dataset.rbPlayerId||ids.get(String(row.querySelector('.pname')?.textContent||'').replace(/\s*\(locked\)\s*$/i,'').trim().toLowerCase())||'');
+      const can=!!pid&&starterIds.has(pid)&&!row.classList.contains('locked-in')&&!!window.rbLockableGame?.(pid,(()=>{try{return selectedDay}catch{return'all'}})());
+      if(pts.classList.contains('rb-other-lockable')!==can)pts.classList.toggle('rb-other-lockable',can);if(can&&pts.title!=='Lockable by the team owner')pts.title='Lockable by the team owner'
     });
     try{if(selectedStarterIndex!=null)selectedStarterIndex=null;if(pendingSwap)pendingSwap=null}catch{}
     try{window.rbClearBenchFirst?.()}catch{}

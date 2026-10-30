@@ -54,4 +54,7 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startup,{once:true});else startup();
   window.addEventListener('focus',run);window.addEventListener('rb:sleeper-vault',run);window.addEventListener('rb:sleeper-lock-state',run);document.addEventListener('click',e=>{if(e.target.closest?.('.day-btn,.tab'))run()},true);document.addEventListener('change',e=>{if(['teamPicker','weekSel'].includes(e.target?.id))run()},true);
   window.rbLockWindowRefresh=run;
+  // Same lock-window rule as the owner's LOCK IN buttons, for read-only display on any team:
+  // the player's latest completed game, while his next game hasn't started, on days from that game through today.
+  window.rbLockableGame=(pid,day)=>{try{const g=candidate(String(pid));if(!g||!g.game_id)return null;const today=fantasyDay();const d=String(day||'all');if(d!=='all'&&(d>today||!visibleOn(d,today,String(pid),g)))return null;return g}catch{return null}};
 })();
