@@ -31,8 +31,6 @@
       const lockedBox=box.querySelector('.rb-lock-total.locked'),projBox=box.querySelector('.rb-lock-total.projected');
       setText(lockedBox?.querySelector('b'),lockedTotal.toFixed(1));
       setText(lockedBox?.querySelector('small'),`${locked.size} verified locks`);
-      setText(projBox?.querySelector('b'),projected.toFixed(1));
-      setText(projBox?.querySelector('small'),remaining?`best remaining game / ${remaining} player${remaining===1?'':'s'}`:'all starters locked');
     }catch{}
   }
   function watch(box){
