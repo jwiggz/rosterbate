@@ -15,7 +15,8 @@
   }
   function exactState(){try{const key=`${String(leagueId)}:${Number(selectedWeek)}:${Number(selectedRoster)}`;const raw=sessionStorage.getItem(`rbOpponentExact:${key}`);return raw?JSON.parse(raw):null}catch{return null}}
   function lockedIds(state,m){const out=new Set(),valid=new Set((state?.starters?.length?state.starters:m?.starters||[]).map(String)),games=state?.startersGames;if(!games||typeof games!=='object'||Array.isArray(games))return out;for(const [k,v] of Object.entries(games)){if(valid.has(String(k)))out.add(String(k));if(v&&typeof v==='object'){const pid=String(v.player_id??v.playerId??v.player??v.pid??'');if(valid.has(pid))out.add(pid)}}return out}
-  function actualFor(m,pid){const starters=(m?.starters||[]).map(String),i=starters.indexOf(String(pid));if(i>=0&&Array.isArray(m?.starters_points)){const v=Number(m.starters_points[i]);if(Number.isFinite(v))return v}const v=Number(m?.players_points?.[pid]??m?.players_points?.[String(pid)]);return Number.isFinite(v)?v:0}
+  function actualFor(m,pid,state){try{const g=state?.startersGames?.[pid];const gv=typeof g==='object'?g?.game_id:g;const v=window.rbLockedGameScore?.(pid,gv);if(Number.isFinite(v))return v}catch{}return publicActual(m,pid)}
+  function publicActual(m,pid){const starters=(m?.starters||[]).map(String),i=starters.indexOf(String(pid));if(i>=0&&Array.isArray(m?.starters_points)){const v=Number(m.starters_points[i]);if(Number.isFinite(v))return v}const v=Number(m?.players_points?.[pid]??m?.players_points?.[String(pid)]);return Number.isFinite(v)?v:0}
   function futureProjection(pid){const p=currentData?.projections?.[String(pid)];if(!p||!Array.isArray(p.games))return null;const team=currentData?.players?.[String(pid)]?.team;let best=null;for(const pg of p.games){const pts=Number(pg?.points);if(!Number.isFinite(pts))continue;const gid=String(pg?.game_id||''),date=String(pg?.date||'');const sg=(currentData?.schedule||[]).find(g=>(gid&&String(g.game_id||'')===gid)||(!gid&&String(g.date||'')===date&&(!team||g.home===team||g.away===team)));if(sg&&String(sg.status||'pre_game')!=='pre_game')continue;if(best===null||pts>best)best=pts}return best}
   function setText(el,value){if(el&&el.textContent!==value)el.textContent=value}
   function paint(){
@@ -24,7 +25,7 @@
       const state=exactState();if(!state?.exact)return;
       const m=(currentData.matchups||[]).find(x=>Number(x.roster_id)===Number(selectedRoster));if(!m)return;
       const locked=lockedIds(state,m),starters=(m.starters||[]).map(String).filter(x=>x&&x!=='0');
-      let lockedTotal=0;for(const pid of locked)lockedTotal+=actualFor(m,pid);
+      let lockedTotal=0;for(const pid of locked){const v=actualFor(m,pid,state);lockedTotal+=v;const row=[...document.querySelectorAll('#teamView .player-row.locked-in')].find(r=>String(r.dataset.rbPlayerId||'')===String(pid));const cell=row?.querySelector(':scope > .pts')||row?.querySelector('.pts');if(cell&&cell.textContent!==v.toFixed(1))cell.textContent=v.toFixed(1)}
       let projected=lockedTotal,remaining=0;for(const pid of starters){if(locked.has(pid))continue;const v=futureProjection(pid);if(v!==null){projected+=v;remaining++}}
       const box=document.querySelector('#teamView .rb-lock-totals');if(!box)return;
       watch(box);
@@ -45,5 +46,6 @@
   document.addEventListener('change',e=>{if(e.target?.id==='teamPicker'||e.target?.id==='weekSel')run()},true);
   window.addEventListener('focus',run);
   window.addEventListener('rb:opponent-locks-exact',run);
+  window.addEventListener('rb:locked-scores',run);
   run();
 })();

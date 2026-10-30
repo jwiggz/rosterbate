@@ -93,7 +93,9 @@ exports.handler=async function(event){
     const [league,allPlayers]=await Promise.all([fetchJson(`${API}/league/${leagueId}`),fetchJson(`${API}/players/nba`)]);
     if(!league)return json(502,{error:'Unable to load the Sleeper league.'});
     const scoring=league.scoring_settings||{};
-    const dates=Array.from({length:LOOKBACK_DAYS+1},(_,i)=>shift(today,-i));
+    const want=new Set(String(q.games||'').split(',').map(x=>x.trim()).filter(x=>/^\d+$/.test(x)).slice(0,200));
+    const lookback=want.size?Math.min(LOOKBACK_DAYS,Math.max(1,Number(q.days)||10)):LOOKBACK_DAYS;
+    const dates=Array.from({length:lookback+1},(_,i)=>shift(today,-i));
     const days=await pool(dates,6,d=>loadDay(d,store));
 
     // Map ESPN athletes to Sleeper players (espn_id first, then name + team).
@@ -109,6 +111,10 @@ exports.handler=async function(event){
     for(const day of days)for(const l of day.lines||[]){
       const id=resolve(l);const g={date:l.date,gameId:l.gameId,opp:l.opp,home:l.home,s:l.s,fpts:fantasy(l.s,scoring),live:l.date===today&&(day.games.find(x=>x.id===l.gameId)?.state==='in')};
       const cur=per.get(id)||{id,name:l.name,team:l.team,games:[]};cur.games.push(g);per.set(id,cur);
+    }
+    if(want.size){
+      const out={};for(const id of want){const p=per.get(id);out[id]=(p?.games||[]).map(g=>({date:g.date,fpts:g.fpts,live:!!g.live,opp:g.opp}))}
+      return json(200,{ok:true,date:today,games_by_player:out,source:'espn-boxscores'});
     }
     const players=[];
     for(const p of per.values()){
