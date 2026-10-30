@@ -93,7 +93,7 @@
   function ensureStyle(){if(document.getElementById('rbHashtagStyle'))return;const s=document.createElement('style');s.id='rbHashtagStyle';s.textContent=`
 .rb-hashtag-btn{height:28px;border:1px solid #8e6621;background:#4c3917;color:#ffd66d;border-radius:6px;padding:0 9px;font-size:8px;font-weight:900}.rb-hashtag-btn.active{border-color:#30d8a0;background:#173f34;color:#8ff2cf}.rb-hashtag-note{font-size:9px;color:#97a7bb;line-height:1.45;margin-bottom:9px}.rb-hashtag-modal textarea{width:100%;min-height:250px;resize:vertical;background:#141d2a;color:#dfe8f4;border:1px solid #3d4d65;border-radius:7px;padding:9px;font:9px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace}.rb-hashtag-summary{margin-top:8px;padding:8px;border-radius:6px;background:#172230;color:#9fb0c5;font-size:9px}`;document.head.appendChild(s)}
 
-  function updateButton(){const b=document.getElementById('rbHashtagBtn');if(!b)return;const d=window.rbHashtagProjectionMeta||loadSaved();b.classList.toggle('active',!!d);b.textContent=d?`Hashtag ✓ ${Object.keys(d.projections||{}).length}`:'Hashtag Projections'}
+  function updateButton(){const b=document.getElementById('rbHashtagBtn');if(!b)return;const d=loadSaved()||window.rbHashtagProjectionMeta;b.classList.toggle('active',!!d);b.textContent=d?`Hashtag ✓ ${d.matched??Object.keys(d.players||d.projections||{}).length}`:'Hashtag Projections'}
   function ensureButton(){
     ensureStyle();
     const host=document.querySelector('#teamView .team-top .week-nav')||document.querySelector('.league-head .head-actions');
