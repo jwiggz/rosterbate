@@ -47,7 +47,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-lock-sync.js')) scripts.push('<script src="/sleeper-lock-sync.js?v=20261030b"></script>');
     if(!html.includes('sleeper-opponent-lock-fix.js')) scripts.push('<script src="/sleeper-opponent-lock-fix.js?v=20261028f"></script>');
     if(!html.includes('sleeper-lock-summary-fix.js')) scripts.push('<script src="/sleeper-lock-summary-fix.js?v=20261030a"></script>');
-    if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js?v=20261030b"></script>');
     if(!html.includes('sleeper-schedule-time-backfill.js')) scripts.push('<script src="/sleeper-schedule-time-backfill.js?v=20261029a"></script>');
     if(!html.includes('sleeper-starter-history.js')) scripts.push('<script src="/sleeper-starter-history.js?v=20261030a"></script>');
     if(!html.includes('sleeper-lock-window-vault.js')) scripts.push('<script src="/sleeper-lock-window-vault.js?v=20261030d"></script>');
@@ -62,7 +62,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
     if(!html.includes('sleeper-player-summary-fix.js')) scripts.push('<script src="/sleeper-player-summary-fix.js?v=20261029c"></script>');
     if(!html.includes('sleeper-player-summary-v2.js')) scripts.push('<script src="/sleeper-player-summary-v2.js?v=20261029d"></script>');
-    if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261028d"></script>');
+    if(!html.includes('sleeper-matchup-lockin.js')) scripts.push('<script src="/sleeper-matchup-lockin.js?v=20261030a"></script>');
     if(!html.includes('sleeper-matchup-header-polish.js')) scripts.push('<script src="/sleeper-matchup-header-polish.js?v=20261028a"></script>');
     if(!html.includes('sleeper-matchup-score-layout.js')) scripts.push('<script src="/sleeper-matchup-score-layout.js?v=20261028a"></script>');
     if(!html.includes('sleeper-team-header-polish.js')) scripts.push('<script src="/sleeper-team-header-polish.js?v=20261028a"></script>');

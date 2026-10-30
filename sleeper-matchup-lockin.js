@@ -81,7 +81,8 @@
   }
   function slotLabelsFor(count){return typeof starterLabels==='function'?starterLabels(count):Array.from({length:count},()=> 'UTIL')}
   function lockedRow(id,m,label){
-    const p=player(id),body=playerBlock(p,matchupDetail(id,'all')),pts=actualFor(m,id);
+    // The padlock chip is part of the row itself, so re-renders (cached → fresh data) never drop it.
+    const p=player(id),body=playerBlock(p,`${matchupDetail(id,'all')} <span class="lock-chip" aria-label="Locked in on Sleeper">LOCKED IN</span>`),pts=actualFor(m,id);
     return `<div class="player-row locked-in"><div class="slot ${slotClass(label)}">${esc(label)}</div>${body}<div class="proj">${projectionText(id,'all')}</div><div class="pts"><span class="rb-match-lock-label">LOCKED IN</span>${num(pts)}</div></div>`;
   }
   function emptySlotRow(label){

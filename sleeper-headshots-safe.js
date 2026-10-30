@@ -4,12 +4,13 @@ const failedUntil=new Map();
 const RETRY_AFTER=5*60*1000;
 
 const css=`
-#teamView .player-head.rb-photo-ready{background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#1f2c3d!important}
-#teamView .player-head.rb-photo-ready .player-fallback{opacity:0!important;visibility:hidden!important}
+#teamView .player-head.rb-photo-ready,#matchupView .player-head.rb-photo-ready{background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-color:#1f2c3d!important}
+#teamView .player-head.rb-photo-ready .player-fallback,#matchupView .player-head.rb-photo-ready .player-fallback{opacity:0!important;visibility:hidden!important}
+#matchupView .player-head.rb-photo-ready{color:transparent!important}
 /* All visible roster avatars are owned by the stable background painter. Legacy/base
    inline img nodes may still be added/removed by older decorators, but they must never
    affect what the user sees. */
-#teamView .player-head > img{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+#teamView .player-head > img,#matchupView .player-head > img{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 `;
 
 function addStyle(){
@@ -103,13 +104,16 @@ function paintRow(row,id){
 }
 
 function apply(){
-  const root=document.getElementById('teamView');
-  if(!root) return 0;
   const map=playerMap();
   let painted=0;
-  for(const row of root.querySelectorAll('.player-row')){
-    const id=rowPlayerId(row,map);
-    if(id){paintRow(row,id);painted++}
+  for(const rid of ['teamView','matchupView']){
+    const root=document.getElementById(rid);
+    if(!root) continue;
+    for(const row of root.querySelectorAll('.player-row')){
+      if(row.classList.contains('rb-match-empty-slot')) continue;
+      const id=rowPlayerId(row,map);
+      if(id){paintRow(row,id);painted++}
+    }
   }
   return painted;
 }
@@ -234,5 +238,7 @@ if(root)new MutationObserver(mutations=>{
   });
   if(relevant)schedule();
 }).observe(root,{childList:true,subtree:true});
+const matchRoot=document.getElementById('matchupView');
+if(matchRoot)new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('.player-row,.match-card,.match-roster')||n.querySelector?.('.player-row')))))schedule()}).observe(matchRoot,{childList:true,subtree:true});
 window.addEventListener('focus',()=>{installLockInProjectionFix();paintBurst()});
 })();
