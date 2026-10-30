@@ -31,7 +31,7 @@
       chip.style.cssText='display:flex;align-items:center;gap:7px;margin-left:6px';
       chip.innerHTML=`<span style="font-size:8px;color:#9aabc0;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${String(username||user.displayName||user.email||'RosterBate User').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</span><button type="button" style="border:1px solid #40516b;background:#27354a;color:#dbe4f1;border-radius:6px;padding:6px 8px;font-size:8px;font-weight:900">Log out</button>`;
       host.appendChild(chip);
-      chip.querySelector('button')?.addEventListener('click',async()=>{try{await firebase.auth().signOut()}finally{location.href='/index.html'}});
+      chip.querySelector('button')?.addEventListener('click',async()=>{try{window.rbAccountStorage?.clearSecrets?.(String(user.uid||''));await firebase.auth().signOut()}finally{location.href='/index.html'}});
     }
   }
   function redirectToLogin(){
