@@ -14,6 +14,7 @@ exports.handler=async function(event){
     if(!html.includes('firebase-auth-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>');
     if(!html.includes('firebase-database-compat.js')) scripts.push('<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>');
     if(!html.includes('rosterbate-account-storage.js')) scripts.push('<script src="/rosterbate-account-storage.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-token-sanity.js')) scripts.push('<script src="/sleeper-token-sanity.js?v=20261030a"></script>');
     if(!html.includes('rosterbate-firebase-session.js')) scripts.push('<script src="/rosterbate-firebase-session.js?v=20261029a"></script>');
     if(!html.includes('sleeper-league-switcher.js')) scripts.push('<script src="/sleeper-league-switcher.js?v=20261029a"></script>');
     if(!html.includes('sleeper-lock-bootstrap.js')) scripts.push('<script src="/sleeper-lock-bootstrap.js?v=20261028b"></script>');
