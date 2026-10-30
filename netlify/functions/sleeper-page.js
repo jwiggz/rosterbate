@@ -33,7 +33,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-headshots-safe.js')) scripts.push('<script src="/sleeper-headshots-safe.js"></script>');
     if(!html.includes('sleeper-schedule-time-backfill.js')) scripts.push('<script src="/sleeper-schedule-time-backfill.js?v=20261029a"></script>');
     if(!html.includes('sleeper-starter-history.js')) scripts.push('<script src="/sleeper-starter-history.js?v=20261029d"></script>');
-    if(!html.includes('sleeper-lock-window.js')) scripts.push('<script src="/sleeper-lock-window.js?v=20261030a"></script>');
+    if(!html.includes('sleeper-lock-window-vault.js')) scripts.push('<script src="/sleeper-lock-window-vault.js?v=20261030a"></script>');
     if(!html.includes('sleeper-lock-eligibility-guard.js')) scripts.push('<script src="/sleeper-lock-eligibility-guard.js?v=20261029b"></script>');
     if(!html.includes('sleeper-lock-authoritative-only.js')) scripts.push('<script src="/sleeper-lock-authoritative-only.js?v=20261029a"></script>');
     if(!html.includes('sleeper-ui-polish.js')) scripts.push('<script src="/sleeper-ui-polish.js?v=20261028b"></script>');
