@@ -15,7 +15,7 @@
     try{
       const s=document.getElementById('status');
       if(!s)return;
-      if(isError){s.className='status error';s.textContent=`Testing Lock Sync: ${text}`}
+      if(isError){s.className='status error';s.textContent=`Lock Sync: ${text}`}
     }catch{}
   }
   async function reconcile(force=false){

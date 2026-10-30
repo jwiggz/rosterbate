@@ -119,7 +119,8 @@
       if(ready)break;
       await new Promise(r=>setTimeout(r,20));
     }
-    await restoreVaultIdentity();
+    const vault=await restoreVaultIdentity();
+    if(!vault?.connected)return;
     try{
       const body={token:PLACEHOLDER,leagueId:String(leagueId),rosterId:Number(selectedRoster),leg:Number(selectedWeek),round:Number(selectedWeek)};
       const res=await fetch('/.netlify/functions/sleeper-lock-state',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(body)});
@@ -132,7 +133,7 @@
       try{window.rbLockWindowRefresh?.()}catch{}
       refresh();
     }catch(e){
-      try{const s=document.getElementById('status');if(s){s.className='status error';s.textContent=`Testing Lock Sync: ${e?.message||String(e)}`}}catch{}
+      try{console.warn('Lock Sync initial reconcile:',e?.message||String(e))}catch{}
     }
   }
 
