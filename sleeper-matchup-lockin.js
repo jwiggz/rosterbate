@@ -80,10 +80,21 @@
     return total;
   }
   function slotLabelsFor(count){return typeof starterLabels==='function'?starterLabels(count):Array.from({length:count},()=> 'UTIL')}
-  function lockedRow(id,m,label){
+  // Projection the player had for the exact game he is locked to (starters_games → game id/date).
+  function lockedGameId(exact,id){const v=exact?.startersGames?.[String(id)];if(v&&typeof v==='object')return String(v.game_id??v.gameId??v.game??'');return v==null?'':String(v)}
+  function lockedGameProjection(id,gid){
+    try{
+      const games=currentData?.projections?.[String(id)]?.games;if(!gid||!Array.isArray(games))return null;
+      const sg=(currentData?.schedule||[]).find(g=>String(g.game_id||'')===String(gid));
+      const hit=games.find(pg=>String(pg?.game_id||'')===String(gid))||(sg?games.find(pg=>String(pg?.date||'')===String(sg.date||'')):null);
+      const v=Number(hit?.points);return Number.isFinite(v)?v:null;
+    }catch{return null}
+  }
+  function lockedRow(id,m,label,gid){
     // The padlock chip is part of the row itself, so re-renders (cached → fresh data) never drop it.
     const p=player(id),body=playerBlock(p,`${matchupDetail(id,'all')} <span class="lock-chip" aria-label="Locked in on Sleeper">LOCKED IN</span>`),pts=actualFor(m,id);
-    return `<div class="player-row locked-in"><div class="slot ${slotClass(label)}">${esc(label)}</div>${body}<div class="proj">${projectionText(id,'all')}</div><div class="pts"><span class="rb-match-lock-label">LOCKED IN</span>${num(pts)}</div></div>`;
+    const lp=lockedGameProjection(id,gid);
+    return `<div class="player-row locked-in"><div class="slot ${slotClass(label)}">${esc(label)}</div>${body}<div class="proj" title="Projection for the locked game">${lp===null?'—':num(lp)}</div><div class="pts"><span class="rb-match-lock-label">LOCKED IN</span>${num(pts)}</div></div>`;
   }
   function emptySlotRow(label){
     return `<div class="player-row rb-match-empty-slot"><div class="slot ${slotClass(label)}">${esc(label)}</div><div class="player-info"><div class="player-head"><span class="player-fallback">—</span></div><div class="player-copy"><div class="pname">Not locked yet</div><div class="pmeta">Waiting for a locked player in this slot</div></div></div><div class="proj">—</div><div class="pts">—</div></div>`;
@@ -91,7 +102,7 @@
   function rosterHtml(m,exact){
     if(!m)return'<div class="match-roster"><div class="empty">Bye</div></div>';
     const starters=(exact?.starters?.length?exact.starters:m.starters||[]).map(String),labels=slotLabelsFor(starters.length),locked=lockedIds(exact,m);
-    return `<div class="match-roster">${starters.map((id,i)=>locked.has(id)?lockedRow(id,m,labels[i]||'UTIL'):emptySlotRow(labels[i]||'UTIL')).join('')}</div>`;
+    return `<div class="match-roster">${starters.map((id,i)=>locked.has(id)?lockedRow(id,m,labels[i]||'UTIL',lockedGameId(exact,id)):emptySlotRow(labels[i]||'UTIL')).join('')}</div>`;
   }
   function teamNameFor(m){const t=team(m?.roster_id);return t?.team_name||'Team'}
   function avatarUrl(t){
