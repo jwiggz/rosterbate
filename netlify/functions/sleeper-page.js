@@ -15,13 +15,15 @@ exports.handler=async function(event){
     // The base dashboard's inline script normally calls load() immediately, before
     // the injected Firebase/vault scripts at the end of <body> have executed.
     // Hold only the very first load until auth + vault bootstrap are available so
-    // initial lock-state rendering matches a manual refresh.
+    // initial lock-state rendering matches a manual refresh. Always resolve vault
+    // status after auth because branch-preview storage can start without the local
+    // connected marker even when an encrypted server-side vault already exists.
     const eagerBoot='updateConnect();load();';
     if(html.includes(eagerBoot)){
       const gatedBoot=`updateConnect();(async function rbInitialDashboardBoot(){
         for(let i=0;i<150&&!window.rbSleeperVault;i++)await new Promise(r=>setTimeout(r,20));
         try{if(window.rbAuthReady)await window.rbAuthReady}catch{}
-        try{if(window.rbSleeperVault?.isConnected?.())await window.rbSleeperVault.status()}catch{}
+        try{if(window.rbSleeperVault?.status)await window.rbSleeperVault.status()}catch{}
         await load();
       })();`;
       html=html.replace(eagerBoot,gatedBoot);
