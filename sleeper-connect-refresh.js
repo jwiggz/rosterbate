@@ -30,7 +30,9 @@
 
   function rosterForSleeperUser(userId){
     userId=String(userId||'');
-    return (window.currentData?.teams||currentData?.teams||[]).find(t=>String(t.owner_id||'')===userId)||null;
+    let teams=[];
+    try{teams=currentData?.teams||[]}catch{}
+    return teams.find(t=>String(t.owner_id||'')===userId)||null;
   }
 
   function refreshConnectionUi(){
@@ -46,14 +48,12 @@
   async function selectLinkedRoster(userId){
     const roster=rosterForSleeperUser(userId);
     if(!roster)throw new Error('That Sleeper account does not own a roster in this league.');
-    try{
-      selectedRoster=Number(roster.roster_id);
-      localStorage.setItem('rbSleeperRoster',String(selectedRoster));
-      if(typeof clearSelection==='function')clearSelection();
-      if(typeof loadLockState==='function')await loadLockState();
-      if(typeof render==='function')render();
-      else if(typeof renderTeam==='function')renderTeam();
-    }catch(e){throw e}
+    selectedRoster=Number(roster.roster_id);
+    localStorage.setItem('rbSleeperRoster',String(selectedRoster));
+    try{if(typeof clearSelection==='function')clearSelection()}catch{}
+    try{if(typeof loadLockState==='function')await loadLockState()}catch{}
+    try{if(typeof render==='function')render();else if(typeof renderTeam==='function')renderTeam()}catch{}
+    refreshConnectionUi();
     return roster;
   }
 
@@ -85,15 +85,14 @@
       const input=document.getElementById('rbSleeperUsername'),btn=document.getElementById('rbLinkSleeper');
       btn?.addEventListener('click',async()=>{
         const old=btn.textContent;btn.disabled=true;btn.textContent='Finding roster…';
+        document.querySelectorAll('.modal-body .error').forEach(x=>x.remove());
         try{
           const result=await linkByUsername(input?.value);
           try{if(typeof closeModal==='function')closeModal()}catch{}
           refreshConnectionUi();
           try{if(typeof setStatus==='function')setStatus(`Sleeper linked: ${result.user.display_name||result.user.username}. Showing your roster.`,'success')}catch{}
         }catch(e){
-          const error=document.createElement('div');
-          error.className='error';error.style.marginTop='10px';error.textContent=String(e?.message||e);
-          document.querySelector('.modal-body')?.appendChild(error);
+          const error=document.createElement('div');error.className='error';error.style.marginTop='10px';error.textContent=String(e?.message||e);document.querySelector('.modal-body')?.appendChild(error);
         }finally{btn.disabled=false;btn.textContent=old}
       });
       input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();btn?.click()}});
@@ -127,6 +126,7 @@
           try{lockedGames={}}catch{}
           try{if(typeof renderTeam==='function')renderTeam()}catch{}
         }
+        refreshConnectionUi();
       });
     },0);
   }
@@ -141,15 +141,8 @@
     );
     setTimeout(()=>{
       document.getElementById('changeSleeperLink')?.addEventListener('click',()=>{try{closeModal()}catch{};showPublicLink()});
-      document.getElementById('unlinkSleeper')?.addEventListener('click',()=>{
-        clearLink();try{closeModal()}catch{};refreshConnectionUi();
-        try{if(typeof setStatus==='function')setStatus('Sleeper username unlinked.','success')}catch{}
-      });
-      document.getElementById('forgetSleeper')?.addEventListener('click',()=>{
-        rememberToken('');try{lockedGames={}}catch{};try{closeModal()}catch{};refreshConnectionUi();
-        try{if(typeof renderTeam==='function')renderTeam()}catch{}
-        try{if(typeof setStatus==='function')setStatus('Advanced Sleeper connection forgotten on this device.','success')}catch{}
-      });
+      document.getElementById('unlinkSleeper')?.addEventListener('click',()=>{clearLink();try{closeModal()}catch{};refreshConnectionUi();try{if(typeof setStatus==='function')setStatus('Sleeper username unlinked.','success')}catch{}});
+      document.getElementById('forgetSleeper')?.addEventListener('click',()=>{rememberToken('');try{lockedGames={}}catch{};try{closeModal()}catch{};refreshConnectionUi();try{if(typeof renderTeam==='function')renderTeam()}catch{};try{if(typeof setStatus==='function')setStatus('Advanced Sleeper connection forgotten on this device.','success')}catch{}});
     },0);
   }
 
@@ -160,19 +153,23 @@
 
   refreshConnectionUi();
   if(linkedUserId()){
-    const trySelect=()=>selectLinkedRoster(linkedUserId()).catch(()=>{});
-    if(window.currentData||typeof currentData!=='undefined'&&currentData)trySelect();
-    else window.addEventListener('rb:sleeper-data-ready',trySelect,{once:true});
+    let attempts=0;
+    const timer=setInterval(()=>{
+      attempts++;
+      if(rosterForSleeperUser(linkedUserId())){clearInterval(timer);selectLinkedRoster(linkedUserId()).catch(()=>{})}
+      else if(attempts>=60)clearInterval(timer);
+    },100);
   }
   if(sessionToken()){
-    try{if(typeof loadLockState==='function')Promise.resolve(loadLockState()).then(()=>{try{renderTeam()}catch{}})}catch{}
+    try{if(typeof loadLockState==='function')Promise.resolve(loadLockState()).then(()=>{try{renderTeam()}catch{};refreshConnectionUi()})}catch{}
   }
 
   let last=sessionToken();
   setInterval(()=>{
     const now=sessionToken();
-    if(now&&now!==last){rememberToken(now);last=now;refreshConnectionUi()}
+    if(now&&now!==last){rememberToken(now);last=now}
     if(!now&&last&&!persistentToken())last='';
+    refreshConnectionUi();
   },1000);
 
   window.rbSleeperLink={show:showPublicLink,advanced:showAdvancedConnect,linkedUsername,linkedUserId,linkByUsername};
