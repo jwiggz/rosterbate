@@ -57,7 +57,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-connect-refresh.js')) scripts.push('<script src="/sleeper-connect-refresh.js?v=20261030f"></script>');
     if(!html.includes('sleeper-guided-link.js')) scripts.push('<script src="/sleeper-guided-link.js?v=20261030c"></script>');
     if(!html.includes('sleeper-lock-sync-guidance.js')) scripts.push('<script src="/sleeper-lock-sync-guidance.js?v=20261030b"></script>');
-    if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js?v=20261030d"></script>');
+    if(!html.includes('sleeper-activity.js')) scripts.push('<script src="/sleeper-activity.js?v=20261030e"></script>');
     if(!html.includes('sleeper-player-card.js')) scripts.push('<script src="/sleeper-player-card.js?v=20261030c"></script>');
     if(!html.includes('sleeper-player-result-colors.js')) scripts.push('<script src="/sleeper-player-result-colors.js?v=20261029a"></script>');
     if(!html.includes('sleeper-player-summary-fix.js')) scripts.push('<script src="/sleeper-player-summary-fix.js?v=20261029c"></script>');
