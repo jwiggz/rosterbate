@@ -73,7 +73,8 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-plan-ux.js')) scripts.push('<script src="/sleeper-plan-ux.js?v=20261030a"></script>');
     if(!html.includes('sleeper-production-polish.js')) scripts.push('<script src="/sleeper-production-polish.js?v=20261030g"></script>');
     if(!html.includes('sleeper-league-standings.js')) scripts.push('<script src="/sleeper-league-standings.js?v=20261030b"></script>');
-    if(!html.includes('sleeper-scores-tab.js')) scripts.push('<script src="/sleeper-scores-tab.js?v=20261030b"></script>');
+    if(!html.includes('sleeper-scores-tab.js')) scripts.push('<script src="/sleeper-scores-tab.js?v=20261030c"></script>');
+    if(!html.includes('sleeper-box-score.js')) scripts.push('<script src="/sleeper-box-score.js?v=20261030a"></script>');
     if(!html.includes('sleeper-selection-ux.js')) scripts.push('<script src="/sleeper-selection-ux.js?v=20261030a"></script>');
     if(!html.includes('sleeper-header-status.js')) scripts.push('<script src="/sleeper-header-status.js?v=20261030a"></script>');
     if(!html.includes('sleeper-trades-tab.js')) scripts.push('<script src="/sleeper-trades-tab.js?v=20261030c"></script>');

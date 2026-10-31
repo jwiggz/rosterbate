@@ -38,7 +38,7 @@ function parseSummary(summary,ev){
       for(const a of block.athletes||[]){
         if(a?.didNotPlay||!Array.isArray(a?.stats)||!a.stats.length)continue;
         const s=lineFrom(labels,a.stats);if(!s.min&&!s.pts&&!s.reb&&!s.ast)continue;
-        out.push({espnId:String(a.athlete?.id||''),name:String(a.athlete?.displayName||''),team:abbr,gameId:ev.id,date:ev.date,opp:abbr===ev.home?ev.away:ev.home,home:abbr===ev.home,s});
+        out.push({espnId:String(a.athlete?.id||''),name:String(a.athlete?.displayName||''),starter:!!a.starter,team:abbr,gameId:ev.id,date:ev.date,opp:abbr===ev.home?ev.away:ev.home,home:abbr===ev.home,s});
       }
     }
   }
@@ -93,6 +93,19 @@ exports.handler=async function(event){
     const [league,allPlayers]=await Promise.all([fetchJson(`${API}/league/${leagueId}`),fetchJson(`${API}/players/nba`)]);
     if(!league)return json(502,{error:'Unable to load the Sleeper league.'});
     const scoring=league.scoring_settings||{};
+    if(/^\d{6,15}$/.test(String(q.game||''))){
+      const sm=await fetchJson(`${ESPN}/summary?event=${encodeURIComponent(String(q.game))}`);
+      if(!sm)return json(502,{error:'Unable to load that box score right now.'});
+      const comp=sm?.header?.competitions?.[0]||{},cs=comp.competitors||[],h=cs.find(c=>c.homeAway==='home')||{},a=cs.find(c=>c.homeAway==='away')||{};
+      const stt=comp.status?.type||{};
+      const g={id:String(q.game),state:String(stt.state||'pre'),detail:String(stt.shortDetail||stt.detail||''),start:String(comp.date||''),home:team(h.team?.abbreviation),away:team(a.team?.abbreviation),homeName:String(h.team?.displayName||''),awayName:String(a.team?.displayName||''),homeScore:Number(h.score||0),awayScore:Number(a.score||0),venue:String(sm?.gameInfo?.venue?.fullName||'')};
+      const byE=new Map(),byN=new Map();
+      for(const [id,p] of Object.entries(allPlayers||{})){if(String(p?.sport||'nba')!=='nba')continue;const e=String(p?.espn_id||'');if(e)byE.set(e,id);const n=normName(p?.full_name||'');if(n){const k=`${n}|${team(p?.team)}`;if(!byN.has(k))byN.set(k,id);if(!byN.has(n))byN.set(n,id)}}
+      const lines=parseSummary(sm,{...g,date:today}).map(l=>{const id=byE.get(l.espnId)||byN.get(`${normName(l.name)}|${l.team}`)||byN.get(normName(l.name))||`espn:${l.espnId}`;const sp=allPlayers?.[id]||{};return{id,name:sp.full_name||l.name,team:l.team,pos:(sp.fantasy_positions||[sp.position].filter(Boolean)).join('/'),starter:l.starter,fpts:fantasy(l.s,scoring),s:pickStats(l.s)}}).sort((x,y)=>y.fpts-x.fpts);
+      const teamIds={};for(const c of cs)teamIds[String(c.team?.id||c.id||'')]=team(c.team?.abbreviation);
+      const plays=(Array.isArray(sm?.plays)?sm.plays:[]).slice(-25).reverse().map(p=>({text:String(p.text||''),clock:String(p.clock?.displayValue||''),period:Number(p.period?.number||0),home:Number(p.homeScore),away:Number(p.awayScore),scoring:!!p.scoringPlay,team:teamIds[String(p.team?.id||'')]||''})).filter(p=>p.text);
+      return json(200,{ok:true,game:g,lines,plays});
+    }
     const want=new Set(String(q.games||'').split(',').map(x=>x.trim()).filter(x=>/^\d+$/.test(x)).slice(0,200));
     const lookback=want.size?Math.min(LOOKBACK_DAYS,Math.max(1,Number(q.days)||10)):LOOKBACK_DAYS;
     const dates=Array.from({length:lookback+1},(_,i)=>shift(today,-i));

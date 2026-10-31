@@ -16,9 +16,11 @@
 #rbScoresView .sc-seg button:focus-visible{outline:2px solid #e9eef7;outline-offset:-2px}
 #rbScoresView select{background:#192434;color:#d7e0ee;border:1px solid var(--border,#334258);border-radius:8px;padding:6px 8px;font-size:9px;font-weight:800}
 #rbScoresView .sc-games{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
-#rbScoresView .sc-game{flex:0 0 auto;min-width:92px;padding:6px 8px;border-radius:7px;background:#192434;border:1px solid rgba(255,255,255,.06);font-size:9px;color:#c7d2e2;font-variant-numeric:tabular-nums}
+#rbScoresView .sc-game{cursor:pointer;flex:0 0 auto;min-width:92px;padding:6px 8px;border-radius:7px;background:#192434;border:1px solid rgba(255,255,255,.06);font-size:9px;color:#c7d2e2;font-variant-numeric:tabular-nums}
 #rbScoresView .sc-game .row{display:flex;justify-content:space-between;gap:8px;font-weight:900}
 #rbScoresView .sc-game .st{margin-top:3px;color:var(--muted,#8e9bb0);font-size:8px;font-weight:800}
+#rbScoresView .sc-game:hover{border-color:rgba(8,199,201,.45)}
+#rbScoresView .sc-game:focus-visible{outline:2px solid #08c7c9;outline-offset:2px}
 #rbScoresView .sc-game.in{border-color:rgba(48,216,160,.45)}#rbScoresView .sc-game.in .st{color:var(--green,#30d8a0)}
 #rbScoresView .sc-wrap{overflow-x:auto}
 #rbScoresView table{width:100%;border-collapse:collapse;font-size:10px;font-variant-numeric:tabular-nums}
@@ -88,7 +90,7 @@
     if(st.range!=='today')return'';
     const g=st.data?.games||[];if(!g.length)return'';
     const status=x=>x.state==='in'?(x.detail||'Live'):x.state==='post'?'Final':(()=>{try{return new Date(x.start).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}catch{return'Scheduled'}})();
-    return`<div class="sc-games" aria-label="Today's games">${g.map(x=>`<div class="sc-game ${x.state}"><div class="row"><span>${esc(x.away)}</span><span>${x.state==='pre'?'':x.awayScore}</span></div><div class="row"><span>${esc(x.home)}</span><span>${x.state==='pre'?'':x.homeScore}</span></div><div class="st">${esc(status(x))}</div></div>`).join('')}</div>`;
+    return`<div class="sc-games" aria-label="Today's games">${g.map(x=>`<div class="sc-game ${x.state}" role="button" tabindex="0" data-box="${esc(x.id)}" title="Open box score"><div class="row"><span>${esc(x.away)}</span><span>${x.state==='pre'?'':x.awayScore}</span></div><div class="row"><span>${esc(x.home)}</span><span>${x.state==='pre'?'':x.homeScore}</span></div><div class="st">${esc(status(x))}</div></div>`).join('')}</div>`;
   }
   function emptyMessage(){
     if(st.range==='today'){const g=st.data?.games||[];if(!g.length)return'No NBA games today.';if(g.every(x=>x.state==='pre'))return'No games have tipped off yet today. Check back once games start, or look at Last Game.';}
