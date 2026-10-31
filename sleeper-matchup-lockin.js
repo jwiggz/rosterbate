@@ -48,7 +48,10 @@
     }
     return out;
   }
+  let paintExact=null;
   function actualFor(m,pid){
+    try{const ex=paintExact?.byRoster?.[String(m?.roster_id)];const v=ex?.startersGames?.[String(pid)];const gid=v&&typeof v==='object'?String(v.game_id??v.gameId??v.game??''):String(v??'');
+      if(gid){const s=window.rbLockedGameScore?.(String(pid),gid);if(Number.isFinite(s))return s}}catch{}
     const starters=(m?.starters||[]).map(String),i=starters.indexOf(String(pid));
     if(i>=0&&Array.isArray(m?.starters_points)){const v=Number(m.starters_points[i]);if(Number.isFinite(v))return v}
     const v=Number(m?.players_points?.[String(pid)]);return Number.isFinite(v)?v:0;
@@ -115,7 +118,7 @@
     return `<div class="rb-match-team-avatar">${url?`<img src="${esc(url)}" alt="" onerror="this.remove()">`:''}<span>${initial}</span></div>`;
   }
   function teamHeader(t,score,side){
-    return `<div class="rb-match-team-block ${side==='right'?'rb-match-team-block--right':''}">${teamAvatar(t)}<div class="rb-match-team-copy"><div class="match-team">${esc(t?.team_name||'Team')}</div><div class="match-owner">${esc(t?.display_name||'')}</div><div class="rb-team-locked-score">${score==null?'—':num(score)} <span>locked</span></div></div></div>`;
+    return `<div class="rb-match-team-block ${side==='right'?'rb-match-team-block--right':''}" data-roster="${esc(t?.roster_id??'')}" role="link" tabindex="0" title="Open ${esc(t?.team_name||'team')}">${teamAvatar(t)}<div class="rb-match-team-copy"><div class="match-team">${esc(t?.team_name||'Team')}</div><div class="match-owner">${esc(t?.display_name||'')}</div><div class="rb-team-locked-score">${score==null?'—':num(score)} <span>locked</span></div></div></div>`;
   }
   function selectorHtml(ps){return `<div class="rb-match-nav"><button type="button" id="rbPrevMatch" ${state.pairIndex<=0?'disabled':''}>‹</button><select id="rbMatchSelect">${ps.map((p,i)=>{const a=p.rows[0],b=p.rows[1];return `<option value="${i}" ${i===state.pairIndex?'selected':''}>${esc(teamNameFor(a))} vs ${esc(teamNameFor(b))}</option>`}).join('')}</select><button type="button" id="rbNextMatch" ${state.pairIndex>=ps.length-1?'disabled':''}>›</button></div>`}
   function bindNav(ps){
@@ -124,6 +127,7 @@
     document.getElementById('rbMatchSelect')?.addEventListener('change',e=>{state.pairIndex=Math.max(0,Math.min(ps.length-1,Number(e.target.value)||0));paint(readCache())});
   }
   function paint(exactState){
+    paintExact=exactState||null;
     const root=document.getElementById('matchupView');if(!root||!currentData)return;
     const ps=pairs();
     if(state.lastWeek!==Number(selectedWeek)||state.lastSelectedRoster!==Number(selectedRoster)){chooseDefault(ps);state.lastWeek=Number(selectedWeek);state.lastSelectedRoster=Number(selectedRoster)}
@@ -145,6 +149,10 @@
     #matchupView .rb-match-team-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#202a3a}
     #matchupView .rb-match-team-avatar span{position:relative;z-index:1}
     #matchupView .rb-match-team-copy{min-width:0}
+    #matchupView .rb-match-team-block[data-roster]{cursor:pointer;border-radius:10px;padding:4px 6px;margin:-4px -6px;transition:background .12s}
+    #matchupView .rb-match-team-block[data-roster]:hover{background:rgba(8,199,201,.08)}
+    #matchupView .rb-match-team-block[data-roster]:hover .match-team{text-decoration:underline}
+    #matchupView .rb-match-team-block[data-roster]:focus-visible{outline:2px solid #08c7c9;outline-offset:2px}
     #matchupView .rb-match-team-block .match-team{font-size:12px}
     #matchupView .rb-team-locked-score{margin-top:5px;color:#43e3b0;font-size:18px;font-weight:950;line-height:1}
     #matchupView .rb-team-locked-score span{font-size:7px;color:#81a79d;text-transform:uppercase;letter-spacing:.07em;margin-left:3px;vertical-align:middle}
@@ -165,6 +173,14 @@
     #matchupView .rb-match-empty-slot .pts,#matchupView .rb-match-empty-slot .proj{color:#66758a!important}
     @media(max-width:760px){#matchupView .match-top.rb-match-browser{grid-template-columns:1fr 1fr}#matchupView .rb-match-center{grid-column:1/-1;grid-row:2}#matchupView .rb-match-team-avatar{width:36px;height:36px;flex-basis:36px}#matchupView .rb-team-locked-score{font-size:15px}}
   `;document.head.appendChild(style);
+  function openTeam(rid){
+    rid=Number(rid);if(!rid)return;
+    try{currentView='team';const pk=document.getElementById('teamPicker');if(pk&&[...pk.options].some(o=>Number(o.value)===rid)){pk.value=String(rid);pk.dispatchEvent(new Event('change',{bubbles:true}))}else{selectedRoster=rid;try{clearSelection()}catch{}window.render?.()}window.scrollTo?.({top:0,behavior:'smooth'})}catch{}
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest?.('#matchupView .rb-match-team-block[data-roster]');if(b){e.preventDefault();openTeam(b.dataset.roster)}});
+  document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const b=e.target.closest?.('#matchupView .rb-match-team-block[data-roster]');if(b){e.preventDefault();openTeam(b.dataset.roster)}});
+  // Repaint once frozen locked-game scores arrive.
+  window.addEventListener('rb:locked-scores',()=>{if(document.querySelector('.tab.active[data-view="matchup"]'))paint(readCache())});
   async function renderExact(){const cached=readCache();paint(cached);const fresh=await fetchExact(false);if(fresh)paint(fresh)}
   try{renderMatchup=renderExact;window.renderMatchup=renderExact}catch{}
   window.addEventListener('focus',()=>{if(document.querySelector('.tab.active[data-view="matchup"]'))fetchExact(true).then(v=>v&&paint(v))});
