@@ -80,6 +80,10 @@ async function sync(force=false){const token=auth(),key=currentKey();if(!key||st
 function applyBurst(){reconcile();requestAnimationFrame(reconcile);setTimeout(reconcile,60);setTimeout(reconcile,180)}
 function boot(){hydrateCache();applyBurst();sync(true)}
 function hookRenderTeam(){try{if(typeof renderTeam!=='function'||renderTeam.__rbLockSyncReconcile)return;const base=renderTeam;const wrapped=function(...args){const out=base.apply(this,args);try{reconcile()}catch{}queueMicrotask(()=>{try{reconcile()}catch{}});return out};wrapped.__rbLockSyncReconcile=true;renderTeam=wrapped;try{window.renderTeam=wrapped}catch{}}catch{}}
+// When Sleeper confirms a Lock-In, update the cached private lock state from its reply
+// *before* the page re-renders, so the new lock shows immediately (instead of after the
+// next background sync re-reads it).
+(function watchLockIns(){try{if(window.fetch.__rbLockInWatch)return;const base=window.fetch;const w=async function(input,init){const r=await base.apply(this,arguments);try{const url=typeof input==='string'?input:String(input?.url||'');if(url.includes('/.netlify/functions/sleeper-lock-in')&&r.ok){const d=await r.clone().json().catch(()=>null);if(d?.ok&&d.startersGames&&typeof d.startersGames==='object'){const k=cacheKey();let cur=null;try{cur=JSON.parse(sessionStorage.getItem(k)||'null')?.data||null}catch{}const data={...(cur||state.data||{}),startersGames:{...d.startersGames}};if(Array.isArray(d.matchup?.starters))data.starters=d.matchup.starters.map(String);ingestAuthoritative(data,'lock-in');try{window.dispatchEvent(new CustomEvent('rb:sleeper-lock-state',{detail:{ok:true,source:'lock-in',data}}))}catch{}}}}catch{}return r};w.__rbLockInWatch=true;window.fetch=w}catch{}})();
 addStyle();hookRenderTeam();
 window.addEventListener('rb:opponent-locks-exact',()=>{try{renderLockTotals()}catch{}});
 window.addEventListener('rb:sleeper-lock-state',e=>{const d=e?.detail?.data;if(d)ingestAuthoritative(d,'event')});
