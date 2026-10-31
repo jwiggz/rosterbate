@@ -117,8 +117,19 @@
     const url=avatarUrl(t),initial=esc(String(t?.team_name||t?.display_name||'T').trim().charAt(0).toUpperCase()||'T');
     return `<div class="rb-match-team-avatar">${url?`<img src="${esc(url)}" alt="" onerror="this.remove()">`:''}<span>${initial}</span></div>`;
   }
-  function teamHeader(t,score,side){
-    return `<div class="rb-match-team-block ${side==='right'?'rb-match-team-block--right':''}" data-roster="${esc(t?.roster_id??'')}" role="link" tabindex="0" title="Open ${esc(t?.team_name||'team')}">${teamAvatar(t)}<div class="rb-match-team-copy"><div class="match-team">${esc(t?.team_name||'Team')}</div><div class="match-owner">${esc(t?.display_name||'')}</div><div class="rb-team-locked-score">${score==null?'—':num(score)} <span>locked</span></div></div></div>`;
+  // Win probability: locked points are certain; what's left is uncertain with a spread that grows
+  // with the square root of both teams' remaining projected points. σ = 7·√remaining was fitted to
+  // Sleeper's own win % on this league's Week 2 matchups (within ~2 points on all five).
+  function normCdf(z){const t=1/(1+0.3275911*Math.abs(z)/Math.SQRT2),y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-(z*z)/2);return 0.5*(1+(z>=0?y:-y))}
+  function winOdds(aLocked,aProj,bLocked,bProj){
+    if(![aLocked,aProj,bLocked,bProj].every(Number.isFinite))return null;
+    const rem=Math.max(0,aProj-aLocked)+Math.max(0,bProj-bLocked),diff=aProj-bProj;
+    if(rem<1)return diff>0?1:diff<0?0:0.5;
+    return normCdf(diff/(7*Math.sqrt(rem)));
+  }
+  function winHtml(p,side){if(p==null)return'';const pct=Math.round(p*100),fav=pct>=50;return`<div class="rb-win ${fav?'fav':'dog'} ${side==='right'?'r':''}" title="Chance to win, from locked points and remaining projections"><span>${pct}% WIN</span><i><b style="width:${Math.max(2,pct)}%"></b></i></div>`}
+  function teamHeader(t,score,side,win){
+    return `<div class="rb-match-team-block ${side==='right'?'rb-match-team-block--right':''}" data-roster="${esc(t?.roster_id??'')}" role="link" tabindex="0" title="Open ${esc(t?.team_name||'team')}">${teamAvatar(t)}<div class="rb-match-team-copy"><div class="match-team">${esc(t?.team_name||'Team')}</div><div class="match-owner">${esc(t?.display_name||'')}</div><div class="rb-team-locked-score">${score==null?'—':num(score)} <span>locked</span></div>${winHtml(win,side)}</div></div>`;
   }
   function selectorHtml(ps){return `<div class="rb-match-nav"><button type="button" id="rbPrevMatch" ${state.pairIndex<=0?'disabled':''}>‹</button><select id="rbMatchSelect">${ps.map((p,i)=>{const a=p.rows[0],b=p.rows[1];return `<option value="${i}" ${i===state.pairIndex?'selected':''}>${esc(teamNameFor(a))} vs ${esc(teamNameFor(b))}</option>`}).join('')}</select><button type="button" id="rbNextMatch" ${state.pairIndex>=ps.length-1?'disabled':''}>›</button></div>`}
   function bindNav(ps){
@@ -138,7 +149,8 @@
       root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,null,'left')}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Loading exact Lock-In data…</div></div>${teamHeader(bT,null,'right')}</div>${selectorHtml(ps)}<div class="match-columns"><div class="match-roster"><div class="empty">Loading locks…</div></div><div class="match-roster"><div class="empty">Loading locks…</div></div></div></div>`;bindNav(ps);return;
     }
     const aLocked=lockedIds(aExact,aM),bLocked=lockedIds(bExact,bM),aScore=lockedTotal(aM,aLocked),bScore=lockedTotal(bM,bLocked),aProj=projectedLockIn(aM,aLocked),bProj=projectedLockIn(bM,bLocked);
-    root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,aScore,'left')}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Proj ${aProj===null?'—':num(aProj)} · ${bProj===null?'—':num(bProj)}</div></div>${teamHeader(bT,bScore,'right')}</div>${selectorHtml(ps)}<div class="match-columns">${rosterHtml(aM,aExact)}${rosterHtml(bM,bExact)}</div></div>`;
+    const pA=winOdds(aScore,aProj,bScore,bProj),pB=pA==null?null:1-pA;
+    root.innerHTML=`<div class="match-card"><div class="match-top rb-match-browser">${teamHeader(aT,aScore,'left',pA)}<div class="rb-match-center"><div class="vs">LOCKED POINTS</div><div class="score-proj">Proj ${aProj===null?'—':num(aProj)} · ${bProj===null?'—':num(bProj)}</div></div>${teamHeader(bT,bScore,'right',pB)}</div>${selectorHtml(ps)}<div class="match-columns">${rosterHtml(aM,aExact)}${rosterHtml(bM,bExact)}</div></div>`;
     bindNav(ps);
   }
   const style=document.createElement('style');style.textContent=`
@@ -149,6 +161,20 @@
     #matchupView .rb-match-team-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#202a3a}
     #matchupView .rb-match-team-avatar span{position:relative;z-index:1}
     #matchupView .rb-match-team-copy{min-width:0}
+    #matchupView .rb-win{margin-top:6px;display:flex;flex-direction:column;gap:4px;width:150px;max-width:100%}
+    #matchupView .rb-win.r{margin-left:auto;align-items:flex-end}
+    #matchupView .rb-win span{font-size:10px;font-weight:950;letter-spacing:.04em}
+    #matchupView .rb-win.fav span{color:#30d8a0}#matchupView .rb-win.dog span{color:#ff6f8f}
+    #matchupView .rb-win i{display:block;width:100%;height:5px;border-radius:99px;background:#2a3648;overflow:hidden}
+    #matchupView .rb-win.r i{transform:scaleX(-1)}
+    #matchupView .rb-win b{display:block;height:100%;border-radius:99px}
+    #matchupView .rb-win.fav b{background:#30d8a0}#matchupView .rb-win.dog b{background:#ff6f8f}
+    /* Rows: projection in its own labeled column, locked points as a bold green box. */
+    #matchupView .match-roster .player-row{grid-template-columns:42px minmax(0,1fr) 62px 84px!important;column-gap:12px!important}
+    #matchupView .match-roster .player-row > .proj{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#f3c75b!important;font-size:12px;font-weight:950}
+    #matchupView .match-roster .player-row.locked-in > .proj::before{content:'PROJ';font-size:6px;font-weight:950;letter-spacing:.1em;color:#a9925a;margin-bottom:3px}
+    #matchupView .match-roster .player-row.locked-in > .pts{justify-self:end;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:74px;height:44px;padding:4px 8px;border:2px solid #30d8a0;border-radius:9px;background:linear-gradient(180deg,rgba(20,95,73,.75),rgba(9,48,38,.62));box-shadow:0 0 12px rgba(48,216,160,.22);color:#9ff6d7!important;font-size:17px!important;font-weight:950;line-height:1;text-shadow:0 0 8px rgba(48,216,160,.35)}
+    #matchupView .match-roster .player-row.locked-in > .pts .rb-match-lock-label{font-size:6px;letter-spacing:.1em;color:#b9ffe9;margin-bottom:4px}
     #matchupView .rb-match-team-block[data-roster]{cursor:pointer;border-radius:10px;padding:4px 6px;margin:-4px -6px;transition:background .12s}
     #matchupView .rb-match-team-block[data-roster]:hover{background:rgba(8,199,201,.08)}
     #matchupView .rb-match-team-block[data-roster]:hover .match-team{text-decoration:underline}
