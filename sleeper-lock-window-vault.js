@@ -41,7 +41,19 @@
     }catch{return null}
   }
   function setPoints(row,pid){try{const el=row.querySelector(':scope > .pts')||row.querySelector('.pts');if(!el)return;const actual=completedPoints(pid);if(actual!==null){el.textContent=actual.toFixed(1);el.dataset.rbVaultActual=actual.toFixed(1);return}if(el.dataset.rbVaultOriginal==null)el.dataset.rbVaultOriginal=String(el.textContent||'').trim();if(el.dataset.rbVaultOriginal)el.textContent=el.dataset.rbVaultOriginal}catch{}}
-  function addButton(row,pid,g){row.querySelector('.rb-lock-unavailable')?.remove();row.classList.add('lockable');row.classList.remove('no-game');let btn=row.querySelector('.lock-btn[data-rb-vault-carry="1"]');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbVaultCarry='1';(row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info'))?.appendChild(btn)}btn.dataset.lockPlayer=String(pid);btn.dataset.lockGame=String(g.game_id||'');btn.title='Completed starter game is still inside Sleeper’s lock window';if(btn.dataset.rbBound!=='1'){btn.dataset.rbBound='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();try{commitLock(String(pid),String(g.game_id||''))}catch{}})}setPoints(row,pid)}
+  // Same confirmation as a same-day LOCK IN: locks are irreversible.
+  function reviewCarryLock(pid,g){
+    const gid=String(g?.game_id||'');const p=(typeof player==='function'?player(pid):currentData?.players?.[pid])||{};
+    let score=null;try{const v=window.rbLockedGameScore?.(pid,gid);if(Number.isFinite(v))score=v}catch{}
+    if(score===null){const v=completedPoints(pid);if(Number.isFinite(v))score=v}
+    const opp=(()=>{try{return opponent(g,p.team)}catch{return''}})();
+    const when=(()=>{try{return new Date(`${g.date}T12:00:00`).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}catch{return g?.date||''}})();
+    const e=v=>(typeof esc==='function'?esc(v):String(v??''));
+    if(typeof showModal!=='function'){commitLock(pid,gid);return}
+    showModal('Lock In Completed Game',`<p>Lock <strong>${e(p.full_name||'this player')}</strong>'s completed ${e(opp)} game for Week ${e(selectedWeek)}?</p><div class="change-card" style="grid-template-columns:1fr"><div><div class="change-person">${e(p.full_name||'')}</div><div class="change-meta">${e(when)} ${e(opp)} · ${score===null?'—':Number(score).toFixed(1)} pts</div></div></div><div class="warning">Sleeper Lock-In selections are irreversible once submitted.</div>`,`<button data-close>Cancel</button><button id="commitLock" class="primary">Lock In</button>`);
+    setTimeout(()=>document.getElementById('commitLock')?.addEventListener('click',()=>commitLock(pid,gid)),0);
+  }
+  function addButton(row,pid,g){row.querySelector('.rb-lock-unavailable')?.remove();row.classList.add('lockable');row.classList.remove('no-game');let btn=row.querySelector('.lock-btn[data-rb-vault-carry="1"]');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='lock-btn';btn.textContent='LOCK IN';btn.dataset.rbVaultCarry='1';(row.querySelector('.matchup-meta')||row.querySelector('.player-copy')||row.querySelector('.player-info'))?.appendChild(btn)}btn.dataset.lockPlayer=String(pid);btn.dataset.lockGame=String(g.game_id||'');btn.title='Completed starter game is still inside Sleeper’s lock window';if(btn.dataset.rbBound!=='1'){btn.dataset.rbBound='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();try{reviewCarryLock(String(pid),g)}catch{}})}setPoints(row,pid)}
   function nextAfter(pid,g){const gt=gameTime(g);return gamesFor(pid).find(x=>gameTime(x)>gt&&String(x?.game_id||'')!==String(g?.game_id||''))||null}
   // A completed game stays lockable until the player's next game tips off, so show the
   // carry-forward button on every day from that game through today, not only today.
