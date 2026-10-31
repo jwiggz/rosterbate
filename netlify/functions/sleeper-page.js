@@ -66,7 +66,7 @@ exports.handler=async function(event){
     if(!html.includes('sleeper-matchup-header-polish.js')) scripts.push('<script src="/sleeper-matchup-header-polish.js?v=20261028a"></script>');
     if(!html.includes('sleeper-matchup-score-layout.js')) scripts.push('<script src="/sleeper-matchup-score-layout.js?v=20261028a"></script>');
     if(!html.includes('sleeper-team-header-polish.js')) scripts.push('<script src="/sleeper-team-header-polish.js?v=20261028a"></script>');
-    if(!html.includes('sleeper-players-waiver.js')) scripts.push('<script src="/sleeper-players-waiver.js?v=20261028d"></script>');
+    if(!html.includes('sleeper-players-waiver.js')) scripts.push('<script src="/sleeper-players-waiver.js?v=20261030a"></script>');
     if(!html.includes('sleeper-waiver-ownership-colors.js')) scripts.push('<script src="/sleeper-waiver-ownership-colors.js?v=20261028a"></script>');
     if(!html.includes('sleeper-lock-pulse-scroll-fix.js')) scripts.push('<script src="/sleeper-lock-pulse-scroll-fix.js?v=20261029a"></script>');
     if(!html.includes('sleeper-future-day-points.js')) scripts.push('<script src="/sleeper-future-day-points.js?v=20261029b"></script>');
